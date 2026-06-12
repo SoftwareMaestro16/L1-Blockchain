@@ -25,9 +25,9 @@ func (s *StoreService) RawStore() *Store {
 }
 
 type Store struct {
-	values    map[string][]byte
-	setCounts map[string]uint64
-	delCounts map[string]uint64
+	values		map[string][]byte
+	setCounts	map[string]uint64
+	delCounts	map[string]uint64
 }
 
 func (s *Store) Get(key []byte) ([]byte, error) {

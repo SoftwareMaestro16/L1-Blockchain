@@ -16,63 +16,63 @@ type XServiceInterfaceFailureMode string
 type XServiceInterfaceIntegrationPoint string
 
 const (
-	XServiceInterfaceStateInterface        XServiceInterfaceStateObject = "ServiceInterface"
-	XServiceInterfaceStateMethod           XServiceInterfaceStateObject = "ServiceMethod"
-	XServiceInterfaceStateEvent            XServiceInterfaceStateObject = "ServiceEvent"
-	XServiceInterfaceStateError            XServiceInterfaceStateObject = "ServiceError"
-	XServiceInterfaceStateInterfaceVersion XServiceInterfaceStateObject = "InterfaceVersion"
+	XServiceInterfaceStateInterface		XServiceInterfaceStateObject	= "ServiceInterface"
+	XServiceInterfaceStateMethod		XServiceInterfaceStateObject	= "ServiceMethod"
+	XServiceInterfaceStateEvent		XServiceInterfaceStateObject	= "ServiceEvent"
+	XServiceInterfaceStateError		XServiceInterfaceStateObject	= "ServiceError"
+	XServiceInterfaceStateInterfaceVersion	XServiceInterfaceStateObject	= "InterfaceVersion"
 
-	XServiceInterfaceMsgRegisterInterface  XServiceInterfaceMessageName = "MsgRegisterInterface"
-	XServiceInterfaceMsgUpdateInterface    XServiceInterfaceMessageName = "MsgUpdateInterface"
-	XServiceInterfaceMsgDeprecateInterface XServiceInterfaceMessageName = "MsgDeprecateInterface"
+	XServiceInterfaceMsgRegisterInterface	XServiceInterfaceMessageName	= "MsgRegisterInterface"
+	XServiceInterfaceMsgUpdateInterface	XServiceInterfaceMessageName	= "MsgUpdateInterface"
+	XServiceInterfaceMsgDeprecateInterface	XServiceInterfaceMessageName	= "MsgDeprecateInterface"
 
-	XServiceInterfaceQueryInterface         XServiceInterfaceQueryName = "QueryInterface"
-	XServiceInterfaceQueryMethod            XServiceInterfaceQueryName = "QueryMethod"
-	XServiceInterfaceQueryInterfaceProof    XServiceInterfaceQueryName = "QueryInterfaceProof"
-	XServiceInterfaceQueryInterfacesByOwner XServiceInterfaceQueryName = "QueryInterfacesByOwner"
+	XServiceInterfaceQueryInterface		XServiceInterfaceQueryName	= "QueryInterface"
+	XServiceInterfaceQueryMethod		XServiceInterfaceQueryName	= "QueryMethod"
+	XServiceInterfaceQueryInterfaceProof	XServiceInterfaceQueryName	= "QueryInterfaceProof"
+	XServiceInterfaceQueryInterfacesByOwner	XServiceInterfaceQueryName	= "QueryInterfacesByOwner"
 
-	XServiceInterfaceFailureSchemaHashMismatch           XServiceInterfaceFailureMode = "schema_hash_mismatch"
-	XServiceInterfaceFailureMethodIDCollision            XServiceInterfaceFailureMode = "method_id_collision"
-	XServiceInterfaceFailureUnsupportedSchemaEncoding    XServiceInterfaceFailureMode = "unsupported_schema_encoding"
-	XServiceInterfaceFailureBreakingUpdateWithoutNewHash XServiceInterfaceFailureMode = "breaking_update_without_new_interface_hash"
+	XServiceInterfaceFailureSchemaHashMismatch		XServiceInterfaceFailureMode	= "schema_hash_mismatch"
+	XServiceInterfaceFailureMethodIDCollision		XServiceInterfaceFailureMode	= "method_id_collision"
+	XServiceInterfaceFailureUnsupportedSchemaEncoding	XServiceInterfaceFailureMode	= "unsupported_schema_encoding"
+	XServiceInterfaceFailureBreakingUpdateWithoutNewHash	XServiceInterfaceFailureMode	= "breaking_update_without_new_interface_hash"
 
-	XServiceInterfaceIntegrationServices        XServiceInterfaceIntegrationPoint = "x/services"
-	XServiceInterfaceIntegrationWalletSDK       XServiceInterfaceIntegrationPoint = "wallet_sdk"
-	XServiceInterfaceIntegrationCLI             XServiceInterfaceIntegrationPoint = "cli"
-	XServiceInterfaceIntegrationContractAdapter XServiceInterfaceIntegrationPoint = "contract_adapter"
+	XServiceInterfaceIntegrationServices		XServiceInterfaceIntegrationPoint	= "x/services"
+	XServiceInterfaceIntegrationWalletSDK		XServiceInterfaceIntegrationPoint	= "wallet_sdk"
+	XServiceInterfaceIntegrationCLI			XServiceInterfaceIntegrationPoint	= "cli"
+	XServiceInterfaceIntegrationContractAdapter	XServiceInterfaceIntegrationPoint	= "contract_adapter"
 )
 
 type XServiceInterfaceFailureCoverage struct {
-	Mode  XServiceInterfaceFailureMode
-	Guard string
-	Scope string
+	Mode	XServiceInterfaceFailureMode
+	Guard	string
+	Scope	string
 }
 
 type XServiceInterfaceModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServiceInterfaceStateObject
-	Messages          []XServiceInterfaceMessageName
-	Queries           []XServiceInterfaceQueryName
-	FailureModes      []XServiceInterfaceFailureCoverage
-	IntegrationPoints []XServiceInterfaceIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServiceInterfaceStateObject
+	Messages		[]XServiceInterfaceMessageName
+	Queries			[]XServiceInterfaceQueryName
+	FailureModes		[]XServiceInterfaceFailureCoverage
+	IntegrationPoints	[]XServiceInterfaceIntegrationPoint
+	BreakdownHash		string
 }
 
 type MsgDeprecateInterface struct {
-	Authority string
-	Marker    ServiceInterfaceDeprecationMarker
-	MsgHash   string
+	Authority	string
+	Marker		ServiceInterfaceDeprecationMarker
+	MsgHash		string
 }
 
 type QueryMethod struct {
-	InterfaceHash string
-	MethodID      string
+	InterfaceHash	string
+	MethodID	string
 }
 
 type QueryMethodResponse struct {
-	Method ServiceInterfaceMethodSchema
-	Found  bool
+	Method	ServiceInterfaceMethodSchema
+	Found	bool
 }
 
 type QueryInterfacesByOwner struct {
@@ -80,22 +80,22 @@ type QueryInterfacesByOwner struct {
 }
 
 type QueryInterfacesByOwnerResponse struct {
-	Interfaces   []FormalServiceInterface
-	Total        uint64
-	ResponseHash string
+	Interfaces	[]FormalServiceInterface
+	Total		uint64
+	ResponseHash	string
 }
 
 type ServiceInterfaceContractAdapterSchema struct {
-	InterfaceHash string
-	MethodID      string
-	ABIHash       string
-	Encoding      string
-	AdapterHash   string
+	InterfaceHash	string
+	MethodID	string
+	ABIHash		string
+	Encoding	string
+	AdapterHash	string
 }
 
 func DefaultXServiceInterfaceModuleBreakdown() (XServiceInterfaceModuleBreakdown, error) {
 	breakdown := XServiceInterfaceModuleBreakdown{
-		ModulePath: ServiceModuleInterface,
+		ModulePath:	ServiceModuleInterface,
 		Purpose: []string{
 			"formal_service_interface_schemas",
 			"interface_proofs",
@@ -216,10 +216,10 @@ func QueryInterfacesByOwnerFromServiceRegistry(state ServiceRegistryState, owner
 
 func NewServiceInterfaceContractAdapterSchema(interfaceHash, methodID, abiHash, encoding string) (ServiceInterfaceContractAdapterSchema, error) {
 	schema := ServiceInterfaceContractAdapterSchema{
-		InterfaceHash: strings.ToLower(strings.TrimSpace(interfaceHash)),
-		MethodID:      strings.TrimSpace(methodID),
-		ABIHash:       strings.ToLower(strings.TrimSpace(abiHash)),
-		Encoding:      strings.TrimSpace(encoding),
+		InterfaceHash:	strings.ToLower(strings.TrimSpace(interfaceHash)),
+		MethodID:	strings.TrimSpace(methodID),
+		ABIHash:	strings.ToLower(strings.TrimSpace(abiHash)),
+		Encoding:	strings.TrimSpace(encoding),
 	}
 	schema.AdapterHash = ComputeServiceInterfaceContractAdapterSchemaHash(schema)
 	return schema, schema.Validate()

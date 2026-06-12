@@ -43,12 +43,12 @@ func TestUnifiedResolverMetadataAndNamedExecution(t *testing.T) {
 	require.NoError(t, err)
 
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
+		Primary:	addr(2),
+		Contract:	addr(3),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(4),
 		},
-		Metadata: metadata,
+		Metadata:	metadata,
 	}, 12)
 	require.NoError(t, err)
 
@@ -62,19 +62,19 @@ func TestUnifiedResolverMetadataAndNamedExecution(t *testing.T) {
 	require.Equal(t, "swap", view.Route.Entrypoint)
 
 	sendTarget, err := ResolveNamedExecutionTarget(state, NamedExecutionRequest{
-		Kind:      NamedExecutionSend,
-		Name:      "alice.aet",
-		RecordKey: ResolverKeyWallet,
+		Kind:		NamedExecutionSend,
+		Name:		"alice.aet",
+		RecordKey:	ResolverKeyWallet,
 	}, 13)
 	require.NoError(t, err)
 	require.Equal(t, addr(4), sendTarget.Address)
 
 	invokeTarget, err := ResolveNamedExecutionTarget(state, NamedExecutionRequest{
-		Kind:        NamedExecutionInvoke,
-		Name:        "alice.aet",
-		InterfaceID: "aw5",
-		Method:      "swap",
-		PayloadHash: identityHash("payload", "swap"),
+		Kind:		NamedExecutionInvoke,
+		Name:		"alice.aet",
+		InterfaceID:	"aw5",
+		Method:		"swap",
+		PayloadHash:	identityHash("payload", "swap"),
 	}, 13)
 	require.NoError(t, err)
 	require.Equal(t, addr(3), invokeTarget.Contract)

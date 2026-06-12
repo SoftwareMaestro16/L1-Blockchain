@@ -18,18 +18,18 @@ func buildQueuedMessage(msg MessageEnvelope, txHeight, txIndex uint64, messageIn
 	msg = cloneMessage(msg)
 	msg.ExecutionBlockHeight = 0
 	queued := QueuedMessage{
-		TxHeight:          txHeight,
-		TxIndex:           txIndex,
-		MessageIndex:      messageIndex,
-		SourceLogicalTime: msg.CreatedLogicalTime,
-		DestinationKey:    queueAddressKey(msg.Destination),
-		Sequence:          sequence,
-		EnqueuedBlock:     txHeight,
-		CreatedHeight:     txHeight,
-		ScheduledHeight:   scheduledHeight(msg),
-		Attempts:          processingAttempts(msg),
-		Status:            QueueStatusPending,
-		Envelope:          msg,
+		TxHeight:		txHeight,
+		TxIndex:		txIndex,
+		MessageIndex:		messageIndex,
+		SourceLogicalTime:	msg.CreatedLogicalTime,
+		DestinationKey:		queueAddressKey(msg.Destination),
+		Sequence:		sequence,
+		EnqueuedBlock:		txHeight,
+		CreatedHeight:		txHeight,
+		ScheduledHeight:	scheduledHeight(msg),
+		Attempts:		processingAttempts(msg),
+		Status:			QueueStatusPending,
+		Envelope:		msg,
 	}
 	queued.MessageID = QueueMessageID(queued)
 	return queued

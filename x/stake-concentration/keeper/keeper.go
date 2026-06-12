@@ -12,16 +12,16 @@ import (
 )
 
 type Keeper struct {
-	cdc          codec.BinaryCodec
-	storeService corestore.KVStoreService
-	authority    string
+	cdc		codec.BinaryCodec
+	storeService	corestore.KVStoreService
+	authority	string
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, authority string) Keeper {
 	return Keeper{cdc: cdc, storeService: storeService, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)

@@ -55,17 +55,17 @@ func TestAetherMessageReceiptStatusesAndRootAreCanonical(t *testing.T) {
 			errorCode = "ERR_DETERMINISTIC_" + string(status)
 		}
 		receipt, err := NewAetherMessageReceipt(AetherMessageReceipt{
-			MsgID:                 msg.MsgID,
-			Height:                120 + uint64(i),
-			ReceiverZoneID:        msg.ReceiverZoneID,
-			ReceiverShardID:       msg.ReceiverShardID,
-			Status:                status,
-			GasUsed:               uint64(i + 1),
-			FeeCharged:            sdkmath.NewInt(int64(i)),
-			ReturnPayload:         []byte("return-" + string(status)),
-			ErrorCode:             errorCode,
-			OutputMessagesRoot:    testMessageHash("out-" + string(status)),
-			StateWriteSummaryHash: testMessageHash("writes-" + string(status)),
+			MsgID:			msg.MsgID,
+			Height:			120 + uint64(i),
+			ReceiverZoneID:		msg.ReceiverZoneID,
+			ReceiverShardID:	msg.ReceiverShardID,
+			Status:			status,
+			GasUsed:		uint64(i + 1),
+			FeeCharged:		sdkmath.NewInt(int64(i)),
+			ReturnPayload:		[]byte("return-" + string(status)),
+			ErrorCode:		errorCode,
+			OutputMessagesRoot:	testMessageHash("out-" + string(status)),
+			StateWriteSummaryHash:	testMessageHash("writes-" + string(status)),
 		})
 		require.NoError(t, err)
 		receipts = append(receipts, receipt)

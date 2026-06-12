@@ -14,34 +14,34 @@ import (
 )
 
 const (
-	SyncStageTx        SyncExecutionStage = "tx"
-	SyncStageAnte      SyncExecutionStage = "ante_handler"
-	SyncStageMsgServer SyncExecutionStage = "msg_server"
-	SyncStageKeeper    SyncExecutionStage = "keeper"
-	SyncStageStore     SyncExecutionStage = "store_v2_kvstore"
-	SyncStageEvents    SyncExecutionStage = "events"
-	SyncStageReceipt   SyncExecutionStage = "receipt"
+	SyncStageTx		SyncExecutionStage	= "tx"
+	SyncStageAnte		SyncExecutionStage	= "ante_handler"
+	SyncStageMsgServer	SyncExecutionStage	= "msg_server"
+	SyncStageKeeper		SyncExecutionStage	= "keeper"
+	SyncStageStore		SyncExecutionStage	= "store_v2_kvstore"
+	SyncStageEvents		SyncExecutionStage	= "events"
+	SyncStageReceipt	SyncExecutionStage	= "receipt"
 
-	SyncModuleBank           SyncModule = "bank"
-	SyncModuleStaking        SyncModule = "staking"
-	SyncModuleGovernance     SyncModule = "governance"
-	SyncModuleContractAssets SyncModule = "contract_assets"
-	SyncModuleDEX            SyncModule = "dex"
-	SyncModuleIdentity       SyncModule = "identity"
-	SyncModulePayments       SyncModule = "payments"
+	SyncModuleBank			SyncModule	= "bank"
+	SyncModuleStaking		SyncModule	= "staking"
+	SyncModuleGovernance		SyncModule	= "governance"
+	SyncModuleContractAssets	SyncModule	= "contract_assets"
+	SyncModuleDEX			SyncModule	= "dex"
+	SyncModuleIdentity		SyncModule	= "identity"
+	SyncModulePayments		SyncModule	= "payments"
 
-	SyncReceiptCommitted SyncReceiptPolicy = "committed"
-	SyncReceiptDisabled  SyncReceiptPolicy = "disabled"
+	SyncReceiptCommitted	SyncReceiptPolicy	= "committed"
+	SyncReceiptDisabled	SyncReceiptPolicy	= "disabled"
 
-	AsyncEngineLaneScheduled    AsyncEngineLane = "scheduled"
-	AsyncEngineLaneCrossZone    AsyncEngineLane = "cross_zone"
-	AsyncEngineLaneContinuation AsyncEngineLane = "continuation"
+	AsyncEngineLaneScheduled	AsyncEngineLane	= "scheduled"
+	AsyncEngineLaneCrossZone	AsyncEngineLane	= "cross_zone"
+	AsyncEngineLaneContinuation	AsyncEngineLane	= "continuation"
 
-	MaxSyncEngineEvents        = 256
-	MaxSyncEngineWrites        = 256
-	MaxSyncEngineDetailLength  = 128
-	MaxAsyncContinuations      = 256
-	MaxContinuationTokenLength = 128
+	MaxSyncEngineEvents		= 256
+	MaxSyncEngineWrites		= 256
+	MaxSyncEngineDetailLength	= 128
+	MaxAsyncContinuations		= 256
+	MaxContinuationTokenLength	= 128
 )
 
 type SyncExecutionStage string
@@ -50,65 +50,65 @@ type SyncReceiptPolicy string
 type AsyncEngineLane string
 
 type SyncExecutionStep struct {
-	Stage  SyncExecutionStage
-	Detail string
+	Stage	SyncExecutionStage
+	Detail	string
 }
 
 type SyncStateWrite struct {
-	StoreKey string
-	Key      string
+	StoreKey	string
+	Key		string
 }
 
 type SyncExecutionPlan struct {
-	Height        uint64
-	Module        SyncModule
-	Route         string
-	GasLimit      uint64
-	GasUsed       uint64
-	Atomic        bool
-	ReceiptPolicy SyncReceiptPolicy
-	Steps         []SyncExecutionStep
-	StateWrites   []SyncStateWrite
-	Events        []string
-	ResultCode    uint32
-	Error         string
-	ReceiptRoot   string
+	Height		uint64
+	Module		SyncModule
+	Route		string
+	GasLimit	uint64
+	GasUsed		uint64
+	Atomic		bool
+	ReceiptPolicy	SyncReceiptPolicy
+	Steps		[]SyncExecutionStep
+	StateWrites	[]SyncStateWrite
+	Events		[]string
+	ResultCode	uint32
+	Error		string
+	ReceiptRoot	string
 }
 
 type AsyncContinuation struct {
-	Token          string
-	ZoneID         zonestypes.ZoneID
-	Contract       string
-	DeliverAtBlock uint64
-	DeadlineBlock  uint64
-	StateRoot      string
+	Token		string
+	ZoneID		zonestypes.ZoneID
+	Contract	string
+	DeliverAtBlock	uint64
+	DeadlineBlock	uint64
+	StateRoot	string
 }
 
 type AsyncZoneQueue struct {
-	ZoneID      zonestypes.ZoneID
-	QueueID     string
-	Lane        AsyncEngineLane
-	Messages    []async.MessageEnvelope
-	MaxMessages uint32
-	MaxGas      uint64
+	ZoneID		zonestypes.ZoneID
+	QueueID		string
+	Lane		AsyncEngineLane
+	Messages	[]async.MessageEnvelope
+	MaxMessages	uint32
+	MaxGas		uint64
 }
 
 type AsyncRetryPolicy struct {
-	MaxRetries       uint32
-	RetryDelayBlocks uint64
-	DeadlineBlock    uint64
-	Bounce           bool
-	DeadLetter       bool
+	MaxRetries		uint32
+	RetryDelayBlocks	uint64
+	DeadlineBlock		uint64
+	Bounce			bool
+	DeadLetter		bool
 }
 
 type AsyncExecutionPlan struct {
-	Height        uint64
-	Queues        []AsyncZoneQueue
-	RetryPolicy   AsyncRetryPolicy
-	Receipts      []async.ExecutionReceipt
-	DeadLetters   []async.DeadLetter
-	Continuations []AsyncContinuation
-	PlanRoot      string
+	Height		uint64
+	Queues		[]AsyncZoneQueue
+	RetryPolicy	AsyncRetryPolicy
+	Receipts	[]async.ExecutionReceipt
+	DeadLetters	[]async.DeadLetter
+	Continuations	[]AsyncContinuation
+	PlanRoot	string
 }
 
 func NewSyncExecutionPlan(plan SyncExecutionPlan) (SyncExecutionPlan, error) {

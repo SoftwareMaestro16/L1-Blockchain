@@ -118,8 +118,8 @@ Add-Check $checks "official_pool_staking" "official pool staking flow works thro
   Assert-Contains "x\nominator-pool\keeper\keeper.go" "DepositToStakingPool" "pool deposit runtime"
   Assert-Contains "x\nominator-pool\keeper\keeper.go" "RequestPoolUnbond" "pool unbond runtime"
   Assert-Contains "x\nominator-pool\keeper\keeper.go" "WithdrawPoolStake" "pool matured withdrawal runtime"
-  Assert-Contains "x\nominator-pool\keeper\keeper_task74_test.go" "DepositToStakingPool" "pool deposit tests"
-  Assert-Contains "x\nominator-pool\keeper\keeper_task74_test.go" "FrozenLimitedPoolAllowsClaimsUnbondAndMaturedWithdrawals" "frozen_limited exit test"
+  Assert-Contains "x\nominator-pool\keeper\keeper_pool_staking_test.go" "DepositToStakingPool" "pool deposit tests"
+  Assert-Contains "x\nominator-pool\keeper\keeper_pool_staking_test.go" "FrozenLimitedPoolAllowsTopUpClaimUnbondAndMaturedWithdrawals" "frozen_limited exit test"
 }
 
 Add-Check $checks "storage_rent_enforcement" "storage rent is enforced for accounts, contracts, and official pool state" {
@@ -154,7 +154,7 @@ Add-Check $checks "export_import_roundtrip" "export/import roundtrip evidence ex
   Assert-Contains "tests\e2e\export_import_smoke.ps1" "export" "export smoke command"
   Assert-Contains "tests\e2e\export_import_smoke.ps1" "import" "import smoke command"
   Assert-Contains "architecture.md" "export/import stable" "architecture mainnet readiness export/import criterion"
-  Assert-Contains "UPDATE.md" "Export/import preserves storage rent debt" "UPDATE export/import rent debt requirement"
+  Assert-Contains "docs\public-testnet-long-running-evidence.md" "Export/import roundtrip preserves account, contract, pool, storage rent, and" "long-running export/import requirement"
 }
 
 Add-Check $checks "formal_ci_readiness" "formal public testnet CI readiness workflow exists" {
@@ -187,7 +187,7 @@ Add-Check $checks "formal_ci_readiness" "formal public testnet CI readiness work
 Add-Check $checks "no_native_asset_modules" "token/NFT/DEX remain contracts, not native app modules" {
   Assert-NotContains "app\modulewiring\modules.go" "tokenfactory|dexmodule|nftmodule|marketmodule|assetfactory" "native token/NFT/DEX app module"
   Assert-Contains "docs\public-testnet-preparation.md" "token, NFT, market, and exchange-style application logic now targets AVM contracts" "docs contract-only asset model"
-  Assert-Contains "UPDATE.md" "Token/NFT/DEX remain contracts" "UPDATE contract-only asset rule"
+  Assert-Contains "docs\public-testnet-long-running-evidence.md" "Native application-asset modules remain absent; assets use AVM contracts" "long-running contract-only asset rule"
 }
 
 Add-Check $checks "docs_match_behavior" "public docs match implemented behavior and readiness command surface" {

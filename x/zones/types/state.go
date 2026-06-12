@@ -7,16 +7,16 @@ import (
 )
 
 type ZoneRegistryState struct {
-	Zones       []Zone
-	ActiveZones []ZoneID
-	Commitments []ZoneCommitment
+	Zones		[]Zone
+	ActiveZones	[]ZoneID
+	Commitments	[]ZoneCommitment
 }
 
 func EmptyState() ZoneRegistryState {
 	return ZoneRegistryState{
-		Zones:       []Zone{},
-		ActiveZones: []ZoneID{},
-		Commitments: []ZoneCommitment{},
+		Zones:		[]Zone{},
+		ActiveZones:	[]ZoneID{},
+		Commitments:	[]ZoneCommitment{},
 	}
 }
 
@@ -105,9 +105,9 @@ func (s ZoneRegistryState) Export() ZoneRegistryState {
 
 func (s ZoneRegistryState) Clone() ZoneRegistryState {
 	out := ZoneRegistryState{
-		Zones:       make([]Zone, len(s.Zones)),
-		ActiveZones: make([]ZoneID, len(s.ActiveZones)),
-		Commitments: make([]ZoneCommitment, len(s.Commitments)),
+		Zones:		make([]Zone, len(s.Zones)),
+		ActiveZones:	make([]ZoneID, len(s.ActiveZones)),
+		Commitments:	make([]ZoneCommitment, len(s.Commitments)),
 	}
 	copy(out.Zones, s.Zones)
 	copy(out.ActiveZones, s.ActiveZones)

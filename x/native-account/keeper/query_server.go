@@ -13,7 +13,7 @@ var _ nativeaccount.QueryServer = queryServer{}
 
 type queryServer struct{ keeper Keeper }
 
-func NewQueryServerImpl(k Keeper) nativeaccount.QueryServer { return queryServer{keeper: k} }
+func NewQueryServerImpl(k Keeper) nativeaccount.QueryServer	{ return queryServer{keeper: k} }
 
 func (q queryServer) Account(ctx context.Context, req *nativeaccount.QueryAccountRequest) (*nativeaccount.QueryAccountResponse, error) {
 	if req == nil {
@@ -32,11 +32,11 @@ func (q queryServer) Account(ctx context.Context, req *nativeaccount.QueryAccoun
 		return nil, err
 	}
 	return &nativeaccount.QueryAccountResponse{
-		Found:       false,
-		Virtual:     true,
-		AddressUser: view.AddressUser,
-		AddressRaw:  view.AddressRaw,
-		Status:      view.Status,
+		Found:		false,
+		Virtual:	true,
+		AddressUser:	view.AddressUser,
+		AddressRaw:	view.AddressRaw,
+		Status:		view.Status,
 	}, nil
 }
 
@@ -84,12 +84,12 @@ func (q queryServer) AccountStatus(ctx context.Context, req *nativeaccount.Query
 	} else if found {
 		view := persistentAccountView(account)
 		return &nativeaccount.QueryAccountStatusResponse{
-			AddressUser:       view.AddressUser,
-			AddressRaw:        view.AddressRaw,
-			Status:            view.Status,
-			Persistent:        view.Persistent,
-			StorageRentActive: view.StorageRentActive,
-			StorageRentDebt:   account.StorageRentDebt,
+			AddressUser:		view.AddressUser,
+			AddressRaw:		view.AddressRaw,
+			Status:			view.Status,
+			Persistent:		view.Persistent,
+			StorageRentActive:	view.StorageRentActive,
+			StorageRentDebt:	account.StorageRentDebt,
 		}, nil
 	}
 	view, err := virtualAccountView(req.Address)
@@ -97,11 +97,11 @@ func (q queryServer) AccountStatus(ctx context.Context, req *nativeaccount.Query
 		return nil, err
 	}
 	return &nativeaccount.QueryAccountStatusResponse{
-		AddressUser:       view.AddressUser,
-		AddressRaw:        view.AddressRaw,
-		Status:            view.Status,
-		Persistent:        view.Persistent,
-		StorageRentActive: view.StorageRentActive,
+		AddressUser:		view.AddressUser,
+		AddressRaw:		view.AddressRaw,
+		Status:			view.Status,
+		Persistent:		view.Persistent,
+		StorageRentActive:	view.StorageRentActive,
 	}, nil
 }
 
@@ -111,19 +111,19 @@ func virtualAccountView(userAddress string) (nativeaccount.VirtualAccountView, e
 		return nativeaccount.VirtualAccountView{}, err
 	}
 	return nativeaccount.VirtualAccountView{
-		AddressUser:       pair.User,
-		AddressRaw:        pair.Raw,
-		Status:            nativeaccount.VirtualAccountStatusInactive,
-		Persistent:        false,
-		StorageRentActive: false,
+		AddressUser:		pair.User,
+		AddressRaw:		pair.Raw,
+		Status:			nativeaccount.VirtualAccountStatusInactive,
+		Persistent:		false,
+		StorageRentActive:	false,
 	}, nil
 }
 
 func persistentAccountView(account nativeaccount.Account) nativeaccount.VirtualAccountView {
 	view, err := nativeaccount.NormalizePersistentAccountView(nativeaccount.VirtualAccountView{
-		AddressUser: account.AddressUser,
-		AddressRaw:  account.AddressRaw,
-		Status:      account.Status,
+		AddressUser:	account.AddressUser,
+		AddressRaw:	account.AddressRaw,
+		Status:		account.Status,
 	})
 	if err != nil {
 		return nativeaccount.VirtualAccountView{}

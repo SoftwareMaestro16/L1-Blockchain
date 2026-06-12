@@ -13,9 +13,9 @@ var fileDescriptorNativeAccountQuery = buildNativeAccountQueryFileDescriptor()
 func buildNativeAccountQueryFileDescriptor() []byte {
 	const path = "l1/nativeaccount/v1/query.proto"
 	fd := &descriptorpb.FileDescriptorProto{
-		Name:    descriptorString(path),
-		Package: descriptorString("l1.nativeaccount.v1"),
-		Syntax:  descriptorString("proto3"),
+		Name:		descriptorString(path),
+		Package:	descriptorString("l1.nativeaccount.v1"),
+		Syntax:		descriptorString("proto3"),
 		Options: &descriptorpb.FileOptions{
 			GoPackage: descriptorString("github.com/sovereign-l1/l1/x/native-account/types"),
 		},
@@ -42,7 +42,7 @@ func buildNativeAccountQueryFileDescriptor() []byte {
 		},
 		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
-				Name: descriptorString("Query"),
+				Name:	descriptorString("Query"),
 				Method: []*descriptorpb.MethodDescriptorProto{
 					queryMethodDescriptor("Account", "QueryAccountRequest", "QueryAccountResponse"),
 					queryMethodDescriptor("AccountByRaw", "QueryAccountByRawRequest", "QueryAccountResponse"),
@@ -70,9 +70,9 @@ func buildNativeAccountQueryFileDescriptor() []byte {
 
 func queryMethodDescriptor(name, input, output string) *descriptorpb.MethodDescriptorProto {
 	return &descriptorpb.MethodDescriptorProto{
-		Name:       descriptorString(name),
-		InputType:  descriptorString(".l1.nativeaccount.v1." + input),
-		OutputType: descriptorString(".l1.nativeaccount.v1." + output),
+		Name:		descriptorString(name),
+		InputType:	descriptorString(".l1.nativeaccount.v1." + input),
+		OutputType:	descriptorString(".l1.nativeaccount.v1." + output),
 	}
 }
 

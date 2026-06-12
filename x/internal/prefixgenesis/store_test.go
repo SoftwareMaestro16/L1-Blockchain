@@ -11,9 +11,9 @@ import (
 )
 
 type testGenesis struct {
-	Version uint64
-	Params  testParams
-	State   testState
+	Version	uint64
+	Params	testParams
+	State	testState
 }
 
 type testParams struct {
@@ -29,9 +29,9 @@ func TestLoadMigratesLegacyGenesisBlobToPrefixLayout(t *testing.T) {
 	service := kvtest.NewStoreService()
 	legacyKey := []byte{0x01}
 	legacy := testGenesis{
-		Version: 2,
-		Params:  testParams{Enabled: true},
-		State:   testState{Records: []string{"b", "a"}},
+		Version:	2,
+		Params:		testParams{Enabled: true},
+		State:		testState{Records: []string{"b", "a"}},
 	}
 	bz, err := json.Marshal(legacy)
 	require.NoError(t, err)

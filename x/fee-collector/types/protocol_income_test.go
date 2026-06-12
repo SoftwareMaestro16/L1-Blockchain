@@ -40,7 +40,7 @@ func TestConstitutionalMinimumEnforced(t *testing.T) {
 
 func TestSplitProtocolIncomeDeterministicRounding(t *testing.T) {
 	policy := ProtocolIncomePolicy{
-		Scale: BasisPoints,
+		Scale:	BasisPoints,
 		Buckets: []ProtocolIncomeBucketRule{
 			{Bucket: BucketValidatorRewards, ModuleAccount: "validators", Weight: 3_333},
 			{Bucket: BucketTreasury, ModuleAccount: "treasury", Weight: 3_333},

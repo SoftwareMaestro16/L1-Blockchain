@@ -25,64 +25,64 @@ func TestDefaultParamsValidate(t *testing.T) {
 
 func TestInvalidParamsRejected(t *testing.T) {
 	tests := []struct {
-		name string
-		mut  func(*Params)
-		err  string
+		name	string
+		mut	func(*Params)
+		err	string
 	}{
 		{
-			name: "zero window",
-			mut:  func(p *Params) { p.WindowBlocks = 0 },
-			err:  "window",
+			name:	"zero window",
+			mut:	func(p *Params) { p.WindowBlocks = 0 },
+			err:	"window",
 		},
 		{
-			name: "zero alpha numerator",
-			mut:  func(p *Params) { p.AlphaNumerator = 0 },
-			err:  "alpha numerator",
+			name:	"zero alpha numerator",
+			mut:	func(p *Params) { p.AlphaNumerator = 0 },
+			err:	"alpha numerator",
 		},
 		{
-			name: "zero alpha denominator",
-			mut:  func(p *Params) { p.AlphaDenominator = 0 },
-			err:  "alpha denominator",
+			name:	"zero alpha denominator",
+			mut:	func(p *Params) { p.AlphaDenominator = 0 },
+			err:	"alpha denominator",
 		},
 		{
-			name: "alpha numerator greater than denominator",
-			mut:  func(p *Params) { p.AlphaNumerator = p.AlphaDenominator + 1 },
-			err:  "cannot exceed",
+			name:	"alpha numerator greater than denominator",
+			mut:	func(p *Params) { p.AlphaNumerator = p.AlphaDenominator + 1 },
+			err:	"cannot exceed",
 		},
 		{
-			name: "alpha denominator too large",
-			mut:  func(p *Params) { p.AlphaDenominator = maxAlphaDenominator + 1 },
-			err:  "alpha denominator",
+			name:	"alpha denominator too large",
+			mut:	func(p *Params) { p.AlphaDenominator = maxAlphaDenominator + 1 },
+			err:	"alpha denominator",
 		},
 		{
-			name: "delta too large",
-			mut:  func(p *Params) { p.MaxDeltaBps = BasisPoints + 1 },
-			err:  "max delta",
+			name:	"delta too large",
+			mut:	func(p *Params) { p.MaxDeltaBps = BasisPoints + 1 },
+			err:	"max delta",
 		},
 		{
-			name: "zero mempool target",
-			mut:  func(p *Params) { p.TargetMempoolSize = 0 },
-			err:  "mempool",
+			name:	"zero mempool target",
+			mut:	func(p *Params) { p.TargetMempoolSize = 0 },
+			err:	"mempool",
 		},
 		{
-			name: "zero block gas target",
-			mut:  func(p *Params) { p.TargetBlockGas = 0 },
-			err:  "block gas",
+			name:	"zero block gas target",
+			mut:	func(p *Params) { p.TargetBlockGas = 0 },
+			err:	"block gas",
 		},
 		{
-			name: "zero latency target",
-			mut:  func(p *Params) { p.TargetLatencyBlocks = 0 },
-			err:  "latency",
+			name:	"zero latency target",
+			mut:	func(p *Params) { p.TargetLatencyBlocks = 0 },
+			err:	"latency",
 		},
 		{
-			name: "zero execution target",
-			mut:  func(p *Params) { p.TargetExecutionSteps = 0 },
-			err:  "execution",
+			name:	"zero execution target",
+			mut:	func(p *Params) { p.TargetExecutionSteps = 0 },
+			err:	"execution",
 		},
 		{
-			name: "weights do not sum",
-			mut:  func(p *Params) { p.ExecutionTimeWeightBps++ },
-			err:  "weights",
+			name:	"weights do not sum",
+			mut:	func(p *Params) { p.ExecutionTimeWeightBps++ },
+			err:	"weights",
 		},
 	}
 
@@ -98,20 +98,20 @@ func TestInvalidParamsRejected(t *testing.T) {
 func TestNormalizeMetricsBounds(t *testing.T) {
 	params := DefaultParams()
 	scores, err := NormalizeMetrics(params, Metrics{
-		CanonicalMempoolSize:        params.TargetMempoolSize * 2,
-		UsedBlockGas:                params.TargetBlockGas * 2,
-		AverageInclusionDelayBlocks: params.TargetLatencyBlocks * 2,
-		FailedTxCount:               2,
-		TotalTxCount:                1,
-		ExecutionStepCount:          params.TargetExecutionSteps * 2,
+		CanonicalMempoolSize:		params.TargetMempoolSize * 2,
+		UsedBlockGas:			params.TargetBlockGas * 2,
+		AverageInclusionDelayBlocks:	params.TargetLatencyBlocks * 2,
+		FailedTxCount:			2,
+		TotalTxCount:			1,
+		ExecutionStepCount:		params.TargetExecutionSteps * 2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, Scores{
-		MempoolSizeBps:      BasisPoints,
-		BlockUtilizationBps: BasisPoints,
-		TxLatencyBps:        BasisPoints,
-		FailureRateBps:      BasisPoints,
-		ExecutionTimeBps:    BasisPoints,
+		MempoolSizeBps:		BasisPoints,
+		BlockUtilizationBps:	BasisPoints,
+		TxLatencyBps:		BasisPoints,
+		FailureRateBps:		BasisPoints,
+		ExecutionTimeBps:	BasisPoints,
 	}, scores)
 	require.NoError(t, scores.Validate())
 }
@@ -119,21 +119,21 @@ func TestNormalizeMetricsBounds(t *testing.T) {
 func TestComputeLoadScoreDeterministic(t *testing.T) {
 	params := DefaultParams()
 	metrics := Metrics{
-		CanonicalMempoolSize:        4_200,
-		UsedBlockGas:                7_500_000,
-		AverageInclusionDelayBlocks: 3,
-		FailedTxCount:               7,
-		TotalTxCount:                100,
-		ExecutionStepCount:          8_250_000,
+		CanonicalMempoolSize:		4_200,
+		UsedBlockGas:			7_500_000,
+		AverageInclusionDelayBlocks:	3,
+		FailedTxCount:			7,
+		TotalTxCount:			100,
+		ExecutionStepCount:		8_250_000,
 	}
 	previous := EMAState{
-		MempoolSizeBps:      100,
-		BlockUtilizationBps: 200,
-		TxLatencyBps:        300,
-		FailureRateBps:      400,
-		ExecutionTimeBps:    500,
-		LoadScoreBps:        275,
-		WindowHeight:        11,
+		MempoolSizeBps:		100,
+		BlockUtilizationBps:	200,
+		TxLatencyBps:		300,
+		FailureRateBps:		400,
+		ExecutionTimeBps:	500,
+		LoadScoreBps:		275,
+		WindowHeight:		11,
 	}
 
 	left, err := ComputeLoadScore(params, previous, metrics)
@@ -218,12 +218,12 @@ func TestExtremeInputsDoNotOverflow(t *testing.T) {
 	params.TargetExecutionSteps = math.MaxUint64
 
 	scores, err := NormalizeMetrics(params, Metrics{
-		CanonicalMempoolSize:        math.MaxUint64 - 1,
-		UsedBlockGas:                math.MaxUint64 - 1,
-		AverageInclusionDelayBlocks: math.MaxUint64 - 1,
-		FailedTxCount:               math.MaxUint64 - 1,
-		TotalTxCount:                math.MaxUint64,
-		ExecutionStepCount:          math.MaxUint64 - 1,
+		CanonicalMempoolSize:		math.MaxUint64 - 1,
+		UsedBlockGas:			math.MaxUint64 - 1,
+		AverageInclusionDelayBlocks:	math.MaxUint64 - 1,
+		FailedTxCount:			math.MaxUint64 - 1,
+		TotalTxCount:			math.MaxUint64,
+		ExecutionStepCount:		math.MaxUint64 - 1,
 	})
 	require.NoError(t, err)
 	require.NoError(t, scores.Validate())
@@ -234,12 +234,12 @@ func TestExtremeInputsDoNotOverflow(t *testing.T) {
 	require.LessOrEqual(t, scores.ExecutionTimeBps, BasisPoints)
 
 	_, err = ComputeLoadScore(params, EMAState{}, Metrics{
-		CanonicalMempoolSize:        math.MaxUint64,
-		UsedBlockGas:                math.MaxUint64,
-		AverageInclusionDelayBlocks: math.MaxUint64,
-		FailedTxCount:               math.MaxUint64,
-		TotalTxCount:                math.MaxUint64,
-		ExecutionStepCount:          math.MaxUint64,
+		CanonicalMempoolSize:		math.MaxUint64,
+		UsedBlockGas:			math.MaxUint64,
+		AverageInclusionDelayBlocks:	math.MaxUint64,
+		FailedTxCount:			math.MaxUint64,
+		TotalTxCount:			math.MaxUint64,
+		ExecutionStepCount:		math.MaxUint64,
 	})
 	require.NoError(t, err)
 }
@@ -254,13 +254,13 @@ func TestCorruptedPreviousEMARejected(t *testing.T) {
 
 func TestEMAStateJSONRoundTripPreservesExactScore(t *testing.T) {
 	state := EMAState{
-		MempoolSizeBps:      111,
-		BlockUtilizationBps: 222,
-		TxLatencyBps:        333,
-		FailureRateBps:      444,
-		ExecutionTimeBps:    555,
-		LoadScoreBps:        666,
-		WindowHeight:        777,
+		MempoolSizeBps:		111,
+		BlockUtilizationBps:	222,
+		TxLatencyBps:		333,
+		FailureRateBps:		444,
+		ExecutionTimeBps:	555,
+		LoadScoreBps:		666,
+		WindowHeight:		777,
 	}
 
 	raw, err := json.Marshal(state)
@@ -274,11 +274,11 @@ func TestEMAStateJSONRoundTripPreservesExactScore(t *testing.T) {
 
 func saturatedMetrics(params Params) Metrics {
 	return Metrics{
-		CanonicalMempoolSize:        params.TargetMempoolSize,
-		UsedBlockGas:                params.TargetBlockGas,
-		AverageInclusionDelayBlocks: params.TargetLatencyBlocks,
-		FailedTxCount:               1,
-		TotalTxCount:                1,
-		ExecutionStepCount:          params.TargetExecutionSteps,
+		CanonicalMempoolSize:		params.TargetMempoolSize,
+		UsedBlockGas:			params.TargetBlockGas,
+		AverageInclusionDelayBlocks:	params.TargetLatencyBlocks,
+		FailedTxCount:			1,
+		TotalTxCount:			1,
+		ExecutionStepCount:		params.TargetExecutionSteps,
 	}
 }

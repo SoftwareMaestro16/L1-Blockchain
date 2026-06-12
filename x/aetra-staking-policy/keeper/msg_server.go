@@ -31,9 +31,9 @@ func (m MsgServer) AcknowledgeConcentrationWarning(msg types.MsgAcknowledgeConce
 		return err
 	}
 	return m.Keeper.AcknowledgeConcentrationWarning(types.WarningAcknowledgement{
-		OperatorAddress: msg.OperatorAddress,
-		AcknowledgedAt:  msg.Height,
-		Warning:         msg.Warning,
+		OperatorAddress:	msg.OperatorAddress,
+		AcknowledgedAt:		msg.Height,
+		Warning:		msg.Warning,
 	})
 }
 

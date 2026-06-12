@@ -17,19 +17,19 @@ func TestStateInitHashAndAddressAreDeterministic(t *testing.T) {
 	owner := stateInitAddress(0x11)
 	codeHash := stateInitHash("code")
 	left := StateInit{
-		ABIVersion:         1,
-		CodeID:             codeHash,
-		CodeHash:           codeHash,
-		InitData:           []byte("init"),
-		Salt:               "salt",
-		Owner:              owner,
-		InitialStorageRoot: DefaultInitialStorageRoot,
-		InitialBalanceNAET: 100,
+		ABIVersion:		1,
+		CodeID:			codeHash,
+		CodeHash:		codeHash,
+		InitData:		[]byte("init"),
+		Salt:			"salt",
+		Owner:			owner,
+		InitialStorageRoot:	DefaultInitialStorageRoot,
+		InitialBalanceNAET:	100,
 		Libraries: []CodeDependency{
 			{CodeID: "z", CodeHash: stateInitHash("z")},
 			{CodeID: "a", CodeHash: stateInitHash("a")},
 		},
-		Capabilities: []string{"write", "read", "read"},
+		Capabilities:	[]string{"write", "read", "read"},
 	}
 	right := left
 	right.Libraries = []CodeDependency{left.Libraries[1], left.Libraries[0]}
@@ -86,8 +86,8 @@ func TestStateInitValidationRejectsBoundsAndMalformedInputs(t *testing.T) {
 	tooManyDeps := NewStateInit(owner, codeHash, nil, "salt", 0)
 	for i := uint32(0); i < params.MaxStateInitDependencies+1; i++ {
 		tooManyDeps.Libraries = append(tooManyDeps.Libraries, CodeDependency{
-			CodeID:   stateInitHash(string(rune('a' + i))),
-			CodeHash: stateInitHash(string(rune('z' + i))),
+			CodeID:		stateInitHash(string(rune('a' + i))),
+			CodeHash:	stateInitHash(string(rune('z' + i))),
 		})
 	}
 	require.ErrorContains(t, tooManyDeps.Validate(params), "dependency count")

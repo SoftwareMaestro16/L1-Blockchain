@@ -118,41 +118,41 @@ func testZoneTransferParams() MessageParams {
 
 func testZoneTransfer() MsgZoneTransfer {
 	return MsgZoneTransfer{
-		FromAddress:       addr(10),
-		ToAddress:         addr(11),
-		SourceZoneID:      zonestypes.ZoneIDFinancial,
-		DestinationZoneID: zonestypes.ZoneIDContract,
-		Amount:            sdkmath.NewInt(100),
-		Denom:             "naet",
-		GasLimit:          100,
-		ForwardingFee:     sdkmath.NewInt(3),
-		ExpiryHeight:      120,
-		MemoHashOptional:  testMessageHash("zone-transfer-memo"),
+		FromAddress:		addr(10),
+		ToAddress:		addr(11),
+		SourceZoneID:		zonestypes.ZoneIDFinancial,
+		DestinationZoneID:	zonestypes.ZoneIDContract,
+		Amount:			sdkmath.NewInt(100),
+		Denom:			"naet",
+		GasLimit:		100,
+		ForwardingFee:		sdkmath.NewInt(3),
+		ExpiryHeight:		120,
+		MemoHashOptional:	testMessageHash("zone-transfer-memo"),
 	}
 }
 
 func testZoneTransferAdmission(transfer MsgZoneTransfer) ZoneTransferAdmission {
 	return ZoneTransferAdmission{
-		CreatedHeight:      20,
-		Nonce:              77,
-		SourceSequence:     78,
-		SourceSpendable:    sdkmath.NewInt(1000),
-		EnabledZones:       []zonestypes.ZoneID{transfer.DestinationZoneID, transfer.SourceZoneID},
-		SourceShardID:      "financial-shard-1",
-		DestinationShardID: "contract-shard-2",
-		MaxDeliveryWindow:  200,
-		SourceEscrowed:     true,
+		CreatedHeight:		20,
+		Nonce:			77,
+		SourceSequence:		78,
+		SourceSpendable:	sdkmath.NewInt(1000),
+		EnabledZones:		[]zonestypes.ZoneID{transfer.DestinationZoneID, transfer.SourceZoneID},
+		SourceShardID:		"financial-shard-1",
+		DestinationShardID:	"contract-shard-2",
+		MaxDeliveryWindow:	200,
+		SourceEscrowed:		true,
 		RoutableDenoms: []RoutableDenom{{
-			Denom:             transfer.Denom,
-			SourceZoneID:      transfer.SourceZoneID,
-			DestinationZoneID: transfer.DestinationZoneID,
-			AuthorityPath:     "financial/contract-assets",
+			Denom:			transfer.Denom,
+			SourceZoneID:		transfer.SourceZoneID,
+			DestinationZoneID:	transfer.DestinationZoneID,
+			AuthorityPath:		"financial/contract-assets",
 		}},
 		MinimumRouteFees: []ZoneTransferRouteFee{{
-			SourceZoneID:      transfer.SourceZoneID,
-			DestinationZoneID: transfer.DestinationZoneID,
-			Denom:             transfer.Denom,
-			MinimumFee:        sdkmath.NewInt(2),
+			SourceZoneID:		transfer.SourceZoneID,
+			DestinationZoneID:	transfer.DestinationZoneID,
+			Denom:			transfer.Denom,
+			MinimumFee:		sdkmath.NewInt(2),
 		}},
 	}
 }

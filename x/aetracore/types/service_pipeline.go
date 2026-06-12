@@ -13,154 +13,154 @@ type ServiceCallStatus string
 type ServicePaymentStatus string
 
 const (
-	ServicePhasePrepareProposal ServicePipelinePhase = "PREPARE_PROPOSAL"
-	ServicePhaseProcessProposal ServicePipelinePhase = "PROCESS_PROPOSAL"
-	ServicePhaseDeliverTxCompat ServicePipelinePhase = "DELIVER_TX_COMPAT"
-	ServicePhaseFinalizeBlock   ServicePipelinePhase = "FINALIZE_BLOCK"
-	ServicePhaseEndBlock        ServicePipelinePhase = "END_BLOCK"
+	ServicePhasePrepareProposal	ServicePipelinePhase	= "PREPARE_PROPOSAL"
+	ServicePhaseProcessProposal	ServicePipelinePhase	= "PROCESS_PROPOSAL"
+	ServicePhaseDeliverTxCompat	ServicePipelinePhase	= "DELIVER_TX_COMPAT"
+	ServicePhaseFinalizeBlock	ServicePipelinePhase	= "FINALIZE_BLOCK"
+	ServicePhaseEndBlock		ServicePipelinePhase	= "END_BLOCK"
 
-	ServiceCallKindOnChain         ServiceCallKind = "ON_CHAIN_CALL"
-	ServiceCallKindOffChainReceipt ServiceCallKind = "OFF_CHAIN_RECEIPT"
-	ServiceCallKindMixedDispute    ServiceCallKind = "MIXED_DISPUTE"
-	ServiceCallKindMixedSettlement ServiceCallKind = "MIXED_SETTLEMENT"
-	ServiceCallKindCallback        ServiceCallKind = "CALLBACK"
-	ServiceCallKindRetry           ServiceCallKind = "RETRY"
+	ServiceCallKindOnChain		ServiceCallKind	= "ON_CHAIN_CALL"
+	ServiceCallKindOffChainReceipt	ServiceCallKind	= "OFF_CHAIN_RECEIPT"
+	ServiceCallKindMixedDispute	ServiceCallKind	= "MIXED_DISPUTE"
+	ServiceCallKindMixedSettlement	ServiceCallKind	= "MIXED_SETTLEMENT"
+	ServiceCallKindCallback		ServiceCallKind	= "CALLBACK"
+	ServiceCallKindRetry		ServiceCallKind	= "RETRY"
 
-	ServiceCallStatusAccepted   ServiceCallStatus = "ACCEPTED"
-	ServiceCallStatusExecuted   ServiceCallStatus = "EXECUTED"
-	ServiceCallStatusFailed     ServiceCallStatus = "FAILED"
-	ServiceCallStatusExpired    ServiceCallStatus = "EXPIRED"
-	ServiceCallStatusChallenged ServiceCallStatus = "CHALLENGED"
-	ServiceCallStatusSettled    ServiceCallStatus = "SETTLED"
-	ServiceCallStatusReverted   ServiceCallStatus = "REVERTED"
+	ServiceCallStatusAccepted	ServiceCallStatus	= "ACCEPTED"
+	ServiceCallStatusExecuted	ServiceCallStatus	= "EXECUTED"
+	ServiceCallStatusFailed		ServiceCallStatus	= "FAILED"
+	ServiceCallStatusExpired	ServiceCallStatus	= "EXPIRED"
+	ServiceCallStatusChallenged	ServiceCallStatus	= "CHALLENGED"
+	ServiceCallStatusSettled	ServiceCallStatus	= "SETTLED"
+	ServiceCallStatusReverted	ServiceCallStatus	= "REVERTED"
 
-	ServicePaymentStatusNone     ServicePaymentStatus = "NONE"
-	ServicePaymentStatusReserved ServicePaymentStatus = "RESERVED"
-	ServicePaymentStatusSettled  ServicePaymentStatus = "SETTLED"
-	ServicePaymentStatusRefunded ServicePaymentStatus = "REFUNDED"
-	ServicePaymentStatusEscrowed ServicePaymentStatus = "ESCROWED"
+	ServicePaymentStatusNone	ServicePaymentStatus	= "NONE"
+	ServicePaymentStatusReserved	ServicePaymentStatus	= "RESERVED"
+	ServicePaymentStatusSettled	ServicePaymentStatus	= "SETTLED"
+	ServicePaymentStatusRefunded	ServicePaymentStatus	= "REFUNDED"
+	ServicePaymentStatusEscrowed	ServicePaymentStatus	= "ESCROWED"
 )
 
 type ServiceConsensusContext struct {
-	ChainID string
-	Height  uint64
+	ChainID	string
+	Height	uint64
 }
 
 type ServiceCallEnvelope struct {
-	CallID           string
-	ServiceID        string
-	Caller           string
-	Nonce            uint64
-	IdempotencyKey   string
-	MethodID         string
-	InterfaceHash    string
-	PayloadHash      string
-	PaymentDenom     string
-	MaxFeeAmount     string
-	ProofRequirement ServiceVerificationModel
-	Kind             ServiceCallKind
-	CreatedHeight    uint64
-	DeadlineHeight   uint64
-	PriorityClass    uint32
-	Callback         bool
-	RetryOf          string
-	Dispute          bool
-	StateReadSet     []string
-	StateWriteSet    []string
+	CallID			string
+	ServiceID		string
+	Caller			string
+	Nonce			uint64
+	IdempotencyKey		string
+	MethodID		string
+	InterfaceHash		string
+	PayloadHash		string
+	PaymentDenom		string
+	MaxFeeAmount		string
+	ProofRequirement	ServiceVerificationModel
+	Kind			ServiceCallKind
+	CreatedHeight		uint64
+	DeadlineHeight		uint64
+	PriorityClass		uint32
+	Callback		bool
+	RetryOf			string
+	Dispute			bool
+	StateReadSet		[]string
+	StateWriteSet		[]string
 }
 
 type ServiceExecutionGroup struct {
-	GroupID       string
-	StateKeyScope string
-	Calls         []ServiceCallEnvelope
+	GroupID		string
+	StateKeyScope	string
+	Calls		[]ServiceCallEnvelope
 }
 
 type ServiceProposalPlan struct {
-	Height        uint64
-	ChainID       string
-	Groups        []ServiceExecutionGroup
-	RegistryRoot  string
-	InterfaceRoot string
-	PlanHash      string
+	Height		uint64
+	ChainID		string
+	Groups		[]ServiceExecutionGroup
+	RegistryRoot	string
+	InterfaceRoot	string
+	PlanHash	string
 }
 
 type ServiceExecutionOutcome struct {
-	CallID         string
-	Status         ServiceCallStatus
-	ResponseHash   string
-	ProofHash      string
-	PaymentStatus  ServicePaymentStatus
-	GasUsed        uint64
-	ProviderID     string
-	ExecutedHeight uint64
-	AnchoredHeight uint64
-	ErrorCode      string
+	CallID		string
+	Status		ServiceCallStatus
+	ResponseHash	string
+	ProofHash	string
+	PaymentStatus	ServicePaymentStatus
+	GasUsed		uint64
+	ProviderID	string
+	ExecutedHeight	uint64
+	AnchoredHeight	uint64
+	ErrorCode	string
 }
 
 type ServiceCallReceipt struct {
-	CallID         string
-	ServiceID      string
-	MethodID       string
-	Caller         string
-	Status         ServiceCallStatus
-	RequestHash    string
-	ResponseHash   string
-	ProofHash      string
-	PaymentStatus  ServicePaymentStatus
-	GasUsed        uint64
-	ProviderID     string
-	ExecutedHeight uint64
-	AnchoredHeight uint64
-	ErrorCode      string
-	ReceiptHash    string
+	CallID		string
+	ServiceID	string
+	MethodID	string
+	Caller		string
+	Status		ServiceCallStatus
+	RequestHash	string
+	ResponseHash	string
+	ProofHash	string
+	PaymentStatus	ServicePaymentStatus
+	GasUsed		uint64
+	ProviderID	string
+	ExecutedHeight	uint64
+	AnchoredHeight	uint64
+	ErrorCode	string
+	ReceiptHash	string
 }
 
 type ServiceFinalization struct {
-	Height              uint64
-	RegistryRoot        string
-	InterfaceRoot       string
-	ServiceReceiptsRoot string
-	Receipts            []ServiceCallReceipt
-	FinalizationHash    string
+	Height			uint64
+	RegistryRoot		string
+	InterfaceRoot		string
+	ServiceReceiptsRoot	string
+	Receipts		[]ServiceCallReceipt
+	FinalizationHash	string
 }
 
 type ProviderReputationDelta struct {
-	ProviderID string
-	Successes  uint64
-	Failures   uint64
+	ProviderID	string
+	Successes	uint64
+	Failures	uint64
 }
 
 type ServicePipelineMetrics struct {
-	ActiveServices       uint64
-	ExpiredServices      uint64
-	ReceiptCount         uint64
-	FailedCallCount      uint64
-	SettledPaymentCount  uint64
-	ProviderReceiptCount uint64
+	ActiveServices		uint64
+	ExpiredServices		uint64
+	ReceiptCount		uint64
+	FailedCallCount		uint64
+	SettledPaymentCount	uint64
+	ProviderReceiptCount	uint64
 }
 
 type ServiceEndBlockMaintenance struct {
-	Height            uint64
-	ExpiredServiceIDs []string
-	CleanupServiceIDs []string
-	ReputationDeltas  []ProviderReputationDelta
-	Metrics           ServicePipelineMetrics
-	MaintenanceHash   string
+	Height			uint64
+	ExpiredServiceIDs	[]string
+	CleanupServiceIDs	[]string
+	ReputationDeltas	[]ProviderReputationDelta
+	Metrics			ServicePipelineMetrics
+	MaintenanceHash		string
 }
 
 type ServiceStateTransition struct {
-	CurrentStateRoot       string
-	NextStateRoot          string
-	Call                   ServiceCallEnvelope
-	Context                ServiceConsensusContext
-	StateReadSet           []string
-	StateWriteSet          []string
-	ExternalCalls          []string
-	UsesWallClock          bool
-	LiveAvailabilityChecks bool
-	IterationLimit         uint64
-	ProofVerificationGas   uint64
-	DirectCrossZoneWrites  []string
+	CurrentStateRoot	string
+	NextStateRoot		string
+	Call			ServiceCallEnvelope
+	Context			ServiceConsensusContext
+	StateReadSet		[]string
+	StateWriteSet		[]string
+	ExternalCalls		[]string
+	UsesWallClock		bool
+	LiveAvailabilityChecks	bool
+	IterationLimit		uint64
+	ProofVerificationGas	uint64
+	DirectCrossZoneWrites	[]string
 }
 
 func PrepareServiceProposal(ctx ServiceConsensusContext, state CoreState, calls []ServiceCallEnvelope) (ServiceProposalPlan, error) {
@@ -189,8 +189,8 @@ func PrepareServiceProposal(ctx ServiceConsensusContext, state CoreState, calls 
 			groupIndex = len(groups)
 			groupsByScope[scope] = groupIndex
 			groups = append(groups, ServiceExecutionGroup{
-				GroupID:       ComputeServiceExecutionGroupID(scope),
-				StateKeyScope: scope,
+				GroupID:	ComputeServiceExecutionGroupID(scope),
+				StateKeyScope:	scope,
 			})
 		}
 		groups[groupIndex].Calls = append(groups[groupIndex].Calls, call)
@@ -205,11 +205,11 @@ func PrepareServiceProposal(ctx ServiceConsensusContext, state CoreState, calls 
 		return ServiceProposalPlan{}, err
 	}
 	plan := ServiceProposalPlan{
-		Height:        ctx.Height,
-		ChainID:       ctx.ChainID,
-		Groups:        groups,
-		RegistryRoot:  registryRoot,
-		InterfaceRoot: interfaceRoot,
+		Height:		ctx.Height,
+		ChainID:	ctx.ChainID,
+		Groups:		groups,
+		RegistryRoot:	registryRoot,
+		InterfaceRoot:	interfaceRoot,
 	}
 	plan.PlanHash = ComputeServiceProposalPlanHash(plan)
 	return plan, ValidateServiceProposalPlan(ctx, state, plan)
@@ -251,11 +251,11 @@ func FinalizeServiceProposal(ctx ServiceConsensusContext, state CoreState, plan 
 		return ServiceFinalization{}, err
 	}
 	finalization := ServiceFinalization{
-		Height:              ctx.Height,
-		RegistryRoot:        plan.RegistryRoot,
-		InterfaceRoot:       plan.InterfaceRoot,
-		ServiceReceiptsRoot: receiptsRoot,
-		Receipts:            cloneServiceCallReceipts(receipts),
+		Height:			ctx.Height,
+		RegistryRoot:		plan.RegistryRoot,
+		InterfaceRoot:		plan.InterfaceRoot,
+		ServiceReceiptsRoot:	receiptsRoot,
+		Receipts:		cloneServiceCallReceipts(receipts),
 	}
 	finalization.FinalizationHash = ComputeServiceFinalizationHash(finalization)
 	return finalization, finalization.Validate()
@@ -294,17 +294,17 @@ func EndBlockServiceMaintenance(state CoreState, height uint64, receipts []Servi
 		}
 	}
 	maintenance := ServiceEndBlockMaintenance{
-		Height:            height,
-		ExpiredServiceIDs: append([]string(nil), expired...),
-		CleanupServiceIDs: append([]string(nil), expired...),
-		ReputationDeltas:  BuildProviderReputationDeltas(receiptCopies),
+		Height:			height,
+		ExpiredServiceIDs:	append([]string(nil), expired...),
+		CleanupServiceIDs:	append([]string(nil), expired...),
+		ReputationDeltas:	BuildProviderReputationDeltas(receiptCopies),
 		Metrics: ServicePipelineMetrics{
-			ActiveServices:       activeCount,
-			ExpiredServices:      uint64(len(expired)),
-			ReceiptCount:         uint64(len(receiptCopies)),
-			FailedCallCount:      countFailedServiceReceipts(receiptCopies),
-			SettledPaymentCount:  countSettledServicePayments(receiptCopies),
-			ProviderReceiptCount: countProviderReceipts(receiptCopies),
+			ActiveServices:		activeCount,
+			ExpiredServices:	uint64(len(expired)),
+			ReceiptCount:		uint64(len(receiptCopies)),
+			FailedCallCount:	countFailedServiceReceipts(receiptCopies),
+			SettledPaymentCount:	countSettledServicePayments(receiptCopies),
+			ProviderReceiptCount:	countProviderReceipts(receiptCopies),
 		},
 	}
 	maintenance.MaintenanceHash = ComputeServiceEndBlockMaintenanceHash(maintenance)
@@ -605,20 +605,20 @@ func ValidateServiceExecutionOutcome(ctx ServiceConsensusContext, call ServiceCa
 
 func NewServiceCallReceipt(call ServiceCallEnvelope, outcome ServiceExecutionOutcome) (ServiceCallReceipt, error) {
 	receipt := ServiceCallReceipt{
-		CallID:         call.CallID,
-		ServiceID:      call.ServiceID,
-		MethodID:       call.MethodID,
-		Caller:         call.Caller,
-		Status:         outcome.Status,
-		RequestHash:    call.PayloadHash,
-		ResponseHash:   outcome.ResponseHash,
-		ProofHash:      outcome.ProofHash,
-		PaymentStatus:  outcome.PaymentStatus,
-		GasUsed:        outcome.GasUsed,
-		ProviderID:     outcome.ProviderID,
-		ExecutedHeight: outcome.ExecutedHeight,
-		AnchoredHeight: outcome.AnchoredHeight,
-		ErrorCode:      outcome.ErrorCode,
+		CallID:		call.CallID,
+		ServiceID:	call.ServiceID,
+		MethodID:	call.MethodID,
+		Caller:		call.Caller,
+		Status:		outcome.Status,
+		RequestHash:	call.PayloadHash,
+		ResponseHash:	outcome.ResponseHash,
+		ProofHash:	outcome.ProofHash,
+		PaymentStatus:	outcome.PaymentStatus,
+		GasUsed:	outcome.GasUsed,
+		ProviderID:	outcome.ProviderID,
+		ExecutedHeight:	outcome.ExecutedHeight,
+		AnchoredHeight:	outcome.AnchoredHeight,
+		ErrorCode:	outcome.ErrorCode,
 	}
 	receipt.ReceiptHash = ComputeServiceCallReceiptHash(receipt)
 	return receipt, receipt.Validate()

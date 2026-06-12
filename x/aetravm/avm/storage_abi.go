@@ -11,32 +11,32 @@ import (
 )
 
 const (
-	DefaultMaxStorageKeyBytes            = uint32(MaxKeySize)
-	DefaultMaxStorageValueBytes          = uint32(64 * 1024)
-	DefaultMaxContractStorageBytes       = uint64(1024 * 1024)
-	DefaultMaxStorageReadsPerExecution   = uint32(128)
-	DefaultMaxStorageWritesPerExecution  = uint32(64)
-	DefaultMaxStorageDeletesPerExecution = uint32(64)
-	DefaultMaxStorageIterationLimit      = uint32(1024)
+	DefaultMaxStorageKeyBytes		= uint32(MaxKeySize)
+	DefaultMaxStorageValueBytes		= uint32(64 * 1024)
+	DefaultMaxContractStorageBytes		= uint64(1024 * 1024)
+	DefaultMaxStorageReadsPerExecution	= uint32(128)
+	DefaultMaxStorageWritesPerExecution	= uint32(64)
+	DefaultMaxStorageDeletesPerExecution	= uint32(64)
+	DefaultMaxStorageIterationLimit		= uint32(1024)
 
-	avmStorageKeyPrefix          = "avm/storage/"
-	avmContractStorageRootDomain = "aetra-avm-contract-storage-root-v1"
-	avmGlobalStorageRootDomain   = "aetra-avm-global-storage-root-v1"
+	avmStorageKeyPrefix		= "avm/storage/"
+	avmContractStorageRootDomain	= "aetra-avm-contract-storage-root-v1"
+	avmGlobalStorageRootDomain	= "aetra-avm-global-storage-root-v1"
 )
 
 type StorageABIParams struct {
-	MaxKeyBytes              uint32
-	MaxValueBytes            uint32
-	MaxContractStorageBytes  uint64
-	MaxReadsPerExecution     uint32
-	MaxWritesPerExecution    uint32
-	MaxDeletesPerExecution   uint32
-	MaxStorageIterationLimit uint32
+	MaxKeyBytes			uint32
+	MaxValueBytes			uint32
+	MaxContractStorageBytes		uint64
+	MaxReadsPerExecution		uint32
+	MaxWritesPerExecution		uint32
+	MaxDeletesPerExecution		uint32
+	MaxStorageIterationLimit	uint32
 }
 
 type KVPair struct {
-	Key   []byte
-	Value []byte
+	Key	[]byte
+	Value	[]byte
 }
 
 type KVBackend interface {
@@ -51,42 +51,42 @@ type MapKVBackend struct {
 }
 
 type StorageABI struct {
-	params StorageABIParams
-	kv     KVBackend
+	params	StorageABIParams
+	kv	KVBackend
 }
 
 type StorageExecution struct {
-	abi     *StorageABI
-	reads   uint32
-	writes  uint32
-	deletes uint32
+	abi	*StorageABI
+	reads	uint32
+	writes	uint32
+	deletes	uint32
 }
 
 type AVMStorageEntry struct {
-	Key   []byte
-	Value []byte
+	Key	[]byte
+	Value	[]byte
 }
 
 type ContractStorageExport struct {
-	Contract string
-	Entries  []AVMStorageEntry
-	Root     string
+	Contract	string
+	Entries		[]AVMStorageEntry
+	Root		string
 }
 
 type AVMStorageState struct {
-	Contracts []ContractStorageExport
-	Root      string
+	Contracts	[]ContractStorageExport
+	Root		string
 }
 
 func DefaultStorageABIParams() StorageABIParams {
 	return StorageABIParams{
-		MaxKeyBytes:              DefaultMaxStorageKeyBytes,
-		MaxValueBytes:            DefaultMaxStorageValueBytes,
-		MaxContractStorageBytes:  DefaultMaxContractStorageBytes,
-		MaxReadsPerExecution:     DefaultMaxStorageReadsPerExecution,
-		MaxWritesPerExecution:    DefaultMaxStorageWritesPerExecution,
-		MaxDeletesPerExecution:   DefaultMaxStorageDeletesPerExecution,
-		MaxStorageIterationLimit: DefaultMaxStorageIterationLimit,
+		MaxKeyBytes:			DefaultMaxStorageKeyBytes,
+		MaxValueBytes:			DefaultMaxStorageValueBytes,
+		MaxContractStorageBytes:	DefaultMaxContractStorageBytes,
+		MaxReadsPerExecution:		DefaultMaxStorageReadsPerExecution,
+		MaxWritesPerExecution:		DefaultMaxStorageWritesPerExecution,
+		MaxDeletesPerExecution:		DefaultMaxStorageDeletesPerExecution,
+		MaxStorageIterationLimit:	DefaultMaxStorageIterationLimit,
 	}
 }
 
@@ -173,8 +173,8 @@ func (m *MapKVBackend) Iterate(prefix []byte, limit uint32) ([]KVPair, error) {
 	out := make([]KVPair, 0, len(keys))
 	for _, key := range keys {
 		out = append(out, KVPair{
-			Key:   []byte(key),
-			Value: append([]byte(nil), m.data[key]...),
+			Key:	[]byte(key),
+			Value:	append([]byte(nil), m.data[key]...),
 		})
 	}
 	return out, nil
@@ -365,9 +365,9 @@ func (a *StorageABI) ExportState() (AVMStorageState, error) {
 	for _, contract := range contracts {
 		entries := cloneAndSortStorageEntries(byContract[contract])
 		out.Contracts = append(out.Contracts, ContractStorageExport{
-			Contract: contract,
-			Entries:  entries,
-			Root:     ComputeContractStateRoot(contract, entries),
+			Contract:	contract,
+			Entries:	entries,
+			Root:		ComputeContractStateRoot(contract, entries),
 		})
 	}
 	out.Root = ComputeGlobalAVMStateRoot(out)
@@ -563,8 +563,8 @@ func storageEntriesFromKVPairs(contract string, pairs []KVPair) ([]AVMStorageEnt
 			return nil, fmt.Errorf("AVM storage key decode failed: %w", err)
 		}
 		out = append(out, AVMStorageEntry{
-			Key:   key,
-			Value: append([]byte(nil), pair.Value...),
+			Key:	key,
+			Value:	append([]byte(nil), pair.Value...),
 		})
 	}
 	return cloneAndSortStorageEntries(out), nil
@@ -595,8 +595,8 @@ func cloneAndSortStorageEntries(entries []AVMStorageEntry) []AVMStorageEntry {
 	out := make([]AVMStorageEntry, len(entries))
 	for i, entry := range entries {
 		out[i] = AVMStorageEntry{
-			Key:   append([]byte(nil), entry.Key...),
-			Value: cloneStorageValue(entry.Value),
+			Key:	append([]byte(nil), entry.Key...),
+			Value:	cloneStorageValue(entry.Value),
 		}
 	}
 	sort.SliceStable(out, func(i, j int) bool {

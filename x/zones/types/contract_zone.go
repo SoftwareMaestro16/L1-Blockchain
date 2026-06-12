@@ -10,16 +10,16 @@ import (
 )
 
 const (
-	ContractZonePrefix     = "contract"
-	ContractCodePrefix     = ContractZonePrefix + "/code"
-	ContractInstancePrefix = ContractZonePrefix + "/instance"
-	ContractStoragePrefix  = ContractZonePrefix + "/storage"
-	ContractABIPrefix      = ContractZonePrefix + "/abi"
-	ContractInboxPrefix    = ContractZonePrefix + "/inbox"
-	ContractOutboxPrefix   = ContractZonePrefix + "/outbox"
-	ContractReceiptPrefix  = ContractZonePrefix + "/receipts"
-	ContractGasTablePrefix = ContractZonePrefix + "/gas"
-	ContractEventPrefix    = ContractZonePrefix + "/events"
+	ContractZonePrefix	= "contract"
+	ContractCodePrefix	= ContractZonePrefix + "/code"
+	ContractInstancePrefix	= ContractZonePrefix + "/instance"
+	ContractStoragePrefix	= ContractZonePrefix + "/storage"
+	ContractABIPrefix	= ContractZonePrefix + "/abi"
+	ContractInboxPrefix	= ContractZonePrefix + "/inbox"
+	ContractOutboxPrefix	= ContractZonePrefix + "/outbox"
+	ContractReceiptPrefix	= ContractZonePrefix + "/receipts"
+	ContractGasTablePrefix	= ContractZonePrefix + "/gas"
+	ContractEventPrefix	= ContractZonePrefix + "/events"
 )
 
 type ContractRuntimeKind string
@@ -29,39 +29,39 @@ type ContractShardRoutingMode string
 type ContractProofRootType string
 
 const (
-	ContractRuntimeAVM      ContractRuntimeKind = "AVM"
-	ContractRuntimeCosmWasm ContractRuntimeKind = "COSMWASM"
+	ContractRuntimeAVM	ContractRuntimeKind	= "AVM"
+	ContractRuntimeCosmWasm	ContractRuntimeKind	= "COSMWASM"
 
-	ContractMessageStoreCode   ContractMessageKind = "MsgStoreCode"
-	ContractMessageInstantiate ContractMessageKind = "MsgInstantiateContract"
-	ContractMessageExecute     ContractMessageKind = "MsgExecuteContract"
-	ContractMessageMigrate     ContractMessageKind = "MsgMigrateContract"
-	ContractMessageCallback    ContractMessageKind = "MsgContractCallback"
-	ContractMessageProofVerify ContractMessageKind = "MsgContractProofVerify"
-	ContractMessageAsyncCall   ContractMessageKind = "MsgAsyncContractCall"
+	ContractMessageStoreCode	ContractMessageKind	= "MsgStoreCode"
+	ContractMessageInstantiate	ContractMessageKind	= "MsgInstantiateContract"
+	ContractMessageExecute		ContractMessageKind	= "MsgExecuteContract"
+	ContractMessageMigrate		ContractMessageKind	= "MsgMigrateContract"
+	ContractMessageCallback		ContractMessageKind	= "MsgContractCallback"
+	ContractMessageProofVerify	ContractMessageKind	= "MsgContractProofVerify"
+	ContractMessageAsyncCall	ContractMessageKind	= "MsgAsyncContractCall"
 
-	ContractProofCode     ContractProofKind = "QueryCode"
-	ContractProofContract ContractProofKind = "QueryContract"
-	ContractProofState    ContractProofKind = "QueryContractState"
-	ContractProofABI      ContractProofKind = "QueryContractABI"
-	ContractProofReceipt  ContractProofKind = "QueryContractReceipt"
-	ContractProofGasTable ContractProofKind = "QueryContractGasTable"
-	ContractProofEvent    ContractProofKind = "QueryContractEvent"
-	ContractProofInbox    ContractProofKind = "QueryContractInbox"
-	ContractProofOutbox   ContractProofKind = "QueryContractOutbox"
+	ContractProofCode	ContractProofKind	= "QueryCode"
+	ContractProofContract	ContractProofKind	= "QueryContract"
+	ContractProofState	ContractProofKind	= "QueryContractState"
+	ContractProofABI	ContractProofKind	= "QueryContractABI"
+	ContractProofReceipt	ContractProofKind	= "QueryContractReceipt"
+	ContractProofGasTable	ContractProofKind	= "QueryContractGasTable"
+	ContractProofEvent	ContractProofKind	= "QueryContractEvent"
+	ContractProofInbox	ContractProofKind	= "QueryContractInbox"
+	ContractProofOutbox	ContractProofKind	= "QueryContractOutbox"
 
-	ContractRouteAddress      ContractShardRoutingMode = "contract_address"
-	ContractRouteStorageKey   ContractShardRoutingMode = "storage_key_prefix"
-	ContractRouteCodeRegistry ContractShardRoutingMode = "code_id"
+	ContractRouteAddress		ContractShardRoutingMode	= "contract_address"
+	ContractRouteStorageKey		ContractShardRoutingMode	= "storage_key_prefix"
+	ContractRouteCodeRegistry	ContractShardRoutingMode	= "code_id"
 
-	ContractProofRootCode     ContractProofRootType = "contract_code"
-	ContractProofRootInstance ContractProofRootType = "contract_instance"
-	ContractProofRootStorage  ContractProofRootType = "contract_storage"
-	ContractProofRootABI      ContractProofRootType = "contract_abi"
-	ContractProofRootGasTable ContractProofRootType = "contract_gas_table"
-	ContractProofRootEvent    ContractProofRootType = "contract_event"
-	ContractProofRootInbox    ContractProofRootType = "contract_inbox"
-	ContractProofRootOutbox   ContractProofRootType = "contract_outbox"
+	ContractProofRootCode		ContractProofRootType	= "contract_code"
+	ContractProofRootInstance	ContractProofRootType	= "contract_instance"
+	ContractProofRootStorage	ContractProofRootType	= "contract_storage"
+	ContractProofRootABI		ContractProofRootType	= "contract_abi"
+	ContractProofRootGasTable	ContractProofRootType	= "contract_gas_table"
+	ContractProofRootEvent		ContractProofRootType	= "contract_event"
+	ContractProofRootInbox		ContractProofRootType	= "contract_inbox"
+	ContractProofRootOutbox		ContractProofRootType	= "contract_outbox"
 )
 
 type ContractBytecodeRuntime interface {
@@ -82,193 +82,193 @@ type CosmWasmAdapterBoundary interface {
 }
 
 type ContractZoneBoundary struct {
-	ZoneID       ZoneID
-	OwnsPrefixes []string
-	Messages     []ContractMessageKind
-	ProofKinds   []ContractProofKind
+	ZoneID		ZoneID
+	OwnsPrefixes	[]string
+	Messages	[]ContractMessageKind
+	ProofKinds	[]ContractProofKind
 }
 
 type AVMInstructionGasCost struct {
-	Instruction string
-	BaseGas     uint64
+	Instruction	string
+	BaseGas		uint64
 }
 
 type AVMGasTable struct {
-	Version   uint64
-	Costs     []AVMInstructionGasCost
-	TableHash string
+	Version		uint64
+	Costs		[]AVMInstructionGasCost
+	TableHash	string
 }
 
 type AVMInstruction struct {
-	Opcode      string
-	OperandHash string
+	Opcode		string
+	OperandHash	string
 }
 
 type AVMExecutionKeeper struct {
-	RuntimeID       string
-	GasTable        AVMGasTable
-	ZoneGasLimit    uint64
-	MaxInstructions uint32
-	KeeperHash      string
+	RuntimeID	string
+	GasTable	AVMGasTable
+	ZoneGasLimit	uint64
+	MaxInstructions	uint32
+	KeeperHash	string
 }
 
 type ContractShardRoute struct {
-	ZoneID      ZoneID
-	LayoutEpoch uint64
-	ShardCount  uint32
-	ShardID     uint32
-	RoutingMode ContractShardRoutingMode
-	RouteKey    string
-	StateKey    string
-	RouteHash   string
+	ZoneID		ZoneID
+	LayoutEpoch	uint64
+	ShardCount	uint32
+	ShardID		uint32
+	RoutingMode	ContractShardRoutingMode
+	RouteKey	string
+	StateKey	string
+	RouteHash	string
 }
 
 type ContractAsyncCall struct {
-	CallID         string
-	Source         string
-	SourceZone     ZoneID
-	TargetContract string
-	PayloadHash    string
-	GasLimit       uint64
-	RetryNonce     uint64
-	ExpiryHeight   uint64
-	CreatedHeight  uint64
-	CallHash       string
+	CallID		string
+	Source		string
+	SourceZone	ZoneID
+	TargetContract	string
+	PayloadHash	string
+	GasLimit	uint64
+	RetryNonce	uint64
+	ExpiryHeight	uint64
+	CreatedHeight	uint64
+	CallHash	string
 }
 
 type ContractEvent struct {
-	ContractAddr string
-	EventID      string
-	Topic        string
-	PayloadHash  string
-	Height       uint64
-	Sequence     uint64
-	EventHash    string
+	ContractAddr	string
+	EventID		string
+	Topic		string
+	PayloadHash	string
+	Height		uint64
+	Sequence	uint64
+	EventHash	string
 }
 
 type ContractProofRootExport struct {
-	ZoneID   ZoneID
-	Height   uint64
-	RootType ContractProofRootType
-	RootHash string
-	Source   string
+	ZoneID		ZoneID
+	Height		uint64
+	RootType	ContractProofRootType
+	RootHash	string
+	Source		string
 }
 
 type ContractBytecodeInterface struct {
-	Runtime         ContractRuntimeKind
-	InstructionSet  string
-	BytecodeHash    string
-	ABIHash         string
-	DeterminismHash string
-	MaxCodeBytes    uint64
-	InterfaceHash   string
+	Runtime		ContractRuntimeKind
+	InstructionSet	string
+	BytecodeHash	string
+	ABIHash		string
+	DeterminismHash	string
+	MaxCodeBytes	uint64
+	InterfaceHash	string
 }
 
 type ContractCosmWasmAdapterDescriptor struct {
-	AdapterID      string
-	Version        string
-	PolicyHash     string
-	CapabilityRoot string
-	DescriptorHash string
+	AdapterID	string
+	Version		string
+	PolicyHash	string
+	CapabilityRoot	string
+	DescriptorHash	string
 }
 
 type ContractCode struct {
-	CodeID         string
-	Runtime        ContractRuntimeKind
-	BytecodeHash   string
-	BytecodeSize   uint64
-	ABIHash        string
-	InterfaceHash  string
-	Uploader       string
-	UploadedHeight uint64
+	CodeID		string
+	Runtime		ContractRuntimeKind
+	BytecodeHash	string
+	BytecodeSize	uint64
+	ABIHash		string
+	InterfaceHash	string
+	Uploader	string
+	UploadedHeight	uint64
 }
 
 type ContractInstance struct {
-	ContractAddr  string
-	CodeID        string
-	Runtime       ContractRuntimeKind
-	Admin         string
-	StorageRoot   string
-	CreatedHeight uint64
-	UpdatedHeight uint64
+	ContractAddr	string
+	CodeID		string
+	Runtime		ContractRuntimeKind
+	Admin		string
+	StorageRoot	string
+	CreatedHeight	uint64
+	UpdatedHeight	uint64
 }
 
 type ContractStorageEntry struct {
-	ContractAddr string
-	Key          string
-	ValueHash    string
+	ContractAddr	string
+	Key		string
+	ValueHash	string
 }
 
 type ContractABIDescriptor struct {
-	CodeID           string
-	ABIHash          string
-	InterfaceHash    string
-	ExportedMethods  []string
-	RegisteredHeight uint64
+	CodeID			string
+	ABIHash			string
+	InterfaceHash		string
+	ExportedMethods		[]string
+	RegisteredHeight	uint64
 }
 
 type ContractInboxMessage struct {
-	ContractAddr   string
-	MsgID          string
-	MessageKind    ContractMessageKind
-	Source         string
-	PayloadHash    string
-	GasLimit       uint64
-	Sequence       uint64
-	ReceivedHeight uint64
+	ContractAddr	string
+	MsgID		string
+	MessageKind	ContractMessageKind
+	Source		string
+	PayloadHash	string
+	GasLimit	uint64
+	Sequence	uint64
+	ReceivedHeight	uint64
 }
 
 type ContractExecutionReceipt struct {
-	ContractAddr    string
-	ReceiptID       string
-	MsgID           string
-	MessageKind     ContractMessageKind
-	Status          ZoneReceiptStatus
-	GasUsed         uint64
-	OutputHash      string
-	StorageRoot     string
-	EmittedMessages uint32
-	Height          uint64
-	Sequence        uint64
-	ReceiptHash     string
+	ContractAddr	string
+	ReceiptID	string
+	MsgID		string
+	MessageKind	ContractMessageKind
+	Status		ZoneReceiptStatus
+	GasUsed		uint64
+	OutputHash	string
+	StorageRoot	string
+	EmittedMessages	uint32
+	Height		uint64
+	Sequence	uint64
+	ReceiptHash	string
 }
 
 type ContractZoneState struct {
-	Height             uint64
-	Codes              []ContractCode
-	Instances          []ContractInstance
-	Storage            []ContractStorageEntry
-	ABIs               []ContractABIDescriptor
-	Inbox              []ContractInboxMessage
-	Outbox             []ContractInboxMessage
-	Receipts           []ContractExecutionReceipt
-	BytecodeInterfaces []ContractBytecodeInterface
-	CosmWasmAdapters   []ContractCosmWasmAdapterDescriptor
-	GasTable           AVMGasTable
-	Events             []ContractEvent
+	Height			uint64
+	Codes			[]ContractCode
+	Instances		[]ContractInstance
+	Storage			[]ContractStorageEntry
+	ABIs			[]ContractABIDescriptor
+	Inbox			[]ContractInboxMessage
+	Outbox			[]ContractInboxMessage
+	Receipts		[]ContractExecutionReceipt
+	BytecodeInterfaces	[]ContractBytecodeInterface
+	CosmWasmAdapters	[]ContractCosmWasmAdapterDescriptor
+	GasTable		AVMGasTable
+	Events			[]ContractEvent
 }
 
 type ContractZoneRoots struct {
-	Height                uint64
-	CodeRoot              string
-	InstanceRoot          string
-	StorageRoot           string
-	ABIRoot               string
-	InboxRoot             string
-	OutboxRoot            string
-	ReceiptRoot           string
-	GasTableRoot          string
-	EventRoot             string
-	BytecodeInterfaceRoot string
-	CosmWasmAdapterRoot   string
-	ExecutionRoot         string
-	ProofRoot             string
-	StateRoot             string
+	Height			uint64
+	CodeRoot		string
+	InstanceRoot		string
+	StorageRoot		string
+	ABIRoot			string
+	InboxRoot		string
+	OutboxRoot		string
+	ReceiptRoot		string
+	GasTableRoot		string
+	EventRoot		string
+	BytecodeInterfaceRoot	string
+	CosmWasmAdapterRoot	string
+	ExecutionRoot		string
+	ProofRoot		string
+	StateRoot		string
 }
 
 func DefaultContractZoneBoundary() ContractZoneBoundary {
 	return ContractZoneBoundary{
-		ZoneID: ZoneIDContract,
+		ZoneID:	ZoneIDContract,
 		OwnsPrefixes: []string{
 			ContractABIPrefix,
 			ContractCodePrefix,
@@ -446,7 +446,7 @@ func NewContractBytecodeInterface(iface ContractBytecodeInterface) (ContractByte
 
 func DefaultAVMGasTable(version uint64) (AVMGasTable, error) {
 	table := AVMGasTable{
-		Version: version,
+		Version:	version,
 		Costs: []AVMInstructionGasCost{
 			{Instruction: "ABI_EXPORT", BaseGas: 3},
 			{Instruction: "ADD", BaseGas: 1},
@@ -465,10 +465,10 @@ func DefaultAVMGasTable(version uint64) (AVMGasTable, error) {
 
 func NewAVMExecutionKeeper(runtimeID string, gasTable AVMGasTable, zoneGasLimit uint64, maxInstructions uint32) (AVMExecutionKeeper, error) {
 	keeper := AVMExecutionKeeper{
-		RuntimeID:       runtimeID,
-		GasTable:        gasTable,
-		ZoneGasLimit:    zoneGasLimit,
-		MaxInstructions: maxInstructions,
+		RuntimeID:		runtimeID,
+		GasTable:		gasTable,
+		ZoneGasLimit:		zoneGasLimit,
+		MaxInstructions:	maxInstructions,
 	}
 	keeper.KeeperHash = ComputeAVMExecutionKeeperHash(keeper)
 	return keeper, keeper.ValidateHash()
@@ -501,17 +501,17 @@ func (k AVMExecutionKeeper) Execute(instance ContractInstance, msg ContractInbox
 		return ContractExecutionReceipt{}, errors.New("AVM execution gas exceeds limit")
 	}
 	return NewContractExecutionReceipt(ContractExecutionReceipt{
-		ContractAddr:    instance.ContractAddr,
-		ReceiptID:       hashRuntimeParts("contract-avm-receipt-id-v1", msg.MsgID, fmt.Sprint(height), fmt.Sprint(sequence)),
-		MsgID:           msg.MsgID,
-		MessageKind:     msg.MessageKind,
-		Status:          ZoneReceiptStatusSuccess,
-		GasUsed:         gasUsed,
-		OutputHash:      instructionRoot,
-		StorageRoot:     instance.StorageRoot,
-		EmittedMessages: 0,
-		Height:          height,
-		Sequence:        sequence,
+		ContractAddr:		instance.ContractAddr,
+		ReceiptID:		hashRuntimeParts("contract-avm-receipt-id-v1", msg.MsgID, fmt.Sprint(height), fmt.Sprint(sequence)),
+		MsgID:			msg.MsgID,
+		MessageKind:		msg.MessageKind,
+		Status:			ZoneReceiptStatusSuccess,
+		GasUsed:		gasUsed,
+		OutputHash:		instructionRoot,
+		StorageRoot:		instance.StorageRoot,
+		EmittedMessages:	0,
+		Height:			height,
+		Sequence:		sequence,
 	})
 }
 
@@ -620,14 +620,14 @@ func NewContractAsyncCall(call ContractAsyncCall) (ContractAsyncCall, ContractIn
 		return ContractAsyncCall{}, ContractInboxMessage{}, err
 	}
 	msg := ContractInboxMessage{
-		ContractAddr:   call.TargetContract,
-		MsgID:          call.CallID,
-		MessageKind:    ContractMessageAsyncCall,
-		Source:         string(call.SourceZone) + ":" + call.Source,
-		PayloadHash:    call.CallHash,
-		GasLimit:       call.GasLimit,
-		Sequence:       call.RetryNonce,
-		ReceivedHeight: call.CreatedHeight,
+		ContractAddr:	call.TargetContract,
+		MsgID:		call.CallID,
+		MessageKind:	ContractMessageAsyncCall,
+		Source:		string(call.SourceZone) + ":" + call.Source,
+		PayloadHash:	call.CallHash,
+		GasLimit:	call.GasLimit,
+		Sequence:	call.RetryNonce,
+		ReceivedHeight:	call.CreatedHeight,
 	}
 	return call, msg, msg.Validate()
 }
@@ -640,12 +640,12 @@ func ContractProofRequest(kind ContractProofKind, key string, height uint64, roo
 		return ZoneProofRequest{}, err
 	}
 	req := ZoneProofRequest{
-		ZoneID: ZoneIDContract,
-		Height: height,
-		Kind:   ZoneProofKindState,
-		Key:    string(kind) + "/" + key,
-		Root:   root,
-		Limit:  limit,
+		ZoneID:	ZoneIDContract,
+		Height:	height,
+		Kind:	ZoneProofKindState,
+		Key:	string(kind) + "/" + key,
+		Root:	root,
+		Limit:	limit,
 	}
 	return req, req.Validate()
 }
@@ -672,15 +672,15 @@ func BuildContractZoneRoot(roots ContractZoneRoots) (ZoneRoot, error) {
 		)
 	}
 	root := ZoneRoot{
-		ZoneID:              ZoneIDContract,
-		Height:              roots.Height,
-		ZoneStateRoot:       stateRoot,
-		InboxRoot:           roots.InboxRoot,
-		OutboxRoot:          roots.OutboxRoot,
-		ReceiptRoot:         roots.ReceiptRoot,
-		EventRoot:           roots.EventRoot,
-		ExecutionResultRoot: roots.ExecutionRoot,
-		ProofRoot:           roots.ProofRoot,
+		ZoneID:			ZoneIDContract,
+		Height:			roots.Height,
+		ZoneStateRoot:		stateRoot,
+		InboxRoot:		roots.InboxRoot,
+		OutboxRoot:		roots.OutboxRoot,
+		ReceiptRoot:		roots.ReceiptRoot,
+		EventRoot:		roots.EventRoot,
+		ExecutionResultRoot:	roots.ExecutionRoot,
+		ProofRoot:		roots.ProofRoot,
 	}
 	root.RootHash = ComputeZoneRootHash(root)
 	return root, root.Validate()
@@ -689,21 +689,21 @@ func BuildContractZoneRoot(roots ContractZoneRoots) (ZoneRoot, error) {
 func BuildContractZoneRootFromState(height uint64, state ContractZoneState, proofRoot string) (ZoneRoot, error) {
 	normalized := state.Normalize()
 	roots := ContractZoneRoots{
-		Height:                height,
-		CodeRoot:              ComputeContractCodeRoot(normalized.Codes),
-		InstanceRoot:          ComputeContractInstanceRoot(normalized.Instances),
-		StorageRoot:           ComputeContractStorageRoot(normalized.Storage),
-		ABIRoot:               ComputeContractABIRoot(normalized.ABIs),
-		InboxRoot:             ComputeContractInboxRoot(normalized.Inbox),
-		OutboxRoot:            ComputeContractOutboxRoot(normalized.Outbox),
-		ReceiptRoot:           ComputeContractReceiptRoot(normalized.Receipts),
-		GasTableRoot:          ComputeAVMGasTableRoot(normalized.GasTable),
-		EventRoot:             ComputeContractEventRoot(normalized.Events),
-		BytecodeInterfaceRoot: ComputeContractBytecodeInterfaceRoot(normalized.BytecodeInterfaces),
-		CosmWasmAdapterRoot:   ComputeContractCosmWasmAdapterRoot(normalized.CosmWasmAdapters),
-		ExecutionRoot:         ComputeContractExecutionRoot(normalized.Receipts),
-		ProofRoot:             proofRoot,
-		StateRoot:             ComputeContractZoneStateRoot(normalized),
+		Height:			height,
+		CodeRoot:		ComputeContractCodeRoot(normalized.Codes),
+		InstanceRoot:		ComputeContractInstanceRoot(normalized.Instances),
+		StorageRoot:		ComputeContractStorageRoot(normalized.Storage),
+		ABIRoot:		ComputeContractABIRoot(normalized.ABIs),
+		InboxRoot:		ComputeContractInboxRoot(normalized.Inbox),
+		OutboxRoot:		ComputeContractOutboxRoot(normalized.Outbox),
+		ReceiptRoot:		ComputeContractReceiptRoot(normalized.Receipts),
+		GasTableRoot:		ComputeAVMGasTableRoot(normalized.GasTable),
+		EventRoot:		ComputeContractEventRoot(normalized.Events),
+		BytecodeInterfaceRoot:	ComputeContractBytecodeInterfaceRoot(normalized.BytecodeInterfaces),
+		CosmWasmAdapterRoot:	ComputeContractCosmWasmAdapterRoot(normalized.CosmWasmAdapters),
+		ExecutionRoot:		ComputeContractExecutionRoot(normalized.Receipts),
+		ProofRoot:		proofRoot,
+		StateRoot:		ComputeContractZoneStateRoot(normalized),
 	}
 	return BuildContractZoneRoot(roots)
 }
@@ -1077,13 +1077,13 @@ func (r ContractExecutionReceipt) Validate() error {
 
 func (r ContractExecutionReceipt) ZoneReceipt() (ZoneReceipt, error) {
 	return NewZoneReceipt(ZoneReceipt{
-		ZoneID:     ZoneIDContract,
-		Height:     r.Height,
-		ItemHash:   hashRuntimeParts("contract-zone-receipt-item-v1", r.ContractAddr, r.ReceiptID, r.MsgID),
-		Status:     r.Status,
-		GasUsed:    r.GasUsed,
-		ResultHash: r.OutputHash,
-		Sequence:   r.Sequence,
+		ZoneID:		ZoneIDContract,
+		Height:		r.Height,
+		ItemHash:	hashRuntimeParts("contract-zone-receipt-item-v1", r.ContractAddr, r.ReceiptID, r.MsgID),
+		Status:		r.Status,
+		GasUsed:	r.GasUsed,
+		ResultHash:	r.OutputHash,
+		Sequence:	r.Sequence,
 	})
 }
 
@@ -1208,8 +1208,8 @@ func (r ContractZoneRoots) Validate() error {
 		return errors.New("contract zone root height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "contract code root", value: r.CodeRoot},
 		{name: "contract instance root", value: r.InstanceRoot},
@@ -1649,13 +1649,13 @@ func routeContractStateKey(mode ContractShardRoutingMode, routeKey string, state
 		return ContractShardRoute{}, err
 	}
 	route := ContractShardRoute{
-		ZoneID:      ZoneIDContract,
-		LayoutEpoch: layoutEpoch,
-		ShardCount:  shardCount,
-		ShardID:     uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
-		RoutingMode: mode,
-		RouteKey:    routeKey,
-		StateKey:    stateKey,
+		ZoneID:		ZoneIDContract,
+		LayoutEpoch:	layoutEpoch,
+		ShardCount:	shardCount,
+		ShardID:	uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
+		RoutingMode:	mode,
+		RouteKey:	routeKey,
+		StateKey:	stateKey,
 	}
 	route.RouteHash = ComputeContractShardRouteHash(route)
 	return route, route.ValidateHash()

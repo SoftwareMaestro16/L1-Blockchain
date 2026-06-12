@@ -12,170 +12,170 @@ import (
 type NativePaymentGoal string
 
 const (
-	NativePaymentGoalFastTransfers        NativePaymentGoal = "fast_offchain_style_transfers"
-	NativePaymentGoalChannelSettlement    NativePaymentGoal = "channel_like_settlement"
-	NativePaymentGoalConditionalPayments  NativePaymentGoal = "conditional_payments"
-	NativePaymentGoalMultiZoneRouting     NativePaymentGoal = "multi_zone_multi_shard_routing"
-	NativePaymentGoalRouteFeeOptimization NativePaymentGoal = "route_fee_optimization"
-	NativePaymentGoalTrustlessFallback    NativePaymentGoal = "trustless_fallback_settlement"
+	NativePaymentGoalFastTransfers		NativePaymentGoal	= "fast_offchain_style_transfers"
+	NativePaymentGoalChannelSettlement	NativePaymentGoal	= "channel_like_settlement"
+	NativePaymentGoalConditionalPayments	NativePaymentGoal	= "conditional_payments"
+	NativePaymentGoalMultiZoneRouting	NativePaymentGoal	= "multi_zone_multi_shard_routing"
+	NativePaymentGoalRouteFeeOptimization	NativePaymentGoal	= "route_fee_optimization"
+	NativePaymentGoalTrustlessFallback	NativePaymentGoal	= "trustless_fallback_settlement"
 )
 
 type NativePaymentObject string
 
 const (
-	NativePaymentObjectChannel         NativePaymentObject = "PaymentChannel"
-	NativePaymentObjectVirtualChannel  NativePaymentObject = "VirtualPaymentChannel"
-	NativePaymentObjectCondition       NativePaymentObject = "ConditionalPayment"
-	NativePaymentObjectRoute           NativePaymentObject = "PaymentRoute"
-	NativePaymentObjectReservation     NativePaymentObject = "LiquidityReservation"
-	NativePaymentObjectSettlementProof NativePaymentObject = "SettlementProof"
-	NativePaymentObjectReceipt         NativePaymentObject = "PaymentReceipt"
+	NativePaymentObjectChannel		NativePaymentObject	= "PaymentChannel"
+	NativePaymentObjectVirtualChannel	NativePaymentObject	= "VirtualPaymentChannel"
+	NativePaymentObjectCondition		NativePaymentObject	= "ConditionalPayment"
+	NativePaymentObjectRoute		NativePaymentObject	= "PaymentRoute"
+	NativePaymentObjectReservation		NativePaymentObject	= "LiquidityReservation"
+	NativePaymentObjectSettlementProof	NativePaymentObject	= "SettlementProof"
+	NativePaymentObjectReceipt		NativePaymentObject	= "PaymentReceipt"
 )
 
 type PaymentCommittedRoot string
 
 const (
-	PaymentCommittedRootChannel         PaymentCommittedRoot = "channel_root"
-	PaymentCommittedRootVirtualChannel  PaymentCommittedRoot = "virtual_channel_root"
-	PaymentCommittedRootCondition       PaymentCommittedRoot = "condition_root"
-	PaymentCommittedRootRoute           PaymentCommittedRoot = "route_root"
-	PaymentCommittedRootReservation     PaymentCommittedRoot = "reservation_root"
-	PaymentCommittedRootSettlementProof PaymentCommittedRoot = "settlement_proof_root"
-	PaymentCommittedRootReceipt         PaymentCommittedRoot = "payment_receipt_root"
+	PaymentCommittedRootChannel		PaymentCommittedRoot	= "channel_root"
+	PaymentCommittedRootVirtualChannel	PaymentCommittedRoot	= "virtual_channel_root"
+	PaymentCommittedRootCondition		PaymentCommittedRoot	= "condition_root"
+	PaymentCommittedRootRoute		PaymentCommittedRoot	= "route_root"
+	PaymentCommittedRootReservation		PaymentCommittedRoot	= "reservation_root"
+	PaymentCommittedRootSettlementProof	PaymentCommittedRoot	= "settlement_proof_root"
+	PaymentCommittedRootReceipt		PaymentCommittedRoot	= "payment_receipt_root"
 )
 
 type PaymentReceiptStatus string
 
 const (
-	PaymentReceiptExecuted PaymentReceiptStatus = "EXECUTED"
-	PaymentReceiptFailed   PaymentReceiptStatus = "FAILED"
-	PaymentReceiptRefunded PaymentReceiptStatus = "REFUNDED"
-	PaymentReceiptExpired  PaymentReceiptStatus = "EXPIRED"
-	PaymentReceiptSettled  PaymentReceiptStatus = "SETTLED"
+	PaymentReceiptExecuted	PaymentReceiptStatus	= "EXECUTED"
+	PaymentReceiptFailed	PaymentReceiptStatus	= "FAILED"
+	PaymentReceiptRefunded	PaymentReceiptStatus	= "REFUNDED"
+	PaymentReceiptExpired	PaymentReceiptStatus	= "EXPIRED"
+	PaymentReceiptSettled	PaymentReceiptStatus	= "SETTLED"
 )
 
 type SettlementProofType string
 
 const (
-	SettlementProofLatestState        SettlementProofType = "LATEST_STATE"
-	SettlementProofFraud              SettlementProofType = "FRAUD_PROOF"
-	SettlementProofCloseAuthorization SettlementProofType = "CLOSE_AUTHORIZATION"
-	SettlementProofFallbackSettlement SettlementProofType = "FALLBACK_SETTLEMENT"
+	SettlementProofLatestState		SettlementProofType	= "LATEST_STATE"
+	SettlementProofFraud			SettlementProofType	= "FRAUD_PROOF"
+	SettlementProofCloseAuthorization	SettlementProofType	= "CLOSE_AUTHORIZATION"
+	SettlementProofFallbackSettlement	SettlementProofType	= "FALLBACK_SETTLEMENT"
 )
 
 type NativePaymentGoalDescriptor struct {
-	Goal        NativePaymentGoal
-	Requirement string
+	Goal		NativePaymentGoal
+	Requirement	string
 }
 
 type NativePaymentAbstractionDescriptor struct {
-	Object        NativePaymentObject
-	Purpose       string
-	CommittedRoot PaymentCommittedRoot
+	Object		NativePaymentObject
+	Purpose		string
+	CommittedRoot	PaymentCommittedRoot
 }
 
 type PaymentChannel struct {
-	ChannelID        string
-	ChainID          string
-	ZoneID           string
-	ShardID          uint32
-	Participants     []string
-	Denom            string
-	Collateral       string
-	LatestStateHash  string
-	LatestNonce      uint64
-	ChallengePeriod  uint64
-	SettlementStatus ChannelStatus
-	ChannelRoot      string
+	ChannelID		string
+	ChainID			string
+	ZoneID			string
+	ShardID			uint32
+	Participants		[]string
+	Denom			string
+	Collateral		string
+	LatestStateHash		string
+	LatestNonce		uint64
+	ChallengePeriod		uint64
+	SettlementStatus	ChannelStatus
+	ChannelRoot		string
 }
 
 type VirtualPaymentChannel struct {
-	VirtualChannelID string
-	ChainID          string
-	ZoneID           string
-	ShardID          uint32
-	ParentRouteID    string
-	ParentChannelIDs []string
-	Endpoints        []string
-	Intermediaries   []string
-	Capacity         string
-	BalanceA         string
-	BalanceB         string
-	RoutingFeeAmount string
-	ExpiresHeight    uint64
-	Status           VirtualChannelStatus
-	StateHash        string
-	VirtualRoot      string
+	VirtualChannelID	string
+	ChainID			string
+	ZoneID			string
+	ShardID			uint32
+	ParentRouteID		string
+	ParentChannelIDs	[]string
+	Endpoints		[]string
+	Intermediaries		[]string
+	Capacity		string
+	BalanceA		string
+	BalanceB		string
+	RoutingFeeAmount	string
+	ExpiresHeight		uint64
+	Status			VirtualChannelStatus
+	StateHash		string
+	VirtualRoot		string
 }
 
 type PaymentRoute struct {
-	RouteID         string
-	Payer           string
-	Payee           string
-	Amount          string
-	MaxFee          string
-	Hops            []PaymentRouteHop
-	Capacity        string
-	ExpiryHeight    uint64
-	ConditionRoot   string
-	RouteCommitment string
-	RouteRoot       string
+	RouteID		string
+	Payer		string
+	Payee		string
+	Amount		string
+	MaxFee		string
+	Hops		[]PaymentRouteHop
+	Capacity	string
+	ExpiryHeight	uint64
+	ConditionRoot	string
+	RouteCommitment	string
+	RouteRoot	string
 }
 
 type LiquidityReservation struct {
-	ReservationID   string
-	RouteID         string
-	ChannelID       string
-	Participant     string
-	Amount          string
-	FeeAmount       string
-	ReservedHeight  uint64
-	ExpiryHeight    uint64
-	ReservationRoot string
+	ReservationID	string
+	RouteID		string
+	ChannelID	string
+	Participant	string
+	Amount		string
+	FeeAmount	string
+	ReservedHeight	uint64
+	ExpiryHeight	uint64
+	ReservationRoot	string
 }
 
 type SettlementProof struct {
-	ProofID                string
-	ProofType              SettlementProofType
-	ChannelID              string
-	LatestStateHash        string
-	FraudProofHashOptional string
-	CloseAuthHashOptional  string
-	FallbackRootOptional   string
-	SubmittedBy            string
-	Height                 uint64
-	ProofRoot              string
+	ProofID			string
+	ProofType		SettlementProofType
+	ChannelID		string
+	LatestStateHash		string
+	FraudProofHashOptional	string
+	CloseAuthHashOptional	string
+	FallbackRootOptional	string
+	SubmittedBy		string
+	Height			uint64
+	ProofRoot		string
 }
 
 type PaymentReceipt struct {
-	PaymentID     string
-	RouteID       string
-	ChannelID     string
-	Status        PaymentReceiptStatus
-	Amount        string
-	FeeAmount     string
-	ValueReturned string
-	Height        uint64
-	ReceiptHash   string
+	PaymentID	string
+	RouteID		string
+	ChannelID	string
+	Status		PaymentReceiptStatus
+	Amount		string
+	FeeAmount	string
+	ValueReturned	string
+	Height		uint64
+	ReceiptHash	string
 }
 
 type NativePaymentRoutingSnapshot struct {
-	Height              uint64
-	Channels            []PaymentChannel
-	VirtualChannels     []VirtualPaymentChannel
-	Conditions          []ConditionalPayment
-	Routes              []PaymentRoute
-	Reservations        []LiquidityReservation
-	SettlementProofs    []SettlementProof
-	Receipts            []PaymentReceipt
-	ChannelRoot         string
-	VirtualChannelRoot  string
-	ConditionRoot       string
-	RouteRoot           string
-	ReservationRoot     string
-	SettlementProofRoot string
-	ReceiptRoot         string
-	StateRoot           string
+	Height			uint64
+	Channels		[]PaymentChannel
+	VirtualChannels		[]VirtualPaymentChannel
+	Conditions		[]ConditionalPayment
+	Routes			[]PaymentRoute
+	Reservations		[]LiquidityReservation
+	SettlementProofs	[]SettlementProof
+	Receipts		[]PaymentReceipt
+	ChannelRoot		string
+	VirtualChannelRoot	string
+	ConditionRoot		string
+	RouteRoot		string
+	ReservationRoot		string
+	SettlementProofRoot	string
+	ReceiptRoot		string
+	StateRoot		string
 }
 
 func NativePaymentGoals() []NativePaymentGoalDescriptor {
@@ -236,17 +236,17 @@ func NewPaymentChannelFromRecord(channel ChannelRecord, zoneID string, shardID u
 		return PaymentChannel{}, err
 	}
 	return BuildPaymentChannel(PaymentChannel{
-		ChannelID:        channel.ChannelID,
-		ChainID:          channel.ChainID,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		Participants:     channel.Participants,
-		Denom:            channel.Denom,
-		Collateral:       channel.Collateral,
-		LatestStateHash:  channel.LatestState.StateHash,
-		LatestNonce:      channel.LatestState.Nonce,
-		ChallengePeriod:  channel.DisputePeriod,
-		SettlementStatus: channel.Status,
+		ChannelID:		channel.ChannelID,
+		ChainID:		channel.ChainID,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Participants:		channel.Participants,
+		Denom:			channel.Denom,
+		Collateral:		channel.Collateral,
+		LatestStateHash:	channel.LatestState.StateHash,
+		LatestNonce:		channel.LatestState.Nonce,
+		ChallengePeriod:	channel.DisputePeriod,
+		SettlementStatus:	channel.Status,
 	})
 }
 
@@ -332,21 +332,21 @@ func NewVirtualPaymentChannelFromRecord(channel VirtualChannel, zoneID string, s
 		return VirtualPaymentChannel{}, err
 	}
 	return BuildVirtualPaymentChannel(VirtualPaymentChannel{
-		VirtualChannelID: channel.VirtualChannelID,
-		ChainID:          channel.ChainID,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		ParentRouteID:    channel.ParentRouteID,
-		ParentChannelIDs: channel.ParentChannelIDs,
-		Endpoints:        channel.Endpoints,
-		Intermediaries:   channel.Intermediaries,
-		Capacity:         channel.Capacity,
-		BalanceA:         channel.BalanceA,
-		BalanceB:         channel.BalanceB,
-		RoutingFeeAmount: channel.RoutingFeeAmount,
-		ExpiresHeight:    channel.ExpiresHeight,
-		Status:           channel.Status,
-		StateHash:        channel.StateHash,
+		VirtualChannelID:	channel.VirtualChannelID,
+		ChainID:		channel.ChainID,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		ParentRouteID:		channel.ParentRouteID,
+		ParentChannelIDs:	channel.ParentChannelIDs,
+		Endpoints:		channel.Endpoints,
+		Intermediaries:		channel.Intermediaries,
+		Capacity:		channel.Capacity,
+		BalanceA:		channel.BalanceA,
+		BalanceB:		channel.BalanceB,
+		RoutingFeeAmount:	channel.RoutingFeeAmount,
+		ExpiresHeight:		channel.ExpiresHeight,
+		Status:			channel.Status,
+		StateHash:		channel.StateHash,
 	})
 }
 
@@ -463,16 +463,16 @@ func NewPaymentRouteFromMsg(msg MsgPaymentRoute, capacity string) (PaymentRoute,
 		return PaymentRoute{}, err
 	}
 	return BuildPaymentRoute(PaymentRoute{
-		RouteID:         msg.RouteID,
-		Payer:           msg.Payer,
-		Payee:           msg.Payee,
-		Amount:          msg.Amount,
-		MaxFee:          msg.MaxFee,
-		Hops:            msg.Hops,
-		Capacity:        capacity,
-		ExpiryHeight:    msg.ExpiryHeight,
-		ConditionRoot:   msg.ConditionRoot,
-		RouteCommitment: ComputePaymentRouteCommitmentHash(msg),
+		RouteID:		msg.RouteID,
+		Payer:			msg.Payer,
+		Payee:			msg.Payee,
+		Amount:			msg.Amount,
+		MaxFee:			msg.MaxFee,
+		Hops:			msg.Hops,
+		Capacity:		capacity,
+		ExpiryHeight:		msg.ExpiryHeight,
+		ConditionRoot:		msg.ConditionRoot,
+		RouteCommitment:	ComputePaymentRouteCommitmentHash(msg),
 	})
 }
 
@@ -524,15 +524,15 @@ func (route PaymentRoute) ValidateFormat() error {
 		return fmt.Errorf("payments native route hops must be between 1 and %d", MaxRoutingHops)
 	}
 	msg := MsgPaymentRoute{
-		RouteID:        route.RouteID,
-		Payer:          route.Payer,
-		Payee:          route.Payee,
-		Amount:         route.Amount,
-		MaxFee:         route.MaxFee,
-		Hops:           route.Hops,
-		ConditionRoot:  route.ConditionRoot,
-		ExpiryHeight:   route.ExpiryHeight,
-		SettlementMode: ConditionSettlementModePreimage,
+		RouteID:	route.RouteID,
+		Payer:		route.Payer,
+		Payee:		route.Payee,
+		Amount:		route.Amount,
+		MaxFee:		route.MaxFee,
+		Hops:		route.Hops,
+		ConditionRoot:	route.ConditionRoot,
+		ExpiryHeight:	route.ExpiryHeight,
+		SettlementMode:	ConditionSettlementModePreimage,
 	}
 	if err := msg.ValidateBasic(); err != nil {
 		return err
@@ -886,13 +886,13 @@ func (snapshot NativePaymentRoutingSnapshot) Validate() error {
 		return err
 	}
 	expectedRoots := map[string][2]string{
-		"payments native channel root":          {snapshot.ChannelRoot, ComputePaymentChannelSetRoot(snapshot.Channels)},
-		"payments native virtual channel root":  {snapshot.VirtualChannelRoot, ComputeVirtualPaymentChannelSetRoot(snapshot.VirtualChannels)},
-		"payments native condition root":        {snapshot.ConditionRoot, ComputeConditionsRoot(snapshot.Conditions)},
-		"payments native route root":            {snapshot.RouteRoot, ComputeNativePaymentRouteSetRoot(snapshot.Routes)},
-		"payments native reservation root":      {snapshot.ReservationRoot, ComputeLiquidityReservationSetRoot(snapshot.Reservations)},
-		"payments native settlement proof root": {snapshot.SettlementProofRoot, ComputeSettlementProofSetRoot(snapshot.SettlementProofs)},
-		"payments native receipt root":          {snapshot.ReceiptRoot, ComputeNativePaymentReceiptSetRoot(snapshot.Receipts)},
+		"payments native channel root":			{snapshot.ChannelRoot, ComputePaymentChannelSetRoot(snapshot.Channels)},
+		"payments native virtual channel root":		{snapshot.VirtualChannelRoot, ComputeVirtualPaymentChannelSetRoot(snapshot.VirtualChannels)},
+		"payments native condition root":		{snapshot.ConditionRoot, ComputeConditionsRoot(snapshot.Conditions)},
+		"payments native route root":			{snapshot.RouteRoot, ComputeNativePaymentRouteSetRoot(snapshot.Routes)},
+		"payments native reservation root":		{snapshot.ReservationRoot, ComputeLiquidityReservationSetRoot(snapshot.Reservations)},
+		"payments native settlement proof root":	{snapshot.SettlementProofRoot, ComputeSettlementProofSetRoot(snapshot.SettlementProofs)},
+		"payments native receipt root":			{snapshot.ReceiptRoot, ComputeNativePaymentReceiptSetRoot(snapshot.Receipts)},
 	}
 	for field, roots := range expectedRoots {
 		if roots[0] == "" {

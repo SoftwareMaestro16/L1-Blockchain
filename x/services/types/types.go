@@ -115,31 +115,31 @@ type QueryServer interface {
 }
 
 type ServiceDisputeRecord struct {
-	DisputeID    string
-	ServiceID    string
-	CallID       string
-	ProviderID   string
-	EvidenceHash string
-	Reason       string
-	OpenedHeight uint64
-	Submitter    string
-	DisputeHash  string
+	DisputeID	string
+	ServiceID	string
+	CallID		string
+	ProviderID	string
+	EvidenceHash	string
+	Reason		string
+	OpenedHeight	uint64
+	Submitter	string
+	DisputeHash	string
 }
 
 type GenesisState struct {
-	Version  uint64
-	Params   coretypes.AetraCoreParams
-	Registry ServiceRegistryState
-	Disputes []ServiceDisputeRecord
+	Version		uint64
+	Params		coretypes.AetraCoreParams
+	Registry	ServiceRegistryState
+	Disputes	[]ServiceDisputeRecord
 }
 
 func DefaultGenesis() GenesisState {
 	registry, _ := coretypes.NewServiceRegistryState(nil, nil, nil, nil, nil, nil, 1)
 	return GenesisState{
-		Version:  CurrentGenesisVersion,
-		Params:   coretypes.TestnetParams(),
-		Registry: registry,
-		Disputes: []ServiceDisputeRecord{},
+		Version:	CurrentGenesisVersion,
+		Params:		coretypes.TestnetParams(),
+		Registry:	registry,
+		Disputes:	[]ServiceDisputeRecord{},
 	}
 }
 
@@ -161,14 +161,14 @@ func NewServiceDisputeRecord(msg MsgSubmitServiceDispute) (ServiceDisputeRecord,
 		return ServiceDisputeRecord{}, err
 	}
 	record := ServiceDisputeRecord{
-		DisputeID:    servicesHashParts("aetra-services-dispute-id-v1", msg.ServiceID, msg.CallID, msg.ProviderID, msg.EvidenceHash),
-		ServiceID:    msg.ServiceID,
-		CallID:       msg.CallID,
-		ProviderID:   msg.ProviderID,
-		EvidenceHash: msg.EvidenceHash,
-		Reason:       msg.Reason,
-		OpenedHeight: msg.OpenedHeight,
-		Submitter:    msg.Authority,
+		DisputeID:	servicesHashParts("aetra-services-dispute-id-v1", msg.ServiceID, msg.CallID, msg.ProviderID, msg.EvidenceHash),
+		ServiceID:	msg.ServiceID,
+		CallID:		msg.CallID,
+		ProviderID:	msg.ProviderID,
+		EvidenceHash:	msg.EvidenceHash,
+		Reason:		msg.Reason,
+		OpenedHeight:	msg.OpenedHeight,
+		Submitter:	msg.Authority,
 	}
 	record.DisputeHash = ComputeServiceDisputeHash(record)
 	return record, record.Validate()

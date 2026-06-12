@@ -9,19 +9,19 @@ import (
 )
 
 const (
-	NameNormalizationVersionV2             uint64 = 1
-	MinSupportedNameNormalizationVersionV2 uint64 = NameNormalizationVersionV2
-	MaxSupportedNameNormalizationVersionV2 uint64 = NameNormalizationVersionV2
+	NameNormalizationVersionV2		uint64	= 1
+	MinSupportedNameNormalizationVersionV2	uint64	= NameNormalizationVersionV2
+	MaxSupportedNameNormalizationVersionV2	uint64	= NameNormalizationVersionV2
 
-	ResolverRecoveryMetadataKeyV2 = "recovery"
+	ResolverRecoveryMetadataKeyV2	= "recovery"
 )
 
 type NameNormalizationResultV2 struct {
-	Input          string
-	NormalizedName string
-	NameHash       string
-	Version        uint64
-	Labels         []string
+	Input		string
+	NormalizedName	string
+	NameHash	string
+	Version		uint64
+	Labels		[]string
 }
 
 func ValidateNameNormalizationVersionV2(version uint64) error {
@@ -83,11 +83,11 @@ func NormalizeAETDomainVersioned(name string, version uint64) (NameNormalization
 		return NameNormalizationResultV2{}, err
 	}
 	return NameNormalizationResultV2{
-		Input:          name,
-		NormalizedName: name,
-		NameHash:       nameHash,
-		Version:        version,
-		Labels:         append([]string(nil), labels...),
+		Input:		name,
+		NormalizedName:	name,
+		NameHash:	nameHash,
+		Version:	version,
+		Labels:		append([]string(nil), labels...),
 	}, nil
 }
 
@@ -233,9 +233,9 @@ func validateTransferBindingAgreementV2(record DomainRecordV2, binding DomainNFT
 		return errors.New("identity v2 registry owner must equal nft owner")
 	}
 	return ValidateDomainNFTBinding(binding, DomainNFTBindingContext{
-		RegistryOwner:  record.Owner,
-		NFTModuleOwner: binding.Owner,
-		CurrentHeight:  height,
+		RegistryOwner:	record.Owner,
+		NFTModuleOwner:	binding.Owner,
+		CurrentHeight:	height,
 	})
 }
 

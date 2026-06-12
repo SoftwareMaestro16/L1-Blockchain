@@ -7,69 +7,69 @@ import (
 )
 
 const (
-	OperationBeginBlock        = "begin_block"
-	OperationEndBlock          = "end_block"
-	OperationDeposit           = "deposit"
-	OperationRewardClaim       = "reward_claim"
-	OperationReputationClaim   = "reputation_claim"
-	OperationStorageRentCharge = "storage_rent_charge"
-	OperationQuery             = "query"
+	OperationBeginBlock		= "begin_block"
+	OperationEndBlock		= "end_block"
+	OperationDeposit		= "deposit"
+	OperationRewardClaim		= "reward_claim"
+	OperationReputationClaim	= "reputation_claim"
+	OperationStorageRentCharge	= "storage_rent_charge"
+	OperationQuery			= "query"
 
-	DefaultMaxValidatorsPerBlock       = uint64(300)
-	DefaultMaxMaintenanceItemsPerBlock = uint64(200)
-	DefaultMaxRewardClaimKeys          = uint64(16)
-	DefaultMaxReputationClaimKeys      = uint64(16)
-	DefaultMaxStorageRentChargeKeys    = uint64(12)
-	DefaultMaxDepositKeys              = uint64(12)
-	DefaultMaxPageSize                 = uint64(200)
-	DefaultPageSize                    = uint64(50)
+	DefaultMaxValidatorsPerBlock		= uint64(300)
+	DefaultMaxMaintenanceItemsPerBlock	= uint64(200)
+	DefaultMaxRewardClaimKeys		= uint64(16)
+	DefaultMaxReputationClaimKeys		= uint64(16)
+	DefaultMaxStorageRentChargeKeys		= uint64(12)
+	DefaultMaxDepositKeys			= uint64(12)
+	DefaultMaxPageSize			= uint64(200)
+	DefaultPageSize				= uint64(50)
 )
 
 type ScalabilityLimits struct {
-	MaxValidatorsPerBlock       uint64
-	MaxMaintenanceItemsPerBlock uint64
-	MaxRewardClaimKeys          uint64
-	MaxReputationClaimKeys      uint64
-	MaxStorageRentChargeKeys    uint64
-	MaxDepositKeys              uint64
-	DefaultPageSize             uint64
-	MaxPageSize                 uint64
+	MaxValidatorsPerBlock		uint64
+	MaxMaintenanceItemsPerBlock	uint64
+	MaxRewardClaimKeys		uint64
+	MaxReputationClaimKeys		uint64
+	MaxStorageRentChargeKeys	uint64
+	MaxDepositKeys			uint64
+	DefaultPageSize			uint64
+	MaxPageSize			uint64
 }
 
 type OperationMetrics struct {
-	Operation                 string
-	FullAccountScan           bool
-	FullPoolUserScan          bool
-	FullPoolShareScan         bool
-	AccountsIterated          uint64
-	PoolUsersIterated         uint64
-	PoolSharesIterated        uint64
-	AllocationItemsIterated   uint64
-	ValidatorSetItemsIterated uint64
-	MaintenanceItemsProcessed uint64
-	KeysRead                  uint64
-	KeysWritten               uint64
-	PageLimit                 uint64
-	PrefixKey                 string
+	Operation			string
+	FullAccountScan			bool
+	FullPoolUserScan		bool
+	FullPoolShareScan		bool
+	AccountsIterated		uint64
+	PoolUsersIterated		uint64
+	PoolSharesIterated		uint64
+	AllocationItemsIterated		uint64
+	ValidatorSetItemsIterated	uint64
+	MaintenanceItemsProcessed	uint64
+	KeysRead			uint64
+	KeysWritten			uint64
+	PageLimit			uint64
+	PrefixKey			string
 }
 
 type StoreKeyDescriptor struct {
-	Name          string
-	Prefix        string
-	Deterministic bool
-	Paginated     bool
+	Name		string
+	Prefix		string
+	Deterministic	bool
+	Paginated	bool
 }
 
 func DefaultScalabilityLimits() ScalabilityLimits {
 	return ScalabilityLimits{
-		MaxValidatorsPerBlock:       DefaultMaxValidatorsPerBlock,
-		MaxMaintenanceItemsPerBlock: DefaultMaxMaintenanceItemsPerBlock,
-		MaxRewardClaimKeys:          DefaultMaxRewardClaimKeys,
-		MaxReputationClaimKeys:      DefaultMaxReputationClaimKeys,
-		MaxStorageRentChargeKeys:    DefaultMaxStorageRentChargeKeys,
-		MaxDepositKeys:              DefaultMaxDepositKeys,
-		DefaultPageSize:             DefaultPageSize,
-		MaxPageSize:                 DefaultMaxPageSize,
+		MaxValidatorsPerBlock:		DefaultMaxValidatorsPerBlock,
+		MaxMaintenanceItemsPerBlock:	DefaultMaxMaintenanceItemsPerBlock,
+		MaxRewardClaimKeys:		DefaultMaxRewardClaimKeys,
+		MaxReputationClaimKeys:		DefaultMaxReputationClaimKeys,
+		MaxStorageRentChargeKeys:	DefaultMaxStorageRentChargeKeys,
+		MaxDepositKeys:			DefaultMaxDepositKeys,
+		DefaultPageSize:		DefaultPageSize,
+		MaxPageSize:			DefaultMaxPageSize,
 	}
 }
 

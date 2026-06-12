@@ -13,143 +13,143 @@ import (
 )
 
 const (
-	MaxUnifiedContractTargets       = 16
-	MaxUnifiedServiceEndpoints      = 16
-	MaxUnifiedInterfaceDescriptors  = 16
-	MaxUnifiedExecutionHints        = 16
-	MaxUnifiedRecordKeyBytes        = 48
-	MaxUnifiedRecordValueBytes      = 128
-	MaxUnifiedEndpointBytes         = 128
-	MaxUnifiedRoutingMetadataBytes  = 256
-	MaxUnifiedOwnerSignatureBytes   = 128
-	MaxUnifiedRouteListEntries      = 16
-	MaxContractCodeIDBytesV2        = 64
-	MaxContractEntrypointBytesV2    = 64
-	MaxRequiredFundsPolicyBytesV2   = 64
-	MaxUnifiedPayloadBytesV2        = 64 * 1024
-	MaxContractGasHintV2            = 100_000_000
-	MaxRouteIDBytesV2               = 48
-	MaxRouteTargetTypeBytesV2       = 24
-	MaxRouteTargetBytesV2           = 64
-	MaxRouteChainContextBytesV2     = 64
-	MaxRouteFeeHintBytesV2          = 64
-	MaxRouteMemoPolicyBytesV2       = 48
-	MaxRouteCapabilityBytesV2       = 48
-	MaxRouteTimeoutHintV2           = 86_400
-	MaxServiceTypeBytesV2           = 48
-	MaxServiceTransportBytesV2      = 24
-	MaxServiceAuthPolicyBytesV2     = 48
-	MaxServiceHealthPathBytesV2     = 96
-	MaxServicePriorityV2            = 1_000
-	MaxServiceWeightV2              = 1_000_000
-	MaxInterfaceSchemaURIBytesV2    = 128
-	MaxInterfaceInlineSchemaBytesV2 = 2 * 1024
-	MaxInterfaceVersionBytesV2      = 32
-	MaxInterfaceRenderPolicyBytesV2 = 48
-	MaxInterfacePermissionBytesV2   = 48
-	MaxInterfacePermissionsV2       = 16
-	MaxExecutionFeeModeBytesV2      = 32
-	MaxExecutionMessageTypeBytesV2  = 64
-	MaxExecutionGasLimitHintV2      = 100_000_000
+	MaxUnifiedContractTargets	= 16
+	MaxUnifiedServiceEndpoints	= 16
+	MaxUnifiedInterfaceDescriptors	= 16
+	MaxUnifiedExecutionHints	= 16
+	MaxUnifiedRecordKeyBytes	= 48
+	MaxUnifiedRecordValueBytes	= 128
+	MaxUnifiedEndpointBytes		= 128
+	MaxUnifiedRoutingMetadataBytes	= 256
+	MaxUnifiedOwnerSignatureBytes	= 128
+	MaxUnifiedRouteListEntries	= 16
+	MaxContractCodeIDBytesV2	= 64
+	MaxContractEntrypointBytesV2	= 64
+	MaxRequiredFundsPolicyBytesV2	= 64
+	MaxUnifiedPayloadBytesV2	= 64 * 1024
+	MaxContractGasHintV2		= 100_000_000
+	MaxRouteIDBytesV2		= 48
+	MaxRouteTargetTypeBytesV2	= 24
+	MaxRouteTargetBytesV2		= 64
+	MaxRouteChainContextBytesV2	= 64
+	MaxRouteFeeHintBytesV2		= 64
+	MaxRouteMemoPolicyBytesV2	= 48
+	MaxRouteCapabilityBytesV2	= 48
+	MaxRouteTimeoutHintV2		= 86_400
+	MaxServiceTypeBytesV2		= 48
+	MaxServiceTransportBytesV2	= 24
+	MaxServiceAuthPolicyBytesV2	= 48
+	MaxServiceHealthPathBytesV2	= 96
+	MaxServicePriorityV2		= 1_000
+	MaxServiceWeightV2		= 1_000_000
+	MaxInterfaceSchemaURIBytesV2	= 128
+	MaxInterfaceInlineSchemaBytesV2	= 2 * 1024
+	MaxInterfaceVersionBytesV2	= 32
+	MaxInterfaceRenderPolicyBytesV2	= 48
+	MaxInterfacePermissionBytesV2	= 48
+	MaxInterfacePermissionsV2	= 16
+	MaxExecutionFeeModeBytesV2	= 32
+	MaxExecutionMessageTypeBytesV2	= 64
+	MaxExecutionGasLimitHintV2	= 100_000_000
 
-	UnifiedResolutionSchemaVersionV2 uint64 = 1
+	UnifiedResolutionSchemaVersionV2	uint64	= 1
 
-	InterfaceDescriptorHashPrefixV2 = "sha256:"
+	InterfaceDescriptorHashPrefixV2	= "sha256:"
 )
 
 type ContractTargetV2 struct {
-	Key                 string
-	Address             sdk.AccAddress
-	CodeID              string
-	TargetID            string
-	ContractAddress     sdk.AccAddress
-	Entrypoint          string
-	InterfaceHash       string
-	RequiredFundsPolicy string
-	GasHint             uint64
-	Enabled             bool
-	UpdatedAtHeight     uint64
+	Key			string
+	Address			sdk.AccAddress
+	CodeID			string
+	TargetID		string
+	ContractAddress		sdk.AccAddress
+	Entrypoint		string
+	InterfaceHash		string
+	RequiredFundsPolicy	string
+	GasHint			uint64
+	Enabled			bool
+	UpdatedAtHeight		uint64
 }
 
 type ServiceEndpointV2 struct {
-	Key                string
-	Endpoint           string
-	ServiceID          string
-	ServiceType        string
-	Transport          string
-	AuthPolicy         string
-	HealthPathOptional string
-	Priority           uint32
-	Weight             uint32
-	TTL                uint64
-	SchemaHashOptional string
+	Key			string
+	Endpoint		string
+	ServiceID		string
+	ServiceType		string
+	Transport		string
+	AuthPolicy		string
+	HealthPathOptional	string
+	Priority		uint32
+	Weight			uint32
+	TTL			uint64
+	SchemaHashOptional	string
 }
 
 type InterfaceDescriptorV2 struct {
-	InterfaceID              string
-	Descriptor               string
-	SchemaHash               string
-	SchemaURIOptional        string
-	SchemaInlineOptional     string
-	Version                  string
-	RenderPolicy             string
-	PermissionsRequired      []string
-	ContractTargetIDOptional string
-	ServiceIDOptional        string
+	InterfaceID			string
+	Descriptor			string
+	SchemaHash			string
+	SchemaURIOptional		string
+	SchemaInlineOptional		string
+	Version				string
+	RenderPolicy			string
+	PermissionsRequired		[]string
+	ContractTargetIDOptional	string
+	ServiceIDOptional		string
 }
 
 type RoutingMetadataV2 struct {
-	ZoneID                 string
-	ShardID                string
-	VM                     string
-	Entrypoint             string
-	RouteID                string
-	TargetType             string
-	PreferredTarget        string
-	FallbackTargets        []string
-	ChainContext           string
-	FeeHint                string
-	TimeoutHint            uint64
-	MemoPolicy             string
-	CapabilityRequirements []string
+	ZoneID			string
+	ShardID			string
+	VM			string
+	Entrypoint		string
+	RouteID			string
+	TargetType		string
+	PreferredTarget		string
+	FallbackTargets		[]string
+	ChainContext		string
+	FeeHint			string
+	TimeoutHint		uint64
+	MemoPolicy		string
+	CapabilityRequirements	[]string
 }
 
 type ExecutionHintV2 struct {
-	Key                           string
-	Value                         string
-	DefaultGasLimitHint           uint64
-	PreferredFeeMode              string
-	MessageType                   string
-	AsyncAllowed                  bool
-	RequiresMemo                  bool
-	RequiresInterfaceConfirmation bool
-	SimulationRequired            bool
+	Key				string
+	Value				string
+	DefaultGasLimitHint		uint64
+	PreferredFeeMode		string
+	MessageType			string
+	AsyncAllowed			bool
+	RequiresMemo			bool
+	RequiresInterfaceConfirmation	bool
+	SimulationRequired		bool
 }
 
 type UnifiedResolutionRecordV2 struct {
-	NameHash               string
-	Owner                  sdk.AccAddress
-	PrimaryAddress         sdk.AccAddress
-	ContractTargets        []ContractTargetV2
-	ServiceEndpoints       []ServiceEndpointV2
-	InterfaceDescriptors   []InterfaceDescriptorV2
-	RoutingMetadata        RoutingMetadataV2
-	ExecutionHints         []ExecutionHintV2
-	RecordVersion          uint64
-	RecordTTL              uint64
-	UpdatedAtHeight        uint64
-	MaxPayloadBytes        uint64
-	SchemaVersion          uint64
-	OwnerSignatureOptional []byte
+	NameHash		string
+	Owner			sdk.AccAddress
+	PrimaryAddress		sdk.AccAddress
+	ContractTargets		[]ContractTargetV2
+	ServiceEndpoints	[]ServiceEndpointV2
+	InterfaceDescriptors	[]InterfaceDescriptorV2
+	RoutingMetadata		RoutingMetadataV2
+	ExecutionHints		[]ExecutionHintV2
+	RecordVersion		uint64
+	RecordTTL		uint64
+	UpdatedAtHeight		uint64
+	MaxPayloadBytes		uint64
+	SchemaVersion		uint64
+	OwnerSignatureOptional	[]byte
 }
 
 type ReverseResolutionRecordV2 struct {
-	Address         sdk.AccAddress
-	NameHash        string
-	Name            string
-	Verified        bool
-	UpdatedAtHeight uint64
-	ExpiryHeight    uint64
+	Address		sdk.AccAddress
+	NameHash	string
+	Name		string
+	Verified	bool
+	UpdatedAtHeight	uint64
+	ExpiryHeight	uint64
 }
 
 func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uint64, ttl uint64) (UnifiedResolutionRecordV2, error) {
@@ -162,15 +162,15 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 		return UnifiedResolutionRecordV2{}, err
 	}
 	record := UnifiedResolutionRecordV2{
-		NameHash:        nameHash,
-		Owner:           cloneSpecAddress(view.AuthorityOwner),
-		PrimaryAddress:  cloneSpecAddress(view.Primary),
-		RoutingMetadata: routeV2FromExecutionRoute(view.Route),
-		RecordVersion:   1,
-		RecordTTL:       ttl,
-		UpdatedAtHeight: height,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		NameHash:		nameHash,
+		Owner:			cloneSpecAddress(view.AuthorityOwner),
+		PrimaryAddress:		cloneSpecAddress(view.Primary),
+		RoutingMetadata:	routeV2FromExecutionRoute(view.Route),
+		RecordVersion:		1,
+		RecordTTL:		ttl,
+		UpdatedAtHeight:	height,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	if len(view.Contract) > 0 {
 		record.ContractTargets = append(record.ContractTargets, NewContractTargetV2(ResolverKeyContract, view.Contract, height))
@@ -187,15 +187,15 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 				return UnifiedResolutionRecordV2{}, err
 			}
 			record.ServiceEndpoints = append(record.ServiceEndpoints, ServiceEndpointV2{
-				Key:         serviceID,
-				Endpoint:    entry.Value,
-				ServiceID:   serviceID,
-				ServiceType: "service.v1",
-				Transport:   transport,
-				AuthPolicy:  "none",
-				Priority:    100,
-				Weight:      1,
-				TTL:         ttl,
+				Key:		serviceID,
+				Endpoint:	entry.Value,
+				ServiceID:	serviceID,
+				ServiceType:	"service.v1",
+				Transport:	transport,
+				AuthPolicy:	"none",
+				Priority:	100,
+				Weight:		1,
+				TTL:		ttl,
 			})
 		case strings.HasPrefix(entry.Key, ResolverMetadataInterfacePrefix):
 			interfaceID := strings.TrimPrefix(entry.Key, ResolverMetadataInterfacePrefix)
@@ -204,11 +204,11 @@ func BuildUnifiedResolutionRecordV2(state IdentityState, name string, height uin
 				return UnifiedResolutionRecordV2{}, err
 			}
 			record.InterfaceDescriptors = append(record.InterfaceDescriptors, InterfaceDescriptorV2{
-				InterfaceID:  interfaceID,
-				Descriptor:   descriptorHash,
-				SchemaHash:   descriptorHash,
-				Version:      "v1",
-				RenderPolicy: "wallet_confirm",
+				InterfaceID:	interfaceID,
+				Descriptor:	descriptorHash,
+				SchemaHash:	descriptorHash,
+				Version:	"v1",
+				RenderPolicy:	"wallet_confirm",
 			})
 		case isResolverRouteMetadataKey(entry.Key):
 			if err := applyRoutingMetadataEntryV2(&record.RoutingMetadata, entry); err != nil {
@@ -295,12 +295,12 @@ func ValidateUnifiedResolutionRecordV2(record UnifiedResolutionRecordV2) error {
 
 func NewContractTargetV2(targetID string, contractAddress sdk.AccAddress, updatedAtHeight uint64) ContractTargetV2 {
 	return ContractTargetV2{
-		Key:             targetID,
-		Address:         cloneSpecAddress(contractAddress),
-		TargetID:        targetID,
-		ContractAddress: cloneSpecAddress(contractAddress),
-		Enabled:         true,
-		UpdatedAtHeight: updatedAtHeight,
+		Key:			targetID,
+		Address:		cloneSpecAddress(contractAddress),
+		TargetID:		targetID,
+		ContractAddress:	cloneSpecAddress(contractAddress),
+		Enabled:		true,
+		UpdatedAtHeight:	updatedAtHeight,
 	}
 }
 
@@ -330,12 +330,12 @@ func NewReverseResolutionRecordV2(address sdk.AccAddress, name string, verified 
 		return ReverseResolutionRecordV2{}, err
 	}
 	record := ReverseResolutionRecordV2{
-		Address:         cloneSpecAddress(address),
-		NameHash:        nameHash,
-		Name:            normalized,
-		Verified:        verified,
-		UpdatedAtHeight: updatedAtHeight,
-		ExpiryHeight:    expiryHeight,
+		Address:		cloneSpecAddress(address),
+		NameHash:		nameHash,
+		Name:			normalized,
+		Verified:		verified,
+		UpdatedAtHeight:	updatedAtHeight,
+		ExpiryHeight:		expiryHeight,
 	}
 	return record, ValidateReverseResolutionRecordV2Format(record)
 }
@@ -481,10 +481,10 @@ func sortUnifiedResolutionRecordV2(record *UnifiedResolutionRecordV2) {
 
 func routeV2FromExecutionRoute(route IdentityExecutionRoute) RoutingMetadataV2 {
 	return RoutingMetadataV2{
-		ZoneID:     route.ZoneID,
-		ShardID:    route.ShardID,
-		VM:         route.VM,
-		Entrypoint: route.Entrypoint,
+		ZoneID:		route.ZoneID,
+		ShardID:	route.ShardID,
+		VM:		route.VM,
+		Entrypoint:	route.Entrypoint,
 	}
 }
 
@@ -892,10 +892,10 @@ func validateRoutingMetadataV2(route RoutingMetadataV2) error {
 		return fmt.Errorf("identity v2 routing metadata must not exceed %d bytes", MaxUnifiedRoutingMetadataBytes)
 	}
 	for field, value := range map[string]string{
-		"zone_id":    route.ZoneID,
-		"shard_id":   route.ShardID,
-		"vm":         route.VM,
-		"entrypoint": route.Entrypoint,
+		"zone_id":	route.ZoneID,
+		"shard_id":	route.ShardID,
+		"vm":		route.VM,
+		"entrypoint":	route.Entrypoint,
 	} {
 		if value == "" {
 			continue

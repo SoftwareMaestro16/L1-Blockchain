@@ -1,16 +1,5 @@
 package keeper_test
 
-// Tests for Requirement 1.1–1.7: complete deterministic fee formula.
-//
-//   transfer_fee_naet = max(min_tx_fee_naet, base_transfer_fee_naet)
-//     + gas_used * current_base_fee_per_gas_naet
-//     + tx_size_bytes * byte_fee_naet
-//     + message_count * message_fee_naet
-//     + bounded_congestion_surcharge_naet
-//     + low_reputation_premium_naet
-//     + storage_rent_side_effects_naet
-//     - bounded_reputation_discount_naet
-
 import (
 	"testing"
 
@@ -26,14 +15,14 @@ import (
 // golden tests. All values in naet.
 func testFormulaParams() types.FeeFormulaParams {
 	return types.FeeFormulaParams{
-		TargetTransferFeeNaet:         "10000000", // 10_000_000 naet (Requirement 1.2)
-		BaseFeePerGasNaet:             "1",
-		ByteFeeNaet:                   "1",
-		MessageFeeNaet:                "1000",
-		MaxCongestionSurchargeNaet:    "2000000",
-		LowReputationPremiumCapNaet:   "500000",
-		HighReputationDiscountCapNaet: "500000",
-		StorageRentSideEffectsNaet:    "0",
+		TargetTransferFeeNaet:		"10000000",
+		BaseFeePerGasNaet:		"1",
+		ByteFeeNaet:			"1",
+		MessageFeeNaet:			"1000",
+		MaxCongestionSurchargeNaet:	"2000000",
+		LowReputationPremiumCapNaet:	"500000",
+		HighReputationDiscountCapNaet:	"500000",
+		StorageRentSideEffectsNaet:	"0",
 	}
 }
 
@@ -42,15 +31,11 @@ func testBaseParams() types.Params {
 	p := types.DefaultParams()
 	p.MinFeeAmount = "1"
 	p.BaseFeeAmount = "100"
-	p.MaxFeeAmount = "1000000000000000000" // very high cap so formula drives the floor
+	p.MaxFeeAmount = "1000000000000000000"
 	p.TargetBlockUtilizationBps = 5_000
 	p.CongestionThresholdBps = 8_000
 	return p
 }
-
-// ---------------------------------------------------------------------------
-// Golden fixture tests (Requirement 1.1)
-// ---------------------------------------------------------------------------
 
 // TestGoldenFeeFixtureLowLoad verifies the complete formula at low block utilization
 // (below congestion threshold → zero congestion surcharge).
@@ -58,23 +43,11 @@ func TestGoldenFeeFixtureLowLoad(t *testing.T) {
 	bp := testBaseParams()
 	fp := testFormulaParams()
 
-	// Inputs: 50_000 gas, 200 bytes, 1 message, 0 bps utilization, neutral reputation
 	gasUsed := uint64(50_000)
 	txBytes := uint64(200)
 	msgCount := uint64(1)
 	utilizationBps := uint32(0)
 
-	// Expected formula breakdown:
-	//   base                      = max(1, 100)       = 100
-	//   gas                       = 50_000 * 1        = 50_000
-	//   bytes                     = 200 * 1           = 200
-	//   messages                  = 1 * 1_000         = 1_000
-	//   congestion_surcharge      = 0                 (bps=0 < threshold=8000)
-	//   reputation_premium        = 0                 (neutral)
-	//   storage_rent              = 0
-	//   reputation_discount       = 0                 (neutral)
-	//   ─────────────────────────────────────────────
-	//   total                     = 51_300
 	expected := sdkmath.NewInt(51_300)
 
 	got, err := types.ComputeFullTransferFee(
@@ -97,10 +70,8 @@ func TestGoldenFeeFixtureMediumLoad(t *testing.T) {
 	gasUsed := uint64(50_000)
 	txBytes := uint64(200)
 	msgCount := uint64(1)
-	utilizationBps := uint32(6_000) // above target (5000) but below threshold (8000)
+	utilizationBps := uint32(6_000)
 
-	// congestion_surcharge = 0 (utilizationBps < CongestionThresholdBps=8000)
-	// total = 100 + 50_000 + 200 + 1_000 = 51_300
 	expected := sdkmath.NewInt(51_300)
 
 	got, err := types.ComputeFullTransferFee(
@@ -123,13 +94,8 @@ func TestGoldenFeeFixtureHighLoad(t *testing.T) {
 	gasUsed := uint64(50_000)
 	txBytes := uint64(200)
 	msgCount := uint64(1)
-	utilizationBps := uint32(9_000) // well above threshold (8000)
+	utilizationBps := uint32(9_000)
 
-	// congestion_surcharge = maxSurcharge * (utilBps - threshold) / (10000 - threshold)
-	//                      = 2_000_000 * (9000 - 8000) / (10000 - 8000)
-	//                      = 2_000_000 * 1000 / 2000
-	//                      = 1_000_000
-	// total = 100 + 50_000 + 200 + 1_000 + 1_000_000 = 1_051_300
 	expected := sdkmath.NewInt(1_051_300)
 
 	got, err := types.ComputeFullTransferFee(
@@ -142,10 +108,6 @@ func TestGoldenFeeFixtureHighLoad(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expected, got, "high load golden fee mismatch")
 }
-
-// ---------------------------------------------------------------------------
-// Reputation tests (Requirements 1.4, 1.5, 7.1–7.4)
-// ---------------------------------------------------------------------------
 
 // TestLowReputationPaysMoreThanNeutralWithinCap verifies that a low-reputation sender
 // pays more than neutral, and the premium never exceeds the cap.
@@ -167,7 +129,6 @@ func TestLowReputationPaysMoreThanNeutralWithinCap(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	// Low reputation: score = 1000 (below neutral 5000)
 	lowScore := uint32(1_000)
 	lowFee, err := types.ComputeFullTransferFee(
 		bp, fp,
@@ -178,11 +139,9 @@ func TestLowReputationPaysMoreThanNeutralWithinCap(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	// Low-reputation fee must be strictly greater than neutral.
 	require.True(t, lowFee.GT(neutralFee),
 		"low-reputation fee %s must exceed neutral fee %s", lowFee, neutralFee)
 
-	// Premium must not exceed the cap (500_000 naet).
 	capNaet := sdkmath.NewInt(500_000)
 	premium := lowFee.Sub(neutralFee)
 	require.True(t, premium.LTE(capNaet),
@@ -195,13 +154,11 @@ func TestHighReputationNeverPaysBelowMinTxFee(t *testing.T) {
 	bp := testBaseParams()
 	fp := testFormulaParams()
 
-	// Use minimal gas/bytes/msgs so the base components are small.
 	gasUsed := uint64(1)
 	txBytes := uint64(1)
 	msgCount := uint64(1)
 	utilizationBps := uint32(0)
 
-	// Max reputation score.
 	maxScore := uint32(10_000)
 
 	fee, err := types.ComputeFullTransferFee(
@@ -230,7 +187,7 @@ func TestZeroReputationDoesNotBlockTx(t *testing.T) {
 		bp, fp,
 		50_000, 200, 1,
 		0,
-		0, true, // score=0, found=true
+		0, true,
 		sdkmath.ZeroInt(),
 	)
 	require.NoError(t, err)
@@ -276,10 +233,6 @@ func TestHighReputationDiscountBoundedByCap(t *testing.T) {
 		"reputation discount %s must not exceed cap %s", discount, discountCap)
 }
 
-// ---------------------------------------------------------------------------
-// Denom and zero-fee rejection tests (Requirements 1.6, 1.7)
-// ---------------------------------------------------------------------------
-
 // TestWrongDenomRejected verifies that a fee paid in wrong denom is rejected.
 func TestWrongDenomRejected(t *testing.T) {
 	app := l1app.Setup(t, false)
@@ -289,7 +242,6 @@ func TestWrongDenomRejected(t *testing.T) {
 		return ctx, nil
 	}
 
-	// Fee in uatom instead of naet → must be rejected.
 	wrongDenomTx := feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin("uatom", 100_000))}
 	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, wrongDenomTx, false)
 	require.Error(t, err)
@@ -316,27 +268,20 @@ func TestZeroFeeRejected(t *testing.T) {
 	require.False(t, stateMutated, "state must not be mutated when fee=0")
 }
 
-// ---------------------------------------------------------------------------
-// Governance params tests (Requirement 1.6)
-// ---------------------------------------------------------------------------
-
 // TestTargetTransferFeeIsGovernanceParam verifies that target_transfer_fee_naet is
 // stored as a KV-backed governance parameter, not a compile-time constant.
 func TestTargetTransferFeeIsGovernanceParam(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false)
 
-	// Read the default formula params from KV.
 	fp, err := app.FeesKeeper.GetFeeFormulaParams(ctx)
 	require.NoError(t, err)
 
-	// Verify the default target transfer fee is 10_000_000 naet.
 	target, err := fp.TargetTransferFeeInt()
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(types.TargetTransferFeeNaet), target,
 		"target_transfer_fee_naet must default to 10_000_000 naet (Requirement 1.2)")
 
-	// Override via governance (SetFeeFormulaParams).
 	fp.TargetTransferFeeNaet = "20000000"
 	require.NoError(t, app.FeesKeeper.SetFeeFormulaParams(ctx, fp))
 
@@ -356,7 +301,7 @@ func TestMinTxFeeIsGovernanceParam(t *testing.T) {
 	params := types.DefaultParams()
 	params.MinFeeAmount = "5000"
 	params.BaseFeeAmount = "5000"
-	params.MaxFeeAmount = "10000" // must be >= BaseFeeAmount
+	params.MaxFeeAmount = "10000"
 	require.NoError(t, app.FeesKeeper.SetParams(ctx, params))
 
 	stored, err := app.FeesKeeper.GetParams(ctx)
@@ -364,10 +309,6 @@ func TestMinTxFeeIsGovernanceParam(t *testing.T) {
 	require.Equal(t, "5000", stored.MinFeeAmount,
 		"min_tx_fee_naet must be updatable via governance")
 }
-
-// ---------------------------------------------------------------------------
-// Formula params validation tests
-// ---------------------------------------------------------------------------
 
 // TestFeeFormulaParamsDefaultsAreValid verifies that default formula params pass validation.
 func TestFeeFormulaParamsDefaultsAreValid(t *testing.T) {
@@ -382,8 +323,8 @@ func TestFeeFormulaParamsDefaultsAreValid(t *testing.T) {
 // TestFeeFormulaParamsRejectNegativeValues ensures negative fee components are rejected.
 func TestFeeFormulaParamsRejectNegativeValues(t *testing.T) {
 	tests := []struct {
-		name   string
-		mutate func(*types.FeeFormulaParams)
+		name	string
+		mutate	func(*types.FeeFormulaParams)
 	}{
 		{"negative target fee", func(p *types.FeeFormulaParams) { p.TargetTransferFeeNaet = "-1" }},
 		{"negative gas fee", func(p *types.FeeFormulaParams) { p.BaseFeePerGasNaet = "-1" }},
@@ -421,7 +362,7 @@ func TestCongestionSurchargeIsZeroBelowThreshold(t *testing.T) {
 		feeNoSurcharge, err := types.ComputeFullTransferFee(
 			bp, fp,
 			1, 1, 1,
-			0, // definitely no surcharge
+			0,
 			types.ReputationNeutralScore, false,
 			sdkmath.ZeroInt(),
 		)

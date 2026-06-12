@@ -11,56 +11,56 @@ import (
 type NamedExecutionKind string
 
 const (
-	NamedExecutionSend   NamedExecutionKind = "send"
-	NamedExecutionInvoke NamedExecutionKind = "invoke"
+	NamedExecutionSend	NamedExecutionKind	= "send"
+	NamedExecutionInvoke	NamedExecutionKind	= "invoke"
 )
 
 type ResolverAddressRecord struct {
-	Key     string
-	Address sdk.AccAddress
+	Key	string
+	Address	sdk.AccAddress
 }
 
 type IdentityExecutionRoute struct {
-	ZoneID     string
-	ShardID    string
-	VM         string
-	Entrypoint string
+	ZoneID		string
+	ShardID		string
+	VM		string
+	Entrypoint	string
 }
 
 type UnifiedResolverView struct {
-	QueryDomain     string
-	ResolverDomain  string
-	AuthorityDomain string
-	AuthorityOwner  sdk.AccAddress
-	Primary         sdk.AccAddress
-	Contract        sdk.AccAddress
-	ZoneEndpoint    string
-	Records         []ResolverAddressRecord
-	Metadata        []ResolverMetadataEntry
-	Route           IdentityExecutionRoute
+	QueryDomain	string
+	ResolverDomain	string
+	AuthorityDomain	string
+	AuthorityOwner	sdk.AccAddress
+	Primary		sdk.AccAddress
+	Contract	sdk.AccAddress
+	ZoneEndpoint	string
+	Records		[]ResolverAddressRecord
+	Metadata	[]ResolverMetadataEntry
+	Route		IdentityExecutionRoute
 }
 
 type NamedExecutionRequest struct {
-	Kind        NamedExecutionKind
-	Name        string
-	RecordKey   string
-	InterfaceID string
-	Method      string
-	PayloadHash string
+	Kind		NamedExecutionKind
+	Name		string
+	RecordKey	string
+	InterfaceID	string
+	Method		string
+	PayloadHash	string
 }
 
 type NamedExecutionTarget struct {
-	Kind            NamedExecutionKind
-	QueryDomain     string
-	ResolverDomain  string
-	AuthorityDomain string
-	Address         sdk.AccAddress
-	Contract        sdk.AccAddress
-	RecordKey       string
-	InterfaceID     string
-	Method          string
-	PayloadHash     string
-	Route           IdentityExecutionRoute
+	Kind		NamedExecutionKind
+	QueryDomain	string
+	ResolverDomain	string
+	AuthorityDomain	string
+	Address		sdk.AccAddress
+	Contract	sdk.AccAddress
+	RecordKey	string
+	InterfaceID	string
+	Method		string
+	PayloadHash	string
+	Route		IdentityExecutionRoute
 }
 
 func BuildUnifiedResolverView(state IdentityState, name string, height uint64) (UnifiedResolverView, error) {
@@ -73,14 +73,14 @@ func BuildUnifiedResolverView(state IdentityState, name string, height uint64) (
 		return UnifiedResolverView{}, err
 	}
 	view := UnifiedResolverView{
-		QueryDomain:     resolution.QueryDomain,
-		ResolverDomain:  resolution.ResolverDomain,
-		AuthorityDomain: resolution.AuthorityDomain.Name,
-		AuthorityOwner:  cloneSpecAddress(resolution.AuthorityDomain.Owner),
-		Primary:         cloneSpecAddress(resolution.Record.Primary),
-		Contract:        cloneSpecAddress(resolution.Record.Contract),
-		ZoneEndpoint:    resolution.Record.ZoneEndpoint,
-		Metadata:        append([]ResolverMetadataEntry(nil), metadata...),
+		QueryDomain:		resolution.QueryDomain,
+		ResolverDomain:		resolution.ResolverDomain,
+		AuthorityDomain:	resolution.AuthorityDomain.Name,
+		AuthorityOwner:		cloneSpecAddress(resolution.AuthorityDomain.Owner),
+		Primary:		cloneSpecAddress(resolution.Record.Primary),
+		Contract:		cloneSpecAddress(resolution.Record.Contract),
+		ZoneEndpoint:		resolution.Record.ZoneEndpoint,
+		Metadata:		append([]ResolverMetadataEntry(nil), metadata...),
 	}
 	for _, key := range sortedResolverKeys(resolution.Record.Records) {
 		view.Records = append(view.Records, ResolverAddressRecord{Key: key, Address: cloneSpecAddress(resolution.Record.Records[key])})
@@ -98,15 +98,15 @@ func ResolveNamedExecutionTarget(state IdentityState, request NamedExecutionRequ
 		return NamedExecutionTarget{}, err
 	}
 	target := NamedExecutionTarget{
-		Kind:            request.Kind,
-		QueryDomain:     view.QueryDomain,
-		ResolverDomain:  view.ResolverDomain,
-		AuthorityDomain: view.AuthorityDomain,
-		RecordKey:       request.RecordKey,
-		InterfaceID:     request.InterfaceID,
-		Method:          request.Method,
-		PayloadHash:     request.PayloadHash,
-		Route:           view.Route,
+		Kind:			request.Kind,
+		QueryDomain:		view.QueryDomain,
+		ResolverDomain:		view.ResolverDomain,
+		AuthorityDomain:	view.AuthorityDomain,
+		RecordKey:		request.RecordKey,
+		InterfaceID:		request.InterfaceID,
+		Method:			request.Method,
+		PayloadHash:		request.PayloadHash,
+		Route:			view.Route,
 	}
 	switch request.Kind {
 	case NamedExecutionSend:
@@ -205,10 +205,10 @@ func routeFromMetadata(entries []ResolverMetadataEntry) IdentityExecutionRoute {
 		values[entry.Key] = entry.Value
 	}
 	return IdentityExecutionRoute{
-		ZoneID:     values[ResolverMetadataRouteZone],
-		ShardID:    values[ResolverMetadataRouteShard],
-		VM:         values[ResolverMetadataRouteVM],
-		Entrypoint: values[ResolverMetadataRouteEntrypoint],
+		ZoneID:		values[ResolverMetadataRouteZone],
+		ShardID:	values[ResolverMetadataRouteShard],
+		VM:		values[ResolverMetadataRouteVM],
+		Entrypoint:	values[ResolverMetadataRouteEntrypoint],
 	}
 }
 

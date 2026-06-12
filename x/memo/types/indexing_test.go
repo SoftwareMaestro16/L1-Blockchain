@@ -93,14 +93,14 @@ func TestMemoFeeReputationCostOrdering(t *testing.T) {
 
 func testMemoRecordBase() MemoStoreRecord {
 	return MemoStoreRecord{
-		TxHash:        []byte("tx1"),
-		Sender:        addr(1),
-		Receiver:      addr(2),
-		AssetType:     AssetTypeNative,
-		RelatedDomain: "alice.aet",
-		EventType:     EventTypeResolverPayment,
-		BlockHeight:   9,
-		TimestampUnix: 100,
+		TxHash:		[]byte("tx1"),
+		Sender:		addr(1),
+		Receiver:	addr(2),
+		AssetType:	AssetTypeNative,
+		RelatedDomain:	"alice.aet",
+		EventType:	EventTypeResolverPayment,
+		BlockHeight:	9,
+		TimestampUnix:	100,
 	}
 }
 

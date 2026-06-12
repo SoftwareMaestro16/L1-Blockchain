@@ -42,11 +42,11 @@ func TestDepositAndDelegate(t *testing.T) {
 	pool := createSinglePool(t, &k, rawSingleAddress("10"))
 
 	deposited, err := k.DepositSingleNominator(types.MsgDepositSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      1_000,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		1_000,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1_000), deposited.BondedStake)
@@ -59,11 +59,11 @@ func TestDepositOverflowRejected(t *testing.T) {
 	depositSingle(t, &k, pool, math.MaxUint64, 2)
 
 	_, err := k.DepositSingleNominator(types.MsgDepositSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      1,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		1,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "overflow bonded stake")
 }
@@ -74,20 +74,20 @@ func TestOwnerOnlyWithdrawal(t *testing.T) {
 	depositSingle(t, &k, pool, 1_000, 2)
 
 	_, err := k.WithdrawSingleNominator(types.MsgWithdrawSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       rawSingleAddress("33"),
-		Amount:      100,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		rawSingleAddress("33"),
+		Amount:		100,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "only single nominator owner")
 
 	withdrawal, err := k.WithdrawSingleNominator(types.MsgWithdrawSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      400,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		400,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.WithdrawalStatusPending, withdrawal.Status)
@@ -103,21 +103,21 @@ func TestEmergencyLockBehavior(t *testing.T) {
 	depositSingle(t, &k, pool, 1_000, 2)
 
 	locked, err := k.EmergencyLockSingleNominator(types.MsgEmergencyLockSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Locked:      true,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Locked:		true,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.True(t, locked.EmergencyLock)
 
 	_, err = k.WithdrawSingleNominator(types.MsgWithdrawSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      100,
-		Height:      4,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		100,
+		Height:		4,
 	})
 	require.ErrorContains(t, err, "emergency lock blocks withdrawals")
 
@@ -126,19 +126,19 @@ func TestEmergencyLockBehavior(t *testing.T) {
 	require.Equal(t, uint64(750), slashed.BondedStake)
 
 	_, err = k.EmergencyLockSingleNominator(types.MsgEmergencyLockSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Locked:      false,
-		Height:      5,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Locked:		false,
+		Height:		5,
 	})
 	require.NoError(t, err)
 	withdrawal, err := k.WithdrawSingleNominator(types.MsgWithdrawSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      100,
-		Height:      6,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		100,
+		Height:		6,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.WithdrawalStatusPending, withdrawal.Status)
@@ -156,10 +156,10 @@ func TestSlashBehavior(t *testing.T) {
 	require.True(t, found)
 	require.Equal(t, uint64(125), rewards)
 	claimed, err := k.ClaimSingleNominatorRewards(types.MsgClaimSingleNominatorRewards{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(125), claimed)
@@ -187,11 +187,11 @@ func TestExportImportDuringPendingWithdrawal(t *testing.T) {
 	pool := createSinglePool(t, &source, rawSingleAddress("10"))
 	depositSingle(t, &source, pool, 1_000, 2)
 	withdrawal, err := source.WithdrawSingleNominator(types.MsgWithdrawSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      400,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		400,
+		Height:		3,
 	})
 	require.NoError(t, err)
 
@@ -209,23 +209,23 @@ func TestExportImportDuringPendingWithdrawal(t *testing.T) {
 func TestCannotDelegateToJailedValidator(t *testing.T) {
 	k := NewKeeper()
 	_, err := k.CreateSingleNominatorPool(types.MsgCreateSingleNominatorPool{
-		Authority:       prototype.DefaultAuthority,
-		PoolAddress:     rawSingleAddress("10"),
-		Owner:           rawSingleAddress("11"),
-		Validator:       rawSingleAddress("12"),
-		ValidatorStatus: validatorregistrytypes.StatusJailed,
-		Height:          1,
+		Authority:		prototype.DefaultAuthority,
+		PoolAddress:		rawSingleAddress("10"),
+		Owner:			rawSingleAddress("11"),
+		Validator:		rawSingleAddress("12"),
+		ValidatorStatus:	validatorregistrytypes.StatusJailed,
+		Height:			1,
 	})
 	require.ErrorContains(t, err, "jailed validator")
 
 	pool := createSinglePool(t, &k, rawSingleAddress("20"))
 	_, err = k.ChangeSingleNominatorValidator(types.MsgChangeSingleNominatorValidator{
-		Authority:       prototype.DefaultAuthority,
-		PoolAddress:     pool.PoolAddress,
-		Owner:           pool.Owner,
-		Validator:       rawSingleAddress("44"),
-		ValidatorStatus: validatorregistrytypes.StatusJailed,
-		Height:          2,
+		Authority:		prototype.DefaultAuthority,
+		PoolAddress:		pool.PoolAddress,
+		Owner:			pool.Owner,
+		Validator:		rawSingleAddress("44"),
+		ValidatorStatus:	validatorregistrytypes.StatusJailed,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "jailed validator")
 }
@@ -233,12 +233,12 @@ func TestCannotDelegateToJailedValidator(t *testing.T) {
 func createSinglePool(t *testing.T, k *Keeper, poolAddress string) types.SingleNominatorPool {
 	t.Helper()
 	pool, err := k.CreateSingleNominatorPool(types.MsgCreateSingleNominatorPool{
-		Authority:       prototype.DefaultAuthority,
-		PoolAddress:     poolAddress,
-		Owner:           rawSingleAddress("11"),
-		Validator:       rawSingleAddress("12"),
-		ValidatorStatus: validatorregistrytypes.StatusActive,
-		Height:          1,
+		Authority:		prototype.DefaultAuthority,
+		PoolAddress:		poolAddress,
+		Owner:			rawSingleAddress("11"),
+		Validator:		rawSingleAddress("12"),
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	return pool
@@ -247,11 +247,11 @@ func createSinglePool(t *testing.T, k *Keeper, poolAddress string) types.SingleN
 func depositSingle(t *testing.T, k *Keeper, pool types.SingleNominatorPool, amount uint64, height uint64) {
 	t.Helper()
 	_, err := k.DepositSingleNominator(types.MsgDepositSingleNominator{
-		Authority:   prototype.DefaultAuthority,
-		PoolAddress: pool.PoolAddress,
-		Owner:       pool.Owner,
-		Amount:      amount,
-		Height:      height,
+		Authority:	prototype.DefaultAuthority,
+		PoolAddress:	pool.PoolAddress,
+		Owner:		pool.Owner,
+		Amount:		amount,
+		Height:		height,
 	})
 	require.NoError(t, err)
 }

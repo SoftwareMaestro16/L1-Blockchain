@@ -6,72 +6,72 @@ import (
 )
 
 const (
-	FinalTargetConsensusCometBFTBFTPoS     = "cometbft_bft_pos"
-	FinalTargetCosmosSDK                   = "cosmos_sdk"
-	FinalTargetAVMOnlyGenesis              = "avm_only_genesis"
-	FinalTargetValidatorSetRange           = "100_300_active_validators_over_time"
-	FinalTargetBlockTimeRange              = "5_8_second_block_time"
-	FinalTargetWorstFinality               = "120_second_worst_acceptable_finality"
-	FinalTargetObjectiveSlashing           = "strict_objective_slashing"
-	FinalTargetValidatorPowerCap           = "validator_effective_power_cap"
-	FinalTargetAntiConcentrationRewards    = "anti_concentration_rewards"
-	FinalTargetDynamicLowModerateInflation = "dynamic_low_moderate_inflation"
-	FinalTargetFeeBurn                     = "fee_burn"
-	FinalTargetProtocolTreasury            = "protocol_treasury"
-	FinalTargetMandatoryFeatureTests       = "mandatory_tests_for_every_feature"
-	FinalTargetTrustProductDecision        = "trust_over_speed_or_short_term_apr"
+	FinalTargetConsensusCometBFTBFTPoS	= "cometbft_bft_pos"
+	FinalTargetCosmosSDK			= "cosmos_sdk"
+	FinalTargetAVMOnlyGenesis		= "avm_only_genesis"
+	FinalTargetValidatorSetRange		= "100_300_active_validators_over_time"
+	FinalTargetBlockTimeRange		= "5_8_second_block_time"
+	FinalTargetWorstFinality		= "120_second_worst_acceptable_finality"
+	FinalTargetObjectiveSlashing		= "strict_objective_slashing"
+	FinalTargetValidatorPowerCap		= "validator_effective_power_cap"
+	FinalTargetAntiConcentrationRewards	= "anti_concentration_rewards"
+	FinalTargetDynamicLowModerateInflation	= "dynamic_low_moderate_inflation"
+	FinalTargetFeeBurn			= "fee_burn"
+	FinalTargetProtocolTreasury		= "protocol_treasury"
+	FinalTargetMandatoryFeatureTests	= "mandatory_tests_for_every_feature"
+	FinalTargetTrustProductDecision		= "trust_over_speed_or_short_term_apr"
 
-	FinalTargetMinActiveValidators  = 100
-	FinalTargetMaxActiveValidators  = 300
-	FinalTargetMinBlockTimeSeconds  = 5
-	FinalTargetMaxBlockTimeSeconds  = 8
-	FinalTargetWorstFinalitySeconds = 120
+	FinalTargetMinActiveValidators	= 100
+	FinalTargetMaxActiveValidators	= 300
+	FinalTargetMinBlockTimeSeconds	= 5
+	FinalTargetMaxBlockTimeSeconds	= 8
+	FinalTargetWorstFinalitySeconds	= 120
 )
 
 type AetraFinalTargetFormula struct {
-	CometBFTBFTPoS                 bool
-	CosmosSDK                      bool
-	AVMOnlyGenesis                 bool
-	MinActiveValidators            int
-	MaxActiveValidators            int
-	MinBlockTimeSeconds            int
-	MaxBlockTimeSeconds            int
-	WorstAcceptableFinalitySeconds int
-	StrictObjectiveSlashing        bool
-	ValidatorEffectivePowerCap     bool
-	AntiConcentrationRewards       bool
-	DynamicLowModerateInflation    bool
-	FeeBurn                        bool
-	ProtocolTreasury               bool
-	MandatoryTestsForEveryFeature  bool
-	TrustOverSpeedOrShortTermAPR   bool
+	CometBFTBFTPoS			bool
+	CosmosSDK			bool
+	AVMOnlyGenesis			bool
+	MinActiveValidators		int
+	MaxActiveValidators		int
+	MinBlockTimeSeconds		int
+	MaxBlockTimeSeconds		int
+	WorstAcceptableFinalitySeconds	int
+	StrictObjectiveSlashing		bool
+	ValidatorEffectivePowerCap	bool
+	AntiConcentrationRewards	bool
+	DynamicLowModerateInflation	bool
+	FeeBurn				bool
+	ProtocolTreasury		bool
+	MandatoryTestsForEveryFeature	bool
+	TrustOverSpeedOrShortTermAPR	bool
 }
 
 type FinalTargetFormulaReport struct {
-	Required int
-	Passed   int
-	Failed   []string
-	Ready    bool
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraFinalTargetFormula() AetraFinalTargetFormula {
 	return AetraFinalTargetFormula{
-		CometBFTBFTPoS:                 true,
-		CosmosSDK:                      true,
-		AVMOnlyGenesis:                 true,
-		MinActiveValidators:            FinalTargetMinActiveValidators,
-		MaxActiveValidators:            FinalTargetMaxActiveValidators,
-		MinBlockTimeSeconds:            FinalTargetMinBlockTimeSeconds,
-		MaxBlockTimeSeconds:            FinalTargetMaxBlockTimeSeconds,
-		WorstAcceptableFinalitySeconds: FinalTargetWorstFinalitySeconds,
-		StrictObjectiveSlashing:        true,
-		ValidatorEffectivePowerCap:     true,
-		AntiConcentrationRewards:       true,
-		DynamicLowModerateInflation:    true,
-		FeeBurn:                        true,
-		ProtocolTreasury:               true,
-		MandatoryTestsForEveryFeature:  true,
-		TrustOverSpeedOrShortTermAPR:   true,
+		CometBFTBFTPoS:			true,
+		CosmosSDK:			true,
+		AVMOnlyGenesis:			true,
+		MinActiveValidators:		FinalTargetMinActiveValidators,
+		MaxActiveValidators:		FinalTargetMaxActiveValidators,
+		MinBlockTimeSeconds:		FinalTargetMinBlockTimeSeconds,
+		MaxBlockTimeSeconds:		FinalTargetMaxBlockTimeSeconds,
+		WorstAcceptableFinalitySeconds:	FinalTargetWorstFinalitySeconds,
+		StrictObjectiveSlashing:	true,
+		ValidatorEffectivePowerCap:	true,
+		AntiConcentrationRewards:	true,
+		DynamicLowModerateInflation:	true,
+		FeeBurn:			true,
+		ProtocolTreasury:		true,
+		MandatoryTestsForEveryFeature:	true,
+		TrustOverSpeedOrShortTermAPR:	true,
 	}
 }
 
@@ -112,9 +112,9 @@ func BuildFinalTargetFormulaReport(formula AetraFinalTargetFormula) FinalTargetF
 	}
 	sort.Strings(failed)
 	return FinalTargetFormulaReport{
-		Required: len(checks),
-		Passed:   passed,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }

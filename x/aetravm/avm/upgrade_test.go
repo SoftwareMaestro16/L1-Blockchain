@@ -7,10 +7,6 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Contract Version Tests
-// ---------------
-
 func TestContractVersionEquals(t *testing.T) {
 	v1 := ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1}
 	v2 := ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1}
@@ -58,16 +54,12 @@ func TestContractVersionDecodeTooShort(t *testing.T) {
 	}
 }
 
-// ---------------
-// Upgrade Authority Tests
-// ---------------
-
 func TestUpgradeAuthorityStrings(t *testing.T) {
 	tests := map[UpgradeAuthority]string{
-		AuthorityNone:       "NONE",
-		AuthorityAdmin:      "ADMIN",
-		AuthorityGovernance: "GOVERNANCE",
-		AuthoritySystem:     "SYSTEM",
+		AuthorityNone:		"NONE",
+		AuthorityAdmin:		"ADMIN",
+		AuthorityGovernance:	"GOVERNANCE",
+		AuthoritySystem:	"SYSTEM",
 	}
 	for auth, expected := range tests {
 		if auth.String() != expected {
@@ -76,17 +68,13 @@ func TestUpgradeAuthorityStrings(t *testing.T) {
 	}
 }
 
-// ---------------
-// Immutability Tests
-// ---------------
-
 func TestImmutableContractCannotUpgrade(t *testing.T) {
 	state := &ContractState{
-		Address:      "4:abc123",
-		Version:      ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:      [32]byte{1},
-		Admin:         "AE:admin1",
-		Capabilities:  UpgradeFlagNone,
+		Address:	"4:abc123",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	[32]byte{1},
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagNone,
 	}
 
 	err := EnforceImmutability(state)
@@ -97,11 +85,11 @@ func TestImmutableContractCannotUpgrade(t *testing.T) {
 
 func TestUpgradeableContractPassesImmutability(t *testing.T) {
 	state := &ContractState{
-		Address:      "4:abc123",
-		Version:      ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:      [32]byte{1},
-		Admin:         "AE:admin1",
-		Capabilities:  UpgradeFlagAllowed,
+		Address:	"4:abc123",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	[32]byte{1},
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 
 	err := EnforceImmutability(state)
@@ -112,12 +100,12 @@ func TestUpgradeableContractPassesImmutability(t *testing.T) {
 
 func TestDisabledUpgradesBlocked(t *testing.T) {
 	state := &ContractState{
-		Address:        "4:abc123",
-		Version:        ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:        [32]byte{1},
-		Admin:           "AE:admin1",
-		Capabilities:    UpgradeFlagAllowed,
-		UpgradeDisabled: true,
+		Address:		"4:abc123",
+		Version:		ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:		[32]byte{1},
+		Admin:			"AE:admin1",
+		Capabilities:		UpgradeFlagAllowed,
+		UpgradeDisabled:	true,
 	}
 
 	err := EnforceImmutability(state)
@@ -126,20 +114,16 @@ func TestDisabledUpgradesBlocked(t *testing.T) {
 	}
 }
 
-// ---------------
-// Upgrade Authority Validation Tests
-// ---------------
-
 func TestAdminUpgradeAuthorized(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:abc123",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:abc123",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 	msg := UpgradeMessage{
-		Type:      MsgUpgradeContractCode,
-		Caller:    "AE:admin1",
-		Authority: AuthorityAdmin,
+		Type:		MsgUpgradeContractCode,
+		Caller:		"AE:admin1",
+		Authority:	AuthorityAdmin,
 	}
 
 	if !ValidateUpgradeAuthority(state, msg) {
@@ -149,14 +133,14 @@ func TestAdminUpgradeAuthorized(t *testing.T) {
 
 func TestNonAdminUpgradeRejected(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:abc123",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:abc123",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 	msg := UpgradeMessage{
-		Type:      MsgUpgradeContractCode,
-		Caller:    "AE:attacker",
-		Authority: AuthorityAdmin,
+		Type:		MsgUpgradeContractCode,
+		Caller:		"AE:attacker",
+		Authority:	AuthorityAdmin,
 	}
 
 	if ValidateUpgradeAuthority(state, msg) {
@@ -166,24 +150,20 @@ func TestNonAdminUpgradeRejected(t *testing.T) {
 
 func TestNoneAuthorityRejected(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:abc123",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:abc123",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 	msg := UpgradeMessage{
-		Type:      MsgUpgradeContractCode,
-		Caller:    "AE:admin1",
-		Authority: AuthorityNone,
+		Type:		MsgUpgradeContractCode,
+		Caller:		"AE:admin1",
+		Authority:	AuthorityNone,
 	}
 
 	if ValidateUpgradeAuthority(state, msg) {
 		t.Error("NONE authority should be rejected")
 	}
 }
-
-// ---------------
-// State Compatibility Tests
-// ---------------
 
 func TestCompatibleNoMigration(t *testing.T) {
 	old := ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1}
@@ -215,10 +195,6 @@ func TestIncompatibleDowngrade(t *testing.T) {
 	}
 }
 
-// ---------------
-// Migration Tests
-// ---------------
-
 func TestMigrationSuccess(t *testing.T) {
 	registry := NewMigrationRegistry()
 	migrationCalled := false
@@ -241,26 +217,26 @@ func TestMigrationSuccess(t *testing.T) {
 	stateRoot := m.Root()
 
 	state := &ContractState{
-		Address:     "4:contract1",
-		Version:     ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:     [32]byte{0},
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
-		StateRoot:     stateRoot,
+		Address:	"4:contract1",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	[32]byte{0},
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
+		StateRoot:	stateRoot,
 	}
 
 	engine := NewUpgradeEngine(registry)
 	engine.RegisterVerifiedModule(codeHash)
 
 	msg := UpgradeMessage{
-		Type:             MsgUpgradeContractCode,
-		ContractAddress:   "4:contract1",
-		Caller:            "AE:admin1",
-		Authority:         AuthorityAdmin,
-		NewCodeHash:       codeHash,
-		MigrationHandler: codeHash,
-		TargetSchema:      ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
-		GasLimit:          100000,
+		Type:			MsgUpgradeContractCode,
+		ContractAddress:	"4:contract1",
+		Caller:			"AE:admin1",
+		Authority:		AuthorityAdmin,
+		NewCodeHash:		codeHash,
+		MigrationHandler:	codeHash,
+		TargetSchema:		ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
+		GasLimit:		100000,
 	}
 
 	newState, receipt, err := engine.ProcessUpgrade(state, msg)
@@ -298,26 +274,26 @@ func TestMigrationRollbackOnFailure(t *testing.T) {
 	originalRoot := m.Root()
 
 	state := &ContractState{
-		Address:     "4:contract1",
-		Version:     ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:     [32]byte{0},
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
-		StateRoot:     originalRoot,
+		Address:	"4:contract1",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	[32]byte{0},
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
+		StateRoot:	originalRoot,
 	}
 
 	engine := NewUpgradeEngine(registry)
 	engine.RegisterVerifiedModule(codeHash)
 
 	msg := UpgradeMessage{
-		Type:             MsgUpgradeContractCode,
-		ContractAddress:   "4:contract1",
-		Caller:            "AE:admin1",
-		Authority:         AuthorityAdmin,
-		NewCodeHash:       codeHash,
-		MigrationHandler: codeHash,
-		TargetSchema:      ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
-		GasLimit:          100000,
+		Type:			MsgUpgradeContractCode,
+		ContractAddress:	"4:contract1",
+		Caller:			"AE:admin1",
+		Authority:		AuthorityAdmin,
+		NewCodeHash:		codeHash,
+		MigrationHandler:	codeHash,
+		TargetSchema:		ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
+		GasLimit:		100000,
 	}
 
 	_, receipt, err := engine.ProcessUpgrade(state, msg)
@@ -341,12 +317,12 @@ func TestMigrationHandlerMissing(t *testing.T) {
 	stateRoot := m.Root()
 
 	state := &ContractState{
-		Address:     "4:contract1",
-		Version:     ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:     [32]byte{0},
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
-		StateRoot:     stateRoot,
+		Address:	"4:contract1",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	[32]byte{0},
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
+		StateRoot:	stateRoot,
 	}
 
 	var codeHash [32]byte
@@ -356,13 +332,13 @@ func TestMigrationHandlerMissing(t *testing.T) {
 	engine.RegisterVerifiedModule(codeHash)
 
 	msg := UpgradeMessage{
-		Type:             MsgUpgradeContractCode,
-		ContractAddress:   "4:contract1",
-		Caller:            "AE:admin1",
-		Authority:         AuthorityAdmin,
-		NewCodeHash:       codeHash,
-		TargetSchema:      ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
-		GasLimit:          100000,
+		Type:			MsgUpgradeContractCode,
+		ContractAddress:	"4:contract1",
+		Caller:			"AE:admin1",
+		Authority:		AuthorityAdmin,
+		NewCodeHash:		codeHash,
+		TargetSchema:		ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
+		GasLimit:		100000,
 	}
 
 	_, _, err := engine.ProcessUpgrade(state, msg)
@@ -371,21 +347,17 @@ func TestMigrationHandlerMissing(t *testing.T) {
 	}
 }
 
-// ---------------
-// Disable Upgrades Tests
-// ---------------
-
 func TestDisableUpgrades(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:contract1",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:contract1",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 
 	msg := UpgradeMessage{
-		Type:      MsgDisableContractUpgrades,
-		Caller:    "AE:admin1",
-		Authority: AuthorityAdmin,
+		Type:		MsgDisableContractUpgrades,
+		Caller:		"AE:admin1",
+		Authority:	AuthorityAdmin,
 	}
 
 	engine := NewUpgradeEngine(NewMigrationRegistry())
@@ -403,21 +375,17 @@ func TestDisableUpgrades(t *testing.T) {
 	}
 }
 
-// ---------------
-// Set Admin Tests
-// ---------------
-
 func TestSetAdmin(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:contract1",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:contract1",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 
 	msg := UpgradeMessage{
-		Type:      MsgSetContractAdmin,
-		Caller:    "AE:admin1",
-		Authority: AuthorityAdmin,
+		Type:		MsgSetContractAdmin,
+		Caller:		"AE:admin1",
+		Authority:	AuthorityAdmin,
 	}
 
 	engine := NewUpgradeEngine(NewMigrationRegistry())
@@ -432,15 +400,15 @@ func TestSetAdmin(t *testing.T) {
 
 func TestSetAdminNonAdminRejected(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:contract1",
-		Admin:       "AE:admin1",
-		Capabilities: UpgradeFlagAllowed,
+		Address:	"4:contract1",
+		Admin:		"AE:admin1",
+		Capabilities:	UpgradeFlagAllowed,
 	}
 
 	msg := UpgradeMessage{
-		Type:      MsgSetContractAdmin,
-		Caller:    "AE:attacker",
-		Authority: AuthorityAdmin,
+		Type:		MsgSetContractAdmin,
+		Caller:		"AE:attacker",
+		Authority:	AuthorityAdmin,
 	}
 
 	engine := NewUpgradeEngine(NewMigrationRegistry())
@@ -450,15 +418,11 @@ func TestSetAdminNonAdminRejected(t *testing.T) {
 	}
 }
 
-// ---------------
-// System Contract Override Tests
-// ---------------
-
 func TestSystemOverrideRequiresSystemAuthority(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:system1",
-		Admin:       "AE:system",
-		Capabilities: UpgradeFlagAllowed | UpgradeFlagSystemOnly,
+		Address:	"4:system1",
+		Admin:		"AE:system",
+		Capabilities:	UpgradeFlagAllowed | UpgradeFlagSystemOnly,
 	}
 
 	err := ValidateSystemUpgrade(state, UpgradeMessage{Authority: AuthorityAdmin})
@@ -469,14 +433,14 @@ func TestSystemOverrideRequiresSystemAuthority(t *testing.T) {
 
 func TestSystemOverrideRequiresSignature(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:system1",
-		Admin:       "AE:system",
-		Capabilities: UpgradeFlagAllowed | UpgradeFlagSystemOnly,
+		Address:	"4:system1",
+		Admin:		"AE:system",
+		Capabilities:	UpgradeFlagAllowed | UpgradeFlagSystemOnly,
 	}
 
 	err := ValidateSystemUpgrade(state, UpgradeMessage{
-		Authority: AuthoritySystem,
-		Signature: nil,
+		Authority:	AuthoritySystem,
+		Signature:	nil,
 	})
 	if err != ErrGovernanceSignatureInvalid {
 		t.Errorf("expected ErrGovernanceSignatureInvalid, got %v", err)
@@ -485,30 +449,26 @@ func TestSystemOverrideRequiresSignature(t *testing.T) {
 
 func TestSystemOverrideWithValidSignature(t *testing.T) {
 	state := &ContractState{
-		Address:     "4:system1",
-		Admin:       "AE:system",
-		Capabilities: UpgradeFlagAllowed | UpgradeFlagSystemOnly,
+		Address:	"4:system1",
+		Admin:		"AE:system",
+		Capabilities:	UpgradeFlagAllowed | UpgradeFlagSystemOnly,
 	}
 
 	err := ValidateSystemUpgrade(state, UpgradeMessage{
-		Authority: AuthoritySystem,
-		Signature: []byte{1, 2, 3, 4},
+		Authority:	AuthoritySystem,
+		Signature:	[]byte{1, 2, 3, 4},
 	})
 	if err != nil {
 		t.Errorf("system override with valid signature should pass: %v", err)
 	}
 }
 
-// ---------------
-// Upgrade Message Type Tests
-// ---------------
-
 func TestUpgradeMessageTypeStrings(t *testing.T) {
 	tests := map[UpgradeMessageType]string{
-		MsgUpgradeContractCode:   "upgrade_code",
-		MsgMigrateContractState:  "migrate_state",
-		MsgSetContractAdmin:      "set_admin",
-		MsgDisableContractUpgrades: "disable_upgrades",
+		MsgUpgradeContractCode:		"upgrade_code",
+		MsgMigrateContractState:	"migrate_state",
+		MsgSetContractAdmin:		"set_admin",
+		MsgDisableContractUpgrades:	"disable_upgrades",
 	}
 	for mt, expected := range tests {
 		if mt.String() != expected {
@@ -517,21 +477,17 @@ func TestUpgradeMessageTypeStrings(t *testing.T) {
 	}
 }
 
-// ---------------
-// Migration Receipt Tests
-// ---------------
-
 func TestMigrationReceiptCanonicalEncode(t *testing.T) {
 	receipt := &MigrationReceipt{
-		SchemaVersionBefore: ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		SchemaVersionAfter:  ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
-		StateRootBefore:     make([]byte, 32),
-		StateRootAfter:      make([]byte, 32),
-		Success:             true,
-		RolledBack:          false,
-		AuthorityType:       AuthorityAdmin,
-		ContractAddress:     "4:contract1",
-		UpgradeCount:        1,
+		SchemaVersionBefore:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		SchemaVersionAfter:	ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
+		StateRootBefore:	make([]byte, 32),
+		StateRootAfter:		make([]byte, 32),
+		Success:		true,
+		RolledBack:		false,
+		AuthorityType:		AuthorityAdmin,
+		ContractAddress:	"4:contract1",
+		UpgradeCount:		1,
 	}
 
 	encoded := receipt.CanonicalEncode()
@@ -542,13 +498,13 @@ func TestMigrationReceiptCanonicalEncode(t *testing.T) {
 
 func TestMigrationReceiptHashDeterministic(t *testing.T) {
 	receipt := &MigrationReceipt{
-		SchemaVersionBefore: ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		SchemaVersionAfter:  ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
-		StateRootBefore:     make([]byte, 32),
-		StateRootAfter:      make([]byte, 32),
-		Success:             true,
-		AuthorityType:       AuthorityAdmin,
-		ContractAddress:     "4:contract1",
+		SchemaVersionBefore:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		SchemaVersionAfter:	ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 2},
+		StateRootBefore:	make([]byte, 32),
+		StateRootAfter:		make([]byte, 32),
+		Success:		true,
+		AuthorityType:		AuthorityAdmin,
+		ContractAddress:	"4:contract1",
 	}
 
 	h1 := MigrationReceiptHash(receipt)
@@ -560,22 +516,22 @@ func TestMigrationReceiptHashDeterministic(t *testing.T) {
 
 func TestMigrationReceiptHashChangesOnMutation(t *testing.T) {
 	r1 := &MigrationReceipt{
-		SchemaVersionBefore: ContractVersion{SchemaVersion: 1, CodeVersion: 1},
-		SchemaVersionAfter:  ContractVersion{SchemaVersion: 2, CodeVersion: 2},
-		StateRootBefore:     make([]byte, 32),
-		StateRootAfter:      make([]byte, 32),
-		Success:             true,
-		AuthorityType:       AuthorityAdmin,
-		ContractAddress:     "4:contract1",
+		SchemaVersionBefore:	ContractVersion{SchemaVersion: 1, CodeVersion: 1},
+		SchemaVersionAfter:	ContractVersion{SchemaVersion: 2, CodeVersion: 2},
+		StateRootBefore:	make([]byte, 32),
+		StateRootAfter:		make([]byte, 32),
+		Success:		true,
+		AuthorityType:		AuthorityAdmin,
+		ContractAddress:	"4:contract1",
 	}
 	r2 := &MigrationReceipt{
-		SchemaVersionBefore: ContractVersion{SchemaVersion: 1, CodeVersion: 1},
-		SchemaVersionAfter:  ContractVersion{SchemaVersion: 3, CodeVersion: 3}, // Different
-		StateRootBefore:     make([]byte, 32),
-		StateRootAfter:      make([]byte, 32),
-		Success:             true,
-		AuthorityType:       AuthorityAdmin,
-		ContractAddress:     "4:contract1",
+		SchemaVersionBefore:	ContractVersion{SchemaVersion: 1, CodeVersion: 1},
+		SchemaVersionAfter:	ContractVersion{SchemaVersion: 3, CodeVersion: 3},
+		StateRootBefore:	make([]byte, 32),
+		StateRootAfter:		make([]byte, 32),
+		Success:		true,
+		AuthorityType:		AuthorityAdmin,
+		ContractAddress:	"4:contract1",
 	}
 
 	h1 := MigrationReceiptHash(r1)
@@ -584,10 +540,6 @@ func TestMigrationReceiptHashChangesOnMutation(t *testing.T) {
 		t.Error("different receipts should produce different hashes")
 	}
 }
-
-// ---------------
-// Upgrade Capability Tests
-// ---------------
 
 func TestUpgradeCapabilityFlags(t *testing.T) {
 	none := UpgradeFlagNone

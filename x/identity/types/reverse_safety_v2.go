@@ -10,40 +10,40 @@ import (
 type IdentityReverseWalletDisplayStateV2 string
 
 const (
-	IdentityReverseWalletDisplayNoneV2      IdentityReverseWalletDisplayStateV2 = "none"
-	IdentityReverseWalletDisplayClaimedV2   IdentityReverseWalletDisplayStateV2 = "claimed_unverified"
-	IdentityReverseWalletDisplayVerifiedV2  IdentityReverseWalletDisplayStateV2 = "verified"
-	IdentityReverseWalletDisplayInvalidV2   IdentityReverseWalletDisplayStateV2 = "invalid"
-	IdentityReverseWalletDisplayExpiredV2   IdentityReverseWalletDisplayStateV2 = "expired"
-	IdentityReverseWalletDisplaySeparatedV2 IdentityReverseWalletDisplayStateV2 = "separate_unverified"
-	IdentityReverseInvalidationPrimaryV2                                        = "primary_resolver_change"
-	IdentityReverseInvalidationTransferV2                                       = "domain_transfer"
-	IdentityReverseInvalidationExpiryV2                                         = "domain_expiry"
-	IdentityReverseInvalidationResolverV2                                       = "resolver_update"
-	IdentityReverseProofFormatVersionV2                                         = uint64(1)
+	IdentityReverseWalletDisplayNoneV2	IdentityReverseWalletDisplayStateV2	= "none"
+	IdentityReverseWalletDisplayClaimedV2	IdentityReverseWalletDisplayStateV2	= "claimed_unverified"
+	IdentityReverseWalletDisplayVerifiedV2	IdentityReverseWalletDisplayStateV2	= "verified"
+	IdentityReverseWalletDisplayInvalidV2	IdentityReverseWalletDisplayStateV2	= "invalid"
+	IdentityReverseWalletDisplayExpiredV2	IdentityReverseWalletDisplayStateV2	= "expired"
+	IdentityReverseWalletDisplaySeparatedV2	IdentityReverseWalletDisplayStateV2	= "separate_unverified"
+	IdentityReverseInvalidationPrimaryV2						= "primary_resolver_change"
+	IdentityReverseInvalidationTransferV2						= "domain_transfer"
+	IdentityReverseInvalidationExpiryV2						= "domain_expiry"
+	IdentityReverseInvalidationResolverV2						= "resolver_update"
+	IdentityReverseProofFormatVersionV2						= uint64(1)
 )
 
 type IdentityReverseWalletDisplayV2 struct {
-	Address                    sdk.AccAddress
-	Name                       string
-	State                      IdentityReverseWalletDisplayStateV2
-	Verified                   bool
-	DisplayAsCanonical         bool
-	DisplaySeparately          bool
-	RequiresForwardProof       bool
-	ForwardConsistencyVerified bool
-	Warning                    string
+	Address				sdk.AccAddress
+	Name				string
+	State				IdentityReverseWalletDisplayStateV2
+	Verified			bool
+	DisplayAsCanonical		bool
+	DisplaySeparately		bool
+	RequiresForwardProof		bool
+	ForwardConsistencyVerified	bool
+	Warning				string
 }
 
 type VerifiedReverseResolutionProofV2 struct {
-	ProofVersion uint64
-	Address      sdk.AccAddress
-	Name         string
-	NameHash     string
-	Height       uint64
-	Record       ReverseResolutionRecordV2
-	Proof        IdentityResolutionProofFormatV2
-	ProofHash    string
+	ProofVersion	uint64
+	Address		sdk.AccAddress
+	Name		string
+	NameHash	string
+	Height		uint64
+	Record		ReverseResolutionRecordV2
+	Proof		IdentityResolutionProofFormatV2
+	ProofHash	string
 }
 
 func InvalidateReverseRecordsForResolverUpdateV2(state IdentityState, name string, height uint64, primaryChanged bool, authorizedAliasKeys []string) (IdentityState, []ReverseRecord, error) {
@@ -146,13 +146,13 @@ func BuildVerifiedReverseResolutionProofV2(state IdentityState, address sdk.AccA
 		return VerifiedReverseResolutionProofV2{}, errors.New("identity v2 verified reverse proof root mismatch")
 	}
 	out := VerifiedReverseResolutionProofV2{
-		ProofVersion: IdentityReverseProofFormatVersionV2,
-		Address:      cloneSpecAddress(address),
-		Name:         record.Name,
-		NameHash:     record.NameHash,
-		Height:       height,
-		Record:       record,
-		Proof:        formatProof,
+		ProofVersion:	IdentityReverseProofFormatVersionV2,
+		Address:	cloneSpecAddress(address),
+		Name:		record.Name,
+		NameHash:	record.NameHash,
+		Height:		height,
+		Record:		record,
+		Proof:		formatProof,
 	}
 	out.ProofHash = ComputeVerifiedReverseResolutionProofHashV2(out)
 	return out, nil
@@ -233,8 +233,8 @@ func BuildIdentityReverseWalletDisplayStateV2(state IdentityState, address sdk.A
 
 func BuildIdentityReverseWalletDisplayFromRecordV2(state IdentityState, record ReverseResolutionRecordV2, height uint64, authorizedAliasKeys []string) IdentityReverseWalletDisplayV2 {
 	out := IdentityReverseWalletDisplayV2{
-		Address: cloneSpecAddress(record.Address),
-		Name:    record.Name,
+		Address:	cloneSpecAddress(record.Address),
+		Name:		record.Name,
 	}
 	if err := ValidateReverseResolutionRecordV2Format(record); err != nil {
 		out.State = IdentityReverseWalletDisplayInvalidV2

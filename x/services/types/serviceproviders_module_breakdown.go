@@ -18,91 +18,91 @@ type XServiceProvidersFailureMode string
 type XServiceProvidersIntegrationPoint string
 
 const (
-	XServiceProvidersStateAvailabilityCommitment XServiceProvidersStateObject = "AvailabilityCommitment"
-	XServiceProvidersStateProviderCollateral     XServiceProvidersStateObject = "ProviderCollateral"
-	XServiceProvidersStateProviderFault          XServiceProvidersStateObject = "ProviderFault"
-	XServiceProvidersStateProviderRecord         XServiceProvidersStateObject = "ProviderRecord"
-	XServiceProvidersStateProviderReputation     XServiceProvidersStateObject = "ProviderReputation"
+	XServiceProvidersStateAvailabilityCommitment	XServiceProvidersStateObject	= "AvailabilityCommitment"
+	XServiceProvidersStateProviderCollateral	XServiceProvidersStateObject	= "ProviderCollateral"
+	XServiceProvidersStateProviderFault		XServiceProvidersStateObject	= "ProviderFault"
+	XServiceProvidersStateProviderRecord		XServiceProvidersStateObject	= "ProviderRecord"
+	XServiceProvidersStateProviderReputation	XServiceProvidersStateObject	= "ProviderReputation"
 
-	XServiceProvidersMsgRegisterProvider             XServiceProvidersMessageName = "MsgRegisterProvider"
-	XServiceProvidersMsgStakeProviderCollateral      XServiceProvidersMessageName = "MsgStakeProviderCollateral"
-	XServiceProvidersMsgSubmitAvailabilityCommitment XServiceProvidersMessageName = "MsgSubmitAvailabilityCommitment"
-	XServiceProvidersMsgSubmitProviderFault          XServiceProvidersMessageName = "MsgSubmitProviderFault"
-	XServiceProvidersMsgUnstakeProviderCollateral    XServiceProvidersMessageName = "MsgUnstakeProviderCollateral"
-	XServiceProvidersMsgUpdateProvider               XServiceProvidersMessageName = "MsgUpdateProvider"
+	XServiceProvidersMsgRegisterProvider			XServiceProvidersMessageName	= "MsgRegisterProvider"
+	XServiceProvidersMsgStakeProviderCollateral		XServiceProvidersMessageName	= "MsgStakeProviderCollateral"
+	XServiceProvidersMsgSubmitAvailabilityCommitment	XServiceProvidersMessageName	= "MsgSubmitAvailabilityCommitment"
+	XServiceProvidersMsgSubmitProviderFault			XServiceProvidersMessageName	= "MsgSubmitProviderFault"
+	XServiceProvidersMsgUnstakeProviderCollateral		XServiceProvidersMessageName	= "MsgUnstakeProviderCollateral"
+	XServiceProvidersMsgUpdateProvider			XServiceProvidersMessageName	= "MsgUpdateProvider"
 
-	XServiceProvidersQueryAvailabilityCommitment XServiceProvidersQueryName = "QueryAvailabilityCommitment"
-	XServiceProvidersQueryProvider               XServiceProvidersQueryName = "QueryProvider"
-	XServiceProvidersQueryProviderCollateral     XServiceProvidersQueryName = "QueryProviderCollateral"
-	XServiceProvidersQueryProviderReputation     XServiceProvidersQueryName = "QueryProviderReputation"
-	XServiceProvidersQueryProvidersByService     XServiceProvidersQueryName = "QueryProvidersByService"
+	XServiceProvidersQueryAvailabilityCommitment	XServiceProvidersQueryName	= "QueryAvailabilityCommitment"
+	XServiceProvidersQueryProvider			XServiceProvidersQueryName	= "QueryProvider"
+	XServiceProvidersQueryProviderCollateral	XServiceProvidersQueryName	= "QueryProviderCollateral"
+	XServiceProvidersQueryProviderReputation	XServiceProvidersQueryName	= "QueryProviderReputation"
+	XServiceProvidersQueryProvidersByService	XServiceProvidersQueryName	= "QueryProvidersByService"
 
-	XServiceProvidersFailureAvailabilityCommitmentExpired XServiceProvidersFailureMode = "availability_commitment_expired"
-	XServiceProvidersFailureCollateralInsufficient        XServiceProvidersFailureMode = "collateral_insufficient"
-	XServiceProvidersFailureFaultProofInvalid             XServiceProvidersFailureMode = "fault_proof_invalid"
-	XServiceProvidersFailureReputationNonDeterministic    XServiceProvidersFailureMode = "reputation_update_not_deterministic"
-	XServiceProvidersFailureUnsupportedInterface          XServiceProvidersFailureMode = "unsupported_interface_advertised"
+	XServiceProvidersFailureAvailabilityCommitmentExpired	XServiceProvidersFailureMode	= "availability_commitment_expired"
+	XServiceProvidersFailureCollateralInsufficient		XServiceProvidersFailureMode	= "collateral_insufficient"
+	XServiceProvidersFailureFaultProofInvalid		XServiceProvidersFailureMode	= "fault_proof_invalid"
+	XServiceProvidersFailureReputationNonDeterministic	XServiceProvidersFailureMode	= "reputation_update_not_deterministic"
+	XServiceProvidersFailureUnsupportedInterface		XServiceProvidersFailureMode	= "unsupported_interface_advertised"
 
-	XServiceProvidersIntegrationRoutingDiscovery     XServiceProvidersIntegrationPoint = "routing_discovery_layer"
-	XServiceProvidersIntegrationSlashingPenaltyRoute XServiceProvidersIntegrationPoint = "slashing_like_penalty_routing"
-	XServiceProvidersIntegrationServicePayments      XServiceProvidersIntegrationPoint = "x/servicepayments"
-	XServiceProvidersIntegrationServices             XServiceProvidersIntegrationPoint = "x/services"
+	XServiceProvidersIntegrationRoutingDiscovery		XServiceProvidersIntegrationPoint	= "routing_discovery_layer"
+	XServiceProvidersIntegrationSlashingPenaltyRoute	XServiceProvidersIntegrationPoint	= "slashing_like_penalty_routing"
+	XServiceProvidersIntegrationServicePayments		XServiceProvidersIntegrationPoint	= "x/servicepayments"
+	XServiceProvidersIntegrationServices			XServiceProvidersIntegrationPoint	= "x/services"
 )
 
 type ProviderFault = ProviderMisbehaviorReport
 
 type XServiceProvidersFailureCoverage struct {
-	Mode  XServiceProvidersFailureMode
-	Guard string
-	Scope string
+	Mode	XServiceProvidersFailureMode
+	Guard	string
+	Scope	string
 }
 
 type XServiceProvidersModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServiceProvidersStateObject
-	Messages          []XServiceProvidersMessageName
-	Queries           []XServiceProvidersQueryName
-	FailureModes      []XServiceProvidersFailureCoverage
-	IntegrationPoints []XServiceProvidersIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServiceProvidersStateObject
+	Messages		[]XServiceProvidersMessageName
+	Queries			[]XServiceProvidersQueryName
+	FailureModes		[]XServiceProvidersFailureCoverage
+	IntegrationPoints	[]XServiceProvidersIntegrationPoint
+	BreakdownHash		string
 }
 
 type ProviderCollateral struct {
-	ServiceID      string
-	ProviderID     string
-	Denom          string
-	Amount         string
-	StakedHeight   uint64
-	UpdatedHeight  uint64
-	CollateralHash string
+	ServiceID	string
+	ProviderID	string
+	Denom		string
+	Amount		string
+	StakedHeight	uint64
+	UpdatedHeight	uint64
+	CollateralHash	string
 }
 
 type AvailabilityCommitment struct {
-	ServiceID       string
-	ProviderID      string
-	InterfaceHash   string
-	EndpointHash    string
-	WindowStart     uint64
-	WindowEnd       uint64
-	UptimeTargetBps uint32
-	RenewalNonce    uint64
-	SignatureHash   string
-	CommitmentHash  string
-	RecordHash      string
+	ServiceID	string
+	ProviderID	string
+	InterfaceHash	string
+	EndpointHash	string
+	WindowStart	uint64
+	WindowEnd	uint64
+	UptimeTargetBps	uint32
+	RenewalNonce	uint64
+	SignatureHash	string
+	CommitmentHash	string
+	RecordHash	string
 }
 
 type MsgSubmitAvailabilityCommitment struct {
-	Authority   string
-	Commitment  AvailabilityCommitment
-	MessageHash string
+	Authority	string
+	Commitment	AvailabilityCommitment
+	MessageHash	string
 }
 
 type MsgSubmitProviderFault struct {
-	Authority   string
-	Report      ProviderMisbehaviorReport
-	Proof       ServiceFaultProof
-	MessageHash string
+	Authority	string
+	Report		ProviderMisbehaviorReport
+	Proof		ServiceFaultProof
+	MessageHash	string
 }
 
 type QueryProvider struct {
@@ -110,8 +110,8 @@ type QueryProvider struct {
 }
 
 type QueryProviderResponse struct {
-	Provider ProviderRecord
-	Found    bool
+	Provider	ProviderRecord
+	Found		bool
 }
 
 type QueryProviderCollateral struct {
@@ -119,8 +119,8 @@ type QueryProviderCollateral struct {
 }
 
 type QueryProviderCollateralResponse struct {
-	Collateral ProviderCollateral
-	Found      bool
+	Collateral	ProviderCollateral
+	Found		bool
 }
 
 type QueryProviderReputation struct {
@@ -128,32 +128,32 @@ type QueryProviderReputation struct {
 }
 
 type QueryProviderReputationResponse struct {
-	Reputation ReputationRecord
-	Found      bool
+	Reputation	ReputationRecord
+	Found		bool
 }
 
 type QueryAvailabilityCommitment struct {
-	ProviderID string
-	ServiceID  string
+	ProviderID	string
+	ServiceID	string
 }
 
 type QueryAvailabilityCommitmentResponse struct {
-	Commitment AvailabilityCommitment
-	Found      bool
+	Commitment	AvailabilityCommitment
+	Found		bool
 }
 
 type ServiceProviderState struct {
-	Providers     []ProviderRecord
-	Collaterals   []ProviderCollateral
-	Reputations   []ReputationRecord
-	Commitments   []AvailabilityCommitment
-	StateRootHash string
-	UpdatedHeight uint64
+	Providers	[]ProviderRecord
+	Collaterals	[]ProviderCollateral
+	Reputations	[]ReputationRecord
+	Commitments	[]AvailabilityCommitment
+	StateRootHash	string
+	UpdatedHeight	uint64
 }
 
 func DefaultXServiceProvidersModuleBreakdown() (XServiceProvidersModuleBreakdown, error) {
 	breakdown := XServiceProvidersModuleBreakdown{
-		ModulePath: ServiceModuleProviders,
+		ModulePath:	ServiceModuleProviders,
 		Purpose: []string{
 			"availability_commitments",
 			"collateral_management",
@@ -215,12 +215,12 @@ func NewProviderCollateral(record ProviderRecord, stakedHeight uint64) (Provider
 		return ProviderCollateral{}, err
 	}
 	collateral := ProviderCollateral{
-		ServiceID:     record.ServiceID,
-		ProviderID:    record.Provider.ProviderID,
-		Denom:         record.Provider.CollateralDenom,
-		Amount:        record.Provider.CollateralAmount,
-		StakedHeight:  stakedHeight,
-		UpdatedHeight: record.Provider.UpdatedHeight,
+		ServiceID:	record.ServiceID,
+		ProviderID:	record.Provider.ProviderID,
+		Denom:		record.Provider.CollateralDenom,
+		Amount:		record.Provider.CollateralAmount,
+		StakedHeight:	stakedHeight,
+		UpdatedHeight:	record.Provider.UpdatedHeight,
 	}
 	collateral.CollateralHash = ComputeProviderCollateralHash(collateral)
 	return collateral, collateral.Validate()
@@ -240,16 +240,16 @@ func NewAvailabilityCommitment(record ProviderRecord, interfaceHash string) (Ava
 	}
 	source := record.Provider.AvailabilityCommitment
 	commitment := AvailabilityCommitment{
-		ServiceID:       record.ServiceID,
-		ProviderID:      record.Provider.ProviderID,
-		InterfaceHash:   interfaceHash,
-		EndpointHash:    source.EndpointHash,
-		WindowStart:     source.WindowStart,
-		WindowEnd:       source.WindowEnd,
-		UptimeTargetBps: source.UptimeTargetBps,
-		RenewalNonce:    source.RenewalNonce,
-		SignatureHash:   source.SignatureHash,
-		CommitmentHash:  source.CommitmentHash,
+		ServiceID:		record.ServiceID,
+		ProviderID:		record.Provider.ProviderID,
+		InterfaceHash:		interfaceHash,
+		EndpointHash:		source.EndpointHash,
+		WindowStart:		source.WindowStart,
+		WindowEnd:		source.WindowEnd,
+		UptimeTargetBps:	source.UptimeTargetBps,
+		RenewalNonce:		source.RenewalNonce,
+		SignatureHash:		source.SignatureHash,
+		CommitmentHash:		source.CommitmentHash,
 	}
 	commitment.RecordHash = ComputeAvailabilityCommitmentRecordHash(commitment)
 	return commitment, commitment.Validate()
@@ -269,11 +269,11 @@ func NewMsgSubmitProviderFault(authority string, report ProviderMisbehaviorRepor
 
 func BuildServiceProviderState(providers []ProviderRecord, collaterals []ProviderCollateral, reputations []ReputationRecord, commitments []AvailabilityCommitment, height uint64) (ServiceProviderState, error) {
 	state := ServiceProviderState{
-		Providers:     cloneProviderRecords(providers),
-		Collaterals:   cloneProviderCollaterals(collaterals),
-		Reputations:   cloneReputationRecords(reputations),
-		Commitments:   cloneAvailabilityCommitments(commitments),
-		UpdatedHeight: height,
+		Providers:	cloneProviderRecords(providers),
+		Collaterals:	cloneProviderCollaterals(collaterals),
+		Reputations:	cloneReputationRecords(reputations),
+		Commitments:	cloneAvailabilityCommitments(commitments),
+		UpdatedHeight:	height,
 	}
 	sortProviderRecords(state.Providers)
 	sortProviderCollaterals(state.Collaterals)
@@ -561,13 +561,13 @@ func (commitment AvailabilityCommitment) Validate() error {
 		return err
 	}
 	source := coretypes.FogAvailabilityCommitment{
-		EndpointHash:    commitment.EndpointHash,
-		WindowStart:     commitment.WindowStart,
-		WindowEnd:       commitment.WindowEnd,
-		UptimeTargetBps: commitment.UptimeTargetBps,
-		RenewalNonce:    commitment.RenewalNonce,
-		SignatureHash:   commitment.SignatureHash,
-		CommitmentHash:  commitment.CommitmentHash,
+		EndpointHash:		commitment.EndpointHash,
+		WindowStart:		commitment.WindowStart,
+		WindowEnd:		commitment.WindowEnd,
+		UptimeTargetBps:	commitment.UptimeTargetBps,
+		RenewalNonce:		commitment.RenewalNonce,
+		SignatureHash:		commitment.SignatureHash,
+		CommitmentHash:		commitment.CommitmentHash,
 	}
 	if expected := coretypes.ComputeFogAvailabilityCommitmentHash(source); commitment.CommitmentHash != expected {
 		return fmt.Errorf("x/serviceproviders availability commitment hash mismatch: expected %s", expected)

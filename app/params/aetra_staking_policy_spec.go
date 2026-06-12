@@ -6,376 +6,376 @@ import (
 )
 
 const (
-	AetraStakingPolicyModuleName = "x/aetra-staking-policy"
+	AetraStakingPolicyModuleName	= "x/aetra-staking-policy"
 
-	AetraStakingPolicyPurposeEffectivePowerOverflowCommissionAntiConcentration = "control_effective_voting_power_delegation_overflow_commission_policy_and_anti_concentration_incentives"
-	AetraStakingPolicyCentralAntiCentralizationModule                          = "central_anti_centralization_module"
+	AetraStakingPolicyPurposeEffectivePowerOverflowCommissionAntiConcentration	= "control_effective_voting_power_delegation_overflow_commission_policy_and_anti_concentration_incentives"
+	AetraStakingPolicyCentralAntiCentralizationModule				= "central_anti_centralization_module"
 
-	AetraStakingPolicyResponsibilityRawStake                       = "calculate_raw_validator_stake"
-	AetraStakingPolicyResponsibilityEffectiveStake                 = "calculate_effective_validator_stake"
-	AetraStakingPolicyResponsibilityOverflowStake                  = "calculate_overflow_stake"
-	AetraStakingPolicyResponsibilityEffectiveVotingPowerCap        = "enforce_or_expose_effective_voting_power_cap"
-	AetraStakingPolicyResponsibilityOverflowRewardMultiplier       = "calculate_reward_multiplier_for_overflow_stake"
-	AetraStakingPolicyResponsibilityDelegationConcentrationWarning = "expose_delegation_concentration_warnings"
-	AetraStakingPolicyResponsibilityCommissionFloor                = "enforce_commission_floor"
-	AetraStakingPolicyResponsibilityMaxCommission                  = "enforce_max_commission"
-	AetraStakingPolicyResponsibilityMaxCommissionChangeRate        = "enforce_max_commission_change_rate"
-	AetraStakingPolicyResponsibilityTopNConcentrationMetrics       = "expose_top_n_concentration_metrics"
-	AetraStakingPolicyResponsibilityGovernanceParamValidation      = "validate_governance_param_changes"
-	AetraStakingPolicyResponsibilityPolicyChangeEvents             = "emit_events_for_cap_overflow_commission_policy_changes"
-	AetraStakingPolicyResponsibilityDeterministicExportImport      = "remain_deterministic_and_export_import_safe"
+	AetraStakingPolicyResponsibilityRawStake			= "calculate_raw_validator_stake"
+	AetraStakingPolicyResponsibilityEffectiveStake			= "calculate_effective_validator_stake"
+	AetraStakingPolicyResponsibilityOverflowStake			= "calculate_overflow_stake"
+	AetraStakingPolicyResponsibilityEffectiveVotingPowerCap		= "enforce_or_expose_effective_voting_power_cap"
+	AetraStakingPolicyResponsibilityOverflowRewardMultiplier	= "calculate_reward_multiplier_for_overflow_stake"
+	AetraStakingPolicyResponsibilityDelegationConcentrationWarning	= "expose_delegation_concentration_warnings"
+	AetraStakingPolicyResponsibilityCommissionFloor			= "enforce_commission_floor"
+	AetraStakingPolicyResponsibilityMaxCommission			= "enforce_max_commission"
+	AetraStakingPolicyResponsibilityMaxCommissionChangeRate		= "enforce_max_commission_change_rate"
+	AetraStakingPolicyResponsibilityTopNConcentrationMetrics	= "expose_top_n_concentration_metrics"
+	AetraStakingPolicyResponsibilityGovernanceParamValidation	= "validate_governance_param_changes"
+	AetraStakingPolicyResponsibilityPolicyChangeEvents		= "emit_events_for_cap_overflow_commission_policy_changes"
+	AetraStakingPolicyResponsibilityDeterministicExportImport	= "remain_deterministic_and_export_import_safe"
 
-	AetraStakingPolicyStateParams                = "Params"
-	AetraStakingPolicyStateValidatorPolicy       = "ValidatorPolicy"
-	AetraStakingPolicyStateConcentrationSnapshot = "ConcentrationSnapshot"
+	AetraStakingPolicyStateParams			= "Params"
+	AetraStakingPolicyStateValidatorPolicy		= "ValidatorPolicy"
+	AetraStakingPolicyStateConcentrationSnapshot	= "ConcentrationSnapshot"
 
-	AetraStakingPolicyStateParamMaxValidatorsSoftTarget        = "MaxValidatorsSoftTarget"
-	AetraStakingPolicyStateParamValidatorPowerCapBps           = "ValidatorPowerCapBps"
-	AetraStakingPolicyStateParamValidatorPowerCapSchedule      = "ValidatorPowerCapSchedule"
-	AetraStakingPolicyStateParamOverflowRewardMultiplierBps    = "OverflowRewardMultiplierBps"
-	AetraStakingPolicyStateParamCommissionFloorBps             = "CommissionFloorBps"
-	AetraStakingPolicyStateParamCommissionMaxBps               = "CommissionMaxBps"
-	AetraStakingPolicyStateParamCommissionMaxDailyChangeBps    = "CommissionMaxDailyChangeBps"
-	AetraStakingPolicyStateParamTop10TargetBps                 = "Top10TargetBps"
-	AetraStakingPolicyStateParamTop20TargetBps                 = "Top20TargetBps"
-	AetraStakingPolicyStateParamTop33TargetBps                 = "Top33TargetBps"
-	AetraStakingPolicyStateParamMinSelfBond                    = "MinSelfBond"
-	AetraStakingPolicyStateParamMinValidatorBond               = "MinValidatorBond"
-	AetraStakingPolicyStateParamWarningThresholdBps            = "WarningThresholdBps"
-	AetraStakingPolicyStateValidatorOperatorAddress            = "OperatorAddress"
-	AetraStakingPolicyStateValidatorRawBondedTokens            = "RawBondedTokens"
-	AetraStakingPolicyStateValidatorEffectiveBondedTokens      = "EffectiveBondedTokens"
-	AetraStakingPolicyStateValidatorOverflowBondedTokens       = "OverflowBondedTokens"
-	AetraStakingPolicyStateValidatorEffectivePowerBps          = "EffectivePowerBps"
-	AetraStakingPolicyStateValidatorIsOverCap                  = "IsOverCap"
-	AetraStakingPolicyStateValidatorRewardMultiplierBps        = "RewardMultiplierBps"
-	AetraStakingPolicyStateValidatorLastCommissionChangeTime   = "LastCommissionChangeTime"
-	AetraStakingPolicyStateValidatorLastCommissionRateBps      = "LastCommissionRateBps"
-	AetraStakingPolicyStateSnapshotHeight                      = "Height"
-	AetraStakingPolicyStateSnapshotBondedRatio                 = "BondedRatio"
-	AetraStakingPolicyStateSnapshotActiveValidators            = "ActiveValidators"
-	AetraStakingPolicyStateSnapshotTop10Bps                    = "Top10Bps"
-	AetraStakingPolicyStateSnapshotTop20Bps                    = "Top20Bps"
-	AetraStakingPolicyStateSnapshotTop33Bps                    = "Top33Bps"
-	AetraStakingPolicyStateSnapshotNakamotoCoefficientEstimate = "NakamotoCoefficientEstimate"
-	AetraStakingPolicyStateIntegerBpsOrSDKDecimal              = "integer_basis_points_or_sdk_decimal_accounting"
-	AetraStakingPolicyStateNoFloatingPoint                     = "avoid_floating_point_accounting"
+	AetraStakingPolicyStateParamMaxValidatorsSoftTarget		= "MaxValidatorsSoftTarget"
+	AetraStakingPolicyStateParamValidatorPowerCapBps		= "ValidatorPowerCapBps"
+	AetraStakingPolicyStateParamValidatorPowerCapSchedule		= "ValidatorPowerCapSchedule"
+	AetraStakingPolicyStateParamOverflowRewardMultiplierBps		= "OverflowRewardMultiplierBps"
+	AetraStakingPolicyStateParamCommissionFloorBps			= "CommissionFloorBps"
+	AetraStakingPolicyStateParamCommissionMaxBps			= "CommissionMaxBps"
+	AetraStakingPolicyStateParamCommissionMaxDailyChangeBps		= "CommissionMaxDailyChangeBps"
+	AetraStakingPolicyStateParamTop10TargetBps			= "Top10TargetBps"
+	AetraStakingPolicyStateParamTop20TargetBps			= "Top20TargetBps"
+	AetraStakingPolicyStateParamTop33TargetBps			= "Top33TargetBps"
+	AetraStakingPolicyStateParamMinSelfBond				= "MinSelfBond"
+	AetraStakingPolicyStateParamMinValidatorBond			= "MinValidatorBond"
+	AetraStakingPolicyStateParamWarningThresholdBps			= "WarningThresholdBps"
+	AetraStakingPolicyStateValidatorOperatorAddress			= "OperatorAddress"
+	AetraStakingPolicyStateValidatorRawBondedTokens			= "RawBondedTokens"
+	AetraStakingPolicyStateValidatorEffectiveBondedTokens		= "EffectiveBondedTokens"
+	AetraStakingPolicyStateValidatorOverflowBondedTokens		= "OverflowBondedTokens"
+	AetraStakingPolicyStateValidatorEffectivePowerBps		= "EffectivePowerBps"
+	AetraStakingPolicyStateValidatorIsOverCap			= "IsOverCap"
+	AetraStakingPolicyStateValidatorRewardMultiplierBps		= "RewardMultiplierBps"
+	AetraStakingPolicyStateValidatorLastCommissionChangeTime	= "LastCommissionChangeTime"
+	AetraStakingPolicyStateValidatorLastCommissionRateBps		= "LastCommissionRateBps"
+	AetraStakingPolicyStateSnapshotHeight				= "Height"
+	AetraStakingPolicyStateSnapshotBondedRatio			= "BondedRatio"
+	AetraStakingPolicyStateSnapshotActiveValidators			= "ActiveValidators"
+	AetraStakingPolicyStateSnapshotTop10Bps				= "Top10Bps"
+	AetraStakingPolicyStateSnapshotTop20Bps				= "Top20Bps"
+	AetraStakingPolicyStateSnapshotTop33Bps				= "Top33Bps"
+	AetraStakingPolicyStateSnapshotNakamotoCoefficientEstimate	= "NakamotoCoefficientEstimate"
+	AetraStakingPolicyStateIntegerBpsOrSDKDecimal			= "integer_basis_points_or_sdk_decimal_accounting"
+	AetraStakingPolicyStateNoFloatingPoint				= "avoid_floating_point_accounting"
 
-	AetraStakingPolicyParamValidatorPowerCapBps         = "ValidatorPowerCapBps"
-	AetraStakingPolicyParamOverflowRewardMultiplierBps  = "OverflowRewardMultiplierBps"
-	AetraStakingPolicyParamCommissionFloorBps           = "CommissionFloorBps"
-	AetraStakingPolicyParamCommissionMaxBps             = "CommissionMaxBps"
-	AetraStakingPolicyParamCommissionMaxDailyChangeBps  = "CommissionMaxDailyChangeBps"
-	AetraStakingPolicyParamTop10TargetBps               = "Top10TargetBps"
-	AetraStakingPolicyParamTop20TargetBps               = "Top20TargetBps"
-	AetraStakingPolicyParamTop33TargetBps               = "Top33TargetBps"
-	AetraStakingPolicyParamMaxValidatorsSoftTarget      = "MaxValidatorsSoftTarget"
-	AetraStakingPolicyParamRejectNegativeOrOverflowMath = "reject_negative_or_overflowing_math_values"
+	AetraStakingPolicyParamValidatorPowerCapBps		= "ValidatorPowerCapBps"
+	AetraStakingPolicyParamOverflowRewardMultiplierBps	= "OverflowRewardMultiplierBps"
+	AetraStakingPolicyParamCommissionFloorBps		= "CommissionFloorBps"
+	AetraStakingPolicyParamCommissionMaxBps			= "CommissionMaxBps"
+	AetraStakingPolicyParamCommissionMaxDailyChangeBps	= "CommissionMaxDailyChangeBps"
+	AetraStakingPolicyParamTop10TargetBps			= "Top10TargetBps"
+	AetraStakingPolicyParamTop20TargetBps			= "Top20TargetBps"
+	AetraStakingPolicyParamTop33TargetBps			= "Top33TargetBps"
+	AetraStakingPolicyParamMaxValidatorsSoftTarget		= "MaxValidatorsSoftTarget"
+	AetraStakingPolicyParamRejectNegativeOrOverflowMath	= "reject_negative_or_overflowing_math_values"
 
-	AetraStakingPolicyEffectivePowerStage1 = "stage_1_rewards_and_delegation_warnings"
-	AetraStakingPolicyEffectivePowerStage2 = "stage_2_capped_validator_updates"
+	AetraStakingPolicyEffectivePowerStage1	= "stage_1_rewards_and_delegation_warnings"
+	AetraStakingPolicyEffectivePowerStage2	= "stage_2_capped_validator_updates"
 
-	AetraStakingPolicyEffectivePowerDefinesCapScope            = "define_whether_cap_affects_rewards_voting_power_or_both"
-	AetraStakingPolicyEffectivePowerRewards                    = "cap_affects_reward_calculation"
-	AetraStakingPolicyEffectivePowerDelegationWarnings         = "cap_affects_delegation_warnings"
-	AetraStakingPolicyEffectivePowerCometBFTVotingPower        = "cap_affects_actual_cometbft_voting_power"
-	AetraStakingPolicyEffectivePowerStage1LowConsensusRisk     = "stage_1_low_consensus_risk"
-	AetraStakingPolicyEffectivePowerStage2DeepIntegrationTests = "stage_2_requires_deeper_integration_and_heavy_tests"
-	AetraStakingPolicyEffectivePowerValidatorUpdatesCapped     = "validator_updates_sent_to_cometbft_use_capped_power"
-	AetraStakingPolicyEffectivePowerTotalVotingConsistent      = "total_voting_power_remains_consistent"
-	AetraStakingPolicyEffectivePowerNoValidatorExceedsCap      = "no_validator_can_exceed_cap"
-	AetraStakingPolicyEffectivePowerSharesCorrect              = "delegation_and_unbonding_shares_remain_correct"
-	AetraStakingPolicyEffectivePowerSlashingRawStake           = "slashing_can_still_slash_underlying_raw_stake"
-	AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect    = "evidence_handling_remains_correct"
+	AetraStakingPolicyEffectivePowerDefinesCapScope			= "define_whether_cap_affects_rewards_voting_power_or_both"
+	AetraStakingPolicyEffectivePowerRewards				= "cap_affects_reward_calculation"
+	AetraStakingPolicyEffectivePowerDelegationWarnings		= "cap_affects_delegation_warnings"
+	AetraStakingPolicyEffectivePowerCometBFTVotingPower		= "cap_affects_actual_cometbft_voting_power"
+	AetraStakingPolicyEffectivePowerStage1LowConsensusRisk		= "stage_1_low_consensus_risk"
+	AetraStakingPolicyEffectivePowerStage2DeepIntegrationTests	= "stage_2_requires_deeper_integration_and_heavy_tests"
+	AetraStakingPolicyEffectivePowerValidatorUpdatesCapped		= "validator_updates_sent_to_cometbft_use_capped_power"
+	AetraStakingPolicyEffectivePowerTotalVotingConsistent		= "total_voting_power_remains_consistent"
+	AetraStakingPolicyEffectivePowerNoValidatorExceedsCap		= "no_validator_can_exceed_cap"
+	AetraStakingPolicyEffectivePowerSharesCorrect			= "delegation_and_unbonding_shares_remain_correct"
+	AetraStakingPolicyEffectivePowerSlashingRawStake		= "slashing_can_still_slash_underlying_raw_stake"
+	AetraStakingPolicyEffectivePowerEvidenceHandlingCorrect		= "evidence_handling_remains_correct"
 
-	AetraStakingPolicyMessageMsgUpdateStakingPolicyParams       = "MsgUpdateStakingPolicyParams"
-	AetraStakingPolicyMessageMsgUpdateValidatorPowerCapSchedule = "MsgUpdateValidatorPowerCapSchedule"
-	AetraStakingPolicyMessageMsgSetCommissionPolicy             = "MsgSetCommissionPolicy"
-	AetraStakingPolicyMessageMsgRegisterValidatorIdentity       = "MsgRegisterValidatorIdentity"
-	AetraStakingPolicyMessageMsgUpdateValidatorIdentity         = "MsgUpdateValidatorIdentity"
-	AetraStakingPolicyMessageMsgAcknowledgeOverCapWarning       = "MsgAcknowledgeOverCapWarning"
+	AetraStakingPolicyMessageMsgUpdateStakingPolicyParams		= "MsgUpdateStakingPolicyParams"
+	AetraStakingPolicyMessageMsgUpdateValidatorPowerCapSchedule	= "MsgUpdateValidatorPowerCapSchedule"
+	AetraStakingPolicyMessageMsgSetCommissionPolicy			= "MsgSetCommissionPolicy"
+	AetraStakingPolicyMessageMsgRegisterValidatorIdentity		= "MsgRegisterValidatorIdentity"
+	AetraStakingPolicyMessageMsgUpdateValidatorIdentity		= "MsgUpdateValidatorIdentity"
+	AetraStakingPolicyMessageMsgAcknowledgeOverCapWarning		= "MsgAcknowledgeOverCapWarning"
 
-	AetraStakingPolicyMessageGovernanceOrAuthorityOnly = "governance_or_authority_only_messages"
-	AetraStakingPolicyMessageOptionalValidatorMessages = "optional_validator_messages"
-	AetraStakingPolicyMessageValidateAuthority         = "validate_authority"
-	AetraStakingPolicyMessageValidateSigner            = "validate_signer"
-	AetraStakingPolicyMessageRejectMalformedAddresses  = "reject_malformed_addresses"
-	AetraStakingPolicyMessageRejectInvalidParams       = "reject_invalid_params"
-	AetraStakingPolicyMessageEmitEvents                = "emit_events"
-	AetraStakingPolicyMessageCoveredByTests            = "covered_by_tests"
+	AetraStakingPolicyMessageGovernanceOrAuthorityOnly	= "governance_or_authority_only_messages"
+	AetraStakingPolicyMessageOptionalValidatorMessages	= "optional_validator_messages"
+	AetraStakingPolicyMessageValidateAuthority		= "validate_authority"
+	AetraStakingPolicyMessageValidateSigner			= "validate_signer"
+	AetraStakingPolicyMessageRejectMalformedAddresses	= "reject_malformed_addresses"
+	AetraStakingPolicyMessageRejectInvalidParams		= "reject_invalid_params"
+	AetraStakingPolicyMessageEmitEvents			= "emit_events"
+	AetraStakingPolicyMessageCoveredByTests			= "covered_by_tests"
 
-	AetraStakingPolicyQueryParams                  = "Query/Params"
-	AetraStakingPolicyQueryValidatorPolicy         = "Query/ValidatorPolicy"
-	AetraStakingPolicyQueryValidatorEffectivePower = "Query/ValidatorEffectivePower"
-	AetraStakingPolicyQueryValidatorOverflow       = "Query/ValidatorOverflow"
-	AetraStakingPolicyQueryTopNConcentration       = "Query/TopNConcentration"
-	AetraStakingPolicyQueryDelegationWarning       = "Query/DelegationWarning"
-	AetraStakingPolicyQueryCommissionPolicy        = "Query/CommissionPolicy"
-	AetraStakingPolicyQueryConcentrationSnapshot   = "Query/ConcentrationSnapshot"
-	AetraStakingPolicyQueryNakamotoCoefficient     = "Query/NakamotoCoefficient"
+	AetraStakingPolicyQueryParams			= "Query/Params"
+	AetraStakingPolicyQueryValidatorPolicy		= "Query/ValidatorPolicy"
+	AetraStakingPolicyQueryValidatorEffectivePower	= "Query/ValidatorEffectivePower"
+	AetraStakingPolicyQueryValidatorOverflow	= "Query/ValidatorOverflow"
+	AetraStakingPolicyQueryTopNConcentration	= "Query/TopNConcentration"
+	AetraStakingPolicyQueryDelegationWarning	= "Query/DelegationWarning"
+	AetraStakingPolicyQueryCommissionPolicy		= "Query/CommissionPolicy"
+	AetraStakingPolicyQueryConcentrationSnapshot	= "Query/ConcentrationSnapshot"
+	AetraStakingPolicyQueryNakamotoCoefficient	= "Query/NakamotoCoefficient"
 
-	AetraStakingPolicyQueryStableResponses          = "query_responses_stable"
-	AetraStakingPolicyQueryIndexerFriendlyResponses = "query_responses_indexer_friendly"
+	AetraStakingPolicyQueryStableResponses		= "query_responses_stable"
+	AetraStakingPolicyQueryIndexerFriendlyResponses	= "query_responses_indexer_friendly"
 
-	AetraStakingPolicyEventParamsUpdated           = "aetra.staking_policy.params_updated"
-	AetraStakingPolicyEventValidatorOverCap        = "aetra.staking_policy.validator_over_cap"
-	AetraStakingPolicyEventValidatorBackUnderCap   = "aetra.staking_policy.validator_back_under_cap"
-	AetraStakingPolicyEventCommissionRejected      = "aetra.staking_policy.commission_rejected"
-	AetraStakingPolicyEventConcentrationSnapshot   = "aetra.staking_policy.concentration_snapshot"
-	AetraStakingPolicyEventRewardMultiplierChanged = "aetra.staking_policy.reward_multiplier_changed"
-	AetraStakingPolicyEventStableNames             = "event_names_are_stable"
-	AetraStakingPolicyEventIndexerFriendlyAttrs    = "event_attributes_are_indexer_friendly"
+	AetraStakingPolicyEventParamsUpdated		= "aetra.staking_policy.params_updated"
+	AetraStakingPolicyEventValidatorOverCap		= "aetra.staking_policy.validator_over_cap"
+	AetraStakingPolicyEventValidatorBackUnderCap	= "aetra.staking_policy.validator_back_under_cap"
+	AetraStakingPolicyEventCommissionRejected	= "aetra.staking_policy.commission_rejected"
+	AetraStakingPolicyEventConcentrationSnapshot	= "aetra.staking_policy.concentration_snapshot"
+	AetraStakingPolicyEventRewardMultiplierChanged	= "aetra.staking_policy.reward_multiplier_changed"
+	AetraStakingPolicyEventStableNames		= "event_names_are_stable"
+	AetraStakingPolicyEventIndexerFriendlyAttrs	= "event_attributes_are_indexer_friendly"
 
-	AetraStakingPolicyInvariantEffectivePowerCap     = "effective_power_never_exceeds_configured_cap"
-	AetraStakingPolicyInvariantOverflowNonNegative   = "overflow_stake_is_never_negative"
-	AetraStakingPolicyInvariantRawStakeConservation  = "raw_stake_equals_effective_stake_plus_overflow_stake"
-	AetraStakingPolicyInvariantCommissionBounds      = "commission_floor_lte_commission_lte_commission_max"
-	AetraStakingPolicyInvariantCommissionDailyChange = "commission_change_lte_max_daily_change"
-	AetraStakingPolicyInvariantTopNMaxHundredPercent = "top_n_calculations_do_not_exceed_100_percent"
-	AetraStakingPolicyInvariantExportImportPreserves = "state_export_import_preserves_policy_state"
-	AetraStakingPolicyInvariantCoveredByTests        = "invariants_are_covered_by_tests"
+	AetraStakingPolicyInvariantEffectivePowerCap		= "effective_power_never_exceeds_configured_cap"
+	AetraStakingPolicyInvariantOverflowNonNegative		= "overflow_stake_is_never_negative"
+	AetraStakingPolicyInvariantRawStakeConservation		= "raw_stake_equals_effective_stake_plus_overflow_stake"
+	AetraStakingPolicyInvariantCommissionBounds		= "commission_floor_lte_commission_lte_commission_max"
+	AetraStakingPolicyInvariantCommissionDailyChange	= "commission_change_lte_max_daily_change"
+	AetraStakingPolicyInvariantTopNMaxHundredPercent	= "top_n_calculations_do_not_exceed_100_percent"
+	AetraStakingPolicyInvariantExportImportPreserves	= "state_export_import_preserves_policy_state"
+	AetraStakingPolicyInvariantCoveredByTests		= "invariants_are_covered_by_tests"
 
-	AetraStakingPolicyTestCapMath100Validators               = "cap_math_for_100_validators"
-	AetraStakingPolicyTestCapMath150Validators               = "cap_math_for_150_validators"
-	AetraStakingPolicyTestCapMath250Validators               = "cap_math_for_250_validators"
-	AetraStakingPolicyTestCapMath300Validators               = "cap_math_for_300_validators"
-	AetraStakingPolicyTestValidatorCrossingCapUpward         = "validator_crossing_cap_upward"
-	AetraStakingPolicyTestValidatorCrossingCapDownward       = "validator_crossing_cap_downward"
-	AetraStakingPolicyTestDelegationToOverCapValidator       = "delegation_to_over_cap_validator"
-	AetraStakingPolicyTestRedelegationFromOverCapValidator   = "redelegation_from_over_cap_validator"
-	AetraStakingPolicyTestUnbondingFromOverCapValidator      = "unbonding_from_over_cap_validator"
-	AetraStakingPolicyTestSlashingOverCapValidator           = "slashing_over_cap_validator"
-	AetraStakingPolicyTestCommissionBelowFloorRejected       = "commission_below_floor_rejected"
-	AetraStakingPolicyTestCommissionAboveMaxRejected         = "commission_above_max_rejected"
-	AetraStakingPolicyTestCommissionDailyJumpRejected        = "commission_daily_jump_rejected"
-	AetraStakingPolicyTestGovernanceParamUpdateAccepted      = "governance_param_update_accepted_within_bounds"
-	AetraStakingPolicyTestGovernanceParamUpdateRejected      = "governance_param_update_rejected_outside_bounds"
-	AetraStakingPolicyTestExportImportOverCapValidators      = "export_import_with_over_cap_validators"
-	AetraStakingPolicyTestDeterministicConcentrationSnapshot = "deterministic_concentration_snapshot"
+	AetraStakingPolicyTestCapMath100Validators			= "cap_math_for_100_validators"
+	AetraStakingPolicyTestCapMath150Validators			= "cap_math_for_150_validators"
+	AetraStakingPolicyTestCapMath250Validators			= "cap_math_for_250_validators"
+	AetraStakingPolicyTestCapMath300Validators			= "cap_math_for_300_validators"
+	AetraStakingPolicyTestValidatorCrossingCapUpward		= "validator_crossing_cap_upward"
+	AetraStakingPolicyTestValidatorCrossingCapDownward		= "validator_crossing_cap_downward"
+	AetraStakingPolicyTestDelegationToOverCapValidator		= "delegation_to_over_cap_validator"
+	AetraStakingPolicyTestRedelegationFromOverCapValidator		= "redelegation_from_over_cap_validator"
+	AetraStakingPolicyTestUnbondingFromOverCapValidator		= "unbonding_from_over_cap_validator"
+	AetraStakingPolicyTestSlashingOverCapValidator			= "slashing_over_cap_validator"
+	AetraStakingPolicyTestCommissionBelowFloorRejected		= "commission_below_floor_rejected"
+	AetraStakingPolicyTestCommissionAboveMaxRejected		= "commission_above_max_rejected"
+	AetraStakingPolicyTestCommissionDailyJumpRejected		= "commission_daily_jump_rejected"
+	AetraStakingPolicyTestGovernanceParamUpdateAccepted		= "governance_param_update_accepted_within_bounds"
+	AetraStakingPolicyTestGovernanceParamUpdateRejected		= "governance_param_update_rejected_outside_bounds"
+	AetraStakingPolicyTestExportImportOverCapValidators		= "export_import_with_over_cap_validators"
+	AetraStakingPolicyTestDeterministicConcentrationSnapshot	= "deterministic_concentration_snapshot"
 )
 
 type AetraStakingPolicySpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	PurposeEffectivePowerOverflowCommissionAntiConcentration bool
-	CentralAntiCentralizationModule                          bool
+	PurposeEffectivePowerOverflowCommissionAntiConcentration	bool
+	CentralAntiCentralizationModule					bool
 
-	CalculatesRawValidatorStake              bool
-	CalculatesEffectiveValidatorStake        bool
-	CalculatesOverflowStake                  bool
-	EnforcesOrExposesEffectiveVotingPowerCap bool
-	CalculatesOverflowRewardMultiplier       bool
-	ExposesDelegationConcentrationWarnings   bool
-	EnforcesCommissionFloor                  bool
-	EnforcesMaxCommission                    bool
-	EnforcesMaxCommissionChangeRate          bool
-	ExposesTopNConcentrationMetrics          bool
-	ValidatesGovernanceParamChanges          bool
-	EmitsCapOverflowCommissionPolicyEvents   bool
-	RemainsDeterministicAndExportImportSafe  bool
+	CalculatesRawValidatorStake			bool
+	CalculatesEffectiveValidatorStake		bool
+	CalculatesOverflowStake				bool
+	EnforcesOrExposesEffectiveVotingPowerCap	bool
+	CalculatesOverflowRewardMultiplier		bool
+	ExposesDelegationConcentrationWarnings		bool
+	EnforcesCommissionFloor				bool
+	EnforcesMaxCommission				bool
+	EnforcesMaxCommissionChangeRate			bool
+	ExposesTopNConcentrationMetrics			bool
+	ValidatesGovernanceParamChanges			bool
+	EmitsCapOverflowCommissionPolicyEvents		bool
+	RemainsDeterministicAndExportImportSafe		bool
 }
 
 type AetraStakingPolicySpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyStateSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	ParamsFields                []string
-	ValidatorPolicyFields       []string
-	ConcentrationSnapshotFields []string
+	ParamsFields			[]string
+	ValidatorPolicyFields		[]string
+	ConcentrationSnapshotFields	[]string
 
-	IntegerBasisPointsOrSDKDecimals bool
-	AvoidsFloatingPoint             bool
+	IntegerBasisPointsOrSDKDecimals	bool
+	AvoidsFloatingPoint		bool
 }
 
 type AetraStakingPolicyStateSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyBpsRule struct {
-	Name           string
-	MinBps         int64
-	MaxBps         int64
-	RecommendedMin int64
-	RecommendedMax int64
+	Name		string
+	MinBps		int64
+	MaxBps		int64
+	RecommendedMin	int64
+	RecommendedMax	int64
 }
 
 type AetraStakingPolicyParameterRuleSet struct {
-	ValidatorPowerCapBps        AetraStakingPolicyBpsRule
-	OverflowRewardMultiplierBps AetraStakingPolicyBpsRule
-	CommissionFloorBps          AetraStakingPolicyBpsRule
-	CommissionMaxBps            AetraStakingPolicyBpsRule
-	CommissionMaxDailyChangeBps AetraStakingPolicyBpsRule
+	ValidatorPowerCapBps		AetraStakingPolicyBpsRule
+	OverflowRewardMultiplierBps	AetraStakingPolicyBpsRule
+	CommissionFloorBps		AetraStakingPolicyBpsRule
+	CommissionMaxBps		AetraStakingPolicyBpsRule
+	CommissionMaxDailyChangeBps	AetraStakingPolicyBpsRule
 }
 
 type AetraStakingPolicyParameterValues struct {
-	ValidatorPowerCapBps        int64
-	OverflowRewardMultiplierBps int64
-	CommissionFloorBps          int64
-	CommissionMaxBps            int64
-	CommissionMaxDailyChangeBps int64
-	Top10TargetBps              int64
-	Top20TargetBps              int64
-	Top33TargetBps              int64
-	MaxValidatorsSoftTarget     int64
+	ValidatorPowerCapBps		int64
+	OverflowRewardMultiplierBps	int64
+	CommissionFloorBps		int64
+	CommissionMaxBps		int64
+	CommissionMaxDailyChangeBps	int64
+	Top10TargetBps			int64
+	Top20TargetBps			int64
+	Top33TargetBps			int64
+	MaxValidatorsSoftTarget		int64
 }
 
 type AetraStakingPolicyParameterReport struct {
-	Required int
-	Passed   int
-	Failed   []string
-	Ready    bool
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyEffectivePowerEvidence struct {
-	ModuleName string
-	Stage      string
+	ModuleName	string
+	Stage		string
 
-	DefinesCapScope               bool
-	CapAffectsRewardCalculation   bool
-	CapAffectsDelegationWarnings  bool
-	CapAffectsCometBFTVotingPower bool
-	Stage1LowConsensusRisk        bool
-	Stage2DeepIntegrationTests    bool
+	DefinesCapScope			bool
+	CapAffectsRewardCalculation	bool
+	CapAffectsDelegationWarnings	bool
+	CapAffectsCometBFTVotingPower	bool
+	Stage1LowConsensusRisk		bool
+	Stage2DeepIntegrationTests	bool
 
-	ValidatorUpdatesUseCappedPower   bool
-	TotalVotingPowerConsistent       bool
-	NoValidatorCanExceedCap          bool
-	DelegationUnbondingSharesCorrect bool
-	SlashingUsesUnderlyingRawStake   bool
-	EvidenceHandlingCorrect          bool
+	ValidatorUpdatesUseCappedPower		bool
+	TotalVotingPowerConsistent		bool
+	NoValidatorCanExceedCap			bool
+	DelegationUnbondingSharesCorrect	bool
+	SlashingUsesUnderlyingRawStake		bool
+	EvidenceHandlingCorrect			bool
 }
 
 type AetraStakingPolicyEffectivePowerReport struct {
-	ModuleName string
-	Stage      string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Stage		string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyMessageSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	GovernanceAuthorityMessages []string
-	OptionalValidatorMessages   []string
+	GovernanceAuthorityMessages	[]string
+	OptionalValidatorMessages	[]string
 
-	ValidateAuthority        bool
-	ValidateSigner           bool
-	RejectMalformedAddresses bool
-	RejectInvalidParams      bool
-	EmitEvents               bool
-	CoveredByTests           bool
+	ValidateAuthority		bool
+	ValidateSigner			bool
+	RejectMalformedAddresses	bool
+	RejectInvalidParams		bool
+	EmitEvents			bool
+	CoveredByTests			bool
 }
 
 type AetraStakingPolicyMessageSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyQuerySpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredQueries []string
+	RequiredQueries	[]string
 
-	StableResponses          bool
-	IndexerFriendlyResponses bool
+	StableResponses			bool
+	IndexerFriendlyResponses	bool
 }
 
 type AetraStakingPolicyQuerySpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyEventSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredEvents []string
+	RequiredEvents	[]string
 
-	StableEventNames          bool
-	IndexerFriendlyAttributes bool
+	StableEventNames		bool
+	IndexerFriendlyAttributes	bool
 }
 
 type AetraStakingPolicyEventSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyInvariantSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	EffectivePowerNeverExceedsCap    bool
-	OverflowStakeNeverNegative       bool
-	RawStakeConservation             bool
-	CommissionWithinFloorAndMax      bool
-	CommissionChangeWithinDailyLimit bool
-	TopNDoesNotExceedHundredPercent  bool
-	ExportImportPreservesPolicyState bool
-	CoveredByTests                   bool
+	EffectivePowerNeverExceedsCap		bool
+	OverflowStakeNeverNegative		bool
+	RawStakeConservation			bool
+	CommissionWithinFloorAndMax		bool
+	CommissionChangeWithinDailyLimit	bool
+	TopNDoesNotExceedHundredPercent		bool
+	ExportImportPreservesPolicyState	bool
+	CoveredByTests				bool
 }
 
 type AetraStakingPolicyInvariantSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakingPolicyTestSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredTests []string
+	RequiredTests	[]string
 }
 
 type AetraStakingPolicyTestSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraStakingPolicySpecEvidence() AetraStakingPolicySpecEvidence {
 	return AetraStakingPolicySpecEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
+		ModuleName:	AetraStakingPolicyModuleName,
 
-		PurposeEffectivePowerOverflowCommissionAntiConcentration: true,
-		CentralAntiCentralizationModule:                          true,
+		PurposeEffectivePowerOverflowCommissionAntiConcentration:	true,
+		CentralAntiCentralizationModule:				true,
 
-		CalculatesRawValidatorStake:              true,
-		CalculatesEffectiveValidatorStake:        true,
-		CalculatesOverflowStake:                  true,
-		EnforcesOrExposesEffectiveVotingPowerCap: true,
-		CalculatesOverflowRewardMultiplier:       true,
-		ExposesDelegationConcentrationWarnings:   true,
-		EnforcesCommissionFloor:                  true,
-		EnforcesMaxCommission:                    true,
-		EnforcesMaxCommissionChangeRate:          true,
-		ExposesTopNConcentrationMetrics:          true,
-		ValidatesGovernanceParamChanges:          true,
-		EmitsCapOverflowCommissionPolicyEvents:   true,
-		RemainsDeterministicAndExportImportSafe:  true,
+		CalculatesRawValidatorStake:			true,
+		CalculatesEffectiveValidatorStake:		true,
+		CalculatesOverflowStake:			true,
+		EnforcesOrExposesEffectiveVotingPowerCap:	true,
+		CalculatesOverflowRewardMultiplier:		true,
+		ExposesDelegationConcentrationWarnings:		true,
+		EnforcesCommissionFloor:			true,
+		EnforcesMaxCommission:				true,
+		EnforcesMaxCommissionChangeRate:		true,
+		ExposesTopNConcentrationMetrics:		true,
+		ValidatesGovernanceParamChanges:		true,
+		EmitsCapOverflowCommissionPolicyEvents:		true,
+		RemainsDeterministicAndExportImportSafe:	true,
 	}
 }
 
@@ -424,17 +424,17 @@ func BuildAetraStakingPolicySpecReport(evidence AetraStakingPolicySpecEvidence) 
 
 	sort.Strings(failed)
 	return AetraStakingPolicySpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraStakingPolicyStateSpecEvidence() AetraStakingPolicyStateSpecEvidence {
 	return AetraStakingPolicyStateSpecEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
+		ModuleName:	AetraStakingPolicyModuleName,
 		ParamsFields: []string{
 			AetraStakingPolicyStateParamMaxValidatorsSoftTarget,
 			AetraStakingPolicyStateParamValidatorPowerCapBps,
@@ -470,8 +470,8 @@ func DefaultAetraStakingPolicyStateSpecEvidence() AetraStakingPolicyStateSpecEvi
 			AetraStakingPolicyStateSnapshotTop33Bps,
 			AetraStakingPolicyStateSnapshotNakamotoCoefficientEstimate,
 		},
-		IntegerBasisPointsOrSDKDecimals: true,
-		AvoidsFloatingPoint:             true,
+		IntegerBasisPointsOrSDKDecimals:	true,
+		AvoidsFloatingPoint:			true,
 	}
 }
 
@@ -521,11 +521,11 @@ func BuildAetraStakingPolicyStateSpecReport(evidence AetraStakingPolicyStateSpec
 
 	sort.Strings(failed)
 	return AetraStakingPolicyStateSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredParams) + len(requiredValidator) + len(requiredSnapshot) + 2,
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredParams) + len(requiredValidator) + len(requiredSnapshot) + 2,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -608,54 +608,54 @@ func validateAetraStakingPolicyStateFields(group string, actual []string, requir
 func DefaultAetraStakingPolicyParameterRuleSet() AetraStakingPolicyParameterRuleSet {
 	return AetraStakingPolicyParameterRuleSet{
 		ValidatorPowerCapBps: AetraStakingPolicyBpsRule{
-			Name:           AetraStakingPolicyParamValidatorPowerCapBps,
-			MinBps:         100,
-			MaxBps:         500,
-			RecommendedMin: 200,
-			RecommendedMax: 300,
+			Name:		AetraStakingPolicyParamValidatorPowerCapBps,
+			MinBps:		100,
+			MaxBps:		500,
+			RecommendedMin:	200,
+			RecommendedMax:	300,
 		},
 		OverflowRewardMultiplierBps: AetraStakingPolicyBpsRule{
-			Name:           AetraStakingPolicyParamOverflowRewardMultiplierBps,
-			MinBps:         0,
-			MaxBps:         10_000,
-			RecommendedMin: 0,
-			RecommendedMax: 3_000,
+			Name:		AetraStakingPolicyParamOverflowRewardMultiplierBps,
+			MinBps:		0,
+			MaxBps:		10_000,
+			RecommendedMin:	0,
+			RecommendedMax:	3_000,
 		},
 		CommissionFloorBps: AetraStakingPolicyBpsRule{
-			Name:           AetraStakingPolicyParamCommissionFloorBps,
-			MinBps:         0,
-			MaxBps:         1_000,
-			RecommendedMin: 300,
-			RecommendedMax: 500,
+			Name:		AetraStakingPolicyParamCommissionFloorBps,
+			MinBps:		0,
+			MaxBps:		1_000,
+			RecommendedMin:	300,
+			RecommendedMax:	500,
 		},
 		CommissionMaxBps: AetraStakingPolicyBpsRule{
-			Name:           AetraStakingPolicyParamCommissionMaxBps,
-			MinBps:         0,
-			MaxBps:         3_000,
-			RecommendedMin: 1_500,
-			RecommendedMax: 2_000,
+			Name:		AetraStakingPolicyParamCommissionMaxBps,
+			MinBps:		0,
+			MaxBps:		3_000,
+			RecommendedMin:	1_500,
+			RecommendedMax:	2_000,
 		},
 		CommissionMaxDailyChangeBps: AetraStakingPolicyBpsRule{
-			Name:           AetraStakingPolicyParamCommissionMaxDailyChangeBps,
-			MinBps:         1,
-			MaxBps:         500,
-			RecommendedMin: 50,
-			RecommendedMax: 100,
+			Name:		AetraStakingPolicyParamCommissionMaxDailyChangeBps,
+			MinBps:		1,
+			MaxBps:		500,
+			RecommendedMin:	50,
+			RecommendedMax:	100,
 		},
 	}
 }
 
 func DefaultAetraStakingPolicyParameterValues() AetraStakingPolicyParameterValues {
 	return AetraStakingPolicyParameterValues{
-		ValidatorPowerCapBps:        250,
-		OverflowRewardMultiplierBps: 0,
-		CommissionFloorBps:          300,
-		CommissionMaxBps:            2_000,
-		CommissionMaxDailyChangeBps: 100,
-		Top10TargetBps:              2_500,
-		Top20TargetBps:              4_000,
-		Top33TargetBps:              5_000,
-		MaxValidatorsSoftTarget:     200,
+		ValidatorPowerCapBps:		250,
+		OverflowRewardMultiplierBps:	0,
+		CommissionFloorBps:		300,
+		CommissionMaxBps:		2_000,
+		CommissionMaxDailyChangeBps:	100,
+		Top10TargetBps:			2_500,
+		Top20TargetBps:			4_000,
+		Top33TargetBps:			5_000,
+		MaxValidatorsSoftTarget:	200,
 	}
 }
 
@@ -693,10 +693,10 @@ func BuildAetraStakingPolicyParameterReport(values AetraStakingPolicyParameterVa
 
 	sort.Strings(failed)
 	return AetraStakingPolicyParameterReport{
-		Required: 10,
-		Passed:   passed,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Required:	10,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -725,34 +725,34 @@ func hasNegativeAetraStakingPolicyParameter(values AetraStakingPolicyParameterVa
 
 func DefaultAetraStakingPolicyEffectivePowerStage1Evidence() AetraStakingPolicyEffectivePowerEvidence {
 	return AetraStakingPolicyEffectivePowerEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
-		Stage:      AetraStakingPolicyEffectivePowerStage1,
+		ModuleName:	AetraStakingPolicyModuleName,
+		Stage:		AetraStakingPolicyEffectivePowerStage1,
 
-		DefinesCapScope:               true,
-		CapAffectsRewardCalculation:   true,
-		CapAffectsDelegationWarnings:  true,
-		CapAffectsCometBFTVotingPower: false,
-		Stage1LowConsensusRisk:        true,
+		DefinesCapScope:		true,
+		CapAffectsRewardCalculation:	true,
+		CapAffectsDelegationWarnings:	true,
+		CapAffectsCometBFTVotingPower:	false,
+		Stage1LowConsensusRisk:		true,
 	}
 }
 
 func DefaultAetraStakingPolicyEffectivePowerStage2Evidence() AetraStakingPolicyEffectivePowerEvidence {
 	return AetraStakingPolicyEffectivePowerEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
-		Stage:      AetraStakingPolicyEffectivePowerStage2,
+		ModuleName:	AetraStakingPolicyModuleName,
+		Stage:		AetraStakingPolicyEffectivePowerStage2,
 
-		DefinesCapScope:               true,
-		CapAffectsRewardCalculation:   true,
-		CapAffectsDelegationWarnings:  true,
-		CapAffectsCometBFTVotingPower: true,
-		Stage2DeepIntegrationTests:    true,
+		DefinesCapScope:		true,
+		CapAffectsRewardCalculation:	true,
+		CapAffectsDelegationWarnings:	true,
+		CapAffectsCometBFTVotingPower:	true,
+		Stage2DeepIntegrationTests:	true,
 
-		ValidatorUpdatesUseCappedPower:   true,
-		TotalVotingPowerConsistent:       true,
-		NoValidatorCanExceedCap:          true,
-		DelegationUnbondingSharesCorrect: true,
-		SlashingUsesUnderlyingRawStake:   true,
-		EvidenceHandlingCorrect:          true,
+		ValidatorUpdatesUseCappedPower:		true,
+		TotalVotingPowerConsistent:		true,
+		NoValidatorCanExceedCap:		true,
+		DelegationUnbondingSharesCorrect:	true,
+		SlashingUsesUnderlyingRawStake:		true,
+		EvidenceHandlingCorrect:		true,
 	}
 }
 
@@ -811,18 +811,18 @@ func BuildAetraStakingPolicyEffectivePowerReport(evidence AetraStakingPolicyEffe
 	}
 	sort.Strings(failed)
 	return AetraStakingPolicyEffectivePowerReport{
-		ModuleName: evidence.ModuleName,
-		Stage:      evidence.Stage,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Stage:		evidence.Stage,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraStakingPolicyMessageSpecEvidence() AetraStakingPolicyMessageSpecEvidence {
 	return AetraStakingPolicyMessageSpecEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
+		ModuleName:	AetraStakingPolicyModuleName,
 		GovernanceAuthorityMessages: []string{
 			AetraStakingPolicyMessageMsgUpdateStakingPolicyParams,
 			AetraStakingPolicyMessageMsgUpdateValidatorPowerCapSchedule,
@@ -833,12 +833,12 @@ func DefaultAetraStakingPolicyMessageSpecEvidence() AetraStakingPolicyMessageSpe
 			AetraStakingPolicyMessageMsgUpdateValidatorIdentity,
 			AetraStakingPolicyMessageMsgAcknowledgeOverCapWarning,
 		},
-		ValidateAuthority:        true,
-		ValidateSigner:           true,
-		RejectMalformedAddresses: true,
-		RejectInvalidParams:      true,
-		EmitEvents:               true,
-		CoveredByTests:           true,
+		ValidateAuthority:		true,
+		ValidateSigner:			true,
+		RejectMalformedAddresses:	true,
+		RejectInvalidParams:		true,
+		EmitEvents:			true,
+		CoveredByTests:			true,
 	}
 }
 
@@ -884,17 +884,17 @@ func BuildAetraStakingPolicyMessageSpecReport(evidence AetraStakingPolicyMessage
 
 	sort.Strings(failed)
 	return AetraStakingPolicyMessageSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredGovMessages) + len(requiredValidatorMessages) + len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredGovMessages) + len(requiredValidatorMessages) + len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraStakingPolicyQuerySpecEvidence() AetraStakingPolicyQuerySpecEvidence {
 	return AetraStakingPolicyQuerySpecEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
+		ModuleName:	AetraStakingPolicyModuleName,
 		RequiredQueries: []string{
 			AetraStakingPolicyQueryParams,
 			AetraStakingPolicyQueryValidatorPolicy,
@@ -906,8 +906,8 @@ func DefaultAetraStakingPolicyQuerySpecEvidence() AetraStakingPolicyQuerySpecEvi
 			AetraStakingPolicyQueryConcentrationSnapshot,
 			AetraStakingPolicyQueryNakamotoCoefficient,
 		},
-		StableResponses:          true,
-		IndexerFriendlyResponses: true,
+		StableResponses:		true,
+		IndexerFriendlyResponses:	true,
 	}
 }
 
@@ -944,11 +944,11 @@ func BuildAetraStakingPolicyQuerySpecReport(evidence AetraStakingPolicyQuerySpec
 
 	sort.Strings(failed)
 	return AetraStakingPolicyQuerySpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredQueries) + len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredQueries) + len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -1016,11 +1016,11 @@ func validateAetraStakingPolicyCatalog(group string, actual []string, required [
 
 func DefaultAetraStakingPolicyEventSpecEvidence() AetraStakingPolicyEventSpecEvidence {
 	return AetraStakingPolicyEventSpecEvidence{
-		ModuleName:     AetraStakingPolicyModuleName,
-		RequiredEvents: requiredAetraStakingPolicyEvents(),
+		ModuleName:	AetraStakingPolicyModuleName,
+		RequiredEvents:	requiredAetraStakingPolicyEvents(),
 
-		StableEventNames:          true,
-		IndexerFriendlyAttributes: true,
+		StableEventNames:		true,
+		IndexerFriendlyAttributes:	true,
 	}
 }
 
@@ -1056,26 +1056,26 @@ func BuildAetraStakingPolicyEventSpecReport(evidence AetraStakingPolicyEventSpec
 
 	sort.Strings(failed)
 	return AetraStakingPolicyEventSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredEvents) + 2,
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredEvents) + 2,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraStakingPolicyInvariantSpecEvidence() AetraStakingPolicyInvariantSpecEvidence {
 	return AetraStakingPolicyInvariantSpecEvidence{
-		ModuleName: AetraStakingPolicyModuleName,
+		ModuleName:	AetraStakingPolicyModuleName,
 
-		EffectivePowerNeverExceedsCap:    true,
-		OverflowStakeNeverNegative:       true,
-		RawStakeConservation:             true,
-		CommissionWithinFloorAndMax:      true,
-		CommissionChangeWithinDailyLimit: true,
-		TopNDoesNotExceedHundredPercent:  true,
-		ExportImportPreservesPolicyState: true,
-		CoveredByTests:                   true,
+		EffectivePowerNeverExceedsCap:		true,
+		OverflowStakeNeverNegative:		true,
+		RawStakeConservation:			true,
+		CommissionWithinFloorAndMax:		true,
+		CommissionChangeWithinDailyLimit:	true,
+		TopNDoesNotExceedHundredPercent:	true,
+		ExportImportPreservesPolicyState:	true,
+		CoveredByTests:				true,
 	}
 }
 
@@ -1116,11 +1116,11 @@ func BuildAetraStakingPolicyInvariantSpecReport(evidence AetraStakingPolicyInvar
 
 	sort.Strings(failed)
 	return AetraStakingPolicyInvariantSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -1137,8 +1137,8 @@ func requiredAetraStakingPolicyEvents() []string {
 
 func DefaultAetraStakingPolicyTestSpecEvidence() AetraStakingPolicyTestSpecEvidence {
 	return AetraStakingPolicyTestSpecEvidence{
-		ModuleName:    AetraStakingPolicyModuleName,
-		RequiredTests: requiredAetraStakingPolicyTests(),
+		ModuleName:	AetraStakingPolicyModuleName,
+		RequiredTests:	requiredAetraStakingPolicyTests(),
 	}
 }
 
@@ -1164,11 +1164,11 @@ func BuildAetraStakingPolicyTestSpecReport(evidence AetraStakingPolicyTestSpecEv
 
 	sort.Strings(failed)
 	return AetraStakingPolicyTestSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredTests),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredTests),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

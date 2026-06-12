@@ -20,10 +20,10 @@ func TestSimGenesisAccountRejectsZeroAddress(t *testing.T) {
 
 func TestSimGenesisAccountRejectsInvalidVestingWindow(t *testing.T) {
 	account := SimGenesisAccount{
-		BaseAccount:     authtypes.NewBaseAccountWithAddress(testAddress(0x11)),
-		OriginalVesting: sdk.NewCoins(sdk.NewInt64Coin("naet", 1)),
-		StartTime:       10,
-		EndTime:         10,
+		BaseAccount:		authtypes.NewBaseAccountWithAddress(testAddress(0x11)),
+		OriginalVesting:	sdk.NewCoins(sdk.NewInt64Coin("naet", 1)),
+		StartTime:		10,
+		EndTime:		10,
 	}
 
 	require.ErrorContains(t, account.Validate(), "vesting start-time")

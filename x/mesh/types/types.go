@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	MaxZoneIDLength = 64
-	MaxShardIDBytes = 128
-	HashHexLength   = 64
-	MaxFinalityAge  = 1_000_000
+	MaxZoneIDLength	= 64
+	MaxShardIDBytes	= 128
+	HashHexLength	= 64
+	MaxFinalityAge	= 1_000_000
 )
 
 type ZoneID string
@@ -20,27 +20,27 @@ type ShardID string
 type MessageKind string
 
 const (
-	MessageKindNormal MessageKind = "NORMAL"
-	MessageKindBounce MessageKind = "BOUNCE"
-	MessageKindRefund MessageKind = "REFUND"
+	MessageKindNormal	MessageKind	= "NORMAL"
+	MessageKindBounce	MessageKind	= "BOUNCE"
+	MessageKindRefund	MessageKind	= "REFUND"
 )
 
 type ReceiptStatus string
 
 const (
-	ReceiptStatusSuccess         ReceiptStatus = "SUCCESS"
-	ReceiptStatusBounced         ReceiptStatus = "BOUNCED"
-	ReceiptStatusRefunded        ReceiptStatus = "REFUNDED"
-	ReceiptStatusTerminalFailure ReceiptStatus = "TERMINAL_FAILURE"
+	ReceiptStatusSuccess		ReceiptStatus	= "SUCCESS"
+	ReceiptStatusBounced		ReceiptStatus	= "BOUNCED"
+	ReceiptStatusRefunded		ReceiptStatus	= "REFUNDED"
+	ReceiptStatusTerminalFailure	ReceiptStatus	= "TERMINAL_FAILURE"
 )
 
 type FailureReason string
 
 const (
-	FailureReasonNone               FailureReason = ""
-	FailureReasonInvalidDestination FailureReason = "INVALID_DESTINATION"
-	FailureReasonExpired            FailureReason = "EXPIRED"
-	FailureReasonExecutionFailed    FailureReason = "EXECUTION_FAILED"
+	FailureReasonNone		FailureReason	= ""
+	FailureReasonInvalidDestination	FailureReason	= "INVALID_DESTINATION"
+	FailureReasonExpired		FailureReason	= "EXPIRED"
+	FailureReasonExecutionFailed	FailureReason	= "EXECUTION_FAILED"
 )
 
 type MeshParams struct {
@@ -48,109 +48,109 @@ type MeshParams struct {
 }
 
 type MeshDestination struct {
-	ZoneID  ZoneID
-	ShardID ShardID
-	Active  bool
+	ZoneID	ZoneID
+	ShardID	ShardID
+	Active	bool
 }
 
 type FinalityReference struct {
-	Height         uint64
-	CommitmentHash string
+	Height		uint64
+	CommitmentHash	string
 }
 
 type FinalizedCommitment struct {
-	ZoneID         ZoneID
-	ShardID        ShardID
-	Height         uint64
-	CommitmentHash string
-	MessageRoot    string
-	ReceiptRoot    string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	Height		uint64
+	CommitmentHash	string
+	MessageRoot	string
+	ReceiptRoot	string
 }
 
 type MeshProof struct {
-	SourceCommitment string
-	MessageRoot      string
-	ProofHash        string
+	SourceCommitment	string
+	MessageRoot		string
+	ProofHash		string
 }
 
 type MeshMessage struct {
-	SourceZone        ZoneID
-	SourceShard       ShardID
-	DestinationZone   ZoneID
-	DestinationShard  ShardID
-	MessageID         string
-	Nonce             uint64
-	Sender            []byte
-	Recipient         []byte
-	AssetCommitment   string
-	PayloadHash       string
-	TimeoutHeight     uint64
-	Finality          FinalityReference
-	Proof             MeshProof
-	Sequence          uint64
-	SourceLogicalTime uint64
-	Kind              MessageKind
-	ParentMessageID   string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	MessageID		string
+	Nonce			uint64
+	Sender			[]byte
+	Recipient		[]byte
+	AssetCommitment		string
+	PayloadHash		string
+	TimeoutHeight		uint64
+	Finality		FinalityReference
+	Proof			MeshProof
+	Sequence		uint64
+	SourceLogicalTime	uint64
+	Kind			MessageKind
+	ParentMessageID		string
 }
 
 type ExecutionResult struct {
-	Success    bool
-	Code       uint32
-	ResultHash string
+	Success		bool
+	Code		uint32
+	ResultHash	string
 }
 
 type MeshReceipt struct {
-	MessageID        string
-	SourceZone       ZoneID
-	SourceShard      ShardID
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	Status           ReceiptStatus
-	Reason           FailureReason
-	Height           uint64
-	Sequence         uint64
-	ExecutionCode    uint32
-	ResultHash       string
-	ReceiptHash      string
+	MessageID		string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	Status			ReceiptStatus
+	Reason			FailureReason
+	Height			uint64
+	Sequence		uint64
+	ExecutionCode		uint32
+	ResultHash		string
+	ReceiptHash		string
 }
 
 type ReplayMarker struct {
-	MessageID   string
-	ReceiptHash string
-	Reason      FailureReason
-	Height      uint64
+	MessageID	string
+	ReceiptHash	string
+	Reason		FailureReason
+	Height		uint64
 }
 
 type BounceReceipt struct {
-	MessageID        string
-	SourceMessageID  string
-	BounceMessageID  string
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	Reason           FailureReason
-	Height           uint64
-	ReceiptHash      string
+	MessageID		string
+	SourceMessageID		string
+	BounceMessageID		string
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	Reason			FailureReason
+	Height			uint64
+	ReceiptHash		string
 }
 
 type RefundReceipt struct {
-	MessageID       string
-	SourceMessageID string
-	Recipient       []byte
-	AssetCommitment string
-	Reason          FailureReason
-	Height          uint64
-	ReceiptHash     string
+	MessageID	string
+	SourceMessageID	string
+	Recipient	[]byte
+	AssetCommitment	string
+	Reason		FailureReason
+	Height		uint64
+	ReceiptHash	string
 }
 
 type MeshState struct {
-	CurrentHeight        uint64
-	Params               MeshParams
-	Destinations         []MeshDestination
-	FinalizedCommitments []FinalizedCommitment
-	ReplayMarkers        []ReplayMarker
-	Receipts             []MeshReceipt
-	BounceReceipts       []BounceReceipt
-	RefundReceipts       []RefundReceipt
+	CurrentHeight		uint64
+	Params			MeshParams
+	Destinations		[]MeshDestination
+	FinalizedCommitments	[]FinalizedCommitment
+	ReplayMarkers		[]ReplayMarker
+	Receipts		[]MeshReceipt
+	BounceReceipts		[]BounceReceipt
+	RefundReceipts		[]RefundReceipt
 }
 
 func DefaultParams() MeshParams {

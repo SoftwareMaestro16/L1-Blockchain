@@ -17,46 +17,46 @@ import (
 )
 
 const (
-	Magic          = "AVM1"
-	Version uint16 = 1
+	Magic		= "AVM1"
+	Version	uint16	= 1
 
-	MetadataHashLength = 32
-	MaxKeySize         = 128
+	MetadataHashLength	= 32
+	MaxKeySize		= 128
 
-	EntryDeploy          Entrypoint = 1
-	EntryReceiveExternal Entrypoint = 2
-	EntryReceiveInternal Entrypoint = 3
-	EntryReceiveBounced  Entrypoint = 4
-	EntryQuery           Entrypoint = 5
-	EntryMigrate         Entrypoint = 6
+	EntryDeploy		Entrypoint	= 1
+	EntryReceiveExternal	Entrypoint	= 2
+	EntryReceiveInternal	Entrypoint	= 3
+	EntryReceiveBounced	Entrypoint	= 4
+	EntryQuery		Entrypoint	= 5
+	EntryMigrate		Entrypoint	= 6
 
-	HostReadStorage  HostFunction = 1
-	HostWriteStorage HostFunction = 2
-	HostEmitInternal HostFunction = 3
-	HostInspectMsg   HostFunction = 4
-	HostBlockContext HostFunction = 5
-	HostChargeGas    HostFunction = 6
-	HostReturn       HostFunction = 7
-	HostScheduleSelf HostFunction = 8
+	HostReadStorage		HostFunction	= 1
+	HostWriteStorage	HostFunction	= 2
+	HostEmitInternal	HostFunction	= 3
+	HostInspectMsg		HostFunction	= 4
+	HostBlockContext	HostFunction	= 5
+	HostChargeGas		HostFunction	= 6
+	HostReturn		HostFunction	= 7
+	HostScheduleSelf	HostFunction	= 8
 
-	OpNop            Opcode = 0x00
-	OpPushU64        Opcode = 0x01
-	OpReadStorage    Opcode = 0x02
-	OpWriteStorage   Opcode = 0x03
-	OpAdd            Opcode = 0x04
-	OpEmitInternal   Opcode = 0x05
-	OpReturn         Opcode = 0x06
-	OpReadMsgOpcode  Opcode = 0x07
-	OpReadMsgQueryID Opcode = 0x08
-	OpReadBlock      Opcode = 0x09
-	OpChargeGas      Opcode = 0x0a
-	OpScheduleSelf   Opcode = 0x0b
+	OpNop			Opcode	= 0x00
+	OpPushU64		Opcode	= 0x01
+	OpReadStorage		Opcode	= 0x02
+	OpWriteStorage		Opcode	= 0x03
+	OpAdd			Opcode	= 0x04
+	OpEmitInternal		Opcode	= 0x05
+	OpReturn		Opcode	= 0x06
+	OpReadMsgOpcode		Opcode	= 0x07
+	OpReadMsgQueryID	Opcode	= 0x08
+	OpReadBlock		Opcode	= 0x09
+	OpChargeGas		Opcode	= 0x0a
+	OpScheduleSelf		Opcode	= 0x0b
 
-	OpWallClock Opcode = 0xf0
-	OpRandom    Opcode = 0xf1
-	OpFileRead  Opcode = 0xf2
-	OpFloatAdd  Opcode = 0xf3
-	OpIterMap   Opcode = 0xf4
+	OpWallClock	Opcode	= 0xf0
+	OpRandom	Opcode	= 0xf1
+	OpFileRead	Opcode	= 0xf2
+	OpFloatAdd	Opcode	= 0xf3
+	OpIterMap	Opcode	= 0xf4
 )
 
 type Entrypoint uint8
@@ -64,65 +64,65 @@ type HostFunction uint16
 type Opcode uint8
 
 type Params struct {
-	MaxCodeBytes    uint32
-	MaxInstructions uint32
-	MaxImports      uint16
-	MaxStackDepth   uint32
-	MaxMemoryBytes  uint32
-	GasSchedule     map[Opcode]uint64
+	MaxCodeBytes	uint32
+	MaxInstructions	uint32
+	MaxImports	uint16
+	MaxStackDepth	uint32
+	MaxMemoryBytes	uint32
+	GasSchedule	map[Opcode]uint64
 }
 
 type Module struct {
-	Version      uint16
-	Imports      []HostFunction
-	Exports      map[Entrypoint]uint32
-	MetadataHash [MetadataHashLength]byte
-	Code         []Instruction
+	Version		uint16
+	Imports		[]HostFunction
+	Exports		map[Entrypoint]uint32
+	MetadataHash	[MetadataHashLength]byte
+	Code		[]Instruction
 }
 
 type Instruction struct {
-	Op   Opcode
-	Arg  uint64
-	Data []byte
+	Op	Opcode
+	Arg	uint64
+	Data	[]byte
 }
 
 type RuntimeContext struct {
-	Entry           Entrypoint
-	ContractAddress sdk.AccAddress
-	Message         async.MessageEnvelope
-	BlockHeight     uint64
-	GasLimit        uint64
-	EmitDestination sdk.AccAddress
+	Entry		Entrypoint
+	ContractAddress	sdk.AccAddress
+	Message		async.MessageEnvelope
+	BlockHeight	uint64
+	GasLimit	uint64
+	EmitDestination	sdk.AccAddress
 }
 
 type Execution struct {
-	State          Storage
-	Outgoing       []async.MessageEnvelope
-	GasUsed        uint64
-	ResultCode     uint32
-	StorageWrites  uint32
-	ReturnValue    uint64
-	ExecutedOpcode []Opcode
+	State		Storage
+	Outgoing	[]async.MessageEnvelope
+	GasUsed		uint64
+	ResultCode	uint32
+	StorageWrites	uint32
+	ReturnValue	uint64
+	ExecutedOpcode	[]Opcode
 }
 
 type Storage map[string][]byte
 
 type SnapshotEntry struct {
-	Key   string
-	Value []byte
+	Key	string
+	Value	[]byte
 }
 
 type ExecutionProof struct {
-	ModuleHash    [32]byte
-	BeforeRoot    [32]byte
-	AfterRoot     [32]byte
-	ContextHash   [32]byte
-	OutgoingRoot  [32]byte
-	TraceHash     [32]byte
-	GasUsed       uint64
-	ResultCode    uint32
-	StorageWrites uint32
-	ReturnValue   uint64
+	ModuleHash	[32]byte
+	BeforeRoot	[32]byte
+	AfterRoot	[32]byte
+	ContextHash	[32]byte
+	OutgoingRoot	[32]byte
+	TraceHash	[32]byte
+	GasUsed		uint64
+	ResultCode	uint32
+	StorageWrites	uint32
+	ReturnValue	uint64
 }
 
 type Verifier struct {
@@ -135,24 +135,24 @@ type Runner struct {
 
 func DefaultParams() Params {
 	return Params{
-		MaxCodeBytes:    64 * 1024,
-		MaxInstructions: 4096,
-		MaxImports:      32,
-		MaxStackDepth:   1024,
-		MaxMemoryBytes:  1024 * 1024,
+		MaxCodeBytes:		64 * 1024,
+		MaxInstructions:	4096,
+		MaxImports:		32,
+		MaxStackDepth:		1024,
+		MaxMemoryBytes:		1024 * 1024,
 		GasSchedule: map[Opcode]uint64{
-			OpNop:            1,
-			OpPushU64:        2,
-			OpReadStorage:    20,
-			OpWriteStorage:   50,
-			OpAdd:            3,
-			OpEmitInternal:   100,
-			OpReturn:         1,
-			OpReadMsgOpcode:  5,
-			OpReadMsgQueryID: 5,
-			OpReadBlock:      5,
-			OpChargeGas:      1,
-			OpScheduleSelf:   100,
+			OpNop:			1,
+			OpPushU64:		2,
+			OpReadStorage:		20,
+			OpWriteStorage:		50,
+			OpAdd:			3,
+			OpEmitInternal:		100,
+			OpReturn:		1,
+			OpReadMsgOpcode:	5,
+			OpReadMsgQueryID:	5,
+			OpReadBlock:		5,
+			OpChargeGas:		1,
+			OpScheduleSelf:		100,
 		},
 	}
 }
@@ -342,14 +342,14 @@ func (r *Runner) Run(module Module, storage Storage, ctx RuntimeContext) (Execut
 				return exec, errors.New("AVM emit internal requires destination")
 			}
 			exec.Outgoing = append(exec.Outgoing, async.MessageEnvelope{
-				Destination: ctx.EmitDestination,
-				Value:       sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
-				Opcode:      uint32(ins.Arg),
-				QueryID:     ctx.Message.QueryID,
-				Body:        append([]byte(nil), ins.Data...),
-				Bounce:      true,
-				GasLimit:    ctx.Message.GasLimit,
-				ForwardFee:  sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
+				Destination:	ctx.EmitDestination,
+				Value:		sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
+				Opcode:		uint32(ins.Arg),
+				QueryID:	ctx.Message.QueryID,
+				Body:		append([]byte(nil), ins.Data...),
+				Bounce:		true,
+				GasLimit:	ctx.Message.GasLimit,
+				ForwardFee:	sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
 			})
 		case OpReadMsgOpcode:
 			if len(stack) >= int(r.params.MaxStackDepth) {
@@ -392,16 +392,16 @@ func (r *Runner) Run(module Module, storage Storage, ctx RuntimeContext) (Execut
 				return exec, nil
 			}
 			exec.Outgoing = append(exec.Outgoing, async.MessageEnvelope{
-				Destination:    append(sdk.AccAddress(nil), ctx.ContractAddress...),
-				Value:          sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
-				Opcode:         ctx.Message.Opcode,
-				QueryID:        ctx.Message.QueryID,
-				Body:           append([]byte(nil), ins.Data...),
-				Bounce:         false,
-				DeliverAtBlock: deliverAt,
-				DeadlineBlock:  ctx.Message.DeadlineBlock,
-				GasLimit:       ctx.Message.GasLimit,
-				ForwardFee:     sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
+				Destination:	append(sdk.AccAddress(nil), ctx.ContractAddress...),
+				Value:		sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
+				Opcode:		ctx.Message.Opcode,
+				QueryID:	ctx.Message.QueryID,
+				Body:		append([]byte(nil), ins.Data...),
+				Bounce:		false,
+				DeliverAtBlock:	deliverAt,
+				DeadlineBlock:	ctx.Message.DeadlineBlock,
+				GasLimit:	ctx.Message.GasLimit,
+				ForwardFee:	sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
 			})
 		case OpReturn:
 			exec.ResultCode = uint32(ins.Arg)
@@ -447,11 +447,11 @@ func (r *Runner) AsyncHandler(module Module, storage Storage, ctx RuntimeContext
 		}
 		snapshot := EncodeSnapshot(exec.State)
 		return async.ExecutionResult{
-			NewState:      snapshot,
-			Outgoing:      exec.Outgoing,
-			GasUsed:       exec.GasUsed,
-			StorageWrites: exec.StorageWrites,
-			ResultCode:    exec.ResultCode,
+			NewState:	snapshot,
+			Outgoing:	exec.Outgoing,
+			GasUsed:	exec.GasUsed,
+			StorageWrites:	exec.StorageWrites,
+			ResultCode:	exec.ResultCode,
 		}
 	}
 }
@@ -773,16 +773,16 @@ func BuildExecutionProof(module Module, before Storage, ctx RuntimeContext, exec
 		return ExecutionProof{}, err
 	}
 	return ExecutionProof{
-		ModuleHash:    moduleHash,
-		BeforeRoot:    StorageRoot(before),
-		AfterRoot:     StorageRoot(exec.State),
-		ContextHash:   RuntimeContextHash(ctx),
-		OutgoingRoot:  OutgoingMessagesRoot(exec.Outgoing),
-		TraceHash:     OpcodeTraceHash(exec.ExecutedOpcode),
-		GasUsed:       exec.GasUsed,
-		ResultCode:    exec.ResultCode,
-		StorageWrites: exec.StorageWrites,
-		ReturnValue:   exec.ReturnValue,
+		ModuleHash:	moduleHash,
+		BeforeRoot:	StorageRoot(before),
+		AfterRoot:	StorageRoot(exec.State),
+		ContextHash:	RuntimeContextHash(ctx),
+		OutgoingRoot:	OutgoingMessagesRoot(exec.Outgoing),
+		TraceHash:	OpcodeTraceHash(exec.ExecutedOpcode),
+		GasUsed:	exec.GasUsed,
+		ResultCode:	exec.ResultCode,
+		StorageWrites:	exec.StorageWrites,
+		ReturnValue:	exec.ReturnValue,
 	}, nil
 }
 

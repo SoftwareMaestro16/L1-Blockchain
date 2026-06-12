@@ -6,52 +6,52 @@ import (
 )
 
 const (
-	AetraValidatorCPUCoreMin     = 4
-	AetraValidatorCPUCoreMax     = 8
-	AetraValidatorRAMMinGB       = 16
-	AetraValidatorRAMMaxGB       = 32
-	AetraValidatorMinNetworkMbps = 100
+	AetraValidatorCPUCoreMin	= 4
+	AetraValidatorCPUCoreMax	= 8
+	AetraValidatorRAMMinGB		= 16
+	AetraValidatorRAMMaxGB		= 32
+	AetraValidatorMinNetworkMbps	= 100
 
-	AetraValidatorStorageClass         = "NVMe SSD"
-	AetraValidatorRecommendedOS        = "Linux"
-	AetraValidatorDevelopmentOSSupport = "Windows local tooling supported for development"
+	AetraValidatorStorageClass		= "NVMe SSD"
+	AetraValidatorRecommendedOS		= "Linux"
+	AetraValidatorDevelopmentOSSupport	= "Windows local tooling supported for development"
 
-	AetraPruningProfileDefault    = "default"
-	AetraPruningProfileArchive    = "nothing"
-	AetraPruningProfileAggressive = "everything"
-	AetraPruningProfileCustom     = "custom"
+	AetraPruningProfileDefault	= "default"
+	AetraPruningProfileArchive	= "nothing"
+	AetraPruningProfileAggressive	= "everything"
+	AetraPruningProfileCustom	= "custom"
 )
 
 type NodeHardwareProfile struct {
-	CPUCores                   int
-	RAMGB                      int
-	Storage                    string
-	NetworkMbps                int
-	LowPacketLoss              bool
-	OS                         string
-	MainnetLoadTestingComplete bool
+	CPUCores			int
+	RAMGB				int
+	Storage				string
+	NetworkMbps			int
+	LowPacketLoss			bool
+	OS				string
+	MainnetLoadTestingComplete	bool
 }
 
 type NodeStateManagementReadiness struct {
-	StateSyncSupported                 bool
-	SnapshotsSupported                 bool
-	PruningProfiles                    []string
-	ArchiveNodeProfile                 bool
-	ExportImportReliable               bool
-	RestartSafety                      bool
-	DeterministicAppHashAcrossRestarts bool
-	ValidatorSetupDocumented           bool
-	SentryArchitectureDocumented       bool
+	StateSyncSupported			bool
+	SnapshotsSupported			bool
+	PruningProfiles				[]string
+	ArchiveNodeProfile			bool
+	ExportImportReliable			bool
+	RestartSafety				bool
+	DeterministicAppHashAcrossRestarts	bool
+	ValidatorSetupDocumented		bool
+	SentryArchitectureDocumented		bool
 }
 
 func DefaultPublicTestnetHardwareProfile() NodeHardwareProfile {
 	return NodeHardwareProfile{
-		CPUCores:      AetraValidatorCPUCoreMin,
-		RAMGB:         AetraValidatorRAMMinGB,
-		Storage:       AetraValidatorStorageClass,
-		NetworkMbps:   AetraValidatorMinNetworkMbps,
-		LowPacketLoss: true,
-		OS:            AetraValidatorRecommendedOS,
+		CPUCores:	AetraValidatorCPUCoreMin,
+		RAMGB:		AetraValidatorRAMMinGB,
+		Storage:	AetraValidatorStorageClass,
+		NetworkMbps:	AetraValidatorMinNetworkMbps,
+		LowPacketLoss:	true,
+		OS:		AetraValidatorRecommendedOS,
 	}
 }
 
@@ -63,15 +63,15 @@ func DefaultLocalDevelopmentHardwareProfile() NodeHardwareProfile {
 
 func DefaultNodeStateManagementReadiness() NodeStateManagementReadiness {
 	return NodeStateManagementReadiness{
-		StateSyncSupported:                 true,
-		SnapshotsSupported:                 true,
-		PruningProfiles:                    DefaultPruningProfiles(),
-		ArchiveNodeProfile:                 true,
-		ExportImportReliable:               true,
-		RestartSafety:                      true,
-		DeterministicAppHashAcrossRestarts: true,
-		ValidatorSetupDocumented:           true,
-		SentryArchitectureDocumented:       true,
+		StateSyncSupported:			true,
+		SnapshotsSupported:			true,
+		PruningProfiles:			DefaultPruningProfiles(),
+		ArchiveNodeProfile:			true,
+		ExportImportReliable:			true,
+		RestartSafety:				true,
+		DeterministicAppHashAcrossRestarts:	true,
+		ValidatorSetupDocumented:		true,
+		SentryArchitectureDocumented:		true,
 	}
 }
 
@@ -166,9 +166,9 @@ func validateMediumValidatorHardware(profile NodeHardwareProfile) error {
 
 func validateRequiredPruningProfiles(profiles []string) error {
 	required := map[string]bool{
-		AetraPruningProfileDefault:    false,
-		AetraPruningProfileArchive:    false,
-		AetraPruningProfileAggressive: false,
+		AetraPruningProfileDefault:	false,
+		AetraPruningProfileArchive:	false,
+		AetraPruningProfileAggressive:	false,
 	}
 	for _, profile := range profiles {
 		if _, ok := required[profile]; ok {

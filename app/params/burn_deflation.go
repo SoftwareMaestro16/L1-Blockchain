@@ -7,137 +7,137 @@ import (
 )
 
 const (
-	BurnSourceFees     = "fees"
-	BurnSourceSlashing = "slashing"
+	BurnSourceFees		= "fees"
+	BurnSourceSlashing	= "slashing"
 
-	BurnEventFundsRemoved = "burn_funds_removed"
+	BurnEventFundsRemoved	= "burn_funds_removed"
 
-	DefaultFeeSpikeDeflationThresholdBps = int64(20_000)
-	DefaultBondedStakeSafetyThresholdBps = int64(5_000)
-	DefaultDeflationReserveCapNaet       = int64(10_000_000_000)
-	DefaultSecurityRewardFloorNaet       = int64(0)
-	DefaultNetIssuanceFloorNaet          = int64(0)
+	DefaultFeeSpikeDeflationThresholdBps	= int64(20_000)
+	DefaultBondedStakeSafetyThresholdBps	= int64(5_000)
+	DefaultDeflationReserveCapNaet		= int64(10_000_000_000)
+	DefaultSecurityRewardFloorNaet		= int64(0)
+	DefaultNetIssuanceFloorNaet		= int64(0)
 )
 
 type BurnMechanicsParams struct {
-	EpochBurnCapNaet              sdkmath.Int
-	BurnFloorNaet                 sdkmath.Int
-	NetIssuanceFloorNaet          sdkmath.Int
-	DeflationReserveCapNaet       sdkmath.Int
-	SecurityRewardFloorNaet       sdkmath.Int
-	FeeSpikeThresholdBps          int64
-	BondedStakeSafetyThresholdBps int64
-	GovernanceAllowsBelowFloor    bool
+	EpochBurnCapNaet		sdkmath.Int
+	BurnFloorNaet			sdkmath.Int
+	NetIssuanceFloorNaet		sdkmath.Int
+	DeflationReserveCapNaet		sdkmath.Int
+	SecurityRewardFloorNaet		sdkmath.Int
+	FeeSpikeThresholdBps		int64
+	BondedStakeSafetyThresholdBps	int64
+	GovernanceAllowsBelowFloor	bool
 }
 
 type BurnAccountingEvent struct {
-	Type                       string
-	EpochID                    uint64
-	BlockHeight                uint64
-	Source                     string
-	BurnedNaet                 sdkmath.Int
-	CumulativeBurnedNaet       sdkmath.Int
-	EpochBurnedNaet            sdkmath.Int
-	RemovedFromSpendableSupply bool
+	Type				string
+	EpochID				uint64
+	BlockHeight			uint64
+	Source				string
+	BurnedNaet			sdkmath.Int
+	CumulativeBurnedNaet		sdkmath.Int
+	EpochBurnedNaet			sdkmath.Int
+	RemovedFromSpendableSupply	bool
 }
 
 type DeflationGuardTelemetry struct {
-	Active                        bool
-	Reasons                       []string
-	ProposedBurnNaet              sdkmath.Int
-	FinalBurnNaet                 sdkmath.Int
-	ReducedBurnNaet               sdkmath.Int
-	DivertedToReserveNaet         sdkmath.Int
-	DivertedToSecurityRewardsNaet sdkmath.Int
-	NetIssuanceFloorNaet          sdkmath.Int
-	NetIssuanceAfterBurnNaet      sdkmath.Int
-	EpochBurnCapNaet              sdkmath.Int
-	SecurityRewardFloorNaet       sdkmath.Int
+	Active				bool
+	Reasons				[]string
+	ProposedBurnNaet		sdkmath.Int
+	FinalBurnNaet			sdkmath.Int
+	ReducedBurnNaet			sdkmath.Int
+	DivertedToReserveNaet		sdkmath.Int
+	DivertedToSecurityRewardsNaet	sdkmath.Int
+	NetIssuanceFloorNaet		sdkmath.Int
+	NetIssuanceAfterBurnNaet	sdkmath.Int
+	EpochBurnCapNaet		sdkmath.Int
+	SecurityRewardFloorNaet		sdkmath.Int
 }
 
 type BurnIntegratedFeeDistributionInput struct {
-	EpochID                    uint64
-	BlockHeight                uint64
-	CollectedFeesNaet          sdkmath.Int
-	BurnRatioBps               int64
-	CommunityPoolRatioBps      int64
-	StateMaintenanceReserveBps int64
-	SecurityReserveRatioBps    int64
-	ExistingEpochBurnedNaet    sdkmath.Int
-	GrossMintedNaet            sdkmath.Int
-	CumulativeBurnedNaet       sdkmath.Int
-	FeeSpikeBps                int64
-	BondedStakeRatioBps        int64
-	Params                     BurnMechanicsParams
+	EpochID				uint64
+	BlockHeight			uint64
+	CollectedFeesNaet		sdkmath.Int
+	BurnRatioBps			int64
+	CommunityPoolRatioBps		int64
+	StateMaintenanceReserveBps	int64
+	SecurityReserveRatioBps		int64
+	ExistingEpochBurnedNaet		sdkmath.Int
+	GrossMintedNaet			sdkmath.Int
+	CumulativeBurnedNaet		sdkmath.Int
+	FeeSpikeBps			int64
+	BondedStakeRatioBps		int64
+	Params				BurnMechanicsParams
 }
 
 type BurnIntegratedFeeDistributionOutput struct {
-	CollectedFeesNaet           sdkmath.Int
-	BurnNaet                    sdkmath.Int
-	ValidatorRewardNaet         sdkmath.Int
-	CommunityPoolNaet           sdkmath.Int
-	StateMaintenanceReserveNaet sdkmath.Int
-	SecurityReserveNaet         sdkmath.Int
-	DeflationReserveNaet        sdkmath.Int
-	CumulativeBurnedNaet        sdkmath.Int
-	EpochBurnedNaet             sdkmath.Int
-	Events                      []BurnAccountingEvent
-	DeflationGuard              DeflationGuardTelemetry
+	CollectedFeesNaet		sdkmath.Int
+	BurnNaet			sdkmath.Int
+	ValidatorRewardNaet		sdkmath.Int
+	CommunityPoolNaet		sdkmath.Int
+	StateMaintenanceReserveNaet	sdkmath.Int
+	SecurityReserveNaet		sdkmath.Int
+	DeflationReserveNaet		sdkmath.Int
+	CumulativeBurnedNaet		sdkmath.Int
+	EpochBurnedNaet			sdkmath.Int
+	Events				[]BurnAccountingEvent
+	DeflationGuard			DeflationGuardTelemetry
 }
 
 type BurnIntegratedSlashingDistributionInput struct {
-	EpochID                 uint64
-	BlockHeight             uint64
-	PenaltyNaet             sdkmath.Int
-	BurnRatioBps            int64
-	TreasuryRatioBps        int64
-	ReporterRewardBps       int64
-	ExistingEpochBurnedNaet sdkmath.Int
-	GrossMintedNaet         sdkmath.Int
-	CumulativeBurnedNaet    sdkmath.Int
-	Params                  BurnMechanicsParams
+	EpochID			uint64
+	BlockHeight		uint64
+	PenaltyNaet		sdkmath.Int
+	BurnRatioBps		int64
+	TreasuryRatioBps	int64
+	ReporterRewardBps	int64
+	ExistingEpochBurnedNaet	sdkmath.Int
+	GrossMintedNaet		sdkmath.Int
+	CumulativeBurnedNaet	sdkmath.Int
+	Params			BurnMechanicsParams
 }
 
 type BurnIntegratedSlashingDistributionOutput struct {
-	PenaltyNaet          sdkmath.Int
-	BurnNaet             sdkmath.Int
-	TreasuryNaet         sdkmath.Int
-	ReporterRewardNaet   sdkmath.Int
-	ValidatorPoolNaet    sdkmath.Int
-	DeflationReserveNaet sdkmath.Int
-	CumulativeBurnedNaet sdkmath.Int
-	EpochBurnedNaet      sdkmath.Int
-	Events               []BurnAccountingEvent
-	DeflationGuard       DeflationGuardTelemetry
+	PenaltyNaet		sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ValidatorPoolNaet	sdkmath.Int
+	DeflationReserveNaet	sdkmath.Int
+	CumulativeBurnedNaet	sdkmath.Int
+	EpochBurnedNaet		sdkmath.Int
+	Events			[]BurnAccountingEvent
+	DeflationGuard		DeflationGuardTelemetry
 }
 
 type BurnAccountingInvariantReport struct {
-	Passed bool
-	Failed []string
+	Passed	bool
+	Failed	[]string
 }
 
 type BurnSupplyQueryInput struct {
-	CumulativeBurnedNaet sdkmath.Int
-	Events               []BurnAccountingEvent
-	CurrentBlockHeight   uint64
-	RecentWindowBlocks   uint64
+	CumulativeBurnedNaet	sdkmath.Int
+	Events			[]BurnAccountingEvent
+	CurrentBlockHeight	uint64
+	RecentWindowBlocks	uint64
 }
 
 type BurnSupplyQueryOutput struct {
-	CumulativeBurnedNaet       sdkmath.Int
-	RecentBurnedNaet           sdkmath.Int
-	RecentBurnRateNaetPerBlock sdkmath.Int
-	EventCount                 int
+	CumulativeBurnedNaet		sdkmath.Int
+	RecentBurnedNaet		sdkmath.Int
+	RecentBurnRateNaetPerBlock	sdkmath.Int
+	EventCount			int
 }
 
 func DefaultBurnMechanicsParams() BurnMechanicsParams {
 	return BurnMechanicsParams{
-		BurnFloorNaet:                 sdkmath.ZeroInt(),
-		NetIssuanceFloorNaet:          sdkmath.NewInt(DefaultNetIssuanceFloorNaet),
-		DeflationReserveCapNaet:       sdkmath.NewInt(DefaultDeflationReserveCapNaet),
-		SecurityRewardFloorNaet:       sdkmath.NewInt(DefaultSecurityRewardFloorNaet),
-		FeeSpikeThresholdBps:          DefaultFeeSpikeDeflationThresholdBps,
-		BondedStakeSafetyThresholdBps: DefaultBondedStakeSafetyThresholdBps,
+		BurnFloorNaet:			sdkmath.ZeroInt(),
+		NetIssuanceFloorNaet:		sdkmath.NewInt(DefaultNetIssuanceFloorNaet),
+		DeflationReserveCapNaet:	sdkmath.NewInt(DefaultDeflationReserveCapNaet),
+		SecurityRewardFloorNaet:	sdkmath.NewInt(DefaultSecurityRewardFloorNaet),
+		FeeSpikeThresholdBps:		DefaultFeeSpikeDeflationThresholdBps,
+		BondedStakeSafetyThresholdBps:	DefaultBondedStakeSafetyThresholdBps,
 	}
 }
 
@@ -161,29 +161,29 @@ func ComputeBurnIntegratedFeeDistribution(input BurnIntegratedFeeDistributionInp
 	validator := fees.Sub(proposedBurn).Sub(community).Sub(stateReserve).Sub(securityReserve)
 
 	guard := applyDeflationGuard(deflationGuardInput{
-		Source:                BurnSourceFees,
-		ProposedBurnNaet:      proposedBurn,
-		ExistingEpochBurned:   normalizeInt(input.ExistingEpochBurnedNaet),
-		GrossMintedNaet:       normalizeInt(input.GrossMintedNaet),
-		CurrentSecurityReward: validator,
-		FeeSpikeBps:           input.FeeSpikeBps,
-		BondedStakeRatioBps:   input.BondedStakeRatioBps,
-		Params:                params,
+		Source:			BurnSourceFees,
+		ProposedBurnNaet:	proposedBurn,
+		ExistingEpochBurned:	normalizeInt(input.ExistingEpochBurnedNaet),
+		GrossMintedNaet:	normalizeInt(input.GrossMintedNaet),
+		CurrentSecurityReward:	validator,
+		FeeSpikeBps:		input.FeeSpikeBps,
+		BondedStakeRatioBps:	input.BondedStakeRatioBps,
+		Params:			params,
 	})
 	validator = validator.Add(guard.DivertedToSecurityRewardsNaet)
 	deflationReserve := guard.DivertedToReserveNaet
 
 	output := BurnIntegratedFeeDistributionOutput{
-		CollectedFeesNaet:           fees,
-		BurnNaet:                    guard.FinalBurnNaet,
-		ValidatorRewardNaet:         validator,
-		CommunityPoolNaet:           community,
-		StateMaintenanceReserveNaet: stateReserve,
-		SecurityReserveNaet:         securityReserve,
-		DeflationReserveNaet:        deflationReserve,
-		EpochBurnedNaet:             normalizeInt(input.ExistingEpochBurnedNaet).Add(guard.FinalBurnNaet),
-		CumulativeBurnedNaet:        normalizeInt(input.CumulativeBurnedNaet).Add(guard.FinalBurnNaet),
-		DeflationGuard:              guard,
+		CollectedFeesNaet:		fees,
+		BurnNaet:			guard.FinalBurnNaet,
+		ValidatorRewardNaet:		validator,
+		CommunityPoolNaet:		community,
+		StateMaintenanceReserveNaet:	stateReserve,
+		SecurityReserveNaet:		securityReserve,
+		DeflationReserveNaet:		deflationReserve,
+		EpochBurnedNaet:		normalizeInt(input.ExistingEpochBurnedNaet).Add(guard.FinalBurnNaet),
+		CumulativeBurnedNaet:		normalizeInt(input.CumulativeBurnedNaet).Add(guard.FinalBurnNaet),
+		DeflationGuard:			guard,
 	}
 	output.Events = burnAccountingEvents(input.EpochID, input.BlockHeight, BurnSourceFees, output.BurnNaet, output.CumulativeBurnedNaet, output.EpochBurnedNaet)
 	return output, nil
@@ -198,33 +198,33 @@ func ComputeBurnIntegratedSlashingDistribution(input BurnIntegratedSlashingDistr
 		return BurnIntegratedSlashingDistributionOutput{}, fmt.Errorf("epoch_id must be positive")
 	}
 	flow, err := ComputeSlashingEconomyFlow(SlashingEconomyFlowInput{
-		PenaltyNaet:       input.PenaltyNaet,
-		BurnRatioBps:      input.BurnRatioBps,
-		TreasuryRatioBps:  input.TreasuryRatioBps,
-		ReporterRewardBps: input.ReporterRewardBps,
+		PenaltyNaet:		input.PenaltyNaet,
+		BurnRatioBps:		input.BurnRatioBps,
+		TreasuryRatioBps:	input.TreasuryRatioBps,
+		ReporterRewardBps:	input.ReporterRewardBps,
 	})
 	if err != nil {
 		return BurnIntegratedSlashingDistributionOutput{}, err
 	}
 
 	guard := applyDeflationGuard(deflationGuardInput{
-		Source:              BurnSourceSlashing,
-		ProposedBurnNaet:    flow.BurnNaet,
-		ExistingEpochBurned: normalizeInt(input.ExistingEpochBurnedNaet),
-		GrossMintedNaet:     normalizeInt(input.GrossMintedNaet),
-		Params:              params,
+		Source:			BurnSourceSlashing,
+		ProposedBurnNaet:	flow.BurnNaet,
+		ExistingEpochBurned:	normalizeInt(input.ExistingEpochBurnedNaet),
+		GrossMintedNaet:	normalizeInt(input.GrossMintedNaet),
+		Params:			params,
 	})
 
 	output := BurnIntegratedSlashingDistributionOutput{
-		PenaltyNaet:          flow.PenaltyNaet,
-		BurnNaet:             guard.FinalBurnNaet,
-		TreasuryNaet:         flow.TreasuryNaet,
-		ReporterRewardNaet:   flow.ReporterRewardNaet,
-		ValidatorPoolNaet:    flow.ValidatorPoolNaet,
-		DeflationReserveNaet: guard.DivertedToReserveNaet,
-		EpochBurnedNaet:      normalizeInt(input.ExistingEpochBurnedNaet).Add(guard.FinalBurnNaet),
-		CumulativeBurnedNaet: normalizeInt(input.CumulativeBurnedNaet).Add(guard.FinalBurnNaet),
-		DeflationGuard:       guard,
+		PenaltyNaet:		flow.PenaltyNaet,
+		BurnNaet:		guard.FinalBurnNaet,
+		TreasuryNaet:		flow.TreasuryNaet,
+		ReporterRewardNaet:	flow.ReporterRewardNaet,
+		ValidatorPoolNaet:	flow.ValidatorPoolNaet,
+		DeflationReserveNaet:	guard.DivertedToReserveNaet,
+		EpochBurnedNaet:	normalizeInt(input.ExistingEpochBurnedNaet).Add(guard.FinalBurnNaet),
+		CumulativeBurnedNaet:	normalizeInt(input.CumulativeBurnedNaet).Add(guard.FinalBurnNaet),
+		DeflationGuard:		guard,
 	}
 	output.Events = burnAccountingEvents(input.EpochID, input.BlockHeight, BurnSourceSlashing, output.BurnNaet, output.CumulativeBurnedNaet, output.EpochBurnedNaet)
 	return output, nil
@@ -301,10 +301,10 @@ func QueryBurnSupply(input BurnSupplyQueryInput) (BurnSupplyQueryOutput, error) 
 		rate = recent.QuoRaw(int64(input.RecentWindowBlocks))
 	}
 	return BurnSupplyQueryOutput{
-		CumulativeBurnedNaet:       cumulative,
-		RecentBurnedNaet:           recent,
-		RecentBurnRateNaetPerBlock: rate,
-		EventCount:                 len(input.Events),
+		CumulativeBurnedNaet:		cumulative,
+		RecentBurnedNaet:		recent,
+		RecentBurnRateNaetPerBlock:	rate,
+		EventCount:			len(input.Events),
 	}, nil
 }
 
@@ -354,14 +354,14 @@ func (p BurnMechanicsParams) withDefaults() BurnMechanicsParams {
 }
 
 type deflationGuardInput struct {
-	Source                string
-	ProposedBurnNaet      sdkmath.Int
-	ExistingEpochBurned   sdkmath.Int
-	GrossMintedNaet       sdkmath.Int
-	CurrentSecurityReward sdkmath.Int
-	FeeSpikeBps           int64
-	BondedStakeRatioBps   int64
-	Params                BurnMechanicsParams
+	Source			string
+	ProposedBurnNaet	sdkmath.Int
+	ExistingEpochBurned	sdkmath.Int
+	GrossMintedNaet		sdkmath.Int
+	CurrentSecurityReward	sdkmath.Int
+	FeeSpikeBps		int64
+	BondedStakeRatioBps	int64
+	Params			BurnMechanicsParams
 }
 
 func applyDeflationGuard(input deflationGuardInput) DeflationGuardTelemetry {
@@ -431,17 +431,17 @@ func applyDeflationGuard(input deflationGuardInput) DeflationGuardTelemetry {
 	}
 	netAfterBurn := normalizeInt(input.GrossMintedNaet).Sub(normalizeInt(input.ExistingEpochBurned)).Sub(finalBurn)
 	return DeflationGuardTelemetry{
-		Active:                        len(reasons) > 0,
-		Reasons:                       reasons,
-		ProposedBurnNaet:              proposed,
-		FinalBurnNaet:                 finalBurn,
-		ReducedBurnNaet:               reduced,
-		DivertedToReserveNaet:         toReserve,
-		DivertedToSecurityRewardsNaet: toSecurity,
-		NetIssuanceFloorNaet:          netFloor,
-		NetIssuanceAfterBurnNaet:      netAfterBurn,
-		EpochBurnCapNaet:              normalizeInt(params.EpochBurnCapNaet),
-		SecurityRewardFloorNaet:       normalizeInt(params.SecurityRewardFloorNaet),
+		Active:				len(reasons) > 0,
+		Reasons:			reasons,
+		ProposedBurnNaet:		proposed,
+		FinalBurnNaet:			finalBurn,
+		ReducedBurnNaet:		reduced,
+		DivertedToReserveNaet:		toReserve,
+		DivertedToSecurityRewardsNaet:	toSecurity,
+		NetIssuanceFloorNaet:		netFloor,
+		NetIssuanceAfterBurnNaet:	netAfterBurn,
+		EpochBurnCapNaet:		normalizeInt(params.EpochBurnCapNaet),
+		SecurityRewardFloorNaet:	normalizeInt(params.SecurityRewardFloorNaet),
 	}
 }
 
@@ -487,14 +487,14 @@ func burnAccountingEvents(epochID, blockHeight uint64, source string, burned, cu
 		return nil
 	}
 	return []BurnAccountingEvent{{
-		Type:                       BurnEventFundsRemoved,
-		EpochID:                    epochID,
-		BlockHeight:                blockHeight,
-		Source:                     source,
-		BurnedNaet:                 normalizeInt(burned),
-		CumulativeBurnedNaet:       normalizeInt(cumulative),
-		EpochBurnedNaet:            normalizeInt(epochBurned),
-		RemovedFromSpendableSupply: true,
+		Type:				BurnEventFundsRemoved,
+		EpochID:			epochID,
+		BlockHeight:			blockHeight,
+		Source:				source,
+		BurnedNaet:			normalizeInt(burned),
+		CumulativeBurnedNaet:		normalizeInt(cumulative),
+		EpochBurnedNaet:		normalizeInt(epochBurned),
+		RemovedFromSpendableSupply:	true,
 	}}
 }
 

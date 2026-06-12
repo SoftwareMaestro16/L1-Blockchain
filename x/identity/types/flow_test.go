@@ -9,10 +9,10 @@ import (
 func TestIdentityDataFlowPlansResolverUpdatePipeline(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	flow, err := PlanIdentityDataFlow(state, IdentityDataFlowRequest{
-		Operation:     IdentityOperationResolverUpdate,
-		Domain:        "api.alice.aet",
-		Actor:         addr(1),
-		ResolverPatch: &ResolverPatch{Primary: addr(2)},
+		Operation:	IdentityOperationResolverUpdate,
+		Domain:		"api.alice.aet",
+		Actor:		addr(1),
+		ResolverPatch:	&ResolverPatch{Primary: addr(2)},
 	}, 12)
 	require.NoError(t, err)
 	require.Equal(t, "api.alice.aet", flow.Domain)
@@ -36,20 +36,20 @@ func TestIdentityDataFlowPlansResolverUpdatePipeline(t *testing.T) {
 func TestIdentityDataFlowPlansTransferAndRejectsNonOwner(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	flow, err := PlanIdentityDataFlow(state, IdentityDataFlowRequest{
-		Operation: IdentityOperationTransfer,
-		Domain:    "alice.aet",
-		Actor:     addr(1),
-		NewOwner:  addr(9),
+		Operation:	IdentityOperationTransfer,
+		Domain:		"alice.aet",
+		Actor:		addr(1),
+		NewOwner:	addr(9),
 	}, 12)
 	require.NoError(t, err)
 	require.Contains(t, flow.EventTypes, "identity_domain_transferred")
 	require.GreaterOrEqual(t, len(flow.StoreWrites), 4)
 
 	_, err = PlanIdentityDataFlow(state, IdentityDataFlowRequest{
-		Operation: IdentityOperationTransfer,
-		Domain:    "alice.aet",
-		Actor:     addr(2),
-		NewOwner:  addr(9),
+		Operation:	IdentityOperationTransfer,
+		Domain:		"alice.aet",
+		Actor:		addr(2),
+		NewOwner:	addr(9),
 	}, 12)
 	require.ErrorContains(t, err, "requires owner")
 }

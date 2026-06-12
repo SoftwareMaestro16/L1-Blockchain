@@ -19,36 +19,36 @@ const (
 )
 
 type MsgContractCall struct {
-	Caller          sdk.AccAddress
-	ContractAddr    sdk.AccAddress
-	Method          string
-	Args            []byte
-	Funds           sdkmath.Int
-	GasLimit        uint64
-	ReplyToOptional sdk.AccAddress
-	ExpiryHeight    uint64
+	Caller		sdk.AccAddress
+	ContractAddr	sdk.AccAddress
+	Method		string
+	Args		[]byte
+	Funds		sdkmath.Int
+	GasLimit	uint64
+	ReplyToOptional	sdk.AccAddress
+	ExpiryHeight	uint64
 }
 
 type ContractMethodAdmission struct {
-	ContractAddr sdk.AccAddress
-	Method       string
-	Entrypoint   avm.Entrypoint
-	Enabled      bool
+	ContractAddr	sdk.AccAddress
+	Method		string
+	Entrypoint	avm.Entrypoint
+	Enabled		bool
 }
 
 type ContractFundsEscrow struct {
-	Caller       sdk.AccAddress
-	ContractAddr sdk.AccAddress
-	Amount       sdkmath.Int
-	ExpiryHeight uint64
-	Escrowed     bool
+	Caller		sdk.AccAddress
+	ContractAddr	sdk.AccAddress
+	Amount		sdkmath.Int
+	ExpiryHeight	uint64
+	Escrowed	bool
 }
 
 type ContractCallAdmission struct {
-	CreatedHeight uint64
-	Methods       []ContractMethodAdmission
-	Escrows       []ContractFundsEscrow
-	MaxArgsBytes  uint64
+	CreatedHeight	uint64
+	Methods		[]ContractMethodAdmission
+	Escrows		[]ContractFundsEscrow
+	MaxArgsBytes	uint64
 }
 
 func BuildContractCallFromMsg(msg MsgContractCall, state ContractZoneState, admission ContractCallAdmission) (ContractCall, error) {
@@ -60,12 +60,12 @@ func BuildContractCallFromMsg(msg MsgContractCall, state ContractZoneState, admi
 	}
 	method, _ := admission.MethodFor(msg.ContractAddr, msg.Method)
 	return ContractCall{
-		Actor:           cloneAddress(msg.Caller),
-		Contract:        cloneAddress(msg.ContractAddr),
-		Entrypoint:      method.Entrypoint,
-		GasLimit:        msg.GasLimit,
-		Body:            append([]byte(nil), msg.Args...),
-		EmitDestination: cloneAddress(msg.ReplyToOptional),
+		Actor:			cloneAddress(msg.Caller),
+		Contract:		cloneAddress(msg.ContractAddr),
+		Entrypoint:		method.Entrypoint,
+		GasLimit:		msg.GasLimit,
+		Body:			append([]byte(nil), msg.Args...),
+		EmitDestination:	cloneAddress(msg.ReplyToOptional),
 	}, nil
 }
 

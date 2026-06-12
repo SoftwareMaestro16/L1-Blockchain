@@ -241,7 +241,7 @@ func TestImplementationPhasePublicTestnetReadinessRequiresAllAcceptanceGates(t *
 
 func TestImplementationPhaseRejectsUnknownPhaseAndUnexpectedItem(t *testing.T) {
 	plan := ImplementationPhasePlan{
-		PhaseID: "phase_99",
+		PhaseID:	"phase_99",
 		Items: []ImplementationPhaseItem{
 			phaseItem("task", PhaseTaskInspectVersions),
 		},

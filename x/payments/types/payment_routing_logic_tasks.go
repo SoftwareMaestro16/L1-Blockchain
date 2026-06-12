@@ -12,29 +12,29 @@ const PaymentRoutingLogicTaskSpecVersion = uint64(1)
 type PaymentRoutingLogicTaskID string
 
 const (
-	PaymentRoutingTaskRouteTableState          PaymentRoutingLogicTaskID = "route_table_state"
-	PaymentRoutingTaskEpochUpdateRules         PaymentRoutingLogicTaskID = "routing_epoch_update_rules"
-	PaymentRoutingTaskDeterministicPathScoring PaymentRoutingLogicTaskID = "deterministic_path_scoring"
-	PaymentRoutingTaskDeliveryScheduler        PaymentRoutingLogicTaskID = "message_delivery_scheduler"
-	PaymentRoutingTaskReceiptCommitmentQuery   PaymentRoutingLogicTaskID = "receipt_commitment_query"
-	PaymentRoutingTaskCongestionEpochTests     PaymentRoutingLogicTaskID = "congestion_epoch_tests"
-	PaymentRoutingTaskRetryExpiryTests         PaymentRoutingLogicTaskID = "retry_expiry_tests"
-	PaymentRoutingTaskBounceConservationTests  PaymentRoutingLogicTaskID = "bounce_value_conservation_tests"
+	PaymentRoutingTaskRouteTableState		PaymentRoutingLogicTaskID	= "route_table_state"
+	PaymentRoutingTaskEpochUpdateRules		PaymentRoutingLogicTaskID	= "routing_epoch_update_rules"
+	PaymentRoutingTaskDeterministicPathScoring	PaymentRoutingLogicTaskID	= "deterministic_path_scoring"
+	PaymentRoutingTaskDeliveryScheduler		PaymentRoutingLogicTaskID	= "message_delivery_scheduler"
+	PaymentRoutingTaskReceiptCommitmentQuery	PaymentRoutingLogicTaskID	= "receipt_commitment_query"
+	PaymentRoutingTaskCongestionEpochTests		PaymentRoutingLogicTaskID	= "congestion_epoch_tests"
+	PaymentRoutingTaskRetryExpiryTests		PaymentRoutingLogicTaskID	= "retry_expiry_tests"
+	PaymentRoutingTaskBounceConservationTests	PaymentRoutingLogicTaskID	= "bounce_value_conservation_tests"
 )
 
 type PaymentRoutingLogicTaskDescriptor struct {
-	TaskID         PaymentRoutingLogicTaskID
-	Task           string
-	Target         string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	TaskID		PaymentRoutingLogicTaskID
+	Task		string
+	Target		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type PaymentRoutingLogicTaskSpec struct {
-	Version uint64
-	Tasks   []PaymentRoutingLogicTaskDescriptor
-	Root    string
+	Version	uint64
+	Tasks	[]PaymentRoutingLogicTaskDescriptor
+	Root	string
 }
 
 func PaymentRoutingLogicTaskDescriptors() []PaymentRoutingLogicTaskDescriptor {
@@ -104,8 +104,8 @@ func DefaultPaymentRoutingLogicTaskSpec() (PaymentRoutingLogicTaskSpec, error) {
 
 func BuildPaymentRoutingLogicTaskSpec(tasks []PaymentRoutingLogicTaskDescriptor) (PaymentRoutingLogicTaskSpec, error) {
 	spec := PaymentRoutingLogicTaskSpec{
-		Version: PaymentRoutingLogicTaskSpecVersion,
-		Tasks:   normalizePaymentRoutingLogicTaskDescriptors(tasks),
+		Version:	PaymentRoutingLogicTaskSpecVersion,
+		Tasks:		normalizePaymentRoutingLogicTaskDescriptors(tasks),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return PaymentRoutingLogicTaskSpec{}, err
@@ -289,11 +289,11 @@ func ComputePaymentRoutingLogicTaskSpecRoot(tasks []PaymentRoutingLogicTaskDescr
 
 func paymentRoutingLogicTask(taskID PaymentRoutingLogicTaskID, task string, target string, enforcement string, evidence string) PaymentRoutingLogicTaskDescriptor {
 	desc, err := BuildPaymentRoutingLogicTaskDescriptor(PaymentRoutingLogicTaskDescriptor{
-		TaskID:      taskID,
-		Task:        task,
-		Target:      target,
-		Enforcement: enforcement,
-		Evidence:    evidence,
+		TaskID:		taskID,
+		Task:		task,
+		Target:		target,
+		Enforcement:	enforcement,
+		Evidence:	evidence,
 	})
 	if err != nil {
 		panic(err)

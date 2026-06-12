@@ -12,65 +12,65 @@ import (
 )
 
 const (
-	AVMStoreV2PayloadInlineMaxBytes  = 256
-	AVMStoreV2CompactMessageMaxBytes = 512
+	AVMStoreV2PayloadInlineMaxBytes		= 256
+	AVMStoreV2CompactMessageMaxBytes	= 512
 )
 
 type AVMStoreV2MessageRecord struct {
-	MessageID     string
-	MessageKey    string
-	PayloadHash   string
-	PayloadInline bool
-	PayloadRefKey string
-	CompactBytes  uint32
-	RecordHash    string
+	MessageID	string
+	MessageKey	string
+	PayloadHash	string
+	PayloadInline	bool
+	PayloadRefKey	string
+	CompactBytes	uint32
+	RecordHash	string
 }
 
 type AVMStoreV2PayloadRecord struct {
-	PayloadHash string
-	PayloadKey  string
-	PayloadSize uint32
-	Inline      bool
-	RecordHash  string
+	PayloadHash	string
+	PayloadKey	string
+	PayloadSize	uint32
+	Inline		bool
+	RecordHash	string
 }
 
 type AVMStoreV2DelayedQueueBucket struct {
-	ZoneID     zonestypes.ZoneID
-	Height     uint64
-	BucketKey  string
-	MessageIDs []string
-	BucketHash string
+	ZoneID		zonestypes.ZoneID
+	Height		uint64
+	BucketKey	string
+	MessageIDs	[]string
+	BucketHash	string
 }
 
 type AVMStoreV2ActorStatePrefix struct {
-	ActorID    string
-	Prefix     string
-	PrefixHash string
+	ActorID		string
+	Prefix		string
+	PrefixHash	string
 }
 
 type AVMStoreV2ContractStatePrefix struct {
-	ContractAddress string
-	Prefix          string
-	PrefixHash      string
+	ContractAddress	string
+	Prefix		string
+	PrefixHash	string
 }
 
 type AVMStoreV2TombstonePruningPlan struct {
-	CurrentHeight         uint64
-	ProofHorizon          uint64
-	RetainAfterHeight     uint64
-	PrunableConsumedIDs   []string
-	PrunableExpiredScopes []string
-	PlanHash              string
+	CurrentHeight		uint64
+	ProofHorizon		uint64
+	RetainAfterHeight	uint64
+	PrunableConsumedIDs	[]string
+	PrunableExpiredScopes	[]string
+	PlanHash		string
 }
 
 type AVMStoreV2LayoutStrategy struct {
-	MessageRecords   []AVMStoreV2MessageRecord
-	PayloadRecords   []AVMStoreV2PayloadRecord
-	ActorPrefixes    []AVMStoreV2ActorStatePrefix
-	ContractPrefixes []AVMStoreV2ContractStatePrefix
-	DelayedBuckets   []AVMStoreV2DelayedQueueBucket
-	PruningPlan      AVMStoreV2TombstonePruningPlan
-	LayoutRoot       string
+	MessageRecords		[]AVMStoreV2MessageRecord
+	PayloadRecords		[]AVMStoreV2PayloadRecord
+	ActorPrefixes		[]AVMStoreV2ActorStatePrefix
+	ContractPrefixes	[]AVMStoreV2ContractStatePrefix
+	DelayedBuckets		[]AVMStoreV2DelayedQueueBucket
+	PruningPlan		AVMStoreV2TombstonePruningPlan
+	LayoutRoot		string
 }
 
 func NewAVMStoreV2MessageRecord(msg AVMAsyncMessage) (AVMStoreV2MessageRecord, AVMStoreV2PayloadRecord, error) {
@@ -80,21 +80,21 @@ func NewAVMStoreV2MessageRecord(msg AVMAsyncMessage) (AVMStoreV2MessageRecord, A
 	}
 	inline := len(msg.Payload) <= AVMStoreV2PayloadInlineMaxBytes
 	payload := AVMStoreV2PayloadRecord{
-		PayloadHash: msg.PayloadHash,
-		PayloadKey:  AVMStoreV2PayloadKey(msg.PayloadHash),
-		PayloadSize: uint32(len(msg.Payload)),
-		Inline:      inline,
+		PayloadHash:	msg.PayloadHash,
+		PayloadKey:	AVMStoreV2PayloadKey(msg.PayloadHash),
+		PayloadSize:	uint32(len(msg.Payload)),
+		Inline:		inline,
 	}
 	payload.RecordHash = ComputeAVMStoreV2PayloadRecordHash(payload)
 	if err := payload.Validate(); err != nil {
 		return AVMStoreV2MessageRecord{}, AVMStoreV2PayloadRecord{}, err
 	}
 	record := AVMStoreV2MessageRecord{
-		MessageID:     msg.ID,
-		MessageKey:    AVMAsyncMessageKey(msg.ID),
-		PayloadHash:   msg.PayloadHash,
-		PayloadInline: inline,
-		CompactBytes:  AVMStoreV2CompactMessageBytes(msg),
+		MessageID:	msg.ID,
+		MessageKey:	AVMAsyncMessageKey(msg.ID),
+		PayloadHash:	msg.PayloadHash,
+		PayloadInline:	inline,
+		CompactBytes:	AVMStoreV2CompactMessageBytes(msg),
 	}
 	if !inline {
 		record.PayloadRefKey = payload.PayloadKey
@@ -163,8 +163,8 @@ func (r AVMStoreV2PayloadRecord) Validate() error {
 
 func NewAVMStoreV2ActorStatePrefix(actorID string) (AVMStoreV2ActorStatePrefix, error) {
 	prefix := AVMStoreV2ActorStatePrefix{
-		ActorID: strings.TrimSpace(actorID),
-		Prefix:  ActorStateKeyPrefix(actorID),
+		ActorID:	strings.TrimSpace(actorID),
+		Prefix:		ActorStateKeyPrefix(actorID),
 	}
 	prefix.PrefixHash = ComputeAVMStoreV2ActorStatePrefixHash(prefix)
 	return prefix, prefix.Validate()
@@ -192,8 +192,8 @@ func (p AVMStoreV2ActorStatePrefix) Validate() error {
 
 func NewAVMStoreV2ContractStatePrefix(contractAddress string) (AVMStoreV2ContractStatePrefix, error) {
 	prefix := AVMStoreV2ContractStatePrefix{
-		ContractAddress: strings.TrimSpace(contractAddress),
-		Prefix:          AVMStatePrefixContractStorage + "/" + strings.TrimSpace(contractAddress) + "/",
+		ContractAddress:	strings.TrimSpace(contractAddress),
+		Prefix:			AVMStatePrefixContractStorage + "/" + strings.TrimSpace(contractAddress) + "/",
 	}
 	prefix.PrefixHash = ComputeAVMStoreV2ContractStatePrefixHash(prefix)
 	return prefix, prefix.Validate()
@@ -225,10 +225,10 @@ func (p AVMStoreV2ContractStatePrefix) Validate() error {
 
 func NewAVMStoreV2DelayedQueueBucket(zoneID zonestypes.ZoneID, height uint64, messageIDs []string) (AVMStoreV2DelayedQueueBucket, error) {
 	bucket := AVMStoreV2DelayedQueueBucket{
-		ZoneID:     zoneID,
-		Height:     height,
-		BucketKey:  AVMStoreV2DelayedQueueBucketKey(zoneID, height),
-		MessageIDs: trimSortStrings(messageIDs),
+		ZoneID:		zoneID,
+		Height:		height,
+		BucketKey:	AVMStoreV2DelayedQueueBucketKey(zoneID, height),
+		MessageIDs:	trimSortStrings(messageIDs),
 	}
 	bucket.BucketHash = ComputeAVMStoreV2DelayedQueueBucketHash(bucket)
 	return bucket, bucket.Validate()
@@ -276,9 +276,9 @@ func NewAVMStoreV2TombstonePruningPlan(store AVMReplayTombstoneStore, currentHei
 		retainAfter = currentHeight - proofHorizon
 	}
 	plan := AVMStoreV2TombstonePruningPlan{
-		CurrentHeight:     currentHeight,
-		ProofHorizon:      proofHorizon,
-		RetainAfterHeight: retainAfter,
+		CurrentHeight:		currentHeight,
+		ProofHorizon:		proofHorizon,
+		RetainAfterHeight:	retainAfter,
 	}
 	for _, tombstone := range store.ConsumedTombstones {
 		if tombstone.ConsumedHeight < retainAfter {

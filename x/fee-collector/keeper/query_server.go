@@ -24,10 +24,10 @@ func (k Keeper) FeeCollector(ctx context.Context, req *types.QueryFeeCollectorRe
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &types.QueryFeeCollectorResponse{
-		ModuleName:          types.CollectorModuleName,
-		ModuleAccount:       k.ModuleAccountAddress(),
-		Balances:            balances,
-		PendingDistribution: pending,
+		ModuleName:		types.CollectorModuleName,
+		ModuleAccount:		k.ModuleAccountAddress(),
+		Balances:		balances,
+		PendingDistribution:	pending,
 	}, nil
 }
 

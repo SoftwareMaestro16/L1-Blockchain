@@ -33,8 +33,8 @@ func TestAVMImplementationRoadmapMatchesSection19(t *testing.T) {
 
 func TestAVMRoadmapPhase0DefinesSpecAndTestVectors(t *testing.T) {
 	phase, err := NewAVMImplementationRoadmapPhase(AVMImplementationRoadmapPhase{
-		PhaseID: AVMRoadmapPhase0,
-		Name:    "Specification and Test Vectors",
+		PhaseID:	AVMRoadmapPhase0,
+		Name:		"Specification and Test Vectors",
 		Tasks: []AVMImplementationRoadmapTask{
 			AVMRoadmapTaskCanonicalAsyncMessageEncoding,
 			AVMRoadmapTaskMessageIDDerivation,
@@ -58,7 +58,7 @@ func TestAVMRoadmapPhase0DefinesSpecAndTestVectors(t *testing.T) {
 			AVMRoadmapVectorGasPolicySchema,
 			AVMRoadmapVectorInterfaceDescriptorSchema,
 		},
-		ConsensusCritical: true,
+		ConsensusCritical:	true,
 	})
 	require.NoError(t, err)
 	require.NoError(t, phase.Validate())

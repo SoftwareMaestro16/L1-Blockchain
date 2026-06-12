@@ -106,10 +106,10 @@ func TestScoreSimulationFlagsCentralizationAfterSaturation(t *testing.T) {
 	}
 
 	result, err := SimulateScores(ScoreSimulationInput{
-		EpochID:      8,
-		Params:       params,
-		Candidates:   candidates,
-		TargetActive: 4,
+		EpochID:	8,
+		Params:		params,
+		Candidates:	candidates,
+		TargetActive:	4,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(7_500), result.MaxRawStakeShareBps)
@@ -123,21 +123,21 @@ func TestStakeSplittingImprovesEffectiveWeightOnlyThroughDistribution(t *testing
 	params.StakeSaturationThresholdNaet = sdkmath.NewInt(1_000)
 	params.StakeSaturationCapFactorBps = 30_000
 	single, err := SimulateScores(ScoreSimulationInput{
-		EpochID:      9,
-		Params:       params,
-		Candidates:   []postypes.Candidate{testCandidate("val-whale", 9_000)},
-		TargetActive: 1,
+		EpochID:	9,
+		Params:		params,
+		Candidates:	[]postypes.Candidate{testCandidate("val-whale", 9_000)},
+		TargetActive:	1,
 	})
 	require.NoError(t, err)
 	split, err := SimulateScores(ScoreSimulationInput{
-		EpochID: 9,
-		Params:  params,
+		EpochID:	9,
+		Params:		params,
 		Candidates: []postypes.Candidate{
 			testCandidate("val-a", 3_000),
 			testCandidate("val-b", 3_000),
 			testCandidate("val-c", 3_000),
 		},
-		TargetActive: 3,
+		TargetActive:	3,
 	})
 	require.NoError(t, err)
 
@@ -152,16 +152,16 @@ func TestValidatorEligibilityScoreIsDeterministicAndAuditable(t *testing.T) {
 	params := testParams()
 	gov := DefaultValidatorEconomyGovernanceParams(params)
 	input := ValidatorSelectionInput{
-		EpochID:                 11,
-		ValidatorAddress:        "val-score",
-		BondedStakeNaet:         sdkmath.NewInt(50_000),
-		SelfDelegationNaet:      params.MinStakeNaet,
-		UptimeBps:               9_900,
-		MissedBlockRateBps:      100,
-		SlashHistoryCount:       1,
-		CommissionBps:           500,
-		StakeConcentrationBps:   1_000,
-		MetadataCompletenessBps: postypes.BasisPoints,
+		EpochID:			11,
+		ValidatorAddress:		"val-score",
+		BondedStakeNaet:		sdkmath.NewInt(50_000),
+		SelfDelegationNaet:		params.MinStakeNaet,
+		UptimeBps:			9_900,
+		MissedBlockRateBps:		100,
+		SlashHistoryCount:		1,
+		CommissionBps:			500,
+		StakeConcentrationBps:		1_000,
+		MetadataCompletenessBps:	postypes.BasisPoints,
 	}
 
 	left, err := ComputeValidatorEligibilityScore(params, gov, input)
@@ -210,13 +210,13 @@ func TestValidatorChurnSimulationsCoverNormalAdversarialAndLowParticipation(t *t
 	}
 	candidates = append(candidates, qualifiedCandidate("new-a", 5_000))
 	normal, err := SimulateValidatorChurn(ValidatorChurnSimulationInput{
-		Scenario: ChurnScenarioNormal,
+		Scenario:	ChurnScenarioNormal,
 		ScoreInput: ScoreSimulationInput{
-			EpochID:        13,
-			Params:         params,
-			Candidates:     candidates,
-			PreviousActive: previous,
-			TargetActive:   75,
+			EpochID:	13,
+			Params:		params,
+			Candidates:	candidates,
+			PreviousActive:	previous,
+			TargetActive:	75,
 		},
 	})
 	require.NoError(t, err)
@@ -226,12 +226,12 @@ func TestValidatorChurnSimulationsCoverNormalAdversarialAndLowParticipation(t *t
 
 	adversarialCandidates := append([]postypes.Candidate{qualifiedCandidate("whale", 100_000)}, candidates[:74]...)
 	adversarial, err := SimulateValidatorChurn(ValidatorChurnSimulationInput{
-		Scenario: ChurnScenarioAdversarial,
+		Scenario:	ChurnScenarioAdversarial,
 		ScoreInput: ScoreSimulationInput{
-			EpochID:      14,
-			Params:       params,
-			Candidates:   adversarialCandidates,
-			TargetActive: 75,
+			EpochID:	14,
+			Params:		params,
+			Candidates:	adversarialCandidates,
+			TargetActive:	75,
 		},
 	})
 	require.NoError(t, err)
@@ -239,12 +239,12 @@ func TestValidatorChurnSimulationsCoverNormalAdversarialAndLowParticipation(t *t
 	require.Contains(t, adversarial.Warnings, "adversarial_concentration_warning")
 
 	low, err := SimulateValidatorChurn(ValidatorChurnSimulationInput{
-		Scenario: ChurnScenarioLowParticipation,
+		Scenario:	ChurnScenarioLowParticipation,
 		ScoreInput: ScoreSimulationInput{
-			EpochID:      15,
-			Params:       params,
-			Candidates:   candidates[:10],
-			TargetActive: 75,
+			EpochID:	15,
+			Params:		params,
+			Candidates:	candidates[:10],
+			TargetActive:	75,
 		},
 	})
 	require.NoError(t, err)
@@ -262,13 +262,13 @@ func TestValidatorRewardAdjustmentDampensConcentrationAndReliability(t *testing.
 	record.ReliabilityIndex = 9_700
 
 	adjusted, err := ComputeValidatorRewardAdjustment(ValidatorRewardAdjustmentInput{
-		Record:               record,
-		TotalActiveStakeNaet: sdkmath.NewInt(10_000),
-		OperatingCostNaet:    sdkmath.NewInt(100),
-		ExpectedRewardNaet:   sdkmath.NewInt(120),
-		ValidatorAgeEpochs:   10,
-		BootstrapQualified:   false,
-		Governance:           gov,
+		Record:			record,
+		TotalActiveStakeNaet:	sdkmath.NewInt(10_000),
+		OperatingCostNaet:	sdkmath.NewInt(100),
+		ExpectedRewardNaet:	sdkmath.NewInt(120),
+		ValidatorAgeEpochs:	10,
+		BootstrapQualified:	false,
+		Governance:		gov,
 	})
 	require.NoError(t, err)
 	require.False(t, adjusted.FullRewardEligible)
@@ -288,17 +288,17 @@ func TestValidatorRewardAdjustmentCannotImproveByReducingUptime(t *testing.T) {
 	weaker.UptimeFactor = 9_000
 
 	healthyReward, err := ComputeValidatorRewardAdjustment(ValidatorRewardAdjustmentInput{
-		Record:               healthy,
-		TotalActiveStakeNaet: sdkmath.NewInt(10_000),
-		ExpectedRewardNaet:   sdkmath.NewInt(100),
-		Governance:           gov,
+		Record:			healthy,
+		TotalActiveStakeNaet:	sdkmath.NewInt(10_000),
+		ExpectedRewardNaet:	sdkmath.NewInt(100),
+		Governance:		gov,
 	})
 	require.NoError(t, err)
 	weakerReward, err := ComputeValidatorRewardAdjustment(ValidatorRewardAdjustmentInput{
-		Record:               weaker,
-		TotalActiveStakeNaet: sdkmath.NewInt(10_000),
-		ExpectedRewardNaet:   sdkmath.NewInt(100),
-		Governance:           gov,
+		Record:			weaker,
+		TotalActiveStakeNaet:	sdkmath.NewInt(10_000),
+		ExpectedRewardNaet:	sdkmath.NewInt(100),
+		Governance:		gov,
 	})
 	require.NoError(t, err)
 	require.Greater(t, healthyReward.RewardMultiplierBps, weakerReward.RewardMultiplierBps)
@@ -310,21 +310,21 @@ func TestValidatorBootstrapBonusExpiresAutomatically(t *testing.T) {
 	record := testRecord(18, "val-new", 100)
 
 	active, err := ComputeValidatorRewardAdjustment(ValidatorRewardAdjustmentInput{
-		Record:               record,
-		TotalActiveStakeNaet: sdkmath.NewInt(10_000),
-		ExpectedRewardNaet:   sdkmath.NewInt(10),
-		ValidatorAgeEpochs:   1,
-		BootstrapQualified:   true,
-		Governance:           gov,
+		Record:			record,
+		TotalActiveStakeNaet:	sdkmath.NewInt(10_000),
+		ExpectedRewardNaet:	sdkmath.NewInt(10),
+		ValidatorAgeEpochs:	1,
+		BootstrapQualified:	true,
+		Governance:		gov,
 	})
 	require.NoError(t, err)
 	expired, err := ComputeValidatorRewardAdjustment(ValidatorRewardAdjustmentInput{
-		Record:               record,
-		TotalActiveStakeNaet: sdkmath.NewInt(10_000),
-		ExpectedRewardNaet:   sdkmath.NewInt(10),
-		ValidatorAgeEpochs:   gov.BootstrapMaxEpochs,
-		BootstrapQualified:   true,
-		Governance:           gov,
+		Record:			record,
+		TotalActiveStakeNaet:	sdkmath.NewInt(10_000),
+		ExpectedRewardNaet:	sdkmath.NewInt(10),
+		ValidatorAgeEpochs:	gov.BootstrapMaxEpochs,
+		BootstrapQualified:	true,
+		Governance:		gov,
 	})
 	require.NoError(t, err)
 	require.Equal(t, gov.BootstrapBonusBps, active.BootstrapBonusBps)
@@ -343,12 +343,12 @@ func testParams() postypes.Params {
 
 func testCandidate(id string, stake int64) postypes.Candidate {
 	return postypes.Candidate{
-		ValidatorID:         id,
-		SelfStakeNaet:       sdkmath.NewInt(stake),
-		DelegatedStakeNaet:  sdkmath.ZeroInt(),
-		PerformanceScoreBps: postypes.BasisPoints,
-		UptimeFactorBps:     postypes.BasisPoints,
-		CommissionBps:       500,
+		ValidatorID:		id,
+		SelfStakeNaet:		sdkmath.NewInt(stake),
+		DelegatedStakeNaet:	sdkmath.ZeroInt(),
+		PerformanceScoreBps:	postypes.BasisPoints,
+		UptimeFactorBps:	postypes.BasisPoints,
+		CommissionBps:		500,
 	}
 }
 
@@ -356,26 +356,26 @@ func qualifiedCandidate(id string, stake int64) postypes.Candidate {
 	candidate := testCandidate(id, stake)
 	candidate.Roles = []postypes.ValidatorRole{postypes.ValidatorRoleBlockProducer}
 	candidate.Capacity = postypes.ValidatorCapacity{
-		MaxTaskGroups:      1,
-		SupportedWorkloads: []postypes.WorkloadType{postypes.WorkloadTypeGlobalConsensus},
+		MaxTaskGroups:		1,
+		SupportedWorkloads:	[]postypes.WorkloadType{postypes.WorkloadTypeGlobalConsensus},
 	}
 	return candidate
 }
 
 func testRecord(epochID uint64, id string, score int64) ValidatorScoreRecord {
 	return ValidatorScoreRecord{
-		EpochID:           epochID,
-		ValidatorAddress:  id,
-		RawStake:          sdkmath.NewInt(score),
-		EffectiveStake:    sdkmath.NewInt(score),
-		StakeWeight:       sdkmath.NewInt(score),
-		PerformanceFactor: postypes.BasisPoints,
-		UptimeFactor:      postypes.BasisPoints,
-		LatencyFactor:     postypes.BasisPoints,
-		ReliabilityIndex:  postypes.BasisPoints,
-		ValidatorScore:    sdkmath.NewInt(score),
-		SaturationStatus:  SaturationStatusNone,
-		ScoreVersion:      DefaultScoreVersion,
+		EpochID:		epochID,
+		ValidatorAddress:	id,
+		RawStake:		sdkmath.NewInt(score),
+		EffectiveStake:		sdkmath.NewInt(score),
+		StakeWeight:		sdkmath.NewInt(score),
+		PerformanceFactor:	postypes.BasisPoints,
+		UptimeFactor:		postypes.BasisPoints,
+		LatencyFactor:		postypes.BasisPoints,
+		ReliabilityIndex:	postypes.BasisPoints,
+		ValidatorScore:		sdkmath.NewInt(score),
+		SaturationStatus:	SaturationStatusNone,
+		ScoreVersion:		DefaultScoreVersion,
 	}
 }
 

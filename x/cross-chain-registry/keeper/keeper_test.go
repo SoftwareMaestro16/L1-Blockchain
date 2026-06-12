@@ -22,33 +22,33 @@ func setupKeeper(t *testing.T) Keeper {
 
 func chain(id string, height uint64) types.RegisteredChain {
 	return types.RegisteredChain{
-		ChainID:        id,
-		Status:         types.ChainStatusActive,
-		ClientType:     types.ClientTypeLightClient,
-		TrustLevel:     types.TrustLevelHigh,
-		LightClientRef: "lc-" + id,
-		RiskScore:      10,
+		ChainID:	id,
+		Status:		types.ChainStatusActive,
+		ClientType:	types.ClientTypeLightClient,
+		TrustLevel:	types.TrustLevelHigh,
+		LightClientRef:	"lc-" + id,
+		RiskScore:	10,
 		Finality: types.FinalityAssumptions{
-			ConfirmationBlocks: 12,
-			FinalitySeconds:    180,
+			ConfirmationBlocks:	12,
+			FinalitySeconds:	180,
 		},
 		Timeout: types.TimeoutParameters{
-			TimeoutBlocks:  1_000,
-			TimeoutSeconds: 3_600,
+			TimeoutBlocks:	1_000,
+			TimeoutSeconds:	3_600,
 		},
-		RiskPolicyID:     id + "-risk",
-		RegisteredHeight: height,
+		RiskPolicyID:		id + "-risk",
+		RegisteredHeight:	height,
 	}
 }
 
 func riskPolicy(id string) types.RiskPolicy {
 	return types.RiskPolicy{
-		PolicyID:           id + "-risk",
-		ChainID:            id,
-		MaxRiskScore:       50,
-		AllowedClientTypes: []string{types.ClientTypeLightClient},
-		MinTrustLevel:      types.TrustLevelMedium,
-		RequireLightClient: true,
+		PolicyID:		id + "-risk",
+		ChainID:		id,
+		MaxRiskScore:		50,
+		AllowedClientTypes:	[]string{types.ClientTypeLightClient},
+		MinTrustLevel:		types.TrustLevelMedium,
+		RequireLightClient:	true,
 	}
 }
 
@@ -89,22 +89,22 @@ func TestRegisterChannelAndRoute(t *testing.T) {
 	registerChain(t, &k, "ethereum")
 
 	channel, err := k.RegisterChannel(types.MsgRegisterChannel{
-		Authority: authority,
+		Authority:	authority,
 		Channel: types.ChannelRecord{
-			ChannelID:           "channel-0",
-			ChainID:             "ethereum",
-			CounterpartyChainID: "aetra",
-			ClientID:            "client-eth",
-			Active:              true,
-			RegisteredHeight:    2,
+			ChannelID:		"channel-0",
+			ChainID:		"ethereum",
+			CounterpartyChainID:	"aetra",
+			ClientID:		"client-eth",
+			Active:			true,
+			RegisteredHeight:	2,
 		},
 		Routes: []types.BridgeRoute{{
-			RouteID:       "eth-aet",
-			SourceChainID: "ethereum",
-			TargetChainID: "aetra",
-			ChannelID:     "channel-0",
-			BridgeID:      "bridge-eth",
-			Enabled:       true,
+			RouteID:	"eth-aet",
+			SourceChainID:	"ethereum",
+			TargetChainID:	"aetra",
+			ChannelID:	"channel-0",
+			BridgeID:	"bridge-eth",
+			Enabled:	true,
 		}},
 	})
 	require.NoError(t, err)
@@ -120,22 +120,22 @@ func TestPauseChainDisablesRoutes(t *testing.T) {
 	registerChain(t, &k, "aetra")
 	registerChain(t, &k, "ethereum")
 	_, err := k.RegisterChannel(types.MsgRegisterChannel{
-		Authority: authority,
+		Authority:	authority,
 		Channel: types.ChannelRecord{
-			ChannelID:           "channel-0",
-			ChainID:             "ethereum",
-			CounterpartyChainID: "aetra",
-			ClientID:            "client-eth",
-			Active:              true,
-			RegisteredHeight:    2,
+			ChannelID:		"channel-0",
+			ChainID:		"ethereum",
+			CounterpartyChainID:	"aetra",
+			ClientID:		"client-eth",
+			Active:			true,
+			RegisteredHeight:	2,
 		},
 		Routes: []types.BridgeRoute{{
-			RouteID:       "eth-aet",
-			SourceChainID: "ethereum",
-			TargetChainID: "aetra",
-			ChannelID:     "channel-0",
-			BridgeID:      "bridge-eth",
-			Enabled:       true,
+			RouteID:	"eth-aet",
+			SourceChainID:	"ethereum",
+			TargetChainID:	"aetra",
+			ChannelID:	"channel-0",
+			BridgeID:	"bridge-eth",
+			Enabled:	true,
 		}},
 	})
 	require.NoError(t, err)

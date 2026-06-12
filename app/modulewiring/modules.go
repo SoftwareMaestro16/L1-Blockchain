@@ -135,68 +135,68 @@ import (
 )
 
 type ModuleDeps struct {
-	AppCodec          codec.Codec
-	TxConfig          client.TxConfig
-	DeliverTx         coregenesis.TxHandler
-	InterfaceRegistry codectypes.InterfaceRegistry
+	AppCodec		codec.Codec
+	TxConfig		client.TxConfig
+	DeliverTx		coregenesis.TxHandler
+	InterfaceRegistry	codectypes.InterfaceRegistry
 
-	AccountKeeper         authkeeper.AccountKeeper
-	BankKeeper            bankkeeper.BaseKeeper
-	StakingKeeper         *stakingkeeper.Keeper
-	SlashingKeeper        slashingkeeper.Keeper
-	MintKeeper            mintkeeper.Keeper
-	DistrKeeper           distrkeeper.Keeper
-	GovKeeper             *govkeeper.Keeper
-	UpgradeKeeper         *upgradekeeper.Keeper
-	EvidenceKeeper        evidencekeeper.Keeper
-	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	FeeGrantKeeper        feegrantkeeper.Keeper
-	AuthzKeeper           authzkeeper.Keeper
-	EpochsKeeper          *epochskeeper.Keeper
-	ProtocolPoolKeeper    protocolpoolkeeper.Keeper
+	AccountKeeper		authkeeper.AccountKeeper
+	BankKeeper		bankkeeper.BaseKeeper
+	StakingKeeper		*stakingkeeper.Keeper
+	SlashingKeeper		slashingkeeper.Keeper
+	MintKeeper		mintkeeper.Keeper
+	DistrKeeper		distrkeeper.Keeper
+	GovKeeper		*govkeeper.Keeper
+	UpgradeKeeper		*upgradekeeper.Keeper
+	EvidenceKeeper		evidencekeeper.Keeper
+	ConsensusParamsKeeper	consensusparamkeeper.Keeper
+	FeeGrantKeeper		feegrantkeeper.Keeper
+	AuthzKeeper		authzkeeper.Keeper
+	EpochsKeeper		*epochskeeper.Keeper
+	ProtocolPoolKeeper	protocolpoolkeeper.Keeper
 
-	ConfigKeeper              *configkeeper.Keeper
-	ConfigVotingKeeper        *configvotingkeeper.Keeper
-	ConstitutionKeeper        *constitutionkeeper.Keeper
-	BurnKeeper                burnkeeper.Keeper
-	TreasuryKeeper            treasurykeeper.Keeper
-	EmissionsKeeper           emissionskeeper.Keeper
-	MintAuthorityKeeper       mintauthoritykeeper.Keeper
-	DelegatorProtectionKeeper delegatorprotectionkeeper.Keeper
-	ReputationKeeper          reputationkeeper.Keeper
-	PerformanceKeeper         performancekeeper.Keeper
-	DynamicCommissionKeeper   dynamiccommissionkeeper.Keeper
-	StakeConcentrationKeeper  stakeconcentrationkeeper.Keeper
-	FeeCollectorKeeper        feecollectorkeeper.Keeper
-	FeesKeeper                feeskeeper.Keeper
-	AetraCoreKeeper           *aetracorekeeper.Keeper
-	LoadKeeper                *loadkeeper.Keeper
-	RoutingKeeper             *routingkeeper.Keeper
-	ZonesKeeper               *zoneskeeper.Keeper
-	MeshKeeper                *meshkeeper.Keeper
-	NetworkingKeeper          *networkingkeeper.Keeper
-	NativeAccountKeeper       *nativeaccountkeeper.Keeper
-	PaymentsKeeper            *paymentskeeper.Keeper
-	SchedulerKeeper           *schedulerkeeper.Keeper
-	AVMSchedulerKeeper        *avmschedulerkeeper.Keeper
-	ActorRegistryKeeper       *actorregistrykeeper.Keeper
-	ContractsKeeper           *contractskeeper.Keeper
-	StorageRentKeeper         *storagerentkeeper.Keeper
-	IdentityRootKeeper        *identityrootkeeper.Keeper
-	BridgeHubKeeper           *bridgehubkeeper.Keeper
-	CrossChainRegistryKeeper  *crosschainregistrykeeper.Keeper
-	ShardingCoordinatorKeeper *shardingcoordinatorkeeper.Keeper
-	SystemRegistryKeeper      *systemregistrykeeper.Keeper
-	NativeEvidenceKeeper      *nativeevidencekeeper.Keeper
-	ReporterKeeper            *reporterkeeper.Keeper
-	NominatorPoolKeeper       *nominatorpoolkeeper.Keeper
-	SingleNominatorPoolKeeper *singlenominatorpoolkeeper.Keeper
-	ValidatorElectionKeeper   *validatorelectionkeeper.Keeper
-	ValidatorInsuranceKeeper  *validatorinsurancekeeper.Keeper
-	ValidatorRegistryKeeper   *validatorregistrykeeper.Keeper
-	AetraStakingPolicyKeeper  *aetrastakingpolicykeeper.Keeper
-	AetraEconomicsKeeper      *aetraeconomicskeeper.Keeper
-	AetraValidatorScoreKeeper *aetravalidatorscorekeeper.Keeper
+	ConfigKeeper			*configkeeper.Keeper
+	ConfigVotingKeeper		*configvotingkeeper.Keeper
+	ConstitutionKeeper		*constitutionkeeper.Keeper
+	BurnKeeper			burnkeeper.Keeper
+	TreasuryKeeper			treasurykeeper.Keeper
+	EmissionsKeeper			emissionskeeper.Keeper
+	MintAuthorityKeeper		mintauthoritykeeper.Keeper
+	DelegatorProtectionKeeper	delegatorprotectionkeeper.Keeper
+	ReputationKeeper		reputationkeeper.Keeper
+	PerformanceKeeper		performancekeeper.Keeper
+	DynamicCommissionKeeper		dynamiccommissionkeeper.Keeper
+	StakeConcentrationKeeper	stakeconcentrationkeeper.Keeper
+	FeeCollectorKeeper		feecollectorkeeper.Keeper
+	FeesKeeper			feeskeeper.Keeper
+	AetraCoreKeeper			*aetracorekeeper.Keeper
+	LoadKeeper			*loadkeeper.Keeper
+	RoutingKeeper			*routingkeeper.Keeper
+	ZonesKeeper			*zoneskeeper.Keeper
+	MeshKeeper			*meshkeeper.Keeper
+	NetworkingKeeper		*networkingkeeper.Keeper
+	NativeAccountKeeper		*nativeaccountkeeper.Keeper
+	PaymentsKeeper			*paymentskeeper.Keeper
+	SchedulerKeeper			*schedulerkeeper.Keeper
+	AVMSchedulerKeeper		*avmschedulerkeeper.Keeper
+	ActorRegistryKeeper		*actorregistrykeeper.Keeper
+	ContractsKeeper			*contractskeeper.Keeper
+	StorageRentKeeper		*storagerentkeeper.Keeper
+	IdentityRootKeeper		*identityrootkeeper.Keeper
+	BridgeHubKeeper			*bridgehubkeeper.Keeper
+	CrossChainRegistryKeeper	*crosschainregistrykeeper.Keeper
+	ShardingCoordinatorKeeper	*shardingcoordinatorkeeper.Keeper
+	SystemRegistryKeeper		*systemregistrykeeper.Keeper
+	NativeEvidenceKeeper		*nativeevidencekeeper.Keeper
+	ReporterKeeper			*reporterkeeper.Keeper
+	NominatorPoolKeeper		*nominatorpoolkeeper.Keeper
+	SingleNominatorPoolKeeper	*singlenominatorpoolkeeper.Keeper
+	ValidatorElectionKeeper		*validatorelectionkeeper.Keeper
+	ValidatorInsuranceKeeper	*validatorinsurancekeeper.Keeper
+	ValidatorRegistryKeeper		*validatorregistrykeeper.Keeper
+	AetraStakingPolicyKeeper	*aetrastakingpolicykeeper.Keeper
+	AetraEconomicsKeeper		*aetraeconomicskeeper.Keeper
+	AetraValidatorScoreKeeper	*aetravalidatorscorekeeper.Keeper
 }
 
 func NewModuleManager(deps ModuleDeps) *module.Manager {
@@ -266,8 +266,8 @@ func NewBasicManager(manager *module.Manager, legacyAmino *codec.LegacyAmino, in
 	basicManager := module.NewBasicManagerFromManager(
 		manager,
 		map[string]module.AppModuleBasic{
-			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-			govtypes.ModuleName:     gov.NewAppModuleBasic([]govclient.ProposalHandler{}),
+			genutiltypes.ModuleName:	genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			govtypes.ModuleName:		gov.NewAppModuleBasic([]govclient.ProposalHandler{}),
 		},
 	)
 	basicManager.RegisterLegacyAminoCodec(legacyAmino)

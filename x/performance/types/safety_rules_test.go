@@ -8,10 +8,10 @@ import (
 
 func TestConsensusDeterminismPolicyRejectsUnsafeSources(t *testing.T) {
 	policy, err := BuildConsensusDeterminismPolicy(ConsensusDeterminismPolicy{
-		ConsensusPathName:            "finalize_block",
-		UsesConsensusTime:            true,
-		SortsStateTransitionMaps:     true,
-		EncodesProposalMempoolInputs: true,
+		ConsensusPathName:		"finalize_block",
+		UsesConsensusTime:		true,
+		SortsStateTransitionMaps:	true,
+		EncodesProposalMempoolInputs:	true,
 	})
 	require.NoError(t, err)
 	require.NoError(t, policy.Validate())
@@ -42,11 +42,11 @@ func TestRoutingSafetyRequiresCommittedInputsAndDeterministicTieBreak(t *testing
 	best := routingSafetyPath("path-best", "10", 2, 100, "a")
 	worse := routingSafetyPath("path-worse", "10", 2, 500, "b")
 	input, err := BuildRoutingSafetyInput(RoutingSafetyInput{
-		RoutingEpoch:       3,
-		RoutingTableHash:   hashStrings("routing-table"),
-		RoutingMetricsRoot: hashStrings("routing-metrics"),
-		CandidatePaths:     []RoutingSafetyPath{worse, best},
-		SelectedPathID:     "path-best",
+		RoutingEpoch:		3,
+		RoutingTableHash:	hashStrings("routing-table"),
+		RoutingMetricsRoot:	hashStrings("routing-metrics"),
+		CandidatePaths:		[]RoutingSafetyPath{worse, best},
+		SelectedPathID:		"path-best",
 	})
 	require.NoError(t, err)
 	require.NoError(t, input.Validate())
@@ -77,18 +77,18 @@ func TestRoutingFailureAccountingPreservesValueAndRequiresReceiptForBurn(t *test
 func TestShardLayoutTransitionRequiresEpochBoundaryMigrationRootAndDeliveryEpoch(t *testing.T) {
 	msg := inFlightMessage("message-a", 6, 120)
 	transition, err := BuildShardLayoutTransition(ShardLayoutTransition{
-		ZoneID:                 "financial",
-		PreviousLayoutEpoch:    5,
-		NextLayoutEpoch:        6,
-		CurrentHeight:          100,
-		ActivationHeight:       110,
-		EpochBoundaryHeight:    110,
-		SplitMergeDecisionHash: hashStrings("split-merge-decision"),
-		MigrationRoot:          hashStrings("migration-root"),
-		OldLayoutHash:          hashStrings("old-layout"),
-		NewLayoutHash:          hashStrings("new-layout"),
-		ProofHorizon:           16,
-		InFlightMessages:       []InFlightShardMessage{msg},
+		ZoneID:			"financial",
+		PreviousLayoutEpoch:	5,
+		NextLayoutEpoch:	6,
+		CurrentHeight:		100,
+		ActivationHeight:	110,
+		EpochBoundaryHeight:	110,
+		SplitMergeDecisionHash:	hashStrings("split-merge-decision"),
+		MigrationRoot:		hashStrings("migration-root"),
+		OldLayoutHash:		hashStrings("old-layout"),
+		NewLayoutHash:		hashStrings("new-layout"),
+		ProofHorizon:		16,
+		InFlightMessages:	[]InFlightShardMessage{msg},
 	})
 	require.NoError(t, err)
 	require.NoError(t, transition.Validate())
@@ -115,25 +115,25 @@ func TestShardLayoutTransitionRequiresEpochBoundaryMigrationRootAndDeliveryEpoch
 
 func routingSafetyPath(id, cost string, hops uint32, congestion uint32, tie string) RoutingSafetyPath {
 	path := RoutingSafetyPath{
-		PathID:        id,
-		RouteHash:     hashStrings("route", id),
-		Cost:          cost,
-		HopCount:      hops,
-		LiquidityBps:  9_000,
-		CongestionBps: congestion,
-		TieBreakKey:   tie,
+		PathID:		id,
+		RouteHash:	hashStrings("route", id),
+		Cost:		cost,
+		HopCount:	hops,
+		LiquidityBps:	9_000,
+		CongestionBps:	congestion,
+		TieBreakKey:	tie,
 	}
 	return path.Normalize()
 }
 
 func routingFailureAccounting(routeID, original, bounced, burned, receiptHash, status string) RoutingFailureAccounting {
 	accounting := RoutingFailureAccounting{
-		RouteID:       routeID,
-		OriginalValue: original,
-		BouncedValue:  bounced,
-		BurnedValue:   burned,
-		ReceiptHash:   receiptHash,
-		ReceiptStatus: status,
+		RouteID:	routeID,
+		OriginalValue:	original,
+		BouncedValue:	bounced,
+		BurnedValue:	burned,
+		ReceiptHash:	receiptHash,
+		ReceiptStatus:	status,
 	}
 	accounting.AccountingHash = ComputeRoutingFailureAccountingHash(accounting)
 	return accounting
@@ -141,11 +141,11 @@ func routingFailureAccounting(routeID, original, bounced, burned, receiptHash, s
 
 func inFlightMessage(seed string, deliveryEpoch uint64, expiryHeight uint64) InFlightShardMessage {
 	msg := InFlightShardMessage{
-		MessageID:          hashStrings("in-flight", seed),
-		SourceShardID:      "shard-a",
-		DestinationShardID: "shard-b",
-		DeliveryEpoch:      deliveryEpoch,
-		ExpiryHeight:       expiryHeight,
+		MessageID:		hashStrings("in-flight", seed),
+		SourceShardID:		"shard-a",
+		DestinationShardID:	"shard-b",
+		DeliveryEpoch:		deliveryEpoch,
+		ExpiryHeight:		expiryHeight,
 	}
 	msg.MessageHash = ComputeInFlightShardMessageHash(msg)
 	return msg

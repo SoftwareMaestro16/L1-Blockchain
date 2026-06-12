@@ -12,31 +12,31 @@ type PaymentEngineeringBacklogStatus string
 type PaymentEngineeringBacklogItemID string
 
 const (
-	PaymentBacklogHighPriority   PaymentEngineeringBacklogPriority = "high"
-	PaymentBacklogMediumPriority PaymentEngineeringBacklogPriority = "medium"
-	PaymentBacklogLowerPriority  PaymentEngineeringBacklogPriority = "lower"
+	PaymentBacklogHighPriority	PaymentEngineeringBacklogPriority	= "high"
+	PaymentBacklogMediumPriority	PaymentEngineeringBacklogPriority	= "medium"
+	PaymentBacklogLowerPriority	PaymentEngineeringBacklogPriority	= "lower"
 
-	PaymentBacklogStatusComplete PaymentEngineeringBacklogStatus = "complete"
+	PaymentBacklogStatusComplete	PaymentEngineeringBacklogStatus	= "complete"
 )
 
 type PaymentEngineeringBacklogItem struct {
-	ItemID      PaymentEngineeringBacklogItemID
-	Priority    PaymentEngineeringBacklogPriority
-	Description string
-	Status      PaymentEngineeringBacklogStatus
-	LocalOnly   bool
-	Evidence    []string
-	ItemHash    string
+	ItemID		PaymentEngineeringBacklogItemID
+	Priority	PaymentEngineeringBacklogPriority
+	Description	string
+	Status		PaymentEngineeringBacklogStatus
+	LocalOnly	bool
+	Evidence	[]string
+	ItemHash	string
 }
 
 type PaymentEngineeringBacklogReport struct {
-	Items               []PaymentEngineeringBacklogItem
-	HighPriorityCount   uint64
-	MediumPriorityCount uint64
-	LowerPriorityCount  uint64
-	CompleteCount       uint64
-	LocalOnlyCount      uint64
-	ReportHash          string
+	Items			[]PaymentEngineeringBacklogItem
+	HighPriorityCount	uint64
+	MediumPriorityCount	uint64
+	LowerPriorityCount	uint64
+	CompleteCount		uint64
+	LocalOnlyCount		uint64
+	ReportHash		string
 }
 
 func BuildPaymentEngineeringBacklog() PaymentEngineeringBacklogReport {
@@ -196,12 +196,12 @@ func (item PaymentEngineeringBacklogItem) Normalize() PaymentEngineeringBacklogI
 
 func backlogItem(id PaymentEngineeringBacklogItemID, priority PaymentEngineeringBacklogPriority, description string, localOnly bool, evidence ...string) PaymentEngineeringBacklogItem {
 	item := PaymentEngineeringBacklogItem{
-		ItemID:      id,
-		Priority:    priority,
-		Description: description,
-		Status:      PaymentBacklogStatusComplete,
-		LocalOnly:   localOnly,
-		Evidence:    evidence,
+		ItemID:		id,
+		Priority:	priority,
+		Description:	description,
+		Status:		PaymentBacklogStatusComplete,
+		LocalOnly:	localOnly,
+		Evidence:	evidence,
 	}
 	item.ItemHash = ComputePaymentEngineeringBacklogItemHash(item)
 	return item.Normalize()

@@ -57,8 +57,8 @@ func TestDistributeFeesRoutesTreasuryProtectionValidatorsAndBurn(t *testing.T) {
 	require.Equal(t, supplyBefore.Amount.Sub(sdkmath.NewInt(500)), app.BankKeeper.GetSupply(ctx, types.BaseDenom).Amount)
 	require.NoError(t, collector.AssertModuleAccountingInvariant(ctx))
 	requireFeeCollectorEvent(t, ctx, types.EventTypeDistributeFees, map[string]string{
-		types.AttributeKeyBurn:      sdk.NewCoins(coin(500)).String(),
-		types.AttributeKeyTotalBurn: sdk.NewCoins(coin(500)).String(),
+		types.AttributeKeyBurn:		sdk.NewCoins(coin(500)).String(),
+		types.AttributeKeyTotalBurn:	sdk.NewCoins(coin(500)).String(),
 	})
 }
 
@@ -91,8 +91,8 @@ func TestRoundingRemainderIsDeterministicAndCannotCreateCoins(t *testing.T) {
 	params.BurnBps = 5_000
 	msgServer := feecollectorkeeper.NewMsgServerImpl(collector)
 	_, err := msgServer.UpdateFeeDistributionParams(ctx, &types.MsgUpdateFeeDistributionParams{
-		Authority: collector.Authority(),
-		Params:    params,
+		Authority:	collector.Authority(),
+		Params:		params,
 	})
 	require.NoError(t, err)
 
@@ -133,8 +133,8 @@ func TestMsgAuthorityAndDistributionParamSecurity(t *testing.T) {
 	params := types.DefaultParams()
 	params.BurnBps = 201
 	_, err := msgServer.UpdateFeeDistributionParams(ctx, &types.MsgUpdateFeeDistributionParams{
-		Authority: app.FeeCollectorKeeper.Authority(),
-		Params:    params,
+		Authority:	app.FeeCollectorKeeper.Authority(),
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidParams)
 

@@ -28,18 +28,18 @@ type BankKeeper interface {
 }
 
 type Keeper struct {
-	genesis                types.GenesisState
-	storeService           corestore.KVStoreService
-	accountStatusReader    AccountStatusReader
-	bankKeeper             BankKeeper
-	runtimeCtx             context.Context
-	storageRentRateProvider StorageRentRateProvider
+	genesis			types.GenesisState
+	storeService		corestore.KVStoreService
+	accountStatusReader	AccountStatusReader
+	bankKeeper		BankKeeper
+	runtimeCtx		context.Context
+	storageRentRateProvider	StorageRentRateProvider
 }
 
 const (
-	accountStatusActive   = "active"
-	accountStatusInactive = "inactive"
-	accountStatusFrozen   = "frozen"
+	accountStatusActive	= "active"
+	accountStatusInactive	= "inactive"
+	accountStatusFrozen	= "frozen"
 )
 
 var genesisKey = []byte{0x01}
@@ -201,11 +201,11 @@ func (k *Keeper) storeCodeUnchecked(msg types.MsgStoreCode) (types.StoreCodeResp
 	}
 	next := k.genesis
 	next.State.Codes = upsertCode(next.State.Codes, types.CodeRecord{
-		CodeID:    msg.CodeHash,
-		CodeHash:  msg.CodeHash,
-		CodeBytes: msg.CodeBytes,
-		Bytecode:  append([]byte(nil), msg.Bytecode...),
-		Owner:     msg.Authority,
+		CodeID:		msg.CodeHash,
+		CodeHash:	msg.CodeHash,
+		CodeBytes:	msg.CodeBytes,
+		Bytecode:	append([]byte(nil), msg.Bytecode...),
+		Owner:		msg.Authority,
 	})
 	next = types.RefreshStateRoot(next)
 	if err := next.Validate(); err != nil {
@@ -249,19 +249,19 @@ func (k *Keeper) deployContract(ctx context.Context, msg types.MsgDeployContract
 		return types.InstantiateContractResponse{}, err
 	}
 	return k.instantiateContract(ctx, types.MsgInstantiateContract{
-		Creator:       msg.Creator,
-		CodeID:        msg.CodeID,
-		ChainID:       msg.ChainID,
-		Namespace:     msg.Namespace,
-		StateInit:     msg.StateInit,
-		InitMsg:       append([]byte(nil), msg.InitPayload...),
-		Funds:         msg.InitialBalance,
-		Admin:         msg.Admin,
-		Salt:          msg.Salt,
-		Upgradeable:   msg.Upgradeable,
-		SystemOwned:   msg.SystemOwned,
-		SchemaVersion: msg.SchemaVersion,
-		Height:        msg.Height,
+		Creator:	msg.Creator,
+		CodeID:		msg.CodeID,
+		ChainID:	msg.ChainID,
+		Namespace:	msg.Namespace,
+		StateInit:	msg.StateInit,
+		InitMsg:	append([]byte(nil), msg.InitPayload...),
+		Funds:		msg.InitialBalance,
+		Admin:		msg.Admin,
+		Salt:		msg.Salt,
+		Upgradeable:	msg.Upgradeable,
+		SystemOwned:	msg.SystemOwned,
+		SchemaVersion:	msg.SchemaVersion,
+		Height:		msg.Height,
 	})
 }
 
@@ -290,23 +290,23 @@ func (k *Keeper) executeExternal(ctx context.Context, msg types.MsgExecuteExtern
 			return types.ExecuteContractResponse{}, errors.New(types.ErrContractNotFound + ": state init address does not match external execute target")
 		}
 		_, err = k.instantiateContract(ctx, types.MsgInstantiateContract{
-			Creator:   msg.Sender,
-			CodeID:    msg.StateInit.Normalize().CodeID,
-			ChainID:   msg.ChainID,
-			Namespace: msg.Namespace,
-			StateInit: msg.StateInit,
-			Height:    msg.Height,
+			Creator:	msg.Sender,
+			CodeID:		msg.StateInit.Normalize().CodeID,
+			ChainID:	msg.ChainID,
+			Namespace:	msg.Namespace,
+			StateInit:	msg.StateInit,
+			Height:		msg.Height,
 		})
 		if err != nil {
 			return types.ExecuteContractResponse{}, err
 		}
 	}
 	return k.executeContract(ctx, types.MsgExecuteContract{
-		Sender:          msg.Sender,
-		ContractAddress: msg.ContractAddress,
-		Msg:             append([]byte(nil), msg.Payload...),
-		Funds:           msg.Funds,
-		Height:          msg.Height,
+		Sender:			msg.Sender,
+		ContractAddress:	msg.ContractAddress,
+		Msg:			append([]byte(nil), msg.Payload...),
+		Funds:			msg.Funds,
+		Height:			msg.Height,
 	})
 }
 
@@ -315,18 +315,18 @@ func (k *Keeper) ExecuteInternal(msg types.MsgExecuteInternal) (types.InternalMe
 		return types.InternalMessage{}, err
 	}
 	return k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
-		SourceContractUser: msg.Message.SourceContractUser,
-		DestinationAccount: msg.Message.DestinationAccount,
-		Funds:              msg.Message.Funds,
-		Opcode:             msg.Message.Opcode,
-		QueryID:            msg.Message.QueryID,
-		Body:               append([]byte(nil), msg.Message.Body...),
-		Bounce:             msg.Message.Bounce,
-		Deadline:           msg.Message.Deadline,
-		GasLimit:           msg.Message.GasLimit,
-		LogicalTime:        msg.Message.LogicalTime,
-		MessageID:          msg.Message.MessageID,
-		Height:             msg.Height,
+		SourceContractUser:	msg.Message.SourceContractUser,
+		DestinationAccount:	msg.Message.DestinationAccount,
+		Funds:			msg.Message.Funds,
+		Opcode:			msg.Message.Opcode,
+		QueryID:		msg.Message.QueryID,
+		Body:			append([]byte(nil), msg.Message.Body...),
+		Bounce:			msg.Message.Bounce,
+		Deadline:		msg.Message.Deadline,
+		GasLimit:		msg.Message.GasLimit,
+		LogicalTime:		msg.Message.LogicalTime,
+		MessageID:		msg.Message.MessageID,
+		Height:			msg.Height,
 	})
 }
 
@@ -335,18 +335,18 @@ func (k *Keeper) SendInternalMessage(msg types.MsgSendInternalMessage) (types.In
 		return types.InternalMessage{}, err
 	}
 	return k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
-		SourceContractUser: msg.Message.SourceContractUser,
-		DestinationAccount: msg.Message.DestinationAccount,
-		Funds:              msg.Message.Funds,
-		Opcode:             msg.Message.Opcode,
-		QueryID:            msg.Message.QueryID,
-		Body:               append([]byte(nil), msg.Message.Body...),
-		Bounce:             msg.Message.Bounce,
-		Deadline:           msg.Message.Deadline,
-		GasLimit:           msg.Message.GasLimit,
-		LogicalTime:        msg.Message.LogicalTime,
-		MessageID:          msg.Message.MessageID,
-		Height:             msg.Height,
+		SourceContractUser:	msg.Message.SourceContractUser,
+		DestinationAccount:	msg.Message.DestinationAccount,
+		Funds:			msg.Message.Funds,
+		Opcode:			msg.Message.Opcode,
+		QueryID:		msg.Message.QueryID,
+		Body:			append([]byte(nil), msg.Message.Body...),
+		Bounce:			msg.Message.Bounce,
+		Deadline:		msg.Message.Deadline,
+		GasLimit:		msg.Message.GasLimit,
+		LogicalTime:		msg.Message.LogicalTime,
+		MessageID:		msg.Message.MessageID,
+		Height:			msg.Height,
 	})
 }
 
@@ -420,9 +420,9 @@ func (k Keeper) ContractStorage(req types.QueryContractStorageRequest) ([]types.
 		return nil, err
 	}
 	entries := []types.ContractStorageEntry{{
-		ContractAddress: contract.AddressUser,
-		Key:             []byte("data"),
-		Value:           append([]byte(nil), contract.Data...),
+		ContractAddress:	contract.AddressUser,
+		Key:			[]byte("data"),
+		Value:			append([]byte(nil), contract.Data...),
 	}}
 	out := make([]types.ContractStorageEntry, 0, len(entries))
 	for _, entry := range entries {
@@ -573,27 +573,27 @@ func (k *Keeper) instantiateContract(ctx context.Context, msg types.MsgInstantia
 		schemaVersion = 1
 	}
 	contract := types.Contract{
-		AddressUser:             user,
-		AddressRaw:              raw,
-		CodeID:                  msg.CodeID,
-		CodeHash:                code.CodeHash,
-		StateInitHash:           stateInitHash,
-		StateInit:               stateInit,
-		Creator:                 msg.Creator,
-		Owner:                   stateInit.Owner,
-		Admin:                   admin,
-		Upgradeable:             msg.Upgradeable,
-		SystemOwned:             msg.SystemOwned,
-		StorageSchemaVersion:    schemaVersion,
-		InitMsg:                 append([]byte(nil), data...),
-		Data:                    append([]byte(nil), data...),
-		Balance:                 funds,
-		Status:                  types.ContractStatusActive,
-		StorageBytes:            storageBytes,
-		LastStorageChargeHeight: msg.Height,
-		LogicalTime:             1,
-		CreatedHeight:           msg.Height,
-		UpdatedHeight:           msg.Height,
+		AddressUser:			user,
+		AddressRaw:			raw,
+		CodeID:				msg.CodeID,
+		CodeHash:			code.CodeHash,
+		StateInitHash:			stateInitHash,
+		StateInit:			stateInit,
+		Creator:			msg.Creator,
+		Owner:				stateInit.Owner,
+		Admin:				admin,
+		Upgradeable:			msg.Upgradeable,
+		SystemOwned:			msg.SystemOwned,
+		StorageSchemaVersion:		schemaVersion,
+		InitMsg:			append([]byte(nil), data...),
+		Data:				append([]byte(nil), data...),
+		Balance:			funds,
+		Status:				types.ContractStatusActive,
+		StorageBytes:			storageBytes,
+		LastStorageChargeHeight:	msg.Height,
+		LogicalTime:			1,
+		CreatedHeight:			msg.Height,
+		UpdatedHeight:			msg.Height,
 	}
 	contract.StateRoot = types.ComputeContractStateRoot(contract)
 	next := k.genesis
@@ -609,17 +609,17 @@ func (k *Keeper) instantiateContract(ctx context.Context, msg types.MsgInstantia
 	}
 	k.genesis = next
 	return types.InstantiateContractResponse{
-		ContractAddressUser: user,
-		ContractAddressRaw:  raw,
-		Owner:               contract.Owner,
-		Admin:               contract.Admin,
-		Balance:             contract.Balance,
+		ContractAddressUser:	user,
+		ContractAddressRaw:	raw,
+		Owner:			contract.Owner,
+		Admin:			contract.Admin,
+		Balance:		contract.Balance,
 		Events: []types.ContractEvent{{
-			Type:        types.EventTypeContractInstantiated,
-			Actor:       msg.Creator,
-			Contract:    user,
-			Amount:      funds,
-			InternalRaw: raw,
+			Type:		types.EventTypeContractInstantiated,
+			Actor:		msg.Creator,
+			Contract:	user,
+			Amount:		funds,
+			InternalRaw:	raw,
 		}},
 	}, nil
 }
@@ -891,15 +891,15 @@ func (k *Keeper) executeContract(ctx context.Context, msg types.MsgExecuteContra
 	}
 	k.genesis = next
 	return types.ExecuteContractResponse{
-		ContractAddressUser: contract.AddressUser,
-		Owner:               contract.Owner,
-		Balance:             contract.Balance,
+		ContractAddressUser:	contract.AddressUser,
+		Owner:			contract.Owner,
+		Balance:		contract.Balance,
 		Events: []types.ContractEvent{{
-			Type:        types.EventTypeContractExecuted,
-			Actor:       msg.Sender,
-			Contract:    contract.AddressUser,
-			Amount:      msg.Funds,
-			InternalRaw: contract.AddressRaw,
+			Type:		types.EventTypeContractExecuted,
+			Actor:		msg.Sender,
+			Contract:	contract.AddressUser,
+			Amount:		msg.Funds,
+			InternalRaw:	contract.AddressRaw,
 		}},
 	}, nil
 }
@@ -1044,11 +1044,11 @@ func (k *Keeper) GrantNativeStakingCapability(msg types.MsgGrantNativeStakingCap
 		return types.ContractCapability{}, errors.New(types.ErrContractNotFound + ": contract not found")
 	}
 	capability := types.ContractCapability{
-		ContractAddressUser: msg.ContractAddressUser,
-		ContractAddressRaw:  msg.ContractAddressRaw,
-		Capability:          types.NativeStakingCapability,
-		PoolID:              msg.PoolID,
-		GrantedHeight:       msg.Height,
+		ContractAddressUser:	msg.ContractAddressUser,
+		ContractAddressRaw:	msg.ContractAddressRaw,
+		Capability:		types.NativeStakingCapability,
+		PoolID:			msg.PoolID,
+		GrantedHeight:		msg.Height,
 	}
 	if err := capability.Validate(); err != nil {
 		return types.ContractCapability{}, err
@@ -1084,11 +1084,11 @@ func (k *Keeper) InjectNativeStaking(msg types.MsgInjectNativeStaking) (types.Na
 		return types.NativeStakingInjectionRecord{}, errors.New(types.ErrUnauthorized + ": contract lacks native staking capability")
 	}
 	record := types.NativeStakingInjectionRecord{
-		ContractAddressUser: msg.CallerContractUser,
-		ContractAddressRaw:  msg.CallerContractRaw,
-		PoolID:              msg.PoolID,
-		Amount:              msg.Amount,
-		Height:              msg.Height,
+		ContractAddressUser:	msg.CallerContractUser,
+		ContractAddressRaw:	msg.CallerContractRaw,
+		PoolID:			msg.PoolID,
+		Amount:			msg.Amount,
+		Height:			msg.Height,
 	}
 	next := k.genesis
 	next.State.NativeStakingInjects = append(next.State.NativeStakingInjects, record)
@@ -1102,18 +1102,18 @@ func (k *Keeper) InjectNativeStaking(msg types.MsgInjectNativeStaking) (types.Na
 
 func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (types.InternalMessage, error) {
 	record := types.InternalMessage{
-		SourceContractUser: msg.SourceContractUser,
-		DestinationAccount: msg.DestinationAccount,
-		Funds:              msg.Funds,
-		Opcode:             msg.Opcode,
-		QueryID:            msg.QueryID,
-		Body:               append([]byte(nil), msg.Body...),
-		Bounce:             msg.Bounce,
-		Deadline:           msg.Deadline,
-		GasLimit:           msg.GasLimit,
-		LogicalTime:        msg.LogicalTime,
-		MessageID:          msg.MessageID,
-		Height:             msg.Height,
+		SourceContractUser:	msg.SourceContractUser,
+		DestinationAccount:	msg.DestinationAccount,
+		Funds:			msg.Funds,
+		Opcode:			msg.Opcode,
+		QueryID:		msg.QueryID,
+		Body:			append([]byte(nil), msg.Body...),
+		Bounce:			msg.Bounce,
+		Deadline:		msg.Deadline,
+		GasLimit:		msg.GasLimit,
+		LogicalTime:		msg.LogicalTime,
+		MessageID:		msg.MessageID,
+		Height:			msg.Height,
 	}
 	if record.LogicalTime == 0 {
 		record.LogicalTime = msg.Height
@@ -1152,14 +1152,14 @@ func (k *Keeper) ReceiveInternalMessage(msg types.MsgReceiveInternalMessage) (ty
 
 func newContractReceipt(contractAddress, actor, operation string, exitCode uint32, amount, gasUsed, logicalTime, height uint64) types.ContractReceipt {
 	receipt := types.ContractReceipt{
-		ContractAddress: contractAddress,
-		Actor:           actor,
-		Operation:       operation,
-		ExitCode:        exitCode,
-		Amount:          amount,
-		GasUsed:         gasUsed,
-		LogicalTime:     logicalTime,
-		Height:          height,
+		ContractAddress:	contractAddress,
+		Actor:			actor,
+		Operation:		operation,
+		ExitCode:		exitCode,
+		Amount:			amount,
+		GasUsed:		gasUsed,
+		LogicalTime:		logicalTime,
+		Height:			height,
 	}
 	receipt.ReceiptID = types.ComputeContractReceiptID(receipt)
 	return receipt

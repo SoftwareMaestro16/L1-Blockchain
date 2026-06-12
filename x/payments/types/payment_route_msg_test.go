@@ -11,14 +11,14 @@ func testMsgPaymentRoute() MsgPaymentRoute {
 	router := testAddress(0x72)
 	bob := testAddress(0x73)
 	return MsgPaymentRoute{
-		RouteID:        HashParts("msg-payment-route"),
-		Payer:          alice,
-		Payee:          bob,
-		Amount:         "100",
-		MaxFee:         "5",
-		ConditionRoot:  HashParts("msg-payment-route-condition"),
-		ExpiryHeight:   100,
-		SettlementMode: ConditionSettlementModePreimage,
+		RouteID:	HashParts("msg-payment-route"),
+		Payer:		alice,
+		Payee:		bob,
+		Amount:		"100",
+		MaxFee:		"5",
+		ConditionRoot:	HashParts("msg-payment-route-condition"),
+		ExpiryHeight:	100,
+		SettlementMode:	ConditionSettlementModePreimage,
 		Hops: []PaymentRouteHop{
 			{ChannelID: HashParts("msg-payment-route-channel-1"), From: alice, To: router, FeeAmount: "1", TimeoutHeight: 80},
 			{ChannelID: HashParts("msg-payment-route-channel-2"), From: router, To: bob, FeeAmount: "2", TimeoutHeight: 90},
@@ -28,15 +28,15 @@ func testMsgPaymentRoute() MsgPaymentRoute {
 
 func admissionForRoute(route MsgPaymentRoute) PaymentRouteAdmission {
 	return PaymentRouteAdmission{
-		CurrentHeight: 50,
+		CurrentHeight:	50,
 		Commitments: []PaymentRouteCommitment{{
-			RouteID:        route.RouteID,
-			Committer:      route.Payer,
-			CommitmentHash: ComputePaymentRouteCommitmentHash(route),
-			Signed:         true,
-			ExpiresHeight:  90,
+			RouteID:	route.RouteID,
+			Committer:	route.Payer,
+			CommitmentHash:	ComputePaymentRouteCommitmentHash(route),
+			Signed:		true,
+			ExpiresHeight:	90,
 		}},
-		Balances: []PaymentRouteBalance{{Participant: route.Payer, Available: "105"}},
+		Balances:	[]PaymentRouteBalance{{Participant: route.Payer, Available: "105"}},
 		SupportedSettlementModes: []ConditionSettlementMode{
 			ConditionSettlementModePreimage,
 			ConditionSettlementModeExpiry,
@@ -74,38 +74,38 @@ func TestMsgPaymentRouteAdmissionValidatesCommitmentBalanceAndPolicy(t *testing.
 func TestPaymentRouteScoringChangesDeterministicallyBetweenEpochs(t *testing.T) {
 	route := testMsgPaymentRoute()
 	epoch1, err := ApplyPaymentRoutingEpochUpdate(PaymentRouteTableState{}, PaymentRoutingEpochUpdate{
-		Epoch:         1,
-		CurrentHeight: 50,
-		Routes:        []MsgPaymentRoute{route},
+		Epoch:		1,
+		CurrentHeight:	50,
+		Routes:		[]MsgPaymentRoute{route},
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), epoch1.Epoch)
 	require.NotEmpty(t, epoch1.RootHash)
 
 	lowScore, err := DeterministicPaymentRouteScore(route, []PaymentRouteCongestionSnapshot{{
-		RouteID:        route.RouteID,
-		ChannelID:      route.Hops[0].ChannelID,
-		HopIndex:       0,
-		CongestionBps:  100,
-		ObservedHeight: 50,
+		RouteID:	route.RouteID,
+		ChannelID:	route.Hops[0].ChannelID,
+		HopIndex:	0,
+		CongestionBps:	100,
+		ObservedHeight:	50,
 	}})
 	require.NoError(t, err)
 	highScore, err := DeterministicPaymentRouteScore(route, []PaymentRouteCongestionSnapshot{{
-		RouteID:             route.RouteID,
-		ChannelID:           route.Hops[0].ChannelID,
-		HopIndex:            0,
-		CongestionBps:       2_500,
-		PendingMessageCount: 4,
-		RetryCount:          2,
-		ObservedHeight:      51,
+		RouteID:		route.RouteID,
+		ChannelID:		route.Hops[0].ChannelID,
+		HopIndex:		0,
+		CongestionBps:		2_500,
+		PendingMessageCount:	4,
+		RetryCount:		2,
+		ObservedHeight:		51,
 	}})
 	require.NoError(t, err)
 	require.Greater(t, highScore, lowScore)
 
 	epoch2, err := ApplyPaymentRoutingEpochUpdate(epoch1, PaymentRoutingEpochUpdate{
-		Epoch:         2,
-		CurrentHeight: 51,
-		Routes:        []MsgPaymentRoute{route},
+		Epoch:		2,
+		CurrentHeight:	51,
+		Routes:		[]MsgPaymentRoute{route},
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), epoch2.Epoch)

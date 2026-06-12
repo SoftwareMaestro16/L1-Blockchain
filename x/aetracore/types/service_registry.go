@@ -12,94 +12,94 @@ import (
 type ServiceRegistryMode string
 
 const (
-	ServiceRegistryOnChain     ServiceRegistryMode = "ON_CHAIN_REGISTRY"
-	ServiceRegistryHybrid      ServiceRegistryMode = "HYBRID_REGISTRY"
-	ServiceRegistryMesh        ServiceRegistryMode = "DISTRIBUTED_MESH_REGISTRY"
-	ServiceRegistryMeshModeKey                     = "mesh"
+	ServiceRegistryOnChain		ServiceRegistryMode	= "ON_CHAIN_REGISTRY"
+	ServiceRegistryHybrid		ServiceRegistryMode	= "HYBRID_REGISTRY"
+	ServiceRegistryMesh		ServiceRegistryMode	= "DISTRIBUTED_MESH_REGISTRY"
+	ServiceRegistryMeshModeKey				= "mesh"
 )
 
 type ServiceRegistry struct {
-	Mode           ServiceRegistryMode
-	Records        []ServiceRegistryRecord
-	InterfaceIndex []ServiceInterfaceVersionRecord
-	RegistryRoot   string
-	UpdatedHeight  uint64
+	Mode		ServiceRegistryMode
+	Records		[]ServiceRegistryRecord
+	InterfaceIndex	[]ServiceInterfaceVersionRecord
+	RegistryRoot	string
+	UpdatedHeight	uint64
 }
 
 type ServiceRegistryRecord struct {
-	ServiceID         string
-	Owner             string
-	ServiceType       ServiceType
-	InterfaceHash     string
-	Endpoint          string
-	ExecutionMode     ExecutionMode
-	PaymentModel      string
-	Stake             string
-	Collateral        string
-	Reputation        uint64
-	ExpiryHeight      uint64
-	ServiceName       string
-	IdentityName      string
-	ZoneID            ZoneID
-	ContractAddress   string
-	ModuleRoute       string
-	ProviderSet       string
-	VerificationModel ServiceVerificationModel
-	TrustModel        ServiceTrustModel
-	Status            ServiceStatus
-	Version           uint64
-	DescriptorHash    string
-	MetadataHash      string
-	CreatedHeight     uint64
-	UpdatedHeight     uint64
-	RecordHash        string
+	ServiceID		string
+	Owner			string
+	ServiceType		ServiceType
+	InterfaceHash		string
+	Endpoint		string
+	ExecutionMode		ExecutionMode
+	PaymentModel		string
+	Stake			string
+	Collateral		string
+	Reputation		uint64
+	ExpiryHeight		uint64
+	ServiceName		string
+	IdentityName		string
+	ZoneID			ZoneID
+	ContractAddress		string
+	ModuleRoute		string
+	ProviderSet		string
+	VerificationModel	ServiceVerificationModel
+	TrustModel		ServiceTrustModel
+	Status			ServiceStatus
+	Version			uint64
+	DescriptorHash		string
+	MetadataHash		string
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	RecordHash		string
 }
 
 type ServiceInterfaceVersionRecord struct {
-	InterfaceID   string
-	Version       uint64
-	InterfaceHash string
-	ServiceIDs    []string
-	MetadataHash  string
-	CreatedHeight uint64
-	RecordHash    string
+	InterfaceID	string
+	Version		uint64
+	InterfaceHash	string
+	ServiceIDs	[]string
+	MetadataHash	string
+	CreatedHeight	uint64
+	RecordHash	string
 }
 
 type ServiceRegistryProof struct {
-	ServiceID      string
-	RegistryMode   ServiceRegistryMode
-	RegistryRoot   string
-	RecordHash     string
-	DescriptorHash string
-	InterfaceHash  string
-	ProofHeight    uint64
-	ProofHash      string
+	ServiceID	string
+	RegistryMode	ServiceRegistryMode
+	RegistryRoot	string
+	RecordHash	string
+	DescriptorHash	string
+	InterfaceHash	string
+	ProofHeight	uint64
+	ProofHash	string
 }
 
 type ServicePaymentDiscovery struct {
-	ServiceID      string
-	PaymentModel   string
-	SettlementMode ServicePaymentSettlementMode
-	Denom          string
-	Amount         string
-	MaxAmount      string
-	PricingUnit    ServicePricingUnit
-	EscrowRequired bool
-	EscrowID       string
-	MeterID        string
-	DiscoveryHash  string
+	ServiceID	string
+	PaymentModel	string
+	SettlementMode	ServicePaymentSettlementMode
+	Denom		string
+	Amount		string
+	MaxAmount	string
+	PricingUnit	ServicePricingUnit
+	EscrowRequired	bool
+	EscrowID	string
+	MeterID		string
+	DiscoveryHash	string
 }
 
 type ServiceTrustDiscovery struct {
-	ServiceID         string
-	TrustModel        ServiceTrustModel
-	VerificationModel ServiceVerificationModel
-	ProofFormat       string
-	ChallengeWindow   uint64
-	CollateralDenom   string
-	CollateralAmount  string
-	FallbackServiceID string
-	DiscoveryHash     string
+	ServiceID		string
+	TrustModel		ServiceTrustModel
+	VerificationModel	ServiceVerificationModel
+	ProofFormat		string
+	ChallengeWindow		uint64
+	CollateralDenom		string
+	CollateralAmount	string
+	FallbackServiceID	string
+	DiscoveryHash		string
 }
 
 func NewServiceRegistry(mode ServiceRegistryMode, descriptors []ServiceDescriptor, height uint64) (ServiceRegistry, error) {
@@ -110,9 +110,9 @@ func NewServiceRegistry(mode ServiceRegistryMode, descriptors []ServiceDescripto
 		return ServiceRegistry{}, errors.New("aetracore service registry height must be positive")
 	}
 	registry := ServiceRegistry{
-		Mode:          mode,
-		Records:       make([]ServiceRegistryRecord, 0, len(descriptors)),
-		UpdatedHeight: height,
+		Mode:		mode,
+		Records:	make([]ServiceRegistryRecord, 0, len(descriptors)),
+		UpdatedHeight:	height,
 	}
 	for _, descriptor := range descriptors {
 		record, err := NewServiceRegistryRecord(descriptor)
@@ -227,31 +227,31 @@ func NewServiceRegistryRecord(descriptor ServiceDescriptor) (ServiceRegistryReco
 		return ServiceRegistryRecord{}, err
 	}
 	record := ServiceRegistryRecord{
-		ServiceID:         descriptor.ServiceID,
-		Owner:             descriptor.Owner,
-		ServiceType:       descriptor.ServiceType,
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		Endpoint:          registryEndpoint(descriptor),
-		ExecutionMode:     descriptor.Execution.Mode,
-		PaymentModel:      registryPaymentModel(descriptor),
-		Stake:             registryStake(descriptor),
-		Collateral:        registryCollateral(descriptor),
-		Reputation:        0,
-		ExpiryHeight:      descriptor.ExpiryHeight,
-		ServiceName:       descriptor.Discovery.ServiceName,
-		IdentityName:      descriptor.Discovery.IdentityName,
-		ZoneID:            descriptor.ZoneID,
-		ContractAddress:   descriptor.Execution.ContractAddress,
-		ModuleRoute:       descriptor.Execution.ModuleRoute,
-		ProviderSet:       registryProviderSet(descriptor),
-		VerificationModel: descriptor.Verification.Model,
-		TrustModel:        descriptor.Verification.TrustModel,
-		Status:            descriptor.Status,
-		Version:           descriptor.Version,
-		DescriptorHash:    ComputeServiceDescriptorHash(descriptor),
-		MetadataHash:      descriptor.Discovery.MetadataHash,
-		CreatedHeight:     descriptor.CreatedHeight,
-		UpdatedHeight:     descriptor.UpdatedHeight,
+		ServiceID:		descriptor.ServiceID,
+		Owner:			descriptor.Owner,
+		ServiceType:		descriptor.ServiceType,
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		Endpoint:		registryEndpoint(descriptor),
+		ExecutionMode:		descriptor.Execution.Mode,
+		PaymentModel:		registryPaymentModel(descriptor),
+		Stake:			registryStake(descriptor),
+		Collateral:		registryCollateral(descriptor),
+		Reputation:		0,
+		ExpiryHeight:		descriptor.ExpiryHeight,
+		ServiceName:		descriptor.Discovery.ServiceName,
+		IdentityName:		descriptor.Discovery.IdentityName,
+		ZoneID:			descriptor.ZoneID,
+		ContractAddress:	descriptor.Execution.ContractAddress,
+		ModuleRoute:		descriptor.Execution.ModuleRoute,
+		ProviderSet:		registryProviderSet(descriptor),
+		VerificationModel:	descriptor.Verification.Model,
+		TrustModel:		descriptor.Verification.TrustModel,
+		Status:			descriptor.Status,
+		Version:		descriptor.Version,
+		DescriptorHash:		ComputeServiceDescriptorHash(descriptor),
+		MetadataHash:		descriptor.Discovery.MetadataHash,
+		CreatedHeight:		descriptor.CreatedHeight,
+		UpdatedHeight:		descriptor.UpdatedHeight,
 	}
 	record.RecordHash = ComputeServiceRegistryRecordHash(record)
 	return record, record.Validate()
@@ -421,13 +421,13 @@ func (registry ServiceRegistry) Lookup(serviceID string) (ServiceRegistryRecord,
 		return ServiceRegistryRecord{}, ServiceRegistryProof{}, false
 	}
 	proof := ServiceRegistryProof{
-		ServiceID:      record.ServiceID,
-		RegistryMode:   registry.Mode,
-		RegistryRoot:   registry.RegistryRoot,
-		RecordHash:     record.RecordHash,
-		DescriptorHash: record.DescriptorHash,
-		InterfaceHash:  record.InterfaceHash,
-		ProofHeight:    registry.UpdatedHeight,
+		ServiceID:	record.ServiceID,
+		RegistryMode:	registry.Mode,
+		RegistryRoot:	registry.RegistryRoot,
+		RecordHash:	record.RecordHash,
+		DescriptorHash:	record.DescriptorHash,
+		InterfaceHash:	record.InterfaceHash,
+		ProofHeight:	registry.UpdatedHeight,
 	}
 	proof.ProofHash = ComputeServiceRegistryProofHash(proof)
 	return record, proof, true
@@ -486,8 +486,8 @@ func (registry ServiceRegistry) PaymentDiscovery(serviceID string) (ServicePayme
 		return ServicePaymentDiscovery{}, false
 	}
 	discovery := ServicePaymentDiscovery{
-		ServiceID:    record.ServiceID,
-		PaymentModel: record.PaymentModel,
+		ServiceID:	record.ServiceID,
+		PaymentModel:	record.PaymentModel,
 	}
 	parts := strings.Split(record.PaymentModel, ":")
 	if len(parts) >= 4 {
@@ -518,10 +518,10 @@ func (registry ServiceRegistry) TrustDiscovery(serviceID string) (ServiceTrustDi
 		return ServiceTrustDiscovery{}, false
 	}
 	discovery := ServiceTrustDiscovery{
-		ServiceID:         record.ServiceID,
-		TrustModel:        record.TrustModel,
-		VerificationModel: record.VerificationModel,
-		CollateralAmount:  record.Collateral,
+		ServiceID:		record.ServiceID,
+		TrustModel:		record.TrustModel,
+		VerificationModel:	record.VerificationModel,
+		CollateralAmount:	record.Collateral,
 	}
 	discovery.DiscoveryHash = ComputeServiceTrustDiscoveryHash(discovery)
 	return discovery, true
@@ -538,12 +538,12 @@ func BuildServiceInterfaceVersionIndex(records []ServiceRegistryRecord) ([]Servi
 		entry, found := byKey[key]
 		if !found {
 			entry = &ServiceInterfaceVersionRecord{
-				InterfaceID:   record.InterfaceHash,
-				Version:       record.Version,
-				InterfaceHash: record.InterfaceHash,
-				ServiceIDs:    []string{},
-				MetadataHash:  record.MetadataHash,
-				CreatedHeight: record.CreatedHeight,
+				InterfaceID:	record.InterfaceHash,
+				Version:	record.Version,
+				InterfaceHash:	record.InterfaceHash,
+				ServiceIDs:	[]string{},
+				MetadataHash:	record.MetadataHash,
+				CreatedHeight:	record.CreatedHeight,
 			}
 			byKey[key] = entry
 		}

@@ -11,13 +11,13 @@ import (
 func TestAVMContractBackendInterfacesAndAdapters(t *testing.T) {
 	nativeDescriptor := testAVMNativeModuleDescriptor(t)
 	nativeInterface, err := NewAVMContractBackendInterface(AVMContractBackendInterface{
-		Name:               "native-bank",
-		BackendKind:        AVMContractBackendNativeModule,
-		RouterBackend:      RouterBackendNativeModule,
-		SupportsSync:       true,
-		EmitsReceipt:       true,
-		SupportsProofQuery: true,
-		InterfaceHash:      nativeDescriptor.ServiceInterfaceHash,
+		Name:			"native-bank",
+		BackendKind:		AVMContractBackendNativeModule,
+		RouterBackend:		RouterBackendNativeModule,
+		SupportsSync:		true,
+		EmitsReceipt:		true,
+		SupportsProofQuery:	true,
+		InterfaceHash:		nativeDescriptor.ServiceInterfaceHash,
 	})
 	require.NoError(t, err)
 	nativeAdapter, err := NewAVMNativeModuleAdapter(AVMNativeModuleAdapter{Interface: nativeInterface, Descriptor: nativeDescriptor})
@@ -25,18 +25,18 @@ func TestAVMContractBackendInterfacesAndAdapters(t *testing.T) {
 	require.NoError(t, nativeAdapter.Validate())
 
 	wasmInterface, err := NewAVMContractBackendInterface(AVMContractBackendInterface{
-		Name:               "wasm-adapter",
-		BackendKind:        AVMContractBackendWASMContract,
-		RouterBackend:      RouterBackendWASMAdapter,
-		SupportsAsync:      true,
-		EmitsReceipt:       true,
-		SupportsProofQuery: true,
-		InterfaceHash:      engineHash("wasm-interface"),
+		Name:			"wasm-adapter",
+		BackendKind:		AVMContractBackendWASMContract,
+		RouterBackend:		RouterBackendWASMAdapter,
+		SupportsAsync:		true,
+		EmitsReceipt:		true,
+		SupportsProofQuery:	true,
+		InterfaceHash:		engineHash("wasm-interface"),
 	})
 	require.NoError(t, err)
 	wasmBoundary, err := NewAVMWASMAdapterBoundary(AVMWASMAdapterBoundary{
-		Interface:     wasmInterface,
-		SandboxPolicy: testAVMWASMSandboxPolicy(t),
+		Interface:	wasmInterface,
+		SandboxPolicy:	testAVMWASMSandboxPolicy(t),
 	})
 	require.NoError(t, err)
 	require.NoError(t, wasmBoundary.Validate())
@@ -55,22 +55,22 @@ func TestAVMNativeActorContractExecutesOneMailboxMessageEmitsReceiptAndContinuat
 	continuation := testAVMActorContinuation(actor.ActorID, msg.CreatedHeight)
 
 	execution, err := NewAVMActorContractExecution(AVMActorContractExecution{
-		Actor:              actor,
-		Message:            msg,
-		ActiveMessageCount: 1,
+		Actor:			actor,
+		Message:		msg,
+		ActiveMessageCount:	1,
 		StateReads: []AVMActorStateRead{{
-			ActorID: actor.ActorID,
-			Key:     ActorStateKeyPrefix(actor.ActorID) + "balance",
-			Hash:    engineHash("actor-read"),
+			ActorID:	actor.ActorID,
+			Key:		ActorStateKeyPrefix(actor.ActorID) + "balance",
+			Hash:		engineHash("actor-read"),
 		}},
 		StateWrites: []ActorStateWrite{{
-			ActorID: actor.ActorID,
-			Key:     ActorStateKeyPrefix(actor.ActorID) + "balance",
-			Hash:    engineHash("actor-write"),
+			ActorID:	actor.ActorID,
+			Key:		ActorStateKeyPrefix(actor.ActorID) + "balance",
+			Hash:		engineHash("actor-write"),
 		}},
-		EmittedMessages:     []AVMAsyncMessage{emitted},
-		StoredContinuations: []ContinuationRecord{continuation},
-		Receipt:             receipt,
+		EmittedMessages:	[]AVMAsyncMessage{emitted},
+		StoredContinuations:	[]ContinuationRecord{continuation},
+		Receipt:		receipt,
 	})
 	require.NoError(t, err)
 	require.NoError(t, execution.Validate())
@@ -82,15 +82,15 @@ func TestAVMActorContractRejectsConcurrentMessagesForeignReadsAndMissingReceipt(
 	msg := testAVMActorContractMessage(t, actor.ActorID)
 	receipt := testAVMActorContractReceipt(t, msg, AVMReceiptStatusExecuted)
 	valid := AVMActorContractExecution{
-		Actor:              actor,
-		Message:            msg,
-		ActiveMessageCount: 1,
+		Actor:			actor,
+		Message:		msg,
+		ActiveMessageCount:	1,
 		StateReads: []AVMActorStateRead{{
-			ActorID: actor.ActorID,
-			Key:     ActorStateKeyPrefix(actor.ActorID) + "balance",
-			Hash:    engineHash("actor-read"),
+			ActorID:	actor.ActorID,
+			Key:		ActorStateKeyPrefix(actor.ActorID) + "balance",
+			Hash:		engineHash("actor-read"),
 		}},
-		Receipt: receipt,
+		Receipt:	receipt,
 	}
 
 	concurrent := valid
@@ -100,9 +100,9 @@ func TestAVMActorContractRejectsConcurrentMessagesForeignReadsAndMissingReceipt(
 
 	foreignRead := valid
 	foreignRead.StateReads = []AVMActorStateRead{{
-		ActorID: "other-actor",
-		Key:     ActorStateKeyPrefix("other-actor") + "balance",
-		Hash:    engineHash("foreign-read"),
+		ActorID:	"other-actor",
+		Key:		ActorStateKeyPrefix("other-actor") + "balance",
+		Hash:		engineHash("foreign-read"),
 	}}
 	foreignRead.ExecutionHash = ComputeAVMActorContractExecutionHash(foreignRead)
 	require.ErrorContains(t, foreignRead.Validate(), "another actor")
@@ -118,37 +118,37 @@ func TestAVMContractRegistriesStoragePrefixesReceiptEmissionAndProofQuery(t *tes
 	msg := testAVMActorContractMessage(t, actor.ActorID)
 	receipt := testAVMActorContractReceipt(t, msg, AVMReceiptStatusExecuted)
 	codeRegistry, err := NewAVMContractCodeRegistry(AVMContractCodeRegistry{Codes: []AVMContractCodeRegistryRecord{{
-		CodeID:        actor.CodeID,
-		BackendKind:   AVMContractBackendActorContract,
-		CodeHash:      engineHash("actor-code"),
-		InterfaceHash: actor.InterfaceHash,
-		Owner:         actor.Owner,
-		Enabled:       true,
+		CodeID:		actor.CodeID,
+		BackendKind:	AVMContractBackendActorContract,
+		CodeHash:	engineHash("actor-code"),
+		InterfaceHash:	actor.InterfaceHash,
+		Owner:		actor.Owner,
+		Enabled:	true,
 	}}})
 	require.NoError(t, err)
 	instanceRegistry, err := NewAVMContractInstanceRegistry(AVMContractInstanceRegistry{Instances: []AVMContractInstanceRegistryRecord{{
-		ContractAddress: "contract-actor-1",
-		CodeID:          actor.CodeID,
-		BackendKind:     AVMContractBackendActorContract,
-		ActorID:         actor.ActorID,
-		Owner:           actor.Owner,
-		StoragePrefix:   AVMStatePrefixContractStorage + "/contract-actor-1/",
-		StateRoot:       actor.StateRoot,
-		InterfaceHash:   actor.InterfaceHash,
-		Status:          AVMActorContractActive,
+		ContractAddress:	"contract-actor-1",
+		CodeID:			actor.CodeID,
+		BackendKind:		AVMContractBackendActorContract,
+		ActorID:		actor.ActorID,
+		Owner:			actor.Owner,
+		StoragePrefix:		AVMStatePrefixContractStorage + "/contract-actor-1/",
+		StateRoot:		actor.StateRoot,
+		InterfaceHash:		actor.InterfaceHash,
+		Status:			AVMActorContractActive,
 	}}})
 	require.NoError(t, err)
 	storagePrefix, err := NewAVMContractStoragePrefixDescriptor(AVMContractStoragePrefixDescriptor{
-		ContractAddress: "contract-actor-1",
-		StorageRoot:     engineHash("contract-storage"),
+		ContractAddress:	"contract-actor-1",
+		StorageRoot:		engineHash("contract-storage"),
 	})
 	require.NoError(t, err)
 
 	index := AVMContractProofIndex{
-		CodeRegistry:     codeRegistry,
-		InstanceRegistry: instanceRegistry,
-		StoragePrefixes:  []AVMContractStoragePrefixDescriptor{storagePrefix},
-		Receipts:         []AVMExecutionReceipt{receipt},
+		CodeRegistry:		codeRegistry,
+		InstanceRegistry:	instanceRegistry,
+		StoragePrefixes:	[]AVMContractStoragePrefixDescriptor{storagePrefix},
+		Receipts:		[]AVMExecutionReceipt{receipt},
 	}
 	codeProof, err := QueryAVMContractProof(index, AVMContractProofCode, AVMContractCodeKey(actor.CodeID))
 	require.NoError(t, err)
@@ -167,14 +167,14 @@ func TestAVMContractRegistriesStoragePrefixesReceiptEmissionAndProofQuery(t *tes
 func testAVMActorContractState(t *testing.T) AVMActorContractState {
 	t.Helper()
 	state, err := NewAVMActorContractState(AVMActorContractState{
-		ActorID:          "actor-contract-1",
-		CodeID:           7,
-		Owner:            "owner-1",
-		MailboxRoot:      engineHash("actor-mailbox"),
-		StateRoot:        engineHash("actor-state"),
-		ContinuationRoot: engineHash("actor-continuation"),
-		InterfaceHash:    engineHash("actor-interface"),
-		Status:           AVMActorContractActive,
+		ActorID:		"actor-contract-1",
+		CodeID:			7,
+		Owner:			"owner-1",
+		MailboxRoot:		engineHash("actor-mailbox"),
+		StateRoot:		engineHash("actor-state"),
+		ContinuationRoot:	engineHash("actor-continuation"),
+		InterfaceHash:		engineHash("actor-interface"),
+		Status:			AVMActorContractActive,
 	})
 	require.NoError(t, err)
 	return state
@@ -203,31 +203,31 @@ func testAVMActorEmittedMessage(t *testing.T, actorID string) AVMAsyncMessage {
 
 func testAVMActorContinuation(actorID string, height uint64) ContinuationRecord {
 	return ContinuationRecord{
-		ContinuationID:    "continuation-actor-1",
-		ActorID:           actorID,
-		StepIndex:         1,
-		PartialStateHash:  engineHash("continuation-partial"),
-		PartialStateBytes: 32,
-		ResumeHeight:      height + 1,
-		ExpiryHeight:      height + 5,
-		GasReserved:       100,
-		Status:            ContinuationStatusScheduled,
-		ResumeBy:          ContinuationResumeByScheduler,
+		ContinuationID:		"continuation-actor-1",
+		ActorID:		actorID,
+		StepIndex:		1,
+		PartialStateHash:	engineHash("continuation-partial"),
+		PartialStateBytes:	32,
+		ResumeHeight:		height + 1,
+		ExpiryHeight:		height + 5,
+		GasReserved:		100,
+		Status:			ContinuationStatusScheduled,
+		ResumeBy:		ContinuationResumeByScheduler,
 	}
 }
 
 func testAVMActorContractReceipt(t *testing.T, msg AVMAsyncMessage, status AVMReceiptStatus) AVMExecutionReceipt {
 	t.Helper()
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          msg.ID,
-		ZoneID:             msg.DestinationZone,
-		Executor:           "actor-contract-runtime",
-		Status:             status,
-		GasUsed:            30,
-		StorageWritten:     1,
-		EventsHash:         engineHash("actor-events"),
-		OutputMessagesRoot: engineHash("actor-output"),
-		CreatedHeight:      msg.CreatedHeight + 1,
+		MessageID:		msg.ID,
+		ZoneID:			msg.DestinationZone,
+		Executor:		"actor-contract-runtime",
+		Status:			status,
+		GasUsed:		30,
+		StorageWritten:		1,
+		EventsHash:		engineHash("actor-events"),
+		OutputMessagesRoot:	engineHash("actor-output"),
+		CreatedHeight:		msg.CreatedHeight + 1,
 	})
 	require.NoError(t, err)
 	return receipt

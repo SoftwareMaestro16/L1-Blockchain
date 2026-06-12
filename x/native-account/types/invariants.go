@@ -7,99 +7,99 @@ import (
 )
 
 const (
-	InvariantNoPrivateKeyOnChain                         = "no_private_key_on_chain"
-	InvariantNoSeedPhraseOnChain                         = "no_seed_phrase_on_chain"
-	InvariantAEAddressRoundtripStable                    = "ae_address_roundtrip_stable"
-	InvariantRawAddressRoundtripStable                   = "raw_4_address_roundtrip_stable"
-	InvariantAccountActivationIdempotency                = "account_activation_idempotency_enforced"
-	InvariantAccountCannotActivateTwice                  = "account_cannot_activate_twice"
-	InvariantPoolStakeDoesNotCreateCoins                 = "pool_stake_does_not_create_coins"
-	InvariantRewardsCannotExceedAllocation               = "rewards_cannot_exceed_emissions_or_fees"
-	InvariantMaxValidatorCountEnforced                   = "max_validator_count_enforced"
-	InvariantMinValidatorStakeEnforced                   = "min_validator_stake_enforced"
-	InvariantValidatorSelfStakeRatioEnforced             = "validator_self_stake_ratio_enforced"
-	InvariantMinPoolDepositEnforced                      = "min_pool_deposit_enforced"
-	InvariantDirectUserValidatorDelegationRejected       = "direct_user_validator_delegation_rejected"
-	InvariantUnbondingCannotReleaseEarly                 = "unbonding_cannot_release_early"
-	InvariantReputationRequiresStakeTime                 = "reputation_cannot_increase_without_stake_time"
-	InvariantJailedValidatorNoPositiveBonus              = "jailed_validator_no_positive_bonus"
-	InvariantExportImportPreservesState                  = "export_import_preserves_state"
-	InvariantModuleBankAccountingConsistent              = "module_bank_accounting_consistent"
-	InvariantProtocolCriticalStateNotFrozenByRent        = "protocol_critical_state_not_frozen_by_rent"
-	InvariantSystemStorageReserveRunway                  = "system_storage_reserve_runway"
-	InvariantSystemRentTopUpBeforeUserFreeze             = "system_rent_topup_before_user_freeze"
-	InvariantProtocolCriticalExecutableUnderUnderfunding = "protocol_critical_executable_under_system_rent_underfunding"
+	InvariantNoPrivateKeyOnChain				= "no_private_key_on_chain"
+	InvariantNoSeedPhraseOnChain				= "no_seed_phrase_on_chain"
+	InvariantAEAddressRoundtripStable			= "ae_address_roundtrip_stable"
+	InvariantRawAddressRoundtripStable			= "raw_4_address_roundtrip_stable"
+	InvariantAccountActivationIdempotency			= "account_activation_idempotency_enforced"
+	InvariantAccountCannotActivateTwice			= "account_cannot_activate_twice"
+	InvariantPoolStakeDoesNotCreateCoins			= "pool_stake_does_not_create_coins"
+	InvariantRewardsCannotExceedAllocation			= "rewards_cannot_exceed_emissions_or_fees"
+	InvariantMaxValidatorCountEnforced			= "max_validator_count_enforced"
+	InvariantMinValidatorStakeEnforced			= "min_validator_stake_enforced"
+	InvariantValidatorSelfStakeRatioEnforced		= "validator_self_stake_ratio_enforced"
+	InvariantMinPoolDepositEnforced				= "min_pool_deposit_enforced"
+	InvariantDirectUserValidatorDelegationRejected		= "direct_user_validator_delegation_rejected"
+	InvariantUnbondingCannotReleaseEarly			= "unbonding_cannot_release_early"
+	InvariantReputationRequiresStakeTime			= "reputation_cannot_increase_without_stake_time"
+	InvariantJailedValidatorNoPositiveBonus			= "jailed_validator_no_positive_bonus"
+	InvariantExportImportPreservesState			= "export_import_preserves_state"
+	InvariantModuleBankAccountingConsistent			= "module_bank_accounting_consistent"
+	InvariantProtocolCriticalStateNotFrozenByRent		= "protocol_critical_state_not_frozen_by_rent"
+	InvariantSystemStorageReserveRunway			= "system_storage_reserve_runway"
+	InvariantSystemRentTopUpBeforeUserFreeze		= "system_rent_topup_before_user_freeze"
+	InvariantProtocolCriticalExecutableUnderUnderfunding	= "protocol_critical_executable_under_system_rent_underfunding"
 )
 
 type NativeAccountInvariant struct {
-	ID          string
-	Description string
+	ID		string
+	Description	string
 }
 
 type NativeAccountInvariantInput struct {
-	ExportedPayloads []string
-	Accounts         []Account
+	ExportedPayloads	[]string
+	Accounts		[]Account
 
-	AEAddressRoundtripStable  bool
-	RawAddressRoundtripStable bool
-	ActivationAttempts        map[string]uint64
+	AEAddressRoundtripStable	bool
+	RawAddressRoundtripStable	bool
+	ActivationAttempts		map[string]uint64
 
-	PoolActiveStake    uint64
-	PoolUnbonding      uint64
-	ValidatorSelfStake uint64
-	LiquidBalances     uint64
-	TotalSupply        uint64
+	PoolActiveStake		uint64
+	PoolUnbonding		uint64
+	ValidatorSelfStake	uint64
+	LiquidBalances		uint64
+	TotalSupply		uint64
 
-	RewardsAccrued uint64
-	RewardBudget   uint64
+	RewardsAccrued	uint64
+	RewardBudget	uint64
 
-	ActiveValidatorCount uint64
-	MaxValidatorCount    uint64
-	ValidatorStakes      []uint64
-	MinValidatorStake    uint64
-	ValidatorTotalStake  uint64
-	MinSelfStakeBps      uint64
+	ActiveValidatorCount	uint64
+	MaxValidatorCount	uint64
+	ValidatorStakes		[]uint64
+	MinValidatorStake	uint64
+	ValidatorTotalStake	uint64
+	MinSelfStakeBps		uint64
 
-	PoolDeposits             []uint64
-	MinPoolDeposit           uint64
-	DirectUserDelegationSeen bool
+	PoolDeposits			[]uint64
+	MinPoolDeposit			uint64
+	DirectUserDelegationSeen	bool
 
-	UnbondingEntries []InvariantUnbondingEntry
+	UnbondingEntries	[]InvariantUnbondingEntry
 
-	StakeTimeDelta    uint64
-	ReputationDelta   uint64
-	JailedBonusAmount uint64
+	StakeTimeDelta		uint64
+	ReputationDelta		uint64
+	JailedBonusAmount	uint64
 
-	ExportImportStable bool
+	ExportImportStable	bool
 
-	BankAccountingScenarios []InvariantAccountingScenario
+	BankAccountingScenarios	[]InvariantAccountingScenario
 
-	ProtocolCriticalFrozenByRent bool
-	SystemReserveRunwayBlocks    uint64
-	MinSystemReserveRunwayBlocks uint64
-	SystemReserveAlertRaised     bool
-	SystemTopUpOrder             []string
-	ProtocolCriticalExecutable   bool
-	SystemRentUnderfunded        bool
+	ProtocolCriticalFrozenByRent	bool
+	SystemReserveRunwayBlocks	uint64
+	MinSystemReserveRunwayBlocks	uint64
+	SystemReserveAlertRaised	bool
+	SystemTopUpOrder		[]string
+	ProtocolCriticalExecutable	bool
+	SystemRentUnderfunded		bool
 }
 
 type InvariantUnbondingEntry struct {
-	ReleaseHeight uint64
-	CurrentHeight uint64
-	Released      bool
+	ReleaseHeight	uint64
+	CurrentHeight	uint64
+	Released	bool
 }
 
 type InvariantAccountingScenario struct {
-	Name                 string
-	BankBalance          uint64
-	ModuleAccounting     uint64
-	ExpectedSupplyChange int64
-	ActualSupplyChange   int64
+	Name			string
+	BankBalance		uint64
+	ModuleAccounting	uint64
+	ExpectedSupplyChange	int64
+	ActualSupplyChange	int64
 }
 
 type NativeAccountInvariantFailure struct {
-	ID    string
-	Error string
+	ID	string
+	Error	string
 }
 
 func RequiredNativeAccountInvariantIDs() []string {

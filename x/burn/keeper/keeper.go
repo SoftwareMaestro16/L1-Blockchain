@@ -16,17 +16,17 @@ import (
 )
 
 type Keeper struct {
-	cdc          codec.BinaryCodec
-	storeService corestore.KVStoreService
-	bankKeeper   types.BankKeeper
-	authority    string
+	cdc		codec.BinaryCodec
+	storeService	corestore.KVStoreService
+	bankKeeper	types.BankKeeper
+	authority	string
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, bankKeeper types.BankKeeper, authority string) Keeper {
 	return Keeper{cdc: cdc, storeService: storeService, bankKeeper: bankKeeper, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)
@@ -137,14 +137,14 @@ func (k Keeper) recordBurn(ctx context.Context, amount sdk.Coins, epoch uint64, 
 		return types.BurnReason{}, err
 	}
 	record := types.BurnReason{
-		Id:           id,
-		Epoch:        epoch,
-		Burner:       burner,
-		SourceModule: sourceModule,
-		Amount:       amount,
-		Reason:       reason,
-		Height:       sdk.UnwrapSDKContext(ctx).BlockHeight(),
-		Protocol:     protocol,
+		Id:		id,
+		Epoch:		epoch,
+		Burner:		burner,
+		SourceModule:	sourceModule,
+		Amount:		amount,
+		Reason:		reason,
+		Height:		sdk.UnwrapSDKContext(ctx).BlockHeight(),
+		Protocol:	protocol,
 	}
 	if err := record.Validate(params); err != nil {
 		return types.BurnReason{}, types.ErrInvalidBurn.Wrap(err.Error())

@@ -84,12 +84,12 @@ func TestXServiceInterfaceDeprecateFlow(t *testing.T) {
 	descriptor := testInterfaceSystemDescriptor()
 	state := testServiceInterfaceRegistryState(t, descriptor)
 	marker, err := NewServiceInterfaceDeprecationMarker(ServiceInterfaceDeprecationMarker{
-		InterfaceHash:            descriptor.Interface.InterfaceHash,
-		Version:                  descriptor.Interface.Version,
-		DeprecatedHeight:         50,
-		RetirementHeight:         100,
-		ReplacementInterfaceHash: testInterfaceHash("x-serviceinterface/replacement"),
-		Reason:                   "replace_with_v2",
+		InterfaceHash:			descriptor.Interface.InterfaceHash,
+		Version:			descriptor.Interface.Version,
+		DeprecatedHeight:		50,
+		RetirementHeight:		100,
+		ReplacementInterfaceHash:	testInterfaceHash("x-serviceinterface/replacement"),
+		Reason:				"replace_with_v2",
 	})
 	require.NoError(t, err)
 	msg, err := NewMsgDeprecateInterface(coretypes.DefaultAuthority, marker)
@@ -120,16 +120,16 @@ func TestXServiceInterfaceQueriesMethodProofAndOwner(t *testing.T) {
 	require.NoError(t, err)
 
 	method, err := QueryMethodFromInterface(definition, QueryMethod{
-		InterfaceHash: descriptor.Interface.InterfaceHash,
-		MethodID:      "submit",
+		InterfaceHash:	descriptor.Interface.InterfaceHash,
+		MethodID:	"submit",
 	})
 	require.NoError(t, err)
 	require.True(t, method.Found)
 	require.Equal(t, "submit", method.Method.MethodID)
 
 	missing, err := QueryMethodFromInterface(definition, QueryMethod{
-		InterfaceHash: descriptor.Interface.InterfaceHash,
-		MethodID:      "missing",
+		InterfaceHash:	descriptor.Interface.InterfaceHash,
+		MethodID:	"missing",
 	})
 	require.NoError(t, err)
 	require.False(t, missing.Found)

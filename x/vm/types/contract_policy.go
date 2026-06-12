@@ -12,44 +12,44 @@ import (
 )
 
 const (
-	DefaultDeployGas            uint64 = 500_000
-	DefaultExecuteGas           uint64 = 250_000
-	DefaultQueryGas             uint64 = 50_000
-	DefaultStorageWriteGas      uint64 = 1_000
-	DefaultMessageForwardingGas uint64 = 10_000
+	DefaultDeployGas		uint64	= 500_000
+	DefaultExecuteGas		uint64	= 250_000
+	DefaultQueryGas			uint64	= 50_000
+	DefaultStorageWriteGas		uint64	= 1_000
+	DefaultMessageForwardingGas	uint64	= 10_000
 
-	DefaultMaxStateSizeBytes      uint64 = 256 * 1024
-	DefaultMaxStorageKeyBytes     uint32 = 128
-	DefaultMaxStorageValueBytes   uint64 = 8 * 1024
-	DefaultMaxEmittedMessages     uint32 = 16
-	DefaultMaxContractMessages    uint32 = 1_000
-	DefaultContractGovernanceSeed byte   = 1
+	DefaultMaxStateSizeBytes	uint64	= 256 * 1024
+	DefaultMaxStorageKeyBytes	uint32	= 128
+	DefaultMaxStorageValueBytes	uint64	= 8 * 1024
+	DefaultMaxEmittedMessages	uint32	= 16
+	DefaultMaxContractMessages	uint32	= 1_000
+	DefaultContractGovernanceSeed	byte	= 1
 )
 
 func DefaultContractZonePolicy() ContractZonePolicy {
 	runtime := DefaultRuntimePolicy()
 	return ContractZonePolicy{
-		Runtime:             runtime,
-		GovernanceAuthority: filledAddress(DefaultContractGovernanceSeed),
-		UploadMode:          UploadModeGovernanceOnly,
-		InstantiateMode:     InstantiateModeCodeOwnerOnly,
-		MigrationsEnabled:   true,
+		Runtime:		runtime,
+		GovernanceAuthority:	filledAddress(DefaultContractGovernanceSeed),
+		UploadMode:		UploadModeGovernanceOnly,
+		InstantiateMode:	InstantiateModeCodeOwnerOnly,
+		MigrationsEnabled:	true,
 		GasModel: GasModel{
-			DeployGas:            DefaultDeployGas,
-			ExecuteGas:           DefaultExecuteGas,
-			QueryGas:             DefaultQueryGas,
-			StorageWriteGas:      DefaultStorageWriteGas,
-			MessageForwardingGas: DefaultMessageForwardingGas,
+			DeployGas:		DefaultDeployGas,
+			ExecuteGas:		DefaultExecuteGas,
+			QueryGas:		DefaultQueryGas,
+			StorageWriteGas:	DefaultStorageWriteGas,
+			MessageForwardingGas:	DefaultMessageForwardingGas,
 		},
 		Limits: ContractLimits{
-			MaxCodeSizeBytes:      uint64(runtime.AVMParams.MaxCodeBytes),
-			MaxStateSizeBytes:     DefaultMaxStateSizeBytes,
-			MaxStorageKeyBytes:    DefaultMaxStorageKeyBytes,
-			MaxStorageValueBytes:  DefaultMaxStorageValueBytes,
-			MaxQueryResponseBytes: runtime.CosmWasmPolicy.MaxQueryResponseBytes,
-			MaxQueryDepth:         runtime.CosmWasmPolicy.MaxQueryDepth,
-			MaxEmittedMessages:    DefaultMaxEmittedMessages,
-			MaxMessagesPerBlock:   DefaultMaxContractMessages,
+			MaxCodeSizeBytes:	uint64(runtime.AVMParams.MaxCodeBytes),
+			MaxStateSizeBytes:	DefaultMaxStateSizeBytes,
+			MaxStorageKeyBytes:	DefaultMaxStorageKeyBytes,
+			MaxStorageValueBytes:	DefaultMaxStorageValueBytes,
+			MaxQueryResponseBytes:	runtime.CosmWasmPolicy.MaxQueryResponseBytes,
+			MaxQueryDepth:		runtime.CosmWasmPolicy.MaxQueryDepth,
+			MaxEmittedMessages:	DefaultMaxEmittedMessages,
+			MaxMessagesPerBlock:	DefaultMaxContractMessages,
 		},
 	}
 }

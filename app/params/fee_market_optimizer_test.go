@@ -11,13 +11,13 @@ func TestFeeMarketBaseFeeUpdateIsBounded(t *testing.T) {
 	params := DefaultFeeMarketOptimizerParams()
 	params.MaxBaseFeeAdjustmentBps = 1_250
 	out, err := OptimizeFeeMarket(baseFeeMarketInput(params, FeeMarketOptimizerInput{
-		CurrentBaseFeeNaet:     sdkmath.NewInt(1_000),
-		BlockGasUsed:           9_500,
-		BlockGasLimit:          10_000,
-		TxGasUsed:              100,
-		MempoolPressureBps:     3_000,
-		FailedExecutionRateBps: 1_000,
-		OfferedFeeNaet:         sdkmath.NewInt(1_000_000),
+		CurrentBaseFeeNaet:	sdkmath.NewInt(1_000),
+		BlockGasUsed:		9_500,
+		BlockGasLimit:		10_000,
+		TxGasUsed:		100,
+		MempoolPressureBps:	3_000,
+		FailedExecutionRateBps:	1_000,
+		OfferedFeeNaet:		sdkmath.NewInt(1_000_000),
 	}))
 	require.NoError(t, err)
 	require.Greater(t, out.BaseFeeNaet.Int64(), int64(1_000))
@@ -30,15 +30,15 @@ func TestFeeMarketBaseFeeUpdateIsBounded(t *testing.T) {
 func TestFeeMarketResourceMultipliersAndSenderSurcharge(t *testing.T) {
 	params := DefaultFeeMarketOptimizerParams()
 	out, err := OptimizeFeeMarket(baseFeeMarketInput(params, FeeMarketOptimizerInput{
-		CurrentBaseFeeNaet:  sdkmath.NewInt(100),
-		BlockGasUsed:        7_000,
-		BlockGasLimit:       10_000,
-		TxGasUsed:           100,
-		StateWriteBytes:     2_000,
-		DeploymentBytes:     20_000,
-		ForwardingMessages:  200,
-		SenderFailedTxCount: 4,
-		OfferedFeeNaet:      sdkmath.NewInt(10_000_000),
+		CurrentBaseFeeNaet:	sdkmath.NewInt(100),
+		BlockGasUsed:		7_000,
+		BlockGasLimit:		10_000,
+		TxGasUsed:		100,
+		StateWriteBytes:	2_000,
+		DeploymentBytes:	20_000,
+		ForwardingMessages:	200,
+		SenderFailedTxCount:	4,
+		OfferedFeeNaet:		sdkmath.NewInt(10_000_000),
 	}))
 	require.NoError(t, err)
 	require.Equal(t, int64(20_000), out.ResourceMultipliers.StorageBps)
@@ -52,15 +52,15 @@ func TestFeeMarketResourceMultipliersAndSenderSurcharge(t *testing.T) {
 func TestFeeMarketMempoolAndExecutionValidationAligned(t *testing.T) {
 	params := DefaultFeeMarketOptimizerParams()
 	estimate, err := OptimizeFeeMarket(baseFeeMarketInput(params, FeeMarketOptimizerInput{
-		CurrentBaseFeeNaet: sdkmath.NewInt(50),
-		TxGasUsed:          1_000,
+		CurrentBaseFeeNaet:	sdkmath.NewInt(50),
+		TxGasUsed:		1_000,
 	}))
 	require.NoError(t, err)
 
 	out, err := OptimizeFeeMarket(baseFeeMarketInput(params, FeeMarketOptimizerInput{
-		CurrentBaseFeeNaet: sdkmath.NewInt(50),
-		TxGasUsed:          1_000,
-		OfferedFeeNaet:     estimate.Validation.RequiredFeeNaet,
+		CurrentBaseFeeNaet:	sdkmath.NewInt(50),
+		TxGasUsed:		1_000,
+		OfferedFeeNaet:		estimate.Validation.RequiredFeeNaet,
 	}))
 	require.NoError(t, err)
 	require.True(t, out.Validation.MempoolAccepted)
@@ -73,8 +73,8 @@ func TestFeeMarketAllocationSumsExactlyWithCaps(t *testing.T) {
 	params := DefaultFeeMarketOptimizerParams()
 	params.EpochBurnCapNaet = sdkmath.NewInt(150)
 	out, err := OptimizeFeeMarket(baseFeeMarketInput(params, FeeMarketOptimizerInput{
-		CollectedFeesNaet: sdkmath.NewInt(1_000),
-		OfferedFeeNaet:    sdkmath.NewInt(1_000_000),
+		CollectedFeesNaet:	sdkmath.NewInt(1_000),
+		OfferedFeeNaet:		sdkmath.NewInt(1_000_000),
 	}))
 	require.NoError(t, err)
 	require.True(t, out.Allocation.SumsExactly)
@@ -91,40 +91,40 @@ func TestFeeMarketSimulationCoversLowSteadyBurstAndSpamLoad(t *testing.T) {
 	params := DefaultFeeMarketOptimizerParams()
 	report, err := SimulateFeeMarket(params, []FeeMarketSimulationStep{
 		{
-			Name: "low_load",
+			Name:	"low_load",
 			Input: baseFeeMarketInput(params, FeeMarketOptimizerInput{
-				EpochID:      20,
-				BlockGasUsed: 2_000,
-				TxGasUsed:    100,
+				EpochID:	20,
+				BlockGasUsed:	2_000,
+				TxGasUsed:	100,
 			}),
 		},
 		{
-			Name: "steady_load",
+			Name:	"steady_load",
 			Input: baseFeeMarketInput(params, FeeMarketOptimizerInput{
-				EpochID:      21,
-				BlockGasUsed: 7_000,
-				TxGasUsed:    100,
+				EpochID:	21,
+				BlockGasUsed:	7_000,
+				TxGasUsed:	100,
 			}),
 		},
 		{
-			Name: "burst_load",
+			Name:	"burst_load",
 			Input: baseFeeMarketInput(params, FeeMarketOptimizerInput{
-				EpochID:            22,
-				BlockGasUsed:       9_500,
-				MempoolPressureBps: 4_000,
-				TxGasUsed:          100,
-				StateWriteBytes:    2_000,
+				EpochID:		22,
+				BlockGasUsed:		9_500,
+				MempoolPressureBps:	4_000,
+				TxGasUsed:		100,
+				StateWriteBytes:	2_000,
 			}),
 		},
 		{
-			Name: "spam_load",
+			Name:	"spam_load",
 			Input: baseFeeMarketInput(params, FeeMarketOptimizerInput{
-				EpochID:                23,
-				BlockGasUsed:           9_000,
-				MempoolPressureBps:     5_000,
-				FailedExecutionRateBps: 3_000,
-				SenderFailedTxCount:    10,
-				TxGasUsed:              100,
+				EpochID:		23,
+				BlockGasUsed:		9_000,
+				MempoolPressureBps:	5_000,
+				FailedExecutionRateBps:	3_000,
+				SenderFailedTxCount:	10,
+				TxGasUsed:		100,
 			}),
 		},
 	})
@@ -148,14 +148,14 @@ func TestFeeMarketRejectsInvalidAllocationSplit(t *testing.T) {
 
 func baseFeeMarketInput(params FeeMarketOptimizerParams, override FeeMarketOptimizerInput) FeeMarketOptimizerInput {
 	input := FeeMarketOptimizerInput{
-		EpochID:            1,
-		BlockHeight:        10,
-		CurrentBaseFeeNaet: params.DefaultBaseFeeNaet,
-		BlockGasUsed:       7_000,
-		BlockGasLimit:      10_000,
-		TxGasUsed:          100,
-		OfferedFeeNaet:     sdkmath.NewInt(1_000_000),
-		Params:             params,
+		EpochID:		1,
+		BlockHeight:		10,
+		CurrentBaseFeeNaet:	params.DefaultBaseFeeNaet,
+		BlockGasUsed:		7_000,
+		BlockGasLimit:		10_000,
+		TxGasUsed:		100,
+		OfferedFeeNaet:		sdkmath.NewInt(1_000_000),
+		Params:			params,
 	}
 	if override.EpochID != 0 {
 		input.EpochID = override.EpochID

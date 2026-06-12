@@ -26,18 +26,18 @@ func TestNameNormalizationV2ValidAndInvalidVectors(t *testing.T) {
 
 	tooLongLabel := strings.Repeat("a", MaxDomainFullBytes)
 	invalid := map[string]string{
-		"Alice.aet":              "lowercase",
-		"alice":                  "must end",
-		"алиса.aet":              "ASCII",
-		".alice.aet":             "leading or trailing separator",
-		"alice..aet":             "leading or trailing separator",
-		"admin.aet":              "reserved",
-		"xn--alice.aet":          "punycode",
-		"bad--dash.aet":          "repeated hyphen",
-		"-bad.aet":               "start or end",
-		"bad-.aet":               "start or end",
-		tooLongLabel + DomainTLD: "<= 253",
-		"a.b.c.d.e.f.g.h.i.aet":  "not exceed",
+		"Alice.aet":			"lowercase",
+		"alice":			"must end",
+		"алиса.aet":			"ASCII",
+		".alice.aet":			"leading or trailing separator",
+		"alice..aet":			"leading or trailing separator",
+		"admin.aet":			"reserved",
+		"xn--alice.aet":		"punycode",
+		"bad--dash.aet":		"repeated hyphen",
+		"-bad.aet":			"start or end",
+		"bad-.aet":			"start or end",
+		tooLongLabel + DomainTLD:	"<= 253",
+		"a.b.c.d.e.f.g.h.i.aet":	"not exceed",
 	}
 	for name, want := range invalid {
 		_, err := NormalizeAETDomainVersioned(name, NameNormalizationVersionV2)
@@ -60,12 +60,12 @@ func TestNameNormalizationV2MigrationAndTxVersionRejection(t *testing.T) {
 	auth := txAuth(IdentitySignerScopeResolverUpdate, 9)
 	auth.NameNormalizationVersion = NameNormalizationVersionV2 + 1
 	msg := MsgUpdateResolverRecordV2{
-		Auth:                  auth,
-		Name:                  "alice.aet",
-		NameHash:              result.NameHash,
-		Patch:                 ResolverPatch{Primary: addr(1)},
-		ExpectedRecordVersion: 1,
-		RecordTTL:             10,
+		Auth:			auth,
+		Name:			"alice.aet",
+		NameHash:		result.NameHash,
+		Patch:			ResolverPatch{Primary: addr(1)},
+		ExpectedRecordVersion:	1,
+		RecordTTL:		10,
 	}
 	require.ErrorContains(t, msg.ValidateBasic(), "unsupported identity name normalization version")
 }
@@ -124,12 +124,12 @@ func TestOwnershipValidationV2ResolverAndSubdomainAuthorization(t *testing.T) {
 func validationDomainRecord(t *testing.T, name string, owner sdk.AccAddress, createdHeight uint64, expiryHeight uint64) DomainRecordV2 {
 	t.Helper()
 	record, err := NewDomainRecordV2FromDomain(Domain{
-		Name:             name,
-		Owner:            owner,
-		NFTID:            "nft-" + name,
-		RegisteredHeight: createdHeight,
-		ExpiryHeight:     expiryHeight,
-		UpdatedHeight:    createdHeight,
+		Name:			name,
+		Owner:			owner,
+		NFTID:			"nft-" + name,
+		RegisteredHeight:	createdHeight,
+		ExpiryHeight:		expiryHeight,
+		UpdatedHeight:		createdHeight,
 	}, DomainRecordV2Active, 0, createdHeight)
 	require.NoError(t, err)
 	return record
@@ -137,11 +137,11 @@ func validationDomainRecord(t *testing.T, name string, owner sdk.AccAddress, cre
 
 func validationBinding(record DomainRecordV2, owner sdk.AccAddress, height uint64) DomainNFTBinding {
 	return DomainNFTBinding{
-		NameHash:           record.NameHash,
-		NFTClassID:         record.NFTClassID,
-		NFTItemID:          record.NFTItemID,
-		Owner:              owner,
-		LastVerifiedHeight: height,
-		BindingVersion:     1,
+		NameHash:		record.NameHash,
+		NFTClassID:		record.NFTClassID,
+		NFTItemID:		record.NFTItemID,
+		Owner:			owner,
+		LastVerifiedHeight:	height,
+		BindingVersion:		1,
 	}
 }

@@ -9,16 +9,16 @@ import (
 
 func TestComputeScoreClampsAndCapsDomainInfluence(t *testing.T) {
 	record := ReputationRecord{
-		Account:         addr(1),
-		AgeScore:        15,
-		StakingScore:    20,
-		TxSuccessScore:  25,
-		VolumeScore:     20,
-		DomainScore:     100,
-		ContractScore:   100,
-		SpamPenalty:     5,
-		FailedTxPenalty: 3,
-		SlashPenalty:    2,
+		Account:		addr(1),
+		AgeScore:		15,
+		StakingScore:		20,
+		TxSuccessScore:		25,
+		VolumeScore:		20,
+		DomainScore:		100,
+		ContractScore:		100,
+		SpamPenalty:		5,
+		FailedTxPenalty:	3,
+		SlashPenalty:		2,
 	}
 	require.Equal(t, uint8(95), ComputeScore(record))
 
@@ -53,10 +53,10 @@ func TestApplyInactivityDecay(t *testing.T) {
 
 func TestValidateReputationRecord(t *testing.T) {
 	record := ApplyComputedScore(ReputationRecord{
-		Account:        addr(1),
-		AgeScore:       10,
-		StakingScore:   10,
-		TxSuccessScore: 10,
+		Account:	addr(1),
+		AgeScore:	10,
+		StakingScore:	10,
+		TxSuccessScore:	10,
 	})
 	require.NoError(t, ValidateReputationRecord(record))
 

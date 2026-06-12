@@ -8,136 +8,136 @@ import (
 )
 
 const (
-	AdaptiveInflationEventController = "adaptive_inflation_controller"
-	AdaptiveInflationEventMint       = "adaptive_inflation_mint_accounted"
-	AdaptiveInflationEventGuard      = "adaptive_inflation_deflation_guard"
-	AdaptiveInflationEventReconcile  = "adaptive_inflation_epoch_reconciled"
+	AdaptiveInflationEventController	= "adaptive_inflation_controller"
+	AdaptiveInflationEventMint		= "adaptive_inflation_mint_accounted"
+	AdaptiveInflationEventGuard		= "adaptive_inflation_deflation_guard"
+	AdaptiveInflationEventReconcile		= "adaptive_inflation_epoch_reconciled"
 
-	DefaultAdaptiveActivityTargetBps      = DefaultTargetLoadBps
-	DefaultAdaptiveActivityClampDeltaBps  = int64(1_500)
-	DefaultAdaptiveReserveHealthTargetBps = BasisPoints
+	DefaultAdaptiveActivityTargetBps	= DefaultTargetLoadBps
+	DefaultAdaptiveActivityClampDeltaBps	= int64(1_500)
+	DefaultAdaptiveReserveHealthTargetBps	= BasisPoints
 )
 
 type AdaptiveInflationParams struct {
-	MinInflationBps                  int64
-	MaxInflationBps                  int64
-	TargetStakeRatioBps              int64
-	TargetActivityBps                int64
-	TargetFeeRevenueNaet             sdkmath.Int
-	TargetValidatorCount             uint64
-	TargetReserveHealthBps           int64
-	PerWindowAdjustmentLimitBps      int64
-	SmoothingWindow                  uint32
-	ActivityClampDeltaBps            int64
-	StakeWeightBps                   int64
-	FeeRevenueWeightBps              int64
-	ValidatorCountWeightBps          int64
-	RewardFloorWeightBps             int64
-	ActivityWeightBps                int64
-	ReserveHealthWeightBps           int64
-	EmergencyFreeze                  bool
-	GovernanceAllowsBelowRewardFloor bool
+	MinInflationBps				int64
+	MaxInflationBps				int64
+	TargetStakeRatioBps			int64
+	TargetActivityBps			int64
+	TargetFeeRevenueNaet			sdkmath.Int
+	TargetValidatorCount			uint64
+	TargetReserveHealthBps			int64
+	PerWindowAdjustmentLimitBps		int64
+	SmoothingWindow				uint32
+	ActivityClampDeltaBps			int64
+	StakeWeightBps				int64
+	FeeRevenueWeightBps			int64
+	ValidatorCountWeightBps			int64
+	RewardFloorWeightBps			int64
+	ActivityWeightBps			int64
+	ReserveHealthWeightBps			int64
+	EmergencyFreeze				bool
+	GovernanceAllowsBelowRewardFloor	bool
 }
 
 type AdaptiveInflationInput struct {
-	EpochID                   uint64
-	AccountingPeriod          string
-	BlocksInEpoch             uint64
-	CurrentSupplyNaet         sdkmath.Int
-	EndingSupplyNaet          sdkmath.Int
-	CurrentInflationBps       int64
-	BondedStakeRatioBps       int64
-	TargetStakeRatioBps       int64
-	FeeRevenueNaet            sdkmath.Int
-	BurnAmountNaet            sdkmath.Int
-	ValidatorCount            uint64
-	ValidatorRewardFloorNaet  sdkmath.Int
-	NetworkActivitySamplesBps []int64
-	TreasuryReserveHealthBps  int64
-	SecurityReserveHealthBps  int64
-	RecentInflationBps        []int64
-	Params                    AdaptiveInflationParams
+	EpochID				uint64
+	AccountingPeriod		string
+	BlocksInEpoch			uint64
+	CurrentSupplyNaet		sdkmath.Int
+	EndingSupplyNaet		sdkmath.Int
+	CurrentInflationBps		int64
+	BondedStakeRatioBps		int64
+	TargetStakeRatioBps		int64
+	FeeRevenueNaet			sdkmath.Int
+	BurnAmountNaet			sdkmath.Int
+	ValidatorCount			uint64
+	ValidatorRewardFloorNaet	sdkmath.Int
+	NetworkActivitySamplesBps	[]int64
+	TreasuryReserveHealthBps	int64
+	SecurityReserveHealthBps	int64
+	RecentInflationBps		[]int64
+	Params				AdaptiveInflationParams
 }
 
 type AdaptiveInflationControllerState struct {
-	PreviousInflationBps             int64
-	RawTargetInflationBps            int64
-	SmoothedInflationBps             int64
-	InflationRateNextEpochBps        int64
-	AppliedDeltaBps                  int64
-	ManipulationResistantActivityBps int64
-	ActivityManipulationClamped      bool
-	BoundedByMin                     bool
-	BoundedByMax                     bool
-	ChangeLimited                    bool
-	EmergencyFrozen                  bool
-	Components                       []InflationAdjustmentComponent
+	PreviousInflationBps			int64
+	RawTargetInflationBps			int64
+	SmoothedInflationBps			int64
+	InflationRateNextEpochBps		int64
+	AppliedDeltaBps				int64
+	ManipulationResistantActivityBps	int64
+	ActivityManipulationClamped		bool
+	BoundedByMin				bool
+	BoundedByMax				bool
+	ChangeLimited				bool
+	EmergencyFrozen				bool
+	Components				[]InflationAdjustmentComponent
 }
 
 type AdaptiveDeflationGuardStatus struct {
-	Active                       bool
-	Reasons                      []string
-	SecurityRewardFloorNaet      sdkmath.Int
-	SecurityRewardFloorPreserved bool
-	BurnAmountNaet               sdkmath.Int
-	NetIssuanceNaet              sdkmath.Int
+	Active				bool
+	Reasons				[]string
+	SecurityRewardFloorNaet		sdkmath.Int
+	SecurityRewardFloorPreserved	bool
+	BurnAmountNaet			sdkmath.Int
+	NetIssuanceNaet			sdkmath.Int
 }
 
 type AdaptiveInflationAccountingEvent struct {
-	Type                string
-	EpochID             uint64
-	InflationBps        int64
-	AmountNaet          sdkmath.Int
-	NetSupplyChangeNaet sdkmath.Int
-	Reconciled          bool
-	Reasons             []string
+	Type			string
+	EpochID			uint64
+	InflationBps		int64
+	AmountNaet		sdkmath.Int
+	NetSupplyChangeNaet	sdkmath.Int
+	Reconciled		bool
+	Reasons			[]string
 }
 
 type AdaptiveInflationEpochReport struct {
-	EpochID                   uint64
-	InflationRateNextEpochBps int64
-	MintAmountNaet            sdkmath.Int
-	ExpectedEndingSupplyNaet  sdkmath.Int
-	EndingSupplyNaet          sdkmath.Int
-	NetIssuance               NetIssuanceReport
-	ControllerState           AdaptiveInflationControllerState
-	DeflationGuard            AdaptiveDeflationGuardStatus
-	Events                    []AdaptiveInflationAccountingEvent
-	Reconciled                bool
-	Failed                    []string
+	EpochID				uint64
+	InflationRateNextEpochBps	int64
+	MintAmountNaet			sdkmath.Int
+	ExpectedEndingSupplyNaet	sdkmath.Int
+	EndingSupplyNaet		sdkmath.Int
+	NetIssuance			NetIssuanceReport
+	ControllerState			AdaptiveInflationControllerState
+	DeflationGuard			AdaptiveDeflationGuardStatus
+	Events				[]AdaptiveInflationAccountingEvent
+	Reconciled			bool
+	Failed				[]string
 }
 
 type AdaptiveInflationStressScenario struct {
-	Name  string
-	Input AdaptiveInflationInput
+	Name	string
+	Input	AdaptiveInflationInput
 }
 
 type AdaptiveInflationStressReport struct {
-	Scenarios               []AdaptiveInflationEpochReport
-	MinInflationObservedBps int64
-	MaxInflationObservedBps int64
-	Passed                  bool
-	Failed                  []string
+	Scenarios		[]AdaptiveInflationEpochReport
+	MinInflationObservedBps	int64
+	MaxInflationObservedBps	int64
+	Passed			bool
+	Failed			[]string
 }
 
 func DefaultAdaptiveInflationParams() AdaptiveInflationParams {
 	return AdaptiveInflationParams{
-		MinInflationBps:             MinInflationBps,
-		MaxInflationBps:             MaxInflationBps,
-		TargetStakeRatioBps:         DefaultTargetStakeBps,
-		TargetActivityBps:           DefaultAdaptiveActivityTargetBps,
-		TargetFeeRevenueNaet:        sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-		TargetValidatorCount:        DefaultActiveValidatorTarget,
-		TargetReserveHealthBps:      DefaultAdaptiveReserveHealthTargetBps,
-		PerWindowAdjustmentLimitBps: DefaultInflationPerWindowChangeLimitBps,
-		SmoothingWindow:             DefaultInflationSmoothingWindow,
-		ActivityClampDeltaBps:       DefaultAdaptiveActivityClampDeltaBps,
-		StakeWeightBps:              2_500,
-		FeeRevenueWeightBps:         1_750,
-		ValidatorCountWeightBps:     1_000,
-		RewardFloorWeightBps:        1_500,
-		ActivityWeightBps:           1_500,
-		ReserveHealthWeightBps:      750,
+		MinInflationBps:		MinInflationBps,
+		MaxInflationBps:		MaxInflationBps,
+		TargetStakeRatioBps:		DefaultTargetStakeBps,
+		TargetActivityBps:		DefaultAdaptiveActivityTargetBps,
+		TargetFeeRevenueNaet:		sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+		TargetValidatorCount:		DefaultActiveValidatorTarget,
+		TargetReserveHealthBps:		DefaultAdaptiveReserveHealthTargetBps,
+		PerWindowAdjustmentLimitBps:	DefaultInflationPerWindowChangeLimitBps,
+		SmoothingWindow:		DefaultInflationSmoothingWindow,
+		ActivityClampDeltaBps:		DefaultAdaptiveActivityClampDeltaBps,
+		StakeWeightBps:			2_500,
+		FeeRevenueWeightBps:		1_750,
+		ValidatorCountWeightBps:	1_000,
+		RewardFloorWeightBps:		1_500,
+		ActivityWeightBps:		1_500,
+		ReserveHealthWeightBps:		750,
 	}
 }
 
@@ -167,17 +167,17 @@ func ComputeAdaptiveInflationEpoch(input AdaptiveInflationInput) (AdaptiveInflat
 	nextInflation := clampInt64(input.CurrentInflationBps+limitedDelta, params.MinInflationBps, params.MaxInflationBps)
 
 	state := AdaptiveInflationControllerState{
-		PreviousInflationBps:             input.CurrentInflationBps,
-		RawTargetInflationBps:            rawTarget,
-		SmoothedInflationBps:             smoothed,
-		InflationRateNextEpochBps:        nextInflation,
-		AppliedDeltaBps:                  nextInflation - input.CurrentInflationBps,
-		ManipulationResistantActivityBps: activityScore,
-		ActivityManipulationClamped:      activityClamped,
-		BoundedByMin:                     nextInflation == params.MinInflationBps && input.CurrentInflationBps+limitedDelta < params.MinInflationBps,
-		BoundedByMax:                     nextInflation == params.MaxInflationBps && input.CurrentInflationBps+limitedDelta > params.MaxInflationBps,
-		ChangeLimited:                    delta != limitedDelta,
-		Components:                       components,
+		PreviousInflationBps:			input.CurrentInflationBps,
+		RawTargetInflationBps:			rawTarget,
+		SmoothedInflationBps:			smoothed,
+		InflationRateNextEpochBps:		nextInflation,
+		AppliedDeltaBps:			nextInflation - input.CurrentInflationBps,
+		ManipulationResistantActivityBps:	activityScore,
+		ActivityManipulationClamped:		activityClamped,
+		BoundedByMin:				nextInflation == params.MinInflationBps && input.CurrentInflationBps+limitedDelta < params.MinInflationBps,
+		BoundedByMax:				nextInflation == params.MaxInflationBps && input.CurrentInflationBps+limitedDelta > params.MaxInflationBps,
+		ChangeLimited:				delta != limitedDelta,
+		Components:				components,
 	}
 	if params.EmergencyFreeze {
 		state.RawTargetInflationBps = input.CurrentInflationBps
@@ -193,13 +193,13 @@ func ComputeAdaptiveInflationEpoch(input AdaptiveInflationInput) (AdaptiveInflat
 
 	mint := ApplyBps(normalizeInt(input.CurrentSupplyNaet), nextInflation)
 	netIssuance, err := ReportNetIssuance(NetIssuanceInput{
-		EpochID:                    input.EpochID,
-		AccountingPeriod:           input.AccountingPeriod,
-		Blocks:                     input.BlocksInEpoch,
-		GrossMintedNaet:            mint,
-		BurnedNaet:                 input.BurnAmountNaet,
-		FeeRevenueNaet:             input.FeeRevenueNaet,
-		ValidatorSecuritySpendNaet: maxSdkInt(mint, normalizeInt(input.ValidatorRewardFloorNaet)),
+		EpochID:			input.EpochID,
+		AccountingPeriod:		input.AccountingPeriod,
+		Blocks:				input.BlocksInEpoch,
+		GrossMintedNaet:		mint,
+		BurnedNaet:			input.BurnAmountNaet,
+		FeeRevenueNaet:			input.FeeRevenueNaet,
+		ValidatorSecuritySpendNaet:	maxSdkInt(mint, normalizeInt(input.ValidatorRewardFloorNaet)),
 	})
 	if err != nil {
 		return AdaptiveInflationEpochReport{}, err
@@ -230,17 +230,17 @@ func ComputeAdaptiveInflationEpoch(input AdaptiveInflationInput) (AdaptiveInflat
 	reconciled := len(failed) == 0
 	events := adaptiveInflationEvents(input.EpochID, state, mint, netIssuance.NetSupplyChangeNaet, guard, reconciled)
 	return AdaptiveInflationEpochReport{
-		EpochID:                   input.EpochID,
-		InflationRateNextEpochBps: state.InflationRateNextEpochBps,
-		MintAmountNaet:            mint,
-		ExpectedEndingSupplyNaet:  expectedEnding,
-		EndingSupplyNaet:          endingSupply,
-		NetIssuance:               netIssuance,
-		ControllerState:           state,
-		DeflationGuard:            guard,
-		Events:                    events,
-		Reconciled:                reconciled,
-		Failed:                    failed,
+		EpochID:			input.EpochID,
+		InflationRateNextEpochBps:	state.InflationRateNextEpochBps,
+		MintAmountNaet:			mint,
+		ExpectedEndingSupplyNaet:	expectedEnding,
+		EndingSupplyNaet:		endingSupply,
+		NetIssuance:			netIssuance,
+		ControllerState:		state,
+		DeflationGuard:			guard,
+		Events:				events,
+		Reconciled:			reconciled,
+		Failed:				failed,
 	}, nil
 }
 
@@ -275,11 +275,11 @@ func RunAdaptiveInflationStressTest(scenarios []AdaptiveInflationStressScenario,
 		}
 	}
 	return AdaptiveInflationStressReport{
-		Scenarios:               reports,
-		MinInflationObservedBps: minObserved,
-		MaxInflationObservedBps: maxObserved,
-		Passed:                  len(failed) == 0,
-		Failed:                  failed,
+		Scenarios:			reports,
+		MinInflationObservedBps:	minObserved,
+		MaxInflationObservedBps:	maxObserved,
+		Passed:				len(failed) == 0,
+		Failed:				failed,
 	}, nil
 }
 
@@ -318,12 +318,12 @@ func (p AdaptiveInflationParams) Validate() error {
 		return err
 	}
 	for name, value := range map[string]int64{
-		"stake_weight_bps":           p.StakeWeightBps,
-		"fee_revenue_weight_bps":     p.FeeRevenueWeightBps,
-		"validator_count_weight_bps": p.ValidatorCountWeightBps,
-		"reward_floor_weight_bps":    p.RewardFloorWeightBps,
-		"activity_weight_bps":        p.ActivityWeightBps,
-		"reserve_health_weight_bps":  p.ReserveHealthWeightBps,
+		"stake_weight_bps":		p.StakeWeightBps,
+		"fee_revenue_weight_bps":	p.FeeRevenueWeightBps,
+		"validator_count_weight_bps":	p.ValidatorCountWeightBps,
+		"reward_floor_weight_bps":	p.RewardFloorWeightBps,
+		"activity_weight_bps":		p.ActivityWeightBps,
+		"reserve_health_weight_bps":	p.ReserveHealthWeightBps,
 	} {
 		if value < 0 {
 			return fmt.Errorf("%s must not be negative", name)
@@ -402,8 +402,8 @@ func (input AdaptiveInflationInput) Validate(params AdaptiveInflationParams) err
 		return fmt.Errorf("current_supply_naet must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "ending_supply_naet", value: input.EndingSupplyNaet},
 		{name: "fee_revenue_naet", value: input.FeeRevenueNaet},
@@ -515,49 +515,49 @@ func adaptiveDeflationGuard(input AdaptiveInflationInput, mint, netIssuance sdkm
 		reasons = append(reasons, "bonded_stake_below_safety_band")
 	}
 	return AdaptiveDeflationGuardStatus{
-		Active:                       len(reasons) > 0,
-		Reasons:                      reasons,
-		SecurityRewardFloorNaet:      floor,
-		SecurityRewardFloorPreserved: preserved,
-		BurnAmountNaet:               normalizeInt(input.BurnAmountNaet),
-		NetIssuanceNaet:              normalizeInt(netIssuance),
+		Active:				len(reasons) > 0,
+		Reasons:			reasons,
+		SecurityRewardFloorNaet:	floor,
+		SecurityRewardFloorPreserved:	preserved,
+		BurnAmountNaet:			normalizeInt(input.BurnAmountNaet),
+		NetIssuanceNaet:		normalizeInt(netIssuance),
 	}
 }
 
 func adaptiveInflationEvents(epochID uint64, state AdaptiveInflationControllerState, mint, netSupplyChange sdkmath.Int, guard AdaptiveDeflationGuardStatus, reconciled bool) []AdaptiveInflationAccountingEvent {
 	events := []AdaptiveInflationAccountingEvent{
 		{
-			Type:         AdaptiveInflationEventController,
-			EpochID:      epochID,
-			InflationBps: state.InflationRateNextEpochBps,
-			Reconciled:   true,
+			Type:		AdaptiveInflationEventController,
+			EpochID:	epochID,
+			InflationBps:	state.InflationRateNextEpochBps,
+			Reconciled:	true,
 		},
 		{
-			Type:                AdaptiveInflationEventMint,
-			EpochID:             epochID,
-			InflationBps:        state.InflationRateNextEpochBps,
-			AmountNaet:          normalizeInt(mint),
-			NetSupplyChangeNaet: normalizeInt(netSupplyChange),
-			Reconciled:          true,
+			Type:			AdaptiveInflationEventMint,
+			EpochID:		epochID,
+			InflationBps:		state.InflationRateNextEpochBps,
+			AmountNaet:		normalizeInt(mint),
+			NetSupplyChangeNaet:	normalizeInt(netSupplyChange),
+			Reconciled:		true,
 		},
 		{
-			Type:                AdaptiveInflationEventReconcile,
-			EpochID:             epochID,
-			InflationBps:        state.InflationRateNextEpochBps,
-			AmountNaet:          normalizeInt(mint),
-			NetSupplyChangeNaet: normalizeInt(netSupplyChange),
-			Reconciled:          reconciled,
+			Type:			AdaptiveInflationEventReconcile,
+			EpochID:		epochID,
+			InflationBps:		state.InflationRateNextEpochBps,
+			AmountNaet:		normalizeInt(mint),
+			NetSupplyChangeNaet:	normalizeInt(netSupplyChange),
+			Reconciled:		reconciled,
 		},
 	}
 	if guard.Active {
 		events = append(events, AdaptiveInflationAccountingEvent{
-			Type:                AdaptiveInflationEventGuard,
-			EpochID:             epochID,
-			InflationBps:        state.InflationRateNextEpochBps,
-			AmountNaet:          guard.BurnAmountNaet,
-			NetSupplyChangeNaet: guard.NetIssuanceNaet,
-			Reconciled:          reconciled,
-			Reasons:             append([]string(nil), guard.Reasons...),
+			Type:			AdaptiveInflationEventGuard,
+			EpochID:		epochID,
+			InflationBps:		state.InflationRateNextEpochBps,
+			AmountNaet:		guard.BurnAmountNaet,
+			NetSupplyChangeNaet:	guard.NetIssuanceNaet,
+			Reconciled:		reconciled,
+			Reasons:		append([]string(nil), guard.Reasons...),
 		})
 	}
 	return events

@@ -33,12 +33,12 @@ func TestDelegationRecordV2RejectsInvalidCanonicalState(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := DelegationRecordV2{
-		NameHash:        nameHash,
-		Delegate:        addr(7),
-		Scope:           DelegationScopeResolverUpdate,
-		Permissions:     []string{ResolverKeyWallet, ResolverKeyContract},
-		ExpiresAtHeight: 100,
-		CreatedAtHeight: 10,
+		NameHash:		nameHash,
+		Delegate:		addr(7),
+		Scope:			DelegationScopeResolverUpdate,
+		Permissions:		[]string{ResolverKeyWallet, ResolverKeyContract},
+		ExpiresAtHeight:	100,
+		CreatedAtHeight:	10,
 	}
 	require.ErrorContains(t, ValidateDelegationRecordV2(record), "permissions must be sorted")
 
@@ -99,18 +99,18 @@ func TestAuctionRecordV2RejectsInvalidFinalizedState(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("market.aet")
 	require.NoError(t, err)
 	record := AuctionRecordV2{
-		AuctionID:             identityHash("identity-v2-auction", "market.aet", "00000000000000000100"),
-		NameHash:              nameHash,
-		Status:                AuctionRecordV2Finalized,
-		CommitStartHeight:     100,
-		CommitEndHeight:       200,
-		RevealStartHeight:     200,
-		RevealEndHeight:       300,
-		MinBid:                100,
-		WinningBid:            50,
-		SealedCommitmentsRoot: identityHash("commitments"),
-		RevealedBidsCount:     1,
-		FeeSplitID:            "domain.fees",
+		AuctionID:		identityHash("identity-v2-auction", "market.aet", "00000000000000000100"),
+		NameHash:		nameHash,
+		Status:			AuctionRecordV2Finalized,
+		CommitStartHeight:	100,
+		CommitEndHeight:	200,
+		RevealStartHeight:	200,
+		RevealEndHeight:	300,
+		MinBid:			100,
+		WinningBid:		50,
+		SealedCommitmentsRoot:	identityHash("commitments"),
+		RevealedBidsCount:	1,
+		FeeSplitID:		"domain.fees",
 	}
 	require.ErrorContains(t, ValidateAuctionRecordV2(record), "auction winner")
 

@@ -10,103 +10,103 @@ import (
 type EconomicFinalityMode string
 
 const (
-	EconomicFinalityCooperative EconomicFinalityMode = "COOPERATIVE_SETTLEMENT"
-	EconomicFinalityUnilateral  EconomicFinalityMode = "UNILATERAL_SETTLEMENT"
-	EconomicFinalityConditional EconomicFinalityMode = "CONDITIONAL_SETTLEMENT"
-	EconomicFinalityVirtual     EconomicFinalityMode = "VIRTUAL_CHANNEL_SETTLEMENT"
-	EconomicFinalityPenalty     EconomicFinalityMode = "PENALTY_SETTLEMENT"
+	EconomicFinalityCooperative	EconomicFinalityMode	= "COOPERATIVE_SETTLEMENT"
+	EconomicFinalityUnilateral	EconomicFinalityMode	= "UNILATERAL_SETTLEMENT"
+	EconomicFinalityConditional	EconomicFinalityMode	= "CONDITIONAL_SETTLEMENT"
+	EconomicFinalityVirtual		EconomicFinalityMode	= "VIRTUAL_CHANNEL_SETTLEMENT"
+	EconomicFinalityPenalty		EconomicFinalityMode	= "PENALTY_SETTLEMENT"
 )
 
 type EconomicFinalityRequirement struct {
-	Mode                         EconomicFinalityMode
-	RequiresInclusion            bool
-	RequiresChallengeExpiry      bool
-	RequiresProofOrTimeout       bool
-	RequiresParentReserveResolve bool
-	RequiresAcceptedFraudProof   bool
-	Description                  string
+	Mode				EconomicFinalityMode
+	RequiresInclusion		bool
+	RequiresChallengeExpiry		bool
+	RequiresProofOrTimeout		bool
+	RequiresParentReserveResolve	bool
+	RequiresAcceptedFraudProof	bool
+	Description			string
 }
 
 type ChallengePeriodSizing struct {
-	MessagePropagationDelay uint64
-	WatchServiceReaction    uint64
-	CongestionBuffer        uint64
-	MultiHopTimeoutMargin   uint64
+	MessagePropagationDelay	uint64
+	WatchServiceReaction	uint64
+	CongestionBuffer	uint64
+	MultiHopTimeoutMargin	uint64
 }
 
 type EconomicFinalityCheck struct {
-	Mode         EconomicFinalityMode
-	Passed       bool
-	EvidenceHash string
-	Reason       string
+	Mode		EconomicFinalityMode
+	Passed		bool
+	EvidenceHash	string
+	Reason		string
 }
 
 type EconomicFinalityReport struct {
-	Requirements          []EconomicFinalityRequirement
-	Checks                []EconomicFinalityCheck
-	RequiredChallengeSize uint64
-	ReportHash            string
+	Requirements		[]EconomicFinalityRequirement
+	Checks			[]EconomicFinalityCheck
+	RequiredChallengeSize	uint64
+	ReportHash		string
 }
 
 type DisputePriorityPolicy struct {
-	BasePriority        uint64
-	NearExpiryBoost     uint64
-	FraudProofBoost     uint64
-	CongestionBoostBps  uint32
-	NearExpiryThreshold uint64
-	MaxPriority         uint64
-	RequiredFeeClass    PaymentFeeClass
-	Deterministic       bool
+	BasePriority		uint64
+	NearExpiryBoost		uint64
+	FraudProofBoost		uint64
+	CongestionBoostBps	uint32
+	NearExpiryThreshold	uint64
+	MaxPriority		uint64
+	RequiredFeeClass	PaymentFeeClass
+	Deterministic		bool
 }
 
 type DisputePriorityRequest struct {
-	Operation         SettlementArbitrationOperation
-	OperationID       string
-	ChannelID         string
-	SubmittedHeight   uint64
-	CurrentHeight     uint64
-	SettleAfterHeight uint64
-	HasFraudProof     bool
-	FeePaid           string
-	RequiredFee       string
-	EstimatedGas      uint64
-	CongestionBps     uint32
+	Operation		SettlementArbitrationOperation
+	OperationID		string
+	ChannelID		string
+	SubmittedHeight		uint64
+	CurrentHeight		uint64
+	SettleAfterHeight	uint64
+	HasFraudProof		bool
+	FeePaid			string
+	RequiredFee		string
+	EstimatedGas		uint64
+	CongestionBps		uint32
 }
 
 type DisputePriorityDecision struct {
-	OperationID     string
-	ChannelID       string
-	Operation       SettlementArbitrationOperation
-	PriorityScore   uint64
-	BlocksRemaining uint64
-	NearExpiry      bool
-	FeeCovered      bool
-	Deterministic   bool
-	EstimatedGas    uint64
-	PolicyHash      string
-	DecisionHash    string
-	DeferredReason  string
+	OperationID	string
+	ChannelID	string
+	Operation	SettlementArbitrationOperation
+	PriorityScore	uint64
+	BlocksRemaining	uint64
+	NearExpiry	bool
+	FeeCovered	bool
+	Deterministic	bool
+	EstimatedGas	uint64
+	PolicyHash	string
+	DecisionHash	string
+	DeferredReason	string
 }
 
 type DisputeInclusionStressResult struct {
-	Included     []DisputePriorityDecision
-	Deferred     []DisputePriorityDecision
-	Conflicts    []BlockSTMConflict
-	TotalGas     uint64
-	GasLimit     uint64
-	ConflictFree bool
-	StressHash   string
+	Included	[]DisputePriorityDecision
+	Deferred	[]DisputePriorityDecision
+	Conflicts	[]BlockSTMConflict
+	TotalGas	uint64
+	GasLimit	uint64
+	ConflictFree	bool
+	StressHash	string
 }
 
 type NearExpiryDisputeAlert struct {
-	ChannelID         string
-	SubmittedHeight   uint64
-	SettleAfterHeight uint64
-	CurrentHeight     uint64
-	BlocksRemaining   uint64
-	DisputeCount      uint32
-	Severity          string
-	EvidenceHash      string
+	ChannelID		string
+	SubmittedHeight		uint64
+	SettleAfterHeight	uint64
+	CurrentHeight		uint64
+	BlocksRemaining		uint64
+	DisputeCount		uint32
+	Severity		string
+	EvidenceHash		string
 }
 
 func DefaultEconomicFinalityRequirements() []EconomicFinalityRequirement {
@@ -162,9 +162,9 @@ func BuildEconomicFinalityReport(state PaymentsState, currentHeight uint64, sizi
 		buildEconomicFinalityCheck(state, EconomicFinalityPenalty, economicPenaltyFinalityPasses(state)),
 	}
 	report := EconomicFinalityReport{
-		Requirements:          normalizeEconomicFinalityRequirements(requirements),
-		Checks:                normalizeEconomicFinalityChecks(checks),
-		RequiredChallengeSize: requiredChallenge,
+		Requirements:		normalizeEconomicFinalityRequirements(requirements),
+		Checks:			normalizeEconomicFinalityChecks(checks),
+		RequiredChallengeSize:	requiredChallenge,
 	}
 	report.ReportHash = ComputeEconomicFinalityReportHash(report)
 	if err := report.Validate(); err != nil {
@@ -262,14 +262,14 @@ func ValidateChallengePeriodSizing(period uint64, sizing ChallengePeriodSizing) 
 
 func DefaultDisputePriorityPolicy() DisputePriorityPolicy {
 	return DisputePriorityPolicy{
-		BasePriority:        1_000,
-		NearExpiryBoost:     10_000,
-		FraudProofBoost:     5_000,
-		CongestionBoostBps:  2_500,
-		NearExpiryThreshold: 4,
-		MaxPriority:         100_000,
-		RequiredFeeClass:    PaymentFeeClassDispute,
-		Deterministic:       true,
+		BasePriority:		1_000,
+		NearExpiryBoost:	10_000,
+		FraudProofBoost:	5_000,
+		CongestionBoostBps:	2_500,
+		NearExpiryThreshold:	4,
+		MaxPriority:		100_000,
+		RequiredFeeClass:	PaymentFeeClassDispute,
+		Deterministic:		true,
 	}
 }
 
@@ -305,16 +305,16 @@ func ComputeDisputeTransactionPriority(policy DisputePriorityPolicy, req Dispute
 		score = policy.MaxPriority
 	}
 	decision := DisputePriorityDecision{
-		OperationID:     req.OperationID,
-		ChannelID:       req.ChannelID,
-		Operation:       req.Operation,
-		PriorityScore:   score,
-		BlocksRemaining: remaining,
-		NearExpiry:      nearExpiry,
-		FeeCovered:      !paid.LT(required),
-		Deterministic:   policy.Deterministic,
-		EstimatedGas:    req.EstimatedGas,
-		PolicyHash:      policy.Hash(),
+		OperationID:		req.OperationID,
+		ChannelID:		req.ChannelID,
+		Operation:		req.Operation,
+		PriorityScore:		score,
+		BlocksRemaining:	remaining,
+		NearExpiry:		nearExpiry,
+		FeeCovered:		!paid.LT(required),
+		Deterministic:		policy.Deterministic,
+		EstimatedGas:		req.EstimatedGas,
+		PolicyHash:		policy.Hash(),
 	}
 	if !decision.FeeCovered {
 		decision.DeferredReason = "insufficient dispute fee"
@@ -340,11 +340,11 @@ func SimulateDisputeInclusionStress(policy DisputePriorityPolicy, requests []Dis
 			opType = BatchOperationSettle
 		}
 		plan, err := AccessPlanForSettlementOperation(SettlementOperation{
-			OperationID:   decision.OperationID,
-			ChannelID:     decision.ChannelID,
-			OperationType: opType,
-			Nonce:         1,
-			StateHash:     HashParts("dispute-priority-state", decision.OperationID),
+			OperationID:	decision.OperationID,
+			ChannelID:	decision.ChannelID,
+			OperationType:	opType,
+			Nonce:		1,
+			StateHash:	HashParts("dispute-priority-state", decision.OperationID),
 		}, req.CurrentHeight)
 		if err != nil {
 			return DisputeInclusionStressResult{}, err
@@ -402,14 +402,14 @@ func MonitorNearExpiryDisputes(state PaymentsState, currentHeight, threshold uin
 			severity = "critical"
 		}
 		alert := NearExpiryDisputeAlert{
-			ChannelID:         channel.ChannelID,
-			SubmittedHeight:   channel.PendingClose.SubmittedHeight,
-			SettleAfterHeight: channel.PendingClose.SettleAfterHeight,
-			CurrentHeight:     currentHeight,
-			BlocksRemaining:   remaining,
-			DisputeCount:      channel.PendingClose.DisputeCount,
-			Severity:          severity,
-			EvidenceHash:      HashParts("near-expiry-dispute", channel.ChannelID, fmt.Sprintf("%d", currentHeight), fmt.Sprintf("%d", remaining)),
+			ChannelID:		channel.ChannelID,
+			SubmittedHeight:	channel.PendingClose.SubmittedHeight,
+			SettleAfterHeight:	channel.PendingClose.SettleAfterHeight,
+			CurrentHeight:		currentHeight,
+			BlocksRemaining:	remaining,
+			DisputeCount:		channel.PendingClose.DisputeCount,
+			Severity:		severity,
+			EvidenceHash:		HashParts("near-expiry-dispute", channel.ChannelID, fmt.Sprintf("%d", currentHeight), fmt.Sprintf("%d", remaining)),
 		}
 		alerts = append(alerts, alert)
 	}
@@ -599,10 +599,10 @@ func buildEconomicFinalityCheck(state PaymentsState, mode EconomicFinalityMode, 
 		reason = "state violates economic finality"
 	}
 	return EconomicFinalityCheck{
-		Mode:         mode,
-		Passed:       passed,
-		EvidenceHash: economicFinalityEvidenceHash(state, mode),
-		Reason:       reason,
+		Mode:		mode,
+		Passed:		passed,
+		EvidenceHash:	economicFinalityEvidenceHash(state, mode),
+		Reason:		reason,
 	}
 }
 

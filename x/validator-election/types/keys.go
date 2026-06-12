@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "validator-election"
-	StoreKey   = ModuleName
+	ModuleName	= "validator-election"
+	StoreKey	= ModuleName
 )

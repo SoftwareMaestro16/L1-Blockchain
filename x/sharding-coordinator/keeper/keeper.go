@@ -15,15 +15,15 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version     uint64
-	Params      prototype.Params
-	ShardParams types.ShardingCoordinatorParams
-	State       types.ShardingCoordinatorState
+	Version		uint64
+	Params		prototype.Params
+	ShardParams	types.ShardingCoordinatorParams
+	State		types.ShardingCoordinatorState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -36,10 +36,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:     prototype.CurrentGenesisVersion,
-		Params:      prototype.DefaultParams(),
-		ShardParams: types.DefaultShardingCoordinatorParams(),
-		State:       types.EmptyShardingCoordinatorState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		ShardParams:	types.DefaultShardingCoordinatorParams(),
+		State:		types.EmptyShardingCoordinatorState(),
 	}
 }
 
@@ -352,12 +352,12 @@ func ensureRoutesForActivatedShard(state types.ShardingCoordinatorState, activat
 			continue
 		}
 		routes = append(routes, types.CrossShardRoute{
-			RouteID:       deterministicRouteID(activated.ShardID, shard.ShardID),
-			SourceShardID: activated.ShardID,
-			TargetShardID: shard.ShardID,
-			Enabled:       true,
-			MaxInFlight:   min32(activated.CrossShardRoutingParams.DefaultRouteLimit, params.MaxRouteInFlight),
-			TimeoutBlocks: min64(activated.CrossShardRoutingParams.MaxTimeoutBlocks, params.MaxRouteTimeoutBlocks),
+			RouteID:	deterministicRouteID(activated.ShardID, shard.ShardID),
+			SourceShardID:	activated.ShardID,
+			TargetShardID:	shard.ShardID,
+			Enabled:	true,
+			MaxInFlight:	min32(activated.CrossShardRoutingParams.DefaultRouteLimit, params.MaxRouteInFlight),
+			TimeoutBlocks:	min64(activated.CrossShardRoutingParams.MaxTimeoutBlocks, params.MaxRouteTimeoutBlocks),
 		})
 	}
 	return routes
@@ -372,9 +372,9 @@ func applyValidatorMoves(state *types.ShardingCoordinatorState, proposal types.R
 	targetIdx, target, found := assignmentIndex(state.Assignments, proposal.TargetShardID)
 	if !found {
 		target = types.ShardValidatorAssignment{
-			ShardID:         proposal.TargetShardID,
-			AssignedHeight:  proposal.ProposedHeight,
-			AssignmentEpoch: source.AssignmentEpoch + 1,
+			ShardID:		proposal.TargetShardID,
+			AssignedHeight:		proposal.ProposedHeight,
+			AssignmentEpoch:	source.AssignmentEpoch + 1,
 		}
 	}
 	sourceSet := map[string]struct{}{}

@@ -32,9 +32,9 @@ func (k Keeper) TreasuryBalance(ctx context.Context, req *types.QueryTreasuryBal
 		return nil, status.Error(codes.Internal, "treasury module account not configured")
 	}
 	return &types.QueryTreasuryBalanceResponse{
-		ModuleAccount:     aetraaddress.FormatAccAddress(addr),
-		BankBalance:       k.bankKeeper.GetAllBalances(ctx, addr),
-		AccountingBalance: allocations.AccountingBalance(),
+		ModuleAccount:		aetraaddress.FormatAccAddress(addr),
+		BankBalance:		k.bankKeeper.GetAllBalances(ctx, addr),
+		AccountingBalance:	allocations.AccountingBalance(),
 	}, nil
 }
 

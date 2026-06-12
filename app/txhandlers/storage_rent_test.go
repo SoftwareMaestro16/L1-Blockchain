@@ -29,15 +29,15 @@ func (m mockNativeAccountReader) AccountStatus(_ context.Context, userAddress st
 }
 
 type sigTx struct {
-	msgs    []sdk.Msg
-	signers [][]byte
+	msgs	[]sdk.Msg
+	signers	[][]byte
 }
 
-func (tx sigTx) GetMsgs() []sdk.Msg                              { return tx.msgs }
-func (tx sigTx) GetMsgsV2() ([]protov2.Message, error)           { return nil, nil }
-func (tx sigTx) GetSigners() ([][]byte, error)                   { return tx.signers, nil }
-func (tx sigTx) GetPubKeys() ([]cryptotypes.PubKey, error)       { return nil, nil }
-func (tx sigTx) GetSignaturesV2() ([]signing.SignatureV2, error) { return nil, nil }
+func (tx sigTx) GetMsgs() []sdk.Msg					{ return tx.msgs }
+func (tx sigTx) GetMsgsV2() ([]protov2.Message, error)			{ return nil, nil }
+func (tx sigTx) GetSigners() ([][]byte, error)				{ return tx.signers, nil }
+func (tx sigTx) GetPubKeys() ([]cryptotypes.PubKey, error)		{ return nil, nil }
+func (tx sigTx) GetSignaturesV2() ([]signing.SignatureV2, error)	{ return nil, nil }
 
 func newSigTx(addr sdk.AccAddress, msg sdk.Msg) sigTx {
 	return sigTx{msgs: []sdk.Msg{msg}, signers: [][]byte{addr}}
@@ -151,8 +151,8 @@ func bankSendMsg(t *testing.T, from sdk.AccAddress) *banktypes.MsgSend {
 	t.Helper()
 	aeAddr := aetraaddress.FormatAccAddress(from)
 	return &banktypes.MsgSend{
-		FromAddress: aeAddr,
-		ToAddress:   aetraaddress.FormatAccAddress(make([]byte, 20)),
-		Amount:      sdk.NewCoins(sdk.NewInt64Coin("naet", 100)),
+		FromAddress:	aeAddr,
+		ToAddress:	aetraaddress.FormatAccAddress(make([]byte, 20)),
+		Amount:		sdk.NewCoins(sdk.NewInt64Coin("naet", 100)),
 	}
 }

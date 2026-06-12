@@ -30,11 +30,11 @@ func TestDNLStateDeterministicRootsAndZoneAwareLookup(t *testing.T) {
 	require.Equal(t, left.LookupRoot, right.LookupRoot)
 
 	response, err := QueryDNL(left, DNLQuery{
-		ServiceID:     "svc-pay",
-		ZoneID:        "financial",
-		CurrentHeight: 30,
-		Limit:         10,
-		RequireProof:  true,
+		ServiceID:	"svc-pay",
+		ZoneID:		"financial",
+		CurrentHeight:	30,
+		Limit:		10,
+		RequireProof:	true,
 	})
 	require.NoError(t, err)
 	require.Len(t, response.Entries, 1)
@@ -71,18 +71,18 @@ func TestDNLRejectsExpiredCacheAndUncommittedRoutes(t *testing.T) {
 	route := testDNLRoute(t, "apps", "svc-app", "node-d", 1, 5_000, 10)
 	service := testDNLEntry(t, "svc-app", "apps", route.RouteID, 10)
 	response := DNLDiscoveryResponse{
-		QueryHash:    HashParts("query"),
-		Entries:      []DNLServiceDiscoveryEntry{service},
-		Routes:       []DNLRoutingTableEntry{route},
-		Proof:        DNLProof{ProofHash: HashParts("proof")},
-		ExpiryHeight: 10,
+		QueryHash:	HashParts("query"),
+		Entries:	[]DNLServiceDiscoveryEntry{service},
+		Routes:		[]DNLRoutingTableEntry{route},
+		Proof:		DNLProof{ProofHash: HashParts("proof")},
+		ExpiryHeight:	10,
 	}
 	response.ResponseHash = ComputeDNLDiscoveryResponseHash(response)
 	cache, err := NewDNLCacheEntry(DNLCacheEntry{
-		QueryHash:    response.QueryHash,
-		ResponseHash: response.ResponseHash,
-		ExpiryHeight: 10,
-		ProofHash:    response.Proof.ProofHash,
+		QueryHash:	response.QueryHash,
+		ResponseHash:	response.ResponseHash,
+		ExpiryHeight:	10,
+		ProofHash:	response.Proof.ProofHash,
 	})
 	require.NoError(t, err)
 	_, err = BuildDNLState([]DNLServiceDiscoveryEntry{service}, []DNLRoutingTableEntry{route}, []DNLCacheEntry{cache}, 11)
@@ -95,11 +95,11 @@ func TestDNLRejectsExpiredCacheAndUncommittedRoutes(t *testing.T) {
 
 func TestDNLNodeLocalObservationIsAdvisoryOnly(t *testing.T) {
 	observation, err := NewDNLAdvisoryObservation(DNLAdvisoryObservation{
-		ObservedNodeID: HashParts("node-local"),
-		ServiceID:      "svc-pay",
-		ZoneID:         "financial",
-		EndpointHash:   HashParts("observed-endpoint"),
-		ObservedHeight: 25,
+		ObservedNodeID:	HashParts("node-local"),
+		ServiceID:	"svc-pay",
+		ZoneID:		"financial",
+		EndpointHash:	HashParts("observed-endpoint"),
+		ObservedHeight:	25,
 	})
 	require.NoError(t, err)
 	require.NoError(t, observation.Validate())
@@ -124,13 +124,13 @@ func TestDNLQuerySkipsExpiredEntriesAndRequiresProofWhenRequested(t *testing.T) 
 func testDNLEntry(t *testing.T, serviceID, zoneID, routeID string, expiry uint64) DNLServiceDiscoveryEntry {
 	t.Helper()
 	entry, err := NewDNLServiceDiscoveryEntry(DNLServiceDiscoveryEntry{
-		ServiceID:     serviceID,
-		ZoneID:        zoneID,
-		InterfaceHash: HashParts(serviceID, "interface"),
-		EndpointHash:  HashParts(serviceID, "endpoint"),
-		RouteID:       routeID,
-		ExpiryHeight:  expiry,
-		ProofHash:     HashParts(serviceID, "proof"),
+		ServiceID:	serviceID,
+		ZoneID:		zoneID,
+		InterfaceHash:	HashParts(serviceID, "interface"),
+		EndpointHash:	HashParts(serviceID, "endpoint"),
+		RouteID:	routeID,
+		ExpiryHeight:	expiry,
+		ProofHash:	HashParts(serviceID, "proof"),
 	})
 	require.NoError(t, err)
 	return entry
@@ -139,13 +139,13 @@ func testDNLEntry(t *testing.T, serviceID, zoneID, routeID string, expiry uint64
 func testDNLRoute(t *testing.T, zoneID, serviceID, nodeSeed string, priority, weight uint32, expiry uint64) DNLRoutingTableEntry {
 	t.Helper()
 	route, err := NewDNLRoutingTableEntry(DNLRoutingTableEntry{
-		ZoneID:        zoneID,
-		ServiceID:     serviceID,
-		NextHopNodeID: HashParts(nodeSeed, "node"),
-		OverlayID:     HashParts(zoneID, "overlay"),
-		Priority:      priority,
-		WeightBps:     weight,
-		ExpiryHeight:  expiry,
+		ZoneID:		zoneID,
+		ServiceID:	serviceID,
+		NextHopNodeID:	HashParts(nodeSeed, "node"),
+		OverlayID:	HashParts(zoneID, "overlay"),
+		Priority:	priority,
+		WeightBps:	weight,
+		ExpiryHeight:	expiry,
 	})
 	require.NoError(t, err)
 	return route

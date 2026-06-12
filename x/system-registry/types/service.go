@@ -17,24 +17,24 @@ import (
 )
 
 type MsgRegisterSystemEntityResponse struct {
-	Entity SystemEntity      `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Event  SystemEntityEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
+	Entity	SystemEntity		`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Event	SystemEntityEvent	`protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
 }
 type MsgUpdateSystemEntityResponse struct {
-	Entity SystemEntity      `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Event  SystemEntityEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
+	Entity	SystemEntity		`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Event	SystemEntityEvent	`protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
 }
 type MsgPauseSystemEntityResponse struct {
-	Entity SystemEntity      `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Event  SystemEntityEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
+	Entity	SystemEntity		`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Event	SystemEntityEvent	`protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
 }
 type MsgResumeSystemEntityResponse struct {
-	Entity SystemEntity      `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Event  SystemEntityEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
+	Entity	SystemEntity		`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Event	SystemEntityEvent	`protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
 }
 type MsgDeprecateSystemEntityResponse struct {
-	Entity SystemEntity      `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Event  SystemEntityEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
+	Entity	SystemEntity		`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Event	SystemEntityEvent	`protobuf:"bytes,2,opt,name=event,proto3" json:"event"`
 }
 
 type QueryParamsRequest struct{}
@@ -42,36 +42,36 @@ type QueryParamsResponse struct {
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 }
 type QuerySystemEntitiesRequest struct {
-	Offset uint64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset	uint64	`protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QuerySystemEntitiesResponse struct {
-	Entities []SystemEntity `protobuf:"bytes,1,rep,name=entities,proto3" json:"entities,omitempty"`
-	Next     uint64         `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total    uint64         `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Entities	[]SystemEntity	`protobuf:"bytes,1,rep,name=entities,proto3" json:"entities,omitempty"`
+	Next		uint64		`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total		uint64		`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 type QuerySystemEntityRequest struct {
 	ModuleName string `protobuf:"bytes,1,opt,name=module_name,json=moduleName,proto3" json:"module_name,omitempty"`
 }
 type QuerySystemEntityResponse struct {
-	Entity SystemEntity `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
-	Found  bool         `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
+	Entity	SystemEntity	`protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	Found	bool		`protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 type QueryReservedSystemAddressesRequest struct {
-	Offset uint64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset	uint64	`protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QueryReservedSystemAddressesResponse struct {
-	Addresses []addressing.SystemAddress `protobuf:"bytes,1,rep,name=addresses,proto3" json:"addresses,omitempty"`
-	Next      uint64                     `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total     uint64                     `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Addresses	[]addressing.SystemAddress	`protobuf:"bytes,1,rep,name=addresses,proto3" json:"addresses,omitempty"`
+	Next		uint64				`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total		uint64				`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 type QuerySystemAddressRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 }
 type QuerySystemAddressResponse struct {
-	Address addressing.SystemAddress `protobuf:"bytes,1,opt,name=address,proto3" json:"address"`
-	Found   bool                     `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
+	Address	addressing.SystemAddress	`protobuf:"bytes,1,opt,name=address,proto3" json:"address"`
+	Found	bool				`protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 type QueryDependencyGraphRequest struct{}
 type QueryDependencyGraphResponse struct {
@@ -113,14 +113,14 @@ func (UnimplementedMsgServer) DeprecateSystemEntity(context.Context, *MsgDepreca
 	return nil, status.Errorf(codes.Unimplemented, "method DeprecateSystemEntity not implemented")
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.systemregistry.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.systemregistry.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("RegisterSystemEntity", serviceHandler("RegisterSystemEntity", func() interface{} { return new(MsgRegisterSystemEntity) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).RegisterSystemEntity(ctx, req.(*MsgRegisterSystemEntity))
@@ -138,12 +138,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).DeprecateSystemEntity(ctx, req.(*MsgDeprecateSystemEntity))
 		})),
 	},
-	Metadata: "l1/systemregistry/v1/tx.proto",
+	Metadata:	"l1/systemregistry/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.systemregistry.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.systemregistry.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("Params", serviceHandler("Params", func() interface{} { return new(QueryParamsRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -164,7 +164,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).DependencyGraph(ctx, req.(*QueryDependencyGraphRequest))
 		})),
 	},
-	Metadata: "l1/systemregistry/v1/query.proto",
+	Metadata:	"l1/systemregistry/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -217,12 +217,12 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	for _, item := range []struct {
-		msg  gogoproto.Message
-		name string
+		msg	gogoproto.Message
+		name	string
 	}{
 		{(*MsgRegisterSystemEntity)(nil), "l1.systemregistry.v1.MsgRegisterSystemEntity"},
 		{(*MsgRegisterSystemEntityResponse)(nil), "l1.systemregistry.v1.MsgRegisterSystemEntityResponse"},
@@ -251,74 +251,74 @@ func registerServiceTypes() {
 	}
 }
 
-func (m *MsgRegisterSystemEntity) Reset()             { *m = MsgRegisterSystemEntity{} }
-func (m *MsgUpdateSystemEntity) Reset()               { *m = MsgUpdateSystemEntity{} }
-func (m *MsgPauseSystemEntity) Reset()                { *m = MsgPauseSystemEntity{} }
-func (m *MsgResumeSystemEntity) Reset()               { *m = MsgResumeSystemEntity{} }
-func (m *MsgDeprecateSystemEntity) Reset()            { *m = MsgDeprecateSystemEntity{} }
-func (m *MsgRegisterSystemEntityResponse) Reset()     { *m = MsgRegisterSystemEntityResponse{} }
-func (m *MsgUpdateSystemEntityResponse) Reset()       { *m = MsgUpdateSystemEntityResponse{} }
-func (m *MsgPauseSystemEntityResponse) Reset()        { *m = MsgPauseSystemEntityResponse{} }
-func (m *MsgResumeSystemEntityResponse) Reset()       { *m = MsgResumeSystemEntityResponse{} }
-func (m *MsgDeprecateSystemEntityResponse) Reset()    { *m = MsgDeprecateSystemEntityResponse{} }
-func (m *QueryParamsRequest) Reset()                  { *m = QueryParamsRequest{} }
-func (m *QueryParamsResponse) Reset()                 { *m = QueryParamsResponse{} }
-func (m *QuerySystemEntitiesRequest) Reset()          { *m = QuerySystemEntitiesRequest{} }
-func (m *QuerySystemEntitiesResponse) Reset()         { *m = QuerySystemEntitiesResponse{} }
-func (m *QuerySystemEntityRequest) Reset()            { *m = QuerySystemEntityRequest{} }
-func (m *QuerySystemEntityResponse) Reset()           { *m = QuerySystemEntityResponse{} }
-func (m *QueryReservedSystemAddressesRequest) Reset() { *m = QueryReservedSystemAddressesRequest{} }
+func (m *MsgRegisterSystemEntity) Reset()		{ *m = MsgRegisterSystemEntity{} }
+func (m *MsgUpdateSystemEntity) Reset()			{ *m = MsgUpdateSystemEntity{} }
+func (m *MsgPauseSystemEntity) Reset()			{ *m = MsgPauseSystemEntity{} }
+func (m *MsgResumeSystemEntity) Reset()			{ *m = MsgResumeSystemEntity{} }
+func (m *MsgDeprecateSystemEntity) Reset()		{ *m = MsgDeprecateSystemEntity{} }
+func (m *MsgRegisterSystemEntityResponse) Reset()	{ *m = MsgRegisterSystemEntityResponse{} }
+func (m *MsgUpdateSystemEntityResponse) Reset()		{ *m = MsgUpdateSystemEntityResponse{} }
+func (m *MsgPauseSystemEntityResponse) Reset()		{ *m = MsgPauseSystemEntityResponse{} }
+func (m *MsgResumeSystemEntityResponse) Reset()		{ *m = MsgResumeSystemEntityResponse{} }
+func (m *MsgDeprecateSystemEntityResponse) Reset()	{ *m = MsgDeprecateSystemEntityResponse{} }
+func (m *QueryParamsRequest) Reset()			{ *m = QueryParamsRequest{} }
+func (m *QueryParamsResponse) Reset()			{ *m = QueryParamsResponse{} }
+func (m *QuerySystemEntitiesRequest) Reset()		{ *m = QuerySystemEntitiesRequest{} }
+func (m *QuerySystemEntitiesResponse) Reset()		{ *m = QuerySystemEntitiesResponse{} }
+func (m *QuerySystemEntityRequest) Reset()		{ *m = QuerySystemEntityRequest{} }
+func (m *QuerySystemEntityResponse) Reset()		{ *m = QuerySystemEntityResponse{} }
+func (m *QueryReservedSystemAddressesRequest) Reset()	{ *m = QueryReservedSystemAddressesRequest{} }
 func (m *QueryReservedSystemAddressesResponse) Reset() {
 	*m = QueryReservedSystemAddressesResponse{}
 }
-func (m *QuerySystemAddressRequest) Reset()                   { *m = QuerySystemAddressRequest{} }
-func (m *QuerySystemAddressResponse) Reset()                  { *m = QuerySystemAddressResponse{} }
-func (m *QueryDependencyGraphRequest) Reset()                 { *m = QueryDependencyGraphRequest{} }
-func (m *QueryDependencyGraphResponse) Reset()                { *m = QueryDependencyGraphResponse{} }
-func (m *MsgRegisterSystemEntity) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateSystemEntity) String() string               { return gogoproto.CompactTextString(m) }
-func (m *MsgPauseSystemEntity) String() string                { return gogoproto.CompactTextString(m) }
-func (m *MsgResumeSystemEntity) String() string               { return gogoproto.CompactTextString(m) }
-func (m *MsgDeprecateSystemEntity) String() string            { return gogoproto.CompactTextString(m) }
-func (m *MsgRegisterSystemEntityResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateSystemEntityResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *MsgPauseSystemEntityResponse) String() string        { return gogoproto.CompactTextString(m) }
-func (m *MsgResumeSystemEntityResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *MsgDeprecateSystemEntityResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsRequest) String() string                  { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsResponse) String() string                 { return gogoproto.CompactTextString(m) }
-func (m *QuerySystemEntitiesRequest) String() string          { return gogoproto.CompactTextString(m) }
-func (m *QuerySystemEntitiesResponse) String() string         { return gogoproto.CompactTextString(m) }
-func (m *QuerySystemEntityRequest) String() string            { return gogoproto.CompactTextString(m) }
-func (m *QuerySystemEntityResponse) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryReservedSystemAddressesRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QuerySystemAddressRequest) Reset()			{ *m = QuerySystemAddressRequest{} }
+func (m *QuerySystemAddressResponse) Reset()			{ *m = QuerySystemAddressResponse{} }
+func (m *QueryDependencyGraphRequest) Reset()			{ *m = QueryDependencyGraphRequest{} }
+func (m *QueryDependencyGraphResponse) Reset()			{ *m = QueryDependencyGraphResponse{} }
+func (m *MsgRegisterSystemEntity) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateSystemEntity) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgPauseSystemEntity) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgResumeSystemEntity) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgDeprecateSystemEntity) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgRegisterSystemEntityResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateSystemEntityResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgPauseSystemEntityResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgResumeSystemEntityResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgDeprecateSystemEntityResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsRequest) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsResponse) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QuerySystemEntitiesRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QuerySystemEntitiesResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QuerySystemEntityRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QuerySystemEntityResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryReservedSystemAddressesRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryReservedSystemAddressesResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QuerySystemAddressRequest) String() string    { return gogoproto.CompactTextString(m) }
-func (m *QuerySystemAddressResponse) String() string   { return gogoproto.CompactTextString(m) }
-func (m *QueryDependencyGraphRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryDependencyGraphResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *QuerySystemAddressRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QuerySystemAddressResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryDependencyGraphRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryDependencyGraphResponse) String() string	{ return gogoproto.CompactTextString(m) }
 
-func (*MsgRegisterSystemEntity) ProtoMessage()              {}
-func (*MsgUpdateSystemEntity) ProtoMessage()                {}
-func (*MsgPauseSystemEntity) ProtoMessage()                 {}
-func (*MsgResumeSystemEntity) ProtoMessage()                {}
-func (*MsgDeprecateSystemEntity) ProtoMessage()             {}
-func (*MsgRegisterSystemEntityResponse) ProtoMessage()      {}
-func (*MsgUpdateSystemEntityResponse) ProtoMessage()        {}
-func (*MsgPauseSystemEntityResponse) ProtoMessage()         {}
-func (*MsgResumeSystemEntityResponse) ProtoMessage()        {}
-func (*MsgDeprecateSystemEntityResponse) ProtoMessage()     {}
-func (*QueryParamsRequest) ProtoMessage()                   {}
-func (*QueryParamsResponse) ProtoMessage()                  {}
-func (*QuerySystemEntitiesRequest) ProtoMessage()           {}
-func (*QuerySystemEntitiesResponse) ProtoMessage()          {}
-func (*QuerySystemEntityRequest) ProtoMessage()             {}
-func (*QuerySystemEntityResponse) ProtoMessage()            {}
-func (*QueryReservedSystemAddressesRequest) ProtoMessage()  {}
-func (*QueryReservedSystemAddressesResponse) ProtoMessage() {}
-func (*QuerySystemAddressRequest) ProtoMessage()            {}
-func (*QuerySystemAddressResponse) ProtoMessage()           {}
-func (*QueryDependencyGraphRequest) ProtoMessage()          {}
-func (*QueryDependencyGraphResponse) ProtoMessage()         {}
+func (*MsgRegisterSystemEntity) ProtoMessage()			{}
+func (*MsgUpdateSystemEntity) ProtoMessage()			{}
+func (*MsgPauseSystemEntity) ProtoMessage()			{}
+func (*MsgResumeSystemEntity) ProtoMessage()			{}
+func (*MsgDeprecateSystemEntity) ProtoMessage()			{}
+func (*MsgRegisterSystemEntityResponse) ProtoMessage()		{}
+func (*MsgUpdateSystemEntityResponse) ProtoMessage()		{}
+func (*MsgPauseSystemEntityResponse) ProtoMessage()		{}
+func (*MsgResumeSystemEntityResponse) ProtoMessage()		{}
+func (*MsgDeprecateSystemEntityResponse) ProtoMessage()		{}
+func (*QueryParamsRequest) ProtoMessage()			{}
+func (*QueryParamsResponse) ProtoMessage()			{}
+func (*QuerySystemEntitiesRequest) ProtoMessage()		{}
+func (*QuerySystemEntitiesResponse) ProtoMessage()		{}
+func (*QuerySystemEntityRequest) ProtoMessage()			{}
+func (*QuerySystemEntityResponse) ProtoMessage()		{}
+func (*QueryReservedSystemAddressesRequest) ProtoMessage()	{}
+func (*QueryReservedSystemAddressesResponse) ProtoMessage()	{}
+func (*QuerySystemAddressRequest) ProtoMessage()		{}
+func (*QuerySystemAddressResponse) ProtoMessage()		{}
+func (*QueryDependencyGraphRequest) ProtoMessage()		{}
+func (*QueryDependencyGraphResponse) ProtoMessage()		{}

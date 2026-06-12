@@ -20,23 +20,23 @@ type ProofKeeperV2 struct{}
 type RoutingIntegrationKeeperV2 struct{}
 
 type IdentityKeeperInvariantInputV2 struct {
-	State         IdentityState
-	Height        uint64
-	CacheRecords  []ResolutionCacheRecordV2
-	CacheContexts []ResolutionCacheUseContextV2
+	State		IdentityState
+	Height		uint64
+	CacheRecords	[]ResolutionCacheRecordV2
+	CacheContexts	[]ResolutionCacheUseContextV2
 }
 
-func NewIdentityKeeperV2() IdentityKeeperV2 { return IdentityKeeperV2{} }
+func NewIdentityKeeperV2() IdentityKeeperV2	{ return IdentityKeeperV2{} }
 
-func NewResolverKeeperV2() ResolverKeeperV2 { return ResolverKeeperV2{} }
+func NewResolverKeeperV2() ResolverKeeperV2	{ return ResolverKeeperV2{} }
 
-func NewDelegationKeeperV2() DelegationKeeperV2 { return DelegationKeeperV2{} }
+func NewDelegationKeeperV2() DelegationKeeperV2	{ return DelegationKeeperV2{} }
 
-func NewAuctionKeeperV2() AuctionKeeperV2 { return AuctionKeeperV2{} }
+func NewAuctionKeeperV2() AuctionKeeperV2	{ return AuctionKeeperV2{} }
 
-func NewProofKeeperV2() ProofKeeperV2 { return ProofKeeperV2{} }
+func NewProofKeeperV2() ProofKeeperV2	{ return ProofKeeperV2{} }
 
-func NewRoutingIntegrationKeeperV2() RoutingIntegrationKeeperV2 { return RoutingIntegrationKeeperV2{} }
+func NewRoutingIntegrationKeeperV2() RoutingIntegrationKeeperV2	{ return RoutingIntegrationKeeperV2{} }
 
 func (IdentityKeeperV2) CommitRegistration(state IdentityState, name string, owner sdk.AccAddress, commitmentHash string, height uint64) (IdentityState, error) {
 	return CommitDomainRegistration(state, name, owner, commitmentHash, height)
@@ -199,19 +199,19 @@ func (ProofKeeperV2) VerifyResolutionProof(proof IdentityResolutionProof, truste
 
 func (RoutingIntegrationKeeperV2) ResolveTransactionTarget(state IdentityState, name string, recordKey string, height uint64) (NamedExecutionTarget, error) {
 	return ResolveNamedExecutionTarget(state, NamedExecutionRequest{
-		Kind:      NamedExecutionSend,
-		Name:      name,
-		RecordKey: recordKey,
+		Kind:		NamedExecutionSend,
+		Name:		name,
+		RecordKey:	recordKey,
 	}, height)
 }
 
 func (RoutingIntegrationKeeperV2) ResolveContractInvocation(state IdentityState, name string, interfaceID string, method string, payloadHash string, height uint64) (NamedExecutionTarget, error) {
 	return ResolveNamedExecutionTarget(state, NamedExecutionRequest{
-		Kind:        NamedExecutionInvoke,
-		Name:        name,
-		InterfaceID: interfaceID,
-		Method:      method,
-		PayloadHash: payloadHash,
+		Kind:		NamedExecutionInvoke,
+		Name:		name,
+		InterfaceID:	interfaceID,
+		Method:		method,
+		PayloadHash:	payloadHash,
 	}, height)
 }
 

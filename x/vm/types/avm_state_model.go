@@ -12,71 +12,71 @@ import (
 )
 
 const (
-	AVMStatePrefixParams               = "avm/params"
-	AVMStatePrefixZones                = "avm/zones"
-	AVMStatePrefixRouterRoutes         = "avm/router/routes"
-	AVMStatePrefixAsyncMessages        = "avm/async/messages"
-	AVMStatePrefixAsyncQueues          = "avm/async/queues"
-	AVMStatePrefixAsyncRetry           = "avm/async/retry"
-	AVMStatePrefixAsyncDead            = "avm/async/dead"
-	AVMStatePrefixActors               = "avm/actors"
-	AVMStatePrefixActorMailbox         = "avm/actors/mailbox"
-	AVMStatePrefixContinuations        = "avm/continuations"
-	AVMStatePrefixContractCode         = "avm/contracts/code"
-	AVMStatePrefixContractInstances    = "avm/contracts/instances"
-	AVMStatePrefixContractStorage      = "avm/contracts/storage"
-	AVMStatePrefixInterfaces           = "avm/interfaces"
-	AVMStatePrefixReceipts             = "avm/receipts"
-	AVMStatePrefixRoots                = "avm/roots"
-	AVMStatePrefixZoneStateRoots       = "avm/roots/state"
-	AVMStatePrefixZoneMessageRoots     = "avm/roots/messages"
-	AVMStatePrefixZoneContinuationRoot = "avm/roots/continuations"
+	AVMStatePrefixParams			= "avm/params"
+	AVMStatePrefixZones			= "avm/zones"
+	AVMStatePrefixRouterRoutes		= "avm/router/routes"
+	AVMStatePrefixAsyncMessages		= "avm/async/messages"
+	AVMStatePrefixAsyncQueues		= "avm/async/queues"
+	AVMStatePrefixAsyncRetry		= "avm/async/retry"
+	AVMStatePrefixAsyncDead			= "avm/async/dead"
+	AVMStatePrefixActors			= "avm/actors"
+	AVMStatePrefixActorMailbox		= "avm/actors/mailbox"
+	AVMStatePrefixContinuations		= "avm/continuations"
+	AVMStatePrefixContractCode		= "avm/contracts/code"
+	AVMStatePrefixContractInstances		= "avm/contracts/instances"
+	AVMStatePrefixContractStorage		= "avm/contracts/storage"
+	AVMStatePrefixInterfaces		= "avm/interfaces"
+	AVMStatePrefixReceipts			= "avm/receipts"
+	AVMStatePrefixRoots			= "avm/roots"
+	AVMStatePrefixZoneStateRoots		= "avm/roots/state"
+	AVMStatePrefixZoneMessageRoots		= "avm/roots/messages"
+	AVMStatePrefixZoneContinuationRoot	= "avm/roots/continuations"
 
-	AVMStateValueParams            = "AVMParams"
-	AVMStateValueZoneRuntimeConfig = "ZoneRuntimeConfig"
-	AVMStateValueRouteDescriptor   = "RouteDescriptor"
-	AVMStateValueAsyncMessage      = "AsyncMessage"
-	AVMStateValueMessageID         = "message_id"
-	AVMStateValueRetryRecord       = "RetryRecord"
-	AVMStateValueDeadLetterRecord  = "DeadLetterRecord"
-	AVMStateValueActorRecord       = "ActorRecord"
-	AVMStateValueContinuation      = "Continuation"
-	AVMStateValueCodeRecord        = "CodeRecord"
-	AVMStateValueContractRecord    = "ContractRecord"
-	AVMStateValueStorageValue      = "StorageValue"
-	AVMStateValueInterface         = "InterfaceDescriptor"
-	AVMStateValueReceipt           = "ExecutionReceipt"
-	AVMStateValueRoot              = "AVMRoot"
+	AVMStateValueParams		= "AVMParams"
+	AVMStateValueZoneRuntimeConfig	= "ZoneRuntimeConfig"
+	AVMStateValueRouteDescriptor	= "RouteDescriptor"
+	AVMStateValueAsyncMessage	= "AsyncMessage"
+	AVMStateValueMessageID		= "message_id"
+	AVMStateValueRetryRecord	= "RetryRecord"
+	AVMStateValueDeadLetterRecord	= "DeadLetterRecord"
+	AVMStateValueActorRecord	= "ActorRecord"
+	AVMStateValueContinuation	= "Continuation"
+	AVMStateValueCodeRecord		= "CodeRecord"
+	AVMStateValueContractRecord	= "ContractRecord"
+	AVMStateValueStorageValue	= "StorageValue"
+	AVMStateValueInterface		= "InterfaceDescriptor"
+	AVMStateValueReceipt		= "ExecutionReceipt"
+	AVMStateValueRoot		= "AVMRoot"
 
-	MaxAVMStateKeySegmentLength = 128
-	MaxAVMMessageBytes          = 1024 * 1024
+	MaxAVMStateKeySegmentLength	= 128
+	MaxAVMMessageBytes		= 1024 * 1024
 )
 
 type AVMStatePrefixDescriptor struct {
-	Prefix      string
-	KeyTemplate string
-	ValueType   string
+	Prefix		string
+	KeyTemplate	string
+	ValueType	string
 }
 
 type AVMStateModel struct {
-	Prefixes []AVMStatePrefixDescriptor
-	Root     string
+	Prefixes	[]AVMStatePrefixDescriptor
+	Root		string
 }
 
 type AVMZoneRuntimeConfig struct {
-	ZoneID                  zonestypes.ZoneID
-	Enabled                 bool
-	ExecutionBudgetPerBlock zonestypes.ZoneExecutionBudget
-	AsyncBudgetPerBlock     zonestypes.ZoneExecutionBudget
-	MaxQueueDepth           uint32
-	MaxMessageBytes         uint32
-	GasPolicyID             string
-	RetryPolicyID           string
-	AllowedMessageTypes     []string
-	StateRootPrefix         string
-	MessageRootPrefix       string
-	ContinuationRootPrefix  string
-	ConfigRoot              string
+	ZoneID			zonestypes.ZoneID
+	Enabled			bool
+	ExecutionBudgetPerBlock	zonestypes.ZoneExecutionBudget
+	AsyncBudgetPerBlock	zonestypes.ZoneExecutionBudget
+	MaxQueueDepth		uint32
+	MaxMessageBytes		uint32
+	GasPolicyID		string
+	RetryPolicyID		string
+	AllowedMessageTypes	[]string
+	StateRootPrefix		string
+	MessageRootPrefix	string
+	ContinuationRootPrefix	string
+	ConfigRoot		string
 }
 
 func DefaultAVMStateModel() AVMStateModel {
@@ -105,21 +105,21 @@ func DefaultAVMStateModel() AVMStateModel {
 
 func DefaultAVMZoneRuntimeConfig(zoneID zonestypes.ZoneID) (AVMZoneRuntimeConfig, error) {
 	config := AVMZoneRuntimeConfig{
-		ZoneID:                  zoneID,
-		Enabled:                 true,
-		ExecutionBudgetPerBlock: zonestypes.DefaultZoneExecutionBudget(),
+		ZoneID:				zoneID,
+		Enabled:			true,
+		ExecutionBudgetPerBlock:	zonestypes.DefaultZoneExecutionBudget(),
 		AsyncBudgetPerBlock: zonestypes.ZoneExecutionBudget{
-			MaxGas:      500_000,
-			MaxMessages: 500,
+			MaxGas:		500_000,
+			MaxMessages:	500,
 		},
-		MaxQueueDepth:          10_000,
-		MaxMessageBytes:        64 * 1024,
-		GasPolicyID:            "default-gas",
-		RetryPolicyID:          "default-retry",
-		AllowedMessageTypes:    []string{"*"},
-		StateRootPrefix:        AVMZoneStateRootPrefix(zoneID),
-		MessageRootPrefix:      AVMZoneMessageRootPrefix(zoneID),
-		ContinuationRootPrefix: AVMZoneContinuationRootPrefix(zoneID),
+		MaxQueueDepth:		10_000,
+		MaxMessageBytes:	64 * 1024,
+		GasPolicyID:		"default-gas",
+		RetryPolicyID:		"default-retry",
+		AllowedMessageTypes:	[]string{"*"},
+		StateRootPrefix:	AVMZoneStateRootPrefix(zoneID),
+		MessageRootPrefix:	AVMZoneMessageRootPrefix(zoneID),
+		ContinuationRootPrefix:	AVMZoneContinuationRootPrefix(zoneID),
 	}
 	config = canonicalAVMZoneRuntimeConfig(config)
 	config.ConfigRoot = ComputeAVMZoneRuntimeConfigRoot(config)
@@ -334,8 +334,8 @@ func ComputeAVMZoneRuntimeConfigRoot(config AVMZoneRuntimeConfig) string {
 
 func canonicalAVMStateModel(model AVMStateModel) AVMStateModel {
 	out := AVMStateModel{
-		Prefixes: append([]AVMStatePrefixDescriptor(nil), model.Prefixes...),
-		Root:     strings.TrimSpace(model.Root),
+		Prefixes:	append([]AVMStatePrefixDescriptor(nil), model.Prefixes...),
+		Root:		strings.TrimSpace(model.Root),
 	}
 	for i := range out.Prefixes {
 		out.Prefixes[i].Prefix = strings.TrimSpace(out.Prefixes[i].Prefix)

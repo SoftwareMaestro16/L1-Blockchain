@@ -16,78 +16,78 @@ type XServicesFailureMode string
 type XServicesIntegrationPoint string
 
 const (
-	XServicesStateDescriptor      XServicesStateObject = "ServiceDescriptor"
-	XServicesStateAnchor          XServicesStateObject = "ServiceAnchor"
-	XServicesStateIdentityBinding XServicesStateObject = "IdentityServiceBinding"
-	XServicesStateStatus          XServicesStateObject = "ServiceStatus"
-	XServicesStateParams          XServicesStateObject = "ServiceParams"
+	XServicesStateDescriptor	XServicesStateObject	= "ServiceDescriptor"
+	XServicesStateAnchor		XServicesStateObject	= "ServiceAnchor"
+	XServicesStateIdentityBinding	XServicesStateObject	= "IdentityServiceBinding"
+	XServicesStateStatus		XServicesStateObject	= "ServiceStatus"
+	XServicesStateParams		XServicesStateObject	= "ServiceParams"
 
-	XServicesMsgRegisterService       XServicesMessageName = "MsgRegisterService"
-	XServicesMsgUpdateService         XServicesMessageName = "MsgUpdateService"
-	XServicesMsgRenewService          XServicesMessageName = "MsgRenewService"
-	XServicesMsgDisableService        XServicesMessageName = "MsgDisableService"
-	XServicesMsgTransferService       XServicesMessageName = "MsgTransferService"
-	XServicesMsgBindServiceIdentity   XServicesMessageName = "MsgBindServiceIdentity"
-	XServicesMsgUnbindServiceIdentity XServicesMessageName = "MsgUnbindServiceIdentity"
+	XServicesMsgRegisterService		XServicesMessageName	= "MsgRegisterService"
+	XServicesMsgUpdateService		XServicesMessageName	= "MsgUpdateService"
+	XServicesMsgRenewService		XServicesMessageName	= "MsgRenewService"
+	XServicesMsgDisableService		XServicesMessageName	= "MsgDisableService"
+	XServicesMsgTransferService		XServicesMessageName	= "MsgTransferService"
+	XServicesMsgBindServiceIdentity		XServicesMessageName	= "MsgBindServiceIdentity"
+	XServicesMsgUnbindServiceIdentity	XServicesMessageName	= "MsgUnbindServiceIdentity"
 
-	XServicesQueryService            XServicesQueryName = "QueryService"
-	XServicesQueryServiceByName      XServicesQueryName = "QueryServiceByName"
-	XServicesQueryServicesByOwner    XServicesQueryName = "QueryServicesByOwner"
-	XServicesQueryServicesByIdentity XServicesQueryName = "QueryServicesByIdentity"
-	XServicesQueryServiceProof       XServicesQueryName = "QueryServiceProof"
+	XServicesQueryService			XServicesQueryName	= "QueryService"
+	XServicesQueryServiceByName		XServicesQueryName	= "QueryServiceByName"
+	XServicesQueryServicesByOwner		XServicesQueryName	= "QueryServicesByOwner"
+	XServicesQueryServicesByIdentity	XServicesQueryName	= "QueryServicesByIdentity"
+	XServicesQueryServiceProof		XServicesQueryName	= "QueryServiceProof"
 
-	XServicesFailureDuplicateServiceID                XServicesFailureMode = "duplicate_service_id"
-	XServicesFailureUnauthorizedDescriptorUpdate      XServicesFailureMode = "unauthorized_descriptor_update"
-	XServicesFailureExpiredDescriptorUsedForCall      XServicesFailureMode = "expired_descriptor_used_for_call"
-	XServicesFailureInterfaceHashMismatch             XServicesFailureMode = "interface_hash_mismatch"
-	XServicesFailureStaleIdentityBindingAfterTransfer XServicesFailureMode = "identity_binding_stale_after_domain_transfer"
+	XServicesFailureDuplicateServiceID			XServicesFailureMode	= "duplicate_service_id"
+	XServicesFailureUnauthorizedDescriptorUpdate		XServicesFailureMode	= "unauthorized_descriptor_update"
+	XServicesFailureExpiredDescriptorUsedForCall		XServicesFailureMode	= "expired_descriptor_used_for_call"
+	XServicesFailureInterfaceHashMismatch			XServicesFailureMode	= "interface_hash_mismatch"
+	XServicesFailureStaleIdentityBindingAfterTransfer	XServicesFailureMode	= "identity_binding_stale_after_domain_transfer"
 
-	XServicesIntegrationIdentity          XServicesIntegrationPoint = "x/identity"
-	XServicesIntegrationServiceInterface  XServicesIntegrationPoint = "x/serviceinterface"
-	XServicesIntegrationServiceCalls      XServicesIntegrationPoint = "x/servicecalls"
-	XServicesIntegrationStoreV2ProofQuery XServicesIntegrationPoint = "store_v2_proof_queries"
+	XServicesIntegrationIdentity		XServicesIntegrationPoint	= "x/identity"
+	XServicesIntegrationServiceInterface	XServicesIntegrationPoint	= "x/serviceinterface"
+	XServicesIntegrationServiceCalls	XServicesIntegrationPoint	= "x/servicecalls"
+	XServicesIntegrationStoreV2ProofQuery	XServicesIntegrationPoint	= "store_v2_proof_queries"
 )
 
 type XServicesFailureCoverage struct {
-	Mode       XServicesFailureMode
-	Guard      string
-	StoreScope string
+	Mode		XServicesFailureMode
+	Guard		string
+	StoreScope	string
 }
 
 type XServicesModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServicesStateObject
-	Messages          []XServicesMessageName
-	Queries           []XServicesQueryName
-	FailureModes      []XServicesFailureCoverage
-	IntegrationPoints []XServicesIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServicesStateObject
+	Messages		[]XServicesMessageName
+	Queries			[]XServicesQueryName
+	FailureModes		[]XServicesFailureCoverage
+	IntegrationPoints	[]XServicesIntegrationPoint
+	BreakdownHash		string
 }
 
 type XServicesCallDescriptorCheck struct {
-	ServiceID             string
-	ExpectedInterfaceHash string
-	CurrentHeight         uint64
-	DescriptorStatus      CanonicalServiceStatus
-	DescriptorTTLHeight   uint64
-	DescriptorHash        string
-	CheckHash             string
+	ServiceID		string
+	ExpectedInterfaceHash	string
+	CurrentHeight		uint64
+	DescriptorStatus	CanonicalServiceStatus
+	DescriptorTTLHeight	uint64
+	DescriptorHash		string
+	CheckHash		string
 }
 
 type XServicesIdentityBindingFreshnessCheck struct {
-	ServiceID            string
-	IdentityName         string
-	BoundOwner           string
-	CurrentIdentityOwner string
-	BoundHeight          uint64
-	CurrentHeight        uint64
-	CheckHash            string
+	ServiceID		string
+	IdentityName		string
+	BoundOwner		string
+	CurrentIdentityOwner	string
+	BoundHeight		uint64
+	CurrentHeight		uint64
+	CheckHash		string
 }
 
 func DefaultXServicesModuleBreakdown() (XServicesModuleBreakdown, error) {
 	breakdown := XServicesModuleBreakdown{
-		ModulePath: ServiceModuleServices,
+		ModulePath:	ServiceModuleServices,
 		Purpose: []string{
 			"identity_binding",
 			"lifecycle",
@@ -155,12 +155,12 @@ func ValidateXServicesDescriptorUsableForCall(descriptor CanonicalServiceDescrip
 		return XServicesCallDescriptorCheck{}, errors.New("x/services call descriptor check height must be positive")
 	}
 	check := XServicesCallDescriptorCheck{
-		ServiceID:             descriptor.ServiceID,
-		ExpectedInterfaceHash: expectedInterfaceHash,
-		CurrentHeight:         currentHeight,
-		DescriptorStatus:      descriptor.Status,
-		DescriptorTTLHeight:   descriptor.TTLHeight,
-		DescriptorHash:        descriptor.DescriptorHash,
+		ServiceID:		descriptor.ServiceID,
+		ExpectedInterfaceHash:	expectedInterfaceHash,
+		CurrentHeight:		currentHeight,
+		DescriptorStatus:	descriptor.Status,
+		DescriptorTTLHeight:	descriptor.TTLHeight,
+		DescriptorHash:		descriptor.DescriptorHash,
 	}
 	check.CheckHash = ComputeXServicesCallDescriptorCheckHash(check)
 	if descriptor.Status != CanonicalServiceStatusActive {
@@ -186,12 +186,12 @@ func ValidateXServicesIdentityBindingFreshness(binding ServiceIdentityBindingV2,
 		return XServicesIdentityBindingFreshnessCheck{}, errors.New("x/services identity freshness height must be positive")
 	}
 	check := XServicesIdentityBindingFreshnessCheck{
-		ServiceID:            binding.ServiceID,
-		IdentityName:         binding.IdentityName,
-		BoundOwner:           binding.Owner,
-		CurrentIdentityOwner: currentIdentityOwner,
-		BoundHeight:          binding.BoundHeight,
-		CurrentHeight:        currentHeight,
+		ServiceID:		binding.ServiceID,
+		IdentityName:		binding.IdentityName,
+		BoundOwner:		binding.Owner,
+		CurrentIdentityOwner:	currentIdentityOwner,
+		BoundHeight:		binding.BoundHeight,
+		CurrentHeight:		currentHeight,
 	}
 	check.CheckHash = ComputeXServicesIdentityBindingFreshnessCheckHash(check)
 	if currentHeight < binding.BoundHeight {

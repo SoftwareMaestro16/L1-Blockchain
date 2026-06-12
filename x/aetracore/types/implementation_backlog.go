@@ -12,50 +12,50 @@ type BacklogPriority string
 type BacklogItemID string
 
 const (
-	BacklogPriorityHigh   BacklogPriority = "high"
-	BacklogPriorityMedium BacklogPriority = "medium"
-	BacklogPriorityLower  BacklogPriority = "lower"
+	BacklogPriorityHigh	BacklogPriority	= "high"
+	BacklogPriorityMedium	BacklogPriority	= "medium"
+	BacklogPriorityLower	BacklogPriority	= "lower"
 
-	BacklogItemZoneDescriptorCommitmentLayout BacklogItemID = "define-zone-descriptor-zone-commitment-shard-layout"
-	BacklogItemAetraCoreSkeleton              BacklogItemID = "aetracore-skeleton"
-	BacklogItemGlobalRootHierarchy            BacklogItemID = "global-root-hierarchy"
-	BacklogItemMsgbusEncoding                 BacklogItemID = "msgbus-message-encoding"
-	BacklogItemLocalMessageStores             BacklogItemID = "local-inbox-outbox-receipt-stores"
-	BacklogItemStoreV2PrefixPlan              BacklogItemID = "store-v2-key-prefix-plan"
-	BacklogItemBlockSTMConflictTests          BacklogItemID = "blockstm-zone-batch-conflict-tests"
-	BacklogItemRoutingTableFormat             BacklogItemID = "deterministic-routing-table-format"
-	BacklogItemProofRegistrySchema            BacklogItemID = "proof-registry-schema"
+	BacklogItemZoneDescriptorCommitmentLayout	BacklogItemID	= "define-zone-descriptor-zone-commitment-shard-layout"
+	BacklogItemAetraCoreSkeleton			BacklogItemID	= "aetracore-skeleton"
+	BacklogItemGlobalRootHierarchy			BacklogItemID	= "global-root-hierarchy"
+	BacklogItemMsgbusEncoding			BacklogItemID	= "msgbus-message-encoding"
+	BacklogItemLocalMessageStores			BacklogItemID	= "local-inbox-outbox-receipt-stores"
+	BacklogItemStoreV2PrefixPlan			BacklogItemID	= "store-v2-key-prefix-plan"
+	BacklogItemBlockSTMConflictTests		BacklogItemID	= "blockstm-zone-batch-conflict-tests"
+	BacklogItemRoutingTableFormat			BacklogItemID	= "deterministic-routing-table-format"
+	BacklogItemProofRegistrySchema			BacklogItemID	= "proof-registry-schema"
 
-	BacklogItemExtractFinancialZone     BacklogItemID = "extract-financial-zone"
-	BacklogItemActivateIdentityZone     BacklogItemID = "activate-identity-zone"
-	BacklogItemPerZoneMempoolLanes      BacklogItemID = "per-zone-mempool-lanes"
-	BacklogItemPerShardFeeAccumulators  BacklogItemID = "per-shard-fee-accumulators"
-	BacklogItemShardSplitMergeScheduler BacklogItemID = "shard-split-merge-scheduler"
-	BacklogItemAVMBytecodeGasTable      BacklogItemID = "avm-bytecode-gas-table"
-	BacklogItemPaymentSettlementState   BacklogItemID = "payment-settlement-state"
-	BacklogItemCrossZoneIdentityLookup  BacklogItemID = "cross-zone-identity-lookup"
+	BacklogItemExtractFinancialZone		BacklogItemID	= "extract-financial-zone"
+	BacklogItemActivateIdentityZone		BacklogItemID	= "activate-identity-zone"
+	BacklogItemPerZoneMempoolLanes		BacklogItemID	= "per-zone-mempool-lanes"
+	BacklogItemPerShardFeeAccumulators	BacklogItemID	= "per-shard-fee-accumulators"
+	BacklogItemShardSplitMergeScheduler	BacklogItemID	= "shard-split-merge-scheduler"
+	BacklogItemAVMBytecodeGasTable		BacklogItemID	= "avm-bytecode-gas-table"
+	BacklogItemPaymentSettlementState	BacklogItemID	= "payment-settlement-state"
+	BacklogItemCrossZoneIdentityLookup	BacklogItemID	= "cross-zone-identity-lookup"
 
-	BacklogItemDynamicRouteCapacityScoring BacklogItemID = "dynamic-route-capacity-scoring"
-	BacklogItemVirtualPaymentChannels      BacklogItemID = "virtual-payment-channels"
-	BacklogItemAdvancedABIIntrospection    BacklogItemID = "advanced-abi-introspection"
-	BacklogItemVMNativeResolverContracts   BacklogItemID = "vm-native-resolver-contracts"
-	BacklogItemValidatorServiceMetadata    BacklogItemID = "validator-operated-service-metadata"
-	BacklogItemZoneStateRentPolicies       BacklogItemID = "zone-specific-state-rent-policies"
+	BacklogItemDynamicRouteCapacityScoring	BacklogItemID	= "dynamic-route-capacity-scoring"
+	BacklogItemVirtualPaymentChannels	BacklogItemID	= "virtual-payment-channels"
+	BacklogItemAdvancedABIIntrospection	BacklogItemID	= "advanced-abi-introspection"
+	BacklogItemVMNativeResolverContracts	BacklogItemID	= "vm-native-resolver-contracts"
+	BacklogItemValidatorServiceMetadata	BacklogItemID	= "validator-operated-service-metadata"
+	BacklogItemZoneStateRentPolicies	BacklogItemID	= "zone-specific-state-rent-policies"
 )
 
 type BacklogItem struct {
-	Priority       BacklogPriority
-	ItemID         BacklogItemID
-	Task           string
-	Target         string
-	Acceptance     []string
-	DescriptorHash string
+	Priority	BacklogPriority
+	ItemID		BacklogItemID
+	Task		string
+	Target		string
+	Acceptance	[]string
+	DescriptorHash	string
 }
 
 type ImplementationBacklogSpec struct {
-	Version uint64
-	Items   []BacklogItem
-	Root    string
+	Version	uint64
+	Items	[]BacklogItem
+	Root	string
 }
 
 func DefaultImplementationBacklogSpec() (ImplementationBacklogSpec, error) {
@@ -64,8 +64,8 @@ func DefaultImplementationBacklogSpec() (ImplementationBacklogSpec, error) {
 
 func BuildImplementationBacklogSpec(items []BacklogItem) (ImplementationBacklogSpec, error) {
 	spec := ImplementationBacklogSpec{
-		Version: ImplementationBacklogSpecVersion,
-		Items:   normalizeBacklogItems(items),
+		Version:	ImplementationBacklogSpecVersion,
+		Items:		normalizeBacklogItems(items),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return ImplementationBacklogSpec{}, err
@@ -322,11 +322,11 @@ func IsBacklogItemID(priority BacklogPriority, itemID BacklogItemID) bool {
 
 func backlogItem(priority BacklogPriority, itemID BacklogItemID, task, target string, acceptance []string) BacklogItem {
 	item := BacklogItem{
-		Priority:   priority,
-		ItemID:     itemID,
-		Task:       task,
-		Target:     target,
-		Acceptance: normalizeBacklogAcceptance(acceptance),
+		Priority:	priority,
+		ItemID:		itemID,
+		Task:		task,
+		Target:		target,
+		Acceptance:	normalizeBacklogAcceptance(acceptance),
 	}
 	item.DescriptorHash = ComputeBacklogItemHash(item)
 	return item

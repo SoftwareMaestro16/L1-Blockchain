@@ -23,10 +23,10 @@ import (
 const ConsensusVersion = prototype.NextMigrationVersion
 
 var (
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasGenesis     = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ appmodule.AppModule   = AppModule{}
+	_	module.AppModuleBasic	= AppModule{}
+	_	module.HasGenesis	= AppModule{}
+	_	module.HasServices	= AppModule{}
+	_	appmodule.AppModule	= AppModule{}
 )
 
 type AppModule struct {
@@ -37,12 +37,12 @@ func NewAppModule(k *keeper.Keeper) AppModule {
 	return AppModule{keeper: k}
 }
 
-func (AppModule) IsOnePerModuleType()                                         {}
-func (AppModule) IsAppModule()                                                {}
-func (AppModule) Name() string                                                { return types.ModuleName }
-func (AppModule) RegisterLegacyAminoCodec(*codec.LegacyAmino)                 {}
-func (AppModule) RegisterInterfaces(codectypes.InterfaceRegistry)             {}
-func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
+func (AppModule) IsOnePerModuleType()						{}
+func (AppModule) IsAppModule()							{}
+func (AppModule) Name() string							{ return types.ModuleName }
+func (AppModule) RegisterLegacyAminoCodec(*codec.LegacyAmino)			{}
+func (AppModule) RegisterInterfaces(codectypes.InterfaceRegistry)		{}
+func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux)	{}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	if err := cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
@@ -82,9 +82,9 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, _ codec.JSONCodec) json.RawMe
 	return mustMarshalGenesis(types.ModuleName, gs)
 }
 
-func (AppModule) ConsensusVersion() uint64    { return ConsensusVersion }
-func (AppModule) GetTxCmd() *cobra.Command    { return nil }
-func (AppModule) GetQueryCmd() *cobra.Command { return nil }
+func (AppModule) ConsensusVersion() uint64	{ return ConsensusVersion }
+func (AppModule) GetTxCmd() *cobra.Command	{ return nil }
+func (AppModule) GetQueryCmd() *cobra.Command	{ return nil }
 
 func mustMarshalGenesis(moduleName string, value any) json.RawMessage {
 	bz, err := json.Marshal(value)

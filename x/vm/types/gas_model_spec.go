@@ -12,74 +12,74 @@ import (
 )
 
 const (
-	AVMGasClassExecution              AVMGasClass = "execution"
-	AVMGasClassStorage                AVMGasClass = "storage"
-	AVMGasClassScheduling             AVMGasClass = "scheduling"
-	AVMGasClassCrossZoneRouting       AVMGasClass = "cross_zone_routing"
-	AVMGasClassProofVerification      AVMGasClass = "proof_verification"
-	AVMGasClassContinuation           AVMGasClass = "continuation"
-	AVMGasClassInterfaceIntrospection AVMGasClass = "interface_introspection"
+	AVMGasClassExecution			AVMGasClass	= "execution"
+	AVMGasClassStorage			AVMGasClass	= "storage"
+	AVMGasClassScheduling			AVMGasClass	= "scheduling"
+	AVMGasClassCrossZoneRouting		AVMGasClass	= "cross_zone_routing"
+	AVMGasClassProofVerification		AVMGasClass	= "proof_verification"
+	AVMGasClassContinuation			AVMGasClass	= "continuation"
+	AVMGasClassInterfaceIntrospection	AVMGasClass	= "interface_introspection"
 
-	MaxAVMGasCharges = 32
+	MaxAVMGasCharges	= 32
 )
 
 type AVMGasClass string
 
 type AVMGasClassBudget struct {
-	Class AVMGasClass
-	Limit uint64
+	Class	AVMGasClass
+	Limit	uint64
 }
 
 type AVMGasCharge struct {
-	Class  AVMGasClass
-	Amount uint64
+	Class	AVMGasClass
+	Amount	uint64
 }
 
 type AVMGasSchedule struct {
-	ClassBudgets              []AVMGasClassBudget
-	SchedulingGas             uint64
-	CrossZoneRoutingGas       uint64
-	ProofVerificationGas      uint64
-	ContinuationGas           uint64
-	InterfaceIntrospectionGas uint64
-	RetryGas                  uint64
-	BounceGas                 uint64
-	RefundUnused              bool
-	MaxRefundGas              uint64
-	ScheduleHash              string
+	ClassBudgets			[]AVMGasClassBudget
+	SchedulingGas			uint64
+	CrossZoneRoutingGas		uint64
+	ProofVerificationGas		uint64
+	ContinuationGas			uint64
+	InterfaceIntrospectionGas	uint64
+	RetryGas			uint64
+	BounceGas			uint64
+	RefundUnused			bool
+	MaxRefundGas			uint64
+	ScheduleHash			string
 }
 
 type AVMGasPolicy struct {
-	BaseMessageGas       uint64
-	PerBytePayloadGas    uint64
-	StorageReadGas       uint64
-	StorageWriteGas      uint64
-	QueueInsertGas       uint64
-	QueuePopGas          uint64
-	CrossZoneBaseGas     uint64
-	ProofVerifyBaseGas   uint64
-	ContinuationStoreGas uint64
-	BounceBaseGas        uint64
-	PolicyHash           string
+	BaseMessageGas		uint64
+	PerBytePayloadGas	uint64
+	StorageReadGas		uint64
+	StorageWriteGas		uint64
+	QueueInsertGas		uint64
+	QueuePopGas		uint64
+	CrossZoneBaseGas	uint64
+	ProofVerifyBaseGas	uint64
+	ContinuationStoreGas	uint64
+	BounceBaseGas		uint64
+	PolicyHash		string
 }
 
 type AVMAsyncGasReserve struct {
-	MessageID    string
-	ZoneID       zonestypes.ZoneID
-	ReservedGas  uint64
-	EscrowedGas  uint64
-	RemainingGas uint64
-	Consumed     []AVMGasCharge
-	RefundGas    uint64
-	Refundable   bool
-	ReserveHash  string
+	MessageID	string
+	ZoneID		zonestypes.ZoneID
+	ReservedGas	uint64
+	EscrowedGas	uint64
+	RemainingGas	uint64
+	Consumed	[]AVMGasCharge
+	RefundGas	uint64
+	Refundable	bool
+	ReserveHash	string
 }
 
 type AVMZoneAsyncGasMeter struct {
-	ZoneID    zonestypes.ZoneID
-	Budget    zonestypes.ZoneExecutionBudget
-	Consumed  []AVMGasCharge
-	MeterHash string
+	ZoneID		zonestypes.ZoneID
+	Budget		zonestypes.ZoneExecutionBudget
+	Consumed	[]AVMGasCharge
+	MeterHash	string
 }
 
 func DefaultAVMGasSchedule() (AVMGasSchedule, error) {
@@ -96,16 +96,16 @@ func DefaultAVMGasSchedule() (AVMGasSchedule, error) {
 
 func DefaultAVMGasPolicy() (AVMGasPolicy, error) {
 	policy := AVMGasPolicy{
-		BaseMessageGas:       10,
-		PerBytePayloadGas:    1,
-		StorageReadGas:       2,
-		StorageWriteGas:      4,
-		QueueInsertGas:       10,
-		QueuePopGas:          10,
-		CrossZoneBaseGas:     20,
-		ProofVerifyBaseGas:   15,
-		ContinuationStoreGas: 30,
-		BounceBaseGas:        25,
+		BaseMessageGas:		10,
+		PerBytePayloadGas:	1,
+		StorageReadGas:		2,
+		StorageWriteGas:	4,
+		QueueInsertGas:		10,
+		QueuePopGas:		10,
+		CrossZoneBaseGas:	20,
+		ProofVerifyBaseGas:	15,
+		ContinuationStoreGas:	30,
+		BounceBaseGas:		25,
 	}
 	policy.PolicyHash = ComputeAVMGasPolicyHash(policy)
 	return policy, policy.Validate()
@@ -126,15 +126,15 @@ func AVMGasScheduleFromPolicy(policy AVMGasPolicy, refundUnused bool, maxRefundG
 			{Class: AVMGasClassContinuation, Limit: 150_000},
 			{Class: AVMGasClassInterfaceIntrospection, Limit: 25_000},
 		},
-		SchedulingGas:             policy.QueueInsertGas,
-		CrossZoneRoutingGas:       policy.CrossZoneBaseGas,
-		ProofVerificationGas:      policy.ProofVerifyBaseGas,
-		ContinuationGas:           policy.ContinuationStoreGas,
-		InterfaceIntrospectionGas: 5,
-		RetryGas:                  policy.QueuePopGas,
-		BounceGas:                 policy.BounceBaseGas,
-		RefundUnused:              refundUnused,
-		MaxRefundGas:              maxRefundGas,
+		SchedulingGas:			policy.QueueInsertGas,
+		CrossZoneRoutingGas:		policy.CrossZoneBaseGas,
+		ProofVerificationGas:		policy.ProofVerifyBaseGas,
+		ContinuationGas:		policy.ContinuationStoreGas,
+		InterfaceIntrospectionGas:	5,
+		RetryGas:			policy.QueuePopGas,
+		BounceGas:			policy.BounceBaseGas,
+		RefundUnused:			refundUnused,
+		MaxRefundGas:			maxRefundGas,
 	}
 	schedule = canonicalAVMGasSchedule(schedule)
 	schedule.ScheduleHash = ComputeAVMGasScheduleHash(schedule)
@@ -155,13 +155,13 @@ func NewAVMAsyncGasReserve(msg AVMAsyncMessage, schedule AVMGasSchedule) (AVMAsy
 		return AVMAsyncGasReserve{}, err
 	}
 	reserve := AVMAsyncGasReserve{
-		MessageID:    msg.ID,
-		ZoneID:       msg.DestinationZone,
-		ReservedGas:  required,
-		EscrowedGas:  required,
-		RemainingGas: required,
-		Consumed:     charges,
-		Refundable:   schedule.RefundUnused,
+		MessageID:	msg.ID,
+		ZoneID:		msg.DestinationZone,
+		ReservedGas:	required,
+		EscrowedGas:	required,
+		RemainingGas:	required,
+		Consumed:	charges,
+		Refundable:	schedule.RefundUnused,
 	}
 	reserve = canonicalAVMAsyncGasReserve(reserve)
 	reserve.ReserveHash = ComputeAVMAsyncGasReserveHash(reserve)
@@ -284,8 +284,8 @@ func NewAVMZoneAsyncGasMeter(zoneID zonestypes.ZoneID, budget zonestypes.ZoneExe
 		return AVMZoneAsyncGasMeter{}, err
 	}
 	meter := AVMZoneAsyncGasMeter{
-		ZoneID: zoneID,
-		Budget: budget,
+		ZoneID:	zoneID,
+		Budget:	budget,
 	}
 	meter.MeterHash = ComputeAVMZoneAsyncGasMeterHash(meter)
 	return meter, meter.Validate()
@@ -483,8 +483,8 @@ func (s AVMGasSchedule) Validate() error {
 		}
 	}
 	for _, item := range []struct {
-		name  string
-		value uint64
+		name	string
+		value	uint64
 	}{
 		{name: "AVM scheduling gas", value: s.SchedulingGas},
 		{name: "AVM cross-zone routing gas", value: s.CrossZoneRoutingGas},
@@ -516,8 +516,8 @@ func (s AVMGasSchedule) Validate() error {
 func (p AVMGasPolicy) Validate() error {
 	p = canonicalAVMGasPolicy(p)
 	for _, item := range []struct {
-		name  string
-		value uint64
+		name	string
+		value	uint64
 	}{
 		{name: "AVM base message gas", value: p.BaseMessageGas},
 		{name: "AVM per-byte payload gas", value: p.PerBytePayloadGas},

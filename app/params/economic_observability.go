@@ -7,86 +7,86 @@ import (
 )
 
 const (
-	EconomicObservabilityKindMetric = "metric"
-	EconomicObservabilityKindEvent  = "event"
-	EconomicObservabilityKindQuery  = "query"
+	EconomicObservabilityKindMetric	= "metric"
+	EconomicObservabilityKindEvent	= "event"
+	EconomicObservabilityKindQuery	= "query"
 
-	EconomicMetricCurrentInflationRate          = "current_inflation_rate"
-	EconomicMetricGrossMintedPerEpoch           = "gross_minted_aet_per_epoch"
-	EconomicMetricBurnedPerEpoch                = "burned_aet_per_epoch"
-	EconomicMetricNetSupplyChangePerEpoch       = "net_supply_change_per_epoch"
-	EconomicMetricTotalBondedStakeRatio         = "total_bonded_stake_ratio"
-	EconomicMetricActiveValidatorCount          = "active_validator_count"
-	EconomicMetricStandbyValidatorCount         = "standby_validator_count"
-	EconomicMetricTopNVotingPowerShare          = "top_n_voting_power_share"
-	EconomicMetricValidatorRewardPerVotingPower = "per_validator_reward_per_voting_power"
-	EconomicMetricFeeRevenueByBucket            = "fee_revenue_by_bucket"
-	EconomicMetricBaseFeeCongestionMultiplier   = "base_fee_and_congestion_multiplier"
-	EconomicMetricFailedTxSurchargeTotals       = "failed_transaction_surcharge_totals"
-	EconomicMetricStateBytesDelta               = "state_bytes_added_removed_net"
-	EconomicMetricStorageRentWarnings           = "storage_rent_balances_and_exhaustion_warnings"
-	EconomicMetricSlashingBySeverity            = "slashing_amount_by_severity"
-	EconomicMetricReporterRewardsPaid           = "reporter_rewards_paid"
-	EconomicMetricDeflationGuardActivations     = "deflation_guard_activation_count"
-	EconomicMetricCircuitBreakerActivations     = "circuit_breaker_activation_count"
+	EconomicMetricCurrentInflationRate		= "current_inflation_rate"
+	EconomicMetricGrossMintedPerEpoch		= "gross_minted_aet_per_epoch"
+	EconomicMetricBurnedPerEpoch			= "burned_aet_per_epoch"
+	EconomicMetricNetSupplyChangePerEpoch		= "net_supply_change_per_epoch"
+	EconomicMetricTotalBondedStakeRatio		= "total_bonded_stake_ratio"
+	EconomicMetricActiveValidatorCount		= "active_validator_count"
+	EconomicMetricStandbyValidatorCount		= "standby_validator_count"
+	EconomicMetricTopNVotingPowerShare		= "top_n_voting_power_share"
+	EconomicMetricValidatorRewardPerVotingPower	= "per_validator_reward_per_voting_power"
+	EconomicMetricFeeRevenueByBucket		= "fee_revenue_by_bucket"
+	EconomicMetricBaseFeeCongestionMultiplier	= "base_fee_and_congestion_multiplier"
+	EconomicMetricFailedTxSurchargeTotals		= "failed_transaction_surcharge_totals"
+	EconomicMetricStateBytesDelta			= "state_bytes_added_removed_net"
+	EconomicMetricStorageRentWarnings		= "storage_rent_balances_and_exhaustion_warnings"
+	EconomicMetricSlashingBySeverity		= "slashing_amount_by_severity"
+	EconomicMetricReporterRewardsPaid		= "reporter_rewards_paid"
+	EconomicMetricDeflationGuardActivations		= "deflation_guard_activation_count"
+	EconomicMetricCircuitBreakerActivations		= "circuit_breaker_activation_count"
 
-	EconomicEventInflationUpdate               = "inflation_update_event"
-	EconomicEventFeeAllocation                 = "fee_allocation_event"
-	EconomicEventBurn                          = "burn_event"
-	EconomicEventDeflationGuard                = "deflation_guard_event"
-	EconomicEventValidatorScoreUpdate          = "validator_score_update_event"
-	EconomicEventValidatorConcentrationWarning = "validator_concentration_warning_event"
-	EconomicEventCommissionChangeWarning       = "commission_change_warning_event"
-	EconomicEventDelegationRiskWarning         = "delegation_risk_warning_event"
-	EconomicEventSlashingRoute                 = "slashing_route_event"
-	EconomicEventReporterReward                = "reporter_reward_event"
-	EconomicEventStorageFee                    = "storage_fee_event"
-	EconomicEventStateRentWarning              = "state_rent_warning_event"
-	EconomicEventCircuitBreaker                = "circuit_breaker_event"
+	EconomicEventInflationUpdate			= "inflation_update_event"
+	EconomicEventFeeAllocation			= "fee_allocation_event"
+	EconomicEventBurn				= "burn_event"
+	EconomicEventDeflationGuard			= "deflation_guard_event"
+	EconomicEventValidatorScoreUpdate		= "validator_score_update_event"
+	EconomicEventValidatorConcentrationWarning	= "validator_concentration_warning_event"
+	EconomicEventCommissionChangeWarning		= "commission_change_warning_event"
+	EconomicEventDelegationRiskWarning		= "delegation_risk_warning_event"
+	EconomicEventSlashingRoute			= "slashing_route_event"
+	EconomicEventReporterReward			= "reporter_reward_event"
+	EconomicEventStorageFee				= "storage_fee_event"
+	EconomicEventStateRentWarning			= "state_rent_warning_event"
+	EconomicEventCircuitBreaker			= "circuit_breaker_event"
 
-	EconomicQueryCurrentParameters             = "current_economic_parameters"
-	EconomicQueryInflationState                = "current_and_historical_inflation_state"
-	EconomicQueryNetIssuanceByEpoch            = "net_issuance_by_epoch"
-	EconomicQueryFeeDistributionByEpoch        = "fee_distribution_by_epoch"
-	EconomicQueryBurnHistory                   = "burn_history"
-	EconomicQueryValidatorScoreComponents      = "validator_score_and_score_components"
-	EconomicQueryValidatorConcentration        = "validator_concentration_metrics"
-	EconomicQueryDelegatorRiskAdjustedYield    = "delegator_risk_adjusted_yield_estimate"
-	EconomicQueryStorageFootprint              = "storage_footprint_by_account_or_contract"
-	EconomicQueryStateRentStatus               = "state_rent_status"
-	EconomicQueryFeeEstimateTxClass            = "fee_estimate_for_transaction_class"
-	EconomicQuerySupplyProjectionCurrentParams = "supply_projection_under_current_parameters"
+	EconomicQueryCurrentParameters			= "current_economic_parameters"
+	EconomicQueryInflationState			= "current_and_historical_inflation_state"
+	EconomicQueryNetIssuanceByEpoch			= "net_issuance_by_epoch"
+	EconomicQueryFeeDistributionByEpoch		= "fee_distribution_by_epoch"
+	EconomicQueryBurnHistory			= "burn_history"
+	EconomicQueryValidatorScoreComponents		= "validator_score_and_score_components"
+	EconomicQueryValidatorConcentration		= "validator_concentration_metrics"
+	EconomicQueryDelegatorRiskAdjustedYield		= "delegator_risk_adjusted_yield_estimate"
+	EconomicQueryStorageFootprint			= "storage_footprint_by_account_or_contract"
+	EconomicQueryStateRentStatus			= "state_rent_status"
+	EconomicQueryFeeEstimateTxClass			= "fee_estimate_for_transaction_class"
+	EconomicQuerySupplyProjectionCurrentParams	= "supply_projection_under_current_parameters"
 )
 
 type EconomicObservabilitySignal struct {
-	ID               string
-	Kind             string
-	Scope            string
-	Source           string
-	Required         bool
-	Queryable        bool
-	TelemetryEnabled bool
-	Emitted          bool
-	SchemaVersion    uint32
-	Labels           []string
+	ID			string
+	Kind			string
+	Scope			string
+	Source			string
+	Required		bool
+	Queryable		bool
+	TelemetryEnabled	bool
+	Emitted			bool
+	SchemaVersion		uint32
+	Labels			[]string
 }
 
 type EconomicObservabilityReport struct {
-	Metrics           []EconomicObservabilitySignal
-	Events            []EconomicObservabilitySignal
-	Queries           []EconomicObservabilitySignal
-	RequiredMetrics   int
-	RequiredEvents    int
-	RequiredQueries   int
-	CoveredMetrics    int
-	CoveredEvents     int
-	CoveredQueries    int
-	MetricCoverageBps int64
-	EventCoverageBps  int64
-	QueryCoverageBps  int64
-	Passed            bool
-	Failed            []string
-	GovernanceSummary string
+	Metrics			[]EconomicObservabilitySignal
+	Events			[]EconomicObservabilitySignal
+	Queries			[]EconomicObservabilitySignal
+	RequiredMetrics		int
+	RequiredEvents		int
+	RequiredQueries		int
+	CoveredMetrics		int
+	CoveredEvents		int
+	CoveredQueries		int
+	MetricCoverageBps	int64
+	EventCoverageBps	int64
+	QueryCoverageBps	int64
+	Passed			bool
+	Failed			[]string
+	GovernanceSummary	string
 }
 
 func DefaultEconomicObservabilityMetrics() []EconomicObservabilitySignal {
@@ -169,62 +169,62 @@ func BuildEconomicObservabilityReport(metrics, events []EconomicObservabilitySig
 	eventCoverage := coverageBps(coveredEvents, requiredEvents)
 	queryCoverage := coverageBps(coveredQueries, requiredQueries)
 	return EconomicObservabilityReport{
-		Metrics:           metricSignals,
-		Events:            eventSignals,
-		Queries:           querySignals,
-		RequiredMetrics:   requiredMetrics,
-		RequiredEvents:    requiredEvents,
-		RequiredQueries:   requiredQueries,
-		CoveredMetrics:    coveredMetrics,
-		CoveredEvents:     coveredEvents,
-		CoveredQueries:    coveredQueries,
-		MetricCoverageBps: metricCoverage,
-		EventCoverageBps:  eventCoverage,
-		QueryCoverageBps:  queryCoverage,
-		Passed:            len(failed) == 0 && metricCoverage == BasisPoints && eventCoverage == BasisPoints && queryCoverage == BasisPoints,
-		Failed:            failed,
-		GovernanceSummary: fmt.Sprintf("required_metrics=%d/%d required_events=%d/%d required_queries=%d/%d metric_coverage_bps=%d event_coverage_bps=%d query_coverage_bps=%d", coveredMetrics, requiredMetrics, coveredEvents, requiredEvents, coveredQueries, requiredQueries, metricCoverage, eventCoverage, queryCoverage),
+		Metrics:		metricSignals,
+		Events:			eventSignals,
+		Queries:		querySignals,
+		RequiredMetrics:	requiredMetrics,
+		RequiredEvents:		requiredEvents,
+		RequiredQueries:	requiredQueries,
+		CoveredMetrics:		coveredMetrics,
+		CoveredEvents:		coveredEvents,
+		CoveredQueries:		coveredQueries,
+		MetricCoverageBps:	metricCoverage,
+		EventCoverageBps:	eventCoverage,
+		QueryCoverageBps:	queryCoverage,
+		Passed:			len(failed) == 0 && metricCoverage == BasisPoints && eventCoverage == BasisPoints && queryCoverage == BasisPoints,
+		Failed:			failed,
+		GovernanceSummary:	fmt.Sprintf("required_metrics=%d/%d required_events=%d/%d required_queries=%d/%d metric_coverage_bps=%d event_coverage_bps=%d query_coverage_bps=%d", coveredMetrics, requiredMetrics, coveredEvents, requiredEvents, coveredQueries, requiredQueries, metricCoverage, eventCoverage, queryCoverage),
 	}
 }
 
 func requiredMetric(id, scope, source string, labels ...string) EconomicObservabilitySignal {
 	return EconomicObservabilitySignal{
-		ID:               id,
-		Kind:             EconomicObservabilityKindMetric,
-		Scope:            scope,
-		Source:           source,
-		Required:         true,
-		Queryable:        true,
-		TelemetryEnabled: true,
-		SchemaVersion:    1,
-		Labels:           append([]string{}, labels...),
+		ID:			id,
+		Kind:			EconomicObservabilityKindMetric,
+		Scope:			scope,
+		Source:			source,
+		Required:		true,
+		Queryable:		true,
+		TelemetryEnabled:	true,
+		SchemaVersion:		1,
+		Labels:			append([]string{}, labels...),
 	}
 }
 
 func requiredEvent(id, scope, source string, labels ...string) EconomicObservabilitySignal {
 	return EconomicObservabilitySignal{
-		ID:               id,
-		Kind:             EconomicObservabilityKindEvent,
-		Scope:            scope,
-		Source:           source,
-		Required:         true,
-		TelemetryEnabled: true,
-		Emitted:          true,
-		SchemaVersion:    1,
-		Labels:           append([]string{}, labels...),
+		ID:			id,
+		Kind:			EconomicObservabilityKindEvent,
+		Scope:			scope,
+		Source:			source,
+		Required:		true,
+		TelemetryEnabled:	true,
+		Emitted:		true,
+		SchemaVersion:		1,
+		Labels:			append([]string{}, labels...),
 	}
 }
 
 func requiredQuery(id, scope, source string, labels ...string) EconomicObservabilitySignal {
 	return EconomicObservabilitySignal{
-		ID:            id,
-		Kind:          EconomicObservabilityKindQuery,
-		Scope:         scope,
-		Source:        source,
-		Required:      true,
-		Queryable:     true,
-		SchemaVersion: 1,
-		Labels:        append([]string{}, labels...),
+		ID:		id,
+		Kind:		EconomicObservabilityKindQuery,
+		Scope:		scope,
+		Source:		source,
+		Required:	true,
+		Queryable:	true,
+		SchemaVersion:	1,
+		Labels:		append([]string{}, labels...),
 	}
 }
 

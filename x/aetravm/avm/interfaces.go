@@ -10,144 +10,144 @@ import (
 )
 
 const (
-	MaxInterfaceNameLength        = 64
-	MaxInterfaceDescriptionLength = 256
-	MaxInterfaceBindingTextLength = 256
-	MaxInterfacePayloadBytes      = 1 << 20
-	MaxInterfaceMethods           = 128
-	MaxInterfaceEvents            = 128
-	MaxInterfaceAsyncHandlers     = 128
-	MaxInterfaceGetMethods        = 128
-	MaxInterfaceBindings          = 128
-	MaxInterfaceFields            = 64
-	MaxInterfaceAliases           = 16
-	MaxInterfaceExamples          = 16
+	MaxInterfaceNameLength		= 64
+	MaxInterfaceDescriptionLength	= 256
+	MaxInterfaceBindingTextLength	= 256
+	MaxInterfacePayloadBytes	= 1 << 20
+	MaxInterfaceMethods		= 128
+	MaxInterfaceEvents		= 128
+	MaxInterfaceAsyncHandlers	= 128
+	MaxInterfaceGetMethods		= 128
+	MaxInterfaceBindings		= 128
+	MaxInterfaceFields		= 64
+	MaxInterfaceAliases		= 16
+	MaxInterfaceExamples		= 16
 )
 
 type InterfaceValueKind string
 
 const (
-	InterfaceValueBool    InterfaceValueKind = "bool"
-	InterfaceValueU64     InterfaceValueKind = "u64"
-	InterfaceValueBytes   InterfaceValueKind = "bytes"
-	InterfaceValueString  InterfaceValueKind = "string"
-	InterfaceValueAddress InterfaceValueKind = "address"
-	InterfaceValueCoin    InterfaceValueKind = "coin"
+	InterfaceValueBool	InterfaceValueKind	= "bool"
+	InterfaceValueU64	InterfaceValueKind	= "u64"
+	InterfaceValueBytes	InterfaceValueKind	= "bytes"
+	InterfaceValueString	InterfaceValueKind	= "string"
+	InterfaceValueAddress	InterfaceValueKind	= "address"
+	InterfaceValueCoin	InterfaceValueKind	= "coin"
 )
 
 type InterfaceWalletRisk string
 
 const (
-	InterfaceWalletRiskLow      InterfaceWalletRisk = "low"
-	InterfaceWalletRiskMedium   InterfaceWalletRisk = "medium"
-	InterfaceWalletRiskHigh     InterfaceWalletRisk = "high"
-	InterfaceWalletRiskCritical InterfaceWalletRisk = "critical"
+	InterfaceWalletRiskLow		InterfaceWalletRisk	= "low"
+	InterfaceWalletRiskMedium	InterfaceWalletRisk	= "medium"
+	InterfaceWalletRiskHigh		InterfaceWalletRisk	= "high"
+	InterfaceWalletRiskCritical	InterfaceWalletRisk	= "critical"
 )
 
 type InterfaceManifest struct {
-	Name          string
-	Version       uint16
-	Methods       []InterfaceMethod
-	Events        []InterfaceEvent
-	AsyncHandlers []InterfaceAsyncHandler
-	GetMethods    []InterfaceGetMethod
-	CLIBindings   []InterfaceCLIBinding
-	SDKBindings   []InterfaceSDKBinding
-	WalletActions []InterfaceWalletAction
+	Name		string
+	Version		uint16
+	Methods		[]InterfaceMethod
+	Events		[]InterfaceEvent
+	AsyncHandlers	[]InterfaceAsyncHandler
+	GetMethods	[]InterfaceGetMethod
+	CLIBindings	[]InterfaceCLIBinding
+	SDKBindings	[]InterfaceSDKBinding
+	WalletActions	[]InterfaceWalletAction
 }
 
 type InterfaceMethod struct {
-	Name        string
-	Entrypoint  Entrypoint
-	Opcode      uint32
-	Async       bool
-	Params      []InterfaceParamDescriptor
-	Results     []InterfaceResultDescriptor
-	Description string
+	Name		string
+	Entrypoint	Entrypoint
+	Opcode		uint32
+	Async		bool
+	Params		[]InterfaceParamDescriptor
+	Results		[]InterfaceResultDescriptor
+	Description	string
 }
 
 type InterfaceEvent struct {
-	Name   string
-	Opcode uint32
-	Fields []InterfaceParamDescriptor
+	Name	string
+	Opcode	uint32
+	Fields	[]InterfaceParamDescriptor
 }
 
 type InterfaceAsyncHandler struct {
-	Name        string
-	Entrypoint  Entrypoint
-	Opcode      uint32
-	MessageType string
-	Bounced     bool
-	Idempotent  bool
-	Params      []InterfaceParamDescriptor
-	Results     []InterfaceResultDescriptor
-	Description string
+	Name		string
+	Entrypoint	Entrypoint
+	Opcode		uint32
+	MessageType	string
+	Bounced		bool
+	Idempotent	bool
+	Params		[]InterfaceParamDescriptor
+	Results		[]InterfaceResultDescriptor
+	Description	string
 }
 
 type InterfaceGetMethod struct {
-	Name             string
-	Entrypoint       Entrypoint
-	Selector         uint32
-	Params           []InterfaceParamDescriptor
-	Results          []InterfaceResultDescriptor
-	Cacheable        bool
-	MaxResponseBytes uint32
-	Description      string
+	Name			string
+	Entrypoint		Entrypoint
+	Selector		uint32
+	Params			[]InterfaceParamDescriptor
+	Results			[]InterfaceResultDescriptor
+	Cacheable		bool
+	MaxResponseBytes	uint32
+	Description		string
 }
 
 type InterfaceParamDescriptor struct {
-	Name        string
-	Kind        InterfaceValueKind
-	Required    bool
-	MaxBytes    uint32
-	Description string
+	Name		string
+	Kind		InterfaceValueKind
+	Required	bool
+	MaxBytes	uint32
+	Description	string
 }
 
 type InterfaceResultDescriptor = InterfaceParamDescriptor
 
 type InterfaceCLIBinding struct {
-	Method       string
-	Command      string
-	Use          string
-	Aliases      []string
-	Examples     []string
-	InputFormat  string
-	OutputFormat string
+	Method		string
+	Command		string
+	Use		string
+	Aliases		[]string
+	Examples	[]string
+	InputFormat	string
+	OutputFormat	string
 }
 
 type InterfaceSDKBinding struct {
-	Method       string
-	Package      string
-	Service      string
-	MethodName   string
-	RequestType  string
-	ResponseType string
-	Async        bool
+	Method		string
+	Package		string
+	Service		string
+	MethodName	string
+	RequestType	string
+	ResponseType	string
+	Async		bool
 }
 
 type InterfaceWalletAction struct {
-	Method       string
-	Title        string
-	Description  string
-	Category     string
-	Icon         string
-	Risk         InterfaceWalletRisk
-	ConfirmLabel string
-	Inputs       []InterfaceParamDescriptor
-	Outputs      []InterfaceResultDescriptor
+	Method		string
+	Title		string
+	Description	string
+	Category	string
+	Icon		string
+	Risk		InterfaceWalletRisk
+	ConfirmLabel	string
+	Inputs		[]InterfaceParamDescriptor
+	Outputs		[]InterfaceResultDescriptor
 }
 
 type InterfaceDeveloperMetadata struct {
-	Name          string
-	Version       uint16
-	MetadataHash  [MetadataHashLength]byte
-	Methods       []InterfaceMethod
-	Events        []InterfaceEvent
-	AsyncHandlers []InterfaceAsyncHandler
-	GetMethods    []InterfaceGetMethod
-	CLIBindings   []InterfaceCLIBinding
-	SDKBindings   []InterfaceSDKBinding
-	WalletActions []InterfaceWalletAction
+	Name		string
+	Version		uint16
+	MetadataHash	[MetadataHashLength]byte
+	Methods		[]InterfaceMethod
+	Events		[]InterfaceEvent
+	AsyncHandlers	[]InterfaceAsyncHandler
+	GetMethods	[]InterfaceGetMethod
+	CLIBindings	[]InterfaceCLIBinding
+	SDKBindings	[]InterfaceSDKBinding
+	WalletActions	[]InterfaceWalletAction
 }
 
 func (m InterfaceManifest) Validate() error {
@@ -321,8 +321,8 @@ func (m InterfaceManifest) Validate() error {
 			return err
 		}
 		for _, descriptor := range []struct {
-			kind  string
-			value string
+			kind	string
+			value	string
 		}{
 			{kind: "interface SDK package", value: binding.Package},
 			{kind: "interface SDK service", value: binding.Service},
@@ -451,16 +451,16 @@ func BuildInterfaceDeveloperMetadata(manifest InterfaceManifest) (InterfaceDevel
 	}
 	manifest = canonicalInterfaceManifest(manifest)
 	return InterfaceDeveloperMetadata{
-		Name:          manifest.Name,
-		Version:       manifest.Version,
-		MetadataHash:  hash,
-		Methods:       manifest.Methods,
-		Events:        manifest.Events,
-		AsyncHandlers: manifest.AsyncHandlers,
-		GetMethods:    manifest.GetMethods,
-		CLIBindings:   manifest.CLIBindings,
-		SDKBindings:   manifest.SDKBindings,
-		WalletActions: manifest.WalletActions,
+		Name:		manifest.Name,
+		Version:	manifest.Version,
+		MetadataHash:	hash,
+		Methods:	manifest.Methods,
+		Events:		manifest.Events,
+		AsyncHandlers:	manifest.AsyncHandlers,
+		GetMethods:	manifest.GetMethods,
+		CLIBindings:	manifest.CLIBindings,
+		SDKBindings:	manifest.SDKBindings,
+		WalletActions:	manifest.WalletActions,
 	}, nil
 }
 

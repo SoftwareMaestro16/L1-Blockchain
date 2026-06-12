@@ -6,114 +6,114 @@ import (
 )
 
 const (
-	TestLayerUnit        = "unit"
-	TestLayerIntegration = "integration"
-	TestLayerE2ELocalnet = "e2e_localnet"
-	TestLayerAdversarial = "adversarial"
-	TestLayerPerformance = "performance"
+	TestLayerUnit		= "unit"
+	TestLayerIntegration	= "integration"
+	TestLayerE2ELocalnet	= "e2e_localnet"
+	TestLayerAdversarial	= "adversarial"
+	TestLayerPerformance	= "performance"
 
-	TestRequirementKeeperLogic      = "keeper_logic"
-	TestRequirementParamsValidation = "params_validation"
-	TestRequirementMathAccounting   = "math_and_accounting"
-	TestRequirementCapCalculation   = "cap_calculation"
-	TestRequirementSlashingPolicy   = "slashing_policy"
-	TestRequirementRewardSplit      = "reward_split"
-	TestRequirementInflationCurve   = "inflation_curve"
-	TestRequirementScoreCalculation = "score_calculation"
+	TestRequirementKeeperLogic	= "keeper_logic"
+	TestRequirementParamsValidation	= "params_validation"
+	TestRequirementMathAccounting	= "math_and_accounting"
+	TestRequirementCapCalculation	= "cap_calculation"
+	TestRequirementSlashingPolicy	= "slashing_policy"
+	TestRequirementRewardSplit	= "reward_split"
+	TestRequirementInflationCurve	= "inflation_curve"
+	TestRequirementScoreCalculation	= "score_calculation"
 
-	TestRequirementStakingCustomPolicy      = "staking_plus_custom_staking_policy"
-	TestRequirementSlashingValidatorScore   = "slashing_plus_validator_score"
-	TestRequirementDistributionEconomics    = "distribution_plus_economics"
-	TestRequirementFeeCollectorBurnTreasury = "fee_collector_plus_burn_plus_treasury"
-	TestRequirementNominationDelegation     = "nomination_pool_plus_delegation_plus_unbonding"
-	TestRequirementGovernanceParamUpdates   = "governance_param_updates"
-	TestRequirementAVMTxFlow                = "avm_tx_flow"
+	TestRequirementStakingCustomPolicy	= "staking_plus_custom_staking_policy"
+	TestRequirementSlashingValidatorScore	= "slashing_plus_validator_score"
+	TestRequirementDistributionEconomics	= "distribution_plus_economics"
+	TestRequirementFeeCollectorBurnTreasury	= "fee_collector_plus_burn_plus_treasury"
+	TestRequirementNominationDelegation	= "nomination_pool_plus_delegation_plus_unbonding"
+	TestRequirementGovernanceParamUpdates	= "governance_param_updates"
+	TestRequirementAVMTxFlow		= "avm_tx_flow"
 
-	TestRequirementNodeStartup         = "node_startup"
-	TestRequirementValidatorCreation   = "validator_creation"
-	TestRequirementDelegation          = "delegation"
-	TestRequirementRedelegation        = "redelegation"
-	TestRequirementUnbonding           = "unbonding"
-	TestRequirementDowntimeScenario    = "downtime_scenario"
-	TestRequirementDoubleSignEvidence  = "double_sign_evidence_scenario_where_feasible"
-	TestRequirementFeeBurnScenario     = "fee_burn_scenario"
-	TestRequirementAVMInstantiateQuery = "avm_instantiate_execute_query"
-	TestRequirementExportImport        = "export_import"
-	TestRequirementRestart             = "restart"
-	TestRequirementStateSyncSnapshot   = "state_sync_snapshot_where_feasible"
+	TestRequirementNodeStartup		= "node_startup"
+	TestRequirementValidatorCreation	= "validator_creation"
+	TestRequirementDelegation		= "delegation"
+	TestRequirementRedelegation		= "redelegation"
+	TestRequirementUnbonding		= "unbonding"
+	TestRequirementDowntimeScenario		= "downtime_scenario"
+	TestRequirementDoubleSignEvidence	= "double_sign_evidence_scenario_where_feasible"
+	TestRequirementFeeBurnScenario		= "fee_burn_scenario"
+	TestRequirementAVMInstantiateQuery	= "avm_instantiate_execute_query"
+	TestRequirementExportImport		= "export_import"
+	TestRequirementRestart			= "restart"
+	TestRequirementStateSyncSnapshot	= "state_sync_snapshot_where_feasible"
 
-	TestRequirementConcentrationAttack    = "concentration_attack_simulation"
-	TestRequirementOverflowStake          = "validator_overflow_stake_simulation"
-	TestRequirementCommissionManipulation = "commission_manipulation_attempt"
-	TestRequirementInvalidParamsProposal  = "invalid_params_proposal"
-	TestRequirementMalformedEvidence      = "malformed_evidence"
-	TestRequirementJailedRewardAttempt    = "jailed_validator_reward_attempt"
-	TestRequirementModuleAccountAbuse     = "module_account_abuse_attempt"
-	TestRequirementContractGasExhaustion  = "contract_gas_exhaustion"
-	TestRequirementContractStorageAbuse   = "contract_storage_abuse"
+	TestRequirementConcentrationAttack	= "concentration_attack_simulation"
+	TestRequirementOverflowStake		= "validator_overflow_stake_simulation"
+	TestRequirementCommissionManipulation	= "commission_manipulation_attempt"
+	TestRequirementInvalidParamsProposal	= "invalid_params_proposal"
+	TestRequirementMalformedEvidence	= "malformed_evidence"
+	TestRequirementJailedRewardAttempt	= "jailed_validator_reward_attempt"
+	TestRequirementModuleAccountAbuse	= "module_account_abuse_attempt"
+	TestRequirementContractGasExhaustion	= "contract_gas_exhaustion"
+	TestRequirementContractStorageAbuse	= "contract_storage_abuse"
 
-	TestRequirementHundredValidatorProfile    = "100_validator_localnet_profile"
-	TestRequirementTwoHundredValidatorProfile = "150_200_validator_simulation_profile_where_feasible"
-	TestRequirementBlockTimeUnderLoad         = "block_time_under_load"
-	TestRequirementFinalityLatencyMeasurement = "finality_latency_measurement"
-	TestRequirementMempoolPressure            = "mempool_pressure"
-	TestRequirementAVMExecutionLoad           = "avm_execution_load"
-	TestRequirementStateGrowthProfile         = "state_growth_profile"
+	TestRequirementHundredValidatorProfile		= "100_validator_localnet_profile"
+	TestRequirementTwoHundredValidatorProfile	= "150_200_validator_simulation_profile_where_feasible"
+	TestRequirementBlockTimeUnderLoad		= "block_time_under_load"
+	TestRequirementFinalityLatencyMeasurement	= "finality_latency_measurement"
+	TestRequirementMempoolPressure			= "mempool_pressure"
+	TestRequirementAVMExecutionLoad			= "avm_execution_load"
+	TestRequirementStateGrowthProfile		= "state_growth_profile"
 
-	ProductionAcceptanceUnitTestsPass         = "unit_tests_pass"
-	ProductionAcceptanceIntegrationTestsPass  = "integration_tests_pass"
-	ProductionAcceptanceGenesisValidationPass = "genesis_validation_tests_pass"
-	ProductionAcceptanceExportImportPass      = "export_import_tests_pass"
-	ProductionAcceptanceDeterministicRestart  = "deterministic_restart_tests_pass"
-	ProductionAcceptanceAdversarialModulePass = "adversarial_tests_for_relevant_module_pass"
-	ProductionAcceptanceCriticalCISubset      = "ci_runs_critical_subset_automatically"
+	ProductionAcceptanceUnitTestsPass		= "unit_tests_pass"
+	ProductionAcceptanceIntegrationTestsPass	= "integration_tests_pass"
+	ProductionAcceptanceGenesisValidationPass	= "genesis_validation_tests_pass"
+	ProductionAcceptanceExportImportPass		= "export_import_tests_pass"
+	ProductionAcceptanceDeterministicRestart	= "deterministic_restart_tests_pass"
+	ProductionAcceptanceAdversarialModulePass	= "adversarial_tests_for_relevant_module_pass"
+	ProductionAcceptanceCriticalCISubset		= "ci_runs_critical_subset_automatically"
 )
 
 type TestingLayerRequirement struct {
-	Layer       string
-	ScenarioID  string
-	Required    bool
-	Feasible    bool
-	HasTest     bool
-	EvidenceRef string
+	Layer		string
+	ScenarioID	string
+	Required	bool
+	Feasible	bool
+	HasTest		bool
+	EvidenceRef	string
 }
 
 type FeatureTestingEvidence struct {
-	FeatureID           string
-	ImplementationReady bool
-	UnitTests           bool
-	IntegrationTests    bool
-	E2ELocalnetTests    bool
-	AdversarialTests    bool
-	PerformanceTests    bool
-	DeferredReason      string
+	FeatureID		string
+	ImplementationReady	bool
+	UnitTests		bool
+	IntegrationTests	bool
+	E2ELocalnetTests	bool
+	AdversarialTests	bool
+	PerformanceTests	bool
+	DeferredReason		string
 }
 
 type ModuleProductionReadinessEvidence struct {
-	ModuleName             string
-	UnitTestsPass          bool
-	IntegrationTestsPass   bool
-	GenesisValidationTests bool
-	ExportImportTests      bool
-	DeterministicRestart   bool
-	AdversarialTests       bool
-	CriticalCISubset       bool
+	ModuleName		string
+	UnitTestsPass		bool
+	IntegrationTestsPass	bool
+	GenesisValidationTests	bool
+	ExportImportTests	bool
+	DeterministicRestart	bool
+	AdversarialTests	bool
+	CriticalCISubset	bool
 }
 
 type TestingRequirementsReport struct {
-	Requirements []TestingLayerRequirement
-	Required     int
-	Covered      int
-	Failed       []string
-	Passed       bool
+	Requirements	[]TestingLayerRequirement
+	Required	int
+	Covered		int
+	Failed		[]string
+	Passed		bool
 }
 
 type ModuleProductionReadinessReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultTestingRequirements() []TestingLayerRequirement {
@@ -243,11 +243,11 @@ func BuildTestingRequirementsReport(requirements []TestingLayerRequirement) Test
 	}
 	sort.Strings(failed)
 	return TestingRequirementsReport{
-		Requirements: requirements,
-		Required:     requiredCount,
-		Covered:      coveredCount,
-		Failed:       failed,
-		Passed:       len(failed) == 0,
+		Requirements:	requirements,
+		Required:	requiredCount,
+		Covered:	coveredCount,
+		Failed:		failed,
+		Passed:		len(failed) == 0,
 	}
 }
 
@@ -314,22 +314,22 @@ func BuildModuleProductionReadinessReport(evidence ModuleProductionReadinessEvid
 	}
 	sort.Strings(failed)
 	return ModuleProductionReadinessReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func testingRequirement(layer, scenarioID string, required bool) TestingLayerRequirement {
 	return TestingLayerRequirement{
-		Layer:       layer,
-		ScenarioID:  scenarioID,
-		Required:    required,
-		Feasible:    required,
-		HasTest:     required,
-		EvidenceRef: defaultTestingEvidenceRef(layer, scenarioID, required),
+		Layer:		layer,
+		ScenarioID:	scenarioID,
+		Required:	required,
+		Feasible:	required,
+		HasTest:	required,
+		EvidenceRef:	defaultTestingEvidenceRef(layer, scenarioID, required),
 	}
 }
 

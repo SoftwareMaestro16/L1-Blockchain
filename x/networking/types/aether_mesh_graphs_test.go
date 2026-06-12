@@ -8,42 +8,42 @@ import (
 
 func TestAetherMeshRoutingGraphSetConnectsAllGraphRootsDeterministically(t *testing.T) {
 	zoneA, err := NewAetherMeshZoneEdge(AetherMeshZoneEdge{
-		SourceZone:          "APPLICATION_ZONE",
-		DestinationZone:     "CONTRACT_ZONE",
-		Enabled:             true,
-		CommittedGasCost:    100,
-		CongestionWeightBps: 2500,
-		ForwardingFeeWeight: 7,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"CONTRACT_ZONE",
+		Enabled:		true,
+		CommittedGasCost:	100,
+		CongestionWeightBps:	2500,
+		ForwardingFeeWeight:	7,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(132), zoneA.EdgeWeight)
 
 	zoneB, err := NewAetherMeshZoneEdge(AetherMeshZoneEdge{
-		SourceZone:       "CONTRACT_ZONE",
-		DestinationZone:  "FINANCIAL_ZONE",
-		Enabled:          true,
-		CommittedGasCost: 80,
+		SourceZone:		"CONTRACT_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Enabled:		true,
+		CommittedGasCost:	80,
 	})
 	require.NoError(t, err)
 
 	service, err := NewAetherMeshServiceEdge(AetherMeshServiceEdge{
-		SourceService:          "svc.payments",
-		DependencyService:      "svc.storage",
-		InterfaceHash:          HashParts("iface", "payments-storage"),
-		InterfaceCompatible:    true,
-		AvailabilityCommitment: HashParts("availability", "svc.storage"),
-		AvailabilityWeightBps:  9500,
+		SourceService:		"svc.payments",
+		DependencyService:	"svc.storage",
+		InterfaceHash:		HashParts("iface", "payments-storage"),
+		InterfaceCompatible:	true,
+		AvailabilityCommitment:	HashParts("availability", "svc.storage"),
+		AvailabilityWeightBps:	9500,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(501), service.EdgeWeight)
 
 	message, err := NewAetherMeshMessageEdge(AetherMeshMessageEdge{
-		SourceQueue:       HashParts("queue", "contract-outbox"),
-		DestinationQueue:  HashParts("queue", "financial-inbox"),
-		DeliveryLane:      "cross-zone/settlement",
-		QueueBacklog:      13,
-		ForwardingFee:     5,
-		PriorityWeightBps: 9000,
+		SourceQueue:		HashParts("queue", "contract-outbox"),
+		DestinationQueue:	HashParts("queue", "financial-inbox"),
+		DeliveryLane:		"cross-zone/settlement",
+		QueueBacklog:		13,
+		ForwardingFee:		5,
+		PriorityWeightBps:	9000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1018), message.EdgeWeight)
@@ -65,40 +65,40 @@ func TestAetherMeshRoutingGraphSetConnectsAllGraphRootsDeterministically(t *test
 
 func TestAetherMeshRoutingGraphsRejectInvalidWeightsAndUncommittedDependencies(t *testing.T) {
 	_, err := NewAetherMeshZoneEdge(AetherMeshZoneEdge{
-		SourceZone:       "APPLICATION_ZONE",
-		DestinationZone:  "CONTRACT_ZONE",
-		Enabled:          false,
-		CommittedGasCost: 100,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"CONTRACT_ZONE",
+		Enabled:		false,
+		CommittedGasCost:	100,
 	})
 	require.ErrorContains(t, err, "enabled")
 
 	_, err = NewAetherMeshServiceEdge(AetherMeshServiceEdge{
-		SourceService:          "svc.a",
-		DependencyService:      "svc.b",
-		InterfaceHash:          HashParts("iface"),
-		InterfaceCompatible:    false,
-		AvailabilityCommitment: HashParts("availability"),
-		AvailabilityWeightBps:  9000,
+		SourceService:		"svc.a",
+		DependencyService:	"svc.b",
+		InterfaceHash:		HashParts("iface"),
+		InterfaceCompatible:	false,
+		AvailabilityCommitment:	HashParts("availability"),
+		AvailabilityWeightBps:	9000,
 	})
 	require.ErrorContains(t, err, "interface compatible")
 
 	_, err = NewAetherMeshMessageEdge(AetherMeshMessageEdge{
-		SourceQueue:       HashParts("queue", "a"),
-		DestinationQueue:  HashParts("queue", "b"),
-		DeliveryLane:      "lane.primary",
-		QueueBacklog:      1,
-		ForwardingFee:     0,
-		PriorityWeightBps: 1000,
+		SourceQueue:		HashParts("queue", "a"),
+		DestinationQueue:	HashParts("queue", "b"),
+		DeliveryLane:		"lane.primary",
+		QueueBacklog:		1,
+		ForwardingFee:		0,
+		PriorityWeightBps:	1000,
 	})
 	require.ErrorContains(t, err, "forwarding fee")
 }
 
 func TestAetherMeshGraphSetRejectsRootTampering(t *testing.T) {
 	zone, err := NewAetherMeshZoneEdge(AetherMeshZoneEdge{
-		SourceZone:       "APPLICATION_ZONE",
-		DestinationZone:  "CONTRACT_ZONE",
-		Enabled:          true,
-		CommittedGasCost: 10,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"CONTRACT_ZONE",
+		Enabled:		true,
+		CommittedGasCost:	10,
 	})
 	require.NoError(t, err)
 	graphSet, err := BuildAetherMeshRoutingGraphSet(9, []AetherMeshZoneEdge{zone}, nil, nil, "", "")
@@ -157,11 +157,11 @@ func TestAetherMeshRouteSelectionBuildsMultiHopCandidateDeterministically(t *tes
 
 func TestAetherMeshRouteSelectionRejectsUncommittedInputs(t *testing.T) {
 	_, err := NewAetherMeshRouteEdge(AetherMeshRouteEdge{
-		RouteID:         "bad-reliability",
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		Enabled:         true,
-		ExpiresHeight:   200,
+		RouteID:		"bad-reliability",
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Enabled:		true,
+		ExpiresHeight:		200,
 	})
 	require.ErrorContains(t, err, "reliability commitment")
 
@@ -257,16 +257,16 @@ func TestAetherMeshRoutingEpochStateRejectsTamperingAndOutOfEpochProofs(t *testi
 func testMeshRouteEdge(t *testing.T, routeID, source, destination string, enabled bool, expiresHeight, gasCost, congestion, inverseReliability, latency uint64) AetherMeshRouteEdge {
 	t.Helper()
 	edge, err := NewAetherMeshRouteEdge(AetherMeshRouteEdge{
-		RouteID:                 routeID,
-		SourceZone:              source,
-		DestinationZone:         destination,
-		Enabled:                 enabled,
-		ExpiresHeight:           expiresHeight,
-		CommittedGasCost:        gasCost,
-		CommittedCongestion:     congestion,
-		InverseReliabilityScore: inverseReliability,
-		CommittedLatencyBucket:  latency,
-		ReliabilityCommitment:   HashParts("reliability", routeID),
+		RouteID:			routeID,
+		SourceZone:			source,
+		DestinationZone:		destination,
+		Enabled:			enabled,
+		ExpiresHeight:			expiresHeight,
+		CommittedGasCost:		gasCost,
+		CommittedCongestion:		congestion,
+		InverseReliabilityScore:	inverseReliability,
+		CommittedLatencyBucket:		latency,
+		ReliabilityCommitment:		HashParts("reliability", routeID),
 	})
 	require.NoError(t, err)
 	return edge
@@ -275,26 +275,26 @@ func testMeshRouteEdge(t *testing.T, routeID, source, destination string, enable
 func testMeshGraphEdges(t *testing.T) (AetherMeshZoneEdge, AetherMeshServiceEdge, AetherMeshMessageEdge) {
 	t.Helper()
 	zone, err := NewAetherMeshZoneEdge(AetherMeshZoneEdge{
-		SourceZone:       "APPLICATION_ZONE",
-		DestinationZone:  "FINANCIAL_ZONE",
-		Enabled:          true,
-		CommittedGasCost: 10,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Enabled:		true,
+		CommittedGasCost:	10,
 	})
 	require.NoError(t, err)
 	service, err := NewAetherMeshServiceEdge(AetherMeshServiceEdge{
-		SourceService:          "svc.payments",
-		DependencyService:      "svc.storage",
-		InterfaceHash:          HashParts("iface", "epoch"),
-		InterfaceCompatible:    true,
-		AvailabilityCommitment: HashParts("availability", "epoch"),
-		AvailabilityWeightBps:  9500,
+		SourceService:		"svc.payments",
+		DependencyService:	"svc.storage",
+		InterfaceHash:		HashParts("iface", "epoch"),
+		InterfaceCompatible:	true,
+		AvailabilityCommitment:	HashParts("availability", "epoch"),
+		AvailabilityWeightBps:	9500,
 	})
 	require.NoError(t, err)
 	message, err := NewAetherMeshMessageEdge(AetherMeshMessageEdge{
-		SourceQueue:      HashParts("queue", "epoch-outbox"),
-		DestinationQueue: HashParts("queue", "epoch-inbox"),
-		DeliveryLane:     "epoch.cross-zone",
-		ForwardingFee:    1,
+		SourceQueue:		HashParts("queue", "epoch-outbox"),
+		DestinationQueue:	HashParts("queue", "epoch-inbox"),
+		DeliveryLane:		"epoch.cross-zone",
+		ForwardingFee:		1,
 	})
 	require.NoError(t, err)
 	return zone, service, message
@@ -302,27 +302,27 @@ func testMeshGraphEdges(t *testing.T) (AetherMeshZoneEdge, AetherMeshServiceEdge
 
 func testMeshRouteRequest(edges []AetherMeshRouteEdge, currentHeight uint64, maxHops uint32) AetherMeshRouteSelectionRequest {
 	return AetherMeshRouteSelectionRequest{
-		SourceZone:             "APPLICATION_ZONE",
-		DestinationZone:        "FINANCIAL_ZONE",
-		Sender:                 "aether1sender",
-		Recipient:              "aether1recipient",
-		Opcode:                 "cross_zone.transfer",
-		RoutingTableRoot:       ComputeAetherMeshCommittedRoutingTableRoot(edges),
-		CongestionSnapshotRoot: ComputeAetherMeshCommittedCongestionSnapshotRoot(edges),
-		MaxHops:                maxHops,
-		CurrentHeight:          currentHeight,
-		CostParams:             DefaultAetherMeshRoutingCostParams(),
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Sender:			"aether1sender",
+		Recipient:		"aether1recipient",
+		Opcode:			"cross_zone.transfer",
+		RoutingTableRoot:	ComputeAetherMeshCommittedRoutingTableRoot(edges),
+		CongestionSnapshotRoot:	ComputeAetherMeshCommittedCongestionSnapshotRoot(edges),
+		MaxHops:		maxHops,
+		CurrentHeight:		currentHeight,
+		CostParams:		DefaultAetherMeshRoutingCostParams(),
 	}
 }
 
 func testMeshRouteProofRequest(currentHeight uint64, maxHops uint32) AetherMeshRouteProofRequest {
 	return AetherMeshRouteProofRequest{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		Sender:          "aether1sender",
-		Recipient:       "aether1recipient",
-		Opcode:          "cross_zone.transfer",
-		MaxHops:         maxHops,
-		CurrentHeight:   currentHeight,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Sender:			"aether1sender",
+		Recipient:		"aether1recipient",
+		Opcode:			"cross_zone.transfer",
+		MaxHops:		maxHops,
+		CurrentHeight:		currentHeight,
 	}
 }

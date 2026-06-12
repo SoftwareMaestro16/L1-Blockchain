@@ -10,104 +10,104 @@ import (
 )
 
 const (
-	AVMModulePathActors        AVMCosmosModulePath = "x/actors"
-	AVMModulePathAVM           AVMCosmosModulePath = "x/avm"
-	AVMModulePathAVMContracts  AVMCosmosModulePath = "x/avmcontracts"
-	AVMModulePathAVMInterfaces AVMCosmosModulePath = "x/avminterfaces"
-	AVMModulePathAsync         AVMCosmosModulePath = "x/async"
-	AVMModulePathContinuations AVMCosmosModulePath = "x/continuations"
+	AVMModulePathActors		AVMCosmosModulePath	= "x/actors"
+	AVMModulePathAVM		AVMCosmosModulePath	= "x/avm"
+	AVMModulePathAVMContracts	AVMCosmosModulePath	= "x/avmcontracts"
+	AVMModulePathAVMInterfaces	AVMCosmosModulePath	= "x/avminterfaces"
+	AVMModulePathAsync		AVMCosmosModulePath	= "x/async"
+	AVMModulePathContinuations	AVMCosmosModulePath	= "x/continuations"
 
-	AVMModuleStateAVMParams        AVMModuleStateObject = "AVMParams"
-	AVMModuleStateRouteDescriptor  AVMModuleStateObject = "RouteDescriptor"
-	AVMModuleStateAVMRoot          AVMModuleStateObject = "AVMRoot"
-	AVMModuleStateExecutionReceipt AVMModuleStateObject = "ExecutionReceipt"
-	AVMModuleStateRuntimeVersion   AVMModuleStateObject = "RuntimeVersion"
+	AVMModuleStateAVMParams		AVMModuleStateObject	= "AVMParams"
+	AVMModuleStateRouteDescriptor	AVMModuleStateObject	= "RouteDescriptor"
+	AVMModuleStateAVMRoot		AVMModuleStateObject	= "AVMRoot"
+	AVMModuleStateExecutionReceipt	AVMModuleStateObject	= "ExecutionReceipt"
+	AVMModuleStateRuntimeVersion	AVMModuleStateObject	= "RuntimeVersion"
 
-	AVMModuleStateAsyncMessage    AVMModuleStateObject = "AsyncMessage"
-	AVMModuleStateZoneQueue       AVMModuleStateObject = "ZoneQueue"
-	AVMModuleStateRetryRecord     AVMModuleStateObject = "RetryRecord"
-	AVMModuleStateDeadLetter      AVMModuleStateObject = "DeadLetterRecord"
-	AVMModuleStateReplayTombstone AVMModuleStateObject = "ReplayTombstone"
+	AVMModuleStateAsyncMessage	AVMModuleStateObject	= "AsyncMessage"
+	AVMModuleStateZoneQueue		AVMModuleStateObject	= "ZoneQueue"
+	AVMModuleStateRetryRecord	AVMModuleStateObject	= "RetryRecord"
+	AVMModuleStateDeadLetter	AVMModuleStateObject	= "DeadLetterRecord"
+	AVMModuleStateReplayTombstone	AVMModuleStateObject	= "ReplayTombstone"
 
-	AVMModuleStateActorRecord     AVMModuleStateObject = "ActorRecord"
-	AVMModuleStateActorMailbox    AVMModuleStateObject = "ActorMailbox"
-	AVMModuleStateActorState      AVMModuleStateObject = "ActorState"
-	AVMModuleStateActorPermission AVMModuleStateObject = "ActorPermission"
+	AVMModuleStateActorRecord	AVMModuleStateObject	= "ActorRecord"
+	AVMModuleStateActorMailbox	AVMModuleStateObject	= "ActorMailbox"
+	AVMModuleStateActorState	AVMModuleStateObject	= "ActorState"
+	AVMModuleStateActorPermission	AVMModuleStateObject	= "ActorPermission"
 
-	AVMModuleStateContinuation        AVMModuleStateObject = "Continuation"
-	AVMModuleStateContinuationQueue   AVMModuleStateObject = "ContinuationQueue"
-	AVMModuleStateContinuationReceipt AVMModuleStateObject = "ContinuationReceipt"
+	AVMModuleStateContinuation		AVMModuleStateObject	= "Continuation"
+	AVMModuleStateContinuationQueue		AVMModuleStateObject	= "ContinuationQueue"
+	AVMModuleStateContinuationReceipt	AVMModuleStateObject	= "ContinuationReceipt"
 
-	AVMModuleStateCodeRecord     AVMModuleStateObject = "CodeRecord"
-	AVMModuleStateContractRecord AVMModuleStateObject = "ContractRecord"
-	AVMModuleStateStorageValue   AVMModuleStateObject = "StorageValue"
-	AVMModuleStateBackendConfig  AVMModuleStateObject = "BackendConfig"
+	AVMModuleStateCodeRecord	AVMModuleStateObject	= "CodeRecord"
+	AVMModuleStateContractRecord	AVMModuleStateObject	= "ContractRecord"
+	AVMModuleStateStorageValue	AVMModuleStateObject	= "StorageValue"
+	AVMModuleStateBackendConfig	AVMModuleStateObject	= "BackendConfig"
 
-	AVMModuleStateInterfaceDescriptor    AVMModuleStateObject = "InterfaceDescriptor"
-	AVMModuleStateMethodDescriptor       AVMModuleStateObject = "MethodDescriptor"
-	AVMModuleStateEventDescriptor        AVMModuleStateObject = "EventDescriptor"
-	AVMModuleStateAsyncHandlerDescriptor AVMModuleStateObject = "AsyncHandlerDescriptor"
+	AVMModuleStateInterfaceDescriptor	AVMModuleStateObject	= "InterfaceDescriptor"
+	AVMModuleStateMethodDescriptor		AVMModuleStateObject	= "MethodDescriptor"
+	AVMModuleStateEventDescriptor		AVMModuleStateObject	= "EventDescriptor"
+	AVMModuleStateAsyncHandlerDescriptor	AVMModuleStateObject	= "AsyncHandlerDescriptor"
 
-	AVMModuleMsgSubmitAVMMessage       AVMModuleMessageName = "MsgSubmitAVMMessage"
-	AVMModuleMsgRegisterRoute          AVMModuleMessageName = "MsgRegisterRoute"
-	AVMModuleMsgUpdateAVMParams        AVMModuleMessageName = "MsgUpdateAVMParams"
-	AVMModuleMsgScheduleRuntimeUpgrade AVMModuleMessageName = "MsgScheduleRuntimeUpgrade"
+	AVMModuleMsgSubmitAVMMessage		AVMModuleMessageName	= "MsgSubmitAVMMessage"
+	AVMModuleMsgRegisterRoute		AVMModuleMessageName	= "MsgRegisterRoute"
+	AVMModuleMsgUpdateAVMParams		AVMModuleMessageName	= "MsgUpdateAVMParams"
+	AVMModuleMsgScheduleRuntimeUpgrade	AVMModuleMessageName	= "MsgScheduleRuntimeUpgrade"
 
-	AVMModuleMsgSubmitAsyncMessage AVMModuleMessageName = "MsgSubmitAsyncMessage"
-	AVMModuleMsgCancelAsyncMessage AVMModuleMessageName = "MsgCancelAsyncMessage"
-	AVMModuleMsgRetryAsyncMessage  AVMModuleMessageName = "MsgRetryAsyncMessage"
-	AVMModuleMsgExpireAsyncMessage AVMModuleMessageName = "MsgExpireAsyncMessage"
+	AVMModuleMsgSubmitAsyncMessage	AVMModuleMessageName	= "MsgSubmitAsyncMessage"
+	AVMModuleMsgCancelAsyncMessage	AVMModuleMessageName	= "MsgCancelAsyncMessage"
+	AVMModuleMsgRetryAsyncMessage	AVMModuleMessageName	= "MsgRetryAsyncMessage"
+	AVMModuleMsgExpireAsyncMessage	AVMModuleMessageName	= "MsgExpireAsyncMessage"
 
-	AVMModuleMsgCreateActor      AVMModuleMessageName = "MsgCreateActor"
-	AVMModuleMsgSendActorMessage AVMModuleMessageName = "MsgSendActorMessage"
-	AVMModuleMsgUpdateActor      AVMModuleMessageName = "MsgUpdateActor"
-	AVMModuleMsgPauseActor       AVMModuleMessageName = "MsgPauseActor"
+	AVMModuleMsgCreateActor		AVMModuleMessageName	= "MsgCreateActor"
+	AVMModuleMsgSendActorMessage	AVMModuleMessageName	= "MsgSendActorMessage"
+	AVMModuleMsgUpdateActor		AVMModuleMessageName	= "MsgUpdateActor"
+	AVMModuleMsgPauseActor		AVMModuleMessageName	= "MsgPauseActor"
 
-	AVMModuleMsgCreateContinuation AVMModuleMessageName = "MsgCreateContinuation"
-	AVMModuleMsgResumeContinuation AVMModuleMessageName = "MsgResumeContinuation"
-	AVMModuleMsgCancelContinuation AVMModuleMessageName = "MsgCancelContinuation"
-	AVMModuleMsgExpireContinuation AVMModuleMessageName = "MsgExpireContinuation"
+	AVMModuleMsgCreateContinuation	AVMModuleMessageName	= "MsgCreateContinuation"
+	AVMModuleMsgResumeContinuation	AVMModuleMessageName	= "MsgResumeContinuation"
+	AVMModuleMsgCancelContinuation	AVMModuleMessageName	= "MsgCancelContinuation"
+	AVMModuleMsgExpireContinuation	AVMModuleMessageName	= "MsgExpireContinuation"
 
-	AVMModuleMsgStoreCode           AVMModuleMessageName = "MsgStoreCode"
-	AVMModuleMsgInstantiateContract AVMModuleMessageName = "MsgInstantiateContract"
-	AVMModuleMsgExecuteContract     AVMModuleMessageName = "MsgExecuteContract"
-	AVMModuleMsgMigrateContract     AVMModuleMessageName = "MsgMigrateContract"
+	AVMModuleMsgStoreCode		AVMModuleMessageName	= "MsgStoreCode"
+	AVMModuleMsgInstantiateContract	AVMModuleMessageName	= "MsgInstantiateContract"
+	AVMModuleMsgExecuteContract	AVMModuleMessageName	= "MsgExecuteContract"
+	AVMModuleMsgMigrateContract	AVMModuleMessageName	= "MsgMigrateContract"
 
-	AVMModuleMsgRegisterInterface  AVMModuleMessageName = "MsgRegisterInterface"
-	AVMModuleMsgUpdateInterface    AVMModuleMessageName = "MsgUpdateInterface"
-	AVMModuleMsgDeprecateInterface AVMModuleMessageName = "MsgDeprecateInterface"
+	AVMModuleMsgRegisterInterface	AVMModuleMessageName	= "MsgRegisterInterface"
+	AVMModuleMsgUpdateInterface	AVMModuleMessageName	= "MsgUpdateInterface"
+	AVMModuleMsgDeprecateInterface	AVMModuleMessageName	= "MsgDeprecateInterface"
 
-	AVMModuleQueryAVMParams        AVMModuleQueryName = "QueryAVMParams"
-	AVMModuleQueryAVMRoot          AVMModuleQueryName = "QueryAVMRoot"
-	AVMModuleQueryRoute            AVMModuleQueryName = "QueryRoute"
-	AVMModuleQueryExecutionReceipt AVMModuleQueryName = "QueryExecutionReceipt"
-	AVMModuleQueryRuntimeVersion   AVMModuleQueryName = "QueryRuntimeVersion"
+	AVMModuleQueryAVMParams		AVMModuleQueryName	= "QueryAVMParams"
+	AVMModuleQueryAVMRoot		AVMModuleQueryName	= "QueryAVMRoot"
+	AVMModuleQueryRoute		AVMModuleQueryName	= "QueryRoute"
+	AVMModuleQueryExecutionReceipt	AVMModuleQueryName	= "QueryExecutionReceipt"
+	AVMModuleQueryRuntimeVersion	AVMModuleQueryName	= "QueryRuntimeVersion"
 
-	AVMModuleQueryAsyncMessage    AVMModuleQueryName = "QueryAsyncMessage"
-	AVMModuleQueryZoneQueue       AVMModuleQueryName = "QueryZoneQueue"
-	AVMModuleQueryDeadLetter      AVMModuleQueryName = "QueryDeadLetter"
-	AVMModuleQueryReplayTombstone AVMModuleQueryName = "QueryReplayTombstone"
+	AVMModuleQueryAsyncMessage	AVMModuleQueryName	= "QueryAsyncMessage"
+	AVMModuleQueryZoneQueue		AVMModuleQueryName	= "QueryZoneQueue"
+	AVMModuleQueryDeadLetter	AVMModuleQueryName	= "QueryDeadLetter"
+	AVMModuleQueryReplayTombstone	AVMModuleQueryName	= "QueryReplayTombstone"
 
-	AVMModuleQueryActor        AVMModuleQueryName = "QueryActor"
-	AVMModuleQueryActorMailbox AVMModuleQueryName = "QueryActorMailbox"
-	AVMModuleQueryActorState   AVMModuleQueryName = "QueryActorState"
+	AVMModuleQueryActor		AVMModuleQueryName	= "QueryActor"
+	AVMModuleQueryActorMailbox	AVMModuleQueryName	= "QueryActorMailbox"
+	AVMModuleQueryActorState	AVMModuleQueryName	= "QueryActorState"
 
-	AVMModuleQueryContinuation         AVMModuleQueryName = "QueryContinuation"
-	AVMModuleQueryContinuationsByActor AVMModuleQueryName = "QueryContinuationsByActor"
-	AVMModuleQueryContinuationReceipt  AVMModuleQueryName = "QueryContinuationReceipt"
+	AVMModuleQueryContinuation		AVMModuleQueryName	= "QueryContinuation"
+	AVMModuleQueryContinuationsByActor	AVMModuleQueryName	= "QueryContinuationsByActor"
+	AVMModuleQueryContinuationReceipt	AVMModuleQueryName	= "QueryContinuationReceipt"
 
-	AVMModuleQueryCode            AVMModuleQueryName = "QueryCode"
-	AVMModuleQueryContract        AVMModuleQueryName = "QueryContract"
-	AVMModuleQueryContractStorage AVMModuleQueryName = "QueryContractStorage"
-	AVMModuleQueryContractProof   AVMModuleQueryName = "QueryContractProof"
+	AVMModuleQueryCode		AVMModuleQueryName	= "QueryCode"
+	AVMModuleQueryContract		AVMModuleQueryName	= "QueryContract"
+	AVMModuleQueryContractStorage	AVMModuleQueryName	= "QueryContractStorage"
+	AVMModuleQueryContractProof	AVMModuleQueryName	= "QueryContractProof"
 
-	AVMModuleQueryInterface         AVMModuleQueryName = "QueryInterface"
-	AVMModuleQueryMethod            AVMModuleQueryName = "QueryMethod"
-	AVMModuleQueryInterfaceByTarget AVMModuleQueryName = "QueryInterfaceByTarget"
+	AVMModuleQueryInterface		AVMModuleQueryName	= "QueryInterface"
+	AVMModuleQueryMethod		AVMModuleQueryName	= "QueryMethod"
+	AVMModuleQueryInterfaceByTarget	AVMModuleQueryName	= "QueryInterfaceByTarget"
 
-	MaxAVMModulePurposeItems = 16
-	MaxAVMModuleSurfaceItems = 32
-	MaxAVMModulePurposeText  = 128
+	MaxAVMModulePurposeItems	= 16
+	MaxAVMModuleSurfaceItems	= 32
+	MaxAVMModulePurposeText		= 128
 )
 
 type AVMCosmosModulePath string
@@ -116,17 +116,17 @@ type AVMModuleMessageName string
 type AVMModuleQueryName string
 
 type AVMCosmosModuleBreakdown struct {
-	ModulePath    AVMCosmosModulePath
-	Purpose       []string
-	StateObjects  []AVMModuleStateObject
-	Messages      []AVMModuleMessageName
-	Queries       []AVMModuleQueryName
-	BreakdownHash string
+	ModulePath	AVMCosmosModulePath
+	Purpose		[]string
+	StateObjects	[]AVMModuleStateObject
+	Messages	[]AVMModuleMessageName
+	Queries		[]AVMModuleQueryName
+	BreakdownHash	string
 }
 
 type AVMCosmosModuleRegistry struct {
-	Modules      []AVMCosmosModuleBreakdown
-	RegistryHash string
+	Modules		[]AVMCosmosModuleBreakdown
+	RegistryHash	string
 }
 
 func DefaultAVMCosmosModuleRegistry() (AVMCosmosModuleRegistry, error) {
@@ -161,7 +161,7 @@ func DefaultAVMCosmosModuleRegistry() (AVMCosmosModuleRegistry, error) {
 
 func DefaultXAVMModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathAVM,
+		ModulePath:	AVMModulePathAVM,
 		Purpose: []string{
 			"execution_receipts",
 			"roots",
@@ -194,7 +194,7 @@ func DefaultXAVMModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 
 func DefaultXAsyncModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathAsync,
+		ModulePath:	AVMModulePathAsync,
 		Purpose: []string{
 			"async_message_queues",
 			"dead_letter_queue",
@@ -226,7 +226,7 @@ func DefaultXAsyncModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 
 func DefaultXActorsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathActors,
+		ModulePath:	AVMModulePathActors,
 		Purpose: []string{
 			"actor_records",
 			"actor_state",
@@ -256,7 +256,7 @@ func DefaultXActorsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 
 func DefaultXContinuationsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathContinuations,
+		ModulePath:	AVMModulePathContinuations,
 		Purpose: []string{
 			"async_workflow_state",
 			"continuation_queues",
@@ -285,7 +285,7 @@ func DefaultXContinuationsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 
 func DefaultXAVMContractsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathAVMContracts,
+		ModulePath:	AVMModulePathAVMContracts,
 		Purpose: []string{
 			"backend_adapters",
 			"contract_code",
@@ -315,7 +315,7 @@ func DefaultXAVMContractsModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 
 func DefaultXAVMInterfacesModuleBreakdown() (AVMCosmosModuleBreakdown, error) {
 	return NewAVMCosmosModuleBreakdown(AVMCosmosModuleBreakdown{
-		ModulePath: AVMModulePathAVMInterfaces,
+		ModulePath:	AVMModulePathAVMInterfaces,
 		Purpose: []string{
 			"actor_interface_schemas",
 			"contract_interface_schemas",

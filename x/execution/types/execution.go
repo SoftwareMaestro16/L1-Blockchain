@@ -17,61 +17,61 @@ import (
 )
 
 const (
-	StageCheckTxDecode     = "checktx.decode"
-	StageCheckTxSignatures = "checktx.validate_signatures"
-	StageCheckTxFees       = "checktx.validate_fees"
-	StageCheckTxMemo       = "checktx.validate_memo"
-	StageCheckTxStateless  = "checktx.stateless_checks"
-	StageDeliverAnte       = "deliver.ante"
-	StageExecutionContext  = "deliver.execution_context"
-	StageResolverLookup    = "deliver.resolver_lookup"
-	StageReputationLimits  = "deliver.reputation_limits"
-	StageModuleDispatch    = "deliver.module_dispatch"
-	StageAsyncEnqueue      = "deliver.async_enqueue"
-	StageEventEmit         = "deliver.event_emit"
-	StageStateWrite        = "deliver.state_write"
+	StageCheckTxDecode	= "checktx.decode"
+	StageCheckTxSignatures	= "checktx.validate_signatures"
+	StageCheckTxFees	= "checktx.validate_fees"
+	StageCheckTxMemo	= "checktx.validate_memo"
+	StageCheckTxStateless	= "checktx.stateless_checks"
+	StageDeliverAnte	= "deliver.ante"
+	StageExecutionContext	= "deliver.execution_context"
+	StageResolverLookup	= "deliver.resolver_lookup"
+	StageReputationLimits	= "deliver.reputation_limits"
+	StageModuleDispatch	= "deliver.module_dispatch"
+	StageAsyncEnqueue	= "deliver.async_enqueue"
+	StageEventEmit		= "deliver.event_emit"
+	StageStateWrite		= "deliver.state_write"
 
-	RouteBankTransfer    = "bank_transfer"
-	RouteResolverPayment = "resolver_payment"
-	RouteSBTProofRevoke  = "sbt_proof_revoke"
-	RouteContractCall    = "contract_call"
-	RouteDomainAuction   = "domain_auction_bid"
-	RouteDomainRenewal   = "domain_renewal"
+	RouteBankTransfer	= "bank_transfer"
+	RouteResolverPayment	= "resolver_payment"
+	RouteSBTProofRevoke	= "sbt_proof_revoke"
+	RouteContractCall	= "contract_call"
+	RouteDomainAuction	= "domain_auction_bid"
+	RouteDomainRenewal	= "domain_renewal"
 
-	VMRouteNone     = ""
-	VMRouteAVM      = "avm"
-	VMRouteCosmWasm = "cosmwasm"
+	VMRouteNone	= ""
+	VMRouteAVM	= "avm"
+	VMRouteCosmWasm	= "cosmwasm"
 )
 
 type ExecutionEnvelope struct {
-	TxHash           []byte
-	Sender           sdk.AccAddress
-	Receiver         sdk.AccAddress
-	Route            string
-	VMRoute          string
-	GasLimit         uint64
-	Fee              sdk.Coins
-	Memo             memotypes.TxMetadata
-	ResolverDomain   string
-	ResolverRecord   *identitytypes.ResolverRecord
-	DomainRecord     *identitytypes.DomainRecord
-	Identity         *reputationtypes.IdentityReputation
-	SenderStake      sdkmath.Int
-	BlockGasConsumed uint64
-	BlockTxCount     uint64
-	SenderTxCount    uint64
-	QueuedMessages   uint32
-	AsyncMessages    []async.MessageEnvelope
-	ModuleEvents     []string
-	BlockHeight      uint64
-	TimestampUnix    int64
+	TxHash			[]byte
+	Sender			sdk.AccAddress
+	Receiver		sdk.AccAddress
+	Route			string
+	VMRoute			string
+	GasLimit		uint64
+	Fee			sdk.Coins
+	Memo			memotypes.TxMetadata
+	ResolverDomain		string
+	ResolverRecord		*identitytypes.ResolverRecord
+	DomainRecord		*identitytypes.DomainRecord
+	Identity		*reputationtypes.IdentityReputation
+	SenderStake		sdkmath.Int
+	BlockGasConsumed	uint64
+	BlockTxCount		uint64
+	SenderTxCount		uint64
+	QueuedMessages		uint32
+	AsyncMessages		[]async.MessageEnvelope
+	ModuleEvents		[]string
+	BlockHeight		uint64
+	TimestampUnix		int64
 }
 
 type PipelineParams struct {
-	FeeParams        feestypes.Params
-	MemoParams       memotypes.MemoParams
-	ReputationPolicy reputationtypes.UsagePolicy
-	AsyncParams      async.Params
+	FeeParams		feestypes.Params
+	MemoParams		memotypes.MemoParams
+	ReputationPolicy	reputationtypes.UsagePolicy
+	AsyncParams		async.Params
 }
 
 type ExecutionTrace struct {
@@ -79,27 +79,27 @@ type ExecutionTrace struct {
 }
 
 type TraceStep struct {
-	Stage  string
-	Detail string
+	Stage	string
+	Detail	string
 }
 
 type PipelineResult struct {
-	Envelope       ExecutionEnvelope
-	FeeQuote       feestypes.FeeQuote
-	MemoFee        sdk.Coin
-	ResolvedTarget sdk.AccAddress
-	Trace          ExecutionTrace
-	Events         []string
-	StateWrite     bool
-	AsyncQueued    bool
+	Envelope	ExecutionEnvelope
+	FeeQuote	feestypes.FeeQuote
+	MemoFee		sdk.Coin
+	ResolvedTarget	sdk.AccAddress
+	Trace		ExecutionTrace
+	Events		[]string
+	StateWrite	bool
+	AsyncQueued	bool
 }
 
 func DefaultPipelineParams() PipelineParams {
 	return PipelineParams{
-		FeeParams:        feestypes.DefaultParams(),
-		MemoParams:       memotypes.DefaultMemoParams(),
-		ReputationPolicy: reputationtypes.DefaultUsagePolicy(),
-		AsyncParams:      async.DefaultParams(),
+		FeeParams:		feestypes.DefaultParams(),
+		MemoParams:		memotypes.DefaultMemoParams(),
+		ReputationPolicy:	reputationtypes.DefaultUsagePolicy(),
+		AsyncParams:		async.DefaultParams(),
 	}
 }
 
@@ -111,12 +111,12 @@ func CheckTx(envelope ExecutionEnvelope, params PipelineParams) (PipelineResult,
 	}
 	trace.Add(StageCheckTxSignatures, "signature validation must precede execution")
 	quote, err := feestypes.ValidateAdmission(params.FeeParams, feestypes.AdmissionInput{
-		Fee:              envelope.Fee,
-		GasLimit:         envelope.GasLimit,
-		BlockGasConsumed: envelope.BlockGasConsumed,
-		BlockTxCount:     envelope.BlockTxCount,
-		SenderTxCount:    envelope.SenderTxCount,
-		SenderStake:      envelope.SenderStake,
+		Fee:			envelope.Fee,
+		GasLimit:		envelope.GasLimit,
+		BlockGasConsumed:	envelope.BlockGasConsumed,
+		BlockTxCount:		envelope.BlockTxCount,
+		SenderTxCount:		envelope.SenderTxCount,
+		SenderStake:		envelope.SenderStake,
 	})
 	if err != nil {
 		return PipelineResult{}, traceError(trace, err)
@@ -129,10 +129,10 @@ func CheckTx(envelope ExecutionEnvelope, params PipelineParams) (PipelineResult,
 	trace.Add(StageCheckTxMemo, fmt.Sprintf("%s%s", memoFee.String(), denom))
 	trace.Add(StageCheckTxStateless, "stateless checks passed")
 	return PipelineResult{
-		Envelope: envelope,
-		FeeQuote: quote,
-		MemoFee:  sdk.NewCoin(denom, memoFee),
-		Trace:    trace,
+		Envelope:	envelope,
+		FeeQuote:	quote,
+		MemoFee:	sdk.NewCoin(denom, memoFee),
+		Trace:		trace,
 	}, nil
 }
 

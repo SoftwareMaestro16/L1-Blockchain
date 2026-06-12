@@ -32,14 +32,14 @@ func TestServiceReplayProtectionProofBindsAllControlsAndTombstone(t *testing.T) 
 	require.ErrorContains(t, err, "tombstone")
 
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusExecuted,
-		ResponseHash:   testInterfaceHash("replay-proof/response"),
-		PaymentStatus:  coretypes.ServicePaymentStatusSettled,
-		GasUsed:        3,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: 31,
-		AnchoredHeight: 32,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("replay-proof/response"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	3,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	31,
+		AnchoredHeight:	32,
 	})
 	require.NoError(t, err)
 	index, tombstone, err := TombstoneServiceReceipt(ctx, index, call, receipt)
@@ -76,15 +76,15 @@ func TestServiceReplayProtectionProofRejectsMismatchedReplayEntry(t *testing.T) 
 
 func TestProviderMisbehaviorReportInvalidResultPenalties(t *testing.T) {
 	report, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             "portable-service",
-		ProviderID:            "provider.storage",
-		CallID:                testInterfaceHash("fault/invalid-result/call"),
-		FaultClass:            ProviderFaultInvalidResult,
-		EvidenceHash:          testInterfaceHash("fault/invalid-result/evidence"),
-		ObservedHeight:        44,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyReputationScore, ProviderPenaltyCollateral},
-		CollateralSlashAmount: "25",
-		ReputationDelta:       -15,
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		CallID:			testInterfaceHash("fault/invalid-result/call"),
+		FaultClass:		ProviderFaultInvalidResult,
+		EvidenceHash:		testInterfaceHash("fault/invalid-result/evidence"),
+		ObservedHeight:		44,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyReputationScore, ProviderPenaltyCollateral},
+		CollateralSlashAmount:	"25",
+		ReputationDelta:	-15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []ProviderPenaltySource{ProviderPenaltyCollateral, ProviderPenaltyReputationScore}, report.PenaltySources)
@@ -99,28 +99,28 @@ func TestProviderMisbehaviorReportInvalidResultPenalties(t *testing.T) {
 
 func TestProviderMisbehaviorReportDeadlineFaults(t *testing.T) {
 	_, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:           "portable-service",
-		ProviderID:          "provider.storage",
-		CallID:              testInterfaceHash("fault/late/call"),
-		FaultClass:          ProviderFaultLateResult,
-		EvidenceHash:        testInterfaceHash("fault/late/evidence"),
-		ObservedHeight:      50,
-		DeadlineHeight:      50,
-		PenaltySources:      []ProviderPenaltySource{ProviderPenaltyEscrowedPayment},
-		EscrowForfeitAmount: "4",
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		CallID:			testInterfaceHash("fault/late/call"),
+		FaultClass:		ProviderFaultLateResult,
+		EvidenceHash:		testInterfaceHash("fault/late/evidence"),
+		ObservedHeight:		50,
+		DeadlineHeight:		50,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyEscrowedPayment},
+		EscrowForfeitAmount:	"4",
 	})
 	require.ErrorContains(t, err, "after deadline")
 
 	report, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:           "portable-service",
-		ProviderID:          "provider.storage",
-		CallID:              testInterfaceHash("fault/missing/call"),
-		FaultClass:          ProviderFaultMissingResult,
-		EvidenceHash:        testInterfaceHash("fault/missing/evidence"),
-		ObservedHeight:      51,
-		DeadlineHeight:      50,
-		PenaltySources:      []ProviderPenaltySource{ProviderPenaltyEscrowedPayment},
-		EscrowForfeitAmount: "4",
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		CallID:			testInterfaceHash("fault/missing/call"),
+		FaultClass:		ProviderFaultMissingResult,
+		EvidenceHash:		testInterfaceHash("fault/missing/evidence"),
+		ObservedHeight:		51,
+		DeadlineHeight:		50,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyEscrowedPayment},
+		EscrowForfeitAmount:	"4",
 	})
 	require.NoError(t, err)
 	require.NoError(t, report.Validate())
@@ -128,51 +128,51 @@ func TestProviderMisbehaviorReportDeadlineFaults(t *testing.T) {
 
 func TestProviderMisbehaviorReportInterfaceProofAndAvailabilityRules(t *testing.T) {
 	_, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:               "portable-service",
-		ProviderID:              "provider.storage",
-		FaultClass:              ProviderFaultWrongInterfaceVersion,
-		EvidenceHash:            testInterfaceHash("fault/interface/evidence"),
-		ExpectedInterfaceHash:   testInterfaceHash("same/interface"),
-		ObservedInterfaceHash:   testInterfaceHash("same/interface"),
-		ObservedHeight:          61,
-		PenaltySources:          []ProviderPenaltySource{ProviderPenaltyServiceStake},
-		ServiceStakeSlashAmount: "10",
+		ServiceID:			"portable-service",
+		ProviderID:			"provider.storage",
+		FaultClass:			ProviderFaultWrongInterfaceVersion,
+		EvidenceHash:			testInterfaceHash("fault/interface/evidence"),
+		ExpectedInterfaceHash:		testInterfaceHash("same/interface"),
+		ObservedInterfaceHash:		testInterfaceHash("same/interface"),
+		ObservedHeight:			61,
+		PenaltySources:			[]ProviderPenaltySource{ProviderPenaltyServiceStake},
+		ServiceStakeSlashAmount:	"10",
 	})
 	require.ErrorContains(t, err, "mismatched interface")
 
 	proofReport, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             "portable-service",
-		ProviderID:            "provider.storage",
-		CallID:                testInterfaceHash("fault/proof/call"),
-		FaultClass:            ProviderFaultInvalidProof,
-		EvidenceHash:          testInterfaceHash("fault/proof/evidence"),
-		ProofHash:             testInterfaceHash("fault/proof/proof"),
-		ObservedHeight:        62,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral},
-		CollateralSlashAmount: "12",
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		CallID:			testInterfaceHash("fault/proof/call"),
+		FaultClass:		ProviderFaultInvalidProof,
+		EvidenceHash:		testInterfaceHash("fault/proof/evidence"),
+		ProofHash:		testInterfaceHash("fault/proof/proof"),
+		ObservedHeight:		62,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral},
+		CollateralSlashAmount:	"12",
 	})
 	require.NoError(t, err)
 	require.NoError(t, proofReport.Validate())
 
 	_, err = NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             "portable-service",
-		ProviderID:            "provider.storage",
-		FaultClass:            ProviderFaultAvailabilityViolation,
-		EvidenceHash:          testInterfaceHash("fault/availability/evidence"),
-		ObservedHeight:        63,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral},
-		CollateralSlashAmount: "1",
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		FaultClass:		ProviderFaultAvailabilityViolation,
+		EvidenceHash:		testInterfaceHash("fault/availability/evidence"),
+		ObservedHeight:		63,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral},
+		CollateralSlashAmount:	"1",
 	})
 	require.ErrorContains(t, err, "reputation")
 
 	availability, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:       "portable-service",
-		ProviderID:      "provider.storage",
-		FaultClass:      ProviderFaultAvailabilityViolation,
-		EvidenceHash:    testInterfaceHash("fault/availability/evidence"),
-		ObservedHeight:  63,
-		PenaltySources:  []ProviderPenaltySource{ProviderPenaltyReputationScore},
-		ReputationDelta: -5,
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		FaultClass:		ProviderFaultAvailabilityViolation,
+		EvidenceHash:		testInterfaceHash("fault/availability/evidence"),
+		ObservedHeight:		63,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyReputationScore},
+		ReputationDelta:	-5,
 	})
 	require.NoError(t, err)
 	require.NoError(t, availability.Validate())

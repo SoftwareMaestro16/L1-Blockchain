@@ -14,72 +14,72 @@ const (
 type VMRemoteMutationMode string
 
 const (
-	VMRemoteMutationNone         VMRemoteMutationMode = "none"
-	VMRemoteMutationAsyncMessage VMRemoteMutationMode = "async_message"
-	VMRemoteMutationSynchronous  VMRemoteMutationMode = "synchronous"
+	VMRemoteMutationNone		VMRemoteMutationMode	= "none"
+	VMRemoteMutationAsyncMessage	VMRemoteMutationMode	= "async_message"
+	VMRemoteMutationSynchronous	VMRemoteMutationMode	= "synchronous"
 )
 
 type VMPromiseTimeoutPolicy struct {
-	CreatedHeight uint64
-	TimeoutHeight uint64
-	DelayBlocks   uint64
-	PolicyHash    string
+	CreatedHeight	uint64
+	TimeoutHeight	uint64
+	DelayBlocks	uint64
+	PolicyHash	string
 }
 
 type VMSafetyEnvelope struct {
-	ExecutionID                  string
-	ZoneID                       string
-	ShardID                      string
-	ContractAddress              string
-	GasMeteringEnabled           bool
-	GasLimit                     uint64
-	GasConsumed                  uint64
-	StorageIterationLimit        uint32
-	StorageIterations            uint32
-	ProofVerificationCount       uint32
-	ProofVerificationGasReserved uint64
-	ProofVerificationGasConsumed uint64
-	MessageCreationCount         uint32
-	ReservedForwardingFee        string
-	ForwardingFeeRequired        string
-	RemoteMutationMode           VMRemoteMutationMode
-	PromiseTimeout               VMPromiseTimeoutPolicy
-	SafetyHash                   string
+	ExecutionID			string
+	ZoneID				string
+	ShardID				string
+	ContractAddress			string
+	GasMeteringEnabled		bool
+	GasLimit			uint64
+	GasConsumed			uint64
+	StorageIterationLimit		uint32
+	StorageIterations		uint32
+	ProofVerificationCount		uint32
+	ProofVerificationGasReserved	uint64
+	ProofVerificationGasConsumed	uint64
+	MessageCreationCount		uint32
+	ReservedForwardingFee		string
+	ForwardingFeeRequired		string
+	RemoteMutationMode		VMRemoteMutationMode
+	PromiseTimeout			VMPromiseTimeoutPolicy
+	SafetyHash			string
 }
 
 type ProofRootType string
 
 const (
-	ProofRootAccount  ProofRootType = "account"
-	ProofRootMessage  ProofRootType = "message"
-	ProofRootZone     ProofRootType = "zone"
-	ProofRootIdentity ProofRootType = "identity"
-	ProofRootResolver ProofRootType = "resolver"
-	ProofRootContract ProofRootType = "contract"
-	ProofRootStorage  ProofRootType = "storage"
+	ProofRootAccount	ProofRootType	= "account"
+	ProofRootMessage	ProofRootType	= "message"
+	ProofRootZone		ProofRootType	= "zone"
+	ProofRootIdentity	ProofRootType	= "identity"
+	ProofRootResolver	ProofRootType	= "resolver"
+	ProofRootContract	ProofRootType	= "contract"
+	ProofRootStorage	ProofRootType	= "storage"
 )
 
 type TrustedHeaderBinding struct {
-	Height     uint64
-	HeaderHash string
-	AppHash    string
+	Height		uint64
+	HeaderHash	string
+	AppHash		string
 }
 
 type UniversalProofSafetyEnvelope struct {
-	ProofID            string
-	ProofVersion       uint32
-	SupportedVersions  []uint32
-	TrustedHeader      TrustedHeaderBinding
-	ProofHeight        uint64
-	ZoneID             string
-	ShardID            string
-	ObjectKey          string
-	RootType           ProofRootType
-	RootHash           string
-	NonExistence       bool
-	ExistenceProofHash string
-	AbsenceProofHash   string
-	ProofHash          string
+	ProofID			string
+	ProofVersion		uint32
+	SupportedVersions	[]uint32
+	TrustedHeader		TrustedHeaderBinding
+	ProofHeight		uint64
+	ZoneID			string
+	ShardID			string
+	ObjectKey		string
+	RootType		ProofRootType
+	RootHash		string
+	NonExistence		bool
+	ExistenceProofHash	string
+	AbsenceProofHash	string
+	ProofHash		string
 }
 
 func BuildVMSafetyEnvelope(envelope VMSafetyEnvelope) (VMSafetyEnvelope, error) {

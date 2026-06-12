@@ -13,7 +13,7 @@ func TestIdentityServiceDiscoveryV2ProofAwareFreshnessAndFallback(t *testing.T) 
 	backupKey, err := ResolverMetadataServiceKey("rpc-backup")
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Metadata: mustMetadataV2(t, []ResolverMetadataEntry{
 			{Key: rpcKey, Value: "https://rpc.aet"},
 			{Key: backupKey, Value: "https://backup.aet"},
@@ -23,16 +23,16 @@ func TestIdentityServiceDiscoveryV2ProofAwareFreshnessAndFallback(t *testing.T) 
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveRecord, 14, 30, nil)
 
 	result, err := BuildIdentityServiceDiscoveryV2(IdentityServiceDiscoveryRequestV2{
-		Name:                  "alice.aet",
-		ServiceID:             "rpc",
-		SupportedTransports:   []string{"https"},
-		AllowedAuthPolicies:   []string{"none"},
-		SupportedServiceTypes: []string{"service.v1"},
-		CurrentHeight:         20,
-		FreshnessThreshold:    10,
-		ExpectedChainID:       "aetra-local-1",
-		TrustedHeader:         trustedHeaderForProofV2(proof),
-		Proof:                 &proof,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		SupportedServiceTypes:	[]string{"service.v1"},
+		CurrentHeight:		20,
+		FreshnessThreshold:	10,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ProofVerified)
@@ -42,23 +42,23 @@ func TestIdentityServiceDiscoveryV2ProofAwareFreshnessAndFallback(t *testing.T) 
 	require.False(t, result.EndpointAvailabilityConsensusGuaranteed)
 
 	_, err = BuildIdentityServiceDiscoveryV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		ServiceID:           "rpc",
-		SupportedTransports: []string{"grpcs"},
-		ExpectedChainID:     "aetra-local-1",
-		TrustedHeader:       trustedHeaderForProofV2(proof),
-		Proof:               &proof,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"grpcs"},
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.ErrorContains(t, err, "failed closed")
 
 	local, err := BuildIdentityServiceDiscoveryV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		State:               state,
-		Height:              14,
-		RecordTTL:           30,
-		CurrentHeight:       20,
-		SupportedTransports: []string{"https"},
-		AllowedAuthPolicies: []string{"none"},
+		Name:			"alice.aet",
+		State:			state,
+		Height:			14,
+		RecordTTL:		30,
+		CurrentHeight:		20,
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
 	})
 	require.NoError(t, err)
 	require.Len(t, local.FallbackEndpoints, 1)
@@ -69,8 +69,8 @@ func TestIdentityServiceDiscoveryV2ExternalMetadataHash(t *testing.T) {
 	rpcKey, err := ResolverMetadataServiceKey("rpc")
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Metadata: mustMetadataV2(t, []ResolverMetadataEntry{{Key: rpcKey, Value: "https://rpc.aet"}}),
+		Primary:	addr(2),
+		Metadata:	mustMetadataV2(t, []ResolverMetadataEntry{{Key: rpcKey, Value: "https://rpc.aet"}}),
 	}, 12)
 	require.NoError(t, err)
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveRecord, 14, 30, nil)
@@ -81,29 +81,29 @@ func TestIdentityServiceDiscoveryV2ExternalMetadataHash(t *testing.T) {
 	proof.ProofCommitmentHash = ComputeIdentityResolutionProofCommitmentHashV2(proof)
 
 	result, err := BuildIdentityServiceDiscoveryV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		ServiceID:           "rpc",
-		SupportedTransports: []string{"https"},
-		AllowedAuthPolicies: []string{"none"},
-		ExternalMetadata:    metadata,
-		CurrentHeight:       20,
-		ExpectedChainID:     "aetra-local-1",
-		TrustedHeader:       trustedHeaderForProofV2(proof),
-		Proof:               &proof,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		ExternalMetadata:	metadata,
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.MetadataHashVerified)
 
 	_, err = BuildIdentityServiceDiscoveryV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		ServiceID:           "rpc",
-		SupportedTransports: []string{"https"},
-		AllowedAuthPolicies: []string{"none"},
-		ExternalMetadata:    `{"service":"rpc","version":"v2"}`,
-		CurrentHeight:       20,
-		ExpectedChainID:     "aetra-local-1",
-		TrustedHeader:       trustedHeaderForProofV2(proof),
-		Proof:               &proof,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		ExternalMetadata:	`{"service":"rpc","version":"v2"}`,
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.ErrorContains(t, err, "hash mismatch")
 }
@@ -113,8 +113,8 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 	interfaceKey, err := ResolverMetadataInterfaceKey("aw5")
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Metadata: mustMetadataV2(t, []ResolverMetadataEntry{{Key: interfaceKey, Value: "placeholder"}}),
+		Primary:	addr(2),
+		Metadata:	mustMetadataV2(t, []ResolverMetadataEntry{{Key: interfaceKey, Value: "placeholder"}}),
 	}, 12)
 	require.NoError(t, err)
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveRecord, 14, 30, nil)
@@ -122,23 +122,23 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 	hash, err := InterfaceDescriptorHashV2(inline)
 	require.NoError(t, err)
 	proof.ResolverRecord.InterfaceDescriptors = []InterfaceDescriptorV2{{
-		InterfaceID:          "aw5",
-		SchemaHash:           hash,
-		SchemaInlineOptional: inline,
-		Version:              "v1",
-		RenderPolicy:         "wallet_confirm",
+		InterfaceID:		"aw5",
+		SchemaHash:		hash,
+		SchemaInlineOptional:	inline,
+		Version:		"v1",
+		RenderPolicy:		"wallet_confirm",
 	}}
 	proof.ProofCommitmentHash = ComputeIdentityResolutionProofCommitmentHashV2(proof)
 
 	result, err := BuildIdentityInterfaceSchemaMappingV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: hash,
-		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
-		CurrentHeight:      20,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	hash,
+		WalletPolicy:		DefaultIdentityInterfaceWalletPolicyV2(),
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ProofVerified)
@@ -151,28 +151,28 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 	rejectInline := DefaultIdentityInterfaceWalletPolicyV2()
 	rejectInline.AllowInlineSchemas = false
 	_, err = BuildIdentityInterfaceSchemaMappingV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: hash,
-		WalletPolicy:       rejectInline,
-		CurrentHeight:      20,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	hash,
+		WalletPolicy:		rejectInline,
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.ErrorContains(t, err, "rejects inline")
 
 	unsupportedRender := DefaultIdentityInterfaceWalletPolicyV2()
 	unsupportedRender.SupportedRenderPolicies = []string{IdentityRenderPolicyReadOnlyV2}
 	result, err = BuildIdentityInterfaceSchemaMappingV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: hash,
-		WalletPolicy:       unsupportedRender,
-		CurrentHeight:      20,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	hash,
+		WalletPolicy:		unsupportedRender,
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.False(t, result.RenderPolicySupported)
@@ -180,14 +180,14 @@ func TestIdentityInterfaceSchemaMappingV2PolicyAndHashVerification(t *testing.T)
 	noConfirmation := DefaultIdentityInterfaceWalletPolicyV2()
 	noConfirmation.RequireUserConfirmation = false
 	_, err = BuildIdentityInterfaceSchemaMappingV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: hash,
-		WalletPolicy:       noConfirmation,
-		CurrentHeight:      20,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	hash,
+		WalletPolicy:		noConfirmation,
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.ErrorContains(t, err, "user confirmation")
 }
@@ -199,7 +199,7 @@ func TestIdentityQueryServiceV2ResolveServiceRecordWithFallbacks(t *testing.T) {
 	backupKey, err := ResolverMetadataServiceKey("rpc-backup")
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Metadata: mustMetadataV2(t, []ResolverMetadataEntry{
 			{Key: rpcKey, Value: "https://rpc.aet"},
 			{Key: backupKey, Value: "https://backup.aet"},

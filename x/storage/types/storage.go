@@ -9,38 +9,38 @@ import (
 )
 
 const (
-	MaxNamespaceBytes         = 64
-	MaxKeyBytes               = 128
-	DefaultMaxStateBytes      = uint64(64 * 1024)
-	DefaultStorageRentPerByte = uint64(1)
+	MaxNamespaceBytes		= 64
+	MaxKeyBytes			= 128
+	DefaultMaxStateBytes		= uint64(64 * 1024)
+	DefaultStorageRentPerByte	= uint64(1)
 )
 
 type Params struct {
-	MaxStateBytes      uint64
-	StorageRentPerByte uint64
+	MaxStateBytes		uint64
+	StorageRentPerByte	uint64
 }
 
 type Key struct {
-	Namespace string
-	Path      string
+	Namespace	string
+	Path		string
 }
 
 type Entry struct {
-	Key     Key
-	Value   []byte
-	Version uint64
+	Key	Key
+	Value	[]byte
+	Version	uint64
 }
 
 type Store struct {
-	params  Params
-	version uint64
-	entries map[string]Entry
+	params	Params
+	version	uint64
+	entries	map[string]Entry
 }
 
 type Snapshot struct {
-	Version   uint64
-	Entries   []Entry
-	StateRoot []byte
+	Version		uint64
+	Entries		[]Entry
+	StateRoot	[]byte
 }
 
 func DefaultParams() Params {

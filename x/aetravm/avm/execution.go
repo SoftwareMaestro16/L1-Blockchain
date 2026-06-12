@@ -2,8 +2,10 @@ package avm
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
@@ -29,7 +31,7 @@ import (
 type Phase uint8
 
 const (
-	PhaseStorage Phase = iota
+	PhaseStorage	Phase	= iota
 	PhaseCredit
 	PhaseCompute
 	PhaseAction
@@ -57,7 +59,7 @@ func (p Phase) String() string {
 type ActionType uint8
 
 const (
-	ActionInternal ActionType = iota
+	ActionInternal	ActionType	= iota
 	ActionExternal
 	ActionSystem
 	ActionEvent
@@ -67,38 +69,38 @@ const (
 type MessageType uint8
 
 const (
-	MessageExternal MessageType = iota
+	MessageExternal	MessageType	= iota
 	MessageInternal
 	MessageSystem
 )
 
 // Message represents an input to the AVM state transition.
 type Message struct {
-	Type     MessageType
-	Sender   string
-	Target   string
-	Value    uint64
-	GasLimit uint64
-	Payload  *chunk.Chunk
-	Height   int64
-	Hash     []byte
+	Type		MessageType
+	Sender		string
+	Target		string
+	Value		uint64
+	GasLimit	uint64
+	Payload		*chunk.Chunk
+	Height		int64
+	Hash		[]byte
 }
 
 // Action represents an output generated during execution.
 type Action struct {
-	Type         ActionType
-	Target       string
-	Payload      *chunk.Chunk
-	Value        uint64
-	SystemBounce bool
+	Type		ActionType
+	Target		string
+	Payload		*chunk.Chunk
+	Value		uint64
+	SystemBounce	bool
 }
 
 // TraceStep records a single step of VM execution.
 type TraceStep struct {
-	Instruction string
-	StackDelta  int
-	GasConsumed uint64
-	Phase       Phase
+	Instruction	string
+	StackDelta	int
+	GasConsumed	uint64
+	Phase		Phase
 }
 
 // ExecutionTrace holds the deterministic trace of execution.
@@ -110,76 +112,76 @@ type ExecutionTrace struct {
 type HostFunctionClass uint8
 
 const (
-	ClassPure HostFunctionClass = iota
+	ClassPure	HostFunctionClass	= iota
 	ClassEffectful
 )
 
 // CapabilityMask defines the set of allowed host function groups.
 type CapabilityMask struct {
-	Crypto    bool
-	Chain     bool
-	Messaging bool
-	Storage   bool
+	Crypto		bool
+	Chain		bool
+	Messaging	bool
+	Storage		bool
 }
 
 var AllowAllCapabilities = CapabilityMask{
-	Crypto:    true,
-	Chain:     true,
-	Messaging: true,
-	Storage:   true,
+	Crypto:		true,
+	Chain:		true,
+	Messaging:	true,
+	Storage:	true,
 }
 
 // BlockContext carries immutable consensus-based information.
 type BlockContext struct {
-	Height    int64
-	ChainID   string
-	BlockHash []byte
-	Timestamp int64
-	Entropy   []byte
+	Height		int64
+	ChainID		string
+	BlockHash	[]byte
+	Timestamp	int64
+	Entropy		[]byte
 }
 
 // ExecutionFrame holds the context and state for a single message execution.
 type ExecutionFrame struct {
-	Phase          Phase
-	Message        Message
-	StateSnapshot  *chunk.Chunk
-	WorkingState   *chunk.Chunk
-	Stack          []types.Value
-	PendingActions []Action
-	Trace          ExecutionTrace
+	Phase		Phase
+	Message		Message
+	StateSnapshot	*chunk.Chunk
+	WorkingState	*chunk.Chunk
+	Stack		[]types.Value
+	PendingActions	[]Action
+	Trace		ExecutionTrace
 
 	// New fields for sandboxing and security
-	Capabilities CapabilityMask
-	BlockCtx     BlockContext
+	Capabilities	CapabilityMask
+	BlockCtx	BlockContext
 
-	GasLimit uint64
-	GasUsed  uint64
-	PhaseGas map[Phase]uint64
-	ExitCode uint32
-	Aborted  bool
+	GasLimit	uint64
+	GasUsed		uint64
+	PhaseGas	map[Phase]uint64
+	ExitCode	uint32
+	Aborted		bool
 
-	ActionBudget uint32
-	ActionsUsed  uint32
+	ActionBudget	uint32
+	ActionsUsed	uint32
 
-	HostCallTrace []HostCallRecord
+	HostCallTrace	[]HostCallRecord
 }
 
 func NewExecutionFrame(state *chunk.Chunk, msg Message, maxActions uint32) *ExecutionFrame {
 	return &ExecutionFrame{
-		Phase:         PhaseStorage,
-		Message:       msg,
-		StateSnapshot: state,
-		WorkingState:  state,
-		GasLimit:      msg.GasLimit,
-		PhaseGas:      make(map[Phase]uint64),
-		ActionBudget:  maxActions,
+		Phase:		PhaseStorage,
+		Message:	msg,
+		StateSnapshot:	state,
+		WorkingState:	state,
+		GasLimit:	msg.GasLimit,
+		PhaseGas:	make(map[Phase]uint64),
+		ActionBudget:	maxActions,
 	}
 }
 
 // ChargeGas adds gas to the total used and the current phase.
 func (f *ExecutionFrame) ChargeGas(amount uint64) bool {
 	if f.GasUsed+amount > f.GasLimit {
-		// Only charge up to limit
+
 		remaining := f.GasLimit - f.GasUsed
 		f.GasUsed = f.GasLimit
 		f.PhaseGas[f.Phase] += remaining
@@ -193,14 +195,14 @@ func (f *ExecutionFrame) ChargeGas(amount uint64) bool {
 
 // AVMReceipt matches the formal receipt structure requirements.
 type AVMReceipt struct {
-	ExitCode           uint32
-	GasUsed            uint64
-	GasLimit           uint64
-	PhaseGas           map[Phase]uint64
-	StateRootBefore    string
-	StateRootAfter     string
-	EmittedActionsHash string
-	ExecutionTraceHash string
+	ExitCode		uint32
+	GasUsed			uint64
+	GasLimit		uint64
+	PhaseGas		map[Phase]uint64
+	StateRootBefore		string
+	StateRootAfter		string
+	EmittedActionsHash	string
+	ExecutionTraceHash	string
 }
 
 // QueryFrame holds the context for a read-only query execution.
@@ -211,11 +213,11 @@ type AVMReceipt struct {
 //   - Only read-only execution frame is created
 //   - Effectful host functions are forbidden
 type QueryFrame struct {
-	Snapshot QuerySnapshot
-	Stack    []types.Value
-	GasLimit uint64
-	GasUsed  uint64
-	ExitCode uint32
+	Snapshot	QuerySnapshot
+	Stack		[]types.Value
+	GasLimit	uint64
+	GasUsed		uint64
+	ExitCode	uint32
 }
 
 // QuerySnapshot represents an immutable execution snapshot for get methods.
@@ -228,9 +230,9 @@ type QueryFrame struct {
 //   - ContractCodeChunk is frozen at deployment time
 //   - Snapshot is a pure value — no references to mutable state
 type QuerySnapshot struct {
-	StateRootChunk *chunk.Chunk
-	Code           []byte
-	BlockCtx       BlockContext
+	StateRootChunk	*chunk.Chunk
+	Code		[]byte
+	BlockCtx	BlockContext
 }
 
 // AsQueryExecutionDomainSnapshot converts a QuerySnapshot to a read-only execution domain.
@@ -241,35 +243,30 @@ func (s QuerySnapshot) AsQueryExecutionDomainSnapshot() QuerySnapshot {
 
 // QueryReceipt matches the formal query receipt structure.
 type QueryReceipt struct {
-	ExitCode  uint32
-	GasUsed   uint64
-	Response  []byte
-	TraceHash string
+	ExitCode	uint32
+	GasUsed		uint64
+	Response	[]byte
+	TraceHash	string
 }
 
 // FailureKind classifies execution failures for error handling.
 type FailureKind uint8
 
 const (
-	FailureNone          FailureKind = iota // success
-	FailureRecoverable                      // retryable (e.g. queue congestion)
-	FailureNonRecoverable                   // contract abort, no retry
-	FailureSystemFatal                      // node-level error, halt processing
+	FailureNone		FailureKind	= iota	// success
+	FailureRecoverable				// retryable (e.g. queue congestion)
+	FailureNonRecoverable				// contract abort, no retry
+	FailureSystemFatal				// node-level error, halt processing
 )
 
 // HostCallRecord captures an auditable host function invocation.
 type HostCallRecord struct {
-	FunctionID uint32
-	InputHash  string
-	OutputHash string
-	GasUsed    uint64
-	Phase      Phase
+	FunctionID	uint32
+	InputHash	string
+	OutputHash	string
+	GasUsed		uint64
+	Phase		Phase
 }
-
-// TraceStep records a single step of VM execution.
-// The execution trace is deterministic: same inputs produce identical traces.
-// Each step records the instruction, stack delta, gas consumed, and phase.
-// Host calls add HostCallRecord entries for auditability.
 
 // SortMessagesByDeterministicOrder sorts messages for deterministic execution.
 // Order: (block_height, message_hash, sender_address).
@@ -297,7 +294,6 @@ func FinalizeStateRoot(frame *ExecutionFrame, newChunks []*chunk.Chunk) (*chunk.
 		return frame.StateSnapshot, nil
 	}
 
-	// Build new state root from all staged chunks
 	builder := chunk.NewBuilder()
 	builder.SetTypeTag(chunk.TypeNormal)
 	for i, c := range newChunks {
@@ -323,18 +319,15 @@ func FinalizeStateRoot(frame *ExecutionFrame, newChunks []*chunk.Chunk) (*chunk.
 //   - No partial state mutation allowed
 func ApplyEffectfulActions(frame *ExecutionFrame) error {
 	if frame.Aborted {
-		return nil // No effects applied on abort
+		return nil
 	}
 
-	// Validate all actions before applying
 	for _, action := range frame.PendingActions {
 		if action.Payload == nil {
 			return errors.New("action payload cannot be nil")
 		}
 	}
 
-	// Apply actions atomically (all or nothing)
-	// In practice, this is handled by the Chunk DAG which is immutable
 	return nil
 }
 
@@ -350,7 +343,7 @@ func ValidateMessageSemantics(msg *Message) error {
 	}
 
 	if msg.Type == MessageInternal {
-		// Internal messages must have deterministic content
+
 		if len(msg.Hash) == 0 {
 			return errors.New("internal message must have content hash")
 		}
@@ -374,16 +367,57 @@ func ClassifyFailureKind(frame *ExecutionFrame) FailureKind {
 		return FailureNone
 	}
 
-	// Check for system-fatal conditions
 	if frame.ExitCode == 0 {
 		return FailureSystemFatal
 	}
 
-	// Check for non-recoverable conditions (contract abort)
 	if frame.ExitCode >= 100 {
 		return FailureNonRecoverable
 	}
 
-	// Default to recoverable (e.g. gas exhaustion)
 	return FailureRecoverable
+}
+
+const creditStateEnvelopePrefix = "avm:credit:v1"
+
+func applyAttachedValueToWorkingState(state *chunk.Chunk, value uint64) (*chunk.Chunk, error) {
+	if state == nil || value == 0 {
+		return state, nil
+	}
+	currentBalance, baseState := unwrapCreditStateEnvelope(state)
+	nextBalance, err := checkedAddUint64(currentBalance, value)
+	if err != nil {
+		return nil, err
+	}
+	data := make([]byte, len(creditStateEnvelopePrefix)+8)
+	copy(data, []byte(creditStateEnvelopePrefix))
+	binary.BigEndian.PutUint64(data[len(creditStateEnvelopePrefix):], nextBalance)
+	builder := chunk.NewBuilder().SetTypeTag(chunk.TypeSystem).SetData(data, uint16(len(data))*8)
+	if baseState != nil {
+		builder.SetRef(chunk.RefControl0, baseState)
+	}
+	return builder.Build()
+}
+
+func unwrapCreditStateEnvelope(state *chunk.Chunk) (uint64, *chunk.Chunk) {
+	if state == nil || state.TypeTag() != chunk.TypeSystem {
+		return 0, state
+	}
+	data := state.Data()
+	if len(data) < len(creditStateEnvelopePrefix)+8 {
+		return 0, state
+	}
+	if !bytes.Equal(data[:len(creditStateEnvelopePrefix)], []byte(creditStateEnvelopePrefix)) {
+		return 0, state
+	}
+	balance := binary.BigEndian.Uint64(data[len(creditStateEnvelopePrefix) : len(creditStateEnvelopePrefix)+8])
+	baseState := state.RefAt(chunk.RefControl0)
+	return balance, baseState
+}
+
+func checkedAddUint64(left, right uint64) (uint64, error) {
+	if math.MaxUint64-left < right {
+		return 0, errors.New("AVM uint64 accounting overflow")
+	}
+	return left + right, nil
 }

@@ -8,15 +8,15 @@ import (
 
 func TestNextDynamicBaseFeeIsDeterministicSmoothedAndBounded(t *testing.T) {
 	params := DynamicFeeControlParams{
-		TargetBlockUtilizationBps: 5_000,
-		MaxAdjustmentBps:          1_000,
-		SmoothingWindow:           4,
-		MinBaseFeeNaet:            sdkmath.NewInt(100),
-		MaxBaseFeeNaet:            sdkmath.NewInt(10_000),
+		TargetBlockUtilizationBps:	5_000,
+		MaxAdjustmentBps:		1_000,
+		SmoothingWindow:		4,
+		MinBaseFeeNaet:			sdkmath.NewInt(100),
+		MaxBaseFeeNaet:			sdkmath.NewInt(10_000),
 	}
 	state := FeeControlState{
-		CurrentBaseFeeNaet: sdkmath.NewInt(1_000),
-		RecentUtilizations: []uint32{2_000, 3_000, 4_000},
+		CurrentBaseFeeNaet:	sdkmath.NewInt(1_000),
+		RecentUtilizations:	[]uint32{2_000, 3_000, 4_000},
 	}
 	burst := CongestionSignals{BlockGasUtilizationBps: 10_000}
 	left, err := NextDynamicBaseFee(params, state, burst)
@@ -39,8 +39,8 @@ func TestNextDynamicBaseFeeIsDeterministicSmoothedAndBounded(t *testing.T) {
 
 	spam := CongestionSignals{BlockGasUtilizationBps: 10_000}
 	high, err := NextDynamicBaseFee(params, FeeControlState{
-		CurrentBaseFeeNaet: sdkmath.NewInt(1_000),
-		RecentUtilizations: []uint32{8_000, 9_000, 9_500},
+		CurrentBaseFeeNaet:	sdkmath.NewInt(1_000),
+		RecentUtilizations:	[]uint32{8_000, 9_000, 9_500},
 	}, spam)
 	if err != nil {
 		t.Fatalf("spam fee should compute: %v", err)
@@ -55,21 +55,21 @@ func TestNextDynamicBaseFeeIsDeterministicSmoothedAndBounded(t *testing.T) {
 
 func TestDynamicFeeEstimatorTracksActualCostsWithinTolerance(t *testing.T) {
 	params := DynamicFeeControlParams{
-		TargetBlockUtilizationBps: 5_000,
-		MaxAdjustmentBps:          1_000,
-		SmoothingWindow:           2,
-		MinBaseFeeNaet:            sdkmath.NewInt(100),
-		MaxBaseFeeNaet:            sdkmath.NewInt(10_000),
+		TargetBlockUtilizationBps:	5_000,
+		MaxAdjustmentBps:		1_000,
+		SmoothingWindow:		2,
+		MinBaseFeeNaet:			sdkmath.NewInt(100),
+		MaxBaseFeeNaet:			sdkmath.NewInt(10_000),
 	}
 	estimate, err := EstimateDynamicFee(FeeEstimateInput{
-		ControlParams:          params,
-		State:                  FeeControlState{CurrentBaseFeeNaet: sdkmath.NewInt(1_000), RecentUtilizations: []uint32{6_000}},
-		Signals:                CongestionSignals{BlockGasUtilizationBps: 6_000, MempoolPressureBps: 1_000},
-		ResourceParams:         DefaultResourceMultiplierParams(),
-		GasLimit:               100_000,
-		ResourceClass:          ResourceCompute,
-		ActualInclusionFeeNaet: sdkmath.NewInt(1_600),
-		ToleranceBps:           250,
+		ControlParams:		params,
+		State:			FeeControlState{CurrentBaseFeeNaet: sdkmath.NewInt(1_000), RecentUtilizations: []uint32{6_000}},
+		Signals:		CongestionSignals{BlockGasUtilizationBps: 6_000, MempoolPressureBps: 1_000},
+		ResourceParams:		DefaultResourceMultiplierParams(),
+		GasLimit:		100_000,
+		ResourceClass:		ResourceCompute,
+		ActualInclusionFeeNaet:	sdkmath.NewInt(1_600),
+		ToleranceBps:		250,
 	})
 	if err != nil {
 		t.Fatalf("estimate should compute: %v", err)
@@ -85,11 +85,11 @@ func TestDynamicFeeEstimatorTracksActualCostsWithinTolerance(t *testing.T) {
 func TestCongestionResponseSeparatesSignalsAndEscalatesFailedSpam(t *testing.T) {
 	params := DefaultResourceMultiplierParams()
 	signals := CongestionSignals{
-		BlockGasUtilizationBps:    6_000,
-		MempoolPressureBps:        9_000,
-		FailedExecutionRateBps:    8_000,
-		RepeatedSenderActivityBps: 9_500,
-		StateWritePressureBps:     7_000,
+		BlockGasUtilizationBps:		6_000,
+		MempoolPressureBps:		9_000,
+		FailedExecutionRateBps:		8_000,
+		RepeatedSenderActivityBps:	9_500,
+		StateWritePressureBps:		7_000,
 	}
 	low, err := ResourceMultipliers(params, signals, 1)
 	if err != nil {
@@ -112,11 +112,11 @@ func TestCongestionResponseSeparatesSignalsAndEscalatesFailedSpam(t *testing.T) 
 
 func TestMessageClassGasLimitsReserveCriticalProtocolOperations(t *testing.T) {
 	policy := MessageGasLimitPolicy{
-		StandardMaxGas:        1_000_000,
-		CriticalMaxGas:        400_000,
-		DeploymentMaxGas:      800_000,
-		ForwardingMaxGas:      250_000,
-		CriticalReserveGasBps: 500,
+		StandardMaxGas:		1_000_000,
+		CriticalMaxGas:		400_000,
+		DeploymentMaxGas:	800_000,
+		ForwardingMaxGas:	250_000,
+		CriticalReserveGasBps:	500,
 	}
 	critical, err := EvaluateMessageGasLimit(policy, MessageClassCritical, 350_000, 20_000_000)
 	if err != nil {
@@ -136,11 +136,11 @@ func TestMessageClassGasLimitsReserveCriticalProtocolOperations(t *testing.T) {
 
 func TestSimulateDynamicFeeMarketCoversLoadScenarios(t *testing.T) {
 	params := DynamicFeeControlParams{
-		TargetBlockUtilizationBps: 5_000,
-		MaxAdjustmentBps:          1_000,
-		SmoothingWindow:           4,
-		MinBaseFeeNaet:            sdkmath.NewInt(100),
-		MaxBaseFeeNaet:            sdkmath.NewInt(10_000),
+		TargetBlockUtilizationBps:	5_000,
+		MaxAdjustmentBps:		1_000,
+		SmoothingWindow:		4,
+		MinBaseFeeNaet:			sdkmath.NewInt(100),
+		MaxBaseFeeNaet:			sdkmath.NewInt(10_000),
 	}
 	steps := []FeeMarketSimulationStep{
 		{Scenario: FeeScenarioLowLoad, Signals: CongestionSignals{BlockGasUtilizationBps: 2_000}, GasLimit: 100_000, ResourceClass: ResourceCompute},

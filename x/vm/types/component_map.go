@@ -11,71 +11,71 @@ import (
 )
 
 const (
-	ComponentLayerCore      ComponentLayer = "aetra_core"
-	ComponentLayerRouter    ComponentLayer = "avm_execution_router"
-	ComponentLayerEngine    ComponentLayer = "execution_engines"
-	ComponentLayerBackend   ComponentLayer = "contract_backends"
-	ComponentLayerZoneState ComponentLayer = "zone_state"
+	ComponentLayerCore	ComponentLayer	= "aetra_core"
+	ComponentLayerRouter	ComponentLayer	= "avm_execution_router"
+	ComponentLayerEngine	ComponentLayer	= "execution_engines"
+	ComponentLayerBackend	ComponentLayer	= "contract_backends"
+	ComponentLayerZoneState	ComponentLayer	= "zone_state"
 
-	ComponentAetraCore      ComponentID = "aetra_core"
-	ComponentAVMRouter      ComponentID = "avm_execution_router"
-	ComponentSyncEngine     ComponentID = "sync_engine"
-	ComponentAsyncEngine    ComponentID = "async_engine"
-	ComponentActorRuntime   ComponentID = "actor_runtime"
-	ComponentNativeModules  ComponentID = "native_modules"
-	ComponentAVMActors      ComponentID = "avm_actors"
-	ComponentWASMAdapter    ComponentID = "wasm_adapter"
-	ComponentZoneStateRoots ComponentID = "zone_state_store_v2_roots"
+	ComponentAetraCore	ComponentID	= "aetra_core"
+	ComponentAVMRouter	ComponentID	= "avm_execution_router"
+	ComponentSyncEngine	ComponentID	= "sync_engine"
+	ComponentAsyncEngine	ComponentID	= "async_engine"
+	ComponentActorRuntime	ComponentID	= "actor_runtime"
+	ComponentNativeModules	ComponentID	= "native_modules"
+	ComponentAVMActors	ComponentID	= "avm_actors"
+	ComponentWASMAdapter	ComponentID	= "wasm_adapter"
+	ComponentZoneStateRoots	ComponentID	= "zone_state_store_v2_roots"
 
-	ComponentCapabilityConsensus      = "consensus"
-	ComponentCapabilityBlockLifecycle = "block_lifecycle"
-	ComponentCapabilityGlobalRoots    = "global_roots"
-	ComponentCapabilityZoneRegistry   = "zone_registry"
-	ComponentCapabilityRouteMessages  = "route_tx_msg"
-	ComponentCapabilityClassifyZone   = "classify_zone"
-	ComponentCapabilityValidateBudget = "validate_budget"
-	ComponentCapabilityDispatch       = "dispatch"
-	ComponentCapabilityMsgServer      = "msg_server"
-	ComponentCapabilityKeeperCalls    = "keeper_calls"
-	ComponentCapabilityQueues         = "queues"
-	ComponentCapabilityScheduling     = "scheduling"
-	ComponentCapabilityMailboxes      = "mailboxes"
-	ComponentCapabilityContinuations  = "continuations"
-	ComponentCapabilityNativeModules  = "native_modules"
-	ComponentCapabilityAVMActors      = "avm_actors"
-	ComponentCapabilityWASMAdapter    = "optional_wasm_adapter"
-	ComponentCapabilityStoreV2        = "store_v2"
-	ComponentCapabilityZoneRoots      = "zone_roots"
+	ComponentCapabilityConsensus		= "consensus"
+	ComponentCapabilityBlockLifecycle	= "block_lifecycle"
+	ComponentCapabilityGlobalRoots		= "global_roots"
+	ComponentCapabilityZoneRegistry		= "zone_registry"
+	ComponentCapabilityRouteMessages	= "route_tx_msg"
+	ComponentCapabilityClassifyZone		= "classify_zone"
+	ComponentCapabilityValidateBudget	= "validate_budget"
+	ComponentCapabilityDispatch		= "dispatch"
+	ComponentCapabilityMsgServer		= "msg_server"
+	ComponentCapabilityKeeperCalls		= "keeper_calls"
+	ComponentCapabilityQueues		= "queues"
+	ComponentCapabilityScheduling		= "scheduling"
+	ComponentCapabilityMailboxes		= "mailboxes"
+	ComponentCapabilityContinuations	= "continuations"
+	ComponentCapabilityNativeModules	= "native_modules"
+	ComponentCapabilityAVMActors		= "avm_actors"
+	ComponentCapabilityWASMAdapter		= "optional_wasm_adapter"
+	ComponentCapabilityStoreV2		= "store_v2"
+	ComponentCapabilityZoneRoots		= "zone_roots"
 
-	MaxComponentIDLength         = 96
-	MaxComponentCapabilityLength = 96
+	MaxComponentIDLength		= 96
+	MaxComponentCapabilityLength	= 96
 )
 
 type ComponentLayer string
 type ComponentID string
 
 type AVMComponent struct {
-	ID           ComponentID
-	Layer        ComponentLayer
-	Capabilities []string
+	ID		ComponentID
+	Layer		ComponentLayer
+	Capabilities	[]string
 }
 
 type AVMComponentEdge struct {
-	From ComponentID
-	To   ComponentID
+	From	ComponentID
+	To	ComponentID
 }
 
 type AVMComponentMap struct {
-	Components []AVMComponent
-	Edges      []AVMComponentEdge
-	Root       string
+	Components	[]AVMComponent
+	Edges		[]AVMComponentEdge
+	Root		string
 }
 
 func DefaultAVMComponentMap() AVMComponentMap {
 	components := []AVMComponent{
 		{
-			ID:    ComponentAetraCore,
-			Layer: ComponentLayerCore,
+			ID:	ComponentAetraCore,
+			Layer:	ComponentLayerCore,
 			Capabilities: []string{
 				ComponentCapabilityBlockLifecycle,
 				ComponentCapabilityConsensus,
@@ -84,8 +84,8 @@ func DefaultAVMComponentMap() AVMComponentMap {
 			},
 		},
 		{
-			ID:    ComponentAVMRouter,
-			Layer: ComponentLayerRouter,
+			ID:	ComponentAVMRouter,
+			Layer:	ComponentLayerRouter,
 			Capabilities: []string{
 				ComponentCapabilityClassifyZone,
 				ComponentCapabilityDispatch,
@@ -94,53 +94,53 @@ func DefaultAVMComponentMap() AVMComponentMap {
 			},
 		},
 		{
-			ID:    ComponentSyncEngine,
-			Layer: ComponentLayerEngine,
+			ID:	ComponentSyncEngine,
+			Layer:	ComponentLayerEngine,
 			Capabilities: []string{
 				ComponentCapabilityKeeperCalls,
 				ComponentCapabilityMsgServer,
 			},
 		},
 		{
-			ID:    ComponentAsyncEngine,
-			Layer: ComponentLayerEngine,
+			ID:	ComponentAsyncEngine,
+			Layer:	ComponentLayerEngine,
 			Capabilities: []string{
 				ComponentCapabilityQueues,
 				ComponentCapabilityScheduling,
 			},
 		},
 		{
-			ID:    ComponentActorRuntime,
-			Layer: ComponentLayerEngine,
+			ID:	ComponentActorRuntime,
+			Layer:	ComponentLayerEngine,
 			Capabilities: []string{
 				ComponentCapabilityContinuations,
 				ComponentCapabilityMailboxes,
 			},
 		},
 		{
-			ID:    ComponentNativeModules,
-			Layer: ComponentLayerBackend,
+			ID:	ComponentNativeModules,
+			Layer:	ComponentLayerBackend,
 			Capabilities: []string{
 				ComponentCapabilityNativeModules,
 			},
 		},
 		{
-			ID:    ComponentAVMActors,
-			Layer: ComponentLayerBackend,
+			ID:	ComponentAVMActors,
+			Layer:	ComponentLayerBackend,
 			Capabilities: []string{
 				ComponentCapabilityAVMActors,
 			},
 		},
 		{
-			ID:    ComponentWASMAdapter,
-			Layer: ComponentLayerBackend,
+			ID:	ComponentWASMAdapter,
+			Layer:	ComponentLayerBackend,
 			Capabilities: []string{
 				ComponentCapabilityWASMAdapter,
 			},
 		},
 		{
-			ID:    ComponentZoneStateRoots,
-			Layer: ComponentLayerZoneState,
+			ID:	ComponentZoneStateRoots,
+			Layer:	ComponentLayerZoneState,
 			Capabilities: []string{
 				ComponentCapabilityStoreV2,
 				ComponentCapabilityZoneRoots,
@@ -169,9 +169,9 @@ func DefaultAVMComponentMap() AVMComponentMap {
 
 func CanonicalAVMComponentMap(componentMap AVMComponentMap) AVMComponentMap {
 	out := AVMComponentMap{
-		Components: cloneAVMComponents(componentMap.Components),
-		Edges:      append([]AVMComponentEdge(nil), componentMap.Edges...),
-		Root:       strings.TrimSpace(componentMap.Root),
+		Components:	cloneAVMComponents(componentMap.Components),
+		Edges:		append([]AVMComponentEdge(nil), componentMap.Edges...),
+		Root:		strings.TrimSpace(componentMap.Root),
 	}
 	sort.SliceStable(out.Components, func(i, j int) bool {
 		return out.Components[i].ID < out.Components[j].ID
@@ -320,15 +320,15 @@ func ComputeAVMComponentMapRoot(componentMap AVMComponentMap) string {
 
 func validateRequiredComponents(components map[ComponentID]AVMComponent) error {
 	required := map[ComponentID][]string{
-		ComponentAetraCore:      {ComponentCapabilityConsensus, ComponentCapabilityBlockLifecycle, ComponentCapabilityGlobalRoots, ComponentCapabilityZoneRegistry},
-		ComponentAVMRouter:      {ComponentCapabilityRouteMessages, ComponentCapabilityClassifyZone, ComponentCapabilityValidateBudget, ComponentCapabilityDispatch},
-		ComponentSyncEngine:     {ComponentCapabilityMsgServer, ComponentCapabilityKeeperCalls},
-		ComponentAsyncEngine:    {ComponentCapabilityQueues, ComponentCapabilityScheduling},
-		ComponentActorRuntime:   {ComponentCapabilityMailboxes, ComponentCapabilityContinuations},
-		ComponentNativeModules:  {ComponentCapabilityNativeModules},
-		ComponentAVMActors:      {ComponentCapabilityAVMActors},
-		ComponentWASMAdapter:    {ComponentCapabilityWASMAdapter},
-		ComponentZoneStateRoots: {ComponentCapabilityStoreV2, ComponentCapabilityZoneRoots},
+		ComponentAetraCore:		{ComponentCapabilityConsensus, ComponentCapabilityBlockLifecycle, ComponentCapabilityGlobalRoots, ComponentCapabilityZoneRegistry},
+		ComponentAVMRouter:		{ComponentCapabilityRouteMessages, ComponentCapabilityClassifyZone, ComponentCapabilityValidateBudget, ComponentCapabilityDispatch},
+		ComponentSyncEngine:		{ComponentCapabilityMsgServer, ComponentCapabilityKeeperCalls},
+		ComponentAsyncEngine:		{ComponentCapabilityQueues, ComponentCapabilityScheduling},
+		ComponentActorRuntime:		{ComponentCapabilityMailboxes, ComponentCapabilityContinuations},
+		ComponentNativeModules:		{ComponentCapabilityNativeModules},
+		ComponentAVMActors:		{ComponentCapabilityAVMActors},
+		ComponentWASMAdapter:		{ComponentCapabilityWASMAdapter},
+		ComponentZoneStateRoots:	{ComponentCapabilityStoreV2, ComponentCapabilityZoneRoots},
 	}
 	for id, capabilities := range required {
 		component, found := components[id]

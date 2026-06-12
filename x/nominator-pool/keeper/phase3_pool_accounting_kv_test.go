@@ -21,10 +21,10 @@ func TestPhase32PersistentPoolMutationExportImportQuerySameState(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &source, "phase32-persist")
 
 	receipt, err := source.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
@@ -63,13 +63,13 @@ func TestPhase32ExportOrderDeterministicAndPaginationBounded(t *testing.T) {
 	require.NoError(t, k.InitGenesisState(ctx, DefaultGenesis()))
 	for _, id := range []string{"pool-c", "pool-a", "pool-b"} {
 		_, err := k.CreateNominatorPool(types.MsgCreateNominatorPool{
-			Authority:         prototype.DefaultAuthority,
-			PoolID:            id,
-			PoolOperator:      rawPoolAddress("11"),
-			ValidatorTarget:   rawPoolAddress("12"),
-			PoolCommissionBps: 100,
-			Height:            1,
-			ValidatorStatus:   "active",
+			Authority:		prototype.DefaultAuthority,
+			PoolID:			id,
+			PoolOperator:		rawPoolAddress("11"),
+			ValidatorTarget:	rawPoolAddress("12"),
+			PoolCommissionBps:	100,
+			Height:			1,
+			ValidatorStatus:	"active",
 		})
 		require.NoError(t, err)
 	}
@@ -123,6 +123,159 @@ func TestPhase32StorageRentDebtPreservedInKVExportImport(t *testing.T) {
 	require.Equal(t, exported.State.LiquidStakingPools[0], roundTrip.State.LiquidStakingPools[0])
 }
 
+func TestPhase32OfficialPoolRentAccrualHookChargesReserveOnMutation(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	user := aePoolAddress(t, "7a")
+	k := NewPersistentKeeper(service)
+	k.accountStatusReader = accountStatusFixture{user: accountStatusActive}
+	require.NoError(t, k.InitGenesisState(ctx, DefaultGenesis()))
+	pool := createOfficialLiquidStakingPool(t, &k, "phase32-rent-hook")
+
+	gs := k.ExportGenesis()
+	gs.State.LiquidStakingPools[0].LastStorageChargeHeight = 2
+	gs.State.LiquidStakingPools[0].StorageRentReserve = 1_000_000
+	gs.State.LiquidStakingPools[0].StorageRentDebt = 0
+	require.NoError(t, k.InitGenesisState(ctx, gs))
+
+	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		10,
+	})
+	require.NoError(t, err)
+
+	exported, err := k.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	liquid := exported.State.LiquidStakingPools[0]
+	require.Equal(t, uint64(10), liquid.LastStorageChargeHeight)
+	require.Less(t, liquid.StorageRentReserve, uint64(1_000_000))
+	require.Zero(t, liquid.StorageRentDebt)
+}
+
+func TestPhase32OfficialPoolRentAccruesOnClaimAndEpochRebalance(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	user := aePoolAddress(t, "7b")
+	validator := aePoolAddress(t, "2a")
+	k := NewPersistentKeeper(service)
+	k.accountStatusReader = accountStatusFixture{user: accountStatusActive, validator: accountStatusActive}
+	require.NoError(t, k.InitGenesisState(ctx, DefaultGenesis()))
+	pool := createOfficialLiquidStakingPool(t, &k, "phase32-rent-claim-epoch")
+
+	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
+	})
+	require.NoError(t, err)
+	_, err = k.ApplyPoolReward(pool.PoolID, 1_000)
+	require.NoError(t, err)
+	_, err = k.RegisterValidator(types.MsgRegisterValidator{
+		SignerAddress:		validator,
+		ValidatorAddress:	validator,
+		SelfStake:		types.DefaultMinValidatorStake,
+		CommissionBps:		types.DefaultParams().DefaultValidatorCommissionBps,
+		Height:			3,
+	})
+	require.NoError(t, err)
+
+	gs := k.ExportGenesis()
+	gs.State.LiquidStakingPools[0].LastStorageChargeHeight = 2
+	gs.State.LiquidStakingPools[0].StorageRentReserve = 5_000_000
+	gs.State.LiquidStakingPools[0].StorageRentDebt = 0
+	require.NoError(t, k.InitGenesisState(ctx, gs))
+
+	_, err = k.ClaimPoolRewardsWithReceipt(types.MsgClaimPoolRewards{
+		PoolID:		pool.PoolID,
+		OwnerAddress:	user,
+		Height:		10,
+	})
+	require.NoError(t, err)
+
+	afterClaim, err := k.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	liquidAfterClaim := afterClaim.State.LiquidStakingPools[0]
+	require.Equal(t, uint64(10), liquidAfterClaim.LastStorageChargeHeight)
+	require.Less(t, liquidAfterClaim.StorageRentReserve, uint64(5_000_000))
+
+	_, err = k.RebalancePoolAllocations(types.MsgRebalancePoolAllocations{
+		CallerContractUser:	pool.ContractAddressUser,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		Height:			14,
+		Candidates: []types.ValidatorPolicyCandidate{{
+			ValidatorAddress:	validator,
+			ReputationScore:	8_000,
+			UptimeBps:		9_500,
+			CommissionBps:		1_000,
+			StakeEfficiencyBps:	8_000,
+			SlashingRiskBps:	100,
+			NetworkLoadBps:		1_000,
+		}},
+	})
+	require.NoError(t, err)
+
+	afterSync, err := k.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	liquidAfterSync := afterSync.State.LiquidStakingPools[0]
+	require.Equal(t, uint64(14), liquidAfterSync.LastStorageChargeHeight)
+	require.Less(t, liquidAfterSync.StorageRentReserve, liquidAfterClaim.StorageRentReserve)
+}
+
+func TestPhase32OfficialPoolRentDebtRecoveryAndExportImportRoundTrip(t *testing.T) {
+	ctx := context.Background()
+	service := kvtest.NewStoreService()
+	user := aePoolAddress(t, "7c")
+	k := NewPersistentKeeper(service)
+	k.accountStatusReader = accountStatusFixture{user: accountStatusActive}
+	require.NoError(t, k.InitGenesisState(ctx, DefaultGenesis()))
+	pool := createOfficialLiquidStakingPool(t, &k, "phase32-rent-recovery")
+
+	gs := k.ExportGenesis()
+	gs.State.LiquidStakingPools[0].LastStorageChargeHeight = 2
+	gs.State.LiquidStakingPools[0].StorageRentReserve = 0
+	gs.State.LiquidStakingPools[0].StorageRentDebt = 0
+	require.NoError(t, k.InitGenesisState(ctx, gs))
+
+	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		10,
+	})
+	require.NoError(t, err)
+
+	withDebt, err := k.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	liquidWithDebt := withDebt.State.LiquidStakingPools[0]
+	require.Greater(t, liquidWithDebt.StorageRentDebt, uint64(0))
+	require.Equal(t, types.PoolStatusFrozenLimited, liquidWithDebt.Status)
+
+	_, err = k.TopUpPoolReserve(types.MsgTopUpPoolReserve{
+		PoolID:		pool.PoolID,
+		PayerAddress:	user,
+		Amount:		liquidWithDebt.StorageRentDebt,
+		Height:		10,
+	})
+	require.NoError(t, err)
+
+	recovered, err := k.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	liquidRecovered := recovered.State.LiquidStakingPools[0]
+	require.Zero(t, liquidRecovered.StorageRentDebt)
+	require.Equal(t, types.PoolStatusActive, liquidRecovered.Status)
+
+	imported := NewPersistentKeeper(kvtest.NewStoreService())
+	imported.accountStatusReader = accountStatusFixture{user: accountStatusActive}
+	require.NoError(t, imported.InitGenesisState(ctx, recovered))
+	roundTrip, err := imported.ExportGenesisState(ctx)
+	require.NoError(t, err)
+	require.Equal(t, liquidRecovered, roundTrip.State.LiquidStakingPools[0])
+}
+
 func TestPhase32PoolAllocationKVUpdateTouchesOnlyChangedAllocationKey(t *testing.T) {
 	ctx := context.Background()
 	service := kvtest.NewStoreService()
@@ -134,11 +287,11 @@ func TestPhase32PoolAllocationKVUpdateTouchesOnlyChangedAllocationKey(t *testing
 	pool := createOfficialLiquidStakingPool(t, &k, "phase32-alloc")
 	for _, validator := range []string{v1, v2} {
 		_, err := k.RegisterValidator(types.MsgRegisterValidator{
-			SignerAddress:    validator,
-			ValidatorAddress: validator,
-			SelfStake:        types.DefaultMinValidatorStake,
-			CommissionBps:    types.DefaultParams().DefaultValidatorCommissionBps,
-			Height:           1,
+			SignerAddress:		validator,
+			ValidatorAddress:	validator,
+			SelfStake:		types.DefaultMinValidatorStake,
+			CommissionBps:		types.DefaultParams().DefaultValidatorCommissionBps,
+			Height:			1,
 		})
 		require.NoError(t, err)
 	}

@@ -129,29 +129,29 @@ func TestXServiceProvidersQueries(t *testing.T) {
 func testServiceProviderRecord(t *testing.T) ProviderRecord {
 	t.Helper()
 	availability := coretypes.FogAvailabilityCommitment{
-		EndpointHash:    testInterfaceHash("serviceproviders/endpoint"),
-		WindowStart:     10,
-		WindowEnd:       30,
-		UptimeTargetBps: 9_500,
-		RenewalNonce:    1,
-		SignatureHash:   testInterfaceHash("serviceproviders/signature"),
+		EndpointHash:		testInterfaceHash("serviceproviders/endpoint"),
+		WindowStart:		10,
+		WindowEnd:		30,
+		UptimeTargetBps:	9_500,
+		RenewalNonce:		1,
+		SignatureHash:		testInterfaceHash("serviceproviders/signature"),
 	}
 	availability.CommitmentHash = coretypes.ComputeFogAvailabilityCommitmentHash(availability)
 	provider := coretypes.FogProviderRecord{
-		ProviderID:             "provider-1",
-		IdentityKey:            "provider-1-key",
-		Category:               coretypes.FogCategoryCompute,
-		Pricing:                coretypes.FogProviderPricing{Denom: "naet", Amount: "1", MaxAmount: "10", Unit: coretypes.FogPricingPerRequest},
-		ReputationScore:        100,
-		CollateralDenom:        "naet",
-		CollateralAmount:       "100",
-		StakeAmount:            "100",
-		AvailabilityCommitment: availability,
-		SupportedInterfaces:    []string{testInterfaceHash("serviceproviders/interface")},
-		Status:                 coretypes.FogProviderActive,
-		RegisteredHeight:       10,
-		UpdatedHeight:          10,
-		ExpiryHeight:           40,
+		ProviderID:		"provider-1",
+		IdentityKey:		"provider-1-key",
+		Category:		coretypes.FogCategoryCompute,
+		Pricing:		coretypes.FogProviderPricing{Denom: "naet", Amount: "1", MaxAmount: "10", Unit: coretypes.FogPricingPerRequest},
+		ReputationScore:	100,
+		CollateralDenom:	"naet",
+		CollateralAmount:	"100",
+		StakeAmount:		"100",
+		AvailabilityCommitment:	availability,
+		SupportedInterfaces:	[]string{testInterfaceHash("serviceproviders/interface")},
+		Status:			coretypes.FogProviderActive,
+		RegisteredHeight:	10,
+		UpdatedHeight:		10,
+		ExpiryHeight:		40,
 	}
 	provider.ProviderHash = coretypes.ComputeFogProviderHash(provider)
 	record := ProviderRecord{ServiceID: "fog-market", Provider: provider}
@@ -166,15 +166,15 @@ func testServiceProviderFaultProof(t *testing.T) (ProviderMisbehaviorReport, Ser
 	descriptor := testInterfaceSystemDescriptor()
 	call := testInteractionCall(t, ctx, descriptor, "submit", 11, "serviceproviders/fault")
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusFailed,
-		ResponseHash:   testInterfaceHash("serviceproviders/fault/response"),
-		ProofHash:      testInterfaceHash("serviceproviders/fault/proof"),
-		PaymentStatus:  coretypes.ServicePaymentStatusRefunded,
-		ProviderID:     "provider-1",
-		ExecutedHeight: 72,
-		AnchoredHeight: 72,
-		ErrorCode:      "invalid_result",
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusFailed,
+		ResponseHash:	testInterfaceHash("serviceproviders/fault/response"),
+		ProofHash:	testInterfaceHash("serviceproviders/fault/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusRefunded,
+		ProviderID:	"provider-1",
+		ExecutedHeight:	72,
+		AnchoredHeight:	72,
+		ErrorCode:	"invalid_result",
 	})
 	require.NoError(t, err)
 	index, err := NewServiceCallReplayIndex(25)
@@ -184,16 +184,16 @@ func testServiceProviderFaultProof(t *testing.T) (ProviderMisbehaviorReport, Ser
 	_, tombstone, err := TombstoneServiceReceipt(ctx, index, call, receipt)
 	require.NoError(t, err)
 	report, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             descriptor.ServiceID,
-		ProviderID:            "provider-1",
-		CallID:                call.CallID,
-		FaultClass:            ProviderFaultInvalidResult,
-		EvidenceHash:          testInterfaceHash("serviceproviders/fault/evidence"),
-		ObservedHeight:        72,
-		DeadlineHeight:        80,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral, ProviderPenaltyReputationScore},
-		CollateralSlashAmount: "10",
-		ReputationDelta:       -10,
+		ServiceID:		descriptor.ServiceID,
+		ProviderID:		"provider-1",
+		CallID:			call.CallID,
+		FaultClass:		ProviderFaultInvalidResult,
+		EvidenceHash:		testInterfaceHash("serviceproviders/fault/evidence"),
+		ObservedHeight:		72,
+		DeadlineHeight:		80,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral, ProviderPenaltyReputationScore},
+		CollateralSlashAmount:	"10",
+		ReputationDelta:	-10,
 	})
 	require.NoError(t, err)
 	proof, err := NewServiceFaultProof(report, receipt, tombstone, 73)

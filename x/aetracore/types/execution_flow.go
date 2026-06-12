@@ -11,94 +11,94 @@ type ReceiptStatus string
 type FailureReason string
 
 const (
-	ExecutionModeSync  ExecutionMode = "SYNC"
-	ExecutionModeAsync ExecutionMode = "ASYNC"
+	ExecutionModeSync	ExecutionMode	= "SYNC"
+	ExecutionModeAsync	ExecutionMode	= "ASYNC"
 
-	DeliveryStatusClassified        DeliveryStatus = "CLASSIFIED"
-	DeliveryStatusPrepared          DeliveryStatus = "PREPARED"
-	DeliveryStatusExecuted          DeliveryStatus = "EXECUTED"
-	DeliveryStatusRootCommitted     DeliveryStatus = "ROOT_COMMITTED"
-	DeliveryStatusNextBlockEligible DeliveryStatus = "NEXT_BLOCK_ELIGIBLE"
-	DeliveryStatusDelivered         DeliveryStatus = "DELIVERED"
-	DeliveryStatusBounced           DeliveryStatus = "BOUNCED"
-	DeliveryStatusRefunded          DeliveryStatus = "REFUNDED"
-	DeliveryStatusFailed            DeliveryStatus = "FAILED"
+	DeliveryStatusClassified	DeliveryStatus	= "CLASSIFIED"
+	DeliveryStatusPrepared		DeliveryStatus	= "PREPARED"
+	DeliveryStatusExecuted		DeliveryStatus	= "EXECUTED"
+	DeliveryStatusRootCommitted	DeliveryStatus	= "ROOT_COMMITTED"
+	DeliveryStatusNextBlockEligible	DeliveryStatus	= "NEXT_BLOCK_ELIGIBLE"
+	DeliveryStatusDelivered		DeliveryStatus	= "DELIVERED"
+	DeliveryStatusBounced		DeliveryStatus	= "BOUNCED"
+	DeliveryStatusRefunded		DeliveryStatus	= "REFUNDED"
+	DeliveryStatusFailed		DeliveryStatus	= "FAILED"
 
-	ReceiptStatusSuccess         ReceiptStatus = "SUCCESS"
-	ReceiptStatusBounced         ReceiptStatus = "BOUNCED"
-	ReceiptStatusRefunded        ReceiptStatus = "REFUNDED"
-	ReceiptStatusTerminalFailure ReceiptStatus = "TERMINAL_FAILURE"
+	ReceiptStatusSuccess		ReceiptStatus	= "SUCCESS"
+	ReceiptStatusBounced		ReceiptStatus	= "BOUNCED"
+	ReceiptStatusRefunded		ReceiptStatus	= "REFUNDED"
+	ReceiptStatusTerminalFailure	ReceiptStatus	= "TERMINAL_FAILURE"
 
-	FailureReasonNone                   FailureReason = ""
-	FailureReasonExecutionFailed        FailureReason = "EXECUTION_FAILED"
-	FailureReasonInvalidDestination     FailureReason = "INVALID_DESTINATION"
-	FailureReasonExpired                FailureReason = "EXPIRED"
-	FailureReasonMissingCommittedRoot   FailureReason = "MISSING_COMMITTED_ROOT"
-	FailureReasonMissingActiveShard     FailureReason = "MISSING_ACTIVE_SHARD"
-	FailureReasonCrossZoneProofRejected FailureReason = "CROSS_ZONE_PROOF_REJECTED"
+	FailureReasonNone			FailureReason	= ""
+	FailureReasonExecutionFailed		FailureReason	= "EXECUTION_FAILED"
+	FailureReasonInvalidDestination		FailureReason	= "INVALID_DESTINATION"
+	FailureReasonExpired			FailureReason	= "EXPIRED"
+	FailureReasonMissingCommittedRoot	FailureReason	= "MISSING_COMMITTED_ROOT"
+	FailureReasonMissingActiveShard		FailureReason	= "MISSING_ACTIVE_SHARD"
+	FailureReasonCrossZoneProofRejected	FailureReason	= "CROSS_ZONE_PROOF_REJECTED"
 )
 
 type ClassificationInput struct {
-	Height           uint64
-	TxHash           string
-	SourceZone       ZoneID
-	SourceShard      ShardID
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	PriorityClass    uint32
-	AdmissionHeight  uint64
-	TxIndex          uint32
-	MessageIndex     uint32
+	Height			uint64
+	TxHash			string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	PriorityClass		uint32
+	AdmissionHeight		uint64
+	TxIndex			uint32
+	MessageIndex		uint32
 }
 
 type ClassifiedTransaction struct {
-	Height           uint64
-	TxHash           string
-	SourceZone       ZoneID
-	SourceShard      ShardID
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	ExecutionMode    ExecutionMode
-	ProposalItem     ProposalItem
-	DeliveryStatus   DeliveryStatus
+	Height			uint64
+	TxHash			string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	ExecutionMode		ExecutionMode
+	ProposalItem		ProposalItem
+	DeliveryStatus		DeliveryStatus
 }
 
 type ExecutionResult struct {
-	Success    bool
-	Code       uint32
-	ResultHash string
+	Success		bool
+	Code		uint32
+	ResultHash	string
 }
 
 type ExecutionReceipt struct {
-	TxHash           string
-	SourceZone       ZoneID
-	SourceShard      ShardID
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	ExecutionMode    ExecutionMode
-	Status           ReceiptStatus
-	Reason           FailureReason
-	Height           uint64
-	Sequence         uint64
-	ExecutionCode    uint32
-	ResultHash       string
-	ReceiptHash      string
+	TxHash			string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	ExecutionMode		ExecutionMode
+	Status			ReceiptStatus
+	Reason			FailureReason
+	Height			uint64
+	Sequence		uint64
+	ExecutionCode		uint32
+	ResultHash		string
+	ReceiptHash		string
 }
 
 type CrossZoneDelivery struct {
-	TxHash               string
-	SourceZone           ZoneID
-	SourceShard          ShardID
-	DestinationZone      ZoneID
-	DestinationShard     ShardID
-	CommittedHeight      uint64
-	EligibleHeight       uint64
-	SourceCommitmentHash string
-	MessageRoot          string
-	DeliveryItem         ProposalItem
-	Status               DeliveryStatus
-	Receipt              ExecutionReceipt
-	BounceReceipt        ExecutionReceipt
+	TxHash			string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	CommittedHeight		uint64
+	EligibleHeight		uint64
+	SourceCommitmentHash	string
+	MessageRoot		string
+	DeliveryItem		ProposalItem
+	Status			DeliveryStatus
+	Receipt			ExecutionReceipt
+	BounceReceipt		ExecutionReceipt
 }
 
 func ClassifyTransaction(state CoreState, input ClassificationInput) (ClassifiedTransaction, error) {
@@ -125,23 +125,23 @@ func ClassifyTransaction(state CoreState, input ClassificationInput) (Classified
 		mode = ExecutionModeAsync
 	}
 	classified := ClassifiedTransaction{
-		Height:           input.Height,
-		TxHash:           input.TxHash,
-		SourceZone:       input.SourceZone,
-		SourceShard:      input.SourceShard,
-		DestinationZone:  input.DestinationZone,
-		DestinationShard: input.DestinationShard,
-		ExecutionMode:    mode,
+		Height:			input.Height,
+		TxHash:			input.TxHash,
+		SourceZone:		input.SourceZone,
+		SourceShard:		input.SourceShard,
+		DestinationZone:	input.DestinationZone,
+		DestinationShard:	input.DestinationShard,
+		ExecutionMode:		mode,
 		ProposalItem: ProposalItem{
-			ZoneID:          input.SourceZone,
-			ShardID:         input.SourceShard,
-			TxHash:          input.TxHash,
-			PriorityClass:   input.PriorityClass,
-			AdmissionHeight: input.AdmissionHeight,
-			TxIndex:         input.TxIndex,
-			MessageIndex:    input.MessageIndex,
+			ZoneID:			input.SourceZone,
+			ShardID:		input.SourceShard,
+			TxHash:			input.TxHash,
+			PriorityClass:		input.PriorityClass,
+			AdmissionHeight:	input.AdmissionHeight,
+			TxIndex:		input.TxIndex,
+			MessageIndex:		input.MessageIndex,
 		},
-		DeliveryStatus: DeliveryStatusClassified,
+		DeliveryStatus:	DeliveryStatusClassified,
 	}
 	if err := classified.Validate(); err != nil {
 		return ClassifiedTransaction{}, err
@@ -185,25 +185,25 @@ func MarkCrossZoneEligible(state CoreState, classified ClassifiedTransaction, co
 		delay = 1
 	}
 	delivery := CrossZoneDelivery{
-		TxHash:               classified.TxHash,
-		SourceZone:           classified.SourceZone,
-		SourceShard:          classified.SourceShard,
-		DestinationZone:      classified.DestinationZone,
-		DestinationShard:     classified.DestinationShard,
-		CommittedHeight:      committedHeight,
-		EligibleHeight:       committedHeight + delay,
-		SourceCommitmentHash: commitment.CommitmentHash,
-		MessageRoot:          commitment.OutboxRoot,
+		TxHash:			classified.TxHash,
+		SourceZone:		classified.SourceZone,
+		SourceShard:		classified.SourceShard,
+		DestinationZone:	classified.DestinationZone,
+		DestinationShard:	classified.DestinationShard,
+		CommittedHeight:	committedHeight,
+		EligibleHeight:		committedHeight + delay,
+		SourceCommitmentHash:	commitment.CommitmentHash,
+		MessageRoot:		commitment.OutboxRoot,
 		DeliveryItem: ProposalItem{
-			ZoneID:          classified.DestinationZone,
-			ShardID:         classified.DestinationShard,
-			TxHash:          classified.TxHash,
-			PriorityClass:   classified.ProposalItem.PriorityClass,
-			AdmissionHeight: committedHeight + delay,
-			TxIndex:         classified.ProposalItem.TxIndex,
-			MessageIndex:    classified.ProposalItem.MessageIndex,
+			ZoneID:			classified.DestinationZone,
+			ShardID:		classified.DestinationShard,
+			TxHash:			classified.TxHash,
+			PriorityClass:		classified.ProposalItem.PriorityClass,
+			AdmissionHeight:	committedHeight + delay,
+			TxIndex:		classified.ProposalItem.TxIndex,
+			MessageIndex:		classified.ProposalItem.MessageIndex,
 		},
-		Status: DeliveryStatusNextBlockEligible,
+		Status:	DeliveryStatusNextBlockEligible,
 	}
 	return delivery, delivery.Validate()
 }
@@ -216,14 +216,14 @@ func DeliverCrossZone(delivery CrossZoneDelivery, result ExecutionResult, height
 		return CrossZoneDelivery{}, errors.New("aetracore cross-zone delivery is not yet eligible")
 	}
 	classified := ClassifiedTransaction{
-		Height:           delivery.CommittedHeight,
-		TxHash:           delivery.TxHash,
-		SourceZone:       delivery.SourceZone,
-		SourceShard:      delivery.SourceShard,
-		DestinationZone:  delivery.DestinationZone,
-		DestinationShard: delivery.DestinationShard,
-		ExecutionMode:    ExecutionModeAsync,
-		DeliveryStatus:   DeliveryStatusNextBlockEligible,
+		Height:			delivery.CommittedHeight,
+		TxHash:			delivery.TxHash,
+		SourceZone:		delivery.SourceZone,
+		SourceShard:		delivery.SourceShard,
+		DestinationZone:	delivery.DestinationZone,
+		DestinationShard:	delivery.DestinationShard,
+		ExecutionMode:		ExecutionModeAsync,
+		DeliveryStatus:		DeliveryStatusNextBlockEligible,
 	}
 	receipt, err := buildExecutionReceipt(classified, result, height, sequence, FailureReasonExecutionFailed, false)
 	if err != nil {
@@ -261,13 +261,13 @@ func FailCrossZoneDelivery(delivery CrossZoneDelivery, reason FailureReason, hei
 	}
 	result := ExecutionResult{Success: false, Code: 1, ResultHash: hashParts("aetracore-delivery-failure", delivery.TxHash, string(reason))}
 	classified := ClassifiedTransaction{
-		Height:           delivery.CommittedHeight,
-		TxHash:           delivery.TxHash,
-		SourceZone:       delivery.SourceZone,
-		SourceShard:      delivery.SourceShard,
-		DestinationZone:  delivery.DestinationZone,
-		DestinationShard: delivery.DestinationShard,
-		ExecutionMode:    ExecutionModeAsync,
+		Height:			delivery.CommittedHeight,
+		TxHash:			delivery.TxHash,
+		SourceZone:		delivery.SourceZone,
+		SourceShard:		delivery.SourceShard,
+		DestinationZone:	delivery.DestinationZone,
+		DestinationShard:	delivery.DestinationShard,
+		ExecutionMode:		ExecutionModeAsync,
 	}
 	receipt, err := buildExecutionReceiptWithReason(classified, result, height, sequence, reason, false)
 	if err != nil {
@@ -604,18 +604,18 @@ func buildExecutionReceiptWithReason(classified ClassifiedTransaction, result Ex
 		}
 	}
 	receipt := ExecutionReceipt{
-		TxHash:           classified.TxHash,
-		SourceZone:       classified.SourceZone,
-		SourceShard:      classified.SourceShard,
-		DestinationZone:  classified.DestinationZone,
-		DestinationShard: classified.DestinationShard,
-		ExecutionMode:    classified.ExecutionMode,
-		Status:           status,
-		Reason:           reason,
-		Height:           height,
-		Sequence:         sequence,
-		ExecutionCode:    result.Code,
-		ResultHash:       result.ResultHash,
+		TxHash:			classified.TxHash,
+		SourceZone:		classified.SourceZone,
+		SourceShard:		classified.SourceShard,
+		DestinationZone:	classified.DestinationZone,
+		DestinationShard:	classified.DestinationShard,
+		ExecutionMode:		classified.ExecutionMode,
+		Status:			status,
+		Reason:			reason,
+		Height:			height,
+		Sequence:		sequence,
+		ExecutionCode:		result.Code,
+		ResultHash:		result.ResultHash,
 	}
 	receipt.ReceiptHash = ComputeExecutionReceiptHash(receipt)
 	return receipt, receipt.Validate()
@@ -623,18 +623,18 @@ func buildExecutionReceiptWithReason(classified ClassifiedTransaction, result Ex
 
 func buildBounceReceipt(receipt ExecutionReceipt, height uint64, sequence uint64) ExecutionReceipt {
 	bounce := ExecutionReceipt{
-		TxHash:           hashParts("aetracore-bounce", receipt.TxHash, receipt.ReceiptHash),
-		SourceZone:       receipt.DestinationZone,
-		SourceShard:      receipt.DestinationShard,
-		DestinationZone:  receipt.SourceZone,
-		DestinationShard: receipt.SourceShard,
-		ExecutionMode:    ExecutionModeAsync,
-		Status:           ReceiptStatusBounced,
-		Reason:           receipt.Reason,
-		Height:           height,
-		Sequence:         sequence,
-		ExecutionCode:    receipt.ExecutionCode,
-		ResultHash:       hashParts("aetracore-bounce-result", receipt.ReceiptHash),
+		TxHash:			hashParts("aetracore-bounce", receipt.TxHash, receipt.ReceiptHash),
+		SourceZone:		receipt.DestinationZone,
+		SourceShard:		receipt.DestinationShard,
+		DestinationZone:	receipt.SourceZone,
+		DestinationShard:	receipt.SourceShard,
+		ExecutionMode:		ExecutionModeAsync,
+		Status:			ReceiptStatusBounced,
+		Reason:			receipt.Reason,
+		Height:			height,
+		Sequence:		sequence,
+		ExecutionCode:		receipt.ExecutionCode,
+		ResultHash:		hashParts("aetracore-bounce-result", receipt.ReceiptHash),
 	}
 	bounce.ReceiptHash = ComputeExecutionReceiptHash(bounce)
 	return bounce

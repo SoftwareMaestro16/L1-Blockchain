@@ -48,11 +48,11 @@ func TestUpdateParamsAuthoritySetRouteAndPagination(t *testing.T) {
 	}))
 
 	decision, err := keeper.Route(routingtypes.RouteInput{
-		MsgType:      routingtypes.MsgTypeBankSend,
-		FeeDenom:     routingtypes.NativeFeeDenom,
-		TxHash:       hashBytes("tx"),
-		Locality:     routingtypes.Locality{AccountKey: bytes.Repeat([]byte{1}, 20)},
-		ActiveShards: nil,
+		MsgType:	routingtypes.MsgTypeBankSend,
+		FeeDenom:	routingtypes.NativeFeeDenom,
+		TxHash:		hashBytes("tx"),
+		Locality:	routingtypes.Locality{AccountKey: bytes.Repeat([]byte{1}, 20)},
+		ActiveShards:	nil,
 	})
 	require.NoError(t, err)
 	require.Equal(t, routingtypes.ZoneFinancial, decision.ZoneID)

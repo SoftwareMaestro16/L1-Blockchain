@@ -13,11 +13,11 @@ func makeTestQuerySnapshot() QuerySnapshot {
 	stateChunk, _ := builder.Build()
 
 	return QuerySnapshot{
-		StateRootChunk: stateChunk,
-		Code:           []byte{0x01, 0x02, 0x03},
+		StateRootChunk:	stateChunk,
+		Code:		[]byte{0x01, 0x02, 0x03},
 		BlockCtx: BlockContext{
-			Height:  100,
-			ChainID: "test-chain",
+			Height:		100,
+			ChainID:	"test-chain",
 		},
 	}
 }
@@ -88,9 +88,9 @@ func TestQueryGasLimitEnforced(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ExecuteQuery failed: %v", err)
 	}
-	// With very low gas limit, should still produce a receipt
+
 	if receipt.ExitCode == 0 {
-		// Even with low gas, we should either succeed or run out of gas
+
 		t.Logf("Low gas query completed with exit code %d", receipt.ExitCode)
 	}
 }
@@ -118,7 +118,6 @@ func TestQueryResponseDeterministic(t *testing.T) {
 		t.Fatalf("deterministic trace hash mismatch: %s vs %s", receipt1.TraceHash, receipt2.TraceHash)
 	}
 
-	// Verify cache hit produces same result
 	receipt3, err := engine.ExecuteQuery(snapshot, "get_balance", []byte(`{}`), 0)
 	if err != nil {
 		t.Fatalf("ExecuteQuery 3 failed: %v", err)
@@ -162,7 +161,6 @@ func TestQueryProofMode(t *testing.T) {
 		t.Fatalf("expected exit code 0, got %d", receipt.ExitCode)
 	}
 
-	// Verify proof
 	stateHash := snapshot.StateRootChunk.Hash()
 	if !VerifyQueryProof(proof, stateHash, "get_balance", []byte(`{}`)) {
 		t.Fatal("proof verification failed")
@@ -171,7 +169,7 @@ func TestQueryProofMode(t *testing.T) {
 
 func TestQueryProofModeDisabled(t *testing.T) {
 	snapshot := makeTestQuerySnapshot()
-	localEngine := NewQueryEngine() // no proof mode
+	localEngine := NewQueryEngine()
 
 	_, _, err := localEngine.ExecuteQueryWithProof(snapshot, "get_balance", []byte(`{}`), 0)
 	if err == nil {
@@ -197,7 +195,6 @@ func TestQueryCacheInvalidation(t *testing.T) {
 		t.Fatalf("cached exit code mismatch: %d", cached.ExitCode)
 	}
 
-	// Invalidate with different state root
 	cache.Invalidate([]byte("different_root"))
 	if cache.Size() != 0 {
 		t.Fatalf("cache should be invalidated, size: %d", cache.Size())
@@ -206,11 +203,11 @@ func TestQueryCacheInvalidation(t *testing.T) {
 
 func TestQueryCanonicalResponseEncoding(t *testing.T) {
 	enc := QueryResponseCanonicalEncoding{
-		MethodID:  42,
-		GasUsed:   1000,
-		ExitCode:  0,
-		Payload:   []byte("response_data"),
-		ProofRoot: []byte("proof"),
+		MethodID:	42,
+		GasUsed:	1000,
+		ExitCode:	0,
+		Payload:	[]byte("response_data"),
+		ProofRoot:	[]byte("proof"),
 	}
 
 	encoded := EncodeQueryResponseCanonical(enc)
@@ -237,11 +234,11 @@ func TestQueryCanonicalResponseEncoding(t *testing.T) {
 
 func TestQueryCanonicalResponseDeterministic(t *testing.T) {
 	enc := QueryResponseCanonicalEncoding{
-		MethodID:  1,
-		GasUsed:   500,
-		ExitCode:  0,
-		Payload:   []byte("data"),
-		ProofRoot: []byte("proof"),
+		MethodID:	1,
+		GasUsed:	500,
+		ExitCode:	0,
+		Payload:	[]byte("data"),
+		ProofRoot:	[]byte("proof"),
 	}
 
 	encoded1 := EncodeQueryResponseCanonical(enc)
@@ -261,34 +258,32 @@ func TestMethodRegistry(t *testing.T) {
 	registry := &MethodRegistry{}
 
 	err := registry.RegisterMethod(MethodRegistryEntry{
-		MethodID:    1,
-		Name:        "get_balance",
-		GasEstimate: 1000,
+		MethodID:	1,
+		Name:		"get_balance",
+		GasEstimate:	1000,
 	})
 	if err != nil {
 		t.Fatalf("RegisterMethod failed: %v", err)
 	}
 
 	err = registry.RegisterMethod(MethodRegistryEntry{
-		MethodID:    2,
-		Name:        "get_owner",
-		GasEstimate: 500,
+		MethodID:	2,
+		Name:		"get_owner",
+		GasEstimate:	500,
 	})
 	if err != nil {
 		t.Fatalf("RegisterMethod failed: %v", err)
 	}
 
-	// Duplicate ID should fail
 	err = registry.RegisterMethod(MethodRegistryEntry{
-		MethodID:    1,
-		Name:        "get_other",
-		GasEstimate: 100,
+		MethodID:	1,
+		Name:		"get_other",
+		GasEstimate:	100,
 	})
 	if err == nil {
 		t.Fatal("duplicate method ID should be rejected")
 	}
 
-	// Lookup by name
 	entry, ok := registry.LookupMethod("get_balance")
 	if !ok {
 		t.Fatal("get_balance should be found")
@@ -297,7 +292,6 @@ func TestMethodRegistry(t *testing.T) {
 		t.Fatalf("method ID mismatch: %d", entry.MethodID)
 	}
 
-	// Lookup by ID
 	entry, ok = registry.LookupMethodByID(2)
 	if !ok {
 		t.Fatal("method ID 2 should be found")
@@ -309,18 +303,18 @@ func TestMethodRegistry(t *testing.T) {
 
 func TestMethodRegistryValidation(t *testing.T) {
 	err := ValidateMethodRegistryEntry(MethodRegistryEntry{
-		MethodID:    0,
-		Name:        "",
-		GasEstimate: 0,
+		MethodID:	0,
+		Name:		"",
+		GasEstimate:	0,
 	})
 	if err == nil {
 		t.Fatal("empty name should be rejected")
 	}
 
 	err = ValidateMethodRegistryEntry(MethodRegistryEntry{
-		MethodID:    1,
-		Name:        "test",
-		GasEstimate: 100,
+		MethodID:	1,
+		Name:		"test",
+		GasEstimate:	100,
 	})
 	if err != nil {
 		t.Fatalf("valid entry should pass: %v", err)
@@ -329,10 +323,10 @@ func TestMethodRegistryValidation(t *testing.T) {
 
 func TestQueryIsolationBoundary(t *testing.T) {
 	boundary := QueryIsolationBoundary{
-		CanReadStorage:  true,
-		CanSendMessages:  false,
-		CanEmitEvents:    false,
-		CanWriteStorage:  false,
+		CanReadStorage:		true,
+		CanSendMessages:	false,
+		CanEmitEvents:		false,
+		CanWriteStorage:	false,
 	}
 
 	if !boundary.CanReadStorage {
@@ -409,17 +403,17 @@ func TestQuerySnapshotImmutability(t *testing.T) {
 	}
 
 	noCode := QuerySnapshot{
-		StateRootChunk: snapshot.StateRootChunk,
-		Code:           nil,
+		StateRootChunk:	snapshot.StateRootChunk,
+		Code:		nil,
 	}
 	_ = noCode
 }
 
 func TestQueryGasModel(t *testing.T) {
 	model := QueryGasModel{
-		ComputeGas:       10,
-		DecodeGas:        5,
-		SerializationGas: 2,
+		ComputeGas:		10,
+		DecodeGas:		5,
+		SerializationGas:	2,
 	}
 
 	total := model.Total()
@@ -428,8 +422,8 @@ func TestQueryGasModel(t *testing.T) {
 	}
 
 	accounting := &QueryGasAccounting{
-		Model: model,
-		Limit: 1000,
+		Model:	model,
+		Limit:	1000,
 	}
 
 	if !accounting.ChargeDecode(10) {
@@ -461,13 +455,13 @@ func TestQueryGasModel(t *testing.T) {
 
 func TestQueryGasExhaustion(t *testing.T) {
 	model := QueryGasModel{
-		ComputeGas:       10,
-		DecodeGas:        5,
-		SerializationGas: 2,
+		ComputeGas:		10,
+		DecodeGas:		5,
+		SerializationGas:	2,
 	}
 	accounting := &QueryGasAccounting{
-		Model: model,
-		Limit: 50,
+		Model:	model,
+		Limit:	50,
 	}
 
 	if accounting.ChargeCompute(100) {
@@ -514,9 +508,9 @@ func TestQueryStackTrace(t *testing.T) {
 
 func TestQueryStackLimits(t *testing.T) {
 	limits := QueryStackLimits{
-		MaxStackDepth:          DefaultQueryMaxStackDepth,
-		MaxRecursionDepth:      DefaultQueryMaxRecursionDepth,
-		MaxChunkTraversalDepth: DefaultQueryMaxChunkTraversalDepth,
+		MaxStackDepth:		DefaultQueryMaxStackDepth,
+		MaxRecursionDepth:	DefaultQueryMaxRecursionDepth,
+		MaxChunkTraversalDepth:	DefaultQueryMaxChunkTraversalDepth,
 	}
 	if limits.MaxStackDepth != 512 {
 		t.Fatalf("expected default max stack depth 512, got %d", limits.MaxStackDepth)

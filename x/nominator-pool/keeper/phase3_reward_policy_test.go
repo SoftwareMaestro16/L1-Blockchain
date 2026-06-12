@@ -19,23 +19,23 @@ func TestPhase33PersistentExportImportAfterRewardsAndClaimIdempotency(t *testing
 	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
 	pool := createOfficialLiquidStakingPool(t, &source, "phase33-reward-persist")
 	_, err := source.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	summary, err := source.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          source.ExportGenesis().Params.Authority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		Height:             3,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: types.DefaultMinPoolDeposit,
+		Authority:		source.ExportGenesis().Params.Authority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		Height:			3,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	types.DefaultMinPoolDeposit,
 		Allocations: []types.ValidatorRewardAllocation{{
-			Validator:          rawPoolAddress("92"),
-			PoolAllocatedStake: types.DefaultMinPoolDeposit,
-			PerformanceBps:     types.MaxBasisPoints,
+			Validator:		rawPoolAddress("92"),
+			PoolAllocatedStake:	types.DefaultMinPoolDeposit,
+			PerformanceBps:		types.MaxBasisPoints,
 		}},
 	})
 	require.NoError(t, err)
@@ -65,17 +65,17 @@ func TestPhase33ReputationCannotIncreaseWithoutStakeTimeExposure(t *testing.T) {
 	k := NewKeeperWithAccountStatus(accountStatusFixture{user: accountStatusActive})
 	pool := createOfficialLiquidStakingPool(t, &k, "phase33-reputation")
 	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
 	claim, err := k.ClaimStakeReputation(types.MsgClaimStakeReputation{
-		PoolID:       pool.PoolID,
-		OwnerAddress: user,
-		Height:       2,
+		PoolID:		pool.PoolID,
+		OwnerAddress:	user,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Zero(t, claim.ReputationDelta)

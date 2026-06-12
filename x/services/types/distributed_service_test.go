@@ -81,23 +81,23 @@ func TestOffConsensusExecutionRequiresCommittedMessageOrProof(t *testing.T) {
 	require.ErrorContains(t, err, "requires message or proof commitment")
 
 	messageCommitment, err := NewDistributedExecutionCommitment(DistributedExecutionCommitment{
-		ServiceID:       "svc-api",
-		EndpointID:      "api-main",
-		Kind:            DistributedCommitmentMessage,
-		MessageID:       testDistributedHash("message"),
-		ResultHash:      testDistributedHash("result"),
-		CommittedHeight: 40,
+		ServiceID:		"svc-api",
+		EndpointID:		"api-main",
+		Kind:			DistributedCommitmentMessage,
+		MessageID:		testDistributedHash("message"),
+		ResultHash:		testDistributedHash("result"),
+		CommittedHeight:	40,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateOffConsensusAuthority(DistributedAuthorityMessageCommit, []DistributedExecutionCommitment{messageCommitment}))
 
 	proofCommitment, err := NewDistributedExecutionCommitment(DistributedExecutionCommitment{
-		ServiceID:       "svc-api",
-		EndpointID:      "api-main",
-		Kind:            DistributedCommitmentProof,
-		ProofHash:       testDistributedHash("proof"),
-		ResultHash:      testDistributedHash("result"),
-		CommittedHeight: 40,
+		ServiceID:		"svc-api",
+		EndpointID:		"api-main",
+		Kind:			DistributedCommitmentProof,
+		ProofHash:		testDistributedHash("proof"),
+		ResultHash:		testDistributedHash("result"),
+		CommittedHeight:	40,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateOffConsensusAuthority(DistributedAuthorityProofCommit, []DistributedExecutionCommitment{proofCommitment}))
@@ -124,19 +124,19 @@ func TestDistributedDiscoveryRejectsInconsistentIndexes(t *testing.T) {
 func testDistributedRecord(t *testing.T, serviceID, name string, kind DistributedServiceKind, zoneID string, interfaceHash string, endpoints []DistributedServiceEndpoint) DistributedServiceRecord {
 	t.Helper()
 	record, err := NewDistributedServiceRecord(DistributedServiceRecord{
-		ServiceID:      serviceID,
-		ServiceName:    name,
-		Kind:           kind,
-		Owner:          coretypes.DefaultAuthority,
-		ZoneID:         zoneID,
-		InterfaceHash:  interfaceHash,
-		EndpointRoot:   ComputeDistributedEndpointRoot(endpoints),
-		DescriptorHash: testDistributedHash(serviceID + "/descriptor"),
-		MetadataHash:   testDistributedHash(serviceID + "/metadata"),
-		CreatedHeight:  10,
-		UpdatedHeight:  10,
-		ExpiryHeight:   100,
-		Discoverable:   true,
+		ServiceID:	serviceID,
+		ServiceName:	name,
+		Kind:		kind,
+		Owner:		coretypes.DefaultAuthority,
+		ZoneID:		zoneID,
+		InterfaceHash:	interfaceHash,
+		EndpointRoot:	ComputeDistributedEndpointRoot(endpoints),
+		DescriptorHash:	testDistributedHash(serviceID + "/descriptor"),
+		MetadataHash:	testDistributedHash(serviceID + "/metadata"),
+		CreatedHeight:	10,
+		UpdatedHeight:	10,
+		ExpiryHeight:	100,
+		Discoverable:	true,
 	})
 	require.NoError(t, err)
 	return record
@@ -149,15 +149,15 @@ func testDistributedEndpoint(t *testing.T, serviceID, endpointID string, kind Di
 		target = "https://api.aetra.local/" + endpointID
 	}
 	endpoint, err := NewDistributedServiceEndpoint(DistributedServiceEndpoint{
-		ServiceID:     serviceID,
-		EndpointID:    endpointID,
-		Kind:          kind,
-		ZoneID:        coretypes.ZoneIDApplication,
-		Target:        target,
-		InterfaceHash: interfaceHash,
-		Priority:      priority,
-		Weight:        1,
-		MetadataHash:  testDistributedHash(endpointID + "/metadata"),
+		ServiceID:	serviceID,
+		EndpointID:	endpointID,
+		Kind:		kind,
+		ZoneID:		coretypes.ZoneIDApplication,
+		Target:		target,
+		InterfaceHash:	interfaceHash,
+		Priority:	priority,
+		Weight:		1,
+		MetadataHash:	testDistributedHash(endpointID + "/metadata"),
 	})
 	require.NoError(t, err)
 	return endpoint
@@ -166,13 +166,13 @@ func testDistributedEndpoint(t *testing.T, serviceID, endpointID string, kind Di
 func testDistributedInterface(t *testing.T, name string) DistributedInterfaceDescriptor {
 	t.Helper()
 	iface, err := NewDistributedInterfaceDescriptor(DistributedInterfaceDescriptor{
-		InterfaceHash: testDistributedHash(name + "/interface"),
-		InterfaceName: name,
-		Version:       1,
-		SchemaHash:    testDistributedHash(name + "/schema"),
-		MethodRoot:    testDistributedHash(name + "/methods"),
-		EventRoot:     testDistributedHash(name + "/events"),
-		ErrorRoot:     testDistributedHash(name + "/errors"),
+		InterfaceHash:	testDistributedHash(name + "/interface"),
+		InterfaceName:	name,
+		Version:	1,
+		SchemaHash:	testDistributedHash(name + "/schema"),
+		MethodRoot:	testDistributedHash(name + "/methods"),
+		EventRoot:	testDistributedHash(name + "/events"),
+		ErrorRoot:	testDistributedHash(name + "/errors"),
 	})
 	require.NoError(t, err)
 	return iface

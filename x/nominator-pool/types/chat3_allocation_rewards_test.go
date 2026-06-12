@@ -48,10 +48,10 @@ func TestCHAT3AllocationPlanTouchesBoundedPoolAllocationKeysOnly(t *testing.T) {
 	valA := chat3AEAddress(0x55)
 	valB := chat3AEAddress(0x66)
 	plan, err := BuildPoolAllocationPlan(PoolAllocationPlanInput{
-		PoolID:                "pool-chat3",
-		Epoch:                 9,
-		Height:                90,
-		MaxTouchedAllocations: 1,
+		PoolID:			"pool-chat3",
+		Epoch:			9,
+		Height:			90,
+		MaxTouchedAllocations:	1,
 		Weights: []AllocationWeight{
 			{ValidatorAddress: valB, WeightBps: 4_000},
 			{ValidatorAddress: valA, WeightBps: 6_000},
@@ -75,9 +75,9 @@ func TestCHAT3AllocationPlanAppliesDeterministicBoundedStateTransition(t *testin
 		{PoolID: "pool-other", Validator: valOther, TargetWeightBps: 25, UpdatedHeight: 10},
 	}
 	receipt := PoolRebalanceReceipt{
-		PoolID: "pool-chat3",
-		Epoch:  2,
-		Height: 20,
+		PoolID:	"pool-chat3",
+		Epoch:	2,
+		Height:	20,
 		Allocations: []PoolValidatorAllocation{
 			{PoolID: "pool-chat3", Validator: valB, TargetWeightBps: 100},
 			{PoolID: "pool-chat3", Validator: valA, TargetWeightBps: 200},
@@ -121,10 +121,10 @@ func TestCHAT3ValidatorPowerCapIsStage1RewardsOnlyUntilCometBFTEvidence(t *testi
 	require.ErrorContains(t, invalidStage1.Validate(), "must not claim CometBFT")
 
 	stage2 := ValidatorPowerCapScope{
-		Stage:                    ValidatorPowerCapStageCometBFT,
-		CapsPoolAllocationWeight: true,
-		CapsRewardEffectivePower: true,
-		CapsCometBFTVotingPower:  true,
+		Stage:				ValidatorPowerCapStageCometBFT,
+		CapsPoolAllocationWeight:	true,
+		CapsRewardEffectivePower:	true,
+		CapsCometBFTVotingPower:	true,
 	}
 	require.NoError(t, stage2.Validate())
 }
@@ -134,18 +134,18 @@ func TestCHAT3PoolRewardsDeductCommissionThenPoolFeeAndCapRewards(t *testing.T) 
 	pool := chat3RewardPool()
 	validator := chat3AEAddress(0x77)
 	msg := MsgSyncPoolRewards{
-		Authority:          params.Authority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		Height:             10,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 20_000,
+		Authority:		params.Authority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		Height:			10,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	20_000,
 		Allocations: []ValidatorRewardAllocation{{
-			Validator:          validator,
-			PoolAllocatedStake: 100_000,
-			ValidatorSelfStake: 50_000,
-			PerformanceBps:     MaxBasisPoints,
-			CommissionBps:      500,
+			Validator:		validator,
+			PoolAllocatedStake:	100_000,
+			ValidatorSelfStake:	50_000,
+			PerformanceBps:		MaxBasisPoints,
+			CommissionBps:		500,
 		}},
 	}
 
@@ -175,11 +175,11 @@ func TestCHAT3PoolRewardClaimUpdatesCallerOnlyAndScalesToMillionUsers(t *testing
 	shareB := DelegatorShare{Delegator: ownerB, Shares: 750}
 
 	nextA, receiptA, err := ClaimPoolRewardShare(PoolRewardClaimInput{
-		PoolID:      "pool-chat3",
-		Share:       shareA,
-		RewardIndex: rewardIndex,
-		Epoch:       2,
-		Height:      20,
+		PoolID:		"pool-chat3",
+		Share:		shareA,
+		RewardIndex:	rewardIndex,
+		Epoch:		2,
+		Height:		20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(2_351), receiptA.Amount)
@@ -189,11 +189,11 @@ func TestCHAT3PoolRewardClaimUpdatesCallerOnlyAndScalesToMillionUsers(t *testing
 	require.Equal(t, shareB, shareB)
 
 	nextB, receiptB, err := ClaimPoolRewardShare(PoolRewardClaimInput{
-		PoolID:      "pool-chat3",
-		Share:       shareB,
-		RewardIndex: rewardIndex,
-		Epoch:       2,
-		Height:      20,
+		PoolID:		"pool-chat3",
+		Share:		shareB,
+		RewardIndex:	rewardIndex,
+		Epoch:		2,
+		Height:		20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(7_053), receiptB.Amount)
@@ -203,11 +203,11 @@ func TestCHAT3PoolRewardClaimUpdatesCallerOnlyAndScalesToMillionUsers(t *testing
 	const simulatedUsers = 1_000_000
 	for i := 0; i < 4; i++ {
 		next, receipt, err := ClaimPoolRewardShare(PoolRewardClaimInput{
-			PoolID:      "pool-chat3",
-			Share:       DelegatorShare{Delegator: ownerA, Shares: uint64(simulatedUsers + i), PendingRewards: 1},
-			RewardIndex: rewardIndex,
-			Epoch:       3,
-			Height:      30,
+			PoolID:		"pool-chat3",
+			Share:		DelegatorShare{Delegator: ownerA, Shares: uint64(simulatedUsers + i), PendingRewards: 1},
+			RewardIndex:	rewardIndex,
+			Epoch:		3,
+			Height:		30,
 		})
 		require.NoError(t, err)
 		require.NotZero(t, receipt.Amount)
@@ -221,27 +221,27 @@ func TestCHAT3PoolRewardStateRecordsAndExportImportRoundTrip(t *testing.T) {
 	owner := chat3AEAddress(0xb1)
 	pool := chat3RewardPool()
 	nextPool, _, err := SyncPoolRewards(params, pool, MsgSyncPoolRewards{
-		Authority:          params.Authority,
-		PoolID:             pool.PoolID,
-		Epoch:              4,
-		Height:             40,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 20_000,
+		Authority:		params.Authority,
+		PoolID:			pool.PoolID,
+		Epoch:			4,
+		Height:			40,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	20_000,
 		Allocations: []ValidatorRewardAllocation{{
-			Validator:          chat3AEAddress(0xb2),
-			PoolAllocatedStake: 100_000,
-			ValidatorSelfStake: 50_000,
-			PerformanceBps:     MaxBasisPoints,
-			CommissionBps:      500,
+			Validator:		chat3AEAddress(0xb2),
+			PoolAllocatedStake:	100_000,
+			ValidatorSelfStake:	50_000,
+			PerformanceBps:		MaxBasisPoints,
+			CommissionBps:		500,
 		}},
 	})
 	require.NoError(t, err)
 	share, receipt, err := ClaimPoolRewardShare(PoolRewardClaimInput{
-		PoolID:      pool.PoolID,
-		Share:       DelegatorShare{Delegator: owner, Shares: 1_000},
-		RewardIndex: nextPool.RewardIndex,
-		Epoch:       4,
-		Height:      41,
+		PoolID:		pool.PoolID,
+		Share:		DelegatorShare{Delegator: owner, Shares: 1_000},
+		RewardIndex:	nextPool.RewardIndex,
+		Epoch:		4,
+		Height:		41,
 	})
 	require.NoError(t, err)
 	require.Equal(t, nextPool.RewardIndex, share.RewardIndexCheckpoint)
@@ -252,24 +252,24 @@ func TestCHAT3PoolRewardStateRecordsAndExportImportRoundTrip(t *testing.T) {
 	_, _, err = RecordPoolRewardClaim(params, claims, receipt)
 	require.ErrorContains(t, err, "duplicate reward claim")
 	_, _, err = RecordPoolRewardClaim(params, nil, PoolRewardClaimReceipt{
-		PoolID:       pool.PoolID,
-		OwnerAddress: "notvalid1address",
-		Amount:       receipt.Amount,
-		Epoch:        4,
-		Height:       41,
+		PoolID:		pool.PoolID,
+		OwnerAddress:	"notvalid1address",
+		Amount:		receipt.Amount,
+		Epoch:		4,
+		Height:		41,
 	})
 	require.Error(t, err)
 	_, _, err = RecordPoolRewardClaim(params, nil, PoolRewardClaimReceipt{
-		PoolID:       pool.PoolID,
-		OwnerAddress: owner,
-		Epoch:        4,
-		Height:       41,
+		PoolID:		pool.PoolID,
+		OwnerAddress:	owner,
+		Epoch:		4,
+		Height:		41,
 	})
 	require.ErrorContains(t, err, "amount must be positive")
 
 	state := State{
-		PoolRewardIndexes: []PoolRewardIndex{{PoolID: nextPool.PoolID, RewardIndex: nextPool.RewardIndex, Epoch: nextPool.RewardEpoch}},
-		RewardClaims:      claims,
+		PoolRewardIndexes:	[]PoolRewardIndex{{PoolID: nextPool.PoolID, RewardIndex: nextPool.RewardIndex, Epoch: nextPool.RewardEpoch}},
+		RewardClaims:		claims,
 	}
 	normalized := state.Normalize(params)
 	require.NoError(t, normalized.Validate(params))
@@ -294,13 +294,13 @@ func TestCHAT3RewardFormulaFixtureForThreeHundredThousandAET(t *testing.T) {
 
 func chat3Candidate(params Params, validator string, mutate func(*ValidatorPolicyCandidate)) ValidatorPolicyCandidate {
 	candidate := ValidatorPolicyCandidate{
-		ValidatorAddress:   validator,
-		ReputationScore:    10_000,
-		UptimeBps:          10_000,
-		CommissionBps:      params.ValidatorCommissionFloorBps,
-		StakeEfficiencyBps: 10_000,
-		SlashingRiskBps:    0,
-		NetworkLoadBps:     0,
+		ValidatorAddress:	validator,
+		ReputationScore:	10_000,
+		UptimeBps:		10_000,
+		CommissionBps:		params.ValidatorCommissionFloorBps,
+		StakeEfficiencyBps:	10_000,
+		SlashingRiskBps:	0,
+		NetworkLoadBps:		0,
 	}
 	if mutate != nil {
 		mutate(&candidate)
@@ -310,11 +310,11 @@ func chat3Candidate(params Params, validator string, mutate func(*ValidatorPolic
 
 func chat3RewardPool() NominatorPool {
 	return NominatorPool{
-		PoolID:            "pool-chat3",
-		TotalShares:       1_000,
-		TotalBondedStake:  100_000,
-		PoolCommissionBps: 100,
-		Status:            PoolStatusActive,
+		PoolID:			"pool-chat3",
+		TotalShares:		1_000,
+		TotalBondedStake:	100_000,
+		PoolCommissionBps:	100,
+		Status:			PoolStatusActive,
 	}
 }
 

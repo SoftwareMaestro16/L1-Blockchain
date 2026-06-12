@@ -6,105 +6,105 @@ import (
 )
 
 const (
-	EngineeringScopeCoreChainConfiguration   = "core_chain_configuration"
-	EngineeringScopeConsensusParameterPolicy = "consensus_parameter_policy"
+	EngineeringScopeCoreChainConfiguration		= "core_chain_configuration"
+	EngineeringScopeConsensusParameterPolicy	= "consensus_parameter_policy"
 
-	FeatureCompletionCode              = "code"
-	FeatureCompletionParams            = "params"
-	FeatureCompletionGenesisValidation = "genesis_validation"
-	FeatureCompletionQueries           = "queries"
-	FeatureCompletionEvents            = "events"
-	FeatureCompletionTests             = "tests"
-	FeatureCompletionDocs              = "docs"
+	FeatureCompletionCode			= "code"
+	FeatureCompletionParams			= "params"
+	FeatureCompletionGenesisValidation	= "genesis_validation"
+	FeatureCompletionQueries		= "queries"
+	FeatureCompletionEvents			= "events"
+	FeatureCompletionTests			= "tests"
+	FeatureCompletionDocs			= "docs"
 
-	CoreChainTaskChainIDNamingPolicy      = "chain_id_naming_policy_for_devnet_testnet_mainnet"
-	CoreChainTaskStakingDenomNaet         = "staking_denom_naet"
-	CoreChainTaskDisplayDenomAET          = "display_denom_aet"
-	CoreChainTaskCoinMetadata             = "coin_metadata_naet_aet"
-	CoreChainTaskAddressPrefixReserved    = "address_prefix_and_reserved_system_address_policy"
-	CoreChainTaskModuleAccountPermissions = "module_account_permissions"
-	CoreChainTaskBlockedAddressPolicy     = "blocked_address_policy"
-	CoreChainTaskMintAuthority            = "mint_authority"
-	CoreChainTaskBurnAuthority            = "burn_authority"
-	CoreChainTaskFeeCollectorAuthority    = "fee_collector_authority"
-	CoreChainTaskTreasuryAuthority        = "treasury_authority"
-	CoreChainTaskAetraGenesisValidation   = "genesis_validation_for_all_aetra_modules"
-	CoreChainTaskAllModulesExportImport   = "app_export_import_with_all_modules_enabled"
+	CoreChainTaskChainIDNamingPolicy	= "chain_id_naming_policy_for_devnet_testnet_mainnet"
+	CoreChainTaskStakingDenomNaet		= "staking_denom_naet"
+	CoreChainTaskDisplayDenomAET		= "display_denom_aet"
+	CoreChainTaskCoinMetadata		= "coin_metadata_naet_aet"
+	CoreChainTaskAddressPrefixReserved	= "address_prefix_and_reserved_system_address_policy"
+	CoreChainTaskModuleAccountPermissions	= "module_account_permissions"
+	CoreChainTaskBlockedAddressPolicy	= "blocked_address_policy"
+	CoreChainTaskMintAuthority		= "mint_authority"
+	CoreChainTaskBurnAuthority		= "burn_authority"
+	CoreChainTaskFeeCollectorAuthority	= "fee_collector_authority"
+	CoreChainTaskTreasuryAuthority		= "treasury_authority"
+	CoreChainTaskAetraGenesisValidation	= "genesis_validation_for_all_aetra_modules"
+	CoreChainTaskAllModulesExportImport	= "app_export_import_with_all_modules_enabled"
 
-	CoreChainDeliverableAppWiringReview        = "app_wiring_review"
-	CoreChainDeliverableGenesisParamsTable     = "genesis_params_table"
-	CoreChainDeliverableModuleAccountsTable    = "module_accounts_table"
-	CoreChainDeliverableAuthorityMatrix        = "authority_matrix"
-	CoreChainDeliverableCLICommandMatrix       = "cli_command_matrix"
-	CoreChainDeliverableQueryMatrix            = "query_matrix"
-	CoreChainDeliverableEventMatrix            = "event_matrix"
-	CoreChainDeliverableStartupValidationTests = "tests_for_startup_validation"
+	CoreChainDeliverableAppWiringReview		= "app_wiring_review"
+	CoreChainDeliverableGenesisParamsTable		= "genesis_params_table"
+	CoreChainDeliverableModuleAccountsTable		= "module_accounts_table"
+	CoreChainDeliverableAuthorityMatrix		= "authority_matrix"
+	CoreChainDeliverableCLICommandMatrix		= "cli_command_matrix"
+	CoreChainDeliverableQueryMatrix			= "query_matrix"
+	CoreChainDeliverableEventMatrix			= "event_matrix"
+	CoreChainDeliverableStartupValidationTests	= "tests_for_startup_validation"
 
-	CoreChainTestDefaultGenesisBoots            = "app_boots_with_default_genesis"
-	CoreChainTestRejectInvalidDenomMetadata     = "app_rejects_invalid_denom_metadata"
-	CoreChainTestRejectMissingModuleAccounts    = "app_rejects_missing_module_accounts"
-	CoreChainTestRejectDuplicateReservedAddress = "app_rejects_duplicate_reserved_addresses"
-	CoreChainTestRejectUnsafeModulePermissions  = "app_rejects_unsafe_module_account_permissions"
-	CoreChainTestExportImportAppHash            = "export_import_preserves_app_hash_where_expected"
-	CoreChainTestModuleInitializationOrder      = "simulation_or_integration_test_covers_module_initialization_order"
+	CoreChainTestDefaultGenesisBoots		= "app_boots_with_default_genesis"
+	CoreChainTestRejectInvalidDenomMetadata		= "app_rejects_invalid_denom_metadata"
+	CoreChainTestRejectMissingModuleAccounts	= "app_rejects_missing_module_accounts"
+	CoreChainTestRejectDuplicateReservedAddress	= "app_rejects_duplicate_reserved_addresses"
+	CoreChainTestRejectUnsafeModulePermissions	= "app_rejects_unsafe_module_account_permissions"
+	CoreChainTestExportImportAppHash		= "export_import_preserves_app_hash_where_expected"
+	CoreChainTestModuleInitializationOrder		= "simulation_or_integration_test_covers_module_initialization_order"
 
-	ConsensusParamTaskBlockTimeRange         = "target_block_time_range"
-	ConsensusParamTaskMaxBlockBytes          = "max_block_bytes"
-	ConsensusParamTaskMaxBlockGas            = "max_block_gas"
-	ConsensusParamTaskEvidenceMaxAgeBlocks   = "evidence_max_age_by_blocks"
-	ConsensusParamTaskEvidenceMaxAgeDuration = "evidence_max_age_by_duration"
-	ConsensusParamTaskValidatorPubKeyTypes   = "validator_public_key_types"
-	ConsensusParamTaskTimeoutProfiles        = "cometbft_timeout_profile_for_100_200_300_validators"
-	ConsensusParamTaskSnapshotInterval       = "snapshot_interval"
-	ConsensusParamTaskStateSyncParameters    = "state_sync_parameters"
-	ConsensusParamTaskPruningProfiles        = "pruning_profiles"
+	ConsensusParamTaskBlockTimeRange		= "target_block_time_range"
+	ConsensusParamTaskMaxBlockBytes			= "max_block_bytes"
+	ConsensusParamTaskMaxBlockGas			= "max_block_gas"
+	ConsensusParamTaskEvidenceMaxAgeBlocks		= "evidence_max_age_by_blocks"
+	ConsensusParamTaskEvidenceMaxAgeDuration	= "evidence_max_age_by_duration"
+	ConsensusParamTaskValidatorPubKeyTypes		= "validator_public_key_types"
+	ConsensusParamTaskTimeoutProfiles		= "cometbft_timeout_profile_for_100_200_300_validators"
+	ConsensusParamTaskSnapshotInterval		= "snapshot_interval"
+	ConsensusParamTaskStateSyncParameters		= "state_sync_parameters"
+	ConsensusParamTaskPruningProfiles		= "pruning_profiles"
 
-	ConsensusParamDeliverableConservativeInitialValues = "conservative_initial_values"
-	ConsensusParamDeliverableBlockTimeTable            = "block_time_target_table_100_200_300_validators"
-	ConsensusParamDeliverableBlockGasBounds            = "max_block_gas_bounds"
-	ConsensusParamDeliverableBlockBytesBounds          = "max_block_bytes_bounds"
-	ConsensusParamDeliverableEvidenceWindowTable       = "evidence_window_table"
-	ConsensusParamDeliverableTimeoutProfileTable       = "timeout_profile_table"
-	ConsensusParamDeliverableStateSyncSnapshotPruning  = "state_sync_snapshot_pruning_table"
-	ConsensusParamDeliverableGovernanceSafetyBounds    = "governance_safety_bounds"
+	ConsensusParamDeliverableConservativeInitialValues	= "conservative_initial_values"
+	ConsensusParamDeliverableBlockTimeTable			= "block_time_target_table_100_200_300_validators"
+	ConsensusParamDeliverableBlockGasBounds			= "max_block_gas_bounds"
+	ConsensusParamDeliverableBlockBytesBounds		= "max_block_bytes_bounds"
+	ConsensusParamDeliverableEvidenceWindowTable		= "evidence_window_table"
+	ConsensusParamDeliverableTimeoutProfileTable		= "timeout_profile_table"
+	ConsensusParamDeliverableStateSyncSnapshotPruning	= "state_sync_snapshot_pruning_table"
+	ConsensusParamDeliverableGovernanceSafetyBounds		= "governance_safety_bounds"
 
-	ConsensusParamTestLocalnetTimeoutStability = "localnet_remains_stable_under_configured_timeout_profile"
-	ConsensusParamTestOversizedBlocksRejected  = "oversized_blocks_are_rejected"
-	ConsensusParamTestInvalidParamsRejected    = "invalid_consensus_params_are_rejected"
-	ConsensusParamTestGovernanceBounds         = "governance_cannot_set_unsafe_block_gas_bytes_outside_bounds"
-	ConsensusParamTestEvidencePeriod           = "evidence_remains_valid_through_configured_evidence_period"
+	ConsensusParamTestLocalnetTimeoutStability	= "localnet_remains_stable_under_configured_timeout_profile"
+	ConsensusParamTestOversizedBlocksRejected	= "oversized_blocks_are_rejected"
+	ConsensusParamTestInvalidParamsRejected		= "invalid_consensus_params_are_rejected"
+	ConsensusParamTestGovernanceBounds		= "governance_cannot_set_unsafe_block_gas_bytes_outside_bounds"
+	ConsensusParamTestEvidencePeriod		= "evidence_remains_valid_through_configured_evidence_period"
 )
 
 type FeatureCompletionEvidence struct {
-	FeatureID         string
-	Code              bool
-	Params            bool
-	GenesisValidation bool
-	Queries           bool
-	Events            bool
-	Tests             bool
-	Docs              bool
+	FeatureID		string
+	Code			bool
+	Params			bool
+	GenesisValidation	bool
+	Queries			bool
+	Events			bool
+	Tests			bool
+	Docs			bool
 }
 
 type EngineeringScopeItem struct {
-	ID       string
-	Kind     string
-	Required bool
-	Done     bool
-	Evidence string
+	ID		string
+	Kind		string
+	Required	bool
+	Done		bool
+	Evidence	string
 }
 
 type EngineeringScopePlan struct {
-	ScopeID string
-	Items   []EngineeringScopeItem
+	ScopeID	string
+	Items	[]EngineeringScopeItem
 }
 
 type EngineeringScopeReport struct {
-	ScopeID  string
-	Required int
-	Done     int
-	Failed   []string
-	Ready    bool
+	ScopeID		string
+	Required	int
+	Done		int
+	Failed		[]string
+	Ready		bool
 }
 
 func ValidateFeatureCompletion(evidence FeatureCompletionEvidence) error {
@@ -139,17 +139,17 @@ func BuildFeatureCompletionReport(evidence FeatureCompletionEvidence) Engineerin
 	}
 	sort.Strings(failed)
 	return EngineeringScopeReport{
-		ScopeID:  evidence.FeatureID,
-		Required: len(checks),
-		Done:     passed,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		ScopeID:	evidence.FeatureID,
+		Required:	len(checks),
+		Done:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultCoreChainConfigurationScopePlan() EngineeringScopePlan {
 	return EngineeringScopePlan{
-		ScopeID: EngineeringScopeCoreChainConfiguration,
+		ScopeID:	EngineeringScopeCoreChainConfiguration,
 		Items: []EngineeringScopeItem{
 			engineeringScopeItem("task", CoreChainTaskChainIDNamingPolicy),
 			engineeringScopeItem("task", CoreChainTaskStakingDenomNaet),
@@ -185,7 +185,7 @@ func DefaultCoreChainConfigurationScopePlan() EngineeringScopePlan {
 
 func DefaultConsensusParameterPolicyScopePlan() EngineeringScopePlan {
 	return EngineeringScopePlan{
-		ScopeID: EngineeringScopeConsensusParameterPolicy,
+		ScopeID:	EngineeringScopeConsensusParameterPolicy,
 		Items: []EngineeringScopeItem{
 			engineeringScopeItem("task", ConsensusParamTaskBlockTimeRange),
 			engineeringScopeItem("task", ConsensusParamTaskMaxBlockBytes),
@@ -263,21 +263,21 @@ func BuildEngineeringScopeReport(plan EngineeringScopePlan) EngineeringScopeRepo
 	}
 	sort.Strings(failed)
 	return EngineeringScopeReport{
-		ScopeID:  plan.ScopeID,
-		Required: required,
-		Done:     done,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		ScopeID:	plan.ScopeID,
+		Required:	required,
+		Done:		done,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func engineeringScopeItem(kind, id string) EngineeringScopeItem {
 	return EngineeringScopeItem{
-		ID:       id,
-		Kind:     kind,
-		Required: true,
-		Done:     true,
-		Evidence: "required " + kind + " evidence for " + id,
+		ID:		id,
+		Kind:		kind,
+		Required:	true,
+		Done:		true,
+		Evidence:	"required " + kind + " evidence for " + id,
 	}
 }
 

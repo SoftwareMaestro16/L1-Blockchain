@@ -11,43 +11,43 @@ import (
 )
 
 const (
-	MinDefaultFeeAmount    = "1"
-	FeeCollectorModuleName = "fee_collector"
-	DistributionModuleName = "distribution"
-	ProtocolPoolModuleName = "protocolpool"
-	ValidatorRewardsTarget = "distribution/validator_rewards"
-	CommunityPoolTarget    = "protocolpool/community_pool"
+	MinDefaultFeeAmount	= "1"
+	FeeCollectorModuleName	= "fee_collector"
+	DistributionModuleName	= "distribution"
+	ProtocolPoolModuleName	= "protocolpool"
+	ValidatorRewardsTarget	= "distribution/validator_rewards"
+	CommunityPoolTarget	= "protocolpool/community_pool"
 )
 
 func DefaultParams() Params {
 	return Params{
-		AllowedFeeDenoms:              []string{BondDenom},
-		ValidatorRewardsRatio:         "0.98",
-		CommunityPoolRatio:            "0.02",
-		MinFeeAmount:                  MinDefaultFeeAmount,
-		FeeCollectorModule:            FeeCollectorModuleName,
-		ValidatorRewardsTarget:        ValidatorRewardsTarget,
-		CommunityPoolTarget:           CommunityPoolTarget,
-		BaseFeeAmount:                 DefaultBaseFeeAmount,
-		MaxFeeAmount:                  DefaultMaxFeeAmount,
-		TargetBlockUtilizationBps:     DefaultTargetUtilizationBps,
-		CongestionThresholdBps:        DefaultCongestionBps,
-		MaxTxGas:                      DefaultMaxTxGas,
-		MaxBlockGas:                   DefaultMaxBlockGas,
-		MaxBlockTxs:                   DefaultMaxBlockTxs,
-		MaxSenderTxsPerBlock:          DefaultSenderTxsPerBlock,
-		StakeTxAllowanceStepAmount:    DefaultStakeAllowanceStep,
-		MaxSenderTxsPerBlockWithStake: DefaultStakeSenderTxsPerBlock,
-		FeePriorityWeightBps:          DefaultFeePriorityWeightBps,
-		StakePriorityWeightBps:        DefaultStakePriorityWeightBps,
+		AllowedFeeDenoms:		[]string{BondDenom},
+		ValidatorRewardsRatio:		"0.98",
+		CommunityPoolRatio:		"0.02",
+		MinFeeAmount:			MinDefaultFeeAmount,
+		FeeCollectorModule:		FeeCollectorModuleName,
+		ValidatorRewardsTarget:		ValidatorRewardsTarget,
+		CommunityPoolTarget:		CommunityPoolTarget,
+		BaseFeeAmount:			DefaultBaseFeeAmount,
+		MaxFeeAmount:			DefaultMaxFeeAmount,
+		TargetBlockUtilizationBps:	DefaultTargetUtilizationBps,
+		CongestionThresholdBps:		DefaultCongestionBps,
+		MaxTxGas:			DefaultMaxTxGas,
+		MaxBlockGas:			DefaultMaxBlockGas,
+		MaxBlockTxs:			DefaultMaxBlockTxs,
+		MaxSenderTxsPerBlock:		DefaultSenderTxsPerBlock,
+		StakeTxAllowanceStepAmount:	DefaultStakeAllowanceStep,
+		MaxSenderTxsPerBlockWithStake:	DefaultStakeSenderTxsPerBlock,
+		FeePriorityWeightBps:		DefaultFeePriorityWeightBps,
+		StakePriorityWeightBps:		DefaultStakePriorityWeightBps,
 	}
 }
 
 func DefaultProtocolFeeState() ProtocolFeeState {
 	return ProtocolFeeState{
-		TotalCollected:   sdk.NewCoins(),
-		ValidatorRewards: sdk.NewCoins(),
-		CommunityPool:    sdk.NewCoins(),
+		TotalCollected:		sdk.NewCoins(),
+		ValidatorRewards:	sdk.NewCoins(),
+		CommunityPool:		sdk.NewCoins(),
 	}
 }
 

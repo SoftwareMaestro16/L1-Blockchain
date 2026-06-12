@@ -8,171 +8,171 @@ import (
 )
 
 const (
-	DefaultDiscoveryBranchingFactor = uint32(16)
-	DefaultMaxDiscoveryHops         = uint32(64)
-	DefaultMaxZoneLatencyMillis     = uint64(250)
+	DefaultDiscoveryBranchingFactor	= uint32(16)
+	DefaultMaxDiscoveryHops		= uint32(64)
+	DefaultMaxZoneLatencyMillis	= uint64(250)
 )
 
 type PerformanceOptimizationGoal string
 
 const (
-	PerformanceGoalParallelPropagation     PerformanceOptimizationGoal = "parallel_message_propagation"
-	PerformanceGoalMultiOverlayConcurrency PerformanceOptimizationGoal = "multi_overlay_concurrency"
-	PerformanceGoalNoGlobalBroadcastOnly   PerformanceOptimizationGoal = "no_global_broadcast_for_all_traffic"
-	PerformanceGoalShardLocalScaling       PerformanceOptimizationGoal = "shard_local_execution_scaling"
-	PerformanceGoalZoneIsolation           PerformanceOptimizationGoal = "zone_isolation"
-	PerformanceGoalLargePayloadStreaming   PerformanceOptimizationGoal = "streaming_large_payloads"
-	PerformanceGoalBoundedGossipFanout     PerformanceOptimizationGoal = "bounded_gossip_fanout"
-	PerformanceGoalPredictableZoneLatency  PerformanceOptimizationGoal = "predictable_latency_per_zone"
+	PerformanceGoalParallelPropagation	PerformanceOptimizationGoal	= "parallel_message_propagation"
+	PerformanceGoalMultiOverlayConcurrency	PerformanceOptimizationGoal	= "multi_overlay_concurrency"
+	PerformanceGoalNoGlobalBroadcastOnly	PerformanceOptimizationGoal	= "no_global_broadcast_for_all_traffic"
+	PerformanceGoalShardLocalScaling	PerformanceOptimizationGoal	= "shard_local_execution_scaling"
+	PerformanceGoalZoneIsolation		PerformanceOptimizationGoal	= "zone_isolation"
+	PerformanceGoalLargePayloadStreaming	PerformanceOptimizationGoal	= "streaming_large_payloads"
+	PerformanceGoalBoundedGossipFanout	PerformanceOptimizationGoal	= "bounded_gossip_fanout"
+	PerformanceGoalPredictableZoneLatency	PerformanceOptimizationGoal	= "predictable_latency_per_zone"
 )
 
 type PerformanceTargetProperty string
 
 const (
-	PerformanceTargetLogDiscovery          PerformanceTargetProperty = "o_log_n_discovery"
-	PerformanceTargetNeighborPropagation   PerformanceTargetProperty = "o_k_neighbor_propagation"
-	PerformanceTargetBoundedGossip         PerformanceTargetProperty = "bounded_gossip_fanout"
-	PerformanceTargetHeaderFirstBlocks     PerformanceTargetProperty = "header_first_block_propagation"
-	PerformanceTargetParallelChunks        PerformanceTargetProperty = "parallel_chunk_streaming"
-	PerformanceTargetZoneLocalLatency      PerformanceTargetProperty = "zone_local_low_latency_paths"
-	PerformanceTargetServiceQoSIsolation   PerformanceTargetProperty = "service_traffic_isolated_from_consensus"
-	PerformanceTargetMultiOverlay          PerformanceTargetProperty = "multi_overlay_concurrency"
-	PerformanceTargetShardLocalExecution   PerformanceTargetProperty = "shard_local_execution_scaling"
-	PerformanceTargetNoGlobalBroadcastOnly PerformanceTargetProperty = "no_global_broadcast_dependency"
+	PerformanceTargetLogDiscovery		PerformanceTargetProperty	= "o_log_n_discovery"
+	PerformanceTargetNeighborPropagation	PerformanceTargetProperty	= "o_k_neighbor_propagation"
+	PerformanceTargetBoundedGossip		PerformanceTargetProperty	= "bounded_gossip_fanout"
+	PerformanceTargetHeaderFirstBlocks	PerformanceTargetProperty	= "header_first_block_propagation"
+	PerformanceTargetParallelChunks		PerformanceTargetProperty	= "parallel_chunk_streaming"
+	PerformanceTargetZoneLocalLatency	PerformanceTargetProperty	= "zone_local_low_latency_paths"
+	PerformanceTargetServiceQoSIsolation	PerformanceTargetProperty	= "service_traffic_isolated_from_consensus"
+	PerformanceTargetMultiOverlay		PerformanceTargetProperty	= "multi_overlay_concurrency"
+	PerformanceTargetShardLocalExecution	PerformanceTargetProperty	= "shard_local_execution_scaling"
+	PerformanceTargetNoGlobalBroadcastOnly	PerformanceTargetProperty	= "no_global_broadcast_dependency"
 )
 
 type PerformanceModelInput struct {
-	PeerCount                uint32
-	DiscoveryBranchingFactor uint32
-	OverlayDescriptors       []OverlayDescriptor
-	RoutingGraphs            []RoutingGraph
-	BroadcastPlans           []BroadcastPlan
-	BlockSession             BlockPropagationSession
-	StreamPlan               StreamParallelFetchPlan
-	QoSPolicies              []QoSClassPolicy
-	ZoneID                   string
-	MaxZoneLatencyMillis     uint64
+	PeerCount			uint32
+	DiscoveryBranchingFactor	uint32
+	OverlayDescriptors		[]OverlayDescriptor
+	RoutingGraphs			[]RoutingGraph
+	BroadcastPlans			[]BroadcastPlan
+	BlockSession			BlockPropagationSession
+	StreamPlan			StreamParallelFetchPlan
+	QoSPolicies			[]QoSClassPolicy
+	ZoneID				string
+	MaxZoneLatencyMillis		uint64
 }
 
 type PerformanceModelPlan struct {
-	PeerCount                   uint32
-	DiscoveryHops               uint32
-	OverlayConcurrency          uint32
-	MaxNeighborFanout           uint32
-	GlobalBroadcastOnly         bool
-	ShardLocalExecution         bool
-	ZoneIsolated                bool
-	HeaderFirstBlockPropagation bool
-	ParallelChunkStreaming      bool
-	ZoneLatencyMillis           uint64
-	ServiceTrafficIsolated      bool
-	SatisfiedOptimizationGoals  []PerformanceOptimizationGoal
-	SatisfiedTargetProperties   []PerformanceTargetProperty
+	PeerCount			uint32
+	DiscoveryHops			uint32
+	OverlayConcurrency		uint32
+	MaxNeighborFanout		uint32
+	GlobalBroadcastOnly		bool
+	ShardLocalExecution		bool
+	ZoneIsolated			bool
+	HeaderFirstBlockPropagation	bool
+	ParallelChunkStreaming		bool
+	ZoneLatencyMillis		uint64
+	ServiceTrafficIsolated		bool
+	SatisfiedOptimizationGoals	[]PerformanceOptimizationGoal
+	SatisfiedTargetProperties	[]PerformanceTargetProperty
 }
 
 type PeerRoleCountMetric struct {
-	Role  NodeRole
-	Count uint64
+	Role	NodeRole
+	Count	uint64
 }
 
 type OverlayPerformanceMetric struct {
-	OverlayID                 string
-	MembershipSize            uint64
-	MessagePropagationLatency PerformanceLatencySummary
-	RouteFailureRateBps       uint32
+	OverlayID			string
+	MembershipSize			uint64
+	MessagePropagationLatency	PerformanceLatencySummary
+	RouteFailureRateBps		uint32
 }
 
 type PerformanceLatencySummary struct {
-	Count         uint64
-	MinMillis     uint64
-	MaxMillis     uint64
-	AverageMillis uint64
+	Count		uint64
+	MinMillis	uint64
+	MaxMillis	uint64
+	AverageMillis	uint64
 }
 
 type PropagationLatencySample struct {
-	OverlayID     string
-	MessageID     string
-	LatencyMillis uint64
+	OverlayID	string
+	MessageID	string
+	LatencyMillis	uint64
 }
 
 type RouteFailureSample struct {
-	OverlayID string
-	Attempts  uint64
-	Failures  uint64
+	OverlayID	string
+	Attempts	uint64
+	Failures	uint64
 }
 
 type CrossZoneDeliverySample struct {
-	SourceZone      string
-	DestinationZone string
-	Sequence        uint64
-	LatencyMillis   uint64
+	SourceZone	string
+	DestinationZone	string
+	Sequence	uint64
+	LatencyMillis	uint64
 }
 
 type ChannelBandwidthMetric struct {
-	Channel       ChannelClass
-	BytesEnqueued uint64
-	BytesSent     uint64
-	BytesDropped  uint64
-	UsageBps      uint32
+	Channel		ChannelClass
+	BytesEnqueued	uint64
+	BytesSent	uint64
+	BytesDropped	uint64
+	UsageBps	uint32
 }
 
 type PeerScoreDistributionMetric struct {
-	Count      uint64
-	MinBps     uint32
-	MaxBps     uint32
-	AverageBps uint32
-	LowCount   uint64
-	MidCount   uint64
-	HighCount  uint64
+	Count		uint64
+	MinBps		uint32
+	MaxBps		uint32
+	AverageBps	uint32
+	LowCount	uint64
+	MidCount	uint64
+	HighCount	uint64
 }
 
 type BlockPropagationBenchmark struct {
-	HeaderLatencyMillis      uint64
-	ReconstructionMillis     uint64
-	ChunkCount               uint32
-	HeaderFirst              bool
-	ReconstructionThroughput uint64
+	HeaderLatencyMillis		uint64
+	ReconstructionMillis		uint64
+	ChunkCount			uint32
+	HeaderFirst			bool
+	ReconstructionThroughput	uint64
 }
 
 type ChunkStreamingBenchmark struct {
-	StreamID           string
-	ThroughputBytesBps uint64
-	RetryRateBps       uint32
-	StallCount         uint64
-	ParallelRequests   uint32
+	StreamID		string
+	ThroughputBytesBps	uint64
+	RetryRateBps		uint32
+	StallCount		uint64
+	ParallelRequests	uint32
 }
 
 type PerformanceMetricsInput struct {
-	NodeRecords               []NodeRecord
-	OverlayMemberships        []OverlayMembershipRecord
-	MessageLatencies          []PropagationLatencySample
-	RouteFailures             []RouteFailureSample
-	BlockSession              BlockPropagationSession
-	BlockHeaderLatencyMillis  uint64
-	BlockReconstructionMillis uint64
-	BlockBytes                uint64
-	ChunkAttempts             uint64
-	ChunkRetries              uint64
-	StreamMetrics             []StreamMetrics
-	StreamPlans               []StreamParallelFetchPlan
-	DiscoveryLatencies        []uint64
-	CrossZoneDeliveries       []CrossZoneDeliverySample
-	ChannelMetrics            []L0ChannelMetrics
-	PeerScores                []PeerScore
+	NodeRecords			[]NodeRecord
+	OverlayMemberships		[]OverlayMembershipRecord
+	MessageLatencies		[]PropagationLatencySample
+	RouteFailures			[]RouteFailureSample
+	BlockSession			BlockPropagationSession
+	BlockHeaderLatencyMillis	uint64
+	BlockReconstructionMillis	uint64
+	BlockBytes			uint64
+	ChunkAttempts			uint64
+	ChunkRetries			uint64
+	StreamMetrics			[]StreamMetrics
+	StreamPlans			[]StreamParallelFetchPlan
+	DiscoveryLatencies		[]uint64
+	CrossZoneDeliveries		[]CrossZoneDeliverySample
+	ChannelMetrics			[]L0ChannelMetrics
+	PeerScores			[]PeerScore
 }
 
 type PerformanceMetricsSnapshot struct {
-	PeerCountByRole           []PeerRoleCountMetric
-	OverlayMetrics            []OverlayPerformanceMetric
-	BlockBenchmark            BlockPropagationBenchmark
-	ChunkBenchmarks           []ChunkStreamingBenchmark
-	DiscoveryQueryLatency     PerformanceLatencySummary
-	CrossZoneDeliveryLatency  PerformanceLatencySummary
-	ChannelBandwidth          []ChannelBandwidthMetric
-	PeerScoreDistribution     PeerScoreDistributionMetric
-	ServiceTrafficIsolated    bool
-	RouteFailureRateBps       uint32
-	MessagePropagationLatency PerformanceLatencySummary
+	PeerCountByRole			[]PeerRoleCountMetric
+	OverlayMetrics			[]OverlayPerformanceMetric
+	BlockBenchmark			BlockPropagationBenchmark
+	ChunkBenchmarks			[]ChunkStreamingBenchmark
+	DiscoveryQueryLatency		PerformanceLatencySummary
+	CrossZoneDeliveryLatency	PerformanceLatencySummary
+	ChannelBandwidth		[]ChannelBandwidthMetric
+	PeerScoreDistribution		PeerScoreDistributionMetric
+	ServiceTrafficIsolated		bool
+	RouteFailureRateBps		uint32
+	MessagePropagationLatency	PerformanceLatencySummary
 }
 
 func BuildPerformanceModelPlan(input PerformanceModelInput) (PerformanceModelPlan, error) {
@@ -198,17 +198,17 @@ func BuildPerformanceModelPlan(input PerformanceModelInput) (PerformanceModelPla
 	parallelChunks := ValidateParallelChunkPerformance(normalized.StreamPlan) == nil
 	shardLocal := performanceHasOverlayType(descriptors, OverlayTypeZone) && performanceHasOverlayType(descriptors, OverlayTypeExecution)
 	plan := PerformanceModelPlan{
-		PeerCount:                   normalized.PeerCount,
-		DiscoveryHops:               hops,
-		OverlayConcurrency:          uint32(len(descriptors)),
-		MaxNeighborFanout:           maxFanout,
-		GlobalBroadcastOnly:         globalOnly,
-		ShardLocalExecution:         shardLocal,
-		ZoneIsolated:                zoneIsolated,
-		HeaderFirstBlockPropagation: headerFirst,
-		ParallelChunkStreaming:      parallelChunks,
-		ZoneLatencyMillis:           zoneLatency,
-		ServiceTrafficIsolated:      serviceIsolated,
+		PeerCount:			normalized.PeerCount,
+		DiscoveryHops:			hops,
+		OverlayConcurrency:		uint32(len(descriptors)),
+		MaxNeighborFanout:		maxFanout,
+		GlobalBroadcastOnly:		globalOnly,
+		ShardLocalExecution:		shardLocal,
+		ZoneIsolated:			zoneIsolated,
+		HeaderFirstBlockPropagation:	headerFirst,
+		ParallelChunkStreaming:		parallelChunks,
+		ZoneLatencyMillis:		zoneLatency,
+		ServiceTrafficIsolated:		serviceIsolated,
 	}
 	plan.SatisfiedOptimizationGoals = performanceGoals(plan)
 	plan.SatisfiedTargetProperties = performanceTargets(plan)
@@ -246,17 +246,17 @@ func BuildPerformanceMetricsSnapshot(input PerformanceMetricsInput) (Performance
 	}
 	serviceIsolated := ValidateServiceTrafficIsolationFromMetrics(input.ChannelMetrics) == nil
 	return PerformanceMetricsSnapshot{
-		PeerCountByRole:           peerCounts,
-		OverlayMetrics:            overlayMetrics,
-		BlockBenchmark:            blockBenchmark,
-		ChunkBenchmarks:           chunkBenchmarks,
-		DiscoveryQueryLatency:     SummarizeLatency(input.DiscoveryLatencies),
-		CrossZoneDeliveryLatency:  SummarizeCrossZoneLatency(input.CrossZoneDeliveries),
-		ChannelBandwidth:          channelBandwidth,
-		PeerScoreDistribution:     scoreDistribution,
-		ServiceTrafficIsolated:    serviceIsolated,
-		RouteFailureRateBps:       routeFailureRate,
-		MessagePropagationLatency: SummarizePropagationLatency(input.MessageLatencies),
+		PeerCountByRole:		peerCounts,
+		OverlayMetrics:			overlayMetrics,
+		BlockBenchmark:			blockBenchmark,
+		ChunkBenchmarks:		chunkBenchmarks,
+		DiscoveryQueryLatency:		SummarizeLatency(input.DiscoveryLatencies),
+		CrossZoneDeliveryLatency:	SummarizeCrossZoneLatency(input.CrossZoneDeliveries),
+		ChannelBandwidth:		channelBandwidth,
+		PeerScoreDistribution:		scoreDistribution,
+		ServiceTrafficIsolated:		serviceIsolated,
+		RouteFailureRateBps:		routeFailureRate,
+		MessagePropagationLatency:	SummarizePropagationLatency(input.MessageLatencies),
 	}, nil
 }
 
@@ -531,11 +531,11 @@ func BenchmarkBlockPropagation(session BlockPropagationSession, headerLatencyMil
 		throughput = blockBytes * 1_000 / reconstructionMillis
 	}
 	return BlockPropagationBenchmark{
-		HeaderLatencyMillis:      headerLatencyMillis,
-		ReconstructionMillis:     reconstructionMillis,
-		ChunkCount:               session.Header.ChunkCount,
-		HeaderFirst:              true,
-		ReconstructionThroughput: throughput,
+		HeaderLatencyMillis:		headerLatencyMillis,
+		ReconstructionMillis:		reconstructionMillis,
+		ChunkCount:			session.Header.ChunkCount,
+		HeaderFirst:			true,
+		ReconstructionThroughput:	throughput,
 	}, nil
 }
 
@@ -560,11 +560,11 @@ func BenchmarkChunkStreaming(metrics []StreamMetrics, plans []StreamParallelFetc
 			return nil, err
 		}
 		out = append(out, ChunkStreamingBenchmark{
-			StreamID:           normalizeHashText(metric.StreamID),
-			ThroughputBytesBps: metric.ThroughputBytesBps,
-			RetryRateBps:       retryRate,
-			StallCount:         metric.StallCount,
-			ParallelRequests:   planParallelism[normalizeHashText(metric.StreamID)],
+			StreamID:		normalizeHashText(metric.StreamID),
+			ThroughputBytesBps:	metric.ThroughputBytesBps,
+			RetryRateBps:		retryRate,
+			StallCount:		metric.StallCount,
+			ParallelRequests:	planParallelism[normalizeHashText(metric.StreamID)],
 		})
 	}
 	sort.SliceStable(out, func(i, j int) bool {
@@ -589,11 +589,11 @@ func ComputeChannelBandwidthMetrics(metrics []L0ChannelMetrics) ([]ChannelBandwi
 			usage = uint32(metric.BytesSent * uint64(BasisPoints) / metric.BytesEnqueued)
 		}
 		out = append(out, ChannelBandwidthMetric{
-			Channel:       metric.Channel,
-			BytesEnqueued: metric.BytesEnqueued,
-			BytesSent:     metric.BytesSent,
-			BytesDropped:  droppedBytes,
-			UsageBps:      usage,
+			Channel:	metric.Channel,
+			BytesEnqueued:	metric.BytesEnqueued,
+			BytesSent:	metric.BytesSent,
+			BytesDropped:	droppedBytes,
+			UsageBps:	usage,
 		})
 	}
 	return out, nil

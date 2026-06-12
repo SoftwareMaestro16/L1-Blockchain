@@ -5,37 +5,33 @@ import (
 	"testing"
 )
 
-// ---------------
-// Value Tag Golden Vector Tests
-// ---------------
-
 func TestValueTagGoldenVectors(t *testing.T) {
 	golden := map[ValueTag]byte{
-		TagNull:          0,
-		TagBool:          1,
-		TagInt8:          2,
-		TagInt16:         3,
-		TagInt32:         4,
-		TagInt64:         5,
-		TagInt128:        6,
-		TagInt256:        7,
-		TagUint8:         8,
-		TagUint16:        9,
-		TagUint32:        10,
-		TagUint64:        11,
-		TagUint128:       12,
-		TagUint256:       13,
-		TagCoins:         14,
-		TagTimestamp:      15,
-		TagAddress:       16,
-		TagHash:          17,
-		TagBytes:         18,
-		TagString:        19,
-		TagTuple:         20,
-		TagChunkRef:      21,
-		TagReaderCursor:  22,
-		TagWriterHandle:  23,
-		TagExecFrameRef: 24,
+		TagNull:		0,
+		TagBool:		1,
+		TagInt8:		2,
+		TagInt16:		3,
+		TagInt32:		4,
+		TagInt64:		5,
+		TagInt128:		6,
+		TagInt256:		7,
+		TagUint8:		8,
+		TagUint16:		9,
+		TagUint32:		10,
+		TagUint64:		11,
+		TagUint128:		12,
+		TagUint256:		13,
+		TagCoins:		14,
+		TagTimestamp:		15,
+		TagAddress:		16,
+		TagHash:		17,
+		TagBytes:		18,
+		TagString:		19,
+		TagTuple:		20,
+		TagChunkRef:		21,
+		TagReaderCursor:	22,
+		TagWriterHandle:	23,
+		TagExecFrameRef:	24,
 	}
 	for tag, expected := range golden {
 		if byte(tag) != expected {
@@ -46,19 +42,19 @@ func TestValueTagGoldenVectors(t *testing.T) {
 
 func TestValueTagString(t *testing.T) {
 	tests := map[ValueTag]string{
-		TagNull:    "null",
-		TagBool:    "bool",
-		TagInt64:   "int64",
-		TagUint256: "uint256",
-		TagCoins:   "coins",
-		TagAddress: "address",
-		TagHash:    "hash",
-		TagString:  "string",
-		TagTuple:   "tuple",
-		TagChunkRef:    "chunk_ref",
-		TagReaderCursor: "reader_cursor",
-		TagWriterHandle: "writer_handle",
-		TagExecFrameRef: "exec_frame_ref",
+		TagNull:		"null",
+		TagBool:		"bool",
+		TagInt64:		"int64",
+		TagUint256:		"uint256",
+		TagCoins:		"coins",
+		TagAddress:		"address",
+		TagHash:		"hash",
+		TagString:		"string",
+		TagTuple:		"tuple",
+		TagChunkRef:		"chunk_ref",
+		TagReaderCursor:	"reader_cursor",
+		TagWriterHandle:	"writer_handle",
+		TagExecFrameRef:	"exec_frame_ref",
 	}
 	for tag, expected := range tests {
 		if tag.String() != expected {
@@ -66,10 +62,6 @@ func TestValueTagString(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Canonical Encoding Round Trip Tests
-// ---------------
 
 func TestCanonicalEncodeDecodeBool(t *testing.T) {
 	for _, v := range []bool{true, false} {
@@ -94,14 +86,14 @@ func TestCanonicalEncodeDecodeBool(t *testing.T) {
 
 func TestCanonicalEncodeDecodeIntegers(t *testing.T) {
 	tests := []struct {
-		name  string
-		value RuntimeValue
-		tag   ValueTag
+		name	string
+		value	RuntimeValue
+		tag	ValueTag
 	}{
 		{"int8_max", ValueInt8(127), TagInt8},
-		{"int8_min", ValueInt8(-128), TagInt8}, // big.Int handles this
+		{"int8_min", ValueInt8(-128), TagInt8},
 		{"uint8_200", ValueUint8(200), TagUint8},
-		{"int64_big", ValueInt64(1<<40), TagInt64},
+		{"int64_big", ValueInt64(1 << 40), TagInt64},
 		{"uint64_max", ValueUint64(18446744073709551615), TagUint64},
 		{"uint128_1", ValueBigUint128(big.NewInt(1)), TagUint128},
 		{"timestamp", ValueTimestamp(1700000000), TagTimestamp},
@@ -230,10 +222,6 @@ func TestCanonicalEncodeDecodeAddress(t *testing.T) {
 	}
 }
 
-// ---------------
-// Tuple Nested Encoding Tests
-// ---------------
-
 func TestCanonicalEncodeDecodeTuple(t *testing.T) {
 	inner := ValueTuple([]RuntimeValue{
 		ValueUint64(42),
@@ -293,10 +281,6 @@ func TestCanonicalEmptyTuple(t *testing.T) {
 	}
 }
 
-// ---------------
-// Option Type Tests
-// ---------------
-
 func TestOptionNoneIsTagNull(t *testing.T) {
 	none := OptionNone()
 	if !none.IsNull() {
@@ -333,10 +317,6 @@ func TestOptionRoundTrip(t *testing.T) {
 		t.Errorf("Option.Some should encode with value tag, got %d", encSome[0])
 	}
 }
-
-// ---------------
-// Type Safety / Explicit Cast Tests
-// ---------------
 
 func TestExplicitCastSameType(t *testing.T) {
 	v := ValueUint64(42)
@@ -378,25 +358,21 @@ func TestExplicitCastNullToValue(t *testing.T) {
 	}
 }
 
-// ---------------
-// Width / Integer Model Tests
-// ---------------
-
 func TestValueBitWidth(t *testing.T) {
 	tests := map[ValueTag]int{
-		TagInt8:   8,
-		TagUint8:   8,
-		TagInt16:  16,
-		TagUint16: 16,
-		TagInt32:  32,
-		TagUint32: 32,
-		TagInt64:  64,
-		TagUint64: 64,
-		TagInt128: 128,
-		TagUint128: 128,
-		TagCoins:  128,
-		TagInt256: 256,
-		TagUint256: 256,
+		TagInt8:	8,
+		TagUint8:	8,
+		TagInt16:	16,
+		TagUint16:	16,
+		TagInt32:	32,
+		TagUint32:	32,
+		TagInt64:	64,
+		TagUint64:	64,
+		TagInt128:	128,
+		TagUint128:	128,
+		TagCoins:	128,
+		TagInt256:	256,
+		TagUint256:	256,
 	}
 	for tag, expected := range tests {
 		width, ok := ValueBitWidth(tag)
@@ -427,10 +403,6 @@ func TestSignedness(t *testing.T) {
 		t.Error("bool should not be integer")
 	}
 }
-
-// ---------------
-// Canonical Encoding Determinism Tests
-// ---------------
 
 func TestCanonicalDeterminism(t *testing.T) {
 	v1 := ValueUint64(42)
@@ -488,10 +460,6 @@ func TestValidateDeterminismDifferentTags(t *testing.T) {
 	}
 }
 
-// ---------------
-// Size & Gas Boundary Tests
-// ---------------
-
 func TestMaxEncodedSize(t *testing.T) {
 	if MaxEncodedSizeForTag(TagNull) != 1 {
 		t.Errorf("null max size: expected 1, got %d", MaxEncodedSizeForTag(TagNull))
@@ -521,10 +489,6 @@ func TestGasCosts(t *testing.T) {
 		t.Errorf("chunkref encode gas: expected 15, got %d", GasCostEncode(TagChunkRef))
 	}
 }
-
-// ---------------
-// Type-safe Accessor Tests
-// ---------------
 
 func TestTypeSafeAccessors(t *testing.T) {
 	v := ValueUint64(42)

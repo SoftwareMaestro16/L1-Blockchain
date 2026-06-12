@@ -10,72 +10,72 @@ import (
 )
 
 const (
-	MsgBusModuleName = "msgbus"
+	MsgBusModuleName	= "msgbus"
 
-	MsgBusEnvelopePrefix = "msgbus/envelopes"
-	MsgBusOutboxPrefix   = "msgbus/outbox"
-	MsgBusInboxPrefix    = "msgbus/inbox"
-	MsgBusReceiptPrefix  = "msgbus/receipts"
-	MsgBusReplayPrefix   = "msgbus/replay"
-	MsgBusEscrowPrefix   = "msgbus/escrow"
+	MsgBusEnvelopePrefix	= "msgbus/envelopes"
+	MsgBusOutboxPrefix	= "msgbus/outbox"
+	MsgBusInboxPrefix	= "msgbus/inbox"
+	MsgBusReceiptPrefix	= "msgbus/receipts"
+	MsgBusReplayPrefix	= "msgbus/replay"
+	MsgBusEscrowPrefix	= "msgbus/escrow"
 )
 
 type AetherEscrowStatus string
 type AetherProofKind string
 
 const (
-	AetherEscrowLocked   AetherEscrowStatus = "locked"
-	AetherEscrowReleased AetherEscrowStatus = "released"
-	AetherEscrowRefunded AetherEscrowStatus = "refunded"
-	AetherEscrowBounced  AetherEscrowStatus = "bounced"
+	AetherEscrowLocked	AetherEscrowStatus	= "locked"
+	AetherEscrowReleased	AetherEscrowStatus	= "released"
+	AetherEscrowRefunded	AetherEscrowStatus	= "refunded"
+	AetherEscrowBounced	AetherEscrowStatus	= "bounced"
 
-	AetherProofMessageInclusion AetherProofKind = "message_inclusion"
-	AetherProofReceiptInclusion AetherProofKind = "receipt_inclusion"
+	AetherProofMessageInclusion	AetherProofKind	= "message_inclusion"
+	AetherProofReceiptInclusion	AetherProofKind	= "receipt_inclusion"
 )
 
 type AetherValueEscrow struct {
-	MsgID       string
-	ValueLocked sdkmath.Int
-	FeeLocked   sdkmath.Int
-	Status      AetherEscrowStatus
-	ReceiptHash string
-	EscrowHash  string
+	MsgID		string
+	ValueLocked	sdkmath.Int
+	FeeLocked	sdkmath.Int
+	Status		AetherEscrowStatus
+	ReceiptHash	string
+	EscrowHash	string
 }
 
 type AetherMsgBusState struct {
-	Outbox       []AetherMessage
-	Inbox        []AetherMessage
-	Receipts     []AetherMessageReceipt
-	Escrows      []AetherValueEscrow
-	ReplayMsgIDs []string
-	MessageRoot  string
-	ReceiptRoot  string
-	StateRoot    string
+	Outbox		[]AetherMessage
+	Inbox		[]AetherMessage
+	Receipts	[]AetherMessageReceipt
+	Escrows		[]AetherValueEscrow
+	ReplayMsgIDs	[]string
+	MessageRoot	string
+	ReceiptRoot	string
+	StateRoot	string
 }
 
 type AetherInclusionProof struct {
-	Kind      AetherProofKind
-	MsgID     string
-	Root      string
-	ValueHash string
-	Path      []string
-	ProofHash string
+	Kind		AetherProofKind
+	MsgID		string
+	Root		string
+	ValueHash	string
+	Path		[]string
+	ProofHash	string
 }
 
 type AetherPayloadExecutionPolicy struct {
-	NoExternalAPIs   bool
-	NoWallClockTime  bool
-	MeteredIteration bool
-	PolicyHash       string
+	NoExternalAPIs		bool
+	NoWallClockTime		bool
+	MeteredIteration	bool
+	PolicyHash		string
 }
 
 func NewAetherMsgBusState(outbox []AetherMessage, inbox []AetherMessage, receipts []AetherMessageReceipt, escrows []AetherValueEscrow, replayMsgIDs []string) (AetherMsgBusState, error) {
 	state := AetherMsgBusState{
-		Outbox:       cloneAetherMessages(outbox),
-		Inbox:        cloneAetherMessages(inbox),
-		Receipts:     cloneAetherMessageReceipts(receipts),
-		Escrows:      cloneAetherValueEscrows(escrows),
-		ReplayMsgIDs: append([]string(nil), replayMsgIDs...),
+		Outbox:		cloneAetherMessages(outbox),
+		Inbox:		cloneAetherMessages(inbox),
+		Receipts:	cloneAetherMessageReceipts(receipts),
+		Escrows:	cloneAetherValueEscrows(escrows),
+		ReplayMsgIDs:	append([]string(nil), replayMsgIDs...),
 	}
 	sortAetherMessages(state.Outbox)
 	sortAetherMessages(state.Inbox)

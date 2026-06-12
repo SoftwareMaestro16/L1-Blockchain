@@ -115,11 +115,11 @@ func TestEquivocationEvidenceAndMalformedStateRejected(t *testing.T) {
 	sim := newTestSimulator(t)
 	root := ShardID{WorkchainID: BaseWorkchain, Prefix: BaseShardID}
 	require.NoError(t, sim.SubmitEquivocation(EquivocationEvidence{
-		Validator: "val1",
-		ShardID:   root,
-		Height:    1,
-		LeftRoot:  "a",
-		RightRoot: "b",
+		Validator:	"val1",
+		ShardID:	root,
+		Height:		1,
+		LeftRoot:	"a",
+		RightRoot:	"b",
 	}))
 	require.Len(t, sim.Export().Evidence, 1)
 
@@ -212,23 +212,23 @@ func benchmarkSimulator(t testing.TB) *Simulator {
 	}, "seed")
 	require.NoError(t, err)
 	require.NoError(t, sim.AddWorkchain(WorkchainConfig{
-		ID:               BaseWorkchain,
-		AllowedVMs:       []string{"AVM", "CosmWasm-gated"},
-		FeeDenom:         FeeDenomNaet,
-		AddressFormat:    "4:<64-lower-hex>",
-		GenesisStateHash: HashParts("genesis"),
-		UpgradePolicy:    "governance-bounded",
+		ID:			BaseWorkchain,
+		AllowedVMs:		[]string{"AVM", "CosmWasm-gated"},
+		FeeDenom:		FeeDenomNaet,
+		AddressFormat:		"4:<64-lower-hex>",
+		GenesisStateHash:	HashParts("genesis"),
+		UpgradePolicy:		"governance-bounded",
 	}))
 	return sim
 }
 
 func testMessage(source, dest ShardID, nonce uint64) CrossShardMessage {
 	return CrossShardMessage{
-		Source:      source,
-		Destination: dest,
-		Nonce:       nonce,
-		Payload:     []byte("payload"),
-		Timeout:     10,
-		Bounce:      true,
+		Source:		source,
+		Destination:	dest,
+		Nonce:		nonce,
+		Payload:	[]byte("payload"),
+		Timeout:	10,
+		Bounce:		true,
 	}
 }

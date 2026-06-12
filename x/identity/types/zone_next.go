@@ -16,79 +16,79 @@ type IdentityLookupTargetType string
 type IdentityResolutionStatus string
 
 const (
-	IdentityRouteNameHash IdentityShardRoutingMode = "name_hash"
-	IdentityRouteAddress  IdentityShardRoutingMode = "address_hash"
-	IdentityRouteAuction  IdentityShardRoutingMode = "auction_id"
+	IdentityRouteNameHash	IdentityShardRoutingMode	= "name_hash"
+	IdentityRouteAddress	IdentityShardRoutingMode	= "address_hash"
+	IdentityRouteAuction	IdentityShardRoutingMode	= "auction_id"
 
-	IdentityLookupTargetResolver IdentityLookupTargetType = "resolver"
-	IdentityLookupTargetReverse  IdentityLookupTargetType = "reverse"
-	IdentityLookupTargetOwner    IdentityLookupTargetType = "owner"
-	IdentityLookupTargetAccount  IdentityLookupTargetType = "account"
-	IdentityLookupTargetContract IdentityLookupTargetType = "contract"
-	IdentityLookupTargetService  IdentityLookupTargetType = "service"
-	IdentityLookupTargetPayment  IdentityLookupTargetType = "payment_route"
-	IdentityLookupTargetMetadata IdentityLookupTargetType = "metadata"
+	IdentityLookupTargetResolver	IdentityLookupTargetType	= "resolver"
+	IdentityLookupTargetReverse	IdentityLookupTargetType	= "reverse"
+	IdentityLookupTargetOwner	IdentityLookupTargetType	= "owner"
+	IdentityLookupTargetAccount	IdentityLookupTargetType	= "account"
+	IdentityLookupTargetContract	IdentityLookupTargetType	= "contract"
+	IdentityLookupTargetService	IdentityLookupTargetType	= "service"
+	IdentityLookupTargetPayment	IdentityLookupTargetType	= "payment_route"
+	IdentityLookupTargetMetadata	IdentityLookupTargetType	= "metadata"
 
-	IdentityResolutionStatusResolved     IdentityResolutionStatus = "resolved"
-	IdentityResolutionStatusNotFound     IdentityResolutionStatus = "not_found"
-	IdentityResolutionStatusExpired      IdentityResolutionStatus = "expired"
-	IdentityResolutionStatusUnauthorized IdentityResolutionStatus = "unauthorized"
-	IdentityResolutionStatusFailed       IdentityResolutionStatus = "failed"
-	IdentityResolutionStatusRejected     IdentityResolutionStatus = "rejected"
+	IdentityResolutionStatusResolved	IdentityResolutionStatus	= "resolved"
+	IdentityResolutionStatusNotFound	IdentityResolutionStatus	= "not_found"
+	IdentityResolutionStatusExpired		IdentityResolutionStatus	= "expired"
+	IdentityResolutionStatusUnauthorized	IdentityResolutionStatus	= "unauthorized"
+	IdentityResolutionStatusFailed		IdentityResolutionStatus	= "failed"
+	IdentityResolutionStatusRejected	IdentityResolutionStatus	= "rejected"
 )
 
 type IdentityShardRoute struct {
-	ZoneID      string
-	LayoutEpoch uint64
-	ShardCount  uint32
-	ShardID     uint32
-	RoutingMode IdentityShardRoutingMode
-	RouteKey    string
-	StateKey    string
-	RouteHash   string
+	ZoneID		string
+	LayoutEpoch	uint64
+	ShardCount	uint32
+	ShardID		uint32
+	RoutingMode	IdentityShardRoutingMode
+	RouteKey	string
+	StateKey	string
+	RouteHash	string
 }
 
 type MsgResolveIdentity struct {
-	RequestID     string
-	Requester     string
-	SourceZoneID  string
-	TargetName    string
-	TargetType    IdentityLookupTargetType
-	ProofRequired bool
-	ReplyTo       string
-	ExpiryHeight  uint64
-	MessageHash   string
+	RequestID	string
+	Requester	string
+	SourceZoneID	string
+	TargetName	string
+	TargetType	IdentityLookupTargetType
+	ProofRequired	bool
+	ReplyTo		string
+	ExpiryHeight	uint64
+	MessageHash	string
 }
 
 type MsgIdentityResolutionResult struct {
-	RequestID             string
-	Name                  string
-	TargetType            IdentityLookupTargetType
-	ResolvedValue         string
-	ResolverRecordVersion uint64
-	ProofHashOptional     string
-	Status                IdentityResolutionStatus
-	ExpiryHeight          uint64
-	ResultHash            string
+	RequestID		string
+	Name			string
+	TargetType		IdentityLookupTargetType
+	ResolvedValue		string
+	ResolverRecordVersion	uint64
+	ProofHashOptional	string
+	Status			IdentityResolutionStatus
+	ExpiryHeight		uint64
+	ResultHash		string
 }
 
 type IdentityReverseLookupProofResponse struct {
-	Height      uint64
-	AddressHash string
-	ProofIndex  IdentityZoneProofIndexEntry
-	Proof       IdentityInclusionProof
-	ReceiptHash string
+	Height		uint64
+	AddressHash	string
+	ProofIndex	IdentityZoneProofIndexEntry
+	Proof		IdentityInclusionProof
+	ReceiptHash	string
 }
 
 type IdentityStoreV2NameHashLayout struct {
-	StorePrefix      string
-	DomainPrefix     string
-	ResolverPrefix   string
-	ReversePrefix    string
-	DelegationPrefix string
-	AuctionPrefix    string
-	PrimaryShardKey  string
-	LayoutHash       string
+	StorePrefix		string
+	DomainPrefix		string
+	ResolverPrefix		string
+	ReversePrefix		string
+	DelegationPrefix	string
+	AuctionPrefix		string
+	PrimaryShardKey		string
+	LayoutHash		string
 }
 
 func BuildIdentityZoneProofRoots(height uint64, roots IdentityZoneRoots) ([]coretypes.ProofRoot, error) {
@@ -257,10 +257,10 @@ func BuildProofBackedIdentityReverseLookup(state IdentityState, address sdk.AccA
 		return IdentityReverseLookupProofResponse{}, err
 	}
 	response := IdentityReverseLookupProofResponse{
-		Height:      height,
-		AddressHash: identityHash("identity-reverse-proof-address", hex.EncodeToString(address)),
-		ProofIndex:  entry,
-		Proof:       proof,
+		Height:		height,
+		AddressHash:	identityHash("identity-reverse-proof-address", hex.EncodeToString(address)),
+		ProofIndex:	entry,
+		Proof:		proof,
 	}
 	response.ReceiptHash = ComputeIdentityReverseLookupProofResponseHash(response)
 	return response, response.Validate()
@@ -293,13 +293,13 @@ func (r IdentityReverseLookupProofResponse) Validate() error {
 
 func DefaultIdentityStoreV2NameHashLayout() (IdentityStoreV2NameHashLayout, error) {
 	layout := IdentityStoreV2NameHashLayout{
-		StorePrefix:      IdentityStoreV2Prefix,
-		DomainPrefix:     IdentityStoreV2SpecDomainsPrefix,
-		ResolverPrefix:   IdentityStoreV2SpecResolversPrefix,
-		ReversePrefix:    IdentityStoreV2SpecReversePrefix,
-		DelegationPrefix: IdentityStoreV2SpecDelegationsPrefix,
-		AuctionPrefix:    IdentityStoreV2SpecAuctionsPrefix,
-		PrimaryShardKey:  IdentityZoneShardKey,
+		StorePrefix:		IdentityStoreV2Prefix,
+		DomainPrefix:		IdentityStoreV2SpecDomainsPrefix,
+		ResolverPrefix:		IdentityStoreV2SpecResolversPrefix,
+		ReversePrefix:		IdentityStoreV2SpecReversePrefix,
+		DelegationPrefix:	IdentityStoreV2SpecDelegationsPrefix,
+		AuctionPrefix:		IdentityStoreV2SpecAuctionsPrefix,
+		PrimaryShardKey:	IdentityZoneShardKey,
 	}
 	layout.LayoutHash = ComputeIdentityStoreV2NameHashLayoutHash(layout)
 	return layout, layout.Validate()
@@ -307,8 +307,8 @@ func DefaultIdentityStoreV2NameHashLayout() (IdentityStoreV2NameHashLayout, erro
 
 func (l IdentityStoreV2NameHashLayout) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "identity store v2 prefix", value: l.StorePrefix},
 		{name: "identity store v2 domain prefix", value: l.DomainPrefix},
@@ -474,13 +474,13 @@ func routeIdentityStateKey(mode IdentityShardRoutingMode, routeKey string, state
 		return IdentityShardRoute{}, err
 	}
 	route := IdentityShardRoute{
-		ZoneID:      IdentityZoneID,
-		LayoutEpoch: layoutEpoch,
-		ShardCount:  shardCount,
-		ShardID:     uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
-		RoutingMode: mode,
-		RouteKey:    routeKey,
-		StateKey:    stateKey,
+		ZoneID:		IdentityZoneID,
+		LayoutEpoch:	layoutEpoch,
+		ShardCount:	shardCount,
+		ShardID:	uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
+		RoutingMode:	mode,
+		RouteKey:	routeKey,
+		StateKey:	stateKey,
 	}
 	route.RouteHash = ComputeIdentityShardRouteHash(route)
 	return route, route.ValidateHash()

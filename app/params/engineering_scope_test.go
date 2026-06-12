@@ -8,14 +8,14 @@ import (
 
 func TestFeatureCompletionRequiresCodeParamsGenesisQueriesEventsTestsDocs(t *testing.T) {
 	evidence := FeatureCompletionEvidence{
-		FeatureID:         "x/aetra-core",
-		Code:              true,
-		Params:            true,
-		GenesisValidation: true,
-		Queries:           true,
-		Events:            true,
-		Tests:             true,
-		Docs:              true,
+		FeatureID:		"x/aetra-core",
+		Code:			true,
+		Params:			true,
+		GenesisValidation:	true,
+		Queries:		true,
+		Events:			true,
+		Tests:			true,
+		Docs:			true,
 	}
 
 	report := BuildFeatureCompletionReport(evidence)
@@ -34,13 +34,13 @@ func TestFeatureCompletionRequiresCodeParamsGenesisQueriesEventsTestsDocs(t *tes
 
 func TestFeatureCompletionRejectsMissingFeatureID(t *testing.T) {
 	report := BuildFeatureCompletionReport(FeatureCompletionEvidence{
-		Code:              true,
-		Params:            true,
-		GenesisValidation: true,
-		Queries:           true,
-		Events:            true,
-		Tests:             true,
-		Docs:              true,
+		Code:			true,
+		Params:			true,
+		GenesisValidation:	true,
+		Queries:		true,
+		Events:			true,
+		Tests:			true,
+		Docs:			true,
 	})
 	require.False(t, report.Ready)
 	require.Contains(t, report.Failed, "feature_id_required")
@@ -147,7 +147,7 @@ func TestEngineeringScopeRejectsMissingEvidenceAndRequiredItems(t *testing.T) {
 
 func TestEngineeringScopeRejectsUnknownScopeAndUnexpectedItems(t *testing.T) {
 	plan := EngineeringScopePlan{
-		ScopeID: "unknown",
+		ScopeID:	"unknown",
 		Items: []EngineeringScopeItem{
 			engineeringScopeItem("task", CoreChainTaskStakingDenomNaet),
 		},

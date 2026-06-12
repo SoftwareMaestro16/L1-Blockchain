@@ -12,18 +12,18 @@ func TestCanonicalPaymentEnvelopeBuildsDeterministicIDAndSignature(t *testing.T)
 	condition := HashParts("invoice", "stream-1")
 
 	first, err := BuildPayment(Payment{
-		From:            " " + alice + " ",
-		To:              bob,
-		Amount:          "125",
-		ConditionHash:   condition,
-		Expiry:          100,
-		RouteHint:       "route/a",
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		Denom:           NativeDenom,
-		FeeLimit:        "7",
-		SettlementMode:  PaymentSettlementConditional,
-		Nonce:           9,
+		From:			" " + alice + " ",
+		To:			bob,
+		Amount:			"125",
+		ConditionHash:		condition,
+		Expiry:			100,
+		RouteHint:		"route/a",
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		Denom:			NativeDenom,
+		FeeLimit:		"7",
+		SettlementMode:		PaymentSettlementConditional,
+		Nonce:			9,
 	})
 	require.NoError(t, err)
 	require.NoError(t, first.Validate())
@@ -31,18 +31,18 @@ func TestCanonicalPaymentEnvelopeBuildsDeterministicIDAndSignature(t *testing.T)
 	require.Equal(t, first.Signature, ComputePaymentSignatureHash(first))
 
 	second, err := BuildPayment(Payment{
-		From:            alice,
-		To:              bob,
-		Amount:          "125",
-		ConditionHash:   condition,
-		Expiry:          100,
-		RouteHint:       "route/a",
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		Denom:           NativeDenom,
-		FeeLimit:        "7",
-		SettlementMode:  PaymentSettlementConditional,
-		Nonce:           9,
+		From:			alice,
+		To:			bob,
+		Amount:			"125",
+		ConditionHash:		condition,
+		Expiry:			100,
+		RouteHint:		"route/a",
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		Denom:			NativeDenom,
+		FeeLimit:		"7",
+		SettlementMode:		PaymentSettlementConditional,
+		Nonce:			9,
 	})
 	require.NoError(t, err)
 	require.Equal(t, first.PaymentID, second.PaymentID)
@@ -57,17 +57,17 @@ func TestPaymentAbstractionStateRejectsNonceReplayAndSettlesInFinancialZone(t *t
 	alice := testAddress(0x63)
 	bob := testAddress(0x64)
 	payment, err := BuildPayment(Payment{
-		From:            alice,
-		To:              bob,
-		Amount:          "25",
-		Expiry:          50,
-		RouteHint:       "direct",
-		SourceZone:      "IDENTITY_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		Denom:           NativeDenom,
-		FeeLimit:        "2",
-		SettlementMode:  PaymentSettlementZoneToZone,
-		Nonce:           1,
+		From:			alice,
+		To:			bob,
+		Amount:			"25",
+		Expiry:			50,
+		RouteHint:		"direct",
+		SourceZone:		"IDENTITY_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		Denom:			NativeDenom,
+		FeeLimit:		"2",
+		SettlementMode:		PaymentSettlementZoneToZone,
+		Nonce:			1,
 	})
 	require.NoError(t, err)
 
@@ -105,39 +105,39 @@ func TestPaymentAbstractionValidationModesExpiryAndStateRoot(t *testing.T) {
 	alice := testAddress(0x65)
 	bob := testAddress(0x66)
 	_, err := BuildPayment(Payment{
-		From:            alice,
-		To:              bob,
-		Amount:          "1",
-		Expiry:          20,
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		SettlementMode:  PaymentSettlementConditional,
-		Nonce:           1,
+		From:			alice,
+		To:			bob,
+		Amount:			"1",
+		Expiry:			20,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		SettlementMode:		PaymentSettlementConditional,
+		Nonce:			1,
 	})
 	require.ErrorContains(t, err, "condition hash")
 
 	first, err := BuildPayment(Payment{
-		From:            alice,
-		To:              bob,
-		Amount:          "10",
-		Expiry:          20,
-		RouteHint:       "slow",
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		SettlementMode:  PaymentSettlementStreaming,
-		Nonce:           1,
+		From:			alice,
+		To:			bob,
+		Amount:			"10",
+		Expiry:			20,
+		RouteHint:		"slow",
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		SettlementMode:		PaymentSettlementStreaming,
+		Nonce:			1,
 	})
 	require.NoError(t, err)
 	second, err := BuildPayment(Payment{
-		From:            bob,
-		To:              alice,
-		Amount:          "5",
-		Expiry:          30,
-		RouteHint:       "fast",
-		SourceZone:      "CONTRACT_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		SettlementMode:  PaymentSettlementDirect,
-		Nonce:           1,
+		From:			bob,
+		To:			alice,
+		Amount:			"5",
+		Expiry:			30,
+		RouteHint:		"fast",
+		SourceZone:		"CONTRACT_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		SettlementMode:		PaymentSettlementDirect,
+		Nonce:			1,
 	})
 	require.NoError(t, err)
 
@@ -166,16 +166,16 @@ func TestPaymentRouteFeeOptimizationIsDeterministicAndBounded(t *testing.T) {
 	alice := testAddress(0x67)
 	bob := testAddress(0x68)
 	payment, err := BuildPayment(Payment{
-		From:            alice,
-		To:              bob,
-		Amount:          "50",
-		Expiry:          80,
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: FinancialSettlementZoneID,
-		Denom:           NativeDenom,
-		FeeLimit:        "5",
-		SettlementMode:  PaymentSettlementZoneToZone,
-		Nonce:           7,
+		From:			alice,
+		To:			bob,
+		Amount:			"50",
+		Expiry:			80,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	FinancialSettlementZoneID,
+		Denom:			NativeDenom,
+		FeeLimit:		"5",
+		SettlementMode:		PaymentSettlementZoneToZone,
+		Nonce:			7,
 	})
 	require.NoError(t, err)
 

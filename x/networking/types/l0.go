@@ -9,62 +9,62 @@ import (
 type ChannelID uint16
 
 const (
-	ChannelIDConsensus ChannelID = 0x01
-	ChannelIDMempool   ChannelID = 0x02
-	ChannelIDBlock     ChannelID = 0x03
-	ChannelIDStateSync ChannelID = 0x04
-	ChannelIDData      ChannelID = 0x05
-	ChannelIDExecution ChannelID = 0x06
-	ChannelIDService   ChannelID = 0x07
-	ChannelIDRouting   ChannelID = 0x08
-	ChannelIDDiscovery ChannelID = 0x09
+	ChannelIDConsensus	ChannelID	= 0x01
+	ChannelIDMempool	ChannelID	= 0x02
+	ChannelIDBlock		ChannelID	= 0x03
+	ChannelIDStateSync	ChannelID	= 0x04
+	ChannelIDData		ChannelID	= 0x05
+	ChannelIDExecution	ChannelID	= 0x06
+	ChannelIDService	ChannelID	= 0x07
+	ChannelIDRouting	ChannelID	= 0x08
+	ChannelIDDiscovery	ChannelID	= 0x09
 )
 
 type BandwidthAccount struct {
-	Channel    ChannelClass
-	LimitBytes uint64
-	UsedBytes  uint64
+	Channel		ChannelClass
+	LimitBytes	uint64
+	UsedBytes	uint64
 }
 
 type BandwidthLedger struct {
-	Height   uint64
-	Accounts []BandwidthAccount
+	Height		uint64
+	Accounts	[]BandwidthAccount
 }
 
 type L0ChannelMetrics struct {
-	Height               uint64
-	Channel              ChannelClass
-	ChannelID            ChannelID
-	EnqueuedCount        uint64
-	SentCount            uint64
-	DroppedCount         uint64
-	BytesEnqueued        uint64
-	BytesSent            uint64
-	ConsensusDelayBlocks uint64
+	Height			uint64
+	Channel			ChannelClass
+	ChannelID		ChannelID
+	EnqueuedCount		uint64
+	SentCount		uint64
+	DroppedCount		uint64
+	BytesEnqueued		uint64
+	BytesSent		uint64
+	ConsensusDelayBlocks	uint64
 }
 
 type L0AlertSeverity string
 
 const (
-	L0AlertInfo     L0AlertSeverity = "INFO"
-	L0AlertWarning  L0AlertSeverity = "WARNING"
-	L0AlertCritical L0AlertSeverity = "CRITICAL"
+	L0AlertInfo	L0AlertSeverity	= "INFO"
+	L0AlertWarning	L0AlertSeverity	= "WARNING"
+	L0AlertCritical	L0AlertSeverity	= "CRITICAL"
 )
 
 type L0Alert struct {
-	Severity L0AlertSeverity
-	Channel  ChannelClass
-	Code     string
-	Message  string
+	Severity	L0AlertSeverity
+	Channel		ChannelClass
+	Code		string
+	Message		string
 }
 
 type L0Schedule struct {
-	Height  uint64
-	Plans   []PropagationPlan
-	Dropped []TransportEnvelope
-	Ledger  BandwidthLedger
-	Metrics []L0ChannelMetrics
-	Alerts  []L0Alert
+	Height	uint64
+	Plans	[]PropagationPlan
+	Dropped	[]TransportEnvelope
+	Ledger	BandwidthLedger
+	Metrics	[]L0ChannelMetrics
+	Alerts	[]L0Alert
 }
 
 func ChannelIDForClass(channel ChannelClass) (ChannelID, error) {
@@ -128,8 +128,8 @@ func NewBandwidthLedger(height uint64, bandwidth BandwidthPolicy, policies []Cha
 		return BandwidthLedger{}, err
 	}
 	ledger := BandwidthLedger{
-		Height:   height,
-		Accounts: make([]BandwidthAccount, len(policies)),
+		Height:		height,
+		Accounts:	make([]BandwidthAccount, len(policies)),
 	}
 	for i, policy := range policies {
 		limit := (bandwidth.MaxOutboundBytesPerBlock * uint64(policy.BandwidthWeight)) / uint64(BasisPoints)
@@ -249,26 +249,26 @@ func EvaluateL0Alerts(metrics []L0ChannelMetrics) []L0Alert {
 	for _, metric := range metrics {
 		if metric.Channel == ChannelConsensus && metric.DroppedCount > 0 {
 			alerts = append(alerts, L0Alert{
-				Severity: L0AlertCritical,
-				Channel:  metric.Channel,
-				Code:     "CONSENSUS_TRAFFIC_DROPPED",
-				Message:  "consensus traffic must not be dropped or delayed by adapter scheduling",
+				Severity:	L0AlertCritical,
+				Channel:	metric.Channel,
+				Code:		"CONSENSUS_TRAFFIC_DROPPED",
+				Message:	"consensus traffic must not be dropped or delayed by adapter scheduling",
 			})
 		}
 		if metric.Channel == ChannelConsensus && metric.ConsensusDelayBlocks > 0 {
 			alerts = append(alerts, L0Alert{
-				Severity: L0AlertCritical,
-				Channel:  metric.Channel,
-				Code:     "CONSENSUS_TRAFFIC_DELAYED",
-				Message:  "consensus traffic delay was observed at L0",
+				Severity:	L0AlertCritical,
+				Channel:	metric.Channel,
+				Code:		"CONSENSUS_TRAFFIC_DELAYED",
+				Message:	"consensus traffic delay was observed at L0",
 			})
 		}
 		if metric.Channel != ChannelConsensus && metric.DroppedCount > 0 {
 			alerts = append(alerts, L0Alert{
-				Severity: L0AlertWarning,
-				Channel:  metric.Channel,
-				Code:     "NON_CONSENSUS_BACKPRESSURE",
-				Message:  "non-consensus traffic hit channel bandwidth limits",
+				Severity:	L0AlertWarning,
+				Channel:	metric.Channel,
+				Code:		"NON_CONSENSUS_BACKPRESSURE",
+				Message:	"non-consensus traffic hit channel bandwidth limits",
 			})
 		}
 	}

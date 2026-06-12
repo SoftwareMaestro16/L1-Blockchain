@@ -20,38 +20,38 @@ func TestContractEmitsInternalMessageAndRecipientExecutesInOrder(t *testing.T) {
 
 	require.NoError(t, executor.RegisterHandler(contractA, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState: []byte("a:sent"),
+			NewState:	[]byte("a:sent"),
 			Outgoing: []MessageEnvelope{{
-				Destination: contractB,
-				Value:       naetCoin(7),
-				Opcode:      20,
-				QueryID:     msg.QueryID,
-				Body:        []byte("from-a"),
-				Bounce:      true,
-				GasLimit:    100_000,
-				ForwardFee:  forwardFee(),
+				Destination:	contractB,
+				Value:		naetCoin(7),
+				Opcode:		20,
+				QueryID:	msg.QueryID,
+				Body:		[]byte("from-a"),
+				Bounce:		true,
+				GasLimit:	100_000,
+				ForwardFee:	forwardFee(),
 			}},
-			ResultCode: ResultOK,
+			ResultCode:	ResultOK,
 		}
 	}))
 	require.NoError(t, executor.RegisterHandler(contractB, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState:   append([]byte("b:"), msg.Body...),
-			ResultCode: ResultOK,
+			NewState:	append([]byte("b:"), msg.Body...),
+			ResultCode:	ResultOK,
 		}
 	}))
 
 	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{{
-		Source:             testAddr(9),
-		Destination:        contractA,
-		Value:              naetCoin(1),
-		Opcode:             10,
-		QueryID:            99,
-		Body:               []byte("start"),
-		Bounce:             true,
-		CreatedLogicalTime: 1,
-		GasLimit:           100_000,
-		ForwardFee:         forwardFee(),
+		Source:			testAddr(9),
+		Destination:		contractA,
+		Value:			naetCoin(1),
+		Opcode:			10,
+		QueryID:		99,
+		Body:			[]byte("start"),
+		Bounce:			true,
+		CreatedLogicalTime:	1,
+		GasLimit:		100_000,
+		ForwardFee:		forwardFee(),
 	}}))
 
 	receipts, err := executor.ProcessBlock(1)
@@ -84,8 +84,8 @@ func TestExecutionEconomyFeedsProtocolLoop(t *testing.T) {
 
 	require.NoError(t, executor.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState:   []byte("abcde"),
-			ResultCode: ResultOK,
+			NewState:	[]byte("abcde"),
+			ResultCode:	ResultOK,
 		}
 	}))
 	msg := testMessage(testAddr(9), contract, 1)
@@ -103,12 +103,12 @@ func TestExecutionEconomyFeedsProtocolLoop(t *testing.T) {
 	require.Equal(t, params.ForwardingFee, activity.AVMForwardingFeeNaet)
 
 	control, err := appparams.BalanceController(appparams.BalanceControllerInput{
-		CurrentInflationBps: appparams.DefaultTargetInflationBps,
-		StakeRatioBps:       appparams.DefaultTargetStakeBps,
-		BlockLoadBps:        appparams.DefaultTargetLoadBps,
-		AnnualMint:          sdkmath.NewInt(100),
-		AnnualBurn:          sdkmath.NewInt(100),
-		Activity:            activity,
+		CurrentInflationBps:	appparams.DefaultTargetInflationBps,
+		StakeRatioBps:		appparams.DefaultTargetStakeBps,
+		BlockLoadBps:		appparams.DefaultTargetLoadBps,
+		AnnualMint:		sdkmath.NewInt(100),
+		AnnualBurn:		sdkmath.NewInt(100),
+		Activity:		activity,
 	})
 	require.NoError(t, err)
 	require.True(t, control.DeflationGuardActive)
@@ -129,27 +129,27 @@ func TestFailedSendProducesDeterministicBounceWithoutDestinationMutation(t *test
 	require.NoError(t, executor.RegisterHandler(source, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		if msg.Bounced {
 			return ExecutionResult{
-				NewState:   []byte("source:bounced"),
-				ResultCode: ResultOK,
+				NewState:	[]byte("source:bounced"),
+				ResultCode:	ResultOK,
 			}
 		}
 		return ExecutionResult{
-			NewState:   []byte("source:original"),
-			ResultCode: ResultOK,
+			NewState:	[]byte("source:original"),
+			ResultCode:	ResultOK,
 		}
 	}))
 
 	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{{
-		Source:             source,
-		Destination:        missingDest,
-		Value:              naetCoin(5),
-		Opcode:             30,
-		QueryID:            123,
-		Body:               []byte("will-bounce"),
-		Bounce:             true,
-		CreatedLogicalTime: 1,
-		GasLimit:           100_000,
-		ForwardFee:         forwardFee(),
+		Source:			source,
+		Destination:		missingDest,
+		Value:			naetCoin(5),
+		Opcode:			30,
+		QueryID:		123,
+		Body:			[]byte("will-bounce"),
+		Bounce:			true,
+		CreatedLogicalTime:	1,
+		GasLimit:		100_000,
+		ForwardFee:		forwardFee(),
 	}}))
 
 	receipts, err := executor.ProcessBlock(1)
@@ -422,9 +422,9 @@ func TestInvalidOutgoingMessageDoesNotCommitRecipientState(t *testing.T) {
 		out.DeliverAtBlock = 5
 		out.DeadlineBlock = 4
 		return ExecutionResult{
-			NewState:   []byte("mutated"),
-			Outgoing:   []MessageEnvelope{out},
-			ResultCode: ResultOK,
+			NewState:	[]byte("mutated"),
+			Outgoing:	[]MessageEnvelope{out},
+			ResultCode:	ResultOK,
 		}
 	}))
 	msg := testMessage(testAddr(9), dest, 1)
@@ -456,22 +456,22 @@ func TestFailureRollsBackRecipientStateAndRefundsWhenBounceDisabled(t *testing.T
 	}))
 	require.NoError(t, executor.RegisterHandler(dest, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState:   []byte("dest:mutated-but-rolled-back"),
-			ResultCode: ResultExecutionFailed,
-			Error:      "handler failure",
+			NewState:	[]byte("dest:mutated-but-rolled-back"),
+			ResultCode:	ResultExecutionFailed,
+			Error:		"handler failure",
 		}
 	}))
 
 	require.NoError(t, executor.EnqueueTxMessages([]MessageEnvelope{{
-		Source:      source,
-		Destination: dest,
-		Value:       naetCoin(3),
-		Opcode:      40,
-		QueryID:     1,
-		Body:        []byte("fail"),
-		Bounce:      false,
-		GasLimit:    100_000,
-		ForwardFee:  forwardFee(),
+		Source:		source,
+		Destination:	dest,
+		Value:		naetCoin(3),
+		Opcode:		40,
+		QueryID:	1,
+		Body:		[]byte("fail"),
+		Bounce:		false,
+		GasLimit:	100_000,
+		ForwardFee:	forwardFee(),
 	}}))
 	receipts, err := executor.ProcessBlock(1)
 	require.NoError(t, err)
@@ -733,8 +733,8 @@ func TestExecutionLimitsRejectGasEmittedMessagesAndStorageWrites(t *testing.T) {
 		dest := deployTestContract(t, executor, testAddr(1), []byte("dest"))
 		require.NoError(t, executor.RegisterHandler(source, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 			return ExecutionResult{
-				NewState:   contract.State,
-				ResultCode: ResultOK,
+				NewState:	contract.State,
+				ResultCode:	ResultOK,
 				Outgoing: []MessageEnvelope{
 					testMessage(contract.Address, dest, 10),
 					testMessage(contract.Address, dest, 11),

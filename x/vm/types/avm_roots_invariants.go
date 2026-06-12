@@ -13,47 +13,47 @@ import (
 )
 
 const (
-	MaxAVMInvariantIDLength  = 128
-	MaxAVMWorkflowIDLength   = 128
-	MaxAVMStorageKeyLength   = 256
-	MaxAVMRootRecordsPerPlan = 4096
+	MaxAVMInvariantIDLength		= 128
+	MaxAVMWorkflowIDLength		= 128
+	MaxAVMStorageKeyLength		= 256
+	MaxAVMRootRecordsPerPlan	= 4096
 )
 
 type AVMRoot struct {
-	Height           uint64
-	RouterRoot       string
-	AsyncMessageRoot string
-	ActorRoot        string
-	ContractRoot     string
-	ContinuationRoot string
-	InterfaceRoot    string
-	ReceiptRoot      string
-	RootHash         string
+	Height			uint64
+	RouterRoot		string
+	AsyncMessageRoot	string
+	ActorRoot		string
+	ContractRoot		string
+	ContinuationRoot	string
+	InterfaceRoot		string
+	ReceiptRoot		string
+	RootHash		string
 }
 
 type AVMZoneStateRoot struct {
-	ZoneID           zonestypes.ZoneID
-	Height           uint64
-	StateRoot        string
-	MessageRoot      string
-	ExecutionRoot    string
-	ContinuationRoot string
-	RootHash         string
+	ZoneID			zonestypes.ZoneID
+	Height			uint64
+	StateRoot		string
+	MessageRoot		string
+	ExecutionRoot		string
+	ContinuationRoot	string
+	RootHash		string
 }
 
 type AVMStoredMessageRecord struct {
-	MessageID         string
-	ZoneID            zonestypes.ZoneID
-	Expired           bool
-	Bounced           bool
-	OriginalMessageID string
+	MessageID		string
+	ZoneID			zonestypes.ZoneID
+	Expired			bool
+	Bounced			bool
+	OriginalMessageID	string
 }
 
 type AVMQueuedMessageRef struct {
-	MessageID string
-	ZoneID    zonestypes.ZoneID
-	QueueID   string
-	SortKey   string
+	MessageID	string
+	ZoneID		zonestypes.ZoneID
+	QueueID		string
+	SortKey		string
 }
 
 type AVMExecutedMessageRef struct {
@@ -61,15 +61,15 @@ type AVMExecutedMessageRef struct {
 }
 
 type AVMReceiptRecord struct {
-	ReceiptID  string
-	MessageID  string
-	ResultCode uint32
+	ReceiptID	string
+	MessageID	string
+	ResultCode	uint32
 }
 
 type AVMContinuationRef struct {
-	ContinuationID string
-	ActorID        string
-	WorkflowID     string
+	ContinuationID	string
+	ActorID		string
+	WorkflowID	string
 }
 
 type AVMActorRef struct {
@@ -81,27 +81,27 @@ type AVMWorkflowRef struct {
 }
 
 type AVMActorMailboxEntry struct {
-	ActorID   string
-	SortKey   string
-	MessageID string
+	ActorID		string
+	SortKey		string
+	MessageID	string
 }
 
 type AVMContractStorageRef struct {
-	ContractAddress string
-	Key             string
+	ContractAddress	string
+	Key		string
 }
 
 type AVMStateInvariantSet struct {
-	StoredMessages   []AVMStoredMessageRecord
-	QueuedMessages   []AVMQueuedMessageRef
-	ExecutedMessages []AVMExecutedMessageRef
-	Receipts         []AVMReceiptRecord
-	Continuations    []AVMContinuationRef
-	Actors           []AVMActorRef
-	Workflows        []AVMWorkflowRef
-	MailboxEntries   []AVMActorMailboxEntry
-	ContractStorage  []AVMContractStorageRef
-	ZoneRoots        []AVMZoneStateRoot
+	StoredMessages		[]AVMStoredMessageRecord
+	QueuedMessages		[]AVMQueuedMessageRef
+	ExecutedMessages	[]AVMExecutedMessageRef
+	Receipts		[]AVMReceiptRecord
+	Continuations		[]AVMContinuationRef
+	Actors			[]AVMActorRef
+	Workflows		[]AVMWorkflowRef
+	MailboxEntries		[]AVMActorMailboxEntry
+	ContractStorage		[]AVMContractStorageRef
+	ZoneRoots		[]AVMZoneStateRoot
 }
 
 func NewAVMRoot(root AVMRoot) (AVMRoot, error) {
@@ -122,8 +122,8 @@ func (r AVMRoot) Validate() error {
 		return errors.New("AVM root height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM router root", value: r.RouterRoot},
 		{name: "AVM async message root", value: r.AsyncMessageRoot},
@@ -153,8 +153,8 @@ func (r AVMZoneStateRoot) Validate() error {
 		return errors.New("AVM zone root height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM zone state root", value: r.StateRoot},
 		{name: "AVM zone message root", value: r.MessageRoot},

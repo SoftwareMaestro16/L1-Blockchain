@@ -13,288 +13,288 @@ import (
 )
 
 const (
-	AVM2BytecodeMagic       = "AVM2"
-	AVM2BytecodeCodec       = "avm2.bytecode.v1"
-	AVM2RuntimeExecutor     = "avm2-runtime"
-	AVM2RuntimeErrorAbort   = "ERR_AVM2_ABORT"
-	AVM2RuntimeErrorGas     = "ERR_AVM2_GAS"
-	AVM2RuntimeErrorInvalid = "ERR_AVM2_INVALID"
+	AVMBytecodeMagic	= "AVM"
+	AVMBytecodeCodec	= "AVM.bytecode.v1"
+	AVMRuntimeExecutor	= "AVM-runtime"
+	AVMRuntimeErrorAbort	= "ERR_AVM_ABORT"
+	AVMRuntimeErrorGas	= "ERR_AVM_GAS"
+	AVMRuntimeErrorInvalid	= "ERR_AVM_INVALID"
 )
 
-type AVM2BytecodeModule struct {
-	Magic                 string
-	VMVersion             uint64
-	InstructionSetVersion uint64
-	Instructions          []AVM2Instruction
-	MeteringProfile       string
-	CanonicalBytes        []byte
-	BytecodeHash          string
+type AVMBytecodeModule struct {
+	Magic			string
+	VMVersion		uint64
+	InstructionSetVersion	uint64
+	Instructions		[]AVMInstruction
+	MeteringProfile		string
+	CanonicalBytes		[]byte
+	BytecodeHash		string
 }
 
-type AVM2StoreV2Entry struct {
-	Key        string
-	ValueHash  string
-	ValueBytes uint64
-	EntryHash  string
+type AVMStoreV2Entry struct {
+	Key		string
+	ValueHash	string
+	ValueBytes	uint64
+	EntryHash	string
 }
 
-type AVM2StoreV2Adapter struct {
-	ContractAddress string
-	Entries         []AVM2StoreV2Entry
-	AdapterRoot     string
+type AVMStoreV2Adapter struct {
+	ContractAddress	string
+	Entries		[]AVMStoreV2Entry
+	AdapterRoot	string
 }
 
-type AVM2MessageDrivenInput struct {
-	Message      AVMAsyncMessage
-	CurrentState AVM2StoreV2Adapter
-	Context      AVM2ExecutionContext
-	Bytecode     AVM2BytecodeModule
-	InputHash    string
+type AVMMessageDrivenInput struct {
+	Message		AVMAsyncMessage
+	CurrentState	AVMStoreV2Adapter
+	Context		AVMExecutionContext
+	Bytecode	AVMBytecodeModule
+	InputHash	string
 }
 
-type AVM2StateTransition struct {
-	Input               AVM2MessageDrivenInput
-	Execution           AVM2ExecutionResult
-	UpdatedState        AVM2StoreV2Adapter
-	Receipt             AVMExecutionReceipt
-	StorageRoot         string
-	EventRoot           string
-	OutboxRoot          string
-	ReceiptRoot         string
-	StateTransitionHash string
+type AVMStateTransition struct {
+	Input			AVMMessageDrivenInput
+	Execution		AVMExecutionResult
+	UpdatedState		AVMStoreV2Adapter
+	Receipt			AVMExecutionReceipt
+	StorageRoot		string
+	EventRoot		string
+	OutboxRoot		string
+	ReceiptRoot		string
+	StateTransitionHash	string
 }
 
-type AVM2ContractShardRouteSet struct {
-	LayoutEpoch   uint64
-	InstanceRoute coretypes.ShardRoute
-	StorageRoutes []coretypes.ShardRoute
-	EventRoutes   []coretypes.ShardRoute
-	MessageRoutes []coretypes.ShardRoute
-	RouteSetHash  string
+type AVMContractShardRouteSet struct {
+	LayoutEpoch	uint64
+	InstanceRoute	coretypes.ShardRoute
+	StorageRoutes	[]coretypes.ShardRoute
+	EventRoutes	[]coretypes.ShardRoute
+	MessageRoutes	[]coretypes.ShardRoute
+	RouteSetHash	string
 }
 
-func NewAVM2BytecodeModule(module AVM2BytecodeModule, limits AVM2Limits, gasTable AVM2GasTable) (AVM2BytecodeModule, error) {
-	module = canonicalAVM2BytecodeModule(module)
+func NewAVMBytecodeModule(module AVMBytecodeModule, limits AVMLimits, gasTable AVMGasTable) (AVMBytecodeModule, error) {
+	module = canonicalAVMBytecodeModule(module)
 	if module.Magic == "" {
-		module.Magic = AVM2BytecodeMagic
+		module.Magic = AVMBytecodeMagic
 	}
 	if module.VMVersion == 0 {
-		module.VMVersion = AVM2VMVersion
+		module.VMVersion = AVMVMVersion
 	}
 	if module.InstructionSetVersion == 0 {
-		module.InstructionSetVersion = AVM2DefaultInstructionSet
+		module.InstructionSetVersion = AVMDefaultInstructionSet
 	}
 	if module.MeteringProfile == "" {
-		module.MeteringProfile = AVM2MeteringProfileDefault
+		module.MeteringProfile = AVMMeteringProfileDefault
 	}
-	module.CanonicalBytes = EncodeAVM2Bytecode(module)
-	module.BytecodeHash = ComputeAVM2BytecodeHash(module)
+	module.CanonicalBytes = EncodeAVMBytecode(module)
+	module.BytecodeHash = ComputeAVMBytecodeHash(module)
 	return module, module.Validate(limits, gasTable)
 }
 
-func NewAVM2StoreV2Adapter(adapter AVM2StoreV2Adapter) (AVM2StoreV2Adapter, error) {
-	adapter = canonicalAVM2StoreV2Adapter(adapter)
+func NewAVMStoreV2Adapter(adapter AVMStoreV2Adapter) (AVMStoreV2Adapter, error) {
+	adapter = canonicalAVMStoreV2Adapter(adapter)
 	for i := range adapter.Entries {
-		adapter.Entries[i].EntryHash = ComputeAVM2StoreV2EntryHash(adapter.Entries[i])
+		adapter.Entries[i].EntryHash = ComputeAVMStoreV2EntryHash(adapter.Entries[i])
 	}
-	adapter = canonicalAVM2StoreV2Adapter(adapter)
-	adapter.AdapterRoot = ComputeAVM2StoreV2AdapterRoot(adapter)
+	adapter = canonicalAVMStoreV2Adapter(adapter)
+	adapter.AdapterRoot = ComputeAVMStoreV2AdapterRoot(adapter)
 	return adapter, adapter.Validate()
 }
 
-func NewAVM2MessageDrivenInput(input AVM2MessageDrivenInput) (AVM2MessageDrivenInput, error) {
-	input = canonicalAVM2MessageDrivenInput(input)
-	input.InputHash = ComputeAVM2MessageDrivenInputHash(input)
+func NewAVMMessageDrivenInput(input AVMMessageDrivenInput) (AVMMessageDrivenInput, error) {
+	input = canonicalAVMMessageDrivenInput(input)
+	input.InputHash = ComputeAVMMessageDrivenInputHash(input)
 	return input, input.Validate()
 }
 
-func ExecuteAVM2MessageTransition(input AVM2MessageDrivenInput, limits AVM2Limits, gasTable AVM2GasTable) (AVM2StateTransition, error) {
-	input = canonicalAVM2MessageDrivenInput(input)
+func ExecuteAVMMessageTransition(input AVMMessageDrivenInput, limits AVMLimits, gasTable AVMGasTable) (AVMStateTransition, error) {
+	input = canonicalAVMMessageDrivenInput(input)
 	if err := input.Validate(); err != nil {
-		return AVM2StateTransition{}, err
+		return AVMStateTransition{}, err
 	}
-	program, err := NewAVM2Program(AVM2Program{
-		VMVersion:             input.Bytecode.VMVersion,
-		InstructionSetVersion: input.Bytecode.InstructionSetVersion,
-		Instructions:          input.Bytecode.Instructions,
-		MaxRecursionDepth:     1,
+	program, err := NewAVMProgram(AVMProgram{
+		VMVersion:		input.Bytecode.VMVersion,
+		InstructionSetVersion:	input.Bytecode.InstructionSetVersion,
+		Instructions:		input.Bytecode.Instructions,
+		MaxRecursionDepth:	1,
 	}, limits, gasTable)
 	if err != nil {
-		return AVM2StateTransition{}, err
+		return AVMStateTransition{}, err
 	}
-	execution, execErr := ExecuteAVM2Program(program, input.Context, limits, gasTable)
+	execution, execErr := ExecuteAVMProgram(program, input.Context, limits, gasTable)
 	status := AVMReceiptStatusExecuted
 	errorCode := ""
 	if execErr != nil {
 		status = AVMReceiptStatusFailed
-		errorCode = AVM2RuntimeErrorInvalid
+		errorCode = AVMRuntimeErrorInvalid
 		if strings.Contains(execErr.Error(), "exhausted gas") {
-			errorCode = AVM2RuntimeErrorGas
+			errorCode = AVMRuntimeErrorGas
 		}
 		if strings.Contains(execErr.Error(), "aborted") {
-			errorCode = AVM2RuntimeErrorAbort
+			errorCode = AVMRuntimeErrorAbort
 		}
-		execution = AVM2ExecutionResult{
-			GasUsed:            maxUint64(1, gasUsedBeforeFailure(program, gasTable, limits, input.Context.GasLimit)),
-			StorageRoot:        ComputeAVM2StorageRoot(nil, nil),
-			MessageRoot:        ComputeAVM2MessageRoot(nil),
-			PromiseRoot:        ComputeAVM2PromiseRoot(nil),
-			ABIRoot:            ComputeAVM2ABIRoot(nil),
-			EventRoot:          ComputeAVM2EventRoot(nil),
-			ReadOnlySimulation: input.Context.ReadOnly,
+		execution = AVMExecutionResult{
+			GasUsed:		maxUint64(1, gasUsedBeforeFailure(program, gasTable, limits, input.Context.GasLimit)),
+			StorageRoot:		ComputeAVMStorageRoot(nil, nil),
+			MessageRoot:		ComputeAVMMessageRoot(nil),
+			PromiseRoot:		ComputeAVMPromiseRoot(nil),
+			ABIRoot:		ComputeAVMABIRoot(nil),
+			EventRoot:		ComputeAVMEventRoot(nil),
+			ReadOnlySimulation:	input.Context.ReadOnly,
 		}
-		execution.ExecutionHash = ComputeAVM2ExecutionHash(execution)
+		execution.ExecutionHash = ComputeAVMExecutionHash(execution)
 	}
-	updated, err := ApplyAVM2StoreV2Writes(input.CurrentState, execution.StorageWrites)
+	updated, err := ApplyAVMStoreV2Writes(input.CurrentState, execution.StorageWrites)
 	if err != nil && execErr == nil {
-		return AVM2StateTransition{}, err
+		return AVMStateTransition{}, err
 	}
 	if execErr != nil {
 		updated = input.CurrentState
 	}
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          input.Message.ID,
-		ZoneID:             zonestypes.ZoneID(coretypes.ZoneIDContract),
-		Executor:           AVM2RuntimeExecutor,
-		Status:             status,
-		GasUsed:            execution.GasUsed,
-		StorageWritten:     uint32(len(execution.StorageWrites)),
-		EventsHash:         execution.EventRoot,
-		OutputMessagesRoot: execution.MessageRoot,
-		ErrorCodeOptional:  errorCode,
-		CreatedHeight:      input.Context.Height,
+		MessageID:		input.Message.ID,
+		ZoneID:			zonestypes.ZoneID(coretypes.ZoneIDContract),
+		Executor:		AVMRuntimeExecutor,
+		Status:			status,
+		GasUsed:		execution.GasUsed,
+		StorageWritten:		uint32(len(execution.StorageWrites)),
+		EventsHash:		execution.EventRoot,
+		OutputMessagesRoot:	execution.MessageRoot,
+		ErrorCodeOptional:	errorCode,
+		CreatedHeight:		input.Context.Height,
 	})
 	if err != nil {
-		return AVM2StateTransition{}, err
+		return AVMStateTransition{}, err
 	}
-	transition := AVM2StateTransition{
-		Input:        input,
-		Execution:    execution,
-		UpdatedState: updated,
-		Receipt:      receipt,
-		StorageRoot:  updated.AdapterRoot,
-		EventRoot:    execution.EventRoot,
-		OutboxRoot:   execution.MessageRoot,
-		ReceiptRoot:  ComputeAVM2ReceiptRoot([]AVMExecutionReceipt{receipt}),
+	transition := AVMStateTransition{
+		Input:		input,
+		Execution:	execution,
+		UpdatedState:	updated,
+		Receipt:	receipt,
+		StorageRoot:	updated.AdapterRoot,
+		EventRoot:	execution.EventRoot,
+		OutboxRoot:	execution.MessageRoot,
+		ReceiptRoot:	ComputeAVMReceiptRoot([]AVMExecutionReceipt{receipt}),
 	}
-	transition.StateTransitionHash = ComputeAVM2StateTransitionHash(transition)
+	transition.StateTransitionHash = ComputeAVMStateTransitionHash(transition)
 	if err := transition.Validate(); err != nil {
-		return AVM2StateTransition{}, err
+		return AVMStateTransition{}, err
 	}
 	return transition, execErr
 }
 
-func RouteAVM2ContractState(layout coretypes.ShardLayout, contract AVM2ContractRecord, storage []AVM2ContractStorageValue, events []AVM2ContractEventRecord, messages []AVMAsyncMessage) (AVM2ContractShardRouteSet, error) {
-	contract = canonicalAVM2ContractRecord(contract)
+func RouteAVMContractState(layout coretypes.ShardLayout, contract AVMContractRecord, storage []AVMContractStorageValue, events []AVMContractEventRecord, messages []AVMAsyncMessage) (AVMContractShardRouteSet, error) {
+	contract = canonicalAVMContractRecord(contract)
 	layout.ActiveShards = append([]coretypes.ShardDescriptor(nil), layout.ActiveShards...)
 	instanceRoute, err := coretypes.RouteKeyToShard(layout, coretypes.ShardRoutingInput{
-		ZoneID:           layout.ZoneID,
-		StateKey:         AVM2ContractInstanceStateKey(contract.ContractAddr),
-		ShardLayoutEpoch: layout.LayoutEpoch,
+		ZoneID:			layout.ZoneID,
+		StateKey:		AVMContractInstanceStateKey(contract.ContractAddr),
+		ShardLayoutEpoch:	layout.LayoutEpoch,
 	})
 	if err != nil {
-		return AVM2ContractShardRouteSet{}, err
+		return AVMContractShardRouteSet{}, err
 	}
 	var storageRoutes []coretypes.ShardRoute
-	for _, value := range canonicalAVM2StorageValuesForRoute(storage) {
+	for _, value := range canonicalAVMStorageValuesForRoute(storage) {
 		route, err := coretypes.RouteKeyToShard(layout, coretypes.ShardRoutingInput{
-			ZoneID:           layout.ZoneID,
-			StateKey:         AVM2ContractStorageStateKey(value.ContractAddr, value.StorageKey),
-			ShardLayoutEpoch: layout.LayoutEpoch,
+			ZoneID:			layout.ZoneID,
+			StateKey:		AVMContractStorageStateKey(value.ContractAddr, value.StorageKey),
+			ShardLayoutEpoch:	layout.LayoutEpoch,
 		})
 		if err != nil {
-			return AVM2ContractShardRouteSet{}, err
+			return AVMContractShardRouteSet{}, err
 		}
 		storageRoutes = append(storageRoutes, route)
 	}
 	var eventRoutes []coretypes.ShardRoute
-	for _, event := range canonicalAVM2EventRecordsForRoute(events) {
+	for _, event := range canonicalAVMEventRecordsForRoute(events) {
 		route, err := coretypes.RouteKeyToShard(layout, coretypes.ShardRoutingInput{
-			ZoneID:           layout.ZoneID,
-			StateKey:         event.Key,
-			ShardLayoutEpoch: layout.LayoutEpoch,
+			ZoneID:			layout.ZoneID,
+			StateKey:		event.Key,
+			ShardLayoutEpoch:	layout.LayoutEpoch,
 		})
 		if err != nil {
-			return AVM2ContractShardRouteSet{}, err
+			return AVMContractShardRouteSet{}, err
 		}
 		eventRoutes = append(eventRoutes, route)
 	}
 	var messageRoutes []coretypes.ShardRoute
-	for _, msg := range canonicalAVM2Messages(messages) {
+	for _, msg := range canonicalAVMMessages(messages) {
 		route, err := coretypes.RouteKeyToShard(layout, coretypes.ShardRoutingInput{
-			ZoneID:           layout.ZoneID,
-			StateKey:         AVMAsyncMessageKey(msg.ID),
-			ShardLayoutEpoch: layout.LayoutEpoch,
+			ZoneID:			layout.ZoneID,
+			StateKey:		AVMAsyncMessageKey(msg.ID),
+			ShardLayoutEpoch:	layout.LayoutEpoch,
 		})
 		if err != nil {
-			return AVM2ContractShardRouteSet{}, err
+			return AVMContractShardRouteSet{}, err
 		}
 		messageRoutes = append(messageRoutes, route)
 	}
-	set := AVM2ContractShardRouteSet{
-		LayoutEpoch:   layout.LayoutEpoch,
-		InstanceRoute: instanceRoute,
-		StorageRoutes: storageRoutes,
-		EventRoutes:   eventRoutes,
-		MessageRoutes: messageRoutes,
+	set := AVMContractShardRouteSet{
+		LayoutEpoch:	layout.LayoutEpoch,
+		InstanceRoute:	instanceRoute,
+		StorageRoutes:	storageRoutes,
+		EventRoutes:	eventRoutes,
+		MessageRoutes:	messageRoutes,
 	}
-	set = canonicalAVM2ContractShardRouteSet(set)
-	set.RouteSetHash = ComputeAVM2ContractShardRouteSetHash(set)
+	set = canonicalAVMContractShardRouteSet(set)
+	set.RouteSetHash = ComputeAVMContractShardRouteSetHash(set)
 	return set, set.Validate()
 }
 
-func DecodeAVM2Bytecode(module AVM2BytecodeModule, limits AVM2Limits, gasTable AVM2GasTable) (AVM2BytecodeModule, error) {
-	module = canonicalAVM2BytecodeModule(module)
+func DecodeAVMBytecode(module AVMBytecodeModule, limits AVMLimits, gasTable AVMGasTable) (AVMBytecodeModule, error) {
+	module = canonicalAVMBytecodeModule(module)
 	if len(module.CanonicalBytes) == 0 {
-		return AVM2BytecodeModule{}, errors.New("AVM 2.0 bytecode bytes are required")
+		return AVMBytecodeModule{}, errors.New("AVM 2.0 bytecode bytes are required")
 	}
-	if module.BytecodeHash != ComputeAVM2BytecodeHash(module) {
-		return AVM2BytecodeModule{}, errors.New("AVM 2.0 bytecode hash mismatch")
+	if module.BytecodeHash != ComputeAVMBytecodeHash(module) {
+		return AVMBytecodeModule{}, errors.New("AVM 2.0 bytecode hash mismatch")
 	}
 	return module, module.Validate(limits, gasTable)
 }
 
-func (m AVM2BytecodeModule) Validate(limits AVM2Limits, gasTable AVM2GasTable) error {
-	m = canonicalAVM2BytecodeModule(m)
-	if m.Magic != AVM2BytecodeMagic {
+func (m AVMBytecodeModule) Validate(limits AVMLimits, gasTable AVMGasTable) error {
+	m = canonicalAVMBytecodeModule(m)
+	if m.Magic != AVMBytecodeMagic {
 		return errors.New("AVM 2.0 bytecode magic mismatch")
 	}
-	if m.VMVersion != AVM2VMVersion {
+	if m.VMVersion != AVMVMVersion {
 		return errors.New("AVM 2.0 bytecode VM version must be 2")
 	}
 	if m.InstructionSetVersion == 0 {
 		return errors.New("AVM 2.0 bytecode instruction set version must be positive")
 	}
-	if err := validateEngineToken("AVM 2.0 bytecode metering profile", m.MeteringProfile, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 bytecode metering profile", m.MeteringProfile, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if len(m.CanonicalBytes) == 0 {
 		return errors.New("AVM 2.0 canonical bytecode is required")
 	}
-	if !strings.HasPrefix(string(m.CanonicalBytes), AVM2BytecodeCodec+"|") {
+	if !strings.HasPrefix(string(m.CanonicalBytes), AVMBytecodeCodec+"|") {
 		return errors.New("AVM 2.0 canonical bytecode codec mismatch")
 	}
-	program := AVM2Program{
-		VMVersion:             m.VMVersion,
-		InstructionSetVersion: m.InstructionSetVersion,
-		Instructions:          m.Instructions,
-		MaxRecursionDepth:     1,
+	program := AVMProgram{
+		VMVersion:		m.VMVersion,
+		InstructionSetVersion:	m.InstructionSetVersion,
+		Instructions:		m.Instructions,
+		MaxRecursionDepth:	1,
 	}
-	program.ProgramHash = ComputeAVM2ProgramHash(program)
-	if err := ValidateAVM2Program(program, limits, gasTable); err != nil {
+	program.ProgramHash = ComputeAVMProgramHash(program)
+	if err := ValidateAVMProgram(program, limits, gasTable); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 bytecode hash", m.BytecodeHash); err != nil {
 		return err
 	}
-	if m.BytecodeHash != ComputeAVM2BytecodeHash(m) {
+	if m.BytecodeHash != ComputeAVMBytecodeHash(m) {
 		return errors.New("AVM 2.0 bytecode hash mismatch")
 	}
 	return nil
 }
 
-func (e AVM2StoreV2Entry) Validate(contractAddress string) error {
-	e = canonicalAVM2StoreV2Entry(e)
+func (e AVMStoreV2Entry) Validate(contractAddress string) error {
+	e = canonicalAVMStoreV2Entry(e)
 	if err := validateAVMStatePrefix("AVM 2.0 Store v2 adapter key", e.Key); err != nil {
 		return err
 	}
@@ -308,14 +308,14 @@ func (e AVM2StoreV2Entry) Validate(contractAddress string) error {
 	if err := zonestypes.ValidateHash("AVM 2.0 Store v2 entry hash", e.EntryHash); err != nil {
 		return err
 	}
-	if e.EntryHash != ComputeAVM2StoreV2EntryHash(e) {
+	if e.EntryHash != ComputeAVMStoreV2EntryHash(e) {
 		return errors.New("AVM 2.0 Store v2 entry hash mismatch")
 	}
 	return nil
 }
 
-func (a AVM2StoreV2Adapter) Validate() error {
-	a = canonicalAVM2StoreV2Adapter(a)
+func (a AVMStoreV2Adapter) Validate() error {
+	a = canonicalAVMStoreV2Adapter(a)
 	if err := validateEngineToken("AVM 2.0 Store v2 contract address", a.ContractAddress, MaxAVMStateKeySegmentLength); err != nil {
 		return err
 	}
@@ -335,14 +335,14 @@ func (a AVM2StoreV2Adapter) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 Store v2 adapter root", a.AdapterRoot); err != nil {
 		return err
 	}
-	if a.AdapterRoot != ComputeAVM2StoreV2AdapterRoot(a) {
+	if a.AdapterRoot != ComputeAVMStoreV2AdapterRoot(a) {
 		return errors.New("AVM 2.0 Store v2 adapter root mismatch")
 	}
 	return nil
 }
 
-func (i AVM2MessageDrivenInput) Validate() error {
-	i = canonicalAVM2MessageDrivenInput(i)
+func (i AVMMessageDrivenInput) Validate() error {
+	i = canonicalAVMMessageDrivenInput(i)
 	if err := i.Message.Validate(); err != nil {
 		return err
 	}
@@ -352,7 +352,7 @@ func (i AVM2MessageDrivenInput) Validate() error {
 	if err := i.Context.Validate(); err != nil {
 		return err
 	}
-	if err := i.Bytecode.Validate(DefaultAVM2Limits(), mustDefaultAVM2GasTable()); err != nil {
+	if err := i.Bytecode.Validate(DefaultAVMLimits(), mustDefaultAVMGasTable()); err != nil {
 		return err
 	}
 	if i.Context.ContractAddress != i.CurrentState.ContractAddress {
@@ -364,14 +364,14 @@ func (i AVM2MessageDrivenInput) Validate() error {
 	if i.Context.Height < i.Message.CreatedHeight {
 		return errors.New("AVM 2.0 message-driven execution cannot precede message creation")
 	}
-	if i.InputHash != ComputeAVM2MessageDrivenInputHash(i) {
+	if i.InputHash != ComputeAVMMessageDrivenInputHash(i) {
 		return errors.New("AVM 2.0 message-driven input hash mismatch")
 	}
 	return nil
 }
 
-func (t AVM2StateTransition) Validate() error {
-	t = canonicalAVM2StateTransition(t)
+func (t AVMStateTransition) Validate() error {
+	t = canonicalAVMStateTransition(t)
 	if err := t.Input.Validate(); err != nil {
 		return err
 	}
@@ -393,20 +393,20 @@ func (t AVM2StateTransition) Validate() error {
 	if t.OutboxRoot != t.Execution.MessageRoot {
 		return errors.New("AVM 2.0 transition outbox root mismatch")
 	}
-	if t.ReceiptRoot != ComputeAVM2ReceiptRoot([]AVMExecutionReceipt{t.Receipt}) {
+	if t.ReceiptRoot != ComputeAVMReceiptRoot([]AVMExecutionReceipt{t.Receipt}) {
 		return errors.New("AVM 2.0 transition receipt root mismatch")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 state transition hash", t.StateTransitionHash); err != nil {
 		return err
 	}
-	if t.StateTransitionHash != ComputeAVM2StateTransitionHash(t) {
+	if t.StateTransitionHash != ComputeAVMStateTransitionHash(t) {
 		return errors.New("AVM 2.0 state transition hash mismatch")
 	}
 	return nil
 }
 
-func (s AVM2ContractShardRouteSet) Validate() error {
-	s = canonicalAVM2ContractShardRouteSet(s)
+func (s AVMContractShardRouteSet) Validate() error {
+	s = canonicalAVMContractShardRouteSet(s)
 	if s.LayoutEpoch == 0 {
 		return errors.New("AVM 2.0 route set layout epoch must be positive")
 	}
@@ -431,43 +431,43 @@ func (s AVM2ContractShardRouteSet) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 route set hash", s.RouteSetHash); err != nil {
 		return err
 	}
-	if s.RouteSetHash != ComputeAVM2ContractShardRouteSetHash(s) {
+	if s.RouteSetHash != ComputeAVMContractShardRouteSetHash(s) {
 		return errors.New("AVM 2.0 route set hash mismatch")
 	}
 	return nil
 }
 
-func ApplyAVM2StoreV2Writes(adapter AVM2StoreV2Adapter, writes []AVM2StorageWrite) (AVM2StoreV2Adapter, error) {
-	adapter = canonicalAVM2StoreV2Adapter(adapter)
+func ApplyAVMStoreV2Writes(adapter AVMStoreV2Adapter, writes []AVMStorageWrite) (AVMStoreV2Adapter, error) {
+	adapter = canonicalAVMStoreV2Adapter(adapter)
 	if err := adapter.Validate(); err != nil {
-		return AVM2StoreV2Adapter{}, err
+		return AVMStoreV2Adapter{}, err
 	}
-	byKey := make(map[string]AVM2StoreV2Entry, len(adapter.Entries))
+	byKey := make(map[string]AVMStoreV2Entry, len(adapter.Entries))
 	for _, entry := range adapter.Entries {
 		byKey[entry.Key] = entry
 	}
-	for _, write := range canonicalAVM2StorageWrites(writes) {
-		if err := ValidateAVM2StoreV2Key(AVM2ExecutionContext{ContractAddress: adapter.ContractAddress}, write.Key, DefaultAVM2Limits()); err != nil {
-			return AVM2StoreV2Adapter{}, err
+	for _, write := range canonicalAVMStorageWrites(writes) {
+		if err := ValidateAVMStoreV2Key(AVMExecutionContext{ContractAddress: adapter.ContractAddress}, write.Key, DefaultAVMLimits()); err != nil {
+			return AVMStoreV2Adapter{}, err
 		}
 		if write.Deleted {
 			delete(byKey, write.Key)
 			continue
 		}
-		byKey[write.Key] = AVM2StoreV2Entry{Key: write.Key, ValueHash: write.ValueHash, ValueBytes: uint64(len(write.ValueHash))}
+		byKey[write.Key] = AVMStoreV2Entry{Key: write.Key, ValueHash: write.ValueHash, ValueBytes: uint64(len(write.ValueHash))}
 	}
-	out := AVM2StoreV2Adapter{ContractAddress: adapter.ContractAddress}
+	out := AVMStoreV2Adapter{ContractAddress: adapter.ContractAddress}
 	for _, entry := range byKey {
-		entry.EntryHash = ComputeAVM2StoreV2EntryHash(entry)
+		entry.EntryHash = ComputeAVMStoreV2EntryHash(entry)
 		out.Entries = append(out.Entries, entry)
 	}
-	return NewAVM2StoreV2Adapter(out)
+	return NewAVMStoreV2Adapter(out)
 }
 
-func EncodeAVM2Bytecode(module AVM2BytecodeModule) []byte {
-	module = canonicalAVM2BytecodeModule(module)
+func EncodeAVMBytecode(module AVMBytecodeModule) []byte {
+	module = canonicalAVMBytecodeModule(module)
 	parts := []string{
-		AVM2BytecodeCodec,
+		AVMBytecodeCodec,
 		module.Magic,
 		fmt.Sprint(module.VMVersion),
 		fmt.Sprint(module.InstructionSetVersion),
@@ -492,28 +492,28 @@ func EncodeAVM2Bytecode(module AVM2BytecodeModule) []byte {
 	return []byte(strings.Join(parts, "|"))
 }
 
-func ComputeAVM2BytecodeHash(module AVM2BytecodeModule) string {
-	module = canonicalAVM2BytecodeModule(module)
+func ComputeAVMBytecodeHash(module AVMBytecodeModule) string {
+	module = canonicalAVMBytecodeModule(module)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-bytecode-v1")
-	writeEnginePart(h, string(EncodeAVM2Bytecode(module)))
+	writeEnginePart(h, "aetra-AVM-bytecode-v1")
+	writeEnginePart(h, string(EncodeAVMBytecode(module)))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2StoreV2EntryHash(entry AVM2StoreV2Entry) string {
-	entry = canonicalAVM2StoreV2Entry(entry)
+func ComputeAVMStoreV2EntryHash(entry AVMStoreV2Entry) string {
+	entry = canonicalAVMStoreV2Entry(entry)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-storev2-entry-v1")
+	writeEnginePart(h, "aetra-AVM-storev2-entry-v1")
 	writeEnginePart(h, entry.Key)
 	writeEnginePart(h, entry.ValueHash)
 	writeEngineUint64(h, entry.ValueBytes)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2StoreV2AdapterRoot(adapter AVM2StoreV2Adapter) string {
-	adapter = canonicalAVM2StoreV2Adapter(adapter)
+func ComputeAVMStoreV2AdapterRoot(adapter AVMStoreV2Adapter) string {
+	adapter = canonicalAVMStoreV2Adapter(adapter)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-storev2-root-v1")
+	writeEnginePart(h, "aetra-AVM-storev2-root-v1")
 	writeEnginePart(h, adapter.ContractAddress)
 	writeEngineUint64(h, uint64(len(adapter.Entries)))
 	for _, entry := range adapter.Entries {
@@ -522,10 +522,10 @@ func ComputeAVM2StoreV2AdapterRoot(adapter AVM2StoreV2Adapter) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2MessageDrivenInputHash(input AVM2MessageDrivenInput) string {
-	input = canonicalAVM2MessageDrivenInput(input)
+func ComputeAVMMessageDrivenInputHash(input AVMMessageDrivenInput) string {
+	input = canonicalAVMMessageDrivenInput(input)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-message-driven-input-v1")
+	writeEnginePart(h, "aetra-AVM-message-driven-input-v1")
 	writeEnginePart(h, input.Message.ID)
 	writeEnginePart(h, input.CurrentState.AdapterRoot)
 	writeEnginePart(h, input.Context.ContextHash)
@@ -533,10 +533,10 @@ func ComputeAVM2MessageDrivenInputHash(input AVM2MessageDrivenInput) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2StateTransitionHash(transition AVM2StateTransition) string {
-	transition = canonicalAVM2StateTransition(transition)
+func ComputeAVMStateTransitionHash(transition AVMStateTransition) string {
+	transition = canonicalAVMStateTransition(transition)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-state-transition-v1")
+	writeEnginePart(h, "aetra-AVM-state-transition-v1")
 	writeEnginePart(h, transition.Input.InputHash)
 	writeEnginePart(h, transition.Execution.ExecutionHash)
 	writeEnginePart(h, transition.UpdatedState.AdapterRoot)
@@ -548,14 +548,14 @@ func ComputeAVM2StateTransitionHash(transition AVM2StateTransition) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ReceiptRoot(receipts []AVMExecutionReceipt) string {
+func ComputeAVMReceiptRoot(receipts []AVMExecutionReceipt) string {
 	out := append([]AVMExecutionReceipt(nil), receipts...)
 	for i := range out {
 		out[i] = canonicalAVMExecutionReceipt(out[i])
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ReceiptID < out[j].ReceiptID })
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-receipt-root-v1")
+	writeEnginePart(h, "aetra-AVM-receipt-root-v1")
 	writeEngineUint64(h, uint64(len(out)))
 	for _, receipt := range out {
 		writeEnginePart(h, receipt.ReceiptHash)
@@ -563,10 +563,10 @@ func ComputeAVM2ReceiptRoot(receipts []AVMExecutionReceipt) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractShardRouteSetHash(set AVM2ContractShardRouteSet) string {
-	set = canonicalAVM2ContractShardRouteSet(set)
+func ComputeAVMContractShardRouteSetHash(set AVMContractShardRouteSet) string {
+	set = canonicalAVMContractShardRouteSet(set)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-shard-routes-v1")
+	writeEnginePart(h, "aetra-AVM-contract-shard-routes-v1")
 	writeEngineUint64(h, set.LayoutEpoch)
 	writeCoreRouteParts(h, set.InstanceRoute)
 	writeEngineUint64(h, uint64(len(set.StorageRoutes)))
@@ -584,49 +584,49 @@ func ComputeAVM2ContractShardRouteSetHash(set AVM2ContractShardRouteSet) string 
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func canonicalAVM2BytecodeModule(module AVM2BytecodeModule) AVM2BytecodeModule {
+func canonicalAVMBytecodeModule(module AVMBytecodeModule) AVMBytecodeModule {
 	module.Magic = strings.TrimSpace(module.Magic)
 	module.MeteringProfile = strings.TrimSpace(module.MeteringProfile)
-	module.Instructions = append([]AVM2Instruction(nil), module.Instructions...)
+	module.Instructions = append([]AVMInstruction(nil), module.Instructions...)
 	for i := range module.Instructions {
-		module.Instructions[i] = canonicalAVM2Instruction(module.Instructions[i])
+		module.Instructions[i] = canonicalAVMInstruction(module.Instructions[i])
 	}
 	module.CanonicalBytes = append([]byte(nil), module.CanonicalBytes...)
 	module.BytecodeHash = strings.TrimSpace(module.BytecodeHash)
 	return module
 }
 
-func canonicalAVM2StoreV2Entry(entry AVM2StoreV2Entry) AVM2StoreV2Entry {
+func canonicalAVMStoreV2Entry(entry AVMStoreV2Entry) AVMStoreV2Entry {
 	entry.Key = strings.TrimSpace(entry.Key)
 	entry.ValueHash = strings.TrimSpace(entry.ValueHash)
 	entry.EntryHash = strings.TrimSpace(entry.EntryHash)
 	return entry
 }
 
-func canonicalAVM2StoreV2Adapter(adapter AVM2StoreV2Adapter) AVM2StoreV2Adapter {
+func canonicalAVMStoreV2Adapter(adapter AVMStoreV2Adapter) AVMStoreV2Adapter {
 	adapter.ContractAddress = strings.TrimSpace(adapter.ContractAddress)
-	adapter.Entries = append([]AVM2StoreV2Entry(nil), adapter.Entries...)
+	adapter.Entries = append([]AVMStoreV2Entry(nil), adapter.Entries...)
 	for i := range adapter.Entries {
-		adapter.Entries[i] = canonicalAVM2StoreV2Entry(adapter.Entries[i])
+		adapter.Entries[i] = canonicalAVMStoreV2Entry(adapter.Entries[i])
 	}
 	sort.SliceStable(adapter.Entries, func(i, j int) bool { return adapter.Entries[i].Key < adapter.Entries[j].Key })
 	adapter.AdapterRoot = strings.TrimSpace(adapter.AdapterRoot)
 	return adapter
 }
 
-func canonicalAVM2MessageDrivenInput(input AVM2MessageDrivenInput) AVM2MessageDrivenInput {
+func canonicalAVMMessageDrivenInput(input AVMMessageDrivenInput) AVMMessageDrivenInput {
 	input.Message = canonicalAVMAsyncMessage(input.Message)
-	input.CurrentState = canonicalAVM2StoreV2Adapter(input.CurrentState)
-	input.Context = canonicalAVM2ExecutionContext(input.Context)
-	input.Bytecode = canonicalAVM2BytecodeModule(input.Bytecode)
+	input.CurrentState = canonicalAVMStoreV2Adapter(input.CurrentState)
+	input.Context = canonicalAVMExecutionContext(input.Context)
+	input.Bytecode = canonicalAVMBytecodeModule(input.Bytecode)
 	input.InputHash = strings.TrimSpace(input.InputHash)
 	return input
 }
 
-func canonicalAVM2StateTransition(transition AVM2StateTransition) AVM2StateTransition {
-	transition.Input = canonicalAVM2MessageDrivenInput(transition.Input)
-	transition.Execution = canonicalAVM2ExecutionResult(transition.Execution)
-	transition.UpdatedState = canonicalAVM2StoreV2Adapter(transition.UpdatedState)
+func canonicalAVMStateTransition(transition AVMStateTransition) AVMStateTransition {
+	transition.Input = canonicalAVMMessageDrivenInput(transition.Input)
+	transition.Execution = canonicalAVMExecutionResult(transition.Execution)
+	transition.UpdatedState = canonicalAVMStoreV2Adapter(transition.UpdatedState)
 	transition.Receipt = canonicalAVMExecutionReceipt(transition.Receipt)
 	transition.StorageRoot = strings.TrimSpace(transition.StorageRoot)
 	transition.EventRoot = strings.TrimSpace(transition.EventRoot)
@@ -636,7 +636,7 @@ func canonicalAVM2StateTransition(transition AVM2StateTransition) AVM2StateTrans
 	return transition
 }
 
-func canonicalAVM2ContractShardRouteSet(set AVM2ContractShardRouteSet) AVM2ContractShardRouteSet {
+func canonicalAVMContractShardRouteSet(set AVMContractShardRouteSet) AVMContractShardRouteSet {
 	set.StorageRoutes = append([]coretypes.ShardRoute(nil), set.StorageRoutes...)
 	sort.SliceStable(set.StorageRoutes, func(i, j int) bool { return set.StorageRoutes[i].StateKey < set.StorageRoutes[j].StateKey })
 	set.EventRoutes = append([]coretypes.ShardRoute(nil), set.EventRoutes...)
@@ -647,21 +647,21 @@ func canonicalAVM2ContractShardRouteSet(set AVM2ContractShardRouteSet) AVM2Contr
 	return set
 }
 
-func canonicalAVM2StorageValuesForRoute(values []AVM2ContractStorageValue) []AVM2ContractStorageValue {
-	out := append([]AVM2ContractStorageValue(nil), values...)
+func canonicalAVMStorageValuesForRoute(values []AVMContractStorageValue) []AVMContractStorageValue {
+	out := append([]AVMContractStorageValue(nil), values...)
 	for i := range out {
-		out[i] = canonicalAVM2ContractStorageValue(out[i])
+		out[i] = canonicalAVMContractStorageValue(out[i])
 	}
 	sort.SliceStable(out, func(i, j int) bool {
-		return AVM2ContractStorageStateKey(out[i].ContractAddr, out[i].StorageKey) < AVM2ContractStorageStateKey(out[j].ContractAddr, out[j].StorageKey)
+		return AVMContractStorageStateKey(out[i].ContractAddr, out[i].StorageKey) < AVMContractStorageStateKey(out[j].ContractAddr, out[j].StorageKey)
 	})
 	return out
 }
 
-func canonicalAVM2EventRecordsForRoute(events []AVM2ContractEventRecord) []AVM2ContractEventRecord {
-	out := append([]AVM2ContractEventRecord(nil), events...)
+func canonicalAVMEventRecordsForRoute(events []AVMContractEventRecord) []AVMContractEventRecord {
+	out := append([]AVMContractEventRecord(nil), events...)
 	for i := range out {
-		out[i] = canonicalAVM2ContractEventRecord(out[i])
+		out[i] = canonicalAVMContractEventRecord(out[i])
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Key < out[j].Key })
 	return out
@@ -690,10 +690,10 @@ func writeCoreRouteParts(h engineByteWriter, route coretypes.ShardRoute) {
 	writeEngineBool(h, route.ReadOnlyReplicated)
 }
 
-func gasUsedBeforeFailure(program AVM2Program, gasTable AVM2GasTable, limits AVM2Limits, gasLimit uint64) uint64 {
+func gasUsedBeforeFailure(program AVMProgram, gasTable AVMGasTable, limits AVMLimits, gasLimit uint64) uint64 {
 	var gas uint64
-	for _, instruction := range canonicalAVM2Program(program).Instructions {
-		cost, err := AVM2InstructionGas(instruction, gasTable, limits)
+	for _, instruction := range canonicalAVMProgram(program).Instructions {
+		cost, err := AVMInstructionGas(instruction, gasTable, limits)
 		if err != nil {
 			return maxUint64(1, gas)
 		}
@@ -702,7 +702,7 @@ func gasUsedBeforeFailure(program AVM2Program, gasTable AVM2GasTable, limits AVM
 			return maxUint64(1, gas)
 		}
 		gas = next
-		if gas >= gasLimit || instruction.Opcode == AVM2OpAbort {
+		if gas >= gasLimit || instruction.Opcode == AVMOpAbort {
 			return gas
 		}
 	}
@@ -716,8 +716,8 @@ func maxUint64(a, b uint64) uint64 {
 	return b
 }
 
-func mustDefaultAVM2GasTable() AVM2GasTable {
-	table, err := DefaultAVM2GasTable()
+func mustDefaultAVMGasTable() AVMGasTable {
+	table, err := DefaultAVMGasTable()
 	if err != nil {
 		panic(err)
 	}

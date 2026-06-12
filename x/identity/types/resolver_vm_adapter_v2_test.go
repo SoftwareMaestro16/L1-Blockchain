@@ -72,15 +72,15 @@ func TestVMResolverAdapterCommitsBoundedContractOutput(t *testing.T) {
 	resolver := testResolverVMRecord(domain)
 	native, ctx := testResolverVMNativeAndContext(t, domain, resolver)
 	output, err := NewVMResolverContractOutputV2(VMResolverContractOutputV2{
-		NameHash:              native.NameHash,
-		TargetType:            native.TargetType,
-		ResolvedValue:         []byte("dynamic-wallet"),
-		ResolverRecordVersion: native.ResolverRecordVersion,
-		GasUsed:               500,
-		MemoryUsedBytes:       1024,
-		ProofChecks:           2,
-		RecursionDepth:        1,
-		Status:                IdentityResolutionStatusResolved,
+		NameHash:		native.NameHash,
+		TargetType:		native.TargetType,
+		ResolvedValue:		[]byte("dynamic-wallet"),
+		ResolverRecordVersion:	native.ResolverRecordVersion,
+		GasUsed:		500,
+		MemoryUsedBytes:	1024,
+		ProofChecks:		2,
+		RecursionDepth:		1,
+		Status:			IdentityResolutionStatusResolved,
 	})
 	require.NoError(t, err)
 
@@ -104,16 +104,16 @@ func TestVMResolverAdapterRejectsOwnershipOverrideAndLimitDrift(t *testing.T) {
 	native, ctx := testResolverVMNativeAndContext(t, domain, resolver)
 
 	override, err := NewVMResolverContractOutputV2(VMResolverContractOutputV2{
-		NameHash:              native.NameHash,
-		TargetType:            native.TargetType,
-		ResolvedValue:         []byte("dynamic-wallet"),
-		ResolverRecordVersion: native.ResolverRecordVersion,
-		GasUsed:               500,
-		MemoryUsedBytes:       1024,
-		ProofChecks:           2,
-		RecursionDepth:        1,
-		OwnerOverride:         resolverVMAddr(9),
-		Status:                IdentityResolutionStatusResolved,
+		NameHash:		native.NameHash,
+		TargetType:		native.TargetType,
+		ResolvedValue:		[]byte("dynamic-wallet"),
+		ResolverRecordVersion:	native.ResolverRecordVersion,
+		GasUsed:		500,
+		MemoryUsedBytes:	1024,
+		ProofChecks:		2,
+		RecursionDepth:		1,
+		OwnerOverride:		resolverVMAddr(9),
+		Status:			IdentityResolutionStatusResolved,
 	})
 	require.NoError(t, err)
 	_, err = EvaluateVMResolverContractOutputV2(native, ctx, override, identityHash("resolver-root"), VMResolverFallbackPolicyV2{})
@@ -132,14 +132,14 @@ func TestVMResolverAdapterFallsBackToNativeRecordDeterministically(t *testing.T)
 	resolver := testResolverVMRecord(domain)
 	native, ctx := testResolverVMNativeAndContext(t, domain, resolver)
 	failed, err := NewVMResolverContractOutputV2(VMResolverContractOutputV2{
-		NameHash:              native.NameHash,
-		TargetType:            native.TargetType,
-		ResolverRecordVersion: native.ResolverRecordVersion,
-		GasUsed:               700,
-		MemoryUsedBytes:       2048,
-		ProofChecks:           1,
-		RecursionDepth:        1,
-		Status:                IdentityResolutionStatusFailed,
+		NameHash:		native.NameHash,
+		TargetType:		native.TargetType,
+		ResolverRecordVersion:	native.ResolverRecordVersion,
+		GasUsed:		700,
+		MemoryUsedBytes:	2048,
+		ProofChecks:		1,
+		RecursionDepth:		1,
+		Status:			IdentityResolutionStatusFailed,
 	})
 	require.NoError(t, err)
 
@@ -172,29 +172,29 @@ func testResolverVMDomain(t *testing.T) DomainRecordV2 {
 	parentHash, err := DomainRecordV2ParentNameHash(name)
 	require.NoError(t, err)
 	return DomainRecordV2{
-		Name:            name,
-		NameHash:        nameHash,
-		NormalizedName:  name,
-		ParentNameHash:  parentHash,
-		TLD:             DomainTLD,
-		Owner:           resolverVMAddr(1),
-		ExpiryHeight:    100,
-		NFTClassID:      DomainNFTClassID,
-		NFTItemID:       "domain:alice",
-		Status:          DomainRecordV2Active,
-		LifecycleEpoch:  10,
-		CreatedAtHeight: 10,
-		UpdatedAtHeight: 12,
-		Version:         1,
+		Name:			name,
+		NameHash:		nameHash,
+		NormalizedName:		name,
+		ParentNameHash:		parentHash,
+		TLD:			DomainTLD,
+		Owner:			resolverVMAddr(1),
+		ExpiryHeight:		100,
+		NFTClassID:		DomainNFTClassID,
+		NFTItemID:		"domain:alice",
+		Status:			DomainRecordV2Active,
+		LifecycleEpoch:		10,
+		CreatedAtHeight:	10,
+		UpdatedAtHeight:	12,
+		Version:		1,
 	}
 }
 
 func testResolverVMRecord(domain DomainRecordV2) ResolverRecord {
 	return ResolverRecord{
-		Domain:        domain.Name,
-		Owner:         cloneSpecAddress(domain.Owner),
-		Primary:       resolverVMAddr(2),
-		UpdatedAtUnix: 7,
+		Domain:		domain.Name,
+		Owner:		cloneSpecAddress(domain.Owner),
+		Primary:	resolverVMAddr(2),
+		UpdatedAtUnix:	7,
 	}
 }
 

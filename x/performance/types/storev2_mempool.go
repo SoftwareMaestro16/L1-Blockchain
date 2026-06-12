@@ -10,163 +10,163 @@ import (
 )
 
 const (
-	MaxStoreV2RangeLimit  = uint32(1_024)
-	MaxStoreV2ValueBytes  = uint32(1 << 20)
-	MaxMempoolTxBytes     = uint32(1 << 20)
-	SystemMempoolZoneID   = "system"
-	SystemMempoolShardID  = "system-shard"
-	DefaultMempoolMaxGas  = uint64(10_000_000)
-	DefaultMempoolLaneCap = uint32(50_000)
+	MaxStoreV2RangeLimit	= uint32(1_024)
+	MaxStoreV2ValueBytes	= uint32(1 << 20)
+	MaxMempoolTxBytes	= uint32(1 << 20)
+	SystemMempoolZoneID	= "system"
+	SystemMempoolShardID	= "system-shard"
+	DefaultMempoolMaxGas	= uint64(10_000_000)
+	DefaultMempoolLaneCap	= uint32(50_000)
 )
 
 type StoreV2RecordKind string
 
 const (
-	StoreV2RecordDomain   StoreV2RecordKind = "domain"
-	StoreV2RecordContract StoreV2RecordKind = "contract"
-	StoreV2RecordChannel  StoreV2RecordKind = "channel"
-	StoreV2RecordPool     StoreV2RecordKind = "pool"
-	StoreV2RecordAccount  StoreV2RecordKind = "account"
+	StoreV2RecordDomain	StoreV2RecordKind	= "domain"
+	StoreV2RecordContract	StoreV2RecordKind	= "contract"
+	StoreV2RecordChannel	StoreV2RecordKind	= "channel"
+	StoreV2RecordPool	StoreV2RecordKind	= "pool"
+	StoreV2RecordAccount	StoreV2RecordKind	= "account"
 )
 
 type StoreV2BenchmarkOperation string
 
 const (
-	StoreV2BenchDirectBalanceRead        StoreV2BenchmarkOperation = "direct_balance_read"
-	StoreV2BenchDirectIdentityResolution StoreV2BenchmarkOperation = "direct_identity_resolution"
-	StoreV2BenchRecursiveIdentityResolve StoreV2BenchmarkOperation = "recursive_identity_resolution"
-	StoreV2BenchContractStorageReadWrite StoreV2BenchmarkOperation = "contract_storage_read_write"
-	StoreV2BenchMessageEnqueueDequeue    StoreV2BenchmarkOperation = "message_enqueue_dequeue"
-	StoreV2BenchPaymentChannelSettle     StoreV2BenchmarkOperation = "payment_channel_settle"
-	StoreV2BenchProofGeneration          StoreV2BenchmarkOperation = "proof_generation"
+	StoreV2BenchDirectBalanceRead		StoreV2BenchmarkOperation	= "direct_balance_read"
+	StoreV2BenchDirectIdentityResolution	StoreV2BenchmarkOperation	= "direct_identity_resolution"
+	StoreV2BenchRecursiveIdentityResolve	StoreV2BenchmarkOperation	= "recursive_identity_resolution"
+	StoreV2BenchContractStorageReadWrite	StoreV2BenchmarkOperation	= "contract_storage_read_write"
+	StoreV2BenchMessageEnqueueDequeue	StoreV2BenchmarkOperation	= "message_enqueue_dequeue"
+	StoreV2BenchPaymentChannelSettle	StoreV2BenchmarkOperation	= "payment_channel_settle"
+	StoreV2BenchProofGeneration		StoreV2BenchmarkOperation	= "proof_generation"
 )
 
 type StoreV2ObjectRecord struct {
-	ZoneID        string
-	ShardID       string
-	Kind          StoreV2RecordKind
-	ObjectKey     string
-	ValueHash     string
-	Version       uint64
-	UpdatedHeight uint64
-	SizeBytes     uint32
-	RecordHash    string
+	ZoneID		string
+	ShardID		string
+	Kind		StoreV2RecordKind
+	ObjectKey	string
+	ValueHash	string
+	Version		uint64
+	UpdatedHeight	uint64
+	SizeBytes	uint32
+	RecordHash	string
 }
 
 type StoreV2KVField struct {
-	ZoneID        string
-	ShardID       string
-	ObjectKey     string
-	FieldPath     string
-	ValueHash     string
-	Version       uint64
-	UpdatedHeight uint64
-	FieldHash     string
+	ZoneID		string
+	ShardID		string
+	ObjectKey	string
+	FieldPath	string
+	ValueHash	string
+	Version		uint64
+	UpdatedHeight	uint64
+	FieldHash	string
 }
 
 type StoreV2ShardState struct {
-	ZoneID   string
-	ShardID  string
-	Records  []StoreV2ObjectRecord
-	KVFields []StoreV2KVField
-	RootHash string
+	ZoneID		string
+	ShardID		string
+	Records		[]StoreV2ObjectRecord
+	KVFields	[]StoreV2KVField
+	RootHash	string
 }
 
 type StoreV2ProofEntry struct {
-	Key      string
-	Hash     string
-	Version  uint64
-	Kind     string
-	LeafHash string
+	Key		string
+	Hash		string
+	Version		uint64
+	Kind		string
+	LeafHash	string
 }
 
 type StoreV2PrefixProof struct {
-	ZoneID     string
-	ShardID    string
-	Prefix     string
-	StartAfter string
-	Limit      uint32
-	Entries    []StoreV2ProofEntry
-	ProofRoot  string
+	ZoneID		string
+	ShardID		string
+	Prefix		string
+	StartAfter	string
+	Limit		uint32
+	Entries		[]StoreV2ProofEntry
+	ProofRoot	string
 }
 
 type StoreV2ShardRoot struct {
-	ZoneID   string
-	ShardID  string
-	RootHash string
+	ZoneID		string
+	ShardID		string
+	RootHash	string
 }
 
 type StoreV2ZoneRoot struct {
-	ZoneID       string
-	ShardRoots   []StoreV2ShardRoot
-	ZoneRootHash string
+	ZoneID		string
+	ShardRoots	[]StoreV2ShardRoot
+	ZoneRootHash	string
 }
 
 type StoreV2BenchmarkResult struct {
-	Operation        StoreV2BenchmarkOperation
-	Samples          uint64
-	Operations       uint64
-	MaxRangeLimit    uint32
-	ObservedRootHash string
+	Operation		StoreV2BenchmarkOperation
+	Samples			uint64
+	Operations		uint64
+	MaxRangeLimit		uint32
+	ObservedRootHash	string
 }
 
 type MempoolMessageClass string
 
 const (
-	MempoolClassAccount  MempoolMessageClass = "account"
-	MempoolClassIdentity MempoolMessageClass = "identity"
-	MempoolClassContract MempoolMessageClass = "contract"
-	MempoolClassPayment  MempoolMessageClass = "payment"
-	MempoolClassDEX      MempoolMessageClass = "dex"
-	MempoolClassMessage  MempoolMessageClass = "message"
-	MempoolClassSystem   MempoolMessageClass = "system"
+	MempoolClassAccount	MempoolMessageClass	= "account"
+	MempoolClassIdentity	MempoolMessageClass	= "identity"
+	MempoolClassContract	MempoolMessageClass	= "contract"
+	MempoolClassPayment	MempoolMessageClass	= "payment"
+	MempoolClassDEX		MempoolMessageClass	= "dex"
+	MempoolClassMessage	MempoolMessageClass	= "message"
+	MempoolClassSystem	MempoolMessageClass	= "system"
 )
 
 type SeparatedMempoolTx struct {
-	TxID          string
-	Sender        string
-	TargetZoneID  string
-	TargetShardID string
-	TargetObject  string
-	RouteKey      string
-	MessageClass  MempoolMessageClass
-	FeeAmount     string
-	GasWanted     uint64
-	SizeBytes     uint32
-	CreatedHeight uint64
-	ExpiryHeight  uint64
-	PreResolved   bool
-	TxHash        string
+	TxID		string
+	Sender		string
+	TargetZoneID	string
+	TargetShardID	string
+	TargetObject	string
+	RouteKey	string
+	MessageClass	MempoolMessageClass
+	FeeAmount	string
+	GasWanted	uint64
+	SizeBytes	uint32
+	CreatedHeight	uint64
+	ExpiryHeight	uint64
+	PreResolved	bool
+	TxHash		string
 }
 
 type MempoolSeparationLimits struct {
-	MaxPerSender       uint32
-	MaxPerTargetObject uint32
-	MaxLaneSize        uint32
-	MaxTxBytes         uint32
-	MaxGasWanted       uint64
+	MaxPerSender		uint32
+	MaxPerTargetObject	uint32
+	MaxLaneSize		uint32
+	MaxTxBytes		uint32
+	MaxGasWanted		uint64
 }
 
 type MempoolLane struct {
-	ZoneID       string
-	ShardID      string
-	MessageClass MempoolMessageClass
-	Transactions []SeparatedMempoolTx
-	LaneHash     string
+	ZoneID		string
+	ShardID		string
+	MessageClass	MempoolMessageClass
+	Transactions	[]SeparatedMempoolTx
+	LaneHash	string
 }
 
 type SeparatedMempoolSnapshot struct {
-	Height   uint64
-	Lanes    []MempoolLane
-	RootHash string
+	Height		uint64
+	Lanes		[]MempoolLane
+	RootHash	string
 }
 
 func BuildStoreV2ShardState(zoneID, shardID string, records []StoreV2ObjectRecord, fields []StoreV2KVField) (StoreV2ShardState, error) {
 	state := StoreV2ShardState{
-		ZoneID:   strings.TrimSpace(zoneID),
-		ShardID:  strings.TrimSpace(shardID),
-		Records:  normalizeStoreV2Records(records),
-		KVFields: normalizeStoreV2Fields(fields),
+		ZoneID:		strings.TrimSpace(zoneID),
+		ShardID:	strings.TrimSpace(shardID),
+		Records:	normalizeStoreV2Records(records),
+		KVFields:	normalizeStoreV2Fields(fields),
 	}
 	if err := state.ValidateWithoutRoot(); err != nil {
 		return StoreV2ShardState{}, err
@@ -334,12 +334,12 @@ func GenerateStoreV2PrefixProof(state StoreV2ShardState, prefix, startAfter stri
 		return StoreV2PrefixProof{}, err
 	}
 	proof := StoreV2PrefixProof{
-		ZoneID:     state.ZoneID,
-		ShardID:    state.ShardID,
-		Prefix:     strings.TrimSpace(prefix),
-		StartAfter: strings.TrimSpace(startAfter),
-		Limit:      limit,
-		Entries:    entries,
+		ZoneID:		state.ZoneID,
+		ShardID:	state.ShardID,
+		Prefix:		strings.TrimSpace(prefix),
+		StartAfter:	strings.TrimSpace(startAfter),
+		Limit:		limit,
+		Entries:	entries,
 	}
 	proof.ProofRoot = ComputeStoreV2PrefixProofRoot(proof)
 	return proof, proof.Validate(state.RootHash)

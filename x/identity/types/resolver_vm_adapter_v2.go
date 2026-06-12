@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	DefaultVMResolverGasLimit       uint64 = 1_000_000
-	DefaultVMResolverMemoryBytes    uint64 = 64 * 1024
-	DefaultVMResolverMaxOutputBytes uint64 = 4 * 1024
-	DefaultVMResolverProofChecks    uint32 = 8
-	DefaultVMResolverRecursionDepth uint32 = 2
+	DefaultVMResolverGasLimit	uint64	= 1_000_000
+	DefaultVMResolverMemoryBytes	uint64	= 64 * 1024
+	DefaultVMResolverMaxOutputBytes	uint64	= 4 * 1024
+	DefaultVMResolverProofChecks	uint32	= 8
+	DefaultVMResolverRecursionDepth	uint32	= 2
 )
 
 type IdentityProofRequirementV2 string
@@ -21,122 +21,122 @@ type IdentityIntegrationTaskIDV2 string
 type IdentityIntegrationPriorityV2 string
 
 const (
-	IdentityProofRequirementDomainOwnership  IdentityProofRequirementV2 = "domain_ownership"
-	IdentityProofRequirementNFTBinding       IdentityProofRequirementV2 = "nft_binding"
-	IdentityProofRequirementDomainStatus     IdentityProofRequirementV2 = "domain_status"
-	IdentityProofRequirementExpiry           IdentityProofRequirementV2 = "expiry"
-	IdentityProofRequirementResolverRecord   IdentityProofRequirementV2 = "resolver_record"
-	IdentityProofRequirementReverseLookup    IdentityProofRequirementV2 = "reverse_lookup"
-	IdentityProofRequirementDelegationGrants IdentityProofRequirementV2 = "delegation_or_grants"
-	IdentityProofRequirementAuctionFinality  IdentityProofRequirementV2 = "auction_finalization"
+	IdentityProofRequirementDomainOwnership		IdentityProofRequirementV2	= "domain_ownership"
+	IdentityProofRequirementNFTBinding		IdentityProofRequirementV2	= "nft_binding"
+	IdentityProofRequirementDomainStatus		IdentityProofRequirementV2	= "domain_status"
+	IdentityProofRequirementExpiry			IdentityProofRequirementV2	= "expiry"
+	IdentityProofRequirementResolverRecord		IdentityProofRequirementV2	= "resolver_record"
+	IdentityProofRequirementReverseLookup		IdentityProofRequirementV2	= "reverse_lookup"
+	IdentityProofRequirementDelegationGrants	IdentityProofRequirementV2	= "delegation_or_grants"
+	IdentityProofRequirementAuctionFinality		IdentityProofRequirementV2	= "auction_finalization"
 
-	IdentityIntegrationPriorityP0 IdentityIntegrationPriorityV2 = "P0"
-	IdentityIntegrationPriorityP1 IdentityIntegrationPriorityV2 = "P1"
-	IdentityIntegrationPriorityP2 IdentityIntegrationPriorityV2 = "P2"
+	IdentityIntegrationPriorityP0	IdentityIntegrationPriorityV2	= "P0"
+	IdentityIntegrationPriorityP1	IdentityIntegrationPriorityV2	= "P1"
+	IdentityIntegrationPriorityP2	IdentityIntegrationPriorityV2	= "P2"
 
-	IdentityTaskIsolatedZone              IdentityIntegrationTaskIDV2 = "isolated-identity-zone-state-machine"
-	IdentityTaskCrossZoneLookupMessages   IdentityIntegrationTaskIDV2 = "cross-zone-identity-lookup-messages"
-	IdentityTaskResolverProofAPIs         IdentityIntegrationTaskIDV2 = "resolver-proof-apis"
-	IdentityTaskVMResolverAdapter         IdentityIntegrationTaskIDV2 = "vm-resolver-adapter"
-	IdentityTaskReverseLookupProof        IdentityIntegrationTaskIDV2 = "reverse-lookup-proof"
-	IdentityTaskCacheInvalidationMessages IdentityIntegrationTaskIDV2 = "identity-cache-invalidation-messages"
-	IdentityTaskWalletSDKHelpers          IdentityIntegrationTaskIDV2 = "wallet-sdk-send-invoke-by-name"
+	IdentityTaskIsolatedZone		IdentityIntegrationTaskIDV2	= "isolated-identity-zone-state-machine"
+	IdentityTaskCrossZoneLookupMessages	IdentityIntegrationTaskIDV2	= "cross-zone-identity-lookup-messages"
+	IdentityTaskResolverProofAPIs		IdentityIntegrationTaskIDV2	= "resolver-proof-apis"
+	IdentityTaskVMResolverAdapter		IdentityIntegrationTaskIDV2	= "vm-resolver-adapter"
+	IdentityTaskReverseLookupProof		IdentityIntegrationTaskIDV2	= "reverse-lookup-proof"
+	IdentityTaskCacheInvalidationMessages	IdentityIntegrationTaskIDV2	= "identity-cache-invalidation-messages"
+	IdentityTaskWalletSDKHelpers		IdentityIntegrationTaskIDV2	= "wallet-sdk-send-invoke-by-name"
 )
 
 type NativeResolverRecordV2 struct {
-	Name                  string
-	NameHash              string
-	Owner                 sdk.AccAddress
-	ResolverRecordVersion uint64
-	ExpiryHeight          uint64
-	TargetType            IdentityLookupTargetType
-	TargetValue           []byte
-	ProofKey              string
-	RecordHash            string
+	Name			string
+	NameHash		string
+	Owner			sdk.AccAddress
+	ResolverRecordVersion	uint64
+	ExpiryHeight		uint64
+	TargetType		IdentityLookupTargetType
+	TargetValue		[]byte
+	ProofKey		string
+	RecordHash		string
 }
 
 type VMResolverExecutionLimitsV2 struct {
-	GasLimit          uint64
-	MemoryBytes       uint64
-	MaxOutputBytes    uint64
-	MaxProofChecks    uint32
-	MaxRecursionDepth uint32
+	GasLimit		uint64
+	MemoryBytes		uint64
+	MaxOutputBytes		uint64
+	MaxProofChecks		uint32
+	MaxRecursionDepth	uint32
 }
 
 type VMResolverContractContextV2 struct {
-	NameHash              string
-	DomainOwner           sdk.AccAddress
-	DomainStatus          DomainRecordV2Status
-	DomainExpiryHeight    uint64
-	ResolverRecordVersion uint64
-	CodeID                uint64
-	ContractAddress       string
-	TargetType            IdentityLookupTargetType
-	Height                uint64
-	Limits                VMResolverExecutionLimitsV2
-	ContextHash           string
+	NameHash		string
+	DomainOwner		sdk.AccAddress
+	DomainStatus		DomainRecordV2Status
+	DomainExpiryHeight	uint64
+	ResolverRecordVersion	uint64
+	CodeID			uint64
+	ContractAddress		string
+	TargetType		IdentityLookupTargetType
+	Height			uint64
+	Limits			VMResolverExecutionLimitsV2
+	ContextHash		string
 }
 
 type VMResolverContractOutputV2 struct {
-	NameHash              string
-	TargetType            IdentityLookupTargetType
-	ResolvedValue         []byte
-	ResolverRecordVersion uint64
-	GasUsed               uint64
-	MemoryUsedBytes       uint64
-	ProofChecks           uint32
-	RecursionDepth        uint32
-	OwnerOverride         sdk.AccAddress
-	Status                IdentityResolutionStatus
-	OutputHash            string
+	NameHash		string
+	TargetType		IdentityLookupTargetType
+	ResolvedValue		[]byte
+	ResolverRecordVersion	uint64
+	GasUsed			uint64
+	MemoryUsedBytes		uint64
+	ProofChecks		uint32
+	RecursionDepth		uint32
+	OwnerOverride		sdk.AccAddress
+	Status			IdentityResolutionStatus
+	OutputHash		string
 }
 
 type VMResolverContractProofV2 struct {
-	Height           uint64
-	Name             string
-	NameHash         string
-	CodeID           uint64
-	ContractAddress  string
-	ResolverRoot     string
-	NativeRecordHash string
-	OutputHash       string
-	ProofHash        string
+	Height			uint64
+	Name			string
+	NameHash		string
+	CodeID			uint64
+	ContractAddress		string
+	ResolverRoot		string
+	NativeRecordHash	string
+	OutputHash		string
+	ProofHash		string
 }
 
 type VMResolverFallbackPolicyV2 struct {
-	AllowNativeFallback bool
-	FallbackStatus      IdentityResolutionStatus
+	AllowNativeFallback	bool
+	FallbackStatus		IdentityResolutionStatus
 }
 
 type VMResolverAdapterResultV2 struct {
-	NativeRecord NativeResolverRecordV2
-	Context      VMResolverContractContextV2
-	Output       VMResolverContractOutputV2
-	Proof        VMResolverContractProofV2
-	UsedFallback bool
-	Status       IdentityResolutionStatus
-	ResultHash   string
+	NativeRecord	NativeResolverRecordV2
+	Context		VMResolverContractContextV2
+	Output		VMResolverContractOutputV2
+	Proof		VMResolverContractProofV2
+	UsedFallback	bool
+	Status		IdentityResolutionStatus
+	ResultHash	string
 }
 
 type IdentityProofRequirementDescriptorV2 struct {
-	Requirement       IdentityProofRequirementV2
-	VerifiedCondition string
+	Requirement		IdentityProofRequirementV2
+	VerifiedCondition	string
 }
 
 type IdentityIntegrationTaskV2 struct {
-	Priority           IdentityIntegrationPriorityV2
-	TaskID             IdentityIntegrationTaskIDV2
-	Target             string
-	AcceptanceCriteria string
+	Priority		IdentityIntegrationPriorityV2
+	TaskID			IdentityIntegrationTaskIDV2
+	Target			string
+	AcceptanceCriteria	string
 }
 
 func DefaultVMResolverExecutionLimitsV2() VMResolverExecutionLimitsV2 {
 	return VMResolverExecutionLimitsV2{
-		GasLimit:          DefaultVMResolverGasLimit,
-		MemoryBytes:       DefaultVMResolverMemoryBytes,
-		MaxOutputBytes:    DefaultVMResolverMaxOutputBytes,
-		MaxProofChecks:    DefaultVMResolverProofChecks,
-		MaxRecursionDepth: DefaultVMResolverRecursionDepth,
+		GasLimit:		DefaultVMResolverGasLimit,
+		MemoryBytes:		DefaultVMResolverMemoryBytes,
+		MaxOutputBytes:		DefaultVMResolverMaxOutputBytes,
+		MaxProofChecks:		DefaultVMResolverProofChecks,
+		MaxRecursionDepth:	DefaultVMResolverRecursionDepth,
 	}
 }
 
@@ -154,14 +154,14 @@ func NewNativeResolverRecordV2(domain DomainRecordV2, resolver ResolverRecord, t
 		return NativeResolverRecordV2{}, errors.New("native resolver proof key is required")
 	}
 	record := NativeResolverRecordV2{
-		Name:                  domain.Name,
-		NameHash:              domain.NameHash,
-		Owner:                 cloneSpecAddress(domain.Owner),
-		ResolverRecordVersion: ResolverRecordVersionV2(resolver),
-		ExpiryHeight:          domain.ExpiryHeight,
-		TargetType:            targetType,
-		TargetValue:           append([]byte(nil), targetValue...),
-		ProofKey:              proofKey,
+		Name:			domain.Name,
+		NameHash:		domain.NameHash,
+		Owner:			cloneSpecAddress(domain.Owner),
+		ResolverRecordVersion:	ResolverRecordVersionV2(resolver),
+		ExpiryHeight:		domain.ExpiryHeight,
+		TargetType:		targetType,
+		TargetValue:		append([]byte(nil), targetValue...),
+		ProofKey:		proofKey,
 	}
 	record.RecordHash = ComputeNativeResolverRecordHashV2(record)
 	return record, record.Validate()
@@ -184,16 +184,16 @@ func NewVMResolverContractContextV2(native NativeResolverRecordV2, domain Domain
 		limits = DefaultVMResolverExecutionLimitsV2()
 	}
 	ctx := VMResolverContractContextV2{
-		NameHash:              native.NameHash,
-		DomainOwner:           cloneSpecAddress(domain.Owner),
-		DomainStatus:          domain.Status,
-		DomainExpiryHeight:    domain.ExpiryHeight,
-		ResolverRecordVersion: native.ResolverRecordVersion,
-		CodeID:                codeID,
-		ContractAddress:       contractAddress,
-		TargetType:            native.TargetType,
-		Height:                height,
-		Limits:                limits,
+		NameHash:		native.NameHash,
+		DomainOwner:		cloneSpecAddress(domain.Owner),
+		DomainStatus:		domain.Status,
+		DomainExpiryHeight:	domain.ExpiryHeight,
+		ResolverRecordVersion:	native.ResolverRecordVersion,
+		CodeID:			codeID,
+		ContractAddress:	contractAddress,
+		TargetType:		native.TargetType,
+		Height:			height,
+		Limits:			limits,
 	}
 	ctx.ContextHash = ComputeVMResolverContractContextHashV2(ctx)
 	return ctx, ctx.Validate()
@@ -227,25 +227,25 @@ func EvaluateVMResolverContractOutputV2(native NativeResolverRecordV2, ctx VMRes
 		return VMResolverAdapterResultV2{}, err
 	}
 	proof, err := NewVMResolverContractProofV2(VMResolverContractProofV2{
-		Height:           ctx.Height,
-		Name:             native.Name,
-		NameHash:         native.NameHash,
-		CodeID:           ctx.CodeID,
-		ContractAddress:  ctx.ContractAddress,
-		ResolverRoot:     resolverRoot,
-		NativeRecordHash: native.RecordHash,
-		OutputHash:       resolvedOutput.OutputHash,
+		Height:			ctx.Height,
+		Name:			native.Name,
+		NameHash:		native.NameHash,
+		CodeID:			ctx.CodeID,
+		ContractAddress:	ctx.ContractAddress,
+		ResolverRoot:		resolverRoot,
+		NativeRecordHash:	native.RecordHash,
+		OutputHash:		resolvedOutput.OutputHash,
 	})
 	if err != nil {
 		return VMResolverAdapterResultV2{}, err
 	}
 	result := VMResolverAdapterResultV2{
-		NativeRecord: native,
-		Context:      ctx,
-		Output:       resolvedOutput,
-		Proof:        proof,
-		UsedFallback: usedFallback,
-		Status:       status,
+		NativeRecord:	native,
+		Context:	ctx,
+		Output:		resolvedOutput,
+		Proof:		proof,
+		UsedFallback:	usedFallback,
+		Status:		status,
 	}
 	result.ResultHash = ComputeVMResolverAdapterResultHashV2(result)
 	return result, result.Validate()
@@ -392,8 +392,8 @@ func (p VMResolverContractProofV2) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"VM resolver proof name hash", p.NameHash},
 		{"VM resolver proof resolver root", p.ResolverRoot},
@@ -504,15 +504,15 @@ func resolveVMResolverOutputOrFallback(native NativeResolverRecordV2, ctx VMReso
 		status = IdentityResolutionStatusFailed
 	}
 	fallbackOutput, err := NewVMResolverContractOutputV2(VMResolverContractOutputV2{
-		NameHash:              native.NameHash,
-		TargetType:            native.TargetType,
-		ResolvedValue:         native.TargetValue,
-		ResolverRecordVersion: native.ResolverRecordVersion,
-		GasUsed:               minVMResolverUint64(output.GasUsed, ctx.Limits.GasLimit),
-		MemoryUsedBytes:       minVMResolverUint64(output.MemoryUsedBytes, ctx.Limits.MemoryBytes),
-		ProofChecks:           minVMResolverUint32(output.ProofChecks, ctx.Limits.MaxProofChecks),
-		RecursionDepth:        minVMResolverUint32(output.RecursionDepth, ctx.Limits.MaxRecursionDepth),
-		Status:                IdentityResolutionStatusResolved,
+		NameHash:		native.NameHash,
+		TargetType:		native.TargetType,
+		ResolvedValue:		native.TargetValue,
+		ResolverRecordVersion:	native.ResolverRecordVersion,
+		GasUsed:		minVMResolverUint64(output.GasUsed, ctx.Limits.GasLimit),
+		MemoryUsedBytes:	minVMResolverUint64(output.MemoryUsedBytes, ctx.Limits.MemoryBytes),
+		ProofChecks:		minVMResolverUint32(output.ProofChecks, ctx.Limits.MaxProofChecks),
+		RecursionDepth:		minVMResolverUint32(output.RecursionDepth, ctx.Limits.MaxRecursionDepth),
+		Status:			IdentityResolutionStatusResolved,
 	})
 	if err != nil {
 		return VMResolverContractOutputV2{}, false, status, err

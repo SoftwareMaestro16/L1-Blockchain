@@ -10,24 +10,24 @@ import (
 )
 
 const (
-	MaxZoneProofKeyLength = 128
-	MaxZoneProofPathItems = 256
+	MaxZoneProofKeyLength	= 128
+	MaxZoneProofPathItems	= 256
 )
 
 type ZoneReceiptStatus string
 type ZoneProofKind string
 
 const (
-	ZoneReceiptStatusSuccess ZoneReceiptStatus = "SUCCESS"
-	ZoneReceiptStatusFailed  ZoneReceiptStatus = "FAILED"
-	ZoneReceiptStatusBounced ZoneReceiptStatus = "BOUNCED"
+	ZoneReceiptStatusSuccess	ZoneReceiptStatus	= "SUCCESS"
+	ZoneReceiptStatusFailed		ZoneReceiptStatus	= "FAILED"
+	ZoneReceiptStatusBounced	ZoneReceiptStatus	= "BOUNCED"
 
-	ZoneProofKindState   ZoneProofKind = "STATE"
-	ZoneProofKindInbox   ZoneProofKind = "INBOX"
-	ZoneProofKindOutbox  ZoneProofKind = "OUTBOX"
-	ZoneProofKindReceipt ZoneProofKind = "RECEIPT"
-	ZoneProofKindRuntime ZoneProofKind = "RUNTIME"
-	ZoneProofKindExport  ZoneProofKind = "EXPORT"
+	ZoneProofKindState	ZoneProofKind	= "STATE"
+	ZoneProofKindInbox	ZoneProofKind	= "INBOX"
+	ZoneProofKindOutbox	ZoneProofKind	= "OUTBOX"
+	ZoneProofKindReceipt	ZoneProofKind	= "RECEIPT"
+	ZoneProofKindRuntime	ZoneProofKind	= "RUNTIME"
+	ZoneProofKindExport	ZoneProofKind	= "EXPORT"
 )
 
 type ZoneStateMachine interface {
@@ -41,115 +41,115 @@ type ZoneStateMachine interface {
 }
 
 type ZoneTransaction struct {
-	ZoneID      ZoneID
-	TxHash      string
-	MessageType string
-	GasLimit    uint64
-	PayloadHash string
-	Sequence    uint64
+	ZoneID		ZoneID
+	TxHash		string
+	MessageType	string
+	GasLimit	uint64
+	PayloadHash	string
+	Sequence	uint64
 }
 
 type ZoneBatch struct {
-	ZoneID          ZoneID
-	Height          uint64
-	MempoolLaneID   string
-	Transactions    []ZoneTransaction
-	InboundMessages []ZoneMessage
+	ZoneID		ZoneID
+	Height		uint64
+	MempoolLaneID	string
+	Transactions	[]ZoneTransaction
+	InboundMessages	[]ZoneMessage
 }
 
 type ZoneBatchResult struct {
-	ZoneID                 ZoneID
-	Height                 uint64
-	TransactionsExecuted   uint32
-	InboundMessagesApplied uint32
-	GasConsumed            uint64
-	OutboundMessages       []ZoneMessage
-	Receipts               []ZoneReceipt
-	ZoneRoot               ZoneRoot
-	ExecutionSummary       ZoneExecutionSummary
+	ZoneID			ZoneID
+	Height			uint64
+	TransactionsExecuted	uint32
+	InboundMessagesApplied	uint32
+	GasConsumed		uint64
+	OutboundMessages	[]ZoneMessage
+	Receipts		[]ZoneReceipt
+	ZoneRoot		ZoneRoot
+	ExecutionSummary	ZoneExecutionSummary
 }
 
 type ZoneRoot struct {
-	ZoneID              ZoneID
-	Height              uint64
-	ZoneStateRoot       string
-	InboxRoot           string
-	OutboxRoot          string
-	ReceiptRoot         string
-	EventRoot           string
-	ExecutionResultRoot string
-	ProofRoot           string
-	RootHash            string
+	ZoneID			ZoneID
+	Height			uint64
+	ZoneStateRoot		string
+	InboxRoot		string
+	OutboxRoot		string
+	ReceiptRoot		string
+	EventRoot		string
+	ExecutionResultRoot	string
+	ProofRoot		string
+	RootHash		string
 }
 
 type ZoneExport struct {
-	ZoneID   ZoneID
-	Height   uint64
-	Runtime  ZoneRuntimeState
-	Queues   ZoneMessageQueues
-	Receipts []ZoneReceipt
-	Proofs   []ZoneProof
-	Manifest ZoneExportManifest
+	ZoneID		ZoneID
+	Height		uint64
+	Runtime		ZoneRuntimeState
+	Queues		ZoneMessageQueues
+	Receipts	[]ZoneReceipt
+	Proofs		[]ZoneProof
+	Manifest	ZoneExportManifest
 }
 
 type ZoneExportManifest struct {
-	ZoneID         ZoneID
-	Height         uint64
-	DescriptorRoot string
-	LayoutRoot     string
-	CommitmentRoot string
-	ProofRoot      string
-	StateRoot      string
-	InboxRoot      string
-	OutboxRoot     string
-	ReceiptRoot    string
-	EventRoot      string
-	ExportHash     string
+	ZoneID		ZoneID
+	Height		uint64
+	DescriptorRoot	string
+	LayoutRoot	string
+	CommitmentRoot	string
+	ProofRoot	string
+	StateRoot	string
+	InboxRoot	string
+	OutboxRoot	string
+	ReceiptRoot	string
+	EventRoot	string
+	ExportHash	string
 }
 
 type ZoneReceipt struct {
-	ZoneID      ZoneID
-	Height      uint64
-	ItemHash    string
-	Status      ZoneReceiptStatus
-	GasUsed     uint64
-	ResultHash  string
-	Sequence    uint64
-	ReceiptHash string
+	ZoneID		ZoneID
+	Height		uint64
+	ItemHash	string
+	Status		ZoneReceiptStatus
+	GasUsed		uint64
+	ResultHash	string
+	Sequence	uint64
+	ReceiptHash	string
 }
 
 type ZoneGasMeter struct {
-	ZoneID       ZoneID
-	MaxGas       uint64
-	GasUsed      uint64
-	MaxMessages  uint32
-	MessagesUsed uint32
+	ZoneID		ZoneID
+	MaxGas		uint64
+	GasUsed		uint64
+	MaxMessages	uint32
+	MessagesUsed	uint32
 }
 
 type ZoneMessageQueues struct {
-	ZoneID ZoneID
-	Inbox  []ZoneMessage
-	Outbox []ZoneMessage
+	ZoneID	ZoneID
+	Inbox	[]ZoneMessage
+	Outbox	[]ZoneMessage
 }
 
 type ZoneProofRequest struct {
-	ZoneID ZoneID
-	Height uint64
-	Kind   ZoneProofKind
-	Key    string
-	Root   string
-	Limit  uint32
+	ZoneID	ZoneID
+	Height	uint64
+	Kind	ZoneProofKind
+	Key	string
+	Root	string
+	Limit	uint32
 }
 
 type ZoneProof struct {
-	ZoneID    ZoneID
-	Height    uint64
-	Kind      ZoneProofKind
-	Key       string
-	Root      string
-	ValueHash string
-	Path      []string
-	ProofHash string
+	ZoneID		ZoneID
+	Height		uint64
+	Kind		ZoneProofKind
+	Key		string
+	Root		string
+	ValueHash	string
+	Path		[]string
+	ProofHash	string
 }
 
 func ExecuteZoneBatch(ctx context.Context, machine ZoneStateMachine, batch ZoneBatch) (ZoneBatchResult, error) {
@@ -246,11 +246,11 @@ func QueryZoneProof(ctx context.Context, machine ZoneStateMachine, req ZoneProof
 
 func NewZoneBatch(zoneID ZoneID, height uint64, transactions []ZoneTransaction, inbound []ZoneMessage) (ZoneBatch, error) {
 	batch := ZoneBatch{
-		ZoneID:          zoneID,
-		Height:          height,
-		MempoolLaneID:   ZoneMempoolLane(zoneID),
-		Transactions:    cloneZoneTransactions(transactions),
-		InboundMessages: cloneZoneMessages(inbound),
+		ZoneID:			zoneID,
+		Height:			height,
+		MempoolLaneID:		ZoneMempoolLane(zoneID),
+		Transactions:		cloneZoneTransactions(transactions),
+		InboundMessages:	cloneZoneMessages(inbound),
 	}
 	return batch, batch.Validate()
 }
@@ -384,15 +384,15 @@ func BuildZoneRoot(height uint64, runtime ZoneRuntimeState, queues ZoneMessageQu
 		return ZoneRoot{}, errors.New("zone root queue route mismatch")
 	}
 	root := ZoneRoot{
-		ZoneID:              runtime.ZoneID,
-		Height:              height,
-		ZoneStateRoot:       runtime.StateRoot,
-		InboxRoot:           ComputeZoneMessageRoot(queues.Inbox),
-		OutboxRoot:          ComputeZoneMessageRoot(queues.Outbox),
-		ReceiptRoot:         runtime.ReceiptRoot,
-		EventRoot:           EmptyRootHash(),
-		ExecutionResultRoot: runtime.ExecutionResultRoot,
-		ProofRoot:           runtime.ProofRoot,
+		ZoneID:			runtime.ZoneID,
+		Height:			height,
+		ZoneStateRoot:		runtime.StateRoot,
+		InboxRoot:		ComputeZoneMessageRoot(queues.Inbox),
+		OutboxRoot:		ComputeZoneMessageRoot(queues.Outbox),
+		ReceiptRoot:		runtime.ReceiptRoot,
+		EventRoot:		EmptyRootHash(),
+		ExecutionResultRoot:	runtime.ExecutionResultRoot,
+		ProofRoot:		runtime.ProofRoot,
 	}
 	root.RootHash = ComputeZoneRootHash(root)
 	return root, root.Validate()
@@ -407,8 +407,8 @@ func (r ZoneRoot) Validate() error {
 		return errors.New("zone root height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "zone state root", value: r.ZoneStateRoot},
 		{name: "zone inbox root", value: r.InboxRoot},
@@ -501,17 +501,17 @@ func BuildZoneExportManifest(exported ZoneExport, descriptorRoot string, layoutR
 		eventRoot = EmptyRootHash()
 	}
 	return NewZoneExportManifest(ZoneExportManifest{
-		ZoneID:         exported.ZoneID,
-		Height:         exported.Height,
-		DescriptorRoot: descriptorRoot,
-		LayoutRoot:     layoutRoot,
-		CommitmentRoot: commitmentRoot,
-		ProofRoot:      ComputeZoneProofCollectionRoot(exported.Proofs),
-		StateRoot:      exported.Runtime.StateRoot,
-		InboxRoot:      exported.Queues.InboxRoot(),
-		OutboxRoot:     exported.Queues.OutboxRoot(),
-		ReceiptRoot:    ComputeZoneReceiptRoot(exported.Receipts),
-		EventRoot:      eventRoot,
+		ZoneID:		exported.ZoneID,
+		Height:		exported.Height,
+		DescriptorRoot:	descriptorRoot,
+		LayoutRoot:	layoutRoot,
+		CommitmentRoot:	commitmentRoot,
+		ProofRoot:	ComputeZoneProofCollectionRoot(exported.Proofs),
+		StateRoot:	exported.Runtime.StateRoot,
+		InboxRoot:	exported.Queues.InboxRoot(),
+		OutboxRoot:	exported.Queues.OutboxRoot(),
+		ReceiptRoot:	ComputeZoneReceiptRoot(exported.Receipts),
+		EventRoot:	eventRoot,
 	})
 }
 
@@ -540,8 +540,8 @@ func (m ZoneExportManifest) ValidateFormat() error {
 		return errors.New("zone export manifest height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "zone export descriptor root", value: m.DescriptorRoot},
 		{name: "zone export layout root", value: m.LayoutRoot},
@@ -630,11 +630,11 @@ func NewZoneGasMeter(zoneID ZoneID, budget ZoneExecutionBudget) (ZoneGasMeter, e
 		return ZoneGasMeter{}, err
 	}
 	meter := ZoneGasMeter{
-		ZoneID:       zoneID,
-		MaxGas:       budget.MaxGas,
-		GasUsed:      budget.GasUsed,
-		MaxMessages:  budget.MaxMessages,
-		MessagesUsed: budget.MessagesUsed,
+		ZoneID:		zoneID,
+		MaxGas:		budget.MaxGas,
+		GasUsed:	budget.GasUsed,
+		MaxMessages:	budget.MaxMessages,
+		MessagesUsed:	budget.MessagesUsed,
 	}
 	return meter, meter.Validate()
 }
@@ -659,18 +659,18 @@ func (m ZoneGasMeter) Consume(gas uint64, messages uint32) (ZoneGasMeter, error)
 
 func (m ZoneGasMeter) Budget() ZoneExecutionBudget {
 	return ZoneExecutionBudget{
-		MaxGas:       m.MaxGas,
-		GasUsed:      m.GasUsed,
-		MaxMessages:  m.MaxMessages,
-		MessagesUsed: m.MessagesUsed,
+		MaxGas:		m.MaxGas,
+		GasUsed:	m.GasUsed,
+		MaxMessages:	m.MaxMessages,
+		MessagesUsed:	m.MessagesUsed,
 	}
 }
 
 func NewZoneMessageQueues(zoneID ZoneID, inbox []ZoneMessage, outbox []ZoneMessage) (ZoneMessageQueues, error) {
 	queues := ZoneMessageQueues{
-		ZoneID: zoneID,
-		Inbox:  cloneZoneMessages(inbox),
-		Outbox: cloneZoneMessages(outbox),
+		ZoneID:	zoneID,
+		Inbox:	cloneZoneMessages(inbox),
+		Outbox:	cloneZoneMessages(outbox),
 	}
 	return queues, queues.Validate()
 }
@@ -713,9 +713,9 @@ func (q ZoneMessageQueues) EnqueueOutbox(msg ZoneMessage) (ZoneMessageQueues, er
 
 func (q ZoneMessageQueues) Clone() ZoneMessageQueues {
 	return ZoneMessageQueues{
-		ZoneID: q.ZoneID,
-		Inbox:  cloneZoneMessages(q.Inbox),
-		Outbox: cloneZoneMessages(q.Outbox),
+		ZoneID:	q.ZoneID,
+		Inbox:	cloneZoneMessages(q.Inbox),
+		Outbox:	cloneZoneMessages(q.Outbox),
 	}
 }
 
@@ -758,13 +758,13 @@ func NewZoneProof(req ZoneProofRequest, valueHash string, path []string) (ZonePr
 		return ZoneProof{}, err
 	}
 	proof := ZoneProof{
-		ZoneID:    req.ZoneID,
-		Height:    req.Height,
-		Kind:      req.Kind,
-		Key:       req.Key,
-		Root:      req.Root,
-		ValueHash: valueHash,
-		Path:      append([]string(nil), path...),
+		ZoneID:		req.ZoneID,
+		Height:		req.Height,
+		Kind:		req.Kind,
+		Key:		req.Key,
+		Root:		req.Root,
+		ValueHash:	valueHash,
+		Path:		append([]string(nil), path...),
 	}
 	if err := proof.ValidateFormat(); err != nil {
 		return ZoneProof{}, err

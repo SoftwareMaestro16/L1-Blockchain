@@ -13,42 +13,42 @@ const DomainNFTClassID = "anft66:domain"
 type DomainRecordV2Status string
 
 const (
-	DomainRecordV2Available     DomainRecordV2Status = "available"
-	DomainRecordV2Committed     DomainRecordV2Status = "committed"
-	DomainRecordV2Auction       DomainRecordV2Status = "auction"
-	DomainRecordV2Active        DomainRecordV2Status = "active"
-	DomainRecordV2RenewalWindow DomainRecordV2Status = "renewal_window"
-	DomainRecordV2Expired       DomainRecordV2Status = "expired"
-	DomainRecordV2GraceLocked   DomainRecordV2Status = "grace_locked"
-	DomainRecordV2Released      DomainRecordV2Status = "released"
-	DomainRecordV2Revoked       DomainRecordV2Status = "revoked"
+	DomainRecordV2Available		DomainRecordV2Status	= "available"
+	DomainRecordV2Committed		DomainRecordV2Status	= "committed"
+	DomainRecordV2Auction		DomainRecordV2Status	= "auction"
+	DomainRecordV2Active		DomainRecordV2Status	= "active"
+	DomainRecordV2RenewalWindow	DomainRecordV2Status	= "renewal_window"
+	DomainRecordV2Expired		DomainRecordV2Status	= "expired"
+	DomainRecordV2GraceLocked	DomainRecordV2Status	= "grace_locked"
+	DomainRecordV2Released		DomainRecordV2Status	= "released"
+	DomainRecordV2Revoked		DomainRecordV2Status	= "revoked"
 )
 
 type DomainRecordV2 struct {
-	Name               string
-	NameHash           string
-	NormalizedName     string
-	ParentNameHash     string
-	TLD                string
-	Owner              sdk.AccAddress
-	Resolver           sdk.AccAddress
-	ExpiryHeight       uint64
-	ExpiryTime         int64
-	RenewalStartHeight uint64
-	NFTClassID         string
-	NFTItemID          string
-	Status             DomainRecordV2Status
-	LifecycleEpoch     uint64
-	CreatedAtHeight    uint64
-	UpdatedAtHeight    uint64
-	Version            uint64
-	Flags              uint64
+	Name			string
+	NameHash		string
+	NormalizedName		string
+	ParentNameHash		string
+	TLD			string
+	Owner			sdk.AccAddress
+	Resolver		sdk.AccAddress
+	ExpiryHeight		uint64
+	ExpiryTime		int64
+	RenewalStartHeight	uint64
+	NFTClassID		string
+	NFTItemID		string
+	Status			DomainRecordV2Status
+	LifecycleEpoch		uint64
+	CreatedAtHeight		uint64
+	UpdatedAtHeight		uint64
+	Version			uint64
+	Flags			uint64
 }
 
 type DomainRecordV2ValidationContext struct {
-	CurrentHeight     uint64
-	NFTOwner          sdk.AccAddress
-	ResolverDelegates []sdk.AccAddress
+	CurrentHeight		uint64
+	NFTOwner		sdk.AccAddress
+	ResolverDelegates	[]sdk.AccAddress
 }
 
 func NewDomainRecordV2FromDomain(domain Domain, status DomainRecordV2Status, expiryTime int64, currentHeight uint64) (DomainRecordV2, error) {
@@ -70,23 +70,23 @@ func NewDomainRecordV2FromDomain(domain Domain, status DomainRecordV2Status, exp
 		renewalStart = domain.ExpiryHeight - params.RenewalWindowBlocks
 	}
 	record := DomainRecordV2{
-		Name:               normalized,
-		NameHash:           nameHash,
-		NormalizedName:     normalized,
-		ParentNameHash:     parentHash,
-		TLD:                DomainTLD,
-		Owner:              cloneSpecAddress(domain.Owner),
-		ExpiryHeight:       domain.ExpiryHeight,
-		ExpiryTime:         expiryTime,
-		RenewalStartHeight: renewalStart,
-		NFTClassID:         DomainNFTClassID,
-		NFTItemID:          domain.NFTID,
-		Status:             status,
-		LifecycleEpoch:     currentHeight,
-		CreatedAtHeight:    domain.RegisteredHeight,
-		UpdatedAtHeight:    domain.UpdatedHeight,
-		Version:            1,
-		Flags:              0,
+		Name:			normalized,
+		NameHash:		nameHash,
+		NormalizedName:		normalized,
+		ParentNameHash:		parentHash,
+		TLD:			DomainTLD,
+		Owner:			cloneSpecAddress(domain.Owner),
+		ExpiryHeight:		domain.ExpiryHeight,
+		ExpiryTime:		expiryTime,
+		RenewalStartHeight:	renewalStart,
+		NFTClassID:		DomainNFTClassID,
+		NFTItemID:		domain.NFTID,
+		Status:			status,
+		LifecycleEpoch:		currentHeight,
+		CreatedAtHeight:	domain.RegisteredHeight,
+		UpdatedAtHeight:	domain.UpdatedHeight,
+		Version:		1,
+		Flags:			0,
 	}
 	return record, nil
 }

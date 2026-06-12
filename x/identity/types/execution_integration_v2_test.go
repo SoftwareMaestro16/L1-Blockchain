@@ -14,13 +14,13 @@ func TestIdentitySendByNameV2ProofAwareMemoAndStaleWarning(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	result, err := BuildIdentitySendByNameV2(IdentitySendByNameRequestV2{
-		Name:               "alice.aet",
-		CurrentHeight:      40,
-		FreshnessThreshold: 5,
-		IncludeAuditMemo:   true,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		CurrentHeight:		40,
+		FreshnessThreshold:	5,
+		IncludeAuditMemo:	true,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ProofVerified)
@@ -39,7 +39,7 @@ func TestIdentityInvokeByNameV2VerifiesContractTargetAndInterface(t *testing.T) 
 	interfaceKey, err := ResolverMetadataInterfaceKey("aw5")
 	require.NoError(t, err)
 	record := ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Records: map[string]sdk.AccAddress{
 			"swap": addr(3),
 		},
@@ -59,16 +59,16 @@ func TestIdentityInvokeByNameV2VerifiesContractTargetAndInterface(t *testing.T) 
 	require.Equal(t, interfaceHash, interfaceDescriptorSchemaHashV2(*descriptor))
 
 	result, err := BuildIdentityInvokeByNameV2(IdentityInvokeByNameRequestV2{
-		Name:                  "alice.aet",
-		TargetID:              "swap",
-		InterfaceID:           "aw5",
-		ExpectedInterfaceHash: interfaceHash,
-		Method:                "execute_swap",
-		State:                 state,
-		Height:                13,
-		RecordTTL:             30,
-		CurrentHeight:         20,
-		FreshnessThreshold:    10,
+		Name:			"alice.aet",
+		TargetID:		"swap",
+		InterfaceID:		"aw5",
+		ExpectedInterfaceHash:	interfaceHash,
+		Method:			"execute_swap",
+		State:			state,
+		Height:			13,
+		RecordTTL:		30,
+		CurrentHeight:		20,
+		FreshnessThreshold:	10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, addr(3), result.ContractAddress)
@@ -81,20 +81,20 @@ func TestIdentityInvokeByNameV2VerifiesContractTargetAndInterface(t *testing.T) 
 func TestIdentityInvokeByNameV2ProofAwareContractTarget(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	state, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
+		Primary:	addr(2),
+		Contract:	addr(3),
 	}, 12)
 	require.NoError(t, err)
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveRecord, 14, 30, nil)
 
 	result, err := BuildIdentityInvokeByNameV2(IdentityInvokeByNameRequestV2{
-		Name:            "alice.aet",
-		TargetID:        ResolverKeyContract,
-		Method:          "execute_swap",
-		CurrentHeight:   20,
-		ExpectedChainID: "aetra-local-1",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           &proof,
+		Name:			"alice.aet",
+		TargetID:		ResolverKeyContract,
+		Method:			"execute_swap",
+		CurrentHeight:		20,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ProofVerified)

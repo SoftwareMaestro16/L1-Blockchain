@@ -284,9 +284,9 @@ func TestDeterministicRecomputation(t *testing.T) {
 func TestGenesisValidationRejectsConsensusOverrideDrift(t *testing.T) {
 	params := types.DefaultParams(authority)
 	score := types.ValidatorScore{
-		OperatorAddress:          "val-a",
-		RewardMultiplierBps:      params.MinRewardMultiplierBps,
-		ConsensusOverrideAllowed: true,
+		OperatorAddress:		"val-a",
+		RewardMultiplierBps:		params.MinRewardMultiplierBps,
+		ConsensusOverrideAllowed:	true,
 	}
 	genesis := types.GenesisState{Params: params, Scores: []types.ValidatorScore{score}}
 	require.Error(t, genesis.Validate())
@@ -294,17 +294,17 @@ func TestGenesisValidationRejectsConsensusOverrideDrift(t *testing.T) {
 
 func validatorMetrics(operator string, signed, missed uint64) types.ValidatorMetricInput {
 	return types.ValidatorMetricInput{
-		OperatorAddress:          operator,
-		SignedBlocks:             signed,
-		MissedBlocks:             missed,
-		UptimeWindow:             10_000,
-		SelfBond:                 100,
-		TotalBond:                1_000,
-		CommissionHistory:        []types.CommissionPoint{{Epoch: 1, CommissionBps: 500}, {Epoch: 2, CommissionBps: 500}},
-		GovernanceVotes:          4,
-		GovernanceProposals:      4,
-		ConcentrationBps:         250,
-		ConcentrationStatus:      types.ConcentrationStatusNormal,
-		IdentityMetadataComplete: true,
+		OperatorAddress:		operator,
+		SignedBlocks:			signed,
+		MissedBlocks:			missed,
+		UptimeWindow:			10_000,
+		SelfBond:			100,
+		TotalBond:			1_000,
+		CommissionHistory:		[]types.CommissionPoint{{Epoch: 1, CommissionBps: 500}, {Epoch: 2, CommissionBps: 500}},
+		GovernanceVotes:		4,
+		GovernanceProposals:		4,
+		ConcentrationBps:		250,
+		ConcentrationStatus:		types.ConcentrationStatusNormal,
+		IdentityMetadataComplete:	true,
 	}
 }

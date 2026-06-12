@@ -13,12 +13,12 @@ func TestStorageFeesAreDeterministicFromStateDelta(t *testing.T) {
 	params.StateUpdateFeePerByteNaet = sdkmath.NewInt(1)
 
 	write, err := ComputeStorageFee(StorageFeeInput{
-		OwnerID:      "acct1",
-		Class:        StorageClassAccount,
-		Operation:    StorageOperationWrite,
-		CurrentBytes: 100,
-		DeltaBytes:   25,
-		Params:       params,
+		OwnerID:	"acct1",
+		Class:		StorageClassAccount,
+		Operation:	StorageOperationWrite,
+		CurrentBytes:	100,
+		DeltaBytes:	25,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(100), write.FeeNaet)
@@ -28,12 +28,12 @@ func TestStorageFeesAreDeterministicFromStateDelta(t *testing.T) {
 	require.Equal(t, StorageFeeEventWrite, write.Events[0].Type)
 
 	update, err := ComputeStorageFee(StorageFeeInput{
-		ContractID:   "contract1",
-		Class:        StorageClassContract,
-		Operation:    StorageOperationUpdate,
-		CurrentBytes: 125,
-		DeltaBytes:   -10,
-		Params:       params,
+		ContractID:	"contract1",
+		Class:		StorageClassContract,
+		Operation:	StorageOperationUpdate,
+		CurrentBytes:	125,
+		DeltaBytes:	-10,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(10), update.FeeNaet)
@@ -49,14 +49,14 @@ func TestDeleteRefundCannotExceedOriginalCostAfterDecayAndCap(t *testing.T) {
 	params.DeleteRefundDecayBpsPerPeriod = 1_000
 
 	deleted, err := ComputeStorageFee(StorageFeeInput{
-		ContractID:        "contract2",
-		Class:             StorageClassContract,
-		Operation:         StorageOperationDelete,
-		CurrentBytes:      100,
-		DeletedBytes:      20,
-		OriginalCostNaet:  sdkmath.NewInt(1_000),
-		StorageAgePeriods: 3,
-		Params:            params,
+		ContractID:		"contract2",
+		Class:			StorageClassContract,
+		Operation:		StorageOperationDelete,
+		CurrentBytes:		100,
+		DeletedBytes:		20,
+		OriginalCostNaet:	sdkmath.NewInt(1_000),
+		StorageAgePeriods:	3,
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.True(t, deleted.FeeNaet.IsZero())
@@ -77,7 +77,7 @@ func TestStorageFootprintIsQueryableForAccountsAndContracts(t *testing.T) {
 			{OwnerID: "acct1", ContractID: "contract1", Class: StorageClassContract, Bytes: 250, PrepaidBalanceNaet: sdkmath.NewInt(2_000)},
 			{OwnerID: "acct2", Class: StorageClassProtocolCritical, Bytes: 500, PrepaidBalanceNaet: sdkmath.NewInt(3_000), ConsensusCritical: true},
 		},
-		OwnerID: "acct1",
+		OwnerID:	"acct1",
 	})
 	require.NoError(t, err)
 	require.Len(t, query.Records, 2)
@@ -87,8 +87,8 @@ func TestStorageFootprintIsQueryableForAccountsAndContracts(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(3_000), query.TotalPrepaidNaet)
 
 	contract, err := QueryStorageFootprint(StorageFootprintQueryInput{
-		Records:    query.Records,
-		ContractID: "contract1",
+		Records:	query.Records,
+		ContractID:	"contract1",
 	})
 	require.NoError(t, err)
 	require.Len(t, contract.Records, 1)
@@ -103,14 +103,14 @@ func TestStorageRentStatusWarningAndRecoveryPath(t *testing.T) {
 
 	status, err := ComputeStorageRentStatus(StorageRentInput{
 		Record: StorageFootprintRecord{
-			OwnerID:            "acct1",
-			Class:              StorageClassAccount,
-			Bytes:              100,
-			PrepaidBalanceNaet: sdkmath.NewInt(500),
-			LastRentHeight:     100,
+			OwnerID:		"acct1",
+			Class:			StorageClassAccount,
+			Bytes:			100,
+			PrepaidBalanceNaet:	sdkmath.NewInt(500),
+			LastRentHeight:		100,
 		},
-		CurrentHeight: 130,
-		Params:        params,
+		CurrentHeight:	130,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, StorageRentStatusWarning, status.Status)
@@ -128,11 +128,11 @@ func TestStorageRentExhaustionStatesAreDeterministic(t *testing.T) {
 	params.FreezeGracePeriods = 1
 	params.CleanupGracePeriods = 2
 	record := StorageFootprintRecord{
-		ContractID:         "contract1",
-		Class:              StorageClassContract,
-		Bytes:              100,
-		PrepaidBalanceNaet: sdkmath.NewInt(100),
-		LastRentHeight:     100,
+		ContractID:		"contract1",
+		Class:			StorageClassContract,
+		Bytes:			100,
+		PrepaidBalanceNaet:	sdkmath.NewInt(100),
+		LastRentHeight:		100,
 	}
 
 	frozen, err := ComputeStorageRentStatus(StorageRentInput{Record: record, CurrentHeight: 120, Params: params})
@@ -158,14 +158,14 @@ func TestStorageRentExhaustionStatesAreDeterministic(t *testing.T) {
 func TestStorageRentCannotDeleteConsensusCriticalStateAccidentally(t *testing.T) {
 	status, err := ComputeStorageRentStatus(StorageRentInput{
 		Record: StorageFootprintRecord{
-			OwnerID:           "module-account",
-			Class:             StorageClassProtocolCritical,
-			Bytes:             10_000,
-			LastRentHeight:    1,
-			ConsensusCritical: true,
+			OwnerID:		"module-account",
+			Class:			StorageClassProtocolCritical,
+			Bytes:			10_000,
+			LastRentHeight:		1,
+			ConsensusCritical:	true,
 		},
-		CurrentHeight: 1_000_000,
-		Params:        DefaultStorageEconomyParams(),
+		CurrentHeight:	1_000_000,
+		Params:		DefaultStorageEconomyParams(),
 	})
 	require.NoError(t, err)
 	require.Equal(t, StorageRentStatusExempt, status.Status)
@@ -174,12 +174,12 @@ func TestStorageRentCannotDeleteConsensusCriticalStateAccidentally(t *testing.T)
 	require.False(t, status.CleanupEligible)
 
 	fee, err := ComputeStorageFee(StorageFeeInput{
-		OwnerID:      "module-account",
-		Class:        StorageClassProtocolCritical,
-		Operation:    StorageOperationDelete,
-		CurrentBytes: 10_000,
-		DeletedBytes: 1_000,
-		Params:       DefaultStorageEconomyParams(),
+		OwnerID:	"module-account",
+		Class:		StorageClassProtocolCritical,
+		Operation:	StorageOperationDelete,
+		CurrentBytes:	10_000,
+		DeletedBytes:	1_000,
+		Params:		DefaultStorageEconomyParams(),
 	})
 	require.NoError(t, err)
 	require.True(t, fee.FeeNaet.IsZero())

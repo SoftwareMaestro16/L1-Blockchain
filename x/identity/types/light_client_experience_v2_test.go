@@ -13,13 +13,13 @@ func TestIdentityLightweightResolutionFlowV2VerifiesCachesAndChecks(t *testing.T
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	result, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID:    "aetra-local-1",
-		RequestedName:      "alice.aet",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              proof,
-		TargetType:         IdentityResolutionTargetPrimary,
-		CurrentHeight:      20,
-		FreshnessThreshold: 10,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		20,
+		FreshnessThreshold:	10,
 	})
 	require.NoError(t, err)
 	require.True(t, result.Verified)
@@ -59,13 +59,13 @@ func TestIdentityLightweightResolutionFlowV2RecursiveAndReverseChecks(t *testing
 	require.NoError(t, err)
 
 	result, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID:          "aetra-local-1",
-		RequestedName:            "alice.aet",
-		TrustedHeader:            trustedHeaderForProofV2(proof),
-		Proof:                    proof,
-		RecursiveProof:           &recursive,
-		TargetType:               IdentityResolutionTargetPrimary,
-		RequireReverseResolution: true,
+		ExpectedChainID:		"aetra-local-1",
+		RequestedName:			"alice.aet",
+		TrustedHeader:			trustedHeaderForProofV2(proof),
+		Proof:				proof,
+		RecursiveProof:			&recursive,
+		TargetType:			IdentityResolutionTargetPrimary,
+		RequireReverseResolution:	true,
 	})
 	require.NoError(t, err)
 	require.True(t, result.Verified)
@@ -83,12 +83,12 @@ func TestIdentityLightweightResolutionFlowV2FailureChecklist(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	stale, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		TargetType:      IdentityResolutionTargetPrimary,
-		CurrentHeight:   100,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		100,
 	})
 	require.Error(t, err)
 	require.False(t, stale.Verified)
@@ -97,23 +97,23 @@ func TestIdentityLightweightResolutionFlowV2FailureChecklist(t *testing.T) {
 	require.Nil(t, stale.CacheMetadata)
 
 	badChain, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID: "other-chain",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		TargetType:      IdentityResolutionTargetPrimary,
+		ExpectedChainID:	"other-chain",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
 	})
 	require.Error(t, err)
 	require.Equal(t, IdentityLightClientErrProofInvalid, badChain.FailureCode)
 	requireLightClientCheckStatusV2(t, badChain, IdentityLightClientCheckChainIDV2, IdentityLightClientCheckFailedV2)
 
 	missingTarget, err := ResolveIdentityLightweightV2(IdentityLightweightResolutionRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		TargetType:      IdentityResolutionTargetService,
-		TargetKey:       "rpc",
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetService,
+		TargetKey:		"rpc",
 	})
 	require.Error(t, err)
 	require.Equal(t, IdentityLightClientErrTargetNotFound, missingTarget.FailureCode)

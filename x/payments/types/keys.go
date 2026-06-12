@@ -6,34 +6,34 @@ import (
 )
 
 const (
-	ModuleName = "payments"
-	StoreKey   = ModuleName
+	ModuleName	= "payments"
+	StoreKey	= ModuleName
 
-	PaymentsKeyChannelPrefix             = "channel"
-	PaymentsKeyParticipantIndexPrefix    = "participant_index"
-	PaymentsKeyPendingCloseIndexPrefix   = "pending_close"
-	PaymentsKeyConditionIndexPrefix      = "condition"
-	PaymentsKeyRoutingAdIndexPrefix      = "routing_ad"
-	PaymentsKeySettlementTombstonePrefix = "settlement_tombstone"
-	PaymentsKeySettlementPrefix          = "settlement"
-	PaymentsKeyCustodyPrefix             = "custody"
-	PaymentsKeyBlockAccumulatorPrefix    = "block_accumulator"
+	PaymentsKeyChannelPrefix		= "channel"
+	PaymentsKeyParticipantIndexPrefix	= "participant_index"
+	PaymentsKeyPendingCloseIndexPrefix	= "pending_close"
+	PaymentsKeyConditionIndexPrefix		= "condition"
+	PaymentsKeyRoutingAdIndexPrefix		= "routing_ad"
+	PaymentsKeySettlementTombstonePrefix	= "settlement_tombstone"
+	PaymentsKeySettlementPrefix		= "settlement"
+	PaymentsKeyCustodyPrefix		= "custody"
+	PaymentsKeyBlockAccumulatorPrefix	= "block_accumulator"
 
-	StoreV2MigrationVersion = uint64(2)
+	StoreV2MigrationVersion	= uint64(2)
 
-	StoreV2KeyChannelsPrefix             = "channels"
-	StoreV2KeyChannelStatesPrefix        = "channel_states"
-	StoreV2KeyPendingClosesPrefix        = "pending_closes"
-	StoreV2KeyConditionsPrefix           = "conditions"
-	StoreV2KeyVirtualChannelsPrefix      = "virtual_channels"
-	StoreV2KeyParticipantChannelsPrefix  = "participant_channels"
-	StoreV2KeySettlementTombstonesPrefix = "settlement_tombstones"
-	StoreV2KeyFeeAccumulatorsPrefix      = "fee_accumulators"
-	StoreV2KeyFraudProofsPrefix          = "fraud_proofs"
-	StoreV2KeyAdaptiveSnapshotsPrefix    = "adaptive_snapshots"
-	StoreV2KeyActiveDisputesPrefix       = "active_disputes"
-	StoreV2KeyPendingFinalizationsPrefix = "pending_finalizations"
-	StoreV2KeyWatcherReplayEventsPrefix  = "watcher_replay_events"
+	StoreV2KeyChannelsPrefix		= "channels"
+	StoreV2KeyChannelStatesPrefix		= "channel_states"
+	StoreV2KeyPendingClosesPrefix		= "pending_closes"
+	StoreV2KeyConditionsPrefix		= "conditions"
+	StoreV2KeyVirtualChannelsPrefix		= "virtual_channels"
+	StoreV2KeyParticipantChannelsPrefix	= "participant_channels"
+	StoreV2KeySettlementTombstonesPrefix	= "settlement_tombstones"
+	StoreV2KeyFeeAccumulatorsPrefix		= "fee_accumulators"
+	StoreV2KeyFraudProofsPrefix		= "fraud_proofs"
+	StoreV2KeyAdaptiveSnapshotsPrefix	= "adaptive_snapshots"
+	StoreV2KeyActiveDisputesPrefix		= "active_disputes"
+	StoreV2KeyPendingFinalizationsPrefix	= "pending_finalizations"
+	StoreV2KeyWatcherReplayEventsPrefix	= "watcher_replay_events"
 )
 
 func PaymentChannelKey(channelID string) string {

@@ -10,126 +10,126 @@ import (
 )
 
 const (
-	DefaultIdentitySpamActiveRecordStorageFeeNaet = int64(2_000_000_000)
-	DefaultIdentitySpamSubdomainCreationFeeNaet   = int64(1_000_000_000)
-	DefaultIdentitySpamAuctionBidDepositNaet      = int64(5_000_000_000)
-	DefaultIdentitySpamEndpointRecordFeeNaet      = int64(250_000_000)
-	DefaultIdentitySpamProofQueryCostUnit         = uint64(1)
-	DefaultIdentitySpamQueryRateLimitPerMinute    = uint64(600)
-	DefaultIdentitySpamResolverUpdateGas          = uint64(25_000)
-	DefaultIdentityAuctionUnrevealedForfeitBps    = uint32(5_000)
-	DefaultIdentityAuctionModuleVersionV2         = uint64(2)
+	DefaultIdentitySpamActiveRecordStorageFeeNaet	= int64(2_000_000_000)
+	DefaultIdentitySpamSubdomainCreationFeeNaet	= int64(1_000_000_000)
+	DefaultIdentitySpamAuctionBidDepositNaet	= int64(5_000_000_000)
+	DefaultIdentitySpamEndpointRecordFeeNaet	= int64(250_000_000)
+	DefaultIdentitySpamProofQueryCostUnit		= uint64(1)
+	DefaultIdentitySpamQueryRateLimitPerMinute	= uint64(600)
+	DefaultIdentitySpamResolverUpdateGas		= uint64(25_000)
+	DefaultIdentityAuctionUnrevealedForfeitBps	= uint32(5_000)
+	DefaultIdentityAuctionModuleVersionV2		= uint64(2)
 
-	IdentityAuctionTieBreakEarliestRevealThenCommitmentV2 IdentityAuctionTieBreakRuleV2 = "earliest_reveal_then_commitment_hash"
-	IdentityAuctionTieBreakCommitmentHashV2               IdentityAuctionTieBreakRuleV2 = "commitment_hash"
+	IdentityAuctionTieBreakEarliestRevealThenCommitmentV2	IdentityAuctionTieBreakRuleV2	= "earliest_reveal_then_commitment_hash"
+	IdentityAuctionTieBreakCommitmentHashV2			IdentityAuctionTieBreakRuleV2	= "commitment_hash"
 )
 
 type IdentitySpamCostParamsV2 struct {
-	PricingParams             IdentityPricingParamsV2
-	ActiveRecordStorageFee    sdkmath.Int
-	SubdomainCreationFee      sdkmath.Int
-	AuctionBidDeposit         sdkmath.Int
-	EndpointRecordFee         sdkmath.Int
-	ProofQueryCostUnit        uint64
-	QueryRateLimitPerMinute   uint64
-	ResolverUpdateGasPerWrite uint64
+	PricingParams			IdentityPricingParamsV2
+	ActiveRecordStorageFee		sdkmath.Int
+	SubdomainCreationFee		sdkmath.Int
+	AuctionBidDeposit		sdkmath.Int
+	EndpointRecordFee		sdkmath.Int
+	ProofQueryCostUnit		uint64
+	QueryRateLimitPerMinute		uint64
+	ResolverUpdateGasPerWrite	uint64
 }
 
 type IdentitySpamCostRequestV2 struct {
-	Registrations             []IdentityDomainPriceRequestV2
-	CommitCount               uint64
-	ResolverUpdateCount       uint64
-	ResolverPayloadBytes      uint64
-	SubdomainCreates          uint64
-	AuctionCommitments        uint64
-	ServiceEndpointCount      uint64
-	ProofQueries              uint64
-	BatchResolverGasPerUpdate uint64
+	Registrations			[]IdentityDomainPriceRequestV2
+	CommitCount			uint64
+	ResolverUpdateCount		uint64
+	ResolverPayloadBytes		uint64
+	SubdomainCreates		uint64
+	AuctionCommitments		uint64
+	ServiceEndpointCount		uint64
+	ProofQueries			uint64
+	BatchResolverGasPerUpdate	uint64
 }
 
 type IdentitySpamCostQuoteV2 struct {
-	Denom                    string
-	RegistrationCost         sdkmath.Int
-	CommitmentDepositCost    sdkmath.Int
-	ActiveRecordStorageCost  sdkmath.Int
-	ResolverPayloadCost      sdkmath.Int
-	ResolverUpdateGas        uint64
-	SubdomainCreationCost    sdkmath.Int
-	AuctionBidDepositCost    sdkmath.Int
-	ServiceEndpointCost      sdkmath.Int
-	ProofQueryNodeCostUnits  uint64
-	QueryRateLimitPerMinute  uint64
-	TotalConsensusCost       sdkmath.Int
-	DeterministicFormula     string
-	QueryRateLimitConsensus  bool
-	EndpointCountLimit       uint64
-	EndpointCountLimitPassed bool
+	Denom				string
+	RegistrationCost		sdkmath.Int
+	CommitmentDepositCost		sdkmath.Int
+	ActiveRecordStorageCost		sdkmath.Int
+	ResolverPayloadCost		sdkmath.Int
+	ResolverUpdateGas		uint64
+	SubdomainCreationCost		sdkmath.Int
+	AuctionBidDepositCost		sdkmath.Int
+	ServiceEndpointCost		sdkmath.Int
+	ProofQueryNodeCostUnits		uint64
+	QueryRateLimitPerMinute		uint64
+	TotalConsensusCost		sdkmath.Int
+	DeterministicFormula		string
+	QueryRateLimitConsensus		bool
+	EndpointCountLimit		uint64
+	EndpointCountLimitPassed	bool
 }
 
 type IdentitySpamRegistrationSimulationV2 struct {
-	Attempts       uint64
-	Allowed        uint64
-	Rejected       uint64
-	TotalCost      sdkmath.Int
-	HighestQuote   sdkmath.Int
-	Results        []IdentityBulkRegistrationResultV2
-	ResultOrder    string
-	BulkWindowSize uint64
+	Attempts	uint64
+	Allowed		uint64
+	Rejected	uint64
+	TotalCost	sdkmath.Int
+	HighestQuote	sdkmath.Int
+	Results		[]IdentityBulkRegistrationResultV2
+	ResultOrder	string
+	BulkWindowSize	uint64
 }
 
 type IdentityAuctionTieBreakRuleV2 string
 
 type IdentityAuctionFairnessParamsV2 struct {
-	ChainID                  string
-	ModuleVersion            uint64
-	TieBreakRule             IdentityAuctionTieBreakRuleV2
-	BidDeposit               sdkmath.Int
-	UnrevealedForfeitBps     uint32
-	FeeBurnBps               uint32
-	FeeTreasuryBps           uint32
-	FeeRewardsBps            uint32
-	FeeCommunityPoolBps      uint32
-	AllowPermissionlessFinal bool
+	ChainID				string
+	ModuleVersion			uint64
+	TieBreakRule			IdentityAuctionTieBreakRuleV2
+	BidDeposit			sdkmath.Int
+	UnrevealedForfeitBps		uint32
+	FeeBurnBps			uint32
+	FeeTreasuryBps			uint32
+	FeeRewardsBps			uint32
+	FeeCommunityPoolBps		uint32
+	AllowPermissionlessFinal	bool
 }
 
 type IdentityAuctionStateMachineV2 struct {
-	CommitStartHeight uint64
-	CommitEndHeight   uint64
-	RevealStartHeight uint64
-	RevealEndHeight   uint64
-	TieBreakRule      IdentityAuctionTieBreakRuleV2
-	FinalizerPolicy   string
+	CommitStartHeight	uint64
+	CommitEndHeight		uint64
+	RevealStartHeight	uint64
+	RevealEndHeight		uint64
+	TieBreakRule		IdentityAuctionTieBreakRuleV2
+	FinalizerPolicy		string
 }
 
 type IdentityAuctionFeeSplitV2 struct {
-	Burn          sdkmath.Int
-	Treasury      sdkmath.Int
-	Rewards       sdkmath.Int
-	CommunityPool sdkmath.Int
+	Burn		sdkmath.Int
+	Treasury	sdkmath.Int
+	Rewards		sdkmath.Int
+	CommunityPool	sdkmath.Int
 }
 
 type IdentityAuctionFairFinalizationV2 struct {
-	Auction             Auction
-	Winner              sdk.AccAddress
-	WinningBid          uint64
-	TieBreakRule        IdentityAuctionTieBreakRuleV2
-	UnrevealedForfeits  []AuctionRefundReceipt
-	LosingBidRefunds    []AuctionRefundReceipt
-	FeeSplit            IdentityAuctionFeeSplitV2
-	FinalizedBy         sdk.AccAddress
-	PermissionlessFinal bool
+	Auction			Auction
+	Winner			sdk.AccAddress
+	WinningBid		uint64
+	TieBreakRule		IdentityAuctionTieBreakRuleV2
+	UnrevealedForfeits	[]AuctionRefundReceipt
+	LosingBidRefunds	[]AuctionRefundReceipt
+	FeeSplit		IdentityAuctionFeeSplitV2
+	FinalizedBy		sdk.AccAddress
+	PermissionlessFinal	bool
 }
 
 func DefaultIdentitySpamCostParamsV2() IdentitySpamCostParamsV2 {
 	return IdentitySpamCostParamsV2{
-		PricingParams:             DefaultIdentityPricingParamsV2(),
-		ActiveRecordStorageFee:    sdkmath.NewInt(DefaultIdentitySpamActiveRecordStorageFeeNaet),
-		SubdomainCreationFee:      sdkmath.NewInt(DefaultIdentitySpamSubdomainCreationFeeNaet),
-		AuctionBidDeposit:         sdkmath.NewInt(DefaultIdentitySpamAuctionBidDepositNaet),
-		EndpointRecordFee:         sdkmath.NewInt(DefaultIdentitySpamEndpointRecordFeeNaet),
-		ProofQueryCostUnit:        DefaultIdentitySpamProofQueryCostUnit,
-		QueryRateLimitPerMinute:   DefaultIdentitySpamQueryRateLimitPerMinute,
-		ResolverUpdateGasPerWrite: DefaultIdentitySpamResolverUpdateGas,
+		PricingParams:			DefaultIdentityPricingParamsV2(),
+		ActiveRecordStorageFee:		sdkmath.NewInt(DefaultIdentitySpamActiveRecordStorageFeeNaet),
+		SubdomainCreationFee:		sdkmath.NewInt(DefaultIdentitySpamSubdomainCreationFeeNaet),
+		AuctionBidDeposit:		sdkmath.NewInt(DefaultIdentitySpamAuctionBidDepositNaet),
+		EndpointRecordFee:		sdkmath.NewInt(DefaultIdentitySpamEndpointRecordFeeNaet),
+		ProofQueryCostUnit:		DefaultIdentitySpamProofQueryCostUnit,
+		QueryRateLimitPerMinute:	DefaultIdentitySpamQueryRateLimitPerMinute,
+		ResolverUpdateGasPerWrite:	DefaultIdentitySpamResolverUpdateGas,
 	}
 }
 
@@ -138,8 +138,8 @@ func ValidateIdentitySpamCostParamsV2(params IdentitySpamCostParamsV2) error {
 		return err
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "active record storage fee", value: params.ActiveRecordStorageFee},
 		{label: "subdomain creation fee", value: params.SubdomainCreationFee},
@@ -167,20 +167,20 @@ func EstimateIdentitySpamCostV2(req IdentitySpamCostRequestV2, params IdentitySp
 		return IdentitySpamCostQuoteV2{}, err
 	}
 	quote := IdentitySpamCostQuoteV2{
-		Denom:                    "naet",
-		RegistrationCost:         sdkmath.ZeroInt(),
-		CommitmentDepositCost:    sdkmath.ZeroInt(),
-		ActiveRecordStorageCost:  sdkmath.ZeroInt(),
-		ResolverPayloadCost:      sdkmath.ZeroInt(),
-		SubdomainCreationCost:    sdkmath.ZeroInt(),
-		AuctionBidDepositCost:    sdkmath.ZeroInt(),
-		ServiceEndpointCost:      sdkmath.ZeroInt(),
-		TotalConsensusCost:       sdkmath.ZeroInt(),
-		QueryRateLimitPerMinute:  params.QueryRateLimitPerMinute,
-		DeterministicFormula:     "registration_quotes + commit_deposits + active_record_storage + resolver_bytes*fee_per_byte + resolver_update_gas + subdomain_fee + auction_bid_deposit + endpoint_fee; proof_query_rate_limit_is_node_local",
-		QueryRateLimitConsensus:  false,
-		EndpointCountLimit:       MaxUnifiedServiceEndpoints,
-		EndpointCountLimitPassed: req.ServiceEndpointCount <= MaxUnifiedServiceEndpoints,
+		Denom:				"naet",
+		RegistrationCost:		sdkmath.ZeroInt(),
+		CommitmentDepositCost:		sdkmath.ZeroInt(),
+		ActiveRecordStorageCost:	sdkmath.ZeroInt(),
+		ResolverPayloadCost:		sdkmath.ZeroInt(),
+		SubdomainCreationCost:		sdkmath.ZeroInt(),
+		AuctionBidDepositCost:		sdkmath.ZeroInt(),
+		ServiceEndpointCost:		sdkmath.ZeroInt(),
+		TotalConsensusCost:		sdkmath.ZeroInt(),
+		QueryRateLimitPerMinute:	params.QueryRateLimitPerMinute,
+		DeterministicFormula:		"registration_quotes + commit_deposits + active_record_storage + resolver_bytes*fee_per_byte + resolver_update_gas + subdomain_fee + auction_bid_deposit + endpoint_fee; proof_query_rate_limit_is_node_local",
+		QueryRateLimitConsensus:	false,
+		EndpointCountLimit:		MaxUnifiedServiceEndpoints,
+		EndpointCountLimitPassed:	req.ServiceEndpointCount <= MaxUnifiedServiceEndpoints,
 	}
 	for _, reg := range req.Registrations {
 		regQuote, err := QuoteIdentityDomainPriceV2(reg, params.PricingParams)
@@ -217,14 +217,14 @@ func SimulateHighVolumeIdentityRegistrationSpamV2(attempts []IdentityBulkRegistr
 	}
 	bulk := SimulateIdentityBulkRegistrationWindowV2(attempts, params.PricingParams.AntiSquattingParams)
 	sim := IdentitySpamRegistrationSimulationV2{
-		Attempts:       uint64(len(attempts)),
-		Allowed:        uint64(bulk.Allowed),
-		Rejected:       uint64(bulk.Rejected),
-		TotalCost:      sdkmath.ZeroInt(),
-		HighestQuote:   sdkmath.ZeroInt(),
-		Results:        append([]IdentityBulkRegistrationResultV2(nil), bulk.Results...),
-		ResultOrder:    bulk.ResultOrder,
-		BulkWindowSize: params.PricingParams.AntiSquattingParams.BulkRegistrationWindowBlocks,
+		Attempts:	uint64(len(attempts)),
+		Allowed:	uint64(bulk.Allowed),
+		Rejected:	uint64(bulk.Rejected),
+		TotalCost:	sdkmath.ZeroInt(),
+		HighestQuote:	sdkmath.ZeroInt(),
+		Results:	append([]IdentityBulkRegistrationResultV2(nil), bulk.Results...),
+		ResultOrder:	bulk.ResultOrder,
+		BulkWindowSize:	params.PricingParams.AntiSquattingParams.BulkRegistrationWindowBlocks,
 	}
 	for _, result := range bulk.Results {
 		if result.Quote == nil {
@@ -241,16 +241,16 @@ func SimulateHighVolumeIdentityRegistrationSpamV2(attempts []IdentityBulkRegistr
 
 func DefaultIdentityAuctionFairnessParamsV2(chainID string) IdentityAuctionFairnessParamsV2 {
 	return IdentityAuctionFairnessParamsV2{
-		ChainID:                  chainID,
-		ModuleVersion:            DefaultIdentityAuctionModuleVersionV2,
-		TieBreakRule:             IdentityAuctionTieBreakEarliestRevealThenCommitmentV2,
-		BidDeposit:               sdkmath.NewInt(DefaultIdentitySpamAuctionBidDepositNaet),
-		UnrevealedForfeitBps:     DefaultIdentityAuctionUnrevealedForfeitBps,
-		FeeBurnBps:               3_000,
-		FeeTreasuryBps:           3_000,
-		FeeRewardsBps:            2_000,
-		FeeCommunityPoolBps:      2_000,
-		AllowPermissionlessFinal: true,
+		ChainID:			chainID,
+		ModuleVersion:			DefaultIdentityAuctionModuleVersionV2,
+		TieBreakRule:			IdentityAuctionTieBreakEarliestRevealThenCommitmentV2,
+		BidDeposit:			sdkmath.NewInt(DefaultIdentitySpamAuctionBidDepositNaet),
+		UnrevealedForfeitBps:		DefaultIdentityAuctionUnrevealedForfeitBps,
+		FeeBurnBps:			3_000,
+		FeeTreasuryBps:			3_000,
+		FeeRewardsBps:			2_000,
+		FeeCommunityPoolBps:		2_000,
+		AllowPermissionlessFinal:	true,
 	}
 }
 
@@ -317,12 +317,12 @@ func DescribeIdentityAuctionStateMachineV2(auction Auction, params IdentityAucti
 		rule = IdentityAuctionTieBreakEarliestRevealThenCommitmentV2
 	}
 	return IdentityAuctionStateMachineV2{
-		CommitStartHeight: auction.CommitStartHeight,
-		CommitEndHeight:   auction.RevealStartHeight,
-		RevealStartHeight: auction.RevealStartHeight,
-		RevealEndHeight:   auction.RevealEndHeight,
-		TieBreakRule:      rule,
-		FinalizerPolicy:   finalizerPolicy,
+		CommitStartHeight:	auction.CommitStartHeight,
+		CommitEndHeight:	auction.RevealStartHeight,
+		RevealStartHeight:	auction.RevealStartHeight,
+		RevealEndHeight:	auction.RevealEndHeight,
+		TieBreakRule:		rule,
+		FinalizerPolicy:	finalizerPolicy,
 	}, nil
 }
 
@@ -366,15 +366,15 @@ func FinalizeSealedAuctionFairV2(state IdentityState, name string, finalizer sdk
 		return IdentityState{}, IdentityAuctionFairFinalizationV2{}, err
 	}
 	result := IdentityAuctionFairFinalizationV2{
-		Auction:             auction,
-		Winner:              cloneSpecAddress(winner.Bidder),
-		WinningBid:          winner.Bid,
-		TieBreakRule:        effectiveAuctionTieBreakRuleV2(params.TieBreakRule),
-		UnrevealedForfeits:  forfeits,
-		LosingBidRefunds:    losingRefunds,
-		FeeSplit:            SplitIdentityAuctionFeeV2(sdkmath.NewIntFromUint64(winner.Bid), params),
-		FinalizedBy:         cloneSpecAddress(finalizer),
-		PermissionlessFinal: params.AllowPermissionlessFinal,
+		Auction:		auction,
+		Winner:			cloneSpecAddress(winner.Bidder),
+		WinningBid:		winner.Bid,
+		TieBreakRule:		effectiveAuctionTieBreakRuleV2(params.TieBreakRule),
+		UnrevealedForfeits:	forfeits,
+		LosingBidRefunds:	losingRefunds,
+		FeeSplit:		SplitIdentityAuctionFeeV2(sdkmath.NewIntFromUint64(winner.Bid), params),
+		FinalizedBy:		cloneSpecAddress(finalizer),
+		PermissionlessFinal:	params.AllowPermissionlessFinal,
 	}
 	return next, result, nil
 }
@@ -431,12 +431,12 @@ func buildAuctionUnrevealedForfeitsV2(auction Auction, params IdentityAuctionFai
 			continue
 		}
 		receipts = append(receipts, AuctionRefundReceipt{
-			ReceiptID:      identityHash("auction-unrevealed-forfeit", auction.Name, commitment.CommitmentHash),
-			Name:           auction.Name,
-			Bidder:         cloneSpecAddress(commitment.Bidder),
-			Amount:         forfeit.Uint64(),
-			CommitmentHash: commitment.CommitmentHash,
-			Reason:         "unrevealed_bid_forfeit",
+			ReceiptID:	identityHash("auction-unrevealed-forfeit", auction.Name, commitment.CommitmentHash),
+			Name:		auction.Name,
+			Bidder:		cloneSpecAddress(commitment.Bidder),
+			Amount:		forfeit.Uint64(),
+			CommitmentHash:	commitment.CommitmentHash,
+			Reason:		"unrevealed_bid_forfeit",
 		})
 	}
 	sortAuctionRefunds(receipts)
@@ -454,5 +454,3 @@ func AuctionCommitmentMatchesChainDomainV2(name string, bidder sdk.AccAddress, b
 	expected, err := ComputeAuctionCommitmentV2(name, bidder, bid, salt, chainID, moduleVersion)
 	return err == nil && expected == commitment
 }
-
-

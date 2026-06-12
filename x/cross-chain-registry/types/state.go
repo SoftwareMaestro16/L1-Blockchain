@@ -8,143 +8,143 @@ import (
 )
 
 const (
-	ChainStatusActive   = "active"
-	ChainStatusPaused   = "paused"
-	ChainStatusDisabled = "disabled"
+	ChainStatusActive	= "active"
+	ChainStatusPaused	= "paused"
+	ChainStatusDisabled	= "disabled"
 
-	ClientTypeIBC         = "ibc"
-	ClientTypeLightClient = "light_client"
-	ClientTypeBridge      = "bridge"
-	ClientTypeExternal    = "external"
+	ClientTypeIBC		= "ibc"
+	ClientTypeLightClient	= "light_client"
+	ClientTypeBridge	= "bridge"
+	ClientTypeExternal	= "external"
 
-	TrustLevelLow    = "low"
-	TrustLevelMedium = "medium"
-	TrustLevelHigh   = "high"
+	TrustLevelLow		= "low"
+	TrustLevelMedium	= "medium"
+	TrustLevelHigh		= "high"
 )
 
 type CrossChainRegistryParams struct {
-	MaxChains              uint32
-	MaxChannels            uint32
-	MaxRoutes              uint32
-	MaxRiskPolicies        uint32
-	MaxRiskScore           uint32
-	MaxFinalityBlocks      uint64
-	MaxFinalityTimeSeconds uint64
-	MaxTimeoutBlocks       uint64
-	MaxTimeoutSeconds      uint64
+	MaxChains		uint32
+	MaxChannels		uint32
+	MaxRoutes		uint32
+	MaxRiskPolicies		uint32
+	MaxRiskScore		uint32
+	MaxFinalityBlocks	uint64
+	MaxFinalityTimeSeconds	uint64
+	MaxTimeoutBlocks	uint64
+	MaxTimeoutSeconds	uint64
 }
 
 type CrossChainRegistryState struct {
-	Chains       []RegisteredChain
-	Channels     []ChannelRecord
-	BridgeRoutes []BridgeRoute
-	RiskPolicies []RiskPolicy
+	Chains		[]RegisteredChain
+	Channels	[]ChannelRecord
+	BridgeRoutes	[]BridgeRoute
+	RiskPolicies	[]RiskPolicy
 }
 
 type RegisteredChain struct {
-	ChainID          string
-	Status           string
-	ClientType       string
-	TrustLevel       string
-	ChannelIDs       []string
-	LightClientRef   string
-	RiskScore        uint32
-	Finality         FinalityAssumptions
-	Timeout          TimeoutParameters
-	RiskPolicyID     string
-	RegisteredHeight uint64
-	UpdatedHeight    uint64
+	ChainID			string
+	Status			string
+	ClientType		string
+	TrustLevel		string
+	ChannelIDs		[]string
+	LightClientRef		string
+	RiskScore		uint32
+	Finality		FinalityAssumptions
+	Timeout			TimeoutParameters
+	RiskPolicyID		string
+	RegisteredHeight	uint64
+	UpdatedHeight		uint64
 }
 
 type FinalityAssumptions struct {
-	ConfirmationBlocks uint64
-	FinalitySeconds    uint64
+	ConfirmationBlocks	uint64
+	FinalitySeconds		uint64
 }
 
 type TimeoutParameters struct {
-	TimeoutBlocks  uint64
-	TimeoutSeconds uint64
+	TimeoutBlocks	uint64
+	TimeoutSeconds	uint64
 }
 
 type ChannelRecord struct {
-	ChannelID           string
-	ChainID             string
-	CounterpartyChainID string
-	ClientID            string
-	Active              bool
-	RegisteredHeight    uint64
+	ChannelID		string
+	ChainID			string
+	CounterpartyChainID	string
+	ClientID		string
+	Active			bool
+	RegisteredHeight	uint64
 }
 
 type BridgeRoute struct {
-	RouteID       string
-	SourceChainID string
-	TargetChainID string
-	ChannelID     string
-	BridgeID      string
-	Enabled       bool
+	RouteID		string
+	SourceChainID	string
+	TargetChainID	string
+	ChannelID	string
+	BridgeID	string
+	Enabled		bool
 }
 
 type RiskPolicy struct {
-	PolicyID           string
-	ChainID            string
-	MaxRiskScore       uint32
-	AllowedClientTypes []string
-	MinTrustLevel      string
-	RequireLightClient bool
+	PolicyID		string
+	ChainID			string
+	MaxRiskScore		uint32
+	AllowedClientTypes	[]string
+	MinTrustLevel		string
+	RequireLightClient	bool
 }
 
 type MsgRegisterChain struct {
-	Authority  string
-	Chain      RegisteredChain
-	RiskPolicy RiskPolicy
+	Authority	string
+	Chain		RegisteredChain
+	RiskPolicy	RiskPolicy
 }
 
 type MsgUpdateChainStatus struct {
-	Authority string
-	ChainID   string
-	Status    string
-	Height    uint64
+	Authority	string
+	ChainID		string
+	Status		string
+	Height		uint64
 }
 
 type MsgRegisterChannel struct {
-	Authority string
-	Channel   ChannelRecord
-	Routes    []BridgeRoute
+	Authority	string
+	Channel		ChannelRecord
+	Routes		[]BridgeRoute
 }
 
 type MsgUpdateRiskPolicy struct {
-	Authority string
-	ChainID   string
-	Policy    RiskPolicy
-	Height    uint64
+	Authority	string
+	ChainID		string
+	Policy		RiskPolicy
+	Height		uint64
 }
 
 type MsgRemoveChain struct {
-	Authority string
-	ChainID   string
-	Height    uint64
+	Authority	string
+	ChainID		string
+	Height		uint64
 }
 
 func DefaultCrossChainRegistryParams() CrossChainRegistryParams {
 	return CrossChainRegistryParams{
-		MaxChains:              4_096,
-		MaxChannels:            100_000,
-		MaxRoutes:              100_000,
-		MaxRiskPolicies:        4_096,
-		MaxRiskScore:           100,
-		MaxFinalityBlocks:      1_000_000,
-		MaxFinalityTimeSeconds: 30 * 24 * 60 * 60,
-		MaxTimeoutBlocks:       1_000_000,
-		MaxTimeoutSeconds:      30 * 24 * 60 * 60,
+		MaxChains:		4_096,
+		MaxChannels:		100_000,
+		MaxRoutes:		100_000,
+		MaxRiskPolicies:	4_096,
+		MaxRiskScore:		100,
+		MaxFinalityBlocks:	1_000_000,
+		MaxFinalityTimeSeconds:	30 * 24 * 60 * 60,
+		MaxTimeoutBlocks:	1_000_000,
+		MaxTimeoutSeconds:	30 * 24 * 60 * 60,
 	}
 }
 
 func EmptyCrossChainRegistryState() CrossChainRegistryState {
 	return CrossChainRegistryState{
-		Chains:       []RegisteredChain{},
-		Channels:     []ChannelRecord{},
-		BridgeRoutes: []BridgeRoute{},
-		RiskPolicies: []RiskPolicy{},
+		Chains:		[]RegisteredChain{},
+		Channels:	[]ChannelRecord{},
+		BridgeRoutes:	[]BridgeRoute{},
+		RiskPolicies:	[]RiskPolicy{},
 	}
 }
 
@@ -160,10 +160,10 @@ func (p CrossChainRegistryParams) Validate() error {
 
 func (s CrossChainRegistryState) Export() CrossChainRegistryState {
 	out := CrossChainRegistryState{
-		Chains:       cloneChains(s.Chains),
-		Channels:     cloneChannels(s.Channels),
-		BridgeRoutes: cloneRoutes(s.BridgeRoutes),
-		RiskPolicies: clonePolicies(s.RiskPolicies),
+		Chains:		cloneChains(s.Chains),
+		Channels:	cloneChannels(s.Channels),
+		BridgeRoutes:	cloneRoutes(s.BridgeRoutes),
+		RiskPolicies:	clonePolicies(s.RiskPolicies),
 	}
 	SortChains(out.Chains)
 	SortChannels(out.Channels)

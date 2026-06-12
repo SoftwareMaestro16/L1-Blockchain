@@ -12,10 +12,10 @@ func TestBlockSTMStrategyGroupsDisjointZonesAndShardQueues(t *testing.T) {
 		blockSTMItem("tx-a", 0, "identity", "shard-1", "name-a", 9, "5"),
 	}
 	items[1].RemoteWrites = []BlockSTMRemoteWrite{{
-		DestinationZoneID:  "contract",
-		DestinationShardID: "shard-9",
-		ObjectID:           "contract-a",
-		PayloadHash:        hashStrings("payload", "contract-a"),
+		DestinationZoneID:	"contract",
+		DestinationShardID:	"shard-9",
+		ObjectID:		"contract-a",
+		PayloadHash:		hashStrings("payload", "contract-a"),
 	}}
 
 	plan, err := BuildBlockSTMStrategyPlan(77, items)
@@ -69,10 +69,10 @@ func TestBlockSTMStrategyRejectsGlobalHotPathWrites(t *testing.T) {
 func TestBlockSTMStrategyRejectsSynchronousRemoteLocalWrites(t *testing.T) {
 	item := blockSTMItem("tx-local-remote", 0, "financial", "shard-1", "acct-local", 1, "1")
 	item.RemoteWrites = []BlockSTMRemoteWrite{{
-		DestinationZoneID:  "financial",
-		DestinationShardID: "shard-1",
-		ObjectID:           "acct-local",
-		PayloadHash:        hashStrings("payload", "local"),
+		DestinationZoneID:	"financial",
+		DestinationShardID:	"shard-1",
+		ObjectID:		"acct-local",
+		PayloadHash:		hashStrings("payload", "local"),
 	}}
 
 	_, err := BuildBlockSTMStrategyPlan(82, []BlockSTMExecutionItem{item})
@@ -82,14 +82,14 @@ func TestBlockSTMStrategyRejectsSynchronousRemoteLocalWrites(t *testing.T) {
 func blockSTMItem(txID string, txIndex uint32, zoneID string, shardID string, objectID string, version uint64, fee string) BlockSTMExecutionItem {
 	stateKey := VersionedObjectStateKey(zoneID, shardID, objectID, version)
 	return BlockSTMExecutionItem{
-		TxID:          txID,
-		TxIndex:       txIndex,
-		ZoneID:        zoneID,
-		ShardID:       shardID,
-		ObjectID:      objectID,
-		ObjectVersion: version,
-		FeeAmount:     fee,
-		ReadKeys:      []string{stateKey + "/balance"},
-		WriteKeys:     []string{stateKey + "/balance"},
+		TxID:		txID,
+		TxIndex:	txIndex,
+		ZoneID:		zoneID,
+		ShardID:	shardID,
+		ObjectID:	objectID,
+		ObjectVersion:	version,
+		FeeAmount:	fee,
+		ReadKeys:	[]string{stateKey + "/balance"},
+		WriteKeys:	[]string{stateKey + "/balance"},
 	}
 }

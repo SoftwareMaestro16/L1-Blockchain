@@ -12,85 +12,85 @@ import (
 type SignerKeyRole string
 
 const (
-	SignerKeyRoleParticipant   SignerKeyRole = "PARTICIPANT"
-	SignerKeyRoleRoutingGossip SignerKeyRole = "ROUTING_GOSSIP"
+	SignerKeyRoleParticipant	SignerKeyRole	= "PARTICIPANT"
+	SignerKeyRoleRoutingGossip	SignerKeyRole	= "ROUTING_GOSSIP"
 )
 
 type ChannelSigningLimit struct {
-	ChannelID        string
-	MaxNonce         uint64
-	MaxAmount        string
-	MaxSignatures    uint32
-	ValidUntilHeight uint64
+	ChannelID		string
+	MaxNonce		uint64
+	MaxAmount		string
+	MaxSignatures		uint32
+	ValidUntilHeight	uint64
 }
 
 type SignerEmergencyPause struct {
-	Signer       string
-	ChannelID    string
-	Reason       string
-	PausedHeight uint64
+	Signer		string
+	ChannelID	string
+	Reason		string
+	PausedHeight	uint64
 }
 
 type SignedStateAuditLog struct {
-	LogID          string
-	Signer         string
-	KeyRole        SignerKeyRole
-	ChainID        string
-	ChannelID      string
-	Epoch          uint64
-	Nonce          uint64
-	StateHash      string
-	CommitmentHash string
-	WALHash        string
-	SignatureHash  string
-	Height         uint64
-	AuditHash      string
+	LogID		string
+	Signer		string
+	KeyRole		SignerKeyRole
+	ChainID		string
+	ChannelID	string
+	Epoch		uint64
+	Nonce		uint64
+	StateHash	string
+	CommitmentHash	string
+	WALHash		string
+	SignatureHash	string
+	Height		uint64
+	AuditHash	string
 }
 
 type PaymentSignerConfig struct {
-	Signer               string
-	KeyRole              SignerKeyRole
-	FundsKey             string
-	GossipKey            string
-	IsolationMode        string
-	ChannelLimits        []ChannelSigningLimit
-	EmergencyPauses      []SignerEmergencyPause
-	AutomatedSigning     bool
-	MaxAutomatedAmount   string
-	MaxAutomatedPerBlock uint32
+	Signer			string
+	KeyRole			SignerKeyRole
+	FundsKey		string
+	GossipKey		string
+	IsolationMode		string
+	ChannelLimits		[]ChannelSigningLimit
+	EmergencyPauses		[]SignerEmergencyPause
+	AutomatedSigning	bool
+	MaxAutomatedAmount	string
+	MaxAutomatedPerBlock	uint32
 }
 
 type PaymentSignerAPI struct {
-	Config      PaymentSignerConfig
-	NonceStore  SignerPersistence
-	AuditLogs   []SignedStateAuditLog
-	BlockHeight uint64
-	BlockSigned uint32
+	Config		PaymentSignerConfig
+	NonceStore	SignerPersistence
+	AuditLogs	[]SignedStateAuditLog
+	BlockHeight	uint64
+	BlockSigned	uint32
 }
 
 type SignStateRequest struct {
-	State         ChannelState
-	Signer        string
-	KeyRole       SignerKeyRole
-	Amount        string
-	Automated     bool
-	CurrentHeight uint64
+	State		ChannelState
+	Signer		string
+	KeyRole		SignerKeyRole
+	Amount		string
+	Automated	bool
+	CurrentHeight	uint64
 }
 
 type SignStateResponse struct {
-	Signature StateSignature
-	AuditLog  SignedStateAuditLog
-	WALRecord SignedNonceRecord
+	Signature	StateSignature
+	AuditLog	SignedStateAuditLog
+	WALRecord	SignedNonceRecord
 }
 
 type KeyCompromiseCloseRequest struct {
-	ChannelID      string
-	CompromisedKey string
-	SafeSubmitter  string
-	LatestState    ChannelState
-	CurrentHeight  uint64
-	SettlementFee  string
-	EvidenceHash   string
+	ChannelID	string
+	CompromisedKey	string
+	SafeSubmitter	string
+	LatestState	ChannelState
+	CurrentHeight	uint64
+	SettlementFee	string
+	EvidenceHash	string
 }
 
 func NewPaymentSignerAPI(config PaymentSignerConfig, store SignerPersistence, logs []SignedStateAuditLog) (PaymentSignerAPI, error) {
@@ -103,9 +103,9 @@ func NewPaymentSignerAPI(config PaymentSignerConfig, store SignerPersistence, lo
 		store.IsolationMode = config.IsolationMode
 	}
 	api := PaymentSignerAPI{
-		Config:     config,
-		NonceStore: store.Normalize(),
-		AuditLogs:  normalizeSignedStateAuditLogs(logs),
+		Config:		config,
+		NonceStore:	store.Normalize(),
+		AuditLogs:	normalizeSignedStateAuditLogs(logs),
 	}
 	return api, nil
 }
@@ -175,11 +175,11 @@ func (api PaymentSignerAPI) SignGossip(message GossipMessage, signer string, cur
 		return PaymentSignerAPI{}, SignedGossipEnvelope{}, err
 	}
 	envelope := SignedGossipEnvelope{
-		Message:      built,
-		MessageHash:  built.MessageID,
-		Signature:    sig,
-		ReceivedFrom: signer,
-		ReceivedAt:   currentHeight,
+		Message:	built,
+		MessageHash:	built.MessageID,
+		Signature:	sig,
+		ReceivedFrom:	signer,
+		ReceivedAt:	currentHeight,
 	}.Normalize()
 	return api, envelope, nil
 }
@@ -204,17 +204,17 @@ func BuildSignedStateAuditLog(req SignStateRequest, sig StateSignature, wal Sign
 	sig = sig.Normalize()
 	wal = wal.Normalize()
 	log := SignedStateAuditLog{
-		Signer:         sig.Signer,
-		KeyRole:        req.KeyRole,
-		ChainID:        sig.ChainID,
-		ChannelID:      sig.ChannelID,
-		Epoch:          wal.Epoch,
-		Nonce:          sig.Nonce,
-		StateHash:      sig.StateHash,
-		CommitmentHash: sig.CommitmentHash,
-		WALHash:        wal.WALHash,
-		SignatureHash:  sig.SignatureHash,
-		Height:         req.CurrentHeight,
+		Signer:		sig.Signer,
+		KeyRole:	req.KeyRole,
+		ChainID:	sig.ChainID,
+		ChannelID:	sig.ChannelID,
+		Epoch:		wal.Epoch,
+		Nonce:		sig.Nonce,
+		StateHash:	sig.StateHash,
+		CommitmentHash:	sig.CommitmentHash,
+		WALHash:	wal.WALHash,
+		SignatureHash:	sig.SignatureHash,
+		Height:		req.CurrentHeight,
 	}
 	log.LogID = HashParts("signed-state-audit-log", log.Signer, log.ChannelID, fmt.Sprintf("%d", log.Epoch), fmt.Sprintf("%d", log.Nonce), log.StateHash, log.SignatureHash)
 	log.AuditHash = ComputeSignedStateAuditHash(log)
@@ -246,10 +246,10 @@ func EmergencyPauseSigner(config PaymentSignerConfig, signer, channelID, reason 
 		return PaymentSignerConfig{}, errors.New("payments signer pause height must be positive")
 	}
 	pause := SignerEmergencyPause{
-		Signer:       strings.TrimSpace(signer),
-		ChannelID:    normalizeHash(channelID),
-		Reason:       strings.TrimSpace(reason),
-		PausedHeight: currentHeight,
+		Signer:		strings.TrimSpace(signer),
+		ChannelID:	normalizeHash(channelID),
+		Reason:		strings.TrimSpace(reason),
+		PausedHeight:	currentHeight,
 	}
 	if err := pause.Validate(); err != nil {
 		return PaymentSignerConfig{}, err
@@ -281,12 +281,12 @@ func SubmitKeyCompromiseClose(state PaymentsState, req KeyCompromiseCloseRequest
 		return PaymentsState{}, err
 	}
 	return SubmitCloseWithRequest(state, ChannelCloseRequest{
-		ChannelID:     req.ChannelID,
-		ClosingState:  req.LatestState,
-		CloseReason:   CloseReasonFraud,
-		Submitter:     req.SafeSubmitter,
-		CurrentHeight: req.CurrentHeight,
-		SettlementFee: req.SettlementFee,
+		ChannelID:	req.ChannelID,
+		ClosingState:	req.LatestState,
+		CloseReason:	CloseReasonFraud,
+		Submitter:	req.SafeSubmitter,
+		CurrentHeight:	req.CurrentHeight,
+		SettlementFee:	req.SettlementFee,
 	})
 }
 
@@ -570,8 +570,8 @@ func (l SignedStateAuditLog) Validate() error {
 		return errors.New("payments signed state audit heights and nonces must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"payments signed state audit channel id", log.ChannelID},
 		{"payments signed state audit state hash", log.StateHash},
@@ -773,5 +773,3 @@ func normalizeSignedStateAuditLogs(logs []SignedStateAuditLog) []SignedStateAudi
 	})
 	return out
 }
-
-

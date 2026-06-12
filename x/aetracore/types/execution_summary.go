@@ -6,18 +6,18 @@ import (
 )
 
 type ZoneExecutionSummary struct {
-	Height              uint64
-	ZoneID              ZoneID
-	LocalTxCount        uint64
-	InboundMessageCount uint64
-	OutboxMessageCount  uint64
-	ReceiptCount        uint64
-	FailedReceiptCount  uint64
-	GasUsed             uint64
-	MessageRoot         string
-	ReceiptsRoot        string
-	EventsRoot          string
-	SummaryHash         string
+	Height			uint64
+	ZoneID			ZoneID
+	LocalTxCount		uint64
+	InboundMessageCount	uint64
+	OutboxMessageCount	uint64
+	ReceiptCount		uint64
+	FailedReceiptCount	uint64
+	GasUsed			uint64
+	MessageRoot		string
+	ReceiptsRoot		string
+	EventsRoot		string
+	SummaryHash		string
 }
 
 func CollectZoneExecutionSummary(height uint64, zoneID ZoneID, envelopes []KernelMessageEnvelope, receipts []ExecutionReceipt, gasUsed uint64, eventsRoot string) (ZoneExecutionSummary, error) {
@@ -53,17 +53,17 @@ func CollectZoneExecutionSummary(height uint64, zoneID ZoneID, envelopes []Kerne
 		return ZoneExecutionSummary{}, err
 	}
 	summary := ZoneExecutionSummary{
-		Height:              height,
-		ZoneID:              zoneID,
-		LocalTxCount:        countZoneLocalEnvelopes(zoneID, zoneEnvelopes),
-		InboundMessageCount: countZoneInboundEnvelopes(zoneID, zoneEnvelopes),
-		OutboxMessageCount:  countZoneOutboxEnvelopes(zoneID, zoneEnvelopes),
-		ReceiptCount:        uint64(len(zoneReceipts)),
-		FailedReceiptCount:  countFailedExecutionReceipts(zoneReceipts),
-		GasUsed:             gasUsed,
-		MessageRoot:         ComputeKernelEnvelopeRoot(zoneEnvelopes),
-		ReceiptsRoot:        receiptsRoot,
-		EventsRoot:          eventsRoot,
+		Height:			height,
+		ZoneID:			zoneID,
+		LocalTxCount:		countZoneLocalEnvelopes(zoneID, zoneEnvelopes),
+		InboundMessageCount:	countZoneInboundEnvelopes(zoneID, zoneEnvelopes),
+		OutboxMessageCount:	countZoneOutboxEnvelopes(zoneID, zoneEnvelopes),
+		ReceiptCount:		uint64(len(zoneReceipts)),
+		FailedReceiptCount:	countFailedExecutionReceipts(zoneReceipts),
+		GasUsed:		gasUsed,
+		MessageRoot:		ComputeKernelEnvelopeRoot(zoneEnvelopes),
+		ReceiptsRoot:		receiptsRoot,
+		EventsRoot:		eventsRoot,
 	}
 	summary.SummaryHash = ComputeZoneExecutionSummaryHash(summary)
 	return summary, summary.Validate()

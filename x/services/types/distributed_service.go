@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	DistributedServiceRecordPrefix    = ServiceStorePrefix + "distributed/records"
-	DistributedServiceEndpointPrefix  = ServiceStorePrefix + "distributed/endpoints"
-	DistributedServiceInterfacePrefix = ServiceStorePrefix + "distributed/interfaces"
-	DistributedServiceProofPrefix     = ServiceStorePrefix + "distributed/proofs"
+	DistributedServiceRecordPrefix		= ServiceStorePrefix + "distributed/records"
+	DistributedServiceEndpointPrefix	= ServiceStorePrefix + "distributed/endpoints"
+	DistributedServiceInterfacePrefix	= ServiceStorePrefix + "distributed/interfaces"
+	DistributedServiceProofPrefix		= ServiceStorePrefix + "distributed/proofs"
 )
 
 type DistributedServiceKind string
@@ -22,93 +22,93 @@ type DistributedExecutionAuthority string
 type DistributedCommitmentKind string
 
 const (
-	DistributedServiceApplication DistributedServiceKind = "application"
-	DistributedServiceAPI         DistributedServiceKind = "api"
-	DistributedServiceOffChain    DistributedServiceKind = "off_chain_compute"
-	DistributedServiceHybrid      DistributedServiceKind = "hybrid"
+	DistributedServiceApplication	DistributedServiceKind	= "application"
+	DistributedServiceAPI		DistributedServiceKind	= "api"
+	DistributedServiceOffChain	DistributedServiceKind	= "off_chain_compute"
+	DistributedServiceHybrid	DistributedServiceKind	= "hybrid"
 
-	DistributedEndpointApplication DistributedEndpointKind = "application"
-	DistributedEndpointAPI         DistributedEndpointKind = "api"
-	DistributedEndpointCompute     DistributedEndpointKind = "off_chain_compute"
-	DistributedEndpointHybrid      DistributedEndpointKind = "hybrid"
-	DistributedEndpointZoneAware   DistributedEndpointKind = "zone_aware"
+	DistributedEndpointApplication	DistributedEndpointKind	= "application"
+	DistributedEndpointAPI		DistributedEndpointKind	= "api"
+	DistributedEndpointCompute	DistributedEndpointKind	= "off_chain_compute"
+	DistributedEndpointHybrid	DistributedEndpointKind	= "hybrid"
+	DistributedEndpointZoneAware	DistributedEndpointKind	= "zone_aware"
 
-	DistributedAuthorityOnChain       DistributedExecutionAuthority = "on_chain"
-	DistributedAuthorityMessageCommit DistributedExecutionAuthority = "message_commit"
-	DistributedAuthorityProofCommit   DistributedExecutionAuthority = "proof_commit"
-	DistributedAuthorityAdvisory      DistributedExecutionAuthority = "advisory"
+	DistributedAuthorityOnChain		DistributedExecutionAuthority	= "on_chain"
+	DistributedAuthorityMessageCommit	DistributedExecutionAuthority	= "message_commit"
+	DistributedAuthorityProofCommit		DistributedExecutionAuthority	= "proof_commit"
+	DistributedAuthorityAdvisory		DistributedExecutionAuthority	= "advisory"
 
-	DistributedCommitmentMessage DistributedCommitmentKind = "message"
-	DistributedCommitmentProof   DistributedCommitmentKind = "proof"
+	DistributedCommitmentMessage	DistributedCommitmentKind	= "message"
+	DistributedCommitmentProof	DistributedCommitmentKind	= "proof"
 )
 
 type DistributedServiceRecord struct {
-	ServiceID      string
-	ServiceName    string
-	Kind           DistributedServiceKind
-	Owner          string
-	ZoneID         string
-	InterfaceHash  string
-	EndpointRoot   string
-	DescriptorHash string
-	MetadataHash   string
-	CreatedHeight  uint64
-	UpdatedHeight  uint64
-	ExpiryHeight   uint64
-	Discoverable   bool
-	RecordHash     string
+	ServiceID	string
+	ServiceName	string
+	Kind		DistributedServiceKind
+	Owner		string
+	ZoneID		string
+	InterfaceHash	string
+	EndpointRoot	string
+	DescriptorHash	string
+	MetadataHash	string
+	CreatedHeight	uint64
+	UpdatedHeight	uint64
+	ExpiryHeight	uint64
+	Discoverable	bool
+	RecordHash	string
 }
 
 type DistributedServiceEndpoint struct {
-	ServiceID      string
-	EndpointID     string
-	Kind           DistributedEndpointKind
-	ZoneID         string
-	Target         string
-	InterfaceHash  string
-	Priority       uint32
-	Weight         uint32
-	MetadataHash   string
-	CommitmentHash string
+	ServiceID	string
+	EndpointID	string
+	Kind		DistributedEndpointKind
+	ZoneID		string
+	Target		string
+	InterfaceHash	string
+	Priority	uint32
+	Weight		uint32
+	MetadataHash	string
+	CommitmentHash	string
 }
 
 type DistributedInterfaceDescriptor struct {
-	InterfaceHash  string
-	InterfaceName  string
-	Version        uint64
-	SchemaHash     string
-	MethodRoot     string
-	EventRoot      string
-	ErrorRoot      string
-	DescriptorHash string
+	InterfaceHash	string
+	InterfaceName	string
+	Version		uint64
+	SchemaHash	string
+	MethodRoot	string
+	EventRoot	string
+	ErrorRoot	string
+	DescriptorHash	string
 }
 
 type DistributedExecutionCommitment struct {
-	ServiceID       string
-	EndpointID      string
-	Kind            DistributedCommitmentKind
-	MessageID       string
-	ProofHash       string
-	ResultHash      string
-	CommittedHeight uint64
-	CommitmentHash  string
+	ServiceID	string
+	EndpointID	string
+	Kind		DistributedCommitmentKind
+	MessageID	string
+	ProofHash	string
+	ResultHash	string
+	CommittedHeight	uint64
+	CommitmentHash	string
 }
 
 type DistributedServiceDiscoveryState struct {
-	Records     []DistributedServiceRecord
-	Endpoints   []DistributedServiceEndpoint
-	Interfaces  []DistributedInterfaceDescriptor
-	Commitments []DistributedExecutionCommitment
-	Height      uint64
-	StateRoot   string
+	Records		[]DistributedServiceRecord
+	Endpoints	[]DistributedServiceEndpoint
+	Interfaces	[]DistributedInterfaceDescriptor
+	Commitments	[]DistributedExecutionCommitment
+	Height		uint64
+	StateRoot	string
 }
 
 type DistributedServiceDiscoveryRoots struct {
-	RecordRoot     string
-	EndpointRoot   string
-	InterfaceRoot  string
-	CommitmentRoot string
-	StateRoot      string
+	RecordRoot	string
+	EndpointRoot	string
+	InterfaceRoot	string
+	CommitmentRoot	string
+	StateRoot	string
 }
 
 func NewDistributedServiceRecord(record DistributedServiceRecord) (DistributedServiceRecord, error) {
@@ -191,11 +191,11 @@ func DistributedServiceProofKey(serviceID, commitmentHash string) (string, error
 
 func BuildDistributedDiscoveryState(records []DistributedServiceRecord, endpoints []DistributedServiceEndpoint, interfaces []DistributedInterfaceDescriptor, commitments []DistributedExecutionCommitment, height uint64) (DistributedServiceDiscoveryState, error) {
 	state := DistributedServiceDiscoveryState{
-		Records:     normalizeDistributedServiceRecords(records),
-		Endpoints:   normalizeDistributedServiceEndpoints(endpoints),
-		Interfaces:  normalizeDistributedInterfaces(interfaces),
-		Commitments: normalizeDistributedExecutionCommitments(commitments),
-		Height:      height,
+		Records:	normalizeDistributedServiceRecords(records),
+		Endpoints:	normalizeDistributedServiceEndpoints(endpoints),
+		Interfaces:	normalizeDistributedInterfaces(interfaces),
+		Commitments:	normalizeDistributedExecutionCommitments(commitments),
+		Height:		height,
 	}
 	if err := state.ValidateFormat(); err != nil {
 		return DistributedServiceDiscoveryState{}, err
@@ -292,8 +292,8 @@ func (record DistributedServiceRecord) ValidateFormat() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "distributed service interface hash", value: record.InterfaceHash},
 		{name: "distributed service endpoint root", value: record.EndpointRoot},
@@ -386,8 +386,8 @@ func (descriptor DistributedInterfaceDescriptor) ValidateFormat() error {
 		return errors.New("distributed interface version must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "distributed interface schema hash", value: descriptor.SchemaHash},
 		{name: "distributed interface method root", value: descriptor.MethodRoot},
@@ -553,10 +553,10 @@ func ComputeDistributedCommitmentRoot(commitments []DistributedExecutionCommitme
 
 func ComputeDistributedServiceDiscoveryRoots(state DistributedServiceDiscoveryState) DistributedServiceDiscoveryRoots {
 	roots := DistributedServiceDiscoveryRoots{
-		RecordRoot:     ComputeDistributedRecordRoot(state.Records),
-		EndpointRoot:   ComputeDistributedEndpointRoot(state.Endpoints),
-		InterfaceRoot:  ComputeDistributedInterfaceRoot(state.Interfaces),
-		CommitmentRoot: ComputeDistributedCommitmentRoot(state.Commitments),
+		RecordRoot:	ComputeDistributedRecordRoot(state.Records),
+		EndpointRoot:	ComputeDistributedEndpointRoot(state.Endpoints),
+		InterfaceRoot:	ComputeDistributedInterfaceRoot(state.Interfaces),
+		CommitmentRoot:	ComputeDistributedCommitmentRoot(state.Commitments),
 	}
 	roots.StateRoot = servicesHashParts("aetra-services-distributed-state-root-v1", roots.RecordRoot, roots.EndpointRoot, roots.InterfaceRoot, roots.CommitmentRoot, fmt.Sprint(state.Height))
 	return roots

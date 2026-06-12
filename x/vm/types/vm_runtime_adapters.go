@@ -18,98 +18,98 @@ const (
 )
 
 type VMRuntimeTrait struct {
-	Runtime                 string
-	AdapterKind             VMAdapterKind
-	DeterminismProfile      VMDeterminismProfile
-	SupportedActions        []string
-	SupportsBytecodeDeploy  bool
-	SupportsStorageAdapter  bool
-	SupportsOutboundMessage bool
-	EmitsReceipts           bool
-	CommitsVMRoot           bool
-	TraitHash               string
+	Runtime			string
+	AdapterKind		VMAdapterKind
+	DeterminismProfile	VMDeterminismProfile
+	SupportedActions	[]string
+	SupportsBytecodeDeploy	bool
+	SupportsStorageAdapter	bool
+	SupportsOutboundMessage	bool
+	EmitsReceipts		bool
+	CommitsVMRoot		bool
+	TraitHash		string
 }
 
 type VMBytecodeValidation struct {
-	Runtime        string
-	BytecodeHash   string
-	CodeBytes      uint64
-	Deterministic  bool
-	Validated      bool
-	ValidationHash string
+	Runtime		string
+	BytecodeHash	string
+	CodeBytes	uint64
+	Deterministic	bool
+	Validated	bool
+	ValidationHash	string
 }
 
 type VMGasTable struct {
-	Runtime        string
-	AVMSchedule    AVMGasSchedule
-	WASMConversion AVMWASMGasConversionTable
-	TableHash      string
+	Runtime		string
+	AVMSchedule	AVMGasSchedule
+	WASMConversion	AVMWASMGasConversionTable
+	TableHash	string
 }
 
 type VMStorageAdapter struct {
-	Runtime       string
-	ZoneID        zonestypes.ZoneID
-	StoreKey      string
-	KeyPrefix     string
-	MaxKeyBytes   uint32
-	MaxValueBytes uint64
-	ReadGas       uint64
-	WriteGas      uint64
-	AdapterHash   string
+	Runtime		string
+	ZoneID		zonestypes.ZoneID
+	StoreKey	string
+	KeyPrefix	string
+	MaxKeyBytes	uint32
+	MaxValueBytes	uint64
+	ReadGas		uint64
+	WriteGas	uint64
+	AdapterHash	string
 }
 
 type VMOutboundMessageRequest struct {
-	ChainID         string
-	Source          string
-	Destination     string
-	SourceZone      zonestypes.ZoneID
-	DestinationZone zonestypes.ZoneID
-	Payload         []byte
-	PayloadType     string
-	GasLimit        uint64
-	ForwardingFee   uint64
-	SenderNonce     uint64
-	CreatedHeight   uint64
-	ExpiryHeight    uint64
-	RouteHint       string
+	ChainID		string
+	Source		string
+	Destination	string
+	SourceZone	zonestypes.ZoneID
+	DestinationZone	zonestypes.ZoneID
+	Payload		[]byte
+	PayloadType	string
+	GasLimit	uint64
+	ForwardingFee	uint64
+	SenderNonce	uint64
+	CreatedHeight	uint64
+	ExpiryHeight	uint64
+	RouteHint	string
 }
 
 type VMOutboundMessageSyscall struct {
-	Runtime     string
-	Syscall     VMSyscallMeter
-	Message     AVMAsyncMessage
-	SyscallHash string
+	Runtime		string
+	Syscall		VMSyscallMeter
+	Message		AVMAsyncMessage
+	SyscallHash	string
 }
 
 type VMReceiptEmission struct {
-	Runtime      string
-	Receipt      AVMExecutionReceipt
-	ReceiptRoot  string
-	EmissionHash string
+	Runtime		string
+	Receipt		AVMExecutionReceipt
+	ReceiptRoot	string
+	EmissionHash	string
 }
 
 type VMRuntimeAdapter struct {
-	Trait              VMRuntimeTrait
-	BoundaryManifest   VMAdapterBoundaryManifest
-	BytecodeValidation VMBytecodeValidation
-	GasTable           VMGasTable
-	StorageAdapter     VMStorageAdapter
-	OutboundSyscalls   []VMOutboundMessageSyscall
-	ReceiptEmission    VMReceiptEmission
-	AdapterHash        string
+	Trait			VMRuntimeTrait
+	BoundaryManifest	VMAdapterBoundaryManifest
+	BytecodeValidation	VMBytecodeValidation
+	GasTable		VMGasTable
+	StorageAdapter		VMStorageAdapter
+	OutboundSyscalls	[]VMOutboundMessageSyscall
+	ReceiptEmission		VMReceiptEmission
+	AdapterHash		string
 }
 
 type VMRuntimeRootCommitment struct {
-	Height              uint64
-	ZoneID              zonestypes.ZoneID
-	Runtime             string
-	AdapterHash         string
-	BytecodeHash        string
-	GasTableHash        string
-	StorageAdapterHash  string
-	OutboundMessageRoot string
-	ReceiptRoot         string
-	VMRootHash          string
+	Height			uint64
+	ZoneID			zonestypes.ZoneID
+	Runtime			string
+	AdapterHash		string
+	BytecodeHash		string
+	GasTableHash		string
+	StorageAdapterHash	string
+	OutboundMessageRoot	string
+	ReceiptRoot		string
+	VMRootHash		string
 }
 
 func NewVMRuntimeTrait(trait VMRuntimeTrait) (VMRuntimeTrait, error) {
@@ -171,11 +171,11 @@ func ValidateDeterministicVMBytecode(runtime string, bytecode []byte, policy Run
 	}
 	sum := sha256.Sum256(bytecode)
 	validation := VMBytecodeValidation{
-		Runtime:       runtime,
-		BytecodeHash:  hex.EncodeToString(sum[:]),
-		CodeBytes:     uint64(len(bytecode)),
-		Deterministic: true,
-		Validated:     true,
+		Runtime:	runtime,
+		BytecodeHash:	hex.EncodeToString(sum[:]),
+		CodeBytes:	uint64(len(bytecode)),
+		Deterministic:	true,
+		Validated:	true,
 	}
 	validation.ValidationHash = ComputeVMBytecodeValidationHash(validation)
 	return validation, validation.Validate()
@@ -245,21 +245,21 @@ func NewVMOutboundMessageSyscall(runtime string, meter VMSyscallMeter, req VMOut
 		return VMOutboundMessageSyscall{}, errors.New("VM outbound message syscall must use cross-zone routing gas")
 	}
 	msg, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:           req.ChainID,
-		Source:            req.Source,
-		Destination:       req.Destination,
-		Payload:           append([]byte(nil), req.Payload...),
-		GasLimit:          req.GasLimit,
-		ExpiryHeight:      req.ExpiryHeight,
-		RetryPolicy:       DefaultAVMRetryPolicy(req.ExpiryHeight),
-		BounceFlag:        true,
-		SourceZone:        req.SourceZone,
-		DestinationZone:   req.DestinationZone,
-		SenderNonce:       req.SenderNonce,
-		PayloadType:       req.PayloadType,
-		ForwardingFee:     req.ForwardingFee,
-		CreatedHeight:     req.CreatedHeight,
-		RouteHintOptional: req.RouteHint,
+		ChainID:		req.ChainID,
+		Source:			req.Source,
+		Destination:		req.Destination,
+		Payload:		append([]byte(nil), req.Payload...),
+		GasLimit:		req.GasLimit,
+		ExpiryHeight:		req.ExpiryHeight,
+		RetryPolicy:		DefaultAVMRetryPolicy(req.ExpiryHeight),
+		BounceFlag:		true,
+		SourceZone:		req.SourceZone,
+		DestinationZone:	req.DestinationZone,
+		SenderNonce:		req.SenderNonce,
+		PayloadType:		req.PayloadType,
+		ForwardingFee:		req.ForwardingFee,
+		CreatedHeight:		req.CreatedHeight,
+		RouteHintOptional:	req.RouteHint,
 	})
 	if err != nil {
 		return VMOutboundMessageSyscall{}, err
@@ -278,9 +278,9 @@ func NewVMReceiptEmission(runtime string, receipt AVMExecutionReceipt, zoneID zo
 		return VMReceiptEmission{}, errors.New("VM receipt emission zone mismatch")
 	}
 	emission := VMReceiptEmission{
-		Runtime:     strings.TrimSpace(runtime),
-		Receipt:     receipt,
-		ReceiptRoot: ComputeAVMContractReceiptRoot([]AVMExecutionReceipt{receipt}),
+		Runtime:	strings.TrimSpace(runtime),
+		Receipt:	receipt,
+		ReceiptRoot:	ComputeAVMContractReceiptRoot([]AVMExecutionReceipt{receipt}),
 	}
 	emission.EmissionHash = ComputeVMReceiptEmissionHash(emission)
 	return emission, emission.Validate()
@@ -334,15 +334,15 @@ func NewVMRuntimeRootCommitment(height uint64, zoneID zonestypes.ZoneID, adapter
 		outbound = append(outbound, syscall.Message)
 	}
 	root := VMRuntimeRootCommitment{
-		Height:              height,
-		ZoneID:              zoneID,
-		Runtime:             adapter.Trait.Runtime,
-		AdapterHash:         adapter.AdapterHash,
-		BytecodeHash:        adapter.BytecodeValidation.BytecodeHash,
-		GasTableHash:        adapter.GasTable.TableHash,
-		StorageAdapterHash:  adapter.StorageAdapter.AdapterHash,
-		OutboundMessageRoot: ComputeAVMZoneOutputMessageRoot(zoneID, outbound),
-		ReceiptRoot:         adapter.ReceiptEmission.ReceiptRoot,
+		Height:			height,
+		ZoneID:			zoneID,
+		Runtime:		adapter.Trait.Runtime,
+		AdapterHash:		adapter.AdapterHash,
+		BytecodeHash:		adapter.BytecodeValidation.BytecodeHash,
+		GasTableHash:		adapter.GasTable.TableHash,
+		StorageAdapterHash:	adapter.StorageAdapter.AdapterHash,
+		OutboundMessageRoot:	ComputeAVMZoneOutputMessageRoot(zoneID, outbound),
+		ReceiptRoot:		adapter.ReceiptEmission.ReceiptRoot,
 	}
 	root.VMRootHash = ComputeVMRuntimeRootCommitmentHash(root)
 	return root, root.Validate()
@@ -577,8 +577,8 @@ func (r VMRuntimeRootCommitment) Validate() error {
 		return fmt.Errorf("VM runtime root runtime %q is not supported", r.Runtime)
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"VM runtime root adapter hash", r.AdapterHash},
 		{"VM runtime root bytecode hash", r.BytecodeHash},

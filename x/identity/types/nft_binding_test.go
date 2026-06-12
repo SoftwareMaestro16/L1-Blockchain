@@ -14,14 +14,14 @@ func TestDomainNFTBindingRequiresRegistryAndNFTModuleOwnerAgreement(t *testing.T
 	require.NoError(t, err)
 
 	require.NoError(t, ValidateDomainNFTBinding(binding, DomainNFTBindingContext{
-		RegistryOwner:  record.Owner,
-		NFTModuleOwner: addr(1),
-		CurrentHeight:  12,
+		RegistryOwner:	record.Owner,
+		NFTModuleOwner:	addr(1),
+		CurrentHeight:	12,
 	}))
 	require.ErrorContains(t, ValidateDomainNFTBinding(binding, DomainNFTBindingContext{
-		RegistryOwner:  record.Owner,
-		NFTModuleOwner: addr(9),
-		CurrentHeight:  12,
+		RegistryOwner:	record.Owner,
+		NFTModuleOwner:	addr(9),
+		CurrentHeight:	12,
 	}), "nft module owner")
 }
 

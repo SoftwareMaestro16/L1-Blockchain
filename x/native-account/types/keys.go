@@ -8,16 +8,16 @@ import (
 )
 
 const (
-	AccountByUserPrefix       = "account/by_user/"
-	AccountByRawPrefix        = "account/by_raw/"
-	AccountByNumberPrefix     = "account/number/"
-	AccountByReputationPrefix = "account/reputation/"
-	AccountStoragePrefix      = "account/storage/"
+	AccountByUserPrefix		= "account/by_user/"
+	AccountByRawPrefix		= "account/by_raw/"
+	AccountByNumberPrefix		= "account/number/"
+	AccountByReputationPrefix	= "account/reputation/"
+	AccountStoragePrefix		= "account/storage/"
 )
 
 type AccountStoreKeyDescriptor struct {
-	Name   string
-	Prefix string
+	Name	string
+	Prefix	string
 }
 
 func DefaultAccountStoreKeyDescriptors() []AccountStoreKeyDescriptor {

@@ -10,89 +10,89 @@ import (
 )
 
 const (
-	FinancialSettlementZoneID = "FINANCIAL_ZONE"
-	MaxPaymentRouteHintLength = 128
+	FinancialSettlementZoneID	= "FINANCIAL_ZONE"
+	MaxPaymentRouteHintLength	= 128
 )
 
 type PaymentSettlementMode string
 
 const (
-	PaymentSettlementDirect          PaymentSettlementMode = "DIRECT"
-	PaymentSettlementStreaming       PaymentSettlementMode = "STREAMING"
-	PaymentSettlementConditional     PaymentSettlementMode = "CONDITIONAL"
-	PaymentSettlementOffchainChannel PaymentSettlementMode = "OFFCHAIN_CHANNEL"
-	PaymentSettlementZoneToZone      PaymentSettlementMode = "ZONE_TO_ZONE"
+	PaymentSettlementDirect			PaymentSettlementMode	= "DIRECT"
+	PaymentSettlementStreaming		PaymentSettlementMode	= "STREAMING"
+	PaymentSettlementConditional		PaymentSettlementMode	= "CONDITIONAL"
+	PaymentSettlementOffchainChannel	PaymentSettlementMode	= "OFFCHAIN_CHANNEL"
+	PaymentSettlementZoneToZone		PaymentSettlementMode	= "ZONE_TO_ZONE"
 )
 
 type PaymentStatus string
 
 const (
-	PaymentStatusQueued   PaymentStatus = "queued"
-	PaymentStatusSettled  PaymentStatus = "settled"
-	PaymentStatusExpired  PaymentStatus = "expired"
-	PaymentStatusDisputed PaymentStatus = "disputed"
-	PaymentStatusRejected PaymentStatus = "rejected"
+	PaymentStatusQueued	PaymentStatus	= "queued"
+	PaymentStatusSettled	PaymentStatus	= "settled"
+	PaymentStatusExpired	PaymentStatus	= "expired"
+	PaymentStatusDisputed	PaymentStatus	= "disputed"
+	PaymentStatusRejected	PaymentStatus	= "rejected"
 )
 
 type Payment struct {
-	From            string
-	To              string
-	Amount          string
-	ConditionHash   string
-	Expiry          uint64
-	RouteHint       string
-	PaymentID       string
-	SourceZone      string
-	DestinationZone string
-	Denom           string
-	FeeLimit        string
-	SettlementMode  PaymentSettlementMode
-	Nonce           uint64
-	Signature       string
+	From		string
+	To		string
+	Amount		string
+	ConditionHash	string
+	Expiry		uint64
+	RouteHint	string
+	PaymentID	string
+	SourceZone	string
+	DestinationZone	string
+	Denom		string
+	FeeLimit	string
+	SettlementMode	PaymentSettlementMode
+	Nonce		uint64
+	Signature	string
 }
 
 type PaymentAbstractionReceipt struct {
-	PaymentID      string
-	Status         PaymentStatus
-	SettlementZone string
-	GasUsed        uint64
-	FeeCharged     string
-	ErrorCode      string
-	ExecutedHeight uint64
-	ReceiptHash    string
+	PaymentID	string
+	Status		PaymentStatus
+	SettlementZone	string
+	GasUsed		uint64
+	FeeCharged	string
+	ErrorCode	string
+	ExecutedHeight	uint64
+	ReceiptHash	string
 }
 
 type PaymentNonceRecord struct {
-	SourceZone    string
-	Sender        string
-	Nonce         uint64
-	PaymentID     string
-	ExpiresHeight uint64
+	SourceZone	string
+	Sender		string
+	Nonce		uint64
+	PaymentID	string
+	ExpiresHeight	uint64
 }
 
 type PaymentAbstractionState struct {
-	Height   uint64
-	Payments []Payment
-	Receipts []PaymentAbstractionReceipt
-	Nonces   []PaymentNonceRecord
+	Height		uint64
+	Payments	[]Payment
+	Receipts	[]PaymentAbstractionReceipt
+	Nonces		[]PaymentNonceRecord
 }
 
 type PaymentRouteQuote struct {
-	RouteHint       string
-	SourceZone      string
-	DestinationZone string
-	FeeAmount       string
-	Capacity        string
-	ExpiresHeight   uint64
-	RouteScoreHash  string
+	RouteHint	string
+	SourceZone	string
+	DestinationZone	string
+	FeeAmount	string
+	Capacity	string
+	ExpiresHeight	uint64
+	RouteScoreHash	string
 }
 
 func EmptyPaymentAbstractionState(height uint64) PaymentAbstractionState {
 	return PaymentAbstractionState{
-		Height:   height,
-		Payments: []Payment{},
-		Receipts: []PaymentAbstractionReceipt{},
-		Nonces:   []PaymentNonceRecord{},
+		Height:		height,
+		Payments:	[]Payment{},
+		Receipts:	[]PaymentAbstractionReceipt{},
+		Nonces:		[]PaymentNonceRecord{},
 	}
 }
 
@@ -143,11 +143,11 @@ func RegisterPayment(state PaymentAbstractionState, payment Payment, currentHeig
 	next.Height = currentHeight
 	next.Payments = append(next.Payments, payment)
 	next.Nonces = append(next.Nonces, PaymentNonceRecord{
-		SourceZone:    payment.SourceZone,
-		Sender:        payment.From,
-		Nonce:         payment.Nonce,
-		PaymentID:     payment.PaymentID,
-		ExpiresHeight: payment.Expiry + DefaultReplayHorizon,
+		SourceZone:	payment.SourceZone,
+		Sender:		payment.From,
+		Nonce:		payment.Nonce,
+		PaymentID:	payment.PaymentID,
+		ExpiresHeight:	payment.Expiry + DefaultReplayHorizon,
 	}.Normalize())
 	sortPayments(next.Payments)
 	sortPaymentNonceRecords(next.Nonces)
@@ -156,22 +156,22 @@ func RegisterPayment(state PaymentAbstractionState, payment Payment, currentHeig
 
 func SettlePaymentInFinancialZone(state PaymentAbstractionState, paymentID string, gasUsed uint64, feeCharged string, currentHeight uint64) (PaymentAbstractionState, PaymentAbstractionReceipt, error) {
 	return appendPaymentAbstractionReceipt(state, PaymentAbstractionReceipt{
-		PaymentID:      paymentID,
-		Status:         PaymentStatusSettled,
-		SettlementZone: FinancialSettlementZoneID,
-		GasUsed:        gasUsed,
-		FeeCharged:     feeCharged,
-		ExecutedHeight: currentHeight,
+		PaymentID:	paymentID,
+		Status:		PaymentStatusSettled,
+		SettlementZone:	FinancialSettlementZoneID,
+		GasUsed:	gasUsed,
+		FeeCharged:	feeCharged,
+		ExecutedHeight:	currentHeight,
 	})
 }
 
 func RejectPaymentInFinancialZone(state PaymentAbstractionState, paymentID, errorCode string, currentHeight uint64) (PaymentAbstractionState, PaymentAbstractionReceipt, error) {
 	return appendPaymentAbstractionReceipt(state, PaymentAbstractionReceipt{
-		PaymentID:      paymentID,
-		Status:         PaymentStatusRejected,
-		SettlementZone: FinancialSettlementZoneID,
-		ErrorCode:      errorCode,
-		ExecutedHeight: currentHeight,
+		PaymentID:	paymentID,
+		Status:		PaymentStatusRejected,
+		SettlementZone:	FinancialSettlementZoneID,
+		ErrorCode:	errorCode,
+		ExecutedHeight:	currentHeight,
 	})
 }
 
@@ -195,10 +195,10 @@ func ExpirePayments(state PaymentAbstractionState, currentHeight uint64) (Paymen
 			continue
 		}
 		receipt, err := BuildPaymentAbstractionReceipt(PaymentAbstractionReceipt{
-			PaymentID:      payment.PaymentID,
-			Status:         PaymentStatusExpired,
-			SettlementZone: FinancialSettlementZoneID,
-			ExecutedHeight: currentHeight,
+			PaymentID:	payment.PaymentID,
+			Status:		PaymentStatusExpired,
+			SettlementZone:	FinancialSettlementZoneID,
+			ExecutedHeight:	currentHeight,
 		})
 		if err != nil {
 			return PaymentAbstractionState{}, nil, err
@@ -629,10 +629,10 @@ func (state PaymentAbstractionState) Export() PaymentAbstractionState {
 
 func (state PaymentAbstractionState) Clone() PaymentAbstractionState {
 	out := PaymentAbstractionState{
-		Height:   state.Height,
-		Payments: make([]Payment, len(state.Payments)),
-		Receipts: make([]PaymentAbstractionReceipt, len(state.Receipts)),
-		Nonces:   make([]PaymentNonceRecord, len(state.Nonces)),
+		Height:		state.Height,
+		Payments:	make([]Payment, len(state.Payments)),
+		Receipts:	make([]PaymentAbstractionReceipt, len(state.Receipts)),
+		Nonces:		make([]PaymentNonceRecord, len(state.Nonces)),
 	}
 	for i, payment := range state.Payments {
 		out.Payments[i] = payment.Normalize()
@@ -787,5 +787,3 @@ func sortPaymentNonceRecords(records []PaymentNonceRecord) {
 		return records[i].NonceKey() < records[j].NonceKey()
 	})
 }
-
-

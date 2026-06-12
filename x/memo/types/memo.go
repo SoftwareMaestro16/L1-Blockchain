@@ -13,42 +13,42 @@ import (
 )
 
 const (
-	DefaultMaxMemoChars = uint32(200)
-	HardMaxMemoChars    = uint32(500)
-	DefaultMaxMemoBytes = uint32(1024)
-	HardMaxMemoBytes    = uint32(4096)
-	MemoHashBytes       = 32
+	DefaultMaxMemoChars	= uint32(200)
+	HardMaxMemoChars	= uint32(500)
+	DefaultMaxMemoBytes	= uint32(1024)
+	HardMaxMemoBytes	= uint32(4096)
+	MemoHashBytes		= 32
 
-	DefaultMemoBaseFee = int64(0)
-	DefaultMemoByteFee = int64(1)
+	DefaultMemoBaseFee	= int64(0)
+	DefaultMemoByteFee	= int64(1)
 
-	MemoReputationEliteBps      = uint32(7_500)
-	MemoReputationNormalBps     = uint32(10_000)
-	MemoReputationNewBps        = uint32(15_000)
-	MemoReputationRestrictedBps = uint32(30_000)
-	DefaultCongestionBps        = uint32(10_000)
-	BpsDenominator              = uint32(10_000)
+	MemoReputationEliteBps		= uint32(7_500)
+	MemoReputationNormalBps		= uint32(10_000)
+	MemoReputationNewBps		= uint32(15_000)
+	MemoReputationRestrictedBps	= uint32(30_000)
+	DefaultCongestionBps		= uint32(10_000)
+	BpsDenominator			= uint32(10_000)
 )
 
 type TxMetadata struct {
-	Memo        string
-	MemoHash    []byte
-	MemoVisible bool
+	Memo		string
+	MemoHash	[]byte
+	MemoVisible	bool
 }
 
 type MemoParams struct {
-	MaxMemoChars uint32
-	MaxMemoBytes uint32
-	MemoBaseFee  sdkmath.Int
-	MemoByteFee  sdkmath.Int
+	MaxMemoChars	uint32
+	MaxMemoBytes	uint32
+	MemoBaseFee	sdkmath.Int
+	MemoByteFee	sdkmath.Int
 }
 
 func DefaultMemoParams() MemoParams {
 	return MemoParams{
-		MaxMemoChars: DefaultMaxMemoChars,
-		MaxMemoBytes: DefaultMaxMemoBytes,
-		MemoBaseFee:  sdkmath.NewInt(DefaultMemoBaseFee),
-		MemoByteFee:  sdkmath.NewInt(DefaultMemoByteFee),
+		MaxMemoChars:	DefaultMaxMemoChars,
+		MaxMemoBytes:	DefaultMaxMemoBytes,
+		MemoBaseFee:	sdkmath.NewInt(DefaultMemoBaseFee),
+		MemoByteFee:	sdkmath.NewInt(DefaultMemoByteFee),
 	}
 }
 

@@ -98,10 +98,10 @@ func TestRejectedDirectUserDelegationDoesNotExportDelegationState(t *testing.T) 
 		baseapp.SetChainID(app.ChainID()),
 	)
 	_, err = restarted.InitChain(&abci.RequestInitChain{
-		ChainId:         app.ChainID(),
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: &exported.ConsensusParams,
-		AppStateBytes:   exported.AppState,
+		ChainId:		app.ChainID(),
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	&exported.ConsensusParams,
+		AppStateBytes:		exported.AppState,
 	})
 	require.NoError(t, err)
 

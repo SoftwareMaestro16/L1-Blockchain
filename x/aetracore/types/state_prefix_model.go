@@ -12,23 +12,23 @@ const StatePrefixModelVersion = uint64(1)
 type StatePrefixNamespace string
 
 const (
-	StatePrefixNamespaceCore  StatePrefixNamespace = "Core"
-	StatePrefixNamespaceZone  StatePrefixNamespace = "Zone"
-	StatePrefixNamespaceShard StatePrefixNamespace = "Shard"
+	StatePrefixNamespaceCore	StatePrefixNamespace	= "Core"
+	StatePrefixNamespaceZone	StatePrefixNamespace	= "Zone"
+	StatePrefixNamespaceShard	StatePrefixNamespace	= "Shard"
 )
 
 type GlobalStatePrefixDescriptor struct {
-	Namespace      StatePrefixNamespace
-	Prefix         string
-	Purpose        string
-	ProofScope     string
-	DescriptorHash string
+	Namespace	StatePrefixNamespace
+	Prefix		string
+	Purpose		string
+	ProofScope	string
+	DescriptorHash	string
 }
 
 type GlobalStatePrefixModel struct {
-	Version uint64
-	Entries []GlobalStatePrefixDescriptor
-	Root    string
+	Version	uint64
+	Entries	[]GlobalStatePrefixDescriptor
+	Root	string
 }
 
 func GlobalStatePrefixDescriptors() []GlobalStatePrefixDescriptor {
@@ -55,8 +55,8 @@ func GlobalStatePrefixDescriptors() []GlobalStatePrefixDescriptor {
 
 func BuildGlobalStatePrefixModel(entries []GlobalStatePrefixDescriptor) (GlobalStatePrefixModel, error) {
 	model := GlobalStatePrefixModel{
-		Version: StatePrefixModelVersion,
-		Entries: normalizeGlobalStatePrefixDescriptors(entries),
+		Version:	StatePrefixModelVersion,
+		Entries:	normalizeGlobalStatePrefixDescriptors(entries),
 	}
 	if err := model.ValidateFormat(); err != nil {
 		return GlobalStatePrefixModel{}, err
@@ -266,10 +266,10 @@ func MaterializeStatePrefix(pattern string, zoneID ZoneID, shardID ShardID) (str
 
 func statePrefix(namespace StatePrefixNamespace, prefix, purpose, proofScope string) GlobalStatePrefixDescriptor {
 	entry, err := BuildGlobalStatePrefixDescriptor(GlobalStatePrefixDescriptor{
-		Namespace:  namespace,
-		Prefix:     prefix,
-		Purpose:    purpose,
-		ProofScope: proofScope,
+		Namespace:	namespace,
+		Prefix:		prefix,
+		Purpose:	purpose,
+		ProofScope:	proofScope,
 	})
 	if err != nil {
 		panic(err)

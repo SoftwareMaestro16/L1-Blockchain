@@ -85,15 +85,15 @@ func TestNativePaymentStaleCloseFraudProofSupersedesLowerNonce(t *testing.T) {
 		{Participant: bob, Amount: "700"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("native-stale-close-proof", channel.ChannelID),
-		ProofType:       FraudProofTypeStaleClose,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          stale,
-		StateB:          newer,
-		PenaltyDenom:    NativeDenom,
-		PenaltyAmount:   "10",
-		EvidenceHash:    HashParts("native-stale-close-evidence", stale.StateHash, newer.StateHash),
+		ProofID:		HashParts("native-stale-close-proof", channel.ChannelID),
+		ProofType:		FraudProofTypeStaleClose,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			stale,
+		StateB:			newer,
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"10",
+		EvidenceHash:		HashParts("native-stale-close-evidence", stale.StateHash, newer.StateHash),
 	}
 	challenged, settlementProof, err := SupersedeNativePaymentStaleCloseWithFraudProof(closing, channel, stale, newer, proof, bob, 25)
 	require.NoError(t, err)
@@ -128,14 +128,14 @@ func TestNativePaymentFinalityCommitmentBindsFinancialAndAetraCoreRoots(t *testi
 	require.NoError(t, err)
 
 	record := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          finalState.StateHash,
-		Nonce:              finalState.Nonce,
-		FinalBalances:      settlementBalancesFromMap(closing.Balances),
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      "0",
-		SettledHeight:      50,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		finalState.StateHash,
+		Nonce:			finalState.Nonce,
+		FinalBalances:		settlementBalancesFromMap(closing.Balances),
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		"0",
+		SettledHeight:		50,
 	}
 	record.SettlementHash = ComputeSettlementHash(record)
 	require.NoError(t, record.ValidateForChannel(channel))

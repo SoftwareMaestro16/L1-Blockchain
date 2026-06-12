@@ -91,7 +91,7 @@ func TestRequiredTestCoverageReportRejectsMismatchedPerformanceClass(t *testing.
 
 func validRequiredTestCoverageInput() RequiredTestCoverageInput {
 	return RequiredTestCoverageInput{
-		CoverageVersion: "required_17",
+		CoverageVersion:	"required_17",
 		Determinism: []RequiredTestCoverageCase{
 			requiredCoverage(RequiredDeterminismZoneRoots, RequiredCoverageDeterminism, "zone_roots"),
 			requiredCoverage(RequiredDeterminismMessageRoots, RequiredCoverageDeterminism, "message_roots"),
@@ -133,11 +133,11 @@ func validRequiredTestCoverageInput() RequiredTestCoverageInput {
 
 func requiredCoverage(caseID string, class RequiredCoverageClass, target string) RequiredTestCoverageCase {
 	return RequiredTestCoverageCase{
-		CaseID:        caseID,
-		Class:         class,
-		Target:        target,
-		EvidenceHash:  hashStrings("required-test-coverage", caseID),
-		Deterministic: true,
-		Covered:       true,
+		CaseID:		caseID,
+		Class:		class,
+		Target:		target,
+		EvidenceHash:	hashStrings("required-test-coverage", caseID),
+		Deterministic:	true,
+		Covered:	true,
 	}
 }

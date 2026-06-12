@@ -5,27 +5,27 @@ import "errors"
 type ValidatorPowerCapStage string
 
 const (
-	ValidatorPowerCapStageRewardsOnly ValidatorPowerCapStage = "stage1_rewards_allocation_only"
-	ValidatorPowerCapStageCometBFT    ValidatorPowerCapStage = "stage2_cometbft_voting_power"
+	ValidatorPowerCapStageRewardsOnly	ValidatorPowerCapStage	= "stage1_rewards_allocation_only"
+	ValidatorPowerCapStageCometBFT		ValidatorPowerCapStage	= "stage2_cometbft_voting_power"
 )
 
 type ValidatorPowerCapScope struct {
-	Stage                       ValidatorPowerCapStage `json:"stage"`
-	CapsPoolAllocationWeight    bool                   `json:"caps_pool_allocation_weight"`
-	CapsRewardEffectivePower    bool                   `json:"caps_reward_effective_power"`
-	CapsCometBFTVotingPower     bool                   `json:"caps_cometbft_voting_power"`
-	ConsensusVotingPowerOwner   string                 `json:"consensus_voting_power_owner"`
-	RequiresCometBFTCapEvidence bool                   `json:"requires_cometbft_cap_evidence"`
+	Stage				ValidatorPowerCapStage	`json:"stage"`
+	CapsPoolAllocationWeight	bool			`json:"caps_pool_allocation_weight"`
+	CapsRewardEffectivePower	bool			`json:"caps_reward_effective_power"`
+	CapsCometBFTVotingPower		bool			`json:"caps_cometbft_voting_power"`
+	ConsensusVotingPowerOwner	string			`json:"consensus_voting_power_owner"`
+	RequiresCometBFTCapEvidence	bool			`json:"requires_cometbft_cap_evidence"`
 }
 
 func ActiveValidatorPowerCapScope() ValidatorPowerCapScope {
 	return ValidatorPowerCapScope{
-		Stage:                       ValidatorPowerCapStageRewardsOnly,
-		CapsPoolAllocationWeight:    true,
-		CapsRewardEffectivePower:    true,
-		CapsCometBFTVotingPower:     false,
-		ConsensusVotingPowerOwner:   "x/pos+x/staking+CometBFT",
-		RequiresCometBFTCapEvidence: true,
+		Stage:				ValidatorPowerCapStageRewardsOnly,
+		CapsPoolAllocationWeight:	true,
+		CapsRewardEffectivePower:	true,
+		CapsCometBFTVotingPower:	false,
+		ConsensusVotingPowerOwner:	"x/pos+x/staking+CometBFT",
+		RequiresCometBFTCapEvidence:	true,
 	}
 }
 

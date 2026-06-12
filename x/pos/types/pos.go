@@ -10,237 +10,237 @@ import (
 )
 
 const (
-	BasisPoints = uint32(10_000)
+	BasisPoints	= uint32(10_000)
 
-	DefaultMinActiveValidators = uint32(75)
-	DefaultMaxActiveValidators = uint32(400)
+	DefaultMinActiveValidators	= uint32(75)
+	DefaultMaxActiveValidators	= uint32(400)
 
-	DefaultEpochDurationSeconds = uint64(43_200)
-	MinEpochDurationSeconds     = uint64(43_200)
-	MaxEpochDurationSeconds     = uint64(86_400)
+	DefaultEpochDurationSeconds	= uint64(43_200)
+	MinEpochDurationSeconds		= uint64(43_200)
+	MaxEpochDurationSeconds		= uint64(86_400)
 
-	DefaultMaxCommissionBps             = uint32(2_000)
-	DefaultMaxVotingPowerBps            = uint32(1_500)
-	DefaultMinUptimeBps                 = uint32(9_500)
-	DefaultInactiveAfterEpochs          = uint64(2)
-	DefaultStakeDecayBps                = uint32(100)
-	DefaultStakeSaturationThresholdNaet = int64(10_000_000_000)
-	DefaultStakeSaturationCapFactorBps  = uint32(100_000)
-	MaxStakeSaturationCapFactorBps      = uint32(1_000_000)
-	DefaultStakeSaturationNaet          = int64(100_000_000_000)
-	DefaultSaturatedStakeRewardBps      = uint32(2_500)
-	DefaultUnbondingSeconds             = uint64(1_209_600)
-	MinUnbondingSeconds                 = uint64(604_800)
-	MaxUnbondingSeconds                 = uint64(1_814_400)
-	DefaultTargetCommitMillis           = uint32(1_500)
-	MaxTargetCommitMillis               = uint32(2_000)
+	DefaultMaxCommissionBps			= uint32(2_000)
+	DefaultMaxVotingPowerBps		= uint32(1_500)
+	DefaultMinUptimeBps			= uint32(9_500)
+	DefaultInactiveAfterEpochs		= uint64(2)
+	DefaultStakeDecayBps			= uint32(100)
+	DefaultStakeSaturationThresholdNaet	= int64(10_000_000_000)
+	DefaultStakeSaturationCapFactorBps	= uint32(100_000)
+	MaxStakeSaturationCapFactorBps		= uint32(1_000_000)
+	DefaultStakeSaturationNaet		= int64(100_000_000_000)
+	DefaultSaturatedStakeRewardBps		= uint32(2_500)
+	DefaultUnbondingSeconds			= uint64(1_209_600)
+	MinUnbondingSeconds			= uint64(604_800)
+	MaxUnbondingSeconds			= uint64(1_814_400)
+	DefaultTargetCommitMillis		= uint32(1_500)
+	MaxTargetCommitMillis			= uint32(2_000)
 
-	DefaultMaxValidatorSetChangeRateBps = uint32(1_000)
+	DefaultMaxValidatorSetChangeRateBps	= uint32(1_000)
 
-	DefaultPerformanceUptimeWeightBps      = uint32(4_000)
-	DefaultPerformanceLatencyWeightBps     = uint32(3_000)
-	DefaultPerformanceCorrectnessWeightBps = uint32(3_000)
+	DefaultPerformanceUptimeWeightBps	= uint32(4_000)
+	DefaultPerformanceLatencyWeightBps	= uint32(3_000)
+	DefaultPerformanceCorrectnessWeightBps	= uint32(3_000)
 
-	MisbehaviorDowntime     = "downtime"
-	MisbehaviorDoubleSign   = "double_sign"
-	MisbehaviorInvalidBlock = "invalid_block"
+	MisbehaviorDowntime	= "downtime"
+	MisbehaviorDoubleSign	= "double_sign"
+	MisbehaviorInvalidBlock	= "invalid_block"
 )
 
 type Params struct {
-	MinActiveValidators          uint32
-	MaxActiveValidators          uint32
-	EpochDurationSeconds         uint64
-	PhaseDurations               EpochPhaseDurations
-	EpochSeedSource              EpochSeedSource
-	MaxValidatorSetChangeRateBps uint32
-	DelegationActivationEpochs   uint64
-	EvidenceWindowEpochs         uint64
-	MinStakeNaet                 sdkmath.Int
-	MaxCommissionBps             uint32
-	MaxVotingPowerBps            uint32
-	MinUptimeBps                 uint32
-	InactiveAfterEpochs          uint64
-	StakeDecayBps                uint32
-	StakeSaturationThresholdNaet sdkmath.Int
-	StakeSaturationCapFactorBps  uint32
-	StakeSaturationNaet          sdkmath.Int
-	SaturatedStakeRewardBps      uint32
-	UnbondingSeconds             uint64
-	TargetCommitMillis           uint32
-	MinTaskGroupValidators       uint32
-	MaxTaskGroupValidators       uint32
-	ReporterRewardBps            uint32
-	PerformanceWeights           PerformanceWeights
+	MinActiveValidators		uint32
+	MaxActiveValidators		uint32
+	EpochDurationSeconds		uint64
+	PhaseDurations			EpochPhaseDurations
+	EpochSeedSource			EpochSeedSource
+	MaxValidatorSetChangeRateBps	uint32
+	DelegationActivationEpochs	uint64
+	EvidenceWindowEpochs		uint64
+	MinStakeNaet			sdkmath.Int
+	MaxCommissionBps		uint32
+	MaxVotingPowerBps		uint32
+	MinUptimeBps			uint32
+	InactiveAfterEpochs		uint64
+	StakeDecayBps			uint32
+	StakeSaturationThresholdNaet	sdkmath.Int
+	StakeSaturationCapFactorBps	uint32
+	StakeSaturationNaet		sdkmath.Int
+	SaturatedStakeRewardBps		uint32
+	UnbondingSeconds		uint64
+	TargetCommitMillis		uint32
+	MinTaskGroupValidators		uint32
+	MaxTaskGroupValidators		uint32
+	ReporterRewardBps		uint32
+	PerformanceWeights		PerformanceWeights
 }
 
 type PerformanceSignals struct {
-	UptimeBps      uint32
-	LatencyBps     uint32
-	CorrectnessBps uint32
+	UptimeBps	uint32
+	LatencyBps	uint32
+	CorrectnessBps	uint32
 }
 
 type PerformanceWeights struct {
-	UptimeWeightBps      uint32
-	LatencyWeightBps     uint32
-	CorrectnessWeightBps uint32
+	UptimeWeightBps		uint32
+	LatencyWeightBps	uint32
+	CorrectnessWeightBps	uint32
 }
 
 type Candidate struct {
-	ValidatorID         string
-	SelfStakeNaet       sdkmath.Int
-	DelegatedStakeNaet  sdkmath.Int
-	PerformanceScoreBps uint32
-	UptimeFactorBps     uint32
-	LatencyFactorBps    uint32
-	ReliabilityIndexBps uint32
-	CommissionBps       uint32
-	InactiveEpochs      uint64
-	Jailed              bool
-	Tombstoned          bool
-	Roles               []ValidatorRole
-	Capacity            ValidatorCapacity
-	Nominations         []Nomination
+	ValidatorID		string
+	SelfStakeNaet		sdkmath.Int
+	DelegatedStakeNaet	sdkmath.Int
+	PerformanceScoreBps	uint32
+	UptimeFactorBps		uint32
+	LatencyFactorBps	uint32
+	ReliabilityIndexBps	uint32
+	CommissionBps		uint32
+	InactiveEpochs		uint64
+	Jailed			bool
+	Tombstoned		bool
+	Roles			[]ValidatorRole
+	Capacity		ValidatorCapacity
+	Nominations		[]Nomination
 }
 
 type Nomination struct {
-	NominatorID string
-	StakeNaet   sdkmath.Int
+	NominatorID	string
+	StakeNaet	sdkmath.Int
 }
 
 type ValidatorScoreComponents struct {
-	StakeWeightNaet        sdkmath.Int
-	StakeSaturationCapNaet sdkmath.Int
-	SaturatedStakeNaet     sdkmath.Int
-	RewardWeightNaet       sdkmath.Int
-	PerformanceFactorBps   uint32
-	UptimeFactorBps        uint32
-	LatencyFactorBps       uint32
-	ReliabilityIndexBps    uint32
-	Score                  sdkmath.Int
+	StakeWeightNaet		sdkmath.Int
+	StakeSaturationCapNaet	sdkmath.Int
+	SaturatedStakeNaet	sdkmath.Int
+	RewardWeightNaet	sdkmath.Int
+	PerformanceFactorBps	uint32
+	UptimeFactorBps		uint32
+	LatencyFactorBps	uint32
+	ReliabilityIndexBps	uint32
+	Score			sdkmath.Int
 }
 
 type ScoredValidator struct {
 	Candidate
-	TotalStakeNaet     sdkmath.Int
-	EffectiveStakeNaet sdkmath.Int
-	Score              sdkmath.Int
-	VotingPowerNaet    sdkmath.Int
-	VotingPowerCap     VotingPowerCapStatus
-	ScoreComponents    ValidatorScoreComponents
+	TotalStakeNaet		sdkmath.Int
+	EffectiveStakeNaet	sdkmath.Int
+	Score			sdkmath.Int
+	VotingPowerNaet		sdkmath.Int
+	VotingPowerCap		VotingPowerCapStatus
+	ScoreComponents		ValidatorScoreComponents
 }
 
 type StakeSaturationPreview struct {
-	ValidatorID             string
-	BondedStakeNaet         sdkmath.Int
-	SaturationThresholdNaet sdkmath.Int
-	CapFactorBps            uint32
-	SaturationCapNaet       sdkmath.Int
-	EffectiveStakeNaet      sdkmath.Int
-	SaturatedStakeNaet      sdkmath.Int
-	RewardWeightNaet        sdkmath.Int
-	SaturatedStakeRewardBps uint32
-	Saturated               bool
-	Warning                 string
+	ValidatorID		string
+	BondedStakeNaet		sdkmath.Int
+	SaturationThresholdNaet	sdkmath.Int
+	CapFactorBps		uint32
+	SaturationCapNaet	sdkmath.Int
+	EffectiveStakeNaet	sdkmath.Int
+	SaturatedStakeNaet	sdkmath.Int
+	RewardWeightNaet	sdkmath.Int
+	SaturatedStakeRewardBps	uint32
+	Saturated		bool
+	Warning			string
 }
 
 type VotingPowerCapStatus struct {
-	CapNaet               sdkmath.Int
-	PreCapVotingPowerNaet sdkmath.Int
-	FinalVotingPowerNaet  sdkmath.Int
-	ExcessVotingPowerNaet sdkmath.Int
-	MaxVotingPowerBps     uint32
-	SoftCapped            bool
-	Warning               string
+	CapNaet			sdkmath.Int
+	PreCapVotingPowerNaet	sdkmath.Int
+	FinalVotingPowerNaet	sdkmath.Int
+	ExcessVotingPowerNaet	sdkmath.Int
+	MaxVotingPowerBps	uint32
+	SoftCapped		bool
+	Warning			string
 }
 
 type Selection struct {
-	Active             []ScoredValidator
-	Rejected           []RejectedCandidate
-	TargetActive       uint32
-	InsufficientActive bool
+	Active			[]ScoredValidator
+	Rejected		[]RejectedCandidate
+	TargetActive		uint32
+	InsufficientActive	bool
 }
 
 type RejectedCandidate struct {
-	Candidate Candidate
-	Reason    string
+	Candidate	Candidate
+	Reason		string
 }
 
 type RewardInput struct {
-	ValidatorID      string
-	TotalRewardsNaet sdkmath.Int
-	CommissionBps    uint32
-	SelfStakeNaet    sdkmath.Int
-	Nominations      []Nomination
+	ValidatorID		string
+	TotalRewardsNaet	sdkmath.Int
+	CommissionBps		uint32
+	SelfStakeNaet		sdkmath.Int
+	Nominations		[]Nomination
 }
 
 type RewardDistribution struct {
-	ValidatorID             string
-	ValidatorCommissionNaet sdkmath.Int
-	ValidatorSelfShareNaet  sdkmath.Int
-	NominatorRewards        []NominatorReward
-	RemainderNaet           sdkmath.Int
-	TotalDistributedNaet    sdkmath.Int
+	ValidatorID		string
+	ValidatorCommissionNaet	sdkmath.Int
+	ValidatorSelfShareNaet	sdkmath.Int
+	NominatorRewards	[]NominatorReward
+	RemainderNaet		sdkmath.Int
+	TotalDistributedNaet	sdkmath.Int
 }
 
 type NominatorReward struct {
-	NominatorID string
-	RewardNaet  sdkmath.Int
+	NominatorID	string
+	RewardNaet	sdkmath.Int
 }
 
 type SlashInput struct {
-	ValidatorID       string
-	Misbehavior       string
-	SlashFractionBps  uint32
-	SelfStakeNaet     sdkmath.Int
-	Nominations       []Nomination
-	EvidenceHeight    int64
-	EvidenceFinalized bool
+	ValidatorID		string
+	Misbehavior		string
+	SlashFractionBps	uint32
+	SelfStakeNaet		sdkmath.Int
+	Nominations		[]Nomination
+	EvidenceHeight		int64
+	EvidenceFinalized	bool
 }
 
 type SlashDistribution struct {
-	ValidatorID       string
-	Misbehavior       string
-	SelfSlashedNaet   sdkmath.Int
-	NominatorSlashes  []NominatorSlash
-	TotalSlashedNaet  sdkmath.Int
-	EvidenceHeight    int64
-	EvidenceFinalized bool
+	ValidatorID		string
+	Misbehavior		string
+	SelfSlashedNaet		sdkmath.Int
+	NominatorSlashes	[]NominatorSlash
+	TotalSlashedNaet	sdkmath.Int
+	EvidenceHeight		int64
+	EvidenceFinalized	bool
 }
 
 type NominatorSlash struct {
-	NominatorID string
-	SlashedNaet sdkmath.Int
+	NominatorID	string
+	SlashedNaet	sdkmath.Int
 }
 
 func DefaultParams() Params {
 	return Params{
-		MinActiveValidators:          DefaultMinActiveValidators,
-		MaxActiveValidators:          DefaultMaxActiveValidators,
-		EpochDurationSeconds:         DefaultEpochDurationSeconds,
-		PhaseDurations:               DefaultEpochPhaseDurations(DefaultEpochDurationSeconds),
-		EpochSeedSource:              EpochSeedSourcePreviousSeedValidatorSet,
-		MaxValidatorSetChangeRateBps: DefaultMaxValidatorSetChangeRateBps,
-		DelegationActivationEpochs:   DefaultDelegationActivationEpochs,
-		EvidenceWindowEpochs:         DefaultEvidenceWindowEpochs,
-		MinStakeNaet:                 sdkmath.NewInt(1_000_000_000),
-		MaxCommissionBps:             DefaultMaxCommissionBps,
-		MaxVotingPowerBps:            DefaultMaxVotingPowerBps,
-		MinUptimeBps:                 DefaultMinUptimeBps,
-		InactiveAfterEpochs:          DefaultInactiveAfterEpochs,
-		StakeDecayBps:                DefaultStakeDecayBps,
-		StakeSaturationThresholdNaet: sdkmath.NewInt(DefaultStakeSaturationThresholdNaet),
-		StakeSaturationCapFactorBps:  DefaultStakeSaturationCapFactorBps,
-		StakeSaturationNaet:          sdkmath.NewInt(DefaultStakeSaturationNaet),
-		SaturatedStakeRewardBps:      DefaultSaturatedStakeRewardBps,
-		UnbondingSeconds:             DefaultUnbondingSeconds,
-		TargetCommitMillis:           DefaultTargetCommitMillis,
-		MinTaskGroupValidators:       DefaultMinTaskGroupValidators,
-		MaxTaskGroupValidators:       DefaultMaxTaskGroupValidators,
-		ReporterRewardBps:            DefaultReporterRewardBps,
+		MinActiveValidators:		DefaultMinActiveValidators,
+		MaxActiveValidators:		DefaultMaxActiveValidators,
+		EpochDurationSeconds:		DefaultEpochDurationSeconds,
+		PhaseDurations:			DefaultEpochPhaseDurations(DefaultEpochDurationSeconds),
+		EpochSeedSource:		EpochSeedSourcePreviousSeedValidatorSet,
+		MaxValidatorSetChangeRateBps:	DefaultMaxValidatorSetChangeRateBps,
+		DelegationActivationEpochs:	DefaultDelegationActivationEpochs,
+		EvidenceWindowEpochs:		DefaultEvidenceWindowEpochs,
+		MinStakeNaet:			sdkmath.NewInt(1_000_000_000),
+		MaxCommissionBps:		DefaultMaxCommissionBps,
+		MaxVotingPowerBps:		DefaultMaxVotingPowerBps,
+		MinUptimeBps:			DefaultMinUptimeBps,
+		InactiveAfterEpochs:		DefaultInactiveAfterEpochs,
+		StakeDecayBps:			DefaultStakeDecayBps,
+		StakeSaturationThresholdNaet:	sdkmath.NewInt(DefaultStakeSaturationThresholdNaet),
+		StakeSaturationCapFactorBps:	DefaultStakeSaturationCapFactorBps,
+		StakeSaturationNaet:		sdkmath.NewInt(DefaultStakeSaturationNaet),
+		SaturatedStakeRewardBps:	DefaultSaturatedStakeRewardBps,
+		UnbondingSeconds:		DefaultUnbondingSeconds,
+		TargetCommitMillis:		DefaultTargetCommitMillis,
+		MinTaskGroupValidators:		DefaultMinTaskGroupValidators,
+		MaxTaskGroupValidators:		DefaultMaxTaskGroupValidators,
+		ReporterRewardBps:		DefaultReporterRewardBps,
 		PerformanceWeights: PerformanceWeights{
-			UptimeWeightBps:      DefaultPerformanceUptimeWeightBps,
-			LatencyWeightBps:     DefaultPerformanceLatencyWeightBps,
-			CorrectnessWeightBps: DefaultPerformanceCorrectnessWeightBps,
+			UptimeWeightBps:	DefaultPerformanceUptimeWeightBps,
+			LatencyWeightBps:	DefaultPerformanceLatencyWeightBps,
+			CorrectnessWeightBps:	DefaultPerformanceCorrectnessWeightBps,
 		},
 	}
 }
@@ -471,12 +471,12 @@ func ScoreCandidate(params Params, candidate Candidate) (ScoredValidator, error)
 	}
 	components := ComputeValidatorScoreComponents(params, totalStake, candidate)
 	return ScoredValidator{
-		Candidate:          cloneCandidate(candidate),
-		TotalStakeNaet:     totalStake,
-		EffectiveStakeNaet: components.StakeWeightNaet,
-		Score:              components.Score,
-		VotingPowerNaet:    components.StakeWeightNaet,
-		ScoreComponents:    components,
+		Candidate:		cloneCandidate(candidate),
+		TotalStakeNaet:		totalStake,
+		EffectiveStakeNaet:	components.StakeWeightNaet,
+		Score:			components.Score,
+		VotingPowerNaet:	components.StakeWeightNaet,
+		ScoreComponents:	components,
 	}, nil
 }
 
@@ -492,15 +492,15 @@ func ComputeValidatorScoreComponents(params Params, totalStake sdkmath.Int, cand
 	score = mulIntBps(score, latencyFactor)
 	score = mulIntBps(score, reliabilityIndex)
 	return ValidatorScoreComponents{
-		StakeWeightNaet:        stakeWeight,
-		StakeSaturationCapNaet: saturationCap,
-		SaturatedStakeNaet:     saturatedStake,
-		RewardWeightNaet:       RewardCurveStakeWeight(decayedStake, params),
-		PerformanceFactorBps:   candidate.PerformanceScoreBps,
-		UptimeFactorBps:        candidate.UptimeFactorBps,
-		LatencyFactorBps:       latencyFactor,
-		ReliabilityIndexBps:    reliabilityIndex,
-		Score:                  score,
+		StakeWeightNaet:	stakeWeight,
+		StakeSaturationCapNaet:	saturationCap,
+		SaturatedStakeNaet:	saturatedStake,
+		RewardWeightNaet:	RewardCurveStakeWeight(decayedStake, params),
+		PerformanceFactorBps:	candidate.PerformanceScoreBps,
+		UptimeFactorBps:	candidate.UptimeFactorBps,
+		LatencyFactorBps:	latencyFactor,
+		ReliabilityIndexBps:	reliabilityIndex,
+		Score:			score,
 	}
 }
 
@@ -583,15 +583,15 @@ func PreviewDelegationSaturation(params Params, candidate Candidate, additionalS
 func buildStakeSaturationPreview(params Params, validatorID string, bondedStake sdkmath.Int) StakeSaturationPreview {
 	cap := StakeSaturationCap(params)
 	preview := StakeSaturationPreview{
-		ValidatorID:             validatorID,
-		BondedStakeNaet:         bondedStake,
-		SaturationThresholdNaet: params.StakeSaturationThresholdNaet,
-		CapFactorBps:            params.StakeSaturationCapFactorBps,
-		SaturationCapNaet:       cap,
-		EffectiveStakeNaet:      ApplyStakeSaturation(bondedStake, params),
-		SaturatedStakeNaet:      SaturatedStake(bondedStake, params),
-		RewardWeightNaet:        RewardCurveStakeWeight(bondedStake, params),
-		SaturatedStakeRewardBps: params.SaturatedStakeRewardBps,
+		ValidatorID:			validatorID,
+		BondedStakeNaet:		bondedStake,
+		SaturationThresholdNaet:	params.StakeSaturationThresholdNaet,
+		CapFactorBps:			params.StakeSaturationCapFactorBps,
+		SaturationCapNaet:		cap,
+		EffectiveStakeNaet:		ApplyStakeSaturation(bondedStake, params),
+		SaturatedStakeNaet:		SaturatedStake(bondedStake, params),
+		RewardWeightNaet:		RewardCurveStakeWeight(bondedStake, params),
+		SaturatedStakeRewardBps:	params.SaturatedStakeRewardBps,
 	}
 	preview.Saturated = preview.SaturatedStakeNaet.IsPositive()
 	if preview.Saturated {
@@ -625,17 +625,17 @@ func DistributeRewards(input RewardInput) (RewardDistribution, error) {
 	remaining := input.TotalRewardsNaet.Sub(commission)
 	validatorSelfShare := shareByStake(remaining, input.SelfStakeNaet, totalStake)
 	out := RewardDistribution{
-		ValidatorID:             strings.TrimSpace(input.ValidatorID),
-		ValidatorCommissionNaet: commission,
-		ValidatorSelfShareNaet:  validatorSelfShare,
-		NominatorRewards:        make([]NominatorReward, 0, len(input.Nominations)),
+		ValidatorID:			strings.TrimSpace(input.ValidatorID),
+		ValidatorCommissionNaet:	commission,
+		ValidatorSelfShareNaet:		validatorSelfShare,
+		NominatorRewards:		make([]NominatorReward, 0, len(input.Nominations)),
 	}
 	distributed := commission.Add(validatorSelfShare)
 	for _, nomination := range sortNominations(input.Nominations) {
 		reward := shareByStake(remaining, nomination.StakeNaet, totalStake)
 		out.NominatorRewards = append(out.NominatorRewards, NominatorReward{
-			NominatorID: nomination.NominatorID,
-			RewardNaet:  reward,
+			NominatorID:	nomination.NominatorID,
+			RewardNaet:	reward,
 		})
 		distributed = distributed.Add(reward)
 	}
@@ -667,19 +667,19 @@ func ComputeSlash(input SlashInput) (SlashDistribution, error) {
 		return SlashDistribution{}, err
 	}
 	out := SlashDistribution{
-		ValidatorID:       strings.TrimSpace(input.ValidatorID),
-		Misbehavior:       input.Misbehavior,
-		SelfSlashedNaet:   mulIntBps(input.SelfStakeNaet, input.SlashFractionBps),
-		NominatorSlashes:  make([]NominatorSlash, 0, len(input.Nominations)),
-		EvidenceHeight:    input.EvidenceHeight,
-		EvidenceFinalized: input.EvidenceFinalized,
+		ValidatorID:		strings.TrimSpace(input.ValidatorID),
+		Misbehavior:		input.Misbehavior,
+		SelfSlashedNaet:	mulIntBps(input.SelfStakeNaet, input.SlashFractionBps),
+		NominatorSlashes:	make([]NominatorSlash, 0, len(input.Nominations)),
+		EvidenceHeight:		input.EvidenceHeight,
+		EvidenceFinalized:	input.EvidenceFinalized,
 	}
 	out.TotalSlashedNaet = out.SelfSlashedNaet
 	for _, nomination := range sortNominations(input.Nominations) {
 		slashed := mulIntBps(nomination.StakeNaet, input.SlashFractionBps)
 		out.NominatorSlashes = append(out.NominatorSlashes, NominatorSlash{
-			NominatorID: nomination.NominatorID,
-			SlashedNaet: slashed,
+			NominatorID:	nomination.NominatorID,
+			SlashedNaet:	slashed,
 		})
 		out.TotalSlashedNaet = out.TotalSlashedNaet.Add(slashed)
 	}
@@ -749,10 +749,10 @@ func applyVotingPowerCap(params Params, validators []ScoredValidator) {
 	cap := mulIntBps(total, params.MaxVotingPowerBps)
 	for i := range validators {
 		status := VotingPowerCapStatus{
-			CapNaet:               cap,
-			PreCapVotingPowerNaet: validators[i].VotingPowerNaet,
-			FinalVotingPowerNaet:  validators[i].VotingPowerNaet,
-			MaxVotingPowerBps:     params.MaxVotingPowerBps,
+			CapNaet:		cap,
+			PreCapVotingPowerNaet:	validators[i].VotingPowerNaet,
+			FinalVotingPowerNaet:	validators[i].VotingPowerNaet,
+			MaxVotingPowerBps:	params.MaxVotingPowerBps,
 		}
 		if validators[i].VotingPowerNaet.GT(cap) {
 			status.ExcessVotingPowerNaet = validators[i].VotingPowerNaet.Sub(cap)

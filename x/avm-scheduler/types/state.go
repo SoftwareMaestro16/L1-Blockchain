@@ -10,134 +10,134 @@ import (
 )
 
 const (
-	BatchStatusQueued    = "queued"
-	BatchStatusFinalized = "finalized"
+	BatchStatusQueued	= "queued"
+	BatchStatusFinalized	= "finalized"
 
-	ReceiptStatusSuccess = "success"
-	ReceiptStatusFailure = "failure"
+	ReceiptStatusSuccess	= "success"
+	ReceiptStatusFailure	= "failure"
 
-	DefaultInitialStateRoot = "0000000000000000000000000000000000000000000000000000000000000000"
-	MaxAVMSetKeyBytes       = 256
+	DefaultInitialStateRoot	= "0000000000000000000000000000000000000000000000000000000000000000"
+	MaxAVMSetKeyBytes	= 256
 )
 
 type AVMSchedulerParams struct {
-	MaxExecutionsPerBlock uint32
-	MaxParallelism        uint32
-	MaxQueueDepth         uint32
-	MaxReadSetKeys        uint32
-	MaxWriteSetKeys       uint32
-	MaxReceipts           uint32
+	MaxExecutionsPerBlock	uint32
+	MaxParallelism		uint32
+	MaxQueueDepth		uint32
+	MaxReadSetKeys		uint32
+	MaxWriteSetKeys		uint32
+	MaxReceipts		uint32
 }
 
 type AVMSchedulerState struct {
-	ExecutionQueue      []AVMExecutionBatch
-	DependencyGraphs    []AVMDependencyGraph
-	ExecutionReceipts   []AVMExecutionReceipt
-	ConflictCounters    []AVMConflictCounter
-	LastFinalizedHeight uint64
+	ExecutionQueue		[]AVMExecutionBatch
+	DependencyGraphs	[]AVMDependencyGraph
+	ExecutionReceipts	[]AVMExecutionReceipt
+	ConflictCounters	[]AVMConflictCounter
+	LastFinalizedHeight	uint64
 }
 
 type AVMExecutionBatch struct {
-	BatchID          string
-	SubmittedHeight  uint64
-	InitialStateRoot string
-	Status           string
-	Tasks            []AVMExecutionTask
+	BatchID			string
+	SubmittedHeight		uint64
+	InitialStateRoot	string
+	Status			string
+	Tasks			[]AVMExecutionTask
 }
 
 type AVMExecutionTask struct {
-	TaskID          string
-	ContractAddress string
-	Mailbox         string
-	ReadSet         []string
-	WriteSet        []string
-	StateWrites     []AVMStateWrite
-	GasLimit        uint64
+	TaskID		string
+	ContractAddress	string
+	Mailbox		string
+	ReadSet		[]string
+	WriteSet	[]string
+	StateWrites	[]AVMStateWrite
+	GasLimit	uint64
 }
 
 type AVMStateWrite struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 type AVMDependencyGraph struct {
-	BatchID        string
-	Nodes          []AVMDependencyNode
-	ParallelGroups []AVMExecutionGroup
-	FallbackSerial bool
-	GraphHash      string
+	BatchID		string
+	Nodes		[]AVMDependencyNode
+	ParallelGroups	[]AVMExecutionGroup
+	FallbackSerial	bool
+	GraphHash	string
 }
 
 type AVMDependencyNode struct {
-	TaskID          string
-	ContractAddress string
-	Mailbox         string
-	ReadSet         []string
-	WriteSet        []string
-	Dependencies    []string
+	TaskID		string
+	ContractAddress	string
+	Mailbox		string
+	ReadSet		[]string
+	WriteSet	[]string
+	Dependencies	[]string
 }
 
 type AVMExecutionGroup struct {
-	GroupIndex uint32
-	TaskIDs    []string
+	GroupIndex	uint32
+	TaskIDs		[]string
 }
 
 type AVMExecutionReceipt struct {
-	ReceiptID       string
-	BatchID         string
-	TaskID          string
-	ContractAddress string
-	Height          uint64
-	Order           uint32
-	Status          string
-	GasUsed         uint64
-	StateRootBefore string
-	StateRootAfter  string
-	Error           string
-	FallbackSerial  bool
+	ReceiptID	string
+	BatchID		string
+	TaskID		string
+	ContractAddress	string
+	Height		uint64
+	Order		uint32
+	Status		string
+	GasUsed		uint64
+	StateRootBefore	string
+	StateRootAfter	string
+	Error		string
+	FallbackSerial	bool
 }
 
 type AVMConflictCounter struct {
-	ContractAddress    string
-	ConflictCount      uint64
-	LastConflictHeight uint64
+	ContractAddress		string
+	ConflictCount		uint64
+	LastConflictHeight	uint64
 }
 
 type MsgSubmitAVMExecutionBatch struct {
-	Authority string
-	Batch     AVMExecutionBatch
+	Authority	string
+	Batch		AVMExecutionBatch
 }
 
 type MsgFinalizeAVMExecutionBatch struct {
-	Authority     string
-	BatchID       string
-	Height        uint64
-	ForceSerial   bool
-	FailedTaskIDs []string
+	Authority	string
+	BatchID		string
+	Height		uint64
+	ForceSerial	bool
+	FailedTaskIDs	[]string
 }
 
 type MsgUpdateAVMSchedulerParams struct {
-	Authority       string
-	SchedulerParams AVMSchedulerParams
+	Authority	string
+	SchedulerParams	AVMSchedulerParams
 }
 
 func DefaultAVMSchedulerParams() AVMSchedulerParams {
 	return AVMSchedulerParams{
-		MaxExecutionsPerBlock: 64,
-		MaxParallelism:        8,
-		MaxQueueDepth:         128,
-		MaxReadSetKeys:        64,
-		MaxWriteSetKeys:       64,
-		MaxReceipts:           1024,
+		MaxExecutionsPerBlock:	64,
+		MaxParallelism:		8,
+		MaxQueueDepth:		128,
+		MaxReadSetKeys:		64,
+		MaxWriteSetKeys:	64,
+		MaxReceipts:		1024,
 	}
 }
 
 func EmptyAVMSchedulerState() AVMSchedulerState {
 	return AVMSchedulerState{
-		ExecutionQueue:    []AVMExecutionBatch{},
-		DependencyGraphs:  []AVMDependencyGraph{},
-		ExecutionReceipts: []AVMExecutionReceipt{},
-		ConflictCounters:  []AVMConflictCounter{},
+		ExecutionQueue:		[]AVMExecutionBatch{},
+		DependencyGraphs:	[]AVMDependencyGraph{},
+		ExecutionReceipts:	[]AVMExecutionReceipt{},
+		ConflictCounters:	[]AVMConflictCounter{},
 	}
 }
 
@@ -162,11 +162,11 @@ func (p AVMSchedulerParams) Validate() error {
 
 func (s AVMSchedulerState) Export() AVMSchedulerState {
 	out := AVMSchedulerState{
-		ExecutionQueue:      cloneBatches(s.ExecutionQueue),
-		DependencyGraphs:    cloneGraphs(s.DependencyGraphs),
-		ExecutionReceipts:   cloneReceipts(s.ExecutionReceipts),
-		ConflictCounters:    cloneCounters(s.ConflictCounters),
-		LastFinalizedHeight: s.LastFinalizedHeight,
+		ExecutionQueue:		cloneBatches(s.ExecutionQueue),
+		DependencyGraphs:	cloneGraphs(s.DependencyGraphs),
+		ExecutionReceipts:	cloneReceipts(s.ExecutionReceipts),
+		ConflictCounters:	cloneCounters(s.ConflictCounters),
+		LastFinalizedHeight:	s.LastFinalizedHeight,
 	}
 	SortBatches(out.ExecutionQueue)
 	SortGraphs(out.DependencyGraphs)
@@ -413,12 +413,12 @@ func (g AVMDependencyGraph) Validate(params AVMSchedulerParams) error {
 
 func (n AVMDependencyNode) Validate(params AVMSchedulerParams) error {
 	task := AVMExecutionTask{
-		TaskID:          n.TaskID,
-		ContractAddress: n.ContractAddress,
-		Mailbox:         n.Mailbox,
-		ReadSet:         n.ReadSet,
-		WriteSet:        n.WriteSet,
-		GasLimit:        1,
+		TaskID:			n.TaskID,
+		ContractAddress:	n.ContractAddress,
+		Mailbox:		n.Mailbox,
+		ReadSet:		n.ReadSet,
+		WriteSet:		n.WriteSet,
+		GasLimit:		1,
 	}
 	if err := task.Validate(params); err != nil {
 		return err
@@ -503,18 +503,18 @@ func BuildDependencyGraph(batch AVMExecutionBatch, params AVMSchedulerParams, fo
 			}
 		}
 		nodes[i] = AVMDependencyNode{
-			TaskID:          task.TaskID,
-			ContractAddress: task.ContractAddress,
-			Mailbox:         task.Mailbox,
-			ReadSet:         append([]string(nil), task.ReadSet...),
-			WriteSet:        append([]string(nil), task.WriteSet...),
-			Dependencies:    normalizeSet(deps),
+			TaskID:			task.TaskID,
+			ContractAddress:	task.ContractAddress,
+			Mailbox:		task.Mailbox,
+			ReadSet:		append([]string(nil), task.ReadSet...),
+			WriteSet:		append([]string(nil), task.WriteSet...),
+			Dependencies:		normalizeSet(deps),
 		}
 	}
 	graph := AVMDependencyGraph{
-		BatchID:        batch.BatchID,
-		Nodes:          nodes,
-		FallbackSerial: forceSerial,
+		BatchID:	batch.BatchID,
+		Nodes:		nodes,
+		FallbackSerial:	forceSerial,
 	}
 	if forceSerial {
 		graph.ParallelGroups = serialGroups(batch.Tasks)

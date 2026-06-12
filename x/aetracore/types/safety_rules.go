@@ -12,66 +12,66 @@ type DeterminismRuleID string
 type RoutingSafetyRuleID string
 
 const (
-	DeterminismNoExternalAPIs      DeterminismRuleID = "no-external-api-calls"
-	DeterminismNoLocalClock        DeterminismRuleID = "no-local-clock"
-	DeterminismNoRandomShard       DeterminismRuleID = "no-random-shard-placement"
-	DeterminismNoMapIteration      DeterminismRuleID = "no-nondeterministic-map-iteration"
-	DeterminismNoMempoolOnlyOutput DeterminismRuleID = "no-mempool-only-execution-results"
-	DeterminismNoFloatingPoint     DeterminismRuleID = "no-floating-point-consensus-math"
+	DeterminismNoExternalAPIs	DeterminismRuleID	= "no-external-api-calls"
+	DeterminismNoLocalClock		DeterminismRuleID	= "no-local-clock"
+	DeterminismNoRandomShard	DeterminismRuleID	= "no-random-shard-placement"
+	DeterminismNoMapIteration	DeterminismRuleID	= "no-nondeterministic-map-iteration"
+	DeterminismNoMempoolOnlyOutput	DeterminismRuleID	= "no-mempool-only-execution-results"
+	DeterminismNoFloatingPoint	DeterminismRuleID	= "no-floating-point-consensus-math"
 
-	RoutingSafetyCommittedTable        RoutingSafetyRuleID = "routing-table-committed"
-	RoutingSafetyCommittedMetrics      RoutingSafetyRuleID = "routing-metrics-committed"
-	RoutingSafetyDeterministicTieBreak RoutingSafetyRuleID = "deterministic-path-tie-breaks"
-	RoutingSafetyRouteFailureReceipt   RoutingSafetyRuleID = "failed-route-receipt"
-	RoutingSafetyBounceValueCap        RoutingSafetyRuleID = "bounce-value-cap"
+	RoutingSafetyCommittedTable		RoutingSafetyRuleID	= "routing-table-committed"
+	RoutingSafetyCommittedMetrics		RoutingSafetyRuleID	= "routing-metrics-committed"
+	RoutingSafetyDeterministicTieBreak	RoutingSafetyRuleID	= "deterministic-path-tie-breaks"
+	RoutingSafetyRouteFailureReceipt	RoutingSafetyRuleID	= "failed-route-receipt"
+	RoutingSafetyBounceValueCap		RoutingSafetyRuleID	= "bounce-value-cap"
 )
 
 type DeterminismRule struct {
-	RuleID         DeterminismRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		DeterminismRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type RoutingSafetyRule struct {
-	RuleID         RoutingSafetyRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		RoutingSafetyRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type SafetyRulesSpec struct {
-	Version         uint64
-	Determinism     []DeterminismRule
-	RoutingSafety   []RoutingSafetyRule
-	DeterminismRoot string
-	RoutingRoot     string
-	Root            string
+	Version		uint64
+	Determinism	[]DeterminismRule
+	RoutingSafety	[]RoutingSafetyRule
+	DeterminismRoot	string
+	RoutingRoot	string
+	Root		string
 }
 
 type ConsensusDeterminismEvidence struct {
-	ExternalAPICalls     bool
-	LocalClockUsage      bool
-	RandomShardPlacement bool
-	MapIterationOutput   bool
-	MempoolOnlyResult    bool
-	FloatingPointMath    bool
-	EvidenceHash         string
+	ExternalAPICalls	bool
+	LocalClockUsage		bool
+	RandomShardPlacement	bool
+	MapIterationOutput	bool
+	MempoolOnlyResult	bool
+	FloatingPointMath	bool
+	EvidenceHash		string
 }
 
 type RoutingSafetyEvidence struct {
-	RoutingTableHash          string
-	RoutingMetricsRoot        string
-	DeterministicTieBreakHash string
-	FailureReceiptRoot        string
-	BounceValueCapHash        string
-	FailedRouteValueNAET      uint64
-	ReceiptedValueNAET        uint64
-	OriginalBounceValueNAET   uint64
-	BounceValueNAET           uint64
-	EvidenceHash              string
+	RoutingTableHash		string
+	RoutingMetricsRoot		string
+	DeterministicTieBreakHash	string
+	FailureReceiptRoot		string
+	BounceValueCapHash		string
+	FailedRouteValueNAET		uint64
+	ReceiptedValueNAET		uint64
+	OriginalBounceValueNAET		uint64
+	BounceValueNAET			uint64
+	EvidenceHash			string
 }
 
 func DefaultSafetyRulesSpec() (SafetyRulesSpec, error) {
@@ -101,9 +101,9 @@ func RoutingSafetyRules() []RoutingSafetyRule {
 
 func BuildSafetyRulesSpec(determinism []DeterminismRule, routing []RoutingSafetyRule) (SafetyRulesSpec, error) {
 	spec := SafetyRulesSpec{
-		Version:       SafetyRulesSpecVersion,
-		Determinism:   normalizeDeterminismRules(determinism),
-		RoutingSafety: normalizeRoutingSafetyRules(routing),
+		Version:	SafetyRulesSpecVersion,
+		Determinism:	normalizeDeterminismRules(determinism),
+		RoutingSafety:	normalizeRoutingSafetyRules(routing),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return SafetyRulesSpec{}, err
@@ -254,8 +254,8 @@ func ValidateConsensusDeterminismEvidence(e ConsensusDeterminismEvidence) error 
 func ValidateRoutingSafetyEvidence(e RoutingSafetyEvidence) error {
 	e = normalizeRoutingSafetyEvidence(e)
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore routing safety table hash", e.RoutingTableHash},
 		{"aetracore routing safety metrics root", e.RoutingMetricsRoot},

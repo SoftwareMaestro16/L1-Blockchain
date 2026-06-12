@@ -69,8 +69,8 @@ import (
 )
 
 var (
-	_ runtime.AppI            = (*L1App)(nil)
-	_ servertypes.Application = (*L1App)(nil)
+	_	runtime.AppI		= (*L1App)(nil)
+	_	servertypes.Application	= (*L1App)(nil)
 )
 
 // L1App extends an ABCI application, but with most of its parameters exported.
@@ -78,84 +78,84 @@ var (
 // capabilities aren't needed for testing.
 type L1App struct {
 	*baseapp.BaseApp
-	legacyAmino       *codec.LegacyAmino
-	appCodec          codec.Codec
-	txConfig          client.TxConfig
-	interfaceRegistry codectypes.InterfaceRegistry
+	legacyAmino		*codec.LegacyAmino
+	appCodec		codec.Codec
+	txConfig		client.TxConfig
+	interfaceRegistry	codectypes.InterfaceRegistry
 
 	// keys to access the substores
-	keys map[string]*storetypes.KVStoreKey
+	keys	map[string]*storetypes.KVStoreKey
 
 	// essential keepers
-	AccountKeeper         authkeeper.AccountKeeper
-	BankKeeper            bankkeeper.BaseKeeper
-	StakingKeeper         *stakingkeeper.Keeper
-	SlashingKeeper        slashingkeeper.Keeper
-	MintKeeper            mintkeeper.Keeper
-	DistrKeeper           distrkeeper.Keeper
-	GovKeeper             govkeeper.Keeper
-	UpgradeKeeper         *upgradekeeper.Keeper
-	EvidenceKeeper        evidencekeeper.Keeper
-	ConsensusParamsKeeper consensusparamkeeper.Keeper
+	AccountKeeper		authkeeper.AccountKeeper
+	BankKeeper		bankkeeper.BaseKeeper
+	StakingKeeper		*stakingkeeper.Keeper
+	SlashingKeeper		slashingkeeper.Keeper
+	MintKeeper		mintkeeper.Keeper
+	DistrKeeper		distrkeeper.Keeper
+	GovKeeper		govkeeper.Keeper
+	UpgradeKeeper		*upgradekeeper.Keeper
+	EvidenceKeeper		evidencekeeper.Keeper
+	ConsensusParamsKeeper	consensusparamkeeper.Keeper
 
 	// supplementary keepers
-	FeeGrantKeeper            feegrantkeeper.Keeper
-	AuthzKeeper               authzkeeper.Keeper
-	EpochsKeeper              *epochskeeper.Keeper
-	ProtocolPoolKeeper        protocolpoolkeeper.Keeper
-	ConfigKeeper              configkeeper.Keeper
-	ConfigVotingKeeper        configvotingkeeper.Keeper
-	ConstitutionKeeper        constitutionkeeper.Keeper
-	BurnKeeper                burnkeeper.Keeper
-	TreasuryKeeper            treasurykeeper.Keeper
-	EmissionsKeeper           emissionskeeper.Keeper
-	MintAuthorityKeeper       mintauthoritykeeper.Keeper
-	DelegatorProtectionKeeper delegatorprotectionkeeper.Keeper
-	ReputationKeeper          reputationkeeper.Keeper
-	PerformanceKeeper         performancekeeper.Keeper
-	DynamicCommissionKeeper   dynamiccommissionkeeper.Keeper
-	StakeConcentrationKeeper  stakeconcentrationkeeper.Keeper
-	FeeCollectorKeeper        feecollectorkeeper.Keeper
-	FeesKeeper                feeskeeper.Keeper
-	AetraCoreKeeper           aetracorekeeper.Keeper
-	LoadKeeper                loadkeeper.Keeper
-	RoutingKeeper             routingkeeper.Keeper
-	ZonesKeeper               zoneskeeper.Keeper
-	MeshKeeper                meshkeeper.Keeper
-	NetworkingKeeper          networkingkeeper.Keeper
-	NativeAccountKeeper       nativeaccountkeeper.Keeper
-	PaymentsKeeper            paymentskeeper.Keeper
-	SchedulerKeeper           schedulerkeeper.Keeper
-	AVMSchedulerKeeper        avmschedulerkeeper.Keeper
-	ActorRegistryKeeper       actorregistrykeeper.Keeper
-	ContractsKeeper           contractskeeper.Keeper
-	StorageRentKeeper         storagerentkeeper.Keeper
-	IdentityRootKeeper        identityrootkeeper.Keeper
-	BridgeHubKeeper           bridgehubkeeper.Keeper
-	CrossChainRegistryKeeper  crosschainregistrykeeper.Keeper
-	ShardingCoordinatorKeeper shardingcoordinatorkeeper.Keeper
-	SystemRegistryKeeper      systemregistrykeeper.Keeper
-	NativeEvidenceKeeper      nativeevidencekeeper.Keeper
-	ReporterKeeper            reporterkeeper.Keeper
-	NominatorPoolKeeper       nominatorpoolkeeper.Keeper
-	SingleNominatorPoolKeeper singlenominatorpoolkeeper.Keeper
-	ValidatorElectionKeeper   validatorelectionkeeper.Keeper
-	ValidatorInsuranceKeeper  validatorinsurancekeeper.Keeper
-	ValidatorRegistryKeeper   validatorregistrykeeper.Keeper
-	AetraStakingPolicyKeeper  aetrastakingpolicykeeper.Keeper
-	AetraEconomicsKeeper      aetraeconomicskeeper.Keeper
-	AetraValidatorScoreKeeper aetravalidatorscorekeeper.Keeper
+	FeeGrantKeeper			feegrantkeeper.Keeper
+	AuthzKeeper			authzkeeper.Keeper
+	EpochsKeeper			*epochskeeper.Keeper
+	ProtocolPoolKeeper		protocolpoolkeeper.Keeper
+	ConfigKeeper			configkeeper.Keeper
+	ConfigVotingKeeper		configvotingkeeper.Keeper
+	ConstitutionKeeper		constitutionkeeper.Keeper
+	BurnKeeper			burnkeeper.Keeper
+	TreasuryKeeper			treasurykeeper.Keeper
+	EmissionsKeeper			emissionskeeper.Keeper
+	MintAuthorityKeeper		mintauthoritykeeper.Keeper
+	DelegatorProtectionKeeper	delegatorprotectionkeeper.Keeper
+	ReputationKeeper		reputationkeeper.Keeper
+	PerformanceKeeper		performancekeeper.Keeper
+	DynamicCommissionKeeper		dynamiccommissionkeeper.Keeper
+	StakeConcentrationKeeper	stakeconcentrationkeeper.Keeper
+	FeeCollectorKeeper		feecollectorkeeper.Keeper
+	FeesKeeper			feeskeeper.Keeper
+	AetraCoreKeeper			aetracorekeeper.Keeper
+	LoadKeeper			loadkeeper.Keeper
+	RoutingKeeper			routingkeeper.Keeper
+	ZonesKeeper			zoneskeeper.Keeper
+	MeshKeeper			meshkeeper.Keeper
+	NetworkingKeeper		networkingkeeper.Keeper
+	NativeAccountKeeper		nativeaccountkeeper.Keeper
+	PaymentsKeeper			paymentskeeper.Keeper
+	SchedulerKeeper			schedulerkeeper.Keeper
+	AVMSchedulerKeeper		avmschedulerkeeper.Keeper
+	ActorRegistryKeeper		actorregistrykeeper.Keeper
+	ContractsKeeper			contractskeeper.Keeper
+	StorageRentKeeper		storagerentkeeper.Keeper
+	IdentityRootKeeper		identityrootkeeper.Keeper
+	BridgeHubKeeper			bridgehubkeeper.Keeper
+	CrossChainRegistryKeeper	crosschainregistrykeeper.Keeper
+	ShardingCoordinatorKeeper	shardingcoordinatorkeeper.Keeper
+	SystemRegistryKeeper		systemregistrykeeper.Keeper
+	NativeEvidenceKeeper		nativeevidencekeeper.Keeper
+	ReporterKeeper			reporterkeeper.Keeper
+	NominatorPoolKeeper		nominatorpoolkeeper.Keeper
+	SingleNominatorPoolKeeper	singlenominatorpoolkeeper.Keeper
+	ValidatorElectionKeeper		validatorelectionkeeper.Keeper
+	ValidatorInsuranceKeeper	validatorinsurancekeeper.Keeper
+	ValidatorRegistryKeeper		validatorregistrykeeper.Keeper
+	AetraStakingPolicyKeeper	aetrastakingpolicykeeper.Keeper
+	AetraEconomicsKeeper		aetraeconomicskeeper.Keeper
+	AetraValidatorScoreKeeper	aetravalidatorscorekeeper.Keeper
 
 	// the module manager
-	ModuleManager      *module.Manager
-	BasicModuleManager module.BasicManager
+	ModuleManager		*module.Manager
+	BasicModuleManager	module.BasicManager
 
 	// simulation manager
-	sm *module.SimulationManager
+	sm	*module.SimulationManager
 
 	// invariant registry
-	invariantRegistry *AppInvariantRouteRegistry
+	invariantRegistry	*AppInvariantRouteRegistry
 
 	// module configurator
-	configurator module.Configurator
+	configurator	module.Configurator
 }

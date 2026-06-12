@@ -33,7 +33,7 @@ Individual profiles:
 .\scripts\testnet\public-testnet-preflight.ps1 -ValidatorProfile 10 -SkipBuild
 ```
 
-The preflight runs full prototype acceptance, validates the requested validator count, exercises bank, fees, official liquid staking pool flows, direct delegation rejection, storage rent recovery behavior, query surfaces, restart persistence, and asserts CosmWasm remains disabled unless explicitly gated. Application-level asset behavior must be exercised through AVM contracts and standards, not through native app modules. The 10-validator profile is the stress profile for public testnet readiness; it is expected to be slower and should run before advertising modular execution features.
+The preflight runs full prototype acceptance, validates the requested validator count, exercises bank, fees, official liquid staking pool flows, direct delegation rejection, storage rent recovery behavior, query surfaces, restart persistence, and asserts CosmWasm remains disabled unless explicitly gated. Application-level asset behavior must be exercised through AVM contracts and standards, not through native app modules. Token, NFT, and DEX-style behavior must be exercised through AVM contracts. Token, NFT, market, and exchange-style application logic now targets AVM contracts. The 10-validator profile is the stress profile for public testnet readiness; it is expected to be slower and should run before advertising modular execution features.
 
 The focused E2E smoke command list is maintained in
 [Public Testnet E2E Smoke Commands](public-testnet-e2e-smoke-commands.md).

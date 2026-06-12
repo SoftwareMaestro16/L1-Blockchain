@@ -13,56 +13,56 @@ type ServiceTrustModelLabel string
 type ServiceFailureBehaviorLabel string
 
 const (
-	ServiceTrustLabelFullyTrusted                ServiceTrustModelLabel = "fully_trusted"
-	ServiceTrustLabelEconomicallySecured         ServiceTrustModelLabel = "economically_secured"
-	ServiceTrustLabelCryptographicallyVerifiable ServiceTrustModelLabel = "cryptographically_verifiable"
-	ServiceTrustLabelConsensusExecuted           ServiceTrustModelLabel = "consensus_executed"
-	ServiceTrustLabelHybridChallengeable         ServiceTrustModelLabel = "hybrid_challengeable"
+	ServiceTrustLabelFullyTrusted			ServiceTrustModelLabel	= "fully_trusted"
+	ServiceTrustLabelEconomicallySecured		ServiceTrustModelLabel	= "economically_secured"
+	ServiceTrustLabelCryptographicallyVerifiable	ServiceTrustModelLabel	= "cryptographically_verifiable"
+	ServiceTrustLabelConsensusExecuted		ServiceTrustModelLabel	= "consensus_executed"
+	ServiceTrustLabelHybridChallengeable		ServiceTrustModelLabel	= "hybrid_challengeable"
 
-	ServiceFailureLabelRevert          ServiceFailureBehaviorLabel = "revert"
-	ServiceFailureLabelRetry           ServiceFailureBehaviorLabel = "retry"
-	ServiceFailureLabelFallbackOnChain ServiceFailureBehaviorLabel = "fallback_on_chain"
-	ServiceFailureLabelChallenge       ServiceFailureBehaviorLabel = "challenge"
-	ServiceFailureLabelSlashProvider   ServiceFailureBehaviorLabel = "slash_provider"
-	ServiceFailureLabelRefund          ServiceFailureBehaviorLabel = "refund"
-	ServiceFailureLabelPartialSettle   ServiceFailureBehaviorLabel = "partial_settle"
+	ServiceFailureLabelRevert		ServiceFailureBehaviorLabel	= "revert"
+	ServiceFailureLabelRetry		ServiceFailureBehaviorLabel	= "retry"
+	ServiceFailureLabelFallbackOnChain	ServiceFailureBehaviorLabel	= "fallback_on_chain"
+	ServiceFailureLabelChallenge		ServiceFailureBehaviorLabel	= "challenge"
+	ServiceFailureLabelSlashProvider	ServiceFailureBehaviorLabel	= "slash_provider"
+	ServiceFailureLabelRefund		ServiceFailureBehaviorLabel	= "refund"
+	ServiceFailureLabelPartialSettle	ServiceFailureBehaviorLabel	= "partial_settle"
 )
 
 type ServiceMethodSecurityPolicy struct {
-	MethodID                 string
-	TrustModel               coretypes.ServiceTrustModel
-	TrustModelLabel          ServiceTrustModelLabel
-	VerificationModel        coretypes.ServiceVerificationModel
-	FailureBehavior          coretypes.ServiceFailureBehavior
-	FailureBehaviorLabel     ServiceFailureBehaviorLabel
-	ConsensusCriticalAllowed bool
-	MethodSecurityHash       string
+	MethodID			string
+	TrustModel			coretypes.ServiceTrustModel
+	TrustModelLabel			ServiceTrustModelLabel
+	VerificationModel		coretypes.ServiceVerificationModel
+	FailureBehavior			coretypes.ServiceFailureBehavior
+	FailureBehaviorLabel		ServiceFailureBehaviorLabel
+	ConsensusCriticalAllowed	bool
+	MethodSecurityHash		string
 }
 
 type ServiceSecurityPolicy struct {
-	ServiceID                       string
-	ServiceType                     coretypes.ServiceType
-	TrustModel                      coretypes.ServiceTrustModel
-	TrustModelLabel                 ServiceTrustModelLabel
-	VerificationModel               coretypes.ServiceVerificationModel
-	ProofFormat                     string
-	ProviderCollateralDenom         string
-	ProviderCollateralAmount        string
-	ChallengeWindow                 uint64
-	FallbackServiceID               string
-	FaultPolicy                     coretypes.ServiceFailureBehavior
-	FaultPolicyLabel                ServiceFailureBehaviorLabel
-	ExecutionFailureBehavior        coretypes.ServiceFailureBehavior
-	ExecutionFailureBehaviorLabel   ServiceFailureBehaviorLabel
-	ConsensusCriticalRequested      bool
-	ConsensusCriticalAllowed        bool
-	RequiresIndependentVerification bool
-	RequiresCollateralPenalty       bool
-	RequiresProofFormat             bool
-	RequiresDeterministicGas        bool
-	RequiresChallengeFallback       bool
-	MethodPolicies                  []ServiceMethodSecurityPolicy
-	SecurityHash                    string
+	ServiceID			string
+	ServiceType			coretypes.ServiceType
+	TrustModel			coretypes.ServiceTrustModel
+	TrustModelLabel			ServiceTrustModelLabel
+	VerificationModel		coretypes.ServiceVerificationModel
+	ProofFormat			string
+	ProviderCollateralDenom		string
+	ProviderCollateralAmount	string
+	ChallengeWindow			uint64
+	FallbackServiceID		string
+	FaultPolicy			coretypes.ServiceFailureBehavior
+	FaultPolicyLabel		ServiceFailureBehaviorLabel
+	ExecutionFailureBehavior	coretypes.ServiceFailureBehavior
+	ExecutionFailureBehaviorLabel	ServiceFailureBehaviorLabel
+	ConsensusCriticalRequested	bool
+	ConsensusCriticalAllowed	bool
+	RequiresIndependentVerification	bool
+	RequiresCollateralPenalty	bool
+	RequiresProofFormat		bool
+	RequiresDeterministicGas	bool
+	RequiresChallengeFallback	bool
+	MethodPolicies			[]ServiceMethodSecurityPolicy
+	SecurityHash			string
 }
 
 func NewServiceSecurityPolicy(descriptor ServiceDescriptor, consensusCritical bool) (ServiceSecurityPolicy, error) {
@@ -71,26 +71,26 @@ func NewServiceSecurityPolicy(descriptor ServiceDescriptor, consensusCritical bo
 		return ServiceSecurityPolicy{}, err
 	}
 	policy := ServiceSecurityPolicy{
-		ServiceID:                       descriptor.ServiceID,
-		ServiceType:                     descriptor.ServiceType,
-		TrustModel:                      descriptor.Verification.TrustModel,
-		TrustModelLabel:                 MustServiceTrustModelLabel(descriptor.Verification.TrustModel),
-		VerificationModel:               descriptor.Verification.Model,
-		ProofFormat:                     descriptor.Verification.ProofFormat,
-		ProviderCollateralDenom:         descriptor.Verification.ProviderCollateralDenom,
-		ProviderCollateralAmount:        descriptor.Verification.ProviderCollateralAmount,
-		ChallengeWindow:                 maxUint64(descriptor.Verification.ChallengeWindow, descriptor.Execution.ChallengeWindow),
-		FallbackServiceID:               descriptor.Verification.FallbackServiceID,
-		FaultPolicy:                     descriptor.Verification.FaultPolicy,
-		FaultPolicyLabel:                serviceFailureBehaviorLabelOrEmpty(descriptor.Verification.FaultPolicy),
-		ExecutionFailureBehavior:        descriptor.Execution.FailureBehavior,
-		ExecutionFailureBehaviorLabel:   MustServiceFailureBehaviorLabel(descriptor.Execution.FailureBehavior),
-		ConsensusCriticalRequested:      consensusCritical,
-		RequiresIndependentVerification: descriptor.Verification.TrustModel == coretypes.ServiceTrustFullyTrusted,
-		RequiresCollateralPenalty:       descriptor.Verification.TrustModel == coretypes.ServiceTrustEconomicallySecured,
-		RequiresProofFormat:             descriptor.Verification.TrustModel == coretypes.ServiceTrustCryptographicallyVerifiable,
-		RequiresDeterministicGas:        descriptor.Verification.TrustModel == coretypes.ServiceTrustConsensusExecuted,
-		RequiresChallengeFallback:       descriptor.Verification.TrustModel == coretypes.ServiceTrustHybridChallengeable,
+		ServiceID:				descriptor.ServiceID,
+		ServiceType:				descriptor.ServiceType,
+		TrustModel:				descriptor.Verification.TrustModel,
+		TrustModelLabel:			MustServiceTrustModelLabel(descriptor.Verification.TrustModel),
+		VerificationModel:			descriptor.Verification.Model,
+		ProofFormat:				descriptor.Verification.ProofFormat,
+		ProviderCollateralDenom:		descriptor.Verification.ProviderCollateralDenom,
+		ProviderCollateralAmount:		descriptor.Verification.ProviderCollateralAmount,
+		ChallengeWindow:			maxUint64(descriptor.Verification.ChallengeWindow, descriptor.Execution.ChallengeWindow),
+		FallbackServiceID:			descriptor.Verification.FallbackServiceID,
+		FaultPolicy:				descriptor.Verification.FaultPolicy,
+		FaultPolicyLabel:			serviceFailureBehaviorLabelOrEmpty(descriptor.Verification.FaultPolicy),
+		ExecutionFailureBehavior:		descriptor.Execution.FailureBehavior,
+		ExecutionFailureBehaviorLabel:		MustServiceFailureBehaviorLabel(descriptor.Execution.FailureBehavior),
+		ConsensusCriticalRequested:		consensusCritical,
+		RequiresIndependentVerification:	descriptor.Verification.TrustModel == coretypes.ServiceTrustFullyTrusted,
+		RequiresCollateralPenalty:		descriptor.Verification.TrustModel == coretypes.ServiceTrustEconomicallySecured,
+		RequiresProofFormat:			descriptor.Verification.TrustModel == coretypes.ServiceTrustCryptographicallyVerifiable,
+		RequiresDeterministicGas:		descriptor.Verification.TrustModel == coretypes.ServiceTrustConsensusExecuted,
+		RequiresChallengeFallback:		descriptor.Verification.TrustModel == coretypes.ServiceTrustHybridChallengeable,
 	}
 	policy.ConsensusCriticalAllowed = serviceConsensusCriticalAllowed(descriptor, consensusCritical)
 	for _, method := range descriptor.Interface.Methods {
@@ -113,13 +113,13 @@ func NewServiceMethodSecurityPolicy(descriptor ServiceDescriptor, method coretyp
 		return ServiceMethodSecurityPolicy{}, fmt.Errorf("services security method %s has unknown failure behavior %q", method.MethodID, method.FailureBehavior)
 	}
 	policy := ServiceMethodSecurityPolicy{
-		MethodID:                 method.MethodID,
-		TrustModel:               descriptor.Verification.TrustModel,
-		TrustModelLabel:          MustServiceTrustModelLabel(descriptor.Verification.TrustModel),
-		VerificationModel:        method.VerificationModel,
-		FailureBehavior:          method.FailureBehavior,
-		FailureBehaviorLabel:     MustServiceFailureBehaviorLabel(method.FailureBehavior),
-		ConsensusCriticalAllowed: serviceConsensusCriticalAllowed(descriptor, consensusCritical),
+		MethodID:			method.MethodID,
+		TrustModel:			descriptor.Verification.TrustModel,
+		TrustModelLabel:		MustServiceTrustModelLabel(descriptor.Verification.TrustModel),
+		VerificationModel:		method.VerificationModel,
+		FailureBehavior:		method.FailureBehavior,
+		FailureBehaviorLabel:		MustServiceFailureBehaviorLabel(method.FailureBehavior),
+		ConsensusCriticalAllowed:	serviceConsensusCriticalAllowed(descriptor, consensusCritical),
 	}
 	policy.MethodSecurityHash = ComputeServiceMethodSecurityPolicyHash(policy)
 	return policy, policy.Validate()

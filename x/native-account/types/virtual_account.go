@@ -10,26 +10,26 @@ import (
 )
 
 const (
-	VirtualAccountStatusInactive  = "inactive"
-	VirtualAccountStatusActive    = "active"
-	VirtualAccountStatusFrozen    = "frozen"
-	VirtualAccountStatusRecovered = "recovered"
-	VirtualAccountStatusArchived  = "archived"
-	VirtualAccountStatusClosed    = "closed"
+	VirtualAccountStatusInactive	= "inactive"
+	VirtualAccountStatusActive	= "active"
+	VirtualAccountStatusFrozen	= "frozen"
+	VirtualAccountStatusRecovered	= "recovered"
+	VirtualAccountStatusArchived	= "archived"
+	VirtualAccountStatusClosed	= "closed"
 
-	AccountMessageActivate = "activate_account"
-	AccountMessageNormal   = "normal_account_message"
+	AccountMessageActivate	= "activate_account"
+	AccountMessageNormal	= "normal_account_message"
 
-	PersistentWriteReasonActivation          = "activation"
-	PersistentWriteReasonControlledMigration = "controlled_migration"
+	PersistentWriteReasonActivation			= "activation"
+	PersistentWriteReasonControlledMigration	= "controlled_migration"
 )
 
 type VirtualAccountView struct {
-	AddressUser       string
-	AddressRaw        string
-	Status            string
-	Persistent        bool
-	StorageRentActive bool
+	AddressUser		string
+	AddressRaw		string
+	Status			string
+	Persistent		bool
+	StorageRentActive	bool
 }
 
 type VirtualAccountBook struct {
@@ -57,11 +57,11 @@ func (b *VirtualAccountBook) QueryAccount(userAddress string) (VirtualAccountVie
 		}
 	}
 	return VirtualAccountView{
-		AddressUser:       pair.User,
-		AddressRaw:        pair.Raw,
-		Status:            VirtualAccountStatusInactive,
-		Persistent:        false,
-		StorageRentActive: false,
+		AddressUser:		pair.User,
+		AddressRaw:		pair.Raw,
+		Status:			VirtualAccountStatusInactive,
+		Persistent:		false,
+		StorageRentActive:	false,
 	}, nil
 }
 

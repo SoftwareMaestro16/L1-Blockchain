@@ -3,11 +3,11 @@ package types
 import "errors"
 
 type PoolRewardClaimInput struct {
-	PoolID      string
-	Share       DelegatorShare
-	RewardIndex uint64
-	Epoch       uint64
-	Height      uint64
+	PoolID		string
+	Share		DelegatorShare
+	RewardIndex	uint64
+	Epoch		uint64
+	Height		uint64
 }
 
 func ClaimPoolRewardShare(input PoolRewardClaimInput) (DelegatorShare, PoolRewardClaimReceipt, error) {
@@ -34,11 +34,11 @@ func ClaimPoolRewardShare(input PoolRewardClaimInput) (DelegatorShare, PoolRewar
 	next.PendingRewards = 0
 	next.RewardIndexCheckpoint = input.RewardIndex
 	receipt := PoolRewardClaimReceipt{
-		PoolID:       input.PoolID,
-		OwnerAddress: next.Delegator,
-		Amount:       amount,
-		Epoch:        input.Epoch,
-		Height:       input.Height,
+		PoolID:		input.PoolID,
+		OwnerAddress:	next.Delegator,
+		Amount:		amount,
+		Epoch:		input.Epoch,
+		Height:		input.Height,
 		InternalMetadata: PoolStateMetadata{
 			TouchedKeys: []string{string(PoolShareKey(input.PoolID, next.Delegator))},
 		},
@@ -63,10 +63,10 @@ func RecordPoolRewardClaim(params Params, existing []RewardClaim, receipt PoolRe
 		return nil, RewardClaim{}, errors.New("pool reward claim record amount must be positive")
 	}
 	claim := RewardClaim{
-		PoolID: receipt.PoolID,
-		Owner:  receipt.OwnerAddress,
-		Epoch:  receipt.Epoch,
-		Amount: receipt.Amount,
+		PoolID:	receipt.PoolID,
+		Owner:	receipt.OwnerAddress,
+		Epoch:	receipt.Epoch,
+		Amount:	receipt.Amount,
 	}
 	if err := claim.Validate(params); err != nil {
 		return nil, RewardClaim{}, err

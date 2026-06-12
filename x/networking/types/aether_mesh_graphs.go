@@ -8,69 +8,69 @@ import (
 )
 
 const (
-	MaxAetherMeshGraphEdges = 4096
-	MaxAetherMeshGraphID    = 128
+	MaxAetherMeshGraphEdges	= 4096
+	MaxAetherMeshGraphID	= 128
 )
 
 type AetherMeshGraphKind string
 
 const (
-	AetherMeshGraphZone    AetherMeshGraphKind = "zone"
-	AetherMeshGraphService AetherMeshGraphKind = "service"
-	AetherMeshGraphMessage AetherMeshGraphKind = "message"
-	AetherMeshGraphPayment AetherMeshGraphKind = "payment"
-	AetherMeshGraphStorage AetherMeshGraphKind = "storage"
+	AetherMeshGraphZone	AetherMeshGraphKind	= "zone"
+	AetherMeshGraphService	AetherMeshGraphKind	= "service"
+	AetherMeshGraphMessage	AetherMeshGraphKind	= "message"
+	AetherMeshGraphPayment	AetherMeshGraphKind	= "payment"
+	AetherMeshGraphStorage	AetherMeshGraphKind	= "storage"
 )
 
 type AetherMeshZoneEdge struct {
-	SourceZone          string
-	DestinationZone     string
-	Enabled             bool
-	CommittedGasCost    uint64
-	CongestionWeightBps uint32
-	ForwardingFeeWeight uint64
-	EdgeWeight          uint64
-	EdgeHash            string
+	SourceZone		string
+	DestinationZone		string
+	Enabled			bool
+	CommittedGasCost	uint64
+	CongestionWeightBps	uint32
+	ForwardingFeeWeight	uint64
+	EdgeWeight		uint64
+	EdgeHash		string
 }
 
 type AetherMeshServiceEdge struct {
-	SourceService          string
-	DependencyService      string
-	InterfaceHash          string
-	InterfaceCompatible    bool
-	AvailabilityCommitment string
-	AvailabilityWeightBps  uint32
-	EdgeWeight             uint64
-	EdgeHash               string
+	SourceService		string
+	DependencyService	string
+	InterfaceHash		string
+	InterfaceCompatible	bool
+	AvailabilityCommitment	string
+	AvailabilityWeightBps	uint32
+	EdgeWeight		uint64
+	EdgeHash		string
 }
 
 type AetherMeshMessageEdge struct {
-	SourceQueue       string
-	DestinationQueue  string
-	DeliveryLane      string
-	QueueBacklog      uint64
-	ForwardingFee     uint64
-	PriorityWeightBps uint32
-	EdgeWeight        uint64
-	EdgeHash          string
+	SourceQueue		string
+	DestinationQueue	string
+	DeliveryLane		string
+	QueueBacklog		uint64
+	ForwardingFee		uint64
+	PriorityWeightBps	uint32
+	EdgeWeight		uint64
+	EdgeHash		string
 }
 
 type AetherMeshCommittedGraph struct {
-	Kind      AetherMeshGraphKind
-	Epoch     uint64
-	RootHash  string
-	EdgeCount uint32
+	Kind		AetherMeshGraphKind
+	Epoch		uint64
+	RootHash	string
+	EdgeCount	uint32
 }
 
 type AetherMeshRoutingGraphSet struct {
-	Epoch        uint64
-	ZoneEdges    []AetherMeshZoneEdge
-	ServiceEdges []AetherMeshServiceEdge
-	MessageEdges []AetherMeshMessageEdge
-	PaymentRoot  string
-	StorageRoot  string
-	Graphs       []AetherMeshCommittedGraph
-	GraphSetRoot string
+	Epoch		uint64
+	ZoneEdges	[]AetherMeshZoneEdge
+	ServiceEdges	[]AetherMeshServiceEdge
+	MessageEdges	[]AetherMeshMessageEdge
+	PaymentRoot	string
+	StorageRoot	string
+	Graphs		[]AetherMeshCommittedGraph
+	GraphSetRoot	string
 }
 
 func NewAetherMeshZoneEdge(edge AetherMeshZoneEdge) (AetherMeshZoneEdge, error) {
@@ -108,12 +108,12 @@ func NewAetherMeshMessageEdge(edge AetherMeshMessageEdge) (AetherMeshMessageEdge
 
 func BuildAetherMeshRoutingGraphSet(epoch uint64, zoneEdges []AetherMeshZoneEdge, serviceEdges []AetherMeshServiceEdge, messageEdges []AetherMeshMessageEdge, paymentRoot, storageRoot string) (AetherMeshRoutingGraphSet, error) {
 	graphSet := AetherMeshRoutingGraphSet{
-		Epoch:        epoch,
-		ZoneEdges:    normalizeAetherMeshZoneEdges(zoneEdges),
-		ServiceEdges: normalizeAetherMeshServiceEdges(serviceEdges),
-		MessageEdges: normalizeAetherMeshMessageEdges(messageEdges),
-		PaymentRoot:  normalizeHashText(paymentRoot),
-		StorageRoot:  normalizeHashText(storageRoot),
+		Epoch:		epoch,
+		ZoneEdges:	normalizeAetherMeshZoneEdges(zoneEdges),
+		ServiceEdges:	normalizeAetherMeshServiceEdges(serviceEdges),
+		MessageEdges:	normalizeAetherMeshMessageEdges(messageEdges),
+		PaymentRoot:	normalizeHashText(paymentRoot),
+		StorageRoot:	normalizeHashText(storageRoot),
 	}
 	if graphSet.PaymentRoot == "" {
 		graphSet.PaymentRoot = HashParts("aether-mesh-empty-payment-route-graph", fmt.Sprintf("%020d", epoch))

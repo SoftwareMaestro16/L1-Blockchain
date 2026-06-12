@@ -15,12 +15,12 @@ func benchmarkLoadScoreUpdate(b *testing.B, updates int) {
 	metrics := make([]Metrics, updates)
 	for i := 0; i < updates; i++ {
 		metrics[i] = Metrics{
-			CanonicalMempoolSize:        uint64((i * 37) % int(params.TargetMempoolSize+1)),
-			UsedBlockGas:                uint64((i * 991) % int(params.TargetBlockGas+1)),
-			AverageInclusionDelayBlocks: uint64((i % int(params.TargetLatencyBlocks)) + 1),
-			FailedTxCount:               uint64(i % 11),
-			TotalTxCount:                uint64((i % 100) + 1),
-			ExecutionStepCount:          uint64((i * 503) % int(params.TargetExecutionSteps+1)),
+			CanonicalMempoolSize:		uint64((i * 37) % int(params.TargetMempoolSize+1)),
+			UsedBlockGas:			uint64((i * 991) % int(params.TargetBlockGas+1)),
+			AverageInclusionDelayBlocks:	uint64((i % int(params.TargetLatencyBlocks)) + 1),
+			FailedTxCount:			uint64(i % 11),
+			TotalTxCount:			uint64((i % 100) + 1),
+			ExecutionStepCount:		uint64((i * 503) % int(params.TargetExecutionSteps+1)),
 		}
 	}
 

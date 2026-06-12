@@ -8,42 +8,42 @@ import (
 )
 
 type ExecutionGuaranteeReport struct {
-	ServiceID                                  string
-	ServiceType                                coretypes.ServiceType
-	CallID                                     string
-	InterfaceHash                              string
-	PaymentModelHash                           string
-	ReplayControlHash                          string
-	ReceiptHash                                string
-	PenaltyRouteHash                           string
-	DiscoveryCacheHash                         string
-	AvailabilityCommitmentHash                 string
-	OnChainPathsDeterministic                  bool
-	HybridResultsVerifiableOrChallengeable     bool
-	OffChainCallsSignedAndReplayProtected      bool
-	ProviderMisbehaviorEconomicallyPenalized   bool
-	AnchoredReceiptsDeterministic              bool
-	PaymentRulesKnownBeforeSigning             bool
-	InterfaceHashKnownBeforeConstruction       bool
-	EndpointAvailabilityBackedByCommitment     bool
-	UIGenerationClientResponsibility           bool
-	OffChainResultCorrectnessVerifiedOrSettled bool
-	CachedDiscoveryAuthoritative               bool
-	GuaranteeHash                              string
+	ServiceID					string
+	ServiceType					coretypes.ServiceType
+	CallID						string
+	InterfaceHash					string
+	PaymentModelHash				string
+	ReplayControlHash				string
+	ReceiptHash					string
+	PenaltyRouteHash				string
+	DiscoveryCacheHash				string
+	AvailabilityCommitmentHash			string
+	OnChainPathsDeterministic			bool
+	HybridResultsVerifiableOrChallengeable		bool
+	OffChainCallsSignedAndReplayProtected		bool
+	ProviderMisbehaviorEconomicallyPenalized	bool
+	AnchoredReceiptsDeterministic			bool
+	PaymentRulesKnownBeforeSigning			bool
+	InterfaceHashKnownBeforeConstruction		bool
+	EndpointAvailabilityBackedByCommitment		bool
+	UIGenerationClientResponsibility		bool
+	OffChainResultCorrectnessVerifiedOrSettled	bool
+	CachedDiscoveryAuthoritative			bool
+	GuaranteeHash					string
 }
 
 type ExecutionGuaranteeInput struct {
-	Context                    coretypes.ServiceConsensusContext
-	Descriptor                 ServiceDescriptor
-	Call                       UnifiedServiceCall
-	ReplayProof                ServiceReplayProtectionProof
-	Receipt                    ServiceReceipt
-	PaymentModel               ServicePaymentModel
-	PenaltyRoute               ProviderPenaltyRoute
-	DiscoveryCache             ServiceDiscoveryCacheRecord
-	AvailabilityCommitmentHash string
-	ResultProofVerified        bool
-	ChallengePeriodElapsed     bool
+	Context				coretypes.ServiceConsensusContext
+	Descriptor			ServiceDescriptor
+	Call				UnifiedServiceCall
+	ReplayProof			ServiceReplayProtectionProof
+	Receipt				ServiceReceipt
+	PaymentModel			ServicePaymentModel
+	PenaltyRoute			ProviderPenaltyRoute
+	DiscoveryCache			ServiceDiscoveryCacheRecord
+	AvailabilityCommitmentHash	string
+	ResultProofVerified		bool
+	ChallengePeriodElapsed		bool
 }
 
 func NewExecutionGuaranteeReport(input ExecutionGuaranteeInput) (ExecutionGuaranteeReport, error) {
@@ -106,27 +106,27 @@ func NewExecutionGuaranteeReport(input ExecutionGuaranteeInput) (ExecutionGuaran
 		}
 	}
 	report := ExecutionGuaranteeReport{
-		ServiceID:                                  descriptor.ServiceID,
-		ServiceType:                                descriptor.ServiceType,
-		CallID:                                     input.Call.CallID,
-		InterfaceHash:                              descriptor.Interface.InterfaceHash,
-		PaymentModelHash:                           input.PaymentModel.ModelHash,
-		ReplayControlHash:                          input.ReplayProof.ControlHash,
-		ReceiptHash:                                input.Receipt.ReceiptHash,
-		PenaltyRouteHash:                           input.PenaltyRoute.RouteHash,
-		DiscoveryCacheHash:                         input.DiscoveryCache.CacheHash,
-		AvailabilityCommitmentHash:                 input.AvailabilityCommitmentHash,
-		OnChainPathsDeterministic:                  descriptor.ServiceType != coretypes.ServiceTypeOnChain || serviceOnChainPathDeterministic(descriptor),
-		HybridResultsVerifiableOrChallengeable:     descriptor.ServiceType != coretypes.ServiceTypeMixed || serviceHybridResultVerifiableOrChallengeable(descriptor),
-		OffChainCallsSignedAndReplayProtected:      !serviceHasOffChainExecution(descriptor) || serviceCallSignedAndReplayProtected(input.Call, input.ReplayProof),
-		ProviderMisbehaviorEconomicallyPenalized:   penalized,
-		AnchoredReceiptsDeterministic:              receiptDeterministic,
-		PaymentRulesKnownBeforeSigning:             input.PaymentModel.KnownBeforeSigning,
-		InterfaceHashKnownBeforeConstruction:       input.Call.InterfaceHash == descriptor.Interface.InterfaceHash && input.Call.InterfaceHash != "",
-		EndpointAvailabilityBackedByCommitment:     availabilityBacked,
-		UIGenerationClientResponsibility:           true,
-		OffChainResultCorrectnessVerifiedOrSettled: !serviceHasOffChainExecution(descriptor) || input.ResultProofVerified || input.ChallengePeriodElapsed,
-		CachedDiscoveryAuthoritative:               cacheAuthoritative,
+		ServiceID:					descriptor.ServiceID,
+		ServiceType:					descriptor.ServiceType,
+		CallID:						input.Call.CallID,
+		InterfaceHash:					descriptor.Interface.InterfaceHash,
+		PaymentModelHash:				input.PaymentModel.ModelHash,
+		ReplayControlHash:				input.ReplayProof.ControlHash,
+		ReceiptHash:					input.Receipt.ReceiptHash,
+		PenaltyRouteHash:				input.PenaltyRoute.RouteHash,
+		DiscoveryCacheHash:				input.DiscoveryCache.CacheHash,
+		AvailabilityCommitmentHash:			input.AvailabilityCommitmentHash,
+		OnChainPathsDeterministic:			descriptor.ServiceType != coretypes.ServiceTypeOnChain || serviceOnChainPathDeterministic(descriptor),
+		HybridResultsVerifiableOrChallengeable:		descriptor.ServiceType != coretypes.ServiceTypeMixed || serviceHybridResultVerifiableOrChallengeable(descriptor),
+		OffChainCallsSignedAndReplayProtected:		!serviceHasOffChainExecution(descriptor) || serviceCallSignedAndReplayProtected(input.Call, input.ReplayProof),
+		ProviderMisbehaviorEconomicallyPenalized:	penalized,
+		AnchoredReceiptsDeterministic:			receiptDeterministic,
+		PaymentRulesKnownBeforeSigning:			input.PaymentModel.KnownBeforeSigning,
+		InterfaceHashKnownBeforeConstruction:		input.Call.InterfaceHash == descriptor.Interface.InterfaceHash && input.Call.InterfaceHash != "",
+		EndpointAvailabilityBackedByCommitment:		availabilityBacked,
+		UIGenerationClientResponsibility:		true,
+		OffChainResultCorrectnessVerifiedOrSettled:	!serviceHasOffChainExecution(descriptor) || input.ResultProofVerified || input.ChallengePeriodElapsed,
+		CachedDiscoveryAuthoritative:			cacheAuthoritative,
 	}
 	report.GuaranteeHash = ComputeExecutionGuaranteeReportHash(report)
 	return report, report.Validate()
@@ -143,19 +143,19 @@ func (report ExecutionGuaranteeReport) Validate() error {
 		return err
 	}
 	for label, value := range map[string]string{
-		"interface":     report.InterfaceHash,
-		"payment model": report.PaymentModelHash,
-		"replay":        report.ReplayControlHash,
+		"interface":		report.InterfaceHash,
+		"payment model":	report.PaymentModelHash,
+		"replay":		report.ReplayControlHash,
 	} {
 		if err := coretypes.ValidateHash("services execution guarantee "+label+" hash", value); err != nil {
 			return err
 		}
 	}
 	for label, value := range map[string]string{
-		"receipt":      report.ReceiptHash,
-		"penalty":      report.PenaltyRouteHash,
-		"cache":        report.DiscoveryCacheHash,
-		"availability": report.AvailabilityCommitmentHash,
+		"receipt":	report.ReceiptHash,
+		"penalty":	report.PenaltyRouteHash,
+		"cache":	report.DiscoveryCacheHash,
+		"availability":	report.AvailabilityCommitmentHash,
 	} {
 		if value == "" {
 			continue

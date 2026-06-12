@@ -22,11 +22,11 @@ func TestGenesisRejectsDuplicateSystemAccounts(t *testing.T) {
 	config, found := gs.State.Entity(types.ModuleConfig)
 	require.True(t, found)
 	gs.State.Entities = append(gs.State.Entities, types.SystemEntity{
-		ModuleName:           "duplicate-config-account",
-		ModuleAccountAddress: config.ModuleAccountAddress,
-		AuthorityAddress:     prototype.DefaultAuthority,
-		Status:               types.StatusActive,
-		Version:              1,
+		ModuleName:		"duplicate-config-account",
+		ModuleAccountAddress:	config.ModuleAccountAddress,
+		AuthorityAddress:	prototype.DefaultAuthority,
+		Status:			types.StatusActive,
+		Version:		1,
 	})
 
 	require.ErrorContains(t, gs.Validate(), "duplicate module account")
@@ -36,9 +36,9 @@ func TestRequiredModulesCannotBeRemovedOrPaused(t *testing.T) {
 	k := NewKeeper()
 
 	_, _, err := k.PauseSystemEntity(types.MsgPauseSystemEntity{
-		Authority:  prototype.DefaultAuthority,
-		ModuleName: types.ModuleConfig,
-		Height:     1,
+		Authority:	prototype.DefaultAuthority,
+		ModuleName:	types.ModuleConfig,
+		Height:		1,
 	})
 	require.ErrorContains(t, err, "required module")
 
@@ -47,8 +47,8 @@ func TestRequiredModulesCannotBeRemovedOrPaused(t *testing.T) {
 	require.True(t, found)
 	config.Status = types.StatusDeprecated
 	_, _, err = k.UpdateSystemEntity(types.MsgUpdateSystemEntity{
-		Authority: prototype.DefaultAuthority,
-		Entity:    config,
+		Authority:	prototype.DefaultAuthority,
+		Entity:		config,
 	})
 	require.ErrorContains(t, err, "required module")
 
@@ -62,32 +62,32 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 	second := NewKeeper()
 	for _, k := range []*Keeper{&first, &second} {
 		_, _, err := k.RegisterSystemEntity(types.MsgRegisterSystemEntity{
-			Authority: prototype.DefaultAuthority,
+			Authority:	prototype.DefaultAuthority,
 			Entity: types.SystemEntity{
-				ModuleName:           "state-metering",
-				ModuleAccountAddress: testAddress(0x55),
-				AuthorityAddress:     prototype.DefaultAuthority,
-				Status:               types.StatusActive,
-				Capabilities:         []string{"rent-collection", "state-metering"},
-				Version:              3,
-				Dependencies:         []string{types.ModuleConstitution},
+				ModuleName:		"state-metering",
+				ModuleAccountAddress:	testAddress(0x55),
+				AuthorityAddress:	prototype.DefaultAuthority,
+				Status:			types.StatusActive,
+				Capabilities:		[]string{"rent-collection", "state-metering"},
+				Version:		3,
+				Dependencies:		[]string{types.ModuleConstitution},
 			},
 		})
 		require.NoError(t, err)
 	}
 
 	pausedFirst, pauseEventFirst, err := first.PauseSystemEntity(types.MsgPauseSystemEntity{
-		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "state-metering",
-		Height:                          10,
-		AllowPrivilegedCallsWhilePaused: false,
+		Authority:				prototype.DefaultAuthority,
+		ModuleName:				"state-metering",
+		Height:					10,
+		AllowPrivilegedCallsWhilePaused:	false,
 	})
 	require.NoError(t, err)
 	pausedSecond, pauseEventSecond, err := second.PauseSystemEntity(types.MsgPauseSystemEntity{
-		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "state-metering",
-		Height:                          10,
-		AllowPrivilegedCallsWhilePaused: false,
+		Authority:				prototype.DefaultAuthority,
+		ModuleName:				"state-metering",
+		Height:					10,
+		AllowPrivilegedCallsWhilePaused:	false,
 	})
 	require.NoError(t, err)
 	require.Equal(t, pausedFirst, pausedSecond)
@@ -98,15 +98,15 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 	require.False(t, allowed)
 
 	resumedFirst, resumeEventFirst, err := first.ResumeSystemEntity(types.MsgResumeSystemEntity{
-		Authority:  prototype.DefaultAuthority,
-		ModuleName: "state-metering",
-		Height:     11,
+		Authority:	prototype.DefaultAuthority,
+		ModuleName:	"state-metering",
+		Height:		11,
 	})
 	require.NoError(t, err)
 	resumedSecond, resumeEventSecond, err := second.ResumeSystemEntity(types.MsgResumeSystemEntity{
-		Authority:  prototype.DefaultAuthority,
-		ModuleName: "state-metering",
-		Height:     11,
+		Authority:	prototype.DefaultAuthority,
+		ModuleName:	"state-metering",
+		Height:		11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, resumedFirst, resumedSecond)
@@ -120,23 +120,23 @@ func TestPauseResumeEventsAreDeterministic(t *testing.T) {
 func TestPausedModulePrivilegedCallsRequireExplicitAllowance(t *testing.T) {
 	k := NewKeeper()
 	_, _, err := k.RegisterSystemEntity(types.MsgRegisterSystemEntity{
-		Authority: prototype.DefaultAuthority,
+		Authority:	prototype.DefaultAuthority,
 		Entity: types.SystemEntity{
-			ModuleName:           "latency-oracle",
-			ModuleAccountAddress: testAddress(0x56),
-			AuthorityAddress:     prototype.DefaultAuthority,
-			Status:               types.StatusActive,
-			Version:              1,
-			Dependencies:         []string{types.ModuleConstitution},
+			ModuleName:		"latency-oracle",
+			ModuleAccountAddress:	testAddress(0x56),
+			AuthorityAddress:	prototype.DefaultAuthority,
+			Status:			types.StatusActive,
+			Version:		1,
+			Dependencies:		[]string{types.ModuleConstitution},
 		},
 	})
 	require.NoError(t, err)
 
 	_, _, err = k.PauseSystemEntity(types.MsgPauseSystemEntity{
-		Authority:                       prototype.DefaultAuthority,
-		ModuleName:                      "latency-oracle",
-		Height:                          7,
-		AllowPrivilegedCallsWhilePaused: true,
+		Authority:				prototype.DefaultAuthority,
+		ModuleName:				"latency-oracle",
+		Height:					7,
+		AllowPrivilegedCallsWhilePaused:	true,
 	})
 	require.NoError(t, err)
 	allowed, err := k.CanReceivePrivilegedCall("latency-oracle")
@@ -148,20 +148,20 @@ func TestDependencyGraphCycleIsRejected(t *testing.T) {
 	gs := DefaultGenesis()
 	gs.State.Entities = append(gs.State.Entities,
 		types.SystemEntity{
-			ModuleName:           "cycle-a",
-			ModuleAccountAddress: testAddress(0x60),
-			AuthorityAddress:     prototype.DefaultAuthority,
-			Status:               types.StatusActive,
-			Version:              1,
-			Dependencies:         []string{"cycle-b"},
+			ModuleName:		"cycle-a",
+			ModuleAccountAddress:	testAddress(0x60),
+			AuthorityAddress:	prototype.DefaultAuthority,
+			Status:			types.StatusActive,
+			Version:		1,
+			Dependencies:		[]string{"cycle-b"},
 		},
 		types.SystemEntity{
-			ModuleName:           "cycle-b",
-			ModuleAccountAddress: testAddress(0x61),
-			AuthorityAddress:     prototype.DefaultAuthority,
-			Status:               types.StatusActive,
-			Version:              1,
-			Dependencies:         []string{"cycle-a"},
+			ModuleName:		"cycle-b",
+			ModuleAccountAddress:	testAddress(0x61),
+			AuthorityAddress:	prototype.DefaultAuthority,
+			Status:			types.StatusActive,
+			Version:		1,
+			Dependencies:		[]string{"cycle-a"},
 		},
 	)
 
@@ -172,15 +172,15 @@ func TestExportImportPreservesRegistryOrdering(t *testing.T) {
 	source := NewKeeper()
 	for _, moduleName := range []string{"custom-election-audit", "custom-emissions-audit"} {
 		_, _, err := source.RegisterSystemEntity(types.MsgRegisterSystemEntity{
-			Authority: prototype.DefaultAuthority,
+			Authority:	prototype.DefaultAuthority,
 			Entity: types.SystemEntity{
-				ModuleName:           moduleName,
-				ModuleAccountAddress: testAddress(byte(len(moduleName))),
-				AuthorityAddress:     prototype.DefaultAuthority,
-				Status:               types.StatusActive,
-				Capabilities:         []string{"z", "a"},
-				Version:              1,
-				Dependencies:         []string{types.ModuleName, types.ModuleConstitution},
+				ModuleName:		moduleName,
+				ModuleAccountAddress:	testAddress(byte(len(moduleName))),
+				AuthorityAddress:	prototype.DefaultAuthority,
+				Status:			types.StatusActive,
+				Capabilities:		[]string{"z", "a"},
+				Version:		1,
+				Dependencies:		[]string{types.ModuleName, types.ModuleConstitution},
 			},
 		})
 		require.NoError(t, err)
@@ -213,13 +213,13 @@ func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
 	require.NoError(t, source.InitGenesisState(ctx, DefaultGenesis()))
 
 	_, _, err := source.RegisterSystemEntity(types.MsgRegisterSystemEntity{
-		Authority: prototype.DefaultAuthority,
+		Authority:	prototype.DefaultAuthority,
 		Entity: types.SystemEntity{
-			ModuleName:           "runtime-metering",
-			ModuleAccountAddress: testAddress(0x72),
-			AuthorityAddress:     prototype.DefaultAuthority,
-			Status:               types.StatusActive,
-			Version:              1,
+			ModuleName:		"runtime-metering",
+			ModuleAccountAddress:	testAddress(0x72),
+			AuthorityAddress:	prototype.DefaultAuthority,
+			Status:			types.StatusActive,
+			Version:		1,
 		},
 	})
 	require.NoError(t, err)
@@ -243,13 +243,13 @@ func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
 func TestMaliciousAuthorityCannotUpdateRegistry(t *testing.T) {
 	k := NewKeeper()
 	_, _, err := k.RegisterSystemEntity(types.MsgRegisterSystemEntity{
-		Authority: "4:0000000000000000000000000000000000000000000000000000000000000002",
+		Authority:	"4:0000000000000000000000000000000000000000000000000000000000000002",
 		Entity: types.SystemEntity{
-			ModuleName:           "malicious",
-			ModuleAccountAddress: testAddress(0x70),
-			AuthorityAddress:     prototype.DefaultAuthority,
-			Status:               types.StatusActive,
-			Version:              1,
+			ModuleName:		"malicious",
+			ModuleAccountAddress:	testAddress(0x70),
+			AuthorityAddress:	prototype.DefaultAuthority,
+			Status:			types.StatusActive,
+			Version:		1,
 		},
 	})
 	require.ErrorContains(t, err, "governance authority")

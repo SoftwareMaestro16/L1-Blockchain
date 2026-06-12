@@ -75,8 +75,8 @@ func TestCosmosModuleBoundarySpecRejectsMalformedEntries(t *testing.T) {
 	require.Empty(t, duplicate.Root)
 
 	noBoundary := ExistingCosmosModuleModification{
-		Module:               "bank",
-		RequiredModification: "zone-aware account routing",
+		Module:			"bank",
+		RequiredModification:	"zone-aware account routing",
 	}
 	_, err = BuildExistingCosmosModuleModification(noBoundary)
 	require.ErrorContains(t, err, "boundary is required")

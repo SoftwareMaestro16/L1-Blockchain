@@ -7,14 +7,14 @@ import (
 const appName = appconfig.AppName
 
 const (
-	SDKBech32AccountPrefix = appconfig.SDKBech32AccountPrefix
-	BondDenom              = appconfig.BondDenom
+	SDKBech32AccountPrefix	= appconfig.SDKBech32AccountPrefix
+	BondDenom		= appconfig.BondDenom
 )
 
 const (
-	AccountAddressPrefix   = appconfig.AccountAddressPrefix
-	ValidatorAddressPrefix = appconfig.ValidatorAddressPrefix
-	ConsensusAddressPrefix = appconfig.ConsensusAddressPrefix
+	AccountAddressPrefix	= appconfig.AccountAddressPrefix
+	ValidatorAddressPrefix	= appconfig.ValidatorAddressPrefix
+	ConsensusAddressPrefix	= appconfig.ConsensusAddressPrefix
 )
 
 // DefaultNodeHome default home directories for the application daemon

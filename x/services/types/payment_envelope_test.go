@@ -34,11 +34,11 @@ func TestPaymentEnvelopeFromDescriptor(t *testing.T) {
 
 func TestPaymentEnvelopeSettlementModes(t *testing.T) {
 	for _, tc := range []struct {
-		name   string
-		mode   coretypes.ServicePaymentSettlementMode
-		escrow string
-		stream string
-		meter  string
+		name	string
+		mode	coretypes.ServicePaymentSettlementMode
+		escrow	string
+		stream	string
+		meter	string
 	}{
 		{name: "on_chain", mode: coretypes.ServicePaymentOnChain},
 		{name: "prepaid", mode: coretypes.ServicePaymentPrepaid},
@@ -48,18 +48,18 @@ func TestPaymentEnvelopeSettlementModes(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			envelope, err := NewPaymentEnvelope(PaymentEnvelope{
-				Asset:             coretypes.NativeFeePolicyID,
-				Payer:             testPaymentPayer(),
-				PayeeService:      "portable-service",
-				Denom:             coretypes.NativeFeePolicyID,
-				Amount:            "5",
-				MaxAmountOptional: "10",
-				PricingUnit:       coretypes.ServicePricingPerCall,
-				SettlementMode:    tc.mode,
-				EscrowIDOptional:  tc.escrow,
-				StreamIDOptional:  tc.stream,
-				MeterIDOptional:   tc.meter,
-				ExpiryHeight:      100,
+				Asset:			coretypes.NativeFeePolicyID,
+				Payer:			testPaymentPayer(),
+				PayeeService:		"portable-service",
+				Denom:			coretypes.NativeFeePolicyID,
+				Amount:			"5",
+				MaxAmountOptional:	"10",
+				PricingUnit:		coretypes.ServicePricingPerCall,
+				SettlementMode:		tc.mode,
+				EscrowIDOptional:	tc.escrow,
+				StreamIDOptional:	tc.stream,
+				MeterIDOptional:	tc.meter,
+				ExpiryHeight:		100,
 			})
 			require.NoError(t, err)
 			require.Equal(t, tc.mode, envelope.SettlementMode)
@@ -70,14 +70,14 @@ func TestPaymentEnvelopeSettlementModes(t *testing.T) {
 
 func TestPaymentEnvelopeRejectsMalformedOrIncompletePayments(t *testing.T) {
 	base := PaymentEnvelope{
-		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          testPaymentPayer(),
-		PayeeService:   "portable-service",
-		Denom:          coretypes.NativeFeePolicyID,
-		Amount:         "5",
-		PricingUnit:    coretypes.ServicePricingPerCall,
-		SettlementMode: coretypes.ServicePaymentOnChain,
-		ExpiryHeight:   100,
+		Asset:		coretypes.NativeFeePolicyID,
+		Payer:		testPaymentPayer(),
+		PayeeService:	"portable-service",
+		Denom:		coretypes.NativeFeePolicyID,
+		Amount:		"5",
+		PricingUnit:	coretypes.ServicePricingPerCall,
+		SettlementMode:	coretypes.ServicePaymentOnChain,
+		ExpiryHeight:	100,
 	}
 
 	zero := base
@@ -113,14 +113,14 @@ func TestPaymentEnvelopeRejectsMalformedOrIncompletePayments(t *testing.T) {
 
 func TestPaymentEnvelopeRejectsHashTampering(t *testing.T) {
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
-		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          testPaymentPayer(),
-		PayeeService:   "portable-service",
-		Denom:          coretypes.NativeFeePolicyID,
-		Amount:         "5",
-		PricingUnit:    coretypes.ServicePricingPerCall,
-		SettlementMode: coretypes.ServicePaymentPrepaid,
-		ExpiryHeight:   100,
+		Asset:		coretypes.NativeFeePolicyID,
+		Payer:		testPaymentPayer(),
+		PayeeService:	"portable-service",
+		Denom:		coretypes.NativeFeePolicyID,
+		Amount:		"5",
+		PricingUnit:	coretypes.ServicePricingPerCall,
+		SettlementMode:	coretypes.ServicePaymentPrepaid,
+		ExpiryHeight:	100,
 	})
 	require.NoError(t, err)
 

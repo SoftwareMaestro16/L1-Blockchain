@@ -8,20 +8,6 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.13: Get Methods As First-Class Contract ABI
-// ---------------
-// Get methods are a formal ABI subsystem with typed interface resolution,
-// canonical selector model, read-only execution domain, proof-capable query mode,
-// and deterministic serialization guarantees.
-
-// ---------------
-// Method Selector Model
-// ---------------
-// Selector = BLAKE3(method_signature)[:4 bytes]
-// Supports both name-based and selector-based resolution.
-// Selector MUST be derived deterministically from the canonical method signature.
-
 // ComputeMethodSelector derives a 4-byte method selector from a method signature.
 // selector = BLAKE3(method_signature)[:4]
 func ComputeMethodSelector(signature string) [4]byte {
@@ -35,22 +21,22 @@ func ComputeMethodSelector(signature string) [4]byte {
 // Every get method MUST declare: name, selector, input codec, output codec,
 // gas model, and mutability flag (always READ).
 type GetMethodABI struct {
-	Name             string
-	Selector         [4]byte
-	InputCodec       string
-	OutputCodec      string
-	GasEstimate      uint64
-	Mutability       MethodMutability
-	Cacheable        bool
-	MaxResponseBytes uint32
-	Description      string
+	Name			string
+	Selector		[4]byte
+	InputCodec		string
+	OutputCodec		string
+	GasEstimate		uint64
+	Mutability		MethodMutability
+	Cacheable		bool
+	MaxResponseBytes	uint32
+	Description		string
 }
 
 // MethodMutability defines whether a method can modify state.
 type MethodMutability uint8
 
 const (
-	MethodRead      MethodMutability = iota
+	MethodRead	MethodMutability	= iota
 	MethodWrite
 )
 
@@ -61,21 +47,17 @@ func (m MethodMutability) String() string {
 	return "WRITE"
 }
 
-// ---------------
-// ABI Method Resolver
-// ---------------
-
 type ABIMethodResolver struct {
-	methods     map[string]GetMethodABI
-	bySelector  map[[4]byte]GetMethodABI
-	byName      map[string]GetMethodABI
+	methods		map[string]GetMethodABI
+	bySelector	map[[4]byte]GetMethodABI
+	byName		map[string]GetMethodABI
 }
 
 func NewABIMethodResolver() *ABIMethodResolver {
 	return &ABIMethodResolver{
-		methods:    make(map[string]GetMethodABI),
-		bySelector: make(map[[4]byte]GetMethodABI),
-		byName:     make(map[string]GetMethodABI),
+		methods:	make(map[string]GetMethodABI),
+		bySelector:	make(map[[4]byte]GetMethodABI),
+		byName:		make(map[string]GetMethodABI),
 	}
 }
 
@@ -119,30 +101,20 @@ func (r *ABIMethodResolver) AllMethods() []GetMethodABI {
 	return result
 }
 
-// ---------------
-// Query VM Domain (Separate from Execution VM)
-// ---------------
-// QueryVM ≠ ExecutionVM
-// Query methods MUST execute in a separate domain with:
-// - No ActionQueue
-// - No state writes
-// - No side effects
-// - No continuation mutation
-
 type QueryVM struct {
-	resolver  *ABIMethodResolver
-	snapshot  QuerySnapshot
-	gasLimit  uint64
-	proofMode bool
-	readOnly  bool
+	resolver	*ABIMethodResolver
+	snapshot	QuerySnapshot
+	gasLimit	uint64
+	proofMode	bool
+	readOnly	bool
 }
 
 func NewQueryVM(resolver *ABIMethodResolver, snapshot QuerySnapshot, gasLimit uint64) *QueryVM {
 	return &QueryVM{
-		resolver:  resolver,
-		snapshot:  snapshot,
-		gasLimit:  gasLimit,
-		readOnly:  true,
+		resolver:	resolver,
+		snapshot:	snapshot,
+		gasLimit:	gasLimit,
+		readOnly:	true,
 	}
 }
 
@@ -181,36 +153,36 @@ func (vm *QueryVM) executeQuery(method GetMethodABI, args []byte) (*QueryResult,
 
 	gasAccounting := &QueryGasAccounting{
 		Model: QueryGasModel{
-			ComputeGas:       10,
-			DecodeGas:        5,
-			SerializationGas: 2,
+			ComputeGas:		10,
+			DecodeGas:		5,
+			SerializationGas:	2,
 		},
-		Limit: vm.gasLimit,
+		Limit:	vm.gasLimit,
 	}
 
 	if !gasAccounting.ChargeDecode(uint64(len(args))) {
 		return &QueryResult{
-			ExitCode: ExitCodeMethodNotFound.ToUint32(),
-			GasUsed:  gasAccounting.Used.Total(),
+			ExitCode:	ExitCodeMethodNotFound.ToUint32(),
+			GasUsed:	gasAccounting.Used.Total(),
 		}, nil
 	}
 
 	if !gasAccounting.ChargeCompute(method.GasEstimate) {
 		return &QueryResult{
-			ExitCode: GasExhaustedCode,
-			GasUsed:  gasAccounting.Used.Total(),
+			ExitCode:	GasExhaustedCode,
+			GasUsed:	gasAccounting.Used.Total(),
 		}, nil
 	}
 
 	return &QueryResult{
-		ExitCode:       ExitSuccess.ToUint32(),
-		GasUsed:        gasAccounting.Used.Total(),
-		GasBreakdown:   gasAccounting.Used,
-		MethodName:     method.Name,
-		MethodSelector: method.Selector,
-		ABIKnown:        true,
-		InputCodec:     method.InputCodec,
-		OutputCodec:    method.OutputCodec,
+		ExitCode:	ExitSuccess.ToUint32(),
+		GasUsed:	gasAccounting.Used.Total(),
+		GasBreakdown:	gasAccounting.Used,
+		MethodName:	method.Name,
+		MethodSelector:	method.Selector,
+		ABIKnown:	true,
+		InputCodec:	method.InputCodec,
+		OutputCodec:	method.OutputCodec,
 	}, nil
 }
 
@@ -221,23 +193,17 @@ func (vm *QueryVM) validateIsolation() error {
 	return nil
 }
 
-// ---------------
-// Query Result Model
-// ---------------
-// Get method output MUST be canonical encoded bytes OR ChunkRef.
-// ABI determines output format: structured JSON if ABIKnown, raw hex/ChunkHash otherwise.
-
 type QueryResult struct {
-	ExitCode       uint32
-	GasUsed        uint64
-	GasBreakdown   QueryGasModel
-	ResponseBytes  []byte
-	MethodName     string
-	MethodSelector [4]byte
-	ABIKnown        bool
-	InputCodec     string
-	OutputCodec    string
-	Proof          *QueryProofMode
+	ExitCode	uint32
+	GasUsed		uint64
+	GasBreakdown	QueryGasModel
+	ResponseBytes	[]byte
+	MethodName	string
+	MethodSelector	[4]byte
+	ABIKnown	bool
+	InputCodec	string
+	OutputCodec	string
+	Proof		*QueryProofMode
 }
 
 // FormatResponse returns the response in the appropriate format.
@@ -252,11 +218,11 @@ func (r *QueryResult) FormatResponse() (string, error) {
 
 func (r *QueryResult) formatTypedJSON() (string, error) {
 	obj := map[string]interface{}{
-		"method":   r.MethodName,
-		"selector": fmt.Sprintf("%x", r.MethodSelector[:]),
-		"exit_code": r.ExitCode,
-		"gas_used":  r.GasUsed,
-		"abi_known": r.ABIKnown,
+		"method":	r.MethodName,
+		"selector":	fmt.Sprintf("%x", r.MethodSelector[:]),
+		"exit_code":	r.ExitCode,
+		"gas_used":	r.GasUsed,
+		"abi_known":	r.ABIKnown,
 	}
 	if r.InputCodec != "" {
 		obj["input_codec"] = r.InputCodec
@@ -286,13 +252,9 @@ func (r *QueryResult) formatRawHex() (string, error) {
 	return fmt.Sprintf("%x", r.ResponseBytes), nil
 }
 
-// ---------------
-// Error Types
-// ---------------
-
 var (
-	ExitCodeMethodNotFound = StructuredExitCode{ExitCategoryVMError, 100, "method_not_found"}
-	GasExhaustedCode       = uint32(6 << 16 | 1)
+	ExitCodeMethodNotFound	= StructuredExitCode{ExitCategoryVMError, 100, "method_not_found"}
+	GasExhaustedCode	= uint32(6<<16 | 1)
 )
 
 type ABIMethodNotFoundError struct {
@@ -307,16 +269,10 @@ func (e *ABIMethodNotFoundError) Error() string {
 	return fmt.Sprintf("AVM ABI: method %q not found → EXIT_ABI_METHOD_NOT_FOUND", e.Method)
 }
 
-// ---------------
-// Forbidden Operation Detector
-// ---------------
-// Any instruction that writes storage, sends messages, emits events,
-// or changes balance → MUST be disabled in QueryVM.
-
 type QueryForbiddenOp struct {
-	Opcode      ISAOpcode
-	Description string
-	Reason      string
+	Opcode		ISAOpcode
+	Description	string
+	Reason		string
 }
 
 var QueryForbiddenOps = []QueryForbiddenOp{
@@ -336,11 +292,6 @@ func IsOpcodeForbiddenInQuery(op ISAOpcode) (bool, string) {
 	}
 	return false, ""
 }
-
-// ---------------
-// ABI Schema Hash (Part of Canonical Module Hash)
-// ---------------
-// ABI change → module hash change. Same contract → same ABI → same selector mapping.
 
 type ABISchemaHash [32]byte
 
@@ -369,16 +320,10 @@ func ComputeABISchemaHash(methods []GetMethodABI) (ABISchemaHash, error) {
 	return hash, nil
 }
 
-// ---------------
-// Query Response Canonical Encoding
-// ---------------
-// Same query → identical output bytes, identical hash.
-// ABI determines output format.
-
 type QueryResponseFormat uint8
 
 const (
-	ResponseFormatTypedJSON QueryResponseFormat = iota
+	ResponseFormatTypedJSON	QueryResponseFormat	= iota
 	ResponseFormatRawHex
 	ResponseFormatChunkHash
 )
@@ -404,20 +349,12 @@ func DetermineResponseFormat(abiKnown bool) QueryResponseFormat {
 	return ResponseFormatRawHex
 }
 
-// ---------------
-// Proof-Capable Query Mode
-// ---------------
-// Get methods MAY run in proof mode, returning:
-// - inclusion proof
-// - state path in Chunk DAG
-// - enables trustless verification
-
 type QueryProof struct {
-	Enabled        bool
-	MethodSelector [4]byte
-	StateRootHash  []byte
-	ResponseHash   []byte
-	InclusionPath  [][]byte
+	Enabled		bool
+	MethodSelector	[4]byte
+	StateRootHash	[]byte
+	ResponseHash	[]byte
+	InclusionPath	[][]byte
 }
 
 func BuildGetMethodProof(snapshot QuerySnapshot, method string, selector [4]byte, response []byte) QueryProof {
@@ -428,27 +365,17 @@ func BuildGetMethodProof(snapshot QuerySnapshot, method string, selector [4]byte
 	responseHash := blake3.Sum256(response)
 
 	return QueryProof{
-		Enabled:        true,
-		MethodSelector: selector,
-		StateRootHash:  stateHash,
-		ResponseHash:   responseHash[:],
-		InclusionPath:  nil,
+		Enabled:	true,
+		MethodSelector:	selector,
+		StateRootHash:	stateHash,
+		ResponseHash:	responseHash[:],
+		InclusionPath:	nil,
 	}
 }
 
-// ---------------
-// Method Discovery
-// ---------------
-// Contracts MUST expose ABI metadata:
-// - method list
-// - selectors
-// - schemas
-// - gas estimates
-// Unknown method → deterministic EXIT_ABI_METHOD_NOT_FOUND
-
 type MethodDiscovery struct {
-	Resolver *ABIMethodResolver
-	Schema   ABISchemaHash
+	Resolver	*ABIMethodResolver
+	Schema		ABISchemaHash
 }
 
 func NewMethodDiscovery(resolver *ABIMethodResolver) (*MethodDiscovery, error) {
@@ -458,8 +385,8 @@ func NewMethodDiscovery(resolver *ABIMethodResolver) (*MethodDiscovery, error) {
 		return nil, err
 	}
 	return &MethodDiscovery{
-		Resolver: resolver,
-		Schema:   schema,
+		Resolver:	resolver,
+		Schema:		schema,
 	}, nil
 }
 
@@ -498,9 +425,5 @@ func ValidateABIDecoding(args []byte, inputCodec string) error {
 	}
 	return nil
 }
-
-// ---------------
-// Preset exit code for ABI-not-found
-// ---------------
 
 var ErrABIMethodNotFound = errors.New("AVM: ABI method not found")

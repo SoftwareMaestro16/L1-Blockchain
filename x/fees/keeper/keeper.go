@@ -18,16 +18,16 @@ import (
 var FeeFormulaParamsKey = []byte{0x10}
 
 type Keeper struct {
-	cdc                codec.BinaryCodec
-	storeService       corestore.KVStoreService
-	accountKeeper      types.AccountKeeper
-	bankKeeper         types.BankKeeper
-	distributionKeeper distrkeeper.Keeper
-	authority          string
+	cdc			codec.BinaryCodec
+	storeService		corestore.KVStoreService
+	accountKeeper		types.AccountKeeper
+	bankKeeper		types.BankKeeper
+	distributionKeeper	distrkeeper.Keeper
+	authority		string
 	// reputationReader is optional; nil → neutral reputation for all senders.
-	reputationReader types.ReputationReader
+	reputationReader	types.ReputationReader
 	// feeCollector is the fee-collector module for distributing collected fees.
-	feeCollector types.FeeCollectorKeeper
+	feeCollector	types.FeeCollectorKeeper
 }
 
 func NewKeeper(
@@ -39,12 +39,12 @@ func NewKeeper(
 	authority string,
 ) Keeper {
 	return Keeper{
-		cdc:                cdc,
-		storeService:       storeService,
-		accountKeeper:      accountKeeper,
-		bankKeeper:         bankKeeper,
-		distributionKeeper: distributionKeeper,
-		authority:          authority,
+		cdc:			cdc,
+		storeService:		storeService,
+		accountKeeper:		accountKeeper,
+		bankKeeper:		bankKeeper,
+		distributionKeeper:	distributionKeeper,
+		authority:		authority,
 	}
 }
 
@@ -62,7 +62,7 @@ func (k Keeper) WithFeeCollector(fc types.FeeCollectorKeeper) Keeper {
 	return k
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)
@@ -140,11 +140,11 @@ func (k Keeper) InitGenesis(ctx context.Context, gs types.GenesisState) error {
 	if err := k.SetProtocolFeeState(ctx, gs.ProtocolFeeState); err != nil {
 		return err
 	}
-	// Initialize extended formula params with defaults if not present.
+
 	if err := k.SetFeeFormulaParams(ctx, types.DefaultFeeFormulaParams()); err != nil {
 		return err
 	}
-	// Restore congestion state (Requirement 2b: export/import round-trip).
+
 	if gs.CongestionBps > uint32(types.BasisPoints) {
 		gs.CongestionBps = 0
 	}
@@ -161,9 +161,9 @@ func (k Keeper) ExportGenesis(ctx context.Context) (*types.GenesisState, error) 
 		return nil, err
 	}
 	gs := &types.GenesisState{
-		Params:           params,
-		ProtocolFeeState: state,
-		CongestionBps:    k.GetCongestionState(sdk.UnwrapSDKContext(ctx)),
+		Params:			params,
+		ProtocolFeeState:	state,
+		CongestionBps:		k.GetCongestionState(sdk.UnwrapSDKContext(ctx)),
 	}
 	if err := gs.Validate(); err != nil {
 		return nil, err
@@ -240,9 +240,7 @@ func (k Keeper) RecordCollectedFees(ctx context.Context, fees sdk.Coins) error {
 	if err := k.SetProtocolFeeState(ctx, state); err != nil {
 		return err
 	}
-	// Also record into fee-collector pending distribution if wired.
-	// Move funds from the SDK fee_collector to the Aetra feecollector module
-	// before recording the split, so the accounting invariant holds.
+
 	if k.feeCollector != nil {
 		if err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.FeeCollectorModuleName, "feecollector", fees); err != nil {
 			return err
@@ -266,9 +264,9 @@ func (k Keeper) GetModuleBalances(ctx context.Context) ([]types.ModuleBalance, e
 			return nil, types.ErrInvalidParams.Wrapf("module account %s is not configured", moduleName)
 		}
 		balances = append(balances, types.ModuleBalance{
-			ModuleName: moduleName,
-			Address:    aetraaddress.FormatAccAddress(addr),
-			Balance:    k.bankKeeper.GetAllBalances(ctx, addr),
+			ModuleName:	moduleName,
+			Address:	aetraaddress.FormatAccAddress(addr),
+			Balance:	k.bankKeeper.GetAllBalances(ctx, addr),
 		})
 	}
 	return balances, nil

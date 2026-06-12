@@ -9,57 +9,57 @@ import (
 )
 
 const (
-	DefaultMaxValidatorFeeShareBps      = int64(9_000)
-	DefaultMaxNativeFeePressureBps      = int64(1_000)
-	DefaultMinFeeNormalizationBps       = int64(500)
-	DefaultMaxFeeNormalizationBps       = int64(20_000)
-	DefaultMaxHardwareUtilizationBps    = int64(8_000)
-	DefaultMinSimulationSampleCount     = 4
-	DefaultCongestedMaintenanceCoverage = appparams.BasisPoints
+	DefaultMaxValidatorFeeShareBps		= int64(9_000)
+	DefaultMaxNativeFeePressureBps		= int64(1_000)
+	DefaultMinFeeNormalizationBps		= int64(500)
+	DefaultMaxFeeNormalizationBps		= int64(20_000)
+	DefaultMaxHardwareUtilizationBps	= int64(8_000)
+	DefaultMinSimulationSampleCount		= 4
+	DefaultCongestedMaintenanceCoverage	= appparams.BasisPoints
 )
 
 type FeeModelEfficiencyInput struct {
-	Params                        Params
-	SimulationLoadsBps            []uint32
-	CurrentBlockLoadBps           uint32
-	ValidatorRewardCoverageBps    int64
-	MaintenanceFundingCoverageBps int64
-	NativeLiquidityDepthNaet      sdkmath.Int
-	DailyFeePressureNaet          sdkmath.Int
-	AntiSpamMultiplierBps         int64
-	BurnIntegratedWithIssuance    bool
-	FeeBurnRatioBps               int64
-	BlockTxFeeNaet                sdkmath.Int
-	StorageFeeNaet                sdkmath.Int
-	ExecutionFeeNaet              sdkmath.Int
-	ExpectedBlockProcessingMs     uint64
-	ObservedBlockProcessingMs     uint64
-	ExpectedValidatorMemoryMB     uint64
-	ObservedValidatorMemoryMB     uint64
-	MaxValidatorFeeShareBps       int64
-	MaxNativeFeePressureBps       int64
-	MinFeeNormalizationBps        int64
-	MaxFeeNormalizationBps        int64
-	MaxHardwareUtilizationBps     int64
-	MinSimulationSampleCount      int
+	Params				Params
+	SimulationLoadsBps		[]uint32
+	CurrentBlockLoadBps		uint32
+	ValidatorRewardCoverageBps	int64
+	MaintenanceFundingCoverageBps	int64
+	NativeLiquidityDepthNaet	sdkmath.Int
+	DailyFeePressureNaet		sdkmath.Int
+	AntiSpamMultiplierBps		int64
+	BurnIntegratedWithIssuance	bool
+	FeeBurnRatioBps			int64
+	BlockTxFeeNaet			sdkmath.Int
+	StorageFeeNaet			sdkmath.Int
+	ExecutionFeeNaet		sdkmath.Int
+	ExpectedBlockProcessingMs	uint64
+	ObservedBlockProcessingMs	uint64
+	ExpectedValidatorMemoryMB	uint64
+	ObservedValidatorMemoryMB	uint64
+	MaxValidatorFeeShareBps		int64
+	MaxNativeFeePressureBps		int64
+	MinFeeNormalizationBps		int64
+	MaxFeeNormalizationBps		int64
+	MaxHardwareUtilizationBps	int64
+	MinSimulationSampleCount	int
 }
 
 type FeeModelEfficiencyReport struct {
-	Healthy                 bool
-	ValidatorFeeShareBps    int64
-	CommunityFeeShareBps    int64
-	NativeFeePressureBps    int64
-	StorageExecutionFeeBps  int64
-	BlockProcessingUsageBps int64
-	ValidatorMemoryUsageBps int64
-	SimulationSampleCount   int
-	Risks                   []string
+	Healthy			bool
+	ValidatorFeeShareBps	int64
+	CommunityFeeShareBps	int64
+	NativeFeePressureBps	int64
+	StorageExecutionFeeBps	int64
+	BlockProcessingUsageBps	int64
+	ValidatorMemoryUsageBps	int64
+	SimulationSampleCount	int
+	Risks			[]string
 }
 
 type FeeModelSimulationReport struct {
-	Passed      bool
-	SampleCount int
-	Risks       []string
+	Passed		bool
+	SampleCount	int
+	Risks		[]string
 }
 
 func EvaluateFeeModelEfficiency(input FeeModelEfficiencyInput) (FeeModelEfficiencyReport, error) {
@@ -116,15 +116,15 @@ func EvaluateFeeModelEfficiency(input FeeModelEfficiencyInput) (FeeModelEfficien
 	}
 
 	return FeeModelEfficiencyReport{
-		Healthy:                 len(risks) == 0,
-		ValidatorFeeShareBps:    validatorShare,
-		CommunityFeeShareBps:    communityShare,
-		NativeFeePressureBps:    feePressureBps,
-		StorageExecutionFeeBps:  storageExecutionBps,
-		BlockProcessingUsageBps: blockProcessingUsage,
-		ValidatorMemoryUsageBps: memoryUsage,
-		SimulationSampleCount:   simulation.SampleCount,
-		Risks:                   risks,
+		Healthy:			len(risks) == 0,
+		ValidatorFeeShareBps:		validatorShare,
+		CommunityFeeShareBps:		communityShare,
+		NativeFeePressureBps:		feePressureBps,
+		StorageExecutionFeeBps:		storageExecutionBps,
+		BlockProcessingUsageBps:	blockProcessingUsage,
+		ValidatorMemoryUsageBps:	memoryUsage,
+		SimulationSampleCount:		simulation.SampleCount,
+		Risks:				risks,
 	}, nil
 }
 
@@ -168,9 +168,9 @@ func SimulateFeeModel(params Params, loads []uint32, minSamples int) (FeeModelSi
 		previous = fee
 	}
 	return FeeModelSimulationReport{
-		Passed:      len(risks) == 0,
-		SampleCount: len(loads),
-		Risks:       risks,
+		Passed:		len(risks) == 0,
+		SampleCount:	len(loads),
+		Risks:		risks,
 	}, nil
 }
 
@@ -200,8 +200,8 @@ func applyFeeEfficiencyDefaults(input *FeeModelEfficiencyInput) {
 
 func validateFeeEfficiencyInput(input FeeModelEfficiencyInput) error {
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "validator_reward_coverage_bps", value: input.ValidatorRewardCoverageBps},
 		{name: "maintenance_funding_coverage_bps", value: input.MaintenanceFundingCoverageBps},
@@ -224,8 +224,8 @@ func validateFeeEfficiencyInput(input FeeModelEfficiencyInput) error {
 		return fmt.Errorf("min_simulation_sample_count must not be negative")
 	}
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "native_liquidity_depth_naet", value: input.NativeLiquidityDepthNaet},
 		{name: "daily_fee_pressure_naet", value: input.DailyFeePressureNaet},

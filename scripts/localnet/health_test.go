@@ -88,19 +88,19 @@ func TestPeerListJSONValidFormat(t *testing.T) {
 	}
 
 	var peers struct {
-		Network string `json:"network"`
-		Peers   []struct {
-			ID          string `json:"id"`
-			NodeID      string `json:"node_id"`
-			Address     string `json:"address"`
-			Persistent  bool   `json:"persistent"`
-			Description string `json:"description"`
-		} `json:"peers"`
-		Seeds []struct {
-			ID          string `json:"id"`
-			Address     string `json:"address"`
-			Description string `json:"description"`
-		} `json:"seeds"`
+		Network	string	`json:"network"`
+		Peers	[]struct {
+			ID		string	`json:"id"`
+			NodeID		string	`json:"node_id"`
+			Address		string	`json:"address"`
+			Persistent	bool	`json:"persistent"`
+			Description	string	`json:"description"`
+		}	`json:"peers"`
+		Seeds	[]struct {
+			ID		string	`json:"id"`
+			Address		string	`json:"address"`
+			Description	string	`json:"description"`
+		}	`json:"seeds"`
 	}
 
 	if err := json.Unmarshal(content, &peers); err != nil {
@@ -130,7 +130,6 @@ func TestPeerListJSONNodeIDFormat(t *testing.T) {
 		t.Skip("JSON parsing failed")
 	}
 
-	// CometBFT node ID format: 64 hex characters
 	nodeIDPattern := regexp.MustCompile(`^[0-9a-fA-F]{64}@.*:\d+$`)
 	for _, peer := range peers.Peers {
 		if peer.ID != "" && !strings.Contains(peer.ID, "NODE_ID") {
@@ -159,12 +158,10 @@ func TestSeedListFormat(t *testing.T) {
 
 	text := string(content)
 
-	// Check for usage documentation
 	if !strings.Contains(text, "seeds =") {
 		t.Error("seeds.example.txt should document how to use in config.toml")
 	}
 
-	// Check format hint
 	if !strings.Contains(text, "node_id@host:port") && !strings.Contains(text, "NODE_ID") {
 		t.Error("seeds.example.txt should show node_id@host:port format")
 	}
@@ -194,8 +191,8 @@ func TestHealthScriptChecksRPC(t *testing.T) {
 
 	text := string(content)
 	healthIndicators := []string{
-		"26657",  // RPC port
-		"status", // /status endpoint
+		"26657",
+		"status",
 		"catching_up",
 	}
 
@@ -214,15 +211,15 @@ func TestHealthScriptChecksRPC(t *testing.T) {
 // TestPeerListParserRejectsMalformed verifies parser logic for malformed data
 func TestPeerListParserRejectsMalformed(t *testing.T) {
 	malformedPeers := []string{
-		"",                     // empty
-		"invalid",              // no @ separator
-		"@host:port",           // no node ID
-		"nodeid@",              // no host
-		"nodeid@host",          // no port
-		"nodeid@host:invalid",  // non-numeric port
-		"nodeid@host:-1",       // negative port
-		"nodeid@host:70000",    // port too high
-		"1234567890@host:port", // short node ID (should be 64 chars)
+		"",
+		"invalid",
+		"@host:port",
+		"nodeid@",
+		"nodeid@host",
+		"nodeid@host:invalid",
+		"nodeid@host:-1",
+		"nodeid@host:70000",
+		"1234567890@host:port",
 	}
 
 	nodeIDPattern := regexp.MustCompile(`^[0-9a-fA-F]{64}@[^:]+:\d+$`)

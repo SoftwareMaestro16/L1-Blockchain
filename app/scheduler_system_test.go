@@ -42,12 +42,12 @@ func TestSchedulerSystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	schedulerGenesis := schedulerkeeper.DefaultGenesis()
 	schedulerGenesis.State.Jobs = []schedulertypes.ScheduledJob{
 		{
-			ID:                  "rent-collection",
-			OwnerModule:         "aetracore",
-			Type:                schedulertypes.JobTypePeriodic,
-			NextExecutionHeight: 10,
-			Interval:            10,
-			MaxGas:              100,
+			ID:			"rent-collection",
+			OwnerModule:		"aetracore",
+			Type:			schedulertypes.JobTypePeriodic,
+			NextExecutionHeight:	10,
+			Interval:		10,
+			MaxGas:			100,
 		},
 	}
 	require.NoError(t, schedulerGenesis.Validate())
@@ -58,15 +58,15 @@ func TestSchedulerSystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

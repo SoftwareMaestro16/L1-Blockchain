@@ -26,12 +26,12 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 	require.NoError(t, err)
 
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
+		Primary:	addr(2),
+		Contract:	addr(3),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(4),
 		},
-		Metadata: metadata,
+		Metadata:	metadata,
 	}, 12)
 	require.NoError(t, err)
 
@@ -47,24 +47,24 @@ func TestUnifiedResolutionRecordV2BuildsFromResolverView(t *testing.T) {
 		NewContractTargetV2(ResolverKeyWallet, addr(4), 13),
 	}, record.ContractTargets)
 	require.Equal(t, []ServiceEndpointV2{{
-		Key:         "rpc",
-		Endpoint:    "https://rpc.aet",
-		ServiceID:   "rpc",
-		ServiceType: "service.v1",
-		Transport:   "https",
-		AuthPolicy:  "none",
-		Priority:    100,
-		Weight:      1,
-		TTL:         30,
+		Key:		"rpc",
+		Endpoint:	"https://rpc.aet",
+		ServiceID:	"rpc",
+		ServiceType:	"service.v1",
+		Transport:	"https",
+		AuthPolicy:	"none",
+		Priority:	100,
+		Weight:		1,
+		TTL:		30,
 	}}, record.ServiceEndpoints)
 	expectedDescriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
 	require.Equal(t, []InterfaceDescriptorV2{{
-		InterfaceID:  "aw5",
-		Descriptor:   expectedDescriptorHash,
-		SchemaHash:   expectedDescriptorHash,
-		Version:      "v1",
-		RenderPolicy: "wallet_confirm",
+		InterfaceID:	"aw5",
+		Descriptor:	expectedDescriptorHash,
+		SchemaHash:	expectedDescriptorHash,
+		Version:	"v1",
+		RenderPolicy:	"wallet_confirm",
 	}}, record.InterfaceDescriptors)
 	require.Equal(t, RoutingMetadataV2{ZoneID: "CONTRACT_ZONE", ShardID: "0:1", VM: "AVM", Entrypoint: "swap"}, record.RoutingMetadata)
 	require.Equal(t, []ExecutionHintV2{{Key: "hint.priority", Value: "fast"}}, record.ExecutionHints)
@@ -90,19 +90,19 @@ func TestUnifiedResolutionRecordV2BuildsRoutingAndExecutionHintsFromMetadata(t *
 	require.NoError(t, err)
 
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Metadata: metadata,
+		Primary:	addr(2),
+		Metadata:	metadata,
 	}, 12)
 	require.NoError(t, err)
 
 	record, err := BuildUnifiedResolutionRecordV2(state, "alice.aet", 13, 30)
 	require.NoError(t, err)
 	require.Equal(t, RoutingMetadataV2{
-		RouteID:         "swap-route",
-		TargetType:      string(IdentityResolutionTargetContract),
-		PreferredTarget: "swap",
-		FallbackTargets: []string{"swap-backup"},
-		FeeHint:         "standard",
+		RouteID:		"swap-route",
+		TargetType:		string(IdentityResolutionTargetContract),
+		PreferredTarget:	"swap",
+		FallbackTargets:	[]string{"swap-backup"},
+		FeeHint:		"standard",
 	}, record.RoutingMetadata)
 	require.Equal(t, []ExecutionHintV2{
 		{Key: "hint.default_gas_limit", Value: "250000", DefaultGasLimitHint: 250_000},
@@ -114,14 +114,14 @@ func TestUnifiedResolutionRecordV2RejectsNonCanonicalAndTTL(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:        nameHash,
-		Owner:           addr(1),
-		PrimaryAddress:  addr(2),
-		RecordVersion:   1,
-		RecordTTL:       10,
-		UpdatedAtHeight: 1,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		NameHash:		nameHash,
+		Owner:			addr(1),
+		PrimaryAddress:		addr(2),
+		RecordVersion:		1,
+		RecordTTL:		10,
+		UpdatedAtHeight:	1,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 		ContractTargets: []ContractTargetV2{
 			{Key: ResolverKeyWallet, Address: addr(4)},
 			{Key: ResolverKeyContract, Address: addr(3)},
@@ -140,32 +140,32 @@ func TestUnifiedResolutionRecordV2ResolverValidationLimitsAndFormats(t *testing.
 	descriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:        nameHash,
-		Owner:           addr(1),
-		PrimaryAddress:  addr(2),
-		ContractTargets: []ContractTargetV2{{Key: ResolverKeyContract, CodeID: "avm:swap-v1"}},
+		NameHash:		nameHash,
+		Owner:			addr(1),
+		PrimaryAddress:		addr(2),
+		ContractTargets:	[]ContractTargetV2{{Key: ResolverKeyContract, CodeID: "avm:swap-v1"}},
 		ServiceEndpoints: []ServiceEndpointV2{{
-			ServiceID:   "rpc",
-			ServiceType: "rpc.v1",
-			Endpoint:    "https://rpc.aet",
-			Transport:   "https",
-			AuthPolicy:  "none",
-			Weight:      1,
-			TTL:         10,
+			ServiceID:	"rpc",
+			ServiceType:	"rpc.v1",
+			Endpoint:	"https://rpc.aet",
+			Transport:	"https",
+			AuthPolicy:	"none",
+			Weight:		1,
+			TTL:		10,
 		}},
 		InterfaceDescriptors: []InterfaceDescriptorV2{{
-			InterfaceID:  "aw5",
-			SchemaHash:   descriptorHash,
-			Version:      "v1",
-			RenderPolicy: "wallet_confirm",
+			InterfaceID:	"aw5",
+			SchemaHash:	descriptorHash,
+			Version:	"v1",
+			RenderPolicy:	"wallet_confirm",
 		}},
-		RoutingMetadata: RoutingMetadataV2{ZoneID: "zone-a", ShardID: "shard-1", VM: "avm", Entrypoint: "swap"},
-		ExecutionHints:  []ExecutionHintV2{{Key: "hint.priority", Value: "fast"}},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RoutingMetadata:	RoutingMetadataV2{ZoneID: "zone-a", ShardID: "shard-1", VM: "avm", Entrypoint: "swap"},
+		ExecutionHints:		[]ExecutionHintV2{{Key: "hint.priority", Value: "fast"}},
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -193,25 +193,25 @@ func TestUnifiedResolutionRecordV2ContractTargetSchemaValidation(t *testing.T) {
 	descriptorHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:             nameHash,
-		Owner:                addr(1),
-		PrimaryAddress:       addr(2),
-		InterfaceDescriptors: []InterfaceDescriptorV2{{InterfaceID: "aw5", SchemaHash: descriptorHash, Version: "v1", RenderPolicy: "wallet_confirm"}},
+		NameHash:		nameHash,
+		Owner:			addr(1),
+		PrimaryAddress:		addr(2),
+		InterfaceDescriptors:	[]InterfaceDescriptorV2{{InterfaceID: "aw5", SchemaHash: descriptorHash, Version: "v1", RenderPolicy: "wallet_confirm"}},
 		ContractTargets: []ContractTargetV2{{
-			TargetID:            "swap",
-			ContractAddress:     addr(3),
-			Entrypoint:          "execute_swap",
-			InterfaceHash:       descriptorHash,
-			RequiredFundsPolicy: "optional",
-			GasHint:             500_000,
-			Enabled:             true,
-			UpdatedAtHeight:     12,
+			TargetID:		"swap",
+			ContractAddress:	addr(3),
+			Entrypoint:		"execute_swap",
+			InterfaceHash:		descriptorHash,
+			RequiredFundsPolicy:	"optional",
+			GasHint:		500_000,
+			Enabled:		true,
+			UpdatedAtHeight:	12,
 		}},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -240,25 +240,25 @@ func TestUnifiedResolutionRecordV2RoutingMetadataValidation(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		RoutingMetadata: RoutingMetadataV2{
-			RouteID:                "swap-route",
-			TargetType:             string(IdentityResolutionTargetContract),
-			PreferredTarget:        "swap",
-			FallbackTargets:        []string{"swap-backup", "swap-cold"},
-			ChainContext:           "aetra-main",
-			FeeHint:                "standard",
-			TimeoutHint:            30,
-			MemoPolicy:             "optional",
-			CapabilityRequirements: []string{"cap.contract.invoke", "cap.fee.pay"},
+			RouteID:		"swap-route",
+			TargetType:		string(IdentityResolutionTargetContract),
+			PreferredTarget:	"swap",
+			FallbackTargets:	[]string{"swap-backup", "swap-cold"},
+			ChainContext:		"aetra-main",
+			FeeHint:		"standard",
+			TimeoutHint:		30,
+			MemoPolicy:		"optional",
+			CapabilityRequirements:	[]string{"cap.contract.invoke", "cap.fee.pay"},
 		},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 	require.True(t, routingMetadataHasTargetV2(record.RoutingMetadata))
@@ -284,24 +284,24 @@ func TestUnifiedResolutionRecordV2ExecutionHintValidation(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		ExecutionHints: []ExecutionHintV2{{
-			Key:                           "hint.invoke",
-			DefaultGasLimitHint:           250_000,
-			PreferredFeeMode:              "standard",
-			MessageType:                   "cosmos.msg.v1",
-			AsyncAllowed:                  true,
-			RequiresMemo:                  true,
-			RequiresInterfaceConfirmation: true,
-			SimulationRequired:            true,
+			Key:				"hint.invoke",
+			DefaultGasLimitHint:		250_000,
+			PreferredFeeMode:		"standard",
+			MessageType:			"cosmos.msg.v1",
+			AsyncAllowed:			true,
+			RequiresMemo:			true,
+			RequiresInterfaceConfirmation:	true,
+			SimulationRequired:		true,
 		}},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -327,26 +327,26 @@ func TestUnifiedResolutionRecordV2ServiceEndpointSchemaValidation(t *testing.T) 
 	schemaHash, err := InterfaceDescriptorHashV2("rpc-service-v1")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		ServiceEndpoints: []ServiceEndpointV2{{
-			ServiceID:          "rpc",
-			ServiceType:        "rpc.v1",
-			Endpoint:           "https://rpc.aet",
-			Transport:          "https",
-			AuthPolicy:         "none",
-			HealthPathOptional: "/healthz",
-			Priority:           100,
-			Weight:             1,
-			TTL:                10,
-			SchemaHashOptional: schemaHash,
+			ServiceID:		"rpc",
+			ServiceType:		"rpc.v1",
+			Endpoint:		"https://rpc.aet",
+			Transport:		"https",
+			AuthPolicy:		"none",
+			HealthPathOptional:	"/healthz",
+			Priority:		100,
+			Weight:			1,
+			TTL:			10,
+			SchemaHashOptional:	schemaHash,
 		}},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -373,25 +373,25 @@ func TestUnifiedResolutionRecordV2InterfaceDescriptorSchemaValidation(t *testing
 	schemaHash, err := InterfaceDescriptorHashV2(inline)
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		InterfaceDescriptors: []InterfaceDescriptorV2{{
-			InterfaceID:              "aw5",
-			SchemaHash:               schemaHash,
-			SchemaURIOptional:        "https://schema.aet/wallet-v1.json",
-			SchemaInlineOptional:     inline,
-			Version:                  "v1",
-			RenderPolicy:             "wallet_confirm",
-			PermissionsRequired:      []string{"read.balance"},
-			ContractTargetIDOptional: "swap",
-			ServiceIDOptional:        "rpc",
+			InterfaceID:			"aw5",
+			SchemaHash:			schemaHash,
+			SchemaURIOptional:		"https://schema.aet/wallet-v1.json",
+			SchemaInlineOptional:		inline,
+			Version:			"v1",
+			RenderPolicy:			"wallet_confirm",
+			PermissionsRequired:		[]string{"read.balance"},
+			ContractTargetIDOptional:	"swap",
+			ServiceIDOptional:		"rpc",
 		}},
-		RecordVersion:   7,
-		RecordTTL:       10,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		7,
+		RecordTTL:		10,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
@@ -409,7 +409,7 @@ func TestUnifiedResolutionRecordV2InterfaceDescriptorSchemaValidation(t *testing
 func TestReverseResolutionRecordV2VerifiedPrimaryAndAlias(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	state, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(3),
 		},

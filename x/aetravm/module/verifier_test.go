@@ -11,15 +11,15 @@ import (
 
 func makeValidModule() *AVMModule {
 	return &AVMModule{
-		Magic:          MagicNumber,
-		Version:        uint32(VerifierVersion),
-		ABIVersion:    1,
-		ImportTable:   []ImportEntry{},
-		ExportTable:   []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:  make([]byte, 32),
-		Instructions:  []byte{0x06},
-		DependencyHashes: nil,
-		Schema:        nil,
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	nil,
+		Schema:			nil,
 	}
 }
 
@@ -29,10 +29,8 @@ func TestVerifierGoldenVectorValid(t *testing.T) {
 		t.Fatalf("NewVerifier failed: %v", err)
 	}
 
-	// Build a valid module and verify through the in-memory path
 	mod := makeValidModule()
 
-	// Verify individual components
 	if err := v.validateMagic(mod); err != nil {
 		t.Fatalf("magic validation failed: %v", err)
 	}
@@ -49,7 +47,6 @@ func TestVerifierGoldenVectorValid(t *testing.T) {
 		t.Fatalf("export validation failed: %v", err)
 	}
 
-	// Verify through encode-decode path
 	data := encodeModule(mod)
 	result, err := v.Verify(data)
 	if err != nil {
@@ -58,7 +55,7 @@ func TestVerifierGoldenVectorValid(t *testing.T) {
 	if !result.Passed {
 		t.Logf("Verification failed: %s (code %d), but structural checks passed", result.ErrorMessage, result.ErrorCode)
 		t.Logf("This may indicate encode/decode alignment issues; structural verification works correctly")
-		// Still verify module hash is computed correctly
+
 		hash := v.computeModuleHash(data)
 		if len(hash) != 32 {
 			t.Fatalf("module hash should be 32 bytes, got %d", len(hash))
@@ -189,14 +186,14 @@ func TestVerifierDependencyDAGRejectsDuplicates(t *testing.T) {
 	dep2 := []byte{0x01, 0x02, 0x03, 0x04}
 
 	mod := &AVMModule{
-		Magic:           MagicNumber,
-		Version:         uint32(VerifierVersion),
-		ABIVersion:      1,
-		ImportTable:     []ImportEntry{},
-		ExportTable:     []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:    make([]byte, 32),
-		Instructions:    []byte{0x06},
-		DependencyHashes: [][]byte{dep1, dep2},
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	[][]byte{dep1, dep2},
 	}
 
 	err := v.validateDependencyDAG(mod)
@@ -216,14 +213,14 @@ func TestVerifierDependencyDAGDepth(t *testing.T) {
 	}
 
 	mod := &AVMModule{
-		Magic:           MagicNumber,
-		Version:         uint32(VerifierVersion),
-		ABIVersion:      1,
-		ImportTable:     []ImportEntry{},
-		ExportTable:     []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:    make([]byte, 32),
-		Instructions:    []byte{0x06},
-		DependencyHashes: deps,
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	deps,
 	}
 
 	err := v.validateDependencyDAG(mod)
@@ -234,14 +231,14 @@ func TestVerifierDependencyDAGDepth(t *testing.T) {
 
 func TestBuildDependencyDAG(t *testing.T) {
 	mod1 := AVMModule{
-		Magic:           MagicNumber,
-		Version:         uint32(VerifierVersion),
-		ABIVersion:      1,
-		ImportTable:     []ImportEntry{},
-		ExportTable:     []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:    make([]byte, 32),
-		Instructions:    []byte{0x06},
-		DependencyHashes: nil,
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	nil,
 	}
 
 	dag, err := BuildDependencyDAG([]AVMModule{mod1})
@@ -258,25 +255,25 @@ func TestBuildDependencyDAGDetectsCycles(t *testing.T) {
 	hashB := blake3.Sum256([]byte("module_b"))
 
 	modA := AVMModule{
-		Magic:           MagicNumber,
-		Version:         uint32(VerifierVersion),
-		ABIVersion:      1,
-		ImportTable:     []ImportEntry{},
-		ExportTable:     []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:    make([]byte, 32),
-		Instructions:    []byte{0x06},
-		DependencyHashes: [][]byte{hashB[:]},
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	[][]byte{hashB[:]},
 	}
 
 	modB := AVMModule{
-		Magic:           MagicNumber,
-		Version:         uint32(VerifierVersion),
-		ABIVersion:      1,
-		ImportTable:     []ImportEntry{},
-		ExportTable:     []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash:    make([]byte, 32),
-		Instructions:    []byte{0x06},
-		DependencyHashes: [][]byte{hashA[:]},
+		Magic:			MagicNumber,
+		Version:		uint32(VerifierVersion),
+		ABIVersion:		1,
+		ImportTable:		[]ImportEntry{},
+		ExportTable:		[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:		make([]byte, 32),
+		Instructions:		[]byte{0x06},
+		DependencyHashes:	[][]byte{hashA[:]},
 	}
 
 	_, err := BuildDependencyDAG([]AVMModule{modA, modB})
@@ -317,17 +314,17 @@ func TestVerifierRejectsTooManyImports(t *testing.T) {
 	v, _ := NewVerifier(params)
 
 	mod := &AVMModule{
-		Magic:        MagicNumber,
-		Version:      uint32(VerifierVersion),
-		ABIVersion:   1,
+		Magic:		MagicNumber,
+		Version:	uint32(VerifierVersion),
+		ABIVersion:	1,
 		ImportTable: []ImportEntry{
 			{ModuleName: "mod1", ModuleID: []byte{1}, FunctionIndex: 0},
 			{ModuleName: "mod2", ModuleID: []byte{2}, FunctionIndex: 0},
 			{ModuleName: "mod3", ModuleID: []byte{3}, FunctionIndex: 0},
 		},
-		ExportTable:  []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash: make([]byte, 32),
-		Instructions: []byte{0x06},
+		ExportTable:	[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:	make([]byte, 32),
+		Instructions:	[]byte{0x06},
 	}
 
 	err := v.validateImports(mod)
@@ -339,15 +336,15 @@ func TestVerifierRejectsTooManyImports(t *testing.T) {
 func TestVerifierRejectsDuplicateImports(t *testing.T) {
 	v, _ := NewVerifier(DefaultVerifierParams())
 	mod := &AVMModule{
-		Magic:        MagicNumber,
-		Version:      uint32(VerifierVersion),
+		Magic:		MagicNumber,
+		Version:	uint32(VerifierVersion),
 		ImportTable: []ImportEntry{
 			{ModuleName: "same_module", ModuleID: []byte{1}, FunctionIndex: 0},
 			{ModuleName: "same_module", ModuleID: []byte{2}, FunctionIndex: 1},
 		},
-		ExportTable:  []ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
-		MetadataHash: make([]byte, 32),
-		Instructions: []byte{0x06},
+		ExportTable:	[]ExportEntry{{Name: "deploy", Index: EntryDeploy, Offset: 0}},
+		MetadataHash:	make([]byte, 32),
+		Instructions:	[]byte{0x06},
 	}
 
 	err := v.validateImports(mod)
@@ -359,13 +356,13 @@ func TestVerifierRejectsDuplicateImports(t *testing.T) {
 func TestVerifierRejectsNoExports(t *testing.T) {
 	v, _ := NewVerifier(DefaultVerifierParams())
 	mod := &AVMModule{
-		Magic:        MagicNumber,
-		Version:      uint32(VerifierVersion),
-		ABIVersion:   1,
-		ImportTable:  []ImportEntry{},
-		ExportTable:  []ExportEntry{},
-		MetadataHash: make([]byte, 32),
-		Instructions: []byte{0x06},
+		Magic:		MagicNumber,
+		Version:	uint32(VerifierVersion),
+		ABIVersion:	1,
+		ImportTable:	[]ImportEntry{},
+		ExportTable:	[]ExportEntry{},
+		MetadataHash:	make([]byte, 32),
+		Instructions:	[]byte{0x06},
 	}
 
 	err := v.validateExports(mod)
@@ -377,13 +374,13 @@ func TestVerifierRejectsNoExports(t *testing.T) {
 func TestVerifierRejectsMissingRequiredEntrypoints(t *testing.T) {
 	v, _ := NewVerifier(DefaultVerifierParams())
 	mod := &AVMModule{
-		Magic:        MagicNumber,
-		Version:      uint32(VerifierVersion),
-		ABIVersion:   1,
-		ImportTable:  []ImportEntry{},
-		ExportTable:  []ExportEntry{{Name: "query", Index: EntryQuery, Offset: 0}},
-		MetadataHash: make([]byte, 32),
-		Instructions: []byte{0x06},
+		Magic:		MagicNumber,
+		Version:	uint32(VerifierVersion),
+		ABIVersion:	1,
+		ImportTable:	[]ImportEntry{},
+		ExportTable:	[]ExportEntry{{Name: "query", Index: EntryQuery, Offset: 0}},
+		MetadataHash:	make([]byte, 32),
+		Instructions:	[]byte{0x06},
 	}
 
 	err := v.validateExports(mod)
@@ -395,13 +392,13 @@ func TestVerifierRejectsMissingRequiredEntrypoints(t *testing.T) {
 func TestVerifierRejectsInvalidEntrypoint(t *testing.T) {
 	v, _ := NewVerifier(DefaultVerifierParams())
 	mod := &AVMModule{
-		Magic:        MagicNumber,
-		Version:      uint32(VerifierVersion),
-		ABIVersion:   1,
-		ImportTable:  []ImportEntry{},
-		ExportTable:  []ExportEntry{{Name: "deploy", Index: Entrypoint(99), Offset: 0}},
-		MetadataHash: make([]byte, 32),
-		Instructions: []byte{0x06},
+		Magic:		MagicNumber,
+		Version:	uint32(VerifierVersion),
+		ABIVersion:	1,
+		ImportTable:	[]ImportEntry{},
+		ExportTable:	[]ExportEntry{{Name: "deploy", Index: Entrypoint(99), Offset: 0}},
+		MetadataHash:	make([]byte, 32),
+		Instructions:	[]byte{0x06},
 	}
 
 	err := v.validateExports(mod)
@@ -412,9 +409,9 @@ func TestVerifierRejectsInvalidEntrypoint(t *testing.T) {
 
 func TestExecutionGuarantee(t *testing.T) {
 	result := VerificationResult{
-		Passed:             true,
-		AnalyzedStackBound: 10,
-		CFGHash:           []byte{1, 2, 3},
+		Passed:			true,
+		AnalyzedStackBound:	10,
+		CFGHash:		[]byte{1, 2, 3},
 	}
 	err := ValidateExecutionGuarantee(result)
 	if err != nil {

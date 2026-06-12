@@ -18,28 +18,28 @@ const MaxAetherErrorCodeLength = 128
 type ReceiptStatus string
 
 const (
-	ReceiptStatusAccepted ReceiptStatus = "accepted"
-	ReceiptStatusExecuted ReceiptStatus = "executed"
-	ReceiptStatusFailed   ReceiptStatus = "failed"
-	ReceiptStatusExpired  ReceiptStatus = "expired"
-	ReceiptStatusBounced  ReceiptStatus = "bounced"
-	ReceiptStatusRejected ReceiptStatus = "rejected"
-	ReceiptStatusDeferred ReceiptStatus = "deferred"
+	ReceiptStatusAccepted	ReceiptStatus	= "accepted"
+	ReceiptStatusExecuted	ReceiptStatus	= "executed"
+	ReceiptStatusFailed	ReceiptStatus	= "failed"
+	ReceiptStatusExpired	ReceiptStatus	= "expired"
+	ReceiptStatusBounced	ReceiptStatus	= "bounced"
+	ReceiptStatusRejected	ReceiptStatus	= "rejected"
+	ReceiptStatusDeferred	ReceiptStatus	= "deferred"
 )
 
 type AetherMessageReceipt struct {
-	MsgID                 string
-	Height                uint64
-	ReceiverZoneID        zonestypes.ZoneID
-	ReceiverShardID       string
-	Status                ReceiptStatus
-	GasUsed               uint64
-	FeeCharged            sdkmath.Int
-	ReturnPayload         []byte
-	ErrorCode             string
-	OutputMessagesRoot    string
-	StateWriteSummaryHash string
-	ReceiptHash           string
+	MsgID			string
+	Height			uint64
+	ReceiverZoneID		zonestypes.ZoneID
+	ReceiverShardID		string
+	Status			ReceiptStatus
+	GasUsed			uint64
+	FeeCharged		sdkmath.Int
+	ReturnPayload		[]byte
+	ErrorCode		string
+	OutputMessagesRoot	string
+	StateWriteSummaryHash	string
+	ReceiptHash		string
 }
 
 func NewAetherMessageReceipt(receipt AetherMessageReceipt) (AetherMessageReceipt, error) {
@@ -59,17 +59,17 @@ func AetherReceiptFromMessage(msg AetherMessage, status ReceiptStatus, height ui
 		return AetherMessageReceipt{}, err
 	}
 	return NewAetherMessageReceipt(AetherMessageReceipt{
-		MsgID:                 msg.MsgID,
-		Height:                height,
-		ReceiverZoneID:        msg.ReceiverZoneID,
-		ReceiverShardID:       msg.ReceiverShardID,
-		Status:                status,
-		GasUsed:               gasUsed,
-		FeeCharged:            feeCharged,
-		ReturnPayload:         returnPayload,
-		ErrorCode:             errorCode,
-		OutputMessagesRoot:    outputMessagesRoot,
-		StateWriteSummaryHash: stateWriteSummaryHash,
+		MsgID:			msg.MsgID,
+		Height:			height,
+		ReceiverZoneID:		msg.ReceiverZoneID,
+		ReceiverShardID:	msg.ReceiverShardID,
+		Status:			status,
+		GasUsed:		gasUsed,
+		FeeCharged:		feeCharged,
+		ReturnPayload:		returnPayload,
+		ErrorCode:		errorCode,
+		OutputMessagesRoot:	outputMessagesRoot,
+		StateWriteSummaryHash:	stateWriteSummaryHash,
 	})
 }
 

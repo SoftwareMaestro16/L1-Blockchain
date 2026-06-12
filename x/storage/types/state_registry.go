@@ -7,116 +7,116 @@ import (
 )
 
 const (
-	StorageObjectStatePrefix  = "storage/objects"
-	StorageContentIndexPrefix = "storage/content"
-	StorageChunkStatePrefix   = "storage/chunks"
-	StorageOwnerIndexPrefix   = "storage/owner_index"
-	StorageAccessPrefix       = "storage/access"
-	StorageReplicationPrefix  = "storage/replication"
-	StorageRootPrefix         = "storage/root"
+	StorageObjectStatePrefix	= "storage/objects"
+	StorageContentIndexPrefix	= "storage/content"
+	StorageChunkStatePrefix		= "storage/chunks"
+	StorageOwnerIndexPrefix		= "storage/owner_index"
+	StorageAccessPrefix		= "storage/access"
+	StorageReplicationPrefix	= "storage/replication"
+	StorageRootPrefix		= "storage/root"
 )
 
 type StorageIndexEntry struct {
-	Key       string
-	Value     string
-	EntryHash string
+	Key		string
+	Value		string
+	EntryHash	string
 }
 
 type StorageChunkDescriptorRecord struct {
-	ObjectID   string
-	Descriptor StorageChunkDescriptor
-	RecordHash string
+	ObjectID	string
+	Descriptor	StorageChunkDescriptor
+	RecordHash	string
 }
 
 type ReplicationStatusCommitment struct {
-	ObjectID           string
-	ReplicationPolicy  string
-	StorageClass       string
-	ReplicaCount       uint32
-	AvailabilityBps    uint32
-	LastVerifiedHeight uint64
-	CommitmentHash     string
+	ObjectID		string
+	ReplicationPolicy	string
+	StorageClass		string
+	ReplicaCount		uint32
+	AvailabilityBps		uint32
+	LastVerifiedHeight	uint64
+	CommitmentHash		string
 }
 
 type StorageRoot struct {
-	Height           uint64
-	ObjectRoot       string
-	ContentIndexRoot string
-	ChunkRoot        string
-	OwnerIndexRoot   string
-	AccessRoot       string
-	ReplicationRoot  string
-	StateRoot        string
+	Height			uint64
+	ObjectRoot		string
+	ContentIndexRoot	string
+	ChunkRoot		string
+	OwnerIndexRoot		string
+	AccessRoot		string
+	ReplicationRoot		string
+	StateRoot		string
 }
 
 type StorageStateV2 struct {
-	Objects        []StorageObject
-	Chunks         []StorageChunkDescriptorRecord
-	ContentIndex   []StorageIndexEntry
-	OwnerIndex     []StorageIndexEntry
-	AccessReceipts []StorageAccessReceipt
-	Replications   []ReplicationStatusCommitment
-	Height         uint64
-	Root           StorageRoot
+	Objects		[]StorageObject
+	Chunks		[]StorageChunkDescriptorRecord
+	ContentIndex	[]StorageIndexEntry
+	OwnerIndex	[]StorageIndexEntry
+	AccessReceipts	[]StorageAccessReceipt
+	Replications	[]ReplicationStatusCommitment
+	Height		uint64
+	Root		StorageRoot
 }
 
 type MsgRegisterStorageObject struct {
-	Authority   string
-	Object      StorageObject
-	Chunks      []StorageChunkDescriptor
-	Replication ReplicationStatusCommitment
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Object		StorageObject
+	Chunks		[]StorageChunkDescriptor
+	Replication	ReplicationStatusCommitment
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgUpdateStoragePolicy struct {
-	Authority         string
-	ObjectID          string
-	ReplicationPolicy string
-	AccessPolicy      string
-	StorageClass      string
-	Replication       ReplicationStatusCommitment
-	Height            uint64
-	MessageHash       string
+	Authority		string
+	ObjectID		string
+	ReplicationPolicy	string
+	AccessPolicy		string
+	StorageClass		string
+	Replication		ReplicationStatusCommitment
+	Height			uint64
+	MessageHash		string
 }
 
 type MsgRenewStorageObject struct {
-	Authority     string
-	ObjectID      string
-	ExpiresHeight uint64
-	Height        uint64
-	MessageHash   string
+	Authority	string
+	ObjectID	string
+	ExpiresHeight	uint64
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgDeleteStorageObject struct {
-	Authority   string
-	ObjectID    string
-	Height      uint64
-	MessageHash string
+	Authority	string
+	ObjectID	string
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgSubmitStorageReceipt struct {
-	Authority   string
-	Receipt     StorageAccessReceipt
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Receipt		StorageAccessReceipt
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgVerifyStorageProof struct {
-	Authority   string
-	ObjectID    string
-	Proof       StorageChunkInclusionProof
-	Height      uint64
-	MessageHash string
+	Authority	string
+	ObjectID	string
+	Proof		StorageChunkInclusionProof
+	Height		uint64
+	MessageHash	string
 }
 
 type StorageStateProof struct {
-	Key         string
-	ValueHash   string
-	Root        string
-	Height      uint64
-	ProofHashes []string
-	ProofHash   string
+	Key		string
+	ValueHash	string
+	Root		string
+	Height		uint64
+	ProofHashes	[]string
+	ProofHash	string
 }
 
 func StorageObjectKey(objectID string) (string, error) {
@@ -187,11 +187,11 @@ func NewReplicationStatusCommitment(commitment ReplicationStatusCommitment) (Rep
 
 func BuildStorageStateV2(objects []StorageObject, chunks []StorageChunkDescriptorRecord, receipts []StorageAccessReceipt, replications []ReplicationStatusCommitment, height uint64) (StorageStateV2, error) {
 	state := StorageStateV2{
-		Objects:        normalizeStorageObjects(objects),
-		Chunks:         normalizeStorageChunkDescriptorRecords(chunks),
-		AccessReceipts: normalizeStorageReceipts(receipts),
-		Replications:   normalizeStorageReplications(replications),
-		Height:         height,
+		Objects:	normalizeStorageObjects(objects),
+		Chunks:		normalizeStorageChunkDescriptorRecords(chunks),
+		AccessReceipts:	normalizeStorageReceipts(receipts),
+		Replications:	normalizeStorageReplications(replications),
+		Height:		height,
 	}
 	if err := state.populateIndexes(); err != nil {
 		return StorageStateV2{}, err
@@ -412,11 +412,11 @@ func QueryStorageProof(state StorageStateV2, key string) (StorageStateProof, err
 		return StorageStateProof{}, fmt.Errorf("storage proof key %s not found", key)
 	}
 	proof := StorageStateProof{
-		Key:         key,
-		ValueHash:   valueHash,
-		Root:        state.Root.StateRoot,
-		Height:      state.Height,
-		ProofHashes: normalizeStorageHashes(proofHashes),
+		Key:		key,
+		ValueHash:	valueHash,
+		Root:		state.Root.StateRoot,
+		Height:		state.Height,
+		ProofHashes:	normalizeStorageHashes(proofHashes),
 	}
 	proof.ProofHash = ComputeStorageStateProofHash(proof)
 	return proof, proof.Validate()
@@ -759,13 +759,13 @@ func ComputeStorageReplicationRoot(commitments []ReplicationStatusCommitment) st
 
 func ComputeStorageRootV2(state StorageStateV2) StorageRoot {
 	root := StorageRoot{
-		Height:           state.Height,
-		ObjectRoot:       ComputeStorageObjectRoot(state.Objects),
-		ContentIndexRoot: ComputeStorageIndexRoot(state.ContentIndex),
-		ChunkRoot:        ComputeStorageChunkDescriptorRecordRoot(state.Chunks),
-		OwnerIndexRoot:   ComputeStorageIndexRoot(state.OwnerIndex),
-		AccessRoot:       ComputeStorageAccessReceiptRoot(state.AccessReceipts),
-		ReplicationRoot:  ComputeStorageReplicationRoot(state.Replications),
+		Height:			state.Height,
+		ObjectRoot:		ComputeStorageObjectRoot(state.Objects),
+		ContentIndexRoot:	ComputeStorageIndexRoot(state.ContentIndex),
+		ChunkRoot:		ComputeStorageChunkDescriptorRecordRoot(state.Chunks),
+		OwnerIndexRoot:		ComputeStorageIndexRoot(state.OwnerIndex),
+		AccessRoot:		ComputeStorageAccessReceiptRoot(state.AccessReceipts),
+		ReplicationRoot:	ComputeStorageReplicationRoot(state.Replications),
 	}
 	root.StateRoot = storageHashParts(
 		"storage-state-root-v2",

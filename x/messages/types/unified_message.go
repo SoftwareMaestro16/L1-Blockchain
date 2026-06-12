@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	MaxTraceIDLength     = 128
-	MaxShardIDLength     = 128
-	MaxModuleRouteLength = 128
+	MaxTraceIDLength	= 128
+	MaxShardIDLength	= 128
+	MaxModuleRouteLength	= 128
 )
 
 type UnifiedMessageCapability string
@@ -22,87 +22,87 @@ type UnifiedOrderingClass string
 type MessageLifecycleStage string
 
 const (
-	MessageCapabilityAccountDelivery UnifiedMessageCapability = "account_delivery"
-	MessageCapabilityContractCall    UnifiedMessageCapability = "contract_call"
-	MessageCapabilityCrossShard      UnifiedMessageCapability = "cross_shard_delivery"
-	MessageCapabilityCrossZone       UnifiedMessageCapability = "cross_zone_delivery"
-	MessageCapabilityModule          UnifiedMessageCapability = "module_message"
-	MessageCapabilityProofRead       UnifiedMessageCapability = "proof_backed_read"
+	MessageCapabilityAccountDelivery	UnifiedMessageCapability	= "account_delivery"
+	MessageCapabilityContractCall		UnifiedMessageCapability	= "contract_call"
+	MessageCapabilityCrossShard		UnifiedMessageCapability	= "cross_shard_delivery"
+	MessageCapabilityCrossZone		UnifiedMessageCapability	= "cross_zone_delivery"
+	MessageCapabilityModule			UnifiedMessageCapability	= "module_message"
+	MessageCapabilityProofRead		UnifiedMessageCapability	= "proof_backed_read"
 
-	UnifiedExecutionSyncLocal UnifiedExecutionMode = "sync_local"
-	UnifiedExecutionAsync     UnifiedExecutionMode = "async"
-	UnifiedExecutionDeferred  UnifiedExecutionMode = "deferred"
-	UnifiedExecutionPromise   UnifiedExecutionMode = "promise"
+	UnifiedExecutionSyncLocal	UnifiedExecutionMode	= "sync_local"
+	UnifiedExecutionAsync		UnifiedExecutionMode	= "async"
+	UnifiedExecutionDeferred	UnifiedExecutionMode	= "deferred"
+	UnifiedExecutionPromise		UnifiedExecutionMode	= "promise"
 
-	UnifiedOrderingUnordered        UnifiedOrderingClass = "unordered"
-	UnifiedOrderingSenderOrdered    UnifiedOrderingClass = "sender_ordered"
-	UnifiedOrderingReceiverOrdered  UnifiedOrderingClass = "receiver_ordered"
-	UnifiedOrderingObjectOrdered    UnifiedOrderingClass = "object_ordered"
-	UnifiedOrderingStrictTraceOrder UnifiedOrderingClass = "strict_trace_ordered"
+	UnifiedOrderingUnordered	UnifiedOrderingClass	= "unordered"
+	UnifiedOrderingSenderOrdered	UnifiedOrderingClass	= "sender_ordered"
+	UnifiedOrderingReceiverOrdered	UnifiedOrderingClass	= "receiver_ordered"
+	UnifiedOrderingObjectOrdered	UnifiedOrderingClass	= "object_ordered"
+	UnifiedOrderingStrictTraceOrder	UnifiedOrderingClass	= "strict_trace_ordered"
 
-	MessageLifecycleCreated  MessageLifecycleStage = "created"
-	MessageLifecycleRouted   MessageLifecycleStage = "route_committed"
-	MessageLifecycleOutbox   MessageLifecycleStage = "source_outbox"
-	MessageLifecycleCore     MessageLifecycleStage = "core_finality"
-	MessageLifecycleInbox    MessageLifecycleStage = "destination_inbox"
-	MessageLifecycleExecuted MessageLifecycleStage = "executed"
-	MessageLifecycleReceipt  MessageLifecycleStage = "receipt_committed"
+	MessageLifecycleCreated		MessageLifecycleStage	= "created"
+	MessageLifecycleRouted		MessageLifecycleStage	= "route_committed"
+	MessageLifecycleOutbox		MessageLifecycleStage	= "source_outbox"
+	MessageLifecycleCore		MessageLifecycleStage	= "core_finality"
+	MessageLifecycleInbox		MessageLifecycleStage	= "destination_inbox"
+	MessageLifecycleExecuted	MessageLifecycleStage	= "executed"
+	MessageLifecycleReceipt		MessageLifecycleStage	= "receipt_committed"
 
-	MessageLifecycleQueuedInSourceOutbox     MessageLifecycleStage = "queued_in_source_outbox"
-	MessageLifecycleCommittedInMessageRoot   MessageLifecycleStage = "committed_in_message_root"
-	MessageLifecycleEligibleForDelivery      MessageLifecycleStage = "eligible_for_delivery"
-	MessageLifecycleQueuedInDestinationInbox MessageLifecycleStage = "queued_in_destination_inbox"
-	MessageLifecycleExecutedOrFailed         MessageLifecycleStage = "executed_or_failed"
-	MessageLifecycleBounceOrFinalize         MessageLifecycleStage = "bounce_or_finalize"
+	MessageLifecycleQueuedInSourceOutbox		MessageLifecycleStage	= "queued_in_source_outbox"
+	MessageLifecycleCommittedInMessageRoot		MessageLifecycleStage	= "committed_in_message_root"
+	MessageLifecycleEligibleForDelivery		MessageLifecycleStage	= "eligible_for_delivery"
+	MessageLifecycleQueuedInDestinationInbox	MessageLifecycleStage	= "queued_in_destination_inbox"
+	MessageLifecycleExecutedOrFailed		MessageLifecycleStage	= "executed_or_failed"
+	MessageLifecycleBounceOrFinalize		MessageLifecycleStage	= "bounce_or_finalize"
 )
 
 type UnifiedMessageRoute struct {
-	SourceZoneID         zonestypes.ZoneID
-	SourceShardID        string
-	DestinationZoneID    zonestypes.ZoneID
-	DestinationShardID   string
-	ModuleRoute          string
-	OrderingClass        UnifiedOrderingClass
-	ExecutionMode        UnifiedExecutionMode
-	RouteCommitment      string
-	CommittedHeight      uint64
-	FinalityDelay        uint64
-	DeliveryEligibleFrom uint64
+	SourceZoneID		zonestypes.ZoneID
+	SourceShardID		string
+	DestinationZoneID	zonestypes.ZoneID
+	DestinationShardID	string
+	ModuleRoute		string
+	OrderingClass		UnifiedOrderingClass
+	ExecutionMode		UnifiedExecutionMode
+	RouteCommitment		string
+	CommittedHeight		uint64
+	FinalityDelay		uint64
+	DeliveryEligibleFrom	uint64
 }
 
 type UnifiedMessageMetadata struct {
-	Capability         UnifiedMessageCapability
-	TraceID            string
-	ExecutionMode      UnifiedExecutionMode
-	OrderingClass      UnifiedOrderingClass
-	SourceShardID      string
-	DestinationShardID string
-	ModuleRoute        string
-	AuthProofHash      string
-	StateProofHash     string
+	Capability		UnifiedMessageCapability
+	TraceID			string
+	ExecutionMode		UnifiedExecutionMode
+	OrderingClass		UnifiedOrderingClass
+	SourceShardID		string
+	DestinationShardID	string
+	ModuleRoute		string
+	AuthProofHash		string
+	StateProofHash		string
 }
 
 type UnifiedMessageObject struct {
-	Message        Message
-	Capability     UnifiedMessageCapability
-	TraceID        string
-	ExecutionMode  UnifiedExecutionMode
-	OrderingClass  UnifiedOrderingClass
-	Route          UnifiedMessageRoute
-	AuthProofHash  string
-	StateProofHash string
-	LifecycleStage MessageLifecycleStage
-	ObjectHash     string
+	Message		Message
+	Capability	UnifiedMessageCapability
+	TraceID		string
+	ExecutionMode	UnifiedExecutionMode
+	OrderingClass	UnifiedOrderingClass
+	Route		UnifiedMessageRoute
+	AuthProofHash	string
+	StateProofHash	string
+	LifecycleStage	MessageLifecycleStage
+	ObjectHash	string
 }
 
 type MessageLifecycleRecord struct {
-	MessageID       []byte
-	Stage           MessageLifecycleStage
-	Height          uint64
-	MessageHash     string
-	RouteCommitment string
-	ReceiptHash     []byte
-	RecordHash      string
+	MessageID	[]byte
+	Stage		MessageLifecycleStage
+	Height		uint64
+	MessageHash	string
+	RouteCommitment	string
+	ReceiptHash	[]byte
+	RecordHash	string
 }
 
 func NewUnifiedMessageObject(msg Message, metadata UnifiedMessageMetadata, params MessageParams) (UnifiedMessageObject, error) {
@@ -111,23 +111,23 @@ func NewUnifiedMessageObject(msg Message, metadata UnifiedMessageMetadata, param
 	}
 	metadata = normalizeUnifiedMessageMetadata(metadata)
 	object := UnifiedMessageObject{
-		Message:        msg.Clone(),
-		Capability:     metadata.Capability,
-		TraceID:        metadata.TraceID,
-		ExecutionMode:  metadata.ExecutionMode,
-		OrderingClass:  metadata.OrderingClass,
-		AuthProofHash:  metadata.AuthProofHash,
-		StateProofHash: metadata.StateProofHash,
-		LifecycleStage: MessageLifecycleCreated,
+		Message:	msg.Clone(),
+		Capability:	metadata.Capability,
+		TraceID:	metadata.TraceID,
+		ExecutionMode:	metadata.ExecutionMode,
+		OrderingClass:	metadata.OrderingClass,
+		AuthProofHash:	metadata.AuthProofHash,
+		StateProofHash:	metadata.StateProofHash,
+		LifecycleStage:	MessageLifecycleCreated,
 	}
 	object.Route = UnifiedMessageRoute{
-		SourceZoneID:       msg.SourceZone,
-		SourceShardID:      metadata.SourceShardID,
-		DestinationZoneID:  msg.DestinationZone,
-		DestinationShardID: metadata.DestinationShardID,
-		ModuleRoute:        metadata.ModuleRoute,
-		OrderingClass:      metadata.OrderingClass,
-		ExecutionMode:      metadata.ExecutionMode,
+		SourceZoneID:		msg.SourceZone,
+		SourceShardID:		metadata.SourceShardID,
+		DestinationZoneID:	msg.DestinationZone,
+		DestinationShardID:	metadata.DestinationShardID,
+		ModuleRoute:		metadata.ModuleRoute,
+		OrderingClass:		metadata.OrderingClass,
+		ExecutionMode:		metadata.ExecutionMode,
 	}
 	if err := object.ValidateFormat(params); err != nil {
 		return UnifiedMessageObject{}, err
@@ -176,11 +176,11 @@ func BuildMessageLifecycleRecord(object UnifiedMessageObject, stage MessageLifec
 		return MessageLifecycleRecord{}, fmt.Errorf("unknown message lifecycle stage %q", stage)
 	}
 	record := MessageLifecycleRecord{
-		MessageID:       append([]byte(nil), object.Message.MessageID...),
-		Stage:           stage,
-		Height:          height,
-		MessageHash:     object.ObjectHash,
-		RouteCommitment: object.Route.RouteCommitment,
+		MessageID:		append([]byte(nil), object.Message.MessageID...),
+		Stage:			stage,
+		Height:			height,
+		MessageHash:		object.ObjectHash,
+		RouteCommitment:	object.Route.RouteCommitment,
 	}
 	if stage == MessageLifecycleReceipt {
 		if err := receipt.Validate(); err != nil {

@@ -7,89 +7,89 @@ import (
 )
 
 const (
-	DefaultMinGossipFanout          = uint32(2)
-	DefaultMaxGossipFanout          = uint32(16)
-	DefaultConsensusReserveBps      = uint32(6_000)
-	DefaultPeerScoreFloorBps        = uint32(2_500)
-	DefaultMaxOutboundBytesPerBlock = uint64(128 << 20)
+	DefaultMinGossipFanout		= uint32(2)
+	DefaultMaxGossipFanout		= uint32(16)
+	DefaultConsensusReserveBps	= uint32(6_000)
+	DefaultPeerScoreFloorBps	= uint32(2_500)
+	DefaultMaxOutboundBytesPerBlock	= uint64(128 << 20)
 )
 
 type BaseTransportCapability string
 
 const (
-	BaseCapabilityConsensusGossip       BaseTransportCapability = "CONSENSUS_MESSAGE_GOSSIP"
-	BaseCapabilityProposalVotes         BaseTransportCapability = "PROPOSAL_AND_VOTE_PROPAGATION"
-	BaseCapabilityBlockPropagation      BaseTransportCapability = "BLOCK_PROPAGATION"
-	BaseCapabilityMempoolPropagation    BaseTransportCapability = "BASELINE_MEMPOOL_TX_PROPAGATION"
-	BaseCapabilityValidatorCoordination BaseTransportCapability = "VALIDATOR_COORDINATION"
-	BaseCapabilityPeerTransport         BaseTransportCapability = "PEER_TRANSPORT_PRIMITIVES"
+	BaseCapabilityConsensusGossip		BaseTransportCapability	= "CONSENSUS_MESSAGE_GOSSIP"
+	BaseCapabilityProposalVotes		BaseTransportCapability	= "PROPOSAL_AND_VOTE_PROPAGATION"
+	BaseCapabilityBlockPropagation		BaseTransportCapability	= "BLOCK_PROPAGATION"
+	BaseCapabilityMempoolPropagation	BaseTransportCapability	= "BASELINE_MEMPOOL_TX_PROPAGATION"
+	BaseCapabilityValidatorCoordination	BaseTransportCapability	= "VALIDATOR_COORDINATION"
+	BaseCapabilityPeerTransport		BaseTransportCapability	= "PEER_TRANSPORT_PRIMITIVES"
 )
 
 type ANAResponsibility string
 
 const (
-	ANAResponsibilityPeerScoring          ANAResponsibility = "PEER_SCORING"
-	ANAResponsibilityConnectionMultiplex  ANAResponsibility = "CONNECTION_MULTIPLEXING"
-	ANAResponsibilityAdaptiveFanout       ANAResponsibility = "ADAPTIVE_GOSSIP_FANOUT"
-	ANAResponsibilityBandwidthAware       ANAResponsibility = "BANDWIDTH_AWARE_PROPAGATION"
-	ANAResponsibilityZoneHints            ANAResponsibility = "ZONE_AWARE_ROUTING_HINTS"
-	ANAResponsibilityMessagePriority      ANAResponsibility = "MESSAGE_CLASS_PRIORITY"
-	ANAResponsibilityStreamingNegotiation ANAResponsibility = "STREAMING_PAYLOAD_NEGOTIATION"
-	ANAResponsibilityRoleValidation       ANAResponsibility = "PEER_ROLE_ADVERTISEMENT_VALIDATION"
+	ANAResponsibilityPeerScoring		ANAResponsibility	= "PEER_SCORING"
+	ANAResponsibilityConnectionMultiplex	ANAResponsibility	= "CONNECTION_MULTIPLEXING"
+	ANAResponsibilityAdaptiveFanout		ANAResponsibility	= "ADAPTIVE_GOSSIP_FANOUT"
+	ANAResponsibilityBandwidthAware		ANAResponsibility	= "BANDWIDTH_AWARE_PROPAGATION"
+	ANAResponsibilityZoneHints		ANAResponsibility	= "ZONE_AWARE_ROUTING_HINTS"
+	ANAResponsibilityMessagePriority	ANAResponsibility	= "MESSAGE_CLASS_PRIORITY"
+	ANAResponsibilityStreamingNegotiation	ANAResponsibility	= "STREAMING_PAYLOAD_NEGOTIATION"
+	ANAResponsibilityRoleValidation		ANAResponsibility	= "PEER_ROLE_ADVERTISEMENT_VALIDATION"
 )
 
 type MultiplexBinding struct {
-	Channel             ChannelClass
-	PhysicalTransport   string
-	CometBFTPassthrough bool
-	Priority            uint32
+	Channel			ChannelClass
+	PhysicalTransport	string
+	CometBFTPassthrough	bool
+	Priority		uint32
 }
 
 type AdaptiveFanoutPolicy struct {
-	MinFanout         uint32
-	MaxFanout         uint32
-	PeerScoreFloorBps uint32
+	MinFanout		uint32
+	MaxFanout		uint32
+	PeerScoreFloorBps	uint32
 }
 
 type BandwidthPolicy struct {
-	MaxOutboundBytesPerBlock uint64
-	ConsensusReserveBps      uint32
+	MaxOutboundBytesPerBlock	uint64
+	ConsensusReserveBps		uint32
 }
 
 type ZoneRoutingHint struct {
-	ZoneID       string
-	Channel      ChannelClass
-	AdvisoryOnly bool
+	ZoneID		string
+	Channel		ChannelClass
+	AdvisoryOnly	bool
 }
 
 type AetherNetworkingAdapter struct {
-	BaselineTransport               string
-	BaseCapabilities                []BaseTransportCapability
-	Responsibilities                []ANAResponsibility
-	ChannelBindings                 []MultiplexBinding
-	Fanout                          AdaptiveFanoutPolicy
-	Bandwidth                       BandwidthPolicy
-	ZoneHints                       []ZoneRoutingHint
-	ValidateRoleAdvertisements      bool
-	ChangesConsensusValidity        bool
-	HidesConsensusMessages          bool
-	ReplacesCometBFTConsensusGossip bool
-	PeerMetricsAffectCommittedState bool
+	BaselineTransport		string
+	BaseCapabilities		[]BaseTransportCapability
+	Responsibilities		[]ANAResponsibility
+	ChannelBindings			[]MultiplexBinding
+	Fanout				AdaptiveFanoutPolicy
+	Bandwidth			BandwidthPolicy
+	ZoneHints			[]ZoneRoutingHint
+	ValidateRoleAdvertisements	bool
+	ChangesConsensusValidity	bool
+	HidesConsensusMessages		bool
+	ReplacesCometBFTConsensusGossip	bool
+	PeerMetricsAffectCommittedState	bool
 }
 
 type PropagationPlan struct {
-	Envelope               TransportEnvelope
-	HandledByCometBFT      bool
-	AdapterFanout          uint32
-	Priority               uint32
-	ConsensusReserveBps    uint32
-	UsesAdvisoryPeerMetric bool
+	Envelope		TransportEnvelope
+	HandledByCometBFT	bool
+	AdapterFanout		uint32
+	Priority		uint32
+	ConsensusReserveBps	uint32
+	UsesAdvisoryPeerMetric	bool
 }
 
 func DefaultAetherNetworkingAdapter() AetherNetworkingAdapter {
 	policies := DefaultChannelPolicies()
 	return AetherNetworkingAdapter{
-		BaselineTransport: BaseTransportCometBFTP2P,
+		BaselineTransport:	BaseTransportCometBFTP2P,
 		BaseCapabilities: []BaseTransportCapability{
 			BaseCapabilityConsensusGossip,
 			BaseCapabilityProposalVotes,
@@ -108,10 +108,10 @@ func DefaultAetherNetworkingAdapter() AetherNetworkingAdapter {
 			ANAResponsibilityStreamingNegotiation,
 			ANAResponsibilityRoleValidation,
 		},
-		ChannelBindings:            defaultMultiplexBindings(policies),
-		Fanout:                     AdaptiveFanoutPolicy{MinFanout: DefaultMinGossipFanout, MaxFanout: DefaultMaxGossipFanout, PeerScoreFloorBps: DefaultPeerScoreFloorBps},
-		Bandwidth:                  BandwidthPolicy{MaxOutboundBytesPerBlock: DefaultMaxOutboundBytesPerBlock, ConsensusReserveBps: DefaultConsensusReserveBps},
-		ValidateRoleAdvertisements: true,
+		ChannelBindings:		defaultMultiplexBindings(policies),
+		Fanout:				AdaptiveFanoutPolicy{MinFanout: DefaultMinGossipFanout, MaxFanout: DefaultMaxGossipFanout, PeerScoreFloorBps: DefaultPeerScoreFloorBps},
+		Bandwidth:			BandwidthPolicy{MaxOutboundBytesPerBlock: DefaultMaxOutboundBytesPerBlock, ConsensusReserveBps: DefaultConsensusReserveBps},
+		ValidateRoleAdvertisements:	true,
 	}
 }
 
@@ -185,9 +185,9 @@ func PlanPropagation(adapter AetherNetworkingAdapter, envelope TransportEnvelope
 	envelope = envelope.Normalize()
 	priority := priorityForBinding(adapter.ChannelBindings, envelope.Channel)
 	plan := PropagationPlan{
-		Envelope:            envelope,
-		Priority:            priority,
-		ConsensusReserveBps: adapter.Bandwidth.ConsensusReserveBps,
+		Envelope:		envelope,
+		Priority:		priority,
+		ConsensusReserveBps:	adapter.Bandwidth.ConsensusReserveBps,
 	}
 	if isCometBFTPassthroughChannel(envelope.Channel) {
 		plan.HandledByCometBFT = true
@@ -229,10 +229,10 @@ func defaultMultiplexBindings(policies []ChannelPolicy) []MultiplexBinding {
 	out := make([]MultiplexBinding, len(policies))
 	for i, policy := range policies {
 		out[i] = MultiplexBinding{
-			Channel:             policy.Channel,
-			PhysicalTransport:   BaseTransportCometBFTP2P,
-			CometBFTPassthrough: isCometBFTPassthroughChannel(policy.Channel),
-			Priority:            policy.Priority,
+			Channel:		policy.Channel,
+			PhysicalTransport:	BaseTransportCometBFTP2P,
+			CometBFTPassthrough:	isCometBFTPassthroughChannel(policy.Channel),
+			Priority:		policy.Priority,
 		}
 	}
 	return out

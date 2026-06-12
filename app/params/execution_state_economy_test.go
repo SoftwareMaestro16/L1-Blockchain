@@ -12,7 +12,7 @@ func TestExecutionCostClassesProducePredictableTraces(t *testing.T) {
 	table.GasPriceNaet = sdkmath.NewInt(2)
 
 	out, err := EstimateExecutionCost(ExecutionCostInput{
-		GasTable: table,
+		GasTable:	table,
 		Operations: []ExecutionOperation{
 			{Class: ExecutionCostClassCompute, Count: 10},
 			{Class: ExecutionCostClassStorageRead, Count: 2},
@@ -51,10 +51,10 @@ func TestDeploymentFeeEstimateWithinTolerance(t *testing.T) {
 	table.DeploymentEstimateToleranceBps = 500
 
 	out, err := EstimateDeploymentFee(DeploymentFeeEstimateInput{
-		CodeSizeBytes:         1_000,
-		InitStateBytes:        250,
-		ExpectedActualFeeNaet: sdkmath.NewInt(26_100),
-		GasTable:              table,
+		CodeSizeBytes:		1_000,
+		InitStateBytes:		250,
+		ExpectedActualFeeNaet:	sdkmath.NewInt(26_100),
+		GasTable:		table,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(13_000), out.GasUsed)
@@ -70,11 +70,11 @@ func TestAsyncMessageForwardingFeeCoversRoutedWorkload(t *testing.T) {
 	table.ForwardingWorkloadToleranceBps = 500
 
 	out, err := EstimateAsyncMessageFlowFee(AsyncMessageFeeEstimateInput{
-		MessageCount:            3,
-		RouteHops:               2,
-		PayloadBytes:            512,
-		ExpectedWorkloadFeeNaet: sdkmath.NewInt(790),
-		GasTable:                table,
+		MessageCount:			3,
+		RouteHops:			2,
+		PayloadBytes:			512,
+		ExpectedWorkloadFeeNaet:	sdkmath.NewInt(790),
+		GasTable:			table,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(800), out.GasUsed)
@@ -93,14 +93,14 @@ func TestStateGrowthTelemetryReportsBlockEpochTopAccountsAndSurcharge(t *testing
 	params.DeleteRefundDecayBpsPerPeriod = 1_000
 
 	out, err := ComputeStateGrowthTelemetry(StateGrowthTelemetryInput{
-		BlockHeight:                 100,
-		EpochID:                     5,
-		PreviousEpochNetGrowthBytes: 500,
-		BaseStorageExpansionFeeNaet: sdkmath.NewInt(10_000),
-		DeleteOriginalCostNaet:      sdkmath.NewInt(1_000),
-		DeleteRefundNaet:            sdkmath.NewInt(800),
-		StorageAgePeriods:           3,
-		Params:                      params,
+		BlockHeight:			100,
+		EpochID:			5,
+		PreviousEpochNetGrowthBytes:	500,
+		BaseStorageExpansionFeeNaet:	sdkmath.NewInt(10_000),
+		DeleteOriginalCostNaet:		sdkmath.NewInt(1_000),
+		DeleteRefundNaet:		sdkmath.NewInt(800),
+		StorageAgePeriods:		3,
+		Params:				params,
 		AccountDeltas: []StateGrowthAccountDelta{
 			{ID: "acct-a", BytesAdded: 1_500, BytesRemoved: 100},
 			{ID: "contract-b", BytesAdded: 800, BytesRemoved: 0},
@@ -125,13 +125,13 @@ func TestStateGrowthRefundDecayResistsWriteDeleteExtraction(t *testing.T) {
 	params := DefaultStateGrowthParams()
 	params.DeleteRefundDecayBpsPerPeriod = 2_000
 	out, err := ComputeStateGrowthTelemetry(StateGrowthTelemetryInput{
-		BlockHeight:                 200,
-		EpochID:                     6,
-		BaseStorageExpansionFeeNaet: sdkmath.NewInt(1_000),
-		DeleteOriginalCostNaet:      sdkmath.NewInt(500),
-		DeleteRefundNaet:            sdkmath.NewInt(900),
-		StorageAgePeriods:           10,
-		Params:                      params,
+		BlockHeight:			200,
+		EpochID:			6,
+		BaseStorageExpansionFeeNaet:	sdkmath.NewInt(1_000),
+		DeleteOriginalCostNaet:		sdkmath.NewInt(500),
+		DeleteRefundNaet:		sdkmath.NewInt(900),
+		StorageAgePeriods:		10,
+		Params:				params,
 		AccountDeltas: []StateGrowthAccountDelta{
 			{ID: "contract-a", BytesAdded: 100, BytesRemoved: 100},
 		},

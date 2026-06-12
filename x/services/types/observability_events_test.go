@@ -14,24 +14,24 @@ func TestDefaultServiceObservabilitySignalsManifestCoversEventsAndAlerts(t *test
 	require.Len(t, manifest.Alerts, 8)
 
 	requiredEvents := map[ServiceObservabilityEventID]bool{
-		ServiceEventRegistered:               false,
-		ServiceEventUpdated:                  false,
-		ServiceEventRenewed:                  false,
-		ServiceEventDisabled:                 false,
-		ServiceEventIdentityBound:            false,
-		ServiceEventInterfaceRegistered:      false,
-		ServiceEventInterfaceDeprecated:      false,
-		ServiceEventCallSubmitted:            false,
-		ServiceEventCallExecuted:             false,
-		ServiceEventCallFailed:               false,
-		ServiceEventResultAnchored:           false,
-		ServiceEventReceiptCommitted:         false,
-		ServiceEventPaymentEscrowed:          false,
-		ServiceEventPaymentSettled:           false,
-		ServiceEventProviderRegistered:       false,
-		ServiceEventProviderCollateralStaked: false,
-		ServiceEventProviderFaultSubmitted:   false,
-		ServiceEventProviderPenalized:        false,
+		ServiceEventRegistered:			false,
+		ServiceEventUpdated:			false,
+		ServiceEventRenewed:			false,
+		ServiceEventDisabled:			false,
+		ServiceEventIdentityBound:		false,
+		ServiceEventInterfaceRegistered:	false,
+		ServiceEventInterfaceDeprecated:	false,
+		ServiceEventCallSubmitted:		false,
+		ServiceEventCallExecuted:		false,
+		ServiceEventCallFailed:			false,
+		ServiceEventResultAnchored:		false,
+		ServiceEventReceiptCommitted:		false,
+		ServiceEventPaymentEscrowed:		false,
+		ServiceEventPaymentSettled:		false,
+		ServiceEventProviderRegistered:		false,
+		ServiceEventProviderCollateralStaked:	false,
+		ServiceEventProviderFaultSubmitted:	false,
+		ServiceEventProviderPenalized:		false,
 	}
 	for _, event := range manifest.Events {
 		_, found := requiredEvents[event.EventID]
@@ -45,14 +45,14 @@ func TestDefaultServiceObservabilitySignalsManifestCoversEventsAndAlerts(t *test
 	}
 
 	requiredAlerts := map[ServiceObservabilityAlertID]bool{
-		ServiceAlertCallFailureSpike:               false,
-		ServiceAlertReceiptAnchoringBacklog:        false,
-		ServiceAlertProviderFaultSpike:             false,
-		ServiceAlertInterfaceHashMismatchAttempt:   false,
-		ServiceAlertExpiredServiceReceivingCalls:   false,
-		ServiceAlertPaymentEscrowSettlementBacklog: false,
-		ServiceAlertReceiptProofLatencyThreshold:   false,
-		ServiceAlertRegistryLookupLatencyThreshold: false,
+		ServiceAlertCallFailureSpike:			false,
+		ServiceAlertReceiptAnchoringBacklog:		false,
+		ServiceAlertProviderFaultSpike:			false,
+		ServiceAlertInterfaceHashMismatchAttempt:	false,
+		ServiceAlertExpiredServiceReceivingCalls:	false,
+		ServiceAlertPaymentEscrowSettlementBacklog:	false,
+		ServiceAlertReceiptProofLatencyThreshold:	false,
+		ServiceAlertRegistryLookupLatencyThreshold:	false,
 	}
 	for _, alert := range manifest.Alerts {
 		_, found := requiredAlerts[alert.AlertID]

@@ -71,15 +71,15 @@ func TestStateInvariantModelRejectsMalformedDescriptors(t *testing.T) {
 	require.Empty(t, duplicate.Root)
 
 	_, err = BuildStateInvariantDescriptor(StateInvariantDescriptor{
-		InvariantID: StateInvariantID("unknown"),
-		Invariant:   "unknown invariant",
-		Enforcement: "unknown enforcement",
+		InvariantID:	StateInvariantID("unknown"),
+		Invariant:	"unknown invariant",
+		Enforcement:	"unknown enforcement",
 	})
 	require.ErrorContains(t, err, "unknown aetracore state invariant")
 
 	noEnforcement := StateInvariantDescriptor{
-		InvariantID: StateInvariantCrossZoneValueConserved,
-		Invariant:   "Every cross-zone value transfer must conserve naet.",
+		InvariantID:	StateInvariantCrossZoneValueConserved,
+		Invariant:	"Every cross-zone value transfer must conserve naet.",
 	}
 	_, err = BuildStateInvariantDescriptor(noEnforcement)
 	require.ErrorContains(t, err, "enforcement is required")
@@ -92,23 +92,23 @@ func TestStateInvariantModelRejectsMalformedDescriptors(t *testing.T) {
 func validStateInvariantEvidence(t *testing.T) StateInvariantEvidence {
 	t.Helper()
 	evidence, err := BuildStateInvariantEvidence(StateInvariantEvidence{
-		Height:                                177,
-		ZoneCommitmentMatchesExecutedState:    true,
-		ShardRootsIncludedInZoneRoot:          true,
-		OutputMessagesIncludedInSourceOutbox:  true,
-		ConsumedMessagesHaveOneReceipt:        true,
-		CrossZoneValueTransferConservesNaet:   true,
-		PaymentCollateralMatchesLockedBalance: true,
-		IdentityDomainsHaveOwnershipBinding:   true,
-		ContractStorageProofsBindToZoneRoot:   true,
-		ZoneCommitmentRoot:                    hashParts("state-invariant-zone-commitment-root"),
-		ShardRootsRoot:                        hashParts("state-invariant-shard-roots-root"),
-		MessageOutboxRoot:                     hashParts("state-invariant-message-outbox-root"),
-		MessageReceiptRoot:                    hashParts("state-invariant-message-receipt-root"),
-		ValueConservationRoot:                 hashParts("state-invariant-value-conservation-root"),
-		PaymentCollateralRoot:                 hashParts("state-invariant-payment-collateral-root"),
-		IdentityOwnershipRoot:                 hashParts("state-invariant-identity-ownership-root"),
-		ContractStorageProofRoot:              hashParts("state-invariant-contract-storage-proof-root"),
+		Height:					177,
+		ZoneCommitmentMatchesExecutedState:	true,
+		ShardRootsIncludedInZoneRoot:		true,
+		OutputMessagesIncludedInSourceOutbox:	true,
+		ConsumedMessagesHaveOneReceipt:		true,
+		CrossZoneValueTransferConservesNaet:	true,
+		PaymentCollateralMatchesLockedBalance:	true,
+		IdentityDomainsHaveOwnershipBinding:	true,
+		ContractStorageProofsBindToZoneRoot:	true,
+		ZoneCommitmentRoot:			hashParts("state-invariant-zone-commitment-root"),
+		ShardRootsRoot:				hashParts("state-invariant-shard-roots-root"),
+		MessageOutboxRoot:			hashParts("state-invariant-message-outbox-root"),
+		MessageReceiptRoot:			hashParts("state-invariant-message-receipt-root"),
+		ValueConservationRoot:			hashParts("state-invariant-value-conservation-root"),
+		PaymentCollateralRoot:			hashParts("state-invariant-payment-collateral-root"),
+		IdentityOwnershipRoot:			hashParts("state-invariant-identity-ownership-root"),
+		ContractStorageProofRoot:		hashParts("state-invariant-contract-storage-proof-root"),
 	})
 	require.NoError(t, err)
 	return evidence

@@ -10,57 +10,57 @@ import (
 )
 
 const (
-	DefaultDomainCommitmentVersion = uint64(1)
-	DefaultIdentityModuleName      = "x/identity"
-	DefaultRegistrationClass       = "direct"
-	DomainRegistrationIntent       = "register"
+	DefaultDomainCommitmentVersion	= uint64(1)
+	DefaultIdentityModuleName	= "x/identity"
+	DefaultRegistrationClass	= "direct"
+	DomainRegistrationIntent	= "register"
 )
 
 type DomainCommitmentV2 struct {
-	CommitmentHash    string
-	Committer         sdk.AccAddress
-	CreatedAtHeight   uint64
-	ExpiresAtHeight   uint64
-	Deposit           sdkmath.Int
-	CommitmentVersion uint64
-	SaltHashOptional  string
-	ChainID           string
-	ModuleName        string
-	RegistrationClass string
-	MaxPrice          sdkmath.Int
+	CommitmentHash		string
+	Committer		sdk.AccAddress
+	CreatedAtHeight		uint64
+	ExpiresAtHeight		uint64
+	Deposit			sdkmath.Int
+	CommitmentVersion	uint64
+	SaltHashOptional	string
+	ChainID			string
+	ModuleName		string
+	RegistrationClass	string
+	MaxPrice		sdkmath.Int
 }
 
 type DomainCommitmentV2Context struct {
-	CurrentHeight            uint64
-	RevealWindowBlocks       uint64
-	ChainID                  string
-	ModuleName               string
-	ModuleVersion            uint64
-	RegistrationIntent       string
-	RegistrationClass        string
-	MaxPrice                 sdkmath.Int
-	RevealedCommitmentHashes []string
-	RefundValidRevealDeposit bool
-	RefundCleanExpiryDeposit bool
+	CurrentHeight			uint64
+	RevealWindowBlocks		uint64
+	ChainID				string
+	ModuleName			string
+	ModuleVersion			uint64
+	RegistrationIntent		string
+	RegistrationClass		string
+	MaxPrice			sdkmath.Int
+	RevealedCommitmentHashes	[]string
+	RefundValidRevealDeposit	bool
+	RefundCleanExpiryDeposit	bool
 }
 
 type DomainCommitmentV2Preimage struct {
-	ChainID           string
-	ModuleName        string
-	ModuleVersion     uint64
-	NormalizedName    string
-	Committer         sdk.AccAddress
-	Salt              string
-	RegistrationClass string
-	MaxPrice          sdkmath.Int
-	ExpiryHeight      uint64
+	ChainID			string
+	ModuleName		string
+	ModuleVersion		uint64
+	NormalizedName		string
+	Committer		sdk.AccAddress
+	Salt			string
+	RegistrationClass	string
+	MaxPrice		sdkmath.Int
+	ExpiryHeight		uint64
 }
 
 type DomainCommitmentRefundReason string
 
 const (
-	DomainCommitmentRefundValidReveal DomainCommitmentRefundReason = "valid_reveal"
-	DomainCommitmentRefundCleanExpiry DomainCommitmentRefundReason = "clean_expiry"
+	DomainCommitmentRefundValidReveal	DomainCommitmentRefundReason	= "valid_reveal"
+	DomainCommitmentRefundCleanExpiry	DomainCommitmentRefundReason	= "clean_expiry"
 )
 
 func NewDomainCommitmentV2(name string, committer sdk.AccAddress, salt string, deposit sdkmath.Int, createdAtHeight uint64, ctx DomainCommitmentV2Context, includeSaltHash bool) (DomainCommitmentV2, error) {
@@ -73,30 +73,30 @@ func NewDomainCommitmentV2(name string, committer sdk.AccAddress, salt string, d
 	}
 	expiresAtHeight := createdAtHeight + ctx.RevealWindowBlocks
 	commitmentHash, err := ComputeDomainCommitmentV2PreimageHash(DomainCommitmentV2Preimage{
-		ChainID:           ctx.ChainID,
-		ModuleName:        ctx.ModuleName,
-		ModuleVersion:     ctx.ModuleVersion,
-		NormalizedName:    name,
-		Committer:         committer,
-		Salt:              salt,
-		RegistrationClass: ctx.RegistrationClass,
-		MaxPrice:          ctx.MaxPrice,
-		ExpiryHeight:      expiresAtHeight,
+		ChainID:		ctx.ChainID,
+		ModuleName:		ctx.ModuleName,
+		ModuleVersion:		ctx.ModuleVersion,
+		NormalizedName:		name,
+		Committer:		committer,
+		Salt:			salt,
+		RegistrationClass:	ctx.RegistrationClass,
+		MaxPrice:		ctx.MaxPrice,
+		ExpiryHeight:		expiresAtHeight,
 	})
 	if err != nil {
 		return DomainCommitmentV2{}, err
 	}
 	commitment := DomainCommitmentV2{
-		CommitmentHash:    commitmentHash,
-		Committer:         cloneSpecAddress(committer),
-		CreatedAtHeight:   createdAtHeight,
-		ExpiresAtHeight:   expiresAtHeight,
-		Deposit:           deposit,
-		CommitmentVersion: ctx.ModuleVersion,
-		ChainID:           ctx.ChainID,
-		ModuleName:        ctx.ModuleName,
-		RegistrationClass: ctx.RegistrationClass,
-		MaxPrice:          ctx.MaxPrice,
+		CommitmentHash:		commitmentHash,
+		Committer:		cloneSpecAddress(committer),
+		CreatedAtHeight:	createdAtHeight,
+		ExpiresAtHeight:	expiresAtHeight,
+		Deposit:		deposit,
+		CommitmentVersion:	ctx.ModuleVersion,
+		ChainID:		ctx.ChainID,
+		ModuleName:		ctx.ModuleName,
+		RegistrationClass:	ctx.RegistrationClass,
+		MaxPrice:		ctx.MaxPrice,
 	}
 	if includeSaltHash {
 		commitment.SaltHashOptional = ComputeDomainCommitmentV2SaltHash(salt)
@@ -168,15 +168,15 @@ func ValidateDomainCommitmentV2Reveal(commitment DomainCommitmentV2, name string
 		return errors.New("identity v2 commitment reveal window expired")
 	}
 	expected, err := ComputeDomainCommitmentV2PreimageHash(DomainCommitmentV2Preimage{
-		ChainID:           ctx.ChainID,
-		ModuleName:        ctx.ModuleName,
-		ModuleVersion:     commitment.CommitmentVersion,
-		NormalizedName:    name,
-		Committer:         commitment.Committer,
-		Salt:              salt,
-		RegistrationClass: ctx.RegistrationClass,
-		MaxPrice:          ctx.MaxPrice,
-		ExpiryHeight:      commitment.ExpiresAtHeight,
+		ChainID:		ctx.ChainID,
+		ModuleName:		ctx.ModuleName,
+		ModuleVersion:		commitment.CommitmentVersion,
+		NormalizedName:		name,
+		Committer:		commitment.Committer,
+		Salt:			salt,
+		RegistrationClass:	ctx.RegistrationClass,
+		MaxPrice:		ctx.MaxPrice,
+		ExpiryHeight:		commitment.ExpiresAtHeight,
 	})
 	if err != nil {
 		return err
@@ -219,15 +219,15 @@ func DomainCommitmentV2Refundable(commitment DomainCommitmentV2, reason DomainCo
 
 func ComputeDomainCommitmentV2Hash(name string, committer sdk.AccAddress, salt string, chainID string, moduleVersion uint64, registrationIntent string) (string, error) {
 	return ComputeDomainCommitmentV2PreimageHash(DomainCommitmentV2Preimage{
-		ChainID:           chainID,
-		ModuleName:        DefaultIdentityModuleName,
-		ModuleVersion:     moduleVersion,
-		NormalizedName:    name,
-		Committer:         committer,
-		Salt:              salt,
-		RegistrationClass: registrationIntent,
-		MaxPrice:          sdkmath.ZeroInt(),
-		ExpiryHeight:      0,
+		ChainID:		chainID,
+		ModuleName:		DefaultIdentityModuleName,
+		ModuleVersion:		moduleVersion,
+		NormalizedName:		name,
+		Committer:		committer,
+		Salt:			salt,
+		RegistrationClass:	registrationIntent,
+		MaxPrice:		sdkmath.ZeroInt(),
+		ExpiryHeight:		0,
 	})
 }
 
@@ -277,15 +277,15 @@ func ComputeDomainCommitmentV2SaltHash(salt string) string {
 
 func NewUsedDomainCommitment(commit DomainCommit, revealedHeight uint64) UsedDomainCommitment {
 	return UsedDomainCommitment{
-		CommitmentHash:    commit.CommitmentHash,
-		Name:              commit.Name,
-		Owner:             cloneSpecAddress(commit.Owner),
-		RevealedHeight:    revealedHeight,
-		ExpiresHeight:     commit.ExpiresHeight,
-		ModuleName:        DefaultIdentityModuleName,
-		ModuleVersion:     DefaultDomainCommitmentVersion,
-		RegistrationClass: DefaultRegistrationClass,
-		MaxPrice:          "0",
+		CommitmentHash:		commit.CommitmentHash,
+		Name:			commit.Name,
+		Owner:			cloneSpecAddress(commit.Owner),
+		RevealedHeight:		revealedHeight,
+		ExpiresHeight:		commit.ExpiresHeight,
+		ModuleName:		DefaultIdentityModuleName,
+		ModuleVersion:		DefaultDomainCommitmentVersion,
+		RegistrationClass:	DefaultRegistrationClass,
+		MaxPrice:		"0",
 	}
 }
 

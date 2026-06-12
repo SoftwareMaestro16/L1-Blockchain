@@ -9,172 +9,172 @@ import (
 )
 
 const (
-	ShardStatusPaused   = "paused"
-	ShardStatusActive   = "active"
-	ShardStatusDraining = "draining"
-	ShardStatusDisabled = "disabled"
+	ShardStatusPaused	= "paused"
+	ShardStatusActive	= "active"
+	ShardStatusDraining	= "draining"
+	ShardStatusDisabled	= "disabled"
 
-	ShardSecurityStandard = "standard"
-	ShardSecurityHigh     = "high"
-	ShardSecurityCritical = "critical"
+	ShardSecurityStandard	= "standard"
+	ShardSecurityHigh	= "high"
+	ShardSecurityCritical	= "critical"
 
-	RebalancePending  = "pending"
-	RebalanceExecuted = "executed"
-	RebalanceRejected = "rejected"
+	RebalancePending	= "pending"
+	RebalanceExecuted	= "executed"
+	RebalanceRejected	= "rejected"
 )
 
 type ShardingCoordinatorParams struct {
-	MaxShards                       uint32
-	MaxValidatorsPerShard           uint32
-	MinValidatorCoverage            uint32
-	MaxShardAssignmentsPerValidator uint32
-	MaxLoadMetrics                  uint32
-	MaxRebalanceProposals           uint32
-	MaxCrossShardRoutes             uint32
-	MaxStateRootReferences          uint32
-	MaxRouteTimeoutBlocks           uint64
-	MaxRouteInFlight                uint32
-	MaxLoadTransactionsPerBlock     uint64
-	MaxLoadGasPerBlock              uint64
-	MaxLoadPendingMessages          uint64
+	MaxShards			uint32
+	MaxValidatorsPerShard		uint32
+	MinValidatorCoverage		uint32
+	MaxShardAssignmentsPerValidator	uint32
+	MaxLoadMetrics			uint32
+	MaxRebalanceProposals		uint32
+	MaxCrossShardRoutes		uint32
+	MaxStateRootReferences		uint32
+	MaxRouteTimeoutBlocks		uint64
+	MaxRouteInFlight		uint32
+	MaxLoadTransactionsPerBlock	uint64
+	MaxLoadGasPerBlock		uint64
+	MaxLoadPendingMessages		uint64
 }
 
 type ShardingCoordinatorState struct {
-	Shards              []Shard
-	Assignments         []ShardValidatorAssignment
-	LoadMetrics         []ShardLoadMetric
-	RebalanceProposals  []RebalanceProposal
-	CrossShardRoutes    []CrossShardRoute
-	StateRootReferences []ShardStateRootReference
+	Shards			[]Shard
+	Assignments		[]ShardValidatorAssignment
+	LoadMetrics		[]ShardLoadMetric
+	RebalanceProposals	[]RebalanceProposal
+	CrossShardRoutes	[]CrossShardRoute
+	StateRootReferences	[]ShardStateRootReference
 }
 
 type Shard struct {
-	ShardID                 string
-	Status                  string
-	SecurityLevel           string
-	RequiredValidatorCount  uint32
-	CrossShardRoutingParams CrossShardRoutingParams
-	RegisteredHeight        uint64
-	UpdatedHeight           uint64
+	ShardID			string
+	Status			string
+	SecurityLevel		string
+	RequiredValidatorCount	uint32
+	CrossShardRoutingParams	CrossShardRoutingParams
+	RegisteredHeight	uint64
+	UpdatedHeight		uint64
 }
 
 type CrossShardRoutingParams struct {
-	AllowInbound      bool
-	AllowOutbound     bool
-	MaxMessageBytes   uint32
-	MaxTimeoutBlocks  uint64
-	DefaultRouteLimit uint32
+	AllowInbound		bool
+	AllowOutbound		bool
+	MaxMessageBytes		uint32
+	MaxTimeoutBlocks	uint64
+	DefaultRouteLimit	uint32
 }
 
 type ShardValidatorAssignment struct {
-	ShardID         string
-	Validators      []string
-	AssignedHeight  uint64
-	AssignmentEpoch uint64
+	ShardID		string
+	Validators	[]string
+	AssignedHeight	uint64
+	AssignmentEpoch	uint64
 }
 
 type ShardLoadMetric struct {
-	ShardID              string
-	TransactionsPerBlock uint64
-	GasPerBlock          uint64
-	StateBytes           uint64
-	PendingMessages      uint64
-	ReportedHeight       uint64
+	ShardID			string
+	TransactionsPerBlock	uint64
+	GasPerBlock		uint64
+	StateBytes		uint64
+	PendingMessages		uint64
+	ReportedHeight		uint64
 }
 
 type RebalanceProposal struct {
-	ProposalID     string
-	SourceShardID  string
-	TargetShardID  string
-	ValidatorMoves []ValidatorMove
-	Reason         string
-	Status         string
-	ProposedHeight uint64
-	ExecutedHeight uint64
+	ProposalID	string
+	SourceShardID	string
+	TargetShardID	string
+	ValidatorMoves	[]ValidatorMove
+	Reason		string
+	Status		string
+	ProposedHeight	uint64
+	ExecutedHeight	uint64
 }
 
 type ValidatorMove struct {
-	ValidatorID string
-	FromShardID string
-	ToShardID   string
-	Weight      uint32
-	Sequence    uint64
+	ValidatorID	string
+	FromShardID	string
+	ToShardID	string
+	Weight		uint32
+	Sequence	uint64
 }
 
 type CrossShardRoute struct {
-	RouteID       string
-	SourceShardID string
-	TargetShardID string
-	Enabled       bool
-	MaxInFlight   uint32
-	TimeoutBlocks uint64
+	RouteID		string
+	SourceShardID	string
+	TargetShardID	string
+	Enabled		bool
+	MaxInFlight	uint32
+	TimeoutBlocks	uint64
 }
 
 type ShardStateRootReference struct {
-	ShardID string
-	Height  uint64
-	RootHex string
+	ShardID	string
+	Height	uint64
+	RootHex	string
 }
 
 type MsgRegisterShard struct {
-	Authority string
-	Shard     Shard
+	Authority	string
+	Shard		Shard
 }
 
 type MsgUpdateShardStatus struct {
-	Authority string
-	ShardID   string
-	Status    string
-	Height    uint64
+	Authority	string
+	ShardID		string
+	Status		string
+	Height		uint64
 }
 
 type MsgAssignValidatorsToShard struct {
-	Authority  string
-	Assignment ShardValidatorAssignment
+	Authority	string
+	Assignment	ShardValidatorAssignment
 }
 
 type MsgSubmitShardLoad struct {
-	Reporter string
-	Load     ShardLoadMetric
+	Reporter	string
+	Load		ShardLoadMetric
 }
 
 type MsgProposeShardRebalance struct {
-	Authority string
-	Proposal  RebalanceProposal
+	Authority	string
+	Proposal	RebalanceProposal
 }
 
 type MsgExecuteShardRebalance struct {
-	Authority  string
-	ProposalID string
-	Height     uint64
+	Authority	string
+	ProposalID	string
+	Height		uint64
 }
 
 func DefaultShardingCoordinatorParams() ShardingCoordinatorParams {
 	return ShardingCoordinatorParams{
-		MaxShards:                       4_096,
-		MaxValidatorsPerShard:           512,
-		MinValidatorCoverage:            2,
-		MaxShardAssignmentsPerValidator: 4,
-		MaxLoadMetrics:                  100_000,
-		MaxRebalanceProposals:           100_000,
-		MaxCrossShardRoutes:             100_000,
-		MaxStateRootReferences:          100_000,
-		MaxRouteTimeoutBlocks:           1_000_000,
-		MaxRouteInFlight:                100_000,
-		MaxLoadTransactionsPerBlock:     10_000_000,
-		MaxLoadGasPerBlock:              1_000_000_000,
-		MaxLoadPendingMessages:          10_000_000,
+		MaxShards:				4_096,
+		MaxValidatorsPerShard:			512,
+		MinValidatorCoverage:			2,
+		MaxShardAssignmentsPerValidator:	4,
+		MaxLoadMetrics:				100_000,
+		MaxRebalanceProposals:			100_000,
+		MaxCrossShardRoutes:			100_000,
+		MaxStateRootReferences:			100_000,
+		MaxRouteTimeoutBlocks:			1_000_000,
+		MaxRouteInFlight:			100_000,
+		MaxLoadTransactionsPerBlock:		10_000_000,
+		MaxLoadGasPerBlock:			1_000_000_000,
+		MaxLoadPendingMessages:			10_000_000,
 	}
 }
 
 func EmptyShardingCoordinatorState() ShardingCoordinatorState {
 	return ShardingCoordinatorState{
-		Shards:              []Shard{},
-		Assignments:         []ShardValidatorAssignment{},
-		LoadMetrics:         []ShardLoadMetric{},
-		RebalanceProposals:  []RebalanceProposal{},
-		CrossShardRoutes:    []CrossShardRoute{},
-		StateRootReferences: []ShardStateRootReference{},
+		Shards:			[]Shard{},
+		Assignments:		[]ShardValidatorAssignment{},
+		LoadMetrics:		[]ShardLoadMetric{},
+		RebalanceProposals:	[]RebalanceProposal{},
+		CrossShardRoutes:	[]CrossShardRoute{},
+		StateRootReferences:	[]ShardStateRootReference{},
 	}
 }
 
@@ -199,12 +199,12 @@ func (p ShardingCoordinatorParams) Validate() error {
 
 func (s ShardingCoordinatorState) Export() ShardingCoordinatorState {
 	out := ShardingCoordinatorState{
-		Shards:              cloneShards(s.Shards),
-		Assignments:         cloneAssignments(s.Assignments),
-		LoadMetrics:         cloneLoadMetrics(s.LoadMetrics),
-		RebalanceProposals:  cloneProposals(s.RebalanceProposals),
-		CrossShardRoutes:    cloneRoutes(s.CrossShardRoutes),
-		StateRootReferences: cloneStateRoots(s.StateRootReferences),
+		Shards:			cloneShards(s.Shards),
+		Assignments:		cloneAssignments(s.Assignments),
+		LoadMetrics:		cloneLoadMetrics(s.LoadMetrics),
+		RebalanceProposals:	cloneProposals(s.RebalanceProposals),
+		CrossShardRoutes:	cloneRoutes(s.CrossShardRoutes),
+		StateRootReferences:	cloneStateRoots(s.StateRootReferences),
 	}
 	SortShards(out.Shards)
 	SortAssignments(out.Assignments)

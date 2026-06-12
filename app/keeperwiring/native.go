@@ -12,8 +12,11 @@ import (
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 
 	aetraeconomicskeeper "github.com/sovereign-l1/l1/x/aetra-economics/keeper"
+	aetraeconomicstypes "github.com/sovereign-l1/l1/x/aetra-economics/types"
 	aetrastakingpolicykeeper "github.com/sovereign-l1/l1/x/aetra-staking-policy/keeper"
+	aetrastakingpolicytypes "github.com/sovereign-l1/l1/x/aetra-staking-policy/types"
 	aetravalidatorscorekeeper "github.com/sovereign-l1/l1/x/aetra-validator-score/keeper"
+	aetravalidatorscoretypes "github.com/sovereign-l1/l1/x/aetra-validator-score/types"
 	burnkeeper "github.com/sovereign-l1/l1/x/burn/keeper"
 	burntypes "github.com/sovereign-l1/l1/x/burn/types"
 	delegatorprotectionkeeper "github.com/sovereign-l1/l1/x/delegator-protection/keeper"
@@ -64,29 +67,29 @@ func (a validatorReputationAdapter) GetValidatorTotalScore(ctx context.Context, 
 }
 
 type NativeKeeperDeps struct {
-	AppCodec      codec.Codec
-	Keys          map[string]*storetypes.KVStoreKey
-	AccountKeeper authkeeper.AccountKeeper
-	BankKeeper    bankkeeper.BaseKeeper
-	DistrKeeper   distrkeeper.Keeper
-	GovAuthority  string
+	AppCodec	codec.Codec
+	Keys		map[string]*storetypes.KVStoreKey
+	AccountKeeper	authkeeper.AccountKeeper
+	BankKeeper	bankkeeper.BaseKeeper
+	DistrKeeper	distrkeeper.Keeper
+	GovAuthority	string
 }
 
 type NativeKeepers struct {
-	BurnKeeper                burnkeeper.Keeper
-	TreasuryKeeper            treasurykeeper.Keeper
-	EmissionsKeeper           emissionskeeper.Keeper
-	MintAuthorityKeeper       mintauthoritykeeper.Keeper
-	DelegatorProtectionKeeper delegatorprotectionkeeper.Keeper
-	ReputationKeeper          reputationkeeper.Keeper
-	PerformanceKeeper         performancekeeper.Keeper
-	DynamicCommissionKeeper   dynamiccommissionkeeper.Keeper
-	StakeConcentrationKeeper  stakeconcentrationkeeper.Keeper
-	FeeCollectorKeeper        feecollectorkeeper.Keeper
-	FeesKeeper                feeskeeper.Keeper
-	AetraStakingPolicyKeeper  aetrastakingpolicykeeper.Keeper
-	AetraEconomicsKeeper      aetraeconomicskeeper.Keeper
-	AetraValidatorScoreKeeper aetravalidatorscorekeeper.Keeper
+	BurnKeeper			burnkeeper.Keeper
+	TreasuryKeeper			treasurykeeper.Keeper
+	EmissionsKeeper			emissionskeeper.Keeper
+	MintAuthorityKeeper		mintauthoritykeeper.Keeper
+	DelegatorProtectionKeeper	delegatorprotectionkeeper.Keeper
+	ReputationKeeper		reputationkeeper.Keeper
+	PerformanceKeeper		performancekeeper.Keeper
+	DynamicCommissionKeeper		dynamiccommissionkeeper.Keeper
+	StakeConcentrationKeeper	stakeconcentrationkeeper.Keeper
+	FeeCollectorKeeper		feecollectorkeeper.Keeper
+	FeesKeeper			feeskeeper.Keeper
+	AetraStakingPolicyKeeper	aetrastakingpolicykeeper.Keeper
+	AetraEconomicsKeeper		aetraeconomicskeeper.Keeper
+	AetraValidatorScoreKeeper	aetravalidatorscorekeeper.Keeper
 }
 
 func NewNativeKeepers(deps NativeKeeperDeps) NativeKeepers {
@@ -129,7 +132,7 @@ func NewNativeKeepers(deps NativeKeeperDeps) NativeKeepers {
 			runtime.NewKVStoreService(deps.Keys[delegatorprotectiontypes.StoreKey]),
 			deps.GovAuthority,
 		),
-		ReputationKeeper: repKeeper,
+		ReputationKeeper:	repKeeper,
 		PerformanceKeeper: performancekeeper.NewKeeper(
 			runtime.NewKVStoreService(deps.Keys[performancetypes.StoreKey]),
 			deps.GovAuthority,
@@ -144,7 +147,7 @@ func NewNativeKeepers(deps NativeKeeperDeps) NativeKeepers {
 			runtime.NewKVStoreService(deps.Keys[stakeconcentrationtypes.StoreKey]),
 			deps.GovAuthority,
 		),
-		FeeCollectorKeeper: fcKeeper,
+		FeeCollectorKeeper:	fcKeeper,
 		FeesKeeper: feeskeeper.NewKeeper(
 			deps.AppCodec,
 			runtime.NewKVStoreService(deps.Keys[feestypes.StoreKey]),
@@ -153,8 +156,8 @@ func NewNativeKeepers(deps NativeKeeperDeps) NativeKeepers {
 			deps.DistrKeeper,
 			deps.GovAuthority,
 		).WithReputationReader(reputationReaderAdapter{Keeper: repKeeper}).WithFeeCollector(fcKeeper),
-		AetraStakingPolicyKeeper:  aetrastakingpolicykeeper.NewKeeper(deps.GovAuthority),
-		AetraEconomicsKeeper:      aetraeconomicskeeper.NewKeeper(deps.GovAuthority),
-		AetraValidatorScoreKeeper: aetravalidatorscorekeeper.NewKeeper(deps.GovAuthority),
+		AetraStakingPolicyKeeper:	aetrastakingpolicykeeper.NewPersistentKeeper(runtime.NewKVStoreService(deps.Keys[aetrastakingpolicytypes.StoreKey]), deps.GovAuthority),
+		AetraEconomicsKeeper:		aetraeconomicskeeper.NewPersistentKeeper(runtime.NewKVStoreService(deps.Keys[aetraeconomicstypes.StoreKey]), deps.GovAuthority),
+		AetraValidatorScoreKeeper:	aetravalidatorscorekeeper.NewPersistentKeeper(runtime.NewKVStoreService(deps.Keys[aetravalidatorscoretypes.StoreKey]), deps.GovAuthority),
 	}
 }

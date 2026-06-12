@@ -67,22 +67,22 @@ func TestClaimPayoutCappedAndCannotBePaidTwice(t *testing.T) {
 	fundInsurance(t, &k, validator, 500)
 
 	claim, err := k.SubmitInsuranceClaim(types.MsgSubmitInsuranceClaim{
-		Authority:        prototype.DefaultAuthority,
-		ClaimID:          "claim-1",
-		ValidatorAddress: validator,
-		Claimant:         rawInsuranceAddress("22"),
-		Amount:           800,
-		Reason:           "delegator loss",
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		ClaimID:		"claim-1",
+		ValidatorAddress:	validator,
+		Claimant:		rawInsuranceAddress("22"),
+		Amount:			800,
+		Reason:			"delegator loss",
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.ClaimStatusPending, claim.Status)
 
 	paid, err := k.ResolveInsuranceClaim(types.MsgResolveInsuranceClaim{
-		Authority: prototype.DefaultAuthority,
-		ClaimID:   "claim-1",
-		Approved:  true,
-		Height:    3,
+		Authority:	prototype.DefaultAuthority,
+		ClaimID:	"claim-1",
+		Approved:	true,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.ClaimStatusPaid, paid.Status)
@@ -90,10 +90,10 @@ func TestClaimPayoutCappedAndCannotBePaidTwice(t *testing.T) {
 	require.Equal(t, uint64(500), paid.PayoutAmount)
 
 	_, err = k.ResolveInsuranceClaim(types.MsgResolveInsuranceClaim{
-		Authority: prototype.DefaultAuthority,
-		ClaimID:   "claim-1",
-		Approved:  true,
-		Height:    4,
+		Authority:	prototype.DefaultAuthority,
+		ClaimID:	"claim-1",
+		Approved:	true,
+		Height:		4,
 	})
 	require.ErrorContains(t, err, "already resolved")
 }
@@ -104,42 +104,42 @@ func TestWithdrawalDelayEnforced(t *testing.T) {
 	fundInsurance(t, &k, validator, 2_000)
 
 	_, err := k.WithdrawValidatorInsurance(types.MsgWithdrawValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Recipient:        rawInsuranceAddress("22"),
-		Amount:           1_001,
-		Height:           2,
-		ValidatorStatus:  validatorregistrytypes.StatusActive,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Recipient:		rawInsuranceAddress("22"),
+		Amount:			1_001,
+		Height:			2,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	})
 	require.ErrorContains(t, err, "minimum requirement")
 
 	withdrawal, err := k.WithdrawValidatorInsurance(types.MsgWithdrawValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Recipient:        rawInsuranceAddress("22"),
-		Amount:           500,
-		Height:           3,
-		ValidatorStatus:  validatorregistrytypes.StatusActive,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Recipient:		rawInsuranceAddress("22"),
+		Amount:			500,
+		Height:			3,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.WithdrawalStatusPending, withdrawal.Status)
 	require.Equal(t, uint64(3+k.InsuranceParams().WithdrawalLockBlocks), withdrawal.CompleteHeight)
 
 	_, err = k.WithdrawValidatorInsurance(types.MsgWithdrawValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Recipient:        rawInsuranceAddress("22"),
-		Height:           withdrawal.CompleteHeight - 1,
-		ValidatorStatus:  validatorregistrytypes.StatusActive,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Recipient:		rawInsuranceAddress("22"),
+		Height:			withdrawal.CompleteHeight - 1,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	})
 	require.ErrorContains(t, err, "lock period")
 
 	completed, err := k.WithdrawValidatorInsurance(types.MsgWithdrawValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Recipient:        rawInsuranceAddress("22"),
-		Height:           withdrawal.CompleteHeight,
-		ValidatorStatus:  validatorregistrytypes.StatusActive,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Recipient:		rawInsuranceAddress("22"),
+		Height:			withdrawal.CompleteHeight,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.WithdrawalStatusCompleted, completed.Status)
@@ -150,13 +150,13 @@ func TestExportImportPreservesPendingClaims(t *testing.T) {
 	validator := rawInsuranceAddress("11")
 	fundInsurance(t, &source, validator, 1_500)
 	claim, err := source.SubmitInsuranceClaim(types.MsgSubmitInsuranceClaim{
-		Authority:        prototype.DefaultAuthority,
-		ClaimID:          "claim-1",
-		ValidatorAddress: validator,
-		Claimant:         rawInsuranceAddress("22"),
-		Amount:           700,
-		Reason:           "pending review",
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		ClaimID:		"claim-1",
+		ValidatorAddress:	validator,
+		Claimant:		rawInsuranceAddress("22"),
+		Amount:			700,
+		Reason:			"pending review",
+		Height:			2,
 	})
 	require.NoError(t, err)
 
@@ -180,13 +180,13 @@ func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
 	validator := rawInsuranceAddress("33")
 	fundInsurance(t, &source, validator, 1_500)
 	claim, err := source.SubmitInsuranceClaim(types.MsgSubmitInsuranceClaim{
-		Authority:        prototype.DefaultAuthority,
-		ClaimID:          "persistent-claim",
-		ValidatorAddress: validator,
-		Claimant:         rawInsuranceAddress("44"),
-		Amount:           700,
-		Reason:           "restart proof",
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		ClaimID:		"persistent-claim",
+		ValidatorAddress:	validator,
+		Claimant:		rawInsuranceAddress("44"),
+		Amount:			700,
+		Reason:			"restart proof",
+		Height:			2,
 	})
 	require.NoError(t, err)
 
@@ -208,11 +208,11 @@ func TestFundingOverflowRejected(t *testing.T) {
 	fundInsurance(t, &k, validator, math.MaxUint64)
 
 	_, err := k.FundValidatorInsurance(types.MsgFundValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Funder:           rawInsuranceAddress("22"),
-		Amount:           1,
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Funder:			rawInsuranceAddress("22"),
+		Amount:			1,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "overflow")
 }
@@ -222,13 +222,13 @@ func TestDuplicateClaimRejected(t *testing.T) {
 	validator := rawInsuranceAddress("11")
 	fundInsurance(t, &k, validator, 1_000)
 	msg := types.MsgSubmitInsuranceClaim{
-		Authority:        prototype.DefaultAuthority,
-		ClaimID:          "claim-1",
-		ValidatorAddress: validator,
-		Claimant:         rawInsuranceAddress("22"),
-		Amount:           100,
-		Reason:           "duplicate test",
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		ClaimID:		"claim-1",
+		ValidatorAddress:	validator,
+		Claimant:		rawInsuranceAddress("22"),
+		Amount:			100,
+		Reason:			"duplicate test",
+		Height:			2,
 	}
 	_, err := k.SubmitInsuranceClaim(msg)
 	require.NoError(t, err)
@@ -239,11 +239,11 @@ func TestDuplicateClaimRejected(t *testing.T) {
 func fundInsurance(t *testing.T, k *Keeper, validator string, amount uint64) types.ValidatorInsurance {
 	t.Helper()
 	insurance, err := k.FundValidatorInsurance(types.MsgFundValidatorInsurance{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Funder:           rawInsuranceAddress("22"),
-		Amount:           amount,
-		Height:           1,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Funder:			rawInsuranceAddress("22"),
+		Amount:			amount,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	return insurance

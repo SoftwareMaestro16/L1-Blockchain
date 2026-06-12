@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	ConflictReductionSpecVersion = uint64(1)
-	StoreV2UsageSpecVersion      = uint64(1)
+	ConflictReductionSpecVersion	= uint64(1)
+	StoreV2UsageSpecVersion		= uint64(1)
 )
 
 type ConflictReductionRuleID string
@@ -17,68 +17,68 @@ type StoreV2LayoutKind string
 type StoreV2BenchmarkID string
 
 const (
-	ConflictRuleAvoidGlobalCounters ConflictReductionRuleID = "avoid-global-counters"
-	ConflictRuleShardFeeAccumulator ConflictReductionRuleID = "per-shard-fee-accumulators"
-	ConflictRuleShardMessageQueues  ConflictReductionRuleID = "per-shard-message-queues"
-	ConflictRuleVersionedObjects    ConflictReductionRuleID = "versioned-object-updates"
-	ConflictRuleObjectLocalLocks    ConflictReductionRuleID = "object-local-locks"
-	ConflictRuleAsyncRemoteWrites   ConflictReductionRuleID = "async-remote-writes"
+	ConflictRuleAvoidGlobalCounters	ConflictReductionRuleID	= "avoid-global-counters"
+	ConflictRuleShardFeeAccumulator	ConflictReductionRuleID	= "per-shard-fee-accumulators"
+	ConflictRuleShardMessageQueues	ConflictReductionRuleID	= "per-shard-message-queues"
+	ConflictRuleVersionedObjects	ConflictReductionRuleID	= "versioned-object-updates"
+	ConflictRuleObjectLocalLocks	ConflictReductionRuleID	= "object-local-locks"
+	ConflictRuleAsyncRemoteWrites	ConflictReductionRuleID	= "async-remote-writes"
 
-	StoreV2LayoutObjectStore      StoreV2LayoutKind = "object-store"
-	StoreV2LayoutKVHybrid         StoreV2LayoutKind = "kv-hybrid"
-	StoreV2LayoutPrefixProof      StoreV2LayoutKind = "prefix-proof"
-	StoreV2LayoutCompactRoot      StoreV2LayoutKind = "compact-root"
-	StoreV2LayoutBoundedRangeScan StoreV2LayoutKind = "bounded-range-scan"
+	StoreV2LayoutObjectStore	StoreV2LayoutKind	= "object-store"
+	StoreV2LayoutKVHybrid		StoreV2LayoutKind	= "kv-hybrid"
+	StoreV2LayoutPrefixProof	StoreV2LayoutKind	= "prefix-proof"
+	StoreV2LayoutCompactRoot	StoreV2LayoutKind	= "compact-root"
+	StoreV2LayoutBoundedRangeScan	StoreV2LayoutKind	= "bounded-range-scan"
 
-	StoreV2BenchmarkDirectBalanceRead     StoreV2BenchmarkID = "direct-balance-read"
-	StoreV2BenchmarkDirectIdentityResolve StoreV2BenchmarkID = "direct-identity-resolution"
-	StoreV2BenchmarkRecursiveIdentity     StoreV2BenchmarkID = "recursive-identity-resolution"
-	StoreV2BenchmarkContractStorageRW     StoreV2BenchmarkID = "contract-storage-read-write"
-	StoreV2BenchmarkMessageEnqueueDequeue StoreV2BenchmarkID = "message-enqueue-dequeue"
-	StoreV2BenchmarkPaymentChannelSettle  StoreV2BenchmarkID = "payment-channel-settle"
-	StoreV2BenchmarkDEXPoolUpdate         StoreV2BenchmarkID = "dex-pool-update"
-	StoreV2BenchmarkProofGeneration       StoreV2BenchmarkID = "proof-generation"
+	StoreV2BenchmarkDirectBalanceRead	StoreV2BenchmarkID	= "direct-balance-read"
+	StoreV2BenchmarkDirectIdentityResolve	StoreV2BenchmarkID	= "direct-identity-resolution"
+	StoreV2BenchmarkRecursiveIdentity	StoreV2BenchmarkID	= "recursive-identity-resolution"
+	StoreV2BenchmarkContractStorageRW	StoreV2BenchmarkID	= "contract-storage-read-write"
+	StoreV2BenchmarkMessageEnqueueDequeue	StoreV2BenchmarkID	= "message-enqueue-dequeue"
+	StoreV2BenchmarkPaymentChannelSettle	StoreV2BenchmarkID	= "payment-channel-settle"
+	StoreV2BenchmarkDEXPoolUpdate		StoreV2BenchmarkID	= "dex-pool-update"
+	StoreV2BenchmarkProofGeneration		StoreV2BenchmarkID	= "proof-generation"
 )
 
 type ConflictReductionRule struct {
-	RuleID         ConflictReductionRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		ConflictReductionRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type ConflictReductionSpec struct {
-	Version uint64
-	Rules   []ConflictReductionRule
-	Root    string
+	Version	uint64
+	Rules	[]ConflictReductionRule
+	Root	string
 }
 
 type StoreV2LayoutDescriptor struct {
-	LayoutID       string
-	Kind           StoreV2LayoutKind
-	StateClasses   []string
-	KeyPattern     string
-	ProofSurface   string
-	BoundedScan    bool
-	DescriptorHash string
+	LayoutID	string
+	Kind		StoreV2LayoutKind
+	StateClasses	[]string
+	KeyPattern	string
+	ProofSurface	string
+	BoundedScan	bool
+	DescriptorHash	string
 }
 
 type StoreV2BenchmarkRequirement struct {
-	BenchmarkID    StoreV2BenchmarkID
-	Operation      string
-	LayoutID       string
-	Metric         string
-	MaxRangeItems  uint32
-	Required       bool
-	DescriptorHash string
+	BenchmarkID	StoreV2BenchmarkID
+	Operation	string
+	LayoutID	string
+	Metric		string
+	MaxRangeItems	uint32
+	Required	bool
+	DescriptorHash	string
 }
 
 type StoreV2UsageSpec struct {
-	Version    uint64
-	Layouts    []StoreV2LayoutDescriptor
-	Benchmarks []StoreV2BenchmarkRequirement
-	Root       string
+	Version		uint64
+	Layouts		[]StoreV2LayoutDescriptor
+	Benchmarks	[]StoreV2BenchmarkRequirement
+	Root		string
 }
 
 func DefaultConflictReductionSpec() (ConflictReductionSpec, error) {
@@ -98,8 +98,8 @@ func ConflictReductionRules() []ConflictReductionRule {
 
 func BuildConflictReductionSpec(rules []ConflictReductionRule) (ConflictReductionSpec, error) {
 	spec := ConflictReductionSpec{
-		Version: ConflictReductionSpecVersion,
-		Rules:   normalizeConflictReductionRules(rules),
+		Version:	ConflictReductionSpecVersion,
+		Rules:		normalizeConflictReductionRules(rules),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return ConflictReductionSpec{}, err
@@ -255,9 +255,9 @@ func StoreV2BenchmarkRequirements() []StoreV2BenchmarkRequirement {
 
 func BuildStoreV2UsageSpec(layouts []StoreV2LayoutDescriptor, benchmarks []StoreV2BenchmarkRequirement) (StoreV2UsageSpec, error) {
 	spec := StoreV2UsageSpec{
-		Version:    StoreV2UsageSpecVersion,
-		Layouts:    normalizeStoreV2LayoutDescriptors(layouts),
-		Benchmarks: normalizeStoreV2BenchmarkRequirements(benchmarks),
+		Version:	StoreV2UsageSpecVersion,
+		Layouts:	normalizeStoreV2LayoutDescriptors(layouts),
+		Benchmarks:	normalizeStoreV2BenchmarkRequirements(benchmarks),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return StoreV2UsageSpec{}, err

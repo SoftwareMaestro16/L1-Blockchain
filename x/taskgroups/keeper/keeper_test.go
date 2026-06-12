@@ -56,17 +56,17 @@ func TestKeeperRejectsUnknownTaskGroupAndDuplicateReceipts(t *testing.T) {
 
 func keeperTestGroup() postypes.TaskGroup {
 	group := postypes.TaskGroup{
-		EpochID:          3,
-		WorkloadID:       "proof-market",
-		WorkloadType:     postypes.WorkloadTypeProofVerification,
-		ValidatorMembers: []string{"val-a", "val-b", "val-c"},
-		ProposerOrder:    []string{"val-a", "val-b", "val-c"},
-		VerifierSet:      []string{"val-a", "val-b", "val-c"},
-		MinimumGroupSize: 3,
-		StakeWeightRoot:  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		AssignmentSeed:   "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-		ActivationHeight: 30,
-		ExpiryHeight:     60,
+		EpochID:		3,
+		WorkloadID:		"proof-market",
+		WorkloadType:		postypes.WorkloadTypeProofVerification,
+		ValidatorMembers:	[]string{"val-a", "val-b", "val-c"},
+		ProposerOrder:		[]string{"val-a", "val-b", "val-c"},
+		VerifierSet:		[]string{"val-a", "val-b", "val-c"},
+		MinimumGroupSize:	3,
+		StakeWeightRoot:	"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		AssignmentSeed:		"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		ActivationHeight:	30,
+		ExpiryHeight:		60,
 	}
 	group.TaskGroupID = postypes.ComputeTaskGroupID(group)
 	return group

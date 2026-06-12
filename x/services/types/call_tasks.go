@@ -9,72 +9,72 @@ import (
 )
 
 type ServiceCallAnteValidation struct {
-	CallID              string
-	ServiceID           string
-	Caller              string
-	Nonce               uint64
-	Accept              bool
-	ReservePayment      bool
-	RequiresProof       bool
-	RequiresIdempotency bool
-	Retry               bool
-	OriginalCallID      string
-	ReplayIndexHash     string
-	RoutingHash         string
-	AnteValidationHash  string
+	CallID			string
+	ServiceID		string
+	Caller			string
+	Nonce			uint64
+	Accept			bool
+	ReservePayment		bool
+	RequiresProof		bool
+	RequiresIdempotency	bool
+	Retry			bool
+	OriginalCallID		string
+	ReplayIndexHash		string
+	RoutingHash		string
+	AnteValidationHash	string
 }
 
 type ServiceReceiptAnchorResult struct {
-	Msg              MsgAnchorServiceReceipt
-	Receipt          ServiceReceipt
-	Tombstone        ServiceReceiptTombstone
-	ReplayIndex      ServiceCallReplayIndex
-	AnchorHash       string
-	AnchorResultHash string
+	Msg			MsgAnchorServiceReceipt
+	Receipt			ServiceReceipt
+	Tombstone		ServiceReceiptTombstone
+	ReplayIndex		ServiceCallReplayIndex
+	AnchorHash		string
+	AnchorResultHash	string
 }
 
 type QueryServiceCallProof struct {
-	ServiceID string
-	CallID    string
+	ServiceID	string
+	CallID		string
 }
 
 type ServiceCallProof struct {
-	ServiceID       string
-	CallID          string
-	ReceiptHash     string
-	TombstoneHash   string
-	ReplayIndexHash string
-	ProofHeight     uint64
-	ProofHash       string
+	ServiceID	string
+	CallID		string
+	ReceiptHash	string
+	TombstoneHash	string
+	ReplayIndexHash	string
+	ProofHeight	uint64
+	ProofHash	string
 }
 
 type QueryServiceCallProofResponse struct {
-	Proof ServiceCallProof
-	Found bool
+	Proof	ServiceCallProof
+	Found	bool
 }
 
 type SDKServiceCallBuildRequest struct {
-	Context        coretypes.ServiceConsensusContext
-	Descriptor     ServiceDescriptor
-	MethodID       string
-	Caller         string
-	Nonce          uint64
-	PayloadHash    string
-	MaxFeeAmount   string
-	SignatureHash  string
-	TimeoutDelta   uint64
-	IdempotencyKey string
-	CallbackTarget string
-	Kind           coretypes.ServiceCallKind
-	RetryOf        string
+	Context		coretypes.ServiceConsensusContext
+	Descriptor	ServiceDescriptor
+	MethodID	string
+	Caller		string
+	Nonce		uint64
+	PayloadHash	string
+	MaxFeeAmount	string
+	SignatureHash	string
+	TimeoutDelta	uint64
+	IdempotencyKey	string
+	CallbackTarget	string
+	Kind		coretypes.ServiceCallKind
+	RetryOf		string
 }
 
 type SDKServiceCallBuildResult struct {
-	Call       UnifiedServiceCall
-	Envelope   ServiceCallEnvelope
-	Routing    UnifiedCallRoutingPlan
-	Schema     WalletCLISchema
-	ResultHash string
+	Call		UnifiedServiceCall
+	Envelope	ServiceCallEnvelope
+	Routing		UnifiedCallRoutingPlan
+	Schema		WalletCLISchema
+	ResultHash	string
 }
 
 func ValidateServiceCallAnte(ctx coretypes.ServiceConsensusContext, descriptor ServiceDescriptor, index ServiceCallReplayIndex, call UnifiedServiceCall) (ServiceCallAnteValidation, error) {
@@ -99,18 +99,18 @@ func ValidateServiceCallAnte(ctx coretypes.ServiceConsensusContext, descriptor S
 		return ServiceCallAnteValidation{}, err
 	}
 	ante := ServiceCallAnteValidation{
-		CallID:              call.CallID,
-		ServiceID:           call.TargetService,
-		Caller:              call.Caller,
-		Nonce:               call.Nonce,
-		Accept:              true,
-		ReservePayment:      route.ReserveFundsBeforeExecution,
-		RequiresProof:       route.VerifyResultProofBeforeAccept,
-		RequiresIdempotency: call.IdempotencyKey != "",
-		Retry:               call.Kind == coretypes.ServiceCallKindRetry,
-		OriginalCallID:      call.RetryOf,
-		ReplayIndexHash:     index.IndexHash,
-		RoutingHash:         route.RoutingHash,
+		CallID:			call.CallID,
+		ServiceID:		call.TargetService,
+		Caller:			call.Caller,
+		Nonce:			call.Nonce,
+		Accept:			true,
+		ReservePayment:		route.ReserveFundsBeforeExecution,
+		RequiresProof:		route.VerifyResultProofBeforeAccept,
+		RequiresIdempotency:	call.IdempotencyKey != "",
+		Retry:			call.Kind == coretypes.ServiceCallKindRetry,
+		OriginalCallID:		call.RetryOf,
+		ReplayIndexHash:	index.IndexHash,
+		RoutingHash:		route.RoutingHash,
 	}
 	ante.AnteValidationHash = ComputeServiceCallAnteValidationHash(ante)
 	return ante, ante.Validate()
@@ -181,11 +181,11 @@ func AnchorUnifiedServiceReceipt(ctx coretypes.ServiceConsensusContext, descript
 		return ServiceReceiptAnchorResult{}, err
 	}
 	result := ServiceReceiptAnchorResult{
-		Msg:         msg,
-		Receipt:     receipt,
-		Tombstone:   tombstone,
-		ReplayIndex: nextIndex,
-		AnchorHash:  anchorHash,
+		Msg:		msg,
+		Receipt:	receipt,
+		Tombstone:	tombstone,
+		ReplayIndex:	nextIndex,
+		AnchorHash:	anchorHash,
 	}
 	result.AnchorResultHash = ComputeServiceReceiptAnchorResultHash(result)
 	return result, result.Validate()
@@ -254,12 +254,12 @@ func QueryServiceCallProofFromReplayIndex(index ServiceCallReplayIndex, receipts
 		}
 	}
 	proof := ServiceCallProof{
-		ServiceID:       q.ServiceID,
-		CallID:          q.CallID,
-		ReceiptHash:     receiptHash,
-		TombstoneHash:   tombstone.TombstoneHash,
-		ReplayIndexHash: index.IndexHash,
-		ProofHeight:     proofHeight,
+		ServiceID:		q.ServiceID,
+		CallID:			q.CallID,
+		ReceiptHash:		receiptHash,
+		TombstoneHash:		tombstone.TombstoneHash,
+		ReplayIndexHash:	index.IndexHash,
+		ProofHeight:		proofHeight,
 	}
 	proof.ProofHash = ComputeServiceCallProofHash(proof)
 	return QueryServiceCallProofResponse{Proof: proof, Found: true}, proof.Validate()
@@ -330,10 +330,10 @@ func BuildSDKServiceCall(req SDKServiceCallBuildRequest) (SDKServiceCallBuildRes
 		return SDKServiceCallBuildResult{}, err
 	}
 	result := SDKServiceCallBuildResult{
-		Call:     call,
-		Envelope: call.ToServiceCallEnvelope(),
-		Routing:  routing,
-		Schema:   schema,
+		Call:		call,
+		Envelope:	call.ToServiceCallEnvelope(),
+		Routing:	routing,
+		Schema:		schema,
 	}
 	result.ResultHash = ComputeSDKServiceCallBuildResultHash(result)
 	return result, result.Validate()

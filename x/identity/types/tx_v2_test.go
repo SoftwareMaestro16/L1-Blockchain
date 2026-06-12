@@ -20,20 +20,20 @@ func TestIdentityTxV2CoreMessagesValidate(t *testing.T) {
 
 	msgs := []IdentityMsgV2{
 		MsgCommitRegistrationV2{
-			Auth:              txAuth(IdentitySignerScopeRegistration, 1),
-			Name:              "alice.aet",
-			NameHash:          nameHash,
-			CommitmentHash:    commitmentHash,
-			CommitmentVersion: 1,
-			SaltHashOptional:  identityHash("salt"),
+			Auth:			txAuth(IdentitySignerScopeRegistration, 1),
+			Name:			"alice.aet",
+			NameHash:		nameHash,
+			CommitmentHash:		commitmentHash,
+			CommitmentVersion:	1,
+			SaltHashOptional:	identityHash("salt"),
 		},
 		MsgRevealRegistrationV2{
-			Auth:              txAuth(IdentitySignerScopeRegistration, 2),
-			Name:              "alice.aet",
-			NameHash:          nameHash,
-			CommitmentHash:    commitmentHash,
-			CommitmentVersion: 1,
-			Salt:              "salt",
+			Auth:			txAuth(IdentitySignerScopeRegistration, 2),
+			Name:			"alice.aet",
+			NameHash:		nameHash,
+			CommitmentHash:		commitmentHash,
+			CommitmentVersion:	1,
+			Salt:			"salt",
 		},
 		MsgRegisterDirectV2{Auth: txAuth(IdentitySignerScopeRegistration, 3), Name: "alice.aet", NameHash: nameHash, Owner: addr(1), ExpectedRecordVersion: 1},
 		MsgRenewDomainV2{Auth: txAuth(IdentitySignerScopeOwner, 4), Name: "alice.aet", NameHash: nameHash, ExpectedRecordVersion: 1},
@@ -89,11 +89,11 @@ func TestIdentityTxV2RejectsReplayAndCommitRevealFields(t *testing.T) {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	commit := MsgCommitRegistrationV2{
-		Auth:              txAuth(IdentitySignerScopeRegistration, 1),
-		Name:              "alice.aet",
-		NameHash:          nameHash,
-		CommitmentHash:    identityHash("commitment"),
-		CommitmentVersion: 1,
+		Auth:			txAuth(IdentitySignerScopeRegistration, 1),
+		Name:			"alice.aet",
+		NameHash:		nameHash,
+		CommitmentHash:		identityHash("commitment"),
+		CommitmentVersion:	1,
 	}
 	require.NoError(t, commit.ValidateBasic())
 
@@ -121,7 +121,7 @@ func TestIdentityTxV2RejectsNameHashMismatchAndDuplicateBatches(t *testing.T) {
 	require.ErrorContains(t, msg.ValidateBasic(), "name_hash mismatch")
 
 	batch := MsgBatchUpdateResolversV2{
-		Auth: txAuth(IdentitySignerScopeBatchAdmin, 2),
+		Auth:	txAuth(IdentitySignerScopeBatchAdmin, 2),
 		Updates: []ResolverBatchUpdateV2{
 			{Name: "alice.aet", NameHash: nameHash, Patch: ResolverPatch{Primary: addr(2)}, ExpectedRecordVersion: 1, RecordTTL: 30},
 			{Name: "alice.aet", NameHash: nameHash, Patch: ResolverPatch{Contract: addr(3)}, ExpectedRecordVersion: 1, RecordTTL: 30},
@@ -132,12 +132,12 @@ func TestIdentityTxV2RejectsNameHashMismatchAndDuplicateBatches(t *testing.T) {
 
 func txAuth(scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:                  "aetra-local-1",
-		Signer:                   addr(byte(nonce + 10)),
-		Scope:                    scope,
-		NameNormalizationVersion: NameNormalizationVersionV2,
-		Nonce:                    nonce,
-		Fee:                      1,
-		StorageCost:              1,
+		ChainID:			"aetra-local-1",
+		Signer:				addr(byte(nonce + 10)),
+		Scope:				scope,
+		NameNormalizationVersion:	NameNormalizationVersionV2,
+		Nonce:				nonce,
+		Fee:				1,
+		StorageCost:			1,
 	}
 }

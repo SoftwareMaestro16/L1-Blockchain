@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	goldenUserAddress = "AEAAAQAAAAAAAAAAAAAAAHUedugZkZbUVJQcRdGzoyPxQzvW"
-	goldenRawAddress  = "4:000000000000000000000000751e76e8199196d454941c45d1b3a323f1433bd6"
+	goldenUserAddress	= "AEAAAQAAAAAAAAAAAAAAAHUedugZkZbUVJQcRdGzoyPxQzvW"
+	goldenRawAddress	= "4:000000000000000000000000751e76e8199196d454941c45d1b3a323f1433bd6"
 )
 
 func TestAccountStoreKeysAreDeterministicGoldenValues(t *testing.T) {
@@ -153,10 +153,10 @@ func TestAccountQueriesRejectUnsupportedAddressFormatsSafely(t *testing.T) {
 
 type meteredAccountQueryStore struct {
 	AccountQueryStore
-	byUser       int
-	byRaw        int
-	byReputation int
-	scans        int
+	byUser		int
+	byRaw		int
+	byReputation	int
+	scans		int
 }
 
 func (s *meteredAccountQueryStore) AccountByUser(userAddress string) (Account, bool, error) {

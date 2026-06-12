@@ -22,9 +22,9 @@ func TestPolicyCanConsumeSDKStakingKeeperValidators(t *testing.T) {
 		tokens := validator.GetTokens()
 		require.True(t, tokens.IsPositive())
 		records = append(records, types.ValidatorStake{
-			OperatorAddress: validator.OperatorAddress,
-			RawStake:        tokens.Uint64(),
-			CommissionBps:   types.DefaultParams(authority).CommissionFloorBps,
+			OperatorAddress:	validator.OperatorAddress,
+			RawStake:		tokens.Uint64(),
+			CommissionBps:		types.DefaultParams(authority).CommissionFloorBps,
 		})
 	}
 

@@ -12,15 +12,15 @@ import (
 )
 
 type Keeper struct {
-	storeService corestore.KVStoreService
-	authority    string
+	storeService	corestore.KVStoreService
+	authority	string
 }
 
 func NewKeeper(storeService corestore.KVStoreService, authority string) Keeper {
 	return Keeper{storeService: storeService, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) DefaultGenesis() types.DelegatorProtectionState {
 	params := types.DefaultProtectionParams()

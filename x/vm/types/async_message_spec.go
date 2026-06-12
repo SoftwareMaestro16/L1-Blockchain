@@ -12,79 +12,79 @@ import (
 )
 
 const (
-	MaxAsyncMessageEndpointLength = 128
-	MaxAsyncMessagePayloadBytes   = 128 * 1024
-	MaxAsyncMessagePayloadType    = 96
-	MaxAsyncMessageRouteHint      = 128
-	MaxAsyncMessagePriority       = 255
+	MaxAsyncMessageEndpointLength	= 128
+	MaxAsyncMessagePayloadBytes	= 128 * 1024
+	MaxAsyncMessagePayloadType	= 96
+	MaxAsyncMessageRouteHint	= 128
+	MaxAsyncMessagePriority		= 255
 
-	AVMRetryModeNone           AVMRetryMode = "none"
-	AVMRetryModeFixed          AVMRetryMode = "fixed"
-	AVMRetryModeBoundedBackoff AVMRetryMode = "bounded_backoff"
+	AVMRetryModeNone		AVMRetryMode	= "none"
+	AVMRetryModeFixed		AVMRetryMode	= "fixed"
+	AVMRetryModeBoundedBackoff	AVMRetryMode	= "bounded_backoff"
 
-	AVMBackoffModeNone        AVMBackoffMode = "none"
-	AVMBackoffModeLinear      AVMBackoffMode = "linear"
-	AVMBackoffModeExponential AVMBackoffMode = "exponential"
+	AVMBackoffModeNone		AVMBackoffMode	= "none"
+	AVMBackoffModeLinear		AVMBackoffMode	= "linear"
+	AVMBackoffModeExponential	AVMBackoffMode	= "exponential"
 )
 
 type AVMRetryMode string
 type AVMBackoffMode string
 
 type AVMRetryPolicy struct {
-	Mode           AVMRetryMode
-	MaxAttempts    uint32
-	RetryDelay     uint64
-	BackoffMode    AVMBackoffMode
-	MaxRetryHeight uint64
-	ChargeRetryGas bool
+	Mode		AVMRetryMode
+	MaxAttempts	uint32
+	RetryDelay	uint64
+	BackoffMode	AVMBackoffMode
+	MaxRetryHeight	uint64
+	ChargeRetryGas	bool
 }
 
 type AVMAsyncMessage struct {
-	ID                       string
-	ChainID                  string
-	Source                   string
-	Destination              string
-	Payload                  []byte
-	GasLimit                 uint64
-	DelayHeight              uint64
-	ExpiryHeight             uint64
-	RetryPolicy              AVMRetryPolicy
-	BounceFlag               bool
-	SourceZone               zonestypes.ZoneID
-	DestinationZone          zonestypes.ZoneID
-	SourceActorOptional      string
-	DestinationActorOptional string
-	SenderNonce              uint64
-	PayloadType              string
-	PayloadHash              string
-	ValueNAET                uint64
-	ForwardingFee            uint64
-	Priority                 uint8
-	CreatedHeight            uint64
-	RouteHintOptional        string
-	AuthProofOptional        string
-	StateProofOptional       string
+	ID				string
+	ChainID				string
+	Source				string
+	Destination			string
+	Payload				[]byte
+	GasLimit			uint64
+	DelayHeight			uint64
+	ExpiryHeight			uint64
+	RetryPolicy			AVMRetryPolicy
+	BounceFlag			bool
+	SourceZone			zonestypes.ZoneID
+	DestinationZone			zonestypes.ZoneID
+	SourceActorOptional		string
+	DestinationActorOptional	string
+	SenderNonce			uint64
+	PayloadType			string
+	PayloadHash			string
+	ValueNAET			uint64
+	ForwardingFee			uint64
+	Priority			uint8
+	CreatedHeight			uint64
+	RouteHintOptional		string
+	AuthProofOptional		string
+	StateProofOptional		string
 }
 
 type AVMAsyncReplayTombstone struct {
-	MessageID      string
-	ConsumedHeight uint64
+	MessageID	string
+	ConsumedHeight	uint64
 }
 
 type AVMAsyncMessageRegistry struct {
-	Messages           []AVMAsyncMessage
-	ConsumedMessageIDs []string
-	ReplayTombstones   []AVMAsyncReplayTombstone
+	Messages		[]AVMAsyncMessage
+	ConsumedMessageIDs	[]string
+	ReplayTombstones	[]AVMAsyncReplayTombstone
 }
 
 func DefaultAVMRetryPolicy(expiryHeight uint64) AVMRetryPolicy {
 	return AVMRetryPolicy{
-		Mode:           AVMRetryModeFixed,
-		MaxAttempts:    3,
-		RetryDelay:     1,
-		BackoffMode:    AVMBackoffModeNone,
-		MaxRetryHeight: expiryHeight,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeFixed,
+		MaxAttempts:	3,
+		RetryDelay:	1,
+		BackoffMode:	AVMBackoffModeNone,
+		MaxRetryHeight:	expiryHeight,
+		ChargeRetryGas:	true,
 	}
 }
 

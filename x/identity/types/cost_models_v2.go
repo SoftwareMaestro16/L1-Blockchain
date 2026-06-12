@@ -12,126 +12,126 @@ import (
 )
 
 const (
-	DefaultIdentityResolverFieldUpdateFeeNaet       = int64(2_000_000)
-	DefaultIdentityResolverProofIndexImpactFeeNaet  = int64(1_000_000)
-	DefaultIdentityResolverBatchCostFloorNaet       = int64(1_000_000)
-	DefaultIdentityResolverRemovedByteCreditBps     = uint32(2_500)
-	DefaultIdentityInlineInterfaceStorageMultiplier = uint32(3)
+	DefaultIdentityResolverFieldUpdateFeeNaet	= int64(2_000_000)
+	DefaultIdentityResolverProofIndexImpactFeeNaet	= int64(1_000_000)
+	DefaultIdentityResolverBatchCostFloorNaet	= int64(1_000_000)
+	DefaultIdentityResolverRemovedByteCreditBps	= uint32(2_500)
+	DefaultIdentityInlineInterfaceStorageMultiplier	= uint32(3)
 
-	DefaultIdentitySubdomainMinimalChildRecordFeeNaet = int64(500_000_000)
-	DefaultIdentitySubdomainLabelByteFeeNaet          = int64(50_000_000)
-	DefaultIdentitySubdomainZonePolicyUnitFeeNaet     = int64(250_000_000)
+	DefaultIdentitySubdomainMinimalChildRecordFeeNaet	= int64(500_000_000)
+	DefaultIdentitySubdomainLabelByteFeeNaet		= int64(50_000_000)
+	DefaultIdentitySubdomainZonePolicyUnitFeeNaet		= int64(250_000_000)
 
-	IdentityDelegatedBillingParentV2   = IdentityDelegatedBillingPolicyV2("parent")
-	IdentityDelegatedBillingDelegateV2 = IdentityDelegatedBillingPolicyV2("delegate")
+	IdentityDelegatedBillingParentV2	= IdentityDelegatedBillingPolicyV2("parent")
+	IdentityDelegatedBillingDelegateV2	= IdentityDelegatedBillingPolicyV2("delegate")
 )
 
 type IdentityResolverUpdateCostParamsV2 struct {
-	PayloadParams                    IdentityResolverPayloadSafetyParamsV2
-	FieldUpdateFee                   sdkmath.Int
-	ProofIndexImpactFee              sdkmath.Int
-	BatchCostFloor                   sdkmath.Int
-	RemovedByteCreditBps             uint32
-	InlineInterfaceStorageMultiplier uint32
-	ChurnSurchargeEnabled            bool
+	PayloadParams				IdentityResolverPayloadSafetyParamsV2
+	FieldUpdateFee				sdkmath.Int
+	ProofIndexImpactFee			sdkmath.Int
+	BatchCostFloor				sdkmath.Int
+	RemovedByteCreditBps			uint32
+	InlineInterfaceStorageMultiplier	uint32
+	ChurnSurchargeEnabled			bool
 }
 
 type IdentityResolverUpdateCostRequestV2 struct {
-	Before           UnifiedResolutionRecordV2
-	After            UnifiedResolutionRecordV2
-	UpdatedFields    []string
-	UpdatesInWindow  uint32
-	ProofIndexWrites uint64
+	Before			UnifiedResolutionRecordV2
+	After			UnifiedResolutionRecordV2
+	UpdatedFields		[]string
+	UpdatesInWindow		uint32
+	ProofIndexWrites	uint64
 }
 
 type IdentityResolverStorageDeltaV2 struct {
-	BeforeBytes       uint64
-	AfterBytes        uint64
-	AddedBytes        uint64
-	RemovedBytes      uint64
-	NetGrowthBytes    uint64
-	InlineBytes       uint64
-	BillableBytes     uint64
-	RemovedByteCredit sdkmath.Int
+	BeforeBytes		uint64
+	AfterBytes		uint64
+	AddedBytes		uint64
+	RemovedBytes		uint64
+	NetGrowthBytes		uint64
+	InlineBytes		uint64
+	BillableBytes		uint64
+	RemovedByteCredit	sdkmath.Int
 }
 
 type IdentityResolverUpdateFeeQuoteV2 struct {
-	Denom                string
-	FieldCount           uint64
-	BaseUpdateFee        sdkmath.Int
-	FieldUpdateFee       sdkmath.Int
-	AddedStorageFee      sdkmath.Int
-	RemovedByteCredit    sdkmath.Int
-	InlineInterfaceFee   sdkmath.Int
-	ChurnSurcharge       sdkmath.Int
-	ChurnMultiplierBps   uint32
-	ProofIndexImpactFee  sdkmath.Int
-	Total                sdkmath.Int
-	StorageDelta         IdentityResolverStorageDeltaV2
-	DeterministicFormula string
+	Denom			string
+	FieldCount		uint64
+	BaseUpdateFee		sdkmath.Int
+	FieldUpdateFee		sdkmath.Int
+	AddedStorageFee		sdkmath.Int
+	RemovedByteCredit	sdkmath.Int
+	InlineInterfaceFee	sdkmath.Int
+	ChurnSurcharge		sdkmath.Int
+	ChurnMultiplierBps	uint32
+	ProofIndexImpactFee	sdkmath.Int
+	Total			sdkmath.Int
+	StorageDelta		IdentityResolverStorageDeltaV2
+	DeterministicFormula	string
 }
 
 type IdentityResolverBatchFeeQuoteV2 struct {
-	Denom                    string
-	ItemQuotes               []IdentityResolverUpdateFeeQuoteV2
-	IndividualTotal          sdkmath.Int
-	BatchFloorTotal          sdkmath.Int
-	Total                    sdkmath.Int
-	BatchSize                uint64
-	NotCheaperThanIndividual bool
-	DeterministicFormula     string
+	Denom				string
+	ItemQuotes			[]IdentityResolverUpdateFeeQuoteV2
+	IndividualTotal			sdkmath.Int
+	BatchFloorTotal			sdkmath.Int
+	Total				sdkmath.Int
+	BatchSize			uint64
+	NotCheaperThanIndividual	bool
+	DeterministicFormula		string
 }
 
 type IdentityDelegatedBillingPolicyV2 string
 
 type IdentitySubdomainCostParamsV2 struct {
-	PricingParams           IdentityPricingParamsV2
-	MinimalChildRecordFee   sdkmath.Int
-	LabelByteFee            sdkmath.Int
-	ZonePolicyUnitFee       sdkmath.Int
-	StorageFeePerByte       sdkmath.Int
-	DetachedRequiresPayment bool
+	PricingParams		IdentityPricingParamsV2
+	MinimalChildRecordFee	sdkmath.Int
+	LabelByteFee		sdkmath.Int
+	ZonePolicyUnitFee	sdkmath.Int
+	StorageFeePerByte	sdkmath.Int
+	DetachedRequiresPayment	bool
 }
 
 type IdentitySubdomainCostRequestV2 struct {
-	State                IdentityState
-	Policy               SubdomainCreationPolicyV2
-	ResolverPayloadBytes uint64
-	ZonePolicyComplexity uint64
-	BillingPolicy        IdentityDelegatedBillingPolicyV2
+	State			IdentityState
+	Policy			SubdomainCreationPolicyV2
+	ResolverPayloadBytes	uint64
+	ZonePolicyComplexity	uint64
+	BillingPolicy		IdentityDelegatedBillingPolicyV2
 }
 
 type IdentitySubdomainFeeQuoteV2 struct {
-	Denom                   string
-	ChildName               string
-	ParentStatus            DomainLifecycleStatus
-	ChildLabelLength        uint64
-	DelegationType          SubdomainDelegationTypeV2
-	Detached                bool
-	BillingPolicy           IdentityDelegatedBillingPolicyV2
-	ChargedAddress          sdk.AccAddress
-	MinimalChildRecordFee   sdkmath.Int
-	LabelLengthFee          sdkmath.Int
-	ResolverPayloadFee      sdkmath.Int
-	ZonePolicyComplexityFee sdkmath.Int
-	DetachedRegistrationFee sdkmath.Int
-	DetachedRenewalFee      sdkmath.Int
-	Total                   sdkmath.Int
-	ExpiryDurationBlocks    uint64
-	ChildExpiryHeight       uint64
-	ParentExpiryHeight      uint64
-	DeterministicFormula    string
+	Denom			string
+	ChildName		string
+	ParentStatus		DomainLifecycleStatus
+	ChildLabelLength	uint64
+	DelegationType		SubdomainDelegationTypeV2
+	Detached		bool
+	BillingPolicy		IdentityDelegatedBillingPolicyV2
+	ChargedAddress		sdk.AccAddress
+	MinimalChildRecordFee	sdkmath.Int
+	LabelLengthFee		sdkmath.Int
+	ResolverPayloadFee	sdkmath.Int
+	ZonePolicyComplexityFee	sdkmath.Int
+	DetachedRegistrationFee	sdkmath.Int
+	DetachedRenewalFee	sdkmath.Int
+	Total			sdkmath.Int
+	ExpiryDurationBlocks	uint64
+	ChildExpiryHeight	uint64
+	ParentExpiryHeight	uint64
+	DeterministicFormula	string
 }
 
 func DefaultIdentityResolverUpdateCostParamsV2() IdentityResolverUpdateCostParamsV2 {
 	return IdentityResolverUpdateCostParamsV2{
-		PayloadParams:                    DefaultIdentityResolverPayloadSafetyParamsV2(),
-		FieldUpdateFee:                   sdkmath.NewInt(DefaultIdentityResolverFieldUpdateFeeNaet),
-		ProofIndexImpactFee:              sdkmath.NewInt(DefaultIdentityResolverProofIndexImpactFeeNaet),
-		BatchCostFloor:                   sdkmath.NewInt(DefaultIdentityResolverBatchCostFloorNaet),
-		RemovedByteCreditBps:             DefaultIdentityResolverRemovedByteCreditBps,
-		InlineInterfaceStorageMultiplier: DefaultIdentityInlineInterfaceStorageMultiplier,
-		ChurnSurchargeEnabled:            true,
+		PayloadParams:				DefaultIdentityResolverPayloadSafetyParamsV2(),
+		FieldUpdateFee:				sdkmath.NewInt(DefaultIdentityResolverFieldUpdateFeeNaet),
+		ProofIndexImpactFee:			sdkmath.NewInt(DefaultIdentityResolverProofIndexImpactFeeNaet),
+		BatchCostFloor:				sdkmath.NewInt(DefaultIdentityResolverBatchCostFloorNaet),
+		RemovedByteCreditBps:			DefaultIdentityResolverRemovedByteCreditBps,
+		InlineInterfaceStorageMultiplier:	DefaultIdentityInlineInterfaceStorageMultiplier,
+		ChurnSurchargeEnabled:			true,
 	}
 }
 
@@ -140,8 +140,8 @@ func ValidateIdentityResolverUpdateCostParamsV2(params IdentityResolverUpdateCos
 		return err
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "field update fee", value: params.FieldUpdateFee},
 		{label: "proof index impact fee", value: params.ProofIndexImpactFee},
@@ -172,10 +172,10 @@ func CalculateIdentityResolverStorageDeltaV2(before UnifiedResolutionRecordV2, a
 	beforeBytes := EstimateUnifiedResolverPayloadBytesV2(before)
 	afterBytes := EstimateUnifiedResolverPayloadBytesV2(after)
 	delta := IdentityResolverStorageDeltaV2{
-		BeforeBytes:       beforeBytes,
-		AfterBytes:        afterBytes,
-		InlineBytes:       EstimateIdentityInlineInterfaceBytesV2(after),
-		RemovedByteCredit: sdkmath.ZeroInt(),
+		BeforeBytes:		beforeBytes,
+		AfterBytes:		afterBytes,
+		InlineBytes:		EstimateIdentityInlineInterfaceBytesV2(after),
+		RemovedByteCredit:	sdkmath.ZeroInt(),
 	}
 	switch {
 	case afterBytes >= beforeBytes:
@@ -227,19 +227,19 @@ func QuoteIdentityResolverUpdateFeeV2(req IdentityResolverUpdateCostRequestV2, p
 		}
 	}
 	return IdentityResolverUpdateFeeQuoteV2{
-		Denom:                appparams.BaseDenom,
-		FieldCount:           fieldCount,
-		BaseUpdateFee:        params.PayloadParams.UpdateBaseFee,
-		FieldUpdateFee:       fieldFee,
-		AddedStorageFee:      addedStorageFee,
-		RemovedByteCredit:    delta.RemovedByteCredit,
-		InlineInterfaceFee:   inlineFee,
-		ChurnSurcharge:       churnSurcharge,
-		ChurnMultiplierBps:   multiplier,
-		ProofIndexImpactFee:  proofFee,
-		Total:                total,
-		StorageDelta:         delta,
-		DeterministicFormula: "base_update_fee + unique_updated_fields*field_fee + net_storage_growth*fee_per_byte + inline_schema_bytes*(multiplier-1)*fee_per_byte + churn_surcharge + proof_index_writes*fee - removed_byte_credit_floor_base",
+		Denom:			appparams.BaseDenom,
+		FieldCount:		fieldCount,
+		BaseUpdateFee:		params.PayloadParams.UpdateBaseFee,
+		FieldUpdateFee:		fieldFee,
+		AddedStorageFee:	addedStorageFee,
+		RemovedByteCredit:	delta.RemovedByteCredit,
+		InlineInterfaceFee:	inlineFee,
+		ChurnSurcharge:		churnSurcharge,
+		ChurnMultiplierBps:	multiplier,
+		ProofIndexImpactFee:	proofFee,
+		Total:			total,
+		StorageDelta:		delta,
+		DeterministicFormula:	"base_update_fee + unique_updated_fields*field_fee + net_storage_growth*fee_per_byte + inline_schema_bytes*(multiplier-1)*fee_per_byte + churn_surcharge + proof_index_writes*fee - removed_byte_credit_floor_base",
 	}, nil
 }
 
@@ -248,12 +248,12 @@ func QuoteIdentityResolverBatchUpdateFeesV2(requests []IdentityResolverUpdateCos
 		return IdentityResolverBatchFeeQuoteV2{}, err
 	}
 	quote := IdentityResolverBatchFeeQuoteV2{
-		Denom:                appparams.BaseDenom,
-		ItemQuotes:           make([]IdentityResolverUpdateFeeQuoteV2, 0, len(requests)),
-		IndividualTotal:      sdkmath.ZeroInt(),
-		BatchFloorTotal:      params.BatchCostFloor.Mul(sdkmath.NewIntFromUint64(uint64(len(requests)))),
-		BatchSize:            uint64(len(requests)),
-		DeterministicFormula: "max(sum(individual_update_fees), batch_size*batch_cost_floor)",
+		Denom:			appparams.BaseDenom,
+		ItemQuotes:		make([]IdentityResolverUpdateFeeQuoteV2, 0, len(requests)),
+		IndividualTotal:	sdkmath.ZeroInt(),
+		BatchFloorTotal:	params.BatchCostFloor.Mul(sdkmath.NewIntFromUint64(uint64(len(requests)))),
+		BatchSize:		uint64(len(requests)),
+		DeterministicFormula:	"max(sum(individual_update_fees), batch_size*batch_cost_floor)",
 	}
 	for _, request := range requests {
 		item, err := QuoteIdentityResolverUpdateFeeV2(request, params)
@@ -273,12 +273,12 @@ func QuoteIdentityResolverBatchUpdateFeesV2(requests []IdentityResolverUpdateCos
 
 func DefaultIdentitySubdomainCostParamsV2() IdentitySubdomainCostParamsV2 {
 	return IdentitySubdomainCostParamsV2{
-		PricingParams:           DefaultIdentityPricingParamsV2(),
-		MinimalChildRecordFee:   sdkmath.NewInt(DefaultIdentitySubdomainMinimalChildRecordFeeNaet),
-		LabelByteFee:            sdkmath.NewInt(DefaultIdentitySubdomainLabelByteFeeNaet),
-		ZonePolicyUnitFee:       sdkmath.NewInt(DefaultIdentitySubdomainZonePolicyUnitFeeNaet),
-		StorageFeePerByte:       sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
-		DetachedRequiresPayment: true,
+		PricingParams:			DefaultIdentityPricingParamsV2(),
+		MinimalChildRecordFee:		sdkmath.NewInt(DefaultIdentitySubdomainMinimalChildRecordFeeNaet),
+		LabelByteFee:			sdkmath.NewInt(DefaultIdentitySubdomainLabelByteFeeNaet),
+		ZonePolicyUnitFee:		sdkmath.NewInt(DefaultIdentitySubdomainZonePolicyUnitFeeNaet),
+		StorageFeePerByte:		sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
+		DetachedRequiresPayment:	true,
 	}
 }
 
@@ -287,8 +287,8 @@ func ValidateIdentitySubdomainCostParamsV2(params IdentitySubdomainCostParamsV2)
 		return err
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "minimal child record fee", value: params.MinimalChildRecordFee},
 		{label: "label byte fee", value: params.LabelByteFee},
@@ -336,24 +336,24 @@ func QuoteIdentitySubdomainCreationFeeV2(req IdentitySubdomainCostRequestV2, par
 	resolverFee := params.StorageFeePerByte.Mul(sdkmath.NewIntFromUint64(req.ResolverPayloadBytes))
 	zoneFee := params.ZonePolicyUnitFee.Mul(sdkmath.NewIntFromUint64(req.ZonePolicyComplexity))
 	quote := IdentitySubdomainFeeQuoteV2{
-		Denom:                   appparams.BaseDenom,
-		ChildName:               childName,
-		ParentStatus:            parentStatus,
-		ChildLabelLength:        uint64(len(req.Policy.Label)),
-		DelegationType:          delegationType,
-		Detached:                req.Policy.DetachedPaid,
-		BillingPolicy:           billing,
-		ChargedAddress:          charged,
-		MinimalChildRecordFee:   params.MinimalChildRecordFee,
-		LabelLengthFee:          labelFee,
-		ResolverPayloadFee:      resolverFee,
-		ZonePolicyComplexityFee: zoneFee,
-		DetachedRegistrationFee: sdkmath.ZeroInt(),
-		DetachedRenewalFee:      sdkmath.ZeroInt(),
-		ExpiryDurationBlocks:    childExpiry - req.Policy.Height,
-		ChildExpiryHeight:       childExpiry,
-		ParentExpiryHeight:      parent.ExpiryHeight,
-		DeterministicFormula:    "minimal_child_record_fee + label_bytes*label_fee + resolver_payload_bytes*storage_fee + zone_policy_complexity*unit_fee + optional_detached_registration_and_renewal",
+		Denom:				appparams.BaseDenom,
+		ChildName:			childName,
+		ParentStatus:			parentStatus,
+		ChildLabelLength:		uint64(len(req.Policy.Label)),
+		DelegationType:			delegationType,
+		Detached:			req.Policy.DetachedPaid,
+		BillingPolicy:			billing,
+		ChargedAddress:			charged,
+		MinimalChildRecordFee:		params.MinimalChildRecordFee,
+		LabelLengthFee:			labelFee,
+		ResolverPayloadFee:		resolverFee,
+		ZonePolicyComplexityFee:	zoneFee,
+		DetachedRegistrationFee:	sdkmath.ZeroInt(),
+		DetachedRenewalFee:		sdkmath.ZeroInt(),
+		ExpiryDurationBlocks:		childExpiry - req.Policy.Height,
+		ChildExpiryHeight:		childExpiry,
+		ParentExpiryHeight:		parent.ExpiryHeight,
+		DeterministicFormula:		"minimal_child_record_fee + label_bytes*label_fee + resolver_payload_bytes*storage_fee + zone_policy_complexity*unit_fee + optional_detached_registration_and_renewal",
 	}
 	quote.Total = quote.MinimalChildRecordFee.Add(quote.LabelLengthFee).Add(quote.ResolverPayloadFee).Add(quote.ZonePolicyComplexityFee)
 	if req.Policy.DetachedPaid {
@@ -361,10 +361,10 @@ func QuoteIdentitySubdomainCreationFeeV2(req IdentitySubdomainCostRequestV2, par
 			return IdentitySubdomainFeeQuoteV2{}, errors.New("identity subdomain detached pricing requires independent payment")
 		}
 		detached, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-			Name:                 childName,
-			DurationBlocks:       quote.ExpiryDurationBlocks,
-			ResolverPayloadBytes: req.ResolverPayloadBytes,
-			SubdomainMode:        IdentitySubdomainModeDetachedPaidV2,
+			Name:			childName,
+			DurationBlocks:		quote.ExpiryDurationBlocks,
+			ResolverPayloadBytes:	req.ResolverPayloadBytes,
+			SubdomainMode:		IdentitySubdomainModeDetachedPaidV2,
 		}, params.PricingParams)
 		if err != nil {
 			return IdentitySubdomainFeeQuoteV2{}, err

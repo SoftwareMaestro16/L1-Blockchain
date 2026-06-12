@@ -14,39 +14,39 @@ import (
 type NativePaymentSettlementStatus string
 
 const (
-	NativePaymentSettlementOpen       NativePaymentSettlementStatus = "open"
-	NativePaymentSettlementClosing    NativePaymentSettlementStatus = "closing"
-	NativePaymentSettlementChallenged NativePaymentSettlementStatus = "challenged"
-	NativePaymentSettlementSettled    NativePaymentSettlementStatus = "settled"
-	NativePaymentSettlementExpired    NativePaymentSettlementStatus = "expired"
-	NativePaymentSettlementDisputed   NativePaymentSettlementStatus = "disputed"
+	NativePaymentSettlementOpen		NativePaymentSettlementStatus	= "open"
+	NativePaymentSettlementClosing		NativePaymentSettlementStatus	= "closing"
+	NativePaymentSettlementChallenged	NativePaymentSettlementStatus	= "challenged"
+	NativePaymentSettlementSettled		NativePaymentSettlementStatus	= "settled"
+	NativePaymentSettlementExpired		NativePaymentSettlementStatus	= "expired"
+	NativePaymentSettlementDisputed		NativePaymentSettlementStatus	= "disputed"
 )
 
 type NativePaymentChannelSettlementState struct {
-	ChannelID        string
-	Participants     []string
-	ZoneID           string
-	ShardID          uint32
-	Balances         map[string]string
-	Nonce            uint64
-	ConditionRoot    string
-	ExpiryHeight     uint64
-	ChallengePeriod  uint64
-	LatestStateHash  string
-	SettlementStatus NativePaymentSettlementStatus
-	StateRoot        string
+	ChannelID		string
+	Participants		[]string
+	ZoneID			string
+	ShardID			uint32
+	Balances		map[string]string
+	Nonce			uint64
+	ConditionRoot		string
+	ExpiryHeight		uint64
+	ChallengePeriod		uint64
+	LatestStateHash		string
+	SettlementStatus	NativePaymentSettlementStatus
+	StateRoot		string
 }
 
 type NativePaymentChannelFinalityCommitment struct {
-	ChannelID          string
-	SettlementHash     string
-	FinalStateHash     string
-	FinalNonce         uint64
-	FinancialZoneRoot  string
-	AetraCoreProofRoot string
-	PaymentReceiptRoot string
-	SettledHeight      uint64
-	FinalityCommitment string
+	ChannelID		string
+	SettlementHash		string
+	FinalStateHash		string
+	FinalNonce		uint64
+	FinancialZoneRoot	string
+	AetraCoreProofRoot	string
+	PaymentReceiptRoot	string
+	SettledHeight		uint64
+	FinalityCommitment	string
 }
 
 func NewNativePaymentChannelSettlementStateFromRecord(channel ChannelRecord, zoneID string, shardID uint32, expiryHeight uint64) (NativePaymentChannelSettlementState, error) {
@@ -58,17 +58,17 @@ func NewNativePaymentChannelSettlementStateFromRecord(channel ChannelRecord, zon
 		expiryHeight = channel.LatestState.TimeoutHeight
 	}
 	return BuildNativePaymentChannelSettlementState(NativePaymentChannelSettlementState{
-		ChannelID:        channel.ChannelID,
-		Participants:     channel.Participants,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		Balances:         balancesToMap(channel.LatestState.Balances),
-		Nonce:            channel.LatestState.Nonce,
-		ConditionRoot:    channel.LatestState.ConditionRoot,
-		ExpiryHeight:     expiryHeight,
-		ChallengePeriod:  channel.DisputePeriod,
-		LatestStateHash:  channel.LatestState.StateHash,
-		SettlementStatus: NativePaymentSettlementOpen,
+		ChannelID:		channel.ChannelID,
+		Participants:		channel.Participants,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Balances:		balancesToMap(channel.LatestState.Balances),
+		Nonce:			channel.LatestState.Nonce,
+		ConditionRoot:		channel.LatestState.ConditionRoot,
+		ExpiryHeight:		expiryHeight,
+		ChallengePeriod:	channel.DisputePeriod,
+		LatestStateHash:	channel.LatestState.StateHash,
+		SettlementStatus:	NativePaymentSettlementOpen,
 	})
 }
 
@@ -294,13 +294,13 @@ func SupersedeNativePaymentStaleCloseWithFraudProof(settlement NativePaymentChan
 		return NativePaymentChannelSettlementState{}, SettlementProof{}, err
 	}
 	settlementProof, err := BuildSettlementProof(SettlementProof{
-		ProofID:                HashParts("native-channel-stale-close-proof", settlement.ChannelID, staleClose.StateHash, newerState.StateHash, fmt.Sprintf("%020d", currentHeight)),
-		ProofType:              SettlementProofFraud,
-		ChannelID:              settlement.ChannelID,
-		LatestStateHash:        newerState.StateHash,
-		FraudProofHashOptional: proof.EvidenceHash,
-		SubmittedBy:            submitter,
-		Height:                 currentHeight,
+		ProofID:		HashParts("native-channel-stale-close-proof", settlement.ChannelID, staleClose.StateHash, newerState.StateHash, fmt.Sprintf("%020d", currentHeight)),
+		ProofType:		SettlementProofFraud,
+		ChannelID:		settlement.ChannelID,
+		LatestStateHash:	newerState.StateHash,
+		FraudProofHashOptional:	proof.EvidenceHash,
+		SubmittedBy:		submitter,
+		Height:			currentHeight,
 	})
 	if err != nil {
 		return NativePaymentChannelSettlementState{}, SettlementProof{}, err
@@ -312,14 +312,14 @@ func BuildNativePaymentChannelFinalityCommitment(settlement NativePaymentChannel
 	settlement = settlement.Normalize()
 	record = record.Normalize()
 	commitment := NativePaymentChannelFinalityCommitment{
-		ChannelID:          settlement.ChannelID,
-		SettlementHash:     record.SettlementHash,
-		FinalStateHash:     record.StateHash,
-		FinalNonce:         record.Nonce,
-		FinancialZoneRoot:  normalizeHash(financialZoneRoot),
-		AetraCoreProofRoot: normalizeHash(aetherCoreProofRoot),
-		PaymentReceiptRoot: normalizeHash(receiptRoot),
-		SettledHeight:      record.SettledHeight,
+		ChannelID:		settlement.ChannelID,
+		SettlementHash:		record.SettlementHash,
+		FinalStateHash:		record.StateHash,
+		FinalNonce:		record.Nonce,
+		FinancialZoneRoot:	normalizeHash(financialZoneRoot),
+		AetraCoreProofRoot:	normalizeHash(aetherCoreProofRoot),
+		PaymentReceiptRoot:	normalizeHash(receiptRoot),
+		SettledHeight:		record.SettledHeight,
 	}
 	if err := settlement.Validate(); err != nil {
 		return NativePaymentChannelFinalityCommitment{}, err

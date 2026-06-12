@@ -14,118 +14,118 @@ type MixedSettlementStatus string
 type MixedVerificationHookType string
 
 const (
-	MixedFaultLow      MixedServiceFaultClass = "LOW"
-	MixedFaultMedium   MixedServiceFaultClass = "MEDIUM"
-	MixedFaultHigh     MixedServiceFaultClass = "HIGH"
-	MixedFaultCritical MixedServiceFaultClass = "CRITICAL"
+	MixedFaultLow		MixedServiceFaultClass	= "LOW"
+	MixedFaultMedium	MixedServiceFaultClass	= "MEDIUM"
+	MixedFaultHigh		MixedServiceFaultClass	= "HIGH"
+	MixedFaultCritical	MixedServiceFaultClass	= "CRITICAL"
 
-	MixedDisputeOpen     MixedDisputeStatus = "OPEN"
-	MixedDisputeRejected MixedDisputeStatus = "REJECTED"
-	MixedDisputeProven   MixedDisputeStatus = "PROVEN"
-	MixedDisputeFallback MixedDisputeStatus = "FALLBACK"
-	MixedDisputeExpired  MixedDisputeStatus = "EXPIRED"
+	MixedDisputeOpen	MixedDisputeStatus	= "OPEN"
+	MixedDisputeRejected	MixedDisputeStatus	= "REJECTED"
+	MixedDisputeProven	MixedDisputeStatus	= "PROVEN"
+	MixedDisputeFallback	MixedDisputeStatus	= "FALLBACK"
+	MixedDisputeExpired	MixedDisputeStatus	= "EXPIRED"
 
-	MixedSettlementReleased  MixedSettlementStatus = "RELEASED"
-	MixedSettlementRefunded  MixedSettlementStatus = "REFUNDED"
-	MixedSettlementPenalized MixedSettlementStatus = "PENALIZED"
-	MixedSettlementFallback  MixedSettlementStatus = "FALLBACK_EXECUTED"
+	MixedSettlementReleased		MixedSettlementStatus	= "RELEASED"
+	MixedSettlementRefunded		MixedSettlementStatus	= "REFUNDED"
+	MixedSettlementPenalized	MixedSettlementStatus	= "PENALIZED"
+	MixedSettlementFallback		MixedSettlementStatus	= "FALLBACK_EXECUTED"
 
-	MixedHookProofVerification MixedVerificationHookType = "PROOF_VERIFICATION"
-	MixedHookRecompute         MixedVerificationHookType = "RECOMPUTE"
-	MixedHookFallbackExecution MixedVerificationHookType = "FALLBACK_EXECUTION"
+	MixedHookProofVerification	MixedVerificationHookType	= "PROOF_VERIFICATION"
+	MixedHookRecompute		MixedVerificationHookType	= "RECOMPUTE"
+	MixedHookFallbackExecution	MixedVerificationHookType	= "FALLBACK_EXECUTION"
 )
 
 type MixedServiceState struct {
-	ServiceID                string
-	ProviderKey              string
-	PaymentDenom             string
-	EscrowID                 string
-	EscrowAmount             string
-	CollateralDenom          string
-	CollateralAmount         string
-	RequiredCollateralAmount string
-	FaultClass               MixedServiceFaultClass
-	ChallengeWindow          uint64
-	FallbackServiceID        string
-	FallbackMethodID         string
-	FallbackDeterministic    bool
-	Anchors                  []MixedResultAnchor
-	Disputes                 []MixedDispute
-	Settlements              []MixedSettlement
-	StateHash                string
+	ServiceID			string
+	ProviderKey			string
+	PaymentDenom			string
+	EscrowID			string
+	EscrowAmount			string
+	CollateralDenom			string
+	CollateralAmount		string
+	RequiredCollateralAmount	string
+	FaultClass			MixedServiceFaultClass
+	ChallengeWindow			uint64
+	FallbackServiceID		string
+	FallbackMethodID		string
+	FallbackDeterministic		bool
+	Anchors				[]MixedResultAnchor
+	Disputes			[]MixedDispute
+	Settlements			[]MixedSettlement
+	StateHash			string
 }
 
 type MixedResultAnchor struct {
-	AnchorID           string
-	ServiceID          string
-	CallID             string
-	RequestCommitment  string
-	ResultCommitment   string
-	ReceiptCommitment  string
-	ProviderKey        string
-	Height             uint64
-	ChallengeEndHeight uint64
-	PaymentAmount      string
-	AnchorHash         string
+	AnchorID		string
+	ServiceID		string
+	CallID			string
+	RequestCommitment	string
+	ResultCommitment	string
+	ReceiptCommitment	string
+	ProviderKey		string
+	Height			uint64
+	ChallengeEndHeight	uint64
+	PaymentAmount		string
+	AnchorHash		string
 }
 
 type MixedChallengeMessage struct {
-	AnchorID            string
-	Challenger          string
-	ChallengeCommitment string
-	OpenedHeight        uint64
-	VerificationHook    MixedVerificationHook
+	AnchorID		string
+	Challenger		string
+	ChallengeCommitment	string
+	OpenedHeight		uint64
+	VerificationHook	MixedVerificationHook
 }
 
 type MixedDispute struct {
-	DisputeID           string
-	AnchorID            string
-	ServiceID           string
-	Challenger          string
-	ChallengeCommitment string
-	OpenedHeight        uint64
-	ResolveByHeight     uint64
-	Status              MixedDisputeStatus
-	VerificationHook    MixedVerificationHook
-	DisputeHash         string
+	DisputeID		string
+	AnchorID		string
+	ServiceID		string
+	Challenger		string
+	ChallengeCommitment	string
+	OpenedHeight		uint64
+	ResolveByHeight		uint64
+	Status			MixedDisputeStatus
+	VerificationHook	MixedVerificationHook
+	DisputeHash		string
 }
 
 type MixedVerificationHook struct {
-	HookType           MixedVerificationHookType
-	TargetServiceID    string
-	MethodID           string
-	ProofCommitment    string
-	Deterministic      bool
-	ProofMeterGas      uint64
-	ExpectedResultHash string
-	HookHash           string
+	HookType		MixedVerificationHookType
+	TargetServiceID		string
+	MethodID		string
+	ProofCommitment		string
+	Deterministic		bool
+	ProofMeterGas		uint64
+	ExpectedResultHash	string
+	HookHash		string
 }
 
 type MixedDisputeResolution struct {
-	DisputeID        string
-	Resolver         string
-	ResolvedHeight   uint64
-	ProofAccepted    bool
-	RecomputeMatches bool
-	FallbackExecuted bool
-	ResolutionHash   string
+	DisputeID		string
+	Resolver		string
+	ResolvedHeight		uint64
+	ProofAccepted		bool
+	RecomputeMatches	bool
+	FallbackExecuted	bool
+	ResolutionHash		string
 }
 
 type MixedSettlement struct {
-	SettlementID     string
-	AnchorID         string
-	DisputeID        string
-	ServiceID        string
-	ProviderKey      string
-	Status           MixedSettlementStatus
-	SettledHeight    uint64
-	PaymentDenom     string
-	PaymentAmount    string
-	PaymentStatus    ServicePaymentStatus
-	PenaltyDenom     string
-	PenaltyAmount    string
-	PenaltyRecipient string
-	SettlementHash   string
+	SettlementID		string
+	AnchorID		string
+	DisputeID		string
+	ServiceID		string
+	ProviderKey		string
+	Status			MixedSettlementStatus
+	SettledHeight		uint64
+	PaymentDenom		string
+	PaymentAmount		string
+	PaymentStatus		ServicePaymentStatus
+	PenaltyDenom		string
+	PenaltyAmount		string
+	PenaltyRecipient	string
+	SettlementHash		string
 }
 
 func NewMixedServiceState(descriptor ServiceDescriptor, providerKey string, faultClass MixedServiceFaultClass, requiredCollateralAmount string) (MixedServiceState, error) {
@@ -137,21 +137,21 @@ func NewMixedServiceState(descriptor ServiceDescriptor, providerKey string, faul
 		return MixedServiceState{}, errors.New("aetracore mixed state requires mixed service descriptor")
 	}
 	state := MixedServiceState{
-		ServiceID:                descriptor.ServiceID,
-		ProviderKey:              strings.TrimSpace(providerKey),
-		PaymentDenom:             descriptor.Payment.Denom,
-		EscrowID:                 descriptor.Payment.EscrowID,
-		EscrowAmount:             descriptor.Payment.Amount,
-		CollateralDenom:          descriptor.Verification.ProviderCollateralDenom,
-		CollateralAmount:         descriptor.Verification.ProviderCollateralAmount,
-		RequiredCollateralAmount: strings.TrimSpace(requiredCollateralAmount),
-		FaultClass:               faultClass,
-		ChallengeWindow:          descriptor.Verification.ChallengeWindow,
-		FallbackServiceID:        descriptor.Verification.FallbackServiceID,
-		FallbackDeterministic:    descriptor.Execution.FailureBehavior == ServiceFailureFallbackOnChain || descriptor.Verification.FallbackServiceID != "",
-		Anchors:                  []MixedResultAnchor{},
-		Disputes:                 []MixedDispute{},
-		Settlements:              []MixedSettlement{},
+		ServiceID:			descriptor.ServiceID,
+		ProviderKey:			strings.TrimSpace(providerKey),
+		PaymentDenom:			descriptor.Payment.Denom,
+		EscrowID:			descriptor.Payment.EscrowID,
+		EscrowAmount:			descriptor.Payment.Amount,
+		CollateralDenom:		descriptor.Verification.ProviderCollateralDenom,
+		CollateralAmount:		descriptor.Verification.ProviderCollateralAmount,
+		RequiredCollateralAmount:	strings.TrimSpace(requiredCollateralAmount),
+		FaultClass:			faultClass,
+		ChallengeWindow:		descriptor.Verification.ChallengeWindow,
+		FallbackServiceID:		descriptor.Verification.FallbackServiceID,
+		FallbackDeterministic:		descriptor.Execution.FailureBehavior == ServiceFailureFallbackOnChain || descriptor.Verification.FallbackServiceID != "",
+		Anchors:			[]MixedResultAnchor{},
+		Disputes:			[]MixedDispute{},
+		Settlements:			[]MixedSettlement{},
 	}
 	if state.ChallengeWindow == 0 {
 		state.ChallengeWindow = descriptor.Execution.ChallengeWindow
@@ -336,14 +336,14 @@ func OpenMixedServiceChallenge(state MixedServiceState, message MixedChallengeMe
 	}
 	hook.HookHash = ComputeMixedVerificationHookHash(hook)
 	dispute := MixedDispute{
-		AnchorID:            message.AnchorID,
-		ServiceID:           state.ServiceID,
-		Challenger:          strings.TrimSpace(message.Challenger),
-		ChallengeCommitment: strings.ToLower(strings.TrimSpace(message.ChallengeCommitment)),
-		OpenedHeight:        message.OpenedHeight,
-		ResolveByHeight:     anchor.ChallengeEndHeight,
-		Status:              MixedDisputeOpen,
-		VerificationHook:    hook,
+		AnchorID:		message.AnchorID,
+		ServiceID:		state.ServiceID,
+		Challenger:		strings.TrimSpace(message.Challenger),
+		ChallengeCommitment:	strings.ToLower(strings.TrimSpace(message.ChallengeCommitment)),
+		OpenedHeight:		message.OpenedHeight,
+		ResolveByHeight:	anchor.ChallengeEndHeight,
+		Status:			MixedDisputeOpen,
+		VerificationHook:	hook,
 	}
 	dispute.DisputeID = ComputeMixedDisputeID(dispute)
 	dispute.DisputeHash = ComputeMixedDisputeHash(dispute)
@@ -481,14 +481,14 @@ func SettleMixedServiceResult(state MixedServiceState, anchorID string, currentH
 		return MixedServiceState{}, MixedSettlement{}, errors.New("aetracore mixed anchor is already settled")
 	}
 	settlement := MixedSettlement{
-		AnchorID:      anchor.AnchorID,
-		ServiceID:     state.ServiceID,
-		ProviderKey:   state.ProviderKey,
-		Status:        MixedSettlementReleased,
-		SettledHeight: currentHeight,
-		PaymentDenom:  state.PaymentDenom,
-		PaymentAmount: anchor.PaymentAmount,
-		PaymentStatus: ServicePaymentStatusSettled,
+		AnchorID:	anchor.AnchorID,
+		ServiceID:	state.ServiceID,
+		ProviderKey:	state.ProviderKey,
+		Status:		MixedSettlementReleased,
+		SettledHeight:	currentHeight,
+		PaymentDenom:	state.PaymentDenom,
+		PaymentAmount:	anchor.PaymentAmount,
+		PaymentStatus:	ServicePaymentStatusSettled,
 	}
 	settlement.SettlementID = ComputeMixedSettlementID(settlement)
 	settlement.SettlementHash = ComputeMixedSettlementHash(settlement)
@@ -906,18 +906,18 @@ func settlementForResolvedDispute(state MixedServiceState, anchor MixedResultAnc
 		penaltyRecipient = dispute.Challenger
 	}
 	settlement := MixedSettlement{
-		AnchorID:         anchor.AnchorID,
-		DisputeID:        dispute.DisputeID,
-		ServiceID:        state.ServiceID,
-		ProviderKey:      state.ProviderKey,
-		Status:           status,
-		SettledHeight:    resolution.ResolvedHeight,
-		PaymentDenom:     state.PaymentDenom,
-		PaymentAmount:    anchor.PaymentAmount,
-		PaymentStatus:    paymentStatus,
-		PenaltyDenom:     penaltyDenom,
-		PenaltyAmount:    penaltyAmount,
-		PenaltyRecipient: penaltyRecipient,
+		AnchorID:		anchor.AnchorID,
+		DisputeID:		dispute.DisputeID,
+		ServiceID:		state.ServiceID,
+		ProviderKey:		state.ProviderKey,
+		Status:			status,
+		SettledHeight:		resolution.ResolvedHeight,
+		PaymentDenom:		state.PaymentDenom,
+		PaymentAmount:		anchor.PaymentAmount,
+		PaymentStatus:		paymentStatus,
+		PenaltyDenom:		penaltyDenom,
+		PenaltyAmount:		penaltyAmount,
+		PenaltyRecipient:	penaltyRecipient,
 	}
 	settlement.SettlementID = ComputeMixedSettlementID(settlement)
 	settlement.SettlementHash = ComputeMixedSettlementHash(settlement)

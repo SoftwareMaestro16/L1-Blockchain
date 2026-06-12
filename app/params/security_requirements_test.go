@@ -23,9 +23,9 @@ func TestConsensusSafetyRejectsNonDeterministicRisks(t *testing.T) {
 	economic := DefaultEconomicSafetyRequirements()
 
 	cases := []struct {
-		name    string
-		mutate  func(*ConsensusSafetyRequirements)
-		failure string
+		name	string
+		mutate	func(*ConsensusSafetyRequirements)
+		failure	string
 	}{
 		{"state transitions", func(r *ConsensusSafetyRequirements) { r.DeterministicStateTransitions = false }, SecurityRequirementDeterministicStateTransitions},
 		{"external calls", func(r *ConsensusSafetyRequirements) { r.NoNonDeterministicExternalCalls = false }, SecurityRequirementNoExternalConsensusCalls},
@@ -53,9 +53,9 @@ func TestEconomicSafetyRejectsInvariantGaps(t *testing.T) {
 	consensus := DefaultConsensusSafetyRequirements()
 
 	cases := []struct {
-		name    string
-		mutate  func(*EconomicSafetyRequirements)
-		failure string
+		name	string
+		mutate	func(*EconomicSafetyRequirements)
+		failure	string
 	}{
 		{"unbounded mint", func(r *EconomicSafetyRequirements) { r.NoUnboundedMint = false }, SecurityRequirementNoUnboundedMint},
 		{"module mint burn", func(r *EconomicSafetyRequirements) { r.NoUnauthorizedModuleAccountMintBurn = false }, SecurityRequirementNoUnauthorizedModuleMintBurn},
@@ -84,9 +84,9 @@ func TestPermissionSafetyRejectsAuthorityAndWiringGaps(t *testing.T) {
 	economic := DefaultEconomicSafetyRequirements()
 
 	cases := []struct {
-		name    string
-		mutate  func(*PermissionSafetyRequirements)
-		failure string
+		name	string
+		mutate	func(*PermissionSafetyRequirements)
+		failure	string
 	}{
 		{"module permissions startup", func(r *PermissionSafetyRequirements) { r.ModuleAccountPermissionsValidatedAtStartup = false }, SecurityRequirementModulePermissionsStartup},
 		{"reserved user tx signer", func(r *PermissionSafetyRequirements) { r.ReservedAddressesCannotSignUserTxs = false }, SecurityRequirementReservedCannotSignUserTxs},
@@ -135,9 +135,9 @@ func TestSlashingCannotUnderflowStake(t *testing.T) {
 
 func TestJailedValidatorsCannotReceiveActiveRewards(t *testing.T) {
 	eligible := ValidatorRewardEligibility{
-		ValidatorAddress: "aetravaloper1example",
-		ActiveSet:        true,
-		RewardNaet:       100,
+		ValidatorAddress:	"aetravaloper1example",
+		ActiveSet:		true,
+		RewardNaet:		100,
 	}
 	require.NoError(t, ValidateActiveValidatorRewardEligibility(eligible))
 

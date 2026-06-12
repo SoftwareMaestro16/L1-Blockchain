@@ -16,116 +16,116 @@ import (
 )
 
 const (
-	ModuleName = "native-evidence"
-	StoreKey   = ModuleName
+	ModuleName	= "native-evidence"
+	StoreKey	= ModuleName
 
-	SubmitterRoleReporter  = "reporter"
-	SubmitterRoleFisherman = "fisherman"
+	SubmitterRoleReporter	= "reporter"
+	SubmitterRoleFisherman	= "fisherman"
 
-	VoterRoleValidator = "validator"
-	VoterRoleFisherman = "fisherman"
+	VoterRoleValidator	= "validator"
+	VoterRoleFisherman	= "fisherman"
 
-	DefaultReporterDepositNaet        = int64(100_000_000)
-	DefaultFishermanDepositNaet       = int64(25_000_000)
-	DefaultInvalidEvidenceBurnBps     = uint32(5_000)
-	DefaultInvalidEvidenceRedirectBps = uint32(5_000)
+	DefaultReporterDepositNaet		= int64(100_000_000)
+	DefaultFishermanDepositNaet		= int64(25_000_000)
+	DefaultInvalidEvidenceBurnBps		= uint32(5_000)
+	DefaultInvalidEvidenceRedirectBps	= uint32(5_000)
 )
 
 type Params struct {
-	ReporterDepositNaet           sdkmath.Int
-	FishermanDepositNaet          sdkmath.Int
-	ReporterRewardBps             uint32
-	InvalidEvidenceBurnBps        uint32
-	InvalidEvidenceRedirectBps    uint32
-	Authority                     string
-	MaxEvidence                   uint32
-	MaxPendingEvidence            uint32
-	MaxProofHashBytes             uint32
-	MaxPayloadBytes               uint32
-	MaxVotes                      uint32
-	MaxSideEffectHistory          uint32
-	EvidenceTTLBlocks             uint64
-	ReviewQuorumBps               uint32
-	MinSlashFractionBps           uint32
-	MaxSlashFractionBps           uint32
-	CriticalFaultSlashFractionBps uint32
-	MaxReporterRewardNaet         uint64
-	DoubleSignJailBlocks          uint64
-	DowntimeFirstJailBlocks       uint64
-	DowntimeRepeatJailBlocks      uint64
-	FrozenStakeBlocks             uint64
-	DowntimeRepeatMultiplier      uint32
-	DowntimeChronicMultiplier     uint32
+	ReporterDepositNaet		sdkmath.Int
+	FishermanDepositNaet		sdkmath.Int
+	ReporterRewardBps		uint32
+	InvalidEvidenceBurnBps		uint32
+	InvalidEvidenceRedirectBps	uint32
+	Authority			string
+	MaxEvidence			uint32
+	MaxPendingEvidence		uint32
+	MaxProofHashBytes		uint32
+	MaxPayloadBytes			uint32
+	MaxVotes			uint32
+	MaxSideEffectHistory		uint32
+	EvidenceTTLBlocks		uint64
+	ReviewQuorumBps			uint32
+	MinSlashFractionBps		uint32
+	MaxSlashFractionBps		uint32
+	CriticalFaultSlashFractionBps	uint32
+	MaxReporterRewardNaet		uint64
+	DoubleSignJailBlocks		uint64
+	DowntimeFirstJailBlocks		uint64
+	DowntimeRepeatJailBlocks	uint64
+	FrozenStakeBlocks		uint64
+	DowntimeRepeatMultiplier	uint32
+	DowntimeChronicMultiplier	uint32
 }
 
 type EvidenceSubmission struct {
-	Evidence          postypes.EvidenceRecord
-	SubmitterID       string
-	SubmitterRole     string
-	DepositNaet       sdkmath.Int
-	SubmittedHeight   int64
-	SubmissionHash    string
-	ProofPayload      EvidenceProofPayload
-	VerificationGroup postypes.EvidenceVerificationGroup
+	Evidence		postypes.EvidenceRecord
+	SubmitterID		string
+	SubmitterRole		string
+	DepositNaet		sdkmath.Int
+	SubmittedHeight		int64
+	SubmissionHash		string
+	ProofPayload		EvidenceProofPayload
+	VerificationGroup	postypes.EvidenceVerificationGroup
 }
 
 type EvidenceProofPayload struct {
-	EvidenceID       string
-	ObjectHash       string
-	ProofPayloadHash string
-	PayloadSignature string
+	EvidenceID		string
+	ObjectHash		string
+	ProofPayloadHash	string
+	PayloadSignature	string
 }
 
 type EvidenceDecisionVote struct {
-	EvidenceID     string
-	VoterID        string
-	VoterRole      string
-	Accept         bool
-	VotingPowerBps uint32
-	SignatureHash  string
-	Height         int64
+	EvidenceID	string
+	VoterID		string
+	VoterRole	string
+	Accept		bool
+	VotingPowerBps	uint32
+	SignatureHash	string
+	Height		int64
 }
 
 type EvidenceMarketSettlement struct {
-	EvidenceID            string
-	SubmitterID           string
-	SubmitterRole         string
-	ValidEvidence         bool
-	DepositReturnedNaet   sdkmath.Int
-	DepositBurnedNaet     sdkmath.Int
-	DepositRedirectedNaet sdkmath.Int
-	RewardNaet            sdkmath.Int
-	TotalPayoutNaet       sdkmath.Int
-	PenaltyAmountNaet     sdkmath.Int
-	SettlementHash        string
+	EvidenceID		string
+	SubmitterID		string
+	SubmitterRole		string
+	ValidEvidence		bool
+	DepositReturnedNaet	sdkmath.Int
+	DepositBurnedNaet	sdkmath.Int
+	DepositRedirectedNaet	sdkmath.Int
+	RewardNaet		sdkmath.Int
+	TotalPayoutNaet		sdkmath.Int
+	PenaltyAmountNaet	sdkmath.Int
+	SettlementHash		string
 }
 
 func DefaultParams() Params {
 	return Params{
-		ReporterDepositNaet:           sdkmath.NewInt(DefaultReporterDepositNaet),
-		FishermanDepositNaet:          sdkmath.NewInt(DefaultFishermanDepositNaet),
-		ReporterRewardBps:             postypes.DefaultReporterRewardBps,
-		InvalidEvidenceBurnBps:        DefaultInvalidEvidenceBurnBps,
-		InvalidEvidenceRedirectBps:    DefaultInvalidEvidenceRedirectBps,
-		Authority:                     prototype.DefaultAuthority,
-		MaxEvidence:                   MaxEvidenceV1,
-		MaxPendingEvidence:            MaxPendingEvidenceV1,
-		MaxProofHashBytes:             MaxProofHashBytesV1,
-		MaxPayloadBytes:               MaxPayloadBytesV1,
-		MaxVotes:                      MaxVotesV1,
-		MaxSideEffectHistory:          MaxSideEffectHistoryV1,
-		EvidenceTTLBlocks:             DefaultEvidenceTTLBlocks,
-		ReviewQuorumBps:               DefaultReviewQuorumBps,
-		MinSlashFractionBps:           DefaultMinSlashFractionBps,
-		MaxSlashFractionBps:           DefaultMaxSlashFractionBps,
-		CriticalFaultSlashFractionBps: DefaultCriticalSlashFractionBps,
-		MaxReporterRewardNaet:         DefaultReporterRewardNaet,
-		DoubleSignJailBlocks:          DefaultDoubleSignJailBlocks,
-		DowntimeFirstJailBlocks:       DefaultDowntimeFirstJailBlocks,
-		DowntimeRepeatJailBlocks:      DefaultDowntimeRepeatJailBlocks,
-		FrozenStakeBlocks:             DefaultFrozenStakeBlocks,
-		DowntimeRepeatMultiplier:      DefaultDowntimeRepeatMultiplier,
-		DowntimeChronicMultiplier:     DefaultDowntimeChronicMultiplier,
+		ReporterDepositNaet:		sdkmath.NewInt(DefaultReporterDepositNaet),
+		FishermanDepositNaet:		sdkmath.NewInt(DefaultFishermanDepositNaet),
+		ReporterRewardBps:		postypes.DefaultReporterRewardBps,
+		InvalidEvidenceBurnBps:		DefaultInvalidEvidenceBurnBps,
+		InvalidEvidenceRedirectBps:	DefaultInvalidEvidenceRedirectBps,
+		Authority:			prototype.DefaultAuthority,
+		MaxEvidence:			MaxEvidenceV1,
+		MaxPendingEvidence:		MaxPendingEvidenceV1,
+		MaxProofHashBytes:		MaxProofHashBytesV1,
+		MaxPayloadBytes:		MaxPayloadBytesV1,
+		MaxVotes:			MaxVotesV1,
+		MaxSideEffectHistory:		MaxSideEffectHistoryV1,
+		EvidenceTTLBlocks:		DefaultEvidenceTTLBlocks,
+		ReviewQuorumBps:		DefaultReviewQuorumBps,
+		MinSlashFractionBps:		DefaultMinSlashFractionBps,
+		MaxSlashFractionBps:		DefaultMaxSlashFractionBps,
+		CriticalFaultSlashFractionBps:	DefaultCriticalSlashFractionBps,
+		MaxReporterRewardNaet:		DefaultReporterRewardNaet,
+		DoubleSignJailBlocks:		DefaultDoubleSignJailBlocks,
+		DowntimeFirstJailBlocks:	DefaultDowntimeFirstJailBlocks,
+		DowntimeRepeatJailBlocks:	DefaultDowntimeRepeatJailBlocks,
+		FrozenStakeBlocks:		DefaultFrozenStakeBlocks,
+		DowntimeRepeatMultiplier:	DefaultDowntimeRepeatMultiplier,
+		DowntimeChronicMultiplier:	DefaultDowntimeChronicMultiplier,
 	}
 }
 
@@ -223,13 +223,13 @@ func SubmitEvidence(params Params, existing []EvidenceSubmission, evidence posty
 		return EvidenceSubmission{}, errors.New("verification group evidence id mismatch")
 	}
 	submission := EvidenceSubmission{
-		Evidence:          evidence,
-		SubmitterID:       submitterID,
-		SubmitterRole:     submitterRole,
-		DepositNaet:       deposit,
-		SubmittedHeight:   evidence.SubmittedHeight,
-		ProofPayload:      proof,
-		VerificationGroup: group,
+		Evidence:		evidence,
+		SubmitterID:		submitterID,
+		SubmitterRole:		submitterRole,
+		DepositNaet:		deposit,
+		SubmittedHeight:	evidence.SubmittedHeight,
+		ProofPayload:		proof,
+		VerificationGroup:	group,
 	}
 	submission.SubmissionHash = ComputeSubmissionHash(submission)
 	return submission, submission.Validate()
@@ -288,24 +288,24 @@ func (p EvidenceProofPayload) Validate(evidence postypes.EvidenceRecord) error {
 
 func SelectVerificationGroup(params postypes.Params, epoch postypes.EpochRecord, validators []postypes.ScoredValidator, evidence postypes.EvidenceRecord, minimumGroupSize uint32, decisionThresholdBps uint32) (postypes.EvidenceVerificationGroup, error) {
 	return postypes.SelectEvidenceVerificationGroup(postypes.EvidenceVerificationGroupInput{
-		Params:               params,
-		Epoch:                epoch,
-		ActiveValidators:     validators,
-		Evidence:             evidence,
-		MinimumGroupSize:     minimumGroupSize,
-		DecisionThresholdBps: decisionThresholdBps,
+		Params:			params,
+		Epoch:			epoch,
+		ActiveValidators:	validators,
+		Evidence:		evidence,
+		MinimumGroupSize:	minimumGroupSize,
+		DecisionThresholdBps:	decisionThresholdBps,
 	})
 }
 
 func NewDecisionVote(evidenceID string, voterID string, voterRole string, accept bool, votingPowerBps uint32, signatureHash string, height int64, activeValidators []string) (EvidenceDecisionVote, error) {
 	vote := EvidenceDecisionVote{
-		EvidenceID:     strings.TrimSpace(evidenceID),
-		VoterID:        strings.TrimSpace(voterID),
-		VoterRole:      strings.TrimSpace(voterRole),
-		Accept:         accept,
-		VotingPowerBps: votingPowerBps,
-		SignatureHash:  strings.TrimSpace(signatureHash),
-		Height:         height,
+		EvidenceID:	strings.TrimSpace(evidenceID),
+		VoterID:	strings.TrimSpace(voterID),
+		VoterRole:	strings.TrimSpace(voterRole),
+		Accept:		accept,
+		VotingPowerBps:	votingPowerBps,
+		SignatureHash:	strings.TrimSpace(signatureHash),
+		Height:		height,
 	}
 	return vote, vote.Validate(activeValidators)
 }
@@ -352,16 +352,16 @@ func SettleMarketplace(params Params, submission EvidenceSubmission, validEviden
 		return EvidenceMarketSettlement{}, errors.New("evidence penalty amount cannot be negative")
 	}
 	settlement := EvidenceMarketSettlement{
-		EvidenceID:            submission.Evidence.EvidenceID,
-		SubmitterID:           submission.SubmitterID,
-		SubmitterRole:         submission.SubmitterRole,
-		ValidEvidence:         validEvidence,
-		DepositReturnedNaet:   sdkmath.ZeroInt(),
-		DepositBurnedNaet:     sdkmath.ZeroInt(),
-		DepositRedirectedNaet: sdkmath.ZeroInt(),
-		RewardNaet:            sdkmath.ZeroInt(),
-		TotalPayoutNaet:       sdkmath.ZeroInt(),
-		PenaltyAmountNaet:     penaltyAmount,
+		EvidenceID:		submission.Evidence.EvidenceID,
+		SubmitterID:		submission.SubmitterID,
+		SubmitterRole:		submission.SubmitterRole,
+		ValidEvidence:		validEvidence,
+		DepositReturnedNaet:	sdkmath.ZeroInt(),
+		DepositBurnedNaet:	sdkmath.ZeroInt(),
+		DepositRedirectedNaet:	sdkmath.ZeroInt(),
+		RewardNaet:		sdkmath.ZeroInt(),
+		TotalPayoutNaet:	sdkmath.ZeroInt(),
+		PenaltyAmountNaet:	penaltyAmount,
 	}
 	if validEvidence {
 		reward := mulIntBps(penaltyAmount, params.ReporterRewardBps)

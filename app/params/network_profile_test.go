@@ -135,37 +135,37 @@ func TestValidatorSetPhasePoliciesMatchAetraGrowthPlan(t *testing.T) {
 	require.Len(t, phases, 3)
 
 	require.Equal(t, ValidatorSetPhasePolicy{
-		Name:                     AetraValidatorPhaseGenesis,
-		MinActiveValidators:      100,
-		MaxActiveValidators:      128,
-		BlockTimeMinSeconds:      5,
-		BlockTimeMaxSeconds:      6,
-		TargetBlockTimeSeconds:   6,
-		NormalFinalityMinSeconds: 5,
-		NormalFinalityMaxSeconds: 10,
+		Name:				AetraValidatorPhaseGenesis,
+		MinActiveValidators:		100,
+		MaxActiveValidators:		128,
+		BlockTimeMinSeconds:		5,
+		BlockTimeMaxSeconds:		6,
+		TargetBlockTimeSeconds:		6,
+		NormalFinalityMinSeconds:	5,
+		NormalFinalityMaxSeconds:	10,
 	}, phases[0])
 
 	require.Equal(t, ValidatorSetPhasePolicy{
-		Name:                     AetraValidatorPhaseGrowth,
-		MinActiveValidators:      150,
-		MaxActiveValidators:      200,
-		BlockTimeMinSeconds:      6,
-		BlockTimeMaxSeconds:      6,
-		TargetBlockTimeSeconds:   6,
-		NormalFinalityMinSeconds: 6,
-		NormalFinalityMaxSeconds: 12,
+		Name:				AetraValidatorPhaseGrowth,
+		MinActiveValidators:		150,
+		MaxActiveValidators:		200,
+		BlockTimeMinSeconds:		6,
+		BlockTimeMaxSeconds:		6,
+		TargetBlockTimeSeconds:		6,
+		NormalFinalityMinSeconds:	6,
+		NormalFinalityMaxSeconds:	12,
 	}, phases[1])
 
 	require.Equal(t, ValidatorSetPhasePolicy{
-		Name:                      AetraValidatorPhaseMature,
-		MinActiveValidators:       250,
-		MaxActiveValidators:       300,
-		BlockTimeMinSeconds:       7,
-		BlockTimeMaxSeconds:       8,
-		TargetBlockTimeSeconds:    8,
-		NormalFinalityMinSeconds:  8,
-		NormalFinalityMaxSeconds:  15,
-		RequiresOperatorReadiness: true,
+		Name:				AetraValidatorPhaseMature,
+		MinActiveValidators:		250,
+		MaxActiveValidators:		300,
+		BlockTimeMinSeconds:		7,
+		BlockTimeMaxSeconds:		8,
+		TargetBlockTimeSeconds:		8,
+		NormalFinalityMinSeconds:	8,
+		NormalFinalityMaxSeconds:	15,
+		RequiresOperatorReadiness:	true,
 	}, phases[2])
 }
 

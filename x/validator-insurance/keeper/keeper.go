@@ -18,18 +18,18 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
-func NewKeeper() Keeper { return Keeper{genesis: DefaultGenesis()} }
+func NewKeeper() Keeper	{ return Keeper{genesis: DefaultGenesis()} }
 
 func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 	return Keeper{genesis: DefaultGenesis(), storeService: storeService}
@@ -67,7 +67,7 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 	return prefixgenesis.Save(ctx, k.storeService, genesisKey, k.genesis)
 }
 
-func (k Keeper) ExportGenesis() GenesisState { return cloneGenesis(k.genesis) }
+func (k Keeper) ExportGenesis() GenesisState	{ return cloneGenesis(k.genesis) }
 
 func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
@@ -151,11 +151,11 @@ func (k *Keeper) WithdrawValidatorInsurance(msg types.MsgWithdrawValidatorInsura
 	}
 	insurance.Balance = remaining
 	insurance.PendingWithdrawal = types.PendingInsuranceWithdrawal{
-		Amount:         msg.Amount,
-		Recipient:      msg.Recipient,
-		RequestHeight:  msg.Height,
-		CompleteHeight: msg.Height + k.genesis.Params.WithdrawalLockBlocks,
-		Status:         types.WithdrawalStatusPending,
+		Amount:		msg.Amount,
+		Recipient:	msg.Recipient,
+		RequestHeight:	msg.Height,
+		CompleteHeight:	msg.Height + k.genesis.Params.WithdrawalLockBlocks,
+		Status:		types.WithdrawalStatusPending,
 	}
 	if _, err := k.saveInsurance(idx, insurance); err != nil {
 		return types.PendingInsuranceWithdrawal{}, err
@@ -177,13 +177,13 @@ func (k *Keeper) SubmitInsuranceClaim(msg types.MsgSubmitInsuranceClaim) (types.
 		return types.InsuranceClaim{}, errors.New("validator insurance not found")
 	}
 	claim := types.InsuranceClaim{
-		ClaimID:          msg.ClaimID,
-		ValidatorAddress: msg.ValidatorAddress,
-		Claimant:         msg.Claimant,
-		Amount:           msg.Amount,
-		Status:           types.ClaimStatusPending,
-		Reason:           strings.TrimSpace(msg.Reason),
-		SubmittedHeight:  msg.Height,
+		ClaimID:		msg.ClaimID,
+		ValidatorAddress:	msg.ValidatorAddress,
+		Claimant:		msg.Claimant,
+		Amount:			msg.Amount,
+		Status:			types.ClaimStatusPending,
+		Reason:			strings.TrimSpace(msg.Reason),
+		SubmittedHeight:	msg.Height,
 	}
 	if err := claim.Validate(k.genesis.Params); err != nil {
 		return types.InsuranceClaim{}, err
@@ -265,11 +265,11 @@ func (k *Keeper) ApplyValidatorSlash(validatorAddress string, slashAmount uint64
 		return types.SlashCoverageResult{}, err
 	}
 	return types.SlashCoverageResult{
-		ValidatorAddress: validatorAddress,
-		SlashAmount:      slashAmount,
-		CoveredAmount:    covered,
-		RemainingPenalty: slashAmount - covered,
-		CoverageBps:      coverageBps,
+		ValidatorAddress:	validatorAddress,
+		SlashAmount:		slashAmount,
+		CoveredAmount:		covered,
+		RemainingPenalty:	slashAmount - covered,
+		CoverageBps:		coverageBps,
 	}, nil
 }
 
@@ -313,12 +313,12 @@ func (k Keeper) InsuranceClaims(validatorAddress string) []types.InsuranceClaim 
 	return types.SortClaims(claims)
 }
 
-func (k Keeper) InsuranceParams() types.Params { return k.genesis.Params }
+func (k Keeper) InsuranceParams() types.Params	{ return k.genesis.Params }
 
 type Migrator struct{ keeper *Keeper }
 
-func NewMigrator(k *Keeper) Migrator  { return Migrator{keeper: k} }
-func (m Migrator) Migrate1to2() error { return m.keeper.ExportGenesis().Validate() }
+func NewMigrator(k *Keeper) Migrator	{ return Migrator{keeper: k} }
+func (m Migrator) Migrate1to2() error	{ return m.keeper.ExportGenesis().Validate() }
 func (k Keeper) Migrate1to2State(ctx context.Context) error {
 	_, err := k.ExportGenesisState(ctx)
 	return err

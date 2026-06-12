@@ -36,11 +36,11 @@ func TestResolverModuleValidationV2RecordTTLReverseBatchAndProof(t *testing.T) {
 
 	badInterface := record
 	badInterface.InterfaceDescriptors = []InterfaceDescriptorV2{{
-		InterfaceID:          "wallet",
-		SchemaHash:           InterfaceDescriptorHashPrefixV2 + identityHash("wrong"),
-		SchemaInlineOptional: `{"kind":"wallet"}`,
-		Version:              "v1",
-		RenderPolicy:         "wallet_confirm",
+		InterfaceID:		"wallet",
+		SchemaHash:		InterfaceDescriptorHashPrefixV2 + identityHash("wrong"),
+		SchemaInlineOptional:	`{"kind":"wallet"}`,
+		Version:		"v1",
+		RenderPolicy:		"wallet_confirm",
 	}}
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(badInterface), "inline schema hash mismatch")
 
@@ -56,16 +56,16 @@ func TestResolverModuleValidationV2RecordTTLReverseBatchAndProof(t *testing.T) {
 	require.ErrorContains(t, ValidateReverseResolutionRecordV2(state, mismatch, 16, nil), "forward primary or authorized alias")
 
 	msg := MsgBatchUpdateResolversV2{
-		Auth: resolverModuleAuth(addr(1), IdentitySignerScopeBatchAdmin, 1),
+		Auth:	resolverModuleAuth(addr(1), IdentitySignerScopeBatchAdmin, 1),
 		Updates: []ResolverBatchUpdateV2{
 			{Name: "alice.aet", NameHash: mustDomainHashV2(t, "alice.aet"), Patch: ResolverPatch{Primary: addr(3)}, ExpectedRecordVersion: ResolverRecordVersionV2(state.Resolvers[0]), RecordTTL: 30},
 		},
 	}
 	next, response, err := ExecuteResolverModuleBatchUpdateV2(state, msg, IdentityBatchResolverUpdateOptionsV2{
-		Mode:         IdentityBatchFailureAtomicV2,
-		Height:       16,
-		GasPerUpdate: MinIdentityBatchResolverUpdateGasV2,
-		GasLimit:     MinIdentityBatchResolverUpdateGasV2,
+		Mode:		IdentityBatchFailureAtomicV2,
+		Height:		16,
+		GasPerUpdate:	MinIdentityBatchResolverUpdateGasV2,
+		GasLimit:	MinIdentityBatchResolverUpdateGasV2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), response.Successes)
@@ -110,12 +110,12 @@ func TestSubdomainModuleBreakdownV2CoversSection133(t *testing.T) {
 func TestSubdomainModuleValidationV2DelegationZoneIndexAndPath(t *testing.T) {
 	state := validIdentityCoreState(t)
 	next, subdomain, err := IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:     "alice.aet",
-		Label:          "api",
-		Actor:          addr(1),
-		ChildOwner:     addr(2),
-		Height:         20,
-		DelegationType: SubdomainDelegationOwnerControlledV2,
+		ParentName:	"alice.aet",
+		Label:		"api",
+		Actor:		addr(1),
+		ChildOwner:	addr(2),
+		Height:		20,
+		DelegationType:	SubdomainDelegationOwnerControlledV2,
 	})
 	require.NoError(t, err)
 	report, err := BuildSubdomainModuleIndexV2(next)
@@ -126,13 +126,13 @@ func TestSubdomainModuleValidationV2DelegationZoneIndexAndPath(t *testing.T) {
 	require.True(t, strings.HasPrefix(report.Index[0].StoreKey, IdentityStoreV2SpecSubdomainsPrefix+"/"))
 
 	tooLong := SubdomainCreationPolicyV2{
-		ParentName:        "alice.aet",
-		Label:             "paid",
-		Actor:             addr(1),
-		ChildOwner:        addr(2),
-		Height:            21,
-		ChildExpiryHeight: next.Domains[0].ExpiryHeight + 10,
-		DelegationType:    SubdomainDelegationOwnerControlledV2,
+		ParentName:		"alice.aet",
+		Label:			"paid",
+		Actor:			addr(1),
+		ChildOwner:		addr(2),
+		Height:			21,
+		ChildExpiryHeight:	next.Domains[0].ExpiryHeight + 10,
+		DelegationType:		SubdomainDelegationOwnerControlledV2,
 	}
 	_, err = ValidateSubdomainCreationV2(next, tooLong)
 	require.ErrorContains(t, err, "child expiry")
@@ -154,15 +154,15 @@ func TestSubdomainModuleValidationV2DelegationZoneIndexAndPath(t *testing.T) {
 	require.True(t, strings.HasPrefix(delegationKey, IdentityStoreV2SpecDelegationsPrefix+"/"))
 
 	parentPolicy, err := NewZonePolicyV2("alice.aet", ZonePolicyV2{
-		AllowedRecordTypes:      []string{"primary", "service"},
-		AllowedServiceTypes:     []string{"rpc.v1"},
-		SubdomainCreationPolicy: ZoneSubdomainCreationDelegatedV2,
-		ResolverUpdatePolicy:    ZoneResolverUpdateDelegatedV2,
-		InterfacePolicy:         ZoneInterfacePolicyHashRequiredV2,
-		RoutingPolicy:           ZoneRoutingPolicyExplicitTargetsV2,
-		MaxChildDepth:           1,
-		MaxChildRecords:         2,
-		UpdatedAtHeight:         20,
+		AllowedRecordTypes:		[]string{"primary", "service"},
+		AllowedServiceTypes:		[]string{"rpc.v1"},
+		SubdomainCreationPolicy:	ZoneSubdomainCreationDelegatedV2,
+		ResolverUpdatePolicy:		ZoneResolverUpdateDelegatedV2,
+		InterfacePolicy:		ZoneInterfacePolicyHashRequiredV2,
+		RoutingPolicy:			ZoneRoutingPolicyExplicitTargetsV2,
+		MaxChildDepth:			1,
+		MaxChildRecords:		2,
+		UpdatedAtHeight:		20,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateZonePolicyForSubdomainV2(parentPolicy, subdomain, 1, 2, "primary", "rpc.v1"))
@@ -189,8 +189,8 @@ func resolverModuleState(t *testing.T) IdentityState {
 	state := validIdentityCoreState(t)
 	var err error
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(4),
+		Primary:	addr(2),
+		Contract:	addr(4),
 	}, 12)
 	require.NoError(t, err)
 	require.NoError(t, state.Validate())
@@ -199,12 +199,12 @@ func resolverModuleState(t *testing.T) IdentityState {
 
 func resolverModuleAuth(signer []byte, scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:                  "aetra-local-1",
-		Signer:                   signer,
-		Scope:                    scope,
-		NameNormalizationVersion: NameNormalizationVersionV2,
-		Nonce:                    nonce,
-		Fee:                      1,
-		StorageCost:              1,
+		ChainID:			"aetra-local-1",
+		Signer:				signer,
+		Scope:				scope,
+		NameNormalizationVersion:	NameNormalizationVersionV2,
+		Nonce:				nonce,
+		Fee:				1,
+		StorageCost:			1,
 	}
 }

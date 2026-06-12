@@ -39,19 +39,19 @@ func TestAVMNativeModuleRouteRequiresDescriptorReceiptAndZoneIsolation(t *testin
 	descriptor := testAVMNativeModuleDescriptor(t)
 	receipt := testAVMNativeModuleReceipt(t, descriptor.ZoneID, AVMReceiptStatusExecuted)
 	call, err := NewAVMNativeModuleRouteCall(AVMNativeModuleRouteCall{
-		Descriptor:          descriptor,
-		RouteKey:            "financial.bank.send",
-		Method:              "MsgSend",
-		ZoneID:              descriptor.ZoneID,
-		Lane:                RouterLaneSync,
-		Backend:             RouterBackendNativeModule,
-		DispatchMode:        RouterDispatchModeDirect,
-		ReceiptPolicy:       RouterReceiptCommit,
-		GasMeter:            RouterGasMeter{Class: RouterGasClassStandard, Limit: 100, Reserved: 80},
-		Receipt:             receipt,
-		CalledThroughAVM:    true,
-		UsesInterfaceSystem: true,
-		StateWriteZones:     []zonestypes.ZoneID{descriptor.ZoneID},
+		Descriptor:		descriptor,
+		RouteKey:		"financial.bank.send",
+		Method:			"MsgSend",
+		ZoneID:			descriptor.ZoneID,
+		Lane:			RouterLaneSync,
+		Backend:		RouterBackendNativeModule,
+		DispatchMode:		RouterDispatchModeDirect,
+		ReceiptPolicy:		RouterReceiptCommit,
+		GasMeter:		RouterGasMeter{Class: RouterGasClassStandard, Limit: 100, Reserved: 80},
+		Receipt:		receipt,
+		CalledThroughAVM:	true,
+		UsesInterfaceSystem:	true,
+		StateWriteZones:	[]zonestypes.ZoneID{descriptor.ZoneID},
 	})
 	require.NoError(t, err)
 	require.NoError(t, call.Validate())
@@ -73,19 +73,19 @@ func TestAVMNativeModuleRejectsNonNativeBackendMissingInterfaceAndUnknownMethod(
 	descriptor := testAVMNativeModuleDescriptor(t)
 	receipt := testAVMNativeModuleReceipt(t, descriptor.ZoneID, AVMReceiptStatusExecuted)
 	valid := AVMNativeModuleRouteCall{
-		Descriptor:          descriptor,
-		RouteKey:            "financial.bank.send",
-		Method:              "MsgSend",
-		ZoneID:              descriptor.ZoneID,
-		Lane:                RouterLaneSync,
-		Backend:             RouterBackendNativeModule,
-		DispatchMode:        RouterDispatchModeDirect,
-		ReceiptPolicy:       RouterReceiptCommit,
-		GasMeter:            RouterGasMeter{Class: RouterGasClassStandard, Limit: 100, Reserved: 80},
-		Receipt:             receipt,
-		CalledThroughAVM:    true,
-		UsesInterfaceSystem: true,
-		StateWriteZones:     []zonestypes.ZoneID{descriptor.ZoneID},
+		Descriptor:		descriptor,
+		RouteKey:		"financial.bank.send",
+		Method:			"MsgSend",
+		ZoneID:			descriptor.ZoneID,
+		Lane:			RouterLaneSync,
+		Backend:		RouterBackendNativeModule,
+		DispatchMode:		RouterDispatchModeDirect,
+		ReceiptPolicy:		RouterReceiptCommit,
+		GasMeter:		RouterGasMeter{Class: RouterGasClassStandard, Limit: 100, Reserved: 80},
+		Receipt:		receipt,
+		CalledThroughAVM:	true,
+		UsesInterfaceSystem:	true,
+		StateWriteZones:	[]zonestypes.ZoneID{descriptor.ZoneID},
 	}
 
 	wrongBackend := valid
@@ -107,13 +107,13 @@ func TestAVMNativeModuleRejectsNonNativeBackendMissingInterfaceAndUnknownMethod(
 func testAVMNativeModuleDescriptor(t *testing.T) AVMNativeModuleDescriptor {
 	t.Helper()
 	descriptor, err := NewAVMNativeModuleDescriptor(AVMNativeModuleDescriptor{
-		ModuleName:           "bank",
-		ZoneID:               zonestypes.ZoneIDFinancial,
-		KeeperService:        "x.bank.Keeper",
-		MsgServerService:     "cosmos.bank.v1.MsgServer",
-		ServiceInterfaceHash: engineHash("bank-interface"),
-		AllowedMessageTypes:  []string{"financial.transfer"},
-		AllowedMethods:       []string{"MsgSend", "MsgMultiSend"},
+		ModuleName:		"bank",
+		ZoneID:			zonestypes.ZoneIDFinancial,
+		KeeperService:		"x.bank.Keeper",
+		MsgServerService:	"cosmos.bank.v1.MsgServer",
+		ServiceInterfaceHash:	engineHash("bank-interface"),
+		AllowedMessageTypes:	[]string{"financial.transfer"},
+		AllowedMethods:		[]string{"MsgSend", "MsgMultiSend"},
 	})
 	require.NoError(t, err)
 	return descriptor
@@ -122,15 +122,15 @@ func testAVMNativeModuleDescriptor(t *testing.T) AVMNativeModuleDescriptor {
 func testAVMNativeModuleReceipt(t *testing.T, zoneID zonestypes.ZoneID, status AVMReceiptStatus) AVMExecutionReceipt {
 	t.Helper()
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          engineHash("native-module-message"),
-		ZoneID:             zoneID,
-		Executor:           "native-bank-msgserver",
-		Status:             status,
-		GasUsed:            12,
-		StorageWritten:     1,
-		EventsHash:         engineHash("native-events"),
-		OutputMessagesRoot: engineHash("native-output"),
-		CreatedHeight:      21,
+		MessageID:		engineHash("native-module-message"),
+		ZoneID:			zoneID,
+		Executor:		"native-bank-msgserver",
+		Status:			status,
+		GasUsed:		12,
+		StorageWritten:		1,
+		EventsHash:		engineHash("native-events"),
+		OutputMessagesRoot:	engineHash("native-output"),
+		CreatedHeight:		21,
 	})
 	require.NoError(t, err)
 	return receipt

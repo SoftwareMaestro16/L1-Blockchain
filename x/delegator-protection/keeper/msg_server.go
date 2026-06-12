@@ -12,7 +12,7 @@ var _ delegatorprotectionpb.MsgServer = msgServer{}
 
 type msgServer struct{ Keeper }
 
-func NewMsgServerImpl(k Keeper) delegatorprotectionpb.MsgServer { return msgServer{Keeper: k} }
+func NewMsgServerImpl(k Keeper) delegatorprotectionpb.MsgServer	{ return msgServer{Keeper: k} }
 
 func (m msgServer) SubmitDelegatorProtectionClaim(ctx context.Context, msg *delegatorprotectionpb.MsgSubmitDelegatorProtectionClaim) (*delegatorprotectionpb.MsgSubmitDelegatorProtectionClaimResponse, error) {
 	state, err := m.GetState(ctx)

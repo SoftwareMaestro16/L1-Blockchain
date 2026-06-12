@@ -192,8 +192,8 @@ func TestServiceRegistryQueriesValidateInputsAndPagination(t *testing.T) {
 	require.ErrorContains(t, err, "call id")
 
 	result, err := state.QueryServicesByOwner(QueryServicesByOwner{
-		Owner:      service.Owner,
-		Pagination: QueryPagination{Offset: 100, Limit: MaxQueryLimit + 1},
+		Owner:		service.Owner,
+		Pagination:	QueryPagination{Offset: 100, Limit: MaxQueryLimit + 1},
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), result.Total)
@@ -205,13 +205,13 @@ func testRegistryAPIReceipt(t *testing.T, service ServiceDescriptor) ServiceRece
 	ctx := ServiceConsensusContext{ChainID: "aetra-test", Height: 50}
 	call := servicePipelineCall(ctx, service, "resolve", ServiceCallKindOnChain, 1, "identity/state", "1")
 	receipt, err := NewServiceCallReceipt(call, ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         ServiceCallStatusExecuted,
-		ResponseHash:   testHash("identity/response"),
-		PaymentStatus:  ServicePaymentStatusSettled,
-		GasUsed:        100,
-		ExecutedHeight: 50,
-		AnchoredHeight: 50,
+		CallID:		call.CallID,
+		Status:		ServiceCallStatusExecuted,
+		ResponseHash:	testHash("identity/response"),
+		PaymentStatus:	ServicePaymentStatusSettled,
+		GasUsed:	100,
+		ExecutedHeight:	50,
+		AnchoredHeight:	50,
 	})
 	require.NoError(t, err)
 	return receipt

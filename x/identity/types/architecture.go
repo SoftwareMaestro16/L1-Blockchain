@@ -10,70 +10,70 @@ import (
 type IdentityV2Component string
 
 const (
-	IdentityV2Root               IdentityV2Component = "x/identity v2"
-	IdentityV2Core               IdentityV2Component = "identity core"
-	IdentityV2Resolver           IdentityV2Component = "resolver module"
-	IdentityV2Subdomain          IdentityV2Component = "subdomain module"
-	IdentityV2Auction            IdentityV2Component = "auction module"
-	IdentityV2Proof              IdentityV2Component = "proof module"
-	IdentityV2RoutingIntegration IdentityV2Component = "routing integration"
+	IdentityV2Root			IdentityV2Component	= "x/identity v2"
+	IdentityV2Core			IdentityV2Component	= "identity core"
+	IdentityV2Resolver		IdentityV2Component	= "resolver module"
+	IdentityV2Subdomain		IdentityV2Component	= "subdomain module"
+	IdentityV2Auction		IdentityV2Component	= "auction module"
+	IdentityV2Proof			IdentityV2Component	= "proof module"
+	IdentityV2RoutingIntegration	IdentityV2Component	= "routing integration"
 )
 
 type IdentityV2ModuleSpec struct {
-	Component       IdentityV2Component
-	Parent          IdentityV2Component
-	DependsOn       []IdentityV2Component
-	OwnsPrefixes    []string
-	ProofProducer   bool
-	RoutingConsumer bool
+	Component	IdentityV2Component
+	Parent		IdentityV2Component
+	DependsOn	[]IdentityV2Component
+	OwnsPrefixes	[]string
+	ProofProducer	bool
+	RoutingConsumer	bool
 }
 
 type IdentityV2Architecture struct {
-	Root    IdentityV2Component
-	Modules []IdentityV2ModuleSpec
+	Root	IdentityV2Component
+	Modules	[]IdentityV2ModuleSpec
 }
 
 func DefaultIdentityV2Architecture() IdentityV2Architecture {
 	return IdentityV2Architecture{
-		Root: IdentityV2Root,
+		Root:	IdentityV2Root,
 		Modules: []IdentityV2ModuleSpec{
 			{
-				Component:     IdentityV2Core,
-				Parent:        IdentityV2Root,
-				OwnsPrefixes:  []string{IdentityStoreV2DomainPrefix, IdentityStoreV2NFTPrefix, IdentityStoreV2OwnerIndexPrefix, IdentityStoreV2CommitPrefix},
-				ProofProducer: true,
+				Component:	IdentityV2Core,
+				Parent:		IdentityV2Root,
+				OwnsPrefixes:	[]string{IdentityStoreV2DomainPrefix, IdentityStoreV2NFTPrefix, IdentityStoreV2OwnerIndexPrefix, IdentityStoreV2CommitPrefix},
+				ProofProducer:	true,
 			},
 			{
-				Component:     IdentityV2Resolver,
-				Parent:        IdentityV2Root,
-				DependsOn:     []IdentityV2Component{IdentityV2Core},
-				OwnsPrefixes:  []string{IdentityStoreV2ResolverPrefix, IdentityStoreV2ReversePrefix, IdentityStoreV2PendingResolverPrefix},
-				ProofProducer: true,
+				Component:	IdentityV2Resolver,
+				Parent:		IdentityV2Root,
+				DependsOn:	[]IdentityV2Component{IdentityV2Core},
+				OwnsPrefixes:	[]string{IdentityStoreV2ResolverPrefix, IdentityStoreV2ReversePrefix, IdentityStoreV2PendingResolverPrefix},
+				ProofProducer:	true,
 			},
 			{
-				Component:     IdentityV2Subdomain,
-				Parent:        IdentityV2Root,
-				DependsOn:     []IdentityV2Component{IdentityV2Core, IdentityV2Resolver},
-				OwnsPrefixes:  []string{IdentityStoreV2SubdomainIndexPrefix},
-				ProofProducer: true,
+				Component:	IdentityV2Subdomain,
+				Parent:		IdentityV2Root,
+				DependsOn:	[]IdentityV2Component{IdentityV2Core, IdentityV2Resolver},
+				OwnsPrefixes:	[]string{IdentityStoreV2SubdomainIndexPrefix},
+				ProofProducer:	true,
 			},
 			{
-				Component:     IdentityV2Auction,
-				Parent:        IdentityV2Root,
-				DependsOn:     []IdentityV2Component{IdentityV2Core},
-				OwnsPrefixes:  []string{IdentityStoreV2AuctionPrefix},
-				ProofProducer: true,
+				Component:	IdentityV2Auction,
+				Parent:		IdentityV2Root,
+				DependsOn:	[]IdentityV2Component{IdentityV2Core},
+				OwnsPrefixes:	[]string{IdentityStoreV2AuctionPrefix},
+				ProofProducer:	true,
 			},
 			{
-				Component: IdentityV2Proof,
-				Parent:    IdentityV2Root,
-				DependsOn: []IdentityV2Component{IdentityV2Core, IdentityV2Resolver, IdentityV2Subdomain, IdentityV2Auction},
+				Component:	IdentityV2Proof,
+				Parent:		IdentityV2Root,
+				DependsOn:	[]IdentityV2Component{IdentityV2Core, IdentityV2Resolver, IdentityV2Subdomain, IdentityV2Auction},
 			},
 			{
-				Component:       IdentityV2RoutingIntegration,
-				Parent:          IdentityV2Root,
-				DependsOn:       []IdentityV2Component{IdentityV2Proof, IdentityV2Resolver},
-				RoutingConsumer: true,
+				Component:		IdentityV2RoutingIntegration,
+				Parent:			IdentityV2Root,
+				DependsOn:		[]IdentityV2Component{IdentityV2Proof, IdentityV2Resolver},
+				RoutingConsumer:	true,
 			},
 		},
 	}

@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	localGenesisValidatorMin = 1
-	localGenesisValidatorMax = 10
+	localGenesisValidatorMin	= 1
+	localGenesisValidatorMax	= 10
 )
 
 func wrapAetraGenesisValidation(cmd *cobra.Command) {

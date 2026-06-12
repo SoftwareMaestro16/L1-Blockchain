@@ -7,47 +7,33 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Task 4.17: AVM Security & Determinism Gate
-// ---------------
-// Three-layer safety model: compile-time, verification-time, runtime.
-// Determinism gate validates execution BEFORE runtime starts.
-// Forbidden capability classes enforce consensus safety.
-// Normalization ensures canonical ordering for unordered structures.
-
-// ---------------
-// Capability Class Model
-// ---------------
-// Any instruction requiring a forbidden capability MUST be rejected
-// at the verification stage (layer 2), never reaching runtime.
-
 type CapabilityClass uint8
 
 const (
-	CapClassTime            CapabilityClass = iota
-	CapClassRandomness                     // process entropy
-	CapClassIO                              // filesystem/network
-	CapClassProcessControl                  // goroutines/process
-	CapClassParallelExec                    // thread creation
-	CapClassFloatArithmetic                 // floating-point ops
-	CapClassStorage                         // state read/write
-	CapClassMessaging                       // internal/external messages
-	CapClassCrypto                          // hash/verify
-	CapClassChain                           // block context
+	CapClassTime		CapabilityClass	= iota
+	CapClassRandomness			// process entropy
+	CapClassIO				// filesystem/network
+	CapClassProcessControl			// goroutines/process
+	CapClassParallelExec			// thread creation
+	CapClassFloatArithmetic			// floating-point ops
+	CapClassStorage				// state read/write
+	CapClassMessaging			// internal/external messages
+	CapClassCrypto				// hash/verify
+	CapClassChain				// block context
 )
 
 func (c CapabilityClass) String() string {
 	names := map[CapabilityClass]string{
-		CapClassTime:            "TIME",
-		CapClassRandomness:      "RANDOMNESS",
-		CapClassIO:              "IO",
-		CapClassProcessControl:  "PROCESS_CONTROL",
-		CapClassParallelExec:    "PARALLEL_EXECUTION",
-		CapClassFloatArithmetic: "FLOAT_ARITHMETIC",
-		CapClassStorage:         "STORAGE",
-		CapClassMessaging:       "MESSAGING",
-		CapClassCrypto:          "CRYPTO",
-		CapClassChain:           "CHAIN",
+		CapClassTime:			"TIME",
+		CapClassRandomness:		"RANDOMNESS",
+		CapClassIO:			"IO",
+		CapClassProcessControl:		"PROCESS_CONTROL",
+		CapClassParallelExec:		"PARALLEL_EXECUTION",
+		CapClassFloatArithmetic:	"FLOAT_ARITHMETIC",
+		CapClassStorage:		"STORAGE",
+		CapClassMessaging:		"MESSAGING",
+		CapClassCrypto:			"CRYPTO",
+		CapClassChain:			"CHAIN",
 	}
 	if name, ok := names[c]; ok {
 		return name
@@ -59,12 +45,12 @@ func (c CapabilityClass) String() string {
 // that are ALWAYS forbidden in consensus execution.
 // These correspond to the host functions marked Forbidden:true.
 var ForbiddenCapabilityClasses = map[CapabilityClass]bool{
-	CapClassTime:            true,
-	CapClassRandomness:      true,
-	CapClassIO:              true,
-	CapClassProcessControl:  true,
-	CapClassParallelExec:    true,
-	CapClassFloatArithmetic: true,
+	CapClassTime:			true,
+	CapClassRandomness:		true,
+	CapClassIO:			true,
+	CapClassProcessControl:		true,
+	CapClassParallelExec:		true,
+	CapClassFloatArithmetic:	true,
 }
 
 // CapabilityClassForHostFunction maps a host function to its required capability class.
@@ -104,25 +90,19 @@ func ForbiddenHostFunctionClasses() []CapabilityClass {
 	return classes
 }
 
-// ---------------
-// Determinism Gate
-// ---------------
-// Validates execution BEFORE runtime starts.
-// If ANY gate check fails, execution MUST be rejected BEFORE state mutation.
-
 type DeterminismGateResult struct {
-	Passed          bool
-	Layer           SafetyLayer
-	CheckName       string
-	ViolationDetail string
+	Passed		bool
+	Layer		SafetyLayer
+	CheckName	string
+	ViolationDetail	string
 }
 
 type SafetyLayer uint8
 
 const (
-	LayerCompile     SafetyLayer = iota
-	LayerVerify                  // bytecode + module verification
-	LayerRuntime                 // VM execution
+	LayerCompile	SafetyLayer	= iota
+	LayerVerify			// bytecode + module verification
+	LayerRuntime			// VM execution
 )
 
 func (l SafetyLayer) String() string {
@@ -178,63 +158,59 @@ func (g *DeterminismGate) ValidateAll(frame *KernelExecutionFrame) bool {
 	return true
 }
 
-// ---------------
-// Individual Gate Checks
-// ---------------
-
 func CheckBytecodeDeterminism(frame *KernelExecutionFrame) DeterminismGateResult {
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "bytecode_determinism",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"bytecode_determinism",
 	}
 }
 
 func CheckStateSnapshotIntegrity(frame *KernelExecutionFrame) DeterminismGateResult {
 	if frame.StateSnapshot == nil {
 		return DeterminismGateResult{
-			Passed:          false,
-			Layer:           LayerVerify,
-			CheckName:       "state_snapshot_integrity",
-			ViolationDetail: "state snapshot is nil",
+			Passed:			false,
+			Layer:			LayerVerify,
+			CheckName:		"state_snapshot_integrity",
+			ViolationDetail:	"state snapshot is nil",
 		}
 	}
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "state_snapshot_integrity",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"state_snapshot_integrity",
 	}
 }
 
 func CheckInputNormalization(frame *KernelExecutionFrame) DeterminismGateResult {
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "input_normalization",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"input_normalization",
 	}
 }
 
 func CheckGasModelConsistency(frame *KernelExecutionFrame) DeterminismGateResult {
 	if frame.GasLimit == 0 {
 		return DeterminismGateResult{
-			Passed:          false,
-			Layer:           LayerRuntime,
-			CheckName:       "gas_model_consistency",
-			ViolationDetail: "gas limit is zero",
+			Passed:			false,
+			Layer:			LayerRuntime,
+			CheckName:		"gas_model_consistency",
+			ViolationDetail:	"gas limit is zero",
 		}
 	}
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerRuntime,
-		CheckName: "gas_model_consistency",
+		Passed:		true,
+		Layer:		LayerRuntime,
+		CheckName:	"gas_model_consistency",
 	}
 }
 
 func CheckHostFunctionWhitelist(frame *KernelExecutionFrame) DeterminismGateResult {
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "host_function_whitelist",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"host_function_whitelist",
 	}
 }
 
@@ -242,88 +218,81 @@ func CheckForbiddenCapabilities(frame *KernelExecutionFrame) DeterminismGateResu
 	for _, call := range frame.HostCallTrace {
 		if IsForbiddenHostFunction(HostFunction(call.FunctionID)) {
 			return DeterminismGateResult{
-				Passed:          false,
-				Layer:           LayerRuntime,
-				CheckName:       "forbidden_capabilities",
-				ViolationDetail: fmt.Sprintf("forbidden host function called: %d", call.FunctionID),
+				Passed:			false,
+				Layer:			LayerRuntime,
+				CheckName:		"forbidden_capabilities",
+				ViolationDetail:	fmt.Sprintf("forbidden host function called: %d", call.FunctionID),
 			}
 		}
 	}
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "forbidden_capabilities",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"forbidden_capabilities",
 	}
 }
 
 func CheckStackBounds(frame *KernelExecutionFrame) DeterminismGateResult {
 	if len(frame.Stack) > 1024 {
 		return DeterminismGateResult{
-			Passed:          false,
-			Layer:           LayerRuntime,
-			CheckName:       "stack_bounds",
-			ViolationDetail: fmt.Sprintf("stack depth %d exceeds maximum 1024", len(frame.Stack)),
+			Passed:			false,
+			Layer:			LayerRuntime,
+			CheckName:		"stack_bounds",
+			ViolationDetail:	fmt.Sprintf("stack depth %d exceeds maximum 1024", len(frame.Stack)),
 		}
 	}
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerRuntime,
-		CheckName: "stack_bounds",
+		Passed:		true,
+		Layer:		LayerRuntime,
+		CheckName:	"stack_bounds",
 	}
 }
 
 func CheckActionBudgetBounds(frame *KernelExecutionFrame) DeterminismGateResult {
 	if frame.ActionsUsed > frame.ActionBudget {
 		return DeterminismGateResult{
-			Passed:          false,
-			Layer:           LayerRuntime,
-			CheckName:       "action_budget_bounds",
-			ViolationDetail: fmt.Sprintf("actions used %d exceeds budget %d", frame.ActionsUsed, frame.ActionBudget),
+			Passed:			false,
+			Layer:			LayerRuntime,
+			CheckName:		"action_budget_bounds",
+			ViolationDetail:	fmt.Sprintf("actions used %d exceeds budget %d", frame.ActionsUsed, frame.ActionBudget),
 		}
 	}
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerRuntime,
-		CheckName: "action_budget_bounds",
+		Passed:		true,
+		Layer:		LayerRuntime,
+		CheckName:	"action_budget_bounds",
 	}
 }
 
 func CheckContinuationIntegrity(frame *KernelExecutionFrame) DeterminismGateResult {
 	return DeterminismGateResult{
-		Passed:    true,
-		Layer:     LayerVerify,
-		CheckName: "continuation_integrity",
+		Passed:		true,
+		Layer:		LayerVerify,
+		CheckName:	"continuation_integrity",
 	}
 }
 
-// ---------------
-// Static Security Scanner
-// ---------------
-// Runs at verification time (layer 2).
-// Detects: forbidden host imports, non-deterministic opcodes,
-// invalid control flow, unbounded loops without gas, unsafe type coercions.
-
 type SecurityViolation struct {
-	Code    string
-	Layer   SafetyLayer
-	Message string
-	Opcode  ISAOpcode
-	HostFn  HostFunction
+	Code	string
+	Layer	SafetyLayer
+	Message	string
+	Opcode	ISAOpcode
+	HostFn	HostFunction
 }
 
 type StaticSecurityScanner struct {
-	Violations        []SecurityViolation
-	ForbiddenHostFns  []HostFunction
-	ForbiddenOpcodes  []ISAOpcode
-	MaxUnboundedJumps int
+	Violations		[]SecurityViolation
+	ForbiddenHostFns	[]HostFunction
+	ForbiddenOpcodes	[]ISAOpcode
+	MaxUnboundedJumps	int
 }
 
 func NewStaticSecurityScanner() *StaticSecurityScanner {
 	return &StaticSecurityScanner{
-		Violations:        make([]SecurityViolation, 0),
-		ForbiddenHostFns:  ForbiddenHostFunctionIDs(),
-		ForbiddenOpcodes:  []ISAOpcode{},
-		MaxUnboundedJumps: 256,
+		Violations:		make([]SecurityViolation, 0),
+		ForbiddenHostFns:	ForbiddenHostFunctionIDs(),
+		ForbiddenOpcodes:	[]ISAOpcode{},
+		MaxUnboundedJumps:	256,
 	}
 }
 
@@ -346,10 +315,10 @@ func (s *StaticSecurityScanner) ScanHostImports(forbiddenIDs []HostFunction) []S
 	for _, id := range forbiddenIDs {
 		if spec, exists := registry[id]; exists && spec.Forbidden {
 			violations = append(violations, SecurityViolation{
-				Code:   "FORBIDDEN_HOST_IMPORT",
-				Layer:  LayerVerify,
-				Message: fmt.Sprintf("forbidden host function %s (0x%x)", spec.Name, id),
-				HostFn: id,
+				Code:		"FORBIDDEN_HOST_IMPORT",
+				Layer:		LayerVerify,
+				Message:	fmt.Sprintf("forbidden host function %s (0x%x)", spec.Name, id),
+				HostFn:		id,
 			})
 		}
 	}
@@ -384,36 +353,29 @@ func (s *StaticSecurityScanner) FullScan(forbiddenIDs []HostFunction, instructio
 	return all
 }
 
-// ---------------
-// Runtime Isolation Enforcement
-// ---------------
-// VM runtime MUST be fully sandboxed.
-// Forbidden: filesystem access, network access, OS process interaction,
-// wall-clock time, process entropy, thread creation, async execution.
-
 type RuntimeIsolationPolicy struct {
-	AllowFilesystem          bool
-	AllowNetwork             bool
-	AllowProcessInteraction  bool
-	AllowWallClockTime       bool
-	AllowProcessEntropy      bool
-	AllowThreadCreation      bool
-	AllowAsyncExecution      bool
-	AllowFloatingPoint       bool
-	AllowExternalRandomness  bool
+	AllowFilesystem		bool
+	AllowNetwork		bool
+	AllowProcessInteraction	bool
+	AllowWallClockTime	bool
+	AllowProcessEntropy	bool
+	AllowThreadCreation	bool
+	AllowAsyncExecution	bool
+	AllowFloatingPoint	bool
+	AllowExternalRandomness	bool
 }
 
 func DefaultRuntimeIsolationPolicy() RuntimeIsolationPolicy {
 	return RuntimeIsolationPolicy{
-		AllowFilesystem:         false,
-		AllowNetwork:            false,
-		AllowProcessInteraction: false,
-		AllowWallClockTime:      false,
-		AllowProcessEntropy:     false,
-		AllowThreadCreation:     false,
-		AllowAsyncExecution:     false,
-		AllowFloatingPoint:      false,
-		AllowExternalRandomness: false,
+		AllowFilesystem:		false,
+		AllowNetwork:			false,
+		AllowProcessInteraction:	false,
+		AllowWallClockTime:		false,
+		AllowProcessEntropy:		false,
+		AllowThreadCreation:		false,
+		AllowAsyncExecution:		false,
+		AllowFloatingPoint:		false,
+		AllowExternalRandomness:	false,
 	}
 }
 
@@ -456,23 +418,17 @@ func EnforceRuntimeIsolation(hostFn HostFunction) error {
 	return nil
 }
 
-// ---------------
-// Canonical Normalization
-// ---------------
-// All unordered structures MUST be normalized BEFORE execution.
-// Maps, events, messages: canonical ordering is hash-based.
-
 type NormalizationPolicy struct {
-	NormalizeMapIteration bool
-	NormalizeEventOrder   bool
-	NormalizeMessageOrder bool
+	NormalizeMapIteration	bool
+	NormalizeEventOrder	bool
+	NormalizeMessageOrder	bool
 }
 
 func DefaultNormalizationPolicy() NormalizationPolicy {
 	return NormalizationPolicy{
-		NormalizeMapIteration: true,
-		NormalizeEventOrder:   true,
-		NormalizeMessageOrder: true,
+		NormalizeMapIteration:	true,
+		NormalizeEventOrder:	true,
+		NormalizeMessageOrder:	true,
 	}
 }
 
@@ -511,29 +467,21 @@ func NormalizeMessageOrder(messages []Message) []Message {
 	return messages
 }
 
-// ---------------
-// Gas Safety Model
-// ---------------
-// Gas exhaustion MUST:
-// - stop execution deterministically
-// - NOT corrupt state
-// - NOT produce partial side effects
-
 type GasSafetyModel struct {
-	MaxGasPerInstruction    uint64
-	MaxGasTotal             uint64
-	MaxActionsPerExecution  uint32
-	GasReservationRatioBps  uint32
-	PriorityFeeCeiling      uint64
+	MaxGasPerInstruction	uint64
+	MaxGasTotal		uint64
+	MaxActionsPerExecution	uint32
+	GasReservationRatioBps	uint32
+	PriorityFeeCeiling	uint64
 }
 
 func DefaultGasSafetyModel() GasSafetyModel {
 	return GasSafetyModel{
-		MaxGasPerInstruction:   1000,
-		MaxGasTotal:          100_000_000,
-		MaxActionsPerExecution: 256,
-		GasReservationRatioBps: 1000,
-		PriorityFeeCeiling:  1_000_000,
+		MaxGasPerInstruction:	1000,
+		MaxGasTotal:		100_000_000,
+		MaxActionsPerExecution:	256,
+		GasReservationRatioBps:	1000,
+		PriorityFeeCeiling:	1_000_000,
 	}
 }
 
@@ -565,30 +513,21 @@ func (m GasSafetyModel) ValidateNoPartialSideEffects(gasUsed, gasLimit uint64, a
 	return nil
 }
 
-// ---------------
-// Fuzz Resilience Model
-// ---------------
-// Fuzz inputs MUST NEVER break verifier or VM.
-// Malformed bytecode → deterministic rejection
-// Random chunk corruption → safe failure
-// Oversized input → bounded exit
-// Invalid state → clean error
-
 type FuzzResilienceModel struct {
-	MaxBytecodeSize    uint32
-	MaxChunkDataSize   uint32
-	MaxMessagePayloadSize uint32
-	MaxStackDepth      uint32
-	MaxRecursionDepth  uint32
+	MaxBytecodeSize		uint32
+	MaxChunkDataSize	uint32
+	MaxMessagePayloadSize	uint32
+	MaxStackDepth		uint32
+	MaxRecursionDepth	uint32
 }
 
 func DefaultFuzzResilienceModel() FuzzResilienceModel {
 	return FuzzResilienceModel{
-		MaxBytecodeSize:      uint32(1 << 20),
-		MaxChunkDataSize:     uint32(1 << 16),
-		MaxMessagePayloadSize: uint32(1 << 20),
-		MaxStackDepth:        1024,
-		MaxRecursionDepth:    256,
+		MaxBytecodeSize:	uint32(1 << 20),
+		MaxChunkDataSize:	uint32(1 << 16),
+		MaxMessagePayloadSize:	uint32(1 << 20),
+		MaxStackDepth:		1024,
+		MaxRecursionDepth:	256,
 	}
 }
 
@@ -613,21 +552,15 @@ func (m FuzzResilienceModel) ValidateStackDepth(depth int) error {
 	return nil
 }
 
-// ---------------
-// Execution Replay Model
-// ---------------
-// Every execution MUST be replayable identically.
-// Same inputs → same gas, same state transitions, same receipts, same event ordering.
-
 type ReplayRecord struct {
-	StateRootBefore []byte
-	StateRootAfter  []byte
-	InputMessage    Message
-	GasUsed         uint64
-	ExitCode        StructuredExitCode
-	Receipt         AVMReceipt
-	ActionHash      []byte
-	TraceHash       []byte
+	StateRootBefore	[]byte
+	StateRootAfter	[]byte
+	InputMessage	Message
+	GasUsed		uint64
+	ExitCode	StructuredExitCode
+	Receipt		AVMReceipt
+	ActionHash	[]byte
+	TraceHash	[]byte
 }
 
 func RecordReplay(stateRootBefore *chunk.Chunk, stateRootAfter *StateRootChunk, msg Message, receipt AVMReceipt, actions *ActionQueueChunk, trace KernelExecutionTrace) *ReplayRecord {
@@ -647,14 +580,14 @@ func RecordReplay(stateRootBefore *chunk.Chunk, stateRootAfter *StateRootChunk, 
 	traceHash := finalizeTraceFromRecord(trace)
 
 	return &ReplayRecord{
-		StateRootBefore: beforeHash,
-		StateRootAfter:  afterHash,
-		InputMessage:    msg,
-		GasUsed:         receipt.GasUsed,
-		ExitCode:        StructuredExitCodeFromUint32(receipt.ExitCode),
-		Receipt:         receipt,
-		ActionHash:      actionHash,
-		TraceHash:       traceHash,
+		StateRootBefore:	beforeHash,
+		StateRootAfter:		afterHash,
+		InputMessage:		msg,
+		GasUsed:		receipt.GasUsed,
+		ExitCode:		StructuredExitCodeFromUint32(receipt.ExitCode),
+		Receipt:		receipt,
+		ActionHash:		actionHash,
+		TraceHash:		traceHash,
 	}
 }
 
@@ -691,119 +624,106 @@ func (r *ReplayRecord) VerifyDeterminism(other *ReplayRecord) bool {
 	return true
 }
 
-// ---------------
-// Adversarial Execution Model
-// ---------------
-// System MUST support adversarial test vectors:
-// malicious bytecode, crafted gas loops, invalid chunk refs,
-// malformed ABI inputs, bounce explosion chains, recursive message amplification.
-
 type AdversarialVector struct {
-	Name        string
-	Category    string
-	Description string
-	ExitCode    StructuredExitCode
-	Input       []byte
+	Name		string
+	Category	string
+	Description	string
+	ExitCode	StructuredExitCode
+	Input		[]byte
 }
 
 var AdversarialVectors = []AdversarialVector{
 	{
-		Name:        "invalid_opcode_0xFF",
-		Category:    "malicious_bytecode",
-		Description: "execute unrecognized opcode 0xFF",
-		ExitCode:    ExitValidationFailed,
-		Input:       []byte{0xFF},
+		Name:		"invalid_opcode_0xFF",
+		Category:	"malicious_bytecode",
+		Description:	"execute unrecognized opcode 0xFF",
+		ExitCode:	ExitValidationFailed,
+		Input:		[]byte{0xFF},
 	},
 	{
-		Name:        "stack_underflow",
-		Category:    "malicious_bytecode",
-		Description: "pop from empty stack",
-		ExitCode:    ExitStackUnderflow,
-		Input:       []byte{0x12},
+		Name:		"stack_underflow",
+		Category:	"malicious_bytecode",
+		Description:	"pop from empty stack",
+		ExitCode:	ExitStackUnderflow,
+		Input:		[]byte{0x12},
 	},
 	{
-		Name:        "gas_exhaustion_loop",
-		Category:    "crafted_gas",
-		Description: "infinite loop consuming all gas",
-		ExitCode:    ExitGasExhausted,
-		Input:       nil,
+		Name:		"gas_exhaustion_loop",
+		Category:	"crafted_gas",
+		Description:	"infinite loop consuming all gas",
+		ExitCode:	ExitGasExhausted,
+		Input:		nil,
 	},
 	{
-		Name:        "chunk_reference_invalid",
-		Category:    "invalid_state",
-		Description: "access nil/nonexistent chunk reference",
-		ExitCode:    ExitChunkError,
-		Input:       nil,
+		Name:		"chunk_reference_invalid",
+		Category:	"invalid_state",
+		Description:	"access nil/nonexistent chunk reference",
+		ExitCode:	ExitChunkError,
+		Input:		nil,
 	},
 	{
-		Name:        "type_mismatch_arith",
-		Category:    "malicious_bytecode",
-		Description: "arithmetic on boolean stack values",
-		ExitCode:    ExitTypeMismatch,
-		Input:       nil,
+		Name:		"type_mismatch_arith",
+		Category:	"malicious_bytecode",
+		Description:	"arithmetic on boolean stack values",
+		ExitCode:	ExitTypeMismatch,
+		Input:		nil,
 	},
 	{
-		Name:        "division_by_zero",
-		Category:    "execution_error",
-		Description: "divide by zero",
-		ExitCode:    ExitDivZero,
-		Input:       nil,
+		Name:		"division_by_zero",
+		Category:	"execution_error",
+		Description:	"divide by zero",
+		ExitCode:	ExitDivZero,
+		Input:		nil,
 	},
 	{
-		Name:        "action_budget_exceeded",
-		Category:    "action_overflow",
-		Description: "emit more actions than allowed",
-		ExitCode:    ExitActionBudget,
-		Input:       nil,
+		Name:		"action_budget_exceeded",
+		Category:	"action_overflow",
+		Description:	"emit more actions than allowed",
+		ExitCode:	ExitActionBudget,
+		Input:		nil,
 	},
 	{
-		Name:        "forbidden_host_call",
-		Category:    "capability_violation",
-		Description: "call forbidden host function (wall clock time)",
-		ExitCode:    ExitForbiddenCall,
-		Input:       nil,
+		Name:		"forbidden_host_call",
+		Category:	"capability_violation",
+		Description:	"call forbidden host function (wall clock time)",
+		ExitCode:	ExitForbiddenCall,
+		Input:		nil,
 	},
 	{
-		Name:        "bounce_explosion",
-		Category:    "message_amplification",
-		Description: "bounced message attempts another bounce",
-		ExitCode:    ExitValidationFailed,
-		Input:       nil,
+		Name:		"bounce_explosion",
+		Category:	"message_amplification",
+		Description:	"bounced message attempts another bounce",
+		ExitCode:	ExitValidationFailed,
+		Input:		nil,
 	},
 	{
-		Name:        "malformed_abi_input",
-		Category:    "invalid_input",
-		Description: "query with malformed arguments",
-		ExitCode:    ExitInvalidDecode,
-		Input:       nil,
+		Name:		"malformed_abi_input",
+		Category:	"invalid_input",
+		Description:	"query with malformed arguments",
+		ExitCode:	ExitInvalidDecode,
+		Input:		nil,
 	},
 	{
-		Name:        "oversized_bytecode",
-		Category:    "resource_exhaustion",
-		Description: "bytecode exceeding maximum size",
-		ExitCode:    ExitValidationFailed,
-		Input:       nil,
+		Name:		"oversized_bytecode",
+		Category:	"resource_exhaustion",
+		Description:	"bytecode exceeding maximum size",
+		ExitCode:	ExitValidationFailed,
+		Input:		nil,
 	},
 	{
-		Name:        "recursive_message_amplification",
-		Category:    "message_amplification",
-		Description: "message that creates exponential messages",
-		ExitCode:    ExitActionBudget,
-		Input:       nil,
+		Name:		"recursive_message_amplification",
+		Category:	"message_amplification",
+		Description:	"message that creates exponential messages",
+		ExitCode:	ExitActionBudget,
+		Input:		nil,
 	},
 }
 
-// ---------------
-// Consensus Safety Guarantee
-// ---------------
-// If AVM passes all gates:
-// → it is safe for consensus execution in distributed environment.
-
 type ConsensusSafetyGuarantee struct {
-	DeterminismPassed  bool
-	IsolationPassed    bool
-	ReplayabilityPassed bool
-	BoundednessPassed  bool
+	DeterminismPassed	bool
+	IsolationPassed		bool
+	ReplayabilityPassed	bool
+	BoundednessPassed	bool
 }
 
 func (g ConsensusSafetyGuarantee) IsConsensusSafe() bool {
@@ -835,67 +755,58 @@ func VerifyConsensusSafety(gateResults []DeterminismGateResult, isolation Runtim
 	}
 
 	return ConsensusSafetyGuarantee{
-		DeterminismPassed:   determinismPassed,
-		IsolationPassed:     isolationPassed,
-		ReplayabilityPassed: replayabilityPassed,
-		BoundednessPassed:   boundednessPassed,
+		DeterminismPassed:	determinismPassed,
+		IsolationPassed:	isolationPassed,
+		ReplayabilityPassed:	replayabilityPassed,
+		BoundednessPassed:	boundednessPassed,
 	}
 }
 
-// ---------------
-// Failure Model
-// ---------------
-// Any failure MUST:
-// - be deterministic
-// - produce stable exit code
-// - NOT mutate state
-// - NOT affect subsequent execution
-
 type FailureClassification struct {
-	Kind            FailureKind
-	ExitCode        StructuredExitCode
-	Deterministic   bool
-	StateMutated    bool
-	AffectsSequence bool
+	Kind		FailureKind
+	ExitCode	StructuredExitCode
+	Deterministic	bool
+	StateMutated	bool
+	AffectsSequence	bool
 }
 
 func ClassifyFailure(exitCode StructuredExitCode) FailureClassification {
 	switch exitCode.Category {
 	case ExitCategorySuccess:
 		return FailureClassification{
-			Kind:          FailureNone,
-			ExitCode:      exitCode,
-			Deterministic: true,
+			Kind:		FailureNone,
+			ExitCode:	exitCode,
+			Deterministic:	true,
 		}
 	case ExitCategoryGasError:
 		return FailureClassification{
-			Kind:          FailureRecoverable,
-			ExitCode:      exitCode,
-			Deterministic: true,
+			Kind:		FailureRecoverable,
+			ExitCode:	exitCode,
+			Deterministic:	true,
 		}
 	case ExitCategoryVMError, ExitCategoryTypeError, ExitCategoryExecutionError:
 		return FailureClassification{
-			Kind:          FailureRecoverable,
-			ExitCode:      exitCode,
-			Deterministic: true,
+			Kind:		FailureRecoverable,
+			ExitCode:	exitCode,
+			Deterministic:	true,
 		}
 	case ExitCategoryStateError:
 		return FailureClassification{
-			Kind:          FailureNonRecoverable,
-			ExitCode:      exitCode,
-			Deterministic: true,
+			Kind:		FailureNonRecoverable,
+			ExitCode:	exitCode,
+			Deterministic:	true,
 		}
 	case ExitCategoryActionError:
 		return FailureClassification{
-			Kind:          FailureRecoverable,
-			ExitCode:      exitCode,
-			Deterministic: true,
+			Kind:		FailureRecoverable,
+			ExitCode:	exitCode,
+			Deterministic:	true,
 		}
 	default:
 		return FailureClassification{
-			Kind:          FailureSystemFatal,
-			ExitCode:      exitCode,
-			Deterministic: false,
+			Kind:		FailureSystemFatal,
+			ExitCode:	exitCode,
+			Deterministic:	false,
 		}
 	}
 }
@@ -912,16 +823,11 @@ func (f FailureClassification) SequenceIsIsolated() bool {
 	return !f.AffectsSequence
 }
 
-// ---------------
-// Security Invariant
-// ---------------
-// AVM MUST satisfy: Determinism + Isolation + Replayability + Boundedness
-
 type SecurityInvariant struct {
-	Determinism   bool
-	Isolation     bool
-	Replayability bool
-	Boundedness   bool
+	Determinism	bool
+	Isolation	bool
+	Replayability	bool
+	Boundedness	bool
 }
 
 func (i SecurityInvariant) IsSatisfied() bool {
@@ -953,17 +859,12 @@ func CheckSecurityInvariant(gateResults []DeterminismGateResult, isolation Runti
 	replayability := determinism && isolation_ && boundedness
 
 	return SecurityInvariant{
-		Determinism:   determinism,
-		Isolation:     isolation_,
-		Replayability: replayability,
-		Boundedness:   boundedness,
+		Determinism:	determinism,
+		Isolation:	isolation_,
+		Replayability:	replayability,
+		Boundedness:	boundedness,
 	}
 }
-
-// ---------------
-// Fuzz Corpus Generation
-// ---------------
-// Generate deterministic fuzz inputs for the verifier and VM.
 
 func GenerateFuzzBytecode(rngSeed uint64, size int) []byte {
 	data := make([]byte, size)
@@ -1010,12 +911,6 @@ func GenerateDeterministicRandomness(previousStateRoot, blockEntropy, messageHas
 	return RandomBeacon(previousStateRoot, blockEntropy, messageHash, domain)
 }
 
-// ---------------
-// Shuffled Map Normalization Test
-// ---------------
-// Verifies that map iteration produces deterministic results
-// regardless of insertion order.
-
 func VerifyMapIterationDeterminism(mapEntries [][]chunk.Entry) bool {
 	if len(mapEntries) < 2 {
 		return true
@@ -1046,7 +941,7 @@ func VerifyMapIterationDeterminism(mapEntries [][]chunk.Entry) bool {
 }
 
 // AVMModuleMagic is the canonical magic number for AVM modules.
-const AVMModuleMagic uint32 = 0x41564D01 // "AVM\x01"
+const AVMModuleMagic uint32 = 0x41564D01	// "AVM\x01"
 
 // VerifyRawFuzzBytecode fills raw random bytes into a module-like structure.
 func VerifyRawFuzzBytecode(data []byte) StructuredExitCode {
@@ -1078,4 +973,3 @@ func SeedCryptoRand(beacon []byte) uint64 {
 	}
 	return binary.BigEndian.Uint64(beacon[:8])
 }
-

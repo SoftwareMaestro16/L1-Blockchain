@@ -69,8 +69,8 @@ func TestActivatedAccountIsPersistentAndExported(t *testing.T) {
 	user := addressing.FormatAccAddress(sdk.AccAddress(virtualBytes20(0x22)))
 
 	require.NoError(t, book.PutPersistentAccount(VirtualAccountView{
-		AddressUser: user,
-		Status:      VirtualAccountStatusActive,
+		AddressUser:	user,
+		Status:		VirtualAccountStatusActive,
 	}, PersistentWriteReasonActivation))
 
 	view, err := book.QueryAccount(user)
@@ -86,8 +86,8 @@ func TestInactiveAccountCannotBePersistedOrChargedRent(t *testing.T) {
 	user := addressing.FormatAccAddress(sdk.AccAddress(virtualBytes20(0x23)))
 
 	err = book.PutPersistentAccount(VirtualAccountView{
-		AddressUser: user,
-		Status:      VirtualAccountStatusInactive,
+		AddressUser:	user,
+		Status:		VirtualAccountStatusInactive,
 	}, PersistentWriteReasonActivation)
 
 	require.ErrorContains(t, err, "virtual only")
@@ -100,8 +100,8 @@ func TestPersistentAccountWritesRequireActivationOrControlledMigration(t *testin
 	user := addressing.FormatAccAddress(sdk.AccAddress(virtualBytes20(0x24)))
 
 	err = book.PutPersistentAccount(VirtualAccountView{
-		AddressUser: user,
-		Status:      VirtualAccountStatusActive,
+		AddressUser:	user,
+		Status:		VirtualAccountStatusActive,
 	}, "query")
 
 	require.ErrorContains(t, err, "activation or controlled migration")
@@ -118,7 +118,6 @@ func TestInactiveAccountRejectsNonActivationMessages(t *testing.T) {
 	require.NoError(t, ValidateAccountMessage(view, AccountMessageActivate))
 	require.ErrorContains(t, ValidateAccountMessage(view, AccountMessageNormal), "inactive account can only send MsgActivateAccount")
 }
-
 
 func activationTestPubKey() *secp256k1.PubKey {
 	return &secp256k1.PubKey{Key: []byte{

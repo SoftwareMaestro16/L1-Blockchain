@@ -111,15 +111,15 @@ func TestScoreCandidateUsesSaturatedCompositeIntegerModel(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(1_000), scored.EffectiveStakeNaet)
 	require.Equal(t, sdkmath.NewInt(478), scored.Score)
 	require.Equal(t, ValidatorScoreComponents{
-		StakeWeightNaet:        sdkmath.NewInt(1_000),
-		StakeSaturationCapNaet: sdkmath.NewInt(1_000),
-		SaturatedStakeNaet:     sdkmath.NewInt(9_000),
-		RewardWeightNaet:       sdkmath.NewInt(3_250),
-		PerformanceFactorBps:   9_000,
-		UptimeFactorBps:        9_500,
-		LatencyFactorBps:       8_000,
-		ReliabilityIndexBps:    7_000,
-		Score:                  sdkmath.NewInt(478),
+		StakeWeightNaet:	sdkmath.NewInt(1_000),
+		StakeSaturationCapNaet:	sdkmath.NewInt(1_000),
+		SaturatedStakeNaet:	sdkmath.NewInt(9_000),
+		RewardWeightNaet:	sdkmath.NewInt(3_250),
+		PerformanceFactorBps:	9_000,
+		UptimeFactorBps:	9_500,
+		LatencyFactorBps:	8_000,
+		ReliabilityIndexBps:	7_000,
+		Score:			sdkmath.NewInt(478),
 	}, scored.ScoreComponents)
 }
 
@@ -159,9 +159,9 @@ func TestStakeSaturationPreviewUsesCapFactorAndPreservesBondedBalance(t *testing
 func TestPerformanceScoreUsesUptimeLatencyAndCorrectness(t *testing.T) {
 	params := DefaultParams()
 	score, err := ComputePerformanceScore(params.PerformanceWeights, PerformanceSignals{
-		UptimeBps:      10_000,
-		LatencyBps:     8_000,
-		CorrectnessBps: 9_000,
+		UptimeBps:	10_000,
+		LatencyBps:	8_000,
+		CorrectnessBps:	9_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(9_100), score)
@@ -185,10 +185,10 @@ func TestEpochNumberUsesConfigurableEpochDuration(t *testing.T) {
 
 func TestDistributeRewardsPaysCommissionThenStakeShares(t *testing.T) {
 	result, err := DistributeRewards(RewardInput{
-		ValidatorID:      "val-a",
-		TotalRewardsNaet: sdkmath.NewInt(1_000),
-		CommissionBps:    1_000,
-		SelfStakeNaet:    sdkmath.NewInt(100),
+		ValidatorID:		"val-a",
+		TotalRewardsNaet:	sdkmath.NewInt(1_000),
+		CommissionBps:		1_000,
+		SelfStakeNaet:		sdkmath.NewInt(100),
 		Nominations: []Nomination{
 			{NominatorID: "nom-b", StakeNaet: sdkmath.NewInt(300)},
 			{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(600)},
@@ -207,12 +207,12 @@ func TestDistributeRewardsPaysCommissionThenStakeShares(t *testing.T) {
 
 func TestComputeSlashSharesPenaltyWithNominators(t *testing.T) {
 	result, err := ComputeSlash(SlashInput{
-		ValidatorID:       "val-a",
-		Misbehavior:       MisbehaviorDoubleSign,
-		SlashFractionBps:  500,
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
-		EvidenceHeight:    12,
-		EvidenceFinalized: true,
+		ValidatorID:		"val-a",
+		Misbehavior:		MisbehaviorDoubleSign,
+		SlashFractionBps:	500,
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
+		EvidenceHeight:		12,
+		EvidenceFinalized:	true,
 		Nominations: []Nomination{
 			{NominatorID: "nom-b", StakeNaet: sdkmath.NewInt(4_000)},
 			{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(2_000)},
@@ -229,19 +229,19 @@ func TestComputeSlashSharesPenaltyWithNominators(t *testing.T) {
 
 func TestComputeSlashRequiresObjectiveFinalizedEvidence(t *testing.T) {
 	_, err := ComputeSlash(SlashInput{
-		ValidatorID:      "val-a",
-		Misbehavior:      MisbehaviorInvalidBlock,
-		SlashFractionBps: 100,
-		SelfStakeNaet:    sdkmath.NewInt(1_000),
+		ValidatorID:		"val-a",
+		Misbehavior:		MisbehaviorInvalidBlock,
+		SlashFractionBps:	100,
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
 	})
 	require.ErrorContains(t, err, "evidence must be finalized")
 
 	_, err = ComputeSlash(SlashInput{
-		ValidatorID:       "val-a",
-		Misbehavior:       "subjective",
-		SlashFractionBps:  100,
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
-		EvidenceFinalized: true,
+		ValidatorID:		"val-a",
+		Misbehavior:		"subjective",
+		SlashFractionBps:	100,
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
+		EvidenceFinalized:	true,
 	})
 	require.ErrorContains(t, err, "unsupported misbehavior")
 }
@@ -290,13 +290,13 @@ func makeCandidates(count int, stake int64) []Candidate {
 
 func candidate(id string, selfStake int64, delegatedStake int64) Candidate {
 	return Candidate{
-		ValidatorID:         id,
-		SelfStakeNaet:       sdkmath.NewInt(selfStake),
-		DelegatedStakeNaet:  sdkmath.NewInt(delegatedStake),
-		PerformanceScoreBps: BasisPoints,
-		UptimeFactorBps:     BasisPoints,
-		CommissionBps:       500,
-		Nominations:         nominations(delegatedStake),
+		ValidatorID:		id,
+		SelfStakeNaet:		sdkmath.NewInt(selfStake),
+		DelegatedStakeNaet:	sdkmath.NewInt(delegatedStake),
+		PerformanceScoreBps:	BasisPoints,
+		UptimeFactorBps:	BasisPoints,
+		CommissionBps:		500,
+		Nominations:		nominations(delegatedStake),
 	}
 }
 

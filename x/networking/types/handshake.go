@@ -9,44 +9,44 @@ import (
 type HandshakePhase string
 
 const (
-	HandshakePhaseInit                HandshakePhase = "INIT"
-	HandshakePhaseIdentityVerified    HandshakePhase = "IDENTITY_VERIFIED"
-	HandshakePhaseProtocolsNegotiated HandshakePhase = "PROTOCOLS_NEGOTIATED"
-	HandshakePhaseChannelsNegotiated  HandshakePhase = "CHANNELS_NEGOTIATED"
-	HandshakePhaseKeysEstablished     HandshakePhase = "KEYS_ESTABLISHED"
-	HandshakePhaseEstablished         HandshakePhase = "ESTABLISHED"
-	HandshakePhaseRejected            HandshakePhase = "REJECTED"
+	HandshakePhaseInit			HandshakePhase	= "INIT"
+	HandshakePhaseIdentityVerified		HandshakePhase	= "IDENTITY_VERIFIED"
+	HandshakePhaseProtocolsNegotiated	HandshakePhase	= "PROTOCOLS_NEGOTIATED"
+	HandshakePhaseChannelsNegotiated	HandshakePhase	= "CHANNELS_NEGOTIATED"
+	HandshakePhaseKeysEstablished		HandshakePhase	= "KEYS_ESTABLISHED"
+	HandshakePhaseEstablished		HandshakePhase	= "ESTABLISHED"
+	HandshakePhaseRejected			HandshakePhase	= "REJECTED"
 )
 
 type SessionHandshakeState struct {
-	Phase            HandshakePhase
-	ReplayID         string
-	LocalNodeID      string
-	RemoteNodeID     string
-	CipherSuite      CipherSuite
-	ProtocolVersions []string
-	ChannelClasses   []ChannelClass
-	SessionKeys      SessionKeySet
-	Session          SessionChannel
-	RejectReason     string
+	Phase			HandshakePhase
+	ReplayID		string
+	LocalNodeID		string
+	RemoteNodeID		string
+	CipherSuite		CipherSuite
+	ProtocolVersions	[]string
+	ChannelClasses		[]ChannelClass
+	SessionKeys		SessionKeySet
+	Session			SessionChannel
+	RejectReason		string
 }
 
 type SessionKeyRotationRequest struct {
-	SessionID                string
-	NewLocalEphemeralPubKey  []byte
-	NewRemoteEphemeralPubKey []byte
-	NewSecretCommitmentHash  string
-	RotatedAtHeight          uint64
-	ExpiresHeight            uint64
-	Nonce                    []byte
+	SessionID			string
+	NewLocalEphemeralPubKey		[]byte
+	NewRemoteEphemeralPubKey	[]byte
+	NewSecretCommitmentHash		string
+	RotatedAtHeight			uint64
+	ExpiresHeight			uint64
+	Nonce				[]byte
 }
 
 func RunSessionHandshake(local, remote NodeRecord, req SessionRequest, networkSalt []byte, currentHeight uint64, seenReplayIDs []string) (SessionHandshakeState, error) {
 	state := SessionHandshakeState{
-		Phase:        HandshakePhaseInit,
-		ReplayID:     ComputeHandshakeReplayID(req),
-		LocalNodeID:  normalizeHashText(req.LocalNodeID),
-		RemoteNodeID: normalizeHashText(req.RemoteNodeID),
+		Phase:		HandshakePhaseInit,
+		ReplayID:	ComputeHandshakeReplayID(req),
+		LocalNodeID:	normalizeHashText(req.LocalNodeID),
+		RemoteNodeID:	normalizeHashText(req.RemoteNodeID),
 	}
 	if hasString(seenReplayIDs, state.ReplayID) {
 		state.Phase = HandshakePhaseRejected
@@ -143,19 +143,19 @@ func RotateSessionKeys(session SessionChannel, req SessionKeyRotationRequest) (S
 		return SessionChannel{}, fmt.Errorf("networking session key rotation nonce must be between 1 and %d bytes", MaxNonceBytes)
 	}
 	rotationRequest := SessionRequest{
-		LocalNodeID:                 session.LocalNodeID,
-		RemoteNodeID:                session.RemoteNodeID,
-		HandshakeVersion:            session.HandshakeVersion,
-		CipherSuites:                []CipherSuite{session.CipherSuite},
-		ProtocolVersions:            append([]string(nil), session.ProtocolVersions...),
-		ChannelClasses:              streamChannels(session.Streams),
-		LocalEphemeralPubKey:        req.NewLocalEphemeralPubKey,
-		RemoteEphemeralPubKey:       req.NewRemoteEphemeralPubKey,
-		SessionSecretCommitmentHash: req.NewSecretCommitmentHash,
-		OpenedHeight:                req.RotatedAtHeight,
-		ExpiresHeight:               req.ExpiresHeight,
-		Nonce:                       req.Nonce,
-		QOSPolicy:                   session.QOSPolicy,
+		LocalNodeID:			session.LocalNodeID,
+		RemoteNodeID:			session.RemoteNodeID,
+		HandshakeVersion:		session.HandshakeVersion,
+		CipherSuites:			[]CipherSuite{session.CipherSuite},
+		ProtocolVersions:		append([]string(nil), session.ProtocolVersions...),
+		ChannelClasses:			streamChannels(session.Streams),
+		LocalEphemeralPubKey:		req.NewLocalEphemeralPubKey,
+		RemoteEphemeralPubKey:		req.NewRemoteEphemeralPubKey,
+		SessionSecretCommitmentHash:	req.NewSecretCommitmentHash,
+		OpenedHeight:			req.RotatedAtHeight,
+		ExpiresHeight:			req.ExpiresHeight,
+		Nonce:				req.Nonce,
+		QOSPolicy:			session.QOSPolicy,
 	}
 	keys, err := BuildSessionKeySet(rotationRequest, session.CipherSuite, session.ProtocolVersions, rotationRequest.ChannelClasses)
 	if err != nil {

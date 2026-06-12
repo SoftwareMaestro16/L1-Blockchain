@@ -11,8 +11,8 @@ import (
 )
 
 type Keeper struct {
-	genesis servicestypes.GenesisState
-	store   map[string][]byte
+	genesis	servicestypes.GenesisState
+	store	map[string][]byte
 }
 
 func NewKeeper() Keeper {

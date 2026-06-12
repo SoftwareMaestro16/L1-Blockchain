@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "crosschainregistry"
-	StoreKey   = ModuleName
+	ModuleName	= "crosschainregistry"
+	StoreKey	= ModuleName
 )

@@ -6,38 +6,38 @@ import (
 )
 
 const (
-	ModuleName = "nativeaccount"
-	ModulePath = "x/native-account"
-	StoreKey   = ModuleName
+	ModuleName	= "nativeaccount"
+	ModulePath	= "x/native-account"
+	StoreKey	= ModuleName
 )
 
 type Boundary struct {
-	Path           string
-	Owner          string
-	OwnedState     []string
-	Interfaces     []string
-	RejectedWrites []string
+	Path		string
+	Owner		string
+	OwnedState	[]string
+	Interfaces	[]string
+	RejectedWrites	[]string
 }
 
 type RejectedCrossModuleWrite struct {
-	From  string
-	To    string
-	State string
+	From	string
+	To	string
+	State	string
 }
 
 type AssetRoute struct {
-	Behavior            string
-	Route               string
-	NativeModuleAllowed bool
+	Behavior		string
+	Route			string
+	NativeModuleAllowed	bool
 }
 
 func DefaultBoundaries() []Boundary {
 	return []Boundary{
 		{
-			Path:       "app/addressing",
-			Owner:      "AE user-facing and 4: raw/internal address codecs",
-			OwnedState: nil,
-			Interfaces: []string{"format AE account/validator/consensus address", "parse raw 4: system address"},
+			Path:		"app/addressing",
+			Owner:		"AE user-facing and 4: raw/internal address codecs",
+			OwnedState:	nil,
+			Interfaces:	[]string{"format AE account/validator/consensus address", "parse raw 4: system address"},
 			RejectedWrites: []string{
 				"account state",
 				"auth policy",
@@ -46,8 +46,8 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:  ModulePath,
-			Owner: "native account state, activation, auth policy, account status, storage-rent account references",
+			Path:	ModulePath,
+			Owner:	"native account state, activation, auth policy, account status, storage-rent account references",
 			OwnedState: []string{
 				"account/by_user",
 				"account/by_raw",
@@ -55,7 +55,7 @@ func DefaultBoundaries() []Boundary {
 				"account/reputation",
 				"account/storage",
 			},
-			Interfaces: []string{"bank balance lookup", "reputation id lookup", "storage-rent debt settlement"},
+			Interfaces:	[]string{"bank balance lookup", "reputation id lookup", "storage-rent debt settlement"},
 			RejectedWrites: []string{
 				"private keys",
 				"seed phrases",
@@ -63,10 +63,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/identity",
-			Owner:      ".aet domain registry, resolver state, and optional domain binding proofs",
-			OwnedState: []string{"domain records", "resolver records", "domain ownership indexes", "domain binding records"},
-			Interfaces: []string{"account owner address validation", "contract resolver address validation"},
+			Path:		"x/identity",
+			Owner:		".aet domain registry, resolver state, and optional domain binding proofs",
+			OwnedState:	[]string{"domain records", "resolver records", "domain ownership indexes", "domain binding records"},
+			Interfaces:	[]string{"account owner address validation", "contract resolver address validation"},
 			RejectedWrites: []string{
 				"native account status",
 				"native account auth policy",
@@ -75,10 +75,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/reputation",
-			Owner:      "deterministic account and contract reputation scores and accumulators",
-			OwnedState: []string{"reputation record", "stake-time accumulator", "score metadata"},
-			Interfaces: []string{"native account reputation id reference", "staking exposure inputs"},
+			Path:		"x/reputation",
+			Owner:		"deterministic account and contract reputation scores and accumulators",
+			OwnedState:	[]string{"reputation record", "stake-time accumulator", "score metadata"},
+			Interfaces:	[]string{"native account reputation id reference", "staking exposure inputs"},
 			RejectedWrites: []string{
 				"account auth policy",
 				"account sequence",
@@ -87,10 +87,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/storage-rent",
-			Owner:      "rent params, debt accounting, state-size records, and protocol-payer accounting",
-			OwnedState: []string{"rent params", "rent debt records", "state size records", "system storage reserve"},
-			Interfaces: []string{"charge account or contract rent", "report frozen/frozen_limited eligibility"},
+			Path:		"x/storage-rent",
+			Owner:		"rent params, debt accounting, state-size records, and protocol-payer accounting",
+			OwnedState:	[]string{"rent params", "rent debt records", "state size records", "system storage reserve"},
+			Interfaces:	[]string{"charge account or contract rent", "report frozen/frozen_limited eligibility"},
 			RejectedWrites: []string{
 				"automatic wallet deletion",
 				"protocol-critical freeze due to rent",
@@ -98,10 +98,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/pos",
-			Owner:      "PoS calculation specs and compatibility checks around SDK staking/slashing",
-			OwnedState: nil,
-			Interfaces: []string{"validator score inputs", "staking policy calculations"},
+			Path:		"x/pos",
+			Owner:		"PoS calculation specs and compatibility checks around SDK staking/slashing",
+			OwnedState:	nil,
+			Interfaces:	[]string{"validator score inputs", "staking policy calculations"},
 			RejectedWrites: []string{
 				"direct user delegation enablement",
 				"native account state",
@@ -109,10 +109,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/nominator-pool",
-			Owner:      "legacy/custom nominator pool records and pool accounting boundaries",
-			OwnedState: []string{"nominator pool state", "pool accounting records"},
-			Interfaces: []string{"official liquid staking integration boundary"},
+			Path:		"x/nominator-pool",
+			Owner:		"legacy/custom nominator pool records and pool accounting boundaries",
+			OwnedState:	[]string{"nominator pool state", "pool accounting records"},
+			Interfaces:	[]string{"official liquid staking integration boundary"},
 			RejectedWrites: []string{
 				"native account auth policy",
 				"validator selection by normal users",
@@ -120,10 +120,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/single-nominator-pool",
-			Owner:      "single-nominator pool state and accounting boundaries",
-			OwnedState: []string{"single-nominator pool state"},
-			Interfaces: []string{"official liquid staking integration boundary"},
+			Path:		"x/single-nominator-pool",
+			Owner:		"single-nominator pool state and accounting boundaries",
+			OwnedState:	[]string{"single-nominator pool state"},
+			Interfaces:	[]string{"official liquid staking integration boundary"},
 			RejectedWrites: []string{
 				"native account auth policy",
 				"validator selection by normal users",
@@ -131,10 +131,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/validator-*",
-			Owner:      "validator registry, election, insurance, and validator lifecycle metadata",
-			OwnedState: []string{"validator registry entries", "validator election records", "validator insurance records"},
-			Interfaces: []string{"pool allocation registry queries", "validator admission policy"},
+			Path:		"x/validator-*",
+			Owner:		"validator registry, election, insurance, and validator lifecycle metadata",
+			OwnedState:	[]string{"validator registry entries", "validator election records", "validator insurance records"},
+			Interfaces:	[]string{"pool allocation registry queries", "validator admission policy"},
 			RejectedWrites: []string{
 				"native account auth policy",
 				"user-facing legacy validator addresses",
@@ -142,10 +142,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/stake-concentration",
-			Owner:      "validator concentration, power-cap snapshots, and anti-centralization metrics",
-			OwnedState: []string{"concentration params", "network concentration snapshot"},
-			Interfaces: []string{"validator registry inputs", "allocation engine cap signals"},
+			Path:		"x/stake-concentration",
+			Owner:		"validator concentration, power-cap snapshots, and anti-centralization metrics",
+			OwnedState:	[]string{"concentration params", "network concentration snapshot"},
+			Interfaces:	[]string{"validator registry inputs", "allocation engine cap signals"},
 			RejectedWrites: []string{
 				"native account state",
 				"bank balances",
@@ -153,10 +153,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/fees",
-			Owner:      "protocol fee policy, minimum fee checks, and fee distribution accounting",
-			OwnedState: []string{"fee params", "protocol fee state", "sender tx count index"},
-			Interfaces: []string{"bank keeper fee movement", "burn and treasury distribution hooks"},
+			Path:		"x/fees",
+			Owner:		"protocol fee policy, minimum fee checks, and fee distribution accounting",
+			OwnedState:	[]string{"fee params", "protocol fee state", "sender tx count index"},
+			Interfaces:	[]string{"bank keeper fee movement", "burn and treasury distribution hooks"},
 			RejectedWrites: []string{
 				"duplicated wallet balances",
 				"account auth policy",
@@ -164,10 +164,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/burn",
-			Owner:      "burn accounting and visible burned-supply records",
-			OwnedState: []string{"burn params", "burned denom totals", "burn reason records"},
-			Interfaces: []string{"bank keeper burn movement"},
+			Path:		"x/burn",
+			Owner:		"burn accounting and visible burned-supply records",
+			OwnedState:	[]string{"burn params", "burned denom totals", "burn reason records"},
+			Interfaces:	[]string{"bank keeper burn movement"},
 			RejectedWrites: []string{
 				"wallet balances",
 				"account auth policy",
@@ -175,10 +175,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/treasury",
-			Owner:      "treasury buckets, spend proposals, and protocol allocation records",
-			OwnedState: []string{"treasury params", "allocation buckets", "spend records"},
-			Interfaces: []string{"bank keeper treasury movement", "governance authorization"},
+			Path:		"x/treasury",
+			Owner:		"treasury buckets, spend proposals, and protocol allocation records",
+			OwnedState:	[]string{"treasury params", "allocation buckets", "spend records"},
+			Interfaces:	[]string{"bank keeper treasury movement", "governance authorization"},
 			RejectedWrites: []string{
 				"wallet balances",
 				"account auth policy",
@@ -186,10 +186,10 @@ func DefaultBoundaries() []Boundary {
 			},
 		},
 		{
-			Path:       "x/contracts, x/vm, x/aetravm/*",
-			Owner:      "contract code/data, VM routing, contract standards, async messages, and contract-owned app assets",
-			OwnedState: []string{"contract code", "contract data", "contract queues", "contract application state"},
-			Interfaces: []string{"native account endpoint validation", "bank value movement", "storage-rent contract charging"},
+			Path:		"x/contracts, x/vm, x/aetravm/*",
+			Owner:		"contract code/data, VM routing, contract standards, async messages, and contract-owned app assets",
+			OwnedState:	[]string{"contract code", "contract data", "contract queues", "contract application state"},
+			Interfaces:	[]string{"native account endpoint validation", "bank value movement", "storage-rent contract charging"},
 			RejectedWrites: []string{
 				"native account private keys",
 				"native account seed phrases",

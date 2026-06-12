@@ -7,54 +7,54 @@ import (
 )
 
 type MsgRegisterNodeRecord struct {
-	Authority   string
-	Record      NodeRecord
-	Reputation  ReputationCommitment
-	NetworkSalt []byte
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Record		NodeRecord
+	Reputation	ReputationCommitment
+	NetworkSalt	[]byte
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgUpdateNodeRecord struct {
-	Authority   string
-	Record      NodeRecord
-	Reputation  ReputationCommitment
-	NetworkSalt []byte
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Record		NodeRecord
+	Reputation	ReputationCommitment
+	NetworkSalt	[]byte
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgExpireNodeRecord struct {
-	Authority   string
-	NodeID      string
-	ReasonHash  string
-	Height      uint64
-	MessageHash string
+	Authority	string
+	NodeID		string
+	ReasonHash	string
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgSubmitReputationCommitment struct {
-	Authority   string
-	Commitment  ReputationCommitment
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Commitment	ReputationCommitment
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgUpdateRoutingTable struct {
-	Authority   string
-	Table       RoutingTable
-	Height      uint64
-	MessageHash string
+	Authority	string
+	Table		RoutingTable
+	Height		uint64
+	MessageHash	string
 }
 
 type QueryNodeRecord struct {
-	NodeID       string
-	IncludeProof bool
+	NodeID		string
+	IncludeProof	bool
 }
 
 type QueryNodeRecordResponse struct {
-	Record NodeRecord
-	Proof  RoutingStateProof
-	Found  bool
+	Record	NodeRecord
+	Proof	RoutingStateProof
+	Found	bool
 }
 
 type QueryNodesByZone struct {
@@ -62,8 +62,8 @@ type QueryNodesByZone struct {
 }
 
 type QueryNodesByZoneResponse struct {
-	Records []NodeRecord
-	Proofs  []RoutingStateProof
+	Records	[]NodeRecord
+	Proofs	[]RoutingStateProof
 }
 
 type QueryNodesByService struct {
@@ -71,19 +71,19 @@ type QueryNodesByService struct {
 }
 
 type QueryNodesByServiceResponse struct {
-	Records []NodeRecord
-	Proofs  []RoutingStateProof
+	Records	[]NodeRecord
+	Proofs	[]RoutingStateProof
 }
 
 type QueryRoutingTable struct {
-	Epoch        uint64
-	IncludeProof bool
+	Epoch		uint64
+	IncludeProof	bool
 }
 
 type QueryRoutingTableResponse struct {
-	Table RoutingTable
-	Proof RoutingStateProof
-	Found bool
+	Table	RoutingTable
+	Proof	RoutingStateProof
+	Found	bool
 }
 
 type QueryLookupProof struct {
@@ -91,51 +91,51 @@ type QueryLookupProof struct {
 }
 
 type QueryLookupProofResponse struct {
-	Proof RoutingStateProof
-	Found bool
+	Proof	RoutingStateProof
+	Found	bool
 }
 
 type QueryReputationCommitment struct {
-	NodeID       string
-	IncludeProof bool
+	NodeID		string
+	IncludeProof	bool
 }
 
 type QueryReputationCommitmentResponse struct {
-	Commitment ReputationCommitment
-	Proof      RoutingStateProof
-	Found      bool
+	Commitment	ReputationCommitment
+	Proof		RoutingStateProof
+	Found		bool
 }
 
 type RoutingStateProof struct {
-	Key       string
-	ValueHash string
-	StateRoot string
-	Height    uint64
-	Path      []string
-	ProofHash string
+	Key		string
+	ValueHash	string
+	StateRoot	string
+	Height		uint64
+	Path		[]string
+	ProofHash	string
 }
 
 type DNLRoutingExportManifest struct {
-	Height            uint64
-	NodeCount         uint64
-	ZoneIndexCount    uint64
-	ServiceIndexCount uint64
-	ReputationCount   uint64
-	CacheCount        uint64
-	TableCount        uint64
-	NodesRoot         string
-	ZonesRoot         string
-	ServicesRoot      string
-	ReputationRoot    string
-	CacheRoot         string
-	TablesRoot        string
-	StateRoot         string
-	ManifestHash      string
+	Height			uint64
+	NodeCount		uint64
+	ZoneIndexCount		uint64
+	ServiceIndexCount	uint64
+	ReputationCount		uint64
+	CacheCount		uint64
+	TableCount		uint64
+	NodesRoot		string
+	ZonesRoot		string
+	ServicesRoot		string
+	ReputationRoot		string
+	CacheRoot		string
+	TablesRoot		string
+	StateRoot		string
+	ManifestHash		string
 }
 
 type DNLRoutingExport struct {
-	State    DNLRoutingState
-	Manifest DNLRoutingExportManifest
+	State		DNLRoutingState
+	Manifest	DNLRoutingExportManifest
 }
 
 func RegisterNodeRecordInRoutingState(state DNLRoutingState, msg MsgRegisterNodeRecord) (DNLRoutingState, error) {
@@ -391,20 +391,20 @@ func ExportDNLRoutingState(state DNLRoutingState) (DNLRoutingExport, error) {
 		return DNLRoutingExport{}, err
 	}
 	manifest := DNLRoutingExportManifest{
-		Height:            state.Height,
-		NodeCount:         uint64(len(state.Nodes)),
-		ZoneIndexCount:    uint64(len(state.ZoneIndex)),
-		ServiceIndexCount: uint64(len(state.ServiceIndex)),
-		ReputationCount:   uint64(len(state.Reputation)),
-		CacheCount:        uint64(len(state.Cache)),
-		TableCount:        uint64(len(state.Tables)),
-		NodesRoot:         state.NodesRoot,
-		ZonesRoot:         state.ZonesRoot,
-		ServicesRoot:      state.ServicesRoot,
-		ReputationRoot:    state.ReputationRoot,
-		CacheRoot:         state.CacheRoot,
-		TablesRoot:        state.TablesRoot,
-		StateRoot:         state.StateRoot,
+		Height:			state.Height,
+		NodeCount:		uint64(len(state.Nodes)),
+		ZoneIndexCount:		uint64(len(state.ZoneIndex)),
+		ServiceIndexCount:	uint64(len(state.ServiceIndex)),
+		ReputationCount:	uint64(len(state.Reputation)),
+		CacheCount:		uint64(len(state.Cache)),
+		TableCount:		uint64(len(state.Tables)),
+		NodesRoot:		state.NodesRoot,
+		ZonesRoot:		state.ZonesRoot,
+		ServicesRoot:		state.ServicesRoot,
+		ReputationRoot:		state.ReputationRoot,
+		CacheRoot:		state.CacheRoot,
+		TablesRoot:		state.TablesRoot,
+		StateRoot:		state.StateRoot,
 	}
 	manifest.ManifestHash = ComputeDNLRoutingExportManifestHash(manifest)
 	if err := manifest.Validate(); err != nil {
@@ -577,8 +577,8 @@ func (manifest DNLRoutingExportManifest) Validate() error {
 		return errors.New("networking DNL routing export height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"nodes root", manifest.NodesRoot},
 		{"zones root", manifest.ZonesRoot},
@@ -726,5 +726,3 @@ func upsertDNLRoutingTable(tables []RoutingTable, table RoutingTable) []RoutingT
 	out = append(out, table)
 	return normalizeRoutingTables(out)
 }
-
-

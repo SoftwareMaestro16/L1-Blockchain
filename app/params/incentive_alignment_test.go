@@ -9,16 +9,16 @@ import (
 
 func TestParticipantIncentiveMapAccountsRewardsPenaltiesAndCosts(t *testing.T) {
 	report, err := BuildParticipantIncentiveMap(ParticipantIncentiveMapInput{
-		ValidatorRewardsNaet: sdkmath.NewInt(1_000),
-		DelegatorRewardsNaet: sdkmath.NewInt(2_000),
-		UserFeesPaidNaet:     sdkmath.NewInt(500),
-		ExecutionFeesNaet:    sdkmath.NewInt(100),
-		StorageFeesNaet:      sdkmath.NewInt(200),
-		SpamSurchargeNaet:    sdkmath.NewInt(50),
-		ValidatorSlashedNaet: sdkmath.NewInt(100),
-		DelegatorSlashedNaet: sdkmath.NewInt(20),
-		ReserveFundingNaet:   sdkmath.NewInt(300),
-		BurnedNaet:           sdkmath.NewInt(75),
+		ValidatorRewardsNaet:	sdkmath.NewInt(1_000),
+		DelegatorRewardsNaet:	sdkmath.NewInt(2_000),
+		UserFeesPaidNaet:	sdkmath.NewInt(500),
+		ExecutionFeesNaet:	sdkmath.NewInt(100),
+		StorageFeesNaet:	sdkmath.NewInt(200),
+		SpamSurchargeNaet:	sdkmath.NewInt(50),
+		ValidatorSlashedNaet:	sdkmath.NewInt(100),
+		DelegatorSlashedNaet:	sdkmath.NewInt(20),
+		ReserveFundingNaet:	sdkmath.NewInt(300),
+		BurnedNaet:		sdkmath.NewInt(75),
 	})
 	require.NoError(t, err)
 	require.True(t, report.Passed)
@@ -65,12 +65,12 @@ func TestEpochEconomicReportDetectsSupplyMismatch(t *testing.T) {
 
 func TestGovernanceParameterImpactRequiresPreUpgradeSimulation(t *testing.T) {
 	report, err := GenerateGovernanceParameterImpactReport(GovernanceParameterImpactInput{
-		ParameterName:                      ParameterChangeInflation,
-		CurrentValueBps:                    DefaultTargetInflationBps,
-		ProposedValueBps:                   250,
-		CurrentEpochReport:                 baseIncentiveEpochInput(),
-		RequirePreUpgradeSimulation:        true,
-		ConsensusRewardAccountingPreserved: true,
+		ParameterName:				ParameterChangeInflation,
+		CurrentValueBps:			DefaultTargetInflationBps,
+		ProposedValueBps:			250,
+		CurrentEpochReport:			baseIncentiveEpochInput(),
+		RequirePreUpgradeSimulation:		true,
+		ConsensusRewardAccountingPreserved:	true,
 	})
 	require.NoError(t, err)
 	require.False(t, report.ActivationAllowed)
@@ -80,13 +80,13 @@ func TestGovernanceParameterImpactRequiresPreUpgradeSimulation(t *testing.T) {
 
 func TestGovernanceParameterImpactProjectsBeforeActivation(t *testing.T) {
 	report, err := GenerateGovernanceParameterImpactReport(GovernanceParameterImpactInput{
-		ParameterName:                      ParameterChangeInflation,
-		CurrentValueBps:                    DefaultTargetInflationBps,
-		ProposedValueBps:                   250,
-		CurrentEpochReport:                 baseIncentiveEpochInput(),
-		ProjectedEpochs:                    3,
-		RequirePreUpgradeSimulation:        true,
-		ConsensusRewardAccountingPreserved: true,
+		ParameterName:				ParameterChangeInflation,
+		CurrentValueBps:			DefaultTargetInflationBps,
+		ProposedValueBps:			250,
+		CurrentEpochReport:			baseIncentiveEpochInput(),
+		ProjectedEpochs:			3,
+		RequirePreUpgradeSimulation:		true,
+		ConsensusRewardAccountingPreserved:	true,
 	})
 	require.NoError(t, err)
 	require.True(t, report.ActivationAllowed)
@@ -106,27 +106,27 @@ func TestGovernanceParameterImpactProjectsBeforeActivation(t *testing.T) {
 
 func baseIncentiveEpochInput() EpochEconomicReportInput {
 	return EpochEconomicReportInput{
-		EpochID:                   9,
-		StartingSupplyNaet:        sdkmath.NewInt(1_000_000),
-		EndingSupplyNaet:          sdkmath.NewInt(1_007_000),
-		GrossIssuedNaet:           sdkmath.NewInt(10_000),
-		BurnedNaet:                sdkmath.NewInt(3_000),
-		FeesCollectedNaet:         sdkmath.NewInt(5_000),
-		ValidatorRewardsNaet:      sdkmath.NewInt(6_000),
-		DelegatorRewardsNaet:      sdkmath.NewInt(4_000),
-		SlashedNaet:               sdkmath.NewInt(1_000),
-		ReserveInflowNaet:         sdkmath.NewInt(800),
-		ReserveOutflowNaet:        sdkmath.NewInt(200),
-		StateGrowthBytes:          1_200,
-		ValidatorConcentrationBps: 3_200,
+		EpochID:			9,
+		StartingSupplyNaet:		sdkmath.NewInt(1_000_000),
+		EndingSupplyNaet:		sdkmath.NewInt(1_007_000),
+		GrossIssuedNaet:		sdkmath.NewInt(10_000),
+		BurnedNaet:			sdkmath.NewInt(3_000),
+		FeesCollectedNaet:		sdkmath.NewInt(5_000),
+		ValidatorRewardsNaet:		sdkmath.NewInt(6_000),
+		DelegatorRewardsNaet:		sdkmath.NewInt(4_000),
+		SlashedNaet:			sdkmath.NewInt(1_000),
+		ReserveInflowNaet:		sdkmath.NewInt(800),
+		ReserveOutflowNaet:		sdkmath.NewInt(200),
+		StateGrowthBytes:		1_200,
+		ValidatorConcentrationBps:	3_200,
 		ParticipantInput: ParticipantIncentiveMapInput{
-			ValidatorRewardsNaet: sdkmath.NewInt(6_000),
-			DelegatorRewardsNaet: sdkmath.NewInt(4_000),
-			UserFeesPaidNaet:     sdkmath.NewInt(5_000),
-			ValidatorSlashedNaet: sdkmath.NewInt(800),
-			DelegatorSlashedNaet: sdkmath.NewInt(200),
-			ReserveFundingNaet:   sdkmath.NewInt(600),
-			BurnedNaet:           sdkmath.NewInt(3_000),
+			ValidatorRewardsNaet:	sdkmath.NewInt(6_000),
+			DelegatorRewardsNaet:	sdkmath.NewInt(4_000),
+			UserFeesPaidNaet:	sdkmath.NewInt(5_000),
+			ValidatorSlashedNaet:	sdkmath.NewInt(800),
+			DelegatorSlashedNaet:	sdkmath.NewInt(200),
+			ReserveFundingNaet:	sdkmath.NewInt(600),
+			BurnedNaet:		sdkmath.NewInt(3_000),
 		},
 	}
 }

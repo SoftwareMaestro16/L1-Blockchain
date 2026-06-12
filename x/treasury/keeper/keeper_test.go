@@ -48,28 +48,28 @@ func TestSpendProposalLifecycle(t *testing.T) {
 	msgServer := treasurykeeper.NewMsgServerImpl(app.TreasuryKeeper)
 
 	submit, err := msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:  aetraaddress.FormatAccAddress(proposer),
-		Recipient: aetraaddress.FormatAccAddress(recipient),
-		Amount:    sdk.NewCoins(coin(100)),
-		Bucket:    types.BucketEcosystem,
-		Epoch:     4,
-		Metadata:  "grant",
+		Proposer:	aetraaddress.FormatAccAddress(proposer),
+		Recipient:	aetraaddress.FormatAccAddress(recipient),
+		Amount:		sdk.NewCoins(coin(100)),
+		Bucket:		types.BucketEcosystem,
+		Epoch:		4,
+		Metadata:	"grant",
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusPending, submit.Spend.Status)
 
 	approved, err := msgServer.ApproveTreasurySpend(ctx, &types.MsgApproveTreasurySpend{
-		Authority: app.TreasuryKeeper.Authority(),
-		SpendId:   submit.Spend.Id,
+		Authority:	app.TreasuryKeeper.Authority(),
+		SpendId:	submit.Spend.Id,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusApproved, approved.Spend.Status)
 
 	before := app.BankKeeper.GetBalance(ctx, recipient, types.BaseDenom)
 	executed, err := msgServer.ExecuteTreasurySpend(ctx, &types.MsgExecuteTreasurySpend{
-		Authority: app.TreasuryKeeper.Authority(),
-		SpendId:   submit.Spend.Id,
-		Epoch:     4,
+		Authority:	app.TreasuryKeeper.Authority(),
+		SpendId:	submit.Spend.Id,
+		Epoch:		4,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusExecuted, executed.Spend.Status)
@@ -77,8 +77,8 @@ func TestSpendProposalLifecycle(t *testing.T) {
 	require.NoError(t, app.TreasuryKeeper.AssertTreasuryAccountingInvariant(ctx))
 
 	_, err = msgServer.CancelTreasurySpend(ctx, &types.MsgCancelTreasurySpend{
-		Actor:   aetraaddress.FormatAccAddress(proposer),
-		SpendId: submit.Spend.Id,
+		Actor:		aetraaddress.FormatAccAddress(proposer),
+		SpendId:	submit.Spend.Id,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidSpend)
 }
@@ -153,11 +153,11 @@ func TestRecipientAllowlistEnforced(t *testing.T) {
 	msgServer := treasurykeeper.NewMsgServerImpl(app.TreasuryKeeper)
 
 	_, err = msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:  aetraaddress.FormatAccAddress(proposer),
-		Recipient: aetraaddress.FormatAccAddress(recipient),
-		Amount:    sdk.NewCoins(coin(1)),
-		Bucket:    types.BucketEcosystem,
-		Epoch:     1,
+		Proposer:	aetraaddress.FormatAccAddress(proposer),
+		Recipient:	aetraaddress.FormatAccAddress(recipient),
+		Amount:		sdk.NewCoins(coin(1)),
+		Bucket:		types.BucketEcosystem,
+		Epoch:		1,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 }
@@ -197,12 +197,12 @@ func TestExportImportPreservesPendingSpends(t *testing.T) {
 func submitAndApprove(t *testing.T, ctx sdk.Context, msgServer types.MsgServer, authority string, proposer, recipient sdk.AccAddress, amount int64, epoch, vestingEnd uint64) types.TreasurySpend {
 	t.Helper()
 	submit, err := msgServer.SubmitTreasurySpend(ctx, &types.MsgSubmitTreasurySpend{
-		Proposer:        aetraaddress.FormatAccAddress(proposer),
-		Recipient:       aetraaddress.FormatAccAddress(recipient),
-		Amount:          sdk.NewCoins(coin(amount)),
-		Bucket:          types.BucketEcosystem,
-		Epoch:           epoch,
-		VestingEndEpoch: vestingEnd,
+		Proposer:		aetraaddress.FormatAccAddress(proposer),
+		Recipient:		aetraaddress.FormatAccAddress(recipient),
+		Amount:			sdk.NewCoins(coin(amount)),
+		Bucket:			types.BucketEcosystem,
+		Epoch:			epoch,
+		VestingEndEpoch:	vestingEnd,
 	})
 	require.NoError(t, err)
 	approved, err := msgServer.ApproveTreasurySpend(ctx, &types.MsgApproveTreasurySpend{Authority: authority, SpendId: submit.Spend.Id})

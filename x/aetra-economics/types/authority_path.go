@@ -7,19 +7,19 @@ import (
 )
 
 const (
-	EconomicsAuthoritativePolicyModule = "x/aetra-economics"
-	EconomicsFeesModule                = "x/fees"
-	EconomicsFeeCollectorModule        = "x/fee-collector"
-	EconomicsBurnModule                = "x/burn"
-	EconomicsTreasuryModule            = "x/treasury"
-	EconomicsEmissionsModule           = "x/emissions"
-	EconomicsMintAuthorityModule       = "x/mint-authority"
+	EconomicsAuthoritativePolicyModule	= "x/aetra-economics"
+	EconomicsFeesModule			= "x/fees"
+	EconomicsFeeCollectorModule		= "x/fee-collector"
+	EconomicsBurnModule			= "x/burn"
+	EconomicsTreasuryModule			= "x/treasury"
+	EconomicsEmissionsModule		= "x/emissions"
+	EconomicsMintAuthorityModule		= "x/mint-authority"
 )
 
 type EconomicsModuleRole struct {
-	Module              string `json:"module"`
-	AuthoritativePolicy bool   `json:"authoritative_policy"`
-	ExecutionAccounting bool   `json:"execution_accounting"`
+	Module			string	`json:"module"`
+	AuthoritativePolicy	bool	`json:"authoritative_policy"`
+	ExecutionAccounting	bool	`json:"execution_accounting"`
 }
 
 func DefaultEconomicsAuthorityPath() []EconomicsModuleRole {
@@ -41,12 +41,12 @@ func ValidateEconomicsAuthorityPath(path []EconomicsModuleRole) error {
 	seen := map[string]struct{}{}
 	authoritative := ""
 	executionModules := map[string]bool{
-		EconomicsFeesModule:          false,
-		EconomicsFeeCollectorModule:  false,
-		EconomicsBurnModule:          false,
-		EconomicsTreasuryModule:      false,
-		EconomicsEmissionsModule:     false,
-		EconomicsMintAuthorityModule: false,
+		EconomicsFeesModule:		false,
+		EconomicsFeeCollectorModule:	false,
+		EconomicsBurnModule:		false,
+		EconomicsTreasuryModule:	false,
+		EconomicsEmissionsModule:	false,
+		EconomicsMintAuthorityModule:	false,
 	}
 	for _, role := range path {
 		if role.Module == "" {

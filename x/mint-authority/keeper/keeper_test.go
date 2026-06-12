@@ -18,35 +18,35 @@ func TestNativeMintAuthorityMintsAndAccounts(t *testing.T) {
 	recipient := sdk.AccAddress(bytes20(0x44))
 	recipientText := aetraaddress.FormatAccAddress(recipient)
 	decision := types.EmissionDecision{
-		Caller:   types.DefaultEmissionCaller,
-		Denom:    types.DefaultBaseDenom,
-		Amount:   sdkmath.NewInt(100),
-		Epoch:    1,
-		Height:   10,
-		Approved: true,
+		Caller:		types.DefaultEmissionCaller,
+		Denom:		types.DefaultBaseDenom,
+		Amount:		sdkmath.NewInt(100),
+		Epoch:		1,
+		Height:		10,
+		Approved:	true,
 	}
 	decision.DecisionHash = types.ComputeEmissionDecisionHash(decision)
 
 	_, err := app.MintAuthorityKeeper.MintProtocolCoins(ctx, types.MsgMintProtocolCoins{
-		Caller:                types.DefaultEmissionCaller,
-		Recipient:             recipientText,
-		Denom:                 types.DefaultBaseDenom,
-		Amount:                sdkmath.NewInt(100),
-		Epoch:                 1,
-		Height:                10,
-		EmissionsDecisionHash: decision.DecisionHash,
+		Caller:			types.DefaultEmissionCaller,
+		Recipient:		recipientText,
+		Denom:			types.DefaultBaseDenom,
+		Amount:			sdkmath.NewInt(100),
+		Epoch:			1,
+		Height:			10,
+		EmissionsDecisionHash:	decision.DecisionHash,
 	}, decision, types.ConstitutionEmergencyAuthorization{})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(100), app.BankKeeper.GetBalance(ctx, recipient, types.DefaultBaseDenom).Amount)
 
 	_, err = app.MintAuthorityKeeper.MintProtocolCoins(ctx, types.MsgMintProtocolCoins{
-		Caller:                "x/attacker",
-		Recipient:             recipientText,
-		Denom:                 types.DefaultBaseDenom,
-		Amount:                sdkmath.NewInt(1),
-		Epoch:                 1,
-		Height:                11,
-		EmissionsDecisionHash: decision.DecisionHash,
+		Caller:			"x/attacker",
+		Recipient:		recipientText,
+		Denom:			types.DefaultBaseDenom,
+		Amount:			sdkmath.NewInt(1),
+		Epoch:			1,
+		Height:			11,
+		EmissionsDecisionHash:	decision.DecisionHash,
 	}, decision, types.ConstitutionEmergencyAuthorization{})
 	require.Error(t, err)
 }

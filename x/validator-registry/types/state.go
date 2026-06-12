@@ -13,138 +13,138 @@ import (
 )
 
 const (
-	StatusCandidate  = "candidate"
-	StatusActive     = "active"
-	StatusJailed     = "jailed"
-	StatusTombstoned = "tombstoned"
-	StatusRetired    = "retired"
+	StatusCandidate		= "candidate"
+	StatusActive		= "active"
+	StatusJailed		= "jailed"
+	StatusTombstoned	= "tombstoned"
+	StatusRetired		= "retired"
 
-	HistoryRegistered        = "registered"
-	HistoryMetadataUpdated   = "metadata-updated"
-	HistoryConsensusRotated  = "consensus-key-rotated"
-	HistoryWithdrawalUpdated = "withdrawal-updated"
-	HistoryTreasuryUpdated   = "treasury-updated"
-	HistoryRetired           = "retired"
-	HistoryCapabilitiesSet   = "capabilities-set"
-	HistoryStatusChanged     = "status-changed"
+	HistoryRegistered		= "registered"
+	HistoryMetadataUpdated		= "metadata-updated"
+	HistoryConsensusRotated		= "consensus-key-rotated"
+	HistoryWithdrawalUpdated	= "withdrawal-updated"
+	HistoryTreasuryUpdated		= "treasury-updated"
+	HistoryRetired			= "retired"
+	HistoryCapabilitiesSet		= "capabilities-set"
+	HistoryStatusChanged		= "status-changed"
 
-	MaxValidatorsV1        = uint32(10_000)
-	MaxMetadataBytesV1     = uint32(4_096)
-	MaxConsensusKeyBytesV1 = uint32(512)
-	MaxCapabilitiesV1      = uint32(64)
-	MaxCapabilityBytesV1   = uint32(128)
-	MaxHistoryEntriesV1    = uint32(512)
-	MaxAuditFlagsV1        = uint32(32)
-	MaxAuditFlagBytesV1    = uint32(128)
-	MaxSlashReasonBytesV1  = uint32(256)
-	MaxBasisPoints         = uint32(10_000)
-	DefaultRotationDelay   = uint64(100)
-	DefaultAETBaseUnits    = uint64(appparams.BaseUnitsPerDisplay)
+	MaxValidatorsV1		= uint32(10_000)
+	MaxMetadataBytesV1	= uint32(4_096)
+	MaxConsensusKeyBytesV1	= uint32(512)
+	MaxCapabilitiesV1	= uint32(64)
+	MaxCapabilityBytesV1	= uint32(128)
+	MaxHistoryEntriesV1	= uint32(512)
+	MaxAuditFlagsV1		= uint32(32)
+	MaxAuditFlagBytesV1	= uint32(128)
+	MaxSlashReasonBytesV1	= uint32(256)
+	MaxBasisPoints		= uint32(10_000)
+	DefaultRotationDelay	= uint64(100)
+	DefaultAETBaseUnits	= uint64(appparams.BaseUnitsPerDisplay)
 
-	DefaultMinValidatorStake                    = uint64(1_000_000) * DefaultAETBaseUnits
-	DefaultSoloValidatorMinSelfStake            = uint64(1_000_000) * DefaultAETBaseUnits
-	DefaultPoolBackedValidatorMinSelfStake      = uint64(400_000) * DefaultAETBaseUnits
-	DefaultPoolBackedValidatorMaxNominatorStake = uint64(600_000) * DefaultAETBaseUnits
-	DefaultMinActiveValidators                  = uint32(100)
-	DefaultMaxActiveValidators                  = uint32(300)
-	DefaultValidatorCommissionFloorBps          = uint32(500)
-	DefaultValidatorCommissionBps               = uint32(1_000)
-	DefaultValidatorCommissionCeilingBps        = uint32(2_000)
-	DefaultValidatorCommissionMaxDailyChangeBps = uint32(100)
+	DefaultMinValidatorStake			= uint64(1_000_000) * DefaultAETBaseUnits
+	DefaultSoloValidatorMinSelfStake		= uint64(1_000_000) * DefaultAETBaseUnits
+	DefaultPoolBackedValidatorMinSelfStake		= uint64(400_000) * DefaultAETBaseUnits
+	DefaultPoolBackedValidatorMaxNominatorStake	= uint64(600_000) * DefaultAETBaseUnits
+	DefaultMinActiveValidators			= uint32(100)
+	DefaultMaxActiveValidators			= uint32(300)
+	DefaultValidatorCommissionFloorBps		= uint32(500)
+	DefaultValidatorCommissionBps			= uint32(1_000)
+	DefaultValidatorCommissionCeilingBps		= uint32(2_000)
+	DefaultValidatorCommissionMaxDailyChangeBps	= uint32(100)
 )
 
 type Params struct {
-	Authority                   string
-	MaxValidators               uint32
-	MinValidatorStake           uint64
-	SoloMinSelfStake            uint64
-	PoolBackedMinSelfStake      uint64
-	PoolBackedMaxNominatorStake uint64
-	MinActiveValidators         uint32
-	MaxActiveValidators         uint32
-	CommissionFloorBps          uint32
-	DefaultCommissionBps        uint32
-	CommissionCeilingBps        uint32
-	CommissionMaxDailyChangeBps uint32
-	PowerCapSchedule            []ValidatorPowerCapPhase
-	MaxMetadataBytes            uint32
-	MaxConsensusKeyBytes        uint32
-	MaxCapabilities             uint32
-	MaxCapabilityBytes          uint32
-	MaxHistoryEntries           uint32
-	MaxAuditFlags               uint32
-	MaxAuditFlagBytes           uint32
-	ConsensusKeyRotationDelay   uint64
+	Authority			string
+	MaxValidators			uint32
+	MinValidatorStake		uint64
+	SoloMinSelfStake		uint64
+	PoolBackedMinSelfStake		uint64
+	PoolBackedMaxNominatorStake	uint64
+	MinActiveValidators		uint32
+	MaxActiveValidators		uint32
+	CommissionFloorBps		uint32
+	DefaultCommissionBps		uint32
+	CommissionCeilingBps		uint32
+	CommissionMaxDailyChangeBps	uint32
+	PowerCapSchedule		[]ValidatorPowerCapPhase
+	MaxMetadataBytes		uint32
+	MaxConsensusKeyBytes		uint32
+	MaxCapabilities			uint32
+	MaxCapabilityBytes		uint32
+	MaxHistoryEntries		uint32
+	MaxAuditFlags			uint32
+	MaxAuditFlagBytes		uint32
+	ConsensusKeyRotationDelay	uint64
 }
 
 type CommissionPolicy struct {
-	CurrentRateBps   uint32
-	MaxRateBps       uint32
-	MaxChangeRateBps uint32
+	CurrentRateBps		uint32
+	MaxRateBps		uint32
+	MaxChangeRateBps	uint32
 }
 
 type ValidatorPowerCapPhase struct {
-	MaxActiveValidators uint32
-	PowerCapBps         uint32
+	MaxActiveValidators	uint32
+	PowerCapBps		uint32
 }
 
 type ValidatorFundingMode string
 
 const (
-	ValidatorFundingSolo       ValidatorFundingMode = "solo"
-	ValidatorFundingPoolBacked ValidatorFundingMode = "pool_backed"
+	ValidatorFundingSolo		ValidatorFundingMode	= "solo"
+	ValidatorFundingPoolBacked	ValidatorFundingMode	= "pool_backed"
 )
 
 type ValidatorFunding struct {
-	Mode          ValidatorFundingMode
-	SelfStake     uint64
-	NominatorBond uint64
+	Mode		ValidatorFundingMode
+	SelfStake	uint64
+	NominatorBond	uint64
 }
 
 type UptimeSample struct {
-	Height    uint64
-	UptimeBps uint32
+	Height		uint64
+	UptimeBps	uint32
 }
 
 type LatencySample struct {
-	Height    uint64
-	LatencyMs uint64
+	Height		uint64
+	LatencyMs	uint64
 }
 
 type SlashingEvent struct {
-	Height      uint64
-	FractionBps uint32
-	Reason      string
+	Height		uint64
+	FractionBps	uint32
+	Reason		string
 }
 
 type ValidatorHistoryEvent struct {
-	Height uint64
-	Type   string
-	Detail string
+	Height	uint64
+	Type	string
+	Detail	string
 }
 
 type ValidatorRecord struct {
-	OperatorAddress              string
-	ConsensusPublicKey           string
-	PendingConsensusPublicKey    string
-	ConsensusKeyActivationHeight uint64
-	TreasuryAddress              string
-	WithdrawalAddress            string
-	EmergencyAddress             string
-	Metadata                     string
-	CommissionPolicy             CommissionPolicy
-	UptimeHistory                []UptimeSample
-	LatencyHistory               []LatencySample
-	MissedBlockCounter           uint64
-	SlashingHistory              []SlashingEvent
-	ReputationScore              uint32
-	PerformanceScore             uint32
-	Status                       string
-	Capabilities                 []string
-	SelfBond                     uint64
-	NominatorBond                uint64
-	ExternalAuditFlags           []string
-	History                      []ValidatorHistoryEvent
+	OperatorAddress			string
+	ConsensusPublicKey		string
+	PendingConsensusPublicKey	string
+	ConsensusKeyActivationHeight	uint64
+	TreasuryAddress			string
+	WithdrawalAddress		string
+	EmergencyAddress		string
+	Metadata			string
+	CommissionPolicy		CommissionPolicy
+	UptimeHistory			[]UptimeSample
+	LatencyHistory			[]LatencySample
+	MissedBlockCounter		uint64
+	SlashingHistory			[]SlashingEvent
+	ReputationScore			uint32
+	PerformanceScore		uint32
+	Status				string
+	Capabilities			[]string
+	SelfBond			uint64
+	NominatorBond			uint64
+	ExternalAuditFlags		[]string
+	History				[]ValidatorHistoryEvent
 }
 
 type State struct {
@@ -152,142 +152,142 @@ type State struct {
 }
 
 type ValidatorKeys struct {
-	OperatorAddress              string
-	ConsensusPublicKey           string
-	PendingConsensusPublicKey    string
-	ConsensusKeyActivationHeight uint64
-	TreasuryAddress              string
-	WithdrawalAddress            string
-	EmergencyAddress             string
+	OperatorAddress			string
+	ConsensusPublicKey		string
+	PendingConsensusPublicKey	string
+	ConsensusKeyActivationHeight	uint64
+	TreasuryAddress			string
+	WithdrawalAddress		string
+	EmergencyAddress		string
 }
 
 type ValidatorPerformance struct {
-	OperatorAddress    string
-	UptimeHistory      []UptimeSample
-	LatencyHistory     []LatencySample
-	MissedBlockCounter uint64
-	ReputationScore    uint32
-	PerformanceScore   uint32
+	OperatorAddress		string
+	UptimeHistory		[]UptimeSample
+	LatencyHistory		[]LatencySample
+	MissedBlockCounter	uint64
+	ReputationScore		uint32
+	PerformanceScore	uint32
 }
 
 type ValidatorSecurityStatus struct {
-	OperatorAddress    string
-	Status             string
-	SlashingHistory    []SlashingEvent
-	ExternalAuditFlags []string
+	OperatorAddress		string
+	Status			string
+	SlashingHistory		[]SlashingEvent
+	ExternalAuditFlags	[]string
 }
 
 type ValidatorAllocationQueryRequest struct {
-	IncludeCandidates   bool
-	IncludeJailed       bool
-	EnforceActiveBounds bool
-	TestnetOverride     bool
+	IncludeCandidates	bool
+	IncludeJailed		bool
+	EnforceActiveBounds	bool
+	TestnetOverride		bool
 }
 
 type ValidatorAllocationEngineInput struct {
-	OperatorAddress    string
-	ConsensusPublicKey string
-	Status             string
-	SelfBond           uint64
-	NominatorBond      uint64
-	CommissionBps      uint32
-	PerformanceScore   uint32
-	ReputationScore    uint32
-	PowerCapBps        uint32
-	Jailed             bool
-	Tombstoned         bool
+	OperatorAddress		string
+	ConsensusPublicKey	string
+	Status			string
+	SelfBond		uint64
+	NominatorBond		uint64
+	CommissionBps		uint32
+	PerformanceScore	uint32
+	ReputationScore		uint32
+	PowerCapBps		uint32
+	Jailed			bool
+	Tombstoned		bool
 }
 
 type MsgRegisterValidator struct {
-	Authority string
-	Validator ValidatorRecord
-	Height    uint64
+	Authority	string
+	Validator	ValidatorRecord
+	Height		uint64
 }
 
 type MsgUpdateValidatorMetadata struct {
-	Authority       string
-	OperatorAddress string
-	Metadata        string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Metadata	string
+	Height		uint64
 }
 
 type MsgRotateConsensusKey struct {
-	Authority             string
-	OperatorAddress       string
-	NewConsensusPublicKey string
-	ActivationHeight      uint64
-	Height                uint64
+	Authority		string
+	OperatorAddress		string
+	NewConsensusPublicKey	string
+	ActivationHeight	uint64
+	Height			uint64
 }
 
 type MsgUpdateWithdrawalAddress struct {
-	Authority         string
-	OperatorAddress   string
-	WithdrawalAddress string
-	Height            uint64
+	Authority		string
+	OperatorAddress		string
+	WithdrawalAddress	string
+	Height			uint64
 }
 
 type MsgUpdateTreasuryAddress struct {
-	Authority       string
-	OperatorAddress string
-	TreasuryAddress string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	TreasuryAddress	string
+	Height		uint64
 }
 
 type MsgRetireValidator struct {
-	Authority       string
-	OperatorAddress string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Height		uint64
 }
 
 type MsgSetValidatorCapabilities struct {
-	Authority       string
-	OperatorAddress string
-	Capabilities    []string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Capabilities	[]string
+	Height		uint64
 }
 
 type MsgUpdateValidatorCommission struct {
-	Authority       string
-	OperatorAddress string
-	NewRateBps      uint32
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	NewRateBps	uint32
+	Height		uint64
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:                   prototype.DefaultAuthority,
-		MaxValidators:               MaxValidatorsV1,
-		MinValidatorStake:           DefaultMinValidatorStake,
-		SoloMinSelfStake:            DefaultSoloValidatorMinSelfStake,
-		PoolBackedMinSelfStake:      DefaultPoolBackedValidatorMinSelfStake,
-		PoolBackedMaxNominatorStake: DefaultPoolBackedValidatorMaxNominatorStake,
-		MinActiveValidators:         DefaultMinActiveValidators,
-		MaxActiveValidators:         DefaultMaxActiveValidators,
-		CommissionFloorBps:          DefaultValidatorCommissionFloorBps,
-		DefaultCommissionBps:        DefaultValidatorCommissionBps,
-		CommissionCeilingBps:        DefaultValidatorCommissionCeilingBps,
-		CommissionMaxDailyChangeBps: DefaultValidatorCommissionMaxDailyChangeBps,
+		Authority:			prototype.DefaultAuthority,
+		MaxValidators:			MaxValidatorsV1,
+		MinValidatorStake:		DefaultMinValidatorStake,
+		SoloMinSelfStake:		DefaultSoloValidatorMinSelfStake,
+		PoolBackedMinSelfStake:		DefaultPoolBackedValidatorMinSelfStake,
+		PoolBackedMaxNominatorStake:	DefaultPoolBackedValidatorMaxNominatorStake,
+		MinActiveValidators:		DefaultMinActiveValidators,
+		MaxActiveValidators:		DefaultMaxActiveValidators,
+		CommissionFloorBps:		DefaultValidatorCommissionFloorBps,
+		DefaultCommissionBps:		DefaultValidatorCommissionBps,
+		CommissionCeilingBps:		DefaultValidatorCommissionCeilingBps,
+		CommissionMaxDailyChangeBps:	DefaultValidatorCommissionMaxDailyChangeBps,
 		PowerCapSchedule: []ValidatorPowerCapPhase{
 			{MaxActiveValidators: 150, PowerCapBps: 300},
 			{MaxActiveValidators: 250, PowerCapBps: 250},
 			{MaxActiveValidators: 0, PowerCapBps: 200},
 		},
-		MaxMetadataBytes:          MaxMetadataBytesV1,
-		MaxConsensusKeyBytes:      MaxConsensusKeyBytesV1,
-		MaxCapabilities:           MaxCapabilitiesV1,
-		MaxCapabilityBytes:        MaxCapabilityBytesV1,
-		MaxHistoryEntries:         MaxHistoryEntriesV1,
-		MaxAuditFlags:             MaxAuditFlagsV1,
-		MaxAuditFlagBytes:         MaxAuditFlagBytesV1,
-		ConsensusKeyRotationDelay: DefaultRotationDelay,
+		MaxMetadataBytes:		MaxMetadataBytesV1,
+		MaxConsensusKeyBytes:		MaxConsensusKeyBytesV1,
+		MaxCapabilities:		MaxCapabilitiesV1,
+		MaxCapabilityBytes:		MaxCapabilityBytesV1,
+		MaxHistoryEntries:		MaxHistoryEntriesV1,
+		MaxAuditFlags:			MaxAuditFlagsV1,
+		MaxAuditFlagBytes:		MaxAuditFlagBytesV1,
+		ConsensusKeyRotationDelay:	DefaultRotationDelay,
 	}
 }
 
 func DefaultCommissionPolicy() CommissionPolicy {
 	return CommissionPolicy{
-		CurrentRateBps:   DefaultValidatorCommissionBps,
-		MaxRateBps:       DefaultValidatorCommissionCeilingBps,
-		MaxChangeRateBps: DefaultValidatorCommissionMaxDailyChangeBps,
+		CurrentRateBps:		DefaultValidatorCommissionBps,
+		MaxRateBps:		DefaultValidatorCommissionCeilingBps,
+		MaxChangeRateBps:	DefaultValidatorCommissionMaxDailyChangeBps,
 	}
 }
 
@@ -515,9 +515,9 @@ func (v ValidatorRecord) Validate(params Params) error {
 		return errors.New("validator registry operator and consensus keys must be distinct roles")
 	}
 	for label, value := range map[string]string{
-		"validator treasury address":   v.TreasuryAddress,
-		"validator withdrawal address": v.WithdrawalAddress,
-		"validator emergency address":  v.EmergencyAddress,
+		"validator treasury address":	v.TreasuryAddress,
+		"validator withdrawal address":	v.WithdrawalAddress,
+		"validator emergency address":	v.EmergencyAddress,
 	} {
 		if err := addressing.ValidateAuthorityAddress(label, value); err != nil {
 			return err
@@ -617,33 +617,33 @@ func (v ValidatorRecord) ConsensusKeys() []string {
 
 func (v ValidatorRecord) Keys() ValidatorKeys {
 	return ValidatorKeys{
-		OperatorAddress:              v.OperatorAddress,
-		ConsensusPublicKey:           v.ConsensusPublicKey,
-		PendingConsensusPublicKey:    v.PendingConsensusPublicKey,
-		ConsensusKeyActivationHeight: v.ConsensusKeyActivationHeight,
-		TreasuryAddress:              v.TreasuryAddress,
-		WithdrawalAddress:            v.WithdrawalAddress,
-		EmergencyAddress:             v.EmergencyAddress,
+		OperatorAddress:		v.OperatorAddress,
+		ConsensusPublicKey:		v.ConsensusPublicKey,
+		PendingConsensusPublicKey:	v.PendingConsensusPublicKey,
+		ConsensusKeyActivationHeight:	v.ConsensusKeyActivationHeight,
+		TreasuryAddress:		v.TreasuryAddress,
+		WithdrawalAddress:		v.WithdrawalAddress,
+		EmergencyAddress:		v.EmergencyAddress,
 	}
 }
 
 func (v ValidatorRecord) Performance() ValidatorPerformance {
 	return ValidatorPerformance{
-		OperatorAddress:    v.OperatorAddress,
-		UptimeHistory:      append([]UptimeSample(nil), v.UptimeHistory...),
-		LatencyHistory:     append([]LatencySample(nil), v.LatencyHistory...),
-		MissedBlockCounter: v.MissedBlockCounter,
-		ReputationScore:    v.ReputationScore,
-		PerformanceScore:   v.PerformanceScore,
+		OperatorAddress:	v.OperatorAddress,
+		UptimeHistory:		append([]UptimeSample(nil), v.UptimeHistory...),
+		LatencyHistory:		append([]LatencySample(nil), v.LatencyHistory...),
+		MissedBlockCounter:	v.MissedBlockCounter,
+		ReputationScore:	v.ReputationScore,
+		PerformanceScore:	v.PerformanceScore,
 	}
 }
 
 func (v ValidatorRecord) SecurityStatus() ValidatorSecurityStatus {
 	return ValidatorSecurityStatus{
-		OperatorAddress:    v.OperatorAddress,
-		Status:             v.Status,
-		SlashingHistory:    append([]SlashingEvent(nil), v.SlashingHistory...),
-		ExternalAuditFlags: append([]string(nil), v.ExternalAuditFlags...),
+		OperatorAddress:	v.OperatorAddress,
+		Status:			v.Status,
+		SlashingHistory:	append([]SlashingEvent(nil), v.SlashingHistory...),
+		ExternalAuditFlags:	append([]string(nil), v.ExternalAuditFlags...),
 	}
 }
 
@@ -699,17 +699,17 @@ func (s State) ValidatorAllocationEngineInputs(params Params, req ValidatorAlloc
 			continue
 		}
 		out = append(out, ValidatorAllocationEngineInput{
-			OperatorAddress:    validator.OperatorAddress,
-			ConsensusPublicKey: validator.ConsensusPublicKey,
-			Status:             validator.Status,
-			SelfBond:           validator.SelfBond,
-			NominatorBond:      validator.NominatorBond,
-			CommissionBps:      validator.CommissionPolicy.CurrentRateBps,
-			PerformanceScore:   validator.PerformanceScore,
-			ReputationScore:    validator.ReputationScore,
-			PowerCapBps:        powerCap,
-			Jailed:             validator.Status == StatusJailed,
-			Tombstoned:         validator.Status == StatusTombstoned,
+			OperatorAddress:	validator.OperatorAddress,
+			ConsensusPublicKey:	validator.ConsensusPublicKey,
+			Status:			validator.Status,
+			SelfBond:		validator.SelfBond,
+			NominatorBond:		validator.NominatorBond,
+			CommissionBps:		validator.CommissionPolicy.CurrentRateBps,
+			PerformanceScore:	validator.PerformanceScore,
+			ReputationScore:	validator.ReputationScore,
+			PowerCapBps:		powerCap,
+			Jailed:			validator.Status == StatusJailed,
+			Tombstoned:		validator.Status == StatusTombstoned,
 		})
 	}
 	return out, nil

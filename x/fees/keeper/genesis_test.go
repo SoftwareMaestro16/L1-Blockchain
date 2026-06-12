@@ -40,11 +40,11 @@ func TestInitGenesisRejectsCorruptedStateWithoutPartialWrites(t *testing.T) {
 	require.NoError(t, err)
 
 	corrupted := types.GenesisState{
-		Params: types.DefaultParams(),
+		Params:	types.DefaultParams(),
 		ProtocolFeeState: types.ProtocolFeeState{
-			TotalCollected:   sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100)),
-			ValidatorRewards: sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 90)),
-			CommunityPool:    sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 5)),
+			TotalCollected:		sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100)),
+			ValidatorRewards:	sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 90)),
+			CommunityPool:		sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 5)),
 		},
 	}
 
@@ -60,9 +60,9 @@ func TestMigrationRejectsCorruptedFeeState(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false)
 	corrupted := types.ProtocolFeeState{
-		TotalCollected:   sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100)),
-		ValidatorRewards: sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 75)),
-		CommunityPool:    sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 20)),
+		TotalCollected:		sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100)),
+		ValidatorRewards:	sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 75)),
+		CommunityPool:		sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 20)),
 	}
 	bz, err := app.AppCodec().Marshal(&corrupted)
 	require.NoError(t, err)
@@ -85,7 +85,6 @@ func TestCongestionStateGenesisRoundTrip(t *testing.T) {
 	sourceApp := l1app.Setup(t, false)
 	sourceCtx := sourceApp.NewContext(false)
 
-	// Set a non-default congestion state.
 	require.NoError(t, sourceApp.FeesKeeper.SetCongestionState(sourceCtx, 7_500))
 
 	exported, err := sourceApp.FeesKeeper.ExportGenesis(sourceCtx)
@@ -97,7 +96,6 @@ func TestCongestionStateGenesisRoundTrip(t *testing.T) {
 	require.NoError(t, targetApp.FeesKeeper.InitGenesis(targetCtx, *exported))
 	require.Equal(t, uint32(7_500), targetApp.FeesKeeper.GetCongestionState(targetCtx))
 
-	// Re-export and verify it matches.
 	reexported, err := targetApp.FeesKeeper.ExportGenesis(targetCtx)
 	require.NoError(t, err)
 	require.Equal(t, exported, reexported)
@@ -125,9 +123,9 @@ func TestCongestionStateInitGenesisClampsOversizedValue(t *testing.T) {
 	ctx := app.NewContext(false)
 
 	gs := &types.GenesisState{
-		Params:           types.DefaultParams(),
-		ProtocolFeeState: types.DefaultProtocolFeeState(),
-		CongestionBps:    99_999,
+		Params:			types.DefaultParams(),
+		ProtocolFeeState:	types.DefaultProtocolFeeState(),
+		CongestionBps:		99_999,
 	}
 	require.NoError(t, app.FeesKeeper.InitGenesis(ctx, *gs))
 	require.Equal(t, uint32(0), app.FeesKeeper.GetCongestionState(ctx))

@@ -10,7 +10,7 @@ import (
 type TypeKind uint16
 
 const (
-	KindNull TypeKind = iota
+	KindNull	TypeKind	= iota
 	KindBool
 	KindUint8
 	KindUint16
@@ -48,15 +48,15 @@ func (id TypeID) String() string {
 type Type interface {
 	Kind() TypeKind
 	TypeID() TypeID
-	Schema() *chunk.Chunk // The type definition as a chunk
+	Schema() *chunk.Chunk	// The type definition as a chunk
 	IsAssignableFrom(other Type) bool
 	String() string
 }
 
 // Value is a runtime container for a data payload and its type information.
 type Value struct {
-	Type    Type
-	Payload interface{}
+	Type	Type
+	Payload	interface{}
 }
 
 func (v Value) String() string {
@@ -65,71 +65,71 @@ func (v Value) String() string {
 
 // BaseType implements basic Type interface for primitives.
 type BaseType struct {
-	kind   TypeKind
-	id     TypeID
-	schema *chunk.Chunk
+	kind	TypeKind
+	id	TypeID
+	schema	*chunk.Chunk
 }
 
-func (t *BaseType) Kind() TypeKind       { return t.kind }
-func (t *BaseType) TypeID() TypeID       { return t.id }
-func (t *BaseType) Schema() *chunk.Chunk { return t.schema }
-func (t *BaseType) String() string       { return fmt.Sprintf("Type(%d)", t.kind) }
+func (t *BaseType) Kind() TypeKind		{ return t.kind }
+func (t *BaseType) TypeID() TypeID		{ return t.id }
+func (t *BaseType) Schema() *chunk.Chunk	{ return t.schema }
+func (t *BaseType) String() string		{ return fmt.Sprintf("Type(%d)", t.kind) }
 func (t *BaseType) IsAssignableFrom(other Type) bool {
 	return t.kind == other.Kind() && t.id == other.TypeID()
 }
 
 var (
-	TypeNull      = &BaseType{kind: KindNull}
-	TypeBool      = &BaseType{kind: KindBool}
-	TypeUint8     = &BaseType{kind: KindUint8}
-	TypeUint16    = &BaseType{kind: KindUint16}
-	TypeUint32    = &BaseType{kind: KindUint32}
-	TypeUint64    = &BaseType{kind: KindUint64}
-	TypeUint128   = &BaseType{kind: KindUint128}
-	TypeUint256   = &BaseType{kind: KindUint256}
-	TypeInt8      = &BaseType{kind: KindInt8}
-	TypeInt16     = &BaseType{kind: KindInt16}
-	TypeInt32     = &BaseType{kind: KindInt32}
-	TypeInt64     = &BaseType{kind: KindInt64}
-	TypeInt128    = &BaseType{kind: KindInt128}
-	TypeInt256    = &BaseType{kind: KindInt256}
-	TypeAddress   = &BaseType{kind: KindAddress}
-	TypeHash      = &BaseType{kind: KindHash}
-	TypeCoins     = TypeUint128
-	TypeTimestamp = TypeUint64
-	TypeChunk     = &BaseType{kind: KindChunk}
-	TypeExecFrame = &BaseType{kind: KindExecutionFrame}
+	TypeNull	= &BaseType{kind: KindNull}
+	TypeBool	= &BaseType{kind: KindBool}
+	TypeUint8	= &BaseType{kind: KindUint8}
+	TypeUint16	= &BaseType{kind: KindUint16}
+	TypeUint32	= &BaseType{kind: KindUint32}
+	TypeUint64	= &BaseType{kind: KindUint64}
+	TypeUint128	= &BaseType{kind: KindUint128}
+	TypeUint256	= &BaseType{kind: KindUint256}
+	TypeInt8	= &BaseType{kind: KindInt8}
+	TypeInt16	= &BaseType{kind: KindInt16}
+	TypeInt32	= &BaseType{kind: KindInt32}
+	TypeInt64	= &BaseType{kind: KindInt64}
+	TypeInt128	= &BaseType{kind: KindInt128}
+	TypeInt256	= &BaseType{kind: KindInt256}
+	TypeAddress	= &BaseType{kind: KindAddress}
+	TypeHash	= &BaseType{kind: KindHash}
+	TypeCoins	= TypeUint128
+	TypeTimestamp	= TypeUint64
+	TypeChunk	= &BaseType{kind: KindChunk}
+	TypeExecFrame	= &BaseType{kind: KindExecutionFrame}
 )
 
 // TupleType represents a fixed-size ordered collection of values of different types.
 type TupleType struct {
 	BaseType
-	Elements []Type
+	Elements	[]Type
 }
 
 // OptionType represents an optional value of type T.
 type OptionType struct {
 	BaseType
-	Underlying Type
+	Underlying	Type
 }
 
 // MapType represents a key-value mapping from K to V.
 type MapType struct {
 	BaseType
-	Key   Type
-	Value Type
+	Key	Type
+	Value	Type
 }
 
 // StringType represents a bounded UTF-8 string.
 type StringType struct {
 	BaseType
-	MaxLength uint32
+	MaxLength	uint32
 }
 
 // BytesType represents a bounded byte slice.
 type BytesType struct {
 	BaseType
-	MaxLength uint32
+	MaxLength	uint32
 }
 
 // Helper for large integers

@@ -6,27 +6,19 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Message Flags Tests
-// ---------------
-
 func TestMessageFlagsString(t *testing.T) {
 	flags := MessageFlags{
-		Consumed:       true,
-		Bounced:        false,
-		BounceRequested: true,
-		RefundIssued:   false,
-		RefundLocked:   false,
+		Consumed:		true,
+		Bounced:		false,
+		BounceRequested:	true,
+		RefundIssued:		false,
+		RefundLocked:		false,
 	}
 	s := flags.String()
 	if s == "" {
 		t.Error("flags string should not be empty")
 	}
 }
-
-// ---------------
-// Message Lifecycle State Machine
-// ---------------
 
 func TestMessageStateTransitionPendingSuccess(t *testing.T) {
 	state, flags := TransitionMessageState(MessagePending, true, false)
@@ -77,11 +69,11 @@ func TestMessageStateTransitionBouncedFinalized(t *testing.T) {
 
 func TestMessageStateStrings(t *testing.T) {
 	tests := map[MessageState]string{
-		MessagePending:    "PENDING",
-		MessageExecuted:   "EXECUTED",
-		MessageFailed:     "FAILED",
-		MessageBounced:    "BOUNCED",
-		MessageFinalized:  "FINALIZED",
+		MessagePending:		"PENDING",
+		MessageExecuted:	"EXECUTED",
+		MessageFailed:		"FAILED",
+		MessageBounced:		"BOUNCED",
+		MessageFinalized:	"FINALIZED",
 	}
 	for state, expected := range tests {
 		if state.String() != expected {
@@ -90,15 +82,11 @@ func TestMessageStateStrings(t *testing.T) {
 	}
 }
 
-// ---------------
-// Bounce Model Tests
-// ---------------
-
 func TestBounceEligibleFailedBounceRequested(t *testing.T) {
 	flags := MessageFlags{
-		Consumed:       true,
-		Bounced:        false,
-		BounceRequested: true,
+		Consumed:		true,
+		Bounced:		false,
+		BounceRequested:	true,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -109,9 +97,9 @@ func TestBounceEligibleFailedBounceRequested(t *testing.T) {
 
 func TestBounceNotEligibleSuccess(t *testing.T) {
 	flags := MessageFlags{
-		Consumed:       true,
-		Bounced:        false,
-		BounceRequested: true,
+		Consumed:		true,
+		Bounced:		false,
+		BounceRequested:	true,
 	}
 	exitCode := ExitSuccess
 
@@ -122,9 +110,9 @@ func TestBounceNotEligibleSuccess(t *testing.T) {
 
 func TestBounceNotEligibleAlreadyBounced(t *testing.T) {
 	flags := MessageFlags{
-		Consumed:       true,
-		Bounced:        true,
-		BounceRequested: true,
+		Consumed:		true,
+		Bounced:		true,
+		BounceRequested:	true,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -135,9 +123,9 @@ func TestBounceNotEligibleAlreadyBounced(t *testing.T) {
 
 func TestBounceNotEligibleNotRequested(t *testing.T) {
 	flags := MessageFlags{
-		Consumed:       true,
-		Bounced:        false,
-		BounceRequested: false,
+		Consumed:		true,
+		Bounced:		false,
+		BounceRequested:	false,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -148,16 +136,16 @@ func TestBounceNotEligibleNotRequested(t *testing.T) {
 
 func TestProcessBounceCreatesBounceMessage(t *testing.T) {
 	msg := &Message{
-		Sender:   "sender1",
-		Target:   "target1",
-		Value:    100,
-		GasLimit: 50000,
-		Hash:     []byte{1, 2, 3, 4},
+		Sender:		"sender1",
+		Target:		"target1",
+		Value:		100,
+		GasLimit:	50000,
+		Hash:		[]byte{1, 2, 3, 4},
 	}
 	flags := MessageFlags{
-		Consumed:       true,
-		BounceRequested: true,
-		Bounced:        false,
+		Consumed:		true,
+		BounceRequested:	true,
+		Bounced:		false,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -175,15 +163,15 @@ func TestProcessBounceCreatesBounceMessage(t *testing.T) {
 
 func TestProcessBounceNotEligible(t *testing.T) {
 	msg := &Message{
-		Sender:   "sender1",
-		Target:   "target1",
-		Value:    100,
-		GasLimit: 50000,
+		Sender:		"sender1",
+		Target:		"target1",
+		Value:		100,
+		GasLimit:	50000,
 	}
 	flags := MessageFlags{
-		Consumed:       true,
-		BounceRequested: false,
-		Bounced:        false,
+		Consumed:		true,
+		BounceRequested:	false,
+		Bounced:		false,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -195,16 +183,16 @@ func TestProcessBounceNotEligible(t *testing.T) {
 
 func TestProcessBounceAlreadyBouncedNoLoop(t *testing.T) {
 	msg := &Message{
-		Sender:   "sender1",
-		Target:   "target1",
-		Value:    100,
-		GasLimit: 50000,
-		Hash:     []byte{1, 2, 3, 4},
+		Sender:		"sender1",
+		Target:		"target1",
+		Value:		100,
+		GasLimit:	50000,
+		Hash:		[]byte{1, 2, 3, 4},
 	}
 	flags := MessageFlags{
-		Consumed:       true,
-		BounceRequested: true,
-		Bounced:        true,
+		Consumed:		true,
+		BounceRequested:	true,
+		Bounced:		true,
 	}
 	exitCode := StructuredExitCode{Category: ExitCategoryVMError, Subcode: 1}
 
@@ -213,10 +201,6 @@ func TestProcessBounceAlreadyBouncedNoLoop(t *testing.T) {
 		t.Error("already bounced message should NOT create another bounce (prevents infinite loop)")
 	}
 }
-
-// ---------------
-// Refund Accounting Tests
-// ---------------
 
 func TestRefundIssuedOnce(t *testing.T) {
 	acc := NewRefundAccounting()
@@ -266,10 +250,6 @@ func TestNoDoubleRefundValidation(t *testing.T) {
 	}
 }
 
-// ---------------
-// Events Hash Tests
-// ---------------
-
 func TestComputeEventsHash(t *testing.T) {
 	events := []EventRecord{
 		{Index: 0, Topic: "transfer", Payload: []byte{1, 2, 3}, Sender: "addr1", Contract: "contract1"},
@@ -304,16 +284,12 @@ func TestEventsHashChangesOnReorder(t *testing.T) {
 	}
 }
 
-// ---------------
-// Value Conservation Tests
-// ---------------
-
 func TestValueConservationBalanced(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ValueIn:    1000,
-		ValueOut:   600,
-		StorageFee: 200,
-		GasRefunded: 200,
+		ValueIn:	1000,
+		ValueOut:	600,
+		StorageFee:	200,
+		GasRefunded:	200,
 	}
 
 	proof := VerifyValueConservation(receipt)
@@ -324,10 +300,10 @@ func TestValueConservationBalanced(t *testing.T) {
 
 func TestValueConservationImbalanced(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ValueIn:    1000,
-		ValueOut:   900,
-		StorageFee: 200,
-		GasRefunded: 0,
+		ValueIn:	1000,
+		ValueOut:	900,
+		StorageFee:	200,
+		GasRefunded:	0,
 	}
 
 	proof := VerifyValueConservation(receipt)
@@ -336,25 +312,17 @@ func TestValueConservationImbalanced(t *testing.T) {
 	}
 }
 
-// ---------------
-// Gas Breakdown Tests
-// ---------------
-
 func TestGasBreakdownTotal(t *testing.T) {
 	gb := GasBreakdown{
-		ComputeGas: 100,
-		StorageGas:  50,
-		MessageGas:  30,
-		BounceGas:   20,
+		ComputeGas:	100,
+		StorageGas:	50,
+		MessageGas:	30,
+		BounceGas:	20,
 	}
 	if gb.Total() != 200 {
 		t.Errorf("expected total 200, got %d", gb.Total())
 	}
 }
-
-// ---------------
-// Ledger Receipt Construction Tests
-// ---------------
 
 func testChunk() *chunk.Chunk {
 	m := chunk.NewEmptyMap()
@@ -366,10 +334,10 @@ func testChunk() *chunk.Chunk {
 func TestBuildLedgerReceipt(t *testing.T) {
 	state := testChunk()
 	msg := Message{
-		Sender:   "sender1",
-		Target:   "target1",
-		Value:    1000,
-		GasLimit: 100000,
+		Sender:		"sender1",
+		Target:		"target1",
+		Value:		1000,
+		GasLimit:	100000,
 	}
 	frame := NewKernelExecutionFrame(state, msg, 100)
 	refund := NewRefundAccounting()
@@ -392,11 +360,11 @@ func TestBuildLedgerReceipt(t *testing.T) {
 func TestBuildLedgerReceiptWithBounce(t *testing.T) {
 	state := testChunk()
 	msg := Message{
-		Sender:   "sender1",
-		Target:   "target1",
-		Value:    1000,
-		GasLimit: 100000,
-		Hash:     []byte{1, 2, 3, 4},
+		Sender:		"sender1",
+		Target:		"target1",
+		Value:		1000,
+		GasLimit:	100000,
+		Hash:		[]byte{1, 2, 3, 4},
 	}
 	frame := NewKernelExecutionFrame(state, msg, 100)
 	refund := NewRefundAccounting()
@@ -414,10 +382,6 @@ func TestBuildLedgerReceiptWithBounce(t *testing.T) {
 	}
 }
 
-// ---------------
-// BounceMessage Tests
-// ---------------
-
 func TestNewBounceMessage(t *testing.T) {
 	bm := NewBounceMessage([]byte{0xAA, 0xBB}, ExitStackOverflow)
 	if !bm.BounceFlag {
@@ -431,24 +395,20 @@ func TestNewBounceMessage(t *testing.T) {
 	}
 }
 
-// ---------------
-// Receipt Canonical Encode Tests
-// ---------------
-
 func TestReceiptCanonicalEncode(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ExitCode:           ExitSuccess,
-		GasUsed:            5000,
-		GasRefunded:        200,
-		GasBreakdown:       GasBreakdown{ComputeGas: 4000, StorageGas: 500, MessageGas: 300, BounceGas: 200},
-		StorageFee:         500,
-		ValueIn:            1000,
-		ValueOut:           600,
-		StateRootBefore:    make([]byte, 32),
-		StateRootAfter:     make([]byte, 32),
-		EmittedActionsHash: make([]byte, 32),
-		EventsHash:         make([]byte, 32),
-		MessageFlags:       MessageFlags{Consumed: true},
+		ExitCode:		ExitSuccess,
+		GasUsed:		5000,
+		GasRefunded:		200,
+		GasBreakdown:		GasBreakdown{ComputeGas: 4000, StorageGas: 500, MessageGas: 300, BounceGas: 200},
+		StorageFee:		500,
+		ValueIn:		1000,
+		ValueOut:		600,
+		StateRootBefore:	make([]byte, 32),
+		StateRootAfter:		make([]byte, 32),
+		EmittedActionsHash:	make([]byte, 32),
+		EventsHash:		make([]byte, 32),
+		MessageFlags:		MessageFlags{Consumed: true},
 	}
 
 	encoded, err := receipt.CanonicalEncode()
@@ -462,13 +422,13 @@ func TestReceiptCanonicalEncode(t *testing.T) {
 
 func TestReceiptHashDeterministic(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ExitCode:     ExitSuccess,
-		GasUsed:      5000,
-		GasRefunded:  200,
-		GasBreakdown: GasBreakdown{ComputeGas: 4000, StorageGas: 500},
-		ValueIn:      1000,
-		ValueOut:     600,
-		MessageFlags: MessageFlags{Consumed: true},
+		ExitCode:	ExitSuccess,
+		GasUsed:	5000,
+		GasRefunded:	200,
+		GasBreakdown:	GasBreakdown{ComputeGas: 4000, StorageGas: 500},
+		ValueIn:	1000,
+		ValueOut:	600,
+		MessageFlags:	MessageFlags{Consumed: true},
 	}
 
 	h1, err := ReceiptHash(receipt)

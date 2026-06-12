@@ -101,7 +101,6 @@ func writeUint64(w interface{ Write([]byte) (int, error) }, value uint64) {
 	_, _ = w.Write(bz[:])
 }
 
-
 func cloneBytes(in []byte) []byte {
 	if len(in) == 0 {
 		return nil

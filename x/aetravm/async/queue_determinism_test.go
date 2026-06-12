@@ -138,8 +138,8 @@ func TestQueueRejectsAttemptsDepthBodyAndMessageExplosion(t *testing.T) {
 		dest := deployTestContract(t, executor, testAddr(1), []byte("explosion-dst"))
 		require.NoError(t, executor.RegisterHandler(source, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 			return ExecutionResult{
-				NewState:   []byte("must-not-commit"),
-				ResultCode: ResultOK,
+				NewState:	[]byte("must-not-commit"),
+				ResultCode:	ResultOK,
 				Outgoing: []MessageEnvelope{
 					testMessage(contract.Address, dest, 10),
 					testMessage(contract.Address, dest, 11),

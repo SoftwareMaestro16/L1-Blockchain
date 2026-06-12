@@ -11,145 +11,145 @@ import (
 type NetworkingAPIEndpoint string
 
 const (
-	APIEndpointNodeNetworkingQuery     NetworkingAPIEndpoint = "grpc_node_networking_query"
-	APIEndpointOverlayDiagnostics      NetworkingAPIEndpoint = "rest_overlay_diagnostics"
-	APIEndpointStreamDiagnostics       NetworkingAPIEndpoint = "rpc_stream_diagnostics"
-	APIEndpointDiscoveryProof          NetworkingAPIEndpoint = "grpc_discovery_proof"
-	APIEndpointRouteHint               NetworkingAPIEndpoint = "rest_route_hint"
-	APIEndpointStateSyncStreamEndpoint NetworkingAPIEndpoint = "state_sync_stream_endpoint"
+	APIEndpointNodeNetworkingQuery		NetworkingAPIEndpoint	= "grpc_node_networking_query"
+	APIEndpointOverlayDiagnostics		NetworkingAPIEndpoint	= "rest_overlay_diagnostics"
+	APIEndpointStreamDiagnostics		NetworkingAPIEndpoint	= "rpc_stream_diagnostics"
+	APIEndpointDiscoveryProof		NetworkingAPIEndpoint	= "grpc_discovery_proof"
+	APIEndpointRouteHint			NetworkingAPIEndpoint	= "rest_route_hint"
+	APIEndpointStateSyncStreamEndpoint	NetworkingAPIEndpoint	= "state_sync_stream_endpoint"
 )
 
 type BlockSTMNetworkAssistInput struct {
-	Height                    uint64
-	Schedules                 []ExecutionMessageSchedule
-	Hints                     []ANAProposalHint
-	CrossZoneMessages         []ExecutionZoneMessage
-	DecidesCommittedConflicts bool
+	Height				uint64
+	Schedules			[]ExecutionMessageSchedule
+	Hints				[]ANAProposalHint
+	CrossZoneMessages		[]ExecutionZoneMessage
+	DecidesCommittedConflicts	bool
 }
 
 type BlockSTMNetworkGroup struct {
-	GroupID            string
-	ZoneID             string
-	ShardID            string
-	BlockSTMGroupID    string
-	ExecutionOverlayID string
-	RouteHint          RouteHint
-	Priority           uint32
-	TransactionIDs     []string
-	MessageIDs         []string
-	ExecutionQueueID   string
+	GroupID			string
+	ZoneID			string
+	ShardID			string
+	BlockSTMGroupID		string
+	ExecutionOverlayID	string
+	RouteHint		RouteHint
+	Priority		uint32
+	TransactionIDs		[]string
+	MessageIDs		[]string
+	ExecutionQueueID	string
 }
 
 type BlockSTMCrossZoneQueueDelivery struct {
-	DeliveryID         string
-	QueueID            string
-	SourceZone         string
-	DestinationZone    string
-	SourceSequence     uint64
-	MessageID          string
-	MessageHash        string
-	ExecutionOverlayID string
+	DeliveryID		string
+	QueueID			string
+	SourceZone		string
+	DestinationZone		string
+	SourceSequence		uint64
+	MessageID		string
+	MessageHash		string
+	ExecutionOverlayID	string
 }
 
 type BlockSTMNetworkAssistPlan struct {
-	Height                             uint64
-	Groups                             []BlockSTMNetworkGroup
-	CrossZoneDeliveries                []BlockSTMCrossZoneQueueDelivery
-	PrioritizesExecutionOverlayTraffic bool
-	PropagatesZoneShardRouteHints      bool
-	DeliversCrossZoneExecutionQueues   bool
-	DecidesCommittedConflicts          bool
+	Height					uint64
+	Groups					[]BlockSTMNetworkGroup
+	CrossZoneDeliveries			[]BlockSTMCrossZoneQueueDelivery
+	PrioritizesExecutionOverlayTraffic	bool
+	PropagatesZoneShardRouteHints		bool
+	DeliversCrossZoneExecutionQueues	bool
+	DecidesCommittedConflicts		bool
 }
 
 type NetworkingQueryServiceDescriptor struct {
-	Endpoints               []NetworkingAPIEndpoint
-	PreserveGRPC            bool
-	PreserveREST            bool
-	PreserveRPC             bool
-	ProofAttachedDiscovery  bool
-	StateSyncStreamEndpoint bool
-	RouteHintEndpoint       bool
+	Endpoints		[]NetworkingAPIEndpoint
+	PreserveGRPC		bool
+	PreserveREST		bool
+	PreserveRPC		bool
+	ProofAttachedDiscovery	bool
+	StateSyncStreamEndpoint	bool
+	RouteHintEndpoint	bool
 }
 
 type NodeNetworkingQueryRequest struct {
-	CurrentHeight  uint64
-	NetworkSalt    []byte
-	Role           NodeRole
-	ZoneID         string
-	ServiceID      string
-	IncludeExpired bool
+	CurrentHeight	uint64
+	NetworkSalt	[]byte
+	Role		NodeRole
+	ZoneID		string
+	ServiceID	string
+	IncludeExpired	bool
 }
 
 type NodeNetworkingQueryResponse struct {
-	Nodes           []NodeRecord
-	PeerCountByRole []PeerRoleCountMetric
-	ResultHash      string
+	Nodes		[]NodeRecord
+	PeerCountByRole	[]PeerRoleCountMetric
+	ResultHash	string
 }
 
 type OverlayDiagnosticsRequest struct {
-	OverlayID     string
-	CurrentHeight uint64
+	OverlayID	string
+	CurrentHeight	uint64
 }
 
 type OverlayDiagnosticsResponse struct {
-	OverlayID           string
-	OverlayType         OverlayType
-	MembershipSize      uint64
-	GraphHash           string
-	QueuedMessages      uint64
-	RouteFailureRateBps uint32
-	ResultHash          string
+	OverlayID		string
+	OverlayType		OverlayType
+	MembershipSize		uint64
+	GraphHash		string
+	QueuedMessages		uint64
+	RouteFailureRateBps	uint32
+	ResultHash		string
 }
 
 type StreamDiagnosticsRequest struct {
-	StreamID    string
-	PayloadType StreamingPayloadType
+	StreamID	string
+	PayloadType	StreamingPayloadType
 }
 
 type StreamDiagnosticsResponse struct {
-	StreamID           string
-	SessionID          string
-	PayloadType        StreamingPayloadType
-	State              StreamSessionState
-	ThroughputBytesBps uint64
-	BytesSent          uint64
-	BytesAcknowledged  uint64
-	StallCount         uint64
-	BackpressureActive bool
-	CompletionBps      uint32
-	ResultHash         string
+	StreamID		string
+	SessionID		string
+	PayloadType		StreamingPayloadType
+	State			StreamSessionState
+	ThroughputBytesBps	uint64
+	BytesSent		uint64
+	BytesAcknowledged	uint64
+	StallCount		uint64
+	BackpressureActive	bool
+	CompletionBps		uint32
+	ResultHash		string
 }
 
 type DiscoveryProofAPIRequest struct {
-	Query         DRTQuery
-	CurrentHeight uint64
-	OnChainProof  DiscoveryOnChainProof
+	Query		DRTQuery
+	CurrentHeight	uint64
+	OnChainProof	DiscoveryOnChainProof
 }
 
 type DiscoveryProofAPIResponse struct {
-	Response   DiscoveryResponse
-	ResultHash string
+	Response	DiscoveryResponse
+	ResultHash	string
 }
 
 type RouteHintAPIRequest struct {
-	Message        NetworkMessage
-	Descriptor     OverlayDescriptor
-	Graph          RoutingGraph
-	RequestedHint  RouteHint
-	ClientZoneID   string
-	ClientShardID  string
-	ServiceID      string
-	StorageKeyHash string
+	Message		NetworkMessage
+	Descriptor	OverlayDescriptor
+	Graph		RoutingGraph
+	RequestedHint	RouteHint
+	ClientZoneID	string
+	ClientShardID	string
+	ServiceID	string
+	StorageKeyHash	string
 }
 
 type RouteHintAPIResponse struct {
-	OverlayID             string
-	OverlayType           OverlayType
-	Hint                  RouteHint
-	Channel               ChannelClass
-	AdvisoryOnly          bool
-	DeterministicHintHash string
-	ResultHash            string
+	OverlayID		string
+	OverlayType		OverlayType
+	Hint			RouteHint
+	Channel			ChannelClass
+	AdvisoryOnly		bool
+	DeterministicHintHash	string
+	ResultHash		string
 }
 
 func BuildBlockSTMNetworkAssistPlan(input BlockSTMNetworkAssistInput) (BlockSTMNetworkAssistPlan, error) {
@@ -178,12 +178,12 @@ func BuildBlockSTMNetworkAssistPlan(input BlockSTMNetworkAssistInput) (BlockSTMN
 		return BlockSTMNetworkAssistPlan{}, err
 	}
 	plan := BlockSTMNetworkAssistPlan{
-		Height:                             input.Height,
-		Groups:                             groups,
-		CrossZoneDeliveries:                deliveries,
-		PrioritizesExecutionOverlayTraffic: true,
-		PropagatesZoneShardRouteHints:      len(groups) > 0,
-		DeliversCrossZoneExecutionQueues:   len(deliveries) > 0,
+		Height:					input.Height,
+		Groups:					groups,
+		CrossZoneDeliveries:			deliveries,
+		PrioritizesExecutionOverlayTraffic:	true,
+		PropagatesZoneShardRouteHints:		len(groups) > 0,
+		DeliversCrossZoneExecutionQueues:	len(deliveries) > 0,
 	}
 	if err := plan.Validate(); err != nil {
 		return BlockSTMNetworkAssistPlan{}, err
@@ -288,12 +288,12 @@ func DefaultNetworkingQueryServiceDescriptor() NetworkingQueryServiceDescriptor 
 			APIEndpointRouteHint,
 			APIEndpointStateSyncStreamEndpoint,
 		},
-		PreserveGRPC:            true,
-		PreserveREST:            true,
-		PreserveRPC:             true,
-		ProofAttachedDiscovery:  true,
-		StateSyncStreamEndpoint: true,
-		RouteHintEndpoint:       true,
+		PreserveGRPC:			true,
+		PreserveREST:			true,
+		PreserveRPC:			true,
+		ProofAttachedDiscovery:		true,
+		StateSyncStreamEndpoint:	true,
+		RouteHintEndpoint:		true,
 	}
 }
 
@@ -344,7 +344,7 @@ func BuildNodeNetworkingQueryResponse(req NodeNetworkingQueryRequest, records []
 		}
 		if err := record.Validate(req.NetworkSalt, validateHeight); err != nil {
 			if req.IncludeExpired && strings.Contains(err.Error(), "expired") {
-				// unreachable with validateHeight 0, kept explicit for future validation changes
+
 			} else {
 				return NodeNetworkingQueryResponse{}, err
 			}
@@ -417,12 +417,12 @@ func BuildOverlayDiagnosticsResponse(req OverlayDiagnosticsRequest, descriptors 
 		return OverlayDiagnosticsResponse{}, err
 	}
 	response := OverlayDiagnosticsResponse{
-		OverlayID:           overlayID,
-		OverlayType:         desc.OverlayType,
-		MembershipSize:      membershipSize,
-		GraphHash:           graph.GraphHash,
-		QueuedMessages:      queued,
-		RouteFailureRateBps: failureRate,
+		OverlayID:		overlayID,
+		OverlayType:		desc.OverlayType,
+		MembershipSize:		membershipSize,
+		GraphHash:		graph.GraphHash,
+		QueuedMessages:		queued,
+		RouteFailureRateBps:	failureRate,
 	}
 	response.ResultHash = ComputeOverlayDiagnosticsResultHash(response)
 	return response, nil
@@ -445,14 +445,14 @@ func BuildStreamDiagnosticsResponse(req StreamDiagnosticsRequest, sessions []Str
 			return StreamDiagnosticsResponse{}, errors.New("networking stream diagnostics payload type mismatch")
 		}
 		metric := StreamMetrics{
-			StreamID:          streamID,
-			PayloadType:       session.PayloadType,
-			State:             session.State,
-			BytesSent:         session.BytesSent,
-			BytesAcknowledged: session.BytesAcknowledged,
-			InFlightBytes:     session.BytesSent - session.BytesAcknowledged,
-			AvailableWindow:   StreamAvailableWindow(session),
-			CompletionBps:     uint32(0),
+			StreamID:		streamID,
+			PayloadType:		session.PayloadType,
+			State:			session.State,
+			BytesSent:		session.BytesSent,
+			BytesAcknowledged:	session.BytesAcknowledged,
+			InFlightBytes:		session.BytesSent - session.BytesAcknowledged,
+			AvailableWindow:	StreamAvailableWindow(session),
+			CompletionBps:		uint32(0),
 		}
 		for _, candidate := range metrics {
 			if normalizeHashText(candidate.StreamID) == streamID {
@@ -464,16 +464,16 @@ func BuildStreamDiagnosticsResponse(req StreamDiagnosticsRequest, sessions []Str
 			}
 		}
 		response := StreamDiagnosticsResponse{
-			StreamID:           streamID,
-			SessionID:          session.SessionID,
-			PayloadType:        metric.PayloadType,
-			State:              metric.State,
-			ThroughputBytesBps: metric.ThroughputBytesBps,
-			BytesSent:          metric.BytesSent,
-			BytesAcknowledged:  metric.BytesAcknowledged,
-			StallCount:         metric.StallCount,
-			BackpressureActive: metric.BackpressureActive,
-			CompletionBps:      metric.CompletionBps,
+			StreamID:		streamID,
+			SessionID:		session.SessionID,
+			PayloadType:		metric.PayloadType,
+			State:			metric.State,
+			ThroughputBytesBps:	metric.ThroughputBytesBps,
+			BytesSent:		metric.BytesSent,
+			BytesAcknowledged:	metric.BytesAcknowledged,
+			StallCount:		metric.StallCount,
+			BackpressureActive:	metric.BackpressureActive,
+			CompletionBps:		metric.CompletionBps,
 		}
 		response.ResultHash = ComputeStreamDiagnosticsResultHash(response)
 		return response, nil
@@ -522,10 +522,10 @@ func BuildRouteHintAPIResponse(req RouteHintAPIRequest) (RouteHintAPIResponse, e
 		return RouteHintAPIResponse{}, err
 	}
 	hint := RouteHint{
-		ZoneID:         strings.TrimSpace(req.ClientZoneID),
-		ShardID:        strings.TrimSpace(req.ClientShardID),
-		ServiceID:      strings.TrimSpace(req.ServiceID),
-		StorageKeyHash: normalizeHashText(req.StorageKeyHash),
+		ZoneID:		strings.TrimSpace(req.ClientZoneID),
+		ShardID:	strings.TrimSpace(req.ClientShardID),
+		ServiceID:	strings.TrimSpace(req.ServiceID),
+		StorageKeyHash:	normalizeHashText(req.StorageKeyHash),
 	}
 	if hint.ZoneID == "" {
 		hint.ZoneID = strings.TrimSpace(req.RequestedHint.ZoneID)
@@ -548,12 +548,12 @@ func BuildRouteHintAPIResponse(req RouteHintAPIRequest) (RouteHintAPIResponse, e
 		}
 	}
 	response := RouteHintAPIResponse{
-		OverlayID:             desc.OverlayID,
-		OverlayType:           desc.OverlayType,
-		Hint:                  hint,
-		Channel:               msg.Channel,
-		AdvisoryOnly:          !msg.ConsensusEffect,
-		DeterministicHintHash: hint.DeterministicHintHash,
+		OverlayID:		desc.OverlayID,
+		OverlayType:		desc.OverlayType,
+		Hint:			hint,
+		Channel:		msg.Channel,
+		AdvisoryOnly:		!msg.ConsensusEffect,
+		DeterministicHintHash:	hint.DeterministicHintHash,
 	}
 	response.ResultHash = ComputeRouteHintAPIResultHash(response)
 	return response, nil
@@ -644,17 +644,17 @@ func ComputeRouteHintAPIResultHash(response RouteHintAPIResponse) string {
 
 func blockSTMGroupFromSchedule(schedule ExecutionMessageSchedule, hints []ANAProposalHint) BlockSTMNetworkGroup {
 	group := BlockSTMNetworkGroup{
-		ZoneID:             schedule.ZoneID,
-		ShardID:            schedule.ShardID,
-		BlockSTMGroupID:    HashParts("blockstm-network-group-id", schedule.ZoneID, schedule.ShardID, schedule.ScheduleID),
-		ExecutionOverlayID: HashParts("blockstm-execution-overlay", schedule.ZoneID, schedule.ShardID),
-		Priority:           PriorityForChannel(ChannelExecution),
-		TransactionIDs:     append([]string(nil), schedule.TransactionIDs...),
-		MessageIDs:         append([]string(nil), schedule.MessageIDs...),
-		ExecutionQueueID:   HashParts("blockstm-execution-queue", schedule.ZoneID, schedule.ShardID),
+		ZoneID:			schedule.ZoneID,
+		ShardID:		schedule.ShardID,
+		BlockSTMGroupID:	HashParts("blockstm-network-group-id", schedule.ZoneID, schedule.ShardID, schedule.ScheduleID),
+		ExecutionOverlayID:	HashParts("blockstm-execution-overlay", schedule.ZoneID, schedule.ShardID),
+		Priority:		PriorityForChannel(ChannelExecution),
+		TransactionIDs:		append([]string(nil), schedule.TransactionIDs...),
+		MessageIDs:		append([]string(nil), schedule.MessageIDs...),
+		ExecutionQueueID:	HashParts("blockstm-execution-queue", schedule.ZoneID, schedule.ShardID),
 		RouteHint: RouteHint{
-			ZoneID:  schedule.ZoneID,
-			ShardID: schedule.ShardID,
+			ZoneID:		schedule.ZoneID,
+			ShardID:	schedule.ShardID,
 		},
 	}
 	for _, hint := range hints {
@@ -687,13 +687,13 @@ func buildBlockSTMCrossZoneDeliveries(messages []ExecutionZoneMessage) ([]BlockS
 			return nil, errors.New("networking BlockSTM cross-zone destination mismatch")
 		}
 		delivery := BlockSTMCrossZoneQueueDelivery{
-			QueueID:            HashParts("blockstm-cross-zone-queue", msg.CrossZone.DestinationZone, msg.ShardID),
-			SourceZone:         msg.CrossZone.SourceZone,
-			DestinationZone:    msg.CrossZone.DestinationZone,
-			SourceSequence:     msg.CrossZone.SourceSequence,
-			MessageID:          msg.Message.MessageID,
-			MessageHash:        msg.CrossZone.MessageHash,
-			ExecutionOverlayID: msg.ExecutionOverlayID,
+			QueueID:		HashParts("blockstm-cross-zone-queue", msg.CrossZone.DestinationZone, msg.ShardID),
+			SourceZone:		msg.CrossZone.SourceZone,
+			DestinationZone:	msg.CrossZone.DestinationZone,
+			SourceSequence:		msg.CrossZone.SourceSequence,
+			MessageID:		msg.Message.MessageID,
+			MessageHash:		msg.CrossZone.MessageHash,
+			ExecutionOverlayID:	msg.ExecutionOverlayID,
 		}
 		delivery.DeliveryID = ComputeBlockSTMCrossZoneDeliveryID(delivery)
 		deliveries = append(deliveries, delivery)

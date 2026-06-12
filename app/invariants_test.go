@@ -68,7 +68,7 @@ func TestAppInvariantRegistryIncludesEveryRequiredInvariant(t *testing.T) {
 		AppInvariantRentReserveBalance,
 	} {
 		_, found := seen[id]
-		require.Truef(t, found, "UPDATE.md runtime invariant %s must be registered", id)
+		require.Truef(t, found, "runtime invariant %s must be registered", id)
 	}
 
 	crisisRegistry := newRecordingInvariantRegistry()
@@ -108,20 +108,20 @@ func TestAppRuntimeInvariantsPassAfterCoreFlows(t *testing.T) {
 	contractUser, contractRaw := nominatorPoolAddressPair(t, "71")
 	userAddress, _ := nominatorPoolAddressPair(t, "72")
 	pool, err := app.NominatorPoolKeeper.CreateOfficialLiquidStakingPool(nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
-		Authority:           initial.Params.Authority,
-		PoolID:              "invariant-flow-pool",
-		ContractAddressUser: contractUser,
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        nominatorPoolRawAddress("73"),
-		PoolCommissionBps:   100,
-		Height:              2,
+		Authority:		initial.Params.Authority,
+		PoolID:			"invariant-flow-pool",
+		ContractAddressUser:	contractUser,
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		nominatorPoolRawAddress("73"),
+		PoolCommissionBps:	100,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	_, err = app.NominatorPoolKeeper.DepositToStakingPool(nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: userAddress,
-		Amount:        2 * nominatorpooltypes.DefaultMinPoolDeposit,
-		Height:        3,
+		PoolID:		pool.PoolID,
+		WalletAddress:	userAddress,
+		Amount:		2 * nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	_, err = app.NominatorPoolKeeper.ApplyPoolReward(pool.PoolID, 100)
@@ -129,11 +129,11 @@ func TestAppRuntimeInvariantsPassAfterCoreFlows(t *testing.T) {
 	_, err = app.NominatorPoolKeeper.ClaimPoolRewardsWithReceipt(nominatorpooltypes.MsgClaimPoolRewards{PoolID: pool.PoolID, OwnerAddress: userAddress, Height: 4})
 	require.NoError(t, err)
 	_, err = app.NominatorPoolKeeper.RequestPoolUnbond(nominatorpooltypes.MsgRequestPoolUnbond{
-		PoolID:       pool.PoolID,
-		OwnerAddress: userAddress,
-		RequestID:    "invariant-unbond-1",
-		Shares:       nominatorpooltypes.DefaultMinPoolDeposit,
-		Height:       5,
+		PoolID:		pool.PoolID,
+		OwnerAddress:	userAddress,
+		RequestID:	"invariant-unbond-1",
+		Shares:		nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:		5,
 	})
 	require.NoError(t, err)
 	poolGenesis, err := app.NominatorPoolKeeper.ExportGenesisState(ctx)
@@ -141,10 +141,10 @@ func TestAppRuntimeInvariantsPassAfterCoreFlows(t *testing.T) {
 	poolGenesis.State.LiquidStakingPools[0].StorageRentDebt = 25
 	require.NoError(t, app.NominatorPoolKeeper.InitGenesis(poolGenesis))
 	_, err = app.NominatorPoolKeeper.TopUpPoolReserve(nominatorpooltypes.MsgTopUpPoolReserve{
-		PoolID:       pool.PoolID,
-		PayerAddress: userAddress,
-		Amount:       25,
-		Height:       6,
+		PoolID:		pool.PoolID,
+		PayerAddress:	userAddress,
+		Amount:		25,
+		Height:		6,
 	})
 	require.NoError(t, err)
 
@@ -154,20 +154,20 @@ func TestAppRuntimeInvariantsPassAfterCoreFlows(t *testing.T) {
 	stored, err := app.ContractsKeeper.StoreCodeState(ctx, contractstypes.MsgStoreCode{Authority: wallet, Bytecode: bytecode})
 	require.NoError(t, err)
 	deployed, err := app.ContractsKeeper.DeployContractState(ctx, contractstypes.MsgDeployContract{
-		Creator:        wallet,
-		CodeID:         stored.CodeID,
-		InitPayload:    []byte("init"),
-		InitialBalance: 10_000_000,
-		Admin:          wallet,
-		Height:         10,
+		Creator:	wallet,
+		CodeID:		stored.CodeID,
+		InitPayload:	[]byte("init"),
+		InitialBalance:	10_000_000,
+		Admin:		wallet,
+		Height:		10,
 	})
 	require.NoError(t, err)
 	_, err = app.ContractsKeeper.ExecuteExternalState(ctx, contractstypes.MsgExecuteExternal{
-		Sender:          wallet,
-		ContractAddress: deployed.ContractAddressUser,
-		Payload:         []byte("execute"),
-		GasLimit:        app.ContractsKeeper.Params().MaxGasPerExecution,
-		Height:          11,
+		Sender:			wallet,
+		ContractAddress:	deployed.ContractAddressUser,
+		Payload:		[]byte("execute"),
+		GasLimit:		app.ContractsKeeper.Params().MaxGasPerExecution,
+		Height:			11,
 	})
 	require.NoError(t, err)
 
@@ -178,10 +178,10 @@ func TestAppRuntimeInvariantsPassAfterCoreFlows(t *testing.T) {
 func TestAppBankAccountingInvariantDetectsSupplyMismatch(t *testing.T) {
 	genesis := &banktypes.GenesisState{
 		Balances: []banktypes.Balance{{
-			Address: "AE1111111111111111111111111111111111111111111111111111",
-			Coins:   sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10)),
+			Address:	"AE1111111111111111111111111111111111111111111111111111",
+			Coins:		sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10)),
 		}},
-		Supply: sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 9)),
+		Supply:	sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 9)),
 	}
 
 	require.ErrorContains(t, validateBankSupplyMatchesBalances(genesis), "bank supply mismatch")
@@ -201,15 +201,15 @@ func TestAppDirectDelegationInvariantDetectsEnabledPolicy(t *testing.T) {
 func TestAppStorageRentInvariantDetectsSystemUnderfunding(t *testing.T) {
 	state := storagerenttypes.EmptyStorageRentState()
 	state.SystemReserve = storagerenttypes.SystemRentReserve{
-		AvailableFunds:                   1,
-		ProjectedRentPerBlock:            10,
-		WarningRunwayBlocks:              100,
-		CriticalRunwayBlocks:             50,
-		FeeCollectorBalance:              2,
-		TreasuryBalance:                  3,
-		GovernanceConfiguredPayerBalance: 4,
-		RequiredTopUp:                    20,
-		ProtocolCriticalExecutable:       true,
+		AvailableFunds:				1,
+		ProjectedRentPerBlock:			10,
+		WarningRunwayBlocks:			100,
+		CriticalRunwayBlocks:			50,
+		FeeCollectorBalance:			2,
+		TreasuryBalance:			3,
+		GovernanceConfiguredPayerBalance:	4,
+		RequiredTopUp:				20,
+		ProtocolCriticalExecutable:		true,
 	}
 
 	err := validateStorageRentRuntimeState(state)
@@ -229,47 +229,47 @@ func TestEveryRequiredAppInvariantHasFailingFixture(t *testing.T) {
 func TestAppRuntimeInvariantHelpersRejectCorruptedStateWithClearErrors(t *testing.T) {
 	state := nominatorpooltypes.State{
 		LiquidStakingPools: []nominatorpooltypes.LiquidStakingPool{{
-			PoolID:      "corrupt",
-			TotalShares: 10,
+			PoolID:		"corrupt",
+			TotalShares:	10,
 		}},
-		PoolShares: []nominatorpooltypes.PoolShare{{PoolID: "corrupt", Shares: 9}},
+		PoolShares:	[]nominatorpooltypes.PoolShare{{PoolID: "corrupt", Shares: 9}},
 	}
 	require.ErrorContains(t, validatePoolSharesSum(state), "share sum mismatch")
 
 	economics := economicstypes.EconomicsState{RewardHistory: []economicstypes.EpochRewardSummary{{
-		Epoch:                     1,
-		StartingSupply:            100,
-		EndingSupply:              100,
-		FeesCollected:             10,
-		BurnedAmount:              3,
-		TreasuryAmount:            2,
-		ValidatorDelegatorRewards: 4,
+		Epoch:				1,
+		StartingSupply:			100,
+		EndingSupply:			100,
+		FeesCollected:			10,
+		BurnedAmount:			3,
+		TreasuryAmount:			2,
+		ValidatorDelegatorRewards:	4,
 	}}}
 	require.ErrorContains(t, validateEconomicsAccounting(economics), "validator rewards do not reconcile")
 
 	contracts := contractstypes.State{InternalMessages: []contractstypes.InternalMessage{{
-		SourceContractUser: "missing",
-		MessageID:          "bad",
+		SourceContractUser:	"missing",
+		MessageID:		"bad",
 	}}}
 	require.ErrorContains(t, validateAVMQueueReceipts(contracts), "unknown source contract")
 }
 
 func TestAppInvariantSecretFailureFixtureRejectsPrivateFields(t *testing.T) {
 	input := nativeaccounttypes.NativeAccountInvariantInput{
-		ExportedPayloads:             []string{"event.private_key=bad"},
-		AEAddressRoundtripStable:     true,
-		RawAddressRoundtripStable:    true,
-		ActivationAttempts:           map[string]uint64{},
-		TotalSupply:                  1,
-		RewardBudget:                 1,
-		MaxValidatorCount:            1,
-		MinValidatorStake:            1,
-		MinPoolDeposit:               1,
-		ExportImportStable:           true,
-		SystemReserveRunwayBlocks:    1,
-		MinSystemReserveRunwayBlocks: 1,
-		SystemTopUpOrder:             []string{"system_rent_top_up", "user_freeze_processing"},
-		ProtocolCriticalExecutable:   true,
+		ExportedPayloads:		[]string{"event.private_key=bad"},
+		AEAddressRoundtripStable:	true,
+		RawAddressRoundtripStable:	true,
+		ActivationAttempts:		map[string]uint64{},
+		TotalSupply:			1,
+		RewardBudget:			1,
+		MaxValidatorCount:		1,
+		MinValidatorStake:		1,
+		MinPoolDeposit:			1,
+		ExportImportStable:		true,
+		SystemReserveRunwayBlocks:	1,
+		MinSystemReserveRunwayBlocks:	1,
+		SystemTopUpOrder:		[]string{"system_rent_top_up", "user_freeze_processing"},
+		ProtocolCriticalExecutable:	true,
 	}
 
 	require.ErrorContains(t,
@@ -280,8 +280,8 @@ func TestAppInvariantSecretFailureFixtureRejectsPrivateFields(t *testing.T) {
 
 func TestAppInvariantRegistryRejectsMissingRuntimeCheck(t *testing.T) {
 	registry := []AppInvariant{{
-		ID:          nativeaccounttypes.InvariantModuleBankAccountingConsistent,
-		Description: "bank accounting",
+		ID:		nativeaccounttypes.InvariantModuleBankAccountingConsistent,
+		Description:	"bank accounting",
 	}}
 
 	require.ErrorContains(t, ValidateAppInvariantRegistry(registry), "check are required")
@@ -336,10 +336,10 @@ func appInvariantFailingFixtures(t *testing.T) map[string]func() error {
 	fixtures[AppInvariantBankSupply] = func() error {
 		return validateBankSupplyMatchesBalances(&banktypes.GenesisState{
 			Balances: []banktypes.Balance{{
-				Address: "AE1111111111111111111111111111111111111111111111111111",
-				Coins:   sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10)),
+				Address:	"AE1111111111111111111111111111111111111111111111111111",
+				Coins:		sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 10)),
 			}},
-			Supply: sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 9)),
+			Supply:	sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 9)),
 		})
 	}
 	fixtures[AppInvariantModuleAccounts] = func() error {
@@ -353,24 +353,24 @@ func appInvariantFailingFixtures(t *testing.T) map[string]func() error {
 	}
 	fixtures[AppInvariantFeeAccounting] = func() error {
 		return validateEconomicsAccounting(economicstypes.EconomicsState{RewardHistory: []economicstypes.EpochRewardSummary{{
-			Epoch:                     1,
-			StartingSupply:            100,
-			EndingSupply:              100,
-			FeesCollected:             10,
-			BurnedAmount:              3,
-			TreasuryAmount:            2,
-			ValidatorDelegatorRewards: 4,
+			Epoch:				1,
+			StartingSupply:			100,
+			EndingSupply:			100,
+			FeesCollected:			10,
+			BurnedAmount:			3,
+			TreasuryAmount:			2,
+			ValidatorDelegatorRewards:	4,
 		}}})
 	}
 	fixtures[AppInvariantStorageAccounting] = func() error {
 		state := storagerenttypes.EmptyStorageRentState()
 		state.SystemReserve = storagerenttypes.SystemRentReserve{
-			AvailableFunds:             1,
-			ProjectedRentPerBlock:      10,
-			WarningRunwayBlocks:        100,
-			CriticalRunwayBlocks:       50,
-			RequiredTopUp:              20,
-			ProtocolCriticalExecutable: true,
+			AvailableFunds:			1,
+			ProjectedRentPerBlock:		10,
+			WarningRunwayBlocks:		100,
+			CriticalRunwayBlocks:		50,
+			RequiredTopUp:			20,
+			ProtocolCriticalExecutable:	true,
 		}
 		return validateStorageRentRuntimeState(state)
 	}
@@ -379,15 +379,15 @@ func appInvariantFailingFixtures(t *testing.T) map[string]func() error {
 	}
 	fixtures[AppInvariantPoolSharesSum] = func() error {
 		return validatePoolSharesSum(nominatorpooltypes.State{
-			LiquidStakingPools: []nominatorpooltypes.LiquidStakingPool{{PoolID: "pool-a", TotalShares: 2}},
-			PoolShares:         []nominatorpooltypes.PoolShare{{PoolID: "pool-a", Shares: 1}},
+			LiquidStakingPools:	[]nominatorpooltypes.LiquidStakingPool{{PoolID: "pool-a", TotalShares: 2}},
+			PoolShares:		[]nominatorpooltypes.PoolShare{{PoolID: "pool-a", Shares: 1}},
 		})
 	}
 	fixtures[AppInvariantPoolRuntimeAccounting] = func() error {
 		return validatePoolRuntimeAccounting(nominatorpooltypes.State{
-			LiquidStakingPools: []nominatorpooltypes.LiquidStakingPool{{PoolID: "pool-a", TotalDeposited: 100, TotalActiveStake: 80, TotalUnbonding: 10}},
+			LiquidStakingPools:	[]nominatorpooltypes.LiquidStakingPool{{PoolID: "pool-a", TotalDeposited: 100, TotalActiveStake: 80, TotalUnbonding: 10}},
 			PoolUnbondingRequests: []nominatorpooltypes.PoolUnbondingRequest{{
-				PoolID: "pool-a", Amount: 9, Status: nominatorpooltypes.WithdrawalStatusPending,
+				PoolID:	"pool-a", Amount: 9, Status: nominatorpooltypes.WithdrawalStatusPending,
 			}},
 		})
 	}
@@ -398,13 +398,13 @@ func appInvariantFailingFixtures(t *testing.T) map[string]func() error {
 	}
 	fixtures[AppInvariantEconomicsAccounting] = func() error {
 		return validateEconomicsAccounting(economicstypes.EconomicsState{RewardHistory: []economicstypes.EpochRewardSummary{{
-			Epoch:                     1,
-			StartingSupply:            100,
-			EndingSupply:              100,
-			FeesCollected:             10,
-			BurnedAmount:              3,
-			TreasuryAmount:            2,
-			ValidatorDelegatorRewards: 4,
+			Epoch:				1,
+			StartingSupply:			100,
+			EndingSupply:			100,
+			FeesCollected:			10,
+			BurnedAmount:			3,
+			TreasuryAmount:			2,
+			ValidatorDelegatorRewards:	4,
 		}}})
 	}
 	fixtures[AppInvariantAVMQueueReceipts] = func() error {
@@ -416,10 +416,10 @@ func appInvariantFailingFixtures(t *testing.T) map[string]func() error {
 	fixtures[AppInvariantValidatorInsuranceBounds] = func() error {
 		params := validatorinsurancetypes.DefaultParams()
 		return validatorinsurancetypes.State{Insurances: []validatorinsurancetypes.ValidatorInsurance{{
-			ValidatorAddress:  invariantAuthorityAddress(0x91),
-			ValidatorStatus:   "active",
-			Balance:           params.MinimumInsurance - 1,
-			PendingWithdrawal: validatorinsurancetypes.PendingInsuranceWithdrawal{},
+			ValidatorAddress:	invariantAuthorityAddress(0x91),
+			ValidatorStatus:	"active",
+			Balance:		params.MinimumInsurance - 1,
+			PendingWithdrawal:	validatorinsurancetypes.PendingInsuranceWithdrawal{},
 		}}}.Validate(params)
 	}
 	fixtures[AppInvariantEmissionCap] = func() error {
@@ -529,22 +529,22 @@ func nativeInvariantMutators() map[string]func(*nativeaccounttypes.NativeAccount
 
 func validAppNativeInvariantInput() nativeaccounttypes.NativeAccountInvariantInput {
 	return nativeaccounttypes.NativeAccountInvariantInput{
-		AEAddressRoundtripStable:     true,
-		RawAddressRoundtripStable:    true,
-		ActivationAttempts:           map[string]uint64{},
-		TotalSupply:                  1_000,
-		RewardBudget:                 1_000,
-		MaxValidatorCount:            1,
-		MinValidatorStake:            1,
-		ValidatorStakes:              []uint64{1},
-		MinPoolDeposit:               1,
-		PoolDeposits:                 []uint64{1},
-		ExportImportStable:           true,
-		SystemReserveRunwayBlocks:    1,
-		MinSystemReserveRunwayBlocks: 1,
-		SystemReserveAlertRaised:     true,
-		SystemTopUpOrder:             []string{"system_rent_top_up", "user_freeze_processing"},
-		ProtocolCriticalExecutable:   true,
+		AEAddressRoundtripStable:	true,
+		RawAddressRoundtripStable:	true,
+		ActivationAttempts:		map[string]uint64{},
+		TotalSupply:			1_000,
+		RewardBudget:			1_000,
+		MaxValidatorCount:		1,
+		MinValidatorStake:		1,
+		ValidatorStakes:		[]uint64{1},
+		MinPoolDeposit:			1,
+		PoolDeposits:			[]uint64{1},
+		ExportImportStable:		true,
+		SystemReserveRunwayBlocks:	1,
+		MinSystemReserveRunwayBlocks:	1,
+		SystemReserveAlertRaised:	true,
+		SystemTopUpOrder:		[]string{"system_rent_top_up", "user_freeze_processing"},
+		ProtocolCriticalExecutable:	true,
 	}
 }
 

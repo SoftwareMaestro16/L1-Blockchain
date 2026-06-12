@@ -29,9 +29,9 @@ func TestPersistentStateRentAccruesForActiveContractAndLongLivedRecords(t *testi
 
 func TestPersistentStorageSizeIsCodeBytesPlusDataBytesOnly(t *testing.T) {
 	size, err := PersistentStorageSize(PersistentStateRecord{
-		CodeBytes:  11,
-		DataBytes:  17,
-		IndexBytes: 99,
+		CodeBytes:	11,
+		DataBytes:	17,
+		IndexBytes:	99,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(28), size)
@@ -102,9 +102,9 @@ func TestWalletEffectiveFeeIncludesGasRentAndUnpaidDebt(t *testing.T) {
 
 func TestPoolRentUsesProtocolReservesAndFrozenLimitedAllowsOnlyRecoveryActions(t *testing.T) {
 	payer, remaining := PayPoolRent(PoolRentPayer{
-		ProtocolFeeReserve: 30,
-		GovernanceReserve:  15,
-		UserFacingCharge:   99,
+		ProtocolFeeReserve:	30,
+		GovernanceReserve:	15,
+		UserFacingCharge:	99,
 	}, 40)
 	require.Zero(t, remaining)
 	require.Equal(t, uint64(0), payer.ProtocolFeeReserve)
@@ -134,13 +134,13 @@ func TestProtocolCriticalSystemStateIsProtocolPaidAndCannotFreezeFromRent(t *tes
 	params.FreeStorageAllowance = 0
 	params.RentRatePerByteSecond = 1
 	system := PersistentStateRecord{
-		SubjectID:         "system/module",
-		Class:             StateClassSystemModule,
-		DataBytes:         10,
-		Persistent:        true,
-		Status:            ContractStatusActive,
-		ProtocolCritical:  true,
-		LastChargedHeight: 1,
+		SubjectID:		"system/module",
+		Class:			StateClassSystemModule,
+		DataBytes:		10,
+		Persistent:		true,
+		Status:			ContractStatusActive,
+		ProtocolCritical:	true,
+		LastChargedHeight:	1,
 	}
 
 	result, err := AccruePersistentStateRent(system, params, 6)
@@ -153,40 +153,40 @@ func TestProtocolCriticalSystemStateIsProtocolPaidAndCannotFreezeFromRent(t *tes
 
 func TestSystemRentAccountingWarnsTopsUpDeterministicallyAndKeepsCriticalExecutable(t *testing.T) {
 	warning := ComputeSystemRentAccounting(SystemRentAccounting{
-		AvailableFunds:             60,
-		ProjectedRentPerBlock:      10,
-		WarningRunwayBlocks:        10,
-		CriticalRunwayBlocks:       5,
-		RequiredTopUp:              20,
-		ProtocolCriticalExecutable: true,
+		AvailableFunds:			60,
+		ProjectedRentPerBlock:		10,
+		WarningRunwayBlocks:		10,
+		CriticalRunwayBlocks:		5,
+		RequiredTopUp:			20,
+		ProtocolCriticalExecutable:	true,
 	})
 	require.Equal(t, uint64(6), warning.RunwayBlocks)
 	require.Equal(t, SystemRentAlertWarning, warning.Alert)
 	require.Zero(t, warning.TopUpAmount)
 
 	critical := ComputeSystemRentAccounting(SystemRentAccounting{
-		AvailableFunds:             40,
-		ProjectedRentPerBlock:      10,
-		WarningRunwayBlocks:        10,
-		CriticalRunwayBlocks:       5,
-		FeeCollectorBalance:        20,
-		RequiredTopUp:              20,
-		ProtocolCriticalExecutable: true,
+		AvailableFunds:			40,
+		ProjectedRentPerBlock:		10,
+		WarningRunwayBlocks:		10,
+		CriticalRunwayBlocks:		5,
+		FeeCollectorBalance:		20,
+		RequiredTopUp:			20,
+		ProtocolCriticalExecutable:	true,
 	})
 	require.Equal(t, uint64(4), critical.RunwayBlocks)
 	require.Equal(t, SystemRentAlertCritical, critical.Alert)
 	require.Equal(t, uint64(20), critical.TopUpAmount)
 
 	result := ComputeSystemRentAccounting(SystemRentAccounting{
-		AvailableFunds:                   10,
-		ProjectedRentPerBlock:            5,
-		WarningRunwayBlocks:              10,
-		CriticalRunwayBlocks:             3,
-		FeeCollectorBalance:              4,
-		TreasuryBalance:                  3,
-		GovernanceConfiguredPayerBalance: 2,
-		RequiredTopUp:                    10,
-		ProtocolCriticalExecutable:       true,
+		AvailableFunds:				10,
+		ProjectedRentPerBlock:			5,
+		WarningRunwayBlocks:			10,
+		CriticalRunwayBlocks:			3,
+		FeeCollectorBalance:			4,
+		TreasuryBalance:			3,
+		GovernanceConfiguredPayerBalance:	2,
+		RequiredTopUp:				10,
+		ProtocolCriticalExecutable:		true,
 	})
 
 	require.Equal(t, uint64(2), result.RunwayBlocks)
@@ -208,19 +208,19 @@ func TestSystemTopUpRunsBeforeUserFreezeProcessingAndProtocolCriticalKeepsExecut
 	params.RentRatePerByteSecond = 1
 
 	result, err := ProcessStorageRent(RentProcessingInput{
-		Params: params,
+		Params:	params,
 		System: SystemRentAccounting{
-			AvailableFunds:             0,
-			ProjectedRentPerBlock:      10,
-			WarningRunwayBlocks:        10,
-			CriticalRunwayBlocks:       5,
-			FeeCollectorBalance:        3,
-			TreasuryBalance:            2,
-			RequiredTopUp:              10,
-			ProtocolCriticalExecutable: true,
+			AvailableFunds:			0,
+			ProjectedRentPerBlock:		10,
+			WarningRunwayBlocks:		10,
+			CriticalRunwayBlocks:		5,
+			FeeCollectorBalance:		3,
+			TreasuryBalance:		2,
+			RequiredTopUp:			10,
+			ProtocolCriticalExecutable:	true,
 		},
-		CurrentUnixSeconds:  20,
-		FreezeDebtThreshold: 0,
+		CurrentUnixSeconds:	20,
+		FreezeDebtThreshold:	0,
 		Subjects: []PersistentStateRecord{
 			{SubjectID: "wallet", Class: StateClassWallet, DataBytes: 4, Persistent: true, Status: ContractStatusActive, LastChargedHeight: 10},
 			{SubjectID: "system", Class: StateClassSystemModule, DataBytes: 4, Persistent: true, Status: ContractStatusActive, ProtocolCritical: true, LastChargedHeight: 10},

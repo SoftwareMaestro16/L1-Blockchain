@@ -13,15 +13,15 @@ func TestServiceReceiptCanonicalViewMatchesCallReceiptFields(t *testing.T) {
 	descriptor := testInterfaceSystemDescriptor()
 	call := testReceiptUnifiedCall(t, ctx, descriptor, 1, "receipt/payload")
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusExecuted,
-		ResponseHash:   testInterfaceHash("receipt/response"),
-		ProofHash:      testInterfaceHash("receipt/proof"),
-		PaymentStatus:  coretypes.ServicePaymentStatusSettled,
-		GasUsed:        44,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: 31,
-		AnchoredHeight: 32,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("receipt/response"),
+		ProofHash:	testInterfaceHash("receipt/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	44,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	31,
+		AnchoredHeight:	32,
 	})
 	require.NoError(t, err)
 
@@ -40,8 +40,8 @@ func TestServiceReceiptCanonicalViewMatchesCallReceiptFields(t *testing.T) {
 	require.NoError(t, view.Validate())
 
 	for _, tc := range []struct {
-		status coretypes.ServiceCallStatus
-		text   ServiceReceiptStatusText
+		status	coretypes.ServiceCallStatus
+		text	ServiceReceiptStatusText
 	}{
 		{coretypes.ServiceCallStatusAccepted, ServiceReceiptStatusAccepted},
 		{coretypes.ServiceCallStatusExecuted, ServiceReceiptStatusExecuted},
@@ -90,15 +90,15 @@ func TestServiceRetryReferencesOriginalAndTombstoneProofHorizon(t *testing.T) {
 	index, err = AcceptUnifiedServiceCall(ctx, descriptor, index, original)
 	require.NoError(t, err)
 	receipt, err := coretypes.NewServiceCallReceipt(original.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         original.CallID,
-		Status:         coretypes.ServiceCallStatusFailed,
-		ResponseHash:   testInterfaceHash("retry/failed-response"),
-		PaymentStatus:  coretypes.ServicePaymentStatusRefunded,
-		GasUsed:        5,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: 42,
-		AnchoredHeight: 43,
-		ErrorCode:      "temporary-failure",
+		CallID:		original.CallID,
+		Status:		coretypes.ServiceCallStatusFailed,
+		ResponseHash:	testInterfaceHash("retry/failed-response"),
+		PaymentStatus:	coretypes.ServicePaymentStatusRefunded,
+		GasUsed:	5,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	42,
+		AnchoredHeight:	43,
+		ErrorCode:	"temporary-failure",
 	})
 	require.NoError(t, err)
 	index, tombstone, err := TombstoneServiceReceipt(ctx, index, original, receipt)

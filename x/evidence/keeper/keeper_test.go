@@ -21,19 +21,19 @@ func TestValidEvidenceAccepted(t *testing.T) {
 	record := submitEvidence(t, &k, "evidence-valid", types.EvidenceTypeConsensus, true, 1)
 
 	_, err := k.VoteEvidence(types.MsgVoteEvidence{
-		Authority:      prototype.DefaultAuthority,
-		EvidenceID:     record.EvidenceID,
-		Voter:          rawAddress("44"),
-		Accept:         true,
-		VotingPowerBps: 7_000,
-		Height:         2,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Voter:		rawAddress("44"),
+		Accept:		true,
+		VotingPowerBps:	7_000,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
 	finalized, err := k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     3,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusAccepted, finalized.Status)
@@ -46,26 +46,26 @@ func TestValidEvidenceAccepted(t *testing.T) {
 func TestMalformedEvidenceRejected(t *testing.T) {
 	k := NewKeeper()
 	_, err := k.SubmitEvidence(types.MsgSubmitEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "bad",
-		EvidenceType:     "unknown",
-		AccusedValidator: rawAddress("11"),
-		Reporter:         rawAddress("22"),
-		ProofPayloadHash: proofHash("bad"),
-		PayloadSizeBytes: 128,
-		Height:           1,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"bad",
+		EvidenceType:		"unknown",
+		AccusedValidator:	rawAddress("11"),
+		Reporter:		rawAddress("22"),
+		ProofPayloadHash:	proofHash("bad"),
+		PayloadSizeBytes:	128,
+		Height:			1,
 	})
 	require.ErrorContains(t, err, "unsupported evidence type")
 
 	_, err = k.SubmitEvidence(types.MsgSubmitEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "bad-hash",
-		EvidenceType:     types.EvidenceTypeFraud,
-		AccusedValidator: rawAddress("11"),
-		Reporter:         rawAddress("22"),
-		ProofPayloadHash: "not hex",
-		PayloadSizeBytes: 128,
-		Height:           1,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"bad-hash",
+		EvidenceType:		types.EvidenceTypeFraud,
+		AccusedValidator:	rawAddress("11"),
+		Reporter:		rawAddress("22"),
+		ProofPayloadHash:	"not hex",
+		PayloadSizeBytes:	128,
+		Height:			1,
 	})
 	require.ErrorContains(t, err, "proof payload hash")
 }
@@ -89,9 +89,9 @@ func TestExpiredEvidenceIgnored(t *testing.T) {
 	record := submitEvidence(t, &k, "evidence-expired", types.EvidenceTypeMissedBlock, false, 10)
 
 	finalized, err := k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     13,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		13,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusExpired, finalized.Status)
@@ -99,9 +99,9 @@ func TestExpiredEvidenceIgnored(t *testing.T) {
 	require.Empty(t, k.ReporterRewards())
 
 	_, err = k.CancelExpiredEvidence(types.MsgCancelExpiredEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     14,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		14,
 	})
 	require.ErrorContains(t, err, "pending")
 }
@@ -111,32 +111,32 @@ func TestSlashEventUpdatesRegistryAndTombstoneIsIrreversible(t *testing.T) {
 	record := submitEvidence(t, &k, "evidence-critical", types.EvidenceTypeConsensus, false, 1)
 
 	finalized, err := k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     2,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.True(t, finalized.SlashDecision.Tombstone)
 
 	require.Equal(t, []types.SlashEvent{{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		FractionBps:      finalized.SlashDecision.FractionBps,
-		Tombstone:        true,
-		Height:           2,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		FractionBps:		finalized.SlashDecision.FractionBps,
+		Tombstone:		true,
+		Height:			2,
 	}}, k.SlashEvents())
 	require.Equal(t, []types.RegistryUpdate{{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		Status:           types.RegistryStatusTombstoned,
-		Height:           2,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		Status:			types.RegistryStatusTombstoned,
+		Height:			2,
 	}}, k.RegistryUpdates())
 	require.Contains(t, k.TombstonedValidators(), record.AccusedValidator)
 
 	_, err = k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     3,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "only be finalized once")
 	require.Contains(t, k.TombstonedValidators(), record.AccusedValidator)
@@ -147,18 +147,18 @@ func TestReporterRewardPaidOnce(t *testing.T) {
 	record := submitEvidence(t, &k, "evidence-reward", types.EvidenceTypePerformance, false, 1)
 
 	_, err := k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     2,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Len(t, k.ReporterRewards(), 1)
 	require.True(t, k.ReporterRewards()[0].Paid)
 
 	_, err = k.FinalizeEvidence(types.MsgFinalizeEvidence{
-		Authority:  prototype.DefaultAuthority,
-		EvidenceID: record.EvidenceID,
-		Height:     3,
+		Authority:	prototype.DefaultAuthority,
+		EvidenceID:	record.EvidenceID,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "only be finalized once")
 	require.Len(t, k.ReporterRewards(), 1)
@@ -185,14 +185,14 @@ func TestEvidenceProcessingCannotPanicOnInvalidPayload(t *testing.T) {
 	k := NewKeeper()
 	require.NotPanics(t, func() {
 		_, err := k.SubmitEvidence(types.MsgSubmitEvidence{
-			Authority:        prototype.DefaultAuthority,
-			EvidenceID:       "bad-payload",
-			EvidenceType:     types.EvidenceTypeFraud,
-			AccusedValidator: rawAddress("11"),
-			Reporter:         rawAddress("22"),
-			ProofPayloadHash: "   ",
-			PayloadSizeBytes: 128,
-			Height:           1,
+			Authority:		prototype.DefaultAuthority,
+			EvidenceID:		"bad-payload",
+			EvidenceType:		types.EvidenceTypeFraud,
+			AccusedValidator:	rawAddress("11"),
+			Reporter:		rawAddress("22"),
+			ProofPayloadHash:	"   ",
+			PayloadSizeBytes:	128,
+			Height:			1,
 		})
 		require.Error(t, err)
 	})
@@ -205,15 +205,15 @@ func TestDoubleSignEvidencePipelineJailsTombstonesFreezesStakeAndCallsHooks(t *t
 	validator := rawAddress("33")
 
 	record, err := k.ProcessDoubleSignEvidence(types.MsgSubmitDoubleSignEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "double-sign-1",
-		AccusedValidator: validator,
-		Reporter:         rawAddress("22"),
-		VoteAHash:        proofHash("vote-a"),
-		VoteBHash:        proofHash("vote-b"),
-		InfractionHeight: 9,
-		Height:           10,
-		ValidatorStake:   1_000_000,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"double-sign-1",
+		AccusedValidator:	validator,
+		Reporter:		rawAddress("22"),
+		VoteAHash:		proofHash("vote-a"),
+		VoteBHash:		proofHash("vote-b"),
+		InfractionHeight:	9,
+		Height:			10,
+		ValidatorStake:		1_000_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusAccepted, record.Status)
@@ -250,15 +250,15 @@ func TestDowntimeEvidencePipelineSupportsRepeatedOffenseAndUnjail(t *testing.T) 
 	validator := rawAddress("44")
 
 	first, err := k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "downtime-1",
-		AccusedValidator: validator,
-		Reporter:         rawAddress("22"),
-		MissedBlocks:     51,
-		WindowBlocks:     100,
-		InfractionHeight: 5,
-		Height:           6,
-		ValidatorStake:   1_000_000,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"downtime-1",
+		AccusedValidator:	validator,
+		Reporter:		rawAddress("22"),
+		MissedBlocks:		51,
+		WindowBlocks:		100,
+		InfractionHeight:	5,
+		Height:			6,
+		ValidatorStake:		1_000_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.EvidenceTypeDowntime, first.EvidenceType)
@@ -268,27 +268,27 @@ func TestDowntimeEvidencePipelineSupportsRepeatedOffenseAndUnjail(t *testing.T) 
 	firstJailUntil := uint64(6 + types.DefaultDowntimeFirstJailBlocks)
 	require.Equal(t, firstJailUntil, k.JailRecords()[0].JailedUntilHeight)
 	require.ErrorContains(t, k.UnjailValidator(types.MsgUnjailValidator{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Height:           firstJailUntil - 1,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Height:			firstJailUntil - 1,
 	}), "before jail period")
 	require.NoError(t, k.UnjailValidator(types.MsgUnjailValidator{
-		Authority:        prototype.DefaultAuthority,
-		ValidatorAddress: validator,
-		Height:           firstJailUntil,
+		Authority:		prototype.DefaultAuthority,
+		ValidatorAddress:	validator,
+		Height:			firstJailUntil,
 	}))
 	require.NoError(t, k.ValidateActiveSetInvariant([]string{validator}))
 
 	second, err := k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "downtime-2",
-		AccusedValidator: validator,
-		Reporter:         rawAddress("22"),
-		MissedBlocks:     60,
-		WindowBlocks:     100,
-		InfractionHeight: firstJailUntil + 1,
-		Height:           firstJailUntil + 2,
-		ValidatorStake:   1_000_000,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"downtime-2",
+		AccusedValidator:	validator,
+		Reporter:		rawAddress("22"),
+		MissedBlocks:		60,
+		WindowBlocks:		100,
+		InfractionHeight:	firstJailUntil + 1,
+		Height:			firstJailUntil + 2,
+		ValidatorStake:		1_000_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.DefaultMinSlashFractionBps*types.DefaultDowntimeRepeatMultiplier, second.SlashDecision.FractionBps)
@@ -301,29 +301,29 @@ func TestInvalidObjectiveEvidenceRejectedSafely(t *testing.T) {
 	k := NewKeeper()
 	hash := proofHash("same")
 	_, err := k.ProcessDoubleSignEvidence(types.MsgSubmitDoubleSignEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "bad-double-sign",
-		AccusedValidator: rawAddress("33"),
-		Reporter:         rawAddress("22"),
-		VoteAHash:        hash,
-		VoteBHash:        hash,
-		InfractionHeight: 9,
-		Height:           10,
-		ValidatorStake:   1_000_000,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"bad-double-sign",
+		AccusedValidator:	rawAddress("33"),
+		Reporter:		rawAddress("22"),
+		VoteAHash:		hash,
+		VoteBHash:		hash,
+		InfractionHeight:	9,
+		Height:			10,
+		ValidatorStake:		1_000_000,
 	})
 	require.ErrorContains(t, err, "distinct")
 	require.Empty(t, k.SlashEvents())
 
 	_, err = k.ProcessDowntimeEvidence(types.MsgSubmitDowntimeEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       "bad-downtime",
-		AccusedValidator: rawAddress("33"),
-		Reporter:         rawAddress("22"),
-		MissedBlocks:     101,
-		WindowBlocks:     100,
-		InfractionHeight: 9,
-		Height:           10,
-		ValidatorStake:   1_000_000,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		"bad-downtime",
+		AccusedValidator:	rawAddress("33"),
+		Reporter:		rawAddress("22"),
+		MissedBlocks:		101,
+		WindowBlocks:		100,
+		InfractionHeight:	9,
+		Height:			10,
+		ValidatorStake:		1_000_000,
 	})
 	require.ErrorContains(t, err, "missed/window")
 	require.Empty(t, k.SlashEvents())
@@ -338,14 +338,14 @@ func submitEvidence(t *testing.T, k *Keeper, id string, evidenceType string, rev
 
 func validSubmit(id string, evidenceType string, hash string, height uint64, opts ...func(*types.MsgSubmitEvidence)) types.MsgSubmitEvidence {
 	msg := types.MsgSubmitEvidence{
-		Authority:        prototype.DefaultAuthority,
-		EvidenceID:       id,
-		EvidenceType:     evidenceType,
-		AccusedValidator: rawAddress("11"),
-		Reporter:         rawAddress("22"),
-		ProofPayloadHash: hash,
-		PayloadSizeBytes: 128,
-		Height:           height,
+		Authority:		prototype.DefaultAuthority,
+		EvidenceID:		id,
+		EvidenceType:		evidenceType,
+		AccusedValidator:	rawAddress("11"),
+		Reporter:		rawAddress("22"),
+		ProofPayloadHash:	hash,
+		PayloadSizeBytes:	128,
+		Height:			height,
 	}
 	for _, opt := range opts {
 		opt(&msg)

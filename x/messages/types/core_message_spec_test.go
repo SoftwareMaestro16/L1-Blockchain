@@ -59,9 +59,9 @@ func TestCoreMessageTypeSpecRejectsMalformedDescriptors(t *testing.T) {
 	require.Empty(t, duplicate.Root)
 
 	_, err = BuildCoreMessageTypeDescriptor(CoreMessageTypeDescriptor{
-		MessageType: CoreMessageType("MsgUnknown"),
-		Purpose:     "unknown",
-		PrimaryZone: "Core",
+		MessageType:	CoreMessageType("MsgUnknown"),
+		Purpose:	"unknown",
+		PrimaryZone:	"Core",
 	})
 	require.ErrorContains(t, err, "unknown core message type")
 

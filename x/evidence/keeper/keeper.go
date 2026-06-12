@@ -19,15 +19,15 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	hooks        SlashingIntegrationHooks
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	hooks		SlashingIntegrationHooks
 }
 
 type SlashingIntegrationHooks interface {
@@ -54,9 +54,9 @@ func (k *Keeper) SetSlashingIntegrationHooks(hooks SlashingIntegrationHooks) {
 func DefaultGenesis() GenesisState {
 	params := types.DefaultParams()
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  params,
-		State:   types.State{}.Normalize(params),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		params,
+		State:		types.State{}.Normalize(params),
 	}
 }
 
@@ -126,25 +126,25 @@ func (k *Keeper) SubmitEvidence(msg types.MsgSubmitEvidence) (types.EvidenceReco
 		return types.EvidenceRecord{}, errors.New("native evidence submission height must be positive")
 	}
 	record := types.EvidenceRecord{
-		EvidenceID:       msg.EvidenceID,
-		Status:           types.StatusPending,
-		EvidenceType:     msg.EvidenceType,
-		AccusedValidator: msg.AccusedValidator,
-		Reporter:         msg.Reporter,
-		ProofPayloadHash: msg.ProofPayloadHash,
-		PayloadSizeBytes: msg.PayloadSizeBytes,
+		EvidenceID:		msg.EvidenceID,
+		Status:			types.StatusPending,
+		EvidenceType:		msg.EvidenceType,
+		AccusedValidator:	msg.AccusedValidator,
+		Reporter:		msg.Reporter,
+		ProofPayloadHash:	msg.ProofPayloadHash,
+		PayloadSizeBytes:	msg.PayloadSizeBytes,
 		SlashDecision: types.SlashDecision{
-			FractionBps: types.CanonicalSlashFraction(k.genesis.Params, msg.EvidenceType, msg.SlashFractionBps),
-			Tombstone:   types.IsCriticalEvidenceType(msg.EvidenceType),
+			FractionBps:	types.CanonicalSlashFraction(k.genesis.Params, msg.EvidenceType, msg.SlashFractionBps),
+			Tombstone:	types.IsCriticalEvidenceType(msg.EvidenceType),
 		},
 		RewardDecision: types.RewardDecision{
-			Reporter:   msg.Reporter,
-			AmountNaet: msg.RewardNaet,
+			Reporter:	msg.Reporter,
+			AmountNaet:	msg.RewardNaet,
 		},
-		SubmittedHeight:  msg.Height,
-		UpdatedHeight:    msg.Height,
-		ExpirationHeight: msg.Height + k.genesis.Params.EvidenceTTLBlocks,
-		RequiresReview:   msg.RequiresReview,
+		SubmittedHeight:	msg.Height,
+		UpdatedHeight:		msg.Height,
+		ExpirationHeight:	msg.Height + k.genesis.Params.EvidenceTTLBlocks,
+		RequiresReview:		msg.RequiresReview,
 	}
 	if record.RewardDecision.AmountNaet == 0 {
 		record.RewardDecision.AmountNaet = k.genesis.Params.MaxReporterRewardNaet
@@ -187,10 +187,10 @@ func (k *Keeper) VoteEvidence(msg types.MsgVoteEvidence) (types.EvidenceRecord, 
 		support = types.VoteSupportAccept
 	}
 	vote := types.EvidenceVote{
-		Voter:          msg.Voter,
-		Support:        support,
-		VotingPowerBps: msg.VotingPowerBps,
-		Height:         msg.Height,
+		Voter:		msg.Voter,
+		Support:	support,
+		VotingPowerBps:	msg.VotingPowerBps,
+		Height:		msg.Height,
 	}
 	if err := vote.Validate(); err != nil {
 		return types.EvidenceRecord{}, err
@@ -262,18 +262,18 @@ func (k *Keeper) FinalizeEvidence(msg types.MsgFinalizeEvidence) (types.Evidence
 	next := cloneGenesis(k.genesis)
 	next.State.Evidence[idx] = record
 	next.State.SlashEvents = append(next.State.SlashEvents, types.SlashEvent{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		FractionBps:      record.SlashDecision.FractionBps,
-		Tombstone:        record.SlashDecision.Tombstone,
-		Height:           msg.Height,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		FractionBps:		record.SlashDecision.FractionBps,
+		Tombstone:		record.SlashDecision.Tombstone,
+		Height:			msg.Height,
 	})
 	next.State.ReporterRewards = append(next.State.ReporterRewards, types.ReporterReward{
-		EvidenceID: record.EvidenceID,
-		Reporter:   record.Reporter,
-		AmountNaet: record.RewardDecision.AmountNaet,
-		Paid:       true,
-		Height:     msg.Height,
+		EvidenceID:	record.EvidenceID,
+		Reporter:	record.Reporter,
+		AmountNaet:	record.RewardDecision.AmountNaet,
+		Paid:		true,
+		Height:		msg.Height,
 	})
 	status := types.RegistryStatusJailed
 	if record.SlashDecision.Tombstone {
@@ -281,10 +281,10 @@ func (k *Keeper) FinalizeEvidence(msg types.MsgFinalizeEvidence) (types.Evidence
 		next.State.TombstonedValidators = append(next.State.TombstonedValidators, record.AccusedValidator)
 	}
 	next.State.RegistryUpdates = append(next.State.RegistryUpdates, types.RegistryUpdate{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		Status:           status,
-		Height:           msg.Height,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		Status:			status,
+		Height:			msg.Height,
 	})
 	next.State = next.State.Normalize(next.Params)
 	if err := next.Validate(); err != nil {
@@ -334,11 +334,11 @@ func (k *Keeper) ProcessDoubleSignEvidence(msg types.MsgSubmitDoubleSignEvidence
 	proofHash := proofHashParts("double-sign", msg.AccusedValidator, msg.VoteAHash, msg.VoteBHash, fmt.Sprint(msg.InfractionHeight))
 	record := acceptedEvidenceRecord(k.genesis.Params, msg.EvidenceID, types.EvidenceTypeDoubleSign, msg.AccusedValidator, msg.Reporter, proofHash, msg.Height, k.genesis.Params.CriticalFaultSlashFractionBps, true)
 	return k.acceptObjectiveEvidence(record, slashingPipeline{
-		reason:         types.SlashingReasonDoubleSign,
-		validatorStake: msg.ValidatorStake,
-		jailBlocks:     k.genesis.Params.DoubleSignJailBlocks,
-		tombstone:      true,
-		height:         msg.Height,
+		reason:		types.SlashingReasonDoubleSign,
+		validatorStake:	msg.ValidatorStake,
+		jailBlocks:	k.genesis.Params.DoubleSignJailBlocks,
+		tombstone:	true,
+		height:		msg.Height,
 	})
 }
 
@@ -357,11 +357,11 @@ func (k *Keeper) ProcessDowntimeEvidence(msg types.MsgSubmitDowntimeEvidence) (t
 	fraction := types.DowntimeSlashFraction(k.genesis.Params, offenseCount)
 	record := acceptedEvidenceRecord(k.genesis.Params, msg.EvidenceID, types.EvidenceTypeDowntime, msg.AccusedValidator, msg.Reporter, proofHash, msg.Height, fraction, false)
 	return k.acceptObjectiveEvidence(record, slashingPipeline{
-		reason:         types.SlashingReasonDowntime,
-		validatorStake: msg.ValidatorStake,
-		jailBlocks:     types.DowntimeJailBlocks(k.genesis.Params, offenseCount),
-		tombstone:      false,
-		height:         msg.Height,
+		reason:		types.SlashingReasonDowntime,
+		validatorStake:	msg.ValidatorStake,
+		jailBlocks:	types.DowntimeJailBlocks(k.genesis.Params, offenseCount),
+		tombstone:	false,
+		height:		msg.Height,
 	})
 }
 
@@ -390,10 +390,10 @@ func (k *Keeper) UnjailValidator(msg types.MsgUnjailValidator) error {
 	next := cloneGenesis(k.genesis)
 	next.State.JailRecords[idx] = jail
 	next.State.RegistryUpdates = append(next.State.RegistryUpdates, types.RegistryUpdate{
-		EvidenceID:       jail.EvidenceID,
-		ValidatorAddress: validator,
-		Status:           types.RegistryStatusCandidate,
-		Height:           msg.Height,
+		EvidenceID:		jail.EvidenceID,
+		ValidatorAddress:	validator,
+		Status:			types.RegistryStatusCandidate,
+		Height:			msg.Height,
 	})
 	next.State.IntegrationEvents = append(next.State.IntegrationEvents, integrationEvent(jail.EvidenceID, validator, "validator-registry", "unjail", msg.Height))
 	next.State = next.State.Normalize(next.Params)
@@ -486,8 +486,8 @@ func (k Keeper) TombstonedValidators() []string {
 
 type Migrator struct{ keeper *Keeper }
 
-func NewMigrator(k *Keeper) Migrator  { return Migrator{keeper: k} }
-func (m Migrator) Migrate1to2() error { return m.keeper.ExportGenesis().Validate() }
+func NewMigrator(k *Keeper) Migrator	{ return Migrator{keeper: k} }
+func (m Migrator) Migrate1to2() error	{ return m.keeper.ExportGenesis().Validate() }
 func (k Keeper) Migrate1to2State(ctx context.Context) error {
 	_, err := k.ExportGenesisState(ctx)
 	return err
@@ -517,11 +517,11 @@ func findEvidenceByHash(records []types.EvidenceRecord, hash string) (types.Evid
 }
 
 type slashingPipeline struct {
-	reason         string
-	validatorStake uint64
-	jailBlocks     uint64
-	tombstone      bool
-	height         uint64
+	reason		string
+	validatorStake	uint64
+	jailBlocks	uint64
+	tombstone	bool
+	height		uint64
 }
 
 func (k *Keeper) acceptObjectiveEvidence(record types.EvidenceRecord, pipeline slashingPipeline) (types.EvidenceRecord, error) {
@@ -562,15 +562,15 @@ func (k *Keeper) acceptObjectiveEvidence(record types.EvidenceRecord, pipeline s
 	record.RewardDecision.Paid = true
 
 	slashEvent := types.SlashEvent{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		FractionBps:      record.SlashDecision.FractionBps,
-		Tombstone:        pipeline.tombstone,
-		Height:           pipeline.height,
-		Reason:           pipeline.reason,
-		OffenseCount:     offenseCount,
-		FrozenStake:      slashAmount,
-		JailUntilHeight:  jailUntil,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		FractionBps:		record.SlashDecision.FractionBps,
+		Tombstone:		pipeline.tombstone,
+		Height:			pipeline.height,
+		Reason:			pipeline.reason,
+		OffenseCount:		offenseCount,
+		FrozenStake:		slashAmount,
+		JailUntilHeight:	jailUntil,
 	}
 	status := types.RegistryStatusJailed
 	if pipeline.tombstone {
@@ -580,34 +580,34 @@ func (k *Keeper) acceptObjectiveEvidence(record types.EvidenceRecord, pipeline s
 	next.State.Evidence = append(next.State.Evidence, record)
 	next.State.SlashEvents = append(next.State.SlashEvents, slashEvent)
 	next.State.ReporterRewards = append(next.State.ReporterRewards, types.ReporterReward{
-		EvidenceID: record.EvidenceID,
-		Reporter:   record.Reporter,
-		AmountNaet: record.RewardDecision.AmountNaet,
-		Paid:       true,
-		Height:     pipeline.height,
+		EvidenceID:	record.EvidenceID,
+		Reporter:	record.Reporter,
+		AmountNaet:	record.RewardDecision.AmountNaet,
+		Paid:		true,
+		Height:		pipeline.height,
 	})
 	next.State.RegistryUpdates = append(next.State.RegistryUpdates, types.RegistryUpdate{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		Status:           status,
-		Height:           pipeline.height,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		Status:			status,
+		Height:			pipeline.height,
 	})
 	next.State.JailRecords = append(next.State.JailRecords, types.JailRecord{
-		EvidenceID:        record.EvidenceID,
-		ValidatorAddress:  record.AccusedValidator,
-		Reason:            pipeline.reason,
-		JailedAtHeight:    pipeline.height,
-		JailedUntilHeight: jailUntil,
-		Tombstone:         pipeline.tombstone,
-		Active:            true,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		Reason:			pipeline.reason,
+		JailedAtHeight:		pipeline.height,
+		JailedUntilHeight:	jailUntil,
+		Tombstone:		pipeline.tombstone,
+		Active:			true,
 	})
 	next.State.FrozenStakes = append(next.State.FrozenStakes, types.FrozenStake{
-		EvidenceID:       record.EvidenceID,
-		ValidatorAddress: record.AccusedValidator,
-		Amount:           slashAmount,
-		FrozenAtHeight:   pipeline.height,
-		ReleaseHeight:    releaseHeight,
-		Reason:           pipeline.reason,
+		EvidenceID:		record.EvidenceID,
+		ValidatorAddress:	record.AccusedValidator,
+		Amount:			slashAmount,
+		FrozenAtHeight:		pipeline.height,
+		ReleaseHeight:		releaseHeight,
+		Reason:			pipeline.reason,
 	})
 	next.State.IntegrationEvents = append(next.State.IntegrationEvents,
 		integrationEvent(record.EvidenceID, record.AccusedValidator, "validator-registry", status, pipeline.height),
@@ -650,27 +650,27 @@ func (k *Keeper) runSlashingHooks(event types.SlashEvent, releaseHeight uint64, 
 func acceptedEvidenceRecord(params types.Params, id string, evidenceType string, validator string, reporter string, proofHash string, height uint64, fractionBps uint32, tombstone bool) types.EvidenceRecord {
 	reward := params.MaxReporterRewardNaet
 	return types.EvidenceRecord{
-		EvidenceID:       strings.TrimSpace(id),
-		Status:           types.StatusAccepted,
-		EvidenceType:     evidenceType,
-		AccusedValidator: strings.TrimSpace(validator),
-		Reporter:         strings.TrimSpace(reporter),
-		ProofPayloadHash: proofHash,
-		PayloadSizeBytes: uint32(len(proofHash)),
+		EvidenceID:		strings.TrimSpace(id),
+		Status:			types.StatusAccepted,
+		EvidenceType:		evidenceType,
+		AccusedValidator:	strings.TrimSpace(validator),
+		Reporter:		strings.TrimSpace(reporter),
+		ProofPayloadHash:	proofHash,
+		PayloadSizeBytes:	uint32(len(proofHash)),
 		SlashDecision: types.SlashDecision{
-			FractionBps: fractionBps,
-			Tombstone:   tombstone,
-			Applied:     true,
+			FractionBps:	fractionBps,
+			Tombstone:	tombstone,
+			Applied:	true,
 		},
 		RewardDecision: types.RewardDecision{
-			Reporter:   strings.TrimSpace(reporter),
-			AmountNaet: reward,
-			Paid:       true,
+			Reporter:	strings.TrimSpace(reporter),
+			AmountNaet:	reward,
+			Paid:		true,
 		},
-		SubmittedHeight:  height,
-		UpdatedHeight:    height,
-		ExpirationHeight: height + params.EvidenceTTLBlocks,
-		FinalizedHeight:  height,
+		SubmittedHeight:	height,
+		UpdatedHeight:		height,
+		ExpirationHeight:	height + params.EvidenceTTLBlocks,
+		FinalizedHeight:	height,
 	}
 }
 
@@ -767,11 +767,11 @@ func slashAmount(stake uint64, fractionBps uint32) uint64 {
 
 func integrationEvent(evidenceID string, validator string, target string, action string, height uint64) types.IntegrationEvent {
 	return types.IntegrationEvent{
-		EvidenceID:       evidenceID,
-		ValidatorAddress: validator,
-		Target:           target,
-		Action:           action,
-		Height:           height,
+		EvidenceID:		evidenceID,
+		ValidatorAddress:	validator,
+		Target:			target,
+		Action:			action,
+		Height:			height,
 	}
 }
 

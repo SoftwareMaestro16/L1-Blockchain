@@ -3,8 +3,8 @@ package types
 import "fmt"
 
 const (
-	ModuleName = "nominator-pool"
-	StoreKey   = ModuleName
+	ModuleName	= "nominator-pool"
+	StoreKey	= ModuleName
 )
 
 func ValidatorKey(validator string) []byte {

@@ -12,26 +12,26 @@ import (
 )
 
 const (
-	AVMCrossZoneBounceDisabled AVMCrossZoneBounceBehavior = "disabled"
-	AVMCrossZoneBounceAllowed  AVMCrossZoneBounceBehavior = "allowed"
-	AVMCrossZoneBounceRequired AVMCrossZoneBounceBehavior = "required"
+	AVMCrossZoneBounceDisabled	AVMCrossZoneBounceBehavior	= "disabled"
+	AVMCrossZoneBounceAllowed	AVMCrossZoneBounceBehavior	= "allowed"
+	AVMCrossZoneBounceRequired	AVMCrossZoneBounceBehavior	= "required"
 
-	AVMCrossZoneProofNone         AVMCrossZoneProofRequirement = "none"
-	AVMCrossZoneProofAuth         AVMCrossZoneProofRequirement = "auth"
-	AVMCrossZoneProofState        AVMCrossZoneProofRequirement = "state"
-	AVMCrossZoneProofAuthAndState AVMCrossZoneProofRequirement = "auth_and_state"
+	AVMCrossZoneProofNone		AVMCrossZoneProofRequirement	= "none"
+	AVMCrossZoneProofAuth		AVMCrossZoneProofRequirement	= "auth"
+	AVMCrossZoneProofState		AVMCrossZoneProofRequirement	= "state"
+	AVMCrossZoneProofAuthAndState	AVMCrossZoneProofRequirement	= "auth_and_state"
 
-	AVMCrossZoneValueNone       AVMCrossZoneValueAccounting = "none"
-	AVMCrossZoneValueEscrow     AVMCrossZoneValueAccounting = "escrow"
-	AVMCrossZoneValueMessage    AVMCrossZoneValueAccounting = "message_value"
-	AVMCrossZoneValueEscrowPlus AVMCrossZoneValueAccounting = "escrow_plus_message_value"
+	AVMCrossZoneValueNone		AVMCrossZoneValueAccounting	= "none"
+	AVMCrossZoneValueEscrow		AVMCrossZoneValueAccounting	= "escrow"
+	AVMCrossZoneValueMessage	AVMCrossZoneValueAccounting	= "message_value"
+	AVMCrossZoneValueEscrowPlus	AVMCrossZoneValueAccounting	= "escrow_plus_message_value"
 
-	AVMCrossZoneFailureNone         AVMCrossZoneFailureResolution = "none"
-	AVMCrossZoneFailureBounced      AVMCrossZoneFailureResolution = "bounced"
-	AVMCrossZoneFailureDeadLettered AVMCrossZoneFailureResolution = "dead_lettered"
+	AVMCrossZoneFailureNone		AVMCrossZoneFailureResolution	= "none"
+	AVMCrossZoneFailureBounced	AVMCrossZoneFailureResolution	= "bounced"
+	AVMCrossZoneFailureDeadLettered	AVMCrossZoneFailureResolution	= "dead_lettered"
 
-	MaxAVMCrossZoneOpcodeLength = 96
-	MaxAVMCrossZoneRouteKey     = 160
+	MaxAVMCrossZoneOpcodeLength	= 96
+	MaxAVMCrossZoneRouteKey		= 160
 )
 
 type AVMCrossZoneBounceBehavior string
@@ -42,118 +42,118 @@ type AVMCrossZoneFailureResolution string
 type AVMCrossZoneEscrowStatus string
 
 const (
-	AVMCrossZoneEscrowLocked   AVMCrossZoneEscrowStatus = "locked"
-	AVMCrossZoneEscrowReleased AVMCrossZoneEscrowStatus = "released"
-	AVMCrossZoneEscrowRefunded AVMCrossZoneEscrowStatus = "refunded"
+	AVMCrossZoneEscrowLocked	AVMCrossZoneEscrowStatus	= "locked"
+	AVMCrossZoneEscrowReleased	AVMCrossZoneEscrowStatus	= "released"
+	AVMCrossZoneEscrowRefunded	AVMCrossZoneEscrowStatus	= "refunded"
 )
 
 type AVMCrossZoneRoutePolicy struct {
-	SourceZone       zonestypes.ZoneID
-	DestinationZone  zonestypes.ZoneID
-	GasPolicy        zonestypes.ZoneGasPolicy
-	ExecutionBudget  zonestypes.ZoneExecutionBudget
-	MessageFilter    zonestypes.ZoneMessageFilter
-	AllowedOpcodes   []string
-	BounceBehavior   AVMCrossZoneBounceBehavior
-	ProofRequirement AVMCrossZoneProofRequirement
-	ValueAccounting  AVMCrossZoneValueAccounting
-	PolicyHash       string
+	SourceZone		zonestypes.ZoneID
+	DestinationZone		zonestypes.ZoneID
+	GasPolicy		zonestypes.ZoneGasPolicy
+	ExecutionBudget		zonestypes.ZoneExecutionBudget
+	MessageFilter		zonestypes.ZoneMessageFilter
+	AllowedOpcodes		[]string
+	BounceBehavior		AVMCrossZoneBounceBehavior
+	ProofRequirement	AVMCrossZoneProofRequirement
+	ValueAccounting		AVMCrossZoneValueAccounting
+	PolicyHash		string
 }
 
 type AVMZoneRouterRoute struct {
-	RouteKey             string
-	SourceZone           zonestypes.ZoneID
-	DestinationZone      zonestypes.ZoneID
-	PolicyHash           string
-	OutputMessageRoot    string
-	DestinationInboxRoot string
-	CrossZoneReceiptRoot string
-	ValueEscrowRoot      string
-	BounceBehavior       AVMCrossZoneBounceBehavior
-	ProofRequirement     AVMCrossZoneProofRequirement
-	ValueAccounting      AVMCrossZoneValueAccounting
-	RouteHash            string
+	RouteKey		string
+	SourceZone		zonestypes.ZoneID
+	DestinationZone		zonestypes.ZoneID
+	PolicyHash		string
+	OutputMessageRoot	string
+	DestinationInboxRoot	string
+	CrossZoneReceiptRoot	string
+	ValueEscrowRoot		string
+	BounceBehavior		AVMCrossZoneBounceBehavior
+	ProofRequirement	AVMCrossZoneProofRequirement
+	ValueAccounting		AVMCrossZoneValueAccounting
+	RouteHash		string
 }
 
 type AVMZoneRouterTable struct {
-	Height    uint64
-	Routes    []AVMZoneRouterRoute
-	TableRoot string
+	Height		uint64
+	Routes		[]AVMZoneRouterRoute
+	TableRoot	string
 }
 
 type AVMCrossZoneZoneRoots struct {
-	ZoneID               zonestypes.ZoneID
-	Height               uint64
-	OutputMessageRoot    string
-	DestinationInboxRoot string
-	CrossZoneReceiptRoot string
-	ValueEscrowRoot      string
-	CrossZoneRootHash    string
+	ZoneID			zonestypes.ZoneID
+	Height			uint64
+	OutputMessageRoot	string
+	DestinationInboxRoot	string
+	CrossZoneReceiptRoot	string
+	ValueEscrowRoot		string
+	CrossZoneRootHash	string
 }
 
 type AVMAetraCoreZoneCommitmentSet struct {
-	Height    uint64
-	ZoneRoots []AVMZoneStateRoot
-	CoreRoot  string
+	Height		uint64
+	ZoneRoots	[]AVMZoneStateRoot
+	CoreRoot	string
 }
 
 type AVMCrossZoneValueEscrowRecord struct {
-	MessageID       string
-	SourceZone      zonestypes.ZoneID
-	DestinationZone zonestypes.ZoneID
-	AmountNAET      uint64
-	RefundedNAET    uint64
-	ReleasedNAET    uint64
-	Status          AVMCrossZoneEscrowStatus
-	RefundReceiptID string
-	EscrowHash      string
+	MessageID	string
+	SourceZone	zonestypes.ZoneID
+	DestinationZone	zonestypes.ZoneID
+	AmountNAET	uint64
+	RefundedNAET	uint64
+	ReleasedNAET	uint64
+	Status		AVMCrossZoneEscrowStatus
+	RefundReceiptID	string
+	EscrowHash	string
 }
 
 type AVMCrossZoneProofKind string
 
 const (
-	AVMCrossZoneProofRoute     AVMCrossZoneProofKind = "route"
-	AVMCrossZoneProofExecution AVMCrossZoneProofKind = "execution"
-	AVMCrossZoneProofEscrow    AVMCrossZoneProofKind = "escrow"
+	AVMCrossZoneProofRoute		AVMCrossZoneProofKind	= "route"
+	AVMCrossZoneProofExecution	AVMCrossZoneProofKind	= "execution"
+	AVMCrossZoneProofEscrow		AVMCrossZoneProofKind	= "escrow"
 )
 
 type AVMCrossZoneProof struct {
-	Kind                 AVMCrossZoneProofKind
-	ZoneID               zonestypes.ZoneID
-	MessageID            string
-	RouteKey             string
-	RouterTableRoot      string
-	ZoneCrossRoot        string
-	OutputMessageRoot    string
-	DestinationInboxRoot string
-	CrossZoneReceiptRoot string
-	ValueEscrowRoot      string
-	ReceiptID            string
-	EscrowHash           string
-	ProofHash            string
+	Kind			AVMCrossZoneProofKind
+	ZoneID			zonestypes.ZoneID
+	MessageID		string
+	RouteKey		string
+	RouterTableRoot		string
+	ZoneCrossRoot		string
+	OutputMessageRoot	string
+	DestinationInboxRoot	string
+	CrossZoneReceiptRoot	string
+	ValueEscrowRoot		string
+	ReceiptID		string
+	EscrowHash		string
+	ProofHash		string
 }
 
 type AVMCrossZoneProofIndex struct {
-	RouterTable AVMZoneRouterTable
-	ZoneRoots   []AVMCrossZoneZoneRoots
-	Executions  []AVMCrossZoneExecution
-	Escrows     []AVMCrossZoneValueEscrowRecord
+	RouterTable	AVMZoneRouterTable
+	ZoneRoots	[]AVMCrossZoneZoneRoots
+	Executions	[]AVMCrossZoneExecution
+	Escrows		[]AVMCrossZoneValueEscrowRecord
 }
 
 type AVMCrossZoneExecution struct {
-	Message                   AVMAsyncMessage
-	RoutePolicy               AVMCrossZoneRoutePolicy
-	DestinationQueueEntry     AVMZoneQueueEntry
-	DestinationReceipt        AVMExecutionReceipt
-	SourceOutputMessagesRoot  string
-	DestinationReceiptRoot    string
-	DirectStateWriteAttempted bool
-	ValueEscrowedNAET         uint64
-	ValueAccountedNAET        uint64
-	FailureResolution         AVMCrossZoneFailureResolution
-	BounceMessageOptional     AVMAsyncMessage
-	DeadLetterOptional        AVMDeadLetterRecord
-	ExecutionHash             string
+	Message				AVMAsyncMessage
+	RoutePolicy			AVMCrossZoneRoutePolicy
+	DestinationQueueEntry		AVMZoneQueueEntry
+	DestinationReceipt		AVMExecutionReceipt
+	SourceOutputMessagesRoot	string
+	DestinationReceiptRoot		string
+	DirectStateWriteAttempted	bool
+	ValueEscrowedNAET		uint64
+	ValueAccountedNAET		uint64
+	FailureResolution		AVMCrossZoneFailureResolution
+	BounceMessageOptional		AVMAsyncMessage
+	DeadLetterOptional		AVMDeadLetterRecord
+	ExecutionHash			string
 }
 
 func NewAVMZoneRouterTable(table AVMZoneRouterTable) (AVMZoneRouterTable, error) {
@@ -180,17 +180,17 @@ func NewAVMZoneRouterRoute(policy AVMCrossZoneRoutePolicy, roots AVMCrossZoneZon
 		return AVMZoneRouterRoute{}, errors.New("AVM zone router route roots must belong to destination zone")
 	}
 	route := AVMZoneRouterRoute{
-		RouteKey:             AVMZoneRouterRouteKey(policy.SourceZone, policy.DestinationZone, policy.AllowedOpcodes),
-		SourceZone:           policy.SourceZone,
-		DestinationZone:      policy.DestinationZone,
-		PolicyHash:           policy.PolicyHash,
-		OutputMessageRoot:    roots.OutputMessageRoot,
-		DestinationInboxRoot: roots.DestinationInboxRoot,
-		CrossZoneReceiptRoot: roots.CrossZoneReceiptRoot,
-		ValueEscrowRoot:      roots.ValueEscrowRoot,
-		BounceBehavior:       policy.BounceBehavior,
-		ProofRequirement:     policy.ProofRequirement,
-		ValueAccounting:      policy.ValueAccounting,
+		RouteKey:		AVMZoneRouterRouteKey(policy.SourceZone, policy.DestinationZone, policy.AllowedOpcodes),
+		SourceZone:		policy.SourceZone,
+		DestinationZone:	policy.DestinationZone,
+		PolicyHash:		policy.PolicyHash,
+		OutputMessageRoot:	roots.OutputMessageRoot,
+		DestinationInboxRoot:	roots.DestinationInboxRoot,
+		CrossZoneReceiptRoot:	roots.CrossZoneReceiptRoot,
+		ValueEscrowRoot:	roots.ValueEscrowRoot,
+		BounceBehavior:		policy.BounceBehavior,
+		ProofRequirement:	policy.ProofRequirement,
+		ValueAccounting:	policy.ValueAccounting,
 	}
 	route.RouteHash = ComputeAVMZoneRouterRouteHash(route)
 	return route, route.Validate()
@@ -293,17 +293,17 @@ func QueryAVMCrossZoneProof(index AVMCrossZoneProofIndex, kind AVMCrossZoneProof
 		return AVMCrossZoneProof{}, errors.New("AVM cross-zone proof route not found")
 	}
 	proof := AVMCrossZoneProof{
-		Kind:                 kind,
-		ZoneID:               zoneID,
-		MessageID:            messageID,
-		RouteKey:             routeKey,
-		RouterTableRoot:      index.RouterTable.TableRoot,
-		ZoneCrossRoot:        zoneRoots.CrossZoneRootHash,
-		OutputMessageRoot:    zoneRoots.OutputMessageRoot,
-		DestinationInboxRoot: zoneRoots.DestinationInboxRoot,
-		CrossZoneReceiptRoot: zoneRoots.CrossZoneReceiptRoot,
-		ValueEscrowRoot:      zoneRoots.ValueEscrowRoot,
-		ReceiptID:            execution.DestinationReceipt.ReceiptID,
+		Kind:			kind,
+		ZoneID:			zoneID,
+		MessageID:		messageID,
+		RouteKey:		routeKey,
+		RouterTableRoot:	index.RouterTable.TableRoot,
+		ZoneCrossRoot:		zoneRoots.CrossZoneRootHash,
+		OutputMessageRoot:	zoneRoots.OutputMessageRoot,
+		DestinationInboxRoot:	zoneRoots.DestinationInboxRoot,
+		CrossZoneReceiptRoot:	zoneRoots.CrossZoneReceiptRoot,
+		ValueEscrowRoot:	zoneRoots.ValueEscrowRoot,
+		ReceiptID:		execution.DestinationReceipt.ReceiptID,
 	}
 	if kind == AVMCrossZoneProofEscrow {
 		escrow, found := findCrossZoneEscrow(index.Escrows, messageID)
@@ -459,8 +459,8 @@ func (r AVMZoneRouterRoute) Validate() error {
 		return errors.New("AVM zone router route requires distinct zones")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM zone router policy hash", value: r.PolicyHash},
 		{name: "AVM zone router output message root", value: r.OutputMessageRoot},
@@ -530,8 +530,8 @@ func (r AVMCrossZoneZoneRoots) Validate() error {
 		return errors.New("AVM cross-zone roots height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM cross-zone output message root", value: r.OutputMessageRoot},
 		{name: "AVM cross-zone destination inbox root", value: r.DestinationInboxRoot},
@@ -658,8 +658,8 @@ func (p AVMCrossZoneProof) Validate() error {
 		return errors.New("AVM cross-zone proof route key is required")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM cross-zone proof message id", value: p.MessageID},
 		{name: "AVM cross-zone proof router table root", value: p.RouterTableRoot},
@@ -709,8 +709,8 @@ func (e AVMCrossZoneExecution) Validate() error {
 		return errors.New("AVM cross-zone execution forbids direct state writes")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM cross-zone source output messages root", value: e.SourceOutputMessagesRoot},
 		{name: "AVM cross-zone destination receipt root", value: e.DestinationReceiptRoot},

@@ -8,18 +8,18 @@ import (
 )
 
 var (
-	_ types.GRPCMsgServer   = grpcMsgServer{}
-	_ types.GRPCQueryServer = grpcQueryServer{}
+	_	types.GRPCMsgServer	= grpcMsgServer{}
+	_	types.GRPCQueryServer	= grpcQueryServer{}
 )
 
 type grpcMsgServer struct {
 	types.UnimplementedGRPCMsgServer
-	keeper *Keeper
+	keeper	*Keeper
 }
 
 type grpcQueryServer struct {
 	types.UnimplementedGRPCQueryServer
-	keeper *Keeper
+	keeper	*Keeper
 }
 
 func NewGRPCMsgServer(k *Keeper) types.GRPCMsgServer {

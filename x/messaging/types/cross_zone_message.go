@@ -17,52 +17,52 @@ import (
 )
 
 const (
-	CrossZoneMessageEncodingVersion = uint16(1)
-	MaxCrossZoneOpcodeLength        = 96
-	MaxCrossZoneRouteIDLength       = 128
-	MaxCrossZoneAuthScopeLength     = 96
+	CrossZoneMessageEncodingVersion	= uint16(1)
+	MaxCrossZoneOpcodeLength	= 96
+	MaxCrossZoneRouteIDLength	= 128
+	MaxCrossZoneAuthScopeLength	= 96
 )
 
 type CrossZoneMessageEnvelope struct {
-	MessageID       []byte
-	SourceZone      zonestypes.ZoneID
-	DestinationZone zonestypes.ZoneID
-	Sender          sdk.AccAddress
-	Recipient       sdk.AccAddress
-	Value           sdkmath.Int
-	Opcode          string
-	Payload         []byte
-	GasLimit        uint64
-	Deadline        uint64
-	Nonce           uint64
-	SourceSequence  uint64
-	RouteID         string
-	Bounce          bool
-	FeeLimit        sdkmath.Int
-	CreatedHeight   uint64
-	PayloadHash     []byte
-	AuthScope       string
+	MessageID	[]byte
+	SourceZone	zonestypes.ZoneID
+	DestinationZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Recipient	sdk.AccAddress
+	Value		sdkmath.Int
+	Opcode		string
+	Payload		[]byte
+	GasLimit	uint64
+	Deadline	uint64
+	Nonce		uint64
+	SourceSequence	uint64
+	RouteID		string
+	Bounce		bool
+	FeeLimit	sdkmath.Int
+	CreatedHeight	uint64
+	PayloadHash	[]byte
+	AuthScope	string
 }
 
 type CrossZoneMessageParams struct {
-	MaxPayloadSize uint32
-	MinGasLimit    uint64
-	MaxGasLimit    uint64
-	MinFeeLimit    sdkmath.Int
+	MaxPayloadSize	uint32
+	MinGasLimit	uint64
+	MaxGasLimit	uint64
+	MinFeeLimit	sdkmath.Int
 }
 
 type CrossZoneReplayState struct {
-	ConsumedMessageIDs  map[string]struct{}
-	LastNonceByScope    map[string]uint64
-	LastSequenceByScope map[string]uint64
+	ConsumedMessageIDs	map[string]struct{}
+	LastNonceByScope	map[string]uint64
+	LastSequenceByScope	map[string]uint64
 }
 
 func DefaultCrossZoneMessageParams() CrossZoneMessageParams {
 	return CrossZoneMessageParams{
-		MaxPayloadSize: 1024 * 1024,
-		MinGasLimit:    1,
-		MaxGasLimit:    100_000_000,
-		MinFeeLimit:    sdkmath.ZeroInt(),
+		MaxPayloadSize:	1024 * 1024,
+		MinGasLimit:	1,
+		MaxGasLimit:	100_000_000,
+		MinFeeLimit:	sdkmath.ZeroInt(),
 	}
 }
 
@@ -249,21 +249,21 @@ func (m CrossZoneMessageEnvelope) ZoneMessage() (zonestypes.ZoneMessage, error) 
 		return zonestypes.ZoneMessage{}, err
 	}
 	return zonestypes.ZoneMessage{
-		ZoneID:      m.DestinationZone,
-		MessageType: m.Opcode,
-		Source:      CrossZoneAddressScope(m.SourceZone, m.Sender),
-		Destination: CrossZoneAddressScope(m.DestinationZone, m.Recipient),
-		GasLimit:    m.GasLimit,
-		PayloadHash: hex.EncodeToString(m.PayloadHash),
-		Sequence:    m.SourceSequence,
+		ZoneID:		m.DestinationZone,
+		MessageType:	m.Opcode,
+		Source:		CrossZoneAddressScope(m.SourceZone, m.Sender),
+		Destination:	CrossZoneAddressScope(m.DestinationZone, m.Recipient),
+		GasLimit:	m.GasLimit,
+		PayloadHash:	hex.EncodeToString(m.PayloadHash),
+		Sequence:	m.SourceSequence,
 	}, nil
 }
 
 func NewCrossZoneReplayState() CrossZoneReplayState {
 	return CrossZoneReplayState{
-		ConsumedMessageIDs:  make(map[string]struct{}),
-		LastNonceByScope:    make(map[string]uint64),
-		LastSequenceByScope: make(map[string]uint64),
+		ConsumedMessageIDs:	make(map[string]struct{}),
+		LastNonceByScope:	make(map[string]uint64),
+		LastSequenceByScope:	make(map[string]uint64),
 	}
 }
 
@@ -292,9 +292,9 @@ func (s CrossZoneReplayState) CheckAndRecord(msg CrossZoneMessageEnvelope, param
 
 func (s CrossZoneReplayState) Clone() CrossZoneReplayState {
 	out := CrossZoneReplayState{
-		ConsumedMessageIDs:  make(map[string]struct{}, len(s.ConsumedMessageIDs)),
-		LastNonceByScope:    make(map[string]uint64, len(s.LastNonceByScope)),
-		LastSequenceByScope: make(map[string]uint64, len(s.LastSequenceByScope)),
+		ConsumedMessageIDs:	make(map[string]struct{}, len(s.ConsumedMessageIDs)),
+		LastNonceByScope:	make(map[string]uint64, len(s.LastNonceByScope)),
+		LastSequenceByScope:	make(map[string]uint64, len(s.LastSequenceByScope)),
 	}
 	for key := range s.ConsumedMessageIDs {
 		out.ConsumedMessageIDs[key] = struct{}{}

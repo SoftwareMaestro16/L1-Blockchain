@@ -10,18 +10,18 @@ import (
 const CosmosModuleMapVersion = uint64(1)
 
 type CosmosModuleDescriptor struct {
-	Module           string
-	Responsibility   string
-	Zone             string
-	Dependencies     []string
-	AcceptanceSignal string
-	DescriptorHash   string
+	Module			string
+	Responsibility		string
+	Zone			string
+	Dependencies		[]string
+	AcceptanceSignal	string
+	DescriptorHash		string
 }
 
 type CosmosModuleMap struct {
-	Version uint64
-	Modules []CosmosModuleDescriptor
-	Root    string
+	Version	uint64
+	Modules	[]CosmosModuleDescriptor
+	Root	string
 }
 
 func CosmosSDKNewModules() []CosmosModuleDescriptor {
@@ -43,8 +43,8 @@ func CosmosSDKNewModules() []CosmosModuleDescriptor {
 func BuildCosmosModuleMap(modules []CosmosModuleDescriptor) (CosmosModuleMap, error) {
 	normalized := normalizeCosmosModuleDescriptors(modules)
 	moduleMap := CosmosModuleMap{
-		Version: CosmosModuleMapVersion,
-		Modules: normalized,
+		Version:	CosmosModuleMapVersion,
+		Modules:	normalized,
 	}
 	if err := moduleMap.ValidateFormat(); err != nil {
 		return CosmosModuleMap{}, err
@@ -249,11 +249,11 @@ func ValidateCosmosSDKNewModuleMap() error {
 
 func cosmosModule(module, responsibility, zone string, dependencies []string, acceptance string) CosmosModuleDescriptor {
 	desc, err := BuildCosmosModuleDescriptor(CosmosModuleDescriptor{
-		Module:           module,
-		Responsibility:   responsibility,
-		Zone:             zone,
-		Dependencies:     dependencies,
-		AcceptanceSignal: acceptance,
+		Module:			module,
+		Responsibility:		responsibility,
+		Zone:			zone,
+		Dependencies:		dependencies,
+		AcceptanceSignal:	acceptance,
 	})
 	if err != nil {
 		panic(err)

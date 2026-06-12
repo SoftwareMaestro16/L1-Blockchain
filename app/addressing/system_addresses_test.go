@@ -14,7 +14,7 @@ import (
 
 type policyTx struct{ msgs []sdk.Msg }
 
-func (tx policyTx) GetMsgs() []sdk.Msg { return tx.msgs }
+func (tx policyTx) GetMsgs() []sdk.Msg	{ return tx.msgs }
 func (tx policyTx) GetMsgsV2() ([]protov2.Message, error) {
 	out := make([]protov2.Message, 0, len(tx.msgs))
 	for _, msg := range tx.msgs {
@@ -119,9 +119,9 @@ func TestReservedAddressPolicyRejectsUserCreationAndAnteRoles(t *testing.T) {
 	require.ErrorContains(t, addressing.ValidateTxAuthorityAddress("authority", mint.Raw), "reserved system address")
 
 	err := addressing.ValidateAnteAddressPolicy(policyTx{msgs: []sdk.Msg{&banktypes.MsgSend{
-		FromAddress: mint.UserFriendly,
-		ToAddress:   addressing.SystemAddressAETBurnUserFriendly,
-		Amount:      sdk.NewCoins(sdk.NewInt64Coin("naet", 1)),
+		FromAddress:	mint.UserFriendly,
+		ToAddress:	addressing.SystemAddressAETBurnUserFriendly,
+		Amount:		sdk.NewCoins(sdk.NewInt64Coin("naet", 1)),
 	}}})
 	require.ErrorContains(t, err, "reserved system address")
 }

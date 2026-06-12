@@ -13,17 +13,17 @@ import (
 type InterfaceUXStep string
 
 const (
-	InterfaceUXUserInput           InterfaceUXStep = "user_input"
-	InterfaceUXResolveService      InterfaceUXStep = "resolve_service"
-	InterfaceUXFetchInterface      InterfaceUXStep = "fetch_interface"
-	InterfaceUXVerifyInterfaceHash InterfaceUXStep = "verify_interface_hash"
-	InterfaceUXGenerateForm        InterfaceUXStep = "generate_form"
-	InterfaceUXBuildCall           InterfaceUXStep = "build_call"
-	InterfaceUXExecuteCall         InterfaceUXStep = "execute_call"
-	InterfaceUXVerifyReceipt       InterfaceUXStep = "verify_receipt"
+	InterfaceUXUserInput		InterfaceUXStep	= "user_input"
+	InterfaceUXResolveService	InterfaceUXStep	= "resolve_service"
+	InterfaceUXFetchInterface	InterfaceUXStep	= "fetch_interface"
+	InterfaceUXVerifyInterfaceHash	InterfaceUXStep	= "verify_interface_hash"
+	InterfaceUXGenerateForm		InterfaceUXStep	= "generate_form"
+	InterfaceUXBuildCall		InterfaceUXStep	= "build_call"
+	InterfaceUXExecuteCall		InterfaceUXStep	= "execute_call"
+	InterfaceUXVerifyReceipt	InterfaceUXStep	= "verify_receipt"
 
-	WalletSchemaFormatJSONV1 = "wallet-json-v1"
-	CLISchemaFormatJSONV1    = "cli-json-v1"
+	WalletSchemaFormatJSONV1	= "wallet-json-v1"
+	CLISchemaFormatJSONV1		= "cli-json-v1"
 )
 
 var interfaceDrivenUXSteps = []InterfaceUXStep{
@@ -38,45 +38,45 @@ var interfaceDrivenUXSteps = []InterfaceUXStep{
 }
 
 type InterfaceSchemaFormat struct {
-	InterfaceHash    string
-	MethodID         string
-	SchemaEncoding   string
-	InputSchemaHash  string
-	OutputSchemaHash string
-	WalletFormat     string
-	CLIFormat        string
-	MetadataHash     string
-	FormatHash       string
+	InterfaceHash		string
+	MethodID		string
+	SchemaEncoding		string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	WalletFormat		string
+	CLIFormat		string
+	MetadataHash		string
+	FormatHash		string
 }
 
 type InterfaceDrivenUXFlow struct {
-	ServiceID                      string
-	InterfaceHash                  string
-	MethodName                     string
-	PaymentModel                   string
-	TrustModel                     coretypes.ServiceTrustModel
-	VerificationModel              coretypes.ServiceVerificationModel
-	Steps                          []InterfaceUXStep
-	DisplayPaymentAndTrustModel    bool
-	RequireUserSigningConfirmation bool
-	MetadataGrantsAuthorization    bool
-	FlowHash                       string
+	ServiceID			string
+	InterfaceHash			string
+	MethodName			string
+	PaymentModel			string
+	TrustModel			coretypes.ServiceTrustModel
+	VerificationModel		coretypes.ServiceVerificationModel
+	Steps				[]InterfaceUXStep
+	DisplayPaymentAndTrustModel	bool
+	RequireUserSigningConfirmation	bool
+	MetadataGrantsAuthorization	bool
+	FlowHash			string
 }
 
 type MsgRegisterInterface struct {
-	Authority   string
-	Interface   ServiceInterface
-	Schema      InterfaceSchemaFormat
-	MessageHash string
+	Authority	string
+	Interface	ServiceInterface
+	Schema		InterfaceSchemaFormat
+	MessageHash	string
 }
 
 type MsgUpdateInterface struct {
-	Authority             string
-	PreviousInterfaceHash string
-	Interface             ServiceInterface
-	Schema                InterfaceSchemaFormat
-	ExpectedVersion       uint64
-	MessageHash           string
+	Authority		string
+	PreviousInterfaceHash	string
+	Interface		ServiceInterface
+	Schema			InterfaceSchemaFormat
+	ExpectedVersion		uint64
+	MessageHash		string
 }
 
 type QueryInterfaceProof struct {
@@ -84,53 +84,53 @@ type QueryInterfaceProof struct {
 }
 
 type InterfaceProof struct {
-	InterfaceHash string
-	RegistryRoot  string
-	RecordHash    string
-	ProofHeight   uint64
-	ProofHash     string
+	InterfaceHash	string
+	RegistryRoot	string
+	RecordHash	string
+	ProofHeight	uint64
+	ProofHash	string
 }
 
 type QueryInterfaceProofResponse struct {
-	Proof InterfaceProof
-	Found bool
+	Proof	InterfaceProof
+	Found	bool
 }
 
 type SDKInterfaceVerification struct {
-	ServiceID        string
-	InterfaceHash    string
-	Definition       FormalServiceInterface
-	PaymentModel     string
-	TrustModel       coretypes.ServiceTrustModel
-	Verification     coretypes.ServiceVerificationModel
-	VerificationHash string
+	ServiceID		string
+	InterfaceHash		string
+	Definition		FormalServiceInterface
+	PaymentModel		string
+	TrustModel		coretypes.ServiceTrustModel
+	Verification		coretypes.ServiceVerificationModel
+	VerificationHash	string
 }
 
 type WalletCLISchema struct {
-	ServiceID        string
-	InterfaceHash    string
-	MethodID         string
-	MethodName       string
-	SchemaEncoding   string
-	InputSchemaHash  string
-	OutputSchemaHash string
-	WalletFormat     string
-	CLIFormat        string
-	PaymentModel     string
-	TrustModel       coretypes.ServiceTrustModel
-	Verification     coretypes.ServiceVerificationModel
-	SchemaHash       string
+	ServiceID		string
+	InterfaceHash		string
+	MethodID		string
+	MethodName		string
+	SchemaEncoding		string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	WalletFormat		string
+	CLIFormat		string
+	PaymentModel		string
+	TrustModel		coretypes.ServiceTrustModel
+	Verification		coretypes.ServiceVerificationModel
+	SchemaHash		string
 }
 
 type InterfaceCompatibilityReport struct {
-	PreviousInterfaceHash string
-	NextInterfaceHash     string
-	PreviousVersion       uint64
-	NextVersion           uint64
-	Compatible            bool
-	BreakingChanges       []string
-	AddedMethods          []string
-	ReportHash            string
+	PreviousInterfaceHash	string
+	NextInterfaceHash	string
+	PreviousVersion		uint64
+	NextVersion		uint64
+	Compatible		bool
+	BreakingChanges		[]string
+	AddedMethods		[]string
+	ReportHash		string
 }
 
 func NewInterfaceSchemaFormat(iface ServiceInterface, methodName string) (InterfaceSchemaFormat, error) {
@@ -143,14 +143,14 @@ func NewInterfaceSchemaFormat(iface ServiceInterface, methodName string) (Interf
 		return InterfaceSchemaFormat{}, fmt.Errorf("services interface method %s not found", methodName)
 	}
 	format := InterfaceSchemaFormat{
-		InterfaceHash:    definition.InterfaceHash,
-		MethodID:         method.MethodID,
-		SchemaEncoding:   definition.SchemaEncoding,
-		InputSchemaHash:  method.InputSchemaHash,
-		OutputSchemaHash: method.OutputSchemaHash,
-		WalletFormat:     WalletSchemaFormatJSONV1,
-		CLIFormat:        CLISchemaFormatJSONV1,
-		MetadataHash:     definition.MetadataHash,
+		InterfaceHash:		definition.InterfaceHash,
+		MethodID:		method.MethodID,
+		SchemaEncoding:		definition.SchemaEncoding,
+		InputSchemaHash:	method.InputSchemaHash,
+		OutputSchemaHash:	method.OutputSchemaHash,
+		WalletFormat:		WalletSchemaFormatJSONV1,
+		CLIFormat:		CLISchemaFormatJSONV1,
+		MetadataHash:		definition.MetadataHash,
 	}
 	format.FormatHash = ComputeInterfaceSchemaFormatHash(format)
 	return format, format.Validate()
@@ -209,16 +209,16 @@ func NewInterfaceDrivenUXFlow(descriptor ServiceDescriptor, methodName string) (
 		return InterfaceDrivenUXFlow{}, fmt.Errorf("services interface method %s not found", methodName)
 	}
 	flow := InterfaceDrivenUXFlow{
-		ServiceID:                      descriptor.ServiceID,
-		InterfaceHash:                  definition.InterfaceHash,
-		MethodName:                     method.Name,
-		PaymentModel:                   registryPaymentModelFromDescriptor(descriptor),
-		TrustModel:                     descriptor.Verification.TrustModel,
-		VerificationModel:              method.VerificationModel,
-		Steps:                          append([]InterfaceUXStep(nil), interfaceDrivenUXSteps...),
-		DisplayPaymentAndTrustModel:    true,
-		RequireUserSigningConfirmation: true,
-		MetadataGrantsAuthorization:    false,
+		ServiceID:			descriptor.ServiceID,
+		InterfaceHash:			definition.InterfaceHash,
+		MethodName:			method.Name,
+		PaymentModel:			registryPaymentModelFromDescriptor(descriptor),
+		TrustModel:			descriptor.Verification.TrustModel,
+		VerificationModel:		method.VerificationModel,
+		Steps:				append([]InterfaceUXStep(nil), interfaceDrivenUXSteps...),
+		DisplayPaymentAndTrustModel:	true,
+		RequireUserSigningConfirmation:	true,
+		MetadataGrantsAuthorization:	false,
 	}
 	flow.FlowHash = ComputeInterfaceDrivenUXFlowHash(flow)
 	return flow, flow.Validate()
@@ -271,9 +271,9 @@ func (flow InterfaceDrivenUXFlow) Validate() error {
 
 func NewMsgRegisterInterface(authority string, iface ServiceInterface, schema InterfaceSchemaFormat) (MsgRegisterInterface, error) {
 	msg := MsgRegisterInterface{
-		Authority: strings.TrimSpace(authority),
-		Interface: coretypes.CanonicalServiceInterfaceDescriptor(iface),
-		Schema:    schema,
+		Authority:	strings.TrimSpace(authority),
+		Interface:	coretypes.CanonicalServiceInterfaceDescriptor(iface),
+		Schema:		schema,
 	}
 	msg.MessageHash = ComputeInterfaceRegistryMessageHash(msg)
 	return msg, msg.ValidateBasic()
@@ -281,18 +281,18 @@ func NewMsgRegisterInterface(authority string, iface ServiceInterface, schema In
 
 func NewMsgUpdateInterface(authority, previousInterfaceHash string, iface ServiceInterface, schema InterfaceSchemaFormat, expectedVersion uint64) (MsgUpdateInterface, error) {
 	msg := MsgUpdateInterface{
-		Authority:             strings.TrimSpace(authority),
-		PreviousInterfaceHash: strings.ToLower(strings.TrimSpace(previousInterfaceHash)),
-		Interface:             coretypes.CanonicalServiceInterfaceDescriptor(iface),
-		Schema:                schema,
-		ExpectedVersion:       expectedVersion,
+		Authority:		strings.TrimSpace(authority),
+		PreviousInterfaceHash:	strings.ToLower(strings.TrimSpace(previousInterfaceHash)),
+		Interface:		coretypes.CanonicalServiceInterfaceDescriptor(iface),
+		Schema:			schema,
+		ExpectedVersion:	expectedVersion,
 	}
 	msg.MessageHash = ComputeInterfaceRegistryMessageHash(msg)
 	return msg, msg.ValidateBasic()
 }
 
-func (m MsgRegisterInterface) ServiceRegistryMessageName() string { return "MsgRegisterInterface" }
-func (m MsgRegisterInterface) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgRegisterInterface) ServiceRegistryMessageName() string	{ return "MsgRegisterInterface" }
+func (m MsgRegisterInterface) ServiceRegistrySigner() string		{ return m.Authority }
 func (m MsgRegisterInterface) ValidateBasic() error {
 	if err := addressing.ValidateAuthorityAddress("services interface registration authority", m.Authority); err != nil {
 		return err
@@ -312,8 +312,8 @@ func (m MsgRegisterInterface) ValidateBasic() error {
 	return validateInterfaceRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgUpdateInterface) ServiceRegistryMessageName() string { return "MsgUpdateInterface" }
-func (m MsgUpdateInterface) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgUpdateInterface) ServiceRegistryMessageName() string	{ return "MsgUpdateInterface" }
+func (m MsgUpdateInterface) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgUpdateInterface) ValidateBasic() error {
 	if err := addressing.ValidateAuthorityAddress("services interface update authority", m.Authority); err != nil {
 		return err
@@ -359,10 +359,10 @@ func QueryInterfaceProofFromState(state ServiceRegistryState, q QueryInterfacePr
 	}
 	recordHash := ComputeInterfaceProofRecordHash(iface)
 	proof := InterfaceProof{
-		InterfaceHash: iface.InterfaceHash,
-		RegistryRoot:  state.StateRoot,
-		RecordHash:    recordHash,
-		ProofHeight:   state.UpdatedHeight,
+		InterfaceHash:	iface.InterfaceHash,
+		RegistryRoot:	state.StateRoot,
+		RecordHash:	recordHash,
+		ProofHeight:	state.UpdatedHeight,
 	}
 	proof.ProofHash = ComputeInterfaceProofHash(proof)
 	return QueryInterfaceProofResponse{Proof: proof, Found: true}, proof.Validate()
@@ -449,12 +449,12 @@ func VerifySDKInterface(descriptor ServiceDescriptor, expectedInterfaceHash stri
 		return SDKInterfaceVerification{}, err
 	}
 	verification := SDKInterfaceVerification{
-		ServiceID:     descriptor.ServiceID,
-		InterfaceHash: definition.InterfaceHash,
-		Definition:    definition,
-		PaymentModel:  registryPaymentModelFromDescriptor(descriptor),
-		TrustModel:    descriptor.Verification.TrustModel,
-		Verification:  descriptor.Verification.Model,
+		ServiceID:	descriptor.ServiceID,
+		InterfaceHash:	definition.InterfaceHash,
+		Definition:	definition,
+		PaymentModel:	registryPaymentModelFromDescriptor(descriptor),
+		TrustModel:	descriptor.Verification.TrustModel,
+		Verification:	descriptor.Verification.Model,
 	}
 	verification.VerificationHash = ComputeSDKInterfaceVerificationHash(verification)
 	return verification, verification.Validate()
@@ -515,18 +515,18 @@ func BuildWalletCLISchema(descriptor ServiceDescriptor, methodName string) (Wall
 		return WalletCLISchema{}, fmt.Errorf("services interface method %s not found", methodName)
 	}
 	schema := WalletCLISchema{
-		ServiceID:        descriptor.ServiceID,
-		InterfaceHash:    definition.InterfaceHash,
-		MethodID:         method.MethodID,
-		MethodName:       method.Name,
-		SchemaEncoding:   definition.SchemaEncoding,
-		InputSchemaHash:  method.InputSchemaHash,
-		OutputSchemaHash: method.OutputSchemaHash,
-		WalletFormat:     WalletSchemaFormatJSONV1,
-		CLIFormat:        CLISchemaFormatJSONV1,
-		PaymentModel:     registryPaymentModelFromDescriptor(descriptor),
-		TrustModel:       descriptor.Verification.TrustModel,
-		Verification:     method.VerificationModel,
+		ServiceID:		descriptor.ServiceID,
+		InterfaceHash:		definition.InterfaceHash,
+		MethodID:		method.MethodID,
+		MethodName:		method.Name,
+		SchemaEncoding:		definition.SchemaEncoding,
+		InputSchemaHash:	method.InputSchemaHash,
+		OutputSchemaHash:	method.OutputSchemaHash,
+		WalletFormat:		WalletSchemaFormatJSONV1,
+		CLIFormat:		CLISchemaFormatJSONV1,
+		PaymentModel:		registryPaymentModelFromDescriptor(descriptor),
+		TrustModel:		descriptor.Verification.TrustModel,
+		Verification:		method.VerificationModel,
 	}
 	schema.SchemaHash = ComputeWalletCLISchemaHash(schema)
 	return schema, schema.Validate()
@@ -604,13 +604,13 @@ func CheckVersionedInterfaceCompatibility(previous ServiceInterface, next Servic
 		nextMethods[method.MethodID] = method
 	}
 	report := InterfaceCompatibilityReport{
-		PreviousInterfaceHash: previousDefinition.InterfaceHash,
-		NextInterfaceHash:     nextDefinition.InterfaceHash,
-		PreviousVersion:       previousDefinition.Version,
-		NextVersion:           nextDefinition.Version,
-		Compatible:            true,
-		BreakingChanges:       []string{},
-		AddedMethods:          []string{},
+		PreviousInterfaceHash:	previousDefinition.InterfaceHash,
+		NextInterfaceHash:	nextDefinition.InterfaceHash,
+		PreviousVersion:	previousDefinition.Version,
+		NextVersion:		nextDefinition.Version,
+		Compatible:		true,
+		BreakingChanges:	[]string{},
+		AddedMethods:		[]string{},
 	}
 	for id, previousMethod := range previousMethods {
 		nextMethod, found := nextMethods[id]
@@ -800,9 +800,9 @@ func appendInterfaceToState(state ServiceRegistryState, iface ServiceInterface, 
 		return ServiceRegistryState{}, err
 	}
 	entry := coretypes.ServiceRegistryStateEntry{
-		Key:       key,
-		Value:     iface.InterfaceHash,
-		EntryType: coretypes.ServiceRegistryStateInterface,
+		Key:		key,
+		Value:		iface.InterfaceHash,
+		EntryType:	coretypes.ServiceRegistryStateInterface,
 	}
 	entry.EntryHash = coretypes.ComputeServiceRegistryStateEntryHash(entry)
 	if err := entry.Validate(); err != nil {

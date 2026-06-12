@@ -18,8 +18,8 @@ func TestValidatorAboveCapRejectsNewDelegation(t *testing.T) {
 	msgServer := stakeconcentrationkeeper.NewMsgServerImpl(app.StakeConcentrationKeeper)
 
 	res, err := msgServer.RecomputeConcentration(ctx, &types.MsgRecomputeConcentration{
-		Authority: app.StakeConcentrationKeeper.Authority(),
-		Epoch:     1,
+		Authority:	app.StakeConcentrationKeeper.Authority(),
+		Epoch:		1,
 		ValidatorSet: []types.ValidatorPower{
 			{OperatorAddress: operator(0x33), VotingPower: 25},
 			{OperatorAddress: operator(0x11), VotingPower: 50},
@@ -71,8 +71,8 @@ func TestRewardModifierApplies(t *testing.T) {
 	msgServer := stakeconcentrationkeeper.NewMsgServerImpl(app.StakeConcentrationKeeper)
 
 	res, err := msgServer.RecomputeConcentration(ctx, &types.MsgRecomputeConcentration{
-		Authority: app.StakeConcentrationKeeper.Authority(),
-		Epoch:     1,
+		Authority:	app.StakeConcentrationKeeper.Authority(),
+		Epoch:		1,
 		ValidatorSet: []types.ValidatorPower{
 			{OperatorAddress: operator(0x11), VotingPower: 40},
 			{OperatorAddress: operator(0x22), VotingPower: 30},
@@ -94,8 +94,8 @@ func TestPowerCapEnforcedAcrossEpochTransition(t *testing.T) {
 	msgServer := stakeconcentrationkeeper.NewMsgServerImpl(app.StakeConcentrationKeeper)
 
 	first, err := msgServer.RecomputeConcentration(ctx, &types.MsgRecomputeConcentration{
-		Authority: app.StakeConcentrationKeeper.Authority(),
-		Epoch:     1,
+		Authority:	app.StakeConcentrationKeeper.Authority(),
+		Epoch:		1,
 		ValidatorSet: []types.ValidatorPower{
 			{OperatorAddress: operator(0x11), VotingPower: 34},
 			{OperatorAddress: operator(0x22), VotingPower: 33},
@@ -106,8 +106,8 @@ func TestPowerCapEnforcedAcrossEpochTransition(t *testing.T) {
 	require.Equal(t, uint32(300), first.Network.MaxValidatorPowerBps)
 
 	second, err := msgServer.RecomputeConcentration(ctx, &types.MsgRecomputeConcentration{
-		Authority: app.StakeConcentrationKeeper.Authority(),
-		Epoch:     2,
+		Authority:	app.StakeConcentrationKeeper.Authority(),
+		Epoch:		2,
 		ValidatorSet: []types.ValidatorPower{
 			{OperatorAddress: operator(0x11), VotingPower: 70},
 			{OperatorAddress: operator(0x22), VotingPower: 20},
@@ -203,8 +203,8 @@ func TestInvalidParamsRejected(t *testing.T) {
 	params.SoftVotingPowerBps = params.MaxVotingPowerBps + 1
 
 	_, err := msgServer.UpdateConcentrationParams(ctx, &types.MsgUpdateConcentrationParams{
-		Authority: app.StakeConcentrationKeeper.Authority(),
-		Params:    params,
+		Authority:	app.StakeConcentrationKeeper.Authority(),
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidParams)
 }

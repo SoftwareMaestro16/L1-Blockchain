@@ -19,31 +19,31 @@ const (
 func newExecutionReceipt(queued QueuedMessage, height uint64, stateRootBefore string) ExecutionReceipt {
 	msg := queued.Envelope
 	receipt := ExecutionReceipt{
-		Sequence:         queued.Sequence,
-		TxHash:           ComputeQueueTxHash(queued),
-		MessageID:        append([]byte(nil), queued.MessageID...),
-		ExecutionKind:    executionKind(msg),
-		ContractAddress:  append(sdk.AccAddress(nil), msg.Destination...),
-		Caller:           append(sdk.AccAddress(nil), msg.Source...),
-		Source:           append(sdk.AccAddress(nil), msg.Source...),
-		Destination:      append(sdk.AccAddress(nil), msg.Destination...),
-		Opcode:           msg.Opcode,
-		QueryID:          msg.QueryID,
-		GasLimit:         msg.GasLimit,
-		GasUsed:          0,
-		StorageFeeNaet:   sdkmath.ZeroInt(),
-		ForwardFeeNaet:   msg.ForwardFee.Amount,
-		FeeChargedNaet:   sdkmath.ZeroInt(),
-		ValueInNaet:      normalizeReceiptInt(msg.Value.Amount),
-		ValueOutNaet:     sdkmath.ZeroInt(),
-		StateRootBefore:  stateRootBefore,
-		StateRootAfter:   stateRootBefore,
-		Bounced:          msg.Bounced,
-		RefundAmountNaet: sdkmath.ZeroInt(),
-		RefundFeeNaet:    sdkmath.ZeroInt(),
-		RetryCount:       msg.RetryCount,
-		Height:           height,
-		LogicalTime:      msg.CreatedLogicalTime,
+		Sequence:		queued.Sequence,
+		TxHash:			ComputeQueueTxHash(queued),
+		MessageID:		append([]byte(nil), queued.MessageID...),
+		ExecutionKind:		executionKind(msg),
+		ContractAddress:	append(sdk.AccAddress(nil), msg.Destination...),
+		Caller:			append(sdk.AccAddress(nil), msg.Source...),
+		Source:			append(sdk.AccAddress(nil), msg.Source...),
+		Destination:		append(sdk.AccAddress(nil), msg.Destination...),
+		Opcode:			msg.Opcode,
+		QueryID:		msg.QueryID,
+		GasLimit:		msg.GasLimit,
+		GasUsed:		0,
+		StorageFeeNaet:		sdkmath.ZeroInt(),
+		ForwardFeeNaet:		msg.ForwardFee.Amount,
+		FeeChargedNaet:		sdkmath.ZeroInt(),
+		ValueInNaet:		normalizeReceiptInt(msg.Value.Amount),
+		ValueOutNaet:		sdkmath.ZeroInt(),
+		StateRootBefore:	stateRootBefore,
+		StateRootAfter:		stateRootBefore,
+		Bounced:		msg.Bounced,
+		RefundAmountNaet:	sdkmath.ZeroInt(),
+		RefundFeeNaet:		sdkmath.ZeroInt(),
+		RetryCount:		msg.RetryCount,
+		Height:			height,
+		LogicalTime:		msg.CreatedLogicalTime,
 	}
 	if receipt.StateRootBefore == "" {
 		receipt.StateRootBefore = EmptyAVMStateRoot()
@@ -175,8 +175,8 @@ func ValidateExecutionReceipt(receipt ExecutionReceipt) error {
 		return errors.New("AVM receipt gas used exceeds gas limit")
 	}
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "fee charged", value: receipt.FeeChargedNaet},
 		{name: "value in", value: receipt.ValueInNaet},

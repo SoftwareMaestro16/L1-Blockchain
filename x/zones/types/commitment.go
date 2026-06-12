@@ -9,14 +9,14 @@ import (
 )
 
 type ZoneCommitment struct {
-	ZoneID              ZoneID
-	ZoneHeight          uint64
-	StateRoot           string
-	ReceiptRoot         string
-	MessageRoot         string
-	ExecutionResultRoot string
-	PreviousCommitment  string
-	CommitmentHash      string
+	ZoneID			ZoneID
+	ZoneHeight		uint64
+	StateRoot		string
+	ReceiptRoot		string
+	MessageRoot		string
+	ExecutionResultRoot	string
+	PreviousCommitment	string
+	CommitmentHash		string
 }
 
 func NewZoneCommitment(
@@ -29,13 +29,13 @@ func NewZoneCommitment(
 	previousCommitment string,
 ) (ZoneCommitment, error) {
 	commitment := ZoneCommitment{
-		ZoneID:              zoneID,
-		ZoneHeight:          zoneHeight,
-		StateRoot:           stateRoot,
-		ReceiptRoot:         receiptRoot,
-		MessageRoot:         messageRoot,
-		ExecutionResultRoot: executionResultRoot,
-		PreviousCommitment:  previousCommitment,
+		ZoneID:			zoneID,
+		ZoneHeight:		zoneHeight,
+		StateRoot:		stateRoot,
+		ReceiptRoot:		receiptRoot,
+		MessageRoot:		messageRoot,
+		ExecutionResultRoot:	executionResultRoot,
+		PreviousCommitment:	previousCommitment,
 	}
 	if err := commitment.ValidateFormat(); err != nil {
 		return ZoneCommitment{}, err

@@ -33,8 +33,8 @@ func StartMetricsServer(ctx context.Context, addr string, registry *Registry) er
 		return err
 	}
 	server := &http.Server{
-		Handler:           Handler(registry),
-		ReadHeaderTimeout: 3 * time.Second,
+		Handler:		Handler(registry),
+		ReadHeaderTimeout:	3 * time.Second,
 	}
 	go func() {
 		<-ctx.Done()

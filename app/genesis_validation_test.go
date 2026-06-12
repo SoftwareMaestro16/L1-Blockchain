@@ -115,17 +115,17 @@ func TestInitChainRejectsZeroGenesisAccount(t *testing.T) {
 	stateBytes, err := json.MarshalIndent(genesis, "", " ")
 	require.NoError(t, err)
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.ErrorContains(t, err, "must not be zero address")
 }
 
 func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
 	tests := map[string]struct {
-		mutate   func(*L1App, GenesisState)
-		errMatch string
+		mutate		func(*L1App, GenesisState)
+		errMatch	string
 	}{
 		"duplicate auth account": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -134,7 +134,7 @@ func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
 				authGenesis.Accounts = append(authGenesis.Accounts, authGenesis.Accounts[0])
 				genesis[authtypes.ModuleName] = app.AppCodec().MustMarshalJSON(&authGenesis)
 			},
-			errMatch: "duplicate account",
+			errMatch:	"duplicate account",
 		},
 		"malformed auth account any": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -145,7 +145,7 @@ func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
 				require.NoError(t, err)
 				genesis[authtypes.ModuleName] = raw
 			},
-			errMatch: "unable to resolve type URL",
+			errMatch:	"unable to resolve type URL",
 		},
 	}
 
@@ -161,8 +161,8 @@ func TestGenesisRejectsDuplicateAndMalformedAccounts(t *testing.T) {
 
 func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 	tests := map[string]struct {
-		mutate   func(*L1App, GenesisState)
-		errMatch string
+		mutate		func(*L1App, GenesisState)
+		errMatch	string
 	}{
 		"duplicate bank balance": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -171,18 +171,18 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				bankGenesis.Balances = append(bankGenesis.Balances, bankGenesis.Balances[0])
 				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 			},
-			errMatch: "duplicate balance",
+			errMatch:	"duplicate balance",
 		},
 		"malformed bank balance address": {
 			mutate: func(app *L1App, genesis GenesisState) {
 				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
 				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
-					Address: "not-an-aetra-address",
-					Coins:   sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
+					Address:	"not-an-aetra-address",
+					Coins:		sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
 				})
 				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 			},
-			errMatch: "decoding bech32 failed",
+			errMatch:	"decoding bech32 failed",
 		},
 		"zero bank balance address": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -190,13 +190,13 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				require.NoError(t, err)
 				bankGenesis := banktypes.GetGenesisStateFromAppState(app.AppCodec(), genesis)
 				bankGenesis.Balances = append(bankGenesis.Balances, banktypes.Balance{
-					Address: zeroBech32,
-					Coins:   sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
+					Address:	zeroBech32,
+					Coins:		sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
 				})
 				bankGenesis.Supply = bankGenesis.Supply.Add(sdk.NewInt64Coin(appparams.BaseDenom, 1))
 				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 			},
-			errMatch: "must not be zero address",
+			errMatch:	"must not be zero address",
 		},
 		"bank supply mismatch": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -204,7 +204,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				bankGenesis.Supply = bankGenesis.Supply.Add(sdk.NewInt64Coin(appparams.BaseDenom, 1))
 				genesis[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
 			},
-			errMatch: "genesis supply is incorrect",
+			errMatch:	"genesis supply is incorrect",
 		},
 		"staking denom mismatch": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -212,7 +212,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				stakingGenesis.Params.BondDenom = fixtureTestAssetDenom
 				genesis[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
 			},
-			errMatch: "invalid staking denom",
+			errMatch:	"invalid staking denom",
 		},
 		"mint denom mismatch": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -221,7 +221,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				mintGenesis.Params.MintDenom = fixtureTestAssetDenom
 				genesis[minttypes.ModuleName] = app.AppCodec().MustMarshalJSON(&mintGenesis)
 			},
-			errMatch: "invalid mint denom",
+			errMatch:	"invalid mint denom",
 		},
 		"mint inflation max mismatch": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -230,7 +230,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				mintGenesis.Params.InflationMax = minttypes.DefaultParams().InflationMax
 				genesis[minttypes.ModuleName] = app.AppCodec().MustMarshalJSON(&mintGenesis)
 			},
-			errMatch: "invalid mint max inflation",
+			errMatch:	"invalid mint max inflation",
 		},
 		"mint current inflation outside bounds": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -239,7 +239,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				mintGenesis.Minter.Inflation = minttypes.DefaultInitialMinter().Inflation
 				genesis[minttypes.ModuleName] = app.AppCodec().MustMarshalJSON(&mintGenesis)
 			},
-			errMatch: "invalid mint current inflation",
+			errMatch:	"invalid mint current inflation",
 		},
 		"fees denom mismatch": {
 			mutate: func(app *L1App, genesis GenesisState) {
@@ -248,7 +248,7 @@ func TestGenesisRejectsInvalidCoreBankAndStakingState(t *testing.T) {
 				feesGenesis.Params.AllowedFeeDenoms = []string{fixtureTestAssetDenom}
 				genesis[feestypes.ModuleName] = app.AppCodec().MustMarshalJSON(&feesGenesis)
 			},
-			errMatch: "v1 only accepts fee denom naet",
+			errMatch:	"v1 only accepts fee denom naet",
 		},
 	}
 
@@ -289,9 +289,9 @@ func requireGenesisValidationError(t *testing.T, app *L1App, genesis GenesisStat
 	stateBytes, marshalErr := json.MarshalIndent(genesis, "", " ")
 	require.NoError(t, marshalErr)
 	_, err := app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.Error(t, err)
 }

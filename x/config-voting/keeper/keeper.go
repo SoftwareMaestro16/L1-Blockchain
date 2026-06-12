@@ -15,16 +15,16 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version      uint64
-	Params       prototype.Params
-	VotingParams types.ConfigVotingParams
-	State        types.ConfigVotingState
+	Version		uint64
+	Params		prototype.Params
+	VotingParams	types.ConfigVotingParams
+	State		types.ConfigVotingState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
 func NewKeeper() Keeper {
@@ -37,10 +37,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:      prototype.CurrentGenesisVersion,
-		Params:       prototype.DefaultParams(),
-		VotingParams: types.DefaultConfigVotingParams(),
-		State:        types.EmptyConfigVotingState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		VotingParams:	types.DefaultConfigVotingParams(),
+		State:		types.EmptyConfigVotingState(),
 	}
 }
 
@@ -135,11 +135,11 @@ func (k *Keeper) VoteConfigProposal(msg types.MsgVoteConfigProposal) (types.Conf
 		return types.ConfigVote{}, errors.New("config voter is not in proposal snapshot")
 	}
 	vote := types.ConfigVote{
-		ProposalID: proposal.ProposalID,
-		Voter:      msg.Voter,
-		Option:     msg.Option,
-		Power:      power,
-		Height:     msg.Height,
+		ProposalID:	proposal.ProposalID,
+		Voter:		msg.Voter,
+		Option:		msg.Option,
+		Power:		power,
+		Height:		msg.Height,
 	}.Normalize()
 	if err := vote.Validate(); err != nil {
 		return types.ConfigVote{}, err

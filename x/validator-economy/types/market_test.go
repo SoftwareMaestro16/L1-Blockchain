@@ -16,10 +16,10 @@ func TestPropagateSlashAppliesProportionalAndFirstLossRules(t *testing.T) {
 	}
 
 	proportional, err := PropagateSlash(SlashPropagationInput{
-		Validator:        "val-risk",
-		SelfBondNaet:     sdkmath.NewInt(1_000),
-		Delegations:      delegations,
-		SlashFractionBps: 1_000,
+		Validator:		"val-risk",
+		SelfBondNaet:		sdkmath.NewInt(1_000),
+		Delegations:		delegations,
+		SlashFractionBps:	1_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(100), proportional.SelfBondSlashedNaet)
@@ -28,11 +28,11 @@ func TestPropagateSlashAppliesProportionalAndFirstLossRules(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(1_100), proportional.TotalSlashedNaet)
 
 	firstLoss, err := PropagateSlash(SlashPropagationInput{
-		Validator:         "val-risk",
-		SelfBondNaet:      sdkmath.NewInt(1_000),
-		Delegations:       delegations,
-		SlashFractionBps:  1_000,
-		SelfBondFirstLoss: true,
+		Validator:		"val-risk",
+		SelfBondNaet:		sdkmath.NewInt(1_000),
+		Delegations:		delegations,
+		SlashFractionBps:	1_000,
+		SelfBondFirstLoss:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_000), firstLoss.SelfBondSlashedNaet)
@@ -41,11 +41,11 @@ func TestPropagateSlashAppliesProportionalAndFirstLossRules(t *testing.T) {
 	require.Equal(t, sdkmath.NewInt(1_100), firstLoss.TotalSlashedNaet)
 
 	accounting, err := BuildFirstLossSelfBondAccounting(SlashPropagationInput{
-		Validator:         "val-risk",
-		SelfBondNaet:      sdkmath.NewInt(1_000),
-		Delegations:       delegations,
-		SlashFractionBps:  1_000,
-		SelfBondFirstLoss: true,
+		Validator:		"val-risk",
+		SelfBondNaet:		sdkmath.NewInt(1_000),
+		Delegations:		delegations,
+		SlashFractionBps:	1_000,
+		SelfBondFirstLoss:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_100), accounting.TargetSlashNaet)
@@ -66,15 +66,15 @@ func TestRouteSlashingCoversSeverityClassesAndFundRoutingInvariant(t *testing.T)
 	for _, severity := range severities {
 		t.Run(string(severity), func(t *testing.T) {
 			result, err := RouteSlashing(SlashingRoutingInput{
-				Validator:      "val-slash",
-				Severity:       severity,
-				TotalStakeNaet: sdkmath.NewInt(1_000_000),
+				Validator:	"val-slash",
+				Severity:	severity,
+				TotalStakeNaet:	sdkmath.NewInt(1_000_000),
 				Evidence: SlashingEvidence{
-					EvidenceID: "evidence-1",
-					ReporterID: "reporter-1",
-					Accepted:   true,
+					EvidenceID:	"evidence-1",
+					ReporterID:	"reporter-1",
+					Accepted:	true,
 				},
-				CurrentEpoch: 10,
+				CurrentEpoch:	10,
 			})
 			require.NoError(t, err)
 			require.True(t, result.PenaltyNaet.IsPositive())
@@ -95,11 +95,11 @@ func TestRouteSlashingPaysReporterOnlyForAcceptedNonDuplicateEvidence(t *testing
 		{EvidenceID: "missing-reporter", Accepted: true},
 	} {
 		result, err := RouteSlashing(SlashingRoutingInput{
-			Validator:      "val-slash",
-			Severity:       SlashSeverityEquivocation,
-			TotalStakeNaet: sdkmath.NewInt(1_000_000),
-			Evidence:       evidence,
-			CurrentEpoch:   7,
+			Validator:	"val-slash",
+			Severity:	SlashSeverityEquivocation,
+			TotalStakeNaet:	sdkmath.NewInt(1_000_000),
+			Evidence:	evidence,
+			CurrentEpoch:	7,
 		})
 		require.NoError(t, err)
 		require.False(t, result.ReporterPaid)
@@ -112,12 +112,12 @@ func TestRouteSlashingPaysReporterOnlyForAcceptedNonDuplicateEvidence(t *testing
 	params[3].ReporterRewardBps = 2_000
 	params[3].ReporterRewardCapBps = 500
 	capped, err := RouteSlashing(SlashingRoutingInput{
-		Validator:      "val-slash",
-		Severity:       SlashSeverityEquivocation,
-		TotalStakeNaet: sdkmath.NewInt(1_000_000),
-		Evidence:       SlashingEvidence{EvidenceID: "accepted", ReporterID: "reporter-1", Accepted: true},
-		CurrentEpoch:   7,
-		Params:         params,
+		Validator:	"val-slash",
+		Severity:	SlashSeverityEquivocation,
+		TotalStakeNaet:	sdkmath.NewInt(1_000_000),
+		Evidence:	SlashingEvidence{EvidenceID: "accepted", ReporterID: "reporter-1", Accepted: true},
+		CurrentEpoch:	7,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, mulIntBps(capped.PenaltyNaet, 500), capped.ReporterRewardNaet)
@@ -153,15 +153,15 @@ func TestConcentrationReportExposesWarningsDampeningAndStakeMovementIncentives(t
 	require.NoError(t, err)
 
 	report, err := state.QueryConcentrationReport(DecentralizationParams{
-		TopN:                          2,
-		MaxValidatorShareBps:          4_000,
-		MaxTopNShareBps:               8_000,
-		MaxDelegatorConcentrationBps:  6_000,
-		MinSelfDelegationRatioBps:     1_500,
-		MinSelfDelegationNaet:         sdkmath.NewInt(2_000),
-		MaxCommissionWeightedBps:      700,
-		RewardDampeningSafetyFloorBps: 7_500,
-		StakeMovementIncentiveBps:     250,
+		TopN:				2,
+		MaxValidatorShareBps:		4_000,
+		MaxTopNShareBps:		8_000,
+		MaxDelegatorConcentrationBps:	6_000,
+		MinSelfDelegationRatioBps:	1_500,
+		MinSelfDelegationNaet:		sdkmath.NewInt(2_000),
+		MaxCommissionWeightedBps:	700,
+		RewardDampeningSafetyFloorBps:	7_500,
+		StakeMovementIncentiveBps:	250,
 	}, []string{"val-a", "val-b", "val-c"})
 	require.NoError(t, err)
 	require.Len(t, report.Metrics, 3)
@@ -199,14 +199,14 @@ func TestDelegatorValidatorProfileExposesRiskAdjustedYieldDisclosureAndPolicies(
 	score.UptimeFactor = 9_800
 	score.ReliabilityIndex = 9_700
 	slash := ValidatorSlashHistoryRecord{
-		EpochID:              3,
-		Height:               30,
-		Validator:            "val-safe",
-		Misbehavior:          postypes.MisbehaviorDowntime,
-		SlashFractionBps:     100,
-		SelfBondSlashedNaet:  sdkmath.NewInt(20),
-		DelegatorSlashedNaet: sdkmath.NewInt(80),
-		TotalSlashedNaet:     sdkmath.NewInt(100),
+		EpochID:		3,
+		Height:			30,
+		Validator:		"val-safe",
+		Misbehavior:		postypes.MisbehaviorDowntime,
+		SlashFractionBps:	100,
+		SelfBondSlashedNaet:	sdkmath.NewInt(20),
+		DelegatorSlashedNaet:	sdkmath.NewInt(80),
+		TotalSlashedNaet:	sdkmath.NewInt(100),
 	}
 	state, err := NewValidatorMarketState(params, candidates, delegations, []ValidatorScoreRecord{score}, []ValidatorSlashHistoryRecord{slash}, nil)
 	require.NoError(t, err)
@@ -285,22 +285,22 @@ func TestRedelegationRewardPreviewIsAdvisoryAndDoesNotMoveStake(t *testing.T) {
 
 func TestValidatorCaptureSignalsEmitMachineReadableEventsAndAdvisoryAlerts(t *testing.T) {
 	metadata, changed, err := TrackValidatorMetadataChange(ValidatorMetadataChangeInput{
-		EpochID:   10,
-		Height:    100,
-		Validator: "val-capture",
+		EpochID:	10,
+		Height:		100,
+		Validator:	"val-capture",
 		Previous: ValidatorMetadataSnapshot{
-			OperatorID:     "operator-a",
-			ConsensusKeyID: "key-a",
-			Moniker:        "validator-a",
-			PayoutAddress:  "payout-a",
+			OperatorID:	"operator-a",
+			ConsensusKeyID:	"key-a",
+			Moniker:	"validator-a",
+			PayoutAddress:	"payout-a",
 		},
 		Current: ValidatorMetadataSnapshot{
-			OperatorID:     "operator-b",
-			ConsensusKeyID: "key-b",
-			Moniker:        "validator-b",
-			PayoutAddress:  "payout-b",
+			OperatorID:	"operator-b",
+			ConsensusKeyID:	"key-b",
+			Moniker:	"validator-b",
+			PayoutAddress:	"payout-b",
 		},
-		CooldownEpochs: 2,
+		CooldownEpochs:	2,
 	})
 	require.NoError(t, err)
 	require.True(t, changed)
@@ -310,13 +310,13 @@ func TestValidatorCaptureSignalsEmitMachineReadableEventsAndAdvisoryAlerts(t *te
 	require.Equal(t, []string{"consensus_key_id", "moniker", "operator_id", "payout_address"}, metadata.ChangedFields)
 
 	commission, changed, err := TrackValidatorCommissionChange(CommissionChangeInput{
-		EpochID:                   10,
-		Height:                    101,
-		Validator:                 "val-capture",
-		PreviousCommissionBps:     500,
-		NewCommissionBps:          1_400,
-		MaxIncreaseBpsPerInterval: 300,
-		WarningPeriodEpochs:       2,
+		EpochID:			10,
+		Height:				101,
+		Validator:			"val-capture",
+		PreviousCommissionBps:		500,
+		NewCommissionBps:		1_400,
+		MaxIncreaseBpsPerInterval:	300,
+		WarningPeriodEpochs:		2,
 	})
 	require.NoError(t, err)
 	require.True(t, changed)
@@ -325,12 +325,12 @@ func TestValidatorCaptureSignalsEmitMachineReadableEventsAndAdvisoryAlerts(t *te
 	require.Equal(t, ValidatorEventCommissionChange, commission.Event.Type)
 
 	report, err := EvaluateValidatorCaptureRisk(CaptureRiskInput{
-		Validator:         "val-capture",
-		CurrentEpoch:      11,
-		Height:            110,
-		PreviousCandidate: marketCandidate("val-capture", 5_000, 1_000, 500),
-		CurrentCandidate:  marketCandidate("val-capture", 3_000, 6_000, 1_400),
-		MetadataChanges:   []ValidatorMetadataChangeRecord{metadata},
+		Validator:		"val-capture",
+		CurrentEpoch:		11,
+		Height:			110,
+		PreviousCandidate:	marketCandidate("val-capture", 5_000, 1_000, 500),
+		CurrentCandidate:	marketCandidate("val-capture", 3_000, 6_000, 1_400),
+		MetadataChanges:	[]ValidatorMetadataChangeRecord{metadata},
 		CommissionHistory: []ValidatorCommissionRecord{
 			{EpochID: 9, Height: 90, Validator: "val-capture", CommissionBps: 500},
 			{EpochID: 11, Height: 110, Validator: "val-capture", CommissionBps: 1_400},
@@ -339,13 +339,13 @@ func TestValidatorCaptureSignalsEmitMachineReadableEventsAndAdvisoryAlerts(t *te
 			{EpochID: 10, Height: 100, Validator: "val-capture", Misbehavior: postypes.MisbehaviorDowntime, SlashFractionBps: 100, SelfBondSlashedNaet: sdkmath.NewInt(10), DelegatorSlashedNaet: sdkmath.NewInt(10), TotalSlashedNaet: sdkmath.NewInt(20)},
 		},
 		Params: CaptureRiskParams{
-			MaterialChangeCooldownEpochs:        2,
-			CommissionChangeIntervalEpochs:      4,
-			MaxCommissionIncreaseBpsPerInterval: 300,
-			SuddenDelegationInflowBps:           3_000,
-			SelfDelegationWithdrawalBps:         2_500,
-			RecentSlashWindowEpochs:             4,
-			HighRiskIndicatorThreshold:          2,
+			MaterialChangeCooldownEpochs:		2,
+			CommissionChangeIntervalEpochs:		4,
+			MaxCommissionIncreaseBpsPerInterval:	300,
+			SuddenDelegationInflowBps:		3_000,
+			SelfDelegationWithdrawalBps:		2_500,
+			RecentSlashWindowEpochs:		4,
+			HighRiskIndicatorThreshold:		2,
 		},
 	})
 	require.NoError(t, err)
@@ -371,14 +371,14 @@ func TestRiskAdjustedYieldProjectionRewardBandsAndVarianceAreQueryable(t *testin
 	score.UptimeFactor = 9_000
 	score.ReliabilityIndex = 9_000
 	slash := ValidatorSlashHistoryRecord{
-		EpochID:              4,
-		Height:               40,
-		Validator:            "val-yield",
-		Misbehavior:          postypes.MisbehaviorDowntime,
-		SlashFractionBps:     100,
-		SelfBondSlashedNaet:  sdkmath.NewInt(10),
-		DelegatorSlashedNaet: sdkmath.NewInt(10),
-		TotalSlashedNaet:     sdkmath.NewInt(20),
+		EpochID:		4,
+		Height:			40,
+		Validator:		"val-yield",
+		Misbehavior:		postypes.MisbehaviorDowntime,
+		SlashFractionBps:	100,
+		SelfBondSlashedNaet:	sdkmath.NewInt(10),
+		DelegatorSlashedNaet:	sdkmath.NewInt(10),
+		TotalSlashedNaet:	sdkmath.NewInt(20),
 	}
 	state, err := NewValidatorMarketState(params, []postypes.Candidate{candidate}, []DelegationRecord{delegation}, []ValidatorScoreRecord{score}, []ValidatorSlashHistoryRecord{slash}, nil)
 	require.NoError(t, err)
@@ -386,13 +386,13 @@ func TestRiskAdjustedYieldProjectionRewardBandsAndVarianceAreQueryable(t *testin
 	decParams.MaxValidatorShareBps = postypes.BasisPoints
 
 	projection, found, err := state.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
-		Delegator:                 "del-a",
-		Validator:                 "val-yield",
-		AmountNaet:                sdkmath.NewInt(1_000),
-		AnnualRewardsNaet:         sdkmath.NewInt(200),
-		UnbondingLiquidityCostBps: 200,
-		Decentralization:          decParams,
-		ActiveValidatorIDs:        []string{"val-yield"},
+		Delegator:			"del-a",
+		Validator:			"val-yield",
+		AmountNaet:			sdkmath.NewInt(1_000),
+		AnnualRewardsNaet:		sdkmath.NewInt(200),
+		UnbondingLiquidityCostBps:	200,
+		Decentralization:		decParams,
+		ActiveValidatorIDs:		[]string{"val-yield"},
 	})
 	require.NoError(t, err)
 	require.True(t, found)
@@ -441,22 +441,22 @@ func TestDelegationSimulatorHandlesCommissionSlashAndDampeningInputs(t *testing.
 	decParams.MaxTopNShareBps = postypes.BasisPoints
 
 	result, found, err := state.SimulateDelegation(DelegationSimulationInput{
-		Delegator:         "del-a",
-		FromValidator:     "val-from",
-		ToValidator:       "val-to",
-		AmountNaet:        sdkmath.NewInt(1_000),
-		AnnualRewardsNaet: sdkmath.NewInt(500),
-		CurrentEpoch:      9,
-		Height:            90,
+		Delegator:		"del-a",
+		FromValidator:		"val-from",
+		ToValidator:		"val-to",
+		AmountNaet:		sdkmath.NewInt(1_000),
+		AnnualRewardsNaet:	sdkmath.NewInt(500),
+		CurrentEpoch:		9,
+		Height:			90,
 		CommissionOverrides: []ValidatorCommissionRecord{
 			{EpochID: 9, Height: 90, Validator: "val-to", CommissionBps: 1_500},
 		},
 		SlashEvents: []ValidatorSlashHistoryRecord{
 			{EpochID: 9, Height: 90, Validator: "val-to", Misbehavior: postypes.MisbehaviorDowntime, SlashFractionBps: 100, SelfBondSlashedNaet: sdkmath.NewInt(10), DelegatorSlashedNaet: sdkmath.NewInt(10), TotalSlashedNaet: sdkmath.NewInt(20)},
 		},
-		Decentralization:          decParams,
-		ActiveValidatorIDs:        []string{"val-from", "val-to"},
-		UnbondingLiquidityCostBps: 100,
+		Decentralization:		decParams,
+		ActiveValidatorIDs:		[]string{"val-from", "val-to"},
+		UnbondingLiquidityCostBps:	100,
 	})
 	require.NoError(t, err)
 	require.True(t, found)
@@ -481,14 +481,14 @@ func TestDelegationMarketQueriesExposeRiskYieldSaturationAndHistory(t *testing.T
 	score := testRecord(4, "val-risk", 8_000)
 	score.ReliabilityIndex = 8_000
 	slash := ValidatorSlashHistoryRecord{
-		EpochID:              3,
-		Height:               33,
-		Validator:            "val-risk",
-		Misbehavior:          postypes.MisbehaviorDoubleSign,
-		SlashFractionBps:     1_000,
-		SelfBondSlashedNaet:  sdkmath.NewInt(200),
-		DelegatorSlashedNaet: sdkmath.NewInt(800),
-		TotalSlashedNaet:     sdkmath.NewInt(1_000),
+		EpochID:		3,
+		Height:			33,
+		Validator:		"val-risk",
+		Misbehavior:		postypes.MisbehaviorDoubleSign,
+		SlashFractionBps:	1_000,
+		SelfBondSlashedNaet:	sdkmath.NewInt(200),
+		DelegatorSlashedNaet:	sdkmath.NewInt(800),
+		TotalSlashedNaet:	sdkmath.NewInt(1_000),
 	}
 	commissions := []ValidatorCommissionRecord{
 		{EpochID: 1, Height: 10, Validator: "val-risk", CommissionBps: 500},
@@ -579,14 +579,14 @@ func TestDelegationRiskExposureSurvivesRedelegationRecords(t *testing.T) {
 	oldCandidate := marketCandidate("val-old", 1_000, 1_000, 500)
 	newCandidate := marketCandidate("val-new", 1_000, 1_000, 500)
 	slash := ValidatorSlashHistoryRecord{
-		EpochID:              8,
-		Height:               80,
-		Validator:            "val-old",
-		Misbehavior:          postypes.MisbehaviorDowntime,
-		SlashFractionBps:     500,
-		SelfBondSlashedNaet:  sdkmath.NewInt(50),
-		DelegatorSlashedNaet: sdkmath.NewInt(50),
-		TotalSlashedNaet:     sdkmath.NewInt(100),
+		EpochID:		8,
+		Height:			80,
+		Validator:		"val-old",
+		Misbehavior:		postypes.MisbehaviorDowntime,
+		SlashFractionBps:	500,
+		SelfBondSlashedNaet:	sdkmath.NewInt(50),
+		DelegatorSlashedNaet:	sdkmath.NewInt(50),
+		TotalSlashedNaet:	sdkmath.NewInt(100),
 	}
 	state, err := NewValidatorMarketState(params, []postypes.Candidate{oldCandidate, newCandidate}, []DelegationRecord{oldRecord, newRecord}, nil, []ValidatorSlashHistoryRecord{slash}, nil)
 	require.NoError(t, err)
@@ -605,17 +605,17 @@ func TestDelegationRiskExposureSurvivesRedelegationRecords(t *testing.T) {
 
 func marketDelegation(delegator string, validator string, amount int64, tranche string) DelegationRecord {
 	return DelegationRecord{
-		Delegator:              delegator,
-		Validator:              validator,
-		Amount:                 sdkmath.NewInt(amount),
-		ActivationEpoch:        11,
-		RiskAppetite:           RiskAppetiteBalanced,
-		CommissionTolerance:    1_000,
-		LockDurationPreference: LockDurationEpoch,
-		RewardStrategy:         RewardStrategyLiquid,
-		RiskTrancheOptional:    tranche,
-		CreatedHeight:          10,
-		UpdatedHeight:          10,
+		Delegator:		delegator,
+		Validator:		validator,
+		Amount:			sdkmath.NewInt(amount),
+		ActivationEpoch:	11,
+		RiskAppetite:		RiskAppetiteBalanced,
+		CommissionTolerance:	1_000,
+		LockDurationPreference:	LockDurationEpoch,
+		RewardStrategy:		RewardStrategyLiquid,
+		RiskTrancheOptional:	tranche,
+		CreatedHeight:		10,
+		UpdatedHeight:		10,
 	}
 }
 
@@ -625,13 +625,13 @@ func marketCandidate(id string, selfStake int64, delegatedStake int64, commissio
 		nominations = []postypes.Nomination{{NominatorID: "market-delegators", StakeNaet: sdkmath.NewInt(delegatedStake)}}
 	}
 	return postypes.Candidate{
-		ValidatorID:         id,
-		SelfStakeNaet:       sdkmath.NewInt(selfStake),
-		DelegatedStakeNaet:  sdkmath.NewInt(delegatedStake),
-		PerformanceScoreBps: postypes.BasisPoints,
-		UptimeFactorBps:     postypes.BasisPoints,
-		CommissionBps:       commissionBps,
-		Nominations:         nominations,
+		ValidatorID:		id,
+		SelfStakeNaet:		sdkmath.NewInt(selfStake),
+		DelegatedStakeNaet:	sdkmath.NewInt(delegatedStake),
+		PerformanceScoreBps:	postypes.BasisPoints,
+		UptimeFactorBps:	postypes.BasisPoints,
+		CommissionBps:		commissionBps,
+		Nominations:		nominations,
 	}
 }
 

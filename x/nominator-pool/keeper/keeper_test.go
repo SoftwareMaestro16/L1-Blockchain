@@ -68,31 +68,31 @@ func TestValidatorFundingPolicyRejectsInsufficientStake(t *testing.T) {
 	params := DefaultGenesis().Params
 
 	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
-		Mode:      types.ValidatorFundingSolo,
-		SelfStake: params.MinValidatorStake - 1,
+		Mode:		types.ValidatorFundingSolo,
+		SelfStake:	params.MinValidatorStake - 1,
 	}), "minimum validator stake")
 	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
-		Mode:           types.ValidatorFundingPoolBacked,
-		SelfStake:      params.PoolBackedValidatorMinSelfStake - 1,
-		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + 1,
+		Mode:		types.ValidatorFundingPoolBacked,
+		SelfStake:	params.PoolBackedValidatorMinSelfStake - 1,
+		NominatorStake:	params.PoolBackedValidatorMaxNominatorStake + 1,
 	}), "self-stake")
 	require.ErrorContains(t, params.ValidateValidatorFunding(types.ValidatorFunding{
-		Mode:           types.ValidatorFundingPoolBacked,
-		SelfStake:      params.PoolBackedValidatorMinSelfStake,
-		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + 1,
+		Mode:		types.ValidatorFundingPoolBacked,
+		SelfStake:	params.PoolBackedValidatorMinSelfStake,
+		NominatorStake:	params.PoolBackedValidatorMaxNominatorStake + 1,
 	}), "nominator stake")
 
 	ratioParams := params
 	ratioParams.PoolBackedValidatorMaxNominatorStake = params.MinValidatorStake
 	require.ErrorContains(t, ratioParams.ValidateValidatorFunding(types.ValidatorFunding{
-		Mode:           types.ValidatorFundingPoolBacked,
-		SelfStake:      params.PoolBackedValidatorMinSelfStake,
-		NominatorStake: params.PoolBackedValidatorMaxNominatorStake + types.DefaultAETBaseUnits,
+		Mode:		types.ValidatorFundingPoolBacked,
+		SelfStake:	params.PoolBackedValidatorMinSelfStake,
+		NominatorStake:	params.PoolBackedValidatorMaxNominatorStake + types.DefaultAETBaseUnits,
 	}), "self-stake ratio")
 	require.NoError(t, params.ValidateValidatorFunding(types.ValidatorFunding{
-		Mode:           types.ValidatorFundingPoolBacked,
-		SelfStake:      params.PoolBackedValidatorMinSelfStake,
-		NominatorStake: params.PoolBackedValidatorMaxNominatorStake,
+		Mode:		types.ValidatorFundingPoolBacked,
+		SelfStake:	params.PoolBackedValidatorMinSelfStake,
+		NominatorStake:	params.PoolBackedValidatorMaxNominatorStake,
 	}))
 }
 
@@ -123,33 +123,33 @@ func TestAllocationWeightsAreDeterministicAndPolicyBounded(t *testing.T) {
 	params := DefaultGenesis().Params
 	candidates := []types.ValidatorPolicyCandidate{
 		{
-			ValidatorAddress:     aePoolAddress(t, "44"),
-			ReputationScore:      8_000,
-			UptimeBps:            9_000,
-			CommissionBps:        1_000,
-			StakeEfficiencyBps:   7_500,
-			SlashingRiskBps:      250,
-			NetworkLoadBps:       1_000,
-			CurrentAllocationBps: params.MaxPoolValidatorAllocationBps,
+			ValidatorAddress:	aePoolAddress(t, "44"),
+			ReputationScore:	8_000,
+			UptimeBps:		9_000,
+			CommissionBps:		1_000,
+			StakeEfficiencyBps:	7_500,
+			SlashingRiskBps:	250,
+			NetworkLoadBps:		1_000,
+			CurrentAllocationBps:	params.MaxPoolValidatorAllocationBps,
 		},
 		{
-			ValidatorAddress:   aePoolAddress(t, "22"),
-			ReputationScore:    6_000,
-			UptimeBps:          9_500,
-			CommissionBps:      500,
-			StakeEfficiencyBps: 8_000,
-			SlashingRiskBps:    100,
-			NetworkLoadBps:     2_000,
+			ValidatorAddress:	aePoolAddress(t, "22"),
+			ReputationScore:	6_000,
+			UptimeBps:		9_500,
+			CommissionBps:		500,
+			StakeEfficiencyBps:	8_000,
+			SlashingRiskBps:	100,
+			NetworkLoadBps:		2_000,
 		},
 		{
-			ValidatorAddress:   aePoolAddress(t, "33"),
-			ReputationScore:    9_000,
-			UptimeBps:          8_000,
-			CommissionBps:      1_500,
-			StakeEfficiencyBps: 7_000,
-			SlashingRiskBps:    500,
-			NetworkLoadBps:     1_000,
-			Jailed:             true,
+			ValidatorAddress:	aePoolAddress(t, "33"),
+			ReputationScore:	9_000,
+			UptimeBps:		8_000,
+			CommissionBps:		1_500,
+			StakeEfficiencyBps:	7_000,
+			SlashingRiskBps:	500,
+			NetworkLoadBps:		1_000,
+			Jailed:			true,
 		},
 	}
 	weights, err := params.AllocationWeights(candidates)
@@ -172,16 +172,16 @@ func TestGovernanceParamsUpdateAuthorizationAndRoundTrip(t *testing.T) {
 	next := source.ExportGenesis().Params
 	next.TargetValidatorCount = 150
 	_, err := source.UpdateParams(types.MsgUpdateParams{
-		Authority: aePoolAddress(t, "22"),
-		Params:    next,
-		Height:    2,
+		Authority:	aePoolAddress(t, "22"),
+		Params:		next,
+		Height:		2,
 	})
 	require.ErrorContains(t, err, "governance authority")
 
 	updated, err := source.UpdateParams(types.MsgUpdateParams{
-		Authority: prototype.DefaultAuthority,
-		Params:    next,
-		Height:    2,
+		Authority:	prototype.DefaultAuthority,
+		Params:		next,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(150), updated.TargetValidatorCount)
@@ -197,11 +197,11 @@ func TestDepositMintsShares(t *testing.T) {
 	pool := createPool(t, &k, "pool-a")
 
 	share, err := k.DepositToPool(types.MsgDepositToPool{
-		Authority: prototype.DefaultAuthority,
-		PoolID:    pool.PoolID,
-		Delegator: rawPoolAddress("22"),
-		Amount:    1_000,
-		Height:    2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		Delegator:	rawPoolAddress("22"),
+		Amount:		1_000,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1_000), share.Shares)
@@ -217,21 +217,21 @@ func TestOfficialLiquidStakingSmallDepositMintsDeterministicShares(t *testing.T)
 	user := aePoolAddress(t, "22")
 
 	share, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: user,
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.DefaultMinPoolDeposit, share.Shares)
 
 	secondShare, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: user,
-		Amount:      90 * types.DefaultAETBaseUnits,
-		Height:      3,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	user,
+		Amount:		90 * types.DefaultAETBaseUnits,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(100)*types.DefaultAETBaseUnits, secondShare.Shares)
@@ -246,8 +246,8 @@ func TestOfficialLiquidStakingSmallDepositMintsDeterministicShares(t *testing.T)
 
 func TestPoolShareMintingUsesOverflowSafeBaseUnitMath(t *testing.T) {
 	pool := types.NominatorPool{
-		TotalShares:      types.DefaultMinPoolDeposit,
-		TotalBondedStake: types.DefaultMinPoolDeposit,
+		TotalShares:		types.DefaultMinPoolDeposit,
+		TotalBondedStake:	types.DefaultMinPoolDeposit,
 	}
 	shares, err := types.SharesForDepositChecked(pool, 90*types.DefaultAETBaseUnits)
 	require.NoError(t, err)
@@ -259,12 +259,12 @@ func TestOfficialLiquidStakingDepositRejectsValidatorAddress(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:        prototype.DefaultAuthority,
-		PoolID:           pool.PoolID,
-		UserAddress:      aePoolAddress(t, "22"),
-		ValidatorAddress: aePoolAddress(t, "33"),
-		Amount:           types.DefaultMinPoolDeposit,
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		UserAddress:		aePoolAddress(t, "22"),
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "must not include a validator address")
 }
@@ -274,11 +274,11 @@ func TestOfficialLiquidStakingDepositBelowMinimumRejected(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit - 1,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit - 1,
+		Height:		2,
 	})
 	require.ErrorContains(t, err, "below configured minimum")
 }
@@ -288,11 +288,11 @@ func TestOfficialLiquidStakingDepositRequiresAEUserAddress(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: rawPoolAddress("22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	rawPoolAddress("22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.ErrorContains(t, err, "must use AE user-facing address format")
 }
@@ -302,11 +302,11 @@ func TestOfficialLiquidStakingReceiptExportImportRoundTrip(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &source, "official-pool")
 	user := aePoolAddress(t, "22")
 	share, err := source.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: user,
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
@@ -325,11 +325,11 @@ func TestDirectUserDelegationDisabledByDefault(t *testing.T) {
 	k := NewKeeper()
 
 	err := k.DelegateUserToValidator(types.MsgDelegateToValidator{
-		Authority:        prototype.DefaultAuthority,
-		UserAddress:      aePoolAddress(t, "22"),
-		ValidatorAddress: aePoolAddress(t, "33"),
-		Amount:           100,
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		UserAddress:		aePoolAddress(t, "22"),
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			100,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "direct user delegation to validators is disabled")
 }
@@ -338,26 +338,26 @@ func TestOfficialContractCanInjectPooledStake(t *testing.T) {
 	k := NewKeeper()
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
 	updated, err := k.InjectPooledStake(types.MsgInjectPooledStake{
-		CallerContractUser: pool.ContractAddressUser,
-		PoolID:             pool.PoolID,
-		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             types.DefaultMinPoolDeposit,
-		Height:             3,
+		CallerContractUser:	pool.ContractAddressUser,
+		PoolID:			pool.PoolID,
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []types.PoolAllocation{{
-		ValidatorAddress: aePoolAddress(t, "33"),
-		Amount:           types.DefaultMinPoolDeposit,
-		Height:           3,
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			3,
 	}}, updated.Allocations)
 }
 
@@ -365,20 +365,20 @@ func TestUnauthorizedContractCannotInjectPooledStake(t *testing.T) {
 	k := NewKeeper()
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
 	_, err = k.InjectPooledStake(types.MsgInjectPooledStake{
-		CallerContractUser: aePoolAddress(t, "77"),
-		PoolID:             pool.PoolID,
-		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             types.DefaultMinPoolDeposit,
-		Height:             3,
+		CallerContractUser:	aePoolAddress(t, "77"),
+		PoolID:			pool.PoolID,
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			3,
 	})
 	require.ErrorContains(t, err, "requires official liquid staking contract")
 }
@@ -387,20 +387,20 @@ func TestPooledStakeInjectionCannotExceedPoolAccounting(t *testing.T) {
 	k := NewKeeper()
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
 	_, err = k.InjectPooledStake(types.MsgInjectPooledStake{
-		CallerContractUser: pool.ContractAddressUser,
-		PoolID:             pool.PoolID,
-		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             types.DefaultMinPoolDeposit + 1,
-		Height:             3,
+		CallerContractUser:	pool.ContractAddressUser,
+		PoolID:			pool.PoolID,
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit + 1,
+		Height:			3,
 	})
 	require.ErrorContains(t, err, "exceeds unallocated pool stake")
 }
@@ -413,11 +413,11 @@ func TestFrozenLimitedOfficialPoolRejectsDeposits(t *testing.T) {
 	require.NoError(t, k.InitGenesis(gs))
 
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.ErrorContains(t, err, "must be active for deposits")
 }
@@ -426,11 +426,11 @@ func TestFrozenLimitedOfficialPoolRejectsPooledStakeInjection(t *testing.T) {
 	k := NewKeeper()
 	pool := createOfficialLiquidStakingPool(t, &k, "official-pool")
 	_, err := k.DepositToOfficialLiquidStaking(types.MsgDepositToOfficialLiquidStaking{
-		Authority:   prototype.DefaultAuthority,
-		PoolID:      pool.PoolID,
-		UserAddress: aePoolAddress(t, "22"),
-		Amount:      types.DefaultMinPoolDeposit,
-		Height:      2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		UserAddress:	aePoolAddress(t, "22"),
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
@@ -440,11 +440,11 @@ func TestFrozenLimitedOfficialPoolRejectsPooledStakeInjection(t *testing.T) {
 	require.NoError(t, k.InitGenesis(gs))
 
 	_, err = k.InjectPooledStake(types.MsgInjectPooledStake{
-		CallerContractUser: pool.ContractAddressUser,
-		PoolID:             pool.PoolID,
-		ValidatorAddress:   aePoolAddress(t, "33"),
-		Amount:             types.DefaultMinPoolDeposit,
-		Height:             3,
+		CallerContractUser:	pool.ContractAddressUser,
+		PoolID:			pool.PoolID,
+		ValidatorAddress:	aePoolAddress(t, "33"),
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			3,
 	})
 	require.ErrorContains(t, err, "must be active for stake injection")
 }
@@ -455,12 +455,12 @@ func TestWithdrawalBurnsShares(t *testing.T) {
 	deposit(t, &k, pool.PoolID, rawPoolAddress("22"), 1_000, 2)
 
 	withdrawal, err := k.RequestPoolWithdrawal(types.MsgRequestPoolWithdrawal{
-		Authority:    prototype.DefaultAuthority,
-		PoolID:       pool.PoolID,
-		WithdrawalID: "withdraw-1",
-		Delegator:    rawPoolAddress("22"),
-		Shares:       400,
-		Height:       3,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		WithdrawalID:	"withdraw-1",
+		Delegator:	rawPoolAddress("22"),
+		Shares:		400,
+		Height:		3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(400), withdrawal.Amount)
@@ -500,19 +500,19 @@ func TestSyncPoolRewardsAfterEpochProgressionAndIllustrativeEconomics(t *testing
 	deposit(t, &k, pool.PoolID, user, 3_000_000, 2)
 
 	summary, err := k.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          prototype.DefaultAuthority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		RewardRateBps:      1_440,
-		EmissionsAllocated: 864_000,
-		Height:             3,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		RewardRateBps:		1_440,
+		EmissionsAllocated:	864_000,
+		Height:			3,
 		Allocations: []types.ValidatorRewardAllocation{{
-			Validator:          rawPoolAddress("12"),
-			PoolAllocatedStake: 3_000_000,
-			ValidatorSelfStake: 3_000_000,
-			PerformanceBps:     types.MaxBasisPoints,
-			CommissionBps:      1_000,
-			InfrastructureCost: 20_000,
+			Validator:		rawPoolAddress("12"),
+			PoolAllocatedStake:	3_000_000,
+			ValidatorSelfStake:	3_000_000,
+			PerformanceBps:		types.MaxBasisPoints,
+			CommissionBps:		1_000,
+			InfrastructureCost:	20_000,
 		}},
 	})
 	require.NoError(t, err)
@@ -546,16 +546,16 @@ func TestSyncPoolRewardsProportionalSharesAndDeterministicRounding(t *testing.T)
 	require.Equal(t, uint64(0), types.IndexedRewardAmount(types.RewardDelta(1, 3), 3))
 
 	summary, err := k.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          prototype.DefaultAuthority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 400,
-		Height:             4,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	400,
+		Height:			4,
 		Allocations: []types.ValidatorRewardAllocation{{
-			Validator:          rawPoolAddress("12"),
-			PoolAllocatedStake: 4_000,
-			PerformanceBps:     types.MaxBasisPoints,
+			Validator:		rawPoolAddress("12"),
+			PoolAllocatedStake:	4_000,
+			PerformanceBps:		types.MaxBasisPoints,
 		}},
 	})
 	require.NoError(t, err)
@@ -575,26 +575,26 @@ func TestValidatorPerformanceCommissionPoolFeeAndJailAreDeterministic(t *testing
 	deposit(t, &k, pool.PoolID, rawPoolAddress("22"), 2_000, 2)
 
 	summary, err := k.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          prototype.DefaultAuthority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 2_000,
-		Height:             3,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	2_000,
+		Height:			3,
 		Allocations: []types.ValidatorRewardAllocation{
 			{
-				Validator:          rawPoolAddress("12"),
-				PoolAllocatedStake: 1_000,
-				PerformanceBps:     types.MaxBasisPoints,
-				CommissionBps:      1_000,
+				Validator:		rawPoolAddress("12"),
+				PoolAllocatedStake:	1_000,
+				PerformanceBps:		types.MaxBasisPoints,
+				CommissionBps:		1_000,
 			},
 			{
-				Validator:                   rawPoolAddress("13"),
-				PoolAllocatedStake:          1_000,
-				PerformanceBps:              5_000,
-				CommissionBps:               1_000,
-				Jailed:                      true,
-				OperatorPerformanceBonusBps: 100,
+				Validator:			rawPoolAddress("13"),
+				PoolAllocatedStake:		1_000,
+				PerformanceBps:			5_000,
+				CommissionBps:			1_000,
+				Jailed:				true,
+				OperatorPerformanceBonusBps:	100,
 			},
 		},
 	})
@@ -618,16 +618,16 @@ func TestSyncPoolRewardsRejectsEmissionFeeCapExceeded(t *testing.T) {
 	deposit(t, &k, pool.PoolID, rawPoolAddress("22"), 1_000, 2)
 
 	_, err := k.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          prototype.DefaultAuthority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 99,
-		Height:             3,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	99,
+		Height:			3,
 		Allocations: []types.ValidatorRewardAllocation{{
-			Validator:          rawPoolAddress("12"),
-			PoolAllocatedStake: 1_000,
-			PerformanceBps:     types.MaxBasisPoints,
+			Validator:		rawPoolAddress("12"),
+			PoolAllocatedStake:	1_000,
+			PerformanceBps:		types.MaxBasisPoints,
 		}},
 	})
 	require.ErrorContains(t, err, "exceed emissions")
@@ -639,16 +639,16 @@ func TestExportImportPreservesSyncedRewardStateAndPendingRewards(t *testing.T) {
 	user := rawPoolAddress("22")
 	deposit(t, &source, pool.PoolID, user, 3, 2)
 	_, err := source.SyncPoolRewards(types.MsgSyncPoolRewards{
-		Authority:          prototype.DefaultAuthority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		RewardRateBps:      3_334,
-		EmissionsAllocated: 1,
-		Height:             3,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		RewardRateBps:		3_334,
+		EmissionsAllocated:	1,
+		Height:			3,
 		Allocations: []types.ValidatorRewardAllocation{{
-			Validator:          rawPoolAddress("12"),
-			PoolAllocatedStake: 3,
-			PerformanceBps:     types.MaxBasisPoints,
+			Validator:		rawPoolAddress("12"),
+			PoolAllocatedStake:	3,
+			PerformanceBps:		types.MaxBasisPoints,
 		}},
 	})
 	require.NoError(t, err)
@@ -673,30 +673,30 @@ func TestClaimPoolRewardsTouchesBoundedKeysWithLargeUserSet(t *testing.T) {
 	shares := make([]types.DelegatorShare, users)
 	for i := range shares {
 		shares[i] = types.DelegatorShare{
-			Delegator:             rawPoolAddressFromInt(i + 1),
-			Shares:                1,
-			RewardIndexCheckpoint: 0,
+			Delegator:		rawPoolAddressFromInt(i + 1),
+			Shares:			1,
+			RewardIndexCheckpoint:	0,
 		}
 	}
 	k.genesis.State.Pools = []types.NominatorPool{{
-		PoolID:            "pool-large",
-		PoolOperator:      rawPoolAddress("11"),
-		ValidatorTarget:   rawPoolAddress("12"),
-		TotalShares:       users,
-		TotalBondedStake:  users,
-		DelegatorShares:   shares,
-		RewardIndex:       types.IndexScale,
-		PoolCommissionBps: 100,
-		Status:            types.PoolStatusActive,
+		PoolID:			"pool-large",
+		PoolOperator:		rawPoolAddress("11"),
+		ValidatorTarget:	rawPoolAddress("12"),
+		TotalShares:		users,
+		TotalBondedStake:	users,
+		DelegatorShares:	shares,
+		RewardIndex:		types.IndexScale,
+		PoolCommissionBps:	100,
+		Status:			types.PoolStatusActive,
 	}}
 	k.rebuildIndexes()
 	k.ResetOperationCounters()
 
 	claimed, err := k.ClaimPoolRewards(types.MsgClaimPoolRewards{
-		Authority: prototype.DefaultAuthority,
-		PoolID:    "pool-large",
-		Delegator: rawPoolAddressFromInt(users),
-		Height:    2,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		"pool-large",
+		Delegator:	rawPoolAddressFromInt(users),
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), claimed)
@@ -709,19 +709,19 @@ func TestClaimPoolRewardsTouchesBoundedKeysWithLargeUserSet(t *testing.T) {
 func TestStakingRewardsCompatibilityIsInternalOnly(t *testing.T) {
 	k := NewKeeper()
 	_, err := k.ClaimStakingRewards(types.MsgClaimStakingRewards{
-		Authority: prototype.DefaultAuthority,
-		Delegator: rawPoolAddress("22"),
-		Validator: rawPoolAddress("12"),
-		Height:    1,
+		Authority:	prototype.DefaultAuthority,
+		Delegator:	rawPoolAddress("22"),
+		Validator:	rawPoolAddress("12"),
+		Height:		1,
 	})
 	require.ErrorContains(t, err, "internal migration only")
 
 	amount, err := k.ClaimStakingRewards(types.MsgClaimStakingRewards{
-		Authority:         prototype.DefaultAuthority,
-		Delegator:         rawPoolAddress("22"),
-		Validator:         rawPoolAddress("12"),
-		Height:            1,
-		InternalMigration: true,
+		Authority:		prototype.DefaultAuthority,
+		Delegator:		rawPoolAddress("22"),
+		Validator:		rawPoolAddress("12"),
+		Height:			1,
+		InternalMigration:	true,
 	})
 	require.NoError(t, err)
 	require.Zero(t, amount)
@@ -738,46 +738,46 @@ func TestStakingProofQueryIsBoundedAndReturnsMetadata(t *testing.T) {
 	poolRoot := "nominator-pool-root-ref"
 	reputationRoot := "reputation-root-ref"
 	cases := []struct {
-		name     string
-		req      types.StakingProofRequest
-		storeKey string
-		stateKey string
-		rootHash string
+		name		string
+		req		types.StakingProofRequest
+		storeKey	string
+		stateKey	string
+		rootHash	string
 	}{
 		{
-			name:     "deposit",
-			req:      types.StakingProofRequest{Kind: types.StakingProofDeposit, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
-			storeKey: types.StoreKey,
-			stateKey: types.PoolDepositProofStateKey("pool-a", account),
-			rootHash: poolRoot,
+			name:		"deposit",
+			req:		types.StakingProofRequest{Kind: types.StakingProofDeposit, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
+			storeKey:	types.StoreKey,
+			stateKey:	types.PoolDepositProofStateKey("pool-a", account),
+			rootHash:	poolRoot,
 		},
 		{
-			name:     "share",
-			req:      types.StakingProofRequest{Kind: types.StakingProofShare, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
-			storeKey: types.StoreKey,
-			stateKey: types.PoolShareProofStateKey("pool-a", account),
-			rootHash: poolRoot,
+			name:		"share",
+			req:		types.StakingProofRequest{Kind: types.StakingProofShare, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
+			storeKey:	types.StoreKey,
+			stateKey:	types.PoolShareProofStateKey("pool-a", account),
+			rootHash:	poolRoot,
 		},
 		{
-			name:     "allocation",
-			req:      types.StakingProofRequest{Kind: types.StakingProofAllocation, Height: 42, PoolID: "pool-a", Epoch: 7, AppHash: appHash, RootHash: poolRoot},
-			storeKey: types.StoreKey,
-			stateKey: types.PoolAllocationProofStateKey("pool-a", 7),
-			rootHash: poolRoot,
+			name:		"allocation",
+			req:		types.StakingProofRequest{Kind: types.StakingProofAllocation, Height: 42, PoolID: "pool-a", Epoch: 7, AppHash: appHash, RootHash: poolRoot},
+			storeKey:	types.StoreKey,
+			stateKey:	types.PoolAllocationProofStateKey("pool-a", 7),
+			rootHash:	poolRoot,
 		},
 		{
-			name:     "reward",
-			req:      types.StakingProofRequest{Kind: types.StakingProofReward, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
-			storeKey: types.StoreKey,
-			stateKey: types.PoolRewardProofStateKey("pool-a", account),
-			rootHash: poolRoot,
+			name:		"reward",
+			req:		types.StakingProofRequest{Kind: types.StakingProofReward, Height: 42, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: poolRoot},
+			storeKey:	types.StoreKey,
+			stateKey:	types.PoolRewardProofStateKey("pool-a", account),
+			rootHash:	poolRoot,
 		},
 		{
-			name:     "reputation",
-			req:      types.StakingProofRequest{Kind: types.StakingProofReputation, Height: 42, Account: account, AppHash: appHash, RootHash: reputationRoot},
-			storeKey: reputationtypes.StoreKey,
-			stateKey: types.StakeReputationProofStateKey(account),
-			rootHash: reputationRoot,
+			name:		"reputation",
+			req:		types.StakingProofRequest{Kind: types.StakingProofReputation, Height: 42, Account: account, AppHash: appHash, RootHash: reputationRoot},
+			storeKey:	reputationtypes.StoreKey,
+			stateKey:	types.StakeReputationProofStateKey(account),
+			rootHash:	reputationRoot,
 		},
 	}
 	for _, tc := range cases {
@@ -829,12 +829,12 @@ func TestPoolCannotWithdrawMoreThanTotalStake(t *testing.T) {
 	deposit(t, &k, pool.PoolID, rawPoolAddress("22"), 1_000, 2)
 
 	_, err := k.RequestPoolWithdrawal(types.MsgRequestPoolWithdrawal{
-		Authority:    prototype.DefaultAuthority,
-		PoolID:       pool.PoolID,
-		WithdrawalID: "withdraw-too-much",
-		Delegator:    rawPoolAddress("22"),
-		Shares:       1_001,
-		Height:       3,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		pool.PoolID,
+		WithdrawalID:	"withdraw-too-much",
+		Delegator:	rawPoolAddress("22"),
+		Shares:		1_001,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "more than total stake")
 }
@@ -866,12 +866,12 @@ func TestPoolValidatorChangeDelayEnforced(t *testing.T) {
 	nextValidator := rawPoolAddress("44")
 
 	pending, err := k.ChangePoolValidator(types.MsgChangePoolValidator{
-		Authority:       prototype.DefaultAuthority,
-		PoolID:          pool.PoolID,
-		PoolOperator:    pool.PoolOperator,
-		ValidatorTarget: nextValidator,
-		ValidatorStatus: validatorregistrytypes.StatusActive,
-		Height:          5,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		PoolOperator:		pool.PoolOperator,
+		ValidatorTarget:	nextValidator,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
+		Height:			5,
 	})
 	require.NoError(t, err)
 	require.Equal(t, pool.ValidatorTarget, pending.ValidatorTarget)
@@ -879,23 +879,23 @@ func TestPoolValidatorChangeDelayEnforced(t *testing.T) {
 	require.Equal(t, uint64(15), pending.ValidatorChangeHeight)
 
 	stillPending, err := k.ChangePoolValidator(types.MsgChangePoolValidator{
-		Authority:       prototype.DefaultAuthority,
-		PoolID:          pool.PoolID,
-		PoolOperator:    pool.PoolOperator,
-		ValidatorTarget: nextValidator,
-		ValidatorStatus: validatorregistrytypes.StatusActive,
-		Height:          14,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		PoolOperator:		pool.PoolOperator,
+		ValidatorTarget:	nextValidator,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
+		Height:			14,
 	})
 	require.NoError(t, err)
 	require.NotEqual(t, nextValidator, stillPending.ValidatorTarget)
 
 	finalized, err := k.ChangePoolValidator(types.MsgChangePoolValidator{
-		Authority:       prototype.DefaultAuthority,
-		PoolID:          pool.PoolID,
-		PoolOperator:    pool.PoolOperator,
-		ValidatorTarget: nextValidator,
-		ValidatorStatus: validatorregistrytypes.StatusActive,
-		Height:          15,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			pool.PoolID,
+		PoolOperator:		pool.PoolOperator,
+		ValidatorTarget:	nextValidator,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
+		Height:			15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, nextValidator, finalized.ValidatorTarget)
@@ -905,13 +905,13 @@ func TestPoolValidatorChangeDelayEnforced(t *testing.T) {
 func TestPoolCannotDelegateToJailedValidator(t *testing.T) {
 	k := NewKeeper()
 	_, err := k.CreateNominatorPool(types.MsgCreateNominatorPool{
-		Authority:         prototype.DefaultAuthority,
-		PoolID:            "pool-jailed",
-		PoolOperator:      rawPoolAddress("11"),
-		ValidatorTarget:   rawPoolAddress("12"),
-		PoolCommissionBps: 100,
-		Height:            1,
-		ValidatorStatus:   validatorregistrytypes.StatusJailed,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			"pool-jailed",
+		PoolOperator:		rawPoolAddress("11"),
+		ValidatorTarget:	rawPoolAddress("12"),
+		PoolCommissionBps:	100,
+		Height:			1,
+		ValidatorStatus:	validatorregistrytypes.StatusJailed,
 	})
 	require.ErrorContains(t, err, "jailed validator")
 }
@@ -924,13 +924,13 @@ func createPool(t *testing.T, k *Keeper, poolID string) types.NominatorPool {
 func createPoolWithCommission(t *testing.T, k *Keeper, poolID string, commissionBps uint32) types.NominatorPool {
 	t.Helper()
 	pool, err := k.CreateNominatorPool(types.MsgCreateNominatorPool{
-		Authority:         prototype.DefaultAuthority,
-		PoolID:            poolID,
-		PoolOperator:      rawPoolAddress("11"),
-		ValidatorTarget:   rawPoolAddress("12"),
-		PoolCommissionBps: commissionBps,
-		Height:            1,
-		ValidatorStatus:   validatorregistrytypes.StatusActive,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			poolID,
+		PoolOperator:		rawPoolAddress("11"),
+		ValidatorTarget:	rawPoolAddress("12"),
+		PoolCommissionBps:	commissionBps,
+		Height:			1,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	})
 	require.NoError(t, err)
 	return pool
@@ -940,13 +940,13 @@ func createOfficialLiquidStakingPool(t *testing.T, k *Keeper, poolID string) typ
 	t.Helper()
 	contractRaw := rawPoolAddress("66")
 	pool, err := k.CreateOfficialLiquidStakingPool(types.MsgCreateOfficialLiquidStakingPool{
-		Authority:           prototype.DefaultAuthority,
-		PoolID:              poolID,
-		ContractAddressUser: aeFromRaw(t, contractRaw),
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        rawPoolAddress("11"),
-		PoolCommissionBps:   100,
-		Height:              1,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			poolID,
+		ContractAddressUser:	aeFromRaw(t, contractRaw),
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		rawPoolAddress("11"),
+		PoolCommissionBps:	100,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	return pool
@@ -955,11 +955,11 @@ func createOfficialLiquidStakingPool(t *testing.T, k *Keeper, poolID string) typ
 func deposit(t *testing.T, k *Keeper, poolID string, delegator string, amount uint64, height uint64) {
 	t.Helper()
 	_, err := k.DepositToPool(types.MsgDepositToPool{
-		Authority: prototype.DefaultAuthority,
-		PoolID:    poolID,
-		Delegator: delegator,
-		Amount:    amount,
-		Height:    height,
+		Authority:	prototype.DefaultAuthority,
+		PoolID:		poolID,
+		Delegator:	delegator,
+		Amount:		amount,
+		Height:		height,
 	})
 	require.NoError(t, err)
 }

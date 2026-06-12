@@ -9,36 +9,36 @@ import (
 )
 
 const (
-	MaxIdentityTxChainIDBytesV2          = 64
-	MaxIdentityTxBatchResolverUpdatesV2  = 32
-	MaxIdentityTxBatchRenewDomainsV2     = 64
-	MaxIdentityTxAuctionSaltBytesV2      = 128
-	MaxIdentityTxRegistrationSaltBytesV2 = 128
+	MaxIdentityTxChainIDBytesV2		= 64
+	MaxIdentityTxBatchResolverUpdatesV2	= 32
+	MaxIdentityTxBatchRenewDomainsV2	= 64
+	MaxIdentityTxAuctionSaltBytesV2		= 128
+	MaxIdentityTxRegistrationSaltBytesV2	= 128
 )
 
 type IdentitySignerScopeV2 string
 
 const (
-	IdentitySignerScopeOwner           IdentitySignerScopeV2 = "owner"
-	IdentitySignerScopeRegistration    IdentitySignerScopeV2 = "registration"
-	IdentitySignerScopeResolverUpdate  IdentitySignerScopeV2 = "resolver_update"
-	IdentitySignerScopeReverseUpdate   IdentitySignerScopeV2 = "reverse_update"
-	IdentitySignerScopeSubdomainAdmin  IdentitySignerScopeV2 = "subdomain_admin"
-	IdentitySignerScopeDelegationAdmin IdentitySignerScopeV2 = "delegation_admin"
-	IdentitySignerScopeAuctionBidder   IdentitySignerScopeV2 = "auction_bidder"
-	IdentitySignerScopeAuctionAdmin    IdentitySignerScopeV2 = "auction_admin"
-	IdentitySignerScopeCacheAdmin      IdentitySignerScopeV2 = "cache_admin"
-	IdentitySignerScopeBatchAdmin      IdentitySignerScopeV2 = "batch_admin"
+	IdentitySignerScopeOwner		IdentitySignerScopeV2	= "owner"
+	IdentitySignerScopeRegistration		IdentitySignerScopeV2	= "registration"
+	IdentitySignerScopeResolverUpdate	IdentitySignerScopeV2	= "resolver_update"
+	IdentitySignerScopeReverseUpdate	IdentitySignerScopeV2	= "reverse_update"
+	IdentitySignerScopeSubdomainAdmin	IdentitySignerScopeV2	= "subdomain_admin"
+	IdentitySignerScopeDelegationAdmin	IdentitySignerScopeV2	= "delegation_admin"
+	IdentitySignerScopeAuctionBidder	IdentitySignerScopeV2	= "auction_bidder"
+	IdentitySignerScopeAuctionAdmin		IdentitySignerScopeV2	= "auction_admin"
+	IdentitySignerScopeCacheAdmin		IdentitySignerScopeV2	= "cache_admin"
+	IdentitySignerScopeBatchAdmin		IdentitySignerScopeV2	= "batch_admin"
 )
 
 type IdentityTxAuthV2 struct {
-	ChainID                  string
-	Signer                   sdk.AccAddress
-	Scope                    IdentitySignerScopeV2
-	NameNormalizationVersion uint64
-	Nonce                    uint64
-	Fee                      uint64
-	StorageCost              uint64
+	ChainID				string
+	Signer				sdk.AccAddress
+	Scope				IdentitySignerScopeV2
+	NameNormalizationVersion	uint64
+	Nonce				uint64
+	Fee				uint64
+	StorageCost			uint64
 }
 
 type IdentityMsgV2 interface {
@@ -49,178 +49,178 @@ type IdentityMsgV2 interface {
 }
 
 type MsgCommitRegistrationV2 struct {
-	Auth              IdentityTxAuthV2
-	Name              string
-	NameHash          string
-	CommitmentHash    string
-	CommitmentVersion uint64
-	SaltHashOptional  string
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	CommitmentHash		string
+	CommitmentVersion	uint64
+	SaltHashOptional	string
 }
 
 type MsgRevealRegistrationV2 struct {
-	Auth              IdentityTxAuthV2
-	Name              string
-	NameHash          string
-	CommitmentHash    string
-	CommitmentVersion uint64
-	Salt              string
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	CommitmentHash		string
+	CommitmentVersion	uint64
+	Salt			string
 }
 
 type MsgRegisterDirectV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	Owner                 sdk.AccAddress
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	Owner			sdk.AccAddress
+	ExpectedRecordVersion	uint64
 }
 
 type MsgRenewDomainV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	ExpectedRecordVersion	uint64
 }
 
 type MsgTransferDomainV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	NewOwner              sdk.AccAddress
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	NewOwner		sdk.AccAddress
+	ExpectedRecordVersion	uint64
 }
 
 type MsgSetResolverV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	Resolver              sdk.AccAddress
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	Resolver		sdk.AccAddress
+	ExpectedRecordVersion	uint64
 }
 
 type MsgUpdateResolverRecordV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	Patch                 ResolverPatch
-	ExpectedRecordVersion uint64
-	RecordTTL             uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	Patch			ResolverPatch
+	ExpectedRecordVersion	uint64
+	RecordTTL		uint64
 }
 
 type MsgSetReverseRecordV2 struct {
-	Auth                  IdentityTxAuthV2
-	Record                ReverseResolutionRecordV2
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Record			ReverseResolutionRecordV2
+	ExpectedRecordVersion	uint64
 }
 
 type MsgVerifyReverseRecordV2 struct {
-	Auth                  IdentityTxAuthV2
-	Record                ReverseResolutionRecordV2
-	AuthorizedAliasKeys   []string
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Record			ReverseResolutionRecordV2
+	AuthorizedAliasKeys	[]string
+	ExpectedRecordVersion	uint64
 }
 
 type MsgCreateSubdomainV2 struct {
-	Auth                  IdentityTxAuthV2
-	ParentName            string
-	ParentNameHash        string
-	Label                 string
-	ChildOwner            sdk.AccAddress
-	ParentControlsRecord  bool
-	DelegationType        SubdomainDelegationTypeV2
-	ChildExpiryHeight     uint64
-	DetachedPaid          bool
-	IndependentPayment    bool
-	ParentAuthorization   bool
-	Ephemeral             bool
-	TimeLockedUntilHeight uint64
-	ExpectedParentVersion uint64
+	Auth			IdentityTxAuthV2
+	ParentName		string
+	ParentNameHash		string
+	Label			string
+	ChildOwner		sdk.AccAddress
+	ParentControlsRecord	bool
+	DelegationType		SubdomainDelegationTypeV2
+	ChildExpiryHeight	uint64
+	DetachedPaid		bool
+	IndependentPayment	bool
+	ParentAuthorization	bool
+	Ephemeral		bool
+	TimeLockedUntilHeight	uint64
+	ExpectedParentVersion	uint64
 }
 
 type MsgDelegateSubdomainV2 struct {
-	Auth                  IdentityTxAuthV2
-	Delegation            DelegationRecordV2
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Delegation		DelegationRecordV2
+	ExpectedRecordVersion	uint64
 }
 
 type MsgRevokeDelegationV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	Delegate              sdk.AccAddress
-	Scope                 DelegationScopeV2
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	Delegate		sdk.AccAddress
+	Scope			DelegationScopeV2
+	ExpectedRecordVersion	uint64
 }
 
 type MsgStartAuctionV2 struct {
-	Auth       IdentityTxAuthV2
-	Name       string
-	NameHash   string
-	MinBid     uint64
-	FeeSplitID string
+	Auth		IdentityTxAuthV2
+	Name		string
+	NameHash	string
+	MinBid		uint64
+	FeeSplitID	string
 }
 
 type MsgCommitBidV2 struct {
-	Auth           IdentityTxAuthV2
-	AuctionID      string
-	NameHash       string
-	CommitmentHash string
+	Auth		IdentityTxAuthV2
+	AuctionID	string
+	NameHash	string
+	CommitmentHash	string
 }
 
 type MsgRevealBidV2 struct {
-	Auth           IdentityTxAuthV2
-	AuctionID      string
-	NameHash       string
-	Bid            uint64
-	Salt           string
-	CommitmentHash string
+	Auth		IdentityTxAuthV2
+	AuctionID	string
+	NameHash	string
+	Bid		uint64
+	Salt		string
+	CommitmentHash	string
 }
 
 type MsgFinalizeAuctionV2 struct {
-	Auth                   IdentityTxAuthV2
-	AuctionID              string
-	NameHash               string
-	ExpectedAuctionVersion uint64
+	Auth			IdentityTxAuthV2
+	AuctionID		string
+	NameHash		string
+	ExpectedAuctionVersion	uint64
 }
 
 type MsgExpireDomainV2 struct {
-	Auth                  IdentityTxAuthV2
-	Name                  string
-	NameHash              string
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	Name			string
+	NameHash		string
+	ExpectedRecordVersion	uint64
 }
 
 type ResolverBatchUpdateV2 struct {
-	Name                  string
-	NameHash              string
-	Patch                 ResolverPatch
-	ExpectedRecordVersion uint64
-	RecordTTL             uint64
+	Name			string
+	NameHash		string
+	Patch			ResolverPatch
+	ExpectedRecordVersion	uint64
+	RecordTTL		uint64
 }
 
 type MsgBatchUpdateResolversV2 struct {
-	Auth    IdentityTxAuthV2
-	Updates []ResolverBatchUpdateV2
+	Auth	IdentityTxAuthV2
+	Updates	[]ResolverBatchUpdateV2
 }
 
 type RenewDomainBatchItemV2 struct {
-	Name                  string
-	NameHash              string
-	ExpectedRecordVersion uint64
+	Name			string
+	NameHash		string
+	ExpectedRecordVersion	uint64
 }
 
 type MsgBatchRenewDomainsV2 struct {
-	Auth     IdentityTxAuthV2
-	Renewals []RenewDomainBatchItemV2
+	Auth		IdentityTxAuthV2
+	Renewals	[]RenewDomainBatchItemV2
 }
 
 type MsgInvalidateResolutionCacheV2 struct {
-	Auth                  IdentityTxAuthV2
-	NameHash              string
-	ResolutionPathHash    string
-	SourceVersion         uint64
-	ParentEpoch           uint64
-	ChildEpoch            uint64
-	ExpectedRecordVersion uint64
+	Auth			IdentityTxAuthV2
+	NameHash		string
+	ResolutionPathHash	string
+	SourceVersion		uint64
+	ParentEpoch		uint64
+	ChildEpoch		uint64
+	ExpectedRecordVersion	uint64
 }
 
 func ValidateIdentityMsgV2(msg IdentityMsgV2) error {
@@ -230,11 +230,11 @@ func ValidateIdentityMsgV2(msg IdentityMsgV2) error {
 	return msg.ValidateBasic()
 }
 
-func (m MsgCommitRegistrationV2) IdentityMessageName() string { return "MsgCommitRegistration" }
+func (m MsgCommitRegistrationV2) IdentityMessageName() string	{ return "MsgCommitRegistration" }
 func (m MsgCommitRegistrationV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgCommitRegistrationV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgCommitRegistrationV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgCommitRegistrationV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeRegistration, true); err != nil {
 		return err
@@ -254,11 +254,11 @@ func (m MsgCommitRegistrationV2) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgRevealRegistrationV2) IdentityMessageName() string { return "MsgRevealRegistration" }
+func (m MsgRevealRegistrationV2) IdentityMessageName() string	{ return "MsgRevealRegistration" }
 func (m MsgRevealRegistrationV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgRevealRegistrationV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgRevealRegistrationV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgRevealRegistrationV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeRegistration, true); err != nil {
 		return err
@@ -275,9 +275,9 @@ func (m MsgRevealRegistrationV2) ValidateBasic() error {
 	return validateIdentityTxSaltV2("identity v2 tx registration salt", m.Salt, MaxIdentityTxRegistrationSaltBytesV2)
 }
 
-func (m MsgRegisterDirectV2) IdentityMessageName() string        { return "MsgRegisterDirect" }
-func (m MsgRegisterDirectV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgRegisterDirectV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgRegisterDirectV2) IdentityMessageName() string		{ return "MsgRegisterDirect" }
+func (m MsgRegisterDirectV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgRegisterDirectV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgRegisterDirectV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeRegistration, true); err != nil {
 		return err
@@ -291,9 +291,9 @@ func (m MsgRegisterDirectV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgRenewDomainV2) IdentityMessageName() string        { return "MsgRenewDomain" }
-func (m MsgRenewDomainV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgRenewDomainV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgRenewDomainV2) IdentityMessageName() string		{ return "MsgRenewDomain" }
+func (m MsgRenewDomainV2) SignerAddress() sdk.AccAddress	{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgRenewDomainV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgRenewDomainV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeOwner, true); err != nil {
 		return err
@@ -304,9 +304,9 @@ func (m MsgRenewDomainV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgTransferDomainV2) IdentityMessageName() string        { return "MsgTransferDomain" }
-func (m MsgTransferDomainV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgTransferDomainV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgTransferDomainV2) IdentityMessageName() string		{ return "MsgTransferDomain" }
+func (m MsgTransferDomainV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgTransferDomainV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgTransferDomainV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeOwner, true); err != nil {
 		return err
@@ -320,9 +320,9 @@ func (m MsgTransferDomainV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgSetResolverV2) IdentityMessageName() string        { return "MsgSetResolver" }
-func (m MsgSetResolverV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgSetResolverV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgSetResolverV2) IdentityMessageName() string		{ return "MsgSetResolver" }
+func (m MsgSetResolverV2) SignerAddress() sdk.AccAddress	{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgSetResolverV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgSetResolverV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeResolverUpdate, true); err != nil {
 		return err
@@ -336,11 +336,11 @@ func (m MsgSetResolverV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgUpdateResolverRecordV2) IdentityMessageName() string { return "MsgUpdateResolverRecord" }
+func (m MsgUpdateResolverRecordV2) IdentityMessageName() string	{ return "MsgUpdateResolverRecord" }
 func (m MsgUpdateResolverRecordV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgUpdateResolverRecordV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgUpdateResolverRecordV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgUpdateResolverRecordV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeResolverUpdate, true); err != nil {
 		return err
@@ -357,9 +357,9 @@ func (m MsgUpdateResolverRecordV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgSetReverseRecordV2) IdentityMessageName() string        { return "MsgSetReverseRecord" }
-func (m MsgSetReverseRecordV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgSetReverseRecordV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgSetReverseRecordV2) IdentityMessageName() string		{ return "MsgSetReverseRecord" }
+func (m MsgSetReverseRecordV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgSetReverseRecordV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgSetReverseRecordV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeReverseUpdate, true); err != nil {
 		return err
@@ -370,11 +370,11 @@ func (m MsgSetReverseRecordV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgVerifyReverseRecordV2) IdentityMessageName() string { return "MsgVerifyReverseRecord" }
+func (m MsgVerifyReverseRecordV2) IdentityMessageName() string	{ return "MsgVerifyReverseRecord" }
 func (m MsgVerifyReverseRecordV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgVerifyReverseRecordV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgVerifyReverseRecordV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgVerifyReverseRecordV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeReverseUpdate, true); err != nil {
 		return err
@@ -393,9 +393,9 @@ func (m MsgVerifyReverseRecordV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgCreateSubdomainV2) IdentityMessageName() string        { return "MsgCreateSubdomain" }
-func (m MsgCreateSubdomainV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgCreateSubdomainV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgCreateSubdomainV2) IdentityMessageName() string		{ return "MsgCreateSubdomain" }
+func (m MsgCreateSubdomainV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgCreateSubdomainV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgCreateSubdomainV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeSubdomainAdmin, true); err != nil {
 		return err
@@ -431,11 +431,11 @@ func (m MsgCreateSubdomainV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedParentVersion)
 }
 
-func (m MsgDelegateSubdomainV2) IdentityMessageName() string { return "MsgDelegateSubdomain" }
+func (m MsgDelegateSubdomainV2) IdentityMessageName() string	{ return "MsgDelegateSubdomain" }
 func (m MsgDelegateSubdomainV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgDelegateSubdomainV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgDelegateSubdomainV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgDelegateSubdomainV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeDelegationAdmin, true); err != nil {
 		return err
@@ -446,9 +446,9 @@ func (m MsgDelegateSubdomainV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgRevokeDelegationV2) IdentityMessageName() string        { return "MsgRevokeDelegation" }
-func (m MsgRevokeDelegationV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgRevokeDelegationV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgRevokeDelegationV2) IdentityMessageName() string		{ return "MsgRevokeDelegation" }
+func (m MsgRevokeDelegationV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgRevokeDelegationV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgRevokeDelegationV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeDelegationAdmin, true); err != nil {
 		return err
@@ -465,9 +465,9 @@ func (m MsgRevokeDelegationV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgStartAuctionV2) IdentityMessageName() string        { return "MsgStartAuction" }
-func (m MsgStartAuctionV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgStartAuctionV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgStartAuctionV2) IdentityMessageName() string		{ return "MsgStartAuction" }
+func (m MsgStartAuctionV2) SignerAddress() sdk.AccAddress	{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgStartAuctionV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgStartAuctionV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeAuctionAdmin, true); err != nil {
 		return err
@@ -481,9 +481,9 @@ func (m MsgStartAuctionV2) ValidateBasic() error {
 	return validateAuctionFeeSplitIDV2(m.FeeSplitID)
 }
 
-func (m MsgCommitBidV2) IdentityMessageName() string        { return "MsgCommitBid" }
-func (m MsgCommitBidV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgCommitBidV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgCommitBidV2) IdentityMessageName() string		{ return "MsgCommitBid" }
+func (m MsgCommitBidV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgCommitBidV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgCommitBidV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeAuctionBidder, true); err != nil {
 		return err
@@ -494,9 +494,9 @@ func (m MsgCommitBidV2) ValidateBasic() error {
 	return validateHexHash("identity v2 tx bid commitment hash", m.CommitmentHash)
 }
 
-func (m MsgRevealBidV2) IdentityMessageName() string        { return "MsgRevealBid" }
-func (m MsgRevealBidV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgRevealBidV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgRevealBidV2) IdentityMessageName() string		{ return "MsgRevealBid" }
+func (m MsgRevealBidV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgRevealBidV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgRevealBidV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeAuctionBidder, true); err != nil {
 		return err
@@ -513,9 +513,9 @@ func (m MsgRevealBidV2) ValidateBasic() error {
 	return validateHexHash("identity v2 tx bid commitment hash", m.CommitmentHash)
 }
 
-func (m MsgFinalizeAuctionV2) IdentityMessageName() string        { return "MsgFinalizeAuction" }
-func (m MsgFinalizeAuctionV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgFinalizeAuctionV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgFinalizeAuctionV2) IdentityMessageName() string		{ return "MsgFinalizeAuction" }
+func (m MsgFinalizeAuctionV2) SignerAddress() sdk.AccAddress		{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgFinalizeAuctionV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgFinalizeAuctionV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeAuctionAdmin, true); err != nil {
 		return err
@@ -526,9 +526,9 @@ func (m MsgFinalizeAuctionV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedAuctionVersion)
 }
 
-func (m MsgExpireDomainV2) IdentityMessageName() string        { return "MsgExpireDomain" }
-func (m MsgExpireDomainV2) SignerAddress() sdk.AccAddress      { return cloneSpecAddress(m.Auth.Signer) }
-func (m MsgExpireDomainV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgExpireDomainV2) IdentityMessageName() string		{ return "MsgExpireDomain" }
+func (m MsgExpireDomainV2) SignerAddress() sdk.AccAddress	{ return cloneSpecAddress(m.Auth.Signer) }
+func (m MsgExpireDomainV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgExpireDomainV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeOwner, true); err != nil {
 		return err
@@ -539,11 +539,11 @@ func (m MsgExpireDomainV2) ValidateBasic() error {
 	return validateExpectedRecordVersionV2(m.ExpectedRecordVersion)
 }
 
-func (m MsgBatchUpdateResolversV2) IdentityMessageName() string { return "MsgBatchUpdateResolvers" }
+func (m MsgBatchUpdateResolversV2) IdentityMessageName() string	{ return "MsgBatchUpdateResolvers" }
 func (m MsgBatchUpdateResolversV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgBatchUpdateResolversV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgBatchUpdateResolversV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgBatchUpdateResolversV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeBatchAdmin, true); err != nil {
 		return err
@@ -577,11 +577,11 @@ func (m MsgBatchUpdateResolversV2) ValidateBasic() error {
 	return nil
 }
 
-func (m MsgBatchRenewDomainsV2) IdentityMessageName() string { return "MsgBatchRenewDomains" }
+func (m MsgBatchRenewDomainsV2) IdentityMessageName() string	{ return "MsgBatchRenewDomains" }
 func (m MsgBatchRenewDomainsV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgBatchRenewDomainsV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgBatchRenewDomainsV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgBatchRenewDomainsV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeBatchAdmin, true); err != nil {
 		return err
@@ -615,7 +615,7 @@ func (m MsgInvalidateResolutionCacheV2) IdentityMessageName() string {
 func (m MsgInvalidateResolutionCacheV2) SignerAddress() sdk.AccAddress {
 	return cloneSpecAddress(m.Auth.Signer)
 }
-func (m MsgInvalidateResolutionCacheV2) SignerScope() IdentitySignerScopeV2 { return m.Auth.Scope }
+func (m MsgInvalidateResolutionCacheV2) SignerScope() IdentitySignerScopeV2	{ return m.Auth.Scope }
 func (m MsgInvalidateResolutionCacheV2) ValidateBasic() error {
 	if err := validateIdentityTxAuthV2(m.Auth, IdentitySignerScopeCacheAdmin, true); err != nil {
 		return err

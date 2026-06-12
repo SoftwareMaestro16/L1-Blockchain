@@ -12,78 +12,78 @@ type ServiceStoreV2LargeValuePolicy string
 type ServiceBlockSTMOperationKind string
 
 const (
-	ServiceStoreV2LookupPrimaryRead ServiceStoreV2LookupKind = "primary_read"
-	ServiceStoreV2LookupPrefixQuery ServiceStoreV2LookupKind = "prefix_query"
-	ServiceStoreV2LookupSingleton   ServiceStoreV2LookupKind = "singleton"
+	ServiceStoreV2LookupPrimaryRead	ServiceStoreV2LookupKind	= "primary_read"
+	ServiceStoreV2LookupPrefixQuery	ServiceStoreV2LookupKind	= "prefix_query"
+	ServiceStoreV2LookupSingleton	ServiceStoreV2LookupKind	= "singleton"
 
-	ServiceStoreV2LargeValueInlineIfSmall       ServiceStoreV2LargeValuePolicy = "inline_if_small"
-	ServiceStoreV2LargeValueHashCommittedOnNeed ServiceStoreV2LargeValuePolicy = "hash_committed_store_on_chain_when_needed"
+	ServiceStoreV2LargeValueInlineIfSmall		ServiceStoreV2LargeValuePolicy	= "inline_if_small"
+	ServiceStoreV2LargeValueHashCommittedOnNeed	ServiceStoreV2LargeValuePolicy	= "hash_committed_store_on_chain_when_needed"
 
-	ServiceStoreV2DescriptorPrefix = ServiceStorePrefix + "descriptor"
-	ServiceStoreV2AnchorPrefix     = ServiceStorePrefix + "anchor"
-	ServiceStoreV2InterfacePrefix  = ServiceStorePrefix + "interface"
-	ServiceStoreV2CallPrefix       = ServiceStorePrefix + "call"
-	ServiceStoreV2ReceiptPrefix    = ServiceStorePrefix + "receipt"
-	ServiceStoreV2ProviderPrefix   = ServiceStorePrefix + "provider"
-	ServiceStoreV2PaymentPrefix    = ServiceStorePrefix + "payment"
-	ServiceStoreV2IndexPrefix      = ServiceStorePrefix + "index"
-	ServiceStoreV2ParamsKey        = ServiceStorePrefix + "params"
+	ServiceStoreV2DescriptorPrefix	= ServiceStorePrefix + "descriptor"
+	ServiceStoreV2AnchorPrefix	= ServiceStorePrefix + "anchor"
+	ServiceStoreV2InterfacePrefix	= ServiceStorePrefix + "interface"
+	ServiceStoreV2CallPrefix	= ServiceStorePrefix + "call"
+	ServiceStoreV2ReceiptPrefix	= ServiceStorePrefix + "receipt"
+	ServiceStoreV2ProviderPrefix	= ServiceStorePrefix + "provider"
+	ServiceStoreV2PaymentPrefix	= ServiceStorePrefix + "payment"
+	ServiceStoreV2IndexPrefix	= ServiceStorePrefix + "index"
+	ServiceStoreV2ParamsKey		= ServiceStorePrefix + "params"
 
-	ServiceStoreV2OwnerIndexPrefix    = ServiceStoreV2IndexPrefix + "/owner"
-	ServiceStoreV2IdentityIndexPrefix = ServiceStoreV2IndexPrefix + "/identity"
-	ServiceStoreV2ProviderIndexPrefix = ServiceStoreV2IndexPrefix + "/provider"
-	ServiceStoreV2MethodIndexPrefix   = ServiceStoreV2IndexPrefix + "/method"
-	ServiceStoreV2ReceiptHeightPrefix = ServiceStoreV2IndexPrefix + "/receipt_height"
+	ServiceStoreV2OwnerIndexPrefix		= ServiceStoreV2IndexPrefix + "/owner"
+	ServiceStoreV2IdentityIndexPrefix	= ServiceStoreV2IndexPrefix + "/identity"
+	ServiceStoreV2ProviderIndexPrefix	= ServiceStoreV2IndexPrefix + "/provider"
+	ServiceStoreV2MethodIndexPrefix		= ServiceStoreV2IndexPrefix + "/method"
+	ServiceStoreV2ReceiptHeightPrefix	= ServiceStoreV2IndexPrefix + "/receipt_height"
 
-	ServiceBlockSTMRegisterService       ServiceBlockSTMOperationKind = "register_service"
-	ServiceBlockSTMUpdateService         ServiceBlockSTMOperationKind = "update_service"
-	ServiceBlockSTMAnchorReceipt         ServiceBlockSTMOperationKind = "anchor_receipt"
-	ServiceBlockSTMUpdateProvider        ServiceBlockSTMOperationKind = "update_provider"
-	ServiceBlockSTMExecuteOnChainCall    ServiceBlockSTMOperationKind = "execute_on_chain_call"
-	ServiceBlockSTMSettlePayment         ServiceBlockSTMOperationKind = "settle_payment"
-	ServiceBlockSTMSlashProvider         ServiceBlockSTMOperationKind = "slash_provider"
-	ServiceBlockSTMDisputePayment        ServiceBlockSTMOperationKind = "dispute_payment"
-	ServiceBlockSTMUpdateInterface       ServiceBlockSTMOperationKind = "update_interface"
-	ServiceBlockSTMUpdateDescriptorIface ServiceBlockSTMOperationKind = "update_descriptor_interface"
+	ServiceBlockSTMRegisterService		ServiceBlockSTMOperationKind	= "register_service"
+	ServiceBlockSTMUpdateService		ServiceBlockSTMOperationKind	= "update_service"
+	ServiceBlockSTMAnchorReceipt		ServiceBlockSTMOperationKind	= "anchor_receipt"
+	ServiceBlockSTMUpdateProvider		ServiceBlockSTMOperationKind	= "update_provider"
+	ServiceBlockSTMExecuteOnChainCall	ServiceBlockSTMOperationKind	= "execute_on_chain_call"
+	ServiceBlockSTMSettlePayment		ServiceBlockSTMOperationKind	= "settle_payment"
+	ServiceBlockSTMSlashProvider		ServiceBlockSTMOperationKind	= "slash_provider"
+	ServiceBlockSTMDisputePayment		ServiceBlockSTMOperationKind	= "dispute_payment"
+	ServiceBlockSTMUpdateInterface		ServiceBlockSTMOperationKind	= "update_interface"
+	ServiceBlockSTMUpdateDescriptorIface	ServiceBlockSTMOperationKind	= "update_descriptor_interface"
 )
 
 type ServiceStoreV2Entry struct {
-	Name             string
-	Prefix           string
-	Keeper           ServiceKeeperBoundaryName
-	LookupKind       ServiceStoreV2LookupKind
-	PartitionKey     string
-	PrimaryReadBound uint32
-	PrefixQueryable  bool
-	HeightIndexed    bool
-	LargeValuePolicy ServiceStoreV2LargeValuePolicy
-	EntryHash        string
+	Name			string
+	Prefix			string
+	Keeper			ServiceKeeperBoundaryName
+	LookupKind		ServiceStoreV2LookupKind
+	PartitionKey		string
+	PrimaryReadBound	uint32
+	PrefixQueryable		bool
+	HeightIndexed		bool
+	LargeValuePolicy	ServiceStoreV2LargeValuePolicy
+	EntryHash		string
 }
 
 type ServiceStoreV2Layout struct {
-	Entries    []ServiceStoreV2Entry
-	LayoutHash string
+	Entries		[]ServiceStoreV2Entry
+	LayoutHash	string
 }
 
 type ServiceBlockSTMPartitionRule struct {
-	StateFamily  string
-	PartitionBy  []string
-	PartitionKey string
-	RuleHash     string
+	StateFamily	string
+	PartitionBy	[]string
+	PartitionKey	string
+	RuleHash	string
 }
 
 type ServiceBlockSTMOperation struct {
-	Kind                      ServiceBlockSTMOperationKind
-	SubjectKey                string
-	ReadPartitions            []string
-	WritePartitions           []string
-	ExpectedDescriptorVersion uint64
-	OperationHash             string
+	Kind				ServiceBlockSTMOperationKind
+	SubjectKey			string
+	ReadPartitions			[]string
+	WritePartitions			[]string
+	ExpectedDescriptorVersion	uint64
+	OperationHash			string
 }
 
 type ServiceBlockSTMStrategy struct {
-	PartitionRules []ServiceBlockSTMPartitionRule
-	StrategyHash   string
+	PartitionRules	[]ServiceBlockSTMPartitionRule
+	StrategyHash	string
 }
 
 func DefaultServiceStoreV2Layout() (ServiceStoreV2Layout, error) {
@@ -448,15 +448,15 @@ func ComputeServiceBlockSTMOperationHash(op ServiceBlockSTMOperation) string {
 
 func newServiceStoreV2Entry(name, prefix string, keeper ServiceKeeperBoundaryName, lookup ServiceStoreV2LookupKind, partitionKey string, primaryReads uint32, prefixQueryable, heightIndexed bool, largeValuePolicy ServiceStoreV2LargeValuePolicy) ServiceStoreV2Entry {
 	entry := ServiceStoreV2Entry{
-		Name:             name,
-		Prefix:           prefix,
-		Keeper:           keeper,
-		LookupKind:       lookup,
-		PartitionKey:     partitionKey,
-		PrimaryReadBound: primaryReads,
-		PrefixQueryable:  prefixQueryable,
-		HeightIndexed:    heightIndexed,
-		LargeValuePolicy: largeValuePolicy,
+		Name:			name,
+		Prefix:			prefix,
+		Keeper:			keeper,
+		LookupKind:		lookup,
+		PartitionKey:		partitionKey,
+		PrimaryReadBound:	primaryReads,
+		PrefixQueryable:	prefixQueryable,
+		HeightIndexed:		heightIndexed,
+		LargeValuePolicy:	largeValuePolicy,
 	}
 	entry.EntryHash = ComputeServiceStoreV2EntryHash(entry)
 	return entry
@@ -464,9 +464,9 @@ func newServiceStoreV2Entry(name, prefix string, keeper ServiceKeeperBoundaryNam
 
 func newServiceBlockSTMPartitionRule(family string, partitionBy []string, partitionKey string) ServiceBlockSTMPartitionRule {
 	rule := ServiceBlockSTMPartitionRule{
-		StateFamily:  family,
-		PartitionBy:  sortedStrings(partitionBy),
-		PartitionKey: partitionKey,
+		StateFamily:	family,
+		PartitionBy:	sortedStrings(partitionBy),
+		PartitionKey:	partitionKey,
 	}
 	rule.RuleHash = ComputeServiceBlockSTMPartitionRuleHash(rule)
 	return rule

@@ -81,34 +81,34 @@ func TestGlobalStatePrefixModelRejectsMalformedOwnershipAndTampering(t *testing.
 	require.Empty(t, duplicate.Root)
 
 	_, err = BuildGlobalStatePrefixDescriptor(GlobalStatePrefixDescriptor{
-		Namespace:  StatePrefixNamespaceCore,
-		Prefix:     "zone/{zone_id}/state/*",
-		Purpose:    "wrong owner",
-		ProofScope: "Core root",
+		Namespace:	StatePrefixNamespaceCore,
+		Prefix:		"zone/{zone_id}/state/*",
+		Purpose:	"wrong owner",
+		ProofScope:	"Core root",
 	})
 	require.ErrorContains(t, err, "core state prefix must start with core/")
 
 	_, err = BuildGlobalStatePrefixDescriptor(GlobalStatePrefixDescriptor{
-		Namespace:  StatePrefixNamespaceZone,
-		Prefix:     "zone/{zone_id}/shard/{shard_id}/state/*",
-		Purpose:    "wrong owner",
-		ProofScope: "Zone state root",
+		Namespace:	StatePrefixNamespaceZone,
+		Prefix:		"zone/{zone_id}/shard/{shard_id}/state/*",
+		Purpose:	"wrong owner",
+		ProofScope:	"Zone state root",
 	})
 	require.ErrorContains(t, err, "cannot contain shard placeholder")
 
 	_, err = BuildGlobalStatePrefixDescriptor(GlobalStatePrefixDescriptor{
-		Namespace:  StatePrefixNamespaceShard,
-		Prefix:     "zone/{zone_id}/state/*",
-		Purpose:    "wrong owner",
-		ProofScope: "Shard state root",
+		Namespace:	StatePrefixNamespaceShard,
+		Prefix:		"zone/{zone_id}/state/*",
+		Purpose:	"wrong owner",
+		ProofScope:	"Shard state root",
 	})
 	require.ErrorContains(t, err, "shard state prefix must start")
 
 	_, err = BuildGlobalStatePrefixDescriptor(GlobalStatePrefixDescriptor{
-		Namespace:  StatePrefixNamespaceCore,
-		Prefix:     "core/*/bad",
-		Purpose:    "bad wildcard",
-		ProofScope: "Core root",
+		Namespace:	StatePrefixNamespaceCore,
+		Prefix:		"core/*/bad",
+		Purpose:	"bad wildcard",
+		ProofScope:	"Core root",
 	})
 	require.ErrorContains(t, err, "wildcard must be terminal")
 

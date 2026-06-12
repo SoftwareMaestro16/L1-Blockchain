@@ -14,16 +14,16 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version        uint64
-	Params         prototype.Params
-	RegistryParams types.ActorRegistryParams
-	State          types.ActorRegistryState
+	Version		uint64
+	Params		prototype.Params
+	RegistryParams	types.ActorRegistryParams
+	State		types.ActorRegistryState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
 func NewKeeper() Keeper {
@@ -36,10 +36,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:        prototype.CurrentGenesisVersion,
-		Params:         prototype.DefaultParams(),
-		RegistryParams: types.DefaultActorRegistryParams(),
-		State:          types.EmptyActorRegistryState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		RegistryParams:	types.DefaultActorRegistryParams(),
+		State:		types.EmptyActorRegistryState(),
 	}
 }
 
@@ -133,18 +133,18 @@ func (k *Keeper) RegisterActor(msg types.MsgRegisterActor) (types.ActorRecord, e
 		return types.ActorRecord{}, errors.New("actor contract address already registered")
 	}
 	actor := types.ActorRecord{
-		ActorID:          actorID,
-		ContractAddress:  address,
-		Owner:            msg.Owner,
-		CodeHash:         msg.CodeHash,
-		StorageRoot:      rootOrDefault(msg.StorageRoot, "storage"),
-		MailboxRoot:      rootOrDefault(msg.MailboxRoot, "mailbox"),
-		Balance:          msg.Balance,
-		LogicalTime:      1,
-		Status:           types.ActorStatusActive,
-		RentStatus:       types.RentStatusCurrent,
-		LastActiveHeight: msg.Height,
-		Capabilities:     msg.Capabilities,
+		ActorID:		actorID,
+		ContractAddress:	address,
+		Owner:			msg.Owner,
+		CodeHash:		msg.CodeHash,
+		StorageRoot:		rootOrDefault(msg.StorageRoot, "storage"),
+		MailboxRoot:		rootOrDefault(msg.MailboxRoot, "mailbox"),
+		Balance:		msg.Balance,
+		LogicalTime:		1,
+		Status:			types.ActorStatusActive,
+		RentStatus:		types.RentStatusCurrent,
+		LastActiveHeight:	msg.Height,
+		Capabilities:		msg.Capabilities,
 	}
 	if actor.LastActiveHeight == 0 {
 		return types.ActorRecord{}, errors.New("actor registration height must be positive")
@@ -262,11 +262,11 @@ func (k *Keeper) MigrateActor(msg types.MsgMigrateActor) (types.ActorRecord, err
 		return types.ActorRecord{}, err
 	}
 	migration := types.ActorMigrationRecord{
-		ActorID:      actor.ActorID,
-		FromCodeHash: previousCode,
-		ToCodeHash:   msg.NewCodeHash,
-		Height:       msg.Height,
-		LogicalTime:  logicalTime,
+		ActorID:	actor.ActorID,
+		FromCodeHash:	previousCode,
+		ToCodeHash:	msg.NewCodeHash,
+		Height:		msg.Height,
+		LogicalTime:	logicalTime,
 	}
 	if err := migration.Validate(); err != nil {
 		return types.ActorRecord{}, err

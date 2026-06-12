@@ -64,8 +64,8 @@ func TestRegisteredValidatorEligibilityRejectsUnderfundedAndUninsured(t *testing
 	strictParams := validatorregistrytypes.DefaultParams()
 	strictParams.MinValidatorStake = validatorregistrytypes.DefaultMinValidatorStake + 1
 	strictRegistry := fakeRegistry{
-		records: map[string]validatorregistrytypes.ValidatorRecord{operator: record},
-		params:  strictParams,
+		records:	map[string]validatorregistrytypes.ValidatorRecord{operator: record},
+		params:		strictParams,
 	}
 	_, err = k.ApplyRegisteredValidator(prototype.DefaultAuthority, operator, 2, strictRegistry, fakeInsurance{eligible: map[string]bool{operator: true}})
 	require.ErrorContains(t, err, "minimum validator stake")
@@ -76,8 +76,8 @@ func TestRegisteredValidatorEligibilityRejectsJailedAndSlashed(t *testing.T) {
 	jailed := adapterAddress(0x33)
 	slashed := adapterAddress(0x44)
 	registry := fakeRegistry{records: map[string]validatorregistrytypes.ValidatorRecord{
-		jailed:  adapterValidator(jailed, "ed25519:validator-jailed", validatorregistrytypes.StatusJailed),
-		slashed: adapterValidator(slashed, "ed25519:validator-slashed", validatorregistrytypes.StatusCandidate),
+		jailed:		adapterValidator(jailed, "ed25519:validator-jailed", validatorregistrytypes.StatusJailed),
+		slashed:	adapterValidator(slashed, "ed25519:validator-slashed", validatorregistrytypes.StatusCandidate),
 	}}
 	slashedRecord := registry.records[slashed]
 	slashedRecord.SlashingHistory = []validatorregistrytypes.SlashingEvent{{Height: 7, FractionBps: 100, Reason: "downtime"}}
@@ -174,8 +174,8 @@ func TestStakingSyncUpdatesAreDeterministic(t *testing.T) {
 }
 
 type fakeRegistry struct {
-	records map[string]validatorregistrytypes.ValidatorRecord
-	params  validatorregistrytypes.Params
+	records	map[string]validatorregistrytypes.ValidatorRecord
+	params	validatorregistrytypes.Params
 }
 
 func (f fakeRegistry) Validator(operator string) (validatorregistrytypes.ValidatorRecord, bool, error) {
@@ -212,14 +212,14 @@ func (r *recordingStakingSyncer) ApplyValidatorSetUpdate(_ context.Context, upda
 
 func adapterValidator(operator, consensusKey, status string) validatorregistrytypes.ValidatorRecord {
 	return validatorregistrytypes.ValidatorRecord{
-		OperatorAddress:    operator,
-		ConsensusPublicKey: consensusKey,
-		TreasuryAddress:    adapterAddress(0x66),
-		WithdrawalAddress:  adapterAddress(0x77),
-		EmergencyAddress:   adapterAddress(0x88),
-		CommissionPolicy:   validatorregistrytypes.DefaultCommissionPolicy(),
-		Status:             status,
-		SelfBond:           validatorregistrytypes.DefaultMinValidatorStake,
+		OperatorAddress:	operator,
+		ConsensusPublicKey:	consensusKey,
+		TreasuryAddress:	adapterAddress(0x66),
+		WithdrawalAddress:	adapterAddress(0x77),
+		EmergencyAddress:	adapterAddress(0x88),
+		CommissionPolicy:	validatorregistrytypes.DefaultCommissionPolicy(),
+		Status:			status,
+		SelfBond:		validatorregistrytypes.DefaultMinValidatorStake,
 	}
 }
 

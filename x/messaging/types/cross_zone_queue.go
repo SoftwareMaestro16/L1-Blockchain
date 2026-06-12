@@ -14,128 +14,128 @@ import (
 )
 
 const (
-	CrossZoneMessagesPrefix = "messages"
-	CrossZoneOutboxPrefix   = CrossZoneMessagesPrefix + "/outbox"
-	CrossZoneInboxPrefix    = CrossZoneMessagesPrefix + "/inbox"
-	CrossZoneReceiptsPrefix = CrossZoneMessagesPrefix + "/receipts"
-	CrossZoneNoncesPrefix   = CrossZoneMessagesPrefix + "/nonces"
-	CrossZoneReplayPrefix   = CrossZoneMessagesPrefix + "/replay"
-	CrossZoneExpiryPrefix   = CrossZoneMessagesPrefix + "/expiry"
+	CrossZoneMessagesPrefix	= "messages"
+	CrossZoneOutboxPrefix	= CrossZoneMessagesPrefix + "/outbox"
+	CrossZoneInboxPrefix	= CrossZoneMessagesPrefix + "/inbox"
+	CrossZoneReceiptsPrefix	= CrossZoneMessagesPrefix + "/receipts"
+	CrossZoneNoncesPrefix	= CrossZoneMessagesPrefix + "/nonces"
+	CrossZoneReplayPrefix	= CrossZoneMessagesPrefix + "/replay"
+	CrossZoneExpiryPrefix	= CrossZoneMessagesPrefix + "/expiry"
 )
 
 type CrossZoneQueueKind string
 type CrossZoneReceiptStatus string
 
 const (
-	CrossZoneQueueOutbox CrossZoneQueueKind = "OUTBOX"
-	CrossZoneQueueInbox  CrossZoneQueueKind = "INBOX"
+	CrossZoneQueueOutbox	CrossZoneQueueKind	= "OUTBOX"
+	CrossZoneQueueInbox	CrossZoneQueueKind	= "INBOX"
 
-	CrossZoneReceiptQueued   CrossZoneReceiptStatus = "queued"
-	CrossZoneReceiptExecuted CrossZoneReceiptStatus = "executed"
-	CrossZoneReceiptFailed   CrossZoneReceiptStatus = "failed"
-	CrossZoneReceiptExpired  CrossZoneReceiptStatus = "expired"
-	CrossZoneReceiptBounced  CrossZoneReceiptStatus = "bounced"
-	CrossZoneReceiptRejected CrossZoneReceiptStatus = "rejected"
+	CrossZoneReceiptQueued		CrossZoneReceiptStatus	= "queued"
+	CrossZoneReceiptExecuted	CrossZoneReceiptStatus	= "executed"
+	CrossZoneReceiptFailed		CrossZoneReceiptStatus	= "failed"
+	CrossZoneReceiptExpired		CrossZoneReceiptStatus	= "expired"
+	CrossZoneReceiptBounced		CrossZoneReceiptStatus	= "bounced"
+	CrossZoneReceiptRejected	CrossZoneReceiptStatus	= "rejected"
 
-	CrossZoneReceiptPending CrossZoneReceiptStatus = CrossZoneReceiptQueued
-	CrossZoneReceiptSuccess CrossZoneReceiptStatus = CrossZoneReceiptExecuted
+	CrossZoneReceiptPending	CrossZoneReceiptStatus	= CrossZoneReceiptQueued
+	CrossZoneReceiptSuccess	CrossZoneReceiptStatus	= CrossZoneReceiptExecuted
 )
 
 type CrossZoneQueueItem struct {
-	Kind           CrossZoneQueueKind
-	Message        CrossZoneMessageEnvelope
-	EnqueuedHeight uint64
+	Kind		CrossZoneQueueKind
+	Message		CrossZoneMessageEnvelope
+	EnqueuedHeight	uint64
 }
 
 type CrossZoneMessageReceipt struct {
-	MessageID         []byte
-	SourceZone        zonestypes.ZoneID
-	DestinationZone   zonestypes.ZoneID
-	Sender            sdk.AccAddress
-	Recipient         sdk.AccAddress
-	Status            CrossZoneReceiptStatus
-	GasUsed           uint64
-	FeeCharged        sdkmath.Int
-	ReturnPayloadHash []byte
-	ErrorCode         uint32
-	HasErrorCode      bool
-	ExecutedHeight    uint64
-	ResultHash        string
-	Height            uint64
-	SourceSequence    uint64
-	Nonce             uint64
-	ReceiptHash       string
+	MessageID		[]byte
+	SourceZone		zonestypes.ZoneID
+	DestinationZone		zonestypes.ZoneID
+	Sender			sdk.AccAddress
+	Recipient		sdk.AccAddress
+	Status			CrossZoneReceiptStatus
+	GasUsed			uint64
+	FeeCharged		sdkmath.Int
+	ReturnPayloadHash	[]byte
+	ErrorCode		uint32
+	HasErrorCode		bool
+	ExecutedHeight		uint64
+	ResultHash		string
+	Height			uint64
+	SourceSequence		uint64
+	Nonce			uint64
+	ReceiptHash		string
 }
 
 type CrossZoneSenderNonce struct {
-	SourceZone zonestypes.ZoneID
-	Sender     sdk.AccAddress
-	Nonce      uint64
+	SourceZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Nonce		uint64
 }
 
 type CrossZoneReplayTombstone struct {
-	MessageID       []byte
-	SourceZone      zonestypes.ZoneID
-	Sender          sdk.AccAddress
-	Nonce           uint64
-	SourceSequence  uint64
-	CreatedHeight   uint64
-	TombstoneHeight uint64
-	ExpiryHeight    uint64
-	TombstoneHash   string
+	MessageID	[]byte
+	SourceZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Nonce		uint64
+	SourceSequence	uint64
+	CreatedHeight	uint64
+	TombstoneHeight	uint64
+	ExpiryHeight	uint64
+	TombstoneHash	string
 }
 
 type CrossZoneExpiryItem struct {
-	Deadline  uint64
-	MessageID []byte
+	Deadline	uint64
+	MessageID	[]byte
 }
 
 type CrossZoneQueueState struct {
-	Outbox     []CrossZoneQueueItem
-	Inbox      []CrossZoneQueueItem
-	Receipts   []CrossZoneMessageReceipt
-	Nonces     []CrossZoneSenderNonce
-	Replay     []CrossZoneReplayTombstone
-	Expiry     []CrossZoneExpiryItem
-	StateRoot  string
-	Height     uint64
-	ParamsHash string
+	Outbox		[]CrossZoneQueueItem
+	Inbox		[]CrossZoneQueueItem
+	Receipts	[]CrossZoneMessageReceipt
+	Nonces		[]CrossZoneSenderNonce
+	Replay		[]CrossZoneReplayTombstone
+	Expiry		[]CrossZoneExpiryItem
+	StateRoot	string
+	Height		uint64
+	ParamsHash	string
 }
 
 type CrossZoneQueueRoots struct {
-	OutboxRoot  string
-	InboxRoot   string
-	ReceiptRoot string
-	NonceRoot   string
-	ReplayRoot  string
-	ExpiryRoot  string
-	StateRoot   string
+	OutboxRoot	string
+	InboxRoot	string
+	ReceiptRoot	string
+	NonceRoot	string
+	ReplayRoot	string
+	ExpiryRoot	string
+	StateRoot	string
 }
 
 type CrossZoneRoutingRules struct {
-	KernelMediated            bool
-	MessageDrivenStateOnly    bool
-	NonceScopedBySourceSender bool
-	SenderOrderedDestination  bool
-	ReceiptExpiredMessages    bool
-	BounceFailures            bool
+	KernelMediated			bool
+	MessageDrivenStateOnly		bool
+	NonceScopedBySourceSender	bool
+	SenderOrderedDestination	bool
+	ReceiptExpiredMessages		bool
+	BounceFailures			bool
 }
 
 type CrossZoneRoutingResult struct {
-	State          CrossZoneQueueState
-	Routed         []CrossZoneQueueItem
-	Receipts       []CrossZoneMessageReceipt
-	BounceMessages []CrossZoneMessageEnvelope
+	State		CrossZoneQueueState
+	Routed		[]CrossZoneQueueItem
+	Receipts	[]CrossZoneMessageReceipt
+	BounceMessages	[]CrossZoneMessageEnvelope
 }
 
 func DefaultCrossZoneRoutingRules() CrossZoneRoutingRules {
 	return CrossZoneRoutingRules{
-		KernelMediated:            true,
-		MessageDrivenStateOnly:    true,
-		NonceScopedBySourceSender: true,
-		SenderOrderedDestination:  true,
-		ReceiptExpiredMessages:    true,
-		BounceFailures:            true,
+		KernelMediated:			true,
+		MessageDrivenStateOnly:		true,
+		NonceScopedBySourceSender:	true,
+		SenderOrderedDestination:	true,
+		ReceiptExpiredMessages:		true,
+		BounceFailures:			true,
 	}
 }
 
@@ -338,22 +338,22 @@ func BuildCrossZoneBounceMessage(original CrossZoneMessageEnvelope, receipt Cros
 		hex.EncodeToString(receipt.ReturnPayloadHash),
 	))
 	bounce := CrossZoneMessageEnvelope{
-		SourceZone:      original.DestinationZone,
-		DestinationZone: original.SourceZone,
-		Sender:          append(sdk.AccAddress(nil), original.Recipient...),
-		Recipient:       append(sdk.AccAddress(nil), original.Sender...),
-		Value:           original.Value,
-		Opcode:          "aether.bounce",
-		Payload:         payload,
-		GasLimit:        original.GasLimit,
-		Deadline:        original.Deadline,
-		Nonce:           nonce,
-		SourceSequence:  sourceSequence,
-		RouteID:         "bounce/" + hex.EncodeToString(original.MessageID),
-		Bounce:          false,
-		FeeLimit:        original.FeeLimit,
-		CreatedHeight:   height,
-		AuthScope:       "bounce",
+		SourceZone:		original.DestinationZone,
+		DestinationZone:	original.SourceZone,
+		Sender:			append(sdk.AccAddress(nil), original.Recipient...),
+		Recipient:		append(sdk.AccAddress(nil), original.Sender...),
+		Value:			original.Value,
+		Opcode:			"aether.bounce",
+		Payload:		payload,
+		GasLimit:		original.GasLimit,
+		Deadline:		original.Deadline,
+		Nonce:			nonce,
+		SourceSequence:		sourceSequence,
+		RouteID:		"bounce/" + hex.EncodeToString(original.MessageID),
+		Bounce:			false,
+		FeeLimit:		original.FeeLimit,
+		CreatedHeight:		height,
+		AuthScope:		"bounce",
 	}
 	if bounce.Deadline < height {
 		bounce.Deadline = height
@@ -372,14 +372,14 @@ func RecordCrossZoneReceipt(state CrossZoneQueueState, receipt CrossZoneMessageR
 	}
 	next.Receipts = append(next.Receipts, receipt)
 	tombstone, err := NewCrossZoneReplayTombstone(CrossZoneReplayTombstone{
-		MessageID:       receipt.MessageID,
-		SourceZone:      receipt.SourceZone,
-		Sender:          receipt.Sender,
-		Nonce:           receipt.Nonce,
-		SourceSequence:  receipt.SourceSequence,
-		TombstoneHeight: receipt.EffectiveHeight(),
-		CreatedHeight:   receipt.EffectiveHeight(),
-		ExpiryHeight:    receipt.EffectiveHeight(),
+		MessageID:		receipt.MessageID,
+		SourceZone:		receipt.SourceZone,
+		Sender:			receipt.Sender,
+		Nonce:			receipt.Nonce,
+		SourceSequence:		receipt.SourceSequence,
+		TombstoneHeight:	receipt.EffectiveHeight(),
+		CreatedHeight:		receipt.EffectiveHeight(),
+		ExpiryHeight:		receipt.EffectiveHeight(),
 	})
 	if err != nil {
 		return CrossZoneQueueState{}, err
@@ -403,19 +403,19 @@ func NewCrossZoneMessageReceipt(receipt CrossZoneMessageReceipt) (CrossZoneMessa
 
 func ReceiptFromCrossZoneMessage(msg CrossZoneMessageEnvelope, status CrossZoneReceiptStatus, gasUsed uint64, feeCharged sdkmath.Int, returnPayloadHash []byte, errorCode *uint32, executedHeight uint64) CrossZoneMessageReceipt {
 	receipt := CrossZoneMessageReceipt{
-		MessageID:         append([]byte(nil), msg.MessageID...),
-		SourceZone:        msg.SourceZone,
-		DestinationZone:   msg.DestinationZone,
-		Sender:            append(sdk.AccAddress(nil), msg.Sender...),
-		Recipient:         append(sdk.AccAddress(nil), msg.Recipient...),
-		Status:            status,
-		GasUsed:           gasUsed,
-		FeeCharged:        feeCharged,
-		ReturnPayloadHash: append([]byte(nil), returnPayloadHash...),
-		ExecutedHeight:    executedHeight,
-		Height:            executedHeight,
-		SourceSequence:    msg.SourceSequence,
-		Nonce:             msg.Nonce,
+		MessageID:		append([]byte(nil), msg.MessageID...),
+		SourceZone:		msg.SourceZone,
+		DestinationZone:	msg.DestinationZone,
+		Sender:			append(sdk.AccAddress(nil), msg.Sender...),
+		Recipient:		append(sdk.AccAddress(nil), msg.Recipient...),
+		Status:			status,
+		GasUsed:		gasUsed,
+		FeeCharged:		feeCharged,
+		ReturnPayloadHash:	append([]byte(nil), returnPayloadHash...),
+		ExecutedHeight:		executedHeight,
+		Height:			executedHeight,
+		SourceSequence:		msg.SourceSequence,
+		Nonce:			msg.Nonce,
 	}
 	if errorCode != nil {
 		receipt.ErrorCode = *errorCode
@@ -712,12 +712,12 @@ func ComputeCrossZoneQueueRoots(state CrossZoneQueueState, params CrossZoneMessa
 		return CrossZoneQueueRoots{}, err
 	}
 	roots := CrossZoneQueueRoots{
-		OutboxRoot:  ComputeCrossZoneQueueRoot(CrossZoneQueueOutbox, normalized.Outbox, params),
-		InboxRoot:   ComputeCrossZoneQueueRoot(CrossZoneQueueInbox, normalized.Inbox, params),
-		ReceiptRoot: ComputeCrossZoneReceiptQueueRoot(normalized.Receipts),
-		NonceRoot:   ComputeCrossZoneNonceRoot(normalized.Nonces),
-		ReplayRoot:  ComputeCrossZoneReplayRoot(normalized.Replay),
-		ExpiryRoot:  ComputeCrossZoneExpiryRoot(normalized.Expiry),
+		OutboxRoot:	ComputeCrossZoneQueueRoot(CrossZoneQueueOutbox, normalized.Outbox, params),
+		InboxRoot:	ComputeCrossZoneQueueRoot(CrossZoneQueueInbox, normalized.Inbox, params),
+		ReceiptRoot:	ComputeCrossZoneReceiptQueueRoot(normalized.Receipts),
+		NonceRoot:	ComputeCrossZoneNonceRoot(normalized.Nonces),
+		ReplayRoot:	ComputeCrossZoneReplayRoot(normalized.Replay),
+		ExpiryRoot:	ComputeCrossZoneExpiryRoot(normalized.Expiry),
 	}
 	roots.StateRoot = hashCrossZoneQueueParts("aether-cross-zone-queue-state-v1", roots.OutboxRoot, roots.InboxRoot, roots.ReceiptRoot, roots.NonceRoot, roots.ReplayRoot, roots.ExpiryRoot)
 	return roots, nil
@@ -725,12 +725,12 @@ func ComputeCrossZoneQueueRoots(state CrossZoneQueueState, params CrossZoneMessa
 
 func ComputeCrossZoneQueueStateRoot(state CrossZoneQueueState, params CrossZoneMessageParams) string {
 	roots := CrossZoneQueueRoots{
-		OutboxRoot:  ComputeCrossZoneQueueRoot(CrossZoneQueueOutbox, state.Outbox, params),
-		InboxRoot:   ComputeCrossZoneQueueRoot(CrossZoneQueueInbox, state.Inbox, params),
-		ReceiptRoot: ComputeCrossZoneReceiptQueueRoot(state.Receipts),
-		NonceRoot:   ComputeCrossZoneNonceRoot(state.Nonces),
-		ReplayRoot:  ComputeCrossZoneReplayRoot(state.Replay),
-		ExpiryRoot:  ComputeCrossZoneExpiryRoot(state.Expiry),
+		OutboxRoot:	ComputeCrossZoneQueueRoot(CrossZoneQueueOutbox, state.Outbox, params),
+		InboxRoot:	ComputeCrossZoneQueueRoot(CrossZoneQueueInbox, state.Inbox, params),
+		ReceiptRoot:	ComputeCrossZoneReceiptQueueRoot(state.Receipts),
+		NonceRoot:	ComputeCrossZoneNonceRoot(state.Nonces),
+		ReplayRoot:	ComputeCrossZoneReplayRoot(state.Replay),
+		ExpiryRoot:	ComputeCrossZoneExpiryRoot(state.Expiry),
 	}
 	return hashCrossZoneQueueParts("aether-cross-zone-queue-state-v1", roots.OutboxRoot, roots.InboxRoot, roots.ReceiptRoot, roots.NonceRoot, roots.ReplayRoot, roots.ExpiryRoot)
 }

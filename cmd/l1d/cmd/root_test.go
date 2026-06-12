@@ -22,9 +22,9 @@ func TestInitCmd(t *testing.T) {
 	homeDir := t.TempDir()
 	rootCmd := cmd.NewRootCmd()
 	rootCmd.SetArgs([]string{
-		"init",       // Test the init cmd
-		"l1app-test", // Moniker
-		fmt.Sprintf("--%s=%s", cli.FlagOverwrite, "true"), // Overwrite genesis.json, in case it already exists
+		"init",
+		"l1app-test",
+		fmt.Sprintf("--%s=%s", cli.FlagOverwrite, "true"),
 		fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 	})
 
@@ -90,12 +90,12 @@ func TestVersionCommandShowsOperatorMetadata(t *testing.T) {
 	require.NoError(t, svrcmd.Execute(rootCmd, "", t.TempDir()))
 
 	var info struct {
-		Name             string            `json:"name"`
-		ServerName       string            `json:"server_name"`
-		Version          string            `json:"version"`
-		Commit           string            `json:"commit"`
-		CosmosSDKVersion string            `json:"cosmos_sdk_version"`
-		ExtraInfo        map[string]string `json:"extra_info"`
+		Name			string			`json:"name"`
+		ServerName		string			`json:"server_name"`
+		Version			string			`json:"version"`
+		Commit			string			`json:"commit"`
+		CosmosSDKVersion	string			`json:"cosmos_sdk_version"`
+		ExtraInfo		map[string]string	`json:"extra_info"`
 	}
 	require.NoError(t, json.Unmarshal(out.Bytes(), &info), out.String())
 	require.Equal(t, "Aetra", info.Name)
@@ -158,8 +158,8 @@ func TestAddressConvertCommandOutputsRawAndUserFriendly(t *testing.T) {
 	require.NoError(t, svrcmd.Execute(rootCmd, "", homeDir))
 
 	var res struct {
-		Raw          string `json:"raw"`
-		UserFriendly string `json:"user_friendly"`
+		Raw		string	`json:"raw"`
+		UserFriendly	string	`json:"user_friendly"`
 	}
 	require.NoError(t, json.Unmarshal(out.Bytes(), &res), out.String())
 	require.Regexp(t, `^4:[0-9a-f]{64}$`, res.Raw)
@@ -188,20 +188,20 @@ func TestPrototypeCommandArgsValidation(t *testing.T) {
 	rootCmd := cmd.NewRootCmd()
 
 	tests := []struct {
-		name    string
-		path    []string
-		args    []string
-		wantErr bool
+		name	string
+		path	[]string
+		args	[]string
+		wantErr	bool
 	}{
 		{
-			name: "fees params accepts no args",
-			path: []string{"query", "fees", "params"},
+			name:	"fees params accepts no args",
+			path:	[]string{"query", "fees", "params"},
 		},
 		{
-			name:    "fees params rejects extra arg",
-			path:    []string{"query", "fees", "params"},
-			args:    []string{"extra"},
-			wantErr: true,
+			name:		"fees params rejects extra arg",
+			path:		[]string{"query", "fees", "params"},
+			args:		[]string{"extra"},
+			wantErr:	true,
 		},
 	}
 

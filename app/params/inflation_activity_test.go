@@ -10,15 +10,15 @@ import (
 func TestActivityInflationControllerRaisesInflationWithExplainableInputs(t *testing.T) {
 	params := DefaultActivityInflationControllerParams()
 	out, err := ActivityInflationControllerWithParams(ActivityInflationControllerInput{
-		CurrentInflationBps:            DefaultTargetInflationBps,
-		BondedStakeRatioBps:            5_000,
-		ValidatorOperatingCostIndexBps: 8_000,
-		FeeRevenueNaet:                 sdkmath.NewInt(100_000_000),
-		ActiveValidatorCount:           50,
-		SlashingRiskEvents:             2,
-		NetworkActivityScoreBps:        3_000,
-		TreasuryReserveHealthBps:       7_000,
-		RecentInflationBps:             []int64{290, 295, DefaultTargetInflationBps},
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		BondedStakeRatioBps:		5_000,
+		ValidatorOperatingCostIndexBps:	8_000,
+		FeeRevenueNaet:			sdkmath.NewInt(100_000_000),
+		ActiveValidatorCount:		50,
+		SlashingRiskEvents:		2,
+		NetworkActivityScoreBps:	3_000,
+		TreasuryReserveHealthBps:	7_000,
+		RecentInflationBps:		[]int64{290, 295, DefaultTargetInflationBps},
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, DefaultTargetInflationBps+params.PerWindowChangeLimitBps, out.InflationBps)
@@ -51,15 +51,15 @@ func TestActivityInflationControllerEmergencyFreezeHoldsCurrentInflation(t *test
 	params.EmergencyFreeze = true
 
 	out, err := ActivityInflationControllerWithParams(ActivityInflationControllerInput{
-		CurrentInflationBps:            DefaultTargetInflationBps,
-		BondedStakeRatioBps:            1_000,
-		ValidatorOperatingCostIndexBps: 1_000,
-		FeeRevenueNaet:                 sdkmath.ZeroInt(),
-		ActiveValidatorCount:           5,
-		SlashingRiskEvents:             10,
-		NetworkActivityScoreBps:        0,
-		TreasuryReserveHealthBps:       1_000,
-		RecentInflationBps:             []int64{MaxInflationBps, MaxInflationBps},
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		BondedStakeRatioBps:		1_000,
+		ValidatorOperatingCostIndexBps:	1_000,
+		FeeRevenueNaet:			sdkmath.ZeroInt(),
+		ActiveValidatorCount:		5,
+		SlashingRiskEvents:		10,
+		NetworkActivityScoreBps:	0,
+		TreasuryReserveHealthBps:	1_000,
+		RecentInflationBps:		[]int64{MaxInflationBps, MaxInflationBps},
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, DefaultTargetInflationBps, out.InflationBps)
@@ -72,14 +72,14 @@ func TestActivityInflationControllerEmergencyFreezeHoldsCurrentInflation(t *test
 func TestActivityInflationControllerHighActivityReducesIssuanceWithinLimit(t *testing.T) {
 	params := DefaultActivityInflationControllerParams()
 	out, err := ActivityInflationControllerWithParams(ActivityInflationControllerInput{
-		CurrentInflationBps:            DefaultTargetInflationBps,
-		BondedStakeRatioBps:            7_500,
-		ValidatorOperatingCostIndexBps: 12_000,
-		FeeRevenueNaet:                 sdkmath.NewInt(DefaultFeeRevenueTargetNaet * 3),
-		ActiveValidatorCount:           90,
-		NetworkActivityScoreBps:        9_500,
-		TreasuryReserveHealthBps:       12_000,
-		RecentInflationBps:             []int64{310, 305, DefaultTargetInflationBps},
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		BondedStakeRatioBps:		7_500,
+		ValidatorOperatingCostIndexBps:	12_000,
+		FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet * 3),
+		ActiveValidatorCount:		90,
+		NetworkActivityScoreBps:	9_500,
+		TreasuryReserveHealthBps:	12_000,
+		RecentInflationBps:		[]int64{310, 305, DefaultTargetInflationBps},
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, -params.PerWindowChangeLimitBps, out.AppliedDeltaBps)
@@ -93,15 +93,15 @@ func TestActivityInflationControllerHighActivityReducesIssuanceWithinLimit(t *te
 func TestActivityInflationControllerClampsToConfiguredBounds(t *testing.T) {
 	params := DefaultActivityInflationControllerParams()
 	out, err := ActivityInflationControllerWithParams(ActivityInflationControllerInput{
-		CurrentInflationBps:            MaxInflationBps,
-		BondedStakeRatioBps:            0,
-		ValidatorOperatingCostIndexBps: 0,
-		FeeRevenueNaet:                 sdkmath.ZeroInt(),
-		ActiveValidatorCount:           1,
-		SlashingRiskEvents:             100,
-		NetworkActivityScoreBps:        0,
-		TreasuryReserveHealthBps:       0,
-		RecentInflationBps:             []int64{MaxInflationBps, MaxInflationBps},
+		CurrentInflationBps:		MaxInflationBps,
+		BondedStakeRatioBps:		0,
+		ValidatorOperatingCostIndexBps:	0,
+		FeeRevenueNaet:			sdkmath.ZeroInt(),
+		ActiveValidatorCount:		1,
+		SlashingRiskEvents:		100,
+		NetworkActivityScoreBps:	0,
+		TreasuryReserveHealthBps:	0,
+		RecentInflationBps:		[]int64{MaxInflationBps, MaxInflationBps},
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, MaxInflationBps, out.InflationBps)
@@ -110,13 +110,13 @@ func TestActivityInflationControllerClampsToConfiguredBounds(t *testing.T) {
 
 func TestNetIssuanceReportPerEpochAndAccountingPeriod(t *testing.T) {
 	report, err := ReportNetIssuance(NetIssuanceInput{
-		EpochID:                    10,
-		AccountingPeriod:           "daily",
-		Blocks:                     100,
-		GrossMintedNaet:            sdkmath.NewInt(1_000),
-		BurnedNaet:                 sdkmath.NewInt(250),
-		FeeRevenueNaet:             sdkmath.NewInt(700),
-		ValidatorSecuritySpendNaet: sdkmath.NewInt(500),
+		EpochID:			10,
+		AccountingPeriod:		"daily",
+		Blocks:				100,
+		GrossMintedNaet:		sdkmath.NewInt(1_000),
+		BurnedNaet:			sdkmath.NewInt(250),
+		FeeRevenueNaet:			sdkmath.NewInt(700),
+		ValidatorSecuritySpendNaet:	sdkmath.NewInt(500),
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(10), report.EpochID)
@@ -131,58 +131,58 @@ func TestSimulateActivityInflationCoversLowNormalHighAndAdversarialActivity(t *t
 	params := DefaultActivityInflationControllerParams()
 	steps := []InflationSimulationStep{
 		{
-			Scenario: InflationScenarioLowActivity,
+			Scenario:	InflationScenarioLowActivity,
 			Controller: ActivityInflationControllerInput{
-				CurrentInflationBps:            DefaultTargetInflationBps,
-				BondedStakeRatioBps:            5_500,
-				ValidatorOperatingCostIndexBps: 8_500,
-				FeeRevenueNaet:                 sdkmath.NewInt(100_000_000),
-				ActiveValidatorCount:           50,
-				NetworkActivityScoreBps:        2_000,
-				TreasuryReserveHealthBps:       8_000,
-				RecentInflationBps:             []int64{290, 295, 300},
+				CurrentInflationBps:		DefaultTargetInflationBps,
+				BondedStakeRatioBps:		5_500,
+				ValidatorOperatingCostIndexBps:	8_500,
+				FeeRevenueNaet:			sdkmath.NewInt(100_000_000),
+				ActiveValidatorCount:		50,
+				NetworkActivityScoreBps:	2_000,
+				TreasuryReserveHealthBps:	8_000,
+				RecentInflationBps:		[]int64{290, 295, 300},
 			},
-			NetIssuance: simulationNetIssuance(1, 10_000, 1_000),
+			NetIssuance:	simulationNetIssuance(1, 10_000, 1_000),
 		},
 		{
-			Scenario: InflationScenarioNormalActivity,
+			Scenario:	InflationScenarioNormalActivity,
 			Controller: ActivityInflationControllerInput{
-				BondedStakeRatioBps:            DefaultTargetStakeBps,
-				ValidatorOperatingCostIndexBps: BasisPoints,
-				FeeRevenueNaet:                 sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-				ActiveValidatorCount:           DefaultActiveValidatorTarget,
-				NetworkActivityScoreBps:        DefaultTargetLoadBps,
-				TreasuryReserveHealthBps:       BasisPoints,
-				RecentInflationBps:             []int64{300, 310, 320},
+				BondedStakeRatioBps:		DefaultTargetStakeBps,
+				ValidatorOperatingCostIndexBps:	BasisPoints,
+				FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+				ActiveValidatorCount:		DefaultActiveValidatorTarget,
+				NetworkActivityScoreBps:	DefaultTargetLoadBps,
+				TreasuryReserveHealthBps:	BasisPoints,
+				RecentInflationBps:		[]int64{300, 310, 320},
 			},
-			NetIssuance: simulationNetIssuance(2, 10_500, 2_000),
+			NetIssuance:	simulationNetIssuance(2, 10_500, 2_000),
 		},
 		{
-			Scenario: InflationScenarioHighActivity,
+			Scenario:	InflationScenarioHighActivity,
 			Controller: ActivityInflationControllerInput{
-				BondedStakeRatioBps:            7_700,
-				ValidatorOperatingCostIndexBps: 12_000,
-				FeeRevenueNaet:                 sdkmath.NewInt(DefaultFeeRevenueTargetNaet * 4),
-				ActiveValidatorCount:           90,
-				NetworkActivityScoreBps:        9_500,
-				TreasuryReserveHealthBps:       12_000,
-				RecentInflationBps:             []int64{320, 315, 310},
+				BondedStakeRatioBps:		7_700,
+				ValidatorOperatingCostIndexBps:	12_000,
+				FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet * 4),
+				ActiveValidatorCount:		90,
+				NetworkActivityScoreBps:	9_500,
+				TreasuryReserveHealthBps:	12_000,
+				RecentInflationBps:		[]int64{320, 315, 310},
 			},
-			NetIssuance: simulationNetIssuance(3, 9_000, 5_000),
+			NetIssuance:	simulationNetIssuance(3, 9_000, 5_000),
 		},
 		{
-			Scenario: InflationScenarioAdversarialActivity,
+			Scenario:	InflationScenarioAdversarialActivity,
 			Controller: ActivityInflationControllerInput{
-				BondedStakeRatioBps:            4_800,
-				ValidatorOperatingCostIndexBps: 7_000,
-				FeeRevenueNaet:                 sdkmath.NewInt(50_000_000),
-				ActiveValidatorCount:           40,
-				SlashingRiskEvents:             8,
-				NetworkActivityScoreBps:        9_900,
-				TreasuryReserveHealthBps:       6_500,
-				RecentInflationBps:             []int64{300, 310, 320},
+				BondedStakeRatioBps:		4_800,
+				ValidatorOperatingCostIndexBps:	7_000,
+				FeeRevenueNaet:			sdkmath.NewInt(50_000_000),
+				ActiveValidatorCount:		40,
+				SlashingRiskEvents:		8,
+				NetworkActivityScoreBps:	9_900,
+				TreasuryReserveHealthBps:	6_500,
+				RecentInflationBps:		[]int64{300, 310, 320},
 			},
-			NetIssuance: simulationNetIssuance(4, 12_000, 4_000),
+			NetIssuance:	simulationNetIssuance(4, 12_000, 4_000),
 		},
 	}
 
@@ -202,12 +202,12 @@ func TestSimulateActivityInflationCoversLowNormalHighAndAdversarialActivity(t *t
 
 func simulationNetIssuance(epochID uint64, grossMinted, burned int64) NetIssuanceInput {
 	return NetIssuanceInput{
-		EpochID:                    epochID,
-		AccountingPeriod:           "epoch",
-		Blocks:                     100,
-		GrossMintedNaet:            sdkmath.NewInt(grossMinted),
-		BurnedNaet:                 sdkmath.NewInt(burned),
-		FeeRevenueNaet:             sdkmath.NewInt(grossMinted + burned),
-		ValidatorSecuritySpendNaet: sdkmath.NewInt(grossMinted / 2),
+		EpochID:			epochID,
+		AccountingPeriod:		"epoch",
+		Blocks:				100,
+		GrossMintedNaet:		sdkmath.NewInt(grossMinted),
+		BurnedNaet:			sdkmath.NewInt(burned),
+		FeeRevenueNaet:			sdkmath.NewInt(grossMinted + burned),
+		ValidatorSecuritySpendNaet:	sdkmath.NewInt(grossMinted / 2),
 	}
 }

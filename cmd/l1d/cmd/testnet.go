@@ -37,49 +37,49 @@ import (
 )
 
 var (
-	flagNodeDirPrefix     = "node-dir-prefix"
-	flagNumValidators     = "validator-count"
-	flagOutputDir         = "output-dir"
-	flagNodeDaemonHome    = "node-daemon-home"
-	flagStartingIPAddress = "starting-ip-address"
-	flagListenIPAddress   = "listen-ip-address"
-	flagEnableLogging     = "enable-logging"
-	flagGRPCAddress       = "grpc.address"
-	flagRPCAddress        = "rpc.address"
-	flagAPIAddress        = "api.address"
-	flagPrintMnemonic     = "print-mnemonic"
-	flagStakingDenom      = "staking-denom"
-	flagCommitTimeout     = "commit-timeout"
-	flagSingleHost        = "single-host"
+	flagNodeDirPrefix	= "node-dir-prefix"
+	flagNumValidators	= "validator-count"
+	flagOutputDir		= "output-dir"
+	flagNodeDaemonHome	= "node-daemon-home"
+	flagStartingIPAddress	= "starting-ip-address"
+	flagListenIPAddress	= "listen-ip-address"
+	flagEnableLogging	= "enable-logging"
+	flagGRPCAddress		= "grpc.address"
+	flagRPCAddress		= "rpc.address"
+	flagAPIAddress		= "api.address"
+	flagPrintMnemonic	= "print-mnemonic"
+	flagStakingDenom	= "staking-denom"
+	flagCommitTimeout	= "commit-timeout"
+	flagSingleHost		= "single-host"
 )
 
 type initArgs struct {
-	algo              string
-	chainID           string
-	keyringBackend    string
-	minGasPrices      string
-	nodeDaemonHome    string
-	nodeDirPrefix     string
-	numValidators     int
-	outputDir         string
-	startingIPAddress string
-	listenIPAddress   string
-	singleMachine     bool
-	bondTokenDenom    string
+	algo			string
+	chainID			string
+	keyringBackend		string
+	minGasPrices		string
+	nodeDaemonHome		string
+	nodeDirPrefix		string
+	numValidators		int
+	outputDir		string
+	startingIPAddress	string
+	listenIPAddress		string
+	singleMachine		bool
+	bondTokenDenom		string
 }
 
 type startArgs struct {
-	algo          string
-	apiAddress    string
-	chainID       string
-	enableLogging bool
-	grpcAddress   string
-	minGasPrices  string
-	numValidators int
-	outputDir     string
-	printMnemonic bool
-	rpcAddress    string
-	timeoutCommit time.Duration
+	algo		string
+	apiAddress	string
+	chainID		string
+	enableLogging	bool
+	grpcAddress	string
+	minGasPrices	string
+	numValidators	int
+	outputDir	string
+	printMnemonic	bool
+	rpcAddress	string
+	timeoutCommit	time.Duration
 }
 
 func addTestnetFlagsToCmd(cmd *cobra.Command) {
@@ -93,7 +93,6 @@ func addTestnetFlagsToCmd(cmd *cobra.Command) {
 	)
 	cmd.Flags().String(flags.FlagKeyType, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
 
-	// support old flags name for backwards compatibility
 	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
 		if name == flags.FlagKeyAlgorithm {
 			name = flags.FlagKeyType
@@ -107,11 +106,11 @@ func addTestnetFlagsToCmd(cmd *cobra.Command) {
 // validator configuration files for running a multi-validator testnet in a separate process
 func NewTestnetCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
 	testnetCmd := &cobra.Command{
-		Use:                        "testnet",
-		Short:                      "subcommands for starting or configuring local testnets",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
+		Use:				"testnet",
+		Short:				"subcommands for starting or configuring local testnets",
+		DisableFlagParsing:		true,
+		SuggestionsMinimumDistance:	2,
+		RunE:				client.ValidateCmd,
 	}
 
 	testnetCmd.AddCommand(testnetStartCmd())
@@ -123,8 +122,8 @@ func NewTestnetCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalan
 // NewInitLocalnetCmd initializes a runnable single-host localnet using Aetra defaults.
 func NewInitLocalnetCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "init-localnet",
-		Short: "Initialize a single-host Aetra localnet with naet genesis balances and gentxs",
+		Use:	"init-localnet",
+		Short:	"Initialize a single-host Aetra localnet with naet genesis balances and gentxs",
 		Long: fmt.Sprintf(`init-localnet is a convenience wrapper around testnet init-files.
 It writes node directories, genesis accounts, gentxs, and collected genesis files
 for a single-host localnet. Use --validator-count 1 for a one-node devnet or
@@ -187,8 +186,8 @@ Example:
 // testnetInitFilesCmd returns a cmd to initialize all files for CometBFT testnet and application
 func testnetInitFilesCmd(mm module.BasicManager, genBalIterator banktypes.GenesisBalancesIterator) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "init-files",
-		Short: "Initialize config directories & files for a multi-validator testnet running locally via separate processes (e.g. Docker Compose or similar)",
+		Use:	"init-files",
+		Short:	"Initialize config directories & files for a multi-validator testnet running locally via separate processes (e.g. Docker Compose or similar)",
 		Long: fmt.Sprintf(`init-files will setup one directory per validator and populate each with
 necessary files (private validator, genesis, config, etc.) for running validator nodes.
 
@@ -252,8 +251,8 @@ Example:
 // testnetStartCmd returns a cmd to start multi validator in-process testnet
 func testnetStartCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "start",
-		Short: "Launch an in-process multi-validator testnet",
+		Use:	"start",
+		Short:	"Launch an in-process multi-validator testnet",
 		Long: fmt.Sprintf(`testnet will launch an in-process multi-validator testnet,
 and generate a directory for each validator populated with necessary
 configuration files (private validator, genesis, config, etc.).
@@ -315,32 +314,32 @@ func initTestnetFiles(
 	appConfig := srvconfig.DefaultConfig()
 	appConfig.MinGasPrices = args.minGasPrices
 	appConfig.API.Enable = true
-	appConfig.Telemetry.Enabled = true                                        //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
-	appConfig.Telemetry.PrometheusRetentionTime = 60                          //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
-	appConfig.Telemetry.EnableHostnameLabel = false                           //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
-	appConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}} //nolint:staticcheck // See docs/observability.md for OpenTelemetry migration plan.
+	appConfig.Telemetry.Enabled = true
+	appConfig.Telemetry.PrometheusRetentionTime = 60
+	appConfig.Telemetry.EnableHostnameLabel = false
+	appConfig.Telemetry.GlobalLabels = [][]string{{"chain_id", args.chainID}}
 
 	var (
-		genAccounts []authtypes.GenesisAccount
-		genBalances []banktypes.Balance
-		genFiles    []string
+		genAccounts	[]authtypes.GenesisAccount
+		genBalances	[]banktypes.Balance
+		genFiles	[]string
 	)
 	const (
-		rpcPort          = 26657
-		apiPort          = 1317
-		grpcPort         = 9090
-		pprofListen      = 6060
-		prometheusListen = 27780
+		rpcPort			= 26657
+		apiPort			= 1317
+		grpcPort		= 9090
+		pprofListen		= 6060
+		prometheusListen	= 27780
 	)
 	p2pPortStart := 26656
 
 	inBuf := bufio.NewReader(cmd.InOrStdin())
-	// generate private keys, node IDs, and initial transactions
+
 	for i := 0; i < args.numValidators; i++ {
 		var portOffset int
 		if args.singleMachine {
 			portOffset = i
-			p2pPortStart = 16656 // use different start point to not conflict with rpc port
+			p2pPortStart = 16656
 			nodeConfig.P2P.AddrBookStrict = false
 			nodeConfig.P2P.PexReactor = false
 			nodeConfig.P2P.AllowDuplicateIP = true
@@ -363,8 +362,8 @@ func initTestnetFiles(
 			return err
 		}
 		var (
-			err error
-			ip  string
+			err	error
+			ip	string
 		)
 		if args.singleMachine {
 			ip = "127.0.0.1"
@@ -409,7 +408,6 @@ func initTestnetFiles(
 			return err
 		}
 
-		// save private key seed words
 		if err := writeFile(fmt.Sprintf("%v.json", "key_seed"), nodeDir, cliPrint); err != nil {
 			return err
 		}
@@ -495,8 +493,6 @@ func initTestnetFiles(
 func startTestnet(cmd *cobra.Command, args startArgs) error {
 	networkConfig := network.DefaultConfig(l1app.NewTestNetworkFixture)
 
-	// Default networkConfig.ChainID is random, and we should only override it if chainID provided
-	// is non-empty
 	if args.chainID != "" {
 		networkConfig.ChainID = args.chainID
 	}
@@ -527,7 +523,7 @@ func startTestnet(cmd *cobra.Command, args startArgs) error {
 		return err
 	}
 	cmd.Println("press the Enter Key to terminate")
-	if _, err := fmt.Scanln(); err != nil { // wait for Enter Key
+	if _, err := fmt.Scanln(); err != nil {
 		return err
 	}
 	testnet.Cleanup()

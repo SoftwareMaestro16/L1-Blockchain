@@ -23,17 +23,18 @@ if (-not $SkipBuild) {
 
 $profiles = if ($ValidatorProfile -eq "All") { @(3, 5, 10) } else { @([int]$ValidatorProfile) }
 
+$profilePorts = @{
+  3  = @{ P2P = 29656; RPC = 29657; REST = 4317; GRPC = 12090; Pprof = 9060 }
+  5  = @{ P2P = 30656; RPC = 30657; REST = 5317; GRPC = 13090; Pprof = 10060 }
+  10 = @{ P2P = 31656; RPC = 31657; REST = 6317; GRPC = 14090; Pprof = 11060 }
+}
+
 Push-Location $RepoRoot
 try {
   foreach ($validators in $profiles) {
     $outputDir = Resolve-LocalnetPath -Path ".localnet-public-preflight-$validators" -DefaultRelativePath ".localnet-public-preflight-$validators"
-    $baseOffset = switch ($validators) {
-      3 { 3000 }
-      5 { 4000 }
-      10 { 5000 }
-      default { 6000 }
-    }
-    Write-Host "Running public testnet preflight: validators=$validators output=$outputDir"
+    $ports = $profilePorts[$validators]
+    Write-Host "Running public testnet preflight: validators=$validators output=$outputDir ports=@{$($ports.RPC),$($ports.P2P),$($ports.REST),$($ports.GRPC)}"
 
     & .\tests\e2e\prototype_acceptance.ps1 `
       -Profile Full `
@@ -42,17 +43,17 @@ try {
       -ChainId $ChainId `
       -ValidatorCount $validators `
       -TimeoutSeconds $TimeoutSeconds `
-      -BaseP2PPort (26656 + $baseOffset) `
-      -BaseRPCPort (26657 + $baseOffset) `
-      -BaseRESTPort (1317 + $baseOffset) `
-      -BaseGRPCPort (9090 + $baseOffset) `
-      -BasePprofPort (6060 + $baseOffset) `
+      -BaseP2PPort $ports.P2P `
+      -BaseRPCPort $ports.RPC `
+      -BaseRESTPort $ports.REST `
+      -BaseGRPCPort $ports.GRPC `
+      -BasePprofPort $ports.Pprof `
       -SkipBuild
 
     if (-not $SkipCosmWasmDisabledCheck) {
       & .\tests\e2e\cosmwasm_smoke.ps1 `
         -Binary $Binary `
-        -Node "tcp://127.0.0.1:$((26657 + $baseOffset))"
+        -Node "tcp://127.0.0.1:$($ports.RPC)"
     }
   }
 } finally {

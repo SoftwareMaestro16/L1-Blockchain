@@ -12,37 +12,37 @@ import (
 )
 
 const (
-	AVMAsyncFailureInvalidPayload           AVMAsyncFailureClass = "invalid_payload"
-	AVMAsyncFailureInsufficientGas          AVMAsyncFailureClass = "insufficient_gas"
-	AVMAsyncFailureDestinationNotFound      AVMAsyncFailureClass = "destination_not_found"
-	AVMAsyncFailureDestinationDisabled      AVMAsyncFailureClass = "destination_disabled"
-	AVMAsyncFailureExpiredMessage           AVMAsyncFailureClass = "expired_message"
-	AVMAsyncFailureHandlerFailure           AVMAsyncFailureClass = "handler_failure"
-	AVMAsyncFailureStorageLimitExceeded     AVMAsyncFailureClass = "storage_limit_exceeded"
-	AVMAsyncFailureProofVerificationFailure AVMAsyncFailureClass = "proof_verification_failure"
-	AVMAsyncFailureRetryExhausted           AVMAsyncFailureClass = "retry_exhausted"
+	AVMAsyncFailureInvalidPayload		AVMAsyncFailureClass	= "invalid_payload"
+	AVMAsyncFailureInsufficientGas		AVMAsyncFailureClass	= "insufficient_gas"
+	AVMAsyncFailureDestinationNotFound	AVMAsyncFailureClass	= "destination_not_found"
+	AVMAsyncFailureDestinationDisabled	AVMAsyncFailureClass	= "destination_disabled"
+	AVMAsyncFailureExpiredMessage		AVMAsyncFailureClass	= "expired_message"
+	AVMAsyncFailureHandlerFailure		AVMAsyncFailureClass	= "handler_failure"
+	AVMAsyncFailureStorageLimitExceeded	AVMAsyncFailureClass	= "storage_limit_exceeded"
+	AVMAsyncFailureProofVerificationFailure	AVMAsyncFailureClass	= "proof_verification_failure"
+	AVMAsyncFailureRetryExhausted		AVMAsyncFailureClass	= "retry_exhausted"
 
-	AVMAsyncErrorInvalidPayload           AVMAsyncErrorCode = "ERR_INVALID_PAYLOAD"
-	AVMAsyncErrorInsufficientGas          AVMAsyncErrorCode = "ERR_INSUFFICIENT_GAS"
-	AVMAsyncErrorDestinationNotFound      AVMAsyncErrorCode = "ERR_DESTINATION_NOT_FOUND"
-	AVMAsyncErrorDestinationDisabled      AVMAsyncErrorCode = "ERR_DESTINATION_DISABLED"
-	AVMAsyncErrorExpiredMessage           AVMAsyncErrorCode = "ERR_EXPIRED_MESSAGE"
-	AVMAsyncErrorHandlerFailure           AVMAsyncErrorCode = "ERR_HANDLER_FAILURE"
-	AVMAsyncErrorStorageLimitExceeded     AVMAsyncErrorCode = "ERR_STORAGE_LIMIT_EXCEEDED"
-	AVMAsyncErrorProofVerificationFailure AVMAsyncErrorCode = "ERR_PROOF_VERIFICATION_FAILURE"
-	AVMAsyncErrorRetryExhausted           AVMAsyncErrorCode = "ERR_RETRY_EXHAUSTED"
-	AVMAsyncErrorBounceFailed             AVMAsyncErrorCode = "ERR_BOUNCE_FAILED"
+	AVMAsyncErrorInvalidPayload		AVMAsyncErrorCode	= "ERR_INVALID_PAYLOAD"
+	AVMAsyncErrorInsufficientGas		AVMAsyncErrorCode	= "ERR_INSUFFICIENT_GAS"
+	AVMAsyncErrorDestinationNotFound	AVMAsyncErrorCode	= "ERR_DESTINATION_NOT_FOUND"
+	AVMAsyncErrorDestinationDisabled	AVMAsyncErrorCode	= "ERR_DESTINATION_DISABLED"
+	AVMAsyncErrorExpiredMessage		AVMAsyncErrorCode	= "ERR_EXPIRED_MESSAGE"
+	AVMAsyncErrorHandlerFailure		AVMAsyncErrorCode	= "ERR_HANDLER_FAILURE"
+	AVMAsyncErrorStorageLimitExceeded	AVMAsyncErrorCode	= "ERR_STORAGE_LIMIT_EXCEEDED"
+	AVMAsyncErrorProofVerificationFailure	AVMAsyncErrorCode	= "ERR_PROOF_VERIFICATION_FAILURE"
+	AVMAsyncErrorRetryExhausted		AVMAsyncErrorCode	= "ERR_RETRY_EXHAUSTED"
+	AVMAsyncErrorBounceFailed		AVMAsyncErrorCode	= "ERR_BOUNCE_FAILED"
 
-	AVMDeadLetterTriggerRetryExhausted                 AVMDeadLetterTrigger = "retry_exhausted"
-	AVMDeadLetterTriggerDestinationPermanentlyDisabled AVMDeadLetterTrigger = "destination_permanently_disabled"
-	AVMDeadLetterTriggerBounceFailed                   AVMDeadLetterTrigger = "bounce_failed"
-	AVMDeadLetterTriggerExpiredBeforeExecution         AVMDeadLetterTrigger = "expired_before_execution"
-	AVMDeadLetterTriggerInvalidMessageFormat           AVMDeadLetterTrigger = "invalid_message_format"
+	AVMDeadLetterTriggerRetryExhausted			AVMDeadLetterTrigger	= "retry_exhausted"
+	AVMDeadLetterTriggerDestinationPermanentlyDisabled	AVMDeadLetterTrigger	= "destination_permanently_disabled"
+	AVMDeadLetterTriggerBounceFailed			AVMDeadLetterTrigger	= "bounce_failed"
+	AVMDeadLetterTriggerExpiredBeforeExecution		AVMDeadLetterTrigger	= "expired_before_execution"
+	AVMDeadLetterTriggerInvalidMessageFormat		AVMDeadLetterTrigger	= "invalid_message_format"
 
-	AVMAsyncBouncePayloadType = "async.bounce"
+	AVMAsyncBouncePayloadType	= "async.bounce"
 
-	MaxAVMBouncePayloadBytes     = 1024
-	MaxAVMFailureErrorCodeLength = MaxAVMReceiptErrorCode
+	MaxAVMBouncePayloadBytes	= 1024
+	MaxAVMFailureErrorCodeLength	= MaxAVMReceiptErrorCode
 )
 
 type AVMAsyncFailureClass string
@@ -50,63 +50,63 @@ type AVMAsyncErrorCode string
 type AVMDeadLetterTrigger string
 
 type AVMAsyncFailureRecord struct {
-	MessageID      string
-	ZoneID         zonestypes.ZoneID
-	FailureClass   AVMAsyncFailureClass
-	ErrorCode      string
-	FailedHeight   uint64
-	Attempt        uint32
-	GasUsed        uint64
-	RetryExhausted bool
-	FailureHash    string
+	MessageID	string
+	ZoneID		zonestypes.ZoneID
+	FailureClass	AVMAsyncFailureClass
+	ErrorCode	string
+	FailedHeight	uint64
+	Attempt		uint32
+	GasUsed		uint64
+	RetryExhausted	bool
+	FailureHash	string
 }
 
 type AVMAsyncBounceOutcome struct {
-	OriginalMessage    AVMAsyncMessage
-	Failure            AVMAsyncFailureRecord
-	BounceMessage      AVMAsyncMessage
-	BounceReceipt      AVMExecutionReceipt
-	RemainingValueNAET uint64
-	BounceGasUsed      uint64
-	BoundedBounceGas   uint64
-	OutcomeHash        string
+	OriginalMessage		AVMAsyncMessage
+	Failure			AVMAsyncFailureRecord
+	BounceMessage		AVMAsyncMessage
+	BounceReceipt		AVMExecutionReceipt
+	RemainingValueNAET	uint64
+	BounceGasUsed		uint64
+	BoundedBounceGas	uint64
+	OutcomeHash		string
 }
 
 type AVMAsyncBounceDeadLetterOutcome struct {
-	BounceOutcome     AVMAsyncBounceOutcome
-	DeadLetter        AVMDeadLetterRecord
-	DeadLetterReceipt AVMExecutionReceipt
-	OutcomeHash       string
+	BounceOutcome		AVMAsyncBounceOutcome
+	DeadLetter		AVMDeadLetterRecord
+	DeadLetterReceipt	AVMExecutionReceipt
+	OutcomeHash		string
 }
 
 type AVMAsyncFailedReceiptModel struct {
-	Message   AVMAsyncMessage
-	Failure   AVMAsyncFailureRecord
-	Receipt   AVMExecutionReceipt
-	ModelHash string
+	Message		AVMAsyncMessage
+	Failure		AVMAsyncFailureRecord
+	Receipt		AVMExecutionReceipt
+	ModelHash	string
 }
 
 type AVMZoneDeadLetterQueue struct {
-	ZoneID    zonestypes.ZoneID
-	Records   []AVMDeadLetterRecord
-	QueueRoot string
+	ZoneID		zonestypes.ZoneID
+	Records		[]AVMDeadLetterRecord
+	QueueRoot	string
 }
 
 type AVMRetryExhaustionOutcome struct {
-	Queue       AVMZoneDeadLetterQueue
-	Message     AVMAsyncMessage
-	Failure     AVMAsyncFailureRecord
-	Receipt     AVMExecutionReceipt
-	DeadLetter  AVMDeadLetterRecord
-	OutcomeHash string
+	Queue		AVMZoneDeadLetterQueue
+	Message		AVMAsyncMessage
+	Failure		AVMAsyncFailureRecord
+	Receipt		AVMExecutionReceipt
+	DeadLetter	AVMDeadLetterRecord
+	OutcomeHash	string
 }
 
 type AVMAsyncFailureValueConservationCheck struct {
-	OriginalMessageID     string
-	OriginalValueNAET     uint64
-	BounceValueNAET       uint64
-	DeadLetterRefundNAET  uint64
-	ConservationCheckHash string
+	OriginalMessageID	string
+	OriginalValueNAET	uint64
+	BounceValueNAET		uint64
+	DeadLetterRefundNAET	uint64
+	ConservationCheckHash	string
 }
 
 func NewAVMAsyncFailureRecord(record AVMAsyncFailureRecord) (AVMAsyncFailureRecord, error) {
@@ -191,24 +191,24 @@ func NewAVMAsyncFailedReceiptModel(message AVMAsyncMessage, failure AVMAsyncFail
 		gasUsed = 1
 	}
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          message.ID,
-		ZoneID:             message.DestinationZone,
-		Executor:           executor,
-		Status:             status,
-		GasUsed:            gasUsed,
-		StorageWritten:     storageWritten,
-		EventsHash:         failure.FailureHash,
-		OutputMessagesRoot: outputMessagesRoot,
-		ErrorCodeOptional:  failure.ErrorCode,
-		CreatedHeight:      createdHeight,
+		MessageID:		message.ID,
+		ZoneID:			message.DestinationZone,
+		Executor:		executor,
+		Status:			status,
+		GasUsed:		gasUsed,
+		StorageWritten:		storageWritten,
+		EventsHash:		failure.FailureHash,
+		OutputMessagesRoot:	outputMessagesRoot,
+		ErrorCodeOptional:	failure.ErrorCode,
+		CreatedHeight:		createdHeight,
 	})
 	if err != nil {
 		return AVMAsyncFailedReceiptModel{}, err
 	}
 	model := AVMAsyncFailedReceiptModel{
-		Message: message,
-		Failure: failure,
-		Receipt: receipt,
+		Message:	message,
+		Failure:	failure,
+		Receipt:	receipt,
 	}
 	model = canonicalAVMAsyncFailedReceiptModel(model)
 	model.ModelHash = ComputeAVMAsyncFailedReceiptModelHash(model)
@@ -296,51 +296,51 @@ func NewAVMAsyncBounceOutcome(original AVMAsyncMessage, failure AVMAsyncFailureR
 		expiryHeight = createdHeight + 1
 	}
 	bounce, err := NewAVMAsyncMessage(AVMAsyncMessage{
-		ChainID:                  original.ChainID,
-		Source:                   original.Destination,
-		Destination:              original.Source,
-		Payload:                  payload,
-		GasLimit:                 schedule.BounceGas,
-		ExpiryHeight:             expiryHeight,
-		RetryPolicy:              AVMRetryPolicy{Mode: AVMRetryModeNone, BackoffMode: AVMBackoffModeNone},
-		BounceFlag:               false,
-		SourceZone:               original.DestinationZone,
-		DestinationZone:          original.SourceZone,
-		SourceActorOptional:      original.DestinationActorOptional,
-		DestinationActorOptional: original.SourceActorOptional,
-		SenderNonce:              bounceSenderNonce,
-		PayloadType:              AVMAsyncBouncePayloadType,
-		ValueNAET:                remainingValueNAET,
-		ForwardingFee:            original.ForwardingFee,
-		Priority:                 original.Priority,
-		CreatedHeight:            createdHeight,
-		RouteHintOptional:        AVMAsyncBounceRouteHint(original.ID),
+		ChainID:			original.ChainID,
+		Source:				original.Destination,
+		Destination:			original.Source,
+		Payload:			payload,
+		GasLimit:			schedule.BounceGas,
+		ExpiryHeight:			expiryHeight,
+		RetryPolicy:			AVMRetryPolicy{Mode: AVMRetryModeNone, BackoffMode: AVMBackoffModeNone},
+		BounceFlag:			false,
+		SourceZone:			original.DestinationZone,
+		DestinationZone:		original.SourceZone,
+		SourceActorOptional:		original.DestinationActorOptional,
+		DestinationActorOptional:	original.SourceActorOptional,
+		SenderNonce:			bounceSenderNonce,
+		PayloadType:			AVMAsyncBouncePayloadType,
+		ValueNAET:			remainingValueNAET,
+		ForwardingFee:			original.ForwardingFee,
+		Priority:			original.Priority,
+		CreatedHeight:			createdHeight,
+		RouteHintOptional:		AVMAsyncBounceRouteHint(original.ID),
 	})
 	if err != nil {
 		return AVMAsyncBounceOutcome{}, err
 	}
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          original.ID,
-		ZoneID:             original.DestinationZone,
-		Executor:           "async-bounce",
-		Status:             AVMReceiptStatusBounced,
-		GasUsed:            schedule.BounceGas,
-		EventsHash:         failure.FailureHash,
-		OutputMessagesRoot: ComputeAVMAsyncBounceMessageRoot(bounce),
-		ErrorCodeOptional:  failure.ErrorCode,
-		CreatedHeight:      createdHeight,
+		MessageID:		original.ID,
+		ZoneID:			original.DestinationZone,
+		Executor:		"async-bounce",
+		Status:			AVMReceiptStatusBounced,
+		GasUsed:		schedule.BounceGas,
+		EventsHash:		failure.FailureHash,
+		OutputMessagesRoot:	ComputeAVMAsyncBounceMessageRoot(bounce),
+		ErrorCodeOptional:	failure.ErrorCode,
+		CreatedHeight:		createdHeight,
 	})
 	if err != nil {
 		return AVMAsyncBounceOutcome{}, err
 	}
 	outcome := AVMAsyncBounceOutcome{
-		OriginalMessage:    original,
-		Failure:            failure,
-		BounceMessage:      bounce,
-		BounceReceipt:      receipt,
-		RemainingValueNAET: remainingValueNAET,
-		BounceGasUsed:      schedule.BounceGas,
-		BoundedBounceGas:   schedule.BounceGas,
+		OriginalMessage:	original,
+		Failure:		failure,
+		BounceMessage:		bounce,
+		BounceReceipt:		receipt,
+		RemainingValueNAET:	remainingValueNAET,
+		BounceGasUsed:		schedule.BounceGas,
+		BoundedBounceGas:	schedule.BounceGas,
 	}
 	outcome = canonicalAVMAsyncBounceOutcome(outcome)
 	outcome.OutcomeHash = ComputeAVMAsyncBounceOutcomeHash(outcome)
@@ -440,36 +440,36 @@ func NewAVMAsyncBounceDeadLetterOutcome(outcome AVMAsyncBounceOutcome, reason st
 		return AVMAsyncBounceDeadLetterOutcome{}, err
 	}
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          outcome.BounceMessage.ID,
-		ZoneID:             outcome.BounceMessage.DestinationZone,
-		Executor:           "async-bounce-dead-letter",
-		Status:             AVMReceiptStatusDeadLettered,
-		GasUsed:            outcome.BounceGasUsed,
-		EventsHash:         outcome.Failure.FailureHash,
-		OutputMessagesRoot: ComputeAVMAsyncBounceDeadLetterOutputRoot(outcome.BounceMessage.ID),
-		ErrorCodeOptional:  outcome.Failure.ErrorCode,
-		CreatedHeight:      finalHeight,
+		MessageID:		outcome.BounceMessage.ID,
+		ZoneID:			outcome.BounceMessage.DestinationZone,
+		Executor:		"async-bounce-dead-letter",
+		Status:			AVMReceiptStatusDeadLettered,
+		GasUsed:		outcome.BounceGasUsed,
+		EventsHash:		outcome.Failure.FailureHash,
+		OutputMessagesRoot:	ComputeAVMAsyncBounceDeadLetterOutputRoot(outcome.BounceMessage.ID),
+		ErrorCodeOptional:	outcome.Failure.ErrorCode,
+		CreatedHeight:		finalHeight,
 	})
 	if err != nil {
 		return AVMAsyncBounceDeadLetterOutcome{}, err
 	}
 	dead, err := NewAVMDeadLetterRecord(AVMDeadLetterRecord{
-		MessageID:            outcome.BounceMessage.ID,
-		ZoneID:               outcome.BounceMessage.DestinationZone,
-		Reason:               reason,
-		FailedAttempts:       failedAttempts,
-		LastErrorCode:        outcome.Failure.ErrorCode,
-		FinalHeight:          finalHeight,
-		RefundAmountOptional: outcome.RemainingValueNAET,
-		ReceiptID:            receipt.ReceiptID,
+		MessageID:		outcome.BounceMessage.ID,
+		ZoneID:			outcome.BounceMessage.DestinationZone,
+		Reason:			reason,
+		FailedAttempts:		failedAttempts,
+		LastErrorCode:		outcome.Failure.ErrorCode,
+		FinalHeight:		finalHeight,
+		RefundAmountOptional:	outcome.RemainingValueNAET,
+		ReceiptID:		receipt.ReceiptID,
 	})
 	if err != nil {
 		return AVMAsyncBounceDeadLetterOutcome{}, err
 	}
 	next := AVMAsyncBounceDeadLetterOutcome{
-		BounceOutcome:     outcome,
-		DeadLetter:        dead,
-		DeadLetterReceipt: receipt,
+		BounceOutcome:		outcome,
+		DeadLetter:		dead,
+		DeadLetterReceipt:	receipt,
 	}
 	next = canonicalAVMAsyncBounceDeadLetterOutcome(next)
 	next.OutcomeHash = ComputeAVMAsyncBounceDeadLetterOutcomeHash(next)
@@ -546,28 +546,28 @@ func DeadLetterAVMAsyncFailure(queue AVMZoneDeadLetterQueue, failure AVMAsyncFai
 		reason = string(trigger)
 	}
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          failure.MessageID,
-		ZoneID:             failure.ZoneID,
-		Executor:           "async-dead-letter",
-		Status:             AVMReceiptStatusDeadLettered,
-		GasUsed:            gasUsed,
-		EventsHash:         failure.FailureHash,
-		OutputMessagesRoot: ComputeAVMAsyncFailureOutputRoot(failure),
-		ErrorCodeOptional:  failure.ErrorCode,
-		CreatedHeight:      finalHeight,
+		MessageID:		failure.MessageID,
+		ZoneID:			failure.ZoneID,
+		Executor:		"async-dead-letter",
+		Status:			AVMReceiptStatusDeadLettered,
+		GasUsed:		gasUsed,
+		EventsHash:		failure.FailureHash,
+		OutputMessagesRoot:	ComputeAVMAsyncFailureOutputRoot(failure),
+		ErrorCodeOptional:	failure.ErrorCode,
+		CreatedHeight:		finalHeight,
 	})
 	if err != nil {
 		return AVMZoneDeadLetterQueue{}, AVMDeadLetterRecord{}, AVMExecutionReceipt{}, err
 	}
 	record, err := NewAVMDeadLetterRecord(AVMDeadLetterRecord{
-		MessageID:            failure.MessageID,
-		ZoneID:               failure.ZoneID,
-		Reason:               reason,
-		FailedAttempts:       failure.Attempt,
-		LastErrorCode:        failure.ErrorCode,
-		FinalHeight:          finalHeight,
-		RefundAmountOptional: refundAmountNAET,
-		ReceiptID:            receipt.ReceiptID,
+		MessageID:		failure.MessageID,
+		ZoneID:			failure.ZoneID,
+		Reason:			reason,
+		FailedAttempts:		failure.Attempt,
+		LastErrorCode:		failure.ErrorCode,
+		FinalHeight:		finalHeight,
+		RefundAmountOptional:	refundAmountNAET,
+		ReceiptID:		receipt.ReceiptID,
 	})
 	if err != nil {
 		return AVMZoneDeadLetterQueue{}, AVMDeadLetterRecord{}, AVMExecutionReceipt{}, err
@@ -587,13 +587,13 @@ func NewAVMRetryExhaustionOutcome(queue AVMZoneDeadLetterQueue, message AVMAsync
 		return AVMRetryExhaustionOutcome{}, err
 	}
 	failure, err := NewAVMAsyncFailureRecord(AVMAsyncFailureRecord{
-		MessageID:      message.ID,
-		ZoneID:         message.DestinationZone,
-		FailureClass:   AVMAsyncFailureRetryExhausted,
-		FailedHeight:   finalHeight,
-		Attempt:        attempt,
-		GasUsed:        gasUsed,
-		RetryExhausted: true,
+		MessageID:	message.ID,
+		ZoneID:		message.DestinationZone,
+		FailureClass:	AVMAsyncFailureRetryExhausted,
+		FailedHeight:	finalHeight,
+		Attempt:	attempt,
+		GasUsed:	gasUsed,
+		RetryExhausted:	true,
 	})
 	if err != nil {
 		return AVMRetryExhaustionOutcome{}, err
@@ -603,11 +603,11 @@ func NewAVMRetryExhaustionOutcome(queue AVMZoneDeadLetterQueue, message AVMAsync
 		return AVMRetryExhaustionOutcome{}, err
 	}
 	outcome := AVMRetryExhaustionOutcome{
-		Queue:      nextQueue,
-		Message:    message,
-		Failure:    failure,
-		Receipt:    receipt,
-		DeadLetter: dead,
+		Queue:		nextQueue,
+		Message:	message,
+		Failure:	failure,
+		Receipt:	receipt,
+		DeadLetter:	dead,
 	}
 	outcome = canonicalAVMRetryExhaustionOutcome(outcome)
 	outcome.OutcomeHash = ComputeAVMRetryExhaustionOutcomeHash(outcome)
@@ -652,10 +652,10 @@ func NewAVMAsyncFailureValueConservationCheck(original AVMAsyncMessage, bounceVa
 		return AVMAsyncFailureValueConservationCheck{}, err
 	}
 	check := AVMAsyncFailureValueConservationCheck{
-		OriginalMessageID:    original.ID,
-		OriginalValueNAET:    original.ValueNAET,
-		BounceValueNAET:      bounceValueNAET,
-		DeadLetterRefundNAET: deadLetterRefundNAET,
+		OriginalMessageID:	original.ID,
+		OriginalValueNAET:	original.ValueNAET,
+		BounceValueNAET:	bounceValueNAET,
+		DeadLetterRefundNAET:	deadLetterRefundNAET,
 	}
 	check = canonicalAVMAsyncFailureValueConservationCheck(check)
 	check.ConservationCheckHash = ComputeAVMAsyncFailureValueConservationHash(check)

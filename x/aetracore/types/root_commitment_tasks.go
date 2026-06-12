@@ -8,62 +8,62 @@ import (
 )
 
 const (
-	RootEncodingVersion     = "aetra-aek-root-encoding-v1"
-	CanonicalEmptyRootLabel = "canonical-empty-root"
+	RootEncodingVersion	= "aetra-aek-root-encoding-v1"
+	CanonicalEmptyRootLabel	= "canonical-empty-root"
 )
 
 type RootEncodingDescriptor struct {
-	Version      string
-	EmptyRoot    string
-	EncodingHash string
+	Version		string
+	EmptyRoot	string
+	EncodingHash	string
 }
 
 type ProofRegistryEntry struct {
-	ProofType    CommitmentProofType
-	RootType     RootType
-	RootID       string
-	RootHash     string
-	Enabled      bool
-	RegistryHash string
+	ProofType	CommitmentProofType
+	RootType	RootType
+	RootID		string
+	RootHash	string
+	Enabled		bool
+	RegistryHash	string
 }
 
 type ProofRegistry struct {
-	Height       uint64
-	Entries      []ProofRegistryEntry
-	RegistryRoot string
+	Height		uint64
+	Entries		[]ProofRegistryEntry
+	RegistryRoot	string
 }
 
 type RootQuery struct {
-	Height   uint64
-	RootType RootType
-	RootID   string
+	Height		uint64
+	RootType	RootType
+	RootID		string
 }
 
 type RootQueryResponse struct {
-	QueryHash string
-	Found     bool
-	Root      RootContribution
-	ProofRoot ProofRoot
+	QueryHash	string
+	Found		bool
+	Root		RootContribution
+	ProofRoot	ProofRoot
 }
 
 type ProofVerificationRequest struct {
-	ExpectedRoot string
-	Registry     ProofRegistry
-	Proof        StateCommitmentProof
+	ExpectedRoot	string
+	Registry	ProofRegistry
+	Proof		StateCommitmentProof
 }
 
 type ProofVerificationResult struct {
-	Verified         bool
-	ProofHash        string
-	RegistryRoot     string
-	VerifiedRoot     string
-	VerificationHash string
+	Verified		bool
+	ProofHash		string
+	RegistryRoot		string
+	VerifiedRoot		string
+	VerificationHash	string
 }
 
 func DefaultRootEncodingDescriptor() RootEncodingDescriptor {
 	descriptor := RootEncodingDescriptor{
-		Version:   RootEncodingVersion,
-		EmptyRoot: CanonicalEmptyRootValue(),
+		Version:	RootEncodingVersion,
+		EmptyRoot:	CanonicalEmptyRootValue(),
 	}
 	descriptor.EncodingHash = ComputeRootEncodingDescriptorHash(descriptor)
 	return descriptor
@@ -75,11 +75,11 @@ func CanonicalEmptyRootValue() string {
 
 func NewProofRegistryEntry(proofType CommitmentProofType, rootType RootType, rootID string, rootHash string, enabled bool) (ProofRegistryEntry, error) {
 	entry := ProofRegistryEntry{
-		ProofType: CommitmentProofType(strings.TrimSpace(string(proofType))),
-		RootType:  RootType(strings.TrimSpace(string(rootType))),
-		RootID:    strings.TrimSpace(rootID),
-		RootHash:  strings.ToLower(strings.TrimSpace(rootHash)),
-		Enabled:   enabled,
+		ProofType:	CommitmentProofType(strings.TrimSpace(string(proofType))),
+		RootType:	RootType(strings.TrimSpace(string(rootType))),
+		RootID:		strings.TrimSpace(rootID),
+		RootHash:	strings.ToLower(strings.TrimSpace(rootHash)),
+		Enabled:	enabled,
 	}
 	if entry.RootHash == "" {
 		entry.RootHash = DeterministicEmptyRootCommitment(entry.RootType, entry.RootID)
@@ -93,8 +93,8 @@ func NewProofRegistryEntry(proofType CommitmentProofType, rootType RootType, roo
 
 func BuildProofRegistry(height uint64, entries []ProofRegistryEntry) (ProofRegistry, error) {
 	registry := ProofRegistry{
-		Height:  height,
-		Entries: normalizeProofRegistryEntries(entries),
+		Height:		height,
+		Entries:	normalizeProofRegistryEntries(entries),
 	}
 	if err := registry.ValidateFormat(); err != nil {
 		return ProofRegistry{}, err
@@ -137,10 +137,10 @@ func QueryCommittedRoot(state CoreState, query RootQuery) (RootQueryResponse, er
 			response.Found = true
 			response.Root = contribution
 			response.ProofRoot = ProofRoot{
-				Height:   query.Height,
-				RootType: query.RootType,
-				RootHash: contribution.RootHash,
-				Source:   "aetracore.root_query",
+				Height:		query.Height,
+				RootType:	query.RootType,
+				RootHash:	contribution.RootHash,
+				Source:		"aetracore.root_query",
 			}
 			return response, response.Validate()
 		}
@@ -163,9 +163,9 @@ func QueryStateProof(state CoreState, registry ProofRegistry, proof StateCommitm
 		return ProofVerificationResult{}, errors.New("aetracore proof query root not found")
 	}
 	return VerifyStateCommitmentProof(ProofVerificationRequest{
-		ExpectedRoot: rootResponse.Root.RootHash,
-		Registry:     registry,
-		Proof:        proof,
+		ExpectedRoot:	rootResponse.Root.RootHash,
+		Registry:	registry,
+		Proof:		proof,
 	})
 }
 
@@ -195,10 +195,10 @@ func VerifyStateCommitmentProof(req ProofVerificationRequest) (ProofVerification
 		return ProofVerificationResult{}, errors.New("aetracore proof verification registry root mismatch")
 	}
 	result := ProofVerificationResult{
-		Verified:     true,
-		ProofHash:    proof.ProofHash,
-		RegistryRoot: req.Registry.RegistryRoot,
-		VerifiedRoot: proof.RootHash,
+		Verified:	true,
+		ProofHash:	proof.ProofHash,
+		RegistryRoot:	req.Registry.RegistryRoot,
+		VerifiedRoot:	proof.RootHash,
 	}
 	result.VerificationHash = ComputeProofVerificationResultHash(result)
 	return result, nil
@@ -233,9 +233,9 @@ func ValidateExportImportRootChecks(state CoreState, manifest ExportManifest) er
 
 func RootContributionsFromGlobalRoot(root GlobalStateRoot) []RootContribution {
 	entries := []struct {
-		rootType RootType
-		id       string
-		rootHash string
+		rootType	RootType
+		id		string
+		rootHash	string
 	}{
 		{RootType("contracts"), "global", root.ContractsRoot},
 		{RootType("identity"), "global", root.IdentityRoot},
@@ -377,9 +377,9 @@ func (registry ProofRegistry) Validate() error {
 func (registry ProofRegistry) EntryFor(proofType CommitmentProofType, rootType RootType, rootID string) (ProofRegistryEntry, bool) {
 	registry = normalizeProofRegistry(registry)
 	needle := proofRegistryEntryKey(ProofRegistryEntry{
-		ProofType: CommitmentProofType(strings.TrimSpace(string(proofType))),
-		RootType:  RootType(strings.TrimSpace(string(rootType))),
-		RootID:    strings.TrimSpace(rootID),
+		ProofType:	CommitmentProofType(strings.TrimSpace(string(proofType))),
+		RootType:	RootType(strings.TrimSpace(string(rootType))),
+		RootID:		strings.TrimSpace(rootID),
 	})
 	for _, entry := range registry.Entries {
 		if proofRegistryEntryKey(entry) == needle {

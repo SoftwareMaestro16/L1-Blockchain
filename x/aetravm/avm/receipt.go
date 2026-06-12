@@ -7,64 +7,46 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.14: Receipts, Events, Bounce, And Refund Accounting
-// ---------------
-// Deterministic execution accounting system that guarantees:
-// - exact value conservation
-// - deterministic gas accounting
-// - safe message bounce semantics
-// - no double refund / no infinite bounce loops
-// - fully auditable execution receipts
-
-// ---------------
-// Enhanced Receipt Model
-// ---------------
-
 // AVMLedgerReceipt is the enhanced receipt with full accounting,
 // message state flags, bounce tracking, and value conservation proof.
 type AVMLedgerReceipt struct {
-	ExitCode           StructuredExitCode
-	GasUsed            uint64
-	GasRefunded        uint64
-	GasBreakdown       GasBreakdown
-	StorageFee         uint64
-	ValueIn            uint64
-	ValueOut           uint64
-	StateRootBefore    []byte
-	StateRootAfter     []byte
-	EmittedActionsHash []byte
-	EventsHash         []byte
-	ProofHash         []byte
-	MessageFlags       MessageFlags
-	BounceMessage     *BounceMessage
-	Actions           []Action
-	Events             []EventRecord
+	ExitCode		StructuredExitCode
+	GasUsed			uint64
+	GasRefunded		uint64
+	GasBreakdown		GasBreakdown
+	StorageFee		uint64
+	ValueIn			uint64
+	ValueOut		uint64
+	StateRootBefore		[]byte
+	StateRootAfter		[]byte
+	EmittedActionsHash	[]byte
+	EventsHash		[]byte
+	ProofHash		[]byte
+	MessageFlags		MessageFlags
+	BounceMessage		*BounceMessage
+	Actions			[]Action
+	Events			[]EventRecord
 }
 
 // GasBreakdown splits gas into compute, storage, message, and bounce components.
 type GasBreakdown struct {
-	ComputeGas uint64
-	StorageGas uint64
-	MessageGas uint64
-	BounceGas  uint64
+	ComputeGas	uint64
+	StorageGas	uint64
+	MessageGas	uint64
+	BounceGas	uint64
 }
 
 func (g GasBreakdown) Total() uint64 {
 	return g.ComputeGas + g.StorageGas + g.MessageGas + g.BounceGas
 }
 
-// ---------------
-// Message State Flags
-// ---------------
-
 // MessageFlags tracks the lifecycle state of a message.
 type MessageFlags struct {
-	Consumed       bool
-	Bounced        bool
-	BounceRequested bool
-	RefundIssued   bool
-	RefundLocked   bool
+	Consumed	bool
+	Bounced		bool
+	BounceRequested	bool
+	RefundIssued	bool
+	RefundLocked	bool
 }
 
 func (f MessageFlags) String() string {
@@ -72,15 +54,10 @@ func (f MessageFlags) String() string {
 		f.Consumed, f.Bounced, f.BounceRequested, f.RefundIssued, f.RefundLocked)
 }
 
-// ---------------
-// Message Lifecycle Model
-// ---------------
-// Created → Executed → (Success | Failure → Bounce?) → Finalized
-
 type MessageState uint8
 
 const (
-	MessagePending    MessageState = iota
+	MessagePending	MessageState	= iota
 	MessageExecuted
 	MessageFailed
 	MessageBounced
@@ -104,39 +81,27 @@ func (s MessageState) String() string {
 	}
 }
 
-// ---------------
-// Bounce Message Model
-// ---------------
-// Bounce is an explicit transformation of a failed message.
-// A message MAY only be bounced ONCE.
-// bounced == true → non-bounceable forever.
-
 type BounceMessage struct {
-	OriginalMessageHash []byte
-	FailureExitCode     StructuredExitCode
-	BounceFlag          bool
-	PartialSnapshot     []byte
+	OriginalMessageHash	[]byte
+	FailureExitCode		StructuredExitCode
+	BounceFlag		bool
+	PartialSnapshot		[]byte
 }
 
 func NewBounceMessage(originalHash []byte, exitCode StructuredExitCode) *BounceMessage {
 	return &BounceMessage{
-		OriginalMessageHash: originalHash,
-		FailureExitCode:     exitCode,
-		BounceFlag:          true,
+		OriginalMessageHash:	originalHash,
+		FailureExitCode:	exitCode,
+		BounceFlag:		true,
 	}
 }
 
-// ---------------
-// Event Record Model
-// ---------------
-// Events are canonical, order-deterministic, hash-stable.
-
 type EventRecord struct {
-	Index    uint32
-	Topic    string
-	Payload  []byte
-	Sender   string
-	Contract string
+	Index		uint32
+	Topic		string
+	Payload		[]byte
+	Sender		string
+	Contract	string
 }
 
 // ComputeEventsHash computes BLAKE3(canonical_event_list) deterministically.
@@ -152,32 +117,24 @@ func ComputeEventsHash(events []EventRecord) []byte {
 	return h.Sum(nil)
 }
 
-// ---------------
-// Value Conservation Model
-// ---------------
-// For every execution:
-// value_in + storage_fee_paid = value_out + refunds + remaining_balance_delta
-// No net creation or destruction of value.
-
 type ValueConservationProof struct {
-	ValueIn                  uint64
-	ValueOut                 uint64
-	StorageFeePaid           uint64
-	RefundIssued             uint64
-	RemainingBalanceDelta   int64
-	Balanced                bool
+	ValueIn			uint64
+	ValueOut		uint64
+	StorageFeePaid		uint64
+	RefundIssued		uint64
+	RemainingBalanceDelta	int64
+	Balanced		bool
 }
 
 // VerifyValueConservation checks that value_in - value_out - refunds - storage_fee == remaining_delta.
 func VerifyValueConservation(receipt *AVMLedgerReceipt) ValueConservationProof {
 	proof := ValueConservationProof{
-		ValueIn:        receipt.ValueIn,
-		ValueOut:       receipt.ValueOut,
-		StorageFeePaid:  receipt.StorageFee,
-		RefundIssued:    receipt.GasRefunded,
+		ValueIn:	receipt.ValueIn,
+		ValueOut:	receipt.ValueOut,
+		StorageFeePaid:	receipt.StorageFee,
+		RefundIssued:	receipt.GasRefunded,
 	}
 
-	// value_in = value_out + storage_fee + refund + remaining_delta
 	expected := int64(receipt.ValueOut) + int64(receipt.StorageFee) + int64(receipt.GasRefunded)
 	actual := int64(receipt.ValueIn)
 	proof.RemainingBalanceDelta = actual - expected
@@ -185,15 +142,6 @@ func VerifyValueConservation(receipt *AVMLedgerReceipt) ValueConservationProof {
 
 	return proof
 }
-
-// ---------------
-// Bounce Eligibility Model
-// ---------------
-// A message is eligible for bounce IF:
-// - execution failed
-// - bounce_requested == true
-// - message is marked bounceable
-// A bounced message CANNOT be bounced again.
 
 func IsBounceEligible(flags MessageFlags, exitCode StructuredExitCode) bool {
 	if flags.Bounced {
@@ -222,17 +170,10 @@ func ProcessBounce(originalMessage *Message, flags MessageFlags, exitCode Struct
 	return NewBounceMessage(originalMessage.Hash, exitCode)
 }
 
-// ---------------
-// Refund Accounting Model
-// ---------------
-// Gas refund MUST be computed BEFORE state commit.
-// refund_issued + refund_locked → irreversible accounting state.
-// refund_issued == true → cannot issue second refund.
-
 type RefundAccounting struct {
-	GasRefunded  uint64
-	RefundIssued bool
-	RefundLocked bool
+	GasRefunded	uint64
+	RefundIssued	bool
+	RefundLocked	bool
 }
 
 func NewRefundAccounting() *RefundAccounting {
@@ -258,15 +199,11 @@ func (r *RefundAccounting) LockRefund() {
 	r.RefundLocked = true
 }
 
-// ---------------
-// Ledger Receipt Construction
-// ---------------
-
 // BuildLedgerReceipt constructs a full ledger receipt from execution results.
 func BuildLedgerReceipt(
 	exitCode StructuredExitCode,
 	frame *KernelExecutionFrame,
- refund *RefundAccounting,
+	refund *RefundAccounting,
 	bounce *BounceMessage,
 	events []EventRecord,
 ) *AVMLedgerReceipt {
@@ -290,10 +227,10 @@ func BuildLedgerReceipt(
 	eventsHash := ComputeEventsHash(events)
 
 	gasBreakdown := GasBreakdown{
-		ComputeGas: frame.PhaseGas[PhaseCompute] + frame.PhaseGas[PhaseStorage] + frame.PhaseGas[PhaseCredit],
-		StorageGas:  frame.PhaseGas[PhaseFinalization],
-		MessageGas:  frame.PhaseGas[PhaseAction],
-		BounceGas:   0,
+		ComputeGas:	frame.PhaseGas[PhaseCompute] + frame.PhaseGas[PhaseStorage] + frame.PhaseGas[PhaseCredit],
+		StorageGas:	frame.PhaseGas[PhaseFinalization],
+		MessageGas:	frame.PhaseGas[PhaseAction],
+		BounceGas:	0,
 	}
 	if bounce != nil {
 		gasBreakdown.BounceGas = 100
@@ -310,22 +247,22 @@ func BuildLedgerReceipt(
 	}
 
 	return &AVMLedgerReceipt{
-		ExitCode:           exitCode,
-		GasUsed:            frame.GasUsed,
-		GasRefunded:        gasRefunded,
-		GasBreakdown:       gasBreakdown,
-		StorageFee:         storageFee,
-		ValueIn:            frame.Message.Value,
-		ValueOut:           sumActionValues(frame),
-		StateRootBefore:    stateRootBefore,
-		StateRootAfter:     stateRootAfter,
-		EmittedActionsHash: actionsHash,
-		EventsHash:         eventsHash,
-		ProofHash:         computeReceiptProofHash(frame, events),
-		MessageFlags:       buildMessageFlags(frame, bounce),
-		BounceMessage:      bounce,
-		Actions:            getFrameActions(frame),
-		Events:             events,
+		ExitCode:		exitCode,
+		GasUsed:		frame.GasUsed,
+		GasRefunded:		gasRefunded,
+		GasBreakdown:		gasBreakdown,
+		StorageFee:		storageFee,
+		ValueIn:		frame.Message.Value,
+		ValueOut:		sumActionValues(frame),
+		StateRootBefore:	stateRootBefore,
+		StateRootAfter:		stateRootAfter,
+		EmittedActionsHash:	actionsHash,
+		EventsHash:		eventsHash,
+		ProofHash:		computeReceiptProofHash(frame, events),
+		MessageFlags:		buildMessageFlags(frame, bounce),
+		BounceMessage:		bounce,
+		Actions:		getFrameActions(frame),
+		Events:			events,
 	}
 }
 
@@ -368,12 +305,6 @@ func computeReceiptProofHash(frame *KernelExecutionFrame, events []EventRecord) 
 	}
 	return h.Sum(nil)
 }
-
-// ---------------
-// Receipt Canonical Encoding
-// ---------------
-// Receipt MUST be fully serializable and replayable.
-// All flags, hashes, and state transitions preserved.
 
 func (r *AVMLedgerReceipt) CanonicalEncode() ([]byte, error) {
 	buf := make([]byte, 0, 512)
@@ -443,10 +374,6 @@ func appendMsgFlags(buf []byte, f MessageFlags) []byte {
 	return append(buf, flags)
 }
 
-// ---------------
-// Message Lifecycle State Machine
-// ---------------
-
 func TransitionMessageState(current MessageState, success bool, bounceEligible bool) (MessageState, MessageFlags) {
 	flags := MessageFlags{Consumed: true}
 
@@ -470,20 +397,12 @@ func TransitionMessageState(current MessageState, success bool, bounceEligible b
 	}
 }
 
-// ---------------
-// Double Refund Prevention
-// ---------------
-
 func ValidateNoDoubleRefund(flags MessageFlags) error {
 	if flags.RefundIssued {
 		return fmt.Errorf("AVM refund: refund already issued, cannot issue second")
 	}
 	return nil
 }
-
-// ---------------
-// Receipt Hash
-// ---------------
 
 func ReceiptHash(receipt *AVMLedgerReceipt) ([32]byte, error) {
 	encoded, err := receipt.CanonicalEncode()

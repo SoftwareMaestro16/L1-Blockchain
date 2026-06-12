@@ -10,51 +10,51 @@ import (
 )
 
 type ServiceDiscoveryDescriptorV1 struct {
-	ServiceID         string
-	ServiceName       string
-	Owner             string
-	ServiceType       coretypes.ServiceType
-	Endpoint          string
-	InterfaceHash     string
-	TrustModel        coretypes.ServiceTrustModel
-	PaymentModel      string
-	VerificationModel coretypes.ServiceVerificationModel
-	Status            coretypes.ServiceStatus
-	ExpiryHeight      uint64
-	ProofOptional     string
-	SignatureOptional string
-	DescriptorHash    string
+	ServiceID		string
+	ServiceName		string
+	Owner			string
+	ServiceType		coretypes.ServiceType
+	Endpoint		string
+	InterfaceHash		string
+	TrustModel		coretypes.ServiceTrustModel
+	PaymentModel		string
+	VerificationModel	coretypes.ServiceVerificationModel
+	Status			coretypes.ServiceStatus
+	ExpiryHeight		uint64
+	ProofOptional		string
+	SignatureOptional	string
+	DescriptorHash		string
 }
 
 type AETServiceBinding struct {
-	IdentityName  string
-	ServiceID     string
-	InterfaceHash string
-	Endpoint      string
-	BindingHash   string
+	IdentityName	string
+	ServiceID	string
+	InterfaceHash	string
+	Endpoint	string
+	BindingHash	string
 }
 
 type AETServiceBindingProof struct {
-	Binding              AETServiceBinding
-	Descriptor           ServiceDiscoveryDescriptorV1
-	RegistryDescriptor   ServiceDescriptor
-	IdentityTrustedRoot  string
-	IdentityProof        identitytypes.IdentityResolutionProof
-	ServiceRegistryProof ServiceRegistryProof
-	Height               uint64
-	ProofHash            string
+	Binding			AETServiceBinding
+	Descriptor		ServiceDiscoveryDescriptorV1
+	RegistryDescriptor	ServiceDescriptor
+	IdentityTrustedRoot	string
+	IdentityProof		identitytypes.IdentityResolutionProof
+	ServiceRegistryProof	ServiceRegistryProof
+	Height			uint64
+	ProofHash		string
 }
 
 type AETServiceBindingVerification struct {
-	IdentityName      string
-	ServiceID         string
-	InterfaceHash     string
-	Endpoint          string
-	IdentityProofHash string
-	ServiceProofHash  string
-	BindingHash       string
-	DescriptorHash    string
-	VerificationHash  string
+	IdentityName		string
+	ServiceID		string
+	InterfaceHash		string
+	Endpoint		string
+	IdentityProofHash	string
+	ServiceProofHash	string
+	BindingHash		string
+	DescriptorHash		string
+	VerificationHash	string
 }
 
 func NewServiceDiscoveryDescriptorV1(descriptor ServiceDiscoveryDescriptorV1) (ServiceDiscoveryDescriptorV1, error) {
@@ -74,19 +74,19 @@ func ProjectServiceDiscoveryDescriptorV1(resolution ServiceResolutionOutput) (Se
 		return ServiceDiscoveryDescriptorV1{}, err
 	}
 	return NewServiceDiscoveryDescriptorV1(ServiceDiscoveryDescriptorV1{
-		ServiceID:         resolution.ServiceID,
-		ServiceName:       resolution.ServiceName,
-		Owner:             resolution.Descriptor.Owner,
-		ServiceType:       resolution.Descriptor.ServiceType,
-		Endpoint:          resolution.Endpoint,
-		InterfaceHash:     resolution.InterfaceHash,
-		TrustModel:        resolution.TrustModel,
-		PaymentModel:      resolution.PaymentModel,
-		VerificationModel: resolution.VerificationModel,
-		Status:            resolution.Descriptor.Status,
-		ExpiryHeight:      resolution.ExpiryHeight,
-		ProofOptional:     resolution.ProofChain.RegistryProofHash,
-		SignatureOptional: firstString(resolution.ProofChain.SignatureHashes),
+		ServiceID:		resolution.ServiceID,
+		ServiceName:		resolution.ServiceName,
+		Owner:			resolution.Descriptor.Owner,
+		ServiceType:		resolution.Descriptor.ServiceType,
+		Endpoint:		resolution.Endpoint,
+		InterfaceHash:		resolution.InterfaceHash,
+		TrustModel:		resolution.TrustModel,
+		PaymentModel:		resolution.PaymentModel,
+		VerificationModel:	resolution.VerificationModel,
+		Status:			resolution.Descriptor.Status,
+		ExpiryHeight:		resolution.ExpiryHeight,
+		ProofOptional:		resolution.ProofChain.RegistryProofHash,
+		SignatureOptional:	firstString(resolution.ProofChain.SignatureHashes),
 	})
 }
 
@@ -99,19 +99,19 @@ func ProjectServiceDiscoveryDescriptorFromCore(descriptor ServiceDescriptor, ser
 		serviceName = descriptor.Discovery.ServiceName
 	}
 	return NewServiceDiscoveryDescriptorV1(ServiceDiscoveryDescriptorV1{
-		ServiceID:         descriptor.ServiceID,
-		ServiceName:       serviceName,
-		Owner:             descriptor.Owner,
-		ServiceType:       descriptor.ServiceType,
-		Endpoint:          resolverEndpointFromDescriptor(descriptor),
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		TrustModel:        descriptor.Verification.TrustModel,
-		PaymentModel:      registryPaymentModelFromDescriptor(descriptor),
-		VerificationModel: descriptor.Verification.Model,
-		Status:            descriptor.Status,
-		ExpiryHeight:      resolverExpiryHeight(descriptor),
-		ProofOptional:     proofHash,
-		SignatureOptional: signatureHash,
+		ServiceID:		descriptor.ServiceID,
+		ServiceName:		serviceName,
+		Owner:			descriptor.Owner,
+		ServiceType:		descriptor.ServiceType,
+		Endpoint:		resolverEndpointFromDescriptor(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		TrustModel:		descriptor.Verification.TrustModel,
+		PaymentModel:		registryPaymentModelFromDescriptor(descriptor),
+		VerificationModel:	descriptor.Verification.Model,
+		Status:			descriptor.Status,
+		ExpiryHeight:		resolverExpiryHeight(descriptor),
+		ProofOptional:		proofHash,
+		SignatureOptional:	signatureHash,
 	})
 }
 
@@ -151,8 +151,8 @@ func (descriptor ServiceDiscoveryDescriptorV1) ValidateFormat() error {
 		return errors.New("service discovery descriptor expiry height is required")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "service discovery descriptor proof", value: descriptor.ProofOptional},
 		{name: "service discovery descriptor signature", value: descriptor.SignatureOptional},
@@ -199,10 +199,10 @@ func NewAETServiceBindingFromDescriptor(identityName string, descriptor ServiceD
 		return AETServiceBinding{}, err
 	}
 	return NewAETServiceBinding(AETServiceBinding{
-		IdentityName:  identityName,
-		ServiceID:     descriptor.ServiceID,
-		InterfaceHash: descriptor.InterfaceHash,
-		Endpoint:      descriptor.Endpoint,
+		IdentityName:	identityName,
+		ServiceID:	descriptor.ServiceID,
+		InterfaceHash:	descriptor.InterfaceHash,
+		Endpoint:	descriptor.Endpoint,
 	})
 }
 
@@ -326,14 +326,14 @@ func VerifyAETServiceBinding(proof AETServiceBindingProof) (AETServiceBindingVer
 		return AETServiceBindingVerification{}, errors.New("aet service proof descriptor hash mismatch")
 	}
 	verification := AETServiceBindingVerification{
-		IdentityName:      proof.Binding.IdentityName,
-		ServiceID:         proof.Binding.ServiceID,
-		InterfaceHash:     proof.Binding.InterfaceHash,
-		Endpoint:          proof.Binding.Endpoint,
-		IdentityProofHash: proof.IdentityTrustedRoot,
-		ServiceProofHash:  proof.ServiceRegistryProof.ProofHash,
-		BindingHash:       proof.Binding.BindingHash,
-		DescriptorHash:    proof.Descriptor.DescriptorHash,
+		IdentityName:		proof.Binding.IdentityName,
+		ServiceID:		proof.Binding.ServiceID,
+		InterfaceHash:		proof.Binding.InterfaceHash,
+		Endpoint:		proof.Binding.Endpoint,
+		IdentityProofHash:	proof.IdentityTrustedRoot,
+		ServiceProofHash:	proof.ServiceRegistryProof.ProofHash,
+		BindingHash:		proof.Binding.BindingHash,
+		DescriptorHash:		proof.Descriptor.DescriptorHash,
 	}
 	verification.VerificationHash = ComputeAETServiceBindingVerificationHash(verification)
 	return verification, verification.Validate()
@@ -362,8 +362,8 @@ func (verification AETServiceBindingVerification) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "aet service binding verification interface hash", value: verification.InterfaceHash},
 		{name: "aet service binding verification identity proof hash", value: verification.IdentityProofHash},

@@ -18,9 +18,9 @@ func MakeTestEncodingConfig() EncodingConfig {
 	marshaler := codec.NewAminoCodec(cdc)
 
 	return EncodingConfig{
-		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
-		TxConfig:          legacytx.StdTxConfig{Cdc: cdc},
-		Amino:             cdc,
+		InterfaceRegistry:	interfaceRegistry,
+		Marshaler:		marshaler,
+		TxConfig:		legacytx.StdTxConfig{Cdc: cdc},
+		Amino:			cdc,
 	}
 }

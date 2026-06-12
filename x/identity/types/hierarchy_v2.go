@@ -10,102 +10,102 @@ import (
 type SubdomainDelegationTypeV2 string
 
 const (
-	SubdomainDelegationOwnerControlledV2    SubdomainDelegationTypeV2 = "owner_controlled"
-	SubdomainDelegationDelegateControlledV2 SubdomainDelegationTypeV2 = "delegate_controlled"
-	SubdomainDelegationZoneManagedV2        SubdomainDelegationTypeV2 = "zone_managed"
-	SubdomainDelegationDetachedPaidV2       SubdomainDelegationTypeV2 = "detached_paid"
-	SubdomainDelegationEphemeralServiceV2   SubdomainDelegationTypeV2 = "ephemeral_service"
+	SubdomainDelegationOwnerControlledV2	SubdomainDelegationTypeV2	= "owner_controlled"
+	SubdomainDelegationDelegateControlledV2	SubdomainDelegationTypeV2	= "delegate_controlled"
+	SubdomainDelegationZoneManagedV2	SubdomainDelegationTypeV2	= "zone_managed"
+	SubdomainDelegationDetachedPaidV2	SubdomainDelegationTypeV2	= "detached_paid"
+	SubdomainDelegationEphemeralServiceV2	SubdomainDelegationTypeV2	= "ephemeral_service"
 
-	IdentityPathCommitmentVersionV2 uint64 = 1
-	ZonePolicyVersionV2             uint64 = 1
-	RecursivePolicyProofVersionV2   uint64 = 1
+	IdentityPathCommitmentVersionV2	uint64	= 1
+	ZonePolicyVersionV2		uint64	= 1
+	RecursivePolicyProofVersionV2	uint64	= 1
 
-	ZoneSubdomainCreationOpenV2        = "open"
-	ZoneSubdomainCreationOwnerOnlyV2   = "owner_only"
-	ZoneSubdomainCreationDelegatedV2   = "delegated"
-	ZoneSubdomainCreationClosedV2      = "closed"
-	ZoneResolverUpdateOwnerOnlyV2      = "owner_only"
-	ZoneResolverUpdateDelegatedV2      = "delegated"
-	ZoneResolverUpdateClosedV2         = "closed"
-	ZoneInterfacePolicyHashRequiredV2  = "hash_required"
-	ZoneInterfacePolicyWalletPolicyV2  = "wallet_policy"
-	ZoneInterfacePolicyClosedV2        = "closed"
-	ZoneRoutingPolicyExplicitTargetsV2 = "explicit_targets"
-	ZoneRoutingPolicyWalletPolicyV2    = "wallet_policy"
-	ZoneRoutingPolicyClosedV2          = "closed"
-	ZonePolicyWildcardV2               = "*"
+	ZoneSubdomainCreationOpenV2		= "open"
+	ZoneSubdomainCreationOwnerOnlyV2	= "owner_only"
+	ZoneSubdomainCreationDelegatedV2	= "delegated"
+	ZoneSubdomainCreationClosedV2		= "closed"
+	ZoneResolverUpdateOwnerOnlyV2		= "owner_only"
+	ZoneResolverUpdateDelegatedV2		= "delegated"
+	ZoneResolverUpdateClosedV2		= "closed"
+	ZoneInterfacePolicyHashRequiredV2	= "hash_required"
+	ZoneInterfacePolicyWalletPolicyV2	= "wallet_policy"
+	ZoneInterfacePolicyClosedV2		= "closed"
+	ZoneRoutingPolicyExplicitTargetsV2	= "explicit_targets"
+	ZoneRoutingPolicyWalletPolicyV2		= "wallet_policy"
+	ZoneRoutingPolicyClosedV2		= "closed"
+	ZonePolicyWildcardV2			= "*"
 )
 
 type SubdomainCreationPolicyV2 struct {
-	ParentName            string
-	Label                 string
-	Actor                 []byte
-	ChildOwner            []byte
-	Height                uint64
-	ChildExpiryHeight     uint64
-	DelegationType        SubdomainDelegationTypeV2
-	ParentControlsRecord  bool
-	DetachedPaid          bool
-	IndependentPayment    bool
-	ParentAuthorization   bool
-	Ephemeral             bool
-	TimeLockedUntilHeight uint64
-	Delegation            *DelegationRecordV2
+	ParentName		string
+	Label			string
+	Actor			[]byte
+	ChildOwner		[]byte
+	Height			uint64
+	ChildExpiryHeight	uint64
+	DelegationType		SubdomainDelegationTypeV2
+	ParentControlsRecord	bool
+	DetachedPaid		bool
+	IndependentPayment	bool
+	ParentAuthorization	bool
+	Ephemeral		bool
+	TimeLockedUntilHeight	uint64
+	Delegation		*DelegationRecordV2
 }
 
 type IdentityPathCommitmentV2 struct {
-	CommitmentVersion uint64
-	RootName          string
-	TargetName        string
-	PathLabels        []string
-	PathHashes        []string
-	PathHash          string
-	SourceVersion     uint64
-	ParentEpoch       uint64
-	ChildEpoch        uint64
-	CommitmentHash    string
+	CommitmentVersion	uint64
+	RootName		string
+	TargetName		string
+	PathLabels		[]string
+	PathHashes		[]string
+	PathHash		string
+	SourceVersion		uint64
+	ParentEpoch		uint64
+	ChildEpoch		uint64
+	CommitmentHash		string
 }
 
 type OptimizedRecursiveResolutionProofRequestV2 struct {
-	State         IdentityState
-	ChainID       string
-	RootName      string
-	TargetName    string
-	Height        uint64
-	TTL           uint64
-	Cache         *ResolutionCacheRecordV2
-	SourceVersion uint64
-	ParentEpoch   uint64
-	ChildEpoch    uint64
-	LightClient   bool
-	ProofVerified bool
+	State		IdentityState
+	ChainID		string
+	RootName	string
+	TargetName	string
+	Height		uint64
+	TTL		uint64
+	Cache		*ResolutionCacheRecordV2
+	SourceVersion	uint64
+	ParentEpoch	uint64
+	ChildEpoch	uint64
+	LightClient	bool
+	ProofVerified	bool
 }
 
 type ZonePolicyV2 struct {
-	PolicyVersion           uint64
-	NameHash                string
-	AllowedRecordTypes      []string
-	AllowedServiceTypes     []string
-	SubdomainCreationPolicy string
-	ResolverUpdatePolicy    string
-	InterfacePolicy         string
-	RoutingPolicy           string
-	MaxChildDepth           uint8
-	MaxChildRecords         uint32
-	LifecycleEpoch          uint64
-	UpdatedAtHeight         uint64
-	ParentPolicyHash        string
-	OverrideParent          bool
-	PolicyHash              string
+	PolicyVersion		uint64
+	NameHash		string
+	AllowedRecordTypes	[]string
+	AllowedServiceTypes	[]string
+	SubdomainCreationPolicy	string
+	ResolverUpdatePolicy	string
+	InterfacePolicy		string
+	RoutingPolicy		string
+	MaxChildDepth		uint8
+	MaxChildRecords		uint32
+	LifecycleEpoch		uint64
+	UpdatedAtHeight		uint64
+	ParentPolicyHash	string
+	OverrideParent		bool
+	PolicyHash		string
 }
 
 type RecursivePolicyProofV2 struct {
-	ProofVersion   uint64
-	RootName       string
-	TargetName     string
-	PathCommitment IdentityPathCommitmentV2
-	ZonePolicies   []ZonePolicyV2
-	ProofHash      string
+	ProofVersion	uint64
+	RootName	string
+	TargetName	string
+	PathCommitment	IdentityPathCommitmentV2
+	ZonePolicies	[]ZonePolicyV2
+	ProofHash	string
 }
 
 func ValidateSubdomainCreationV2(state IdentityState, policy SubdomainCreationPolicyV2) (string, error) {
@@ -194,17 +194,17 @@ func IssueSubdomainV2(state IdentityState, policy SubdomainCreationPolicyV2) (Id
 	domain := Domain{Name: childName, Owner: cloneSpecAddress(policy.ChildOwner), NFTID: nftID, RegisteredHeight: policy.Height, ExpiryHeight: childExpiry, UpdatedHeight: policy.Height, ParentName: parent.Name, ParentControlsRecord: policy.ParentControlsRecord}
 	nft := DomainNFT{ID: nftID, Domain: childName, Owner: cloneSpecAddress(policy.ChildOwner), MintHeight: policy.Height}
 	record := SubdomainRecord{
-		ParentName:            parent.Name,
-		Name:                  childName,
-		Owner:                 cloneSpecAddress(policy.ChildOwner),
-		ParentControlsRecord:  policy.ParentControlsRecord,
-		CreatedHeight:         policy.Height,
-		DelegationType:        delegationType,
-		Detached:              policy.DetachedPaid,
-		Ephemeral:             policy.Ephemeral,
-		ExpiryHeight:          childExpiry,
-		TimeLockedUntilHeight: policy.TimeLockedUntilHeight,
-		ParentAuthorized:      policy.ParentAuthorization || bytes.Equal(policy.Actor, parent.Owner),
+		ParentName:		parent.Name,
+		Name:			childName,
+		Owner:			cloneSpecAddress(policy.ChildOwner),
+		ParentControlsRecord:	policy.ParentControlsRecord,
+		CreatedHeight:		policy.Height,
+		DelegationType:		delegationType,
+		Detached:		policy.DetachedPaid,
+		Ephemeral:		policy.Ephemeral,
+		ExpiryHeight:		childExpiry,
+		TimeLockedUntilHeight:	policy.TimeLockedUntilHeight,
+		ParentAuthorized:	policy.ParentAuthorization || bytes.Equal(policy.Actor, parent.Owner),
 	}
 	next := state.Clone()
 	next.Domains = upsertDomain(next.Domains, domain)
@@ -256,15 +256,15 @@ func BuildIdentityPathCommitmentV2(path DeterministicResolutionPathV2, sourceVer
 		return IdentityPathCommitmentV2{}, err
 	}
 	commitment := IdentityPathCommitmentV2{
-		CommitmentVersion: IdentityPathCommitmentVersionV2,
-		RootName:          path.Path[0],
-		TargetName:        path.TargetName,
-		PathLabels:        append([]string(nil), path.Labels...),
-		PathHashes:        append([]string(nil), path.PathHashes...),
-		PathHash:          pathHash,
-		SourceVersion:     sourceVersion,
-		ParentEpoch:       parentEpoch,
-		ChildEpoch:        childEpoch,
+		CommitmentVersion:	IdentityPathCommitmentVersionV2,
+		RootName:		path.Path[0],
+		TargetName:		path.TargetName,
+		PathLabels:		append([]string(nil), path.Labels...),
+		PathHashes:		append([]string(nil), path.PathHashes...),
+		PathHash:		pathHash,
+		SourceVersion:		sourceVersion,
+		ParentEpoch:		parentEpoch,
+		ChildEpoch:		childEpoch,
 	}
 	commitment.CommitmentHash = ComputeIdentityPathCommitmentHashV2(commitment)
 	return commitment, ValidateIdentityPathCommitmentV2(commitment)
@@ -338,12 +338,12 @@ func BuildOptimizedRecursiveResolutionProofV2(request OptimizedRecursiveResoluti
 	}
 	if request.Cache != nil {
 		if err := ValidateResolutionCacheRecordV2Use(*request.Cache, ResolutionCacheUseContextV2{
-			Height:        request.Height,
-			SourceVersion: request.SourceVersion,
-			ParentEpoch:   request.ParentEpoch,
-			ChildEpoch:    request.ChildEpoch,
-			LightClient:   request.LightClient,
-			ProofVerified: request.ProofVerified,
+			Height:		request.Height,
+			SourceVersion:	request.SourceVersion,
+			ParentEpoch:	request.ParentEpoch,
+			ChildEpoch:	request.ChildEpoch,
+			LightClient:	request.LightClient,
+			ProofVerified:	request.ProofVerified,
 		}); err != nil {
 			return RecursiveResolutionProofV2{}, IdentityPathCommitmentV2{}, err
 		}
@@ -522,11 +522,11 @@ func BuildRecursivePolicyProofV2(rootName string, targetName string, commitment 
 		return RecursivePolicyProofV2{}, err
 	}
 	out := RecursivePolicyProofV2{
-		ProofVersion:   RecursivePolicyProofVersionV2,
-		RootName:       root,
-		TargetName:     target,
-		PathCommitment: commitment,
-		ZonePolicies:   cloneZonePoliciesV2(policies),
+		ProofVersion:	RecursivePolicyProofVersionV2,
+		RootName:	root,
+		TargetName:	target,
+		PathCommitment:	commitment,
+		ZonePolicies:	cloneZonePoliciesV2(policies),
 	}
 	out.ProofHash = ComputeRecursivePolicyProofHashV2(out)
 	return out, ValidateRecursivePolicyProofV2(out)

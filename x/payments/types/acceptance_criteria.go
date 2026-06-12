@@ -12,35 +12,35 @@ type PaymentAcceptanceDomain string
 type PaymentAcceptanceStatus string
 
 const (
-	PaymentAcceptanceSettlement    PaymentAcceptanceDomain = "settlement"
-	PaymentAcceptanceFraud         PaymentAcceptanceDomain = "fraud"
-	PaymentAcceptanceConditional   PaymentAcceptanceDomain = "conditional"
-	PaymentAcceptanceVirtual       PaymentAcceptanceDomain = "virtual"
-	PaymentAcceptanceExecution     PaymentAcceptanceDomain = "execution"
-	PaymentAcceptanceRecovery      PaymentAcceptanceDomain = "recovery"
-	PaymentAcceptanceEconomics     PaymentAcceptanceDomain = "economics"
-	PaymentAcceptanceSecurity      PaymentAcceptanceDomain = "security"
-	PaymentAcceptanceObservability PaymentAcceptanceDomain = "observability"
+	PaymentAcceptanceSettlement	PaymentAcceptanceDomain	= "settlement"
+	PaymentAcceptanceFraud		PaymentAcceptanceDomain	= "fraud"
+	PaymentAcceptanceConditional	PaymentAcceptanceDomain	= "conditional"
+	PaymentAcceptanceVirtual	PaymentAcceptanceDomain	= "virtual"
+	PaymentAcceptanceExecution	PaymentAcceptanceDomain	= "execution"
+	PaymentAcceptanceRecovery	PaymentAcceptanceDomain	= "recovery"
+	PaymentAcceptanceEconomics	PaymentAcceptanceDomain	= "economics"
+	PaymentAcceptanceSecurity	PaymentAcceptanceDomain	= "security"
+	PaymentAcceptanceObservability	PaymentAcceptanceDomain	= "observability"
 
-	PaymentAcceptanceStatusSatisfied PaymentAcceptanceStatus = "satisfied"
+	PaymentAcceptanceStatusSatisfied	PaymentAcceptanceStatus	= "satisfied"
 )
 
 type PaymentAcceptanceCriterion struct {
-	CriterionID PaymentAcceptanceCriterionID
-	Domain      PaymentAcceptanceDomain
-	Description string
-	Status      PaymentAcceptanceStatus
-	Evidence    []string
-	TestNames   []string
-	ItemHash    string
+	CriterionID	PaymentAcceptanceCriterionID
+	Domain		PaymentAcceptanceDomain
+	Description	string
+	Status		PaymentAcceptanceStatus
+	Evidence	[]string
+	TestNames	[]string
+	ItemHash	string
 }
 
 type PaymentAcceptanceReport struct {
-	Criteria       []PaymentAcceptanceCriterion
-	CriterionCount uint64
-	SatisfiedCount uint64
-	DomainCount    uint64
-	ReportHash     string
+	Criteria	[]PaymentAcceptanceCriterion
+	CriterionCount	uint64
+	SatisfiedCount	uint64
+	DomainCount	uint64
+	ReportHash	string
 }
 
 func BuildPaymentAcceptanceReport() PaymentAcceptanceReport {
@@ -166,12 +166,12 @@ func (criterion PaymentAcceptanceCriterion) Normalize() PaymentAcceptanceCriteri
 
 func acceptanceCriterion(id PaymentAcceptanceCriterionID, domain PaymentAcceptanceDomain, description string, evidence, tests []string) PaymentAcceptanceCriterion {
 	criterion := PaymentAcceptanceCriterion{
-		CriterionID: id,
-		Domain:      domain,
-		Description: description,
-		Status:      PaymentAcceptanceStatusSatisfied,
-		Evidence:    evidence,
-		TestNames:   tests,
+		CriterionID:	id,
+		Domain:		domain,
+		Description:	description,
+		Status:		PaymentAcceptanceStatusSatisfied,
+		Evidence:	evidence,
+		TestNames:	tests,
 	}
 	criterion.ItemHash = ComputePaymentAcceptanceCriterionHash(criterion)
 	return criterion.Normalize()

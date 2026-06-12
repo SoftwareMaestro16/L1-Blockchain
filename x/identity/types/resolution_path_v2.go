@@ -9,44 +9,44 @@ import (
 type IdentityResolutionTargetTypeV2 string
 
 const (
-	IdentityResolutionTargetPrimary   IdentityResolutionTargetTypeV2 = "primary"
-	IdentityResolutionTargetContract  IdentityResolutionTargetTypeV2 = "contract"
-	IdentityResolutionTargetService   IdentityResolutionTargetTypeV2 = "service"
-	IdentityResolutionTargetInterface IdentityResolutionTargetTypeV2 = "interface"
-	IdentityResolutionTargetRoute     IdentityResolutionTargetTypeV2 = "route"
-	IdentityResolutionTargetRecord    IdentityResolutionTargetTypeV2 = "record"
+	IdentityResolutionTargetPrimary		IdentityResolutionTargetTypeV2	= "primary"
+	IdentityResolutionTargetContract	IdentityResolutionTargetTypeV2	= "contract"
+	IdentityResolutionTargetService		IdentityResolutionTargetTypeV2	= "service"
+	IdentityResolutionTargetInterface	IdentityResolutionTargetTypeV2	= "interface"
+	IdentityResolutionTargetRoute		IdentityResolutionTargetTypeV2	= "route"
+	IdentityResolutionTargetRecord		IdentityResolutionTargetTypeV2	= "record"
 )
 
 type DeterministicResolutionPathV2 struct {
-	TargetName string
-	Labels     []string
-	Path       []string
-	PathHashes []string
+	TargetName	string
+	Labels		[]string
+	Path		[]string
+	PathHashes	[]string
 }
 
 type DeterministicResolutionStepV2 struct {
-	Name           string
-	NameHash       string
-	DomainRecord   *DomainRecordV2
-	ResolverRecord *UnifiedResolutionRecordV2
-	Delegation     *DelegationRecordV2
-	Exists         bool
-	Delegated      bool
+	Name		string
+	NameHash	string
+	DomainRecord	*DomainRecordV2
+	ResolverRecord	*UnifiedResolutionRecordV2
+	Delegation	*DelegationRecordV2
+	Exists		bool
+	Delegated	bool
 }
 
 type DeterministicResolutionPathValidationV2 struct {
-	TargetType   IdentityResolutionTargetTypeV2
-	TargetKey    string
-	Height       uint64
-	RecordTTL    uint64
-	MaxRecordAge uint64
-	Delegations  []DelegationRecordV2
+	TargetType	IdentityResolutionTargetTypeV2
+	TargetKey	string
+	Height		uint64
+	RecordTTL	uint64
+	MaxRecordAge	uint64
+	Delegations	[]DelegationRecordV2
 }
 
 type DeterministicResolutionPathResultV2 struct {
-	Path       DeterministicResolutionPathV2
-	Steps      []DeterministicResolutionStepV2
-	Resolution IdentityResolution
+	Path		DeterministicResolutionPathV2
+	Steps		[]DeterministicResolutionStepV2
+	Resolution	IdentityResolution
 }
 
 func CanonicalResolutionPathV2(name string) (DeterministicResolutionPathV2, error) {
@@ -69,10 +69,10 @@ func CanonicalResolutionPathV2(name string) (DeterministicResolutionPathV2, erro
 		pathHashes = append(pathHashes, nameHash)
 	}
 	return DeterministicResolutionPathV2{
-		TargetName: normalized.NormalizedName,
-		Labels:     pathLabels,
-		Path:       path,
-		PathHashes: pathHashes,
+		TargetName:	normalized.NormalizedName,
+		Labels:		pathLabels,
+		Path:		path,
+		PathHashes:	pathHashes,
 	}, nil
 }
 

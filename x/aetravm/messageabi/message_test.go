@@ -154,19 +154,19 @@ func requireDifferentID(t *testing.T, left, right Message) {
 func validMessage(t *testing.T) Message {
 	t.Helper()
 	return Message{
-		Kind:          KindInternal,
-		Opcode:        0x1020_3040_5060_7080,
-		QueryID:       42,
-		Sender:        pair(t, 0x11),
-		Destination:   pair(t, 0x22),
-		ValueNAET:     300_000_000,
-		Bounce:        true,
-		DeadlineBlock: 100,
-		GasLimit:      1_000_000,
-		Body:          []byte{1, 2, 3},
-		StateInit:     []byte("state-init-canonical"),
-		Metadata:      []byte("debug-metadata"),
-		Signature:     bytes.Repeat([]byte{0x33}, 64),
+		Kind:		KindInternal,
+		Opcode:		0x1020_3040_5060_7080,
+		QueryID:	42,
+		Sender:		pair(t, 0x11),
+		Destination:	pair(t, 0x22),
+		ValueNAET:	300_000_000,
+		Bounce:		true,
+		DeadlineBlock:	100,
+		GasLimit:	1_000_000,
+		Body:		[]byte{1, 2, 3},
+		StateInit:	[]byte("state-init-canonical"),
+		Metadata:	[]byte("debug-metadata"),
+		Signature:	bytes.Repeat([]byte{0x33}, 64),
 	}
 }
 

@@ -18,45 +18,45 @@ type ResolverModuleFailureModeV2 string
 type ResolverModuleIntegrationPointV2 string
 
 const (
-	ResolverModulePathV2 = "resolver-module"
+	ResolverModulePathV2	= "resolver-module"
 
-	ResolverModuleStateUnifiedResolutionRecord ResolverModuleStateObjectV2 = "UnifiedResolutionRecord"
-	ResolverModuleStateContractTarget          ResolverModuleStateObjectV2 = "ContractTarget"
-	ResolverModuleStateServiceEndpoint         ResolverModuleStateObjectV2 = "ServiceEndpoint"
-	ResolverModuleStateInterfaceDescriptor     ResolverModuleStateObjectV2 = "InterfaceDescriptor"
-	ResolverModuleStateRoutingMetadata         ResolverModuleStateObjectV2 = "RoutingMetadata"
-	ResolverModuleStateExecutionHints          ResolverModuleStateObjectV2 = "ExecutionHints"
-	ResolverModuleStateReverseResolutionRecord ResolverModuleStateObjectV2 = "ReverseResolutionRecord"
-	ResolverModuleStateResolverParams          ResolverModuleStateObjectV2 = "ResolverParams"
+	ResolverModuleStateUnifiedResolutionRecord	ResolverModuleStateObjectV2	= "UnifiedResolutionRecord"
+	ResolverModuleStateContractTarget		ResolverModuleStateObjectV2	= "ContractTarget"
+	ResolverModuleStateServiceEndpoint		ResolverModuleStateObjectV2	= "ServiceEndpoint"
+	ResolverModuleStateInterfaceDescriptor		ResolverModuleStateObjectV2	= "InterfaceDescriptor"
+	ResolverModuleStateRoutingMetadata		ResolverModuleStateObjectV2	= "RoutingMetadata"
+	ResolverModuleStateExecutionHints		ResolverModuleStateObjectV2	= "ExecutionHints"
+	ResolverModuleStateReverseResolutionRecord	ResolverModuleStateObjectV2	= "ReverseResolutionRecord"
+	ResolverModuleStateResolverParams		ResolverModuleStateObjectV2	= "ResolverParams"
 
-	ResolverModuleMsgSetResolver          ResolverModuleMessageNameV2 = "MsgSetResolver"
-	ResolverModuleMsgUpdateResolverRecord ResolverModuleMessageNameV2 = "MsgUpdateResolverRecord"
-	ResolverModuleMsgBatchUpdateResolvers ResolverModuleMessageNameV2 = "MsgBatchUpdateResolvers"
-	ResolverModuleMsgSetReverseRecord     ResolverModuleMessageNameV2 = "MsgSetReverseRecord"
-	ResolverModuleMsgVerifyReverseRecord  ResolverModuleMessageNameV2 = "MsgVerifyReverseRecord"
-	ResolverModuleMsgClearResolverRecord  ResolverModuleMessageNameV2 = "MsgClearResolverRecord"
+	ResolverModuleMsgSetResolver		ResolverModuleMessageNameV2	= "MsgSetResolver"
+	ResolverModuleMsgUpdateResolverRecord	ResolverModuleMessageNameV2	= "MsgUpdateResolverRecord"
+	ResolverModuleMsgBatchUpdateResolvers	ResolverModuleMessageNameV2	= "MsgBatchUpdateResolvers"
+	ResolverModuleMsgSetReverseRecord	ResolverModuleMessageNameV2	= "MsgSetReverseRecord"
+	ResolverModuleMsgVerifyReverseRecord	ResolverModuleMessageNameV2	= "MsgVerifyReverseRecord"
+	ResolverModuleMsgClearResolverRecord	ResolverModuleMessageNameV2	= "MsgClearResolverRecord"
 
-	ResolverModuleQueryResolver         ResolverModuleQueryNameV2 = "QueryResolver"
-	ResolverModuleQueryResolvePrimary   ResolverModuleQueryNameV2 = "QueryResolvePrimary"
-	ResolverModuleQueryResolveTarget    ResolverModuleQueryNameV2 = "QueryResolveTarget"
-	ResolverModuleQueryResolveService   ResolverModuleQueryNameV2 = "QueryResolveService"
-	ResolverModuleQueryResolveInterface ResolverModuleQueryNameV2 = "QueryResolveInterface"
-	ResolverModuleQueryResolveRoute     ResolverModuleQueryNameV2 = "QueryResolveRoute"
-	ResolverModuleQueryReverse          ResolverModuleQueryNameV2 = "QueryReverse"
-	ResolverModuleQueryVerifiedReverse  ResolverModuleQueryNameV2 = "QueryVerifiedReverse"
+	ResolverModuleQueryResolver		ResolverModuleQueryNameV2	= "QueryResolver"
+	ResolverModuleQueryResolvePrimary	ResolverModuleQueryNameV2	= "QueryResolvePrimary"
+	ResolverModuleQueryResolveTarget	ResolverModuleQueryNameV2	= "QueryResolveTarget"
+	ResolverModuleQueryResolveService	ResolverModuleQueryNameV2	= "QueryResolveService"
+	ResolverModuleQueryResolveInterface	ResolverModuleQueryNameV2	= "QueryResolveInterface"
+	ResolverModuleQueryResolveRoute		ResolverModuleQueryNameV2	= "QueryResolveRoute"
+	ResolverModuleQueryReverse		ResolverModuleQueryNameV2	= "QueryReverse"
+	ResolverModuleQueryVerifiedReverse	ResolverModuleQueryNameV2	= "QueryVerifiedReverse"
 
-	ResolverModuleFailureUnauthorizedUpdate     ResolverModuleFailureModeV2 = "unauthorized_resolver_update"
-	ResolverModuleFailureOversizedPayload       ResolverModuleFailureModeV2 = "oversized_record_payload"
-	ResolverModuleFailureStaleExpectedVersion   ResolverModuleFailureModeV2 = "stale_expected_record_version"
-	ResolverModuleFailureReverseForwardMismatch ResolverModuleFailureModeV2 = "reverse_record_forward_mismatch"
-	ResolverModuleFailureInterfaceHashMismatch  ResolverModuleFailureModeV2 = "interface_descriptor_hash_mismatch"
-	ResolverModuleFailureTTLExceedsDomainExpiry ResolverModuleFailureModeV2 = "resolver_ttl_exceeds_domain_expiry"
+	ResolverModuleFailureUnauthorizedUpdate		ResolverModuleFailureModeV2	= "unauthorized_resolver_update"
+	ResolverModuleFailureOversizedPayload		ResolverModuleFailureModeV2	= "oversized_record_payload"
+	ResolverModuleFailureStaleExpectedVersion	ResolverModuleFailureModeV2	= "stale_expected_record_version"
+	ResolverModuleFailureReverseForwardMismatch	ResolverModuleFailureModeV2	= "reverse_record_forward_mismatch"
+	ResolverModuleFailureInterfaceHashMismatch	ResolverModuleFailureModeV2	= "interface_descriptor_hash_mismatch"
+	ResolverModuleFailureTTLExceedsDomainExpiry	ResolverModuleFailureModeV2	= "resolver_ttl_exceeds_domain_expiry"
 
-	ResolverModuleIntegrationIdentityCore       ResolverModuleIntegrationPointV2 = "identity_core"
-	ResolverModuleIntegrationSubdomainModule    ResolverModuleIntegrationPointV2 = "subdomain_module"
-	ResolverModuleIntegrationFeeModule          ResolverModuleIntegrationPointV2 = "fee_module"
-	ResolverModuleIntegrationRoutingIntegration ResolverModuleIntegrationPointV2 = "routing_integration_module"
-	ResolverModuleIntegrationStoreV2            ResolverModuleIntegrationPointV2 = "store_v2"
+	ResolverModuleIntegrationIdentityCore		ResolverModuleIntegrationPointV2	= "identity_core"
+	ResolverModuleIntegrationSubdomainModule	ResolverModuleIntegrationPointV2	= "subdomain_module"
+	ResolverModuleIntegrationFeeModule		ResolverModuleIntegrationPointV2	= "fee_module"
+	ResolverModuleIntegrationRoutingIntegration	ResolverModuleIntegrationPointV2	= "routing_integration_module"
+	ResolverModuleIntegrationStoreV2		ResolverModuleIntegrationPointV2	= "store_v2"
 )
 
 type SubdomainModuleStateObjectV2 string
@@ -66,98 +66,98 @@ type SubdomainModuleFailureModeV2 string
 type SubdomainModuleIntegrationPointV2 string
 
 const (
-	SubdomainModulePathV2 = "subdomain-module"
+	SubdomainModulePathV2	= "subdomain-module"
 
-	SubdomainModuleStateSubdomainRecord  SubdomainModuleStateObjectV2 = "SubdomainRecord"
-	SubdomainModuleStateDelegationRecord SubdomainModuleStateObjectV2 = "DelegationRecord"
-	SubdomainModuleStateZonePolicy       SubdomainModuleStateObjectV2 = "ZonePolicy"
-	SubdomainModuleStateSubdomainIndex   SubdomainModuleStateObjectV2 = "SubdomainIndex"
-	SubdomainModuleStatePathCommitment   SubdomainModuleStateObjectV2 = "PathCommitment"
+	SubdomainModuleStateSubdomainRecord	SubdomainModuleStateObjectV2	= "SubdomainRecord"
+	SubdomainModuleStateDelegationRecord	SubdomainModuleStateObjectV2	= "DelegationRecord"
+	SubdomainModuleStateZonePolicy		SubdomainModuleStateObjectV2	= "ZonePolicy"
+	SubdomainModuleStateSubdomainIndex	SubdomainModuleStateObjectV2	= "SubdomainIndex"
+	SubdomainModuleStatePathCommitment	SubdomainModuleStateObjectV2	= "PathCommitment"
 
-	SubdomainModuleMsgCreateSubdomain   SubdomainModuleMessageNameV2 = "MsgCreateSubdomain"
-	SubdomainModuleMsgDelegateSubdomain SubdomainModuleMessageNameV2 = "MsgDelegateSubdomain"
-	SubdomainModuleMsgRevokeDelegation  SubdomainModuleMessageNameV2 = "MsgRevokeDelegation"
-	SubdomainModuleMsgUpdateZonePolicy  SubdomainModuleMessageNameV2 = "MsgUpdateZonePolicy"
-	SubdomainModuleMsgDetachSubdomain   SubdomainModuleMessageNameV2 = "MsgDetachSubdomain"
-	SubdomainModuleMsgRenewSubdomain    SubdomainModuleMessageNameV2 = "MsgRenewSubdomain"
+	SubdomainModuleMsgCreateSubdomain	SubdomainModuleMessageNameV2	= "MsgCreateSubdomain"
+	SubdomainModuleMsgDelegateSubdomain	SubdomainModuleMessageNameV2	= "MsgDelegateSubdomain"
+	SubdomainModuleMsgRevokeDelegation	SubdomainModuleMessageNameV2	= "MsgRevokeDelegation"
+	SubdomainModuleMsgUpdateZonePolicy	SubdomainModuleMessageNameV2	= "MsgUpdateZonePolicy"
+	SubdomainModuleMsgDetachSubdomain	SubdomainModuleMessageNameV2	= "MsgDetachSubdomain"
+	SubdomainModuleMsgRenewSubdomain	SubdomainModuleMessageNameV2	= "MsgRenewSubdomain"
 
-	SubdomainModuleQuerySubdomains             SubdomainModuleQueryNameV2 = "QuerySubdomains"
-	SubdomainModuleQueryDelegations            SubdomainModuleQueryNameV2 = "QueryDelegations"
-	SubdomainModuleQueryZonePolicy             SubdomainModuleQueryNameV2 = "QueryZonePolicy"
-	SubdomainModuleQueryRecursivePath          SubdomainModuleQueryNameV2 = "QueryRecursivePath"
-	SubdomainModuleQuerySubdomainAuthorization SubdomainModuleQueryNameV2 = "QuerySubdomainAuthorization"
+	SubdomainModuleQuerySubdomains			SubdomainModuleQueryNameV2	= "QuerySubdomains"
+	SubdomainModuleQueryDelegations			SubdomainModuleQueryNameV2	= "QueryDelegations"
+	SubdomainModuleQueryZonePolicy			SubdomainModuleQueryNameV2	= "QueryZonePolicy"
+	SubdomainModuleQueryRecursivePath		SubdomainModuleQueryNameV2	= "QueryRecursivePath"
+	SubdomainModuleQuerySubdomainAuthorization	SubdomainModuleQueryNameV2	= "QuerySubdomainAuthorization"
 
-	SubdomainModuleFailureChildExpiryExceedsParent SubdomainModuleFailureModeV2 = "child_expiry_exceeds_parent_expiry"
-	SubdomainModuleFailureDelegateEscalation       SubdomainModuleFailureModeV2 = "delegate_escalates_permissions"
-	SubdomainModuleFailureParentTransferStaleCache SubdomainModuleFailureModeV2 = "parent_transfer_leaves_child_cache_stale"
-	SubdomainModuleFailureInconsistentZonePolicy   SubdomainModuleFailureModeV2 = "zone_policy_inconsistent_child_rules"
-	SubdomainModuleFailureDetachedMissingPayment   SubdomainModuleFailureModeV2 = "detached_subdomain_lacks_independent_payment"
+	SubdomainModuleFailureChildExpiryExceedsParent	SubdomainModuleFailureModeV2	= "child_expiry_exceeds_parent_expiry"
+	SubdomainModuleFailureDelegateEscalation	SubdomainModuleFailureModeV2	= "delegate_escalates_permissions"
+	SubdomainModuleFailureParentTransferStaleCache	SubdomainModuleFailureModeV2	= "parent_transfer_leaves_child_cache_stale"
+	SubdomainModuleFailureInconsistentZonePolicy	SubdomainModuleFailureModeV2	= "zone_policy_inconsistent_child_rules"
+	SubdomainModuleFailureDetachedMissingPayment	SubdomainModuleFailureModeV2	= "detached_subdomain_lacks_independent_payment"
 
-	SubdomainModuleIntegrationIdentityCore   SubdomainModuleIntegrationPointV2 = "identity_core"
-	SubdomainModuleIntegrationResolverModule SubdomainModuleIntegrationPointV2 = "resolver_module"
-	SubdomainModuleIntegrationFeeModule      SubdomainModuleIntegrationPointV2 = "fee_module"
-	SubdomainModuleIntegrationProofModule    SubdomainModuleIntegrationPointV2 = "proof_module"
-	SubdomainModuleIntegrationStoreV2        SubdomainModuleIntegrationPointV2 = "store_v2"
+	SubdomainModuleIntegrationIdentityCore		SubdomainModuleIntegrationPointV2	= "identity_core"
+	SubdomainModuleIntegrationResolverModule	SubdomainModuleIntegrationPointV2	= "resolver_module"
+	SubdomainModuleIntegrationFeeModule		SubdomainModuleIntegrationPointV2	= "fee_module"
+	SubdomainModuleIntegrationProofModule		SubdomainModuleIntegrationPointV2	= "proof_module"
+	SubdomainModuleIntegrationStoreV2		SubdomainModuleIntegrationPointV2	= "store_v2"
 )
 
 type ResolverModuleFailureCoverageV2 struct {
-	Mode       ResolverModuleFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		ResolverModuleFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type ResolverModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []ResolverModuleStateObjectV2
-	Messages          []ResolverModuleMessageNameV2
-	Queries           []ResolverModuleQueryNameV2
-	FailureModes      []ResolverModuleFailureCoverageV2
-	IntegrationPoints []ResolverModuleIntegrationPointV2
-	BackingPrimitives []string
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]ResolverModuleStateObjectV2
+	Messages		[]ResolverModuleMessageNameV2
+	Queries			[]ResolverModuleQueryNameV2
+	FailureModes		[]ResolverModuleFailureCoverageV2
+	IntegrationPoints	[]ResolverModuleIntegrationPointV2
+	BackingPrimitives	[]string
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type SubdomainModuleFailureCoverageV2 struct {
-	Mode       SubdomainModuleFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		SubdomainModuleFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type SubdomainModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []SubdomainModuleStateObjectV2
-	Messages          []SubdomainModuleMessageNameV2
-	Queries           []SubdomainModuleQueryNameV2
-	FailureModes      []SubdomainModuleFailureCoverageV2
-	IntegrationPoints []SubdomainModuleIntegrationPointV2
-	BackingPrimitives []string
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]SubdomainModuleStateObjectV2
+	Messages		[]SubdomainModuleMessageNameV2
+	Queries			[]SubdomainModuleQueryNameV2
+	FailureModes		[]SubdomainModuleFailureCoverageV2
+	IntegrationPoints	[]SubdomainModuleIntegrationPointV2
+	BackingPrimitives	[]string
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type SubdomainModuleIndexEntryV2 struct {
-	ParentName     string
-	ChildName      string
-	ChildLabel     string
-	ParentNameHash string
-	ChildNameHash  string
-	StoreKey       string
-	Detached       bool
+	ParentName	string
+	ChildName	string
+	ChildLabel	string
+	ParentNameHash	string
+	ChildNameHash	string
+	StoreKey	string
+	Detached	bool
 }
 
 type SubdomainModuleIndexReportV2 struct {
-	Valid      bool
-	Issues     []string
-	Index      []SubdomainModuleIndexEntryV2
-	ReportHash string
+	Valid		bool
+	Issues		[]string
+	Index		[]SubdomainModuleIndexEntryV2
+	ReportHash	string
 }
 
 func DefaultResolverModuleBreakdownV2() (ResolverModuleBreakdownV2, error) {
 	breakdown := ResolverModuleBreakdownV2{
-		ModulePath: ResolverModulePathV2,
+		ModulePath:	ResolverModulePathV2,
 		Purpose: []string{
 			"contract_target_resolution",
 			"execution_hint_resolution",
@@ -167,9 +167,9 @@ func DefaultResolverModuleBreakdownV2() (ResolverModuleBreakdownV2, error) {
 			"service_endpoint_resolution",
 			"unified_record_validation",
 		},
-		StateObjects: requiredResolverModuleStateObjectsV2(),
-		Messages:     requiredResolverModuleMessagesV2(),
-		Queries:      requiredResolverModuleQueriesV2(),
+		StateObjects:	requiredResolverModuleStateObjectsV2(),
+		Messages:	requiredResolverModuleMessagesV2(),
+		Queries:	requiredResolverModuleQueriesV2(),
 		FailureModes: []ResolverModuleFailureCoverageV2{
 			{Mode: ResolverModuleFailureInterfaceHashMismatch, Guard: "ValidateUnifiedResolutionRecordV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
 			{Mode: ResolverModuleFailureOversizedPayload, Guard: "ValidateUnifiedResolverPayloadSafetyV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
@@ -178,7 +178,7 @@ func DefaultResolverModuleBreakdownV2() (ResolverModuleBreakdownV2, error) {
 			{Mode: ResolverModuleFailureTTLExceedsDomainExpiry, Guard: "ValidateResolverModuleRecordV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
 			{Mode: ResolverModuleFailureUnauthorizedUpdate, Guard: "ValidateResolverUpdateAuthorizationV2", StoreScope: IdentityStoreV2SpecDelegationsPrefix},
 		},
-		IntegrationPoints: requiredResolverModuleIntegrationPointsV2(),
+		IntegrationPoints:	requiredResolverModuleIntegrationPointsV2(),
 		BackingPrimitives: []string{
 			"BuildIdentityResolutionProofFormatV2",
 			"BuildUnifiedResolutionRecordV2",
@@ -198,7 +198,7 @@ func DefaultResolverModuleBreakdownV2() (ResolverModuleBreakdownV2, error) {
 
 func DefaultSubdomainModuleBreakdownV2() (SubdomainModuleBreakdownV2, error) {
 	breakdown := SubdomainModuleBreakdownV2{
-		ModulePath: SubdomainModulePathV2,
+		ModulePath:	SubdomainModulePathV2,
 		Purpose: []string{
 			"delegated_partial_permissions",
 			"detached_subdomain_lifecycle",
@@ -207,9 +207,9 @@ func DefaultSubdomainModuleBreakdownV2() (SubdomainModuleBreakdownV2, error) {
 			"recursive_path_commitments",
 			"zone_policy_enforcement",
 		},
-		StateObjects: requiredSubdomainModuleStateObjectsV2(),
-		Messages:     requiredSubdomainModuleMessagesV2(),
-		Queries:      requiredSubdomainModuleQueriesV2(),
+		StateObjects:	requiredSubdomainModuleStateObjectsV2(),
+		Messages:	requiredSubdomainModuleMessagesV2(),
+		Queries:	requiredSubdomainModuleQueriesV2(),
 		FailureModes: []SubdomainModuleFailureCoverageV2{
 			{Mode: SubdomainModuleFailureChildExpiryExceedsParent, Guard: "ValidateSubdomainCreationV2", StoreScope: IdentityStoreV2SpecSubdomainsPrefix},
 			{Mode: SubdomainModuleFailureDelegateEscalation, Guard: "ValidateDelegationDoesNotEscalateV2", StoreScope: IdentityStoreV2SpecDelegationsPrefix},
@@ -217,7 +217,7 @@ func DefaultSubdomainModuleBreakdownV2() (SubdomainModuleBreakdownV2, error) {
 			{Mode: SubdomainModuleFailureInconsistentZonePolicy, Guard: "ValidateZonePolicyForSubdomainV2", StoreScope: IdentityStoreV2SpecSubdomainsPrefix},
 			{Mode: SubdomainModuleFailureParentTransferStaleCache, Guard: "ValidateResolutionCacheRecordV2Use", StoreScope: IdentityStoreV2SpecResolutionCachePrefix},
 		},
-		IntegrationPoints: requiredSubdomainModuleIntegrationPointsV2(),
+		IntegrationPoints:	requiredSubdomainModuleIntegrationPointsV2(),
 		BackingPrimitives: []string{
 			"BuildIdentityPathCommitmentV2",
 			"BuildRecursivePolicyProofV2",
@@ -423,13 +423,13 @@ func BuildSubdomainModuleIndexV2(state IdentityState) (SubdomainModuleIndexRepor
 			continue
 		}
 		report.Index = append(report.Index, SubdomainModuleIndexEntryV2{
-			ParentName:     subdomain.ParentName,
-			ChildName:      subdomain.Name,
-			ChildLabel:     label,
-			ParentNameHash: parentHash,
-			ChildNameHash:  childHash,
-			StoreKey:       key,
-			Detached:       subdomain.Detached,
+			ParentName:	subdomain.ParentName,
+			ChildName:	subdomain.Name,
+			ChildLabel:	label,
+			ParentNameHash:	parentHash,
+			ChildNameHash:	childHash,
+			StoreKey:	key,
+			Detached:	subdomain.Detached,
 		})
 	}
 	sort.Slice(report.Index, func(i, j int) bool { return report.Index[i].StoreKey < report.Index[j].StoreKey })

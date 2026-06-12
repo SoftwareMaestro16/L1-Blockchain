@@ -10,8 +10,8 @@ import (
 )
 
 type RefundCalculation struct {
-	Amount sdkmath.Int
-	Fee    sdkmath.Int
+	Amount	sdkmath.Int
+	Fee	sdkmath.Int
 }
 
 func CalculateRefund(msg MessageEnvelope, receipt ExecutionReceipt) (RefundCalculation, error) {
@@ -29,8 +29,8 @@ func CalculateRefund(msg MessageEnvelope, receipt ExecutionReceipt) (RefundCalcu
 		fee = msg.Value.Amount
 	}
 	return RefundCalculation{
-		Amount: msg.Value.Amount.Sub(fee),
-		Fee:    fee,
+		Amount:	msg.Value.Amount.Sub(fee),
+		Fee:	fee,
 	}, nil
 }
 
@@ -42,19 +42,19 @@ func BuildBounceMessage(msg MessageEnvelope, refund RefundCalculation, forwardin
 		return MessageEnvelope{}, errors.New("bounce forwarding fee must be non-negative")
 	}
 	return MessageEnvelope{
-		Source:             append(sdk.AccAddress(nil), msg.Destination...),
-		Destination:        append(sdk.AccAddress(nil), msg.Source...),
-		Value:              sdk.NewCoin(appparams.BaseDenom, refund.Amount),
-		Opcode:             BounceOpcode,
-		QueryID:            msg.QueryID,
-		Body:               append([]byte(nil), msg.Body...),
-		Bounce:             false,
-		Bounced:            true,
-		CreatedLogicalTime: msg.CreatedLogicalTime,
-		DeadlineBlock:      msg.DeadlineBlock,
-		GasLimit:           msg.GasLimit,
-		ForwardFee:         sdk.NewCoin(appparams.BaseDenom, forwardingFee),
-		Depth:              msg.Depth + 1,
+		Source:			append(sdk.AccAddress(nil), msg.Destination...),
+		Destination:		append(sdk.AccAddress(nil), msg.Source...),
+		Value:			sdk.NewCoin(appparams.BaseDenom, refund.Amount),
+		Opcode:			BounceOpcode,
+		QueryID:		msg.QueryID,
+		Body:			append([]byte(nil), msg.Body...),
+		Bounce:			false,
+		Bounced:		true,
+		CreatedLogicalTime:	msg.CreatedLogicalTime,
+		DeadlineBlock:		msg.DeadlineBlock,
+		GasLimit:		msg.GasLimit,
+		ForwardFee:		sdk.NewCoin(appparams.BaseDenom, forwardingFee),
+		Depth:			msg.Depth + 1,
 	}, nil
 }
 
@@ -66,19 +66,19 @@ func BuildRefundMessage(msg MessageEnvelope, refund RefundCalculation, forwardin
 		return MessageEnvelope{}, errors.New("refund forwarding fee must be non-negative")
 	}
 	return MessageEnvelope{
-		Source:             append(sdk.AccAddress(nil), msg.Destination...),
-		Destination:        append(sdk.AccAddress(nil), msg.Source...),
-		Value:              sdk.NewCoin(appparams.BaseDenom, refund.Amount),
-		Opcode:             RefundOpcode,
-		QueryID:            msg.QueryID,
-		Body:               []byte("refund"),
-		Bounce:             false,
-		Bounced:            false,
-		CreatedLogicalTime: msg.CreatedLogicalTime,
-		DeadlineBlock:      0,
-		GasLimit:           msg.GasLimit,
-		ForwardFee:         sdk.NewCoin(appparams.BaseDenom, forwardingFee),
-		Depth:              msg.Depth + 1,
+		Source:			append(sdk.AccAddress(nil), msg.Destination...),
+		Destination:		append(sdk.AccAddress(nil), msg.Source...),
+		Value:			sdk.NewCoin(appparams.BaseDenom, refund.Amount),
+		Opcode:			RefundOpcode,
+		QueryID:		msg.QueryID,
+		Body:			[]byte("refund"),
+		Bounce:			false,
+		Bounced:		false,
+		CreatedLogicalTime:	msg.CreatedLogicalTime,
+		DeadlineBlock:		0,
+		GasLimit:		msg.GasLimit,
+		ForwardFee:		sdk.NewCoin(appparams.BaseDenom, forwardingFee),
+		Depth:			msg.Depth + 1,
 	}, nil
 }
 

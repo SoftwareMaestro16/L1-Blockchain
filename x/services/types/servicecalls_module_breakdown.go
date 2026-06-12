@@ -16,85 +16,85 @@ type XServiceCallsFailureMode string
 type XServiceCallsIntegrationPoint string
 
 const (
-	XServiceCallsStateServiceCall       XServiceCallsStateObject = "ServiceCall"
-	XServiceCallsStateCallNonce         XServiceCallsStateObject = "CallNonce"
-	XServiceCallsStateIdempotencyRecord XServiceCallsStateObject = "IdempotencyRecord"
-	XServiceCallsStateCallbackRecord    XServiceCallsStateObject = "CallbackRecord"
-	XServiceCallsStateCallReceipt       XServiceCallsStateObject = "CallReceipt"
+	XServiceCallsStateServiceCall		XServiceCallsStateObject	= "ServiceCall"
+	XServiceCallsStateCallNonce		XServiceCallsStateObject	= "CallNonce"
+	XServiceCallsStateIdempotencyRecord	XServiceCallsStateObject	= "IdempotencyRecord"
+	XServiceCallsStateCallbackRecord	XServiceCallsStateObject	= "CallbackRecord"
+	XServiceCallsStateCallReceipt		XServiceCallsStateObject	= "CallReceipt"
 
-	XServiceCallsMsgSubmitServiceCall   XServiceCallsMessageName = "MsgSubmitServiceCall"
-	XServiceCallsMsgAnchorServiceResult XServiceCallsMessageName = "MsgAnchorServiceResult"
-	XServiceCallsMsgRetryServiceCall    XServiceCallsMessageName = "MsgRetryServiceCall"
-	XServiceCallsMsgSubmitCallback      XServiceCallsMessageName = "MsgSubmitCallback"
-	XServiceCallsMsgExpireServiceCall   XServiceCallsMessageName = "MsgExpireServiceCall"
+	XServiceCallsMsgSubmitServiceCall	XServiceCallsMessageName	= "MsgSubmitServiceCall"
+	XServiceCallsMsgAnchorServiceResult	XServiceCallsMessageName	= "MsgAnchorServiceResult"
+	XServiceCallsMsgRetryServiceCall	XServiceCallsMessageName	= "MsgRetryServiceCall"
+	XServiceCallsMsgSubmitCallback		XServiceCallsMessageName	= "MsgSubmitCallback"
+	XServiceCallsMsgExpireServiceCall	XServiceCallsMessageName	= "MsgExpireServiceCall"
 
-	XServiceCallsQueryServiceCall   XServiceCallsQueryName = "QueryServiceCall"
-	XServiceCallsQueryCallReceipt   XServiceCallsQueryName = "QueryCallReceipt"
-	XServiceCallsQueryCallsByCaller XServiceCallsQueryName = "QueryCallsByCaller"
-	XServiceCallsQueryCallProof     XServiceCallsQueryName = "QueryCallProof"
+	XServiceCallsQueryServiceCall	XServiceCallsQueryName	= "QueryServiceCall"
+	XServiceCallsQueryCallReceipt	XServiceCallsQueryName	= "QueryCallReceipt"
+	XServiceCallsQueryCallsByCaller	XServiceCallsQueryName	= "QueryCallsByCaller"
+	XServiceCallsQueryCallProof	XServiceCallsQueryName	= "QueryCallProof"
 
-	XServiceCallsFailureNonceReplay             XServiceCallsFailureMode = "nonce_replay"
-	XServiceCallsFailureDuplicateIdempotencyKey XServiceCallsFailureMode = "duplicate_idempotency_key_misuse"
-	XServiceCallsFailureCallbackMismatch        XServiceCallsFailureMode = "callback_mismatch"
-	XServiceCallsFailureExpiredCallAnchoredLate XServiceCallsFailureMode = "expired_call_anchored_late"
-	XServiceCallsFailureResultHashMismatch      XServiceCallsFailureMode = "result_hash_mismatch"
+	XServiceCallsFailureNonceReplay			XServiceCallsFailureMode	= "nonce_replay"
+	XServiceCallsFailureDuplicateIdempotencyKey	XServiceCallsFailureMode	= "duplicate_idempotency_key_misuse"
+	XServiceCallsFailureCallbackMismatch		XServiceCallsFailureMode	= "callback_mismatch"
+	XServiceCallsFailureExpiredCallAnchoredLate	XServiceCallsFailureMode	= "expired_call_anchored_late"
+	XServiceCallsFailureResultHashMismatch		XServiceCallsFailureMode	= "result_hash_mismatch"
 
-	XServiceCallsIntegrationServices             XServiceCallsIntegrationPoint = "x/services"
-	XServiceCallsIntegrationServicePayments      XServiceCallsIntegrationPoint = "x/servicepayments"
-	XServiceCallsIntegrationServiceReceipts      XServiceCallsIntegrationPoint = "x/servicereceipts"
-	XServiceCallsIntegrationABCIProposalHandling XServiceCallsIntegrationPoint = "abci_plus_proposal_handling"
+	XServiceCallsIntegrationServices		XServiceCallsIntegrationPoint	= "x/services"
+	XServiceCallsIntegrationServicePayments		XServiceCallsIntegrationPoint	= "x/servicepayments"
+	XServiceCallsIntegrationServiceReceipts		XServiceCallsIntegrationPoint	= "x/servicereceipts"
+	XServiceCallsIntegrationABCIProposalHandling	XServiceCallsIntegrationPoint	= "abci_plus_proposal_handling"
 )
 
 type XServiceCallsFailureCoverage struct {
-	Mode  XServiceCallsFailureMode
-	Guard string
-	Scope string
+	Mode	XServiceCallsFailureMode
+	Guard	string
+	Scope	string
 }
 
 type XServiceCallsModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServiceCallsStateObject
-	Messages          []XServiceCallsMessageName
-	Queries           []XServiceCallsQueryName
-	FailureModes      []XServiceCallsFailureCoverage
-	IntegrationPoints []XServiceCallsIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServiceCallsStateObject
+	Messages		[]XServiceCallsMessageName
+	Queries			[]XServiceCallsQueryName
+	FailureModes		[]XServiceCallsFailureCoverage
+	IntegrationPoints	[]XServiceCallsIntegrationPoint
+	BreakdownHash		string
 }
 
 type MsgSubmitServiceCall struct {
-	Authority   string
-	Call        UnifiedServiceCall
-	MessageHash string
+	Authority	string
+	Call		UnifiedServiceCall
+	MessageHash	string
 }
 
 type MsgAnchorServiceResult struct {
-	Authority          string
-	CallID             string
-	ExpectedResultHash string
-	Outcome            ServiceExecutionOutcome
-	MessageHash        string
+	Authority		string
+	CallID			string
+	ExpectedResultHash	string
+	Outcome			ServiceExecutionOutcome
+	MessageHash		string
 }
 
 type MsgRetryServiceCall struct {
-	Authority      string
-	OriginalCallID string
-	RetryCall      UnifiedServiceCall
-	MessageHash    string
+	Authority	string
+	OriginalCallID	string
+	RetryCall	UnifiedServiceCall
+	MessageHash	string
 }
 
 type MsgSubmitCallback struct {
-	Authority   string
-	Callback    UnifiedServiceCallback
-	MessageHash string
+	Authority	string
+	Callback	UnifiedServiceCallback
+	MessageHash	string
 }
 
 type MsgExpireServiceCall struct {
-	Authority    string
-	CallID       string
-	ServiceID    string
-	ExpireHeight uint64
-	MessageHash  string
+	Authority	string
+	CallID		string
+	ServiceID	string
+	ExpireHeight	uint64
+	MessageHash	string
 }
 
 type QueryServiceCall struct {
@@ -102,8 +102,8 @@ type QueryServiceCall struct {
 }
 
 type QueryServiceCallResponse struct {
-	Call  UnifiedServiceCall
-	Found bool
+	Call	UnifiedServiceCall
+	Found	bool
 }
 
 type QueryCallReceipt struct {
@@ -111,8 +111,8 @@ type QueryCallReceipt struct {
 }
 
 type QueryCallReceiptResponse struct {
-	Receipt ServiceReceiptCanonicalView
-	Found   bool
+	Receipt	ServiceReceiptCanonicalView
+	Found	bool
 }
 
 type QueryCallsByCaller struct {
@@ -120,45 +120,45 @@ type QueryCallsByCaller struct {
 }
 
 type QueryCallsByCallerResponse struct {
-	Calls        []UnifiedServiceCall
-	Total        uint64
-	ResponseHash string
+	Calls		[]UnifiedServiceCall
+	Total		uint64
+	ResponseHash	string
 }
 
 type QueryCallProof struct {
-	ServiceID string
-	CallID    string
+	ServiceID	string
+	CallID		string
 }
 
 type ServiceCallIdempotencyRecord struct {
-	ServiceID      string
-	Caller         string
-	IdempotencyKey string
-	PayloadHash    string
-	CallID         string
-	RecordHash     string
+	ServiceID	string
+	Caller		string
+	IdempotencyKey	string
+	PayloadHash	string
+	CallID		string
+	RecordHash	string
 }
 
 type ServiceCallExpiryRecord struct {
-	ServiceID      string
-	CallID         string
-	DeadlineHeight uint64
-	AnchorHeight   uint64
-	RecordHash     string
+	ServiceID	string
+	CallID		string
+	DeadlineHeight	uint64
+	AnchorHeight	uint64
+	RecordHash	string
 }
 
 type ServiceCallsABCIProposalContract struct {
-	ClassifyByTargetService       bool
-	VerifySameSenderOrdering      bool
-	RejectExpiredCalls            bool
-	IncludeCallbacksAndRetries    bool
-	AnchorReceiptsInFinalizeBlock bool
-	ContractHash                  string
+	ClassifyByTargetService		bool
+	VerifySameSenderOrdering	bool
+	RejectExpiredCalls		bool
+	IncludeCallbacksAndRetries	bool
+	AnchorReceiptsInFinalizeBlock	bool
+	ContractHash			string
 }
 
 func DefaultXServiceCallsModuleBreakdown() (XServiceCallsModuleBreakdown, error) {
 	breakdown := XServiceCallsModuleBreakdown{
-		ModulePath: ServiceModuleCalls,
+		ModulePath:	ServiceModuleCalls,
 		Purpose: []string{
 			"call_envelopes",
 			"callbacks",
@@ -220,10 +220,10 @@ func NewMsgSubmitServiceCall(authority string, call UnifiedServiceCall) (MsgSubm
 
 func NewMsgAnchorServiceResult(authority string, call UnifiedServiceCall, expectedResultHash string, outcome ServiceExecutionOutcome) (MsgAnchorServiceResult, error) {
 	msg := MsgAnchorServiceResult{
-		Authority:          strings.TrimSpace(authority),
-		CallID:             strings.ToLower(strings.TrimSpace(call.CallID)),
-		ExpectedResultHash: strings.ToLower(strings.TrimSpace(expectedResultHash)),
-		Outcome:            outcome,
+		Authority:		strings.TrimSpace(authority),
+		CallID:			strings.ToLower(strings.TrimSpace(call.CallID)),
+		ExpectedResultHash:	strings.ToLower(strings.TrimSpace(expectedResultHash)),
+		Outcome:		outcome,
 	}
 	msg.MessageHash = ComputeMsgAnchorServiceResultHash(msg)
 	return msg, msg.ValidateForCall(call)
@@ -243,10 +243,10 @@ func NewMsgSubmitCallback(authority string, callback UnifiedServiceCallback) (Ms
 
 func NewMsgExpireServiceCall(authority string, call UnifiedServiceCall, expireHeight uint64) (MsgExpireServiceCall, error) {
 	msg := MsgExpireServiceCall{
-		Authority:    strings.TrimSpace(authority),
-		CallID:       strings.ToLower(strings.TrimSpace(call.CallID)),
-		ServiceID:    strings.TrimSpace(call.TargetService),
-		ExpireHeight: expireHeight,
+		Authority:	strings.TrimSpace(authority),
+		CallID:		strings.ToLower(strings.TrimSpace(call.CallID)),
+		ServiceID:	strings.TrimSpace(call.TargetService),
+		ExpireHeight:	expireHeight,
 	}
 	msg.MessageHash = ComputeMsgExpireServiceCallHash(msg)
 	return msg, msg.ValidateForCall(call)
@@ -268,11 +268,11 @@ func NewServiceCallIdempotencyRecord(call UnifiedServiceCall, existing []Service
 		}
 	}
 	record := ServiceCallIdempotencyRecord{
-		ServiceID:      call.TargetService,
-		Caller:         call.Caller,
-		IdempotencyKey: call.IdempotencyKey,
-		PayloadHash:    call.PayloadHash,
-		CallID:         call.CallID,
+		ServiceID:	call.TargetService,
+		Caller:		call.Caller,
+		IdempotencyKey:	call.IdempotencyKey,
+		PayloadHash:	call.PayloadHash,
+		CallID:		call.CallID,
 	}
 	record.RecordHash = ComputeServiceCallIdempotencyRecordHash(record)
 	return record, record.Validate()
@@ -280,10 +280,10 @@ func NewServiceCallIdempotencyRecord(call UnifiedServiceCall, existing []Service
 
 func ValidateServiceCallResultAnchorWindow(call UnifiedServiceCall, anchorHeight uint64) (ServiceCallExpiryRecord, error) {
 	record := ServiceCallExpiryRecord{
-		ServiceID:      call.TargetService,
-		CallID:         call.CallID,
-		DeadlineHeight: call.DeadlineHeight,
-		AnchorHeight:   anchorHeight,
+		ServiceID:	call.TargetService,
+		CallID:		call.CallID,
+		DeadlineHeight:	call.DeadlineHeight,
+		AnchorHeight:	anchorHeight,
 	}
 	record.RecordHash = ComputeServiceCallExpiryRecordHash(record)
 	if err := record.Validate(); err != nil {
@@ -355,11 +355,11 @@ func QueryCallsByCallerFromCalls(calls []UnifiedServiceCall, query QueryCallsByC
 
 func DefaultServiceCallsABCIProposalContract() (ServiceCallsABCIProposalContract, error) {
 	contract := ServiceCallsABCIProposalContract{
-		ClassifyByTargetService:       true,
-		VerifySameSenderOrdering:      true,
-		RejectExpiredCalls:            true,
-		IncludeCallbacksAndRetries:    true,
-		AnchorReceiptsInFinalizeBlock: true,
+		ClassifyByTargetService:	true,
+		VerifySameSenderOrdering:	true,
+		RejectExpiredCalls:		true,
+		IncludeCallbacksAndRetries:	true,
+		AnchorReceiptsInFinalizeBlock:	true,
 	}
 	contract.ContractHash = ComputeServiceCallsABCIProposalContractHash(contract)
 	return contract, contract.Validate()

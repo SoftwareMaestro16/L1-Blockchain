@@ -6,195 +6,195 @@ import (
 )
 
 const (
-	AetraValidatorScoreModuleName = "x/aetra-validator-score"
+	AetraValidatorScoreModuleName	= "x/aetra-validator-score"
 
-	AetraValidatorScorePurposePublicAccountability = "public_accountability_without_subjective_consensus_control"
+	AetraValidatorScorePurposePublicAccountability	= "public_accountability_without_subjective_consensus_control"
 
-	AetraValidatorScoreResponsibilityTrackUptime                  = "track_validator_uptime"
-	AetraValidatorScoreResponsibilityTrackMissedBlockWindows      = "track_missed_block_windows"
-	AetraValidatorScoreResponsibilityTrackJailHistory             = "track_jail_history"
-	AetraValidatorScoreResponsibilityTrackSlashingHistory         = "track_slashing_history"
-	AetraValidatorScoreResponsibilityTrackCommissionBehavior      = "track_commission_behavior"
-	AetraValidatorScoreResponsibilityTrackSelfBondRatio           = "track_self_bond_ratio"
-	AetraValidatorScoreResponsibilityTrackGovernanceParticipation = "track_governance_participation"
-	AetraValidatorScoreResponsibilityTrackConcentrationStatus     = "track_concentration_status"
-	AetraValidatorScoreResponsibilityProducePublicScore           = "produce_public_score"
-	AetraValidatorScoreResponsibilityExplorerFriendlyQueries      = "expose_explorer_friendly_queries"
+	AetraValidatorScoreResponsibilityTrackUptime			= "track_validator_uptime"
+	AetraValidatorScoreResponsibilityTrackMissedBlockWindows	= "track_missed_block_windows"
+	AetraValidatorScoreResponsibilityTrackJailHistory		= "track_jail_history"
+	AetraValidatorScoreResponsibilityTrackSlashingHistory		= "track_slashing_history"
+	AetraValidatorScoreResponsibilityTrackCommissionBehavior	= "track_commission_behavior"
+	AetraValidatorScoreResponsibilityTrackSelfBondRatio		= "track_self_bond_ratio"
+	AetraValidatorScoreResponsibilityTrackGovernanceParticipation	= "track_governance_participation"
+	AetraValidatorScoreResponsibilityTrackConcentrationStatus	= "track_concentration_status"
+	AetraValidatorScoreResponsibilityProducePublicScore		= "produce_public_score"
+	AetraValidatorScoreResponsibilityExplorerFriendlyQueries	= "expose_explorer_friendly_queries"
 
-	AetraValidatorScoreGuardNoSubjectiveCensorship       = "score_must_not_be_subjective_censorship_mechanism"
-	AetraValidatorScoreGuardInformationalFirst           = "score_informational_first"
-	AetraValidatorScoreGuardObjectiveRewardOnly          = "reward_affecting_only_from_objective_chain_data"
-	AetraValidatorScoreGuardConsensusOverrideDisabled    = "consensus_override_disabled_by_default"
-	AetraValidatorScoreGuardObjectiveInputsDeterministic = "objective_inputs_must_be_deterministic"
+	AetraValidatorScoreGuardNoSubjectiveCensorship		= "score_must_not_be_subjective_censorship_mechanism"
+	AetraValidatorScoreGuardInformationalFirst		= "score_informational_first"
+	AetraValidatorScoreGuardObjectiveRewardOnly		= "reward_affecting_only_from_objective_chain_data"
+	AetraValidatorScoreGuardConsensusOverrideDisabled	= "consensus_override_disabled_by_default"
+	AetraValidatorScoreGuardObjectiveInputsDeterministic	= "objective_inputs_must_be_deterministic"
 
-	AetraValidatorScoreStateParams         = "Params"
-	AetraValidatorScoreStateValidatorScore = "ValidatorScore"
+	AetraValidatorScoreStateParams		= "Params"
+	AetraValidatorScoreStateValidatorScore	= "ValidatorScore"
 
-	AetraValidatorScoreStateParamUptimeWindow           = "UptimeWindow"
-	AetraValidatorScoreStateParamUptimeWeightBps        = "UptimeWeightBps"
-	AetraValidatorScoreStateParamSlashHistoryWeightBps  = "SlashHistoryWeightBps"
-	AetraValidatorScoreStateParamGovernanceWeightBps    = "GovernanceWeightBps"
-	AetraValidatorScoreStateParamSelfBondWeightBps      = "SelfBondWeightBps"
-	AetraValidatorScoreStateParamConcentrationWeightBps = "ConcentrationWeightBps"
-	AetraValidatorScoreStateParamMinScore               = "MinScore"
-	AetraValidatorScoreStateParamMaxScore               = "MaxScore"
-	AetraValidatorScoreStateParamRewardModifierEnabled  = "RewardModifierEnabled"
-	AetraValidatorScoreStateParamMaxRewardPenaltyBps    = "MaxRewardPenaltyBps"
+	AetraValidatorScoreStateParamUptimeWindow		= "UptimeWindow"
+	AetraValidatorScoreStateParamUptimeWeightBps		= "UptimeWeightBps"
+	AetraValidatorScoreStateParamSlashHistoryWeightBps	= "SlashHistoryWeightBps"
+	AetraValidatorScoreStateParamGovernanceWeightBps	= "GovernanceWeightBps"
+	AetraValidatorScoreStateParamSelfBondWeightBps		= "SelfBondWeightBps"
+	AetraValidatorScoreStateParamConcentrationWeightBps	= "ConcentrationWeightBps"
+	AetraValidatorScoreStateParamMinScore			= "MinScore"
+	AetraValidatorScoreStateParamMaxScore			= "MaxScore"
+	AetraValidatorScoreStateParamRewardModifierEnabled	= "RewardModifierEnabled"
+	AetraValidatorScoreStateParamMaxRewardPenaltyBps	= "MaxRewardPenaltyBps"
 
-	AetraValidatorScoreStateScoreOperatorAddress    = "OperatorAddress"
-	AetraValidatorScoreStateScoreScore              = "Score"
-	AetraValidatorScoreStateScoreUptimeScore        = "UptimeScore"
-	AetraValidatorScoreStateScoreSlashScore         = "SlashScore"
-	AetraValidatorScoreStateScoreGovernanceScore    = "GovernanceScore"
-	AetraValidatorScoreStateScoreSelfBondScore      = "SelfBondScore"
-	AetraValidatorScoreStateScoreConcentrationScore = "ConcentrationScore"
-	AetraValidatorScoreStateScoreMissedBlocks       = "MissedBlocks"
-	AetraValidatorScoreStateScoreSignedBlocks       = "SignedBlocks"
-	AetraValidatorScoreStateScoreJailCount          = "JailCount"
-	AetraValidatorScoreStateScoreSlashCount         = "SlashCount"
-	AetraValidatorScoreStateScoreLastUpdatedHeight  = "LastUpdatedHeight"
+	AetraValidatorScoreStateScoreOperatorAddress	= "OperatorAddress"
+	AetraValidatorScoreStateScoreScore		= "Score"
+	AetraValidatorScoreStateScoreUptimeScore	= "UptimeScore"
+	AetraValidatorScoreStateScoreSlashScore		= "SlashScore"
+	AetraValidatorScoreStateScoreGovernanceScore	= "GovernanceScore"
+	AetraValidatorScoreStateScoreSelfBondScore	= "SelfBondScore"
+	AetraValidatorScoreStateScoreConcentrationScore	= "ConcentrationScore"
+	AetraValidatorScoreStateScoreMissedBlocks	= "MissedBlocks"
+	AetraValidatorScoreStateScoreSignedBlocks	= "SignedBlocks"
+	AetraValidatorScoreStateScoreJailCount		= "JailCount"
+	AetraValidatorScoreStateScoreSlashCount		= "SlashCount"
+	AetraValidatorScoreStateScoreLastUpdatedHeight	= "LastUpdatedHeight"
 
-	AetraValidatorScoreRequirementDeterministic               = "score_deterministic"
-	AetraValidatorScoreRequirementChainStateOnly              = "score_based_only_on_chain_state"
-	AetraValidatorScoreRequirementExplainable                 = "score_explainable"
-	AetraValidatorScoreRequirementQueryable                   = "score_queryable"
-	AetraValidatorScoreRequirementBounded                     = "score_bounded"
-	AetraValidatorScoreRequirementExportImportSafe            = "score_export_import_safe"
-	AetraValidatorScoreRequirementOverflowUnderflowResistant  = "score_resistant_to_overflow_underflow"
-	AetraValidatorScoreRequiredTestPerfectUptime              = "perfect_uptime_score"
-	AetraValidatorScoreRequiredTestPartialUptime              = "partial_uptime_score"
-	AetraValidatorScoreRequiredTestMissedBlockPenalty         = "missed_block_penalty"
-	AetraValidatorScoreRequiredTestJailPenalty                = "jail_penalty"
-	AetraValidatorScoreRequiredTestSlashPenalty               = "slash_penalty"
-	AetraValidatorScoreRequiredTestGovernanceParticipation    = "governance_participation_score"
-	AetraValidatorScoreRequiredTestConcentrationPenalty       = "concentration_penalty"
-	AetraValidatorScoreRequiredTestRewardModifierBounded      = "reward_modifier_bounded"
-	AetraValidatorScoreRequiredTestScoreCannotGoBelowMin      = "score_cannot_go_below_min"
-	AetraValidatorScoreRequiredTestScoreCannotExceedMax       = "score_cannot_exceed_max"
-	AetraValidatorScoreRequiredTestExportImport               = "export_import"
-	AetraValidatorScoreRequiredTestDeterministicRecomputation = "deterministic_recomputation"
+	AetraValidatorScoreRequirementDeterministic			= "score_deterministic"
+	AetraValidatorScoreRequirementChainStateOnly			= "score_based_only_on_chain_state"
+	AetraValidatorScoreRequirementExplainable			= "score_explainable"
+	AetraValidatorScoreRequirementQueryable				= "score_queryable"
+	AetraValidatorScoreRequirementBounded				= "score_bounded"
+	AetraValidatorScoreRequirementExportImportSafe			= "score_export_import_safe"
+	AetraValidatorScoreRequirementOverflowUnderflowResistant	= "score_resistant_to_overflow_underflow"
+	AetraValidatorScoreRequiredTestPerfectUptime			= "perfect_uptime_score"
+	AetraValidatorScoreRequiredTestPartialUptime			= "partial_uptime_score"
+	AetraValidatorScoreRequiredTestMissedBlockPenalty		= "missed_block_penalty"
+	AetraValidatorScoreRequiredTestJailPenalty			= "jail_penalty"
+	AetraValidatorScoreRequiredTestSlashPenalty			= "slash_penalty"
+	AetraValidatorScoreRequiredTestGovernanceParticipation		= "governance_participation_score"
+	AetraValidatorScoreRequiredTestConcentrationPenalty		= "concentration_penalty"
+	AetraValidatorScoreRequiredTestRewardModifierBounded		= "reward_modifier_bounded"
+	AetraValidatorScoreRequiredTestScoreCannotGoBelowMin		= "score_cannot_go_below_min"
+	AetraValidatorScoreRequiredTestScoreCannotExceedMax		= "score_cannot_exceed_max"
+	AetraValidatorScoreRequiredTestExportImport			= "export_import"
+	AetraValidatorScoreRequiredTestDeterministicRecomputation	= "deterministic_recomputation"
 )
 
 type AetraValidatorScoreSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	PublicAccountabilityWithoutSubjectiveConsensusControl bool
+	PublicAccountabilityWithoutSubjectiveConsensusControl	bool
 }
 
 type AetraValidatorScoreSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraValidatorScoreResponsibilitiesEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	TracksValidatorUptime          bool
-	TracksMissedBlockWindows       bool
-	TracksJailHistory              bool
-	TracksSlashingHistory          bool
-	TracksCommissionBehavior       bool
-	TracksSelfBondRatio            bool
-	TracksGovernanceParticipation  bool
-	TracksConcentrationStatus      bool
-	ProducesPublicScore            bool
-	ExposesExplorerFriendlyQueries bool
+	TracksValidatorUptime		bool
+	TracksMissedBlockWindows	bool
+	TracksJailHistory		bool
+	TracksSlashingHistory		bool
+	TracksCommissionBehavior	bool
+	TracksSelfBondRatio		bool
+	TracksGovernanceParticipation	bool
+	TracksConcentrationStatus	bool
+	ProducesPublicScore		bool
+	ExposesExplorerFriendlyQueries	bool
 }
 
 type AetraValidatorScoreResponsibilitiesReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraValidatorScoreSubjectiveControlEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	NoSubjectiveCensorshipMechanism  bool
-	InformationalFirst               bool
-	RewardAffectingOnlyObjectiveData bool
-	ConsensusOverrideDisabledDefault bool
-	ObjectiveInputsDeterministic     bool
+	NoSubjectiveCensorshipMechanism		bool
+	InformationalFirst			bool
+	RewardAffectingOnlyObjectiveData	bool
+	ConsensusOverrideDisabledDefault	bool
+	ObjectiveInputsDeterministic		bool
 }
 
 type AetraValidatorScoreSubjectiveControlReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraValidatorScoreStateSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	ParamsFields         []string
-	ValidatorScoreFields []string
+	ParamsFields		[]string
+	ValidatorScoreFields	[]string
 }
 
 type AetraValidatorScoreStateSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraValidatorScoreRequirementsEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Deterministic              bool
-	BasedOnlyOnChainState      bool
-	Explainable                bool
-	Queryable                  bool
-	Bounded                    bool
-	ExportImportSafe           bool
-	OverflowUnderflowResistant bool
+	Deterministic			bool
+	BasedOnlyOnChainState		bool
+	Explainable			bool
+	Queryable			bool
+	Bounded				bool
+	ExportImportSafe		bool
+	OverflowUnderflowResistant	bool
 }
 
 type AetraValidatorScoreRequirementsReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraValidatorScoreTestingRequirementsEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	PerfectUptimeScore           bool
-	PartialUptimeScore           bool
-	MissedBlockPenalty           bool
-	JailPenalty                  bool
-	SlashPenalty                 bool
-	GovernanceParticipationScore bool
-	ConcentrationPenalty         bool
-	RewardModifierBounded        bool
-	ScoreCannotGoBelowMin        bool
-	ScoreCannotExceedMax         bool
-	ExportImport                 bool
-	DeterministicRecomputation   bool
+	PerfectUptimeScore		bool
+	PartialUptimeScore		bool
+	MissedBlockPenalty		bool
+	JailPenalty			bool
+	SlashPenalty			bool
+	GovernanceParticipationScore	bool
+	ConcentrationPenalty		bool
+	RewardModifierBounded		bool
+	ScoreCannotGoBelowMin		bool
+	ScoreCannotExceedMax		bool
+	ExportImport			bool
+	DeterministicRecomputation	bool
 }
 
 type AetraValidatorScoreTestingRequirementsReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraValidatorScoreSpecEvidence() AetraValidatorScoreSpecEvidence {
 	return AetraValidatorScoreSpecEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 
-		PublicAccountabilityWithoutSubjectiveConsensusControl: true,
+		PublicAccountabilityWithoutSubjectiveConsensusControl:	true,
 	}
 }
 
@@ -228,28 +228,28 @@ func BuildAetraValidatorScoreSpecReport(evidence AetraValidatorScoreSpecEvidence
 
 	sort.Strings(failed)
 	return AetraValidatorScoreSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraValidatorScoreResponsibilitiesEvidence() AetraValidatorScoreResponsibilitiesEvidence {
 	return AetraValidatorScoreResponsibilitiesEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 
-		TracksValidatorUptime:          true,
-		TracksMissedBlockWindows:       true,
-		TracksJailHistory:              true,
-		TracksSlashingHistory:          true,
-		TracksCommissionBehavior:       true,
-		TracksSelfBondRatio:            true,
-		TracksGovernanceParticipation:  true,
-		TracksConcentrationStatus:      true,
-		ProducesPublicScore:            true,
-		ExposesExplorerFriendlyQueries: true,
+		TracksValidatorUptime:		true,
+		TracksMissedBlockWindows:	true,
+		TracksJailHistory:		true,
+		TracksSlashingHistory:		true,
+		TracksCommissionBehavior:	true,
+		TracksSelfBondRatio:		true,
+		TracksGovernanceParticipation:	true,
+		TracksConcentrationStatus:	true,
+		ProducesPublicScore:		true,
+		ExposesExplorerFriendlyQueries:	true,
 	}
 }
 
@@ -292,23 +292,23 @@ func BuildAetraValidatorScoreResponsibilitiesReport(evidence AetraValidatorScore
 
 	sort.Strings(failed)
 	return AetraValidatorScoreResponsibilitiesReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraValidatorScoreSubjectiveControlEvidence() AetraValidatorScoreSubjectiveControlEvidence {
 	return AetraValidatorScoreSubjectiveControlEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 
-		NoSubjectiveCensorshipMechanism:  true,
-		InformationalFirst:               true,
-		RewardAffectingOnlyObjectiveData: true,
-		ConsensusOverrideDisabledDefault: true,
-		ObjectiveInputsDeterministic:     true,
+		NoSubjectiveCensorshipMechanism:	true,
+		InformationalFirst:			true,
+		RewardAffectingOnlyObjectiveData:	true,
+		ConsensusOverrideDisabledDefault:	true,
+		ObjectiveInputsDeterministic:		true,
 	}
 }
 
@@ -346,17 +346,17 @@ func BuildAetraValidatorScoreSubjectiveControlReport(evidence AetraValidatorScor
 
 	sort.Strings(failed)
 	return AetraValidatorScoreSubjectiveControlReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraValidatorScoreStateSpecEvidence() AetraValidatorScoreStateSpecEvidence {
 	return AetraValidatorScoreStateSpecEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 		ParamsFields: []string{
 			AetraValidatorScoreStateParamUptimeWindow,
 			AetraValidatorScoreStateParamUptimeWeightBps,
@@ -412,11 +412,11 @@ func BuildAetraValidatorScoreStateSpecReport(evidence AetraValidatorScoreStateSp
 	failed = append(failed, failedScore...)
 	sort.Strings(failed)
 	return AetraValidatorScoreStateSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredParams) + len(requiredScore),
-		Passed:     passedParams + passedScore,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredParams) + len(requiredScore),
+		Passed:		passedParams + passedScore,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -454,15 +454,15 @@ func requiredAetraValidatorScoreValidatorScoreFields() []string {
 
 func DefaultAetraValidatorScoreRequirementsEvidence() AetraValidatorScoreRequirementsEvidence {
 	return AetraValidatorScoreRequirementsEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 
-		Deterministic:              true,
-		BasedOnlyOnChainState:      true,
-		Explainable:                true,
-		Queryable:                  true,
-		Bounded:                    true,
-		ExportImportSafe:           true,
-		OverflowUnderflowResistant: true,
+		Deterministic:			true,
+		BasedOnlyOnChainState:		true,
+		Explainable:			true,
+		Queryable:			true,
+		Bounded:			true,
+		ExportImportSafe:		true,
+		OverflowUnderflowResistant:	true,
 	}
 }
 
@@ -502,30 +502,30 @@ func BuildAetraValidatorScoreRequirementsReport(evidence AetraValidatorScoreRequ
 
 	sort.Strings(failed)
 	return AetraValidatorScoreRequirementsReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraValidatorScoreTestingRequirementsEvidence() AetraValidatorScoreTestingRequirementsEvidence {
 	return AetraValidatorScoreTestingRequirementsEvidence{
-		ModuleName: AetraValidatorScoreModuleName,
+		ModuleName:	AetraValidatorScoreModuleName,
 
-		PerfectUptimeScore:           true,
-		PartialUptimeScore:           true,
-		MissedBlockPenalty:           true,
-		JailPenalty:                  true,
-		SlashPenalty:                 true,
-		GovernanceParticipationScore: true,
-		ConcentrationPenalty:         true,
-		RewardModifierBounded:        true,
-		ScoreCannotGoBelowMin:        true,
-		ScoreCannotExceedMax:         true,
-		ExportImport:                 true,
-		DeterministicRecomputation:   true,
+		PerfectUptimeScore:		true,
+		PartialUptimeScore:		true,
+		MissedBlockPenalty:		true,
+		JailPenalty:			true,
+		SlashPenalty:			true,
+		GovernanceParticipationScore:	true,
+		ConcentrationPenalty:		true,
+		RewardModifierBounded:		true,
+		ScoreCannotGoBelowMin:		true,
+		ScoreCannotExceedMax:		true,
+		ExportImport:			true,
+		DeterministicRecomputation:	true,
 	}
 }
 
@@ -570,11 +570,11 @@ func BuildAetraValidatorScoreTestingRequirementsReport(evidence AetraValidatorSc
 
 	sort.Strings(failed)
 	return AetraValidatorScoreTestingRequirementsReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

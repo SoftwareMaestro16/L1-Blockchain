@@ -12,157 +12,157 @@ import (
 )
 
 const (
-	StatusActive    = "active"
-	StatusUnbonding = "unbonding"
-	StatusJailed    = "jailed"
+	StatusActive	= "active"
+	StatusUnbonding	= "unbonding"
+	StatusJailed	= "jailed"
 
-	ReportStatusPending   = "pending"
-	ReportStatusAccepted  = "accepted"
-	ReportStatusRejected  = "rejected"
-	ReportStatusMalicious = "malicious"
+	ReportStatusPending	= "pending"
+	ReportStatusAccepted	= "accepted"
+	ReportStatusRejected	= "rejected"
+	ReportStatusMalicious	= "malicious"
 
-	ReportTypeFault        = "fault"
-	ReportTypeProof        = "proof"
-	ReportTypeLatency      = "latency"
-	ReportTypeAvailability = "availability"
+	ReportTypeFault		= "fault"
+	ReportTypeProof		= "proof"
+	ReportTypeLatency	= "latency"
+	ReportTypeAvailability	= "availability"
 
-	MaxReportersV1        = uint32(100_000)
-	MaxReportsV1          = uint32(1_000_000)
-	MaxRewardHistoryV1    = uint32(10_000)
-	MaxReportIDBytesV1    = uint32(96)
-	MaxReportTypeBytesV1  = uint32(64)
-	MaxSubjectBytesV1     = uint32(256)
-	MaxPayloadHashBytesV1 = uint32(64)
-	MaxPayloadBytesV1     = uint32(16_384)
-	MaxBasisPoints        = uint32(10_000)
+	MaxReportersV1		= uint32(100_000)
+	MaxReportsV1		= uint32(1_000_000)
+	MaxRewardHistoryV1	= uint32(10_000)
+	MaxReportIDBytesV1	= uint32(96)
+	MaxReportTypeBytesV1	= uint32(64)
+	MaxSubjectBytesV1	= uint32(256)
+	MaxPayloadHashBytesV1	= uint32(64)
+	MaxPayloadBytesV1	= uint32(16_384)
+	MaxBasisPoints		= uint32(10_000)
 
-	DefaultMinBondAmount         = uint64(1_000_000)
-	DefaultChallengePeriodBlocks = uint64(1_000)
-	DefaultMaliciousSlashBps     = uint32(5_000)
-	DefaultInitialScore          = int64(1_000)
-	DefaultAcceptedScoreDelta    = int64(10)
-	DefaultRejectedScoreDelta    = int64(25)
-	DefaultMaxRewardAmount       = uint64(1_000_000)
+	DefaultMinBondAmount		= uint64(1_000_000)
+	DefaultChallengePeriodBlocks	= uint64(1_000)
+	DefaultMaliciousSlashBps	= uint32(5_000)
+	DefaultInitialScore		= int64(1_000)
+	DefaultAcceptedScoreDelta	= int64(10)
+	DefaultRejectedScoreDelta	= int64(25)
+	DefaultMaxRewardAmount		= uint64(1_000_000)
 )
 
 type Params struct {
-	Authority             string
-	MinBondAmount         uint64
-	MaxReporters          uint32
-	MaxReports            uint32
-	MaxRewardHistory      uint32
-	MaxReportIDBytes      uint32
-	MaxReportTypeBytes    uint32
-	MaxSubjectBytes       uint32
-	MaxPayloadHashBytes   uint32
-	MaxPayloadBytes       uint32
-	ChallengePeriodBlocks uint64
-	MaliciousSlashBps     uint32
-	InitialScore          int64
-	AcceptedScoreDelta    int64
-	RejectedScoreDelta    int64
-	MaxRewardAmount       uint64
+	Authority		string
+	MinBondAmount		uint64
+	MaxReporters		uint32
+	MaxReports		uint32
+	MaxRewardHistory	uint32
+	MaxReportIDBytes	uint32
+	MaxReportTypeBytes	uint32
+	MaxSubjectBytes		uint32
+	MaxPayloadHashBytes	uint32
+	MaxPayloadBytes		uint32
+	ChallengePeriodBlocks	uint64
+	MaliciousSlashBps	uint32
+	InitialScore		int64
+	AcceptedScoreDelta	int64
+	RejectedScoreDelta	int64
+	MaxRewardAmount		uint64
 }
 
 type State struct {
-	Reporters []ReporterRecord
-	Reports   []ReportRecord
+	Reporters	[]ReporterRecord
+	Reports		[]ReportRecord
 }
 
 type ReporterRecord struct {
-	ReporterAddress         string
-	BondedAmount            uint64
-	ReporterScore           int64
-	AcceptedReports         uint64
-	RejectedReports         uint64
-	SlashedReporterBond     uint64
-	Status                  string
-	UnbondingStartHeight    uint64
-	UnbondingCompleteHeight uint64
-	RewardHistory           []ReporterReward
+	ReporterAddress		string
+	BondedAmount		uint64
+	ReporterScore		int64
+	AcceptedReports		uint64
+	RejectedReports		uint64
+	SlashedReporterBond	uint64
+	Status			string
+	UnbondingStartHeight	uint64
+	UnbondingCompleteHeight	uint64
+	RewardHistory		[]ReporterReward
 }
 
 type ReporterReward struct {
-	ReportID  string
-	Amount    uint64
-	Claimed   bool
-	CreatedAt uint64
-	ClaimedAt uint64
+	ReportID	string
+	Amount		uint64
+	Claimed		bool
+	CreatedAt	uint64
+	ClaimedAt	uint64
 }
 
 type ReportRecord struct {
-	ReportID         string
-	ReporterAddress  string
-	ReportType       string
-	Subject          string
-	PayloadHash      string
-	PayloadSizeBytes uint32
-	Status           string
-	SubmittedHeight  uint64
-	FinalizedHeight  uint64
-	RewardAmount     uint64
-	RewardClaimed    bool
-	SlashAmount      uint64
+	ReportID		string
+	ReporterAddress		string
+	ReportType		string
+	Subject			string
+	PayloadHash		string
+	PayloadSizeBytes	uint32
+	Status			string
+	SubmittedHeight		uint64
+	FinalizedHeight		uint64
+	RewardAmount		uint64
+	RewardClaimed		bool
+	SlashAmount		uint64
 }
 
 type MsgRegisterReporter struct {
-	Authority       string
-	ReporterAddress string
-	Height          uint64
+	Authority	string
+	ReporterAddress	string
+	Height		uint64
 }
 
 type MsgBondReporter struct {
-	Authority       string
-	ReporterAddress string
-	Amount          uint64
-	Height          uint64
+	Authority	string
+	ReporterAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgUnbondReporter struct {
-	Authority       string
-	ReporterAddress string
-	Height          uint64
+	Authority	string
+	ReporterAddress	string
+	Height		uint64
 }
 
 type MsgSubmitReport struct {
-	Authority        string
-	ReporterAddress  string
-	ReportID         string
-	ReportType       string
-	Subject          string
-	PayloadHash      string
-	PayloadSizeBytes uint32
-	Accepted         bool
-	Malicious        bool
-	RewardAmount     uint64
-	Height           uint64
+	Authority		string
+	ReporterAddress		string
+	ReportID		string
+	ReportType		string
+	Subject			string
+	PayloadHash		string
+	PayloadSizeBytes	uint32
+	Accepted		bool
+	Malicious		bool
+	RewardAmount		uint64
+	Height			uint64
 }
 
 type MsgClaimReporterReward struct {
-	Authority       string
-	ReporterAddress string
-	ReportID        string
-	Height          uint64
+	Authority	string
+	ReporterAddress	string
+	ReportID	string
+	Height		uint64
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:             prototype.DefaultAuthority,
-		MinBondAmount:         DefaultMinBondAmount,
-		MaxReporters:          MaxReportersV1,
-		MaxReports:            MaxReportsV1,
-		MaxRewardHistory:      MaxRewardHistoryV1,
-		MaxReportIDBytes:      MaxReportIDBytesV1,
-		MaxReportTypeBytes:    MaxReportTypeBytesV1,
-		MaxSubjectBytes:       MaxSubjectBytesV1,
-		MaxPayloadHashBytes:   MaxPayloadHashBytesV1,
-		MaxPayloadBytes:       MaxPayloadBytesV1,
-		ChallengePeriodBlocks: DefaultChallengePeriodBlocks,
-		MaliciousSlashBps:     DefaultMaliciousSlashBps,
-		InitialScore:          DefaultInitialScore,
-		AcceptedScoreDelta:    DefaultAcceptedScoreDelta,
-		RejectedScoreDelta:    DefaultRejectedScoreDelta,
-		MaxRewardAmount:       DefaultMaxRewardAmount,
+		Authority:		prototype.DefaultAuthority,
+		MinBondAmount:		DefaultMinBondAmount,
+		MaxReporters:		MaxReportersV1,
+		MaxReports:		MaxReportsV1,
+		MaxRewardHistory:	MaxRewardHistoryV1,
+		MaxReportIDBytes:	MaxReportIDBytesV1,
+		MaxReportTypeBytes:	MaxReportTypeBytesV1,
+		MaxSubjectBytes:	MaxSubjectBytesV1,
+		MaxPayloadHashBytes:	MaxPayloadHashBytesV1,
+		MaxPayloadBytes:	MaxPayloadBytesV1,
+		ChallengePeriodBlocks:	DefaultChallengePeriodBlocks,
+		MaliciousSlashBps:	DefaultMaliciousSlashBps,
+		InitialScore:		DefaultInitialScore,
+		AcceptedScoreDelta:	DefaultAcceptedScoreDelta,
+		RejectedScoreDelta:	DefaultRejectedScoreDelta,
+		MaxRewardAmount:	DefaultMaxRewardAmount,
 	}
 }
 

@@ -7,34 +7,23 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Task 4.16: AVM Developer Surface & CI Examples
-// ---------------
-// Developer-facing module builder, scenario-based testing, invariant validation,
-// and CI pipeline model.
-
-// ---------------
-// AVM-ASM Minimal Assembly Format
-// ---------------
-// Supports: push, dup, drop, add, sub, mul, div, eq, jump, call, return, nop
-
 type ASMInstruction struct {
-	Opcode  string
-	Args    []string
-	Comment string
+	Opcode	string
+	Args	[]string
+	Comment	string
 }
 
 type ASMModule struct {
-	Name         string
-	Instructions []ASMInstruction
-	Entrypoints  []string
+	Name		string
+	Instructions	[]ASMInstruction
+	Entrypoints	[]string
 }
 
 func NewASMModule(name string) *ASMModule {
 	return &ASMModule{
-		Name:         name,
-		Instructions: make([]ASMInstruction, 0),
-		Entrypoints:  []string{"main"},
+		Name:		name,
+		Instructions:	make([]ASMInstruction, 0),
+		Entrypoints:	[]string{"main"},
 	}
 }
 
@@ -145,40 +134,36 @@ func (m *ASMModule) Comment(text string) *ASMModule {
 	return m
 }
 
-// ---------------
-// AVM-JSON Module Builder
-// ---------------
-
 type JSONModule struct {
-	Name        string            `json:"name"`
-	Version     uint32            `json:"version"`
-	ABI         uint32            `json:"abi_version"`
-	Code        []JSONInstruction `json:"code"`
-	Imports     []string          `json:"imports,omitempty"`
-	Exports     []JSONExport      `json:"exports"`
-	InitData    []byte            `json:"init_data,omitempty"`
-	Salt        []byte            `json:"salt,omitempty"`
+	Name		string			`json:"name"`
+	Version		uint32			`json:"version"`
+	ABI		uint32			`json:"abi_version"`
+	Code		[]JSONInstruction	`json:"code"`
+	Imports		[]string		`json:"imports,omitempty"`
+	Exports		[]JSONExport		`json:"exports"`
+	InitData	[]byte			`json:"init_data,omitempty"`
+	Salt		[]byte			`json:"salt,omitempty"`
 }
 
 type JSONInstruction struct {
-	Opcode string `json:"opcode"`
-	Arg    int64  `json:"arg,omitempty"`
-	Target string `json:"target,omitempty"`
+	Opcode	string	`json:"opcode"`
+	Arg	int64	`json:"arg,omitempty"`
+	Target	string	`json:"target,omitempty"`
 }
 
 type JSONExport struct {
-	Name       string `json:"name"`
-	Entrypoint string `json:"entrypoint"`
-	Selector   uint32 `json:"selector"`
+	Name		string	`json:"name"`
+	Entrypoint	string	`json:"entrypoint"`
+	Selector	uint32	`json:"selector"`
 }
 
 func NewJSONModule(name string, version, abi uint32) *JSONModule {
 	return &JSONModule{
-		Name:    name,
-		Version: version,
-		ABI:     abi,
-		Code:     make([]JSONInstruction, 0),
-		Exports:  make([]JSONExport, 0),
+		Name:		name,
+		Version:	version,
+		ABI:		abi,
+		Code:		make([]JSONInstruction, 0),
+		Exports:	make([]JSONExport, 0),
 	}
 }
 
@@ -208,56 +193,48 @@ func JSONModuleFromJSON(data string) (*JSONModule, error) {
 	return &m, nil
 }
 
-// ---------------
-// Scenario-Based Test Model
-// ---------------
-
 type Scenario struct {
-	Name             string
-	InitialState      *chunk.Chunk
-	Messages         []ScenarioMessage
-	ExpectedStateHash []byte
-	ExpectedReceipts  []ScenarioReceipt
-	ExpectedEvents    []EventRecord
-	ExpectedBounce    bool
+	Name			string
+	InitialState		*chunk.Chunk
+	Messages		[]ScenarioMessage
+	ExpectedStateHash	[]byte
+	ExpectedReceipts	[]ScenarioReceipt
+	ExpectedEvents		[]EventRecord
+	ExpectedBounce		bool
 }
 
 type ScenarioMessage struct {
-	Name      string
-	Sender    string
-	Target    string
-	Value     uint64
-	GasLimit  uint64
-	Payload   []byte
-	Bounce    bool
+	Name		string
+	Sender		string
+	Target		string
+	Value		uint64
+	GasLimit	uint64
+	Payload		[]byte
+	Bounce		bool
 }
 
 type ScenarioReceipt struct {
-	ExitCode      StructuredExitCode
-	GasUsed       uint64
-	ValueIn       uint64
-	ValueOut      uint64
-	Bounced       bool
-	RefundIssued  bool
+	ExitCode	StructuredExitCode
+	GasUsed		uint64
+	ValueIn		uint64
+	ValueOut	uint64
+	Bounced		bool
+	RefundIssued	bool
 }
 
 type ScenarioResult struct {
-	StateRoot      *chunk.Chunk
-	Receipts      []*AVMLedgerReceipt
-	Events        []EventRecord
-	Bounced        bool
-	InvariantChecks []InvariantCheckResult
-	Passed         bool
+	StateRoot	*chunk.Chunk
+	Receipts	[]*AVMLedgerReceipt
+	Events		[]EventRecord
+	Bounced		bool
+	InvariantChecks	[]InvariantCheckResult
+	Passed		bool
 }
 
-// ---------------
-// Invariant Testing Layer
-// ---------------
-
 type InvariantCheckResult struct {
-	Name    string
-	Passed  bool
-	Message string
+	Name	string
+	Passed	bool
+	Message	string
 }
 
 type InvariantFunc func(result *ScenarioResult) InvariantCheckResult
@@ -273,9 +250,9 @@ var CoreInvariants = []InvariantFunc{
 
 func DeterminismInvariant(result *ScenarioResult) InvariantCheckResult {
 	return InvariantCheckResult{
-		Name:   "determinism",
-		Passed: true,
-		Message: "same input produces same output",
+		Name:		"determinism",
+		Passed:		true,
+		Message:	"same input produces same output",
 	}
 }
 
@@ -284,8 +261,8 @@ func ValueConservationInvariant(result *ScenarioResult) InvariantCheckResult {
 		proof := VerifyValueConservation(receipt)
 		if !proof.Balanced {
 			return InvariantCheckResult{
-				Name:   "value_conservation",
-				Passed: false,
+				Name:	"value_conservation",
+				Passed:	false,
 				Message: fmt.Sprintf("value imbalance: in=%d out=%d fee=%d refund=%d delta=%d",
 					proof.ValueIn, proof.ValueOut, proof.StorageFeePaid, proof.RefundIssued, proof.RemainingBalanceDelta),
 			}
@@ -299,9 +276,9 @@ func GasMonotonicityInvariant(result *ScenarioResult) InvariantCheckResult {
 	for _, receipt := range result.Receipts {
 		if receipt.GasUsed < prevGas {
 			return InvariantCheckResult{
-				Name:   "gas_monotonicity",
-				Passed: false,
-				Message: fmt.Sprintf("gas decreased: %d → %d", prevGas, receipt.GasUsed),
+				Name:		"gas_monotonicity",
+				Passed:		false,
+				Message:	fmt.Sprintf("gas decreased: %d → %d", prevGas, receipt.GasUsed),
 			}
 		}
 		prevGas = receipt.GasUsed
@@ -325,9 +302,9 @@ func NoDoubleRefundInvariant(result *ScenarioResult) InvariantCheckResult {
 	for _, receipt := range result.Receipts {
 		if receipt.MessageFlags.RefundIssued && receipt.GasRefunded > 0 && receipt.GasRefunded > receipt.GasUsed {
 			return InvariantCheckResult{
-				Name:   "no_double_refund",
-				Passed: false,
-				Message: fmt.Sprintf("refund %d exceeds gas used %d", receipt.GasRefunded, receipt.GasUsed),
+				Name:		"no_double_refund",
+				Passed:		false,
+				Message:	fmt.Sprintf("refund %d exceeds gas used %d", receipt.GasRefunded, receipt.GasUsed),
 			}
 		}
 	}
@@ -343,9 +320,9 @@ func NoInfiniteBounceInvariant(result *ScenarioResult) InvariantCheckResult {
 	}
 	if bounceCount > 1 {
 		return InvariantCheckResult{
-			Name:   "no_infinite_bounce",
-			Passed: false,
-			Message: fmt.Sprintf("multiple bounces detected: %d", bounceCount),
+			Name:		"no_infinite_bounce",
+			Passed:		false,
+			Message:	fmt.Sprintf("multiple bounces detected: %d", bounceCount),
 		}
 	}
 	return InvariantCheckResult{Name: "no_infinite_bounce", Passed: true, Message: "bounce count within bounds"}
@@ -359,28 +336,24 @@ func RunInvariants(result *ScenarioResult) []InvariantCheckResult {
 	return results
 }
 
-// ---------------
-// CI Pipeline Model
-// ---------------
-
 type CIPipelineStage string
 
 const (
-	CIStageBuild       CIPipelineStage = "build"
-	CIStageVerify      CIPipelineStage = "verify"
-	CIStageDeploy      CIPipelineStage = "deploy"
-	CIStageExecute     CIPipelineStage = "execute"
-	CIStageQuery      CIPipelineStage = "query"
-	CIStageExport     CIPipelineStage = "export"
-	CIStageImport     CIPipelineStage = "import"
-	CIStageReplay     CIPipelineStage = "replay"
+	CIStageBuild	CIPipelineStage	= "build"
+	CIStageVerify	CIPipelineStage	= "verify"
+	CIStageDeploy	CIPipelineStage	= "deploy"
+	CIStageExecute	CIPipelineStage	= "execute"
+	CIStageQuery	CIPipelineStage	= "query"
+	CIStageExport	CIPipelineStage	= "export"
+	CIStageImport	CIPipelineStage	= "import"
+	CIStageReplay	CIPipelineStage	= "replay"
 )
 
 type CIPipelineResult struct {
-	Stage    CIPipelineStage
-	Success  bool
-	Error    string
-	Duration string
+	Stage		CIPipelineStage
+	Success		bool
+	Error		string
+	Duration	string
 }
 
 type CIPipeline struct {
@@ -402,14 +375,10 @@ func NewCIPipeline() *CIPipeline {
 	}
 }
 
-// ---------------
-// Negative Test Cases
-// ---------------
-
 type NegativeTestCase struct {
-	Name        string
-	Description string
-	ExitCode    StructuredExitCode
+	Name		string
+	Description	string
+	ExitCode	StructuredExitCode
 }
 
 var NegativeTestCases = []NegativeTestCase{
@@ -429,66 +398,57 @@ var NegativeTestCases = []NegativeTestCase{
 	{Name: "action_budget_exceeded", Description: "emit more actions than allowed", ExitCode: ExitActionBudget},
 }
 
-// ---------------
-// Example Contract Definitions
-// ---------------
-// These define the canonical example suite for CI validation.
-
 type ExampleContract struct {
-	Name              string
-	Description       string
-	Source            string
-	ABI               *InterfaceManifest
-	StateInit         *StateInit
-	HappyPath         []Scenario
-	FailurePaths      []Scenario
-	GetMethods        []Scenario
-	ExportImport      []Scenario
-	UpgradePath       []Scenario
-	BounceScenario    []Scenario
-	RefundScenario    []Scenario
+	Name		string
+	Description	string
+	Source		string
+	ABI		*InterfaceManifest
+	StateInit	*StateInit
+	HappyPath	[]Scenario
+	FailurePaths	[]Scenario
+	GetMethods	[]Scenario
+	ExportImport	[]Scenario
+	UpgradePath	[]Scenario
+	BounceScenario	[]Scenario
+	RefundScenario	[]Scenario
 }
 
 var CanonicalExamples = []ExampleContract{
 	{
-		Name:        "counter",
-		Description: "State mutation + get-method scenario",
+		Name:		"counter",
+		Description:	"State mutation + get-method scenario",
 	},
 	{
-		Name:        "domain_registry",
-		Description: "ChunkMap + bounded string names",
+		Name:		"domain_registry",
+		Description:	"ChunkMap + bounded string names",
 	},
 	{
-		Name:        "message_sender_receiver",
-		Description: "Internal message passing between contracts",
+		Name:		"message_sender_receiver",
+		Description:	"Internal message passing between contracts",
 	},
 	{
-		Name:        "bounce_scenario",
-		Description: "Failed internal message creates bounce",
+		Name:		"bounce_scenario",
+		Description:	"Failed internal message creates bounce",
 	},
 	{
-		Name:        "refund_scenario",
-		Description: "Gas refund accounting on failure",
+		Name:		"refund_scenario",
+		Description:	"Gas refund accounting on failure",
 	},
 	{
-		Name:        "get_method_query",
-		Description: "Query contract state via get methods",
+		Name:		"get_method_query",
+		Description:	"Query contract state via get methods",
 	},
 	{
-		Name:        "upgrade_migration",
-		Description: "Minimal upgrade + schema migration",
+		Name:		"upgrade_migration",
+		Description:	"Minimal upgrade + schema migration",
 	},
 }
 
-// ---------------
-// Scenario Runner (For CI)
-// ---------------
-
 func RunScenario(scenario *Scenario) (*ScenarioResult, error) {
 	result := &ScenarioResult{
-		Receipts: make([]*AVMLedgerReceipt, 0),
-		Events:   make([]EventRecord, 0),
-		Passed:   true,
+		Receipts:	make([]*AVMLedgerReceipt, 0),
+		Events:		make([]EventRecord, 0),
+		Passed:		true,
 	}
 
 	for _, msg := range scenario.Messages {
@@ -498,24 +458,24 @@ func RunScenario(scenario *Scenario) (*ScenarioResult, error) {
 
 		state := m.Root()
 		avmMsg := Message{
-			Type:     MessageInternal,
-			Sender:   msg.Sender,
-			Target:   msg.Target,
-			Value:    msg.Value,
-			GasLimit: msg.GasLimit,
+			Type:		MessageInternal,
+			Sender:		msg.Sender,
+			Target:		msg.Target,
+			Value:		msg.Value,
+			GasLimit:	msg.GasLimit,
 		}
 
 		frame := NewKernelExecutionFrame(state, avmMsg, 100)
 		_, _, exitCode, avmReceipt, _ := ExecuteKernelSemantics(frame)
 
 		receipt := &AVMLedgerReceipt{
-			ExitCode:       exitCode,
-			GasUsed:        avmReceipt.GasUsed,
-			GasBreakdown:   GasBreakdown{ComputeGas: avmReceipt.GasUsed},
-			ValueIn:        msg.Value,
-			MessageFlags:   MessageFlags{Consumed: true},
-			StateRootBefore: []byte(avmReceipt.StateRootBefore),
-			StateRootAfter:  []byte(avmReceipt.StateRootAfter),
+			ExitCode:		exitCode,
+			GasUsed:		avmReceipt.GasUsed,
+			GasBreakdown:		GasBreakdown{ComputeGas: avmReceipt.GasUsed},
+			ValueIn:		msg.Value,
+			MessageFlags:		MessageFlags{Consumed: true},
+			StateRootBefore:	[]byte(avmReceipt.StateRootBefore),
+			StateRootAfter:		[]byte(avmReceipt.StateRootAfter),
 		}
 		result.Receipts = append(result.Receipts, receipt)
 	}

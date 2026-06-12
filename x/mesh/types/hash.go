@@ -24,9 +24,9 @@ func ComputeMessageID(msg MeshMessage) string {
 func BuildProof(msg MeshMessage, commitment FinalizedCommitment) MeshProof {
 	msg = msg.Normalize()
 	return MeshProof{
-		SourceCommitment: commitment.CommitmentHash,
-		MessageRoot:      commitment.MessageRoot,
-		ProofHash:        ComputeProofHash(msg, commitment),
+		SourceCommitment:	commitment.CommitmentHash,
+		MessageRoot:		commitment.MessageRoot,
+		ProofHash:		ComputeProofHash(msg, commitment),
 	}
 }
 

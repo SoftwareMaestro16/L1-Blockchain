@@ -9,16 +9,16 @@ import (
 
 // Reader is a read cursor over Chunk data and its references.
 type Reader struct {
-	chunk    *chunk.Chunk
-	data     []byte
-	offset   int // bit offset
-	refIndex int
+	chunk		*chunk.Chunk
+	data		[]byte
+	offset		int	// bit offset
+	refIndex	int
 }
 
 func NewReader(c *chunk.Chunk) *Reader {
 	return &Reader{
-		chunk: c,
-		data:  c.Data(),
+		chunk:	c,
+		data:	c.Data(),
 	}
 }
 
@@ -69,7 +69,6 @@ func (r *Reader) ReadBits(n int) ([]byte, error) {
 		return nil, fmt.Errorf("read out of bounds: offset %d + bits %d > %d", r.offset, n, r.chunk.BitCount())
 	}
 
-	// Simplified bit reading for now (byte-aligned if possible)
 	if r.offset%8 == 0 && n%8 == 0 {
 		start := r.offset / 8
 		end := start + (n / 8)
@@ -77,17 +76,15 @@ func (r *Reader) ReadBits(n int) ([]byte, error) {
 		return append([]byte(nil), r.data[start:end]...), nil
 	}
 
-	// TODO: Proper bit-level reading if needed for AVM.
-	// For now, we assume byte-aligned operations for these primitives.
 	return nil, fmt.Errorf("unaligned bit reading not yet implemented")
 }
 
 // Writer is an immutable Chunk constructor with typed methods.
 type Writer struct {
-	builder  *chunk.Builder
-	data     []byte
-	bitCount int
-	refs     []*chunk.Chunk
+	builder		*chunk.Builder
+	data		[]byte
+	bitCount	int
+	refs		[]*chunk.Chunk
 }
 
 func NewWriter() *Writer {
@@ -125,7 +122,7 @@ func (w *Writer) AddRef(c *chunk.Chunk) error {
 }
 
 func (w *Writer) WriteBits(data []byte, n int) error {
-	// Simple byte-aligned append for now
+
 	if w.bitCount%8 == 0 && n%8 == 0 {
 		w.data = append(w.data, data...)
 		w.bitCount += n

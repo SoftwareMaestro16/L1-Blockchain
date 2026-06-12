@@ -13,125 +13,125 @@ import (
 )
 
 const (
-	MaxPendingAmendmentsV1 = uint32(64)
-	MaxAmendmentIDBytesV1  = uint32(96)
-	MaxReasonBytesV1       = uint32(512)
+	MaxPendingAmendmentsV1	= uint32(64)
+	MaxAmendmentIDBytesV1	= uint32(96)
+	MaxReasonBytesV1	= uint32(512)
 
-	AmendmentStatusPending   = "pending"
-	AmendmentStatusApproved  = "approved"
-	AmendmentStatusExecuted  = "executed"
-	AmendmentStatusCancelled = "cancelled"
+	AmendmentStatusPending		= "pending"
+	AmendmentStatusApproved		= "approved"
+	AmendmentStatusExecuted		= "executed"
+	AmendmentStatusCancelled	= "cancelled"
 
-	VoteSupportYes = "yes"
-	VoteSupportNo  = "no"
+	VoteSupportYes	= "yes"
+	VoteSupportNo	= "no"
 
-	MaxBasisPoints = uint32(10_000)
+	MaxBasisPoints	= uint32(10_000)
 )
 
 type Params struct {
-	Authority               string
-	MaxPendingAmendments    uint32
-	MaxAmendmentIDBytes     uint32
-	MinAmendmentDelay       uint64
-	MinQuorumBps            uint32
-	EmergencyPauseMaxBlocks uint64
+	Authority		string
+	MaxPendingAmendments	uint32
+	MaxAmendmentIDBytes	uint32
+	MinAmendmentDelay	uint64
+	MinQuorumBps		uint32
+	EmergencyPauseMaxBlocks	uint64
 }
 
 type Constitution struct {
-	MaxInflationBps             uint32
-	MinSlashFractionBps         uint32
-	MaxSlashFractionBps         uint32
-	MaxValidatorVotingPowerBps  uint32
-	MaxBlockGas                 uint64
-	MaxAVMCodeSizeBytes         uint64
-	MaxContractStateSizeBytes   uint64
-	MinStorageRentRate          uint64
-	TreasurySpendLimitPerEpoch  uint64
-	UpgradeDelayBlocks          uint64
-	EmergencyPauseMaxBlocks     uint64
-	GovernanceQuorumFloorBps    uint32
-	ProtectedModules            []string
-	ConstitutionalExceptionKeys []string
-	EmergencyPauseUntilHeight   uint64
+	MaxInflationBps			uint32
+	MinSlashFractionBps		uint32
+	MaxSlashFractionBps		uint32
+	MaxValidatorVotingPowerBps	uint32
+	MaxBlockGas			uint64
+	MaxAVMCodeSizeBytes		uint64
+	MaxContractStateSizeBytes	uint64
+	MinStorageRentRate		uint64
+	TreasurySpendLimitPerEpoch	uint64
+	UpgradeDelayBlocks		uint64
+	EmergencyPauseMaxBlocks		uint64
+	GovernanceQuorumFloorBps	uint32
+	ProtectedModules		[]string
+	ConstitutionalExceptionKeys	[]string
+	EmergencyPauseUntilHeight	uint64
 }
 
 type Amendment struct {
-	ID                string
-	Status            string
-	Proposer          string
-	Approver          string
-	Executor          string
-	Canceller         string
-	Reason            string
-	Proposed          Constitution
-	CreatedHeight     uint64
-	UpdatedHeight     uint64
-	ExecutableHeight  uint64
-	YesVotingPowerBps uint32
-	NoVotingPowerBps  uint32
+	ID			string
+	Status			string
+	Proposer		string
+	Approver		string
+	Executor		string
+	Canceller		string
+	Reason			string
+	Proposed		Constitution
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	ExecutableHeight	uint64
+	YesVotingPowerBps	uint32
+	NoVotingPowerBps	uint32
 }
 
 type State struct {
-	Constitution      Constitution
-	PendingAmendments []Amendment
+	Constitution		Constitution
+	PendingAmendments	[]Amendment
 }
 
 type ProtectedLimits struct {
-	MaxBlockGas               uint64
-	MaxAVMCodeSizeBytes       uint64
-	MaxContractStateSizeBytes uint64
-	MinStorageRentRate        uint64
-	ProtectedModules          []string
+	MaxBlockGas			uint64
+	MaxAVMCodeSizeBytes		uint64
+	MaxContractStateSizeBytes	uint64
+	MinStorageRentRate		uint64
+	ProtectedModules		[]string
 }
 
 type MsgProposeConstitutionAmendment struct {
-	Authority string
-	Amendment Amendment
+	Authority	string
+	Amendment	Amendment
 }
 
 type MsgVoteConstitutionAmendment struct {
-	Authority      string
-	AmendmentID    string
-	Support        string
-	VotingPowerBps uint32
+	Authority	string
+	AmendmentID	string
+	Support		string
+	VotingPowerBps	uint32
 }
 
 type MsgExecuteConstitutionAmendment struct {
-	Authority   string
-	AmendmentID string
+	Authority	string
+	AmendmentID	string
 }
 
 type MsgCancelConstitutionAmendment struct {
-	Authority   string
-	AmendmentID string
-	Reason      string
+	Authority	string
+	AmendmentID	string
+	Reason		string
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:               prototype.DefaultAuthority,
-		MaxPendingAmendments:    MaxPendingAmendmentsV1,
-		MaxAmendmentIDBytes:     MaxAmendmentIDBytesV1,
-		MinAmendmentDelay:       100,
-		MinQuorumBps:            6_700,
-		EmergencyPauseMaxBlocks: 1_000,
+		Authority:			prototype.DefaultAuthority,
+		MaxPendingAmendments:		MaxPendingAmendmentsV1,
+		MaxAmendmentIDBytes:		MaxAmendmentIDBytesV1,
+		MinAmendmentDelay:		100,
+		MinQuorumBps:			6_700,
+		EmergencyPauseMaxBlocks:	1_000,
 	}
 }
 
 func DefaultConstitution() Constitution {
 	return Constitution{
-		MaxInflationBps:            2_000,
-		MinSlashFractionBps:        1,
-		MaxSlashFractionBps:        2_000,
-		MaxValidatorVotingPowerBps: 2_500,
-		MaxBlockGas:                1_000_000_000,
-		MaxAVMCodeSizeBytes:        10 * 1024 * 1024,
-		MaxContractStateSizeBytes:  1_000 * 1024 * 1024,
-		MinStorageRentRate:         1,
-		TreasurySpendLimitPerEpoch: 1_000_000_000_000,
-		UpgradeDelayBlocks:         10_000,
-		EmergencyPauseMaxBlocks:    1_000,
-		GovernanceQuorumFloorBps:   6_700,
+		MaxInflationBps:		2_000,
+		MinSlashFractionBps:		1,
+		MaxSlashFractionBps:		2_000,
+		MaxValidatorVotingPowerBps:	2_500,
+		MaxBlockGas:			1_000_000_000,
+		MaxAVMCodeSizeBytes:		10 * 1024 * 1024,
+		MaxContractStateSizeBytes:	1_000 * 1024 * 1024,
+		MinStorageRentRate:		1,
+		TreasurySpendLimitPerEpoch:	1_000_000_000_000,
+		UpgradeDelayBlocks:		10_000,
+		EmergencyPauseMaxBlocks:	1_000,
+		GovernanceQuorumFloorBps:	6_700,
 		ProtectedModules: []string{
 			"config",
 			"constitution",
@@ -144,7 +144,7 @@ func DefaultConstitution() Constitution {
 			"validator-election",
 			"validator-registry",
 		},
-		ConstitutionalExceptionKeys: []string{},
+		ConstitutionalExceptionKeys:	[]string{},
 	}
 }
 
@@ -243,9 +243,9 @@ func (a Amendment) Validate(params Params) error {
 		return err
 	}
 	for label, value := range map[string]string{
-		"constitution amendment approver":  a.Approver,
-		"constitution amendment executor":  a.Executor,
-		"constitution amendment canceller": a.Canceller,
+		"constitution amendment approver":	a.Approver,
+		"constitution amendment executor":	a.Executor,
+		"constitution amendment canceller":	a.Canceller,
 	} {
 		if strings.TrimSpace(value) != "" {
 			if err := addressing.ValidateAuthorityAddress(label, value); err != nil {
@@ -299,11 +299,11 @@ func (s State) Validate(params Params) error {
 
 func (c Constitution) ProtectedLimits() ProtectedLimits {
 	return ProtectedLimits{
-		MaxBlockGas:               c.MaxBlockGas,
-		MaxAVMCodeSizeBytes:       c.MaxAVMCodeSizeBytes,
-		MaxContractStateSizeBytes: c.MaxContractStateSizeBytes,
-		MinStorageRentRate:        c.MinStorageRentRate,
-		ProtectedModules:          append([]string(nil), c.ProtectedModules...),
+		MaxBlockGas:			c.MaxBlockGas,
+		MaxAVMCodeSizeBytes:		c.MaxAVMCodeSizeBytes,
+		MaxContractStateSizeBytes:	c.MaxContractStateSizeBytes,
+		MinStorageRentRate:		c.MinStorageRentRate,
+		ProtectedModules:		append([]string(nil), c.ProtectedModules...),
 	}
 }
 

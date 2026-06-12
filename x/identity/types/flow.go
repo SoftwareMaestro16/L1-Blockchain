@@ -10,57 +10,57 @@ import (
 type IdentityOperationKind string
 
 const (
-	IdentityOperationRegister       IdentityOperationKind = "register"
-	IdentityOperationRenew          IdentityOperationKind = "renew"
-	IdentityOperationTransfer       IdentityOperationKind = "transfer"
-	IdentityOperationResolverUpdate IdentityOperationKind = "resolver_update"
+	IdentityOperationRegister	IdentityOperationKind	= "register"
+	IdentityOperationRenew		IdentityOperationKind	= "renew"
+	IdentityOperationTransfer	IdentityOperationKind	= "transfer"
+	IdentityOperationResolverUpdate	IdentityOperationKind	= "resolver_update"
 )
 
 type IdentityFlowStep string
 
 const (
-	IdentityFlowStepDeterministicValidation IdentityFlowStep = "deterministic_validation"
-	IdentityFlowStepRegistryNFTCheck        IdentityFlowStep = "registry_state_nft_ownership_check"
-	IdentityFlowStepResolverStateUpdate     IdentityFlowStep = "resolver_state_update"
-	IdentityFlowStepStoreV2Writes           IdentityFlowStep = "proof_indexed_store_v2_writes"
-	IdentityFlowStepEventsProofsRouting     IdentityFlowStep = "events_queryable_proofs_execution_routing_hooks"
+	IdentityFlowStepDeterministicValidation	IdentityFlowStep	= "deterministic_validation"
+	IdentityFlowStepRegistryNFTCheck	IdentityFlowStep	= "registry_state_nft_ownership_check"
+	IdentityFlowStepResolverStateUpdate	IdentityFlowStep	= "resolver_state_update"
+	IdentityFlowStepStoreV2Writes		IdentityFlowStep	= "proof_indexed_store_v2_writes"
+	IdentityFlowStepEventsProofsRouting	IdentityFlowStep	= "events_queryable_proofs_execution_routing_hooks"
 )
 
 type IdentityDataFlowRequest struct {
-	Operation     IdentityOperationKind
-	Domain        string
-	Actor         sdk.AccAddress
-	NewOwner      sdk.AccAddress
-	ResolverPatch *ResolverPatch
+	Operation	IdentityOperationKind
+	Domain		string
+	Actor		sdk.AccAddress
+	NewOwner	sdk.AccAddress
+	ResolverPatch	*ResolverPatch
 }
 
 type IdentityDataFlow struct {
-	Operation    IdentityOperationKind
-	Domain       string
-	Actor        sdk.AccAddress
-	Steps        []IdentityFlowStep
-	AccessSet    IdentityAccessSet
-	StoreWrites  []string
-	EventTypes   []string
-	ProofRoot    string
-	RoutingHooks []IdentityV2Component
+	Operation	IdentityOperationKind
+	Domain		string
+	Actor		sdk.AccAddress
+	Steps		[]IdentityFlowStep
+	AccessSet	IdentityAccessSet
+	StoreWrites	[]string
+	EventTypes	[]string
+	ProofRoot	string
+	RoutingHooks	[]IdentityV2Component
 }
 
 type IdentityBoundaryStatus string
 
 const (
-	IdentityBoundaryTrusted  IdentityBoundaryStatus = "trusted"
-	IdentityBoundaryAdvisory IdentityBoundaryStatus = "advisory"
-	IdentityBoundaryRejected IdentityBoundaryStatus = "rejected"
+	IdentityBoundaryTrusted		IdentityBoundaryStatus	= "trusted"
+	IdentityBoundaryAdvisory	IdentityBoundaryStatus	= "advisory"
+	IdentityBoundaryRejected	IdentityBoundaryStatus	= "rejected"
 )
 
 type IdentityTrustBoundaryReport struct {
-	RegistryNFTAuthority IdentityBoundaryStatus
-	ResolverAuthority    IdentityBoundaryStatus
-	ServiceMetadata      IdentityBoundaryStatus
-	InterfaceDescriptor  IdentityBoundaryStatus
-	LightClientProof     IdentityBoundaryStatus
-	CacheFreshness       IdentityBoundaryStatus
+	RegistryNFTAuthority	IdentityBoundaryStatus
+	ResolverAuthority	IdentityBoundaryStatus
+	ServiceMetadata		IdentityBoundaryStatus
+	InterfaceDescriptor	IdentityBoundaryStatus
+	LightClientProof	IdentityBoundaryStatus
+	CacheFreshness		IdentityBoundaryStatus
 }
 
 func PlanIdentityDataFlow(state IdentityState, request IdentityDataFlowRequest, height uint64) (IdentityDataFlow, error) {
@@ -76,9 +76,9 @@ func PlanIdentityDataFlow(state IdentityState, request IdentityDataFlowRequest, 
 		return IdentityDataFlow{}, err
 	}
 	flow := IdentityDataFlow{
-		Operation: request.Operation,
-		Domain:    normalized,
-		Actor:     cloneSpecAddress(request.Actor),
+		Operation:	request.Operation,
+		Domain:		normalized,
+		Actor:		cloneSpecAddress(request.Actor),
 		Steps: []IdentityFlowStep{
 			IdentityFlowStepDeterministicValidation,
 			IdentityFlowStepRegistryNFTCheck,
@@ -217,10 +217,10 @@ func ValidateResolutionCacheFreshness(cachedHeight uint64, currentHeight uint64,
 
 func EvaluateIdentityTrustBoundaries(state IdentityState, name string, actor sdk.AccAddress, height uint64, proof *IdentityResolutionProof, cachedHeight uint64, maxCacheAge uint64) IdentityTrustBoundaryReport {
 	report := IdentityTrustBoundaryReport{
-		ServiceMetadata:     IdentityBoundaryAdvisory,
-		InterfaceDescriptor: IdentityBoundaryAdvisory,
-		LightClientProof:    IdentityBoundaryAdvisory,
-		CacheFreshness:      IdentityBoundaryAdvisory,
+		ServiceMetadata:	IdentityBoundaryAdvisory,
+		InterfaceDescriptor:	IdentityBoundaryAdvisory,
+		LightClientProof:	IdentityBoundaryAdvisory,
+		CacheFreshness:		IdentityBoundaryAdvisory,
 	}
 	if _, _, err := ValidateRegistryNFTAuthority(state, name, height); err != nil {
 		report.RegistryNFTAuthority = IdentityBoundaryRejected

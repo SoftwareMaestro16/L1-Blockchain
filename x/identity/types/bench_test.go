@@ -121,21 +121,21 @@ func BenchmarkIdentityResolverUpdateWritePath(b *testing.B) {
 		b.Fatal("benchmark resolver missing")
 	}
 	msg := MsgBatchUpdateResolversV2{
-		Auth: benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 1),
+		Auth:	benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 1),
 		Updates: []ResolverBatchUpdateV2{{
-			Name:                  name,
-			NameHash:              nameHash,
-			Patch:                 ResolverPatch{Primary: benchmarkIdentityAddress(60_000)},
-			ExpectedRecordVersion: ResolverRecordVersionV2(resolver),
-			RecordTTL:             30,
+			Name:			name,
+			NameHash:		nameHash,
+			Patch:			ResolverPatch{Primary: benchmarkIdentityAddress(60_000)},
+			ExpectedRecordVersion:	ResolverRecordVersionV2(resolver),
+			RecordTTL:		30,
 		}},
 	}
 	msg.Auth.Signer = benchmarkIdentityAddress(1)
 	options := IdentityBatchResolverUpdateOptionsV2{
-		Mode:         IdentityBatchFailureAtomicV2,
-		Height:       benchmarkIdentityResolveHeight + 1,
-		GasPerUpdate: MinIdentityBatchResolverUpdateGasV2,
-		GasLimit:     MinIdentityBatchResolverUpdateGasV2,
+		Mode:		IdentityBatchFailureAtomicV2,
+		Height:		benchmarkIdentityResolveHeight + 1,
+		GasPerUpdate:	MinIdentityBatchResolverUpdateGasV2,
+		GasLimit:	MinIdentityBatchResolverUpdateGasV2,
 	}
 
 	b.ReportAllocs()
@@ -206,11 +206,11 @@ func BenchmarkIdentityRegistrationsPerBlock(b *testing.B) {
 			b.Fatal(err)
 		}
 		msg := MsgRegisterDirectV2{
-			Auth:                  benchmarkIdentityTxAuth(IdentitySignerScopeRegistration, uint64(i+1)),
-			Name:                  name,
-			NameHash:              nameHash,
-			Owner:                 benchmarkIdentityAddress(i + 50_000),
-			ExpectedRecordVersion: 1,
+			Auth:			benchmarkIdentityTxAuth(IdentitySignerScopeRegistration, uint64(i+1)),
+			Name:			name,
+			NameHash:		nameHash,
+			Owner:			benchmarkIdentityAddress(i + 50_000),
+			ExpectedRecordVersion:	1,
 		}
 		plan, err := IdentityBlockSTMAccessSetV2(msg, benchmarkIdentityResolveHeight)
 		if err != nil {
@@ -246,10 +246,10 @@ func BenchmarkIdentityAdaptiveSyncRecoveryLargeState(b *testing.B) {
 func BenchmarkIdentityResolverUpdateSpamGasCostModelV2(b *testing.B) {
 	params := DefaultIdentitySpamCostParamsV2()
 	request := IdentitySpamCostRequestV2{
-		ResolverUpdateCount:       MaxIdentityTxBatchResolverUpdatesV2,
-		ResolverPayloadBytes:      MaxUnifiedPayloadBytesV2,
-		BatchResolverGasPerUpdate: MinIdentityBatchResolverUpdateGasV2,
-		ServiceEndpointCount:      MaxUnifiedServiceEndpoints,
+		ResolverUpdateCount:		MaxIdentityTxBatchResolverUpdatesV2,
+		ResolverPayloadBytes:		MaxUnifiedPayloadBytesV2,
+		BatchResolverGasPerUpdate:	MinIdentityBatchResolverUpdateGasV2,
+		ServiceEndpointCount:		MaxUnifiedServiceEndpoints,
 	}
 
 	b.ReportAllocs()
@@ -266,8 +266,8 @@ func BenchmarkIdentityResolverUpdateSpamGasCostModelV2(b *testing.B) {
 }
 
 const (
-	benchmarkIdentityRevealHeight  = uint64(11)
-	benchmarkIdentityResolveHeight = uint64(12)
+	benchmarkIdentityRevealHeight	= uint64(11)
+	benchmarkIdentityResolveHeight	= uint64(12)
 )
 
 func benchmarkIdentityState(b *testing.B, count int) IdentityState {
@@ -282,27 +282,27 @@ func benchmarkIdentityState(b *testing.B, count int) IdentityState {
 			b.Fatal(err)
 		}
 		state.Domains = append(state.Domains, Domain{
-			Name:             name,
-			Owner:            owner,
-			NFTID:            nftID,
-			RegisteredHeight: benchmarkIdentityRevealHeight,
-			ExpiryHeight:     benchmarkIdentityRevealHeight + state.Params.RegistrationPeriodBlocks,
-			UpdatedHeight:    benchmarkIdentityResolveHeight,
+			Name:			name,
+			Owner:			owner,
+			NFTID:			nftID,
+			RegisteredHeight:	benchmarkIdentityRevealHeight,
+			ExpiryHeight:		benchmarkIdentityRevealHeight + state.Params.RegistrationPeriodBlocks,
+			UpdatedHeight:		benchmarkIdentityResolveHeight,
 		})
 		state.DomainNFTs = append(state.DomainNFTs, DomainNFT{
-			ID:         nftID,
-			Domain:     name,
-			Owner:      owner,
-			MintHeight: benchmarkIdentityRevealHeight,
+			ID:		nftID,
+			Domain:		name,
+			Owner:		owner,
+			MintHeight:	benchmarkIdentityRevealHeight,
 		})
 		state.Resolvers = append(state.Resolvers, ResolverRecord{
-			Domain:  name,
-			Owner:   owner,
-			Primary: benchmarkIdentityAddress(i + 10_000),
+			Domain:		name,
+			Owner:		owner,
+			Primary:	benchmarkIdentityAddress(i + 10_000),
 			Records: map[string]sdk.AccAddress{
 				ResolverKeyWallet: benchmarkIdentityAddress(i + 20_000),
 			},
-			UpdatedAtUnix: int64(benchmarkIdentityResolveHeight),
+			UpdatedAtUnix:	int64(benchmarkIdentityResolveHeight),
 		})
 	}
 	state = state.Export()
@@ -334,11 +334,11 @@ func benchmarkBatchResolverUpdateMsg(b *testing.B, count int) MsgBatchUpdateReso
 			b.Fatal(err)
 		}
 		updates[i] = ResolverBatchUpdateV2{
-			Name:                  name,
-			NameHash:              nameHash,
-			Patch:                 ResolverPatch{Primary: benchmarkIdentityAddress(i + 30_000)},
-			ExpectedRecordVersion: 1,
-			RecordTTL:             30,
+			Name:			name,
+			NameHash:		nameHash,
+			Patch:			ResolverPatch{Primary: benchmarkIdentityAddress(i + 30_000)},
+			ExpectedRecordVersion:	1,
+			RecordTTL:		30,
 		}
 	}
 	return MsgBatchUpdateResolversV2{Auth: benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 1), Updates: updates}
@@ -354,9 +354,9 @@ func benchmarkBatchRenewDomainsMsg(b *testing.B, count int) MsgBatchRenewDomains
 			b.Fatal(err)
 		}
 		renewals[i] = RenewDomainBatchItemV2{
-			Name:                  name,
-			NameHash:              nameHash,
-			ExpectedRecordVersion: 1,
+			Name:			name,
+			NameHash:		nameHash,
+			ExpectedRecordVersion:	1,
 		}
 	}
 	return MsgBatchRenewDomainsV2{Auth: benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 2), Renewals: renewals}
@@ -373,13 +373,13 @@ func benchmarkBlockSTMPlan(b *testing.B, msg IdentityMsgV2) IdentityBlockSTMPlan
 
 func benchmarkIdentityTxAuth(scope IdentitySignerScopeV2, nonce uint64) IdentityTxAuthV2 {
 	return IdentityTxAuthV2{
-		ChainID:                  "aetra-local-1",
-		Signer:                   benchmarkIdentityAddress(int(nonce + 40_000)),
-		Scope:                    scope,
-		NameNormalizationVersion: NameNormalizationVersionV2,
-		Nonce:                    nonce,
-		Fee:                      1,
-		StorageCost:              1,
+		ChainID:			"aetra-local-1",
+		Signer:				benchmarkIdentityAddress(int(nonce + 40_000)),
+		Scope:				scope,
+		NameNormalizationVersion:	NameNormalizationVersionV2,
+		Nonce:				nonce,
+		Fee:				1,
+		StorageCost:			1,
 	}
 }
 

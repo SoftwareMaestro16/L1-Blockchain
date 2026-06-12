@@ -13,19 +13,19 @@ import (
 )
 
 const (
-	MaxHostArgs     = 8
-	MaxHostArgBytes = 4096
+	MaxHostArgs	= 8
+	MaxHostArgBytes	= 4096
 
-	ExitCodeForbiddenHostCall = async.ResultForbiddenHostCall
+	ExitCodeForbiddenHostCall	= async.ResultForbiddenHostCall
 )
 
 // HostGasCost specifies the gas cost model for a host function.
 // Each function has a base cost plus per-byte and per-ref (Chunk reference) costs.
 type HostGasCost struct {
-	BaseCost   uint64
-	PerByte    uint64
-	PerRef     uint64
-	MinCost    uint64
+	BaseCost	uint64
+	PerByte		uint64
+	PerRef		uint64
+	MinCost		uint64
 }
 
 // HostGasCostFor returns the gas cost for calling a host function with given inputs.
@@ -47,94 +47,94 @@ func HostGasCostFor(host HostFunction, argBytes int, refCount int) uint64 {
 
 func hostPerByteCosts() map[HostFunction]uint64 {
 	return map[HostFunction]uint64{
-		HostSendInternal: 2,
-		HostEmitEvent:    1,
-		HostWriteStorage: 1,
-		HostReadStorage:  1,
+		HostSendInternal:	2,
+		HostEmitEvent:		1,
+		HostWriteStorage:	1,
+		HostReadStorage:	1,
 	}
 }
 
 func hostPerRefCosts() map[HostFunction]uint64 {
 	return map[HostFunction]uint64{
-		HostReadStorage:  10,
-		HostWriteStorage: 25,
+		HostReadStorage:	10,
+		HostWriteStorage:	25,
 	}
 }
 
 func hostMinCosts() map[HostFunction]uint64 {
 	return map[HostFunction]uint64{
-		HostHashSHA256:         70,
-		HostHashBLAKE3:         80,
-		HostVerifyEd25519:      3_000,
-		HostSendInternal:       200,
-		HostWriteStorage:       50,
-		HostReadStorage:        20,
-		HostDeleteStorage:      150,
-		HostParseAetraAddress:  30,
-		HostFormatAetraAddress: 30,
+		HostHashSHA256:		70,
+		HostHashBLAKE3:		80,
+		HostVerifyEd25519:	3_000,
+		HostSendInternal:	200,
+		HostWriteStorage:	50,
+		HostReadStorage:	20,
+		HostDeleteStorage:	150,
+		HostParseAetraAddress:	30,
+		HostFormatAetraAddress:	30,
 	}
 }
 
 type HostFunctionSpec struct {
-	ID          HostFunction
-	Name        string
-	MinArgs     uint16
-	MaxArgs     uint16
-	MaxArgBytes uint32
-	Forbidden   bool
-	Class       HostFunctionClass
+	ID		HostFunction
+	Name		string
+	MinArgs		uint16
+	MaxArgs		uint16
+	MaxArgBytes	uint32
+	Forbidden	bool
+	Class		HostFunctionClass
 }
 
 const (
-	HostHashSHA256         HostFunction = 101
-	HostHashBLAKE3         HostFunction = 102
-	HostVerifyEd25519      HostFunction = 103
-	HostParseAetraAddress  HostFunction = 104
-	HostFormatAetraAddress HostFunction = 105
-	HostDeleteStorage      HostFunction = 106
-	HostEmitEvent          HostFunction = 107
-	HostSendInternal       HostFunction = 108
-	HostGetBlockHeight     HostFunction = 109
-	HostGetChainID         HostFunction = 110
-	HostGetContractAddress HostFunction = 111
-	HostGetCallerSource    HostFunction = 112
-	HostGetAttachedValue   HostFunction = 113
-	HostAbort              HostFunction = 114
+	HostHashSHA256		HostFunction	= 101
+	HostHashBLAKE3		HostFunction	= 102
+	HostVerifyEd25519	HostFunction	= 103
+	HostParseAetraAddress	HostFunction	= 104
+	HostFormatAetraAddress	HostFunction	= 105
+	HostDeleteStorage	HostFunction	= 106
+	HostEmitEvent		HostFunction	= 107
+	HostSendInternal	HostFunction	= 108
+	HostGetBlockHeight	HostFunction	= 109
+	HostGetChainID		HostFunction	= 110
+	HostGetContractAddress	HostFunction	= 111
+	HostGetCallerSource	HostFunction	= 112
+	HostGetAttachedValue	HostFunction	= 113
+	HostAbort		HostFunction	= 114
 
-	HostWallClockTime       HostFunction = 0xf001
-	HostRandomness          HostFunction = 0xf002
-	HostFilesystem          HostFunction = 0xf003
-	HostNetwork             HostFunction = 0xf004
-	HostFloatingPoint       HostFunction = 0xf005
-	HostGoroutine           HostFunction = 0xf006
-	HostProcessEnv          HostFunction = 0xf007
-	HostNondeterministicMap HostFunction = 0xf008
+	HostWallClockTime	HostFunction	= 0xf001
+	HostRandomness		HostFunction	= 0xf002
+	HostFilesystem		HostFunction	= 0xf003
+	HostNetwork		HostFunction	= 0xf004
+	HostFloatingPoint	HostFunction	= 0xf005
+	HostGoroutine		HostFunction	= 0xf006
+	HostProcessEnv		HostFunction	= 0xf007
+	HostNondeterministicMap	HostFunction	= 0xf008
 )
 
 func DefaultHostFunctionCosts() map[HostFunction]uint64 {
 	return map[HostFunction]uint64{
-		HostReadStorage:        25,
-		HostWriteStorage:       60,
-		HostEmitInternal:       150,
-		HostInspectMsg:         10,
-		HostBlockContext:       10,
-		HostChargeGas:          1,
-		HostReturn:             1,
-		HostScheduleSelf:       150,
-		HostHashSHA256:         80,
-		HostHashBLAKE3:         90,
-		HostVerifyEd25519:      5_000,
-		HostParseAetraAddress:  40,
-		HostFormatAetraAddress: 40,
-		HostDeleteStorage:      200,
-		HostEmitEvent:          100,
-		HostSendInternal:       250,
-		HostGetBlockHeight:     10,
-		HostGetChainID:         10,
-		HostGetContractAddress: 10,
-		HostGetCallerSource:    10,
-		HostGetAttachedValue:   10,
-		HostAbort:              1,
+		HostReadStorage:	25,
+		HostWriteStorage:	60,
+		HostEmitInternal:	150,
+		HostInspectMsg:		10,
+		HostBlockContext:	10,
+		HostChargeGas:		1,
+		HostReturn:		1,
+		HostScheduleSelf:	150,
+		HostHashSHA256:		80,
+		HostHashBLAKE3:		90,
+		HostVerifyEd25519:	5_000,
+		HostParseAetraAddress:	40,
+		HostFormatAetraAddress:	40,
+		HostDeleteStorage:	200,
+		HostEmitEvent:		100,
+		HostSendInternal:	250,
+		HostGetBlockHeight:	10,
+		HostGetChainID:		10,
+		HostGetContractAddress:	10,
+		HostGetCallerSource:	10,
+		HostGetAttachedValue:	10,
+		HostAbort:		1,
 	}
 }
 
@@ -204,7 +204,6 @@ func ValidateHostImport(host HostFunction, caps CapabilityMask) error {
 		return fmt.Errorf("AVM host function %q is forbidden", spec.Name)
 	}
 
-	// Capability Enforcement
 	switch host {
 	case HostHashSHA256, HostHashBLAKE3, HostVerifyEd25519:
 		if !caps.Crypto {
@@ -339,36 +338,35 @@ func RandomBeacon(previousStateRoot, blockEntropy, messageHash, domain []byte) [
 //   - No side-channel communication between contracts
 //   - Replay-safe execution model
 type ExecutionIsolationBoundary struct {
-	FrameID        uint64
-	ParentFrameID  uint64
-	AllowedReads   []string // Chunk hashes readable by this frame
-	AllowedWrites  []string // Chunk hashes writable by this frame
+	FrameID		uint64
+	ParentFrameID	uint64
+	AllowedReads	[]string	// Chunk hashes readable by this frame
+	AllowedWrites	[]string	// Chunk hashes writable by this frame
 }
 
 // ValidateIsolation checks that a host call respects isolation boundaries.
 func ValidateIsolation(boundary *ExecutionIsolationBoundary, host HostFunction, args [][]byte) error {
-	// Pure functions don't need isolation checks
+
 	if IsPureHostFunction(host) {
 		return nil
 	}
 
-	// Effectful functions must respect boundaries
 	switch host {
 	case HostReadStorage:
 		if len(args) < 1 {
 			return errors.New("read_storage requires key argument")
 		}
-		// In production, would check if key is in AllowedReads
+
 	case HostWriteStorage:
 		if len(args) < 2 {
 			return errors.New("write_storage requires key and value arguments")
 		}
-		// In production, would check if key is in AllowedWrites
+
 	case HostDeleteStorage:
 		if len(args) < 1 {
 			return errors.New("delete_storage requires key argument")
 		}
-		// In production, would check if key is in AllowedWrites
+
 	}
 
 	return nil
@@ -397,30 +395,28 @@ func IsPureHostFunction(host HostFunction) bool {
 //   - Capability violation → ExitCodeUnauthorized (2)
 //   - Resource exhaustion → ExitCodeOutOfGas (8)
 type HostErrorBoundary struct {
-	LastHostCall    HostFunction
-	LastError       error
-	MappedExitCode  uint32
+	LastHostCall	HostFunction
+	LastError	error
+	MappedExitCode	uint32
 }
 
 // MapHostErrorToExitCode maps a host function error to a VM exit code.
 func MapHostErrorToExitCode(err error) uint32 {
 	if err == nil {
-		return 0 // Success
+		return 0
 	}
 
 	errStr := err.Error()
 
-	// Map specific error patterns to exit codes
 	if bytes.Contains([]byte(errStr), []byte("forbidden")) {
-		return 7 // ExitCodeForbiddenHostCall
+		return 7
 	}
 	if bytes.Contains([]byte(errStr), []byte("capability")) {
-		return 2 // ExitCodeUnauthorized
+		return 2
 	}
 	if bytes.Contains([]byte(errStr), []byte("gas")) {
-		return 8 // ExitCodeOutOfGas
+		return 8
 	}
 
-	// Default to validation failed
-	return 1 // ExitCodeValidationFailed
+	return 1
 }

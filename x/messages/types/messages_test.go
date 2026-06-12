@@ -266,22 +266,22 @@ func testMessageParams() MessageParams {
 func testMessage(t *testing.T, params MessageParams, nonce uint64, sequence uint64, payload []byte) Message {
 	t.Helper()
 	msg, err := NewMessage(Message{
-		SourceZone:      zonestypes.ZoneIDFinancial,
-		DestinationZone: zonestypes.ZoneIDContract,
-		Sender:          addr(1),
-		Recipient:       addr(2),
-		Value:           sdkmath.NewInt(10),
-		Opcode:          "contract.execute",
-		Payload:         payload,
-		GasLimit:        10,
-		Deadline:        100,
-		Nonce:           nonce,
-		SourceSequence:  sequence,
-		RouteID:         "financial/contract",
-		Bounce:          true,
-		FeeLimit:        sdkmath.NewInt(1),
-		CreatedHeight:   20,
-		AuthScope:       "owner",
+		SourceZone:		zonestypes.ZoneIDFinancial,
+		DestinationZone:	zonestypes.ZoneIDContract,
+		Sender:			addr(1),
+		Recipient:		addr(2),
+		Value:			sdkmath.NewInt(10),
+		Opcode:			"contract.execute",
+		Payload:		payload,
+		GasLimit:		10,
+		Deadline:		100,
+		Nonce:			nonce,
+		SourceSequence:		sequence,
+		RouteID:		"financial/contract",
+		Bounce:			true,
+		FeeLimit:		sdkmath.NewInt(1),
+		CreatedHeight:		20,
+		AuthScope:		"owner",
 	}, params)
 	require.NoError(t, err)
 	return msg
@@ -299,38 +299,38 @@ func addr(seed byte) sdk.AccAddress {
 
 func testCrossZoneCall() MsgCrossZoneCall {
 	return MsgCrossZoneCall{
-		Caller:            addr(1),
-		Callee:            addr(2),
-		SourceZoneID:      zonestypes.ZoneIDFinancial,
-		DestinationZoneID: zonestypes.ZoneIDContract,
-		PayloadType:       "contract.execute",
-		Payload:           []byte("call-body"),
-		ValueNAET:         sdkmath.NewInt(10),
-		GasLimit:          10,
-		ForwardingFee:     sdkmath.NewInt(1),
-		ReplyMode:         ReplyModeCaller,
-		ExpiryHeight:      100,
+		Caller:			addr(1),
+		Callee:			addr(2),
+		SourceZoneID:		zonestypes.ZoneIDFinancial,
+		DestinationZoneID:	zonestypes.ZoneIDContract,
+		PayloadType:		"contract.execute",
+		Payload:		[]byte("call-body"),
+		ValueNAET:		sdkmath.NewInt(10),
+		GasLimit:		10,
+		ForwardingFee:		sdkmath.NewInt(1),
+		ReplyMode:		ReplyModeCaller,
+		ExpiryHeight:		100,
 	}
 }
 
 func testCrossZoneAdmission(call MsgCrossZoneCall) CrossZoneCallAdmission {
 	return CrossZoneCallAdmission{
-		CreatedHeight:  20,
-		Nonce:          11,
-		SourceSequence: 12,
+		CreatedHeight:	20,
+		Nonce:		11,
+		SourceSequence:	12,
 		SupportedPayloadTypes: []DestinationPayloadTypes{{
-			ZoneID:       call.DestinationZoneID,
-			PayloadTypes: []string{call.PayloadType},
+			ZoneID:		call.DestinationZoneID,
+			PayloadTypes:	[]string{call.PayloadType},
 		}},
-		SupportedReplyModes: []string{ReplyModeNone, ReplyModeCaller},
+		SupportedReplyModes:	[]string{ReplyModeNone, ReplyModeCaller},
 		Escrows: []CrossZoneCallEscrow{{
-			Caller:            call.Caller,
-			SourceZoneID:      call.SourceZoneID,
-			DestinationZoneID: call.DestinationZoneID,
-			ValueNAET:         call.ValueNAET,
-			ForwardingFee:     call.ForwardingFee,
-			ExpiryHeight:      call.ExpiryHeight,
-			Escrowed:          true,
+			Caller:			call.Caller,
+			SourceZoneID:		call.SourceZoneID,
+			DestinationZoneID:	call.DestinationZoneID,
+			ValueNAET:		call.ValueNAET,
+			ForwardingFee:		call.ForwardingFee,
+			ExpiryHeight:		call.ExpiryHeight,
+			Escrowed:		true,
 		}},
 	}
 }

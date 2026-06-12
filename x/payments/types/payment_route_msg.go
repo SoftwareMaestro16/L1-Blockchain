@@ -12,111 +12,111 @@ import (
 )
 
 type PaymentRouteHop struct {
-	ChannelID     string
-	From          string
-	To            string
-	FeeAmount     string
-	TimeoutHeight uint64
+	ChannelID	string
+	From		string
+	To		string
+	FeeAmount	string
+	TimeoutHeight	uint64
 }
 
 type PaymentRouteCommitment struct {
-	RouteID        string
-	Committer      string
-	CommitmentHash string
-	Signed         bool
-	Reserved       bool
-	ExpiresHeight  uint64
+	RouteID		string
+	Committer	string
+	CommitmentHash	string
+	Signed		bool
+	Reserved	bool
+	ExpiresHeight	uint64
 }
 
 type PaymentRouteBalance struct {
-	Participant string
-	Available   string
+	Participant	string
+	Available	string
 }
 
 type PaymentRouteAdmission struct {
-	CurrentHeight            uint64
-	Commitments              []PaymentRouteCommitment
-	Balances                 []PaymentRouteBalance
-	SupportedSettlementModes []ConditionSettlementMode
+	CurrentHeight			uint64
+	Commitments			[]PaymentRouteCommitment
+	Balances			[]PaymentRouteBalance
+	SupportedSettlementModes	[]ConditionSettlementMode
 }
 
 type MsgPaymentRoute struct {
-	RouteID        string
-	Payer          string
-	Payee          string
-	Amount         string
-	MaxFee         string
-	Hops           []PaymentRouteHop
-	ConditionRoot  string
-	ExpiryHeight   uint64
-	SettlementMode ConditionSettlementMode
+	RouteID		string
+	Payer		string
+	Payee		string
+	Amount		string
+	MaxFee		string
+	Hops		[]PaymentRouteHop
+	ConditionRoot	string
+	ExpiryHeight	uint64
+	SettlementMode	ConditionSettlementMode
 }
 
 type PaymentRouteCongestionSnapshot struct {
-	RouteID             string
-	ChannelID           string
-	HopIndex            uint32
-	CongestionBps       uint32
-	PendingMessageCount uint32
-	RetryCount          uint32
-	ObservedHeight      uint64
+	RouteID			string
+	ChannelID		string
+	HopIndex		uint32
+	CongestionBps		uint32
+	PendingMessageCount	uint32
+	RetryCount		uint32
+	ObservedHeight		uint64
 }
 
 type PaymentRouteReceiptStatus string
 
 const (
-	PaymentRouteReceiptDelivered PaymentRouteReceiptStatus = "DELIVERED"
-	PaymentRouteReceiptRetry     PaymentRouteReceiptStatus = "RETRY"
-	PaymentRouteReceiptExpired   PaymentRouteReceiptStatus = "EXPIRED"
-	PaymentRouteReceiptBounced   PaymentRouteReceiptStatus = "BOUNCED"
+	PaymentRouteReceiptDelivered	PaymentRouteReceiptStatus	= "DELIVERED"
+	PaymentRouteReceiptRetry	PaymentRouteReceiptStatus	= "RETRY"
+	PaymentRouteReceiptExpired	PaymentRouteReceiptStatus	= "EXPIRED"
+	PaymentRouteReceiptBounced	PaymentRouteReceiptStatus	= "BOUNCED"
 )
 
 type PaymentRouteReceipt struct {
-	RouteID        string
-	Status         PaymentRouteReceiptStatus
-	Amount         string
-	FeeAmount      string
-	ValueReturned  string
-	Attempt        uint32
-	RecordedHeight uint64
-	ExpiryHeight   uint64
-	ReceiptHash    string
+	RouteID		string
+	Status		PaymentRouteReceiptStatus
+	Amount		string
+	FeeAmount	string
+	ValueReturned	string
+	Attempt		uint32
+	RecordedHeight	uint64
+	ExpiryHeight	uint64
+	ReceiptHash	string
 }
 
 type PaymentRouteDeliveryTask struct {
-	TaskID             string
-	RouteID            string
-	HopIndex           uint32
-	ChannelID          string
-	From               string
-	To                 string
-	Amount             string
-	FeeAmount          string
-	Attempt            uint32
-	DeliverAfterHeight uint64
-	ExpiryHeight       uint64
-	TaskHash           string
+	TaskID			string
+	RouteID			string
+	HopIndex		uint32
+	ChannelID		string
+	From			string
+	To			string
+	Amount			string
+	FeeAmount		string
+	Attempt			uint32
+	DeliverAfterHeight	uint64
+	ExpiryHeight		uint64
+	TaskHash		string
 }
 
 type PaymentRouteDeliveryPlan struct {
-	Tasks   []PaymentRouteDeliveryTask
-	Receipt PaymentRouteReceipt
+	Tasks	[]PaymentRouteDeliveryTask
+	Receipt	PaymentRouteReceipt
 }
 
 type PaymentRouteTableState struct {
-	Epoch    uint64
-	Routes   []MsgPaymentRoute
-	Tasks    []PaymentRouteDeliveryTask
-	Receipts []PaymentRouteReceipt
-	RootHash string
+	Epoch		uint64
+	Routes		[]MsgPaymentRoute
+	Tasks		[]PaymentRouteDeliveryTask
+	Receipts	[]PaymentRouteReceipt
+	RootHash	string
 }
 
 type PaymentRoutingEpochUpdate struct {
-	Epoch         uint64
-	CurrentHeight uint64
-	Routes        []MsgPaymentRoute
-	Tasks         []PaymentRouteDeliveryTask
-	Receipts      []PaymentRouteReceipt
+	Epoch		uint64
+	CurrentHeight	uint64
+	Routes		[]MsgPaymentRoute
+	Tasks		[]PaymentRouteDeliveryTask
+	Receipts	[]PaymentRouteReceipt
 }
 
 func (h PaymentRouteHop) Normalize() PaymentRouteHop {
@@ -466,30 +466,30 @@ func SchedulePaymentRouteDelivery(route MsgPaymentRoute, currentHeight uint64, p
 	tasks := make([]PaymentRouteDeliveryTask, 0, len(route.Hops))
 	for i, hop := range route.Hops {
 		task := PaymentRouteDeliveryTask{
-			RouteID:            route.RouteID,
-			HopIndex:           uint32(i),
-			ChannelID:          hop.ChannelID,
-			From:               hop.From,
-			To:                 hop.To,
-			Amount:             route.Amount,
-			FeeAmount:          hop.FeeAmount,
-			Attempt:            attempt,
-			DeliverAfterHeight: deliverAfter,
-			ExpiryHeight:       route.ExpiryHeight,
+			RouteID:		route.RouteID,
+			HopIndex:		uint32(i),
+			ChannelID:		hop.ChannelID,
+			From:			hop.From,
+			To:			hop.To,
+			Amount:			route.Amount,
+			FeeAmount:		hop.FeeAmount,
+			Attempt:		attempt,
+			DeliverAfterHeight:	deliverAfter,
+			ExpiryHeight:		route.ExpiryHeight,
 		}
 		task.TaskHash = ComputePaymentRouteDeliveryTaskHash(task)
 		task.TaskID = HashParts("payment-route-task-id", task.TaskHash)
 		tasks = append(tasks, task.Normalize())
 	}
 	receipt := PaymentRouteReceipt{
-		RouteID:        route.RouteID,
-		Status:         PaymentRouteReceiptRetry,
-		Amount:         route.Amount,
-		FeeAmount:      totalRouteFee(route).String(),
-		ValueReturned:  "0",
-		Attempt:        attempt,
-		RecordedHeight: currentHeight,
-		ExpiryHeight:   route.ExpiryHeight,
+		RouteID:	route.RouteID,
+		Status:		PaymentRouteReceiptRetry,
+		Amount:		route.Amount,
+		FeeAmount:	totalRouteFee(route).String(),
+		ValueReturned:	"0",
+		Attempt:	attempt,
+		RecordedHeight:	currentHeight,
+		ExpiryHeight:	route.ExpiryHeight,
 	}
 	receipt.ReceiptHash = ComputePaymentRouteReceiptHash(receipt)
 	return PaymentRouteDeliveryPlan{Tasks: tasks, Receipt: receipt.Normalize()}, nil
@@ -515,13 +515,13 @@ func BuildPaymentRouteBounceReceipt(route MsgPaymentRoute, currentHeight uint64,
 		return PaymentRouteReceipt{}, err
 	}
 	receipt := PaymentRouteReceipt{
-		RouteID:        route.RouteID,
-		Status:         status,
-		Amount:         route.Amount,
-		FeeAmount:      route.MaxFee,
-		ValueReturned:  amount.Add(maxFee).String(),
-		RecordedHeight: currentHeight,
-		ExpiryHeight:   route.ExpiryHeight,
+		RouteID:	route.RouteID,
+		Status:		status,
+		Amount:		route.Amount,
+		FeeAmount:	route.MaxFee,
+		ValueReturned:	amount.Add(maxFee).String(),
+		RecordedHeight:	currentHeight,
+		ExpiryHeight:	route.ExpiryHeight,
 	}
 	receipt.ReceiptHash = ComputePaymentRouteReceiptHash(receipt)
 	return receipt.Normalize(), nil
@@ -572,10 +572,10 @@ func ApplyPaymentRoutingEpochUpdate(previous PaymentRouteTableState, update Paym
 		return PaymentRouteTableState{}, errors.New("payments route epoch height must be positive")
 	}
 	next := PaymentRouteTableState{
-		Epoch:    update.Epoch,
-		Routes:   append([]MsgPaymentRoute{}, update.Routes...),
-		Tasks:    append([]PaymentRouteDeliveryTask{}, update.Tasks...),
-		Receipts: append([]PaymentRouteReceipt{}, update.Receipts...),
+		Epoch:		update.Epoch,
+		Routes:		append([]MsgPaymentRoute{}, update.Routes...),
+		Tasks:		append([]PaymentRouteDeliveryTask{}, update.Tasks...),
+		Receipts:	append([]PaymentRouteReceipt{}, update.Receipts...),
 	}.Normalize()
 	for _, route := range next.Routes {
 		if err := route.ValidateBasic(); err != nil {

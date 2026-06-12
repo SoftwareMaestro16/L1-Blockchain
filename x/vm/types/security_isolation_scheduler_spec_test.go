@@ -27,8 +27,8 @@ func TestAVMNonceKeeperAndReplayTombstoneStore(t *testing.T) {
 	require.NoError(t, err)
 
 	store, err := NewAVMReplayTombstoneStore(AVMReplayTombstoneStore{
-		ConsumedTombstones: []AVMAsyncReplayTombstone{consumed},
-		ExpiredNonces:      []AVMExpiredNonceTombstone{expired},
+		ConsumedTombstones:	[]AVMAsyncReplayTombstone{consumed},
+		ExpiredNonces:		[]AVMExpiredNonceTombstone{expired},
 	})
 	require.NoError(t, err)
 	require.NoError(t, store.Validate())
@@ -41,18 +41,18 @@ func TestAVMNonceKeeperAndReplayTombstoneStore(t *testing.T) {
 
 func TestAVMStateIsolationCapabilityChecks(t *testing.T) {
 	capability, err := NewAVMZoneAccessCapability(AVMZoneAccessCapability{
-		SourceZone:      zonestypes.ZoneIDApplication,
-		ActorIDOptional: "actor-a",
-		ContractAddress: "contract-a",
+		SourceZone:		zonestypes.ZoneIDApplication,
+		ActorIDOptional:	"actor-a",
+		ContractAddress:	"contract-a",
 	})
 	require.NoError(t, err)
 
 	zoneWrite := testAVMStateAccessRequest(t, AVMStateAccessRequest{
-		SourceZone: zonestypes.ZoneIDApplication,
-		TargetZone: zonestypes.ZoneIDApplication,
-		Mode:       AVMStateAccessWrite,
-		Target:     AVMStateAccessTargetZone,
-		StateKey:   AVMZoneRuntimeConfigKey(zonestypes.ZoneIDApplication),
+		SourceZone:	zonestypes.ZoneIDApplication,
+		TargetZone:	zonestypes.ZoneIDApplication,
+		Mode:		AVMStateAccessWrite,
+		Target:		AVMStateAccessTargetZone,
+		StateKey:	AVMZoneRuntimeConfigKey(zonestypes.ZoneIDApplication),
 	})
 	require.NoError(t, ValidateAVMStateIsolationAccess(capability, zoneWrite))
 
@@ -64,22 +64,22 @@ func TestAVMStateIsolationCapabilityChecks(t *testing.T) {
 	require.ErrorContains(t, ValidateAVMStateIsolationAccess(capability, crossZoneWrite), "cross-zone writes")
 
 	actorWrite := testAVMStateAccessRequest(t, AVMStateAccessRequest{
-		SourceZone:      zonestypes.ZoneIDApplication,
-		TargetZone:      zonestypes.ZoneIDApplication,
-		Mode:            AVMStateAccessWrite,
-		Target:          AVMStateAccessTargetActor,
-		ActorIDOptional: "actor-a",
-		StateKey:        ActorStateKeyPrefix("actor-a") + "balance",
+		SourceZone:		zonestypes.ZoneIDApplication,
+		TargetZone:		zonestypes.ZoneIDApplication,
+		Mode:			AVMStateAccessWrite,
+		Target:			AVMStateAccessTargetActor,
+		ActorIDOptional:	"actor-a",
+		StateKey:		ActorStateKeyPrefix("actor-a") + "balance",
 	})
 	require.NoError(t, ValidateAVMStateIsolationAccess(capability, actorWrite))
 
 	crossActorRead := testAVMStateAccessRequest(t, AVMStateAccessRequest{
-		SourceZone:      zonestypes.ZoneIDApplication,
-		TargetZone:      zonestypes.ZoneIDApplication,
-		Mode:            AVMStateAccessRead,
-		Target:          AVMStateAccessTargetActor,
-		ActorIDOptional: "actor-b",
-		StateKey:        ActorStateKeyPrefix("actor-b") + "balance",
+		SourceZone:		zonestypes.ZoneIDApplication,
+		TargetZone:		zonestypes.ZoneIDApplication,
+		Mode:			AVMStateAccessRead,
+		Target:			AVMStateAccessTargetActor,
+		ActorIDOptional:	"actor-b",
+		StateKey:		ActorStateKeyPrefix("actor-b") + "balance",
 	})
 	require.ErrorContains(t, ValidateAVMStateIsolationAccess(capability, crossActorRead), "read-only proof")
 
@@ -90,12 +90,12 @@ func TestAVMStateIsolationCapabilityChecks(t *testing.T) {
 	require.NoError(t, ValidateAVMStateIsolationAccess(capability, crossActorRead))
 
 	contractWrite := testAVMStateAccessRequest(t, AVMStateAccessRequest{
-		SourceZone:      zonestypes.ZoneIDApplication,
-		TargetZone:      zonestypes.ZoneIDApplication,
-		Mode:            AVMStateAccessWrite,
-		Target:          AVMStateAccessTargetContract,
-		ContractAddress: "contract-a",
-		StateKey:        AVMContractStorageKey("contract-a", "balance"),
+		SourceZone:		zonestypes.ZoneIDApplication,
+		TargetZone:		zonestypes.ZoneIDApplication,
+		Mode:			AVMStateAccessWrite,
+		Target:			AVMStateAccessTargetContract,
+		ContractAddress:	"contract-a",
+		StateKey:		AVMContractStorageKey("contract-a", "balance"),
 	})
 	require.NoError(t, ValidateAVMStateIsolationAccess(capability, contractWrite))
 

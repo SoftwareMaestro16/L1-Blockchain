@@ -34,11 +34,11 @@ func TestDNLRecursiveLookupUsesProofsAndIgnoresExpiredNodes(t *testing.T) {
 	require.NoError(t, err)
 
 	response, err := RecursiveDNLLookup(dnl, routing, DNLRecursiveLookupRequest{
-		ServiceID:            "svc-pay",
-		CurrentHeight:        30,
-		MaxDepth:             2,
-		Limit:                10,
-		ConsensusRoutingOnly: true,
+		ServiceID:		"svc-pay",
+		CurrentHeight:		30,
+		MaxDepth:		2,
+		Limit:			10,
+		ConsensusRoutingOnly:	true,
 	})
 	require.NoError(t, err)
 	require.Len(t, response.Hops, 1)
@@ -66,10 +66,10 @@ func TestDNLConsensusRouteSelectionUsesCommittedMetricsOnly(t *testing.T) {
 	slowMetric := testDNLMetric(t, slowRoute, 200, 10, 9_000, 500, true, 40)
 
 	selection, err := SelectConsensusRouteFromCommittedMetrics(state, 7, []DNLRoutingMetricSnapshot{slowMetric, fastMetric}, DNLRecursiveLookupRequest{
-		ServiceID:            "svc-contract",
-		ZoneID:               "contract",
-		CurrentHeight:        41,
-		ConsensusRoutingOnly: true,
+		ServiceID:		"svc-contract",
+		ZoneID:			"contract",
+		CurrentHeight:		41,
+		ConsensusRoutingOnly:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, fastRoute.RouteID, selection.Route.RouteID)
@@ -84,20 +84,20 @@ func TestDNLConsensusRouteSelectionUsesCommittedMetricsOnly(t *testing.T) {
 	uncommitted, err = NewDNLRoutingMetricSnapshot(uncommitted)
 	require.NoError(t, err)
 	_, err = SelectConsensusRouteFromCommittedMetrics(state, 7, []DNLRoutingMetricSnapshot{uncommitted, slowMetric}, DNLRecursiveLookupRequest{
-		ServiceID:            "svc-contract",
-		ZoneID:               "contract",
-		CurrentHeight:        41,
-		ConsensusRoutingOnly: true,
+		ServiceID:		"svc-contract",
+		ZoneID:			"contract",
+		CurrentHeight:		41,
+		ConsensusRoutingOnly:	true,
 	})
 	require.ErrorContains(t, err, "committed")
 }
 
 func TestDNLLiveLatencyHintsAreAdvisoryUntilCommitted(t *testing.T) {
 	hint, err := NewDNLLiveRoutingHint(DNLLiveRoutingHint{
-		RouteID:        HashParts("route"),
-		NodeID:         HashParts("node"),
-		LatencyMillis:  5,
-		ObservedHeight: 42,
+		RouteID:	HashParts("route"),
+		NodeID:		HashParts("node"),
+		LatencyMillis:	5,
+		ObservedHeight:	42,
 	})
 	require.NoError(t, err)
 	require.NoError(t, hint.Validate())
@@ -112,13 +112,13 @@ func TestDNLLiveLatencyHintsAreAdvisoryUntilCommitted(t *testing.T) {
 func testDNLRouteForNode(t *testing.T, zoneID, serviceID, nodeID string, priority, weight uint32, expiry uint64) DNLRoutingTableEntry {
 	t.Helper()
 	route, err := NewDNLRoutingTableEntry(DNLRoutingTableEntry{
-		ZoneID:        zoneID,
-		ServiceID:     serviceID,
-		NextHopNodeID: nodeID,
-		OverlayID:     HashParts("lookup-metrics-overlay", zoneID, serviceID),
-		Priority:      priority,
-		WeightBps:     weight,
-		ExpiryHeight:  expiry,
+		ZoneID:		zoneID,
+		ServiceID:	serviceID,
+		NextHopNodeID:	nodeID,
+		OverlayID:	HashParts("lookup-metrics-overlay", zoneID, serviceID),
+		Priority:	priority,
+		WeightBps:	weight,
+		ExpiryHeight:	expiry,
 	})
 	require.NoError(t, err)
 	return route
@@ -134,18 +134,18 @@ func testRoutingTableForRoutes(t *testing.T, epoch uint64, routes ...DNLRoutingT
 func testDNLMetric(t *testing.T, route DNLRoutingTableEntry, latency, gas uint64, reliability, congestion uint32, committed bool, height uint64) DNLRoutingMetricSnapshot {
 	t.Helper()
 	metric, err := NewDNLRoutingMetricSnapshot(DNLRoutingMetricSnapshot{
-		RouteID:             route.RouteID,
-		NodeID:              route.NextHopNodeID,
-		ZoneID:              route.ZoneID,
-		ServiceID:           route.ServiceID,
-		LatencyMillis:       latency,
-		GasCost:             gas,
-		ReliabilityScoreBps: reliability,
-		CongestionWeightBps: congestion,
-		ZoneSupport:         true,
-		ServiceSupport:      true,
-		Committed:           committed,
-		SnapshotHeight:      height,
+		RouteID:		route.RouteID,
+		NodeID:			route.NextHopNodeID,
+		ZoneID:			route.ZoneID,
+		ServiceID:		route.ServiceID,
+		LatencyMillis:		latency,
+		GasCost:		gas,
+		ReliabilityScoreBps:	reliability,
+		CongestionWeightBps:	congestion,
+		ZoneSupport:		true,
+		ServiceSupport:		true,
+		Committed:		committed,
+		SnapshotHeight:		height,
 	})
 	require.NoError(t, err)
 	return metric

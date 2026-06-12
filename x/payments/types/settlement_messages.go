@@ -12,124 +12,124 @@ import (
 type PaymentSettlementRuleID string
 
 const (
-	PaymentSettlementRuleIntermediateOffchain PaymentSettlementRuleID = "intermediate-states-offchain-or-queued"
-	PaymentSettlementRuleDeterministicReplay  PaymentSettlementRuleID = "disputes-resolve-by-deterministic-replay"
-	PaymentSettlementRuleFinancialStateWrite  PaymentSettlementRuleID = "final-settlement-writes-financial-zone-state"
-	PaymentSettlementRuleConditionalProof     PaymentSettlementRuleID = "conditional-transfers-require-resolution"
-	PaymentSettlementRuleExpiryRelease        PaymentSettlementRuleID = "expired-conditions-release-reserved-funds"
-	PaymentSettlementRuleCommittedRoutesOnly  PaymentSettlementRuleID = "route-hints-advisory-unless-committed"
+	PaymentSettlementRuleIntermediateOffchain	PaymentSettlementRuleID	= "intermediate-states-offchain-or-queued"
+	PaymentSettlementRuleDeterministicReplay	PaymentSettlementRuleID	= "disputes-resolve-by-deterministic-replay"
+	PaymentSettlementRuleFinancialStateWrite	PaymentSettlementRuleID	= "final-settlement-writes-financial-zone-state"
+	PaymentSettlementRuleConditionalProof		PaymentSettlementRuleID	= "conditional-transfers-require-resolution"
+	PaymentSettlementRuleExpiryRelease		PaymentSettlementRuleID	= "expired-conditions-release-reserved-funds"
+	PaymentSettlementRuleCommittedRoutesOnly	PaymentSettlementRuleID	= "route-hints-advisory-unless-committed"
 )
 
 type PaymentMessageType string
 
 const (
-	PaymentMessageCreateIntent     PaymentMessageType = "MsgCreatePaymentIntent"
-	PaymentMessageOpenChannel      PaymentMessageType = "MsgOpenPaymentChannel"
-	PaymentMessageUpdateChannel    PaymentMessageType = "MsgUpdatePaymentChannel"
-	PaymentMessageCloseChannel     PaymentMessageType = "MsgClosePaymentChannel"
-	PaymentMessageDisputeChannel   PaymentMessageType = "MsgDisputePaymentChannel"
-	PaymentMessageCreateCondition  PaymentMessageType = "MsgCreateConditionalPayment"
-	PaymentMessageResolveCondition PaymentMessageType = "MsgResolveConditionalPayment"
-	PaymentMessageExpireCondition  PaymentMessageType = "MsgExpireConditionalPayment"
-	PaymentMessageSettlePayment    PaymentMessageType = "MsgSettlePayment"
+	PaymentMessageCreateIntent	PaymentMessageType	= "MsgCreatePaymentIntent"
+	PaymentMessageOpenChannel	PaymentMessageType	= "MsgOpenPaymentChannel"
+	PaymentMessageUpdateChannel	PaymentMessageType	= "MsgUpdatePaymentChannel"
+	PaymentMessageCloseChannel	PaymentMessageType	= "MsgClosePaymentChannel"
+	PaymentMessageDisputeChannel	PaymentMessageType	= "MsgDisputePaymentChannel"
+	PaymentMessageCreateCondition	PaymentMessageType	= "MsgCreateConditionalPayment"
+	PaymentMessageResolveCondition	PaymentMessageType	= "MsgResolveConditionalPayment"
+	PaymentMessageExpireCondition	PaymentMessageType	= "MsgExpireConditionalPayment"
+	PaymentMessageSettlePayment	PaymentMessageType	= "MsgSettlePayment"
 )
 
 type PaymentSettlementRule struct {
-	Rule            PaymentSettlementRuleID
-	ConsensusEffect string
+	Rule		PaymentSettlementRuleID
+	ConsensusEffect	string
 }
 
 type PaymentMessageDescriptor struct {
-	Message            PaymentMessageType
-	Purpose            string
-	RequiredValidation []string
+	Message			PaymentMessageType
+	Purpose			string
+	RequiredValidation	[]string
 }
 
 type MsgCreatePaymentIntent struct {
-	PaymentID      string
-	Payer          string
-	Payee          string
-	TargetIdentity string
-	Amount         string
-	Denom          string
-	MaxFee         string
-	ExpiryHeight   uint64
-	IdempotencyKey string
-	MessageHash    string
+	PaymentID	string
+	Payer		string
+	Payee		string
+	TargetIdentity	string
+	Amount		string
+	Denom		string
+	MaxFee		string
+	ExpiryHeight	uint64
+	IdempotencyKey	string
+	MessageHash	string
 }
 
 type MsgOpenPaymentChannel struct {
-	Channel               PaymentChannel
-	CollateralAvailable   string
-	ParticipantSignatures []string
-	IdempotencyKey        string
-	MessageHash           string
+	Channel			PaymentChannel
+	CollateralAvailable	string
+	ParticipantSignatures	[]string
+	IdempotencyKey		string
+	MessageHash		string
 }
 
 type MsgUpdatePaymentChannel struct {
-	ChannelID       string
-	Submitter       string
-	PreviousNonce   uint64
-	NewNonce        uint64
-	SignedStateHash string
-	BalanceRoot     string
-	ConditionRoot   string
-	MessageHash     string
+	ChannelID	string
+	Submitter	string
+	PreviousNonce	uint64
+	NewNonce	uint64
+	SignedStateHash	string
+	BalanceRoot	string
+	ConditionRoot	string
+	MessageHash	string
 }
 
 type MsgClosePaymentChannel struct {
-	PaymentID        string
-	ChannelID        string
-	LatestStateHash  string
-	ChallengeStart   uint64
-	ChallengeEnd     uint64
-	SettlementStatus NativePaymentSettlementStatus
-	CollateralRoot   string
-	MessageHash      string
+	PaymentID		string
+	ChannelID		string
+	LatestStateHash		string
+	ChallengeStart		uint64
+	ChallengeEnd		uint64
+	SettlementStatus	NativePaymentSettlementStatus
+	CollateralRoot		string
+	MessageHash		string
 }
 
 type MsgDisputePaymentChannel struct {
-	Dispute       PaymentDispute
-	StaleNonce    uint64
-	NewerNonce    uint64
-	CurrentHeight uint64
-	MessageHash   string
+	Dispute		PaymentDispute
+	StaleNonce	uint64
+	NewerNonce	uint64
+	CurrentHeight	uint64
+	MessageHash	string
 }
 
 type MsgCreateConditionalPayment struct {
-	Condition         NativeConditionalPayment
-	Payer             string
-	ReservedLiquidity string
-	LinkedConditions  []NativeConditionalPayment
-	MessageHash       string
+	Condition		NativeConditionalPayment
+	Payer			string
+	ReservedLiquidity	string
+	LinkedConditions	[]NativeConditionalPayment
+	MessageHash		string
 }
 
 type MsgResolveConditionalPayment struct {
-	Conditions        []NativeConditionalPayment
-	Preimage          string
-	ProofRoot         string
-	PromiseResultHash string
-	PaymentStateRoot  string
-	CurrentHeight     uint64
-	MessageHash       string
+	Conditions		[]NativeConditionalPayment
+	Preimage		string
+	ProofRoot		string
+	PromiseResultHash	string
+	PaymentStateRoot	string
+	CurrentHeight		uint64
+	MessageHash		string
 }
 
 type MsgExpireConditionalPayment struct {
-	Condition        NativeConditionalPayment
-	Resolver         string
-	RefundRouteRoot  string
-	PaymentStateRoot string
-	CurrentHeight    uint64
-	MessageHash      string
+	Condition		NativeConditionalPayment
+	Resolver		string
+	RefundRouteRoot		string
+	PaymentStateRoot	string
+	CurrentHeight		uint64
+	MessageHash		string
 }
 
 type MsgSettlePayment struct {
-	Settlement         PaymentSettlement
-	RouteCommitment    PaymentRouteCommitment
-	ReceiptRoot        string
-	PaymentStateRoot   string
-	FinancialStateRoot string
-	MessageHash        string
+	Settlement		PaymentSettlement
+	RouteCommitment		PaymentRouteCommitment
+	ReceiptRoot		string
+	PaymentStateRoot	string
+	FinancialStateRoot	string
+	MessageHash		string
 }
 
 func PaymentSettlementRules() []PaymentSettlementRule {
@@ -191,14 +191,14 @@ func BuildMsgCreatePaymentIntent(msg MsgCreatePaymentIntent) (MsgCreatePaymentIn
 	}
 	msg.MessageHash = ComputeMsgCreatePaymentIntentHash(msg)
 	intent, err := BuildPaymentIntent(PaymentIntent{
-		PaymentID:      msg.PaymentID,
-		IntentType:     PaymentIntentInitiate,
-		Payer:          msg.Payer,
-		Payee:          msg.Payee,
-		TargetIdentity: msg.TargetIdentity,
-		Amount:         msg.Amount,
-		MaxFee:         msg.MaxFee,
-		ExpiryHeight:   msg.ExpiryHeight,
+		PaymentID:	msg.PaymentID,
+		IntentType:	PaymentIntentInitiate,
+		Payer:		msg.Payer,
+		Payee:		msg.Payee,
+		TargetIdentity:	msg.TargetIdentity,
+		Amount:		msg.Amount,
+		MaxFee:		msg.MaxFee,
+		ExpiryHeight:	msg.ExpiryHeight,
 	})
 	if err != nil {
 		return MsgCreatePaymentIntent{}, PaymentIntent{}, err

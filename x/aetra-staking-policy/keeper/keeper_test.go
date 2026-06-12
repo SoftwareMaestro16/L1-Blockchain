@@ -20,14 +20,14 @@ func TestKeeperExportImportPreservesPolicyState(t *testing.T) {
 	require.NoError(t, err)
 	msgServer := policykeeper.NewMsgServerImpl(&source)
 	require.NoError(t, msgServer.RegisterValidatorIdentity(types.MsgRegisterValidatorIdentity{
-		Authority: authority,
-		Identity:  types.ValidatorIdentityMetadata{OperatorAddress: "val-a", Moniker: "Aetra One", Website: "https://validator.example"},
+		Authority:	authority,
+		Identity:	types.ValidatorIdentityMetadata{OperatorAddress: "val-a", Moniker: "Aetra One", Website: "https://validator.example"},
 	}))
 	require.NoError(t, msgServer.AcknowledgeConcentrationWarning(types.MsgAcknowledgeConcentrationWarning{
-		Authority:       authority,
-		OperatorAddress: "val-a",
-		Warning:         types.DelegationWarningOverloaded,
-		Height:          10,
+		Authority:		authority,
+		OperatorAddress:	"val-a",
+		Warning:		types.DelegationWarningOverloaded,
+		Height:			10,
 	}))
 
 	exported, err := source.ExportGenesis()
@@ -48,14 +48,14 @@ func TestGovernanceAuthorityRequiredForMessages(t *testing.T) {
 	params.CommissionFloorBps = 400
 
 	err := msgServer.UpdateStakingPolicyParams(types.MsgUpdateStakingPolicyParams{
-		Authority: "ae1notgov",
-		Params:    params,
+		Authority:	"ae1notgov",
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 
 	require.NoError(t, msgServer.UpdateStakingPolicyParams(types.MsgUpdateStakingPolicyParams{
-		Authority: authority,
-		Params:    params,
+		Authority:	authority,
+		Params:		params,
 	}))
 	res, err := k.QueryParams(types.QueryParamsRequest{})
 	require.NoError(t, err)

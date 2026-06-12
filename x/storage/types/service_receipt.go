@@ -9,40 +9,40 @@ import (
 )
 
 type ServiceStorageReceipt struct {
-	ReceiptID     string
-	ServiceID     string
-	ObjectID      string
-	RequestHash   string
-	ContentHash   string
-	ProviderID    string
-	AccessHeight  uint64
-	Signature     string
-	ProofOptional string
-	ReceiptHash   string
+	ReceiptID	string
+	ServiceID	string
+	ObjectID	string
+	RequestHash	string
+	ContentHash	string
+	ProviderID	string
+	AccessHeight	uint64
+	Signature	string
+	ProofOptional	string
+	ReceiptHash	string
 }
 
 type ServiceStorageReceiptAnchor struct {
-	ServiceID  string
-	Receipts   []ServiceStorageReceipt
-	Height     uint64
-	RootHash   string
-	AnchorHash string
+	ServiceID	string
+	Receipts	[]ServiceStorageReceipt
+	Height		uint64
+	RootHash	string
+	AnchorHash	string
 }
 
 type OnChainStorageFeeModel struct {
-	Denom           string
-	PricePerByte    uint64
-	MinimumFee      uint64
-	MaxPayloadBytes uint64
-	ModelHash       string
+	Denom		string
+	PricePerByte	uint64
+	MinimumFee	uint64
+	MaxPayloadBytes	uint64
+	ModelHash	string
 }
 
 type OnChainStorageFeeQuote struct {
-	DeclarationHash string
-	PayloadBytes    uint64
-	Denom           string
-	FeeAmount       uint64
-	QuoteHash       string
+	DeclarationHash	string
+	PayloadBytes	uint64
+	Denom		string
+	FeeAmount	uint64
+	QuoteHash	string
 }
 
 func NewServiceStorageReceipt(receipt ServiceStorageReceipt) (ServiceStorageReceipt, error) {
@@ -65,9 +65,9 @@ func AnchorServiceStorageReceipts(serviceID string, receipts []ServiceStorageRec
 		return ServiceStorageReceiptAnchor{}, err
 	}
 	anchor := ServiceStorageReceiptAnchor{
-		ServiceID: serviceID,
-		Receipts:  normalizeServiceStorageReceipts(receipts),
-		Height:    height,
+		ServiceID:	serviceID,
+		Receipts:	normalizeServiceStorageReceipts(receipts),
+		Height:		height,
 	}
 	if err := anchor.ValidateFormat(); err != nil {
 		return ServiceStorageReceiptAnchor{}, err
@@ -138,10 +138,10 @@ func QuoteOnChainStorageFee(declaration StorageDeclaration, model OnChainStorage
 		fee = model.MinimumFee
 	}
 	quote := OnChainStorageFeeQuote{
-		DeclarationHash: declaration.DeclarationHash,
-		PayloadBytes:    payloadBytes,
-		Denom:           model.Denom,
-		FeeAmount:       fee,
+		DeclarationHash:	declaration.DeclarationHash,
+		PayloadBytes:		payloadBytes,
+		Denom:			model.Denom,
+		FeeAmount:		fee,
 	}
 	quote.QuoteHash = ComputeOnChainStorageFeeQuoteHash(quote)
 	return quote, quote.Validate()

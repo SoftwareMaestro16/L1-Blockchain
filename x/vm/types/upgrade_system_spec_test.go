@@ -22,10 +22,10 @@ func TestAVMUpgradeManifestStagesGovernedComponents(t *testing.T) {
 
 func TestAVMUpgradeRejectsActivationBeforeStaging(t *testing.T) {
 	component, err := NewAVMUpgradeComponent(AVMUpgradeComponent{
-		Kind:             AVMUpgradeComponentGasModel,
-		PreviousVersion:  "gas-v1",
-		NextVersion:      "gas-v2",
-		ActivationHeight: 99,
+		Kind:			AVMUpgradeComponentGasModel,
+		PreviousVersion:	"gas-v1",
+		NextVersion:		"gas-v2",
+		ActivationHeight:	99,
 	})
 	require.NoError(t, err)
 
@@ -45,17 +45,17 @@ func TestAVMUpgradeRejectsActivationBeforeStaging(t *testing.T) {
 
 func TestAVMUpgradeRejectsSchedulerRuleOverlapInOneBlock(t *testing.T) {
 	oldRule, err := NewAVMSchedulerRuleVersion(AVMSchedulerRuleVersion{
-		RuleSetID:            "async-scheduler",
-		Version:              "scheduler-v1",
-		EffectiveFromHeight:  100,
-		EffectiveUntilHeight: 120,
+		RuleSetID:		"async-scheduler",
+		Version:		"scheduler-v1",
+		EffectiveFromHeight:	100,
+		EffectiveUntilHeight:	120,
 	})
 	require.NoError(t, err)
 	overlappingRule, err := NewAVMSchedulerRuleVersion(AVMSchedulerRuleVersion{
-		RuleSetID:            "async-scheduler",
-		Version:              "scheduler-v2",
-		EffectiveFromHeight:  120,
-		EffectiveUntilHeight: 0,
+		RuleSetID:		"async-scheduler",
+		Version:		"scheduler-v2",
+		EffectiveFromHeight:	120,
+		EffectiveUntilHeight:	0,
 	})
 	require.NoError(t, err)
 
@@ -103,19 +103,19 @@ func TestAVMUpgradeVersionedMessagesUseCreationPolicy(t *testing.T) {
 
 func TestAVMUpgradeRequiresContinuationRuntimeAndContractVMVersions(t *testing.T) {
 	continuation, err := NewAVMContinuationRuntimeVersion(AVMContinuationRuntimeVersion{
-		ContinuationID: "continuation-1",
-		ActorID:        "actor-1",
-		RuntimeVersion: "runtime-v1",
-		StoredHeight:   99,
+		ContinuationID:	"continuation-1",
+		ActorID:	"actor-1",
+		RuntimeVersion:	"runtime-v1",
+		StoredHeight:	99,
 	})
 	require.NoError(t, err)
 	require.NoError(t, continuation.Validate())
 
 	contractCode, err := NewAVMContractCodeVMVersion(AVMContractCodeVMVersion{
-		CodeID:      7,
-		BackendKind: AVMContractBackendWASMContract,
-		CodeHash:    engineHash("code-7"),
-		VMVersion:   "wasm-v1",
+		CodeID:		7,
+		BackendKind:	AVMContractBackendWASMContract,
+		CodeHash:	engineHash("code-7"),
+		VMVersion:	"wasm-v1",
 	})
 	require.NoError(t, err)
 	require.NoError(t, contractCode.Validate())
@@ -140,10 +140,10 @@ func TestAVMUpgradeGasTableAppliesAtActivationHeight(t *testing.T) {
 	schedule, err := AVMGasScheduleFromPolicy(policy, true, 1_000_000)
 	require.NoError(t, err)
 	table, err := NewAVMGasTableActivation(AVMGasTableActivation{
-		ActivationHeight: 200,
-		PolicyVersion:    "gas-v2",
-		Policy:           policy,
-		Schedule:         schedule,
+		ActivationHeight:	200,
+		PolicyVersion:		"gas-v2",
+		Policy:			policy,
+		Schedule:		schedule,
 	})
 	require.NoError(t, err)
 	require.NoError(t, table.Validate())
@@ -162,26 +162,26 @@ func testAVMUpgradeManifest(t *testing.T, stagedHeight uint64) AVMUpgradeManifes
 	components := make([]AVMUpgradeComponent, 0, len(AllAVMUpgradeComponentKinds()))
 	for _, kind := range AllAVMUpgradeComponentKinds() {
 		component, err := NewAVMUpgradeComponent(AVMUpgradeComponent{
-			Kind:             kind,
-			PreviousVersion:  fmt.Sprintf("%s-v1", kind),
-			NextVersion:      fmt.Sprintf("%s-v2", kind),
-			ActivationHeight: stagedHeight + 10,
+			Kind:			kind,
+			PreviousVersion:	fmt.Sprintf("%s-v1", kind),
+			NextVersion:		fmt.Sprintf("%s-v2", kind),
+			ActivationHeight:	stagedHeight + 10,
 		})
 		require.NoError(t, err)
 		components = append(components, component)
 	}
 	oldRule, err := NewAVMSchedulerRuleVersion(AVMSchedulerRuleVersion{
-		RuleSetID:            "async-scheduler",
-		Version:              "scheduler-v1",
-		EffectiveFromHeight:  stagedHeight,
-		EffectiveUntilHeight: stagedHeight + 9,
+		RuleSetID:		"async-scheduler",
+		Version:		"scheduler-v1",
+		EffectiveFromHeight:	stagedHeight,
+		EffectiveUntilHeight:	stagedHeight + 9,
 	})
 	require.NoError(t, err)
 	newRule, err := NewAVMSchedulerRuleVersion(AVMSchedulerRuleVersion{
-		RuleSetID:            "async-scheduler",
-		Version:              "scheduler-v2",
-		EffectiveFromHeight:  stagedHeight + 10,
-		EffectiveUntilHeight: 0,
+		RuleSetID:		"async-scheduler",
+		Version:		"scheduler-v2",
+		EffectiveFromHeight:	stagedHeight + 10,
+		EffectiveUntilHeight:	0,
 	})
 	require.NoError(t, err)
 	policy, err := DefaultAVMGasPolicy()
@@ -191,36 +191,36 @@ func testAVMUpgradeManifest(t *testing.T, stagedHeight uint64) AVMUpgradeManifes
 	schedule, err := AVMGasScheduleFromPolicy(policy, true, 1_000_000)
 	require.NoError(t, err)
 	gasTable, err := NewAVMGasTableActivation(AVMGasTableActivation{
-		ActivationHeight: stagedHeight + 10,
-		PolicyVersion:    "gas-v2",
-		Policy:           policy,
-		Schedule:         schedule,
+		ActivationHeight:	stagedHeight + 10,
+		PolicyVersion:		"gas-v2",
+		Policy:			policy,
+		Schedule:		schedule,
 	})
 	require.NoError(t, err)
 	continuation, err := NewAVMContinuationRuntimeVersion(AVMContinuationRuntimeVersion{
-		ContinuationID: "continuation-1",
-		ActorID:        "actor-1",
-		RuntimeVersion: "runtime-v1",
-		StoredHeight:   stagedHeight,
+		ContinuationID:	"continuation-1",
+		ActorID:	"actor-1",
+		RuntimeVersion:	"runtime-v1",
+		StoredHeight:	stagedHeight,
 	})
 	require.NoError(t, err)
 	contractCode, err := NewAVMContractCodeVMVersion(AVMContractCodeVMVersion{
-		CodeID:      1,
-		BackendKind: AVMContractBackendActorContract,
-		CodeHash:    engineHash("code-1"),
-		VMVersion:   "avm-v1",
+		CodeID:		1,
+		BackendKind:	AVMContractBackendActorContract,
+		CodeHash:	engineHash("code-1"),
+		VMVersion:	"avm-v1",
 	})
 	require.NoError(t, err)
 
 	manifest, err := NewAVMUpgradeManifest(AVMUpgradeManifest{
-		UpgradeID:            "upgrade-15",
-		GovernanceProposalID: "gov-15",
-		StagedHeight:         stagedHeight,
-		Components:           components,
-		SchedulerRules:       []AVMSchedulerRuleVersion{oldRule, newRule},
-		GasTables:            []AVMGasTableActivation{gasTable},
-		Continuations:        []AVMContinuationRuntimeVersion{continuation},
-		ContractCodes:        []AVMContractCodeVMVersion{contractCode},
+		UpgradeID:		"upgrade-15",
+		GovernanceProposalID:	"gov-15",
+		StagedHeight:		stagedHeight,
+		Components:		components,
+		SchedulerRules:		[]AVMSchedulerRuleVersion{oldRule, newRule},
+		GasTables:		[]AVMGasTableActivation{gasTable},
+		Continuations:		[]AVMContinuationRuntimeVersion{continuation},
+		ContractCodes:		[]AVMContractCodeVMVersion{contractCode},
 	})
 	require.NoError(t, err)
 	return manifest

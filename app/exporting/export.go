@@ -26,18 +26,18 @@ import (
 )
 
 type Dependencies struct {
-	AppCodec          codec.Codec
-	ModuleManager     *module.Manager
-	AccountKeeper     authkeeper.AccountKeeper
-	StakingKeeper     *stakingkeeper.Keeper
-	DistrKeeper       distrkeeper.Keeper
-	SlashingKeeper    slashingkeeper.Keeper
-	StakingStoreKey   *storetypes.KVStoreKey
-	Logger            sdklog.Logger
-	NewContext        func(cmtproto.Header) sdk.Context
-	LastBlockHeight   func() int64
-	ConsensusParams   func(sdk.Context) cmtproto.ConsensusParams
-	EnsureCollections func(sdk.Context) error
+	AppCodec		codec.Codec
+	ModuleManager		*module.Manager
+	AccountKeeper		authkeeper.AccountKeeper
+	StakingKeeper		*stakingkeeper.Keeper
+	DistrKeeper		distrkeeper.Keeper
+	SlashingKeeper		slashingkeeper.Keeper
+	StakingStoreKey		*storetypes.KVStoreKey
+	Logger			sdklog.Logger
+	NewContext		func(cmtproto.Header) sdk.Context
+	LastBlockHeight		func() int64
+	ConsensusParams		func(sdk.Context) cmtproto.ConsensusParams
+	EnsureCollections	func(sdk.Context) error
 }
 
 func ExportAppStateAndValidators(deps Dependencies, forZeroHeight bool, jailAllowedAddrs, modulesToExport []string) (servertypes.ExportedApp, error) {
@@ -64,10 +64,10 @@ func ExportAppStateAndValidators(deps Dependencies, forZeroHeight bool, jailAllo
 
 	validators, err := staking.WriteValidators(ctx, deps.StakingKeeper)
 	return servertypes.ExportedApp{
-		AppState:        appState,
-		Validators:      validators,
-		Height:          height,
-		ConsensusParams: deps.ConsensusParams(ctx),
+		AppState:		appState,
+		Validators:		validators,
+		Height:			height,
+		ConsensusParams:	deps.ConsensusParams(ctx),
 	}, err
 }
 

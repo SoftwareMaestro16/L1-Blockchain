@@ -11,14 +11,14 @@ import (
 
 func TestAVMRootCommitsSection43RootSet(t *testing.T) {
 	root, err := NewAVMRoot(AVMRoot{
-		Height:           42,
-		RouterRoot:       engineHash("router"),
-		AsyncMessageRoot: engineHash("async"),
-		ActorRoot:        engineHash("actor"),
-		ContractRoot:     engineHash("contract"),
-		ContinuationRoot: engineHash("continuation"),
-		InterfaceRoot:    engineHash("interface"),
-		ReceiptRoot:      engineHash("receipt"),
+		Height:			42,
+		RouterRoot:		engineHash("router"),
+		AsyncMessageRoot:	engineHash("async"),
+		ActorRoot:		engineHash("actor"),
+		ContractRoot:		engineHash("contract"),
+		ContinuationRoot:	engineHash("continuation"),
+		InterfaceRoot:		engineHash("interface"),
+		ReceiptRoot:		engineHash("receipt"),
 	})
 	require.NoError(t, err)
 	require.NoError(t, root.Validate())
@@ -36,12 +36,12 @@ func TestAVMRootCommitsSection43RootSet(t *testing.T) {
 
 func TestAVMZoneStateRootIncludesStateMessageExecutionAndContinuationRoots(t *testing.T) {
 	root, err := NewAVMZoneStateRoot(AVMZoneStateRoot{
-		ZoneID:           zonestypes.ZoneIDContract,
-		Height:           42,
-		StateRoot:        engineHash("state"),
-		MessageRoot:      engineHash("message"),
-		ExecutionRoot:    engineHash("execution"),
-		ContinuationRoot: engineHash("continuation"),
+		ZoneID:			zonestypes.ZoneIDContract,
+		Height:			42,
+		StateRoot:		engineHash("state"),
+		MessageRoot:		engineHash("message"),
+		ExecutionRoot:		engineHash("execution"),
+		ContinuationRoot:	engineHash("continuation"),
 	})
 	require.NoError(t, err)
 	require.NoError(t, root.Validate())
@@ -66,10 +66,10 @@ func TestAVMStateInvariantsAcceptConsistentState(t *testing.T) {
 func TestAVMStateInvariantsRejectMissingMessageAndReceiptRules(t *testing.T) {
 	set := validInvariantSet(t)
 	set.QueuedMessages = append(set.QueuedMessages, AVMQueuedMessageRef{
-		MessageID: "missing-message",
-		ZoneID:    zonestypes.ZoneIDContract,
-		QueueID:   "default",
-		SortKey:   "0009",
+		MessageID:	"missing-message",
+		ZoneID:		zonestypes.ZoneIDContract,
+		QueueID:	"default",
+		SortKey:	"0009",
 	})
 	require.ErrorContains(t, set.Validate(), "no stored message")
 
@@ -123,12 +123,12 @@ func TestAVMStateInvariantsRejectContinuationMailboxStorageAndZoneRootDrift(t *t
 func validInvariantSet(t *testing.T) AVMStateInvariantSet {
 	t.Helper()
 	zoneRoot, err := NewAVMZoneStateRoot(AVMZoneStateRoot{
-		ZoneID:           zonestypes.ZoneIDContract,
-		Height:           42,
-		StateRoot:        engineHash("zone-state"),
-		MessageRoot:      engineHash("zone-message"),
-		ExecutionRoot:    engineHash("zone-execution"),
-		ContinuationRoot: engineHash("zone-continuation"),
+		ZoneID:			zonestypes.ZoneIDContract,
+		Height:			42,
+		StateRoot:		engineHash("zone-state"),
+		MessageRoot:		engineHash("zone-message"),
+		ExecutionRoot:		engineHash("zone-execution"),
+		ContinuationRoot:	engineHash("zone-continuation"),
 	})
 	require.NoError(t, err)
 	return AVMStateInvariantSet{
@@ -167,6 +167,6 @@ func validInvariantSet(t *testing.T) AVMStateInvariantSet {
 		ContractStorage: []AVMContractStorageRef{
 			{ContractAddress: "contract-1", Key: AVMContractStorageKey("contract-1", "balance")},
 		},
-		ZoneRoots: []AVMZoneStateRoot{zoneRoot},
+		ZoneRoots:	[]AVMZoneStateRoot{zoneRoot},
 	}
 }

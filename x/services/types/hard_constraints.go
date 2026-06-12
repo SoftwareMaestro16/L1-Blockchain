@@ -11,60 +11,60 @@ type ServiceHardConstraintCategory string
 type ServiceHardConstraintStage string
 
 const (
-	ServiceConstraintNoCentralizedBackendAssumption     ServiceHardConstraintID = "no_centralized_service_backend_assumptions"
-	ServiceConstraintNoMessagingApplicationDependency   ServiceHardConstraintID = "no_messaging_application_dependency"
-	ServiceConstraintNoMonolithicExecutionEngine        ServiceHardConstraintID = "no_monolithic_service_execution_engine"
-	ServiceConstraintNoManualABIForRegisteredServices   ServiceHardConstraintID = "no_manual_abi_integrations_for_registered_services"
-	ServiceConstraintNoExternalAPIInConsensusExecution  ServiceHardConstraintID = "no_external_api_reliance_in_consensus_execution"
-	ServiceConstraintNoNondeterministicStateTransition  ServiceHardConstraintID = "no_nondeterministic_state_transitions"
-	ServiceConstraintNoUnboundedRegistryScans           ServiceHardConstraintID = "no_unbounded_registry_scans"
-	ServiceConstraintNoUnmeteredProofVerification       ServiceHardConstraintID = "no_unmetered_proof_verification"
-	ServiceConstraintNoUnverifiedOffChainCanonicalState ServiceHardConstraintID = "no_unverified_offchain_result_canonicalization"
+	ServiceConstraintNoCentralizedBackendAssumption		ServiceHardConstraintID	= "no_centralized_service_backend_assumptions"
+	ServiceConstraintNoMessagingApplicationDependency	ServiceHardConstraintID	= "no_messaging_application_dependency"
+	ServiceConstraintNoMonolithicExecutionEngine		ServiceHardConstraintID	= "no_monolithic_service_execution_engine"
+	ServiceConstraintNoManualABIForRegisteredServices	ServiceHardConstraintID	= "no_manual_abi_integrations_for_registered_services"
+	ServiceConstraintNoExternalAPIInConsensusExecution	ServiceHardConstraintID	= "no_external_api_reliance_in_consensus_execution"
+	ServiceConstraintNoNondeterministicStateTransition	ServiceHardConstraintID	= "no_nondeterministic_state_transitions"
+	ServiceConstraintNoUnboundedRegistryScans		ServiceHardConstraintID	= "no_unbounded_registry_scans"
+	ServiceConstraintNoUnmeteredProofVerification		ServiceHardConstraintID	= "no_unmetered_proof_verification"
+	ServiceConstraintNoUnverifiedOffChainCanonicalState	ServiceHardConstraintID	= "no_unverified_offchain_result_canonicalization"
 
-	ServiceConstraintCategoryArchitecture ServiceHardConstraintCategory = "architecture"
-	ServiceConstraintCategoryIntegration  ServiceHardConstraintCategory = "integration"
-	ServiceConstraintCategoryConsensus    ServiceHardConstraintCategory = "consensus"
-	ServiceConstraintCategoryPerformance  ServiceHardConstraintCategory = "performance"
-	ServiceConstraintCategorySecurity     ServiceHardConstraintCategory = "security"
+	ServiceConstraintCategoryArchitecture	ServiceHardConstraintCategory	= "architecture"
+	ServiceConstraintCategoryIntegration	ServiceHardConstraintCategory	= "integration"
+	ServiceConstraintCategoryConsensus	ServiceHardConstraintCategory	= "consensus"
+	ServiceConstraintCategoryPerformance	ServiceHardConstraintCategory	= "performance"
+	ServiceConstraintCategorySecurity	ServiceHardConstraintCategory	= "security"
 
-	ServiceConstraintStageDesign          ServiceHardConstraintStage = "design"
-	ServiceConstraintStageClientSDK       ServiceHardConstraintStage = "client_sdk"
-	ServiceConstraintStageAnteHandler     ServiceHardConstraintStage = "ante_handler"
-	ServiceConstraintStageProcessProposal ServiceHardConstraintStage = "process_proposal"
-	ServiceConstraintStageFinalizeBlock   ServiceHardConstraintStage = "finalize_block"
-	ServiceConstraintStageKeeper          ServiceHardConstraintStage = "keeper"
-	ServiceConstraintStageQuery           ServiceHardConstraintStage = "query"
-	ServiceConstraintStageDispute         ServiceHardConstraintStage = "dispute"
+	ServiceConstraintStageDesign		ServiceHardConstraintStage	= "design"
+	ServiceConstraintStageClientSDK		ServiceHardConstraintStage	= "client_sdk"
+	ServiceConstraintStageAnteHandler	ServiceHardConstraintStage	= "ante_handler"
+	ServiceConstraintStageProcessProposal	ServiceHardConstraintStage	= "process_proposal"
+	ServiceConstraintStageFinalizeBlock	ServiceHardConstraintStage	= "finalize_block"
+	ServiceConstraintStageKeeper		ServiceHardConstraintStage	= "keeper"
+	ServiceConstraintStageQuery		ServiceHardConstraintStage	= "query"
+	ServiceConstraintStageDispute		ServiceHardConstraintStage	= "dispute"
 )
 
 type ServiceHardConstraint struct {
-	ConstraintID      ServiceHardConstraintID
-	Category          ServiceHardConstraintCategory
-	ConsensusCritical bool
-	Stages            []ServiceHardConstraintStage
-	RequiredControls  []string
-	ConstraintHash    string
+	ConstraintID		ServiceHardConstraintID
+	Category		ServiceHardConstraintCategory
+	ConsensusCritical	bool
+	Stages			[]ServiceHardConstraintStage
+	RequiredControls	[]string
+	ConstraintHash		string
 }
 
 type ServiceHardConstraintsManifest struct {
-	Constraints  []ServiceHardConstraint
-	ManifestHash string
+	Constraints	[]ServiceHardConstraint
+	ManifestHash	string
 }
 
 type ServiceExecutionHardConstraintPolicy struct {
-	CentralizedBackendRequired            bool
-	MessagingApplicationRequired          bool
-	MonolithicExecutionEngine             bool
-	ManualABIRequiredForRegisteredService bool
-	ExternalAPIRequiredInConsensus        bool
-	NondeterministicStateTransition       bool
-	UnboundedRegistryScan                 bool
-	UnmeteredProofVerification            bool
-	OffChainResultCanonical               bool
-	OffChainResultHasProof                bool
-	OffChainResultHasSignature            bool
-	OffChainResultHasChallengeWindow      bool
-	OffChainResultHasExplicitTrustModel   bool
+	CentralizedBackendRequired		bool
+	MessagingApplicationRequired		bool
+	MonolithicExecutionEngine		bool
+	ManualABIRequiredForRegisteredService	bool
+	ExternalAPIRequiredInConsensus		bool
+	NondeterministicStateTransition		bool
+	UnboundedRegistryScan			bool
+	UnmeteredProofVerification		bool
+	OffChainResultCanonical			bool
+	OffChainResultHasProof			bool
+	OffChainResultHasSignature		bool
+	OffChainResultHasChallengeWindow	bool
+	OffChainResultHasExplicitTrustModel	bool
 }
 
 func DefaultServiceHardConstraintsManifest() (ServiceHardConstraintsManifest, error) {
@@ -313,11 +313,11 @@ func IsServiceHardConstraintStage(stage ServiceHardConstraintStage) bool {
 
 func newServiceHardConstraint(constraintID ServiceHardConstraintID, category ServiceHardConstraintCategory, consensusCritical bool, stages []ServiceHardConstraintStage, controls []string) ServiceHardConstraint {
 	return ServiceHardConstraint{
-		ConstraintID:      constraintID,
-		Category:          category,
-		ConsensusCritical: consensusCritical,
-		Stages:            stages,
-		RequiredControls:  controls,
+		ConstraintID:		constraintID,
+		Category:		category,
+		ConsensusCritical:	consensusCritical,
+		Stages:			stages,
+		RequiredControls:	controls,
 	}
 }
 

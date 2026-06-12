@@ -16,10 +16,10 @@ func TestIdentitySpamCostModelV2HighVolumeRegistrationSimulation(t *testing.T) {
 	attempts := make([]IdentityBulkRegistrationAttemptV2, 12)
 	for i := range attempts {
 		attempts[i] = IdentityBulkRegistrationAttemptV2{
-			Owner:                owner,
-			Name:                 fmt.Sprintf("bulk%04d.aet", i),
-			Height:               10,
-			ResolverPayloadBytes: uint64(i * 16),
+			Owner:			owner,
+			Name:			fmt.Sprintf("bulk%04d.aet", i),
+			Height:			10,
+			ResolverPayloadBytes:	uint64(i * 16),
 		}
 	}
 
@@ -41,14 +41,14 @@ func TestIdentitySpamCostModelV2SurfacesAndEndpointLimit(t *testing.T) {
 			{Name: "market.aet", ResolverPayloadBytes: 256},
 			{Name: "vault.aet", DemandClass: IdentityDemandClassContestedV2, Auction: true},
 		},
-		CommitCount:               2,
-		ResolverUpdateCount:       8,
-		ResolverPayloadBytes:      2048,
-		SubdomainCreates:          4,
-		AuctionCommitments:        3,
-		ServiceEndpointCount:      MaxUnifiedServiceEndpoints + 1,
-		ProofQueries:              1000,
-		BatchResolverGasPerUpdate: MinIdentityBatchResolverUpdateGasV2,
+		CommitCount:			2,
+		ResolverUpdateCount:		8,
+		ResolverPayloadBytes:		2048,
+		SubdomainCreates:		4,
+		AuctionCommitments:		3,
+		ServiceEndpointCount:		MaxUnifiedServiceEndpoints + 1,
+		ProofQueries:			1000,
+		BatchResolverGasPerUpdate:	MinIdentityBatchResolverUpdateGasV2,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, quote.RegistrationCost.IsPositive())

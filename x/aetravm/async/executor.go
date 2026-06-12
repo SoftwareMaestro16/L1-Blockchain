@@ -15,11 +15,11 @@ func NewExecutor(params Params) (*Executor, error) {
 		return nil, err
 	}
 	return &Executor{
-		params:    params,
-		contracts: make(map[string]ContractAccount),
-		inbox:     make(map[string][]QueuedMessage),
-		outbox:    make(map[string][]QueuedMessage),
-		handlers:  make(map[string]Handler),
+		params:		params,
+		contracts:	make(map[string]ContractAccount),
+		inbox:		make(map[string][]QueuedMessage),
+		outbox:		make(map[string][]QueuedMessage),
+		handlers:	make(map[string]Handler),
 	}, nil
 }
 
@@ -61,13 +61,13 @@ func (e *Executor) DeployContracts(deployer sdk.AccAddress, specs []DeploySpec) 
 			return nil, errors.New("contract already deployed")
 		}
 		contract := ContractAccount{
-			Address:                 address,
-			CodeHash:                append([]byte(nil), spec.CodeHash...),
-			State:                   append([]byte(nil), spec.State...),
-			BalanceNaet:             spec.BalanceNaet.Sub(e.params.ContractDeploymentCost),
-			Status:                  ContractStatusActive,
-			StorageRentDebtNaet:     sdkmath.ZeroInt(),
-			LastStorageChargeHeight: e.blockHeight,
+			Address:			address,
+			CodeHash:			append([]byte(nil), spec.CodeHash...),
+			State:				append([]byte(nil), spec.State...),
+			BalanceNaet:			spec.BalanceNaet.Sub(e.params.ContractDeploymentCost),
+			Status:				ContractStatusActive,
+			StorageRentDebtNaet:		sdkmath.ZeroInt(),
+			LastStorageChargeHeight:	e.blockHeight,
 		}
 		if err := contract.Validate(e.params); err != nil {
 			return nil, err

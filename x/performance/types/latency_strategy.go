@@ -8,112 +8,112 @@ import (
 )
 
 const (
-	DefaultLatencyTargetLocalBlocks       = uint64(1)
-	DefaultLatencyTargetCrossShardBlocks  = uint64(1)
-	DefaultLatencyTargetCrossZoneBlocks   = uint64(2)
-	DefaultLatencyTargetPromiseBlocks     = uint64(1)
-	DefaultNearExpiryPriorityWindowBlocks = uint64(2)
-	DefaultLatencyQueueDepthStep          = uint32(64)
+	DefaultLatencyTargetLocalBlocks		= uint64(1)
+	DefaultLatencyTargetCrossShardBlocks	= uint64(1)
+	DefaultLatencyTargetCrossZoneBlocks	= uint64(2)
+	DefaultLatencyTargetPromiseBlocks	= uint64(1)
+	DefaultNearExpiryPriorityWindowBlocks	= uint64(2)
+	DefaultLatencyQueueDepthStep		= uint32(64)
 )
 
 type LatencyOperationClass string
 
 const (
-	LatencyOpSingleZoneLocalTx         LatencyOperationClass = "single_zone_local_tx"
-	LatencyOpSameZoneCrossShard        LatencyOperationClass = "same_zone_cross_shard_message"
-	LatencyOpCrossZoneAsyncMessage     LatencyOperationClass = "cross_zone_async_message"
-	LatencyOpContractPromiseResolution LatencyOperationClass = "contract_promise_resolution"
+	LatencyOpSingleZoneLocalTx		LatencyOperationClass	= "single_zone_local_tx"
+	LatencyOpSameZoneCrossShard		LatencyOperationClass	= "same_zone_cross_shard_message"
+	LatencyOpCrossZoneAsyncMessage		LatencyOperationClass	= "cross_zone_async_message"
+	LatencyOpContractPromiseResolution	LatencyOperationClass	= "contract_promise_resolution"
 )
 
 type CrossZoneMessageSLAParams struct {
-	LocalTxTargetBlocks       uint64
-	CrossShardTargetBlocks    uint64
-	CrossZoneTargetBlocks     uint64
-	PromiseTargetBlocks       uint64
-	MinForwardingFee          string
-	CongestionMultiplierBps   uint32
-	QueueDepthFeeStep         uint32
-	QueueDepthFeeBps          uint32
-	NearExpiryPriorityWindow  uint64
-	NearExpiryPriorityBoost   uint64
-	FeePriorityWeight         uint64
-	CongestionPriorityWeight  uint64
-	ExpiryPriorityWeight      uint64
-	MaxDeliveryQueueDepth     uint32
-	MaxCrossZoneCommitmentLag uint64
+	LocalTxTargetBlocks		uint64
+	CrossShardTargetBlocks		uint64
+	CrossZoneTargetBlocks		uint64
+	PromiseTargetBlocks		uint64
+	MinForwardingFee		string
+	CongestionMultiplierBps		uint32
+	QueueDepthFeeStep		uint32
+	QueueDepthFeeBps		uint32
+	NearExpiryPriorityWindow	uint64
+	NearExpiryPriorityBoost		uint64
+	FeePriorityWeight		uint64
+	CongestionPriorityWeight	uint64
+	ExpiryPriorityWeight		uint64
+	MaxDeliveryQueueDepth		uint32
+	MaxCrossZoneCommitmentLag	uint64
 }
 
 type LatencyMetricInput struct {
-	OperationClass         LatencyOperationClass
-	ZoneID                 string
-	ShardID                string
-	DestinationZoneID      string
-	DestinationShardID     string
-	CreatedHeight          uint64
-	SourceCommitmentHeight uint64
-	EligibleHeight         uint64
-	ExecutedHeight         uint64
+	OperationClass		LatencyOperationClass
+	ZoneID			string
+	ShardID			string
+	DestinationZoneID	string
+	DestinationShardID	string
+	CreatedHeight		uint64
+	SourceCommitmentHeight	uint64
+	EligibleHeight		uint64
+	ExecutedHeight		uint64
 }
 
 type LatencyMetric struct {
-	OperationClass         LatencyOperationClass
-	ZoneID                 string
-	ShardID                string
-	DestinationZoneID      string
-	DestinationShardID     string
-	CreatedHeight          uint64
-	SourceCommitmentHeight uint64
-	EligibleHeight         uint64
-	ExecutedHeight         uint64
-	TargetBlocks           uint64
-	ObservedBlocks         uint64
-	Satisfied              bool
-	MetricHash             string
+	OperationClass		LatencyOperationClass
+	ZoneID			string
+	ShardID			string
+	DestinationZoneID	string
+	DestinationShardID	string
+	CreatedHeight		uint64
+	SourceCommitmentHeight	uint64
+	EligibleHeight		uint64
+	ExecutedHeight		uint64
+	TargetBlocks		uint64
+	ObservedBlocks		uint64
+	Satisfied		bool
+	MetricHash		string
 }
 
 type LatencyDeliveryMessage struct {
-	MessageID              string
-	OperationClass         LatencyOperationClass
-	SourceZoneID           string
-	SourceShardID          string
-	DestinationZoneID      string
-	DestinationShardID     string
-	CreatedHeight          uint64
-	SourceCommitmentHeight uint64
-	EligibleHeight         uint64
-	ExpiryHeight           uint64
-	BaseForwardingFee      string
-	ForwardingFee          string
-	CongestionBps          uint32
-	QueueDepth             uint32
-	PromiseResolution      bool
-	PriorityScore          uint64
-	MessageHash            string
+	MessageID		string
+	OperationClass		LatencyOperationClass
+	SourceZoneID		string
+	SourceShardID		string
+	DestinationZoneID	string
+	DestinationShardID	string
+	CreatedHeight		uint64
+	SourceCommitmentHeight	uint64
+	EligibleHeight		uint64
+	ExpiryHeight		uint64
+	BaseForwardingFee	string
+	ForwardingFee		string
+	CongestionBps		uint32
+	QueueDepth		uint32
+	PromiseResolution	bool
+	PriorityScore		uint64
+	MessageHash		string
 }
 
 type LatencyDeliveryQueue struct {
-	Height    uint64
-	Messages  []LatencyDeliveryMessage
-	QueueRoot string
+	Height		uint64
+	Messages	[]LatencyDeliveryMessage
+	QueueRoot	string
 }
 
 func DefaultCrossZoneMessageSLAParams() CrossZoneMessageSLAParams {
 	return CrossZoneMessageSLAParams{
-		LocalTxTargetBlocks:       DefaultLatencyTargetLocalBlocks,
-		CrossShardTargetBlocks:    DefaultLatencyTargetCrossShardBlocks,
-		CrossZoneTargetBlocks:     DefaultLatencyTargetCrossZoneBlocks,
-		PromiseTargetBlocks:       DefaultLatencyTargetPromiseBlocks,
-		MinForwardingFee:          "1",
-		CongestionMultiplierBps:   10_000,
-		QueueDepthFeeStep:         DefaultLatencyQueueDepthStep,
-		QueueDepthFeeBps:          250,
-		NearExpiryPriorityWindow:  DefaultNearExpiryPriorityWindowBlocks,
-		NearExpiryPriorityBoost:   10_000_000,
-		FeePriorityWeight:         100,
-		CongestionPriorityWeight:  10,
-		ExpiryPriorityWeight:      1_000,
-		MaxDeliveryQueueDepth:     50_000,
-		MaxCrossZoneCommitmentLag: 8,
+		LocalTxTargetBlocks:		DefaultLatencyTargetLocalBlocks,
+		CrossShardTargetBlocks:		DefaultLatencyTargetCrossShardBlocks,
+		CrossZoneTargetBlocks:		DefaultLatencyTargetCrossZoneBlocks,
+		PromiseTargetBlocks:		DefaultLatencyTargetPromiseBlocks,
+		MinForwardingFee:		"1",
+		CongestionMultiplierBps:	10_000,
+		QueueDepthFeeStep:		DefaultLatencyQueueDepthStep,
+		QueueDepthFeeBps:		250,
+		NearExpiryPriorityWindow:	DefaultNearExpiryPriorityWindowBlocks,
+		NearExpiryPriorityBoost:	10_000_000,
+		FeePriorityWeight:		100,
+		CongestionPriorityWeight:	10,
+		ExpiryPriorityWeight:		1_000,
+		MaxDeliveryQueueDepth:		50_000,
+		MaxCrossZoneCommitmentLag:	8,
 	}
 }
 
@@ -171,8 +171,8 @@ func (p CrossZoneMessageSLAParams) Normalize() CrossZoneMessageSLAParams {
 func (p CrossZoneMessageSLAParams) Validate() error {
 	params := p.Normalize()
 	for _, target := range []struct {
-		name  string
-		value uint64
+		name	string
+		value	uint64
 	}{
 		{"local tx target", params.LocalTxTargetBlocks},
 		{"cross-shard target", params.CrossShardTargetBlocks},
@@ -220,18 +220,18 @@ func BuildLatencyMetric(input LatencyMetricInput, params CrossZoneMessageSLAPara
 		observed = input.ExecutedHeight - start
 	}
 	metric := LatencyMetric{
-		OperationClass:         input.OperationClass,
-		ZoneID:                 input.ZoneID,
-		ShardID:                input.ShardID,
-		DestinationZoneID:      input.DestinationZoneID,
-		DestinationShardID:     input.DestinationShardID,
-		CreatedHeight:          input.CreatedHeight,
-		SourceCommitmentHeight: input.SourceCommitmentHeight,
-		EligibleHeight:         input.EligibleHeight,
-		ExecutedHeight:         input.ExecutedHeight,
-		TargetBlocks:           target,
-		ObservedBlocks:         observed,
-		Satisfied:              observed <= target,
+		OperationClass:		input.OperationClass,
+		ZoneID:			input.ZoneID,
+		ShardID:		input.ShardID,
+		DestinationZoneID:	input.DestinationZoneID,
+		DestinationShardID:	input.DestinationShardID,
+		CreatedHeight:		input.CreatedHeight,
+		SourceCommitmentHeight:	input.SourceCommitmentHeight,
+		EligibleHeight:		input.EligibleHeight,
+		ExecutedHeight:		input.ExecutedHeight,
+		TargetBlocks:		target,
+		ObservedBlocks:		observed,
+		Satisfied:		observed <= target,
 	}
 	metric.MetricHash = ComputeLatencyMetricHash(metric)
 	return metric, metric.Validate()

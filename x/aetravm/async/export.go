@@ -15,18 +15,18 @@ func (e *Executor) ExportState() ExportedState {
 		return string(contracts[i].Address) < string(contracts[j].Address)
 	})
 	return ExportedState{
-		Params:                 e.params,
-		Contracts:              contracts,
-		Queue:                  cloneQueuedMessages(e.queue),
-		Inbox:                  cloneQueuedMap(e.inbox),
-		Outbox:                 cloneQueuedMap(e.outbox),
-		DeadLetters:            cloneDeadLetters(e.deadLetters),
-		Receipts:               cloneReceipts(e.receipts),
-		NextSequence:           e.nextSequence,
-		NextTxIndex:            e.nextTxIndex,
-		NextDeadLetterSequence: e.nextDeadLetterSequence,
-		BlockHeight:            e.blockHeight,
-		Metrics:                e.metrics,
+		Params:			e.params,
+		Contracts:		contracts,
+		Queue:			cloneQueuedMessages(e.queue),
+		Inbox:			cloneQueuedMap(e.inbox),
+		Outbox:			cloneQueuedMap(e.outbox),
+		DeadLetters:		cloneDeadLetters(e.deadLetters),
+		Receipts:		cloneReceipts(e.receipts),
+		NextSequence:		e.nextSequence,
+		NextTxIndex:		e.nextTxIndex,
+		NextDeadLetterSequence:	e.nextDeadLetterSequence,
+		BlockHeight:		e.blockHeight,
+		Metrics:		e.metrics,
 	}
 }
 

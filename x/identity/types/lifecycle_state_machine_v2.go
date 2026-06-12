@@ -8,31 +8,31 @@ import (
 type DomainLifecycleEventV2 string
 
 const (
-	DomainLifecycleEventCommitRegistration DomainLifecycleEventV2 = "MsgCommitRegistration"
-	DomainLifecycleEventRevealRegistration DomainLifecycleEventV2 = "MsgRevealRegistration"
-	DomainLifecycleEventRegisterDirect     DomainLifecycleEventV2 = "MsgRegisterDirect"
-	DomainLifecycleEventRenewDomain        DomainLifecycleEventV2 = "MsgRenewDomain"
-	DomainLifecycleEventStartAuction       DomainLifecycleEventV2 = "MsgStartAuction"
-	DomainLifecycleEventFinalizeAuction    DomainLifecycleEventV2 = "MsgFinalizeAuction"
-	DomainLifecycleEventRenewalWindowBegin DomainLifecycleEventV2 = "renewal_window_begins"
-	DomainLifecycleEventExpireDomain       DomainLifecycleEventV2 = "expiry_reached"
-	DomainLifecycleEventGracePeriodBegin   DomainLifecycleEventV2 = "grace_period_begins"
-	DomainLifecycleEventGracePeriodEnd     DomainLifecycleEventV2 = "grace_period_ends"
-	DomainLifecycleEventReleaseDomain      DomainLifecycleEventV2 = "release_domain"
+	DomainLifecycleEventCommitRegistration	DomainLifecycleEventV2	= "MsgCommitRegistration"
+	DomainLifecycleEventRevealRegistration	DomainLifecycleEventV2	= "MsgRevealRegistration"
+	DomainLifecycleEventRegisterDirect	DomainLifecycleEventV2	= "MsgRegisterDirect"
+	DomainLifecycleEventRenewDomain		DomainLifecycleEventV2	= "MsgRenewDomain"
+	DomainLifecycleEventStartAuction	DomainLifecycleEventV2	= "MsgStartAuction"
+	DomainLifecycleEventFinalizeAuction	DomainLifecycleEventV2	= "MsgFinalizeAuction"
+	DomainLifecycleEventRenewalWindowBegin	DomainLifecycleEventV2	= "renewal_window_begins"
+	DomainLifecycleEventExpireDomain	DomainLifecycleEventV2	= "expiry_reached"
+	DomainLifecycleEventGracePeriodBegin	DomainLifecycleEventV2	= "grace_period_begins"
+	DomainLifecycleEventGracePeriodEnd	DomainLifecycleEventV2	= "grace_period_ends"
+	DomainLifecycleEventReleaseDomain	DomainLifecycleEventV2	= "release_domain"
 )
 
 type DomainLifecycleTransitionContextV2 struct {
-	Event                     DomainLifecycleEventV2
-	Height                    uint64
-	DepositPaid               bool
-	RegistrationPaymentPaid   bool
-	RenewalPaymentPaid        bool
-	DirectRegistrationEnabled bool
-	NFTMintedOrBound          bool
-	GracePeriodEnabled        bool
-	GracePeriodEndHeight      uint64
-	AuctionFinalized          bool
-	DeterministicWinnerProof  bool
+	Event				DomainLifecycleEventV2
+	Height				uint64
+	DepositPaid			bool
+	RegistrationPaymentPaid		bool
+	RenewalPaymentPaid		bool
+	DirectRegistrationEnabled	bool
+	NFTMintedOrBound		bool
+	GracePeriodEnabled		bool
+	GracePeriodEndHeight		uint64
+	AuctionFinalized		bool
+	DeterministicWinnerProof	bool
 }
 
 func ApplyDomainLifecycleTransitionV2(record DomainRecordV2, ctx DomainLifecycleTransitionContextV2) (DomainRecordV2, error) {

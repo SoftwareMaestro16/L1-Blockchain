@@ -24,10 +24,10 @@ func TestUserBurnReducesBalanceSupplyAndRecordsCounters(t *testing.T) {
 	userBefore := app.BankKeeper.GetBalance(ctx, user, types.BaseDenom)
 
 	res, err := msgServer.BurnUserCoins(ctx, &types.MsgBurnUserCoins{
-		Burner: aetraaddress.FormatAccAddress(user),
-		Amount: sdk.NewCoins(coin(125)),
-		Epoch:  7,
-		Reason: "user-opt-in",
+		Burner:	aetraaddress.FormatAccAddress(user),
+		Amount:	sdk.NewCoins(coin(125)),
+		Epoch:	7,
+		Reason:	"user-opt-in",
 	})
 	require.NoError(t, err)
 
@@ -59,11 +59,11 @@ func TestProtocolBurnReducesModuleBalanceSupplyAndRecordsReason(t *testing.T) {
 	moduleBefore := app.BankKeeper.GetBalance(ctx, moduleAddr, types.BaseDenom)
 
 	res, err := msgServer.BurnProtocolCoins(ctx, &types.MsgBurnProtocolCoins{
-		Authority:    app.BurnKeeper.Authority(),
-		SourceModule: types.ModuleName,
-		Amount:       sdk.NewCoins(coin(200)),
-		Epoch:        9,
-		Reason:       "protocol-deflation",
+		Authority:	app.BurnKeeper.Authority(),
+		SourceModule:	types.ModuleName,
+		Amount:		sdk.NewCoins(coin(200)),
+		Epoch:		9,
+		Reason:		"protocol-deflation",
 	})
 	require.NoError(t, err)
 
@@ -86,9 +86,9 @@ func TestZeroAndNegativeBurnRejectedWithoutMutation(t *testing.T) {
 	supplyBefore := app.BankKeeper.GetSupply(ctx, types.BaseDenom)
 
 	_, err := msgServer.BurnUserCoins(ctx, &types.MsgBurnUserCoins{
-		Burner: aetraaddress.FormatAccAddress(user),
-		Amount: sdk.NewCoins(),
-		Epoch:  1,
+		Burner:	aetraaddress.FormatAccAddress(user),
+		Amount:	sdk.NewCoins(),
+		Epoch:	1,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidBurn)
 
@@ -107,20 +107,20 @@ func TestUnauthorizedProtocolBurnRejectedWithoutSupplyMutation(t *testing.T) {
 	msgServer := burnkeeper.NewMsgServerImpl(app.BurnKeeper)
 
 	_, err := msgServer.BurnProtocolCoins(ctx, &types.MsgBurnProtocolCoins{
-		Authority:    app.BurnKeeper.Authority(),
-		SourceModule: minttypes.ModuleName,
-		Amount:       sdk.NewCoins(coin(10)),
-		Epoch:        2,
-		Reason:       "not-allowed",
+		Authority:	app.BurnKeeper.Authority(),
+		SourceModule:	minttypes.ModuleName,
+		Amount:		sdk.NewCoins(coin(10)),
+		Epoch:		2,
+		Reason:		"not-allowed",
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 	require.Equal(t, supplyBefore, app.BankKeeper.GetSupply(ctx, types.BaseDenom))
 
 	_, err = msgServer.BurnProtocolCoins(ctx, &types.MsgBurnProtocolCoins{
-		Authority:    aetraaddress.FormatAccAddress(sdk.AccAddress(bytes20(1))),
-		SourceModule: types.ModuleName,
-		Amount:       sdk.NewCoins(coin(10)),
-		Epoch:        2,
+		Authority:	aetraaddress.FormatAccAddress(sdk.AccAddress(bytes20(1))),
+		SourceModule:	types.ModuleName,
+		Amount:		sdk.NewCoins(coin(10)),
+		Epoch:		2,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 }

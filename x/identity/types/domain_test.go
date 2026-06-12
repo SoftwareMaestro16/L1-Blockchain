@@ -42,15 +42,15 @@ func TestValidateDomainRecord(t *testing.T) {
 	resolver := []byte{4, 5, 6}
 
 	record := DomainRecord{
-		Name:          "alice",
-		TLD:           DomainTLD,
-		Owner:         owner,
-		Resolver:      resolver,
-		ExpiryUnix:    100,
-		NFTItemID:     "anft66:1",
-		Status:        DomainStatusActive,
-		CreatedAtUnix: 1,
-		UpdatedAtUnix: 2,
+		Name:		"alice",
+		TLD:		DomainTLD,
+		Owner:		owner,
+		Resolver:	resolver,
+		ExpiryUnix:	100,
+		NFTItemID:	"anft66:1",
+		Status:		DomainStatusActive,
+		CreatedAtUnix:	1,
+		UpdatedAtUnix:	2,
 	}
 	require.NoError(t, ValidateDomainRecord(record))
 

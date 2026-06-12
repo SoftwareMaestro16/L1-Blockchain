@@ -22,18 +22,18 @@ func setupKeeper(t *testing.T) Keeper {
 
 func shard(id string) types.Shard {
 	return types.Shard{
-		ShardID:                id,
-		Status:                 types.ShardStatusPaused,
-		SecurityLevel:          types.ShardSecurityStandard,
-		RequiredValidatorCount: 2,
+		ShardID:		id,
+		Status:			types.ShardStatusPaused,
+		SecurityLevel:		types.ShardSecurityStandard,
+		RequiredValidatorCount:	2,
 		CrossShardRoutingParams: types.CrossShardRoutingParams{
-			AllowInbound:      true,
-			AllowOutbound:     true,
-			MaxMessageBytes:   1024,
-			MaxTimeoutBlocks:  100,
-			DefaultRouteLimit: 10,
+			AllowInbound:		true,
+			AllowOutbound:		true,
+			MaxMessageBytes:	1024,
+			MaxTimeoutBlocks:	100,
+			DefaultRouteLimit:	10,
 		},
-		RegisteredHeight: 1,
+		RegisteredHeight:	1,
 	}
 }
 
@@ -46,12 +46,12 @@ func registerShard(t *testing.T, k *Keeper, id string) {
 func assign(t *testing.T, k *Keeper, shardID string, validators ...string) {
 	t.Helper()
 	_, err := k.AssignValidatorsToShard(types.MsgAssignValidatorsToShard{
-		Authority: authority,
+		Authority:	authority,
 		Assignment: types.ShardValidatorAssignment{
-			ShardID:         shardID,
-			Validators:      validators,
-			AssignedHeight:  2,
-			AssignmentEpoch: 1,
+			ShardID:		shardID,
+			Validators:		validators,
+			AssignedHeight:		2,
+			AssignmentEpoch:	1,
 		},
 	})
 	require.NoError(t, err)
@@ -87,14 +87,14 @@ func TestSubmitShardLoad(t *testing.T) {
 	registerShard(t, &k, "shard-a")
 
 	load, err := k.SubmitShardLoad(types.MsgSubmitShardLoad{
-		Reporter: "oracle",
+		Reporter:	"oracle",
 		Load: types.ShardLoadMetric{
-			ShardID:              "shard-a",
-			TransactionsPerBlock: 100,
-			GasPerBlock:          1_000,
-			StateBytes:           10_000,
-			PendingMessages:      5,
-			ReportedHeight:       3,
+			ShardID:		"shard-a",
+			TransactionsPerBlock:	100,
+			GasPerBlock:		1_000,
+			StateBytes:		10_000,
+			PendingMessages:	5,
+			ReportedHeight:		3,
 		},
 	})
 	require.NoError(t, err)
@@ -113,14 +113,14 @@ func TestRebalanceProposalLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	proposal, err := k.ProposeShardRebalance(types.MsgProposeShardRebalance{
-		Authority: authority,
+		Authority:	authority,
 		Proposal: types.RebalanceProposal{
-			ProposalID:     "rebalance-1",
-			SourceShardID:  "shard-a",
-			TargetShardID:  "shard-b",
-			ValidatorMoves: []types.ValidatorMove{{ValidatorID: "val3", FromShardID: "shard-a", ToShardID: "shard-b", Sequence: 1}},
-			Reason:         "load skew",
-			ProposedHeight: 5,
+			ProposalID:	"rebalance-1",
+			SourceShardID:	"shard-a",
+			TargetShardID:	"shard-b",
+			ValidatorMoves:	[]types.ValidatorMove{{ValidatorID: "val3", FromShardID: "shard-a", ToShardID: "shard-b", Sequence: 1}},
+			Reason:		"load skew",
+			ProposedHeight:	5,
 		},
 	})
 	require.NoError(t, err)

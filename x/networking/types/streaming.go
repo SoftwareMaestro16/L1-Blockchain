@@ -7,122 +7,122 @@ import (
 )
 
 const (
-	DefaultStreamParallelism = uint32(1)
-	MaxStreamParallelism     = uint32(64)
-	MinStreamChunkBytes      = uint64(256)
+	DefaultStreamParallelism	= uint32(1)
+	MaxStreamParallelism		= uint32(64)
+	MinStreamChunkBytes		= uint64(256)
 )
 
 type StreamingPayloadType string
 
 const (
-	StreamingPayloadStateSync            StreamingPayloadType = "state_sync"
-	StreamingPayloadZoneSnapshot         StreamingPayloadType = "zone_snapshot"
-	StreamingPayloadBlockPropagation     StreamingPayloadType = "block_propagation"
-	StreamingPayloadExecutionReceipts    StreamingPayloadType = "execution_receipts"
-	StreamingPayloadStorageObject        StreamingPayloadType = "storage_object"
-	StreamingPayloadProofBundle          StreamingPayloadType = "proof_bundle"
-	StreamingPayloadHistoricalQueryRange StreamingPayloadType = "historical_query_range"
+	StreamingPayloadStateSync		StreamingPayloadType	= "state_sync"
+	StreamingPayloadZoneSnapshot		StreamingPayloadType	= "zone_snapshot"
+	StreamingPayloadBlockPropagation	StreamingPayloadType	= "block_propagation"
+	StreamingPayloadExecutionReceipts	StreamingPayloadType	= "execution_receipts"
+	StreamingPayloadStorageObject		StreamingPayloadType	= "storage_object"
+	StreamingPayloadProofBundle		StreamingPayloadType	= "proof_bundle"
+	StreamingPayloadHistoricalQueryRange	StreamingPayloadType	= "historical_query_range"
 )
 
 type StreamSessionState string
 
 const (
-	StreamStateOpening  StreamSessionState = "opening"
-	StreamStateActive   StreamSessionState = "active"
-	StreamStatePaused   StreamSessionState = "paused"
-	StreamStateDraining StreamSessionState = "draining"
-	StreamStateClosed   StreamSessionState = "closed"
-	StreamStateFailed   StreamSessionState = "failed"
+	StreamStateOpening	StreamSessionState	= "opening"
+	StreamStateActive	StreamSessionState	= "active"
+	StreamStatePaused	StreamSessionState	= "paused"
+	StreamStateDraining	StreamSessionState	= "draining"
+	StreamStateClosed	StreamSessionState	= "closed"
+	StreamStateFailed	StreamSessionState	= "failed"
 )
 
 type StreamBackpressureSignal string
 
 const (
-	StreamSignalWindowUpdate StreamBackpressureSignal = "window_update"
-	StreamSignalPause        StreamBackpressureSignal = "pause"
-	StreamSignalResume       StreamBackpressureSignal = "resume"
-	StreamSignalSlowDown     StreamBackpressureSignal = "slow_down"
-	StreamSignalCancel       StreamBackpressureSignal = "cancel"
+	StreamSignalWindowUpdate	StreamBackpressureSignal	= "window_update"
+	StreamSignalPause		StreamBackpressureSignal	= "pause"
+	StreamSignalResume		StreamBackpressureSignal	= "resume"
+	StreamSignalSlowDown		StreamBackpressureSignal	= "slow_down"
+	StreamSignalCancel		StreamBackpressureSignal	= "cancel"
 )
 
 type StreamSession struct {
-	StreamID          string
-	SessionID         string
-	PayloadType       StreamingPayloadType
-	Priority          uint32
-	FlowControlWindow uint64
-	ChunkSize         uint64
-	Parallelism       uint32
-	BytesSent         uint64
-	BytesAcknowledged uint64
-	State             StreamSessionState
+	StreamID		string
+	SessionID		string
+	PayloadType		StreamingPayloadType
+	Priority		uint32
+	FlowControlWindow	uint64
+	ChunkSize		uint64
+	Parallelism		uint32
+	BytesSent		uint64
+	BytesAcknowledged	uint64
+	State			StreamSessionState
 }
 
 type StreamWindowUpdate struct {
-	StreamID          string
-	BytesSent         uint64
-	BytesAcknowledged uint64
-	AvailableWindow   uint64
-	Backpressure      bool
+	StreamID		string
+	BytesSent		uint64
+	BytesAcknowledged	uint64
+	AvailableWindow		uint64
+	Backpressure		bool
 }
 
 type StreamChunkPlan struct {
-	StreamID          string
-	NextOffset        uint64
-	ChunkSize         uint64
-	MaxInFlightChunks uint32
-	Parallelism       uint32
-	Backpressure      bool
+	StreamID		string
+	NextOffset		uint64
+	ChunkSize		uint64
+	MaxInFlightChunks	uint32
+	Parallelism		uint32
+	Backpressure		bool
 }
 
 type StreamBackpressureFrame struct {
-	StreamID              string
-	Signal                StreamBackpressureSignal
-	FlowControlWindow     uint64
-	CumulativeAcknowledge uint64
-	SuggestedChunkSize    uint64
-	Reason                string
+	StreamID		string
+	Signal			StreamBackpressureSignal
+	FlowControlWindow	uint64
+	CumulativeAcknowledge	uint64
+	SuggestedChunkSize	uint64
+	Reason			string
 }
 
 type StreamAdaptiveChunkInputs struct {
-	ObservedThroughputBps uint64
-	LossRateBps           uint32
-	PeerScoreBps          uint32
-	PayloadPriority       uint32
-	StreamClass           QoSClass
+	ObservedThroughputBps	uint64
+	LossRateBps		uint32
+	PeerScoreBps		uint32
+	PayloadPriority		uint32
+	StreamClass		QoSClass
 }
 
 type StreamFetchRequest struct {
-	StreamID     string
-	ChunkIndex   uint32
-	RangeStart   uint64
-	RangeEnd     uint64
-	ChunkSize    uint64
-	AssignedPeer string
+	StreamID	string
+	ChunkIndex	uint32
+	RangeStart	uint64
+	RangeEnd	uint64
+	ChunkSize	uint64
+	AssignedPeer	string
 }
 
 type StreamParallelFetchPlan struct {
-	StreamID       string
-	ChunkSize      uint64
-	PayloadBytes   uint64
-	TotalChunks    uint32
-	Requests       []StreamFetchRequest
-	RecoveryResume bool
+	StreamID	string
+	ChunkSize	uint64
+	PayloadBytes	uint64
+	TotalChunks	uint32
+	Requests	[]StreamFetchRequest
+	RecoveryResume	bool
 }
 
 type StreamMetrics struct {
-	StreamID           string
-	PayloadType        StreamingPayloadType
-	State              StreamSessionState
-	BytesSent          uint64
-	BytesAcknowledged  uint64
-	InFlightBytes      uint64
-	AvailableWindow    uint64
-	ThroughputBytesBps uint64
-	StallCount         uint64
-	BackpressureEvents uint64
-	BackpressureActive bool
-	CompletionBps      uint32
+	StreamID		string
+	PayloadType		StreamingPayloadType
+	State			StreamSessionState
+	BytesSent		uint64
+	BytesAcknowledged	uint64
+	InFlightBytes		uint64
+	AvailableWindow		uint64
+	ThroughputBytesBps	uint64
+	StallCount		uint64
+	BackpressureEvents	uint64
+	BackpressureActive	bool
+	CompletionBps		uint32
 }
 
 func NewStreamSession(stream StreamSession) (StreamSession, error) {
@@ -163,13 +163,13 @@ func StreamSessionFromSpec(session SessionChannel, spec StreamSpec, payloadType 
 		}
 	}
 	return NewStreamSession(StreamSession{
-		SessionID:         session.SessionID,
-		PayloadType:       payloadType,
-		Priority:          spec.Priority,
-		FlowControlWindow: spec.FlowControlWindow,
-		ChunkSize:         chunkSize,
-		Parallelism:       parallelism,
-		State:             StreamStateOpening,
+		SessionID:		session.SessionID,
+		PayloadType:		payloadType,
+		Priority:		spec.Priority,
+		FlowControlWindow:	spec.FlowControlWindow,
+		ChunkSize:		chunkSize,
+		Parallelism:		parallelism,
+		State:			StreamStateOpening,
 	})
 }
 
@@ -405,11 +405,11 @@ func StreamWindow(stream StreamSession) StreamWindowUpdate {
 	stream = stream.Normalize()
 	available := StreamAvailableWindow(stream)
 	return StreamWindowUpdate{
-		StreamID:          stream.StreamID,
-		BytesSent:         stream.BytesSent,
-		BytesAcknowledged: stream.BytesAcknowledged,
-		AvailableWindow:   available,
-		Backpressure:      available == 0 || stream.State == StreamStatePaused,
+		StreamID:		stream.StreamID,
+		BytesSent:		stream.BytesSent,
+		BytesAcknowledged:	stream.BytesAcknowledged,
+		AvailableWindow:	available,
+		Backpressure:		available == 0 || stream.State == StreamStatePaused,
 	}
 }
 
@@ -432,19 +432,19 @@ func PlanStreamChunks(stream StreamSession, remainingBytes uint64) (StreamChunkP
 	}
 	if remainingBytes == 0 {
 		return StreamChunkPlan{
-			StreamID:     stream.StreamID,
-			NextOffset:   stream.BytesSent,
-			Parallelism:  stream.Parallelism,
-			Backpressure: false,
+			StreamID:	stream.StreamID,
+			NextOffset:	stream.BytesSent,
+			Parallelism:	stream.Parallelism,
+			Backpressure:	false,
 		}, nil
 	}
 	available := StreamAvailableWindow(stream)
 	if available == 0 {
 		return StreamChunkPlan{
-			StreamID:     stream.StreamID,
-			NextOffset:   stream.BytesSent,
-			Parallelism:  stream.Parallelism,
-			Backpressure: true,
+			StreamID:	stream.StreamID,
+			NextOffset:	stream.BytesSent,
+			Parallelism:	stream.Parallelism,
+			Backpressure:	true,
 		}, nil
 	}
 	chunkSize := minStreamingUint64(stream.ChunkSize, remainingBytes)
@@ -457,12 +457,12 @@ func PlanStreamChunks(stream StreamSession, remainingBytes uint64) (StreamChunkP
 		maxChunks = uint64(stream.Parallelism)
 	}
 	return StreamChunkPlan{
-		StreamID:          stream.StreamID,
-		NextOffset:        stream.BytesSent,
-		ChunkSize:         chunkSize,
-		MaxInFlightChunks: uint32(maxChunks),
-		Parallelism:       stream.Parallelism,
-		Backpressure:      false,
+		StreamID:		stream.StreamID,
+		NextOffset:		stream.BytesSent,
+		ChunkSize:		chunkSize,
+		MaxInFlightChunks:	uint32(maxChunks),
+		Parallelism:		stream.Parallelism,
+		Backpressure:		false,
 	}, nil
 }
 
@@ -556,21 +556,21 @@ func PlanParallelStreamFetch(stream StreamSession, payloadBytes uint64, verified
 			end = payloadBytes
 		}
 		requests = append(requests, StreamFetchRequest{
-			StreamID:     stream.StreamID,
-			ChunkIndex:   index,
-			RangeStart:   start,
-			RangeEnd:     end,
-			ChunkSize:    end - start,
-			AssignedPeer: peers[len(requests)%len(peers)],
+			StreamID:	stream.StreamID,
+			ChunkIndex:	index,
+			RangeStart:	start,
+			RangeEnd:	end,
+			ChunkSize:	end - start,
+			AssignedPeer:	peers[len(requests)%len(peers)],
 		})
 	}
 	return StreamParallelFetchPlan{
-		StreamID:       stream.StreamID,
-		ChunkSize:      stream.ChunkSize,
-		PayloadBytes:   payloadBytes,
-		TotalChunks:    totalChunks,
-		Requests:       requests,
-		RecoveryResume: len(verifiedBitmap) > 0,
+		StreamID:	stream.StreamID,
+		ChunkSize:	stream.ChunkSize,
+		PayloadBytes:	payloadBytes,
+		TotalChunks:	totalChunks,
+		Requests:	requests,
+		RecoveryResume:	len(verifiedBitmap) > 0,
 	}, nil
 }
 
@@ -603,18 +603,18 @@ func ComputeStreamMetrics(stream StreamSession, elapsedMillis, stallCount, backp
 	}
 	window := StreamWindow(stream)
 	return StreamMetrics{
-		StreamID:           stream.StreamID,
-		PayloadType:        stream.PayloadType,
-		State:              stream.State,
-		BytesSent:          stream.BytesSent,
-		BytesAcknowledged:  stream.BytesAcknowledged,
-		InFlightBytes:      inFlight,
-		AvailableWindow:    window.AvailableWindow,
-		ThroughputBytesBps: throughput,
-		StallCount:         stallCount,
-		BackpressureEvents: backpressureEvents,
-		BackpressureActive: window.Backpressure || stream.State == StreamStatePaused,
-		CompletionBps:      completion,
+		StreamID:		stream.StreamID,
+		PayloadType:		stream.PayloadType,
+		State:			stream.State,
+		BytesSent:		stream.BytesSent,
+		BytesAcknowledged:	stream.BytesAcknowledged,
+		InFlightBytes:		inFlight,
+		AvailableWindow:	window.AvailableWindow,
+		ThroughputBytesBps:	throughput,
+		StallCount:		stallCount,
+		BackpressureEvents:	backpressureEvents,
+		BackpressureActive:	window.Backpressure || stream.State == StreamStatePaused,
+		CompletionBps:		completion,
 	}, nil
 }
 

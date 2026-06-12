@@ -3,34 +3,34 @@ package types
 import "errors"
 
 const (
-	RewardPolicyV1ID                    = "nominator-pool/reward-policy/v1"
-	RewardSourceFeesAndInflation        = "fees_and_inflation"
-	RewardDistributionByPoolShares      = "pool_shares"
-	RewardRoundingFloorWithRemainder    = "floor_with_pool_remainder"
-	RewardValidatorCommissionBeforePool = "validator_commission_before_pool_fee"
+	RewardPolicyV1ID			= "nominator-pool/reward-policy/v1"
+	RewardSourceFeesAndInflation		= "fees_and_inflation"
+	RewardDistributionByPoolShares		= "pool_shares"
+	RewardRoundingFloorWithRemainder	= "floor_with_pool_remainder"
+	RewardValidatorCommissionBeforePool	= "validator_commission_before_pool_fee"
 )
 
 type RewardPolicyV1 struct {
-	PolicyID              string
-	RewardSource          string
-	Distribution          string
-	CommissionRule        string
-	RoundingRule          string
-	LazyRewardIndex       bool
-	CapByCollectedRewards bool
-	ManualValidatorChoice bool
+	PolicyID		string
+	RewardSource		string
+	Distribution		string
+	CommissionRule		string
+	RoundingRule		string
+	LazyRewardIndex		bool
+	CapByCollectedRewards	bool
+	ManualValidatorChoice	bool
 }
 
 func DefaultRewardPolicyV1() RewardPolicyV1 {
 	return RewardPolicyV1{
-		PolicyID:              RewardPolicyV1ID,
-		RewardSource:          RewardSourceFeesAndInflation,
-		Distribution:          RewardDistributionByPoolShares,
-		CommissionRule:        RewardValidatorCommissionBeforePool,
-		RoundingRule:          RewardRoundingFloorWithRemainder,
-		LazyRewardIndex:       true,
-		CapByCollectedRewards: true,
-		ManualValidatorChoice: false,
+		PolicyID:		RewardPolicyV1ID,
+		RewardSource:		RewardSourceFeesAndInflation,
+		Distribution:		RewardDistributionByPoolShares,
+		CommissionRule:		RewardValidatorCommissionBeforePool,
+		RoundingRule:		RewardRoundingFloorWithRemainder,
+		LazyRewardIndex:	true,
+		CapByCollectedRewards:	true,
+		ManualValidatorChoice:	false,
 	}
 }
 

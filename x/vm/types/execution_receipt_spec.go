@@ -11,34 +11,34 @@ import (
 )
 
 const (
-	AVMReceiptStatusSubmitted    AVMReceiptStatus = "submitted"
-	AVMReceiptStatusScheduled    AVMReceiptStatus = "scheduled"
-	AVMReceiptStatusExecuted     AVMReceiptStatus = "executed"
-	AVMReceiptStatusFailed       AVMReceiptStatus = "failed"
-	AVMReceiptStatusRetried      AVMReceiptStatus = "retried"
-	AVMReceiptStatusExpired      AVMReceiptStatus = "expired"
-	AVMReceiptStatusBounced      AVMReceiptStatus = "bounced"
-	AVMReceiptStatusDeadLettered AVMReceiptStatus = "dead_lettered"
+	AVMReceiptStatusSubmitted	AVMReceiptStatus	= "submitted"
+	AVMReceiptStatusScheduled	AVMReceiptStatus	= "scheduled"
+	AVMReceiptStatusExecuted	AVMReceiptStatus	= "executed"
+	AVMReceiptStatusFailed		AVMReceiptStatus	= "failed"
+	AVMReceiptStatusRetried		AVMReceiptStatus	= "retried"
+	AVMReceiptStatusExpired		AVMReceiptStatus	= "expired"
+	AVMReceiptStatusBounced		AVMReceiptStatus	= "bounced"
+	AVMReceiptStatusDeadLettered	AVMReceiptStatus	= "dead_lettered"
 
-	MaxAVMReceiptExecutorLength = 128
-	MaxAVMReceiptErrorCode      = 128
+	MaxAVMReceiptExecutorLength	= 128
+	MaxAVMReceiptErrorCode		= 128
 )
 
 type AVMReceiptStatus string
 
 type AVMExecutionReceipt struct {
-	ReceiptID          string
-	MessageID          string
-	ZoneID             zonestypes.ZoneID
-	Executor           string
-	Status             AVMReceiptStatus
-	GasUsed            uint64
-	StorageWritten     uint32
-	EventsHash         string
-	OutputMessagesRoot string
-	ErrorCodeOptional  string
-	CreatedHeight      uint64
-	ReceiptHash        string
+	ReceiptID		string
+	MessageID		string
+	ZoneID			zonestypes.ZoneID
+	Executor		string
+	Status			AVMReceiptStatus
+	GasUsed			uint64
+	StorageWritten		uint32
+	EventsHash		string
+	OutputMessagesRoot	string
+	ErrorCodeOptional	string
+	CreatedHeight		uint64
+	ReceiptHash		string
 }
 
 func NewAVMExecutionReceipt(receipt AVMExecutionReceipt) (AVMExecutionReceipt, error) {

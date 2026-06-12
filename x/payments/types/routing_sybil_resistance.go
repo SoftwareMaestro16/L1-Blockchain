@@ -10,90 +10,90 @@ import (
 )
 
 type GossipRateLimitPolicy struct {
-	WindowBlocks          uint64
-	MaxMessagesPerNode    uint32
-	MaxMessagesPerChannel uint32
-	MaxTopologyUpdates    uint32
-	RejectPenalty         int64
+	WindowBlocks		uint64
+	MaxMessagesPerNode	uint32
+	MaxMessagesPerChannel	uint32
+	MaxTopologyUpdates	uint32
+	RejectPenalty		int64
 }
 
 type GossipRateLimitDecision struct {
-	NodeID          string
-	ChannelID       string
-	WindowStart     uint64
-	WindowEnd       uint64
-	NodeMessages    uint32
-	ChannelMessages uint32
-	TopologyUpdates uint32
-	Allowed         bool
-	Reason          string
-	PolicyHash      string
-	DecisionHash    string
+	NodeID		string
+	ChannelID	string
+	WindowStart	uint64
+	WindowEnd	uint64
+	NodeMessages	uint32
+	ChannelMessages	uint32
+	TopologyUpdates	uint32
+	Allowed		bool
+	Reason		string
+	PolicyHash	string
+	DecisionHash	string
 }
 
 type RouteFailureScoringPolicy struct {
-	CapacityPenalty        int64
-	TimeoutPenalty         int64
-	CongestionPenalty      int64
-	LiquidityStalePenalty  int64
-	NodeUnavailablePenalty int64
-	PolicyRejectedPenalty  int64
-	UnknownPenalty         int64
-	RepeatedFailurePenalty int64
-	MaxPenalty             int64
+	CapacityPenalty		int64
+	TimeoutPenalty		int64
+	CongestionPenalty	int64
+	LiquidityStalePenalty	int64
+	NodeUnavailablePenalty	int64
+	PolicyRejectedPenalty	int64
+	UnknownPenalty		int64
+	RepeatedFailurePenalty	int64
+	MaxPenalty		int64
 }
 
 type RouteFailureScore struct {
-	NodeID         string
-	ChannelID      string
-	FailureClass   RouteFailureClass
-	FailureCount   uint32
-	ScoreDelta     int64
-	ObservedHeight uint64
-	ScoreHash      string
+	NodeID		string
+	ChannelID	string
+	FailureClass	RouteFailureClass
+	FailureCount	uint32
+	ScoreDelta	int64
+	ObservedHeight	uint64
+	ScoreHash	string
 }
 
 type RouteLiquidityProof struct {
-	ChannelID          string
-	Amount             string
-	HighValueThreshold string
-	RequiredDeposit    string
-	CurrentHeight      uint64
-	Advertisement      LiquidityAdvertisement
-	Reservation        SignedLiquidityReservation
-	ProofHash          string
+	ChannelID		string
+	Amount			string
+	HighValueThreshold	string
+	RequiredDeposit		string
+	CurrentHeight		uint64
+	Advertisement		LiquidityAdvertisement
+	Reservation		SignedLiquidityReservation
+	ProofHash		string
 }
 
 type TopologySpamSimulation struct {
-	Accepted        uint32
-	Rejected        uint32
-	PenalizedNodes  []string
-	FinalReputation []GossipReputation
-	Decisions       []GossipRateLimitDecision
-	SimulationHash  string
+	Accepted	uint32
+	Rejected	uint32
+	PenalizedNodes	[]string
+	FinalReputation	[]GossipReputation
+	Decisions	[]GossipRateLimitDecision
+	SimulationHash	string
 }
 
 func DefaultGossipRateLimitPolicy() GossipRateLimitPolicy {
 	return GossipRateLimitPolicy{
-		WindowBlocks:          8,
-		MaxMessagesPerNode:    8,
-		MaxMessagesPerChannel: 12,
-		MaxTopologyUpdates:    16,
-		RejectPenalty:         InvalidGossipPenalty,
+		WindowBlocks:		8,
+		MaxMessagesPerNode:	8,
+		MaxMessagesPerChannel:	12,
+		MaxTopologyUpdates:	16,
+		RejectPenalty:		InvalidGossipPenalty,
 	}
 }
 
 func DefaultRouteFailureScoringPolicy() RouteFailureScoringPolicy {
 	return RouteFailureScoringPolicy{
-		CapacityPenalty:        20,
-		TimeoutPenalty:         25,
-		CongestionPenalty:      30,
-		LiquidityStalePenalty:  20,
-		NodeUnavailablePenalty: 40,
-		PolicyRejectedPenalty:  25,
-		UnknownPenalty:         15,
-		RepeatedFailurePenalty: 10,
-		MaxPenalty:             250,
+		CapacityPenalty:	20,
+		TimeoutPenalty:		25,
+		CongestionPenalty:	30,
+		LiquidityStalePenalty:	20,
+		NodeUnavailablePenalty:	40,
+		PolicyRejectedPenalty:	25,
+		UnknownPenalty:		15,
+		RepeatedFailurePenalty:	10,
+		MaxPenalty:		250,
 	}
 }
 
@@ -119,12 +119,12 @@ func CheckGossipRateLimit(store TopologyStore, envelope SignedGossipEnvelope, cu
 	windowStart := currentHeight - ((currentHeight - 1) % policy.WindowBlocks)
 	windowEnd := windowStart + policy.WindowBlocks - 1
 	decision := GossipRateLimitDecision{
-		NodeID:      nodeID,
-		ChannelID:   channelID,
-		WindowStart: windowStart,
-		WindowEnd:   windowEnd,
-		Allowed:     true,
-		PolicyHash:  policy.Hash(),
+		NodeID:		nodeID,
+		ChannelID:	channelID,
+		WindowStart:	windowStart,
+		WindowEnd:	windowEnd,
+		Allowed:	true,
+		PolicyHash:	policy.Hash(),
 	}
 	for _, existing := range store.Messages {
 		existing = existing.Normalize()
@@ -190,12 +190,12 @@ func BuildRouteFailureScore(report RouteFailureReport, failureCount uint32, poli
 		total = policy.MaxPenalty
 	}
 	score := RouteFailureScore{
-		NodeID:         report.From,
-		ChannelID:      report.ChannelID,
-		FailureClass:   report.FailureClass,
-		FailureCount:   failureCount,
-		ScoreDelta:     -total,
-		ObservedHeight: report.ObservedHeight,
+		NodeID:		report.From,
+		ChannelID:	report.ChannelID,
+		FailureClass:	report.FailureClass,
+		FailureCount:	failureCount,
+		ScoreDelta:	-total,
+		ObservedHeight:	report.ObservedHeight,
 	}
 	score.ScoreHash = score.Hash()
 	return score, nil

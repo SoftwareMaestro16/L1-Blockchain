@@ -10,271 +10,271 @@ import (
 type MigrationPhase string
 
 const (
-	MigrationPhase0BaselineHardening MigrationPhase = "phase_0_baseline_hardening"
-	MigrationPhase1CoreCommitments   MigrationPhase = "phase_1_core_commitments"
-	MigrationPhase2MessageBus        MigrationPhase = "phase_2_message_bus"
-	MigrationPhase3ZoneExtraction    MigrationPhase = "phase_3_zone_extraction"
-	MigrationPhase4ShardingRuntime   MigrationPhase = "phase_4_sharding_runtime"
-	MigrationPhase5AVM20             MigrationPhase = "phase_5_avm_2_0"
-	MigrationPhase6IdentityPayments  MigrationPhase = "phase_6_identity_payment_integration"
-	MigrationPhase7Performance       MigrationPhase = "phase_7_performance_hardening"
+	MigrationPhase0BaselineHardening	MigrationPhase	= "phase_0_baseline_hardening"
+	MigrationPhase1CoreCommitments		MigrationPhase	= "phase_1_core_commitments"
+	MigrationPhase2MessageBus		MigrationPhase	= "phase_2_message_bus"
+	MigrationPhase3ZoneExtraction		MigrationPhase	= "phase_3_zone_extraction"
+	MigrationPhase4ShardingRuntime		MigrationPhase	= "phase_4_sharding_runtime"
+	MigrationPhase5AVM20			MigrationPhase	= "phase_5_avm_2_0"
+	MigrationPhase6IdentityPayments		MigrationPhase	= "phase_6_identity_payment_integration"
+	MigrationPhase7Performance		MigrationPhase	= "phase_7_performance_hardening"
 )
 
 type GenesisImportCheck struct {
-	ModuleName    string
-	Active        bool
-	Deterministic bool
-	ExportHash    string
-	ImportHash    string
+	ModuleName	string
+	Active		bool
+	Deterministic	bool
+	ExportHash	string
+	ImportHash	string
 }
 
 type ModuleInvariantCheck struct {
-	ModuleName    string
-	InvariantName string
-	Covered       bool
-	Deterministic bool
-	EvidenceHash  string
+	ModuleName	string
+	InvariantName	string
+	Covered		bool
+	Deterministic	bool
+	EvidenceHash	string
 }
 
 type StatePrefixMigrationCheck struct {
-	ModuleName      string
-	OldPrefix       string
-	NewPrefix       string
-	MigrationHash   string
-	ReversibleProof string
-	Safe            bool
+	ModuleName	string
+	OldPrefix	string
+	NewPrefix	string
+	MigrationHash	string
+	ReversibleProof	string
+	Safe		bool
 }
 
 type MigrationPhase0Input struct {
-	ModuleBoundaryDocHash     string
-	StateExportValidationHash string
-	ExportedAppHash           string
-	ReplayedAppHash           string
-	GenesisImports            []GenesisImportCheck
-	DynamicFeeBoundsTestHash  string
-	InvariantChecks           []ModuleInvariantCheck
-	StoreV2CompatibilityHash  string
-	PrefixMigrations          []StatePrefixMigrationCheck
+	ModuleBoundaryDocHash		string
+	StateExportValidationHash	string
+	ExportedAppHash			string
+	ReplayedAppHash			string
+	GenesisImports			[]GenesisImportCheck
+	DynamicFeeBoundsTestHash	string
+	InvariantChecks			[]ModuleInvariantCheck
+	StoreV2CompatibilityHash	string
+	PrefixMigrations		[]StatePrefixMigrationCheck
 }
 
 type RootQueryAPICheck struct {
-	QueryName    string
-	RootType     ProofRootType
-	Available    bool
-	ResponseHash string
+	QueryName	string
+	RootType	ProofRootType
+	Available	bool
+	ResponseHash	string
 }
 
 type ProofRootMetadataCheck struct {
-	RootType     ProofRootType
-	Height       uint64
-	RootHash     string
-	MetadataHash string
+	RootType	ProofRootType
+	Height		uint64
+	RootHash	string
+	MetadataHash	string
 }
 
 type MigrationPhase1Input struct {
-	AetraCoreModuleHash     string
-	ZoneRegistryRoot        string
-	ZoneCount               uint32
-	DefaultZoneID           string
-	DefaultZoneStateRoot    string
-	MessageRoot             string
-	EmptyQueueRoot          string
-	ProofRegistryRoot       string
-	RootQueryAPIs           []RootQueryAPICheck
-	ProofMetadata           []ProofRootMetadataCheck
-	AppHashIncludesCoreRoot bool
-	CoreRootHash            string
+	AetraCoreModuleHash	string
+	ZoneRegistryRoot	string
+	ZoneCount		uint32
+	DefaultZoneID		string
+	DefaultZoneStateRoot	string
+	MessageRoot		string
+	EmptyQueueRoot		string
+	ProofRegistryRoot	string
+	RootQueryAPIs		[]RootQueryAPICheck
+	ProofMetadata		[]ProofRootMetadataCheck
+	AppHashIncludesCoreRoot	bool
+	CoreRootHash		string
 }
 
 type MsgBusStoreCheck struct {
-	StoreName string
-	RootHash  string
-	Committed bool
+	StoreName	string
+	RootHash	string
+	Committed	bool
 }
 
 type MsgBusEncodingCheck struct {
-	CodecHash        string
-	MessageIDRoot    string
-	DeterministicIDs bool
+	CodecHash		string
+	MessageIDRoot		string
+	DeterministicIDs	bool
 }
 
 type MsgBusExecutionCheck struct {
-	ExecutionRoot   string
-	Deterministic   bool
-	ExecutedLocally bool
+	ExecutionRoot	string
+	Deterministic	bool
+	ExecutedLocally	bool
 }
 
 type MsgBusSafetyCheck struct {
-	ExpiryRoot         string
-	BounceRoot         string
-	InclusionProofRoot string
-	ReceiptsProofRoot  string
+	ExpiryRoot		string
+	BounceRoot		string
+	InclusionProofRoot	string
+	ReceiptsProofRoot	string
 }
 
 type MigrationPhase2Input struct {
-	MsgBusModuleHash     string
-	Encoding             MsgBusEncodingCheck
-	Stores               []MsgBusStoreCheck
-	LocalExecution       MsgBusExecutionCheck
-	Safety               MsgBusSafetyCheck
-	FirstClassObjectRoot string
+	MsgBusModuleHash	string
+	Encoding		MsgBusEncodingCheck
+	Stores			[]MsgBusStoreCheck
+	LocalExecution		MsgBusExecutionCheck
+	Safety			MsgBusSafetyCheck
+	FirstClassObjectRoot	string
 }
 
 type ZoneExtractionCheck struct {
-	ZoneID               string
-	Extracted            bool
-	KeeperHash           string
-	StatePrefixRoot      string
-	FeePolicyHash        string
-	ExecutionSummaryHash string
-	CommittedRoot        string
-	Modules              []string
+	ZoneID			string
+	Extracted		bool
+	KeeperHash		string
+	StatePrefixRoot		string
+	FeePolicyHash		string
+	ExecutionSummaryHash	string
+	CommittedRoot		string
+	Modules			[]string
 }
 
 type MigrationPhase3Input struct {
-	FinancialZone                           ZoneExtractionCheck
-	IdentityZone                            ZoneExtractionCheck
-	ApplicationZone                         ZoneExtractionCheck
-	BankFeesContractAssetsAVMAMMInFinancial bool
-	IdentityIsolatedActivation              bool
-	ZoneRootsCommittedPerBlock              bool
-	ZoneCommitmentRoot                      string
+	FinancialZone				ZoneExtractionCheck
+	IdentityZone				ZoneExtractionCheck
+	ApplicationZone				ZoneExtractionCheck
+	BankFeesContractAssetsAVMAMMInFinancial	bool
+	IdentityIsolatedActivation		bool
+	ZoneRootsCommittedPerBlock		bool
+	ZoneCommitmentRoot			string
 }
 
 type ShardRuntimeDescriptorCheck struct {
-	ShardID           string
-	LayoutHash        string
-	RouteKeyRoot      string
-	InboxRoot         string
-	OutboxRoot        string
-	ShardRoot         string
-	ParallelGroupHash string
-	Active            bool
+	ShardID			string
+	LayoutHash		string
+	RouteKeyRoot		string
+	InboxRoot		string
+	OutboxRoot		string
+	ShardRoot		string
+	ParallelGroupHash	string
+	Active			bool
 }
 
 type ShardSplitMergeSchedulerCheck struct {
-	SchedulerRoot     string
-	SplitDecisionRoot string
-	MergeDecisionRoot string
-	Deterministic     bool
+	SchedulerRoot		string
+	SplitDecisionRoot	string
+	MergeDecisionRoot	string
+	Deterministic		bool
 }
 
 type ShardMigrationCheck struct {
-	MigrationRoot          string
-	OldLayoutHash          string
-	NewLayoutHash          string
-	InFlightMessageRoot    string
-	SurvivesLayoutChange   bool
-	DeterministicMigration bool
+	MigrationRoot		string
+	OldLayoutHash		string
+	NewLayoutHash		string
+	InFlightMessageRoot	string
+	SurvivesLayoutChange	bool
+	DeterministicMigration	bool
 }
 
 type MigrationPhase4Input struct {
-	ShardsModuleHash              string
-	ZoneID                        string
-	ShardLayoutDescriptorRoot     string
-	RouteKeyCalculationHash       string
-	ShardDescriptors              []ShardRuntimeDescriptorCheck
-	RootAggregationHash           string
-	SplitMergeScheduler           ShardSplitMergeSchedulerCheck
-	Migration                     ShardMigrationCheck
-	ZonesSupportMultipleShards    bool
-	IndependentWorkloadsParallel  bool
-	InFlightMessagesSurviveChange bool
+	ShardsModuleHash		string
+	ZoneID				string
+	ShardLayoutDescriptorRoot	string
+	RouteKeyCalculationHash		string
+	ShardDescriptors		[]ShardRuntimeDescriptorCheck
+	RootAggregationHash		string
+	SplitMergeScheduler		ShardSplitMergeSchedulerCheck
+	Migration			ShardMigrationCheck
+	ZonesSupportMultipleShards	bool
+	IndependentWorkloadsParallel	bool
+	InFlightMessagesSurviveChange	bool
 }
 
 type AVM20ComponentCheck struct {
-	ComponentName string
-	ComponentHash string
-	Implemented   bool
-	Deterministic bool
+	ComponentName	string
+	ComponentHash	string
+	Implemented	bool
+	Deterministic	bool
 }
 
 type AVM20SyscallCheck struct {
-	SyscallName string
-	SyscallHash string
-	Metered     bool
-	Enabled     bool
+	SyscallName	string
+	SyscallHash	string
+	Metered		bool
+	Enabled		bool
 }
 
 type MigrationPhase5Input struct {
-	BytecodeFormat            AVM20ComponentCheck
-	Interpreter               AVM20ComponentCheck
-	GasTable                  AVM20ComponentCheck
-	ContractStorageAdapter    AVM20ComponentCheck
-	ABIRegistry               AVM20ComponentCheck
-	MessageSyscalls           []AVM20SyscallCheck
-	ProofVerificationSyscalls []AVM20SyscallCheck
-	ContractZoneDeterministic bool
-	AsyncMessageEmissionRoot  string
-	ContractStateProofRoot    string
-	ContractZoneExecutionRoot string
+	BytecodeFormat			AVM20ComponentCheck
+	Interpreter			AVM20ComponentCheck
+	GasTable			AVM20ComponentCheck
+	ContractStorageAdapter		AVM20ComponentCheck
+	ABIRegistry			AVM20ComponentCheck
+	MessageSyscalls			[]AVM20SyscallCheck
+	ProofVerificationSyscalls	[]AVM20SyscallCheck
+	ContractZoneDeterministic	bool
+	AsyncMessageEmissionRoot	string
+	ContractStateProofRoot		string
+	ContractZoneExecutionRoot	string
 }
 
 type IdentityPaymentFlowCheck struct {
-	FlowName        string
-	FlowRoot        string
-	ProofBacked     bool
-	Asynchronous    bool
-	Deterministic   bool
-	ZoneID          string
-	MessageTypeHash string
+	FlowName	string
+	FlowRoot	string
+	ProofBacked	bool
+	Asynchronous	bool
+	Deterministic	bool
+	ZoneID		string
+	MessageTypeHash	string
 }
 
 type WalletSDKHelperCheck struct {
-	HelperName    string
-	HelperHash    string
-	Available     bool
-	Deterministic bool
+	HelperName	string
+	HelperHash	string
+	Available	bool
+	Deterministic	bool
 }
 
 type MigrationPhase6Input struct {
-	AETIdentityProofRoot               string
-	CrossZoneIdentityLookupRoot        string
-	PaymentChannelSettlementRoot       string
-	ConditionalPaymentRoutingRoot      string
-	PaymentProofAPIRoot                string
-	IdentityFlows                      []IdentityPaymentFlowCheck
-	PaymentFlows                       []IdentityPaymentFlowCheck
-	WalletSDKHelpers                   []WalletSDKHelperCheck
-	NamesResolveThroughIdentityZone    bool
-	PaymentsSettleThroughFinancialZone bool
-	ContractsUseAsyncIdentityPayments  bool
+	AETIdentityProofRoot			string
+	CrossZoneIdentityLookupRoot		string
+	PaymentChannelSettlementRoot		string
+	ConditionalPaymentRoutingRoot		string
+	PaymentProofAPIRoot			string
+	IdentityFlows				[]IdentityPaymentFlowCheck
+	PaymentFlows				[]IdentityPaymentFlowCheck
+	WalletSDKHelpers			[]WalletSDKHelperCheck
+	NamesResolveThroughIdentityZone		bool
+	PaymentsSettleThroughFinancialZone	bool
+	ContractsUseAsyncIdentityPayments	bool
 }
 
 type PerformanceHardeningCheck struct {
-	CheckName     string
-	EvidenceHash  string
-	Enabled       bool
-	Deterministic bool
+	CheckName	string
+	EvidenceHash	string
+	Enabled		bool
+	Deterministic	bool
 }
 
 type StoreV2BenchmarkCheck struct {
-	BenchmarkName string
-	ResultHash    string
-	Covered       bool
-	Bounded       bool
+	BenchmarkName	string
+	ResultHash	string
+	Covered		bool
+	Bounded		bool
 }
 
 type MigrationPhase7Input struct {
-	BlockSTMWorkloadRoot                string
-	ConflictProfilingRoot               string
-	MempoolLaneRoot                     string
-	CongestionRoutingRoot               string
-	AdaptiveSyncRecoveryRoot            string
-	MultiZoneLoadSimulationRoot         string
-	HardeningChecks                     []PerformanceHardeningCheck
-	StoreV2Benchmarks                   []StoreV2BenchmarkCheck
-	IndependentExecutionScalesParallel  bool
-	StateSyncRecoversCommitments        bool
-	RoutingDeterministicUnderCongestion bool
+	BlockSTMWorkloadRoot			string
+	ConflictProfilingRoot			string
+	MempoolLaneRoot				string
+	CongestionRoutingRoot			string
+	AdaptiveSyncRecoveryRoot		string
+	MultiZoneLoadSimulationRoot		string
+	HardeningChecks				[]PerformanceHardeningCheck
+	StoreV2Benchmarks			[]StoreV2BenchmarkCheck
+	IndependentExecutionScalesParallel	bool
+	StateSyncRecoversCommitments		bool
+	RoutingDeterministicUnderCongestion	bool
 }
 
 type MigrationReadinessReport struct {
-	Phase      MigrationPhase
-	Passed     bool
-	Failed     []string
-	Evidence   []string
-	ReportHash string
+	Phase		MigrationPhase
+	Passed		bool
+	Failed		[]string
+	Evidence	[]string
+	ReportHash	string
 }
 
 func BuildMigrationPhase0Readiness(input MigrationPhase0Input) MigrationReadinessReport {
@@ -334,10 +334,10 @@ func BuildMigrationPhase0Readiness(input MigrationPhase0Input) MigrationReadines
 		}
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase0BaselineHardening,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase0BaselineHardening,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -348,8 +348,8 @@ func BuildMigrationPhase1Readiness(input MigrationPhase1Input) MigrationReadines
 	failed := make([]string, 0)
 	evidence := make([]string, 0)
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"aetracore_module", input.AetraCoreModuleHash},
 		{"zone_registry_root", input.ZoneRegistryRoot},
@@ -388,10 +388,10 @@ func BuildMigrationPhase1Readiness(input MigrationPhase1Input) MigrationReadines
 		evidence = append(evidence, "proof_registry_metadata:"+hashProofMetadata(input.ProofMetadata))
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase1CoreCommitments,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase1CoreCommitments,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -402,8 +402,8 @@ func BuildMigrationPhase2Readiness(input MigrationPhase2Input) MigrationReadines
 	failed := make([]string, 0)
 	evidence := make([]string, 0)
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"msgbus_module", input.MsgBusModuleHash},
 		{"first_class_message_objects", input.FirstClassObjectRoot},
@@ -435,10 +435,10 @@ func BuildMigrationPhase2Readiness(input MigrationPhase2Input) MigrationReadines
 		evidence = append(evidence, "message_safety:"+hashMsgBusSafety(input.Safety))
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase2MessageBus,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase2MessageBus,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -470,10 +470,10 @@ func BuildMigrationPhase3Readiness(input MigrationPhase3Input) MigrationReadines
 		evidence = append(evidence, "zone_commitment_root:"+input.ZoneCommitmentRoot)
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase3ZoneExtraction,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase3ZoneExtraction,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -484,8 +484,8 @@ func BuildMigrationPhase4Readiness(input MigrationPhase4Input) MigrationReadines
 	failed := make([]string, 0)
 	evidence := make([]string, 0)
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"shards_module", input.ShardsModuleHash},
 		{"shard_layout_descriptors", input.ShardLayoutDescriptorRoot},
@@ -526,10 +526,10 @@ func BuildMigrationPhase4Readiness(input MigrationPhase4Input) MigrationReadines
 		failed = append(failed, "in_flight_messages_survive_layout_changes")
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase4ShardingRuntime,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase4ShardingRuntime,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -563,8 +563,8 @@ func BuildMigrationPhase5Readiness(input MigrationPhase5Input) MigrationReadines
 		evidence = append(evidence, "proof_verification_syscalls:"+hashAVM20Syscalls("proof", input.ProofVerificationSyscalls))
 	}
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"async_message_emission_root", input.AsyncMessageEmissionRoot},
 		{"contract_state_proof_root", input.ContractStateProofRoot},
@@ -580,10 +580,10 @@ func BuildMigrationPhase5Readiness(input MigrationPhase5Input) MigrationReadines
 		failed = append(failed, "contract_zone_deterministic_execution")
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase5AVM20,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase5AVM20,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -594,8 +594,8 @@ func BuildMigrationPhase6Readiness(input MigrationPhase6Input) MigrationReadines
 	failed := make([]string, 0)
 	evidence := make([]string, 0)
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"aet_identity_proofs", input.AETIdentityProofRoot},
 		{"cross_zone_identity_lookup_messages", input.CrossZoneIdentityLookupRoot},
@@ -634,10 +634,10 @@ func BuildMigrationPhase6Readiness(input MigrationPhase6Input) MigrationReadines
 		failed = append(failed, "contracts_use_async_identity_payment_messages")
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase6IdentityPayments,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase6IdentityPayments,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -648,8 +648,8 @@ func BuildMigrationPhase7Readiness(input MigrationPhase7Input) MigrationReadines
 	failed := make([]string, 0)
 	evidence := make([]string, 0)
 	for _, item := range []struct {
-		label string
-		hash  string
+		label	string
+		hash	string
 	}{
 		{"blockstm_workloads", input.BlockSTMWorkloadRoot},
 		{"conflict_profiling", input.ConflictProfilingRoot},
@@ -684,10 +684,10 @@ func BuildMigrationPhase7Readiness(input MigrationPhase7Input) MigrationReadines
 		failed = append(failed, "routing_deterministic_under_congestion")
 	}
 	report := MigrationReadinessReport{
-		Phase:    MigrationPhase7Performance,
-		Passed:   len(failed) == 0,
-		Failed:   normalizeStringSet(failed),
-		Evidence: normalizeStringSet(evidence),
+		Phase:		MigrationPhase7Performance,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeMigrationReadinessReportHash(report)
 	return report
@@ -1033,8 +1033,8 @@ func (c MsgBusSafetyCheck) Normalize() MsgBusSafetyCheck {
 func (c MsgBusSafetyCheck) Validate() error {
 	check := c.Normalize()
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"migration msgbus expiry root", check.ExpiryRoot},
 		{"migration msgbus bounce root", check.BounceRoot},
@@ -1071,8 +1071,8 @@ func (c ZoneExtractionCheck) Validate() error {
 		return errors.New("migration extracted zone requires modules")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"migration zone keeper hash", check.KeeperHash},
 		{"migration zone state prefix root", check.StatePrefixRoot},
@@ -1107,8 +1107,8 @@ func (c ShardRuntimeDescriptorCheck) Validate() error {
 		return errors.New("migration shard descriptor must be active")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"migration shard layout hash", check.LayoutHash},
 		{"migration shard route key root", check.RouteKeyRoot},
@@ -1137,8 +1137,8 @@ func (c ShardSplitMergeSchedulerCheck) Validate() error {
 		return errors.New("migration shard split merge scheduler must be deterministic")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"migration shard scheduler root", check.SchedulerRoot},
 		{"migration shard split decision root", check.SplitDecisionRoot},
@@ -1168,8 +1168,8 @@ func (c ShardMigrationCheck) Validate() error {
 		return errors.New("migration shard migration must preserve in-flight messages")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"migration shard migration root", check.MigrationRoot},
 		{"migration shard old layout hash", check.OldLayoutHash},
@@ -1321,9 +1321,9 @@ func (r MigrationReadinessReport) Validate() error {
 
 func validateMsgBusStores(checks []MsgBusStoreCheck) error {
 	required := map[string]struct{}{
-		"inbox":   {},
-		"outbox":  {},
-		"receipt": {},
+		"inbox":	{},
+		"outbox":	{},
+		"receipt":	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1405,8 +1405,8 @@ func validateIdentityPaymentFlows(kind string, checks []IdentityPaymentFlowCheck
 
 func validateWalletSDKHelpers(checks []WalletSDKHelperCheck) error {
 	required := map[string]struct{}{
-		"identity_lookup": {},
-		"payment_route":   {},
+		"identity_lookup":	{},
+		"payment_route":	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1425,12 +1425,12 @@ func validateWalletSDKHelpers(checks []WalletSDKHelperCheck) error {
 
 func validatePerformanceHardeningChecks(checks []PerformanceHardeningCheck) error {
 	required := map[string]struct{}{
-		"blockstm_zone_shard_batches": {},
-		"conflict_profiling":          {},
-		"mempool_lanes":               {},
-		"congestion_aware_routing":    {},
-		"adaptive_sync_recovery":      {},
-		"multi_zone_load_simulation":  {},
+		"blockstm_zone_shard_batches":	{},
+		"conflict_profiling":		{},
+		"mempool_lanes":		{},
+		"congestion_aware_routing":	{},
+		"adaptive_sync_recovery":	{},
+		"multi_zone_load_simulation":	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1449,13 +1449,13 @@ func validatePerformanceHardeningChecks(checks []PerformanceHardeningCheck) erro
 
 func validateStoreV2Benchmarks(checks []StoreV2BenchmarkCheck) error {
 	required := map[string]struct{}{
-		"direct_balance_read":           {},
-		"direct_identity_resolution":    {},
-		"recursive_identity_resolution": {},
-		"contract_storage_read_write":   {},
-		"message_enqueue_dequeue":       {},
-		"payment_channel_settle":        {},
-		"proof_generation":              {},
+		"direct_balance_read":			{},
+		"direct_identity_resolution":		{},
+		"recursive_identity_resolution":	{},
+		"contract_storage_read_write":		{},
+		"message_enqueue_dequeue":		{},
+		"payment_channel_settle":		{},
+		"proof_generation":			{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1474,10 +1474,10 @@ func validateStoreV2Benchmarks(checks []StoreV2BenchmarkCheck) error {
 
 func validateRequiredInvariantCoverage(checks []ModuleInvariantCheck) error {
 	required := map[string]struct{}{
-		"staking":      {},
-		"slashing":     {},
-		"bank":         {},
-		"distribution": {},
+		"staking":	{},
+		"slashing":	{},
+		"bank":		{},
+		"distribution":	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1495,9 +1495,9 @@ func validateRequiredInvariantCoverage(checks []ModuleInvariantCheck) error {
 
 func validateRootQueryAPIs(checks []RootQueryAPICheck) error {
 	required := map[ProofRootType]struct{}{
-		ProofRootZone:    {},
-		ProofRootMessage: {},
-		ProofRootStorage: {},
+		ProofRootZone:		{},
+		ProofRootMessage:	{},
+		ProofRootStorage:	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {
@@ -1515,9 +1515,9 @@ func validateRootQueryAPIs(checks []RootQueryAPICheck) error {
 
 func validateProofRootMetadata(checks []ProofRootMetadataCheck) error {
 	required := map[ProofRootType]struct{}{
-		ProofRootZone:    {},
-		ProofRootMessage: {},
-		ProofRootStorage: {},
+		ProofRootZone:		{},
+		ProofRootMessage:	{},
+		ProofRootStorage:	{},
 	}
 	for _, check := range checks {
 		if err := check.Validate(); err != nil {

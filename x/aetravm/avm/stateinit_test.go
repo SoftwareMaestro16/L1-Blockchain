@@ -5,18 +5,14 @@ import (
 	"testing"
 )
 
-// ---------------
-// StateInit Validation Tests
-// ---------------
-
 func newStateInit() *StateInit {
 	return &StateInit{
-		ABIVersion:      StateInitABIVersion,
-		CodeHash:        [32]byte{1, 2, 3},
-		DeployerAddress: "AE:deployer1",
-		ChainID:         "aetra-1",
-		Namespace:       "default",
-		Capabilities:    AllDeployCapabilities,
+		ABIVersion:		StateInitABIVersion,
+		CodeHash:		[32]byte{1, 2, 3},
+		DeployerAddress:	"AE:deployer1",
+		ChainID:		"aetra-1",
+		Namespace:		"default",
+		Capabilities:		AllDeployCapabilities,
 	}
 }
 
@@ -75,10 +71,6 @@ func TestStateInitEmptyChainID(t *testing.T) {
 	}
 }
 
-// ---------------
-// Same StateInit → Same Address
-// ---------------
-
 func TestDeriveContractAddressDeterministic(t *testing.T) {
 	si1 := newStateInit()
 	si2 := newStateInit()
@@ -103,10 +95,6 @@ func TestDeriveContractAddressDeterministic(t *testing.T) {
 	}
 }
 
-// ---------------
-// Init Data Change → Address Changes
-// ---------------
-
 func TestInitDataChangesAddress(t *testing.T) {
 	si1 := newStateInit()
 	si2 := newStateInit()
@@ -119,10 +107,6 @@ func TestInitDataChangesAddress(t *testing.T) {
 		t.Error("different init data should produce different addresses")
 	}
 }
-
-// ---------------
-// Salt Change → Address Changes
-// ---------------
 
 func TestSaltChangesAddress(t *testing.T) {
 	si1 := newStateInit()
@@ -137,10 +121,6 @@ func TestSaltChangesAddress(t *testing.T) {
 	}
 }
 
-// ---------------
-// Oversized Init Data Rejected
-// ---------------
-
 func TestOversizedInitDataRejected(t *testing.T) {
 	si := newStateInit()
 	si.InitData = make([]byte, MaxInitDataSize+1)
@@ -148,10 +128,6 @@ func TestOversizedInitDataRejected(t *testing.T) {
 		t.Error("oversized init data should be rejected")
 	}
 }
-
-// ---------------
-// Duplicate Deployment Rejected
-// ---------------
 
 func TestDuplicateDeploymentRejected(t *testing.T) {
 	si := newStateInit()
@@ -174,10 +150,6 @@ func TestDuplicateDeploymentRejected(t *testing.T) {
 		t.Errorf("expected ErrDuplicateDeployment, got %v", result2.Error)
 	}
 }
-
-// ---------------
-// Counterfactual Address Query
-// ---------------
 
 func TestCounterfactualAddressQuery(t *testing.T) {
 	si := newStateInit()
@@ -202,10 +174,6 @@ func TestCounterfactualAddressQuery(t *testing.T) {
 	}
 }
 
-// ---------------
-// Zero Deployer Rejected
-// ---------------
-
 func TestZeroDeployerRejected(t *testing.T) {
 	si := newStateInit()
 	si.DeployerAddress = ""
@@ -215,10 +183,6 @@ func TestZeroDeployerRejected(t *testing.T) {
 	}
 }
 
-// ---------------
-// Malformed Code Hash Rejected
-// ---------------
-
 func TestMalformedCodeHashRejected(t *testing.T) {
 	si := newStateInit()
 	si.CodeHash = [32]byte{}
@@ -227,10 +191,6 @@ func TestMalformedCodeHashRejected(t *testing.T) {
 		t.Error("empty code hash should be rejected")
 	}
 }
-
-// ---------------
-// Hash StateInit Determinism
-// ---------------
 
 func TestHashStateInitDeterminism(t *testing.T) {
 	si1 := newStateInit()
@@ -262,10 +222,6 @@ func TestHashStateInitChangesOnMutation(t *testing.T) {
 		t.Error("different StateInit should produce different hashes")
 	}
 }
-
-// ---------------
-// Export/Import Round Trip
-// ---------------
 
 func TestExportImportRoundTrip(t *testing.T) {
 	si := newStateInit()
@@ -327,10 +283,6 @@ func TestExportImportPreservesDerivedAddress(t *testing.T) {
 		t.Errorf("address not preserved after round trip: %s vs %s", addr1.Internal, addr2.Internal)
 	}
 }
-
-// ---------------
-// Address Format Tests
-// ---------------
 
 func TestContractAddressFormat(t *testing.T) {
 	si := newStateInit()
@@ -406,9 +358,9 @@ func TestDeployCapabilityMask(t *testing.T) {
 
 func TestContractDeployStateStrings(t *testing.T) {
 	tests := map[ContractDeployState]string{
-		ContractNotDeployed: "NOT_DEPLOYED",
-		ContractDeployed:    "DEPLOYED",
-		ContractInitialized: "INITIALIZED",
+		ContractNotDeployed:	"NOT_DEPLOYED",
+		ContractDeployed:	"DEPLOYED",
+		ContractInitialized:	"INITIALIZED",
 	}
 	for state, expected := range tests {
 		if state.String() != expected {

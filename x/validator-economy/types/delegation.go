@@ -12,48 +12,48 @@ import (
 )
 
 const (
-	DelegationStatusActive             = "active"
-	DelegationStatusCommissionExceeded = "commission_exceeded"
+	DelegationStatusActive			= "active"
+	DelegationStatusCommissionExceeded	= "commission_exceeded"
 
-	RiskAppetiteConservative = "conservative"
-	RiskAppetiteBalanced     = "balanced"
-	RiskAppetiteAggressive   = "aggressive"
+	RiskAppetiteConservative	= "conservative"
+	RiskAppetiteBalanced		= "balanced"
+	RiskAppetiteAggressive		= "aggressive"
 
-	LockDurationFlexible = "flexible"
-	LockDurationEpoch    = "epoch"
-	LockDurationLongTerm = "long_term"
+	LockDurationFlexible	= "flexible"
+	LockDurationEpoch	= "epoch"
+	LockDurationLongTerm	= "long_term"
 
-	RewardStrategyLiquid         = "liquid"
-	RewardStrategyCompound       = "compound"
-	RewardStrategyAutoRedelegate = "auto_redelegate"
+	RewardStrategyLiquid		= "liquid"
+	RewardStrategyCompound		= "compound"
+	RewardStrategyAutoRedelegate	= "auto_redelegate"
 
-	RiskTrancheSenior    = "senior"
-	RiskTrancheMezzanine = "mezzanine"
-	RiskTrancheJunior    = "junior"
-	RiskTrancheFirstLoss = "first_loss"
+	RiskTrancheSenior	= "senior"
+	RiskTrancheMezzanine	= "mezzanine"
+	RiskTrancheJunior	= "junior"
+	RiskTrancheFirstLoss	= "first_loss"
 )
 
 type DelegationRecord struct {
-	Delegator              string
-	Validator              string
-	Amount                 sdkmath.Int
-	ActivationEpoch        uint64
-	Status                 string
-	RiskAppetite           string
-	CommissionTolerance    uint32
-	LockDurationPreference string
-	RewardStrategy         string
-	RiskTrancheOptional    string
-	CreatedHeight          uint64
-	UpdatedHeight          uint64
+	Delegator		string
+	Validator		string
+	Amount			sdkmath.Int
+	ActivationEpoch		uint64
+	Status			string
+	RiskAppetite		string
+	CommissionTolerance	uint32
+	LockDurationPreference	string
+	RewardStrategy		string
+	RiskTrancheOptional	string
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
 }
 
 type DelegationPreferences struct {
-	RiskAppetite           string
-	CommissionTolerance    uint32
-	LockDurationPreference string
-	RewardStrategy         string
-	RiskTrancheOptional    string
+	RiskAppetite		string
+	CommissionTolerance	uint32
+	LockDurationPreference	string
+	RewardStrategy		string
+	RiskTrancheOptional	string
 }
 
 type DelegationCapitalState struct {
@@ -61,27 +61,27 @@ type DelegationCapitalState struct {
 }
 
 type DelegationCommissionAlert struct {
-	Delegator              string
-	Validator              string
-	PreviousStatus         string
-	NewStatus              string
-	CommissionToleranceBps uint32
-	CurrentCommissionBps   uint32
-	Height                 uint64
-	RedelegationAdvisory   bool
+	Delegator		string
+	Validator		string
+	PreviousStatus		string
+	NewStatus		string
+	CommissionToleranceBps	uint32
+	CurrentCommissionBps	uint32
+	Height			uint64
+	RedelegationAdvisory	bool
 }
 
 type LockDurationRewardEligibility struct {
-	Delegator                     string
-	Validator                     string
-	LockDurationPreference        string
-	ProtocolUnbondingSeconds      uint64
-	EffectiveUnbondingSeconds     uint64
-	SlashableWindowEpochs         uint64
-	RequiredSlashableWindowEpochs uint64
-	RewardMultiplierBps           uint32
-	EligibleForRewardMultiplier   bool
-	RedelegationKeepsRiskHistory  bool
+	Delegator			string
+	Validator			string
+	LockDurationPreference		string
+	ProtocolUnbondingSeconds	uint64
+	EffectiveUnbondingSeconds	uint64
+	SlashableWindowEpochs		uint64
+	RequiredSlashableWindowEpochs	uint64
+	RewardMultiplierBps		uint32
+	EligibleForRewardMultiplier	bool
+	RedelegationKeepsRiskHistory	bool
 }
 
 func BuildDelegationRecord(params postypes.Params, requestedEpoch uint64, createdHeight uint64, delegator string, validator string, amount sdkmath.Int, preferences DelegationPreferences) (DelegationRecord, error) {
@@ -90,18 +90,18 @@ func BuildDelegationRecord(params postypes.Params, requestedEpoch uint64, create
 		return DelegationRecord{}, err
 	}
 	record := DelegationRecord{
-		Delegator:              strings.TrimSpace(delegator),
-		Validator:              strings.TrimSpace(validator),
-		Amount:                 amount,
-		ActivationEpoch:        activationEpoch,
-		Status:                 DelegationStatusActive,
-		RiskAppetite:           normalizeDefault(preferences.RiskAppetite, RiskAppetiteBalanced),
-		CommissionTolerance:    preferences.CommissionTolerance,
-		LockDurationPreference: normalizeDefault(preferences.LockDurationPreference, LockDurationEpoch),
-		RewardStrategy:         normalizeDefault(preferences.RewardStrategy, RewardStrategyLiquid),
-		RiskTrancheOptional:    strings.TrimSpace(preferences.RiskTrancheOptional),
-		CreatedHeight:          createdHeight,
-		UpdatedHeight:          createdHeight,
+		Delegator:		strings.TrimSpace(delegator),
+		Validator:		strings.TrimSpace(validator),
+		Amount:			amount,
+		ActivationEpoch:	activationEpoch,
+		Status:			DelegationStatusActive,
+		RiskAppetite:		normalizeDefault(preferences.RiskAppetite, RiskAppetiteBalanced),
+		CommissionTolerance:	preferences.CommissionTolerance,
+		LockDurationPreference:	normalizeDefault(preferences.LockDurationPreference, LockDurationEpoch),
+		RewardStrategy:		normalizeDefault(preferences.RewardStrategy, RewardStrategyLiquid),
+		RiskTrancheOptional:	strings.TrimSpace(preferences.RiskTrancheOptional),
+		CreatedHeight:		createdHeight,
+		UpdatedHeight:		createdHeight,
 	}
 	return record, record.Validate(params)
 }
@@ -162,11 +162,11 @@ func (r DelegationRecord) Validate(params postypes.Params) error {
 
 func (r DelegationRecord) ToDelegationIntent(requestedEpoch uint64) postypes.DelegationIntent {
 	return postypes.DelegationIntent{
-		NominatorID:      strings.TrimSpace(r.Delegator),
-		ValidatorID:      strings.TrimSpace(r.Validator),
-		StakeNaet:        r.Amount,
-		RequestedEpoch:   requestedEpoch,
-		MaxCommissionBps: r.CommissionTolerance,
+		NominatorID:		strings.TrimSpace(r.Delegator),
+		ValidatorID:		strings.TrimSpace(r.Validator),
+		StakeNaet:		r.Amount,
+		RequestedEpoch:		requestedEpoch,
+		MaxCommissionBps:	r.CommissionTolerance,
 	}
 }
 
@@ -243,14 +243,14 @@ func CheckCommissionTolerance(params postypes.Params, record DelegationRecord, c
 	previous := record.Status
 	updated.Status = DelegationStatusCommissionExceeded
 	alert := &DelegationCommissionAlert{
-		Delegator:              record.Delegator,
-		Validator:              record.Validator,
-		PreviousStatus:         previous,
-		NewStatus:              updated.Status,
-		CommissionToleranceBps: record.CommissionTolerance,
-		CurrentCommissionBps:   currentCommissionBps,
-		Height:                 height,
-		RedelegationAdvisory:   emitRedelegationAlert,
+		Delegator:		record.Delegator,
+		Validator:		record.Validator,
+		PreviousStatus:		previous,
+		NewStatus:		updated.Status,
+		CommissionToleranceBps:	record.CommissionTolerance,
+		CurrentCommissionBps:	currentCommissionBps,
+		Height:			height,
+		RedelegationAdvisory:	emitRedelegationAlert,
 	}
 	return updated, alert, nil
 }
@@ -283,16 +283,16 @@ func EvaluateLockDurationPreference(params postypes.Params, record DelegationRec
 		return LockDurationRewardEligibility{}, errors.New("effective unbonding period cannot be below protocol minimum")
 	}
 	return LockDurationRewardEligibility{
-		Delegator:                     record.Delegator,
-		Validator:                     record.Validator,
-		LockDurationPreference:        record.LockDurationPreference,
-		ProtocolUnbondingSeconds:      params.UnbondingSeconds,
-		EffectiveUnbondingSeconds:     effectiveUnbonding,
-		SlashableWindowEpochs:         slashableWindowEpochs,
-		RequiredSlashableWindowEpochs: requiredWindow,
-		RewardMultiplierBps:           multiplier,
-		EligibleForRewardMultiplier:   eligible,
-		RedelegationKeepsRiskHistory:  true,
+		Delegator:			record.Delegator,
+		Validator:			record.Validator,
+		LockDurationPreference:		record.LockDurationPreference,
+		ProtocolUnbondingSeconds:	params.UnbondingSeconds,
+		EffectiveUnbondingSeconds:	effectiveUnbonding,
+		SlashableWindowEpochs:		slashableWindowEpochs,
+		RequiredSlashableWindowEpochs:	requiredWindow,
+		RewardMultiplierBps:		multiplier,
+		EligibleForRewardMultiplier:	eligible,
+		RedelegationKeepsRiskHistory:	true,
 	}, nil
 }
 

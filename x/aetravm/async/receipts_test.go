@@ -15,11 +15,11 @@ func TestExecutionReceiptGeneratedForSuccess(t *testing.T) {
 	contract := deployTestContract(t, executor, testAddr(1), []byte("receipt-success"))
 	require.NoError(t, executor.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState: []byte("committed"),
+			NewState:	[]byte("committed"),
 			Outgoing: []MessageEnvelope{
 				testMessage(contract.Address, contract.Address, 99),
 			},
-			ResultCode: ResultOK,
+			ResultCode:	ResultOK,
 		}
 	}))
 
@@ -57,9 +57,9 @@ func TestExecutionReceiptGeneratedForFailedExecutionAndRollback(t *testing.T) {
 	beforeRoot := ContractStateRoot(before)
 	require.NoError(t, executor.RegisterHandler(contract, func(contract ContractAccount, msg MessageEnvelope) ExecutionResult {
 		return ExecutionResult{
-			NewState:   []byte("must-roll-back"),
-			ResultCode: ResultExecutionFailed,
-			Error:      "handler failed",
+			NewState:	[]byte("must-roll-back"),
+			ResultCode:	ResultExecutionFailed,
+			Error:		"handler failed",
 		}
 	}))
 

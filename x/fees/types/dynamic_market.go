@@ -10,135 +10,135 @@ import (
 )
 
 const (
-	DefaultFeeSmoothingWindow       = uint32(4)
-	DefaultMaxBaseFeeAdjustmentBps  = uint32(1_250)
-	DefaultEstimatorToleranceBps    = uint32(250)
-	DefaultSpamSurchargeStepBps     = uint32(500)
-	DefaultMaxSpamSurchargeBps      = uint32(5_000)
-	DefaultCriticalReserveGasBps    = uint32(500)
-	DefaultResourceMultiplierMaxBps = uint32(30_000)
+	DefaultFeeSmoothingWindow	= uint32(4)
+	DefaultMaxBaseFeeAdjustmentBps	= uint32(1_250)
+	DefaultEstimatorToleranceBps	= uint32(250)
+	DefaultSpamSurchargeStepBps	= uint32(500)
+	DefaultMaxSpamSurchargeBps	= uint32(5_000)
+	DefaultCriticalReserveGasBps	= uint32(500)
+	DefaultResourceMultiplierMaxBps	= uint32(30_000)
 
-	ResourceCompute           = "compute"
-	ResourceStorageWrite      = "storage_write"
-	ResourceMessageForwarding = "message_forwarding"
-	ResourceDeployment        = "deployment"
+	ResourceCompute			= "compute"
+	ResourceStorageWrite		= "storage_write"
+	ResourceMessageForwarding	= "message_forwarding"
+	ResourceDeployment		= "deployment"
 
-	MessageClassStandard   = "standard"
-	MessageClassCritical   = "critical_protocol"
-	MessageClassDeployment = "deployment"
-	MessageClassForwarding = "message_forwarding"
+	MessageClassStandard	= "standard"
+	MessageClassCritical	= "critical_protocol"
+	MessageClassDeployment	= "deployment"
+	MessageClassForwarding	= "message_forwarding"
 
-	FeeScenarioLowLoad    = "low_load"
-	FeeScenarioSteadyLoad = "steady_load"
-	FeeScenarioBurstLoad  = "burst_load"
-	FeeScenarioSpamLoad   = "spam_load"
+	FeeScenarioLowLoad	= "low_load"
+	FeeScenarioSteadyLoad	= "steady_load"
+	FeeScenarioBurstLoad	= "burst_load"
+	FeeScenarioSpamLoad	= "spam_load"
 )
 
 type DynamicFeeControlParams struct {
-	TargetBlockUtilizationBps uint32
-	MaxAdjustmentBps          uint32
-	SmoothingWindow           uint32
-	MinBaseFeeNaet            sdkmath.Int
-	MaxBaseFeeNaet            sdkmath.Int
+	TargetBlockUtilizationBps	uint32
+	MaxAdjustmentBps		uint32
+	SmoothingWindow			uint32
+	MinBaseFeeNaet			sdkmath.Int
+	MaxBaseFeeNaet			sdkmath.Int
 }
 
 type FeeControlState struct {
-	CurrentBaseFeeNaet sdkmath.Int
-	RecentUtilizations []uint32
+	CurrentBaseFeeNaet	sdkmath.Int
+	RecentUtilizations	[]uint32
 }
 
 type CongestionSignals struct {
-	BlockGasUtilizationBps    uint32
-	MempoolPressureBps        uint32
-	FailedExecutionRateBps    uint32
-	RepeatedSenderActivityBps uint32
-	StateWritePressureBps     uint32
+	BlockGasUtilizationBps		uint32
+	MempoolPressureBps		uint32
+	FailedExecutionRateBps		uint32
+	RepeatedSenderActivityBps	uint32
+	StateWritePressureBps		uint32
 }
 
 type DynamicFeeControlResult struct {
-	PreviousBaseFeeNaet    sdkmath.Int
-	NextBaseFeeNaet        sdkmath.Int
-	RawUtilizationBps      uint32
-	SmoothedUtilizationBps uint32
-	AdjustmentBps          int32
-	BoundedByGovernance    bool
+	PreviousBaseFeeNaet	sdkmath.Int
+	NextBaseFeeNaet		sdkmath.Int
+	RawUtilizationBps	uint32
+	SmoothedUtilizationBps	uint32
+	AdjustmentBps		int32
+	BoundedByGovernance	bool
 }
 
 type ResourceMultiplierParams struct {
-	ComputeMaxBps           uint32
-	StorageWriteMaxBps      uint32
-	MessageForwardingMaxBps uint32
-	DeploymentMaxBps        uint32
-	SpamSurchargeStepBps    uint32
-	MaxSpamSurchargeBps     uint32
+	ComputeMaxBps		uint32
+	StorageWriteMaxBps	uint32
+	MessageForwardingMaxBps	uint32
+	DeploymentMaxBps	uint32
+	SpamSurchargeStepBps	uint32
+	MaxSpamSurchargeBps	uint32
 }
 
 type ResourceFeeMultipliers struct {
-	ComputeBps           uint32
-	StorageWriteBps      uint32
-	MessageForwardingBps uint32
-	DeploymentBps        uint32
-	SpamSurchargeBps     uint32
+	ComputeBps		uint32
+	StorageWriteBps		uint32
+	MessageForwardingBps	uint32
+	DeploymentBps		uint32
+	SpamSurchargeBps	uint32
 }
 
 type FeeEstimateInput struct {
-	ControlParams          DynamicFeeControlParams
-	State                  FeeControlState
-	Signals                CongestionSignals
-	ResourceParams         ResourceMultiplierParams
-	GasLimit               uint64
-	ResourceClass          string
-	RepeatedFailedTxs      uint32
-	ActualInclusionFeeNaet sdkmath.Int
-	ToleranceBps           uint32
+	ControlParams		DynamicFeeControlParams
+	State			FeeControlState
+	Signals			CongestionSignals
+	ResourceParams		ResourceMultiplierParams
+	GasLimit		uint64
+	ResourceClass		string
+	RepeatedFailedTxs	uint32
+	ActualInclusionFeeNaet	sdkmath.Int
+	ToleranceBps		uint32
 }
 
 type FeeEstimate struct {
-	RequiredFee            sdk.Coin
-	BaseFee                sdk.Coin
-	ResourceMultiplierBps  uint32
-	SpamSurchargeBps       uint32
-	EstimatedFeeNaet       sdkmath.Int
-	ActualInclusionFeeNaet sdkmath.Int
-	WithinTolerance        bool
-	ToleranceBps           uint32
-	FeeControl             DynamicFeeControlResult
+	RequiredFee		sdk.Coin
+	BaseFee			sdk.Coin
+	ResourceMultiplierBps	uint32
+	SpamSurchargeBps	uint32
+	EstimatedFeeNaet	sdkmath.Int
+	ActualInclusionFeeNaet	sdkmath.Int
+	WithinTolerance		bool
+	ToleranceBps		uint32
+	FeeControl		DynamicFeeControlResult
 }
 
 type MessageGasLimitPolicy struct {
-	StandardMaxGas        uint64
-	CriticalMaxGas        uint64
-	DeploymentMaxGas      uint64
-	ForwardingMaxGas      uint64
-	CriticalReserveGasBps uint32
+	StandardMaxGas		uint64
+	CriticalMaxGas		uint64
+	DeploymentMaxGas	uint64
+	ForwardingMaxGas	uint64
+	CriticalReserveGasBps	uint32
 }
 
 type MessageGasLimitDecision struct {
-	MessageClass       string
-	MaxGas             uint64
-	RequestedGas       uint64
-	Allowed            bool
-	CriticalReserveGas uint64
-	Auditable          bool
+	MessageClass		string
+	MaxGas			uint64
+	RequestedGas		uint64
+	Allowed			bool
+	CriticalReserveGas	uint64
+	Auditable		bool
 }
 
 type FeeMarketSimulationStep struct {
-	Scenario          string
-	Signals           CongestionSignals
-	GasLimit          uint64
-	ResourceClass     string
-	RepeatedFailedTxs uint32
-	ActualFeeNaet     sdkmath.Int
+	Scenario		string
+	Signals			CongestionSignals
+	GasLimit		uint64
+	ResourceClass		string
+	RepeatedFailedTxs	uint32
+	ActualFeeNaet		sdkmath.Int
 }
 
 type FeeMarketSimulationReport struct {
-	ScenarioCount       int
-	FinalBaseFeeNaet    sdkmath.Int
-	MaxBaseFeeNaet      sdkmath.Int
-	EstimatorMismatches int
-	SpamSurchargeMaxBps uint32
-	Passed              bool
-	Risks               []string
+	ScenarioCount		int
+	FinalBaseFeeNaet	sdkmath.Int
+	MaxBaseFeeNaet		sdkmath.Int
+	EstimatorMismatches	int
+	SpamSurchargeMaxBps	uint32
+	Passed			bool
+	Risks			[]string
 }
 
 func DefaultDynamicFeeControlParams(params Params) (DynamicFeeControlParams, error) {
@@ -155,11 +155,11 @@ func DefaultDynamicFeeControlParams(params Params) (DynamicFeeControlParams, err
 		return DynamicFeeControlParams{}, err
 	}
 	return DynamicFeeControlParams{
-		TargetBlockUtilizationBps: params.TargetBlockUtilizationBps,
-		MaxAdjustmentBps:          DefaultMaxBaseFeeAdjustmentBps,
-		SmoothingWindow:           DefaultFeeSmoothingWindow,
-		MinBaseFeeNaet:            baseFee,
-		MaxBaseFeeNaet:            maxFee,
+		TargetBlockUtilizationBps:	params.TargetBlockUtilizationBps,
+		MaxAdjustmentBps:		DefaultMaxBaseFeeAdjustmentBps,
+		SmoothingWindow:		DefaultFeeSmoothingWindow,
+		MinBaseFeeNaet:			baseFee,
+		MaxBaseFeeNaet:			maxFee,
 	}, nil
 }
 
@@ -184,12 +184,12 @@ func (p DynamicFeeControlParams) Validate() error {
 
 func DefaultResourceMultiplierParams() ResourceMultiplierParams {
 	return ResourceMultiplierParams{
-		ComputeMaxBps:           DefaultResourceMultiplierMaxBps,
-		StorageWriteMaxBps:      DefaultResourceMultiplierMaxBps,
-		MessageForwardingMaxBps: DefaultResourceMultiplierMaxBps,
-		DeploymentMaxBps:        DefaultResourceMultiplierMaxBps,
-		SpamSurchargeStepBps:    DefaultSpamSurchargeStepBps,
-		MaxSpamSurchargeBps:     DefaultMaxSpamSurchargeBps,
+		ComputeMaxBps:			DefaultResourceMultiplierMaxBps,
+		StorageWriteMaxBps:		DefaultResourceMultiplierMaxBps,
+		MessageForwardingMaxBps:	DefaultResourceMultiplierMaxBps,
+		DeploymentMaxBps:		DefaultResourceMultiplierMaxBps,
+		SpamSurchargeStepBps:		DefaultSpamSurchargeStepBps,
+		MaxSpamSurchargeBps:		DefaultMaxSpamSurchargeBps,
 	}
 }
 
@@ -198,8 +198,8 @@ func (p ResourceMultiplierParams) Validate() error {
 		p.ComputeMaxBps = DefaultResourceMultiplierMaxBps
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "compute max", value: p.ComputeMaxBps},
 		{name: "storage write max", value: p.StorageWriteMaxBps},
@@ -240,19 +240,19 @@ func NextDynamicBaseFee(params DynamicFeeControlParams, state FeeControlState, s
 		bounded = true
 	}
 	return DynamicFeeControlResult{
-		PreviousBaseFeeNaet:    current,
-		NextBaseFeeNaet:        next,
-		RawUtilizationBps:      signals.BlockGasUtilizationBps,
-		SmoothedUtilizationBps: smoothed,
-		AdjustmentBps:          adjustment,
-		BoundedByGovernance:    bounded || absInt32(adjustment) == int32(params.MaxAdjustmentBps),
+		PreviousBaseFeeNaet:	current,
+		NextBaseFeeNaet:	next,
+		RawUtilizationBps:	signals.BlockGasUtilizationBps,
+		SmoothedUtilizationBps:	smoothed,
+		AdjustmentBps:		adjustment,
+		BoundedByGovernance:	bounded || absInt32(adjustment) == int32(params.MaxAdjustmentBps),
 	}, nil
 }
 
 func (s CongestionSignals) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "block gas utilization", value: s.BlockGasUtilizationBps},
 		{name: "mempool pressure", value: s.MempoolPressureBps},
@@ -282,11 +282,11 @@ func ResourceMultipliers(params ResourceMultiplierParams, signals CongestionSign
 		spam = params.MaxSpamSurchargeBps
 	}
 	return ResourceFeeMultipliers{
-		ComputeBps:           boundedResourceMultiplier(signals.BlockGasUtilizationBps, signals.MempoolPressureBps, params.ComputeMaxBps),
-		StorageWriteBps:      boundedResourceMultiplier(signals.StateWritePressureBps, signals.BlockGasUtilizationBps, params.StorageWriteMaxBps),
-		MessageForwardingBps: boundedResourceMultiplier(signals.MempoolPressureBps, signals.RepeatedSenderActivityBps, params.MessageForwardingMaxBps),
-		DeploymentBps:        boundedResourceMultiplier(signals.BlockGasUtilizationBps, signals.StateWritePressureBps, params.DeploymentMaxBps),
-		SpamSurchargeBps:     spam,
+		ComputeBps:		boundedResourceMultiplier(signals.BlockGasUtilizationBps, signals.MempoolPressureBps, params.ComputeMaxBps),
+		StorageWriteBps:	boundedResourceMultiplier(signals.StateWritePressureBps, signals.BlockGasUtilizationBps, params.StorageWriteMaxBps),
+		MessageForwardingBps:	boundedResourceMultiplier(signals.MempoolPressureBps, signals.RepeatedSenderActivityBps, params.MessageForwardingMaxBps),
+		DeploymentBps:		boundedResourceMultiplier(signals.BlockGasUtilizationBps, signals.StateWritePressureBps, params.DeploymentMaxBps),
+		SpamSurchargeBps:	spam,
 	}, nil
 }
 
@@ -324,26 +324,26 @@ func EstimateDynamicFee(input FeeEstimateInput) (FeeEstimate, error) {
 		withinTolerance = withinFeeTolerance(estimated, actual, tolerance)
 	}
 	return FeeEstimate{
-		RequiredFee:            sdk.NewCoin(BondDenom, estimated),
-		BaseFee:                sdk.NewCoin(BondDenom, control.NextBaseFeeNaet),
-		ResourceMultiplierBps:  resourceMultiplier,
-		SpamSurchargeBps:       multipliers.SpamSurchargeBps,
-		EstimatedFeeNaet:       estimated,
-		ActualInclusionFeeNaet: actual,
-		WithinTolerance:        withinTolerance,
-		ToleranceBps:           tolerance,
-		FeeControl:             control,
+		RequiredFee:		sdk.NewCoin(BondDenom, estimated),
+		BaseFee:		sdk.NewCoin(BondDenom, control.NextBaseFeeNaet),
+		ResourceMultiplierBps:	resourceMultiplier,
+		SpamSurchargeBps:	multipliers.SpamSurchargeBps,
+		EstimatedFeeNaet:	estimated,
+		ActualInclusionFeeNaet:	actual,
+		WithinTolerance:	withinTolerance,
+		ToleranceBps:		tolerance,
+		FeeControl:		control,
 	}, nil
 }
 
 func DefaultMessageGasLimitPolicy(params Params) MessageGasLimitPolicy {
 	params = NormalizeParams(params)
 	return MessageGasLimitPolicy{
-		StandardMaxGas:        params.MaxTxGas,
-		CriticalMaxGas:        params.MaxTxGas / 2,
-		DeploymentMaxGas:      params.MaxTxGas,
-		ForwardingMaxGas:      params.MaxTxGas / 4,
-		CriticalReserveGasBps: DefaultCriticalReserveGasBps,
+		StandardMaxGas:		params.MaxTxGas,
+		CriticalMaxGas:		params.MaxTxGas / 2,
+		DeploymentMaxGas:	params.MaxTxGas,
+		ForwardingMaxGas:	params.MaxTxGas / 4,
+		CriticalReserveGasBps:	DefaultCriticalReserveGasBps,
 	}
 }
 
@@ -363,12 +363,12 @@ func EvaluateMessageGasLimit(policy MessageGasLimitPolicy, messageClass string, 
 	}
 	reserve := sdkmath.NewIntFromUint64(maxBlockGas).MulRaw(int64(policy.CriticalReserveGasBps)).QuoRaw(int64(BasisPoints)).Uint64()
 	return MessageGasLimitDecision{
-		MessageClass:       messageClass,
-		MaxGas:             maxGas,
-		RequestedGas:       requestedGas,
-		Allowed:            requestedGas <= maxGas,
-		CriticalReserveGas: reserve,
-		Auditable:          true,
+		MessageClass:		messageClass,
+		MaxGas:			maxGas,
+		RequestedGas:		requestedGas,
+		Allowed:		requestedGas <= maxGas,
+		CriticalReserveGas:	reserve,
+		Auditable:		true,
 	}, nil
 }
 
@@ -388,15 +388,15 @@ func SimulateDynamicFeeMarket(params DynamicFeeControlParams, resourceParams Res
 		}
 		scenarios[step.Scenario] = struct{}{}
 		estimate, err := EstimateDynamicFee(FeeEstimateInput{
-			ControlParams:          params,
-			State:                  state,
-			Signals:                step.Signals,
-			ResourceParams:         resourceParams,
-			GasLimit:               step.GasLimit,
-			ResourceClass:          step.ResourceClass,
-			RepeatedFailedTxs:      step.RepeatedFailedTxs,
-			ActualInclusionFeeNaet: step.ActualFeeNaet,
-			ToleranceBps:           DefaultEstimatorToleranceBps,
+			ControlParams:		params,
+			State:			state,
+			Signals:		step.Signals,
+			ResourceParams:		resourceParams,
+			GasLimit:		step.GasLimit,
+			ResourceClass:		step.ResourceClass,
+			RepeatedFailedTxs:	step.RepeatedFailedTxs,
+			ActualInclusionFeeNaet:	step.ActualFeeNaet,
+			ToleranceBps:		DefaultEstimatorToleranceBps,
 		})
 		if err != nil {
 			return FeeMarketSimulationReport{}, err
@@ -423,13 +423,13 @@ func SimulateDynamicFeeMarket(params DynamicFeeControlParams, resourceParams Res
 	}
 	sort.Strings(risks)
 	return FeeMarketSimulationReport{
-		ScenarioCount:       len(scenarios),
-		FinalBaseFeeNaet:    state.CurrentBaseFeeNaet,
-		MaxBaseFeeNaet:      maxFee,
-		EstimatorMismatches: mismatches,
-		SpamSurchargeMaxBps: maxSpam,
-		Passed:              len(risks) == 0,
-		Risks:               risks,
+		ScenarioCount:		len(scenarios),
+		FinalBaseFeeNaet:	state.CurrentBaseFeeNaet,
+		MaxBaseFeeNaet:		maxFee,
+		EstimatorMismatches:	mismatches,
+		SpamSurchargeMaxBps:	maxSpam,
+		Passed:			len(risks) == 0,
+		Risks:			risks,
 	}, nil
 }
 

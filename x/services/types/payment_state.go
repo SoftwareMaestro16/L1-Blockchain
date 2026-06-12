@@ -11,101 +11,101 @@ import (
 )
 
 const (
-	ServicePaymentModelPrefix      = ServiceStorePrefix + "payments/models"
-	ServicePaymentEscrowPrefix     = ServiceStorePrefix + "payments/escrow"
-	ServicePaymentStreamPrefix     = ServiceStorePrefix + "payments/streams"
-	ServicePaymentMeterPrefix      = ServiceStorePrefix + "payments/meters"
-	ServicePaymentSettlementPrefix = ServiceStorePrefix + "payments/settlements"
+	ServicePaymentModelPrefix	= ServiceStorePrefix + "payments/models"
+	ServicePaymentEscrowPrefix	= ServiceStorePrefix + "payments/escrow"
+	ServicePaymentStreamPrefix	= ServiceStorePrefix + "payments/streams"
+	ServicePaymentMeterPrefix	= ServiceStorePrefix + "payments/meters"
+	ServicePaymentSettlementPrefix	= ServiceStorePrefix + "payments/settlements"
 )
 
 type ServicePaymentModel struct {
-	ServiceID          string
-	SupportedDenoms    []string
-	DefaultDenom       string
-	PricingUnit        coretypes.ServicePricingUnit
-	SettlementMode     coretypes.ServicePaymentSettlementMode
-	UnitAmount         string
-	MaxAmountOptional  string
-	FailurePolicy      coretypes.ServiceFailureBehavior
-	ProtocolNative     bool
-	KnownBeforeSigning bool
-	UpdatedHeight      uint64
-	ModelHash          string
+	ServiceID		string
+	SupportedDenoms		[]string
+	DefaultDenom		string
+	PricingUnit		coretypes.ServicePricingUnit
+	SettlementMode		coretypes.ServicePaymentSettlementMode
+	UnitAmount		string
+	MaxAmountOptional	string
+	FailurePolicy		coretypes.ServiceFailureBehavior
+	ProtocolNative		bool
+	KnownBeforeSigning	bool
+	UpdatedHeight		uint64
+	ModelHash		string
 }
 
 type ServiceEscrow struct {
-	EscrowID     string
-	ServiceID    string
-	Payer        string
-	Denom        string
-	Amount       string
-	LockedHeight uint64
-	ExpiryHeight uint64
-	LockHash     string
+	EscrowID	string
+	ServiceID	string
+	Payer		string
+	Denom		string
+	Amount		string
+	LockedHeight	uint64
+	ExpiryHeight	uint64
+	LockHash	string
 }
 
 type PaymentStream struct {
-	StreamID      string
-	ServiceID     string
-	Payer         string
-	Denom         string
-	RatePerHeight string
-	StartHeight   uint64
-	EndHeight     uint64
-	PaidThrough   uint64
-	StreamHash    string
+	StreamID	string
+	ServiceID	string
+	Payer		string
+	Denom		string
+	RatePerHeight	string
+	StartHeight	uint64
+	EndHeight	uint64
+	PaidThrough	uint64
+	StreamHash	string
 }
 
 type MeteredUsage struct {
-	MeterID        string
-	ServiceID      string
-	CallID         string
-	UsageReceipt   PaymentUsageReceipt
-	AmountDue      string
-	RecordedHeight uint64
-	UsageHash      string
+	MeterID		string
+	ServiceID	string
+	CallID		string
+	UsageReceipt	PaymentUsageReceipt
+	AmountDue	string
+	RecordedHeight	uint64
+	UsageHash	string
 }
 
 type PaymentSettlement struct {
-	CallID           string
-	ServiceID        string
-	EnvelopeHash     string
-	QuoteHash        string
-	AmountSettled    string
-	Denom            string
-	Status           coretypes.ServicePaymentStatus
-	FailurePolicy    coretypes.ServiceFailureBehavior
-	SettlementHeight uint64
-	SettlementHash   string
+	CallID			string
+	ServiceID		string
+	EnvelopeHash		string
+	QuoteHash		string
+	AmountSettled		string
+	Denom			string
+	Status			coretypes.ServicePaymentStatus
+	FailurePolicy		coretypes.ServiceFailureBehavior
+	SettlementHeight	uint64
+	SettlementHash		string
 }
 
 type FinancialZonePaymentRoute struct {
-	RouteID       string
-	ServiceID     string
-	Payer         string
-	Denom         string
-	Amount        string
-	BankKeeper    string
-	FinancialZone string
-	RouteHash     string
+	RouteID		string
+	ServiceID	string
+	Payer		string
+	Denom		string
+	Amount		string
+	BankKeeper	string
+	FinancialZone	string
+	RouteHash	string
 }
 
 type ServicePaymentState struct {
-	Models      []ServicePaymentModel
-	Escrows     []ServiceEscrow
-	Streams     []PaymentStream
-	Meters      []MeteredUsage
-	Settlements []PaymentSettlement
-	Height      uint64
-	StateRoot   string
+	Models		[]ServicePaymentModel
+	Escrows		[]ServiceEscrow
+	Streams		[]PaymentStream
+	Meters		[]MeteredUsage
+	Settlements	[]PaymentSettlement
+	Height		uint64
+	StateRoot	string
 }
 
 type ServicePaymentProof struct {
-	Key       string
-	ValueHash string
-	StateRoot string
-	Height    uint64
-	ProofHash string
+	Key		string
+	ValueHash	string
+	StateRoot	string
+	Height		uint64
+	ProofHash	string
 }
 
 type QueryPaymentModel struct {
@@ -117,13 +117,13 @@ type QueryPaymentProof struct {
 }
 
 type QueryPaymentModelResponse struct {
-	Model ServicePaymentModel
-	Found bool
+	Model	ServicePaymentModel
+	Found	bool
 }
 
 type QueryPaymentProofResponse struct {
-	Proof ServicePaymentProof
-	Found bool
+	Proof	ServicePaymentProof
+	Found	bool
 }
 
 func PaymentModelStateKey(serviceID string) (string, error) {
@@ -187,17 +187,17 @@ func NewServicePaymentModelFromDescriptor(descriptor ServiceDescriptor) (Service
 		supportedDenoms = append(supportedDenoms, coretypes.NativeFeePolicyID)
 	}
 	return NewServicePaymentModel(ServicePaymentModel{
-		ServiceID:          descriptor.ServiceID,
-		SupportedDenoms:    supportedDenoms,
-		DefaultDenom:       descriptor.Payment.Denom,
-		PricingUnit:        descriptor.Payment.PricingUnit,
-		SettlementMode:     descriptor.Payment.SettlementMode,
-		UnitAmount:         descriptor.Payment.Amount,
-		MaxAmountOptional:  maxAmount,
-		FailurePolicy:      descriptor.Execution.FailureBehavior,
-		ProtocolNative:     isProtocolNativePaymentDescriptor(descriptor),
-		KnownBeforeSigning: true,
-		UpdatedHeight:      descriptor.UpdatedHeight,
+		ServiceID:		descriptor.ServiceID,
+		SupportedDenoms:	supportedDenoms,
+		DefaultDenom:		descriptor.Payment.Denom,
+		PricingUnit:		descriptor.Payment.PricingUnit,
+		SettlementMode:		descriptor.Payment.SettlementMode,
+		UnitAmount:		descriptor.Payment.Amount,
+		MaxAmountOptional:	maxAmount,
+		FailurePolicy:		descriptor.Execution.FailureBehavior,
+		ProtocolNative:		isProtocolNativePaymentDescriptor(descriptor),
+		KnownBeforeSigning:	true,
+		UpdatedHeight:		descriptor.UpdatedHeight,
 	})
 }
 
@@ -486,12 +486,12 @@ func BuildServicePaymentState(models []ServicePaymentModel, escrows []ServiceEsc
 		return ServicePaymentState{}, errors.New("services payment state height is required")
 	}
 	state := ServicePaymentState{
-		Models:      normalizeServicePaymentModels(models),
-		Escrows:     normalizeServiceEscrows(escrows),
-		Streams:     normalizePaymentStreams(streams),
-		Meters:      normalizeMeteredUsages(meters),
-		Settlements: normalizePaymentSettlements(settlements),
-		Height:      height,
+		Models:		normalizeServicePaymentModels(models),
+		Escrows:	normalizeServiceEscrows(escrows),
+		Streams:	normalizePaymentStreams(streams),
+		Meters:		normalizeMeteredUsages(meters),
+		Settlements:	normalizePaymentSettlements(settlements),
+		Height:		height,
 	}
 	if err := state.ValidateFormat(); err != nil {
 		return ServicePaymentState{}, err
@@ -632,13 +632,13 @@ func CreateServiceEscrowFromEnvelope(envelope PaymentEnvelope, height uint64) (S
 		return ServiceEscrow{}, errors.New("services escrow creation requires escrow payment envelope")
 	}
 	return NewServiceEscrow(ServiceEscrow{
-		EscrowID:     envelope.EscrowIDOptional,
-		ServiceID:    envelope.PayeeService,
-		Payer:        envelope.Payer,
-		Denom:        envelope.Denom,
-		Amount:       envelope.Amount,
-		LockedHeight: height,
-		ExpiryHeight: envelope.ExpiryHeight,
+		EscrowID:	envelope.EscrowIDOptional,
+		ServiceID:	envelope.PayeeService,
+		Payer:		envelope.Payer,
+		Denom:		envelope.Denom,
+		Amount:		envelope.Amount,
+		LockedHeight:	height,
+		ExpiryHeight:	envelope.ExpiryHeight,
 	})
 }
 
@@ -650,14 +650,14 @@ func CreatePaymentStreamFromEnvelope(envelope PaymentEnvelope, startHeight, endH
 		return PaymentStream{}, errors.New("services stream creation requires streaming payment envelope")
 	}
 	return NewPaymentStream(PaymentStream{
-		StreamID:      envelope.StreamIDOptional,
-		ServiceID:     envelope.PayeeService,
-		Payer:         envelope.Payer,
-		Denom:         envelope.Denom,
-		RatePerHeight: envelope.Amount,
-		StartHeight:   startHeight,
-		EndHeight:     endHeight,
-		PaidThrough:   startHeight,
+		StreamID:	envelope.StreamIDOptional,
+		ServiceID:	envelope.PayeeService,
+		Payer:		envelope.Payer,
+		Denom:		envelope.Denom,
+		RatePerHeight:	envelope.Amount,
+		StartHeight:	startHeight,
+		EndHeight:	endHeight,
+		PaidThrough:	startHeight,
 	})
 }
 
@@ -669,12 +669,12 @@ func RecordMeteredUsageFromQuote(meterID string, quote PaymentModelQuote, receip
 		return MeteredUsage{}, errors.New("services metered usage requires usage receipt quote")
 	}
 	return NewMeteredUsage(MeteredUsage{
-		MeterID:        meterID,
-		ServiceID:      quote.Envelope.PayeeService,
-		CallID:         receipt.CallID,
-		UsageReceipt:   receipt,
-		AmountDue:      quote.AmountDue,
-		RecordedHeight: height,
+		MeterID:	meterID,
+		ServiceID:	quote.Envelope.PayeeService,
+		CallID:		receipt.CallID,
+		UsageReceipt:	receipt,
+		AmountDue:	quote.AmountDue,
+		RecordedHeight:	height,
 	})
 }
 
@@ -687,15 +687,15 @@ func SettlePaymentFromQuote(callID string, quote PaymentModelQuote, status coret
 		return PaymentSettlement{}, errors.New("services payment settlement status does not follow failure policy")
 	}
 	return NewPaymentSettlement(PaymentSettlement{
-		CallID:           callID,
-		ServiceID:        quote.Envelope.PayeeService,
-		EnvelopeHash:     quote.Envelope.EnvelopeHash,
-		QuoteHash:        quote.QuoteHash,
-		AmountSettled:    amount,
-		Denom:            quote.Envelope.Denom,
-		Status:           status,
-		FailurePolicy:    failurePolicy,
-		SettlementHeight: height,
+		CallID:			callID,
+		ServiceID:		quote.Envelope.PayeeService,
+		EnvelopeHash:		quote.Envelope.EnvelopeHash,
+		QuoteHash:		quote.QuoteHash,
+		AmountSettled:		amount,
+		Denom:			quote.Envelope.Denom,
+		Status:			status,
+		FailurePolicy:		failurePolicy,
+		SettlementHeight:	height,
 	})
 }
 
@@ -719,13 +719,13 @@ func BuildFinancialZonePaymentRoute(envelope PaymentEnvelope, bankKeeper, financ
 		return FinancialZonePaymentRoute{}, err
 	}
 	route := FinancialZonePaymentRoute{
-		RouteID:       servicesHashParts("aetra-services-financial-route-id-v1", envelope.EnvelopeHash),
-		ServiceID:     envelope.PayeeService,
-		Payer:         envelope.Payer,
-		Denom:         envelope.Denom,
-		Amount:        envelope.Amount,
-		BankKeeper:    strings.TrimSpace(bankKeeper),
-		FinancialZone: strings.TrimSpace(financialZone),
+		RouteID:	servicesHashParts("aetra-services-financial-route-id-v1", envelope.EnvelopeHash),
+		ServiceID:	envelope.PayeeService,
+		Payer:		envelope.Payer,
+		Denom:		envelope.Denom,
+		Amount:		envelope.Amount,
+		BankKeeper:	strings.TrimSpace(bankKeeper),
+		FinancialZone:	strings.TrimSpace(financialZone),
 	}
 	if err := validateInterfaceToken("services financial route bank keeper", route.BankKeeper); err != nil {
 		return FinancialZonePaymentRoute{}, err

@@ -13,68 +13,68 @@ import (
 )
 
 const (
-	AVMWASMHostStorageRead  AVMWASMHostFunctionKind = "storage_read"
-	AVMWASMHostStorageWrite AVMWASMHostFunctionKind = "storage_write"
-	AVMWASMHostCrypto       AVMWASMHostFunctionKind = "crypto"
-	AVMWASMHostQuery        AVMWASMHostFunctionKind = "query"
-	AVMWASMHostAsyncEmit    AVMWASMHostFunctionKind = "async_emit"
+	AVMWASMHostStorageRead	AVMWASMHostFunctionKind	= "storage_read"
+	AVMWASMHostStorageWrite	AVMWASMHostFunctionKind	= "storage_write"
+	AVMWASMHostCrypto	AVMWASMHostFunctionKind	= "crypto"
+	AVMWASMHostQuery	AVMWASMHostFunctionKind	= "query"
+	AVMWASMHostAsyncEmit	AVMWASMHostFunctionKind	= "async_emit"
 
-	WASMMemoryPageBytes uint64 = 64 * 1024
+	WASMMemoryPageBytes	uint64	= 64 * 1024
 
-	MaxAVMWASMHostFunctionName = 128
+	MaxAVMWASMHostFunctionName	= 128
 )
 
 type AVMWASMHostFunctionKind string
 
 type AVMWASMHostFunction struct {
-	Name          string
-	Kind          AVMWASMHostFunctionKind
-	Deterministic bool
-	GasCost       uint64
+	Name		string
+	Kind		AVMWASMHostFunctionKind
+	Deterministic	bool
+	GasCost		uint64
 }
 
 type AVMWASMGasConversionTable struct {
-	WASMGasUnit      uint64
-	AVMGasPerWASMGas uint64
-	StorageReadGas   uint64
-	StorageWriteGas  uint64
-	MessageEmitGas   uint64
-	ConversionHash   string
+	WASMGasUnit		uint64
+	AVMGasPerWASMGas	uint64
+	StorageReadGas		uint64
+	StorageWriteGas		uint64
+	MessageEmitGas		uint64
+	ConversionHash		string
 }
 
 type AVMWASMStoreV2KVAdapter struct {
-	ZoneID        zonestypes.ZoneID
-	StoreKey      string
-	KeyPrefix     string
-	MaxKeyBytes   uint32
-	MaxValueBytes uint64
-	AdapterHash   string
+	ZoneID		zonestypes.ZoneID
+	StoreKey	string
+	KeyPrefix	string
+	MaxKeyBytes	uint32
+	MaxValueBytes	uint64
+	AdapterHash	string
 }
 
 type AVMWASMSandboxPolicy struct {
-	Enabled            bool
-	Optional           bool
-	RuntimePolicy      wasmconfig.Policy
-	MaxMemoryPages     uint32
-	HostFunctions      []AVMWASMHostFunction
-	GasConversion      AVMWASMGasConversionTable
-	StoreAdapter       AVMWASMStoreV2KVAdapter
-	ExternalNetwork    bool
-	CrossZoneAsyncOnly bool
-	SandboxPolicyHash  string
+	Enabled			bool
+	Optional		bool
+	RuntimePolicy		wasmconfig.Policy
+	MaxMemoryPages		uint32
+	HostFunctions		[]AVMWASMHostFunction
+	GasConversion		AVMWASMGasConversionTable
+	StoreAdapter		AVMWASMStoreV2KVAdapter
+	ExternalNetwork		bool
+	CrossZoneAsyncOnly	bool
+	SandboxPolicyHash	string
 }
 
 type AVMWASMContractRouteCall struct {
-	SandboxPolicy        AVMWASMSandboxPolicy
-	Call                 VMCall
-	ZoneID               zonestypes.ZoneID
-	Backend              RouterBackend
-	DispatchMode         RouterDispatchMode
-	GasMeter             RouterGasMeter
-	EmittedMessages      []AVMAsyncMessage
-	DirectCrossZoneCall  bool
-	NetworkAccessAttempt bool
-	RouteCallHash        string
+	SandboxPolicy		AVMWASMSandboxPolicy
+	Call			VMCall
+	ZoneID			zonestypes.ZoneID
+	Backend			RouterBackend
+	DispatchMode		RouterDispatchMode
+	GasMeter		RouterGasMeter
+	EmittedMessages		[]AVMAsyncMessage
+	DirectCrossZoneCall	bool
+	NetworkAccessAttempt	bool
+	RouteCallHash		string
 }
 
 func DefaultAVMWASMHostFunctions() []AVMWASMHostFunction {
@@ -89,11 +89,11 @@ func DefaultAVMWASMHostFunctions() []AVMWASMHostFunction {
 
 func DefaultAVMWASMGasConversionTable() (AVMWASMGasConversionTable, error) {
 	table := AVMWASMGasConversionTable{
-		WASMGasUnit:      1,
-		AVMGasPerWASMGas: wasmconfig.DefaultGasMultiplier,
-		StorageReadGas:   2,
-		StorageWriteGas:  4,
-		MessageEmitGas:   10,
+		WASMGasUnit:		1,
+		AVMGasPerWASMGas:	wasmconfig.DefaultGasMultiplier,
+		StorageReadGas:		2,
+		StorageWriteGas:	4,
+		MessageEmitGas:		10,
 	}
 	table.ConversionHash = ComputeAVMWASMGasConversionHash(table)
 	return table, table.Validate()

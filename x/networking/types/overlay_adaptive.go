@@ -7,82 +7,82 @@ import (
 )
 
 const (
-	MaxAdaptivePeersPerSet       = 128
-	DefaultPeerScoreDecayBps     = uint32(1_000)
-	DefaultPeerScoreDecayFloor   = uint32(500)
-	DefaultRandomDiversityBucket = 2
+	MaxAdaptivePeersPerSet		= 128
+	DefaultPeerScoreDecayBps	= uint32(1_000)
+	DefaultPeerScoreDecayFloor	= uint32(500)
+	DefaultRandomDiversityBucket	= 2
 )
 
 type PeerSetClass string
 
 const (
-	PeerSetFast     PeerSetClass = "fast_set"
-	PeerSetStable   PeerSetClass = "stable_set"
-	PeerSetRandom   PeerSetClass = "random_set"
-	PeerSetZone     PeerSetClass = "zone_set"
-	PeerSetService  PeerSetClass = "service_set"
-	PeerSetFallback PeerSetClass = "fallback_set"
+	PeerSetFast	PeerSetClass	= "fast_set"
+	PeerSetStable	PeerSetClass	= "stable_set"
+	PeerSetRandom	PeerSetClass	= "random_set"
+	PeerSetZone	PeerSetClass	= "zone_set"
+	PeerSetService	PeerSetClass	= "service_set"
+	PeerSetFallback	PeerSetClass	= "fallback_set"
 )
 
 type AdaptivePeer struct {
-	NodeID          string
-	ScoreBps        uint32
-	LatencyMillis   uint64
-	ReliabilityBps  uint32
-	Roles           []NodeRole
-	ZonesSupported  []string
-	Services        []string
-	CommittedScore  bool
-	LastSeenHeight  uint64
-	LastScoreHeight uint64
+	NodeID		string
+	ScoreBps	uint32
+	LatencyMillis	uint64
+	ReliabilityBps	uint32
+	Roles		[]NodeRole
+	ZonesSupported	[]string
+	Services	[]string
+	CommittedScore	bool
+	LastSeenHeight	uint64
+	LastScoreHeight	uint64
 }
 
 type AdaptivePeerSet struct {
-	Class PeerSetClass
-	Peers []AdaptivePeer
+	Class	PeerSetClass
+	Peers	[]AdaptivePeer
 }
 
 type AdaptiveOverlayGraph struct {
-	OverlayID               string
-	LocalNodeID             string
-	RoutingEpoch            uint64
-	FastSet                 []AdaptivePeer
-	StableSet               []AdaptivePeer
-	RandomSet               []AdaptivePeer
-	ZoneSet                 []AdaptivePeer
-	ServiceSet              []AdaptivePeer
-	FallbackSet             []AdaptivePeer
-	PolicyHash              string
-	LivePeerScoresCommitted bool
+	OverlayID		string
+	LocalNodeID		string
+	RoutingEpoch		uint64
+	FastSet			[]AdaptivePeer
+	StableSet		[]AdaptivePeer
+	RandomSet		[]AdaptivePeer
+	ZoneSet			[]AdaptivePeer
+	ServiceSet		[]AdaptivePeer
+	FallbackSet		[]AdaptivePeer
+	PolicyHash		string
+	LivePeerScoresCommitted	bool
 }
 
 type PeerScoreDecayPolicy struct {
-	MaxDecayBpsPerEpoch uint32
-	MinScoreBps         uint32
+	MaxDecayBpsPerEpoch	uint32
+	MinScoreBps		uint32
 }
 
 type OverlayRouteRoot struct {
-	OverlayID string
-	RootHash  string
+	OverlayID	string
+	RootHash	string
 }
 
 type RoutingTableCommitment struct {
-	RoutingEpoch           uint64
-	OverlayRoots           []OverlayRouteRoot
-	ZoneRouteRoot          string
-	ServiceRouteRoot       string
-	PeerClassRoot          string
-	CongestionSnapshotRoot string
-	PolicyHash             string
+	RoutingEpoch		uint64
+	OverlayRoots		[]OverlayRouteRoot
+	ZoneRouteRoot		string
+	ServiceRouteRoot	string
+	PeerClassRoot		string
+	CongestionSnapshotRoot	string
+	PolicyHash		string
 }
 
 type RoutingTableUse struct {
-	Commitment                  RoutingTableCommitment
-	Committed                   bool
-	UsedForExecutionScheduling  bool
-	UsedForPhysicalForwarding   bool
-	DeterministicRouteHintHash  string
-	AllowsNodeLocalOptimization bool
+	Commitment			RoutingTableCommitment
+	Committed			bool
+	UsedForExecutionScheduling	bool
+	UsedForPhysicalForwarding	bool
+	DeterministicRouteHintHash	string
+	AllowsNodeLocalOptimization	bool
 }
 
 func BuildAdaptiveOverlayGraph(desc OverlayDescriptor, localNodeID string, peers []AdaptivePeer, routingEpoch uint64, policyHash string) (AdaptiveOverlayGraph, error) {
@@ -110,16 +110,16 @@ func BuildAdaptiveOverlayGraph(desc OverlayDescriptor, localNodeID string, peers
 		limit = MaxAdaptivePeersPerSet
 	}
 	graph := AdaptiveOverlayGraph{
-		OverlayID:    desc.OverlayID,
-		LocalNodeID:  localNodeID,
-		RoutingEpoch: routingEpoch,
-		FastSet:      takeAdaptivePeers(sortAdaptivePeersByLatency(normalized), limit),
-		StableSet:    takeAdaptivePeers(sortAdaptivePeersByReliability(normalized), limit),
-		RandomSet:    takeAdaptivePeers(sortAdaptivePeersBySeed(normalized, HashParts("adaptive-random", desc.OverlayID, fmt.Sprintf("%d", routingEpoch), policyHash)), limit),
-		ZoneSet:      takeAdaptivePeers(filterAdaptivePeersWithZones(normalized), limit),
-		ServiceSet:   takeAdaptivePeers(filterAdaptivePeersWithServices(normalized), limit),
-		FallbackSet:  takeAdaptivePeers(sortAdaptivePeersBySeed(normalized, HashParts("adaptive-fallback", desc.OverlayID, policyHash)), limit),
-		PolicyHash:   policyHash,
+		OverlayID:	desc.OverlayID,
+		LocalNodeID:	localNodeID,
+		RoutingEpoch:	routingEpoch,
+		FastSet:	takeAdaptivePeers(sortAdaptivePeersByLatency(normalized), limit),
+		StableSet:	takeAdaptivePeers(sortAdaptivePeersByReliability(normalized), limit),
+		RandomSet:	takeAdaptivePeers(sortAdaptivePeersBySeed(normalized, HashParts("adaptive-random", desc.OverlayID, fmt.Sprintf("%d", routingEpoch), policyHash)), limit),
+		ZoneSet:	takeAdaptivePeers(filterAdaptivePeersWithZones(normalized), limit),
+		ServiceSet:	takeAdaptivePeers(filterAdaptivePeersWithServices(normalized), limit),
+		FallbackSet:	takeAdaptivePeers(sortAdaptivePeersBySeed(normalized, HashParts("adaptive-fallback", desc.OverlayID, policyHash)), limit),
+		PolicyHash:	policyHash,
 	}
 	if err := graph.Validate(desc); err != nil {
 		return AdaptiveOverlayGraph{}, err
@@ -195,8 +195,8 @@ func ValidateAdaptiveOverlayGraphUse(graph AdaptiveOverlayGraph, usedForConsensu
 
 func DefaultPeerScoreDecayPolicy() PeerScoreDecayPolicy {
 	return PeerScoreDecayPolicy{
-		MaxDecayBpsPerEpoch: DefaultPeerScoreDecayBps,
-		MinScoreBps:         DefaultPeerScoreDecayFloor,
+		MaxDecayBpsPerEpoch:	DefaultPeerScoreDecayBps,
+		MinScoreBps:		DefaultPeerScoreDecayFloor,
 	}
 }
 
@@ -275,8 +275,8 @@ func (c RoutingTableCommitment) Validate() error {
 		return fmt.Errorf("networking routing table overlay roots must be between 1 and %d", MaxOverlayDescriptors)
 	}
 	for _, field := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"networking routing table zone route root", commitment.ZoneRouteRoot},
 		{"networking routing table service route root", commitment.ServiceRouteRoot},
@@ -331,16 +331,16 @@ func ValidateRoutingTableUse(use RoutingTableUse) error {
 func AdaptivePeerFromNodeRecord(record NodeRecord, score PeerScore, metrics PeerMetrics, committedScore bool, height uint64) AdaptivePeer {
 	record = NormalizeNodeRecord(record)
 	return AdaptivePeer{
-		NodeID:          record.NodeID,
-		ScoreBps:        score.ScoreBps,
-		LatencyMillis:   metrics.LatencyMillis,
-		ReliabilityBps:  metrics.ReliabilityBps,
-		Roles:           append([]NodeRole(nil), record.Roles...),
-		ZonesSupported:  append([]string(nil), record.ZonesSupported...),
-		Services:        append([]string(nil), record.ServicesSupported...),
-		CommittedScore:  committedScore,
-		LastSeenHeight:  height,
-		LastScoreHeight: height,
+		NodeID:			record.NodeID,
+		ScoreBps:		score.ScoreBps,
+		LatencyMillis:		metrics.LatencyMillis,
+		ReliabilityBps:		metrics.ReliabilityBps,
+		Roles:			append([]NodeRole(nil), record.Roles...),
+		ZonesSupported:		append([]string(nil), record.ZonesSupported...),
+		Services:		append([]string(nil), record.ServicesSupported...),
+		CommittedScore:		committedScore,
+		LastSeenHeight:		height,
+		LastScoreHeight:	height,
 	}
 }
 
@@ -497,8 +497,8 @@ func cloneOverlayRouteRoots(roots []OverlayRouteRoot) []OverlayRouteRoot {
 	out := make([]OverlayRouteRoot, len(roots))
 	for i, root := range roots {
 		out[i] = OverlayRouteRoot{
-			OverlayID: normalizeHashText(root.OverlayID),
-			RootHash:  normalizeHashText(root.RootHash),
+			OverlayID:	normalizeHashText(root.OverlayID),
+			RootHash:	normalizeHashText(root.RootHash),
 		}
 	}
 	return out

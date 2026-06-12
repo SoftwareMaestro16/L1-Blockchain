@@ -31,14 +31,14 @@ func TestExecutionGuaranteesForOffChainSignedReplayProtectedCall(t *testing.T) {
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/offchain", true, false)
 	input.ResultProofVerified = true
 	cache, err := NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:         descriptor.ServiceID,
-		DescriptorHash:    coretypes.ComputeServiceDescriptorHash(descriptor),
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		Source:            ServiceResolutionSignedCache,
-		SignatureOptional: testInterfaceHash("cache/signature"),
-		ExpiresHeight:     90,
-		FetchedAtHeight:   40,
-		Trust:             ServiceDiscoveryCacheVerified,
+		ServiceID:		descriptor.ServiceID,
+		DescriptorHash:		coretypes.ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		Source:			ServiceResolutionSignedCache,
+		SignatureOptional:	testInterfaceHash("cache/signature"),
+		ExpiresHeight:		90,
+		FetchedAtHeight:	40,
+		Trust:			ServiceDiscoveryCacheVerified,
 	}, ServiceDiscoveryCacheConstraints{RegistryExpiryHeight: descriptor.ExpiryHeight, CurrentHeight: 40})
 	require.NoError(t, err)
 	input.DiscoveryCache = cache
@@ -108,13 +108,13 @@ func TestExecutionNonGuaranteesKeepAdvisoryCacheAndAvailabilityExplicit(t *testi
 	input := testExecutionGuaranteeInput(t, ctx, descriptor, 1, "guarantee/cache-advisory", true, false)
 	input.ResultProofVerified = true
 	cache, err := NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       descriptor.ServiceID,
-		DescriptorHash:  coretypes.ComputeServiceDescriptorHash(descriptor),
-		InterfaceHash:   descriptor.Interface.InterfaceHash,
-		Source:          ServiceResolutionDistributedMesh,
-		ExpiresHeight:   90,
-		FetchedAtHeight: 40,
-		Trust:           ServiceDiscoveryCacheAdvisory,
+		ServiceID:		descriptor.ServiceID,
+		DescriptorHash:		coretypes.ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		Source:			ServiceResolutionDistributedMesh,
+		ExpiresHeight:		90,
+		FetchedAtHeight:	40,
+		Trust:			ServiceDiscoveryCacheAdvisory,
 	}, ServiceDiscoveryCacheConstraints{RegistryExpiryHeight: descriptor.ExpiryHeight, CurrentHeight: 40})
 	require.NoError(t, err)
 	input.DiscoveryCache = cache
@@ -144,24 +144,24 @@ func testExecutionGuaranteeInput(t *testing.T, ctx coretypes.ServiceConsensusCon
 	paymentModel, err := NewServicePaymentModelFromDescriptor(descriptor)
 	require.NoError(t, err)
 	input := ExecutionGuaranteeInput{
-		Context:      ctx,
-		Descriptor:   descriptor,
-		Call:         call,
-		ReplayProof:  replayProof,
-		Receipt:      receipt,
-		PaymentModel: paymentModel,
+		Context:	ctx,
+		Descriptor:	descriptor,
+		Call:		call,
+		ReplayProof:	replayProof,
+		Receipt:	receipt,
+		PaymentModel:	paymentModel,
 	}
 	if withPenalty {
 		report, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-			ServiceID:             descriptor.ServiceID,
-			ProviderID:            "provider.storage",
-			CallID:                call.CallID,
-			FaultClass:            ProviderFaultInvalidProof,
-			EvidenceHash:          testInterfaceHash(seed + "/fault-evidence"),
-			ProofHash:             testInterfaceHash(seed + "/fault-proof"),
-			ObservedHeight:        ctx.Height,
-			PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral},
-			CollateralSlashAmount: "10",
+			ServiceID:		descriptor.ServiceID,
+			ProviderID:		"provider.storage",
+			CallID:			call.CallID,
+			FaultClass:		ProviderFaultInvalidProof,
+			EvidenceHash:		testInterfaceHash(seed + "/fault-evidence"),
+			ProofHash:		testInterfaceHash(seed + "/fault-proof"),
+			ObservedHeight:		ctx.Height,
+			PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral},
+			CollateralSlashAmount:	"10",
 		})
 		require.NoError(t, err)
 		route, err := NewProviderPenaltyRoute(report, coretypes.NativeFeePolicyID, "treasury.services")
@@ -174,15 +174,15 @@ func testExecutionGuaranteeInput(t *testing.T, ctx coretypes.ServiceConsensusCon
 func testExecutionGuaranteeReceipt(t *testing.T, call UnifiedServiceCall, seed string) ServiceReceipt {
 	t.Helper()
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusExecuted,
-		ResponseHash:   testInterfaceHash(seed + "/response"),
-		ProofHash:      testInterfaceHash(seed + "/proof"),
-		PaymentStatus:  coretypes.ServicePaymentStatusSettled,
-		GasUsed:        3,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: call.CreatedHeight + 1,
-		AnchoredHeight: call.CreatedHeight + 2,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash(seed + "/response"),
+		ProofHash:	testInterfaceHash(seed + "/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	3,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	call.CreatedHeight + 1,
+		AnchoredHeight:	call.CreatedHeight + 2,
 	})
 	require.NoError(t, err)
 	return receipt

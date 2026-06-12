@@ -12,59 +12,59 @@ const MaxOverlayDescriptors = 64
 type OverlayType string
 
 const (
-	OverlayTypeValidator OverlayType = "VALIDATOR_OVERLAY"
-	OverlayTypeZone      OverlayType = "ZONE_OVERLAY"
-	OverlayTypeExecution OverlayType = "EXECUTION_OVERLAY"
-	OverlayTypeData      OverlayType = "DATA_OVERLAY"
-	OverlayTypeService   OverlayType = "SERVICE_OVERLAY"
-	OverlayTypeDiscovery OverlayType = "DISCOVERY_OVERLAY"
-	OverlayTypeStorage   OverlayType = "STORAGE_OVERLAY"
-	OverlayTypeRouting   OverlayType = "ROUTING_OVERLAY"
+	OverlayTypeValidator	OverlayType	= "VALIDATOR_OVERLAY"
+	OverlayTypeZone		OverlayType	= "ZONE_OVERLAY"
+	OverlayTypeExecution	OverlayType	= "EXECUTION_OVERLAY"
+	OverlayTypeData		OverlayType	= "DATA_OVERLAY"
+	OverlayTypeService	OverlayType	= "SERVICE_OVERLAY"
+	OverlayTypeDiscovery	OverlayType	= "DISCOVERY_OVERLAY"
+	OverlayTypeStorage	OverlayType	= "STORAGE_OVERLAY"
+	OverlayTypeRouting	OverlayType	= "ROUTING_OVERLAY"
 )
 
 type OverlayMembershipRule string
 
 const (
-	OverlayMembershipValidatorSet         OverlayMembershipRule = "VALIDATOR_SET"
-	OverlayMembershipZoneSupported        OverlayMembershipRule = "ZONE_SUPPORTED"
-	OverlayMembershipExecutionRole        OverlayMembershipRule = "EXECUTION_ROLE"
-	OverlayMembershipDataProvider         OverlayMembershipRule = "DATA_PROVIDER"
-	OverlayMembershipServiceAdvertisement OverlayMembershipRule = "SERVICE_ADVERTISEMENT"
-	OverlayMembershipSignedDiscovery      OverlayMembershipRule = "SIGNED_DISCOVERY"
-	OverlayMembershipStorageProvider      OverlayMembershipRule = "STORAGE_PROVIDER"
-	OverlayMembershipRoutingRole          OverlayMembershipRule = "ROUTING_ROLE"
+	OverlayMembershipValidatorSet		OverlayMembershipRule	= "VALIDATOR_SET"
+	OverlayMembershipZoneSupported		OverlayMembershipRule	= "ZONE_SUPPORTED"
+	OverlayMembershipExecutionRole		OverlayMembershipRule	= "EXECUTION_ROLE"
+	OverlayMembershipDataProvider		OverlayMembershipRule	= "DATA_PROVIDER"
+	OverlayMembershipServiceAdvertisement	OverlayMembershipRule	= "SERVICE_ADVERTISEMENT"
+	OverlayMembershipSignedDiscovery	OverlayMembershipRule	= "SIGNED_DISCOVERY"
+	OverlayMembershipStorageProvider	OverlayMembershipRule	= "STORAGE_PROVIDER"
+	OverlayMembershipRoutingRole		OverlayMembershipRule	= "ROUTING_ROLE"
 )
 
 type RoutingStrategy string
 
 const (
-	RoutingStrategyDeterministicRoundRobin RoutingStrategy = "DETERMINISTIC_ROUND_ROBIN"
-	RoutingStrategyKBucket                 RoutingStrategy = "K_BUCKET"
-	RoutingStrategyFanoutGossip            RoutingStrategy = "FANOUT_GOSSIP"
-	RoutingStrategyBroadcast               RoutingStrategy = "BROADCAST"
-	RoutingStrategyLowLatencyAdvisory      RoutingStrategy = "LOW_LATENCY_ADVISORY"
-	RoutingStrategyRandomWalkAdvisory      RoutingStrategy = "RANDOM_WALK_ADVISORY"
-	RoutingStrategyShortestLatencyPath     RoutingStrategy = "SHORTEST_LATENCY_PATH"
-	RoutingStrategyZoneLocal               RoutingStrategy = "ZONE_LOCAL"
-	RoutingStrategyProbabilisticGossip     RoutingStrategy = "PROBABILISTIC_GOSSIP_FALLBACK"
-	RoutingStrategyDeterministicShard      RoutingStrategy = "DETERMINISTIC_SHARD"
-	RoutingStrategyPriorityBroadcastTree   RoutingStrategy = "PRIORITY_BROADCAST_TREE"
-	RoutingStrategyServiceProvider         RoutingStrategy = "SERVICE_PROVIDER"
-	RoutingStrategyStorageProvider         RoutingStrategy = "STORAGE_PROVIDER"
+	RoutingStrategyDeterministicRoundRobin	RoutingStrategy	= "DETERMINISTIC_ROUND_ROBIN"
+	RoutingStrategyKBucket			RoutingStrategy	= "K_BUCKET"
+	RoutingStrategyFanoutGossip		RoutingStrategy	= "FANOUT_GOSSIP"
+	RoutingStrategyBroadcast		RoutingStrategy	= "BROADCAST"
+	RoutingStrategyLowLatencyAdvisory	RoutingStrategy	= "LOW_LATENCY_ADVISORY"
+	RoutingStrategyRandomWalkAdvisory	RoutingStrategy	= "RANDOM_WALK_ADVISORY"
+	RoutingStrategyShortestLatencyPath	RoutingStrategy	= "SHORTEST_LATENCY_PATH"
+	RoutingStrategyZoneLocal		RoutingStrategy	= "ZONE_LOCAL"
+	RoutingStrategyProbabilisticGossip	RoutingStrategy	= "PROBABILISTIC_GOSSIP_FALLBACK"
+	RoutingStrategyDeterministicShard	RoutingStrategy	= "DETERMINISTIC_SHARD"
+	RoutingStrategyPriorityBroadcastTree	RoutingStrategy	= "PRIORITY_BROADCAST_TREE"
+	RoutingStrategyServiceProvider		RoutingStrategy	= "SERVICE_PROVIDER"
+	RoutingStrategyStorageProvider		RoutingStrategy	= "STORAGE_PROVIDER"
 )
 
 type OverlayDescriptor struct {
-	OverlayID     string
-	OverlayType   OverlayType
-	PolicyHash    string
-	Membership    OverlayMembershipRule
-	Routing       RoutingStrategy
-	MinPeers      uint32
-	MaxPeers      uint32
-	Fanout        uint32
-	QoSClass      QoSClass
-	ExpiresHeight uint64
-	Version       uint64
+	OverlayID	string
+	OverlayType	OverlayType
+	PolicyHash	string
+	Membership	OverlayMembershipRule
+	Routing		RoutingStrategy
+	MinPeers	uint32
+	MaxPeers	uint32
+	Fanout		uint32
+	QoSClass	QoSClass
+	ExpiresHeight	uint64
+	Version		uint64
 }
 
 func NewOverlayDescriptor(desc OverlayDescriptor) (OverlayDescriptor, error) {
@@ -283,15 +283,15 @@ func IsRoutingStrategy(strategy RoutingStrategy) bool {
 
 func mustOverlayDescriptor(overlayType OverlayType, membership OverlayMembershipRule, routing RoutingStrategy, qos QoSClass, minPeers, maxPeers, fanout uint32) OverlayDescriptor {
 	desc, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: overlayType,
-		PolicyHash:  HashParts("default-overlay-policy", string(overlayType)),
-		Membership:  membership,
-		Routing:     routing,
-		MinPeers:    minPeers,
-		MaxPeers:    maxPeers,
-		Fanout:      fanout,
-		QoSClass:    qos,
-		Version:     1,
+		OverlayType:	overlayType,
+		PolicyHash:	HashParts("default-overlay-policy", string(overlayType)),
+		Membership:	membership,
+		Routing:	routing,
+		MinPeers:	minPeers,
+		MaxPeers:	maxPeers,
+		Fanout:		fanout,
+		QoSClass:	qos,
+		Version:	1,
 	})
 	if err != nil {
 		panic(err)

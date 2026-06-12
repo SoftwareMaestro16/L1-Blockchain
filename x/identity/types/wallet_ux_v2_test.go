@@ -11,11 +11,11 @@ func TestIdentityWalletFallbackStrategyV2OrderedAndNoSilentDowngrade(t *testing.
 	err := IdentityLightClientVerificationErrorV2{Code: IdentityLightClientErrRecordStale, Message: "stale proof"}
 
 	decision := EvaluateIdentityWalletFallbackStrategyV2(err, &cache, IdentityWalletFallbackPolicyV2{
-		CurrentHeight:          24,
-		FreshnessThreshold:     10,
-		AllowVerifiedCache:     true,
-		UserAllowsCache:        true,
-		DirectAddressConfirmed: false,
+		CurrentHeight:		24,
+		FreshnessThreshold:	10,
+		AllowVerifiedCache:	true,
+		UserAllowsCache:	true,
+		DirectAddressConfirmed:	false,
 	})
 	require.Equal(t, IdentityWalletFailureKindStaleProofV2, decision.FailureKind)
 	require.Equal(t, IdentityLightClientErrRecordStale, decision.FailureCode)
@@ -32,10 +32,10 @@ func TestIdentityWalletFallbackStrategyV2OrderedAndNoSilentDowngrade(t *testing.
 
 	expiredCache := walletUXCacheMetadata(t, "alice.aet", 7, 20, 5, 100, 5)
 	decision = EvaluateIdentityWalletFallbackStrategyV2(err, &expiredCache, IdentityWalletFallbackPolicyV2{
-		CurrentHeight:      40,
-		FreshnessThreshold: 5,
-		AllowVerifiedCache: true,
-		UserAllowsCache:    true,
+		CurrentHeight:		40,
+		FreshnessThreshold:	5,
+		AllowVerifiedCache:	true,
+		UserAllowsCache:	true,
 	})
 	require.False(t, decision.UseVerifiedCache)
 	require.Contains(t, decision.CacheRejectedReason, "stale")
@@ -43,8 +43,8 @@ func TestIdentityWalletFallbackStrategyV2OrderedAndNoSilentDowngrade(t *testing.
 
 func TestIdentityWalletFallbackStrategyV2ClassifiesProofFailures(t *testing.T) {
 	cases := []struct {
-		code IdentityLightClientFailureCodeV2
-		kind IdentityWalletProofFailureKindV2
+		code	IdentityLightClientFailureCodeV2
+		kind	IdentityWalletProofFailureKindV2
 	}{
 		{IdentityLightClientErrRecordStale, IdentityWalletFailureKindStaleProofV2},
 		{IdentityLightClientErrDomainNotFound, IdentityWalletFailureKindMissingProofV2},
@@ -65,23 +65,23 @@ func TestIdentityWalletFallbackStrategyV2ClassifiesProofFailures(t *testing.T) {
 
 func TestIdentityWalletResolutionUXV2StatesAndSendOverrideAudit(t *testing.T) {
 	target := &IdentityLightClientVerifiedTargetV2{
-		Name:             "alice.aet",
-		NameHash:         identityHash("alice"),
-		TargetType:       IdentityResolutionTargetPrimary,
-		Address:          addr(2),
-		RecordVersion:    7,
-		FreshUntilHeight: 50,
-		ProofHeight:      20,
+		Name:			"alice.aet",
+		NameHash:		identityHash("alice"),
+		TargetType:		IdentityResolutionTargetPrimary,
+		Address:		addr(2),
+		RecordVersion:		7,
+		FreshUntilHeight:	50,
+		ProofHeight:		20,
 	}
 	cache := walletUXCacheMetadata(t, "alice.aet", 7, 20, 30, 100, 10)
 	current, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:          "alice.aet",
-		Target:        target,
-		CacheMetadata: &cache,
+		Name:		"alice.aet",
+		Target:		target,
+		CacheMetadata:	&cache,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:          IdentityWalletOperationSendByNameV2,
-			CurrentHeight:      24,
-			FreshnessThreshold: 10,
+			Operation:		IdentityWalletOperationSendByNameV2,
+			CurrentHeight:		24,
+			FreshnessThreshold:	10,
 		},
 	})
 	require.NoError(t, err)
@@ -92,13 +92,13 @@ func TestIdentityWalletResolutionUXV2StatesAndSendOverrideAudit(t *testing.T) {
 	require.Contains(t, current.CacheMetadata.AdvancedDetails, "proof_height=20")
 
 	stale, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:          "alice.aet",
-		Target:        target,
-		CacheMetadata: &cache,
+		Name:		"alice.aet",
+		Target:		target,
+		CacheMetadata:	&cache,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:          IdentityWalletOperationSendByNameV2,
-			CurrentHeight:      40,
-			FreshnessThreshold: 10,
+			Operation:		IdentityWalletOperationSendByNameV2,
+			CurrentHeight:		40,
+			FreshnessThreshold:	10,
 		},
 	})
 	require.NoError(t, err)
@@ -109,16 +109,16 @@ func TestIdentityWalletResolutionUXV2StatesAndSendOverrideAudit(t *testing.T) {
 
 	proofErr := IdentityLightClientVerificationErrorV2{Code: IdentityLightClientErrProofInvalid, Message: "bad proof"}
 	override, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:                  "alice.aet",
-		ProofError:            proofErr,
-		CacheMetadata:         &cache,
-		DirectAddress:         addr(9),
-		OverrideReason:        "user entered address after proof failure",
-		OverrideCreatedHeight: 42,
+		Name:			"alice.aet",
+		ProofError:		proofErr,
+		CacheMetadata:		&cache,
+		DirectAddress:		addr(9),
+		OverrideReason:		"user entered address after proof failure",
+		OverrideCreatedHeight:	42,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:              IdentityWalletOperationSendByNameV2,
-			CurrentHeight:          42,
-			DirectAddressConfirmed: true,
+			Operation:		IdentityWalletOperationSendByNameV2,
+			CurrentHeight:		42,
+			DirectAddressConfirmed:	true,
 		},
 	})
 	require.NoError(t, err)
@@ -150,15 +150,15 @@ func TestIdentityWalletResolutionUXV2DisplayStatesAndInvokeRules(t *testing.T) {
 	require.Equal(t, IdentityWalletStateExpiredV2, expired.State)
 
 	invoke, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:   "alice.aet",
-		Target: target,
+		Name:	"alice.aet",
+		Target:	target,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:              IdentityWalletOperationInvokeByNameV2,
-			CurrentHeight:          21,
-			FreshnessThreshold:     10,
-			ContractTargetVerified: true,
-			InterfaceProofRequired: true,
-			InterfaceProofVerified: true,
+			Operation:		IdentityWalletOperationInvokeByNameV2,
+			CurrentHeight:		21,
+			FreshnessThreshold:	10,
+			ContractTargetVerified:	true,
+			InterfaceProofRequired:	true,
+			InterfaceProofVerified:	true,
 		},
 	})
 	require.NoError(t, err)
@@ -167,15 +167,15 @@ func TestIdentityWalletResolutionUXV2DisplayStatesAndInvokeRules(t *testing.T) {
 	require.False(t, invoke.AutoGeneratedUIDisabled)
 
 	interfaceFailed, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:   "alice.aet",
-		Target: target,
+		Name:	"alice.aet",
+		Target:	target,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:              IdentityWalletOperationInvokeByNameV2,
-			CurrentHeight:          21,
-			FreshnessThreshold:     10,
-			ContractTargetVerified: true,
-			InterfaceProofRequired: true,
-			InterfaceProofVerified: false,
+			Operation:		IdentityWalletOperationInvokeByNameV2,
+			CurrentHeight:		21,
+			FreshnessThreshold:	10,
+			ContractTargetVerified:	true,
+			InterfaceProofRequired:	true,
+			InterfaceProofVerified:	false,
 		},
 	})
 	require.NoError(t, err)
@@ -183,13 +183,13 @@ func TestIdentityWalletResolutionUXV2DisplayStatesAndInvokeRules(t *testing.T) {
 	require.True(t, interfaceFailed.AutoGeneratedUIDisabled)
 
 	reverse, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:   "alice.aet",
-		Target: target,
+		Name:	"alice.aet",
+		Target:	target,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:          IdentityWalletOperationReverseLookupV2,
-			CurrentHeight:      21,
-			FreshnessThreshold: 10,
-			ReverseLookup:      true,
+			Operation:		IdentityWalletOperationReverseLookupV2,
+			CurrentHeight:		21,
+			FreshnessThreshold:	10,
+			ReverseLookup:		true,
 		},
 	})
 	require.NoError(t, err)
@@ -208,14 +208,14 @@ func TestIdentityWalletProofCacheMetadataV2FormatAndServiceDetails(t *testing.T)
 	require.Contains(t, meta.AdvancedDetails, "ttl=25")
 
 	ux, err := BuildIdentityWalletResolutionUXV2(IdentityWalletResolutionUXRequestV2{
-		Name:          "alice.aet",
-		Target:        &IdentityLightClientVerifiedTargetV2{Name: "alice.aet", RecordVersion: 9, ProofHeight: 30, FreshUntilHeight: 45},
-		CacheMetadata: &cache,
+		Name:		"alice.aet",
+		Target:		&IdentityLightClientVerifiedTargetV2{Name: "alice.aet", RecordVersion: 9, ProofHeight: 30, FreshUntilHeight: 45},
+		CacheMetadata:	&cache,
 		Policy: IdentityWalletUXPolicyV2{
-			Operation:          IdentityWalletOperationServiceLookupV2,
-			CurrentHeight:      34,
-			FreshnessThreshold: 15,
-			ServiceEndpoint:    true,
+			Operation:		IdentityWalletOperationServiceLookupV2,
+			CurrentHeight:		34,
+			FreshnessThreshold:	15,
+			ServiceEndpoint:	true,
 		},
 	})
 	require.NoError(t, err)

@@ -6,105 +6,105 @@ import (
 )
 
 const (
-	IdentityServiceTypeRPCV1       = "rpc.v1"
-	IdentityServiceTypeIndexerV1   = "indexer.v1"
-	IdentityServiceTypeGatewayV1   = "gateway.v1"
-	IdentityServiceTypeGenericV1   = "service.v1"
-	IdentityRenderPolicyConfirmV2  = "wallet_confirm"
-	IdentityRenderPolicyReadOnlyV2 = "read_only"
-	IdentityRenderPolicyFormV1     = "form.v1"
+	IdentityServiceTypeRPCV1	= "rpc.v1"
+	IdentityServiceTypeIndexerV1	= "indexer.v1"
+	IdentityServiceTypeGatewayV1	= "gateway.v1"
+	IdentityServiceTypeGenericV1	= "service.v1"
+	IdentityRenderPolicyConfirmV2	= "wallet_confirm"
+	IdentityRenderPolicyReadOnlyV2	= "read_only"
+	IdentityRenderPolicyFormV1	= "form.v1"
 )
 
 type IdentityServiceEndpointTypeV2 struct {
-	ServiceType         string
-	SupportedTransports []string
-	AllowedAuthPolicies []string
-	SchemaHashOptional  string
+	ServiceType		string
+	SupportedTransports	[]string
+	AllowedAuthPolicies	[]string
+	SchemaHashOptional	string
 }
 
 type IdentityServiceDiscoveryRequestV2 struct {
-	Name                  string
-	ServiceID             string
-	SupportedTransports   []string
-	AllowedAuthPolicies   []string
-	SupportedServiceTypes []string
-	ExternalMetadata      string
-	State                 IdentityState
-	Height                uint64
-	RecordTTL             uint64
-	CurrentHeight         uint64
-	FreshnessThreshold    uint64
+	Name			string
+	ServiceID		string
+	SupportedTransports	[]string
+	AllowedAuthPolicies	[]string
+	SupportedServiceTypes	[]string
+	ExternalMetadata	string
+	State			IdentityState
+	Height			uint64
+	RecordTTL		uint64
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
 
-	ExpectedChainID string
-	TrustedHeader   IdentityTrustedHeaderV2
-	Proof           *IdentityResolutionProofFormatV2
+	ExpectedChainID	string
+	TrustedHeader	IdentityTrustedHeaderV2
+	Proof		*IdentityResolutionProofFormatV2
 }
 
 type IdentityServiceDiscoveryResultV2 struct {
-	Endpoint                                ServiceEndpointV2
-	FallbackEndpoints                       []ServiceEndpointV2
-	DisplayPolicy                           IdentityServiceEndpointDisplayPolicyV2
-	TypeRegistryMatched                     bool
-	MetadataHashVerified                    bool
-	ProofVerified                           bool
-	ProofHeight                             uint64
-	RecordVersion                           uint64
-	FreshUntilHeight                        uint64
-	FreshnessWarning                        bool
-	EndpointTTLRespected                    bool
-	EndpointAvailabilityConsensusGuaranteed bool
+	Endpoint				ServiceEndpointV2
+	FallbackEndpoints			[]ServiceEndpointV2
+	DisplayPolicy				IdentityServiceEndpointDisplayPolicyV2
+	TypeRegistryMatched			bool
+	MetadataHashVerified			bool
+	ProofVerified				bool
+	ProofHeight				uint64
+	RecordVersion				uint64
+	FreshUntilHeight			uint64
+	FreshnessWarning			bool
+	EndpointTTLRespected			bool
+	EndpointAvailabilityConsensusGuaranteed	bool
 }
 
 type IdentityServiceEndpointDisplayPolicyV2 struct {
-	DisplayEndpoint               bool
-	DisplayAsVerifiedService      bool
-	DisplayAsVerifiedOwnership    bool
-	DisplayMetadataAsOwnership    bool
-	MetadataHashVerified          bool
-	ProofVerified                 bool
-	EndpointAvailabilityAdvisory  bool
-	OwnershipVerificationSource   string
-	UserFacingVerificationWarning string
+	DisplayEndpoint			bool
+	DisplayAsVerifiedService	bool
+	DisplayAsVerifiedOwnership	bool
+	DisplayMetadataAsOwnership	bool
+	MetadataHashVerified		bool
+	ProofVerified			bool
+	EndpointAvailabilityAdvisory	bool
+	OwnershipVerificationSource	string
+	UserFacingVerificationWarning	string
 }
 
 type IdentityInterfaceWalletPolicyV2 struct {
-	SupportedRenderPolicies []string
-	RequireUserConfirmation bool
-	AllowExternalSchemas    bool
-	AllowInlineSchemas      bool
+	SupportedRenderPolicies	[]string
+	RequireUserConfirmation	bool
+	AllowExternalSchemas	bool
+	AllowInlineSchemas	bool
 }
 
 type IdentityInterfaceSchemaRequestV2 struct {
-	Name               string
-	InterfaceID        string
-	ExpectedSchemaHash string
-	ExternalSchema     string
-	WalletPolicy       IdentityInterfaceWalletPolicyV2
-	State              IdentityState
-	Height             uint64
-	RecordTTL          uint64
-	CurrentHeight      uint64
-	FreshnessThreshold uint64
+	Name			string
+	InterfaceID		string
+	ExpectedSchemaHash	string
+	ExternalSchema		string
+	WalletPolicy		IdentityInterfaceWalletPolicyV2
+	State			IdentityState
+	Height			uint64
+	RecordTTL		uint64
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
 
-	ExpectedChainID string
-	TrustedHeader   IdentityTrustedHeaderV2
-	Proof           *IdentityResolutionProofFormatV2
+	ExpectedChainID	string
+	TrustedHeader	IdentityTrustedHeaderV2
+	Proof		*IdentityResolutionProofFormatV2
 }
 
 type IdentityInterfaceSchemaResultV2 struct {
-	Descriptor                 InterfaceDescriptorV2
-	SchemaHash                 string
-	SchemaSource               string
-	SchemaHashVerified         bool
-	ExternalSchemaHashVerified bool
-	RenderPolicySupported      bool
-	UserConfirmationRequired   bool
-	ExecutionTargetImmutable   bool
-	ProofVerified              bool
-	ProofHeight                uint64
-	RecordVersion              uint64
-	FreshUntilHeight           uint64
-	FreshnessWarning           bool
+	Descriptor			InterfaceDescriptorV2
+	SchemaHash			string
+	SchemaSource			string
+	SchemaHashVerified		bool
+	ExternalSchemaHashVerified	bool
+	RenderPolicySupported		bool
+	UserConfirmationRequired	bool
+	ExecutionTargetImmutable	bool
+	ProofVerified			bool
+	ProofHeight			uint64
+	RecordVersion			uint64
+	FreshUntilHeight		uint64
+	FreshnessWarning		bool
 }
 
 func DefaultIdentityServiceEndpointTypeRegistryV2() []IdentityServiceEndpointTypeV2 {
@@ -118,10 +118,10 @@ func DefaultIdentityServiceEndpointTypeRegistryV2() []IdentityServiceEndpointTyp
 
 func DefaultIdentityInterfaceWalletPolicyV2() IdentityInterfaceWalletPolicyV2 {
 	return IdentityInterfaceWalletPolicyV2{
-		SupportedRenderPolicies: []string{IdentityRenderPolicyConfirmV2, IdentityRenderPolicyReadOnlyV2, IdentityRenderPolicyFormV1},
-		RequireUserConfirmation: true,
-		AllowExternalSchemas:    true,
-		AllowInlineSchemas:      true,
+		SupportedRenderPolicies:	[]string{IdentityRenderPolicyConfirmV2, IdentityRenderPolicyReadOnlyV2, IdentityRenderPolicyFormV1},
+		RequireUserConfirmation:	true,
+		AllowExternalSchemas:		true,
+		AllowInlineSchemas:		true,
 	}
 }
 
@@ -146,32 +146,32 @@ func BuildIdentityServiceDiscoveryV2(request IdentityServiceDiscoveryRequestV2) 
 	fallbacks := append([]ServiceEndpointV2(nil), endpoints[1:]...)
 	displayPolicy := BuildIdentityServiceEndpointDisplayPolicyV2(proofVerified, metadataVerified)
 	return IdentityServiceDiscoveryResultV2{
-		Endpoint:                                selected,
-		FallbackEndpoints:                       fallbacks,
-		DisplayPolicy:                           displayPolicy,
-		TypeRegistryMatched:                     serviceEndpointMatchesRegistryV2(selected, DefaultIdentityServiceEndpointTypeRegistryV2()),
-		MetadataHashVerified:                    metadataVerified,
-		ProofVerified:                           proofVerified,
-		ProofHeight:                             proofHeight,
-		RecordVersion:                           recordVersion,
-		FreshUntilHeight:                        freshUntil,
-		FreshnessWarning:                        EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
-		EndpointTTLRespected:                    endpointTTLRespectedV2(selected, request.CurrentHeight, proofHeight),
-		EndpointAvailabilityConsensusGuaranteed: false,
+		Endpoint:					selected,
+		FallbackEndpoints:				fallbacks,
+		DisplayPolicy:					displayPolicy,
+		TypeRegistryMatched:				serviceEndpointMatchesRegistryV2(selected, DefaultIdentityServiceEndpointTypeRegistryV2()),
+		MetadataHashVerified:				metadataVerified,
+		ProofVerified:					proofVerified,
+		ProofHeight:					proofHeight,
+		RecordVersion:					recordVersion,
+		FreshUntilHeight:				freshUntil,
+		FreshnessWarning:				EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
+		EndpointTTLRespected:				endpointTTLRespectedV2(selected, request.CurrentHeight, proofHeight),
+		EndpointAvailabilityConsensusGuaranteed:	false,
 	}, nil
 }
 
 func BuildIdentityServiceEndpointDisplayPolicyV2(proofVerified bool, metadataHashVerified bool) IdentityServiceEndpointDisplayPolicyV2 {
 	return IdentityServiceEndpointDisplayPolicyV2{
-		DisplayEndpoint:               true,
-		DisplayAsVerifiedService:      proofVerified,
-		DisplayAsVerifiedOwnership:    false,
-		DisplayMetadataAsOwnership:    false,
-		MetadataHashVerified:          metadataHashVerified,
-		ProofVerified:                 proofVerified,
-		EndpointAvailabilityAdvisory:  true,
-		OwnershipVerificationSource:   "registry_nft_binding",
-		UserFacingVerificationWarning: "service endpoint metadata is not verified ownership",
+		DisplayEndpoint:		true,
+		DisplayAsVerifiedService:	proofVerified,
+		DisplayAsVerifiedOwnership:	false,
+		DisplayMetadataAsOwnership:	false,
+		MetadataHashVerified:		metadataHashVerified,
+		ProofVerified:			proofVerified,
+		EndpointAvailabilityAdvisory:	true,
+		OwnershipVerificationSource:	"registry_nft_binding",
+		UserFacingVerificationWarning:	"service endpoint metadata is not verified ownership",
 	}
 }
 
@@ -217,19 +217,19 @@ func BuildIdentityInterfaceSchemaMappingV2(request IdentityInterfaceSchemaReques
 		return IdentityInterfaceSchemaResultV2{}, err
 	}
 	return IdentityInterfaceSchemaResultV2{
-		Descriptor:                 *descriptor,
-		SchemaHash:                 schemaHash,
-		SchemaSource:               source,
-		SchemaHashVerified:         true,
-		ExternalSchemaHashVerified: externalVerified,
-		RenderPolicySupported:      IdentityInterfaceRenderPolicySupportedV2(*descriptor, policy),
-		UserConfirmationRequired:   policy.RequireUserConfirmation,
-		ExecutionTargetImmutable:   true,
-		ProofVerified:              proofVerified,
-		ProofHeight:                proofHeight,
-		RecordVersion:              recordVersion,
-		FreshUntilHeight:           freshUntil,
-		FreshnessWarning:           EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
+		Descriptor:			*descriptor,
+		SchemaHash:			schemaHash,
+		SchemaSource:			source,
+		SchemaHashVerified:		true,
+		ExternalSchemaHashVerified:	externalVerified,
+		RenderPolicySupported:		IdentityInterfaceRenderPolicySupportedV2(*descriptor, policy),
+		UserConfirmationRequired:	policy.RequireUserConfirmation,
+		ExecutionTargetImmutable:	true,
+		ProofVerified:			proofVerified,
+		ProofHeight:			proofHeight,
+		RecordVersion:			recordVersion,
+		FreshUntilHeight:		freshUntil,
+		FreshnessWarning:		EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
 	}, nil
 }
 
@@ -250,15 +250,15 @@ func unifiedRecordForServiceInterfaceRequestV2(name string, state IdentityState,
 	}
 	if proof != nil {
 		target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-			ExpectedChainID:      expectedChainID,
-			RequestedName:        normalized,
-			TrustedHeader:        trustedHeader,
-			Proof:                *proof,
-			TargetType:           targetType,
-			TargetKey:            targetKey,
-			CurrentHeight:        currentHeight,
-			AllowRenewalWindow:   true,
-			NormalizationVersion: NameNormalizationVersionV2,
+			ExpectedChainID:	expectedChainID,
+			RequestedName:		normalized,
+			TrustedHeader:		trustedHeader,
+			Proof:			*proof,
+			TargetType:		targetType,
+			TargetKey:		targetKey,
+			CurrentHeight:		currentHeight,
+			AllowRenewalWindow:	true,
+			NormalizationVersion:	NameNormalizationVersionV2,
 		})
 		if err != nil {
 			return UnifiedResolutionRecordV2{}, false, 0, 0, 0, err

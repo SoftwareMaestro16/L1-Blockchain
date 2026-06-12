@@ -91,18 +91,18 @@ func TestReservedSystemBankSendPolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, found)
 	_, err = msgServer.Send(ctx, &banktypes.MsgSend{
-		FromAddress: sender.String(),
-		ToAddress:   mint.Raw,
-		Amount:      sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
+		FromAddress:	sender.String(),
+		ToAddress:	mint.Raw,
+		Amount:		sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 1)),
 	})
 	require.ErrorContains(t, err, "not allowed to receive funds")
 
 	burn, found := ReservedSystemModuleAccountByName("AETBurn")
 	require.True(t, found)
 	_, err = msgServer.Send(ctx, &banktypes.MsgSend{
-		FromAddress: sender.String(),
-		ToAddress:   burn.Raw,
-		Amount:      sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 2)),
+		FromAddress:	sender.String(),
+		ToAddress:	burn.Raw,
+		Amount:		sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 2)),
 	})
 	require.NoError(t, err)
 

@@ -128,14 +128,14 @@ func testServiceReceiptForReceipts(t *testing.T, nonce uint64) (ServiceReceipt, 
 	call.CallID = coretypes.NormalizeServiceCall(ctx, call.ToServiceCallEnvelope()).CallID
 	call.UnifiedCallHash = ComputeUnifiedServiceCallHash(call)
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusExecuted,
-		ResponseHash:   testInterfaceHash("servicereceipts/response"),
-		ProofHash:      testInterfaceHash("servicereceipts/proof"),
-		PaymentStatus:  coretypes.ServicePaymentStatusSettled,
-		GasUsed:        17,
-		ExecutedHeight: ctx.Height,
-		AnchoredHeight: ctx.Height,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("servicereceipts/response"),
+		ProofHash:	testInterfaceHash("servicereceipts/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	17,
+		ExecutedHeight:	ctx.Height,
+		AnchoredHeight:	ctx.Height,
 	})
 	require.NoError(t, err)
 	return receipt, call

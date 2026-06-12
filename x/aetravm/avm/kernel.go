@@ -9,17 +9,6 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Task 4.X: Execution Kernel Architecture Upgrade
-// ---------------
-// AVM operates as: Stack Machine + Continuation Engine + Chunk DAG State Model
-// All memory, state, and execution context expressed via Chunks, ChunkMaps, and typed VM values.
-// No mutable heap or linear memory. All execution state representable in ExecutionFrame.
-
-// ---------------
-// ContinuationSlot (replaces TVM c0-c7 concept)
-// ---------------
-
 // ContinuationSlot defines the 4 continuation pointers for AVM control flow.
 // Replaces the TVM c0-c7 model with a deterministic, continuation-driven system.
 //
@@ -31,10 +20,10 @@ import (
 //   - All slots are IMMUTABLE during execution
 //   - Slots are replaced ONLY via continuation transitions
 type ContinuationSlot struct {
-	ReturnPtr       uint32
-	AltReturnPtr    uint32
-	ErrorHandlerPtr uint32
-	DispatcherPtr   uint32
+	ReturnPtr	uint32
+	AltReturnPtr	uint32
+	ErrorHandlerPtr	uint32
+	DispatcherPtr	uint32
 }
 
 // ExecutionSlot defines named VM control registers (rebranded from TVM c0-c7).
@@ -42,13 +31,13 @@ type ContinuationSlot struct {
 type ExecutionSlot int
 
 const (
-	SlotReturn     ExecutionSlot = iota // Normal continuation
-	SlotAltReturn                       // Alternate continuation (e.g., bounced)
-	SlotError                           // Exception handler
-	SlotDispatch                        // Contract entry resolver
-	SlotState                           // StateRootChunk reference
-	SlotActions                        // ActionQueueChunk reference
-	SlotEnv                             // ExecutionContextChunk reference
+	SlotReturn	ExecutionSlot	= iota	// Normal continuation
+	SlotAltReturn				// Alternate continuation (e.g., bounced)
+	SlotError				// Exception handler
+	SlotDispatch				// Contract entry resolver
+	SlotState				// StateRootChunk reference
+	SlotActions				// ActionQueueChunk reference
+	SlotEnv					// ExecutionContextChunk reference
 )
 
 func (s ExecutionSlot) String() string {
@@ -72,21 +61,17 @@ func (s ExecutionSlot) String() string {
 	}
 }
 
-// ---------------
-// Structured ExitCode Model
-// ---------------
-
 // ExitCategory defines the category of an AVM exit code.
 type ExitCategory uint8
 
 const (
-	ExitCategorySuccess       ExitCategory = 0
-	ExitCategoryVMError       ExitCategory = 1
-	ExitCategoryTypeError     ExitCategory = 2
-	ExitCategoryExecutionError ExitCategory = 3
-	ExitCategoryActionError   ExitCategory = 4
-	ExitCategoryStateError    ExitCategory = 5
-	ExitCategoryGasError      ExitCategory = 6
+	ExitCategorySuccess		ExitCategory	= 0
+	ExitCategoryVMError		ExitCategory	= 1
+	ExitCategoryTypeError		ExitCategory	= 2
+	ExitCategoryExecutionError	ExitCategory	= 3
+	ExitCategoryActionError		ExitCategory	= 4
+	ExitCategoryStateError		ExitCategory	= 5
+	ExitCategoryGasError		ExitCategory	= 6
 )
 
 func (c ExitCategory) String() string {
@@ -117,9 +102,9 @@ func (c ExitCategory) String() string {
 //   - Only SUCCESS reaches commit phase
 //   - All failures produce deterministic receipt
 type StructuredExitCode struct {
-	Category   ExitCategory
-	Subcode    uint16
-	MessageHex string
+	Category	ExitCategory
+	Subcode		uint16
+	MessageHex	string
 }
 
 func (e StructuredExitCode) ToUint32() uint32 {
@@ -128,37 +113,33 @@ func (e StructuredExitCode) ToUint32() uint32 {
 
 func StructuredExitCodeFromUint32(code uint32) StructuredExitCode {
 	return StructuredExitCode{
-		Category: ExitCategory(code >> 16),
-		Subcode:  uint16(code & 0xFFFF),
+		Category:	ExitCategory(code >> 16),
+		Subcode:	uint16(code & 0xFFFF),
 	}
 }
 
 // Predefined structured exit codes
 var (
-	ExitSuccess          = StructuredExitCode{ExitCategorySuccess, 0, ""}
-	ExitValidationFailed = StructuredExitCode{ExitCategoryVMError, 1, ""}
-	ExitUnauthorized     = StructuredExitCode{ExitCategoryVMError, 2, ""}
-	ExitStackOverflow    = StructuredExitCode{ExitCategoryVMError, 3, ""}
-	ExitStackUnderflow   = StructuredExitCode{ExitCategoryVMError, 4, ""}
-	ExitInvalidJump      = StructuredExitCode{ExitCategoryVMError, 5, ""}
-	ExitCallStackOverflow = StructuredExitCode{ExitCategoryVMError, 6, ""}
-	ExitTypeMismatch     = StructuredExitCode{ExitCategoryTypeError, 1, ""}
-	ExitInvalidDecode    = StructuredExitCode{ExitCategoryTypeError, 2, ""}
-	ExitChunkError       = StructuredExitCode{ExitCategoryStateError, 1, ""}
-	ExitStateCorruption = StructuredExitCode{ExitCategoryStateError, 2, ""}
-	ExitStateMutation   = StructuredExitCode{ExitCategoryStateError, 3, ""}
-	ExitDivZero         = StructuredExitCode{ExitCategoryExecutionError, 1, ""}
-	ExitOverflow        = StructuredExitCode{ExitCategoryExecutionError, 2, ""}
-	ExitGasExhausted   = StructuredExitCode{ExitCategoryGasError, 1, ""}
-	ExitGasLimit       = StructuredExitCode{ExitCategoryGasError, 2, ""}
-	ExitActionBudget   = StructuredExitCode{ExitCategoryActionError, 1, ""}
-	ExitContractAbort  = StructuredExitCode{ExitCategoryExecutionError, 3, ""}
-	ExitForbiddenCall  = StructuredExitCode{ExitCategoryVMError, 7, ""}
+	ExitSuccess		= StructuredExitCode{ExitCategorySuccess, 0, ""}
+	ExitValidationFailed	= StructuredExitCode{ExitCategoryVMError, 1, ""}
+	ExitUnauthorized	= StructuredExitCode{ExitCategoryVMError, 2, ""}
+	ExitStackOverflow	= StructuredExitCode{ExitCategoryVMError, 3, ""}
+	ExitStackUnderflow	= StructuredExitCode{ExitCategoryVMError, 4, ""}
+	ExitInvalidJump		= StructuredExitCode{ExitCategoryVMError, 5, ""}
+	ExitCallStackOverflow	= StructuredExitCode{ExitCategoryVMError, 6, ""}
+	ExitTypeMismatch	= StructuredExitCode{ExitCategoryTypeError, 1, ""}
+	ExitInvalidDecode	= StructuredExitCode{ExitCategoryTypeError, 2, ""}
+	ExitChunkError		= StructuredExitCode{ExitCategoryStateError, 1, ""}
+	ExitStateCorruption	= StructuredExitCode{ExitCategoryStateError, 2, ""}
+	ExitStateMutation	= StructuredExitCode{ExitCategoryStateError, 3, ""}
+	ExitDivZero		= StructuredExitCode{ExitCategoryExecutionError, 1, ""}
+	ExitOverflow		= StructuredExitCode{ExitCategoryExecutionError, 2, ""}
+	ExitGasExhausted	= StructuredExitCode{ExitCategoryGasError, 1, ""}
+	ExitGasLimit		= StructuredExitCode{ExitCategoryGasError, 2, ""}
+	ExitActionBudget	= StructuredExitCode{ExitCategoryActionError, 1, ""}
+	ExitContractAbort	= StructuredExitCode{ExitCategoryExecutionError, 3, ""}
+	ExitForbiddenCall	= StructuredExitCode{ExitCategoryVMError, 7, ""}
 )
-
-// ---------------
-// ExecutionContextChunk (BlockContext Integration)
-// ---------------
 
 // ExecutionContextChunk replaces the runtime tuple with an immutable,
 // content-addressed environment chunk.
@@ -169,14 +150,14 @@ var (
 //   - All values come from block-provided context
 //   - Immutable during execution
 type ExecutionContextChunk struct {
-	Caller          string
-	Origin          string
-	AttachedValue   uint64
-	BlockHeight     int64
-	ChainID         string
-	ContractAddress string
-	MessageHash     []byte
-	Timestamp       int64
+	Caller		string
+	Origin		string
+	AttachedValue	uint64
+	BlockHeight	int64
+	ChainID		string
+	ContractAddress	string
+	MessageHash	[]byte
+	Timestamp	int64
 }
 
 // ToChunk encodes the ExecutionContextChunk into an immutable Chunk.
@@ -204,19 +185,15 @@ func (ctx ExecutionContextChunk) ToChunk() (*chunk.Chunk, error) {
 // FromBlockContext creates an ExecutionContextChunk from an existing BlockContext.
 func ExecutionContextFromBlockContext(blockCtx BlockContext, msg Message) ExecutionContextChunk {
 	return ExecutionContextChunk{
-		Caller:          msg.Sender,
-		AttachedValue:   msg.Value,
-		BlockHeight:     blockCtx.Height,
-		ChainID:         blockCtx.ChainID,
-		ContractAddress: msg.Target,
-		MessageHash:     msg.Hash,
-		Timestamp:       blockCtx.Timestamp,
+		Caller:			msg.Sender,
+		AttachedValue:		msg.Value,
+		BlockHeight:		blockCtx.Height,
+		ChainID:		blockCtx.ChainID,
+		ContractAddress:	msg.Target,
+		MessageHash:		msg.Hash,
+		Timestamp:		blockCtx.Timestamp,
 	}
 }
-
-// ---------------
-// ActionQueueChunk (Message + Action System)
-// ---------------
 
 // ActionQueueChunk represents the accumulated actions during execution.
 // Actions are NOT executed immediately — they are flushed only during Finalization Phase.
@@ -228,43 +205,43 @@ func ExecutionContextFromBlockContext(blockCtx BlockContext, msg Message) Execut
 //   - Actions are flushed only during Finalization Phase
 //   - No mutation of existing queue entries
 type ActionQueueChunk struct {
-	Actions []Action
-	Hash    []byte
+	Actions	[]Action
+	Hash	[]byte
 }
 
 // NewActionQueueChunk creates an empty action queue.
 func NewActionQueueChunk() *ActionQueueChunk {
 	return &ActionQueueChunk{
-		Actions: make([]Action, 0),
-		Hash:    nil,
+		Actions:	make([]Action, 0),
+		Hash:		nil,
 	}
 }
 
 // EmitAction adds an action to the queue (accumulated during compute phase).
 func (q *ActionQueueChunk) EmitAction(actionType ActionType, target string, payload *chunk.Chunk, value uint64) {
 	q.Actions = append(q.Actions, Action{
-		Type:    actionType,
-		Target:  target,
-		Payload: payload,
-		Value:   value,
+		Type:		actionType,
+		Target:		target,
+		Payload:	payload,
+		Value:		value,
 	})
 }
 
 // EmitMessage adds an internal message action.
 func (q *ActionQueueChunk) EmitMessage(target string, payload *chunk.Chunk, value uint64, gasLimit uint64) {
 	q.Actions = append(q.Actions, Action{
-		Type:     ActionInternal,
-		Target:   target,
-		Payload:  payload,
-		Value:    value,
+		Type:		ActionInternal,
+		Target:		target,
+		Payload:	payload,
+		Value:		value,
 	})
 }
 
 // EmitEvent adds an event notification.
 func (q *ActionQueueChunk) EmitEvent(payload *chunk.Chunk) {
 	q.Actions = append(q.Actions, Action{
-		Type:    ActionEvent,
-		Payload: payload,
+		Type:		ActionEvent,
+		Payload:	payload,
 	})
 }
 
@@ -294,10 +271,6 @@ func sortActionsCanonical(actions []Action) {
 		return actions[i].Target < actions[j].Target
 	})
 }
-
-// ---------------
-// StateRootChunk Model
-// ---------------
 
 // StateRootChunk represents the immutable root of contract state.
 // All persistent contract state MUST be stored in Chunk graphs.
@@ -335,109 +308,101 @@ func (s *StateRootChunk) RootHash() []byte {
 	return s.Root.Hash()
 }
 
-// ---------------
-// Extended ExecutionFrame with Continuation + Chunk DAG
-// ---------------
-
 // KernelExecutionFrame is the expanded VM context layer for the kernel architecture.
 //
-// ExecutionFrame {
-//   ip (instruction pointer)
-//   stack_snapshot
-//   local_context_chunk
-//   continuation_slot
-//   env_chunk
-//   pending_actions
-//   error_state
-// }
+//	ExecutionFrame {
+//	  ip (instruction pointer)
+//	  stack_snapshot
+//	  local_context_chunk
+//	  continuation_slot
+//	  env_chunk
+//	  pending_actions
+//	  error_state
+//	}
 type KernelExecutionFrame struct {
 	// Instruction pointer
-	IP uint32
+	IP	uint32
 
 	// Typed evaluation stack: int256, bool, ChunkRef, ExecutionFrameRef, tuple, address, hash
-	Stack []StackValue
+	Stack	[]StackValue
 
 	// Continuation slot (replaces call stack)
-	Continuation ContinuationSlot
+	Continuation	ContinuationSlot
 
 	// Current execution phase
-	Phase Phase
+	Phase	Phase
 
 	// Immutable state snapshot (read-only)
-	StateSnapshot *chunk.Chunk
+	StateSnapshot	*chunk.Chunk
 
 	// Working state root (write target)
-	WorkingState *chunk.Chunk
+	WorkingState	*chunk.Chunk
 
 	// Local context chunk (replaces temporary VM state storage)
-	LocalContext *chunk.Chunk
+	LocalContext	*chunk.Chunk
 
 	// Environment context (immutable during execution)
-	EnvChunk ExecutionContextChunk
+	EnvChunk	ExecutionContextChunk
 
 	// Action queue (accumulated, not executed immediately)
-	ActionQueue *ActionQueueChunk
+	ActionQueue	*ActionQueueChunk
 
 	// Error state (structured)
-	ErrorState StructuredExitCode
+	ErrorState	StructuredExitCode
 
 	// Gas tracking
-	GasLimit uint64
-	GasUsed  uint64
-	PhaseGas map[Phase]uint64
+	GasLimit	uint64
+	GasUsed		uint64
+	PhaseGas	map[Phase]uint64
 
 	// Capabilities
-	Capabilities CapabilityMask
+	Capabilities	CapabilityMask
 
 	// Block context (immutable)
-	BlockCtx BlockContext
+	BlockCtx	BlockContext
 
 	// Message being processed
-	Message Message
+	Message	Message
 
 	// Execution trace for determinism verification
-	Trace KernelExecutionTrace
+	Trace	KernelExecutionTrace
 
 	// Abort flag
-	Aborted bool
+	Aborted	bool
 
 	// Action budget
-	ActionBudget uint32
-	ActionsUsed  uint32
+	ActionBudget	uint32
+	ActionsUsed	uint32
 
 	// Host call trace for auditing
-	HostCallTrace []HostCallRecord
+	HostCallTrace	[]HostCallRecord
 }
 
 // NewKernelExecutionFrame creates a new kernel execution frame.
 func NewKernelExecutionFrame(state *chunk.Chunk, msg Message, maxActions uint32) *KernelExecutionFrame {
 	return &KernelExecutionFrame{
-		IP:           0,
-		Stack:        make([]StackValue, 0),
-		Continuation: ContinuationSlot{},
-		Phase:        PhaseStorage,
-		StateSnapshot: state,
-		WorkingState: state,
-		ActionQueue:   NewActionQueueChunk(),
-		EnvChunk:      ExecutionContextFromBlockContext(BlockContext{}, msg),
-		GasLimit:      msg.GasLimit,
-		PhaseGas:      make(map[Phase]uint64),
-		Capabilities:  AllowAllCapabilities,
-		Message:       msg,
-		ActionBudget:  maxActions,
-		Trace:         KernelExecutionTrace{Steps: make([]KernelTraceStep, 0)},
+		IP:		0,
+		Stack:		make([]StackValue, 0),
+		Continuation:	ContinuationSlot{},
+		Phase:		PhaseStorage,
+		StateSnapshot:	state,
+		WorkingState:	state,
+		ActionQueue:	NewActionQueueChunk(),
+		EnvChunk:	ExecutionContextFromBlockContext(BlockContext{}, msg),
+		GasLimit:	msg.GasLimit,
+		PhaseGas:	make(map[Phase]uint64),
+		Capabilities:	AllowAllCapabilities,
+		Message:	msg,
+		ActionBudget:	maxActions,
+		Trace:		KernelExecutionTrace{Steps: make([]KernelTraceStep, 0)},
 	}
 }
-
-// ---------------
-// Typed Evaluation Stack Values
-// ---------------
 
 // StackValueType defines the type of a value on the AVM evaluation stack.
 type StackValueType uint8
 
 const (
-	StackTypeInt256  StackValueType = iota
+	StackTypeInt256	StackValueType	= iota
 	StackTypeBool
 	StackTypeChunkRef
 	StackTypeFrameRef
@@ -483,15 +448,15 @@ func (t StackValueType) String() string {
 // The stack is strictly typed at the opcode level — no implicit conversions.
 // Invalid type usage → immediate trap (EXIT_TYPE_ERROR).
 type StackValue struct {
-	Type    StackValueType
-	IntVal  int64
-	UintVal uint64
-	BoolVal bool
-	ChunkVal *chunk.Chunk
-	BytesVal []byte
-	StrVal  string
-	AddrVal string
-	TupleVal []StackValue
+	Type		StackValueType
+	IntVal		int64
+	UintVal		uint64
+	BoolVal		bool
+	ChunkVal	*chunk.Chunk
+	BytesVal	[]byte
+	StrVal		string
+	AddrVal		string
+	TupleVal	[]StackValue
 }
 
 // StackValueInt256 creates a signed integer stack value.
@@ -534,27 +499,19 @@ func StackValueCoins(val uint64) StackValue {
 	return StackValue{Type: StackTypeCoins, UintVal: val}
 }
 
-// ---------------
-// Kernel Execution Trace
-// ---------------
-
 // KernelTraceStep records a single step of kernel execution.
 type KernelTraceStep struct {
-	Opcode     ISAOpcode
-	StackDepth int
-	GasUsed    uint64
-	Phase      Phase
-	IP         uint32
+	Opcode		ISAOpcode
+	StackDepth	int
+	GasUsed		uint64
+	Phase		Phase
+	IP		uint32
 }
 
 // KernelExecutionTrace holds the complete deterministic trace.
 type KernelExecutionTrace struct {
 	Steps []KernelTraceStep
 }
-
-// ---------------
-// ISA Opcode Definitions (Continuation-Aware)
-// ---------------
 
 // ISAOpcode defines the AVM instruction set architecture opcodes.
 // Every instruction MUST define:
@@ -570,444 +527,444 @@ type ISAOpcode uint16
 
 const (
 	// Stack operations
-	OpISANop         ISAOpcode = 0x00
-	OpISAPush        ISAOpcode = 0x01
-	OpISADup         ISAOpcode = 0x10
-	OpISASwap        ISAOpcode = 0x11
-	OpISADrop        ISAOpcode = 0x12
-	OpISAOver        ISAOpcode = 0x13
+	OpISANop	ISAOpcode	= 0x00
+	OpISAPush	ISAOpcode	= 0x01
+	OpISADup	ISAOpcode	= 0x10
+	OpISASwap	ISAOpcode	= 0x11
+	OpISADrop	ISAOpcode	= 0x12
+	OpISAOver	ISAOpcode	= 0x13
 
 	// Arithmetic (checked, on int256)
-	OpISAAdd         ISAOpcode = 0x20
-	OpISASub         ISAOpcode = 0x21
-	OpISAMul         ISAOpcode = 0x22
-	OpISADiv         ISAOpcode = 0x23
-	OpISAMod         ISAOpcode = 0x24
+	OpISAAdd	ISAOpcode	= 0x20
+	OpISASub	ISAOpcode	= 0x21
+	OpISAMul	ISAOpcode	= 0x22
+	OpISADiv	ISAOpcode	= 0x23
+	OpISAMod	ISAOpcode	= 0x24
 
 	// Comparison
-	OpISAEq          ISAOpcode = 0x30
-	OpISANeq         ISAOpcode = 0x31
-	OpISALt          ISAOpcode = 0x32
-	OpISALte         ISAOpcode = 0x33
-	OpISAGt          ISAOpcode = 0x34
-	OpISAGte         ISAOpcode = 0x35
+	OpISAEq		ISAOpcode	= 0x30
+	OpISANeq	ISAOpcode	= 0x31
+	OpISALt		ISAOpcode	= 0x32
+	OpISALte	ISAOpcode	= 0x33
+	OpISAGt		ISAOpcode	= 0x34
+	OpISAGte	ISAOpcode	= 0x35
 
 	// Boolean
-	OpISAAnd         ISAOpcode = 0x40
-	OpISAOr          ISAOpcode = 0x41
-	OpISANot         ISAOpcode = 0x42
+	OpISAAnd	ISAOpcode	= 0x40
+	OpISAOr		ISAOpcode	= 0x41
+	OpISANot	ISAOpcode	= 0x42
 
 	// Control flow (continuation-aware)
-	OpISACallFrame   ISAOpcode = 0x50
-	OpISAReturnFrame ISAOpcode = 0x51
-	OpISAJumpCond    ISAOpcode = 0x52
-	OpISAJumpUncond  ISAOpcode = 0x53
-	OpISARaiseError  ISAOpcode = 0x54
-	OpISATryBegin    ISAOpcode = 0x55
-	OpISATryEnd      ISAOpcode = 0x56
+	OpISACallFrame		ISAOpcode	= 0x50
+	OpISAReturnFrame	ISAOpcode	= 0x51
+	OpISAJumpCond		ISAOpcode	= 0x52
+	OpISAJumpUncond		ISAOpcode	= 0x53
+	OpISARaiseError		ISAOpcode	= 0x54
+	OpISATryBegin		ISAOpcode	= 0x55
+	OpISATryEnd		ISAOpcode	= 0x56
 
 	// State operations (Chunk DAG)
-	OpISALoadState   ISAOpcode = 0x60
-	OpISAStoreState  ISAOpcode = 0x61
-	OpISACloneState  ISAOpcode = 0x62
-	OpISAMergeState  ISAOpcode = 0x63
+	OpISALoadState	ISAOpcode	= 0x60
+	OpISAStoreState	ISAOpcode	= 0x61
+	OpISACloneState	ISAOpcode	= 0x62
+	OpISAMergeState	ISAOpcode	= 0x63
 
 	// ChunkMap operations
-	OpISAChunkMapGet    ISAOpcode = 0x70
-	OpISAChunkMapPut    ISAOpcode = 0x71
-	OpISAChunkMapDelete ISAOpcode = 0x72
-	OpISAChunkMapProof  ISAOpcode = 0x73
+	OpISAChunkMapGet	ISAOpcode	= 0x70
+	OpISAChunkMapPut	ISAOpcode	= 0x71
+	OpISAChunkMapDelete	ISAOpcode	= 0x72
+	OpISAChunkMapProof	ISAOpcode	= 0x73
 
 	// Action system
-	OpISAEmitAction   ISAOpcode = 0x80
-	OpISAQueueMessage ISAOpcode = 0x81
-	OpISAFlushActions  ISAOpcode = 0x82
+	OpISAEmitAction		ISAOpcode	= 0x80
+	OpISAQueueMessage	ISAOpcode	= 0x81
+	OpISAFlushActions	ISAOpcode	= 0x82
 
 	// Context operations
-	OpISAGetCaller    ISAOpcode = 0x90
-	OpISAGetOrigin    ISAOpcode = 0x91
-	OpISAGetValue     ISAOpcode = 0x92
-	OpISAGetBlockHeight ISAOpcode = 0x93
-	OpISAGetChainID   ISAOpcode = 0x94
-	OpISAGetAddress   ISAOpcode = 0x95
-	OpISAGetBody      ISAOpcode = 0x96
-	OpISAGetQueryID   ISAOpcode = 0x97
+	OpISAGetCaller		ISAOpcode	= 0x90
+	OpISAGetOrigin		ISAOpcode	= 0x91
+	OpISAGetValue		ISAOpcode	= 0x92
+	OpISAGetBlockHeight	ISAOpcode	= 0x93
+	OpISAGetChainID		ISAOpcode	= 0x94
+	OpISAGetAddress		ISAOpcode	= 0x95
+	OpISAGetBody		ISAOpcode	= 0x96
+	OpISAGetQueryID		ISAOpcode	= 0x97
 
 	// Cryptographic operations
-	OpISAHashChunk   ISAOpcode = 0xA0
-	OpISAHashData    ISAOpcode = 0xA1
-	OpISAVerifySig   ISAOpcode = 0xA2
+	OpISAHashChunk	ISAOpcode	= 0xA0
+	OpISAHashData	ISAOpcode	= 0xA1
+	OpISAVerifySig	ISAOpcode	= 0xA2
 
 	// Type codec operations
-	OpISAEncode      ISAOpcode = 0xB0
-	OpISADecode      ISAOpcode = 0xB1
+	OpISAEncode	ISAOpcode	= 0xB0
+	OpISADecode	ISAOpcode	= 0xB1
 
 	// Original AVM opcodes (backward compatible)
-	OpISAReadStorage ISAOpcode = 0x02
-	OpISAWriteStorage ISAOpcode = 0x03
-	OpISAAddLegacy   ISAOpcode = 0x04
-	OpISAReturn      ISAOpcode = 0x06
+	OpISAReadStorage	ISAOpcode	= 0x02
+	OpISAWriteStorage	ISAOpcode	= 0x03
+	OpISAAddLegacy		ISAOpcode	= 0x04
+	OpISAReturn		ISAOpcode	= 0x06
 )
 
 // ISAInstructionSpec defines the complete specification for each ISA opcode.
 type ISAInstructionSpec struct {
-	Mnemonic            string
-	Opcode              ISAOpcode
-	StackInputs         int
-	StackOutputs        int
-	InputTypes          []StackValueType
-	OutputTypes         []StackValueType
-	BaseGasCost         uint64
-	StackGasCost        uint64
-	ChunkGasCost        uint64
-	OverflowBehavior    string
-	FailureExitCode     StructuredExitCode
-	DeterminismRule     string
+	Mnemonic		string
+	Opcode			ISAOpcode
+	StackInputs		int
+	StackOutputs		int
+	InputTypes		[]StackValueType
+	OutputTypes		[]StackValueType
+	BaseGasCost		uint64
+	StackGasCost		uint64
+	ChunkGasCost		uint64
+	OverflowBehavior	string
+	FailureExitCode		StructuredExitCode
+	DeterminismRule		string
 }
 
 // ISAOpcodeTable defines the complete ISA specification.
 // Every instruction has formal stack contracts, gas rules, overflow behavior, and exit codes.
 var ISAOpcodeTable = map[ISAOpcode]ISAInstructionSpec{
 	OpISANop: {
-		Mnemonic: "nop", Opcode: OpISANop,
-		StackInputs: 0, StackOutputs: 0,
-		InputTypes: nil, OutputTypes: nil,
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "always succeeds",
+		Mnemonic:	"nop", Opcode: OpISANop,
+		StackInputs:	0, StackOutputs: 0,
+		InputTypes:	nil, OutputTypes: nil,
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "always succeeds",
 	},
 	OpISAPush: {
-		Mnemonic: "push", Opcode: OpISAPush,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "constant value, always succeeds",
+		Mnemonic:	"push", Opcode: OpISAPush,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "constant value, always succeeds",
 	},
 	OpISADup: {
-		Mnemonic: "dup", Opcode: OpISADup,
-		StackInputs: 1, StackOutputs: 2,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitStackOverflow, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"dup", Opcode: OpISADup,
+		StackInputs:	1, StackOutputs: 2,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitStackOverflow, DeterminismRule: "pure, always deterministic",
 	},
 	OpISASwap: {
-		Mnemonic: "swap", Opcode: OpISASwap,
-		StackInputs: 2, StackOutputs: 2,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"swap", Opcode: OpISASwap,
+		StackInputs:	2, StackOutputs: 2,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
 	},
 	OpISADrop: {
-		Mnemonic: "drop", Opcode: OpISADrop,
-		StackInputs: 1, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: nil,
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"drop", Opcode: OpISADrop,
+		StackInputs:	1, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: nil,
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAAdd: {
-		Mnemonic: "add", Opcode: OpISAAdd,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 3, OverflowBehavior: "trap on overflow",
-		FailureExitCode: ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
+		Mnemonic:	"add", Opcode: OpISAAdd,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	3, OverflowBehavior: "trap on overflow",
+		FailureExitCode:	ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
 	},
 	OpISASub: {
-		Mnemonic: "sub", Opcode: OpISASub,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 3, OverflowBehavior: "trap on underflow",
-		FailureExitCode: ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
+		Mnemonic:	"sub", Opcode: OpISASub,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	3, OverflowBehavior: "trap on underflow",
+		FailureExitCode:	ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
 	},
 	OpISAMul: {
-		Mnemonic: "mul", Opcode: OpISAMul,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 5, OverflowBehavior: "trap on overflow",
-		FailureExitCode: ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
+		Mnemonic:	"mul", Opcode: OpISAMul,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	5, OverflowBehavior: "trap on overflow",
+		FailureExitCode:	ExitOverflow, DeterminismRule: "checked arithmetic, deterministic",
 	},
 	OpISADiv: {
-		Mnemonic: "div", Opcode: OpISADiv,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 5, OverflowBehavior: "trap on division by zero",
-		FailureExitCode: ExitDivZero, DeterminismRule: "trap on div by zero, else deterministic",
+		Mnemonic:	"div", Opcode: OpISADiv,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	5, OverflowBehavior: "trap on division by zero",
+		FailureExitCode:	ExitDivZero, DeterminismRule: "trap on div by zero, else deterministic",
 	},
 	OpISAMod: {
-		Mnemonic: "mod", Opcode: OpISAMod,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 5, OverflowBehavior: "trap on division by zero",
-		FailureExitCode: ExitDivZero, DeterminismRule: "trap on div by zero, else deterministic",
+		Mnemonic:	"mod", Opcode: OpISAMod,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	5, OverflowBehavior: "trap on division by zero",
+		FailureExitCode:	ExitDivZero, DeterminismRule: "trap on div by zero, else deterministic",
 	},
 	OpISAEq: {
-		Mnemonic: "eq", Opcode: OpISAEq,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"eq", Opcode: OpISAEq,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAAnd: {
-		Mnemonic: "and", Opcode: OpISAAnd,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBool, StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"and", Opcode: OpISAAnd,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBool, StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAOr: {
-		Mnemonic: "or", Opcode: OpISAOr,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBool, StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"or", Opcode: OpISAOr,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBool, StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
 	},
 	OpISANot: {
-		Mnemonic: "not", Opcode: OpISANot,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"not", Opcode: OpISANot,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBool}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitTypeMismatch, DeterminismRule: "pure, always deterministic",
 	},
 	OpISACallFrame: {
-		Mnemonic: "call_frame", Opcode: OpISACallFrame,
-		StackInputs: 1, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: nil,
-		BaseGasCost: 100, OverflowBehavior: "none",
-		FailureExitCode: ExitInvalidJump, DeterminismRule: "pushes continuation frame, deterministic",
+		Mnemonic:	"call_frame", Opcode: OpISACallFrame,
+		StackInputs:	1, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: nil,
+		BaseGasCost:	100, OverflowBehavior: "none",
+		FailureExitCode:	ExitInvalidJump, DeterminismRule: "pushes continuation frame, deterministic",
 	},
 	OpISAReturnFrame: {
-		Mnemonic: "return_frame", Opcode: OpISAReturnFrame,
-		StackInputs: 0, StackOutputs: 0,
-		InputTypes: nil, OutputTypes: nil,
-		BaseGasCost: 50, OverflowBehavior: "none",
-		FailureExitCode: ExitStackUnderflow, DeterminismRule: "restores continuation slot, deterministic",
+		Mnemonic:	"return_frame", Opcode: OpISAReturnFrame,
+		StackInputs:	0, StackOutputs: 0,
+		InputTypes:	nil, OutputTypes: nil,
+		BaseGasCost:	50, OverflowBehavior: "none",
+		FailureExitCode:	ExitStackUnderflow, DeterminismRule: "restores continuation slot, deterministic",
 	},
 	OpISAJumpCond: {
-		Mnemonic: "jump_cond", Opcode: OpISAJumpCond,
-		StackInputs: 2, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeBool, StackTypeInt256}, OutputTypes: nil,
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitInvalidJump, DeterminismRule: "target MUST be CFG block entry",
+		Mnemonic:	"jump_cond", Opcode: OpISAJumpCond,
+		StackInputs:	2, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeBool, StackTypeInt256}, OutputTypes: nil,
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitInvalidJump, DeterminismRule: "target MUST be CFG block entry",
 	},
 	OpISARaiseError: {
-		Mnemonic: "raise_error", Opcode: OpISARaiseError,
-		StackInputs: 1, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: nil,
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitContractAbort, DeterminismRule: "terminates execution frame, deterministic",
+		Mnemonic:	"raise_error", Opcode: OpISARaiseError,
+		StackInputs:	1, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: nil,
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitContractAbort, DeterminismRule: "terminates execution frame, deterministic",
 	},
 	OpISALoadState: {
-		Mnemonic: "load_state_chunk", Opcode: OpISALoadState,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 20, StackGasCost: 0, ChunkGasCost: 10,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "reads immutable snapshot, deterministic",
+		Mnemonic:	"load_state_chunk", Opcode: OpISALoadState,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	20, StackGasCost: 0, ChunkGasCost: 10,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "reads immutable snapshot, deterministic",
 	},
 	OpISAStoreState: {
-		Mnemonic: "store_state_chunk", Opcode: OpISAStoreState,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 50, StackGasCost: 0, ChunkGasCost: 25,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitStateMutation, DeterminismRule: "creates new root, does not mutate in-place",
+		Mnemonic:	"store_state_chunk", Opcode: OpISAStoreState,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	50, StackGasCost: 0, ChunkGasCost: 25,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitStateMutation, DeterminismRule: "creates new root, does not mutate in-place",
 	},
 	OpISAHashChunk: {
-		Mnemonic: "hash_chunk", Opcode: OpISAHashChunk,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeHash},
-		BaseGasCost: 80, ChunkGasCost: 10,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "BLAKE3 hash, deterministic",
+		Mnemonic:	"hash_chunk", Opcode: OpISAHashChunk,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeHash},
+		BaseGasCost:	80, ChunkGasCost: 10,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "BLAKE3 hash, deterministic",
 	},
 	OpISAHashData: {
-		Mnemonic: "hash_data", Opcode: OpISAHashData,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBytes}, OutputTypes: []StackValueType{StackTypeHash},
-		BaseGasCost: 80, StackGasCost: 1,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "SHA256 hash, deterministic",
+		Mnemonic:	"hash_data", Opcode: OpISAHashData,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBytes}, OutputTypes: []StackValueType{StackTypeHash},
+		BaseGasCost:	80, StackGasCost: 1,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "SHA256 hash, deterministic",
 	},
 	OpISAEmitAction: {
-		Mnemonic: "emit_action", Opcode: OpISAEmitAction,
-		StackInputs: 2, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeChunkRef}, OutputTypes: nil,
-		BaseGasCost: 100, OverflowBehavior: "none",
-		FailureExitCode: ExitActionBudget, DeterminismRule: "accumulates in ActionQueue, not immediate",
+		Mnemonic:	"emit_action", Opcode: OpISAEmitAction,
+		StackInputs:	2, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeChunkRef}, OutputTypes: nil,
+		BaseGasCost:	100, OverflowBehavior: "none",
+		FailureExitCode:	ExitActionBudget, DeterminismRule: "accumulates in ActionQueue, not immediate",
 	},
 	OpISAQueueMessage: {
-		Mnemonic: "queue_message", Opcode: OpISAQueueMessage,
-		StackInputs: 3, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeAddress, StackTypeChunkRef, StackTypeCoins}, OutputTypes: nil,
-		BaseGasCost: 250, OverflowBehavior: "none",
-		FailureExitCode: ExitActionBudget, DeterminismRule: "accumulates in ActionQueue, not immediate",
+		Mnemonic:	"queue_message", Opcode: OpISAQueueMessage,
+		StackInputs:	3, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeAddress, StackTypeChunkRef, StackTypeCoins}, OutputTypes: nil,
+		BaseGasCost:	250, OverflowBehavior: "none",
+		FailureExitCode:	ExitActionBudget, DeterminismRule: "accumulates in ActionQueue, not immediate",
 	},
 	OpISAGetCaller: {
-		Mnemonic: "get_caller", Opcode: OpISAGetCaller,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeAddress},
-		BaseGasCost: 10, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
+		Mnemonic:	"get_caller", Opcode: OpISAGetCaller,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeAddress},
+		BaseGasCost:	10, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
 	},
 	OpISAChunkMapGet: {
-		Mnemonic: "chunkmap_get", Opcode: OpISAChunkMapGet,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 20, ChunkGasCost: 10,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "reads from immutable snapshot, deterministic",
+		Mnemonic:	"chunkmap_get", Opcode: OpISAChunkMapGet,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	20, ChunkGasCost: 10,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "reads from immutable snapshot, deterministic",
 	},
 	OpISAChunkMapPut: {
-		Mnemonic: "chunkmap_put", Opcode: OpISAChunkMapPut,
-		StackInputs: 3, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef, StackTypeBytes, StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 60, ChunkGasCost: 25,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitStateMutation, DeterminismRule: "returns new root, does not mutate in-place",
+		Mnemonic:	"chunkmap_put", Opcode: OpISAChunkMapPut,
+		StackInputs:	3, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef, StackTypeBytes, StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	60, ChunkGasCost: 25,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitStateMutation, DeterminismRule: "returns new root, does not mutate in-place",
 	},
 	OpISAChunkMapDelete: {
-		Mnemonic: "chunkmap_delete", Opcode: OpISAChunkMapDelete,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 150, ChunkGasCost: 15,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitStateMutation, DeterminismRule: "returns new root, does not mutate in-place",
+		Mnemonic:	"chunkmap_delete", Opcode: OpISAChunkMapDelete,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	150, ChunkGasCost: 15,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitStateMutation, DeterminismRule: "returns new root, does not mutate in-place",
 	},
 	OpISAChunkMapProof: {
-		Mnemonic: "chunkmap_proof", Opcode: OpISAChunkMapProof,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 200, ChunkGasCost: 30,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "generates Merkle proof, deterministic",
+		Mnemonic:	"chunkmap_proof", Opcode: OpISAChunkMapProof,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	200, ChunkGasCost: 30,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "generates Merkle proof, deterministic",
 	},
 	OpISAOver: {
-		Mnemonic: "over", Opcode: OpISAOver,
-		StackInputs: 2, StackOutputs: 3,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256, StackTypeInt256},
-		BaseGasCost: 1, OverflowBehavior: "none",
-		FailureExitCode: ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"over", Opcode: OpISAOver,
+		StackInputs:	2, StackOutputs: 3,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeInt256, StackTypeInt256, StackTypeInt256},
+		BaseGasCost:	1, OverflowBehavior: "none",
+		FailureExitCode:	ExitStackUnderflow, DeterminismRule: "pure, always deterministic",
 	},
 	OpISANeq: {
-		Mnemonic: "neq", Opcode: OpISANeq,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"neq", Opcode: OpISANeq,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISALt: {
-		Mnemonic: "lt", Opcode: OpISALt,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"lt", Opcode: OpISALt,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISALte: {
-		Mnemonic: "lte", Opcode: OpISALte,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"lte", Opcode: OpISALte,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAGt: {
-		Mnemonic: "gt", Opcode: OpISAGt,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"gt", Opcode: OpISAGt,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAGte: {
-		Mnemonic: "gte", Opcode: OpISAGte,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pure, always deterministic",
+		Mnemonic:	"gte", Opcode: OpISAGte,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256, StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pure, always deterministic",
 	},
 	OpISAJumpUncond: {
-		Mnemonic: "jump", Opcode: OpISAJumpUncond,
-		StackInputs: 1, StackOutputs: 0,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: nil,
-		BaseGasCost: 2, OverflowBehavior: "none",
-		FailureExitCode: ExitInvalidJump, DeterminismRule: "target MUST be CFG block entry",
+		Mnemonic:	"jump", Opcode: OpISAJumpUncond,
+		StackInputs:	1, StackOutputs: 0,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: nil,
+		BaseGasCost:	2, OverflowBehavior: "none",
+		FailureExitCode:	ExitInvalidJump, DeterminismRule: "target MUST be CFG block entry",
 	},
 	OpISATryBegin: {
-		Mnemonic: "try_begin", Opcode: OpISATryBegin,
-		StackInputs: 0, StackOutputs: 0,
-		InputTypes: nil, OutputTypes: nil,
-		BaseGasCost: 10, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pushes error handler, deterministic",
+		Mnemonic:	"try_begin", Opcode: OpISATryBegin,
+		StackInputs:	0, StackOutputs: 0,
+		InputTypes:	nil, OutputTypes: nil,
+		BaseGasCost:	10, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pushes error handler, deterministic",
 	},
 	OpISATryEnd: {
-		Mnemonic: "try_end", Opcode: OpISATryEnd,
-		StackInputs: 0, StackOutputs: 0,
-		InputTypes: nil, OutputTypes: nil,
-		BaseGasCost: 5, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "pops error handler, deterministic",
+		Mnemonic:	"try_end", Opcode: OpISATryEnd,
+		StackInputs:	0, StackOutputs: 0,
+		InputTypes:	nil, OutputTypes: nil,
+		BaseGasCost:	5, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "pops error handler, deterministic",
 	},
 	OpISACloneState: {
-		Mnemonic: "clone_state", Opcode: OpISACloneState,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 30, ChunkGasCost: 15,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "creates copy of state root, deterministic",
+		Mnemonic:	"clone_state", Opcode: OpISACloneState,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	30, ChunkGasCost: 15,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "creates copy of state root, deterministic",
 	},
 	OpISAMergeState: {
-		Mnemonic: "merge_state", Opcode: OpISAMergeState,
-		StackInputs: 2, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeChunkRef, StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
-		BaseGasCost: 50, ChunkGasCost: 25,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "merges two state branches, deterministic",
+		Mnemonic:	"merge_state", Opcode: OpISAMergeState,
+		StackInputs:	2, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeChunkRef, StackTypeChunkRef}, OutputTypes: []StackValueType{StackTypeChunkRef},
+		BaseGasCost:	50, ChunkGasCost: 25,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "merges two state branches, deterministic",
 	},
 	OpISAFlushActions: {
-		Mnemonic: "flush_actions", Opcode: OpISAFlushActions,
-		StackInputs: 0, StackOutputs: 0,
-		InputTypes: nil, OutputTypes: nil,
-		BaseGasCost: 200, OverflowBehavior: "none",
-		FailureExitCode: ExitActionBudget, DeterminismRule: "finalizes and sorts actions, deterministic",
+		Mnemonic:	"flush_actions", Opcode: OpISAFlushActions,
+		StackInputs:	0, StackOutputs: 0,
+		InputTypes:	nil, OutputTypes: nil,
+		BaseGasCost:	200, OverflowBehavior: "none",
+		FailureExitCode:	ExitActionBudget, DeterminismRule: "finalizes and sorts actions, deterministic",
 	},
 	OpISAGetOrigin: {
-		Mnemonic: "get_origin", Opcode: OpISAGetOrigin,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeAddress},
-		BaseGasCost: 10, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
+		Mnemonic:	"get_origin", Opcode: OpISAGetOrigin,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeAddress},
+		BaseGasCost:	10, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
 	},
 	OpISAGetValue: {
-		Mnemonic: "get_value", Opcode: OpISAGetValue,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeCoins},
-		BaseGasCost: 10, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
+		Mnemonic:	"get_value", Opcode: OpISAGetValue,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeCoins},
+		BaseGasCost:	10, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
 	},
 	OpISAGetBlockHeight: {
-		Mnemonic: "get_block_height", Opcode: OpISAGetBlockHeight,
-		StackInputs: 0, StackOutputs: 1,
-		InputTypes: nil, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 10, OverflowBehavior: "none",
-		FailureExitCode: ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
+		Mnemonic:	"get_block_height", Opcode: OpISAGetBlockHeight,
+		StackInputs:	0, StackOutputs: 1,
+		InputTypes:	nil, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	10, OverflowBehavior: "none",
+		FailureExitCode:	ExitSuccess, DeterminismRule: "reads from immutable ExecutionContextChunk",
 	},
 	OpISAVerifySig: {
-		Mnemonic: "verify_sig", Opcode: OpISAVerifySig,
-		StackInputs: 3, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBytes, StackTypeBytes, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeBool},
-		BaseGasCost: 5000, OverflowBehavior: "none",
-		FailureExitCode: ExitChunkError, DeterminismRule: "Ed25519 signature verify, deterministic",
+		Mnemonic:	"verify_sig", Opcode: OpISAVerifySig,
+		StackInputs:	3, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBytes, StackTypeBytes, StackTypeBytes}, OutputTypes: []StackValueType{StackTypeBool},
+		BaseGasCost:	5000, OverflowBehavior: "none",
+		FailureExitCode:	ExitChunkError, DeterminismRule: "Ed25519 signature verify, deterministic",
 	},
 	OpISAEncode: {
-		Mnemonic: "encode", Opcode: OpISAEncode,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBytes},
-		BaseGasCost: 5, StackGasCost: 1,
-		OverflowBehavior: "none",
-		FailureExitCode: ExitTypeMismatch, DeterminismRule: "Codec<T>-verified, deterministic",
+		Mnemonic:	"encode", Opcode: OpISAEncode,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeInt256}, OutputTypes: []StackValueType{StackTypeBytes},
+		BaseGasCost:	5, StackGasCost: 1,
+		OverflowBehavior:	"none",
+		FailureExitCode:	ExitTypeMismatch, DeterminismRule: "Codec<T>-verified, deterministic",
 	},
 	OpISADecode: {
-		Mnemonic: "decode", Opcode: OpISADecode,
-		StackInputs: 1, StackOutputs: 1,
-		InputTypes: []StackValueType{StackTypeBytes}, OutputTypes: []StackValueType{StackTypeInt256},
-		BaseGasCost: 5, StackGasCost: 1,
-		OverflowBehavior: "trap on invalid decode",
-		FailureExitCode: ExitInvalidDecode, DeterminismRule: "Codec<T>-verified, invalid decode → trap",
+		Mnemonic:	"decode", Opcode: OpISADecode,
+		StackInputs:	1, StackOutputs: 1,
+		InputTypes:	[]StackValueType{StackTypeBytes}, OutputTypes: []StackValueType{StackTypeInt256},
+		BaseGasCost:	5, StackGasCost: 1,
+		OverflowBehavior:	"trap on invalid decode",
+		FailureExitCode:	ExitInvalidDecode, DeterminismRule: "Codec<T>-verified, invalid decode → trap",
 	},
 }
 
@@ -1044,10 +1001,6 @@ func ISAGasCost(op ISAOpcode) uint64 {
 	return spec.BaseGasCost + spec.StackGasCost + spec.ChunkGasCost
 }
 
-// ---------------
-// ISA Execution Semantics Rule
-// ---------------
-
 // ExecuteKernelSemantics enforces the formal execution rule:
 //
 //	(StateRootChunk, Message) → (NewStateRootChunk, ActionQueueChunk, ExitCode, Receipt)
@@ -1058,25 +1011,31 @@ func ISAGasCost(op ISAOpcode) uint64 {
 //   - All failures produce deterministic receipt
 //   - Only SUCCESS reaches commit phase
 func ExecuteKernelSemantics(frame *KernelExecutionFrame) (*StateRootChunk, *ActionQueueChunk, StructuredExitCode, AVMReceipt, error) {
-	// Phase 1: State Load - load immutable StateRootChunk and ExecutionContextChunk
+
 	frame.Phase = PhaseStorage
 	if !frame.ChargeGas(500) {
 		return nil, nil, ExitGasExhausted, AVMReceipt{}, nil
 	}
 
-	// Phase 2: Credit - apply attached value
 	frame.Phase = PhaseCredit
 	if !frame.ChargeGas(100) {
 		return nil, nil, ExitGasExhausted, AVMReceipt{}, nil
 	}
+	if frame.Message.Value > 0 && frame.WorkingState != nil {
+		credited, err := applyAttachedValueToWorkingState(frame.WorkingState, frame.Message.Value)
+		if err != nil {
+			frame.Aborted = true
+			frame.ErrorState = ExitStateCorruption
+			return nil, nil, ExitStateCorruption, AVMReceipt{}, nil
+		}
+		frame.WorkingState = credited
+	}
 
-	// Phase 3: Compute - execute bytecode with continuation slots
 	frame.Phase = PhaseCompute
 	if !frame.ChargeGas(1000) {
 		return nil, nil, ExitGasExhausted, AVMReceipt{}, nil
 	}
 
-	// Phase 4: Action Build - finalize ActionQueueChunk
 	frame.Phase = PhaseAction
 	if !frame.ChargeGas(200) {
 		return nil, nil, ExitGasExhausted, AVMReceipt{}, nil
@@ -1087,7 +1046,6 @@ func ExecuteKernelSemantics(frame *KernelExecutionFrame) (*StateRootChunk, *Acti
 		return nil, nil, ExitActionBudget, AVMReceipt{}, nil
 	}
 
-	// Phase 5: Commit - produce new StateRootChunk
 	frame.Phase = PhaseFinalization
 	if !frame.ChargeGas(300) {
 		return nil, nil, ExitGasExhausted, AVMReceipt{}, nil
@@ -1118,22 +1076,18 @@ func ExecuteKernelSemantics(frame *KernelExecutionFrame) (*StateRootChunk, *Acti
 	}
 
 	receipt := AVMReceipt{
-		ExitCode:           exitCode.ToUint32(),
-		GasUsed:            frame.GasUsed,
-		GasLimit:           frame.GasLimit,
-		PhaseGas:           frame.PhaseGas,
-		StateRootBefore:    stateRootBefore,
-		StateRootAfter:     stateRootAfter,
-		EmittedActionsHash: string(frame.ActionQueue.Hash),
-		ExecutionTraceHash: string(frame.finalizeTrace()),
+		ExitCode:		exitCode.ToUint32(),
+		GasUsed:		frame.GasUsed,
+		GasLimit:		frame.GasLimit,
+		PhaseGas:		frame.PhaseGas,
+		StateRootBefore:	stateRootBefore,
+		StateRootAfter:		stateRootAfter,
+		EmittedActionsHash:	string(frame.ActionQueue.Hash),
+		ExecutionTraceHash:	string(frame.finalizeTrace()),
 	}
 
 	return newRoot, frame.ActionQueue, exitCode, receipt, nil
 }
-
-// ---------------
-// Kernel Frame Operations
-// ---------------
 
 // ChargeGas adds gas to the frame's total used.
 func (f *KernelExecutionFrame) ChargeGas(amount uint64) bool {
@@ -1158,11 +1112,11 @@ func (f *KernelExecutionFrame) PushValue(val StackValue) error {
 	}
 	f.Stack = append(f.Stack, val)
 	f.Trace.Steps = append(f.Trace.Steps, KernelTraceStep{
-		Opcode:     OpISAPush,
-		StackDepth: len(f.Stack),
-		GasUsed:    2,
-		Phase:      f.Phase,
-		IP:         f.IP,
+		Opcode:		OpISAPush,
+		StackDepth:	len(f.Stack),
+		GasUsed:	2,
+		Phase:		f.Phase,
+		IP:		f.IP,
 	})
 	return nil
 }
@@ -1238,10 +1192,6 @@ func (f *KernelExecutionFrame) finalizeTrace() []byte {
 	return h.Sum(nil)
 }
 
-// ---------------
-// Helper functions
-// ---------------
-
 func appendUint64BigEndian(buf []byte, v uint64) []byte {
 	return append(buf,
 		byte(v>>56), byte(v>>48), byte(v>>40), byte(v>>32),
@@ -1258,4 +1208,3 @@ func appendString(buf []byte, s string) []byte {
 	buf = append(buf, s...)
 	return buf
 }
-

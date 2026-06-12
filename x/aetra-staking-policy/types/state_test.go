@@ -73,11 +73,11 @@ func TestTopNConcentrationTargets(t *testing.T) {
 func TestGenesisValidationRejectsUnsortedValidators(t *testing.T) {
 	params := DefaultParams(testAuthority)
 	gs := GenesisState{
-		Params: params,
+		Params:	params,
 		Network: NetworkPolicy{
-			ActiveValidators: 2,
-			TotalRawStake:    2,
-			PowerCapBps:      PhaseOnePowerCapBps,
+			ActiveValidators:	2,
+			TotalRawStake:		2,
+			PowerCapBps:		PhaseOnePowerCapBps,
 			Validators: []ValidatorPolicy{
 				{OperatorAddress: "val-b", RawStake: 1, EffectiveStake: 1, RawPowerBps: 5_000, EffectivePowerBps: 300, PowerCapBps: 300, RewardMultiplierBps: BasisPoints, DelegationWarning: DelegationWarningOverloaded, CommissionAllowed: true},
 				{OperatorAddress: "val-a", RawStake: 1, EffectiveStake: 1, RawPowerBps: 5_000, EffectivePowerBps: 300, PowerCapBps: 300, RewardMultiplierBps: BasisPoints, DelegationWarning: DelegationWarningOverloaded, CommissionAllowed: true},

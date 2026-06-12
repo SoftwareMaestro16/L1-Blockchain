@@ -10,17 +10,17 @@ import (
 func TestSupplyStabilizationMovesTowardLowerNetIssuanceWhenActivitySupportsIt(t *testing.T) {
 	params := DefaultSupplyStabilizationParams()
 	report, err := GenerateSupplyStabilizationReport(SupplyStabilizationInput{
-		CurrentSupplyNaet:                  sdkmath.NewInt(1_000_000),
-		RecentAnnualGrossMintedNaet:        sdkmath.NewInt(30_000),
-		RecentAnnualBurnedNaet:             sdkmath.NewInt(5_000),
-		RecentAnnualFeeRevenueNaet:         sdkmath.NewInt(20_000),
-		RecentAnnualValidatorRewardsNaet:   sdkmath.NewInt(25_000),
-		BondedStakeRatioBps:                DefaultTargetStakeBps,
-		ActiveValidatorCount:               DefaultActiveValidatorTarget,
-		SlashingRateBps:                    10,
-		ReserveCoverageBps:                 BasisPoints,
-		ProjectionYears:                    3,
-		ConsensusRewardAccountingPreserved: true,
+		CurrentSupplyNaet:			sdkmath.NewInt(1_000_000),
+		RecentAnnualGrossMintedNaet:		sdkmath.NewInt(30_000),
+		RecentAnnualBurnedNaet:			sdkmath.NewInt(5_000),
+		RecentAnnualFeeRevenueNaet:		sdkmath.NewInt(20_000),
+		RecentAnnualValidatorRewardsNaet:	sdkmath.NewInt(25_000),
+		BondedStakeRatioBps:			DefaultTargetStakeBps,
+		ActiveValidatorCount:			DefaultActiveValidatorTarget,
+		SlashingRateBps:			10,
+		ReserveCoverageBps:			BasisPoints,
+		ProjectionYears:			3,
+		ConsensusRewardAccountingPreserved:	true,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, report.Passed)
@@ -42,19 +42,19 @@ func TestSupplyStabilizationMovesTowardLowerNetIssuanceWhenActivitySupportsIt(t 
 func TestSupplyStabilizationTemporarilyRaisesIssuanceUnderSecurityStress(t *testing.T) {
 	params := DefaultSupplyStabilizationParams()
 	report, err := GenerateSupplyStabilizationReport(SupplyStabilizationInput{
-		CurrentSupplyNaet:                  sdkmath.NewInt(1_000_000),
-		RecentAnnualGrossMintedNaet:        sdkmath.NewInt(15_000),
-		RecentAnnualBurnedNaet:             sdkmath.NewInt(5_000),
-		RecentAnnualFeeRevenueNaet:         sdkmath.NewInt(1_000),
-		RecentAnnualValidatorRewardsNaet:   sdkmath.NewInt(14_000),
-		BondedStakeRatioBps:                4_900,
-		ActiveValidatorCount:               50,
-		SlashingRateBps:                    200,
-		ReserveCoverageBps:                 5_000,
-		ValidatorAttritionBps:              300,
-		SecurityRiskBps:                    400,
-		ProjectionYears:                    1,
-		ConsensusRewardAccountingPreserved: true,
+		CurrentSupplyNaet:			sdkmath.NewInt(1_000_000),
+		RecentAnnualGrossMintedNaet:		sdkmath.NewInt(15_000),
+		RecentAnnualBurnedNaet:			sdkmath.NewInt(5_000),
+		RecentAnnualFeeRevenueNaet:		sdkmath.NewInt(1_000),
+		RecentAnnualValidatorRewardsNaet:	sdkmath.NewInt(14_000),
+		BondedStakeRatioBps:			4_900,
+		ActiveValidatorCount:			50,
+		SlashingRateBps:			200,
+		ReserveCoverageBps:			5_000,
+		ValidatorAttritionBps:			300,
+		SecurityRiskBps:			400,
+		ProjectionYears:			1,
+		ConsensusRewardAccountingPreserved:	true,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, report.Passed)
@@ -79,17 +79,17 @@ func TestSupplyProjectionStressScenariosForOneThreeAndFiveYears(t *testing.T) {
 	params := DefaultSupplyStabilizationParams()
 	for _, years := range []uint32{1, 3, 5} {
 		report, err := GenerateSupplyStabilizationReport(SupplyStabilizationInput{
-			CurrentSupplyNaet:                  sdkmath.NewInt(2_000_000),
-			RecentAnnualGrossMintedNaet:        sdkmath.NewInt(60_000),
-			RecentAnnualBurnedNaet:             sdkmath.NewInt(20_000),
-			RecentAnnualFeeRevenueNaet:         sdkmath.NewInt(50_000),
-			RecentAnnualValidatorRewardsNaet:   sdkmath.NewInt(45_000),
-			BondedStakeRatioBps:                DefaultTargetStakeBps,
-			ActiveValidatorCount:               DefaultActiveValidatorTarget + 10,
-			SlashingRateBps:                    0,
-			ReserveCoverageBps:                 15_000,
-			ProjectionYears:                    years,
-			ConsensusRewardAccountingPreserved: true,
+			CurrentSupplyNaet:			sdkmath.NewInt(2_000_000),
+			RecentAnnualGrossMintedNaet:		sdkmath.NewInt(60_000),
+			RecentAnnualBurnedNaet:			sdkmath.NewInt(20_000),
+			RecentAnnualFeeRevenueNaet:		sdkmath.NewInt(50_000),
+			RecentAnnualValidatorRewardsNaet:	sdkmath.NewInt(45_000),
+			BondedStakeRatioBps:			DefaultTargetStakeBps,
+			ActiveValidatorCount:			DefaultActiveValidatorTarget + 10,
+			SlashingRateBps:			0,
+			ReserveCoverageBps:			15_000,
+			ProjectionYears:			years,
+			ConsensusRewardAccountingPreserved:	true,
 		}, params)
 		require.NoError(t, err)
 		require.True(t, report.Passed)
@@ -105,17 +105,17 @@ func TestSupplyProjectionStressScenariosForOneThreeAndFiveYears(t *testing.T) {
 
 func TestSupplyStabilizationFlagsConsensusRewardAccountingBypass(t *testing.T) {
 	report, err := GenerateSupplyStabilizationReport(SupplyStabilizationInput{
-		CurrentSupplyNaet:                  sdkmath.NewInt(1_000_000),
-		RecentAnnualGrossMintedNaet:        sdkmath.NewInt(30_000),
-		RecentAnnualBurnedNaet:             sdkmath.NewInt(5_000),
-		RecentAnnualFeeRevenueNaet:         sdkmath.NewInt(20_000),
-		RecentAnnualValidatorRewardsNaet:   sdkmath.NewInt(25_000),
-		BondedStakeRatioBps:                DefaultTargetStakeBps,
-		ActiveValidatorCount:               DefaultActiveValidatorTarget,
-		SlashingRateBps:                    10,
-		ReserveCoverageBps:                 BasisPoints,
-		ProjectionYears:                    1,
-		ConsensusRewardAccountingPreserved: false,
+		CurrentSupplyNaet:			sdkmath.NewInt(1_000_000),
+		RecentAnnualGrossMintedNaet:		sdkmath.NewInt(30_000),
+		RecentAnnualBurnedNaet:			sdkmath.NewInt(5_000),
+		RecentAnnualFeeRevenueNaet:		sdkmath.NewInt(20_000),
+		RecentAnnualValidatorRewardsNaet:	sdkmath.NewInt(25_000),
+		BondedStakeRatioBps:			DefaultTargetStakeBps,
+		ActiveValidatorCount:			DefaultActiveValidatorTarget,
+		SlashingRateBps:			10,
+		ReserveCoverageBps:			BasisPoints,
+		ProjectionYears:			1,
+		ConsensusRewardAccountingPreserved:	false,
 	}, DefaultSupplyStabilizationParams())
 	require.NoError(t, err)
 	require.False(t, report.Passed)
@@ -125,14 +125,14 @@ func TestSupplyStabilizationFlagsConsensusRewardAccountingBypass(t *testing.T) {
 
 func TestSupplyStabilizationRejectsManualOffChainMissingInputs(t *testing.T) {
 	_, err := GenerateSupplyStabilizationReport(SupplyStabilizationInput{
-		RecentAnnualGrossMintedNaet:        sdkmath.NewInt(30_000),
-		RecentAnnualBurnedNaet:             sdkmath.NewInt(5_000),
-		RecentAnnualFeeRevenueNaet:         sdkmath.NewInt(20_000),
-		RecentAnnualValidatorRewardsNaet:   sdkmath.NewInt(25_000),
-		BondedStakeRatioBps:                DefaultTargetStakeBps,
-		ActiveValidatorCount:               DefaultActiveValidatorTarget,
-		ProjectionYears:                    1,
-		ConsensusRewardAccountingPreserved: true,
+		RecentAnnualGrossMintedNaet:		sdkmath.NewInt(30_000),
+		RecentAnnualBurnedNaet:			sdkmath.NewInt(5_000),
+		RecentAnnualFeeRevenueNaet:		sdkmath.NewInt(20_000),
+		RecentAnnualValidatorRewardsNaet:	sdkmath.NewInt(25_000),
+		BondedStakeRatioBps:			DefaultTargetStakeBps,
+		ActiveValidatorCount:			DefaultActiveValidatorTarget,
+		ProjectionYears:			1,
+		ConsensusRewardAccountingPreserved:	true,
 	}, DefaultSupplyStabilizationParams())
 	require.ErrorContains(t, err, "current_supply_naet must be positive")
 }

@@ -11,37 +11,37 @@ import (
 )
 
 type ResolverPatch struct {
-	Domain            string
-	Primary           sdk.AccAddress
-	ClearPrimary      bool
-	Contract          sdk.AccAddress
-	ClearContract     bool
-	ZoneEndpoint      string
-	ClearZoneEndpoint bool
-	Records           map[string]sdk.AccAddress
-	DeleteRecords     []string
-	Metadata          []byte
-	ClearMetadata     bool
-	UpdatedAtUnix     int64
+	Domain			string
+	Primary			sdk.AccAddress
+	ClearPrimary		bool
+	Contract		sdk.AccAddress
+	ClearContract		bool
+	ZoneEndpoint		string
+	ClearZoneEndpoint	bool
+	Records			map[string]sdk.AccAddress
+	DeleteRecords		[]string
+	Metadata		[]byte
+	ClearMetadata		bool
+	UpdatedAtUnix		int64
 }
 
 type IdentityResolution struct {
-	QueryDomain     string
-	ResolverDomain  string
-	AuthorityDomain Domain
-	Record          ResolverRecord
-	Depth           uint8
+	QueryDomain	string
+	ResolverDomain	string
+	AuthorityDomain	Domain
+	Record		ResolverRecord
+	Depth		uint8
 }
 
 type IdentityRouteTarget struct {
-	QueryDomain    string
-	ResolverDomain string
-	AuthorityName  string
-	Key            string
-	Address        sdk.AccAddress
-	Primary        sdk.AccAddress
-	Contract       sdk.AccAddress
-	ZoneEndpoint   string
+	QueryDomain	string
+	ResolverDomain	string
+	AuthorityName	string
+	Key		string
+	Address		sdk.AccAddress
+	Primary		sdk.AccAddress
+	Contract	sdk.AccAddress
+	ZoneEndpoint	string
 }
 
 func PatchIdentityResolver(state IdentityState, domainName string, actor sdk.AccAddress, patch ResolverPatch, height uint64) (IdentityState, ResolverRecord, error) {
@@ -103,10 +103,10 @@ func ApplyResolverPatch(existing *ResolverRecord, domainRecord DomainRecord, pat
 		return ResolverRecord{}, errors.New("resolver patch must update at least one key")
 	}
 	record := ResolverRecord{
-		Domain:        normalizedDomain,
-		Owner:         cloneAddress(domainRecord.Owner),
-		Records:       map[string]sdk.AccAddress{},
-		UpdatedAtUnix: patch.UpdatedAtUnix,
+		Domain:		normalizedDomain,
+		Owner:		cloneAddress(domainRecord.Owner),
+		Records:	map[string]sdk.AccAddress{},
+		UpdatedAtUnix:	patch.UpdatedAtUnix,
 	}
 	if existing != nil {
 		if err := ValidateResolverRecordForDomain(*existing, domainRecord, nowUnix); err != nil {
@@ -235,13 +235,13 @@ func ResolveIdentityRoute(state IdentityState, name string, key string, height u
 	}
 	record := resolution.Record
 	target := IdentityRouteTarget{
-		QueryDomain:    resolution.QueryDomain,
-		ResolverDomain: resolution.ResolverDomain,
-		AuthorityName:  resolution.AuthorityDomain.Name,
-		Key:            key,
-		Primary:        cloneSpecAddress(record.Primary),
-		Contract:       cloneSpecAddress(record.Contract),
-		ZoneEndpoint:   record.ZoneEndpoint,
+		QueryDomain:	resolution.QueryDomain,
+		ResolverDomain:	resolution.ResolverDomain,
+		AuthorityName:	resolution.AuthorityDomain.Name,
+		Key:		key,
+		Primary:	cloneSpecAddress(record.Primary),
+		Contract:	cloneSpecAddress(record.Contract),
+		ZoneEndpoint:	record.ZoneEndpoint,
 	}
 	switch key {
 	case ResolverKeyPrimary:
@@ -287,11 +287,11 @@ func ResolveIdentityRecordRecursive(state IdentityState, name string, height uin
 				return IdentityResolution{}, errors.New("identity resolver owner must match registry owner")
 			}
 			return IdentityResolution{
-				QueryDomain:     query,
-				ResolverDomain:  resolver.Domain,
-				AuthorityDomain: authority,
-				Record:          resolver,
-				Depth:           uint8(depth),
+				QueryDomain:		query,
+				ResolverDomain:		resolver.Domain,
+				AuthorityDomain:	authority,
+				Record:			resolver,
+				Depth:			uint8(depth),
 			}, nil
 		}
 		if nearestAuthority != nil && nearestAuthority.Name == candidate {
@@ -345,14 +345,14 @@ func authorityDomainRecord(domain Domain) DomainRecord {
 		baseName = strings.TrimSuffix(domain.Name, DomainTLD)
 	}
 	return DomainRecord{
-		Name:          baseName,
-		TLD:           DomainTLD,
-		Owner:         cloneSpecAddress(domain.Owner),
-		ExpiryUnix:    int64(domain.ExpiryHeight),
-		NFTItemID:     domain.NFTID,
-		Status:        DomainStatusActive,
-		CreatedAtUnix: int64(domain.RegisteredHeight),
-		UpdatedAtUnix: int64(domain.UpdatedHeight),
+		Name:		baseName,
+		TLD:		DomainTLD,
+		Owner:		cloneSpecAddress(domain.Owner),
+		ExpiryUnix:	int64(domain.ExpiryHeight),
+		NFTItemID:	domain.NFTID,
+		Status:		DomainStatusActive,
+		CreatedAtUnix:	int64(domain.RegisteredHeight),
+		UpdatedAtUnix:	int64(domain.UpdatedHeight),
 	}
 }
 

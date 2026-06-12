@@ -116,22 +116,22 @@ func testDNLNodeRecord(t *testing.T, seed byte, salt []byte, zones, services []s
 	peerID := ComputeNodeID(peerKey, salt)
 	nodeID := ComputeNodeID(privateKey.Public().(ed25519.PublicKey), salt)
 	latency, err := NewNodeLatencyVectorEntry(NodeLatencyVectorEntry{
-		NodeID:        nodeID,
-		PeerNodeID:    peerID,
-		ZoneID:        zones[0],
-		LatencyMillis: 25,
-		SampleHeight:  12,
+		NodeID:		nodeID,
+		PeerNodeID:	peerID,
+		ZoneID:		zones[0],
+		LatencyMillis:	25,
+		SampleHeight:	12,
 	})
 	require.NoError(t, err)
 	record, err := SignNodeRecord(NodeRecord{
-		OperatorAddress:      "operator-" + HashParts("operator", string([]byte{seed}))[:8],
-		Roles:                []NodeRole{NodeRoleService, NodeRoleRouting},
-		NetworkAddressesHash: addressHash,
-		ZonesSupported:       zones,
-		Services:             services,
-		SupportedProtocols:   []string{DefaultProtocolVersion},
-		LatencyVector:        []NodeLatencyVectorEntry{latency},
-		ExpiresHeight:        expires,
+		OperatorAddress:	"operator-" + HashParts("operator", string([]byte{seed}))[:8],
+		Roles:			[]NodeRole{NodeRoleService, NodeRoleRouting},
+		NetworkAddressesHash:	addressHash,
+		ZonesSupported:		zones,
+		Services:		services,
+		SupportedProtocols:	[]string{DefaultProtocolVersion},
+		LatencyVector:		[]NodeLatencyVectorEntry{latency},
+		ExpiresHeight:		expires,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
@@ -140,16 +140,16 @@ func testDNLNodeRecord(t *testing.T, seed byte, salt []byte, zones, services []s
 func testDNLReputation(t *testing.T, nodeID string, height uint64) ReputationCommitment {
 	t.Helper()
 	reputation, err := NewReputationCommitment(ReputationCommitment{
-		NodeID: nodeID,
+		NodeID:	nodeID,
 		Reputation: PeerScore{
-			ScoreBps:       9_000,
-			LatencyBps:     8_000,
-			ReliabilityBps: 9_500,
-			ThroughputBps:  7_500,
-			PenaltyBps:     100,
+			ScoreBps:	9_000,
+			LatencyBps:	8_000,
+			ReliabilityBps:	9_500,
+			ThroughputBps:	7_500,
+			PenaltyBps:	100,
 		},
-		EvidenceRoot:  HashParts("evidence", nodeID),
-		UpdatedHeight: height,
+		EvidenceRoot:	HashParts("evidence", nodeID),
+		UpdatedHeight:	height,
 	})
 	require.NoError(t, err)
 	return reputation
@@ -158,10 +158,10 @@ func testDNLReputation(t *testing.T, nodeID string, height uint64) ReputationCom
 func testLookupCacheRecord(t *testing.T, expiry uint64) LookupCacheRecord {
 	t.Helper()
 	record, err := NewLookupCacheRecord(LookupCacheRecord{
-		QueryHash:    HashParts("query"),
-		ResponseHash: HashParts("response"),
-		ExpiryHeight: expiry,
-		ProofHash:    HashParts("proof"),
+		QueryHash:	HashParts("query"),
+		ResponseHash:	HashParts("response"),
+		ExpiryHeight:	expiry,
+		ProofHash:	HashParts("proof"),
 	})
 	require.NoError(t, err)
 	return record
@@ -170,13 +170,13 @@ func testLookupCacheRecord(t *testing.T, expiry uint64) LookupCacheRecord {
 func testRoutingTable(t *testing.T, epoch uint64, zoneID, serviceID, nodeID string) RoutingTable {
 	t.Helper()
 	route, err := NewDNLRoutingTableEntry(DNLRoutingTableEntry{
-		ZoneID:        zoneID,
-		ServiceID:     serviceID,
-		NextHopNodeID: nodeID,
-		OverlayID:     HashParts("routing-table-overlay", zoneID),
-		Priority:      1,
-		WeightBps:     8_000,
-		ExpiryHeight:  100,
+		ZoneID:		zoneID,
+		ServiceID:	serviceID,
+		NextHopNodeID:	nodeID,
+		OverlayID:	HashParts("routing-table-overlay", zoneID),
+		Priority:	1,
+		WeightBps:	8_000,
+		ExpiryHeight:	100,
 	})
 	require.NoError(t, err)
 	table, err := NewRoutingTable(RoutingTable{Epoch: epoch, Routes: []DNLRoutingTableEntry{route}})

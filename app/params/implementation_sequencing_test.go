@@ -207,30 +207,30 @@ func TestValidatorRewardPerVotingPowerTelemetry(t *testing.T) {
 
 func TestValidateEconomicSequencingMetricsReconcilesPhase0AndPhase1(t *testing.T) {
 	criterion := ValidateEconomicSequencingMetrics(EconomicSequencingMetricInput{
-		EpochReport:              EpochEconomicReport{Reconciled: true},
-		BurnSupply:               BurnSupplyQueryOutput{CumulativeBurnedNaet: sdkmath.NewInt(1_000), RecentBurnedNaet: sdkmath.NewInt(100)},
-		FeeAllocation:            FeeAllocationBuckets{SumsExactly: true},
-		SecurityReport:           EconomicSecurityEpochReport{Passed: true},
-		StateGrowth:              StateGrowthTelemetryOutput{EpochID: 1, BlockHeight: 10},
-		FeeOptimizer:             FeeMarketOptimizerOutput{Validation: FeeValidationResult{MempoolExecutionAligned: true}},
-		BurnFeeInvariant:         BurnAccountingInvariantReport{Passed: true},
-		BurnSlashingInvariant:    BurnAccountingInvariantReport{Passed: true},
-		AdaptiveInflation:        AdaptiveInflationEpochReport{Reconciled: true},
-		ValidatorRewardTelemetry: []ValidatorRewardTelemetrySample{{ValidatorID: "val-a", VotingPowerBps: 1_000, RewardNaet: sdkmath.NewInt(5_000)}},
+		EpochReport:			EpochEconomicReport{Reconciled: true},
+		BurnSupply:			BurnSupplyQueryOutput{CumulativeBurnedNaet: sdkmath.NewInt(1_000), RecentBurnedNaet: sdkmath.NewInt(100)},
+		FeeAllocation:			FeeAllocationBuckets{SumsExactly: true},
+		SecurityReport:			EconomicSecurityEpochReport{Passed: true},
+		StateGrowth:			StateGrowthTelemetryOutput{EpochID: 1, BlockHeight: 10},
+		FeeOptimizer:			FeeMarketOptimizerOutput{Validation: FeeValidationResult{MempoolExecutionAligned: true}},
+		BurnFeeInvariant:		BurnAccountingInvariantReport{Passed: true},
+		BurnSlashingInvariant:		BurnAccountingInvariantReport{Passed: true},
+		AdaptiveInflation:		AdaptiveInflationEpochReport{Reconciled: true},
+		ValidatorRewardTelemetry:	[]ValidatorRewardTelemetrySample{{ValidatorID: "val-a", VotingPowerBps: 1_000, RewardNaet: sdkmath.NewInt(5_000)}},
 	})
 	require.True(t, criterion.Met, criterion.FailedReason)
 
 	criterion = ValidateEconomicSequencingMetrics(EconomicSequencingMetricInput{
-		EpochReport:              EpochEconomicReport{Reconciled: false},
-		BurnSupply:               BurnSupplyQueryOutput{CumulativeBurnedNaet: sdkmath.NewInt(-1)},
-		FeeAllocation:            FeeAllocationBuckets{SumsExactly: false},
-		SecurityReport:           EconomicSecurityEpochReport{Failed: []string{"fund_movement_mismatch"}},
-		StateGrowth:              StateGrowthTelemetryOutput{},
-		FeeOptimizer:             FeeMarketOptimizerOutput{Validation: FeeValidationResult{MempoolExecutionAligned: false}},
-		BurnFeeInvariant:         BurnAccountingInvariantReport{Passed: false},
-		BurnSlashingInvariant:    BurnAccountingInvariantReport{Passed: false},
-		AdaptiveInflation:        AdaptiveInflationEpochReport{Reconciled: false},
-		ValidatorRewardTelemetry: []ValidatorRewardTelemetrySample{{ValidatorID: "", VotingPowerBps: 1, RewardNaet: sdkmath.OneInt()}},
+		EpochReport:			EpochEconomicReport{Reconciled: false},
+		BurnSupply:			BurnSupplyQueryOutput{CumulativeBurnedNaet: sdkmath.NewInt(-1)},
+		FeeAllocation:			FeeAllocationBuckets{SumsExactly: false},
+		SecurityReport:			EconomicSecurityEpochReport{Failed: []string{"fund_movement_mismatch"}},
+		StateGrowth:			StateGrowthTelemetryOutput{},
+		FeeOptimizer:			FeeMarketOptimizerOutput{Validation: FeeValidationResult{MempoolExecutionAligned: false}},
+		BurnFeeInvariant:		BurnAccountingInvariantReport{Passed: false},
+		BurnSlashingInvariant:		BurnAccountingInvariantReport{Passed: false},
+		AdaptiveInflation:		AdaptiveInflationEpochReport{Reconciled: false},
+		ValidatorRewardTelemetry:	[]ValidatorRewardTelemetrySample{{ValidatorID: "", VotingPowerBps: 1, RewardNaet: sdkmath.OneInt()}},
 	})
 	require.False(t, criterion.Met)
 	require.Contains(t, criterion.FailedReason, "epoch_economic_report_not_reconciled")

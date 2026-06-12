@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	IdentityCrossZoneBindingV2Prefix      = IdentityZonePrefix + "/cross_zone/bindings"
-	IdentityCrossZoneInvalidationV2Prefix = IdentityZonePrefix + "/cross_zone/invalidations"
+	IdentityCrossZoneBindingV2Prefix	= IdentityZonePrefix + "/cross_zone/bindings"
+	IdentityCrossZoneInvalidationV2Prefix	= IdentityZonePrefix + "/cross_zone/invalidations"
 )
 
 type IdentityCrossZoneBindingTargetType string
@@ -19,86 +19,86 @@ type IdentityCrossZoneBindingConfirmationType string
 type IdentityCrossZoneBindingInvalidationReason string
 
 const (
-	IdentityBindingTargetAccount      IdentityCrossZoneBindingTargetType = "account"
-	IdentityBindingTargetService      IdentityCrossZoneBindingTargetType = "service"
-	IdentityBindingTargetContract     IdentityCrossZoneBindingTargetType = "contract"
-	IdentityBindingTargetZoneEndpoint IdentityCrossZoneBindingTargetType = "zone_endpoint"
-	IdentityBindingTargetComposite    IdentityCrossZoneBindingTargetType = "composite_identity_object"
+	IdentityBindingTargetAccount		IdentityCrossZoneBindingTargetType	= "account"
+	IdentityBindingTargetService		IdentityCrossZoneBindingTargetType	= "service"
+	IdentityBindingTargetContract		IdentityCrossZoneBindingTargetType	= "contract"
+	IdentityBindingTargetZoneEndpoint	IdentityCrossZoneBindingTargetType	= "zone_endpoint"
+	IdentityBindingTargetComposite		IdentityCrossZoneBindingTargetType	= "composite_identity_object"
 
-	IdentityBindingConfirmationProof   IdentityCrossZoneBindingConfirmationType = "proof_verifiable"
-	IdentityBindingConfirmationMessage IdentityCrossZoneBindingConfirmationType = "message_confirmed"
+	IdentityBindingConfirmationProof	IdentityCrossZoneBindingConfirmationType	= "proof_verifiable"
+	IdentityBindingConfirmationMessage	IdentityCrossZoneBindingConfirmationType	= "message_confirmed"
 
-	IdentityBindingInvalidatedCreated IdentityCrossZoneBindingInvalidationReason = "created"
-	IdentityBindingInvalidatedUpdated IdentityCrossZoneBindingInvalidationReason = "updated"
-	IdentityBindingInvalidatedRevoked IdentityCrossZoneBindingInvalidationReason = "revoked"
-	IdentityBindingInvalidatedExpired IdentityCrossZoneBindingInvalidationReason = "expired"
+	IdentityBindingInvalidatedCreated	IdentityCrossZoneBindingInvalidationReason	= "created"
+	IdentityBindingInvalidatedUpdated	IdentityCrossZoneBindingInvalidationReason	= "updated"
+	IdentityBindingInvalidatedRevoked	IdentityCrossZoneBindingInvalidationReason	= "revoked"
+	IdentityBindingInvalidatedExpired	IdentityCrossZoneBindingInvalidationReason	= "expired"
 )
 
 type CrossZoneIdentityBindingV2 struct {
-	IdentityID     string
-	TargetZone     string
-	TargetType     IdentityCrossZoneBindingTargetType
-	TargetKey      string
-	ProofRequired  bool
-	ExpiresHeight  uint64
-	BindingVersion uint64
-	BindingHash    string
+	IdentityID	string
+	TargetZone	string
+	TargetType	IdentityCrossZoneBindingTargetType
+	TargetKey	string
+	ProofRequired	bool
+	ExpiresHeight	uint64
+	BindingVersion	uint64
+	BindingHash	string
 }
 
 type CrossZoneBindingConfirmationV2 struct {
-	ConfirmationType IdentityCrossZoneBindingConfirmationType
-	ProofRoot        string
-	ProofHash        string
-	MessageID        string
-	ReceiptHash      string
-	ConfirmedHeight  uint64
-	ConfirmationHash string
+	ConfirmationType	IdentityCrossZoneBindingConfirmationType
+	ProofRoot		string
+	ProofHash		string
+	MessageID		string
+	ReceiptHash		string
+	ConfirmedHeight		uint64
+	ConfirmationHash	string
 }
 
 type CrossZoneBindingInvalidationEventV2 struct {
-	EventID     string
-	BindingHash string
-	IdentityID  string
-	TargetZone  string
-	TargetType  IdentityCrossZoneBindingTargetType
-	TargetKey   string
-	Reason      IdentityCrossZoneBindingInvalidationReason
-	Height      uint64
-	EventHash   string
+	EventID		string
+	BindingHash	string
+	IdentityID	string
+	TargetZone	string
+	TargetType	IdentityCrossZoneBindingTargetType
+	TargetKey	string
+	Reason		IdentityCrossZoneBindingInvalidationReason
+	Height		uint64
+	EventHash	string
 }
 
 type CrossZoneIdentityBindingStateV2 struct {
-	Bindings      []CrossZoneIdentityBindingV2
-	Confirmations []CrossZoneBindingConfirmationV2
-	Invalidations []CrossZoneBindingInvalidationEventV2
-	Height        uint64
-	RootHash      string
+	Bindings	[]CrossZoneIdentityBindingV2
+	Confirmations	[]CrossZoneBindingConfirmationV2
+	Invalidations	[]CrossZoneBindingInvalidationEventV2
+	Height		uint64
+	RootHash	string
 }
 
 type MsgBindCrossZoneIdentityV2 struct {
-	Authority    sdk.AccAddress
-	Binding      CrossZoneIdentityBindingV2
-	Confirmation CrossZoneBindingConfirmationV2
-	Height       uint64
-	MessageHash  string
+	Authority	sdk.AccAddress
+	Binding		CrossZoneIdentityBindingV2
+	Confirmation	CrossZoneBindingConfirmationV2
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgUpdateCrossZoneIdentityBindingV2 struct {
-	Authority    sdk.AccAddress
-	Binding      CrossZoneIdentityBindingV2
-	Confirmation CrossZoneBindingConfirmationV2
-	Height       uint64
-	MessageHash  string
+	Authority	sdk.AccAddress
+	Binding		CrossZoneIdentityBindingV2
+	Confirmation	CrossZoneBindingConfirmationV2
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgRevokeCrossZoneIdentityBindingV2 struct {
-	Authority   sdk.AccAddress
-	IdentityID  string
-	TargetZone  string
-	TargetType  IdentityCrossZoneBindingTargetType
-	TargetKey   string
-	Height      uint64
-	MessageHash string
+	Authority	sdk.AccAddress
+	IdentityID	string
+	TargetZone	string
+	TargetType	IdentityCrossZoneBindingTargetType
+	TargetKey	string
+	Height		uint64
+	MessageHash	string
 }
 
 func CrossZoneIdentityBindingV2Key(identityID, targetZone string, targetType IdentityCrossZoneBindingTargetType, targetKey string) (string, error) {
@@ -165,10 +165,10 @@ func NewCrossZoneBindingInvalidationEventV2(event CrossZoneBindingInvalidationEv
 
 func BuildCrossZoneIdentityBindingStateV2(bindings []CrossZoneIdentityBindingV2, confirmations []CrossZoneBindingConfirmationV2, invalidations []CrossZoneBindingInvalidationEventV2, height uint64) (CrossZoneIdentityBindingStateV2, error) {
 	state := CrossZoneIdentityBindingStateV2{
-		Bindings:      normalizeCrossZoneIdentityBindingsV2(bindings),
-		Confirmations: normalizeCrossZoneBindingConfirmationsV2(confirmations),
-		Invalidations: normalizeCrossZoneBindingInvalidationsV2(invalidations),
-		Height:        height,
+		Bindings:	normalizeCrossZoneIdentityBindingsV2(bindings),
+		Confirmations:	normalizeCrossZoneBindingConfirmationsV2(confirmations),
+		Invalidations:	normalizeCrossZoneBindingInvalidationsV2(invalidations),
+		Height:		height,
 	}
 	if err := state.ValidateFormat(); err != nil {
 		return CrossZoneIdentityBindingStateV2{}, err
@@ -185,13 +185,13 @@ func ApplyCrossZoneIdentityBindV2(state CrossZoneIdentityBindingStateV2, graph I
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, errors.New("cross-zone identity binding already exists")
 	}
 	event, err := NewCrossZoneBindingInvalidationEventV2(CrossZoneBindingInvalidationEventV2{
-		BindingHash: msg.Binding.BindingHash,
-		IdentityID:  msg.Binding.IdentityID,
-		TargetZone:  msg.Binding.TargetZone,
-		TargetType:  msg.Binding.TargetType,
-		TargetKey:   msg.Binding.TargetKey,
-		Reason:      IdentityBindingInvalidatedCreated,
-		Height:      msg.Height,
+		BindingHash:	msg.Binding.BindingHash,
+		IdentityID:	msg.Binding.IdentityID,
+		TargetZone:	msg.Binding.TargetZone,
+		TargetType:	msg.Binding.TargetType,
+		TargetKey:	msg.Binding.TargetKey,
+		Reason:		IdentityBindingInvalidatedCreated,
+		Height:		msg.Height,
 	})
 	if err != nil {
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, err
@@ -218,13 +218,13 @@ func ApplyCrossZoneIdentityBindingUpdateV2(state CrossZoneIdentityBindingStateV2
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, errors.New("cross-zone identity binding update must increase version")
 	}
 	event, err := NewCrossZoneBindingInvalidationEventV2(CrossZoneBindingInvalidationEventV2{
-		BindingHash: state.Bindings[idx].BindingHash,
-		IdentityID:  msg.Binding.IdentityID,
-		TargetZone:  msg.Binding.TargetZone,
-		TargetType:  msg.Binding.TargetType,
-		TargetKey:   msg.Binding.TargetKey,
-		Reason:      IdentityBindingInvalidatedUpdated,
-		Height:      msg.Height,
+		BindingHash:	state.Bindings[idx].BindingHash,
+		IdentityID:	msg.Binding.IdentityID,
+		TargetZone:	msg.Binding.TargetZone,
+		TargetType:	msg.Binding.TargetType,
+		TargetKey:	msg.Binding.TargetKey,
+		Reason:		IdentityBindingInvalidatedUpdated,
+		Height:		msg.Height,
 	})
 	if err != nil {
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, err
@@ -244,13 +244,13 @@ func ApplyCrossZoneIdentityBindingRevokeV2(state CrossZoneIdentityBindingStateV2
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, err
 	}
 	probe, err := NewCrossZoneIdentityBindingV2(CrossZoneIdentityBindingV2{
-		IdentityID:     msg.IdentityID,
-		TargetZone:     msg.TargetZone,
-		TargetType:     msg.TargetType,
-		TargetKey:      msg.TargetKey,
-		ProofRequired:  false,
-		ExpiresHeight:  msg.Height + 1,
-		BindingVersion: 1,
+		IdentityID:	msg.IdentityID,
+		TargetZone:	msg.TargetZone,
+		TargetType:	msg.TargetType,
+		TargetKey:	msg.TargetKey,
+		ProofRequired:	false,
+		ExpiresHeight:	msg.Height + 1,
+		BindingVersion:	1,
 	})
 	if err != nil {
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, err
@@ -260,13 +260,13 @@ func ApplyCrossZoneIdentityBindingRevokeV2(state CrossZoneIdentityBindingStateV2
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, errors.New("cross-zone identity binding not found")
 	}
 	event, err := NewCrossZoneBindingInvalidationEventV2(CrossZoneBindingInvalidationEventV2{
-		BindingHash: state.Bindings[idx].BindingHash,
-		IdentityID:  msg.IdentityID,
-		TargetZone:  msg.TargetZone,
-		TargetType:  msg.TargetType,
-		TargetKey:   msg.TargetKey,
-		Reason:      IdentityBindingInvalidatedRevoked,
-		Height:      msg.Height,
+		BindingHash:	state.Bindings[idx].BindingHash,
+		IdentityID:	msg.IdentityID,
+		TargetZone:	msg.TargetZone,
+		TargetType:	msg.TargetType,
+		TargetKey:	msg.TargetKey,
+		Reason:		IdentityBindingInvalidatedRevoked,
+		Height:		msg.Height,
 	})
 	if err != nil {
 		return CrossZoneIdentityBindingStateV2{}, CrossZoneBindingInvalidationEventV2{}, err

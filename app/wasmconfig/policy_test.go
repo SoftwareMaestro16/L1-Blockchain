@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	governanceAddr = testAEAddress(0x01)
-	uploaderAddr   = testAEAddress(0x02)
-	ownerAddr      = testAEAddress(0x03)
-	contractAddr   = testAEAddress(0x04)
-	attackerAddr   = testAEAddress(0x05)
+	governanceAddr	= testAEAddress(0x01)
+	uploaderAddr	= testAEAddress(0x02)
+	ownerAddr	= testAEAddress(0x03)
+	contractAddr	= testAEAddress(0x04)
+	attackerAddr	= testAEAddress(0x05)
 )
 
 func TestDefaultPolicyIsDisabledAndPinnedToCompatibleWasmd(t *testing.T) {

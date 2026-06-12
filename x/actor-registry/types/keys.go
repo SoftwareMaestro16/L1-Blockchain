@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "actorregistry"
-	StoreKey   = ModuleName
+	ModuleName	= "actorregistry"
+	StoreKey	= ModuleName
 )

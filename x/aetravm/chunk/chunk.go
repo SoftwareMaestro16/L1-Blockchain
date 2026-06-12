@@ -10,49 +10,49 @@ import (
 )
 
 const (
-	MaxDataBits = 2048
-	MaxRefs     = 8
-	HashSize    = 32
+	MaxDataBits	= 2048
+	MaxRefs		= 8
+	HashSize	= 32
 )
 
 // Structured ref indices
 const (
-	RefData0    = 0
-	RefData1    = 1
-	RefData2    = 2
-	RefData3    = 3
-	RefControl0 = 4
-	RefControl1 = 5
-	RefMetadata = 6
-	RefSystem   = 7
+	RefData0	= 0
+	RefData1	= 1
+	RefData2	= 2
+	RefData3	= 3
+	RefControl0	= 4
+	RefControl1	= 5
+	RefMetadata	= 6
+	RefSystem	= 7
 )
 
 type TypeTag uint8
 
 const (
-	TypeNormal   TypeTag = 0
-	TypePruned   TypeTag = 1
-	TypeSnapshot TypeTag = 2
-	TypeDiff     TypeTag = 3
-	TypeProof    TypeTag = 4
-	TypeSystem   TypeTag = 5
+	TypeNormal	TypeTag	= 0
+	TypePruned	TypeTag	= 1
+	TypeSnapshot	TypeTag	= 2
+	TypeDiff	TypeTag	= 3
+	TypeProof	TypeTag	= 4
+	TypeSystem	TypeTag	= 5
 )
 
 // Chunk represents a content-addressed, immutable Merkle DAG node.
 type Chunk struct {
-	typeTag   TypeTag
-	level     uint8
-	data      []byte
-	bitCount  uint16
-	refBitmap uint8
-	refs      [MaxRefs]*Chunk
-	hashes    [][HashSize]byte
+	typeTag		TypeTag
+	level		uint8
+	data		[]byte
+	bitCount	uint16
+	refBitmap	uint8
+	refs		[MaxRefs]*Chunk
+	hashes		[][HashSize]byte
 }
 
-func (c *Chunk) TypeTag() TypeTag { return c.typeTag }
-func (c *Chunk) Level() uint8     { return c.level }
-func (c *Chunk) Data() []byte     { return c.data }
-func (c *Chunk) BitCount() uint16 { return c.bitCount }
+func (c *Chunk) TypeTag() TypeTag	{ return c.typeTag }
+func (c *Chunk) Level() uint8		{ return c.level }
+func (c *Chunk) Data() []byte		{ return c.data }
+func (c *Chunk) BitCount() uint16	{ return c.bitCount }
 
 func (c *Chunk) Refs() []*Chunk {
 	var out []*Chunk
@@ -84,7 +84,7 @@ func (c *Chunk) RefHashes(layer int) [][]byte {
 	return out
 }
 
-func (c *Chunk) Hash() []byte { return c.hashes[0][:] }
+func (c *Chunk) Hash() []byte	{ return c.hashes[0][:] }
 func (c *Chunk) HashLayer(i int) []byte {
 	if i >= len(c.hashes) {
 		return nil
@@ -108,9 +108,9 @@ func NewPrunedChunk(level uint8, hashes [][]byte) (*Chunk, error) {
 		return nil, fmt.Errorf("pruned chunk must have at least H0")
 	}
 	c := &Chunk{
-		typeTag: TypePruned,
-		level:   level,
-		hashes:  make([][HashSize]byte, len(hashes)),
+		typeTag:	TypePruned,
+		level:		level,
+		hashes:		make([][HashSize]byte, len(hashes)),
 	}
 	for i, h := range hashes {
 		if len(h) != HashSize {
@@ -127,11 +127,11 @@ func NewBuilder() *Builder {
 }
 
 type Builder struct {
-	typeTag   TypeTag
-	data      []byte
-	bitCount  uint16
-	refBitmap uint8
-	refs      [MaxRefs]*Chunk
+	typeTag		TypeTag
+	data		[]byte
+	bitCount	uint16
+	refBitmap	uint8
+	refs		[MaxRefs]*Chunk
 }
 
 func (b *Builder) SetTypeTag(t TypeTag) *Builder {
@@ -174,11 +174,11 @@ func (b *Builder) Build() (*Chunk, error) {
 	}
 
 	c := &Chunk{
-		typeTag:   b.typeTag,
-		data:      append([]byte(nil), b.data...),
-		bitCount:  b.bitCount,
-		refBitmap: b.refBitmap,
-		refs:      b.refs,
+		typeTag:	b.typeTag,
+		data:		append([]byte(nil), b.data...),
+		bitCount:	b.bitCount,
+		refBitmap:	b.refBitmap,
+		refs:		b.refs,
 	}
 
 	// Calculate level: max(ref.level) + 1
@@ -201,7 +201,6 @@ func (b *Builder) Build() (*Chunk, error) {
 		c.level = 0
 	}
 
-	// Calculate layered hashes
 	h0, err := c.calculateHash(0)
 	if err != nil {
 		return nil, err
@@ -227,8 +226,6 @@ func (c *Chunk) calculateHash(layer int) ([HashSize]byte, error) {
 }
 
 func (c *Chunk) encodeCanonical(w io.Writer, layer int) error {
-	// Canonical encoding format:
-	// [type_tag:1][level:1][bit_count:2][data_bytes:N][ref_bitmap:1][ref_hashes:M*32]
 
 	if err := binary.Write(w, binary.BigEndian, uint8(c.typeTag)); err != nil {
 		return err

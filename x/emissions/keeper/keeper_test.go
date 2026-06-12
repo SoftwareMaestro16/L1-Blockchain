@@ -21,9 +21,9 @@ func TestStakingRatioBelowTargetIncreasesRewardsWithinBounds(t *testing.T) {
 	msgServer := emissionskeeper.NewMsgServerImpl(app.EmissionsKeeper)
 
 	res, err := msgServer.FinalizeEmissionEpoch(ctx, &types.MsgFinalizeEmissionEpoch{
-		Authority:       app.EmissionsKeeper.Authority(),
-		Epoch:           1,
-		StakingRatioBps: 5_000,
+		Authority:		app.EmissionsKeeper.Authority(),
+		Epoch:			1,
+		StakingRatioBps:	5_000,
 	})
 	require.NoError(t, err)
 
@@ -43,9 +43,9 @@ func TestStakingRatioAboveTargetDecreasesRewardsWithinBounds(t *testing.T) {
 	msgServer := emissionskeeper.NewMsgServerImpl(app.EmissionsKeeper)
 
 	res, err := msgServer.FinalizeEmissionEpoch(ctx, &types.MsgFinalizeEmissionEpoch{
-		Authority:       app.EmissionsKeeper.Authority(),
-		Epoch:           1,
-		StakingRatioBps: 8_000,
+		Authority:		app.EmissionsKeeper.Authority(),
+		Epoch:			1,
+		StakingRatioBps:	8_000,
 	})
 	require.NoError(t, err)
 
@@ -62,8 +62,8 @@ func TestDistributionWeightsSumValidation(t *testing.T) {
 	params.DistributionWeights.EcosystemBps = 499
 
 	_, err := msgServer.UpdateEmissionsParams(ctx, &types.MsgUpdateEmissionsParams{
-		Authority: app.EmissionsKeeper.Authority(),
-		Params:    params,
+		Authority:	app.EmissionsKeeper.Authority(),
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidParams)
 }
@@ -81,11 +81,11 @@ func TestDeterministicRoundingRemainder(t *testing.T) {
 	params.AnnualReferenceSupply = sdk.NewInt64Coin(types.BaseDenom, 101)
 	params.EpochsPerYear = 1
 	params.DistributionWeights = types.DistributionWeights{
-		ValidatorRewardBps: 3_333,
-		TreasuryBps:        3_333,
-		ProtectionBps:      3_333,
-		BurnBps:            1,
-		EcosystemBps:       0,
+		ValidatorRewardBps:	3_333,
+		TreasuryBps:		3_333,
+		ProtectionBps:		3_333,
+		BurnBps:		1,
+		EcosystemBps:		0,
 	}
 	require.NoError(t, app.EmissionsKeeper.SetParams(ctx, params))
 

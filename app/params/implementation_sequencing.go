@@ -9,118 +9,118 @@ import (
 )
 
 const (
-	EconomicSequencePhase0 = "phase_0_measurement_accounting"
-	EconomicSequencePhase1 = "phase_1_production_safety"
-	EconomicSequencePhase2 = "phase_2_validator_delegation_incentives"
-	EconomicSequencePhase3 = "phase_3_fee_storage_execution_optimization"
-	EconomicSequencePhase4 = "phase_4_adaptive_controllers_long_term_stabilization"
+	EconomicSequencePhase0	= "phase_0_measurement_accounting"
+	EconomicSequencePhase1	= "phase_1_production_safety"
+	EconomicSequencePhase2	= "phase_2_validator_delegation_incentives"
+	EconomicSequencePhase3	= "phase_3_fee_storage_execution_optimization"
+	EconomicSequencePhase4	= "phase_4_adaptive_controllers_long_term_stabilization"
 
-	SequencingStatusReady   = "ready"
-	SequencingStatusBlocked = "blocked"
+	SequencingStatusReady	= "ready"
+	SequencingStatusBlocked	= "blocked"
 
-	SequencingTaskNetIssuanceAccounting                   = "net_issuance_accounting"
-	SequencingTaskCumulativeBurnAccounting                = "cumulative_burn_accounting"
-	SequencingTaskFeeBucketAccounting                     = "fee_bucket_accounting"
-	SequencingTaskValidatorConcentrationMetrics           = "validator_concentration_metrics"
-	SequencingTaskStateGrowthTelemetry                    = "state_growth_telemetry"
-	SequencingTaskValidatorRewardPerVotingPower           = "validator_reward_per_voting_power_telemetry"
-	SequencingTaskEpochEconomicReportGeneration           = "epoch_economic_report_generation"
-	SequencingTaskBurnControllerFeeDistributionWiring     = "burn_controller_fee_distribution_wiring"
-	SequencingTaskDeflationGuardEnforcement               = "deflation_guard_enforcement"
-	SequencingTaskBurnCaps                                = "burn_caps"
-	SequencingTaskFeeControllerBounds                     = "fee_controller_bounds"
-	SequencingTaskMempoolExecutionFeeValidationAlignment  = "mempool_execution_fee_validation_alignment"
-	SequencingTaskSlashingFundRouting                     = "slashing_fund_routing"
-	SequencingTaskFundMovementInvariantTests              = "fund_movement_invariant_tests"
-	SequencingTaskValidatorScoring                        = "validator_scoring"
-	SequencingTaskEpochBasedSelectionProduction           = "epoch_based_selection_production"
-	SequencingTaskConcentrationRewardDampening            = "concentration_reward_dampening"
-	SequencingTaskValidatorRiskScoreQueries               = "validator_risk_score_queries"
-	SequencingTaskCommissionChangeWarnings                = "commission_change_warnings"
-	SequencingTaskRiskAdjustedYieldEstimates              = "risk_adjusted_yield_estimates"
-	SequencingTaskValidatorBootstrapBand                  = "validator_bootstrap_band"
-	SequencingTaskResourceSpecificFeeMultipliers          = "resource_specific_fee_multipliers"
-	SequencingTaskSenderLocalSpamSurcharge                = "sender_local_spam_surcharge"
-	SequencingTaskStorageWriteUpdatePricing               = "storage_write_update_pricing"
-	SequencingTaskStorageFootprintQueries                 = "storage_footprint_queries"
-	SequencingTaskDeleteRefundPolicy                      = "delete_refund_policy"
-	SequencingTaskDeploymentForwardingFeeEstimation       = "deployment_forwarding_fee_estimation"
-	SequencingTaskStateGrowthSurcharge                    = "state_growth_surcharge"
-	SequencingTaskAdaptiveInflationController             = "adaptive_inflation_controller"
-	SequencingTaskSupplyProjectionReports                 = "supply_projection_reports"
-	SequencingTaskEconomicSecurityModule                  = "economic_security_module"
-	SequencingTaskFeeMarketCircuitBreaker                 = "fee_market_circuit_breaker"
-	SequencingTaskSecurityReserveAccounting               = "security_reserve_accounting"
-	SequencingTaskPreUpgradeEconomicSimulationRequirement = "pre_upgrade_economic_simulation_requirement"
+	SequencingTaskNetIssuanceAccounting			= "net_issuance_accounting"
+	SequencingTaskCumulativeBurnAccounting			= "cumulative_burn_accounting"
+	SequencingTaskFeeBucketAccounting			= "fee_bucket_accounting"
+	SequencingTaskValidatorConcentrationMetrics		= "validator_concentration_metrics"
+	SequencingTaskStateGrowthTelemetry			= "state_growth_telemetry"
+	SequencingTaskValidatorRewardPerVotingPower		= "validator_reward_per_voting_power_telemetry"
+	SequencingTaskEpochEconomicReportGeneration		= "epoch_economic_report_generation"
+	SequencingTaskBurnControllerFeeDistributionWiring	= "burn_controller_fee_distribution_wiring"
+	SequencingTaskDeflationGuardEnforcement			= "deflation_guard_enforcement"
+	SequencingTaskBurnCaps					= "burn_caps"
+	SequencingTaskFeeControllerBounds			= "fee_controller_bounds"
+	SequencingTaskMempoolExecutionFeeValidationAlignment	= "mempool_execution_fee_validation_alignment"
+	SequencingTaskSlashingFundRouting			= "slashing_fund_routing"
+	SequencingTaskFundMovementInvariantTests		= "fund_movement_invariant_tests"
+	SequencingTaskValidatorScoring				= "validator_scoring"
+	SequencingTaskEpochBasedSelectionProduction		= "epoch_based_selection_production"
+	SequencingTaskConcentrationRewardDampening		= "concentration_reward_dampening"
+	SequencingTaskValidatorRiskScoreQueries			= "validator_risk_score_queries"
+	SequencingTaskCommissionChangeWarnings			= "commission_change_warnings"
+	SequencingTaskRiskAdjustedYieldEstimates		= "risk_adjusted_yield_estimates"
+	SequencingTaskValidatorBootstrapBand			= "validator_bootstrap_band"
+	SequencingTaskResourceSpecificFeeMultipliers		= "resource_specific_fee_multipliers"
+	SequencingTaskSenderLocalSpamSurcharge			= "sender_local_spam_surcharge"
+	SequencingTaskStorageWriteUpdatePricing			= "storage_write_update_pricing"
+	SequencingTaskStorageFootprintQueries			= "storage_footprint_queries"
+	SequencingTaskDeleteRefundPolicy			= "delete_refund_policy"
+	SequencingTaskDeploymentForwardingFeeEstimation		= "deployment_forwarding_fee_estimation"
+	SequencingTaskStateGrowthSurcharge			= "state_growth_surcharge"
+	SequencingTaskAdaptiveInflationController		= "adaptive_inflation_controller"
+	SequencingTaskSupplyProjectionReports			= "supply_projection_reports"
+	SequencingTaskEconomicSecurityModule			= "economic_security_module"
+	SequencingTaskFeeMarketCircuitBreaker			= "fee_market_circuit_breaker"
+	SequencingTaskSecurityReserveAccounting			= "security_reserve_accounting"
+	SequencingTaskPreUpgradeEconomicSimulationRequirement	= "pre_upgrade_economic_simulation_requirement"
 )
 
 type EconomicSequencingTask struct {
-	PhaseID         string
-	Name            string
-	Implemented     bool
-	Observable      bool
-	Queryable       bool
-	InvariantTested bool
-	Reconciled      bool
-	Evidence        []string
+	PhaseID		string
+	Name		string
+	Implemented	bool
+	Observable	bool
+	Queryable	bool
+	InvariantTested	bool
+	Reconciled	bool
+	Evidence	[]string
 }
 
 type EconomicSequencingExitCriterion struct {
-	Name         string
-	Met          bool
-	FailedReason string
+	Name		string
+	Met		bool
+	FailedReason	string
 }
 
 type EconomicSequencingPhaseReport struct {
-	PhaseID      string
-	Goal         string
-	Status       string
-	Tasks        []EconomicSequencingTask
-	ExitCriteria []EconomicSequencingExitCriterion
-	Failed       []string
-	Passed       bool
+	PhaseID		string
+	Goal		string
+	Status		string
+	Tasks		[]EconomicSequencingTask
+	ExitCriteria	[]EconomicSequencingExitCriterion
+	Failed		[]string
+	Passed		bool
 }
 
 type EconomicSequencingReport struct {
-	Phases                        []EconomicSequencingPhaseReport
-	ReadyForPhase1                bool
-	ReadyForPhase2                bool
-	ReadyForPhase3                bool
-	ReadyForPhase4                bool
-	ReadyForIncentiveChanges      bool
-	ReadyForResourcePricing       bool
-	ReadyForLongTermStabilization bool
-	Failed                        []string
-	Passed                        bool
-	GovernanceSummary             string
+	Phases				[]EconomicSequencingPhaseReport
+	ReadyForPhase1			bool
+	ReadyForPhase2			bool
+	ReadyForPhase3			bool
+	ReadyForPhase4			bool
+	ReadyForIncentiveChanges	bool
+	ReadyForResourcePricing		bool
+	ReadyForLongTermStabilization	bool
+	Failed				[]string
+	Passed				bool
+	GovernanceSummary		string
 }
 
 type EconomicSequencingMetricInput struct {
-	EpochReport              EpochEconomicReport
-	BurnSupply               BurnSupplyQueryOutput
-	FeeAllocation            FeeAllocationBuckets
-	SecurityReport           EconomicSecurityEpochReport
-	StateGrowth              StateGrowthTelemetryOutput
-	FeeOptimizer             FeeMarketOptimizerOutput
-	BurnFeeDistribution      BurnIntegratedFeeDistributionOutput
-	BurnSlashingDistribution BurnIntegratedSlashingDistributionOutput
-	BurnFeeInvariant         BurnAccountingInvariantReport
-	BurnSlashingInvariant    BurnAccountingInvariantReport
-	AdaptiveInflation        AdaptiveInflationEpochReport
-	ValidatorRewardTelemetry []ValidatorRewardTelemetrySample
+	EpochReport			EpochEconomicReport
+	BurnSupply			BurnSupplyQueryOutput
+	FeeAllocation			FeeAllocationBuckets
+	SecurityReport			EconomicSecurityEpochReport
+	StateGrowth			StateGrowthTelemetryOutput
+	FeeOptimizer			FeeMarketOptimizerOutput
+	BurnFeeDistribution		BurnIntegratedFeeDistributionOutput
+	BurnSlashingDistribution	BurnIntegratedSlashingDistributionOutput
+	BurnFeeInvariant		BurnAccountingInvariantReport
+	BurnSlashingInvariant		BurnAccountingInvariantReport
+	AdaptiveInflation		AdaptiveInflationEpochReport
+	ValidatorRewardTelemetry	[]ValidatorRewardTelemetrySample
 }
 
 type ValidatorRewardTelemetrySample struct {
-	ValidatorID    string
-	VotingPowerBps int64
-	RewardNaet     sdkmath.Int
+	ValidatorID	string
+	VotingPowerBps	int64
+	RewardNaet	sdkmath.Int
 }
 
 type ValidatorRewardPerPowerTelemetry struct {
-	ValidatorID      string
-	VotingPowerBps   int64
-	RewardNaet       sdkmath.Int
-	RewardPerBpsNaet sdkmath.Int
+	ValidatorID		string
+	VotingPowerBps		int64
+	RewardNaet		sdkmath.Int
+	RewardPerBpsNaet	sdkmath.Int
 }
 
 func DefaultPhase0SequencingTasks() []EconomicSequencingTask {
@@ -269,17 +269,17 @@ func buildImplementationSequencingReport(phase0Tasks, phase1Tasks, phase2Tasks, 
 	}
 
 	return EconomicSequencingReport{
-		Phases:                        phases,
-		ReadyForPhase1:                readyForPhase1,
-		ReadyForPhase2:                readyForPhase2,
-		ReadyForPhase3:                readyForPhase3,
-		ReadyForPhase4:                readyForPhase4,
-		ReadyForIncentiveChanges:      readyForIncentiveChanges,
-		ReadyForResourcePricing:       readyForResourcePricing,
-		ReadyForLongTermStabilization: readyForLongTermStabilization,
-		Failed:                        failed,
-		Passed:                        len(failed) == 0,
-		GovernanceSummary:             sequencingGovernanceSummary(status, phases),
+		Phases:				phases,
+		ReadyForPhase1:			readyForPhase1,
+		ReadyForPhase2:			readyForPhase2,
+		ReadyForPhase3:			readyForPhase3,
+		ReadyForPhase4:			readyForPhase4,
+		ReadyForIncentiveChanges:	readyForIncentiveChanges,
+		ReadyForResourcePricing:	readyForResourcePricing,
+		ReadyForLongTermStabilization:	readyForLongTermStabilization,
+		Failed:				failed,
+		Passed:				len(failed) == 0,
+		GovernanceSummary:		sequencingGovernanceSummary(status, phases),
 	}
 }
 
@@ -317,9 +317,9 @@ func ValidateEconomicSequencingMetrics(input EconomicSequencingMetricInput) Econ
 	}
 
 	return EconomicSequencingExitCriterion{
-		Name:         "phase_0_phase_1_accounting_reconciliation",
-		Met:          len(failed) == 0,
-		FailedReason: strings.Join(failed, ","),
+		Name:		"phase_0_phase_1_accounting_reconciliation",
+		Met:		len(failed) == 0,
+		FailedReason:	strings.Join(failed, ","),
 	}
 }
 
@@ -346,10 +346,10 @@ func ComputeValidatorRewardPerVotingPowerTelemetry(samples []ValidatorRewardTele
 			rewardPerBps = reward.QuoRaw(sample.VotingPowerBps)
 		}
 		out = append(out, ValidatorRewardPerPowerTelemetry{
-			ValidatorID:      sample.ValidatorID,
-			VotingPowerBps:   sample.VotingPowerBps,
-			RewardNaet:       reward,
-			RewardPerBpsNaet: rewardPerBps,
+			ValidatorID:		sample.ValidatorID,
+			VotingPowerBps:		sample.VotingPowerBps,
+			RewardNaet:		reward,
+			RewardPerBpsNaet:	rewardPerBps,
 		})
 	}
 	sort.SliceStable(out, func(i, j int) bool {
@@ -360,14 +360,14 @@ func ComputeValidatorRewardPerVotingPowerTelemetry(samples []ValidatorRewardTele
 
 func readySequencingTask(phaseID, name string, reconciled bool, queryable bool, evidence []string) EconomicSequencingTask {
 	return EconomicSequencingTask{
-		PhaseID:         phaseID,
-		Name:            name,
-		Implemented:     true,
-		Observable:      true,
-		Queryable:       queryable,
-		InvariantTested: true,
-		Reconciled:      reconciled,
-		Evidence:        append([]string{}, evidence...),
+		PhaseID:		phaseID,
+		Name:			name,
+		Implemented:		true,
+		Observable:		true,
+		Queryable:		queryable,
+		InvariantTested:	true,
+		Reconciled:		reconciled,
+		Evidence:		append([]string{}, evidence...),
 	}
 }
 
@@ -426,13 +426,13 @@ func buildSequencingPhaseReport(phaseID, goal string, tasks []EconomicSequencing
 		status = SequencingStatusBlocked
 	}
 	return EconomicSequencingPhaseReport{
-		PhaseID:      phaseID,
-		Goal:         goal,
-		Status:       status,
-		Tasks:        append([]EconomicSequencingTask{}, tasks...),
-		ExitCriteria: criteria,
-		Failed:       failed,
-		Passed:       len(failed) == 0,
+		PhaseID:	phaseID,
+		Goal:		goal,
+		Status:		status,
+		Tasks:		append([]EconomicSequencingTask{}, tasks...),
+		ExitCriteria:	criteria,
+		Failed:		failed,
+		Passed:		len(failed) == 0,
 	}
 }
 

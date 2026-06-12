@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	flagObservabilityMetrics     = "observability-metrics"
-	flagObservabilityMetricsAddr = "observability-metrics-addr"
+	flagObservabilityMetrics	= "observability-metrics"
+	flagObservabilityMetricsAddr	= "observability-metrics-addr"
 )
 
 func startObservabilityMetrics(cmd *cobra.Command) error {

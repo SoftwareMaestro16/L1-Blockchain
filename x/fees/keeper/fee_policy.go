@@ -16,12 +16,12 @@ import (
 // expands chain state. Transactions carrying at least one such message should
 // incur the additional StorageRentSideEffects fee.
 var stateCreatingMsgTypes = map[string]bool{
-	"/l1.contracts.v1.MsgStoreCode":            true,
-	"/l1.contracts.v1.MsgDeployContract":       true,
-	"/l1.contracts.v1.MsgExecuteExternal":      true,
-	"/l1.contracts.v1.MsgExecuteInternal":      true,
-	"/l1.contracts.v1.MsgSendInternalMessage":  true,
-	"/l1.contracts.v1.MsgUpdateContractParams": true,
+	"/l1.contracts.v1.MsgStoreCode":		true,
+	"/l1.contracts.v1.MsgDeployContract":		true,
+	"/l1.contracts.v1.MsgExecuteExternal":		true,
+	"/l1.contracts.v1.MsgExecuteInternal":		true,
+	"/l1.contracts.v1.MsgSendInternalMessage":	true,
+	"/l1.contracts.v1.MsgUpdateContractParams":	true,
 }
 
 func (k Keeper) ValidateTxFees(ctx context.Context, fees sdk.Coins) error {
@@ -54,33 +54,27 @@ func (k Keeper) AdmitTx(ctx sdk.Context, tx sdk.FeeTx, sender sdk.AccAddress, si
 		gasConsumed = ctx.BlockGasMeter().GasConsumed()
 	}
 
-	// Validate admission limits (rate limiting, gas limits, fee denom/amount) using
-	// the existing dynamic market logic.
 	quote, err := types.ValidateAdmission(params, types.AdmissionInput{
-		Fee:              tx.GetFee(),
-		GasLimit:         tx.GetGas(),
-		BlockGasConsumed: gasConsumed,
-		BlockTxCount:     blockCount,
-		SenderTxCount:    senderCount,
-		SenderStake:      sdkmath.ZeroInt(),
+		Fee:			tx.GetFee(),
+		GasLimit:		tx.GetGas(),
+		BlockGasConsumed:	gasConsumed,
+		BlockTxCount:		blockCount,
+		SenderTxCount:		senderCount,
+		SenderStake:		sdkmath.ZeroInt(),
 	})
 	if err != nil {
 		return types.FeeQuote{}, err
 	}
 
-	// Read deterministic block utilization bps from KV-state (not mempool, not wall-clock).
-	// Falls back to current gas meter utilization if no stored congestion state yet.
 	kvUtilizationBps := k.getKVCongestionBps(ctx, gasConsumed, tx.GetGas(), params.MaxBlockGas)
 
-	// Read reputation score for the sender (nil-safe via GetReputationScore).
 	reputationScore, reputationFound, err := k.GetReputationScore(ctx, sender)
 	if err != nil {
-		// Non-fatal: if reputation read fails, treat as neutral.
+
 		reputationScore = types.ReputationNeutralScore
 		reputationFound = false
 	}
 
-	// Compute storage rent side effects budget — only for state-creating txs.
 	storageRentNaet := sdkmath.ZeroInt()
 	if srDefault, parseErr := formulaParams.StorageRentSideEffectsInt(); parseErr == nil && srDefault.IsPositive() {
 		for _, msg := range tx.GetMsgs() {
@@ -113,7 +107,6 @@ func (k Keeper) AdmitTx(ctx sdk.Context, tx sdk.FeeTx, sender sdk.AccAddress, si
 		return types.FeeQuote{}, err
 	}
 
-	// The full formula result is our required fee. Verify the paid fee meets it.
 	paidAmount := tx.GetFee().AmountOf(types.BondDenom)
 	if paidAmount.LT(requiredFull) {
 		return types.FeeQuote{}, types.ErrInvalidFee.Wrapf(
@@ -123,7 +116,6 @@ func (k Keeper) AdmitTx(ctx sdk.Context, tx sdk.FeeTx, sender sdk.AccAddress, si
 		)
 	}
 
-	// Also enforce the hard cap from params.
 	maxFee, err := params.MaxFeeInt()
 	if err != nil {
 		return types.FeeQuote{}, err
@@ -147,8 +139,8 @@ func (k Keeper) AdmitTx(ctx sdk.Context, tx sdk.FeeTx, sender sdk.AccAddress, si
 			Activity: appparams.ProtocolEconomicActivity{
 				TxFeeNaet: quote.AcceptedFeeAmount,
 			},
-			BurnRatioBps:     quote.EconomicControl.BurnRatioBps,
-			TreasuryRatioBps: appparams.TreasuryFeeRatioBps,
+			BurnRatioBps:		quote.EconomicControl.BurnRatioBps,
+			TreasuryRatioBps:	appparams.TreasuryFeeRatioBps,
 		}); err == nil {
 			observability.RecordEconomicFlow(
 				flow.TotalChargesNaet.Int64(),

@@ -136,12 +136,12 @@ func queryFixtureV2(t *testing.T) (IdentityState, IdentityQueryServiceV2, Delega
 	})
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
+		Primary:	addr(2),
+		Contract:	addr(3),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(4),
 		},
-		Metadata: metadata,
+		Metadata:	metadata,
 	}, 14)
 	require.NoError(t, err)
 	state, _, err = SetIdentityReverse(state, addr(2), addr(2), "alice.aet", 15)
@@ -153,10 +153,10 @@ func queryFixtureV2(t *testing.T) (IdentityState, IdentityQueryServiceV2, Delega
 	delegation, err := NewDelegationRecordV2("alice.aet", addr(7), DelegationScopeSubdomainCreate, []string{"create"}, 100, 1, "", 16)
 	require.NoError(t, err)
 	service := NewIdentityQueryServiceV2(IdentityQueryContextV2{
-		State:       state,
-		Height:      20,
-		DefaultTTL:  30,
-		Delegations: []DelegationRecordV2{delegation},
+		State:		state,
+		Height:		20,
+		DefaultTTL:	30,
+		Delegations:	[]DelegationRecordV2{delegation},
 	})
 	return state, service, delegation, auctionRecord
 }

@@ -12,7 +12,7 @@ var _ performancepb.MsgServer = msgServer{}
 
 type msgServer struct{ Keeper }
 
-func NewMsgServerImpl(k Keeper) performancepb.MsgServer { return msgServer{Keeper: k} }
+func NewMsgServerImpl(k Keeper) performancepb.MsgServer	{ return msgServer{Keeper: k} }
 
 func (m msgServer) SubmitPerformanceReport(ctx context.Context, msg *performancepb.MsgSubmitPerformanceReport) (*performancepb.MsgSubmitPerformanceReportResponse, error) {
 	state, err := m.GetState(ctx)

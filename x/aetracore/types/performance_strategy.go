@@ -10,53 +10,53 @@ import (
 type BlockSTMAccessMode string
 
 const (
-	BlockSTMAccessRead  BlockSTMAccessMode = "read"
-	BlockSTMAccessWrite BlockSTMAccessMode = "write"
+	BlockSTMAccessRead	BlockSTMAccessMode	= "read"
+	BlockSTMAccessWrite	BlockSTMAccessMode	= "write"
 )
 
 type BlockSTMStateAccess struct {
-	ActorZoneID  ZoneID
-	ActorShardID ShardID
-	StateZoneID  ZoneID
-	StateShardID ShardID
-	StateKey     string
-	Mode         BlockSTMAccessMode
-	ViaMessage   bool
+	ActorZoneID	ZoneID
+	ActorShardID	ShardID
+	StateZoneID	ZoneID
+	StateShardID	ShardID
+	StateKey	string
+	Mode		BlockSTMAccessMode
+	ViaMessage	bool
 }
 
 type BlockSTMMessageBatch struct {
-	SourceZoneID       ZoneID
-	SourceShardID      ShardID
-	DestinationZoneID  ZoneID
-	DestinationShardID ShardID
-	MessageCount       uint32
-	BatchHash          string
+	SourceZoneID		ZoneID
+	SourceShardID		ShardID
+	DestinationZoneID	ZoneID
+	DestinationShardID	ShardID
+	MessageCount		uint32
+	BatchHash		string
 }
 
 type BlockSTMConflictSet struct {
-	ConflictKey string
-	WorkloadIDs []string
+	ConflictKey	string
+	WorkloadIDs	[]string
 }
 
 type BlockSTMZoneWorkload struct {
-	WorkloadID       string
-	ZoneID           ZoneID
-	ShardID          ShardID
-	Items            []ProposalItem
-	StateAccesses    []BlockSTMStateAccess
-	MessageBatches   []BlockSTMMessageBatch
-	ConflictKeyRoot  string
-	MessageBatchRoot string
+	WorkloadID		string
+	ZoneID			ZoneID
+	ShardID			ShardID
+	Items			[]ProposalItem
+	StateAccesses		[]BlockSTMStateAccess
+	MessageBatches		[]BlockSTMMessageBatch
+	ConflictKeyRoot		string
+	MessageBatchRoot	string
 }
 
 type BlockSTMZonePerformancePlan struct {
-	Height            uint64
-	Workloads         []BlockSTMZoneWorkload
-	ConflictSets      []BlockSTMConflictSet
-	ParallelWorkloads uint32
-	GlobalWriteLocks  uint32
-	CrossZoneWrites   uint32
-	PlanHash          string
+	Height			uint64
+	Workloads		[]BlockSTMZoneWorkload
+	ConflictSets		[]BlockSTMConflictSet
+	ParallelWorkloads	uint32
+	GlobalWriteLocks	uint32
+	CrossZoneWrites		uint32
+	PlanHash		string
 }
 
 func BuildBlockSTMZonePerformancePlan(schedule ProposalSchedule, accesses []BlockSTMStateAccess, batches []BlockSTMMessageBatch) (BlockSTMZonePerformancePlan, error) {
@@ -85,9 +85,9 @@ func BuildBlockSTMZonePerformancePlan(schedule ProposalSchedule, accesses []Bloc
 	workloads := make([]BlockSTMZoneWorkload, 0, len(schedule.Groups))
 	for _, group := range schedule.Groups {
 		workload := BlockSTMZoneWorkload{
-			ZoneID:  group.ZoneID,
-			ShardID: group.ShardID,
-			Items:   append([]ProposalItem(nil), group.Items...),
+			ZoneID:		group.ZoneID,
+			ShardID:	group.ShardID,
+			Items:		append([]ProposalItem(nil), group.Items...),
 		}
 		sortProposalItems(workload.Items)
 		for _, access := range accesses {
@@ -107,9 +107,9 @@ func BuildBlockSTMZonePerformancePlan(schedule ProposalSchedule, accesses []Bloc
 		workloads = append(workloads, workload)
 	}
 	plan := BlockSTMZonePerformancePlan{
-		Height:            schedule.Height,
-		Workloads:         normalizeBlockSTMZoneWorkloads(workloads),
-		ParallelWorkloads: uint32(len(workloads)),
+		Height:			schedule.Height,
+		Workloads:		normalizeBlockSTMZoneWorkloads(workloads),
+		ParallelWorkloads:	uint32(len(workloads)),
 	}
 	plan.ConflictSets = computeBlockSTMConflictSets(plan.Workloads)
 	plan.CrossZoneWrites = countBlockSTMCrossZoneMessageWrites(accesses)

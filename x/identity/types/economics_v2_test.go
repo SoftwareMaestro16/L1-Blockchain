@@ -30,8 +30,8 @@ func TestIdentityEconomicsV2PricingBoundariesAndQueries(t *testing.T) {
 	root, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{Name: "alice.aet"}, params)
 	require.NoError(t, err)
 	child, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-		Name:          "node.alice.aet",
-		SubdomainMode: IdentitySubdomainModeDetachedPaidV2,
+		Name:		"node.alice.aet",
+		SubdomainMode:	IdentitySubdomainModeDetachedPaidV2,
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), child.LabelCount)
@@ -40,9 +40,9 @@ func TestIdentityEconomicsV2PricingBoundariesAndQueries(t *testing.T) {
 	require.True(t, child.Total.GT(root.Total))
 
 	auction, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-		Name:        "vault.aet",
-		DemandClass: IdentityDemandClassContestedV2,
-		Auction:     true,
+		Name:		"vault.aet",
+		DemandClass:	IdentityDemandClassContestedV2,
+		Auction:	true,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, auction.DemandFee.IsPositive())

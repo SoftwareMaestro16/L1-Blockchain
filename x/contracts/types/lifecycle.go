@@ -6,18 +6,18 @@ import (
 )
 
 const (
-	ContractLifecycleActionExecuteExternal     = "execute_external"
-	ContractLifecycleActionReceiveInternal     = "receive_internal"
-	ContractLifecycleActionReceiveTopUp        = "receive_top_up"
-	ContractLifecycleActionPayRentDebt         = "pay_rent_debt"
-	ContractLifecycleActionUnfreeze            = "unfreeze"
-	ContractLifecycleActionQuery               = "query"
-	ContractLifecycleActionProofQuery          = "proof_query"
-	ContractLifecycleActionEmitInternalMessage = "emit_internal_message"
-	ContractLifecycleActionUpgradeMigrate      = "upgrade_migrate"
-	ContractLifecycleActionArchiveDelete       = "archive_delete"
+	ContractLifecycleActionExecuteExternal		= "execute_external"
+	ContractLifecycleActionReceiveInternal		= "receive_internal"
+	ContractLifecycleActionReceiveTopUp		= "receive_top_up"
+	ContractLifecycleActionPayRentDebt		= "pay_rent_debt"
+	ContractLifecycleActionUnfreeze			= "unfreeze"
+	ContractLifecycleActionQuery			= "query"
+	ContractLifecycleActionProofQuery		= "proof_query"
+	ContractLifecycleActionEmitInternalMessage	= "emit_internal_message"
+	ContractLifecycleActionUpgradeMigrate		= "upgrade_migrate"
+	ContractLifecycleActionArchiveDelete		= "archive_delete"
 
-	ErrContractLifecycle = "contracts_lifecycle"
+	ErrContractLifecycle	= "contracts_lifecycle"
 )
 
 // ContractLifecycleActionAllowed is the canonical AVM contract lifecycle matrix.

@@ -8,7 +8,7 @@ import (
 )
 
 func TestChunkBuilder(t *testing.T) {
-	// 1. Leaf chunk
+
 	leaf, err := NewBuilder().
 		SetTypeTag(TypeNormal).
 		SetData([]byte{0xDE, 0xAD, 0xBE, 0xEF}, 32).
@@ -22,7 +22,6 @@ func TestChunkBuilder(t *testing.T) {
 	h1 := hex.EncodeToString(leaf.HashLayer(1))
 	require.Equal(t, h0, h1, "leaf H0 and H1 must be equal")
 
-	// 2. Parent chunk
 	parent, err := NewBuilder().
 		SetTypeTag(TypeNormal).
 		SetRef(0, leaf).
@@ -39,21 +38,20 @@ func TestChunkBuilder(t *testing.T) {
 }
 
 func TestChunkLimits(t *testing.T) {
-	// Data limit
+
 	_, err := NewBuilder().SetData(make([]byte, 300), 2400).Build()
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "exceeds limit 2048")
 
-	// Refs limit is handled by fixed array/bitmap now, but AddRef can fail if full
 	builder := NewBuilder()
 	leaf, _ := builder.SetData([]byte{0}, 8).Build()
 	builder = NewBuilder()
 	for i := 0; i < 8; i++ {
 		builder.AddRef(leaf)
 	}
-	// 9th ref
+
 	builder.AddRef(leaf)
-	require.Equal(t, uint8(0xff), builder.refBitmap) // All 8 bits set
+	require.Equal(t, uint8(0xff), builder.refBitmap)
 }
 
 func TestChunkImmutabilityAndDeterminism(t *testing.T) {
@@ -77,7 +75,6 @@ func TestChunkLevel(t *testing.T) {
 	c2, _ := NewBuilder().SetRef(4, c1).Build()
 	require.Equal(t, uint8(2), c2.Level())
 
-	// Mixed levels
 	c3, _ := NewBuilder().SetRef(1, c0).SetRef(7, c2).Build()
 	require.Equal(t, uint8(3), c3.Level())
 }

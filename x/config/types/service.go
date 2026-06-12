@@ -24,8 +24,8 @@ type MsgRejectConfigChangeResponse struct {
 	Change ConfigChange `protobuf:"bytes,1,opt,name=change,proto3" json:"change"`
 }
 type MsgExecuteConfigChangeResponse struct {
-	Entry  ConfigEntry  `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry"`
-	Change ConfigChange `protobuf:"bytes,2,opt,name=change,proto3" json:"change"`
+	Entry	ConfigEntry	`protobuf:"bytes,1,opt,name=entry,proto3" json:"entry"`
+	Change	ConfigChange	`protobuf:"bytes,2,opt,name=change,proto3" json:"change"`
 }
 type MsgCancelConfigChangeResponse struct {
 	Change ConfigChange `protobuf:"bytes,1,opt,name=change,proto3" json:"change"`
@@ -36,46 +36,46 @@ type QueryParamsResponse struct {
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 }
 type QueryEntriesRequest struct {
-	Offset uint64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset	uint64	`protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QueryEntriesResponse struct {
-	Entries []ConfigEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
-	Next    uint64        `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total   uint64        `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Entries	[]ConfigEntry	`protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	Next	uint64		`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total	uint64		`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 type QueryEntryRequest struct {
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 type QueryEntryResponse struct {
-	Entry ConfigEntry `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry"`
-	Found bool        `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
+	Entry	ConfigEntry	`protobuf:"bytes,1,opt,name=entry,proto3" json:"entry"`
+	Found	bool		`protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 type QueryPendingChangesRequest struct {
-	Offset uint64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset	uint64	`protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QueryPendingChangesResponse struct {
-	Changes []ConfigChange `protobuf:"bytes,1,rep,name=changes,proto3" json:"changes,omitempty"`
-	Next    uint64         `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total   uint64         `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Changes	[]ConfigChange	`protobuf:"bytes,1,rep,name=changes,proto3" json:"changes,omitempty"`
+	Next	uint64		`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total	uint64		`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 type QueryChangeRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 type QueryChangeResponse struct {
-	Change ConfigChange `protobuf:"bytes,1,opt,name=change,proto3" json:"change"`
-	Found  bool         `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
+	Change	ConfigChange	`protobuf:"bytes,1,opt,name=change,proto3" json:"change"`
+	Found	bool		`protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 type QueryEffectiveParamsRequest struct {
-	Height int64  `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
-	Offset uint64 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Height	int64	`protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
+	Offset	uint64	`protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QueryEffectiveParamsResponse struct {
-	Entries []ConfigEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
-	Next    uint64        `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total   uint64        `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Entries	[]ConfigEntry	`protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	Next	uint64		`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total	uint64		`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 
 type MsgServer interface {
@@ -114,14 +114,14 @@ func (UnimplementedMsgServer) CancelConfigChange(context.Context, *MsgCancelConf
 	return nil, status.Errorf(codes.Unimplemented, "method CancelConfigChange not implemented")
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.config.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.config.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("SubmitConfigChange", serviceHandler("SubmitConfigChange", func() interface{} { return new(MsgSubmitConfigChange) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).SubmitConfigChange(ctx, req.(*MsgSubmitConfigChange))
@@ -139,12 +139,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).CancelConfigChange(ctx, req.(*MsgCancelConfigChange))
 		})),
 	},
-	Metadata: "l1/config/v1/tx.proto",
+	Metadata:	"l1/config/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.config.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.config.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("Params", serviceHandler("Params", func() interface{} { return new(QueryParamsRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -165,7 +165,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).EffectiveParams(ctx, req.(*QueryEffectiveParamsRequest))
 		})),
 	},
-	Metadata: "l1/config/v1/query.proto",
+	Metadata:	"l1/config/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -218,12 +218,12 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	for _, item := range []struct {
-		msg  gogoproto.Message
-		name string
+		msg	gogoproto.Message
+		name	string
 	}{
 		{(*MsgSubmitConfigChange)(nil), "l1.config.v1.MsgSubmitConfigChange"},
 		{(*MsgSubmitConfigChangeResponse)(nil), "l1.config.v1.MsgSubmitConfigChangeResponse"},
@@ -252,33 +252,33 @@ func registerServiceTypes() {
 	}
 }
 
-func (m *MsgSubmitConfigChange) Reset()          { *m = MsgSubmitConfigChange{} }
-func (m *MsgApproveConfigChange) Reset()         { *m = MsgApproveConfigChange{} }
-func (m *MsgRejectConfigChange) Reset()          { *m = MsgRejectConfigChange{} }
-func (m *MsgExecuteConfigChange) Reset()         { *m = MsgExecuteConfigChange{} }
-func (m *MsgCancelConfigChange) Reset()          { *m = MsgCancelConfigChange{} }
-func (m *MsgSubmitConfigChangeResponse) Reset()  { *m = MsgSubmitConfigChangeResponse{} }
-func (m *MsgApproveConfigChangeResponse) Reset() { *m = MsgApproveConfigChangeResponse{} }
-func (m *MsgRejectConfigChangeResponse) Reset()  { *m = MsgRejectConfigChangeResponse{} }
-func (m *MsgExecuteConfigChangeResponse) Reset() { *m = MsgExecuteConfigChangeResponse{} }
-func (m *MsgCancelConfigChangeResponse) Reset()  { *m = MsgCancelConfigChangeResponse{} }
-func (m *QueryParamsRequest) Reset()             { *m = QueryParamsRequest{} }
-func (m *QueryParamsResponse) Reset()            { *m = QueryParamsResponse{} }
-func (m *QueryEntriesRequest) Reset()            { *m = QueryEntriesRequest{} }
-func (m *QueryEntriesResponse) Reset()           { *m = QueryEntriesResponse{} }
-func (m *QueryEntryRequest) Reset()              { *m = QueryEntryRequest{} }
-func (m *QueryEntryResponse) Reset()             { *m = QueryEntryResponse{} }
-func (m *QueryPendingChangesRequest) Reset()     { *m = QueryPendingChangesRequest{} }
-func (m *QueryPendingChangesResponse) Reset()    { *m = QueryPendingChangesResponse{} }
-func (m *QueryChangeRequest) Reset()             { *m = QueryChangeRequest{} }
-func (m *QueryChangeResponse) Reset()            { *m = QueryChangeResponse{} }
-func (m *QueryEffectiveParamsRequest) Reset()    { *m = QueryEffectiveParamsRequest{} }
-func (m *QueryEffectiveParamsResponse) Reset()   { *m = QueryEffectiveParamsResponse{} }
-func (m *MsgSubmitConfigChange) String() string  { return gogoproto.CompactTextString(m) }
-func (m *MsgApproveConfigChange) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgRejectConfigChange) String() string  { return gogoproto.CompactTextString(m) }
-func (m *MsgExecuteConfigChange) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgCancelConfigChange) String() string  { return gogoproto.CompactTextString(m) }
+func (m *MsgSubmitConfigChange) Reset()			{ *m = MsgSubmitConfigChange{} }
+func (m *MsgApproveConfigChange) Reset()		{ *m = MsgApproveConfigChange{} }
+func (m *MsgRejectConfigChange) Reset()			{ *m = MsgRejectConfigChange{} }
+func (m *MsgExecuteConfigChange) Reset()		{ *m = MsgExecuteConfigChange{} }
+func (m *MsgCancelConfigChange) Reset()			{ *m = MsgCancelConfigChange{} }
+func (m *MsgSubmitConfigChangeResponse) Reset()		{ *m = MsgSubmitConfigChangeResponse{} }
+func (m *MsgApproveConfigChangeResponse) Reset()	{ *m = MsgApproveConfigChangeResponse{} }
+func (m *MsgRejectConfigChangeResponse) Reset()		{ *m = MsgRejectConfigChangeResponse{} }
+func (m *MsgExecuteConfigChangeResponse) Reset()	{ *m = MsgExecuteConfigChangeResponse{} }
+func (m *MsgCancelConfigChangeResponse) Reset()		{ *m = MsgCancelConfigChangeResponse{} }
+func (m *QueryParamsRequest) Reset()			{ *m = QueryParamsRequest{} }
+func (m *QueryParamsResponse) Reset()			{ *m = QueryParamsResponse{} }
+func (m *QueryEntriesRequest) Reset()			{ *m = QueryEntriesRequest{} }
+func (m *QueryEntriesResponse) Reset()			{ *m = QueryEntriesResponse{} }
+func (m *QueryEntryRequest) Reset()			{ *m = QueryEntryRequest{} }
+func (m *QueryEntryResponse) Reset()			{ *m = QueryEntryResponse{} }
+func (m *QueryPendingChangesRequest) Reset()		{ *m = QueryPendingChangesRequest{} }
+func (m *QueryPendingChangesResponse) Reset()		{ *m = QueryPendingChangesResponse{} }
+func (m *QueryChangeRequest) Reset()			{ *m = QueryChangeRequest{} }
+func (m *QueryChangeResponse) Reset()			{ *m = QueryChangeResponse{} }
+func (m *QueryEffectiveParamsRequest) Reset()		{ *m = QueryEffectiveParamsRequest{} }
+func (m *QueryEffectiveParamsResponse) Reset()		{ *m = QueryEffectiveParamsResponse{} }
+func (m *MsgSubmitConfigChange) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgApproveConfigChange) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgRejectConfigChange) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgExecuteConfigChange) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgCancelConfigChange) String() string		{ return gogoproto.CompactTextString(m) }
 func (m *MsgSubmitConfigChangeResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
@@ -294,38 +294,38 @@ func (m *MsgExecuteConfigChangeResponse) String() string {
 func (m *MsgCancelConfigChangeResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryParamsRequest) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsResponse) String() string          { return gogoproto.CompactTextString(m) }
-func (m *QueryEntriesRequest) String() string          { return gogoproto.CompactTextString(m) }
-func (m *QueryEntriesResponse) String() string         { return gogoproto.CompactTextString(m) }
-func (m *QueryEntryRequest) String() string            { return gogoproto.CompactTextString(m) }
-func (m *QueryEntryResponse) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryPendingChangesRequest) String() string   { return gogoproto.CompactTextString(m) }
-func (m *QueryPendingChangesResponse) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryChangeRequest) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryChangeResponse) String() string          { return gogoproto.CompactTextString(m) }
-func (m *QueryEffectiveParamsRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryEffectiveParamsResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryParamsRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEntriesRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEntriesResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEntryRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEntryResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryPendingChangesRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPendingChangesResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryChangeRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryChangeResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEffectiveParamsRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryEffectiveParamsResponse) String() string	{ return gogoproto.CompactTextString(m) }
 
-func (*MsgSubmitConfigChange) ProtoMessage()          {}
-func (*MsgApproveConfigChange) ProtoMessage()         {}
-func (*MsgRejectConfigChange) ProtoMessage()          {}
-func (*MsgExecuteConfigChange) ProtoMessage()         {}
-func (*MsgCancelConfigChange) ProtoMessage()          {}
-func (*MsgSubmitConfigChangeResponse) ProtoMessage()  {}
-func (*MsgApproveConfigChangeResponse) ProtoMessage() {}
-func (*MsgRejectConfigChangeResponse) ProtoMessage()  {}
-func (*MsgExecuteConfigChangeResponse) ProtoMessage() {}
-func (*MsgCancelConfigChangeResponse) ProtoMessage()  {}
-func (*QueryParamsRequest) ProtoMessage()             {}
-func (*QueryParamsResponse) ProtoMessage()            {}
-func (*QueryEntriesRequest) ProtoMessage()            {}
-func (*QueryEntriesResponse) ProtoMessage()           {}
-func (*QueryEntryRequest) ProtoMessage()              {}
-func (*QueryEntryResponse) ProtoMessage()             {}
-func (*QueryPendingChangesRequest) ProtoMessage()     {}
-func (*QueryPendingChangesResponse) ProtoMessage()    {}
-func (*QueryChangeRequest) ProtoMessage()             {}
-func (*QueryChangeResponse) ProtoMessage()            {}
-func (*QueryEffectiveParamsRequest) ProtoMessage()    {}
-func (*QueryEffectiveParamsResponse) ProtoMessage()   {}
+func (*MsgSubmitConfigChange) ProtoMessage()		{}
+func (*MsgApproveConfigChange) ProtoMessage()		{}
+func (*MsgRejectConfigChange) ProtoMessage()		{}
+func (*MsgExecuteConfigChange) ProtoMessage()		{}
+func (*MsgCancelConfigChange) ProtoMessage()		{}
+func (*MsgSubmitConfigChangeResponse) ProtoMessage()	{}
+func (*MsgApproveConfigChangeResponse) ProtoMessage()	{}
+func (*MsgRejectConfigChangeResponse) ProtoMessage()	{}
+func (*MsgExecuteConfigChangeResponse) ProtoMessage()	{}
+func (*MsgCancelConfigChangeResponse) ProtoMessage()	{}
+func (*QueryParamsRequest) ProtoMessage()		{}
+func (*QueryParamsResponse) ProtoMessage()		{}
+func (*QueryEntriesRequest) ProtoMessage()		{}
+func (*QueryEntriesResponse) ProtoMessage()		{}
+func (*QueryEntryRequest) ProtoMessage()		{}
+func (*QueryEntryResponse) ProtoMessage()		{}
+func (*QueryPendingChangesRequest) ProtoMessage()	{}
+func (*QueryPendingChangesResponse) ProtoMessage()	{}
+func (*QueryChangeRequest) ProtoMessage()		{}
+func (*QueryChangeResponse) ProtoMessage()		{}
+func (*QueryEffectiveParamsRequest) ProtoMessage()	{}
+func (*QueryEffectiveParamsResponse) ProtoMessage()	{}

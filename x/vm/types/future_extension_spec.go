@@ -10,128 +10,128 @@ import (
 )
 
 const (
-	AVMFutureExtensionSpeculativeExecution     AVMFutureExtensionArea = "speculative_execution_layer"
-	AVMFutureExtensionParallelActorScheduling  AVMFutureExtensionArea = "parallel_actor_scheduling"
-	AVMFutureExtensionZKExecutionAttestation   AVMFutureExtensionArea = "zero_knowledge_execution_attestation"
-	AVMFutureExtensionDistributedScheduler     AVMFutureExtensionArea = "distributed_async_scheduler"
-	AVMFutureExtensionCrossChainBridge         AVMFutureExtensionArea = "cross_chain_message_bridge_layer"
-	AVMFutureExtensionActorStateRent           AVMFutureExtensionArea = "actor_state_rent"
-	AVMFutureExtensionInterfacePackageRegistry AVMFutureExtensionArea = "interface_package_registry"
-	AVMFutureExtensionFormalVMVerification     AVMFutureExtensionArea = "formal_vm_verification_test_suite"
-	AVMFutureExtensionReplayDebugger           AVMFutureExtensionArea = "deterministic_replay_debugger"
+	AVMFutureExtensionSpeculativeExecution		AVMFutureExtensionArea	= "speculative_execution_layer"
+	AVMFutureExtensionParallelActorScheduling	AVMFutureExtensionArea	= "parallel_actor_scheduling"
+	AVMFutureExtensionZKExecutionAttestation	AVMFutureExtensionArea	= "zero_knowledge_execution_attestation"
+	AVMFutureExtensionDistributedScheduler		AVMFutureExtensionArea	= "distributed_async_scheduler"
+	AVMFutureExtensionCrossChainBridge		AVMFutureExtensionArea	= "cross_chain_message_bridge_layer"
+	AVMFutureExtensionActorStateRent		AVMFutureExtensionArea	= "actor_state_rent"
+	AVMFutureExtensionInterfacePackageRegistry	AVMFutureExtensionArea	= "interface_package_registry"
+	AVMFutureExtensionFormalVMVerification		AVMFutureExtensionArea	= "formal_vm_verification_test_suite"
+	AVMFutureExtensionReplayDebugger		AVMFutureExtensionArea	= "deterministic_replay_debugger"
 
-	AVMFutureExtensionStatusPlanned      AVMFutureExtensionStatus = "planned"
-	AVMFutureExtensionStatusResearch     AVMFutureExtensionStatus = "research"
-	AVMFutureExtensionStatusExperimental AVMFutureExtensionStatus = "experimental"
+	AVMFutureExtensionStatusPlanned		AVMFutureExtensionStatus	= "planned"
+	AVMFutureExtensionStatusResearch	AVMFutureExtensionStatus	= "research"
+	AVMFutureExtensionStatusExperimental	AVMFutureExtensionStatus	= "experimental"
 
-	MaxAVMFutureExtensions       = 32
-	MaxAVMFutureExtensionText    = 160
-	MaxAVMFuturePrerequisites    = 16
-	MaxAVMFuturePrerequisiteName = 96
+	MaxAVMFutureExtensions		= 32
+	MaxAVMFutureExtensionText	= 160
+	MaxAVMFuturePrerequisites	= 16
+	MaxAVMFuturePrerequisiteName	= 96
 )
 
 type AVMFutureExtensionArea string
 type AVMFutureExtensionStatus string
 
 type AVMFutureExtensionDescriptor struct {
-	Area                    AVMFutureExtensionArea
-	Name                    string
-	Description             string
-	Prerequisites           []string
-	ConsensusAffecting      bool
-	RequiresGovernedUpgrade bool
-	Status                  AVMFutureExtensionStatus
-	DescriptorHash          string
+	Area			AVMFutureExtensionArea
+	Name			string
+	Description		string
+	Prerequisites		[]string
+	ConsensusAffecting	bool
+	RequiresGovernedUpgrade	bool
+	Status			AVMFutureExtensionStatus
+	DescriptorHash		string
 }
 
 type AVMFutureExtensionRegistry struct {
-	RegistryName string
-	Extensions   []AVMFutureExtensionDescriptor
-	RegistryHash string
+	RegistryName	string
+	Extensions	[]AVMFutureExtensionDescriptor
+	RegistryHash	string
 }
 
 func DefaultAVMFutureExtensionRegistry() (AVMFutureExtensionRegistry, error) {
 	descriptors := []AVMFutureExtensionDescriptor{
 		{
-			Area:                    AVMFutureExtensionSpeculativeExecution,
-			Name:                    "Speculative execution layer",
-			Description:             "Pre-execute eligible deterministic workloads while preserving commit-time validation.",
-			Prerequisites:           []string{"blockstm_conflict_model", "deterministic_replay_tests"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionSpeculativeExecution,
+			Name:				"Speculative execution layer",
+			Description:			"Pre-execute eligible deterministic workloads while preserving commit-time validation.",
+			Prerequisites:			[]string{"blockstm_conflict_model", "deterministic_replay_tests"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionParallelActorScheduling,
-			Name:                    "Parallel actor scheduling",
-			Description:             "Schedule independent actor mailboxes concurrently with actor-local conflict isolation.",
-			Prerequisites:           []string{"actor_mailbox_roots", "blockstm_conflict_model"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionParallelActorScheduling,
+			Name:				"Parallel actor scheduling",
+			Description:			"Schedule independent actor mailboxes concurrently with actor-local conflict isolation.",
+			Prerequisites:			[]string{"actor_mailbox_roots", "blockstm_conflict_model"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionZKExecutionAttestation,
-			Name:                    "Zero-knowledge execution attestation",
-			Description:             "Attach proof-oriented execution attestations to AVM receipts and roots.",
-			Prerequisites:           []string{"receipt_roots", "proof_gas_metering"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionZKExecutionAttestation,
+			Name:				"Zero-knowledge execution attestation",
+			Description:			"Attach proof-oriented execution attestations to AVM receipts and roots.",
+			Prerequisites:			[]string{"receipt_roots", "proof_gas_metering"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionDistributedScheduler,
-			Name:                    "Distributed async scheduler",
-			Description:             "Coordinate async scheduling across deterministic scheduler shards.",
-			Prerequisites:           []string{"queue_roots", "scheduler_safety_checks"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionDistributedScheduler,
+			Name:				"Distributed async scheduler",
+			Description:			"Coordinate async scheduling across deterministic scheduler shards.",
+			Prerequisites:			[]string{"queue_roots", "scheduler_safety_checks"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionCrossChainBridge,
-			Name:                    "Cross-chain message bridge layer",
-			Description:             "Bridge AVM async messages across chains with proof-bound ingress and egress.",
-			Prerequisites:           []string{"cross_zone_proofs", "message_replay_protection"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionCrossChainBridge,
+			Name:				"Cross-chain message bridge layer",
+			Description:			"Bridge AVM async messages across chains with proof-bound ingress and egress.",
+			Prerequisites:			[]string{"cross_zone_proofs", "message_replay_protection"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionActorStateRent,
-			Name:                    "Actor state rent",
-			Description:             "Meter long-lived actor state with deterministic rent accounting.",
-			Prerequisites:           []string{"actor_state_prefixes", "storage_byte_metering"},
-			ConsensusAffecting:      true,
-			RequiresGovernedUpgrade: true,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionActorStateRent,
+			Name:				"Actor state rent",
+			Description:			"Meter long-lived actor state with deterministic rent accounting.",
+			Prerequisites:			[]string{"actor_state_prefixes", "storage_byte_metering"},
+			ConsensusAffecting:		true,
+			RequiresGovernedUpgrade:	true,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionInterfacePackageRegistry,
-			Name:                    "Interface package registry",
-			Description:             "Publish interface descriptors as versioned packages for SDKs, CLIs, and wallets.",
-			Prerequisites:           []string{"interface_hash_verification", "sdk_binding_metadata"},
-			ConsensusAffecting:      false,
-			RequiresGovernedUpgrade: false,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionInterfacePackageRegistry,
+			Name:				"Interface package registry",
+			Description:			"Publish interface descriptors as versioned packages for SDKs, CLIs, and wallets.",
+			Prerequisites:			[]string{"interface_hash_verification", "sdk_binding_metadata"},
+			ConsensusAffecting:		false,
+			RequiresGovernedUpgrade:	false,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionFormalVMVerification,
-			Name:                    "Formal VM verification test suite",
-			Description:             "Add formal and replay-focused VM verification cases for consensus-critical behavior.",
-			Prerequisites:           []string{"determinism_tests", "state_invariant_tests"},
-			ConsensusAffecting:      false,
-			RequiresGovernedUpgrade: false,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionFormalVMVerification,
+			Name:				"Formal VM verification test suite",
+			Description:			"Add formal and replay-focused VM verification cases for consensus-critical behavior.",
+			Prerequisites:			[]string{"determinism_tests", "state_invariant_tests"},
+			ConsensusAffecting:		false,
+			RequiresGovernedUpgrade:	false,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 		{
-			Area:                    AVMFutureExtensionReplayDebugger,
-			Name:                    "Deterministic replay debugger",
-			Description:             "Inspect deterministic execution traces without changing consensus outputs.",
-			Prerequisites:           []string{"execution_receipts", "replay_export_import"},
-			ConsensusAffecting:      false,
-			RequiresGovernedUpgrade: false,
-			Status:                  AVMFutureExtensionStatusPlanned,
+			Area:				AVMFutureExtensionReplayDebugger,
+			Name:				"Deterministic replay debugger",
+			Description:			"Inspect deterministic execution traces without changing consensus outputs.",
+			Prerequisites:			[]string{"execution_receipts", "replay_export_import"},
+			ConsensusAffecting:		false,
+			RequiresGovernedUpgrade:	false,
+			Status:				AVMFutureExtensionStatusPlanned,
 		},
 	}
 	for i := range descriptors {
@@ -142,8 +142,8 @@ func DefaultAVMFutureExtensionRegistry() (AVMFutureExtensionRegistry, error) {
 		descriptors[i] = descriptor
 	}
 	return NewAVMFutureExtensionRegistry(AVMFutureExtensionRegistry{
-		RegistryName: "AVM future extensions",
-		Extensions:   descriptors,
+		RegistryName:	"AVM future extensions",
+		Extensions:	descriptors,
 	})
 }
 
@@ -344,15 +344,15 @@ func canonicalAVMFutureExtensionRegistry(registry AVMFutureExtensionRegistry) AV
 func sortAVMFutureExtensionsByDocumentOrder(extensions []AVMFutureExtensionDescriptor) []AVMFutureExtensionDescriptor {
 	out := append([]AVMFutureExtensionDescriptor(nil), extensions...)
 	order := map[AVMFutureExtensionArea]int{
-		AVMFutureExtensionSpeculativeExecution:     0,
-		AVMFutureExtensionParallelActorScheduling:  1,
-		AVMFutureExtensionZKExecutionAttestation:   2,
-		AVMFutureExtensionDistributedScheduler:     3,
-		AVMFutureExtensionCrossChainBridge:         4,
-		AVMFutureExtensionActorStateRent:           5,
-		AVMFutureExtensionInterfacePackageRegistry: 6,
-		AVMFutureExtensionFormalVMVerification:     7,
-		AVMFutureExtensionReplayDebugger:           8,
+		AVMFutureExtensionSpeculativeExecution:		0,
+		AVMFutureExtensionParallelActorScheduling:	1,
+		AVMFutureExtensionZKExecutionAttestation:	2,
+		AVMFutureExtensionDistributedScheduler:		3,
+		AVMFutureExtensionCrossChainBridge:		4,
+		AVMFutureExtensionActorStateRent:		5,
+		AVMFutureExtensionInterfacePackageRegistry:	6,
+		AVMFutureExtensionFormalVMVerification:		7,
+		AVMFutureExtensionReplayDebugger:		8,
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		return order[out[i].Area] < order[out[j].Area]

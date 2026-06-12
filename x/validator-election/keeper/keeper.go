@@ -16,15 +16,15 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
 func NewKeeper() Keeper {
@@ -38,9 +38,9 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 func DefaultGenesis() GenesisState {
 	params := types.DefaultParams()
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  params,
-		State:   types.DefaultState(params).Normalize(params),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		params,
+		State:		types.DefaultState(params).Normalize(params),
 	}
 }
 
@@ -123,10 +123,10 @@ func (k *Keeper) ApplyForValidatorSet(msg types.MsgApplyForValidatorSet) (types.
 	}
 	next.State.CandidateApplications = upsertApplication(next.State.CandidateApplications, app)
 	next.State.FrozenStakes = append(next.State.FrozenStakes, types.FrozenStake{
-		OperatorAddress: app.OperatorAddress,
-		Amount:          app.SelfBond,
-		FrozenAtHeight:  msg.Height,
-		UnlockHeight:    msg.Height + k.genesis.Params.FrozenStakeUnlockBlocks,
+		OperatorAddress:	app.OperatorAddress,
+		Amount:			app.SelfBond,
+		FrozenAtHeight:		msg.Height,
+		UnlockHeight:		msg.Height + k.genesis.Params.FrozenStakeUnlockBlocks,
 	})
 	next.State = next.State.Normalize(next.Params)
 	if err := next.Validate(); err != nil {
@@ -164,10 +164,10 @@ func (k *Keeper) CommitElection(msg types.MsgCommitElection) (types.ElectionResu
 	}
 	nextSet := k.computeNextSet()
 	result := types.ElectionResult{
-		Epoch:     k.genesis.State.ElectionEpoch,
-		Height:    msg.Height,
-		NextSet:   types.SortValidatorSet(nextSet),
-		Committed: true,
+		Epoch:		k.genesis.State.ElectionEpoch,
+		Height:		msg.Height,
+		NextSet:	types.SortValidatorSet(nextSet),
+		Committed:	true,
 	}
 	next := cloneGenesis(k.genesis)
 	next.State.NextValidatorSet = result.NextSet
@@ -194,11 +194,11 @@ func (k *Keeper) FinalizeElection(msg types.MsgFinalizeElection) (types.Validato
 		return types.ValidatorSetTransition{}, errors.New("validator election must be committed before finalization")
 	}
 	transition := types.ValidatorSetTransition{
-		Epoch:       k.genesis.State.ElectionEpoch,
-		Height:      msg.Height,
-		PreviousSet: types.SortValidatorSet(k.genesis.State.CurrentValidatorSet),
-		CurrentSet:  types.SortValidatorSet(k.genesis.State.NextValidatorSet),
-		NextSet:     []types.ValidatorPower{},
+		Epoch:		k.genesis.State.ElectionEpoch,
+		Height:		msg.Height,
+		PreviousSet:	types.SortValidatorSet(k.genesis.State.CurrentValidatorSet),
+		CurrentSet:	types.SortValidatorSet(k.genesis.State.NextValidatorSet),
+		NextSet:	[]types.ValidatorPower{},
 	}
 	next := cloneGenesis(k.genesis)
 	next.State.PreviousValidatorSet = transition.PreviousSet
@@ -206,17 +206,17 @@ func (k *Keeper) FinalizeElection(msg types.MsgFinalizeElection) (types.Validato
 	next.State.NextValidatorSet = []types.ValidatorPower{}
 	next.State.ElectionResults = finalizeResults(next.State.ElectionResults, next.State.ElectionEpoch)
 	next.State.RewardDistributionSnapshots = append(next.State.RewardDistributionSnapshots, types.RewardDistributionSnapshot{
-		Epoch:            next.State.ElectionEpoch,
-		Height:           msg.Height,
-		ValidatorPowers:  transition.CurrentSet,
-		TotalVotingPower: totalPower(transition.CurrentSet),
+		Epoch:			next.State.ElectionEpoch,
+		Height:			msg.Height,
+		ValidatorPowers:	transition.CurrentSet,
+		TotalVotingPower:	totalPower(transition.CurrentSet),
 	})
 	next.State.TransitionHistory = append(next.State.TransitionHistory, transition)
 	next.State.ElectionEpoch++
 	next.State.ElectionWindow = types.ElectionWindow{
-		StartHeight:            msg.Height + 1,
-		EndHeight:              msg.Height + 1 + next.Params.ElectionWindowBlocks,
-		WithdrawDeadlineHeight: msg.Height + 1 + next.Params.WithdrawDeadlineBlocks,
+		StartHeight:		msg.Height + 1,
+		EndHeight:		msg.Height + 1 + next.Params.ElectionWindowBlocks,
+		WithdrawDeadlineHeight:	msg.Height + 1 + next.Params.WithdrawDeadlineBlocks,
 	}
 	next.State.CandidateApplications = []types.CandidateApplication{}
 	next.State.PendingExits = finalizePendingExits(next.State.PendingExits)
@@ -310,7 +310,7 @@ func (k Keeper) CurrentValidatorSet() []types.ValidatorPower {
 func (k Keeper) NextValidatorSet() []types.ValidatorPower {
 	return types.SortValidatorSet(k.genesis.State.NextValidatorSet)
 }
-func (k Keeper) Election() types.State { return cloneGenesis(k.genesis).State }
+func (k Keeper) Election() types.State	{ return cloneGenesis(k.genesis).State }
 func (k Keeper) ElectionCandidates() []types.CandidateApplication {
 	return types.SortApplications(k.genesis.State.CandidateApplications)
 }
@@ -334,8 +334,8 @@ func (k Keeper) ValidatorSetTransition(epoch uint64) (types.ValidatorSetTransiti
 
 type Migrator struct{ keeper *Keeper }
 
-func NewMigrator(k *Keeper) Migrator  { return Migrator{keeper: k} }
-func (m Migrator) Migrate1to2() error { return m.keeper.ExportGenesis().Validate() }
+func NewMigrator(k *Keeper) Migrator	{ return Migrator{keeper: k} }
+func (m Migrator) Migrate1to2() error	{ return m.keeper.ExportGenesis().Validate() }
 func (k Keeper) Migrate1to2State(ctx context.Context) error {
 	_, err := k.ExportGenesisState(ctx)
 	return err

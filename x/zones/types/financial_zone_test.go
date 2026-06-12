@@ -57,21 +57,21 @@ func TestFinancialZoneBoundaryRoutesStateUnderSpecPrefixes(t *testing.T) {
 
 func TestFinancialZoneMessageDrivenTransferIngressAndFeeAccounting(t *testing.T) {
 	state := FinancialZoneState{
-		Accounts: []string{"bob", "alice"},
+		Accounts:	[]string{"bob", "alice"},
 		Balances: []FinancialBalance{
 			{Address: "bob", Denom: "naet", Amount: 5},
 			{Address: "alice", Denom: "naet", Amount: 100},
 		},
 	}
 	msg := FinancialZoneMessage{
-		Kind:            FinancialMessageTransfer,
-		AccountKey:      "alice",
-		CounterpartyKey: "bob",
-		Denom:           "naet",
-		Amount:          40,
-		PayloadHash:     hash("financial-transfer"),
-		Sequence:        9,
-		GasLimit:        700,
+		Kind:			FinancialMessageTransfer,
+		AccountKey:		"alice",
+		CounterpartyKey:	"bob",
+		Denom:			"naet",
+		Amount:			40,
+		PayloadHash:		hash("financial-transfer"),
+		Sequence:		9,
+		GasLimit:		700,
 	}
 	zoneMsg, err := msg.ZoneMessage()
 	require.NoError(t, err)
@@ -109,14 +109,14 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 	}
 
 	mint := FinancialZoneMessage{
-		Kind:        FinancialMessageMintFactoryDenom,
-		AccountKey:  "alice",
-		Denom:       "factory/alice/token",
-		Authority:   "alice",
-		Amount:      500,
-		PayloadHash: hash("mint"),
-		Sequence:    1,
-		GasLimit:    10,
+		Kind:		FinancialMessageMintFactoryDenom,
+		AccountKey:	"alice",
+		Denom:		"factory/alice/token",
+		Authority:	"alice",
+		Amount:		500,
+		PayloadHash:	hash("mint"),
+		Sequence:	1,
+		GasLimit:	10,
 	}
 	next, _, err := ApplyFinancialMessage(state, mint, 13)
 	require.NoError(t, err)
@@ -124,16 +124,16 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 	require.Equal(t, uint64(500), next.Balances[0].Amount)
 
 	swap := FinancialZoneMessage{
-		Kind:        FinancialMessageDexSwap,
-		AccountKey:  "alice",
-		PoolID:      1,
-		OrderID:     "order-1",
-		Denom:       "naet",
-		OutputDenom: "factory/alice/token",
-		Amount:      50,
-		PayloadHash: hash("swap"),
-		Sequence:    2,
-		GasLimit:    20,
+		Kind:		FinancialMessageDexSwap,
+		AccountKey:	"alice",
+		PoolID:		1,
+		OrderID:	"order-1",
+		Denom:		"naet",
+		OutputDenom:	"factory/alice/token",
+		Amount:		50,
+		PayloadHash:	hash("swap"),
+		Sequence:	2,
+		GasLimit:	20,
 	}
 	next, _, err = ApplyFinancialMessage(next, swap, 14)
 	require.NoError(t, err)
@@ -141,12 +141,12 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 	require.Equal(t, "open", next.DEXOrders[0].Status)
 
 	settle := FinancialZoneMessage{
-		Kind:        FinancialMessageDexSettle,
-		OrderID:     "order-1",
-		Amount:      1,
-		PayloadHash: hash("settle"),
-		Sequence:    3,
-		GasLimit:    30,
+		Kind:		FinancialMessageDexSettle,
+		OrderID:	"order-1",
+		Amount:		1,
+		PayloadHash:	hash("settle"),
+		Sequence:	3,
+		GasLimit:	30,
 	}
 	next, _, err = ApplyFinancialMessage(next, settle, 15)
 	require.NoError(t, err)
@@ -156,12 +156,12 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 	require.Equal(t, ZoneIDFinancial, dexReceipt.ZoneID)
 
 	payment := FinancialZoneMessage{
-		Kind:        FinancialMessagePaymentSettle,
-		ChannelID:   "channel-1",
-		Amount:      1,
-		PayloadHash: hash("payment"),
-		Sequence:    5,
-		GasLimit:    40,
+		Kind:		FinancialMessagePaymentSettle,
+		ChannelID:	"channel-1",
+		Amount:		1,
+		PayloadHash:	hash("payment"),
+		Sequence:	5,
+		GasLimit:	40,
 	}
 	next, _, err = ApplyFinancialMessage(next, payment, 16)
 	require.NoError(t, err)
@@ -171,12 +171,12 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 	require.Equal(t, ZoneReceiptStatusSuccess, hook.Status)
 
 	disputed := FinancialZoneMessage{
-		Kind:        FinancialMessagePaymentDispute,
-		ConditionID: "condition-1",
-		Amount:      1,
-		PayloadHash: hash("dispute"),
-		Sequence:    7,
-		GasLimit:    50,
+		Kind:		FinancialMessagePaymentDispute,
+		ConditionID:	"condition-1",
+		Amount:		1,
+		PayloadHash:	hash("dispute"),
+		Sequence:	7,
+		GasLimit:	50,
 	}
 	next, _, err = ApplyFinancialMessage(next, disputed, 17)
 	require.NoError(t, err)
@@ -186,16 +186,16 @@ func TestFinancialZoneTokenfactoryDexAndPaymentHooks(t *testing.T) {
 
 func TestFinancialZoneStateRootIsCanonicalAndBuildsZoneRoot(t *testing.T) {
 	left := FinancialZoneState{
-		Accounts: []string{"bob", "alice"},
+		Accounts:	[]string{"bob", "alice"},
 		Balances: []FinancialBalance{
 			{Address: "bob", Denom: "naet", Amount: 2},
 			{Address: "alice", Denom: "naet", Amount: 1},
 		},
-		FeeBuckets: []FinancialFeeBucket{{BucketID: "base", Denom: "naet", Amount: 3}},
+		FeeBuckets:	[]FinancialFeeBucket{{BucketID: "base", Denom: "naet", Amount: 3}},
 		FactoryDenoms: []FinancialFactoryDenom{
 			{Denom: "factory/alice/token", Authority: "alice", Supply: 4},
 		},
-		DEXPools: []FinancialDEXPool{{PoolID: 1, BaseDenom: "naet", QuoteDenom: "uatom", BaseReserve: 5, QuoteReserve: 6}},
+		DEXPools:	[]FinancialDEXPool{{PoolID: 1, BaseDenom: "naet", QuoteDenom: "uatom", BaseReserve: 5, QuoteReserve: 6}},
 		PaymentChannels: []FinancialPaymentChannel{
 			{ChannelID: "channel-1", Payer: "alice", Receiver: "bob", Denom: "naet", EscrowAmount: 7},
 		},
@@ -240,7 +240,7 @@ func TestFinancialShardRoutingEscrowAndFeeAggregation(t *testing.T) {
 
 	receiver := distinctFinancialShardReceiver(t, "alice", "naet", 4, 3)
 	state := FinancialZoneState{
-		Accounts: []string{"alice", receiver},
+		Accounts:	[]string{"alice", receiver},
 		Balances: []FinancialBalance{
 			{Address: "alice", Denom: "naet", Amount: 100},
 		},
@@ -257,7 +257,7 @@ func TestFinancialShardRoutingEscrowAndFeeAggregation(t *testing.T) {
 	require.Equal(t, uint64(25), balanceAmount(settled, receiver, "naet"))
 
 	refundState := FinancialZoneState{
-		Accounts: []string{"alice", receiver},
+		Accounts:	[]string{"alice", receiver},
 		Balances: []FinancialBalance{
 			{Address: "alice", Denom: "naet", Amount: 100},
 		},

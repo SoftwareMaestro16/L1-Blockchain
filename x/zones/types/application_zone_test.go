@@ -51,9 +51,9 @@ func TestApplicationSchedulerExecutesReadyTasksDeterministicallyWithBounds(t *te
 	require.Equal(t, "high", queue.Tasks[1].TaskID)
 
 	next, ready, err := ExecuteApplicationScheduledTasks(queue, 10, ApplicationWorkLimit{
-		MaxTasksPerBlock:    2,
-		MaxMessagesPerBlock: 2,
-		MaxGasPerBlock:      200,
+		MaxTasksPerBlock:	2,
+		MaxMessagesPerBlock:	2,
+		MaxGasPerBlock:		200,
 	})
 	require.NoError(t, err)
 	require.Len(t, ready, 2)
@@ -91,14 +91,14 @@ func TestApplicationWorkflowReceiptsAndStateRoot(t *testing.T) {
 		},
 	}
 	workflow := ApplicationWorkflowState{
-		WorkflowID:    "workflow-1",
-		AppID:         "billing",
-		Owner:         "alice",
-		Status:        ApplicationWorkflowPending,
-		CurrentStep:   0,
-		TotalSteps:    2,
-		PayloadHash:   hash("workflow-payload"),
-		UpdatedHeight: 1,
+		WorkflowID:	"workflow-1",
+		AppID:		"billing",
+		Owner:		"alice",
+		Status:		ApplicationWorkflowPending,
+		CurrentStep:	0,
+		TotalSteps:	2,
+		PayloadHash:	hash("workflow-payload"),
+		UpdatedHeight:	1,
 	}
 	next, startReceipt, err := StartApplicationWorkflow(state, workflow, 10)
 	require.NoError(t, err)
@@ -139,14 +139,14 @@ func TestApplicationRuntimeBoundaryAsyncOutputShardRoutesAndProofRoots(t *testin
 	queues, err := NewApplicationMessageQueues(nil, nil)
 	require.NoError(t, err)
 	queues, receipt, err := EmitApplicationAsyncOutput(queues, ApplicationAsyncOutput{
-		AppID:           "billing",
-		WorkflowID:      "workflow-1",
-		DestinationZone: ZoneIDContract,
-		Destination:     "contract-1",
-		PayloadHash:     hash("async-payload"),
-		GasLimit:        500,
-		RetryNonce:      1,
-		CreatedHeight:   20,
+		AppID:			"billing",
+		WorkflowID:		"workflow-1",
+		DestinationZone:	ZoneIDContract,
+		Destination:		"contract-1",
+		PayloadHash:		hash("async-payload"),
+		GasLimit:		500,
+		RetryNonce:		1,
+		CreatedHeight:		20,
 	})
 	require.NoError(t, err)
 	require.Len(t, queues.Outbox, 1)
@@ -155,18 +155,18 @@ func TestApplicationRuntimeBoundaryAsyncOutputShardRoutesAndProofRoots(t *testin
 	require.Equal(t, uint32(1), receipt.OutboxMessages)
 
 	roots := ApplicationZoneRoots{
-		Height:         20,
-		AppRoot:        hash("app-root"),
-		WorkflowRoot:   hash("workflow-root"),
-		SchedulerRoot:  hash("scheduler-root"),
-		AutomationRoot: hash("automation-root"),
-		PermissionRoot: hash("permission-root"),
-		ReceiptRoot:    hash("receipt-root"),
-		QueueRoot:      queues.QueueRoot(),
-		InboxRoot:      queues.InboxRoot(),
-		OutboxRoot:     queues.OutboxRoot(),
-		ExecutionRoot:  hash("execution-root"),
-		ProofRoot:      hash("proof-root"),
+		Height:		20,
+		AppRoot:	hash("app-root"),
+		WorkflowRoot:	hash("workflow-root"),
+		SchedulerRoot:	hash("scheduler-root"),
+		AutomationRoot:	hash("automation-root"),
+		PermissionRoot:	hash("permission-root"),
+		ReceiptRoot:	hash("receipt-root"),
+		QueueRoot:	queues.QueueRoot(),
+		InboxRoot:	queues.InboxRoot(),
+		OutboxRoot:	queues.OutboxRoot(),
+		ExecutionRoot:	hash("execution-root"),
+		ProofRoot:	hash("proof-root"),
 	}
 	exports, err := BuildApplicationProofRootExports(20, roots)
 	require.NoError(t, err)
@@ -184,17 +184,17 @@ func TestApplicationMessagesReceiptsProofsAndRootValidate(t *testing.T) {
 	require.Equal(t, uint64(1), queues.Inbox[0].Sequence)
 
 	receipt, err := NewApplicationExecutionReceipt(ApplicationExecutionReceipt{
-		ZoneID:         ZoneIDApplication,
-		Height:         77,
-		ExecutionID:    "exec-1",
-		TaskID:         "task-1",
-		WorkflowID:     "workflow-1",
-		AppID:          "billing",
-		Status:         ApplicationTaskExecuted,
-		GasUsed:        500,
-		OutputHash:     hash("app-output"),
-		OutboxMessages: 1,
-		Sequence:       9,
+		ZoneID:		ZoneIDApplication,
+		Height:		77,
+		ExecutionID:	"exec-1",
+		TaskID:		"task-1",
+		WorkflowID:	"workflow-1",
+		AppID:		"billing",
+		Status:		ApplicationTaskExecuted,
+		GasUsed:	500,
+		OutputHash:	hash("app-output"),
+		OutboxMessages:	1,
+		Sequence:	9,
 	})
 	require.NoError(t, err)
 	zoneReceipt, err := receipt.ZoneReceipt()
@@ -208,10 +208,10 @@ func TestApplicationMessagesReceiptsProofsAndRootValidate(t *testing.T) {
 		Workflows: []ApplicationWorkflowState{
 			{WorkflowID: "workflow-1", AppID: "billing", Owner: "alice", Status: ApplicationWorkflowRunning, CurrentStep: 1, TotalSteps: 2, PayloadHash: hash("workflow"), UpdatedHeight: 77},
 		},
-		Tasks:       []ApplicationScheduledTask{applicationTask("task-1", "workflow-1", "billing", "hourly", 77, 1, 1, 100)},
-		Automations: []ApplicationAutomation{{AutomationID: "auto-1", AppID: "billing", WorkflowID: "workflow-1", Enabled: true, TriggerHash: hash("trigger"), NextRunHeight: 78, UpdatedHeight: 77}},
-		Permissions: []ApplicationPermission{{AppID: "billing", Address: "alice", Scope: ApplicationPermissionExecute, ExpiresHeight: 100, GrantHash: hash("grant")}},
-		Receipts:    []ApplicationExecutionReceipt{receipt},
+		Tasks:		[]ApplicationScheduledTask{applicationTask("task-1", "workflow-1", "billing", "hourly", 77, 1, 1, 100)},
+		Automations:	[]ApplicationAutomation{{AutomationID: "auto-1", AppID: "billing", WorkflowID: "workflow-1", Enabled: true, TriggerHash: hash("trigger"), NextRunHeight: 78, UpdatedHeight: 77}},
+		Permissions:	[]ApplicationPermission{{AppID: "billing", Address: "alice", Scope: ApplicationPermissionExecute, ExpiresHeight: 100, GrantHash: hash("grant")}},
+		Receipts:	[]ApplicationExecutionReceipt{receipt},
 	}
 	root, err := BuildApplicationZoneRootFromState(77, state, queues, hash("proofs"))
 	require.NoError(t, err)
@@ -234,15 +234,15 @@ func hasApplicationProofRoot(exports []ApplicationProofRootExport, rootType Appl
 
 func applicationTask(taskID, workflowID, appID, bucket string, height uint64, priority uint32, sequence uint64, gas uint64) ApplicationScheduledTask {
 	return ApplicationScheduledTask{
-		Bucket:          bucket,
-		TaskID:          taskID,
-		WorkflowID:      workflowID,
-		AppID:           appID,
-		ScheduledHeight: height,
-		Priority:        priority,
-		Sequence:        sequence,
-		GasLimit:        gas,
-		PayloadHash:     hash(taskID),
-		Status:          ApplicationTaskPending,
+		Bucket:			bucket,
+		TaskID:			taskID,
+		WorkflowID:		workflowID,
+		AppID:			appID,
+		ScheduledHeight:	height,
+		Priority:		priority,
+		Sequence:		sequence,
+		GasLimit:		gas,
+		PayloadHash:		hash(taskID),
+		Status:			ApplicationTaskPending,
 	}
 }

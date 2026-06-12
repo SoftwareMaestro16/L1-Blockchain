@@ -17,21 +17,21 @@ func TestNativeDelegatorProtectionClaimAndAuthority(t *testing.T) {
 	msgServer := delegatorprotectionkeeper.NewMsgServerImpl(app.DelegatorProtectionKeeper)
 
 	res, err := msgServer.SubmitDelegatorProtectionClaim(ctx, &delegatorprotectionpb.MsgSubmitDelegatorProtectionClaim{
-		Delegator:       "delegator-a",
-		Validator:       "validator-a",
-		LossAmount:      "1000",
-		RequestedPayout: "500",
-		EligibilityHash: strings.Repeat("a", 64),
-		Reason:          "slash",
-		Epoch:           1,
-		Height:          10,
+		Delegator:		"delegator-a",
+		Validator:		"validator-a",
+		LossAmount:		"1000",
+		RequestedPayout:	"500",
+		EligibilityHash:	strings.Repeat("a", 64),
+		Reason:			"slash",
+		Epoch:			1,
+		Height:			10,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.ClaimJson)
 
 	_, err = msgServer.UpdateProtectionParams(ctx, &delegatorprotectionpb.MsgUpdateProtectionParams{
-		Authority:  "wrong",
-		ParamsJson: `{"Authority":"wrong"}`,
+		Authority:	"wrong",
+		ParamsJson:	`{"Authority":"wrong"}`,
 	})
 	require.Error(t, err)
 

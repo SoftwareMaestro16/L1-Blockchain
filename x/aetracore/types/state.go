@@ -7,41 +7,41 @@ import (
 )
 
 type ProofRoot struct {
-	Height    uint64
-	ZoneID    ZoneID
-	RootType  RootType
-	RootHash  string
-	Source    string
-	ZoneCount uint32
+	Height		uint64
+	ZoneID		ZoneID
+	RootType	RootType
+	RootHash	string
+	Source		string
+	ZoneCount	uint32
 }
 
 type FinalityRoots struct {
-	GlobalStateRoot      string
-	GlobalMessageRoot    string
-	ExecutionReceiptRoot string
+	GlobalStateRoot		string
+	GlobalMessageRoot	string
+	ExecutionReceiptRoot	string
 }
 
 type RootSnapshot struct {
-	Height               uint64
-	GlobalStateRoot      ProofRoot
-	GlobalMessageRoot    ProofRoot
-	ExecutionReceiptRoot ProofRoot
-	ProofRoots           []ProofRoot
-	Finality             FinalityRoots
+	Height			uint64
+	GlobalStateRoot		ProofRoot
+	GlobalMessageRoot	ProofRoot
+	ExecutionReceiptRoot	ProofRoot
+	ProofRoots		[]ProofRoot
+	Finality		FinalityRoots
 }
 
 type CoreState struct {
-	Params             AetraCoreParams
-	Zones              []ZoneDescriptor
-	ZoneDescriptors    []ZoneDescriptor
-	ServiceDescriptors []ServiceDescriptor
-	ShardLayouts       []ShardLayout
-	RoutingTables      []RoutingTableCommitment
-	ZoneCommitments    []ZoneCommitment
-	GlobalRoots        []GlobalStateRoot
-	RootSnapshots      []RootSnapshot
-	FinalityRecords    []FinalityRecord
-	ExportManifests    []ExportManifest
+	Params			AetraCoreParams
+	Zones			[]ZoneDescriptor
+	ZoneDescriptors		[]ZoneDescriptor
+	ServiceDescriptors	[]ServiceDescriptor
+	ShardLayouts		[]ShardLayout
+	RoutingTables		[]RoutingTableCommitment
+	ZoneCommitments		[]ZoneCommitment
+	GlobalRoots		[]GlobalStateRoot
+	RootSnapshots		[]RootSnapshot
+	FinalityRecords		[]FinalityRecord
+	ExportManifests		[]ExportManifest
 }
 
 type AetraCoreState = CoreState
@@ -52,17 +52,17 @@ func EmptyState(params ...AetraCoreParams) CoreState {
 		stateParams = params[0]
 	}
 	return CoreState{
-		Params:             stateParams,
-		Zones:              []ZoneDescriptor{},
-		ZoneDescriptors:    []ZoneDescriptor{},
-		ServiceDescriptors: []ServiceDescriptor{},
-		ShardLayouts:       []ShardLayout{},
-		RoutingTables:      []RoutingTableCommitment{},
-		ZoneCommitments:    []ZoneCommitment{},
-		GlobalRoots:        []GlobalStateRoot{},
-		RootSnapshots:      []RootSnapshot{},
-		FinalityRecords:    []FinalityRecord{},
-		ExportManifests:    []ExportManifest{},
+		Params:			stateParams,
+		Zones:			[]ZoneDescriptor{},
+		ZoneDescriptors:	[]ZoneDescriptor{},
+		ServiceDescriptors:	[]ServiceDescriptor{},
+		ShardLayouts:		[]ShardLayout{},
+		RoutingTables:		[]RoutingTableCommitment{},
+		ZoneCommitments:	[]ZoneCommitment{},
+		GlobalRoots:		[]GlobalStateRoot{},
+		RootSnapshots:		[]RootSnapshot{},
+		FinalityRecords:	[]FinalityRecord{},
+		ExportManifests:	[]ExportManifest{},
 	}
 }
 
@@ -217,15 +217,15 @@ func CommitBlockRoots(state CoreState, height uint64) (CoreState, RootSnapshot, 
 	messageRoot := hashParts("aetra-aek-global-message-root-v1", fmt.Sprint(height), zonesRoot)
 	receiptRoot := hashParts("aetra-aek-execution-receipt-root-v1", fmt.Sprint(height), zonesRoot)
 	contributions := RootContributions{
-		IdentityRoot:  EmptyRootHash,
-		StorageRoot:   EmptyRootHash,
-		MessageRoot:   messageRoot,
-		ReceiptsRoot:  receiptRoot,
-		RoutingRoot:   EmptyRootHash,
-		PaymentsRoot:  EmptyRootHash,
-		ContractsRoot: EmptyRootHash,
-		VMRoot:        EmptyRootHash,
-		ParamsHash:    ComputeAetraCoreParamsHash(state.Params),
+		IdentityRoot:	EmptyRootHash,
+		StorageRoot:	EmptyRootHash,
+		MessageRoot:	messageRoot,
+		ReceiptsRoot:	receiptRoot,
+		RoutingRoot:	EmptyRootHash,
+		PaymentsRoot:	EmptyRootHash,
+		ContractsRoot:	EmptyRootHash,
+		VMRoot:		EmptyRootHash,
+		ParamsHash:	ComputeAetraCoreParamsHash(state.Params),
 	}
 	return CommitBlockRootsWithContributions(state, height, contributions)
 }
@@ -257,46 +257,46 @@ func CommitBlockRootsWithContributions(state CoreState, height uint64, contribut
 	proofRoots := make([]ProofRoot, len(commitments))
 	for i, commitment := range commitments {
 		proofRoots[i] = ProofRoot{
-			Height:   height,
-			ZoneID:   ZoneID(commitment.ZoneID),
-			RootType: ZoneCommitmentsRoot,
-			RootHash: commitment.CommitmentHash,
-			Source:   "aetracore.zone_commitments",
+			Height:		height,
+			ZoneID:		ZoneID(commitment.ZoneID),
+			RootType:	ZoneCommitmentsRoot,
+			RootHash:	commitment.CommitmentHash,
+			Source:		"aetracore.zone_commitments",
 		}
 	}
 	proofRoots = append(proofRoots, state.ShardLayoutProofRootsAtHeight(height)...)
 	if table, found := state.LatestRoutingTableAtHeight(height); found {
 		proofRoots = append(proofRoots, ProofRoot{
-			Height:    height,
-			RootType:  RoutingTableRootType,
-			RootHash:  table.TableHash,
-			Source:    "aetracore.routing_table",
-			ZoneCount: uint32(len(table.Entries)),
+			Height:		height,
+			RootType:	RoutingTableRootType,
+			RootHash:	table.TableHash,
+			Source:		"aetracore.routing_table",
+			ZoneCount:	uint32(len(table.Entries)),
 		})
 	}
 	snapshot := RootSnapshot{
-		Height: height,
+		Height:	height,
 		GlobalStateRoot: ProofRoot{
-			Height:    height,
-			RootType:  DefaultProofRootType,
-			RootHash:  globalRootHash,
-			ZoneCount: uint32(len(commitments)),
+			Height:		height,
+			RootType:	DefaultProofRootType,
+			RootHash:	globalRootHash,
+			ZoneCount:	uint32(len(commitments)),
 		},
 		GlobalMessageRoot: ProofRoot{
-			Height:   height,
-			RootType: MessageProofRootType,
-			RootHash: contributions.MessageRoot,
+			Height:		height,
+			RootType:	MessageProofRootType,
+			RootHash:	contributions.MessageRoot,
 		},
 		ExecutionReceiptRoot: ProofRoot{
-			Height:   height,
-			RootType: ReceiptProofRootType,
-			RootHash: contributions.ReceiptsRoot,
+			Height:		height,
+			RootType:	ReceiptProofRootType,
+			RootHash:	contributions.ReceiptsRoot,
 		},
-		ProofRoots: proofRoots,
+		ProofRoots:	proofRoots,
 		Finality: FinalityRoots{
-			GlobalStateRoot:      globalRootHash,
-			GlobalMessageRoot:    contributions.MessageRoot,
-			ExecutionReceiptRoot: contributions.ReceiptsRoot,
+			GlobalStateRoot:	globalRootHash,
+			GlobalMessageRoot:	contributions.MessageRoot,
+			ExecutionReceiptRoot:	contributions.ReceiptsRoot,
 		},
 	}
 	if err := snapshot.Validate(); err != nil {
@@ -413,17 +413,17 @@ func (s CoreState) Export() CoreState {
 func (s CoreState) Clone() CoreState {
 	zones := canonicalZones(s)
 	out := CoreState{
-		Params:             s.Params,
-		Zones:              make([]ZoneDescriptor, len(zones)),
-		ZoneDescriptors:    make([]ZoneDescriptor, len(zones)),
-		ServiceDescriptors: cloneServiceDescriptors(s.ServiceDescriptors),
-		ShardLayouts:       cloneShardLayouts(s.ShardLayouts),
-		RoutingTables:      cloneRoutingTables(s.RoutingTables),
-		ZoneCommitments:    append([]ZoneCommitment(nil), s.ZoneCommitments...),
-		GlobalRoots:        append([]GlobalStateRoot(nil), s.GlobalRoots...),
-		RootSnapshots:      cloneRootSnapshots(s.RootSnapshots),
-		FinalityRecords:    append([]FinalityRecord(nil), s.FinalityRecords...),
-		ExportManifests:    append([]ExportManifest(nil), s.ExportManifests...),
+		Params:			s.Params,
+		Zones:			make([]ZoneDescriptor, len(zones)),
+		ZoneDescriptors:	make([]ZoneDescriptor, len(zones)),
+		ServiceDescriptors:	cloneServiceDescriptors(s.ServiceDescriptors),
+		ShardLayouts:		cloneShardLayouts(s.ShardLayouts),
+		RoutingTables:		cloneRoutingTables(s.RoutingTables),
+		ZoneCommitments:	append([]ZoneCommitment(nil), s.ZoneCommitments...),
+		GlobalRoots:		append([]GlobalStateRoot(nil), s.GlobalRoots...),
+		RootSnapshots:		cloneRootSnapshots(s.RootSnapshots),
+		FinalityRecords:	append([]FinalityRecord(nil), s.FinalityRecords...),
+		ExportManifests:	append([]ExportManifest(nil), s.ExportManifests...),
 	}
 	for i, descriptor := range zones {
 		out.Zones[i] = CanonicalZoneDescriptor(descriptor)
@@ -560,12 +560,12 @@ func (s CoreState) ShardLayoutProofRootsAtHeight(height uint64) []ProofRoot {
 			continue
 		}
 		roots = append(roots, ProofRoot{
-			Height:    height,
-			ZoneID:    zoneID,
-			RootType:  ShardLayoutRootType,
-			RootHash:  layout.LayoutHash,
-			Source:    "aetracore.shard_layout",
-			ZoneCount: uint32(len(layout.ActiveShards)),
+			Height:		height,
+			ZoneID:		zoneID,
+			RootType:	ShardLayoutRootType,
+			RootHash:	layout.LayoutHash,
+			Source:		"aetracore.shard_layout",
+			ZoneCount:	uint32(len(layout.ActiveShards)),
 		})
 	}
 	return roots

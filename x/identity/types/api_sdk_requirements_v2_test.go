@@ -57,14 +57,14 @@ func TestIdentityNodeAPIV2EndpointsReturnOptionalProofPassthrough(t *testing.T) 
 	require.NotNil(t, primary.ProofPassthrough)
 	require.NoError(t, ValidateIdentityProofPassthroughFormatV2(*primary.ProofPassthrough))
 	verified, err := IdentityWalletSDKVerifyResolutionProofV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetra-local-1",
-		RequestedName:        "alice.aet",
-		TrustedHeader:        trustedHeaderForProofV2(*primary.ProofPassthrough.Proof),
-		Proof:                *primary.ProofPassthrough.Proof,
-		TargetType:           IdentityResolutionTargetPrimary,
-		CurrentHeight:        15,
-		AllowRenewalWindow:   true,
-		NormalizationVersion: NameNormalizationVersionV2,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(*primary.ProofPassthrough.Proof),
+		Proof:			*primary.ProofPassthrough.Proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		15,
+		AllowRenewalWindow:	true,
+		NormalizationVersion:	NameNormalizationVersionV2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, addr(2), verified.Address)
@@ -114,13 +114,13 @@ func TestIdentityNodeAPIV2EndpointsReturnOptionalProofPassthrough(t *testing.T) 
 	delegation, err := NewDelegationRecordV2("alice.aet", addr(7), DelegationScopeResolverUpdate, []string{ResolverKeyPrimary}, 90, 0, ResolverKeyPrimary, 15)
 	require.NoError(t, err)
 	auth := api.QueryDelegationAuthorization(IdentityNodeAPIRequestV2{
-		Delegation: &delegation,
+		Delegation:	&delegation,
 		DelegationAuth: PartialDelegationAuthorizationV2{
-			Scope:                     DelegationScopeResolverUpdate,
-			Permission:                ResolverKeyPrimary,
-			RecordKey:                 ResolverKeyPrimary,
-			Height:                    20,
-			ExpectedDelegationVersion: delegation.DelegationVersion,
+			Scope:				DelegationScopeResolverUpdate,
+			Permission:			ResolverKeyPrimary,
+			RecordKey:			ResolverKeyPrimary,
+			Height:				20,
+			ExpectedDelegationVersion:	delegation.DelegationVersion,
 		},
 	})
 	require.Equal(t, IdentityQueryOK, auth.QueryCode)
@@ -140,12 +140,12 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 	require.NoError(t, IdentityWalletSDKValidateNameV2("alice.aet"))
 
 	primary, err := IdentityWalletSDKResolvePrimaryVerifiedV2(IdentitySendByNameRequestV2{
-		Name:             "alice.aet",
-		CurrentHeight:    15,
-		IncludeAuditMemo: true,
-		ExpectedChainID:  "aetra-local-1",
-		TrustedHeader:    header,
-		Proof:            &proof,
+		Name:			"alice.aet",
+		CurrentHeight:		15,
+		IncludeAuditMemo:	true,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		header,
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, primary.ProofVerified)
@@ -155,16 +155,16 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 	require.NoError(t, ValidateIdentityWalletSendByNameTxV2(sendTx))
 
 	invoke, err := IdentityWalletSDKResolveContractTargetVerifiedV2(IdentityInvokeByNameRequestV2{
-		Name:                  "alice.aet",
-		TargetID:              ResolverKeyContract,
-		InterfaceID:           "aw5",
-		ExpectedInterfaceHash: interfaceHash,
-		Method:                "swap",
-		PayloadHash:           identityHash("payload"),
-		CurrentHeight:         15,
-		ExpectedChainID:       "aetra-local-1",
-		TrustedHeader:         header,
-		Proof:                 &proof,
+		Name:			"alice.aet",
+		TargetID:		ResolverKeyContract,
+		InterfaceID:		"aw5",
+		ExpectedInterfaceHash:	interfaceHash,
+		Method:			"swap",
+		PayloadHash:		identityHash("payload"),
+		CurrentHeight:		15,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		header,
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	invokeTx, err := IdentityWalletSDKBuildInvokeByNameTxV2(invoke)
@@ -174,14 +174,14 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 	require.NoError(t, ValidateIdentityWalletInvokeByNameTxV2(invokeTx))
 
 	service, err := IdentityWalletSDKResolveServiceVerifiedV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		ServiceID:           "rpc",
-		SupportedTransports: []string{"https"},
-		AllowedAuthPolicies: []string{"none"},
-		CurrentHeight:       15,
-		ExpectedChainID:     "aetra-local-1",
-		TrustedHeader:       header,
-		Proof:               &proof,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		CurrentHeight:		15,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		header,
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.True(t, service.ProofVerified)
@@ -190,14 +190,14 @@ func TestIdentityWalletSDKV2VerifiedHelpersBuildTransactions(t *testing.T) {
 	inlineProof := routingIntegrationInlineInterfaceProof(t, state)
 	inlineHash := inlineProof.ResolverRecord.InterfaceDescriptors[0].SchemaHash
 	rendered, err := IdentityWalletSDKRenderVerifiedInterfaceV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: inlineHash,
-		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
-		CurrentHeight:      15,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(inlineProof),
-		Proof:              &inlineProof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	inlineHash,
+		WalletPolicy:		DefaultIdentityInterfaceWalletPolicyV2(),
+		CurrentHeight:		15,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(inlineProof),
+		Proof:			&inlineProof,
 	})
 	require.NoError(t, err)
 	require.True(t, rendered.ProofVerified)
@@ -215,24 +215,24 @@ func TestIdentityIndexerV2ProofPassthroughAndReplay(t *testing.T) {
 	require.NoError(t, err)
 
 	domainEvent, err := BuildIdentityIndexerEventV2(IdentityIndexerEventDomainV2, 15, map[string]string{
-		IdentityIndexerAttrName:          "alice.aet",
-		IdentityIndexerAttrNameHash:      nameHash,
-		IdentityIndexerAttrOwner:         hex.EncodeToString(addr(1)),
-		IdentityIndexerAttrExpiryHeight:  "1010",
-		IdentityIndexerAttrRecordVersion: "1",
+		IdentityIndexerAttrName:		"alice.aet",
+		IdentityIndexerAttrNameHash:		nameHash,
+		IdentityIndexerAttrOwner:		hex.EncodeToString(addr(1)),
+		IdentityIndexerAttrExpiryHeight:	"1010",
+		IdentityIndexerAttrRecordVersion:	"1",
 	}, primary.ProofPassthrough)
 	require.NoError(t, err)
 	resolverEvent, err := BuildIdentityIndexerEventV2(IdentityIndexerEventResolverV2, 15, map[string]string{
-		IdentityIndexerAttrName:          "alice.aet",
-		IdentityIndexerAttrNameHash:      nameHash,
-		IdentityIndexerAttrResolver:      hex.EncodeToString(addr(1)),
-		IdentityIndexerAttrRecordVersion: "1",
+		IdentityIndexerAttrName:		"alice.aet",
+		IdentityIndexerAttrNameHash:		nameHash,
+		IdentityIndexerAttrResolver:		hex.EncodeToString(addr(1)),
+		IdentityIndexerAttrRecordVersion:	"1",
 	}, primary.ProofPassthrough)
 	require.NoError(t, err)
 	expiryEvent, err := BuildIdentityIndexerEventV2(IdentityIndexerEventExpiryV2, 16, map[string]string{
-		IdentityIndexerAttrNameHash:      nameHash,
-		IdentityIndexerAttrExpiryHeight:  "1010",
-		IdentityIndexerAttrRecordVersion: "1",
+		IdentityIndexerAttrNameHash:		nameHash,
+		IdentityIndexerAttrExpiryHeight:	"1010",
+		IdentityIndexerAttrRecordVersion:	"1",
 	}, primary.ProofPassthrough)
 	require.NoError(t, err)
 

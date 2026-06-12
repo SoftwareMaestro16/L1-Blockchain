@@ -13,103 +13,103 @@ import (
 )
 
 const (
-	DefaultDelegationActivationEpochs = uint64(1)
-	DefaultEvidenceWindowEpochs       = uint64(4)
-	DefaultMinTaskGroupValidators     = uint32(3)
-	DefaultMaxTaskGroupValidators     = uint32(21)
-	DefaultReporterRewardBps          = uint32(500)
-	MaxReporterRewardBps              = uint32(2_000)
+	DefaultDelegationActivationEpochs	= uint64(1)
+	DefaultEvidenceWindowEpochs		= uint64(4)
+	DefaultMinTaskGroupValidators		= uint32(3)
+	DefaultMaxTaskGroupValidators		= uint32(21)
+	DefaultReporterRewardBps		= uint32(500)
+	MaxReporterRewardBps			= uint32(2_000)
 
-	PosHashHexLength = 64
-	PosEmptyRootHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	PosHashHexLength	= 64
+	PosEmptyRootHash	= "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
-	DefaultWorkloadClass = "general"
-	maxPosTokenLength    = 128
+	DefaultWorkloadClass	= "general"
+	maxPosTokenLength	= 128
 )
 
 const (
-	CentralizationWarningValidatorShare        = "validator_voting_power_concentration"
-	CentralizationWarningTopNShare             = "top_n_voting_power_concentration"
-	CentralizationWarningStakeSaturation       = "stake_saturation_ratio"
-	CentralizationWarningDelegationRisk        = "delegation_risk_concentration"
-	CentralizationWarningRewardDampeningActive = "reward_dampening_active"
-	CentralizationWarningTaskAssignmentShare   = "task_assignment_concentration"
-	CentralizationWarningBootstrapEligible     = "bootstrap_eligible_reliable_validator"
+	CentralizationWarningValidatorShare		= "validator_voting_power_concentration"
+	CentralizationWarningTopNShare			= "top_n_voting_power_concentration"
+	CentralizationWarningStakeSaturation		= "stake_saturation_ratio"
+	CentralizationWarningDelegationRisk		= "delegation_risk_concentration"
+	CentralizationWarningRewardDampeningActive	= "reward_dampening_active"
+	CentralizationWarningTaskAssignmentShare	= "task_assignment_concentration"
+	CentralizationWarningBootstrapEligible		= "bootstrap_eligible_reliable_validator"
 
-	ConcentrationAlertSeverityWarning  = "warning"
-	ConcentrationAlertSeverityCritical = "critical"
+	ConcentrationAlertSeverityWarning	= "warning"
+	ConcentrationAlertSeverityCritical	= "critical"
 )
 
 type EpochPhase string
 
 const (
-	EpochPhaseDelegation EpochPhase = "delegation"
-	EpochPhaseElection   EpochPhase = "election"
-	EpochPhaseAssignment EpochPhase = "assignment"
-	EpochPhaseActive     EpochPhase = "active"
-	EpochPhaseSettlement EpochPhase = "settlement"
-	EpochPhaseClosed     EpochPhase = "closed"
+	EpochPhaseDelegation	EpochPhase	= "delegation"
+	EpochPhaseElection	EpochPhase	= "election"
+	EpochPhaseAssignment	EpochPhase	= "assignment"
+	EpochPhaseActive	EpochPhase	= "active"
+	EpochPhaseSettlement	EpochPhase	= "settlement"
+	EpochPhaseClosed	EpochPhase	= "closed"
 )
 
 type SettlementStatus string
 
 const (
-	SettlementStatusPending   SettlementStatus = "pending"
-	SettlementStatusFinalized SettlementStatus = "finalized"
+	SettlementStatusPending		SettlementStatus	= "pending"
+	SettlementStatusFinalized	SettlementStatus	= "finalized"
 )
 
 type ValidatorRole string
 
 const (
-	ValidatorRoleValidator          ValidatorRole = "validator"
-	ValidatorRoleProposer           ValidatorRole = "proposer"
-	ValidatorRoleBlockProducer      ValidatorRole = "block_producer"
-	ValidatorRoleVerifier           ValidatorRole = "verifier"
-	ValidatorRoleEvidenceReporter   ValidatorRole = "evidence_reporter"
-	ValidatorRoleCollator           ValidatorRole = "collator"
-	ValidatorRoleDelegationOperator ValidatorRole = "delegation_operator"
-	ValidatorRoleFisherman          ValidatorRole = "fisherman"
-	ValidatorRoleEvidenceReviewer   ValidatorRole = "evidence_reviewer"
+	ValidatorRoleValidator		ValidatorRole	= "validator"
+	ValidatorRoleProposer		ValidatorRole	= "proposer"
+	ValidatorRoleBlockProducer	ValidatorRole	= "block_producer"
+	ValidatorRoleVerifier		ValidatorRole	= "verifier"
+	ValidatorRoleEvidenceReporter	ValidatorRole	= "evidence_reporter"
+	ValidatorRoleCollator		ValidatorRole	= "collator"
+	ValidatorRoleDelegationOperator	ValidatorRole	= "delegation_operator"
+	ValidatorRoleFisherman		ValidatorRole	= "fisherman"
+	ValidatorRoleEvidenceReviewer	ValidatorRole	= "evidence_reviewer"
 )
 
 const (
-	RoleStatusEligible  = "eligible"
-	RoleStatusAssigned  = "assigned"
-	RoleStatusSuspended = "suspended"
-	RoleStatusInactive  = "inactive"
+	RoleStatusEligible	= "eligible"
+	RoleStatusAssigned	= "assigned"
+	RoleStatusSuspended	= "suspended"
+	RoleStatusInactive	= "inactive"
 )
 
 const (
-	CollatorStatusRegistered = "registered"
-	CollatorStatusActive     = "active"
-	CollatorStatusSuspended  = "suspended"
-	CollatorStatusRetired    = "retired"
+	CollatorStatusRegistered	= "registered"
+	CollatorStatusActive		= "active"
+	CollatorStatusSuspended		= "suspended"
+	CollatorStatusRetired		= "retired"
 )
 
 type RoleRecord struct {
-	ValidatorAddress  string
-	Role              ValidatorRole
-	EpochID           uint64
-	Status            string
-	EligibilityScore  uint32
-	Capacity          ValidatorCapacity
-	AssignedTaskCount uint32
-	PerformanceScore  uint32
+	ValidatorAddress	string
+	Role			ValidatorRole
+	EpochID			uint64
+	Status			string
+	EligibilityScore	uint32
+	Capacity		ValidatorCapacity
+	AssignedTaskCount	uint32
+	PerformanceScore	uint32
 }
 
 type RoleRule struct {
-	Role                  ValidatorRole
-	Description           string
-	RequiresValidator     bool
-	RequiresMinimumStake  bool
-	RequiresDeposit       bool
-	RequiresAuthorization bool
-	RequiresFeeDisclosure bool
-	RequiresRiskPolicy    bool
-	CanFinalize           bool
-	RewardWeightBps       uint32
-	MinimumPerformanceBps uint32
-	MinimumEligibilityBps uint32
+	Role			ValidatorRole
+	Description		string
+	RequiresValidator	bool
+	RequiresMinimumStake	bool
+	RequiresDeposit		bool
+	RequiresAuthorization	bool
+	RequiresFeeDisclosure	bool
+	RequiresRiskPolicy	bool
+	CanFinalize		bool
+	RewardWeightBps		uint32
+	MinimumPerformanceBps	uint32
+	MinimumEligibilityBps	uint32
 }
 
 type RoleRegistry struct {
@@ -117,668 +117,668 @@ type RoleRegistry struct {
 }
 
 type RoleEligibilityInput struct {
-	Params                       Params
-	Role                         ValidatorRole
-	ActorAddress                 string
-	Candidate                    Candidate
-	DepositNaet                  sdkmath.Int
-	DelegationOperatorAuthorized bool
-	FeesDisclosed                bool
-	RiskPolicyDisclosed          bool
+	Params				Params
+	Role				ValidatorRole
+	ActorAddress			string
+	Candidate			Candidate
+	DepositNaet			sdkmath.Int
+	DelegationOperatorAuthorized	bool
+	FeesDisclosed			bool
+	RiskPolicyDisclosed		bool
 }
 
 type RolePerformanceMetrics struct {
-	ValidatorAddress string
-	Role             ValidatorRole
-	EpochID          uint64
-	AssignedTasks    uint32
-	CompletedTasks   uint32
-	FaultedTasks     uint32
-	MissedTasks      uint32
-	PerformanceScore uint32
+	ValidatorAddress	string
+	Role			ValidatorRole
+	EpochID			uint64
+	AssignedTasks		uint32
+	CompletedTasks		uint32
+	FaultedTasks		uint32
+	MissedTasks		uint32
+	PerformanceScore	uint32
 }
 
 type RoleRewardInput struct {
-	EpochID          uint64
-	TotalRewardsNaet sdkmath.Int
-	Records          []RoleRecord
-	Weights          []RoleRewardWeight
+	EpochID			uint64
+	TotalRewardsNaet	sdkmath.Int
+	Records			[]RoleRecord
+	Weights			[]RoleRewardWeight
 }
 
 type CollatorRecord struct {
-	CollatorID         string
-	OperatorAddress    string
-	SupportedWorkloads []WorkloadType
-	BondOptional       sdkmath.Int
-	Reputation         uint32
-	Status             string
-	RegisteredEpoch    uint64
+	CollatorID		string
+	OperatorAddress		string
+	SupportedWorkloads	[]WorkloadType
+	BondOptional		sdkmath.Int
+	Reputation		uint32
+	Status			string
+	RegisteredEpoch		uint64
 }
 
 type CollatorCandidateOutputInput struct {
-	EpochID             uint64
-	Collator            CollatorRecord
-	Task                WorkloadTask
-	TaskGroupIDOptional string
-	TransactionRoot     string
-	StateTransitionRoot string
-	ProofBundleRoot     string
+	EpochID			uint64
+	Collator		CollatorRecord
+	Task			WorkloadTask
+	TaskGroupIDOptional	string
+	TransactionRoot		string
+	StateTransitionRoot	string
+	ProofBundleRoot		string
 }
 
 type CollatorCandidateOutput struct {
-	EpochID                       uint64
-	CollatorID                    string
-	OperatorAddress               string
-	TaskID                        string
-	TaskGroupIDOptional           string
-	WorkloadID                    string
-	WorkloadType                  WorkloadType
-	TransactionRoot               string
-	StateTransitionRoot           string
-	ProofBundleRoot               string
-	RequiresValidatorVerification bool
-	ValidatorSignatures           []string
-	Finalized                     bool
-	CandidateOutputHash           string
+	EpochID				uint64
+	CollatorID			string
+	OperatorAddress			string
+	TaskID				string
+	TaskGroupIDOptional		string
+	WorkloadID			string
+	WorkloadType			WorkloadType
+	TransactionRoot			string
+	StateTransitionRoot		string
+	ProofBundleRoot			string
+	RequiresValidatorVerification	bool
+	ValidatorSignatures		[]string
+	Finalized			bool
+	CandidateOutputHash		string
 }
 
 type CollatorRegistry struct {
-	EpochID      uint64
-	Collators    []CollatorRecord
-	RegistryRoot string
+	EpochID		uint64
+	Collators	[]CollatorRecord
+	RegistryRoot	string
 }
 
 const (
-	CollatorVerificationResultValid   = "valid"
-	CollatorVerificationResultInvalid = "invalid"
-	CollatorVerificationResultAbstain = "abstain"
+	CollatorVerificationResultValid		= "valid"
+	CollatorVerificationResultInvalid	= "invalid"
+	CollatorVerificationResultAbstain	= "abstain"
 )
 
 type CollatorOutputVerification struct {
-	OutputHash       string
-	ValidatorAddress string
-	Result           string
-	SignatureHash    string
-	VerifiedHeight   int64
+	OutputHash		string
+	ValidatorAddress	string
+	Result			string
+	SignatureHash		string
+	VerifiedHeight		int64
 }
 
 type CollatorOutputVerificationResult struct {
-	OutputHash           string
-	ValidVotes           uint32
-	InvalidVotes         uint32
-	AbstainVotes         uint32
-	TotalValidators      uint32
-	ParticipationBps     uint32
-	DecisionThresholdBps uint32
-	Accepted             bool
-	Rejected             bool
-	ValidSignatureHashes []string
-	VerificationRoot     string
+	OutputHash		string
+	ValidVotes		uint32
+	InvalidVotes		uint32
+	AbstainVotes		uint32
+	TotalValidators		uint32
+	ParticipationBps	uint32
+	DecisionThresholdBps	uint32
+	Accepted		bool
+	Rejected		bool
+	ValidSignatureHashes	[]string
+	VerificationRoot	string
 }
 
 type ValidatorCapacity struct {
-	MaxTaskGroups          uint32
-	SupportedWorkloads     []WorkloadType
-	ZoneSupport            []string
-	HardwareClassOptional  string
-	NetworkClassOptional   string
-	AvailabilityCommitment uint32
+	MaxTaskGroups		uint32
+	SupportedWorkloads	[]WorkloadType
+	ZoneSupport		[]string
+	HardwareClassOptional	string
+	NetworkClassOptional	string
+	AvailabilityCommitment	uint32
 }
 
 type EpochPhaseDurations struct {
-	DelegationSeconds       uint64
-	ElectionSeconds         uint64
-	AssignmentSeconds       uint64
-	ActiveValidationSeconds uint64
-	SettlementSeconds       uint64
+	DelegationSeconds	uint64
+	ElectionSeconds		uint64
+	AssignmentSeconds	uint64
+	ActiveValidationSeconds	uint64
+	SettlementSeconds	uint64
 }
 
 type EpochSeedSource string
 
 const (
-	EpochSeedSourcePreviousSeedValidatorSet EpochSeedSource = "previous_seed_validator_set"
-	EpochSeedSourceCometBFTBlockID          EpochSeedSource = "cometbft_block_id"
-	EpochSeedSourceExternalBeacon           EpochSeedSource = "external_beacon"
+	EpochSeedSourcePreviousSeedValidatorSet	EpochSeedSource	= "previous_seed_validator_set"
+	EpochSeedSourceCometBFTBlockID		EpochSeedSource	= "cometbft_block_id"
+	EpochSeedSourceExternalBeacon		EpochSeedSource	= "external_beacon"
 )
 
 type EpochLifecycleStep struct {
-	Phase       EpochPhase
-	Name        string
-	DurationKey string
+	Phase		EpochPhase
+	Name		string
+	DurationKey	string
 }
 
 type EpochRecord struct {
-	EpochID          uint64
-	StartHeight      uint64
-	EndHeight        uint64
-	Phase            EpochPhase
-	Seed             string
-	ValidatorSetHash string
-	TaskGroupRoot    string
-	PerformanceRoot  string
-	RewardRoot       string
-	SlashRoot        string
-	SettlementStatus SettlementStatus
+	EpochID			uint64
+	StartHeight		uint64
+	EndHeight		uint64
+	Phase			EpochPhase
+	Seed			string
+	ValidatorSetHash	string
+	TaskGroupRoot		string
+	PerformanceRoot		string
+	RewardRoot		string
+	SlashRoot		string
+	SettlementStatus	SettlementStatus
 }
 
 type EpochSettlementRoots struct {
-	PerformanceRoot string
-	RewardRoot      string
-	SlashRoot       string
+	PerformanceRoot	string
+	RewardRoot	string
+	SlashRoot	string
 }
 
 type WorkloadTask struct {
-	TaskID             string
-	WorkloadID         string
-	WorkloadType       WorkloadType
-	ZoneID             string
-	ShardID            string
-	WorkloadClass      string
-	RequiredValidators uint32
-	Roles              []ValidatorRole
-	ExcludedValidators []string
+	TaskID			string
+	WorkloadID		string
+	WorkloadType		WorkloadType
+	ZoneID			string
+	ShardID			string
+	WorkloadClass		string
+	RequiredValidators	uint32
+	Roles			[]ValidatorRole
+	ExcludedValidators	[]string
 }
 
 type WorkloadType string
 
 const (
-	WorkloadTypeGlobalConsensus      WorkloadType = "global_consensus"
-	WorkloadTypeZoneExecution        WorkloadType = "zone_execution"
-	WorkloadTypeShardExecution       WorkloadType = "shard_execution"
-	WorkloadTypeProofVerification    WorkloadType = "proof_verification"
-	WorkloadTypeEvidenceVerification WorkloadType = "evidence_verification"
-	WorkloadTypeDataAvailability     WorkloadType = "data_availability"
-	WorkloadTypeServiceValidation    WorkloadType = "service_validation"
+	WorkloadTypeGlobalConsensus		WorkloadType	= "global_consensus"
+	WorkloadTypeZoneExecution		WorkloadType	= "zone_execution"
+	WorkloadTypeShardExecution		WorkloadType	= "shard_execution"
+	WorkloadTypeProofVerification		WorkloadType	= "proof_verification"
+	WorkloadTypeEvidenceVerification	WorkloadType	= "evidence_verification"
+	WorkloadTypeDataAvailability		WorkloadType	= "data_availability"
+	WorkloadTypeServiceValidation		WorkloadType	= "service_validation"
 )
 
 type TaskAssignment struct {
-	TaskID         string
-	WorkloadID     string
-	WorkloadType   WorkloadType
-	ZoneID         string
-	ShardID        string
-	WorkloadClass  string
-	Role           ValidatorRole
-	Validators     []string
-	AssignmentHash string
+	TaskID		string
+	WorkloadID	string
+	WorkloadType	WorkloadType
+	ZoneID		string
+	ShardID		string
+	WorkloadClass	string
+	Role		ValidatorRole
+	Validators	[]string
+	AssignmentHash	string
 }
 
 type TaskAssignmentSet struct {
-	EpochID     uint64
-	Seed        string
-	Assignments []TaskAssignment
-	Root        string
+	EpochID		uint64
+	Seed		string
+	Assignments	[]TaskAssignment
+	Root		string
 }
 
 type TaskGroup struct {
-	EpochID          uint64
-	TaskGroupID      string
-	WorkloadID       string
-	WorkloadType     WorkloadType
-	ValidatorMembers []string
-	ProposerOrder    []string
-	VerifierSet      []string
-	MinimumGroupSize uint32
-	StakeWeightRoot  string
-	AssignmentSeed   string
-	ActivationHeight uint64
-	ExpiryHeight     uint64
+	EpochID			uint64
+	TaskGroupID		string
+	WorkloadID		string
+	WorkloadType		WorkloadType
+	ValidatorMembers	[]string
+	ProposerOrder		[]string
+	VerifierSet		[]string
+	MinimumGroupSize	uint32
+	StakeWeightRoot		string
+	AssignmentSeed		string
+	ActivationHeight	uint64
+	ExpiryHeight		uint64
 }
 
 type TaskGroupSet struct {
-	EpochID uint64
-	Seed    string
-	Groups  []TaskGroup
-	Root    string
+	EpochID	uint64
+	Seed	string
+	Groups	[]TaskGroup
+	Root	string
 }
 
 type CapacityFaultEvidence struct {
-	ValidatorID       string
-	WorkloadID        string
-	WorkloadType      WorkloadType
-	AssignmentEpoch   uint64
-	EvidenceHeight    int64
-	UsedForAssignment bool
-	Finalized         bool
+	ValidatorID		string
+	WorkloadID		string
+	WorkloadType		WorkloadType
+	AssignmentEpoch		uint64
+	EvidenceHeight		int64
+	UsedForAssignment	bool
+	Finalized		bool
 }
 
 const (
-	EvidenceTypeDoubleSignProof              = "double_sign_proof"
-	EvidenceTypeInvalidStateTransitionProof  = "invalid_state_transition_proof"
-	EvidenceTypeEquivocationProof            = "equivocation_proof"
-	EvidenceTypeDowntimeProof                = "downtime_proof"
-	EvidenceTypeInvalidTaskExecutionProof    = "invalid_task_execution_proof"
-	EvidenceTypeInvalidCollatorOutputProof   = "invalid_collator_output_proof"
-	EvidenceTypeInvalidProofAcceptance       = "invalid_proof_acceptance"
-	EvidenceTypeFalseCapacityDeclaration     = "false_capacity_declaration"
-	EvidenceTypeInvalidEvidenceSubmission    = "invalid_evidence_submission"
-	EvidenceStatusSubmitted                  = "submitted"
-	EvidenceStatusInVerification             = "in_verification"
-	EvidenceStatusAccepted                   = "accepted"
-	EvidenceStatusVerified                   = "verified"
-	EvidenceStatusRejected                   = "rejected"
-	EvidenceStatusExpired                    = "expired"
-	EvidenceStatusFinalized                  = "finalized"
-	EvidenceStatusSlashed                    = "slashed"
-	DefaultEvidenceVerificationQuorumBps     = uint32(6_700)
-	DefaultEvidenceFinalityQuorumBps         = uint32(6_700)
-	DefaultDoubleSignSlashBps                = uint32(5_000)
-	DefaultInvalidStateTransitionSlashBps    = uint32(1_500)
-	DefaultEquivocationSlashBps              = uint32(2_000)
-	DefaultDowntimeSlashBps                  = uint32(100)
-	DefaultInvalidTaskExecutionSlashBps      = uint32(750)
-	DefaultInvalidCollatorOutputSlashBps     = uint32(500)
-	DefaultInvalidProofAcceptanceSlashBps    = uint32(1_000)
-	DefaultFalseCapacityDeclarationSlashBps  = uint32(500)
-	DefaultInvalidEvidenceSubmissionSlashBps = uint32(250)
+	EvidenceTypeDoubleSignProof			= "double_sign_proof"
+	EvidenceTypeInvalidStateTransitionProof		= "invalid_state_transition_proof"
+	EvidenceTypeEquivocationProof			= "equivocation_proof"
+	EvidenceTypeDowntimeProof			= "downtime_proof"
+	EvidenceTypeInvalidTaskExecutionProof		= "invalid_task_execution_proof"
+	EvidenceTypeInvalidCollatorOutputProof		= "invalid_collator_output_proof"
+	EvidenceTypeInvalidProofAcceptance		= "invalid_proof_acceptance"
+	EvidenceTypeFalseCapacityDeclaration		= "false_capacity_declaration"
+	EvidenceTypeInvalidEvidenceSubmission		= "invalid_evidence_submission"
+	EvidenceStatusSubmitted				= "submitted"
+	EvidenceStatusInVerification			= "in_verification"
+	EvidenceStatusAccepted				= "accepted"
+	EvidenceStatusVerified				= "verified"
+	EvidenceStatusRejected				= "rejected"
+	EvidenceStatusExpired				= "expired"
+	EvidenceStatusFinalized				= "finalized"
+	EvidenceStatusSlashed				= "slashed"
+	DefaultEvidenceVerificationQuorumBps		= uint32(6_700)
+	DefaultEvidenceFinalityQuorumBps		= uint32(6_700)
+	DefaultDoubleSignSlashBps			= uint32(5_000)
+	DefaultInvalidStateTransitionSlashBps		= uint32(1_500)
+	DefaultEquivocationSlashBps			= uint32(2_000)
+	DefaultDowntimeSlashBps				= uint32(100)
+	DefaultInvalidTaskExecutionSlashBps		= uint32(750)
+	DefaultInvalidCollatorOutputSlashBps		= uint32(500)
+	DefaultInvalidProofAcceptanceSlashBps		= uint32(1_000)
+	DefaultFalseCapacityDeclarationSlashBps		= uint32(500)
+	DefaultInvalidEvidenceSubmissionSlashBps	= uint32(250)
 )
 
 type EvidenceRecord struct {
-	EvidenceID          string
-	EvidenceType        string
-	AccusedValidator    string
-	Reporter            string
-	EpochID             uint64
-	TaskGroupIDOptional string
-	ObjectHash          string
-	ProofPayloadHash    string
-	SubmittedHeight     int64
-	Status              string
-	VerificationGroupID string
-	DecisionHeight      int64
-	PenaltyIDOptional   string
+	EvidenceID		string
+	EvidenceType		string
+	AccusedValidator	string
+	Reporter		string
+	EpochID			uint64
+	TaskGroupIDOptional	string
+	ObjectHash		string
+	ProofPayloadHash	string
+	SubmittedHeight		int64
+	Status			string
+	VerificationGroupID	string
+	DecisionHeight		int64
+	PenaltyIDOptional	string
 }
 
 type EvidenceVerificationGroupInput struct {
-	Params               Params
-	Epoch                EpochRecord
-	ActiveValidators     []ScoredValidator
-	Evidence             EvidenceRecord
-	MinimumGroupSize     uint32
-	DecisionThresholdBps uint32
+	Params			Params
+	Epoch			EpochRecord
+	ActiveValidators	[]ScoredValidator
+	Evidence		EvidenceRecord
+	MinimumGroupSize	uint32
+	DecisionThresholdBps	uint32
 }
 
 type EvidenceVerificationGroup struct {
-	EvidenceID           string
-	EpochID              uint64
-	VerificationGroupID  string
-	Members              []string
-	ExcludedValidators   []string
-	MinimumGroupSize     uint32
-	DecisionThresholdBps uint32
-	AssignmentSeed       string
-	GroupHash            string
+	EvidenceID		string
+	EpochID			uint64
+	VerificationGroupID	string
+	Members			[]string
+	ExcludedValidators	[]string
+	MinimumGroupSize	uint32
+	DecisionThresholdBps	uint32
+	AssignmentSeed		string
+	GroupHash		string
 }
 
 type StructuredEvidenceRecord struct {
-	EvidenceID           string
-	EvidenceType         string
-	ReporterID           string
-	AccusedValidatorID   string
-	SubjectID            string
-	EvidenceHash         string
-	EvidenceHeight       int64
-	EvidenceEpoch        uint64
-	SubmittedHeight      int64
-	VerificationGroupID  string
-	Status               string
-	StructuredRecordHash string
+	EvidenceID		string
+	EvidenceType		string
+	ReporterID		string
+	AccusedValidatorID	string
+	SubjectID		string
+	EvidenceHash		string
+	EvidenceHeight		int64
+	EvidenceEpoch		uint64
+	SubmittedHeight		int64
+	VerificationGroupID	string
+	Status			string
+	StructuredRecordHash	string
 }
 
 type EvidenceSlashPolicy struct {
-	EvidenceType     string
-	Misbehavior      string
-	SlashFractionBps uint32
+	EvidenceType		string
+	Misbehavior		string
+	SlashFractionBps	uint32
 }
 
 type EvidenceVerificationVote struct {
-	EvidenceID    string
-	ReviewerID    string
-	Accepted      bool
-	SignatureHash string
-	VoteHeight    int64
+	EvidenceID	string
+	ReviewerID	string
+	Accepted	bool
+	SignatureHash	string
+	VoteHeight	int64
 }
 
 type EvidenceVerificationResult struct {
-	EvidenceID        string
-	AcceptedVotes     uint32
-	RejectedVotes     uint32
-	TotalReviewers    uint32
-	ParticipationBps  uint32
-	QuorumBps         uint32
-	Accepted          bool
-	Rejected          bool
-	Status            string
-	VerificationRoot  string
-	VerificationGroup string
+	EvidenceID		string
+	AcceptedVotes		uint32
+	RejectedVotes		uint32
+	TotalReviewers		uint32
+	ParticipationBps	uint32
+	QuorumBps		uint32
+	Accepted		bool
+	Rejected		bool
+	Status			string
+	VerificationRoot	string
+	VerificationGroup	string
 }
 
 type EvidenceFinalityVote struct {
-	EvidenceID     string
-	ValidatorID    string
-	Approve        bool
-	VotingPowerBps uint32
-	SignatureHash  string
-	FinalityHeight int64
+	EvidenceID	string
+	ValidatorID	string
+	Approve		bool
+	VotingPowerBps	uint32
+	SignatureHash	string
+	FinalityHeight	int64
 }
 
 type EvidenceFinalityDecision struct {
-	EvidenceID        string
-	AcceptedPowerBps  uint32
-	RejectedPowerBps  uint32
-	QuorumBps         uint32
-	Finalized         bool
-	Accepted          bool
-	Status            string
-	FinalityVoteRoot  string
-	FinalityVoteCount uint32
+	EvidenceID		string
+	AcceptedPowerBps	uint32
+	RejectedPowerBps	uint32
+	QuorumBps		uint32
+	Finalized		bool
+	Accepted		bool
+	Status			string
+	FinalityVoteRoot	string
+	FinalityVoteCount	uint32
 }
 
 type DelegationIntent struct {
-	NominatorID            string
-	ValidatorID            string
-	StakeNaet              sdkmath.Int
-	RequestedEpoch         uint64
-	MaxCommissionBps       uint32
-	MinPerformanceScoreBps uint32
+	NominatorID		string
+	ValidatorID		string
+	StakeNaet		sdkmath.Int
+	RequestedEpoch		uint64
+	MaxCommissionBps	uint32
+	MinPerformanceScoreBps	uint32
 }
 
 type DelegationActivation struct {
-	ValidatorID   string
-	Nominations   []Nomination
-	ActivatedAt   uint64
-	IntentCount   uint32
-	TotalStake    sdkmath.Int
-	ActivationKey string
+	ValidatorID	string
+	Nominations	[]Nomination
+	ActivatedAt	uint64
+	IntentCount	uint32
+	TotalStake	sdkmath.Int
+	ActivationKey	string
 }
 
 type UnbondingRiskWindow struct {
-	UnbondingEpochs       uint64
-	SlashableWindowEpochs uint64
-	TotalRiskEpochs       uint64
+	UnbondingEpochs		uint64
+	SlashableWindowEpochs	uint64
+	TotalRiskEpochs		uint64
 }
 
 type UnbondingRiskRecord struct {
-	DelegatorID         string
-	ValidatorID         string
-	AmountNaet          sdkmath.Int
-	RequestedEpoch      uint64
-	ExitEpoch           uint64
-	SlashableUntilEpoch uint64
-	RiskHistoryKey      string
+	DelegatorID		string
+	ValidatorID		string
+	AmountNaet		sdkmath.Int
+	RequestedEpoch		uint64
+	ExitEpoch		uint64
+	SlashableUntilEpoch	uint64
+	RiskHistoryKey		string
 }
 
 type RedelegationRiskRecord struct {
-	DelegatorID               string
-	SourceValidatorID         string
-	DestinationValidatorID    string
-	AmountNaet                sdkmath.Int
-	RequestedEpoch            uint64
-	ActivationEpoch           uint64
-	SourceSlashableUntilEpoch uint64
-	RiskHistoryKey            string
+	DelegatorID			string
+	SourceValidatorID		string
+	DestinationValidatorID		string
+	AmountNaet			sdkmath.Int
+	RequestedEpoch			uint64
+	ActivationEpoch			uint64
+	SourceSlashableUntilEpoch	uint64
+	RiskHistoryKey			string
 }
 
 type SelfBondChangeRecord struct {
-	ValidatorID      string
-	PreviousBondNaet sdkmath.Int
-	NewBondNaet      sdkmath.Int
-	RequestedEpoch   uint64
-	ActivationEpoch  uint64
+	ValidatorID		string
+	PreviousBondNaet	sdkmath.Int
+	NewBondNaet		sdkmath.Int
+	RequestedEpoch		uint64
+	ActivationEpoch		uint64
 }
 
 type PendingUnbondingSlashExposureInput struct {
-	Record        UnbondingRiskRecord
-	FaultEpoch    uint64
-	EvidenceEpoch uint64
+	Record		UnbondingRiskRecord
+	FaultEpoch	uint64
+	EvidenceEpoch	uint64
 }
 
 const (
-	RiskWindowStatusActive  = "active"
-	RiskWindowStatusExited  = "exited"
-	RiskWindowStatusExpired = "expired"
-	RiskWindowStatusSlashed = "slashed"
+	RiskWindowStatusActive	= "active"
+	RiskWindowStatusExited	= "exited"
+	RiskWindowStatusExpired	= "expired"
+	RiskWindowStatusSlashed	= "slashed"
 )
 
 type RiskWindowRecord struct {
-	StakeOwner          string
-	ValidatorAddress    string
-	AmountNaet          sdkmath.Int
-	StartEpoch          uint64
-	EndEpoch            uint64
-	SlashableUntilEpoch uint64
-	RiskHistoryRoot     string
-	Status              string
+	StakeOwner		string
+	ValidatorAddress	string
+	AmountNaet		sdkmath.Int
+	StartEpoch		uint64
+	EndEpoch		uint64
+	SlashableUntilEpoch	uint64
+	RiskHistoryRoot		string
+	Status			string
 }
 
 type SlashExposureQuery struct {
-	StakeOwner       string
-	ValidatorAddress string
-	FaultEpoch       uint64
-	EvidenceEpoch    uint64
+	StakeOwner		string
+	ValidatorAddress	string
+	FaultEpoch		uint64
+	EvidenceEpoch		uint64
 }
 
 type SlashExposureQueryResult struct {
-	StakeOwner       string
-	ValidatorAddress string
-	FaultEpoch       uint64
-	EvidenceEpoch    uint64
-	ExposureNaet     sdkmath.Int
-	MatchingWindows  []RiskWindowRecord
+	StakeOwner		string
+	ValidatorAddress	string
+	FaultEpoch		uint64
+	EvidenceEpoch		uint64
+	ExposureNaet		sdkmath.Int
+	MatchingWindows		[]RiskWindowRecord
 }
 
 type RejectedDelegationIntent struct {
-	Intent DelegationIntent
-	Reason string
+	Intent	DelegationIntent
+	Reason	string
 }
 
 type EvidenceCase struct {
-	EvidenceID       string
-	ReporterID       string
-	ValidatorID      string
-	Misbehavior      string
-	SlashFractionBps uint32
-	EvidenceHeight   int64
-	EvidenceEpoch    uint64
-	Finalized        bool
+	EvidenceID		string
+	ReporterID		string
+	ValidatorID		string
+	Misbehavior		string
+	SlashFractionBps	uint32
+	EvidenceHeight		int64
+	EvidenceEpoch		uint64
+	Finalized		bool
 }
 
 type EvidenceSettlement struct {
-	EvidenceID         string
-	ReporterID         string
-	Slash              SlashDistribution
-	ReporterRewardNaet sdkmath.Int
-	BurnNaet           sdkmath.Int
-	SettlementHash     string
+	EvidenceID		string
+	ReporterID		string
+	Slash			SlashDistribution
+	ReporterRewardNaet	sdkmath.Int
+	BurnNaet		sdkmath.Int
+	SettlementHash		string
 }
 
 type RoleRewardWeight struct {
-	Role      ValidatorRole
-	WeightBps uint32
+	Role		ValidatorRole
+	WeightBps	uint32
 }
 
 type AssignmentOutcome struct {
-	TaskID      string
-	Role        ValidatorRole
-	ValidatorID string
-	Completed   bool
-	Faulted     bool
-	WorkUnits   uint64
+	TaskID		string
+	Role		ValidatorRole
+	ValidatorID	string
+	Completed	bool
+	Faulted		bool
+	WorkUnits	uint64
 }
 
 type ValidatorWorkloadReward struct {
-	ValidatorID string
-	RewardNaet  sdkmath.Int
-	WorkUnits   uint64
+	ValidatorID	string
+	RewardNaet	sdkmath.Int
+	WorkUnits	uint64
 }
 
 type WorkloadRewardInput struct {
-	EpochID          uint64
-	TotalRewardsNaet sdkmath.Int
-	RoleWeights      []RoleRewardWeight
-	Outcomes         []AssignmentOutcome
+	EpochID			uint64
+	TotalRewardsNaet	sdkmath.Int
+	RoleWeights		[]RoleRewardWeight
+	Outcomes		[]AssignmentOutcome
 }
 
 type WorkloadRewardSettlement struct {
-	EpochID        uint64
-	Rewards        []ValidatorWorkloadReward
-	RemainderNaet  sdkmath.Int
-	RewardRoot     string
-	CompletedUnits uint64
+	EpochID		uint64
+	Rewards		[]ValidatorWorkloadReward
+	RemainderNaet	sdkmath.Int
+	RewardRoot	string
+	CompletedUnits	uint64
 }
 
 type PerformanceFactorInput struct {
-	CompletedTasks         uint64
-	MissedTasks            uint64
-	CorrectVerifications   uint64
-	IncorrectVerifications uint64
-	AvailableWindows       uint64
-	CommittedWindows       uint64
+	CompletedTasks		uint64
+	MissedTasks		uint64
+	CorrectVerifications	uint64
+	IncorrectVerifications	uint64
+	AvailableWindows	uint64
+	CommittedWindows	uint64
 }
 
 type UptimeFactorInput struct {
-	SignedBlocks             uint64
-	TotalBlocks              uint64
-	TaskParticipations       uint64
-	MissedTaskParticipations uint64
+	SignedBlocks			uint64
+	TotalBlocks			uint64
+	TaskParticipations		uint64
+	MissedTaskParticipations	uint64
 }
 
 type LatencyFactorInput struct {
-	CommittedWindow bool
-	AdvisoryOnly    bool
-	TargetMillis    uint64
-	P95Millis       uint64
+	CommittedWindow	bool
+	AdvisoryOnly	bool
+	TargetMillis	uint64
+	P95Millis	uint64
 }
 
 type ReliabilityIndexInput struct {
-	PriorIndexBps    uint32
-	SlashEvents      uint64
-	DowntimeEpochs   uint64
-	MissedTasks      uint64
-	RejectedEvidence uint64
-	RecoveryEpochs   uint64
+	PriorIndexBps		uint32
+	SlashEvents		uint64
+	DowntimeEpochs		uint64
+	MissedTasks		uint64
+	RejectedEvidence	uint64
+	RecoveryEpochs		uint64
 }
 
 type CorrectnessScoreInput struct {
-	ValidSignatures       uint64
-	InvalidSignatures     uint64
-	ValidTaskOutputs      uint64
-	InvalidTaskOutputs    uint64
-	AcceptedEvidence      uint64
-	EvidencePenaltyWeight uint64
+	ValidSignatures		uint64
+	InvalidSignatures	uint64
+	ValidTaskOutputs	uint64
+	InvalidTaskOutputs	uint64
+	AcceptedEvidence	uint64
+	EvidencePenaltyWeight	uint64
 }
 
 type TaskCompletionRateInput struct {
-	CompletedAssignedTasks uint64
-	ExpectedAssignedTasks  uint64
+	CompletedAssignedTasks	uint64
+	ExpectedAssignedTasks	uint64
 }
 
 type PerformanceRewardInput struct {
-	EpochID               uint64
-	ValidatorID           string
-	BaseEmissionNaet      sdkmath.Int
-	UptimeScoreBps        uint32
-	LatencyScoreBps       uint32
-	CorrectnessScoreBps   uint32
-	TaskCompletionRateBps uint32
+	EpochID			uint64
+	ValidatorID		string
+	BaseEmissionNaet	sdkmath.Int
+	UptimeScoreBps		uint32
+	LatencyScoreBps		uint32
+	CorrectnessScoreBps	uint32
+	TaskCompletionRateBps	uint32
 }
 
 type PerformanceRewardRecord struct {
-	EpochID               uint64
-	ValidatorID           string
-	BaseEmissionNaet      sdkmath.Int
-	UptimeScoreBps        uint32
-	LatencyScoreBps       uint32
-	CorrectnessScoreBps   uint32
-	TaskCompletionRateBps uint32
-	RewardNaet            sdkmath.Int
-	RewardHash            string
+	EpochID			uint64
+	ValidatorID		string
+	BaseEmissionNaet	sdkmath.Int
+	UptimeScoreBps		uint32
+	LatencyScoreBps		uint32
+	CorrectnessScoreBps	uint32
+	TaskCompletionRateBps	uint32
+	RewardNaet		sdkmath.Int
+	RewardHash		string
 }
 
 type PerformanceRecord struct {
-	EpochID               uint64
-	OperatorAddress       string
-	Role                  ValidatorRole
-	AssignedTasks         uint64
-	CompletedTasks        uint64
-	MissedTasks           uint64
-	InvalidTasks          uint64
-	UptimeScoreBps        uint32
-	LatencyScoreBps       uint32
-	CorrectnessScoreBps   uint32
-	TaskCompletionRateBps uint32
-	RewardMultiplierBps   uint32
+	EpochID			uint64
+	OperatorAddress		string
+	Role			ValidatorRole
+	AssignedTasks		uint64
+	CompletedTasks		uint64
+	MissedTasks		uint64
+	InvalidTasks		uint64
+	UptimeScoreBps		uint32
+	LatencyScoreBps		uint32
+	CorrectnessScoreBps	uint32
+	TaskCompletionRateBps	uint32
+	RewardMultiplierBps	uint32
 }
 
 type PerformanceRecordInput struct {
-	EpochID             uint64
-	OperatorAddress     string
-	Role                ValidatorRole
-	AssignedTasks       uint64
-	CompletedTasks      uint64
-	MissedTasks         uint64
-	InvalidTasks        uint64
-	UptimeScoreBps      uint32
-	LatencyScoreBps     uint32
-	CorrectnessScoreBps uint32
+	EpochID			uint64
+	OperatorAddress		string
+	Role			ValidatorRole
+	AssignedTasks		uint64
+	CompletedTasks		uint64
+	MissedTasks		uint64
+	InvalidTasks		uint64
+	UptimeScoreBps		uint32
+	LatencyScoreBps		uint32
+	CorrectnessScoreBps	uint32
 }
 
 type PerformanceDampeningInput struct {
-	Record                           PerformanceRecord
-	CurrentRewardNaet                sdkmath.Int
-	FutureElectionScoreBps           uint32
-	DelegationAttractivenessBps      uint32
-	RoleEligibilityBps               uint32
-	CollatorAssignmentProbabilityBps uint32
+	Record					PerformanceRecord
+	CurrentRewardNaet			sdkmath.Int
+	FutureElectionScoreBps			uint32
+	DelegationAttractivenessBps		uint32
+	RoleEligibilityBps			uint32
+	CollatorAssignmentProbabilityBps	uint32
 }
 
 type PerformanceDampeningResult struct {
-	EpochID                          uint64
-	OperatorAddress                  string
-	Role                             ValidatorRole
-	RewardMultiplierBps              uint32
-	CurrentRewardNaet                sdkmath.Int
-	FutureElectionScoreBps           uint32
-	DelegationAttractivenessBps      uint32
-	RoleEligibilityBps               uint32
-	CollatorAssignmentProbabilityBps uint32
+	EpochID					uint64
+	OperatorAddress				string
+	Role					ValidatorRole
+	RewardMultiplierBps			uint32
+	CurrentRewardNaet			sdkmath.Int
+	FutureElectionScoreBps			uint32
+	DelegationAttractivenessBps		uint32
+	RoleEligibilityBps			uint32
+	CollatorAssignmentProbabilityBps	uint32
 }
 
 type EconomicSecurityInput struct {
-	Validators              []ScoredValidator
-	RiskWindows             []RiskWindowRecord
-	StakeAtRiskNaet         sdkmath.Int
-	TopN                    uint32
-	ParticipatingValidators uint64
-	EligibleValidators      uint64
-	AcceptedSlashEvents     uint64
-	DetectedFaultEvents     uint64
-	AcceptedEvidence        uint64
-	SubmittedEvidence       uint64
-	CompletedTasks          uint64
-	ExpectedTasks           uint64
+	Validators		[]ScoredValidator
+	RiskWindows		[]RiskWindowRecord
+	StakeAtRiskNaet		sdkmath.Int
+	TopN			uint32
+	ParticipatingValidators	uint64
+	EligibleValidators	uint64
+	AcceptedSlashEvents	uint64
+	DetectedFaultEvents	uint64
+	AcceptedEvidence	uint64
+	SubmittedEvidence	uint64
+	CompletedTasks		uint64
+	ExpectedTasks		uint64
 }
 
 type DelegationRiskBucket struct {
-	ValidatorAddress string
-	ExposureNaet     sdkmath.Int
-	RiskWindowCount  uint64
+	ValidatorAddress	string
+	ExposureNaet		sdkmath.Int
+	RiskWindowCount		uint64
 }
 
 type EconomicSecurityMetrics struct {
-	TotalBondedStakeNaet            sdkmath.Int
-	EffectiveStakeNaet              sdkmath.Int
-	TotalStakeAtRiskNaet            sdkmath.Int
-	StakeSaturationRatioBps         uint32
-	TopN                            uint32
-	TopNVotingPowerConcentrationBps uint32
-	ParticipationRateBps            uint32
-	SlashingEfficiencyBps           uint32
-	EvidenceAcceptanceRateBps       uint32
-	AverageValidatorScore           sdkmath.Int
-	DelegationRiskDistribution      []DelegationRiskBucket
-	TaskCompletionRateBps           uint32
-	SecurityNaet                    sdkmath.Int
+	TotalBondedStakeNaet		sdkmath.Int
+	EffectiveStakeNaet		sdkmath.Int
+	TotalStakeAtRiskNaet		sdkmath.Int
+	StakeSaturationRatioBps		uint32
+	TopN				uint32
+	TopNVotingPowerConcentrationBps	uint32
+	ParticipationRateBps		uint32
+	SlashingEfficiencyBps		uint32
+	EvidenceAcceptanceRateBps	uint32
+	AverageValidatorScore		sdkmath.Int
+	DelegationRiskDistribution	[]DelegationRiskBucket
+	TaskCompletionRateBps		uint32
+	SecurityNaet			sdkmath.Int
 }
 
 type SecurityMetricQuery struct {
@@ -790,219 +790,219 @@ type SecurityMetricQueryResult struct {
 }
 
 type CentralizationControlParams struct {
-	MaxValidatorShareBps            uint32
-	MaxTopNConcentrationBps         uint32
-	MaxStakeSaturationRatioBps      uint32
-	MaxDelegationRiskBucketBps      uint32
-	MinBootstrapPerformanceBps      uint32
-	MinBootstrapReliabilityBps      uint32
-	MaxTaskAssignmentShareBps       uint32
-	BootstrapMaxVotingPowerShareBps uint32
+	MaxValidatorShareBps		uint32
+	MaxTopNConcentrationBps		uint32
+	MaxStakeSaturationRatioBps	uint32
+	MaxDelegationRiskBucketBps	uint32
+	MinBootstrapPerformanceBps	uint32
+	MinBootstrapReliabilityBps	uint32
+	MaxTaskAssignmentShareBps	uint32
+	BootstrapMaxVotingPowerShareBps	uint32
 }
 
 type CentralizationTaskAssignment struct {
-	TaskGroupID      string
-	ValidatorAddress string
-	AssignmentCount  uint64
+	TaskGroupID		string
+	ValidatorAddress	string
+	AssignmentCount		uint64
 }
 
 type CentralizationValidatorControl struct {
-	ValidatorAddress    string
-	VotingPowerShareBps uint32
-	EffectiveStakeNaet  sdkmath.Int
-	SaturatedStakeNaet  sdkmath.Int
-	RewardDampeningBps  uint32
-	BootstrapEligible   bool
-	Warnings            []string
+	ValidatorAddress	string
+	VotingPowerShareBps	uint32
+	EffectiveStakeNaet	sdkmath.Int
+	SaturatedStakeNaet	sdkmath.Int
+	RewardDampeningBps	uint32
+	BootstrapEligible	bool
+	Warnings		[]string
 }
 
 type DelegationRiskWarning struct {
-	ValidatorAddress string
-	ExposureNaet     sdkmath.Int
-	ExposureShareBps uint32
-	ThresholdBps     uint32
+	ValidatorAddress	string
+	ExposureNaet		sdkmath.Int
+	ExposureShareBps	uint32
+	ThresholdBps		uint32
 }
 
 type TaskAssignmentDiversityReport struct {
-	TotalAssignments        uint64
-	MaxValidatorAssignments uint64
-	MaxValidatorAddress     string
-	MaxAssignmentShareBps   uint32
-	DiversityScoreBps       uint32
-	Warnings                []string
+	TotalAssignments	uint64
+	MaxValidatorAssignments	uint64
+	MaxValidatorAddress	string
+	MaxAssignmentShareBps	uint32
+	DiversityScoreBps	uint32
+	Warnings		[]string
 }
 
 type ConcentrationInvariantAlert struct {
-	AlertType    string
-	Severity     string
-	ObservedBps  uint32
-	ThresholdBps uint32
+	AlertType	string
+	Severity	string
+	ObservedBps	uint32
+	ThresholdBps	uint32
 }
 
 type CentralizationDashboardInput struct {
-	SecurityInput   EconomicSecurityInput
-	ControlParams   CentralizationControlParams
-	TaskAssignments []CentralizationTaskAssignment
+	SecurityInput	EconomicSecurityInput
+	ControlParams	CentralizationControlParams
+	TaskAssignments	[]CentralizationTaskAssignment
 }
 
 type CentralizationDashboardData struct {
-	Metrics                 EconomicSecurityMetrics
-	ValidatorControls       []CentralizationValidatorControl
-	DelegationRiskWarnings  []DelegationRiskWarning
-	TaskAssignmentDiversity TaskAssignmentDiversityReport
-	Alerts                  []ConcentrationInvariantAlert
+	Metrics			EconomicSecurityMetrics
+	ValidatorControls	[]CentralizationValidatorControl
+	DelegationRiskWarnings	[]DelegationRiskWarning
+	TaskAssignmentDiversity	TaskAssignmentDiversityReport
+	Alerts			[]ConcentrationInvariantAlert
 }
 
 type StakeConcentrationSimulationInput struct {
-	Params                  Params
-	Candidates              []Candidate
-	TargetValidatorID       string
-	AddedDelegatedStakeNaet sdkmath.Int
-	TopN                    uint32
+	Params			Params
+	Candidates		[]Candidate
+	TargetValidatorID	string
+	AddedDelegatedStakeNaet	sdkmath.Int
+	TopN			uint32
 }
 
 type StakeConcentrationSimulationResult struct {
-	Before                        EconomicSecurityMetrics
-	After                         EconomicSecurityMetrics
-	TopNConcentrationDeltaBps     int32
-	TargetEffectiveStakeDeltaNaet sdkmath.Int
-	Alerts                        []ConcentrationInvariantAlert
+	Before				EconomicSecurityMetrics
+	After				EconomicSecurityMetrics
+	TopNConcentrationDeltaBps	int32
+	TargetEffectiveStakeDeltaNaet	sdkmath.Int
+	Alerts				[]ConcentrationInvariantAlert
 }
 
 type StakeSplittingSimulationInput struct {
-	Params     Params
-	Candidate  Candidate
-	SplitCount uint32
-	TopN       uint32
+	Params		Params
+	Candidate	Candidate
+	SplitCount	uint32
+	TopN		uint32
 }
 
 type StakeSplittingSimulationResult struct {
-	SingleEffectiveStakeNaet sdkmath.Int
-	SplitEffectiveStakeNaet  sdkmath.Int
-	EffectiveStakeGainNaet   sdkmath.Int
-	SingleConcentrationBps   uint32
-	SplitConcentrationBps    uint32
+	SingleEffectiveStakeNaet	sdkmath.Int
+	SplitEffectiveStakeNaet		sdkmath.Int
+	EffectiveStakeGainNaet		sdkmath.Int
+	SingleConcentrationBps		uint32
+	SplitConcentrationBps		uint32
 }
 
 type CosmosSDKExtensionMode string
 
 const (
-	CosmosSDKExtensionModeExtend  CosmosSDKExtensionMode = "extend"
-	CosmosSDKExtensionModeReplace CosmosSDKExtensionMode = "replace"
+	CosmosSDKExtensionModeExtend	CosmosSDKExtensionMode	= "extend"
+	CosmosSDKExtensionModeReplace	CosmosSDKExtensionMode	= "replace"
 )
 
 type CosmosSDKModuleExtension struct {
-	ModuleName          string
-	ModulePath          string
-	ExtensionMode       CosmosSDKExtensionMode
-	PreservedInterfaces []string
-	AddedState          []string
-	RewardInputs        []string
+	ModuleName		string
+	ModulePath		string
+	ExtensionMode		CosmosSDKExtensionMode
+	PreservedInterfaces	[]string
+	AddedState		[]string
+	RewardInputs		[]string
 }
 
 type PosModuleRequirement struct {
-	ModuleName string
-	ModulePath string
-	Required   bool
+	ModuleName	string
+	ModulePath	string
+	Required	bool
 }
 
 type PosCompatibilityMiddleware struct {
-	Name          string
-	Layer         PosLayer
-	Extends       []string
-	ReadsModules  []string
-	WritesModules []string
+	Name		string
+	Layer		PosLayer
+	Extends		[]string
+	ReadsModules	[]string
+	WritesModules	[]string
 }
 
 type CosmosSDKCompatibilityManifest struct {
-	Extensions []CosmosSDKModuleExtension
-	Modules    []PosModuleRequirement
-	Middleware []PosCompatibilityMiddleware
-	Root       string
+	Extensions	[]CosmosSDKModuleExtension
+	Modules		[]PosModuleRequirement
+	Middleware	[]PosCompatibilityMiddleware
+	Root		string
 }
 
 type PosModuleBoundary struct {
-	ModuleName     string
-	ModulePath     string
-	Owns           []string
-	ReadsModules   []string
-	WritesModules  []string
-	QueryEndpoints []string
+	ModuleName	string
+	ModulePath	string
+	Owns		[]string
+	ReadsModules	[]string
+	WritesModules	[]string
+	QueryEndpoints	[]string
 }
 
 type PosModuleBoundaryManifest struct {
-	Boundaries []PosModuleBoundary
-	Root       string
+	Boundaries	[]PosModuleBoundary
+	Root		string
 }
 
 type KeeperInterfaceSpec struct {
-	KeeperName       string
-	ModuleName       string
-	InterfaceName    string
-	IntegrationPoint string
-	Reads            []string
-	Writes           []string
+	KeeperName		string
+	ModuleName		string
+	InterfaceName		string
+	IntegrationPoint	string
+	Reads			[]string
+	Writes			[]string
 }
 
 type KeeperHookSpec struct {
-	SourceKeeper       string
-	HookName           string
-	Trigger            string
-	TargetModules      []string
-	PreservesBaseState bool
-	DeterministicOrder bool
+	SourceKeeper		string
+	HookName		string
+	Trigger			string
+	TargetModules		[]string
+	PreservesBaseState	bool
+	DeterministicOrder	bool
 }
 
 type RewardMultiplierIntegration struct {
-	SourceModule       string
-	DistributionKeeper string
-	MintKeeper         string
-	MultiplierField    string
-	RewardInputs       []string
+	SourceModule		string
+	DistributionKeeper	string
+	MintKeeper		string
+	MultiplierField		string
+	RewardInputs		[]string
 }
 
 type MigrationHandlerSpec struct {
-	ModuleName                    string
-	FromVersion                   uint64
-	ToVersion                     uint64
-	PreservesExistingStakingState bool
-	ExportsGenesis                bool
-	ImportsGenesis                bool
+	ModuleName			string
+	FromVersion			uint64
+	ToVersion			uint64
+	PreservesExistingStakingState	bool
+	ExportsGenesis			bool
+	ImportsGenesis			bool
 }
 
 type ModuleExportImportSpec struct {
-	ModuleName            string
-	ExportsGenesis        bool
-	ImportsGenesis        bool
-	DeterministicEncoding bool
+	ModuleName		string
+	ExportsGenesis		bool
+	ImportsGenesis		bool
+	DeterministicEncoding	bool
 }
 
 type KeeperIntegrationManifest struct {
-	KeeperInterfaces      []KeeperInterfaceSpec
-	StakingLifecycleHooks []KeeperHookSpec
-	SlashingHooks         []KeeperHookSpec
-	RewardIntegrations    []RewardMultiplierIntegration
-	MigrationHandlers     []MigrationHandlerSpec
-	ExportImport          []ModuleExportImportSpec
-	Root                  string
+	KeeperInterfaces	[]KeeperInterfaceSpec
+	StakingLifecycleHooks	[]KeeperHookSpec
+	SlashingHooks		[]KeeperHookSpec
+	RewardIntegrations	[]RewardMultiplierIntegration
+	MigrationHandlers	[]MigrationHandlerSpec
+	ExportImport		[]ModuleExportImportSpec
+	Root			string
 }
 
 type StateKeySpec struct {
-	Domain     string
-	Name       string
-	Template   string
-	Components []string
+	Domain		string
+	Name		string
+	Template	string
+	Components	[]string
 }
 
 type StateModelManifest struct {
-	Keys []StateKeySpec
-	Root string
+	Keys	[]StateKeySpec
+	Root	string
 }
 
 func (p CentralizationControlParams) Validate() error {
 	checks := []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "max_validator_share_bps", value: p.MaxValidatorShareBps},
 		{name: "max_top_n_concentration_bps", value: p.MaxTopNConcentrationBps},
@@ -1024,28 +1024,28 @@ func (p CentralizationControlParams) Validate() error {
 type PosLayer string
 
 const (
-	PosLayerEconomicConsensus  PosLayer = "economic_consensus"
-	PosLayerTaskAssignment     PosLayer = "task_assignment"
-	PosLayerValidatorExecution PosLayer = "validator_execution"
-	PosLayerStakingCapital     PosLayer = "staking_capital"
-	PosLayerBaseCometBFT       PosLayer = "base_cometbft"
+	PosLayerEconomicConsensus	PosLayer	= "economic_consensus"
+	PosLayerTaskAssignment		PosLayer	= "task_assignment"
+	PosLayerValidatorExecution	PosLayer	= "validator_execution"
+	PosLayerStakingCapital		PosLayer	= "staking_capital"
+	PosLayerBaseCometBFT		PosLayer	= "base_cometbft"
 )
 
 type PosLayerSpec struct {
-	Layer            PosLayer
-	Responsibilities []string
-	DependsOn        []PosLayer
+	Layer			PosLayer
+	Responsibilities	[]string
+	DependsOn		[]PosLayer
 }
 
 type LayeredPosArchitecture struct {
-	Layers []PosLayerSpec
-	Root   string
+	Layers	[]PosLayerSpec
+	Root	string
 }
 
 func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 	layers := []PosLayerSpec{
 		{
-			Layer: PosLayerEconomicConsensus,
+			Layer:	PosLayerEconomicConsensus,
 			Responsibilities: []string{
 				"validator scoring",
 				"performance incentives",
@@ -1055,10 +1055,10 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 				"reporter incentives",
 				"treasury, burn, and stabilization routing",
 			},
-			DependsOn: []PosLayer{PosLayerTaskAssignment, PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
+			DependsOn:	[]PosLayer{PosLayerTaskAssignment, PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
 		},
 		{
-			Layer: PosLayerTaskAssignment,
+			Layer:	PosLayerTaskAssignment,
 			Responsibilities: []string{
 				"workload grouping",
 				"shard validator groups",
@@ -1066,10 +1066,10 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 				"evidence verification subsets",
 				"collator and verifier assignments",
 			},
-			DependsOn: []PosLayer{PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
+			DependsOn:	[]PosLayer{PosLayerValidatorExecution, PosLayerStakingCapital, PosLayerBaseCometBFT},
 		},
 		{
-			Layer: PosLayerValidatorExecution,
+			Layer:	PosLayerValidatorExecution,
 			Responsibilities: []string{
 				"block production",
 				"state transition verification",
@@ -1077,10 +1077,10 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 				"signature production",
 				"fault rejection",
 			},
-			DependsOn: []PosLayer{PosLayerStakingCapital, PosLayerBaseCometBFT},
+			DependsOn:	[]PosLayer{PosLayerStakingCapital, PosLayerBaseCometBFT},
 		},
 		{
-			Layer: PosLayerStakingCapital,
+			Layer:	PosLayerStakingCapital,
 			Responsibilities: []string{
 				"validators",
 				"delegators",
@@ -1090,10 +1090,10 @@ func DefaultLayeredPosArchitecture() LayeredPosArchitecture {
 				"capital risk preferences",
 				"commission and delegation market metadata",
 			},
-			DependsOn: []PosLayer{PosLayerBaseCometBFT},
+			DependsOn:	[]PosLayer{PosLayerBaseCometBFT},
 		},
 		{
-			Layer: PosLayerBaseCometBFT,
+			Layer:	PosLayerBaseCometBFT,
 			Responsibilities: []string{
 				"finality",
 				"proposal and vote protocol",
@@ -1111,34 +1111,34 @@ func DefaultCosmosSDKCompatibilityManifest() CosmosSDKCompatibilityManifest {
 	manifest := CosmosSDKCompatibilityManifest{
 		Extensions: []CosmosSDKModuleExtension{
 			{
-				ModuleName:          "staking",
-				ModulePath:          "x/staking",
-				ExtensionMode:       CosmosSDKExtensionModeExtend,
-				PreservedInterfaces: []string{"ValidatorI", "Delegation", "Redelegation", "UnbondingDelegation", "staking keeper hooks"},
-				AddedState:          []string{"delegation activation epoch", "validator score references", "risk window references", "capacity declarations"},
+				ModuleName:		"staking",
+				ModulePath:		"x/staking",
+				ExtensionMode:		CosmosSDKExtensionModeExtend,
+				PreservedInterfaces:	[]string{"ValidatorI", "Delegation", "Redelegation", "UnbondingDelegation", "staking keeper hooks"},
+				AddedState:		[]string{"delegation activation epoch", "validator score references", "risk window references", "capacity declarations"},
 			},
 			{
-				ModuleName:          "slashing",
-				ModulePath:          "x/slashing",
-				ExtensionMode:       CosmosSDKExtensionModeExtend,
-				PreservedInterfaces: []string{"ValidatorSigningInfo", "tombstone", "jail", "missed block bitmap"},
-				AddedState:          []string{"severity matrix", "role suspension", "future election score penalty", "delegator slash exposure"},
+				ModuleName:		"slashing",
+				ModulePath:		"x/slashing",
+				ExtensionMode:		CosmosSDKExtensionModeExtend,
+				PreservedInterfaces:	[]string{"ValidatorSigningInfo", "tombstone", "jail", "missed block bitmap"},
+				AddedState:		[]string{"severity matrix", "role suspension", "future election score penalty", "delegator slash exposure"},
 			},
 			{
-				ModuleName:          "distribution",
-				ModulePath:          "x/distribution",
-				ExtensionMode:       CosmosSDKExtensionModeExtend,
-				PreservedInterfaces: []string{"delegator rewards", "validator outstanding rewards", "fee pool"},
-				AddedState:          []string{"role reward weights", "performance reward multiplier", "reporter reward routing"},
-				RewardInputs:        []string{"uptime score", "correctness score", "task completion rate", "role weight"},
+				ModuleName:		"distribution",
+				ModulePath:		"x/distribution",
+				ExtensionMode:		CosmosSDKExtensionModeExtend,
+				PreservedInterfaces:	[]string{"delegator rewards", "validator outstanding rewards", "fee pool"},
+				AddedState:		[]string{"role reward weights", "performance reward multiplier", "reporter reward routing"},
+				RewardInputs:		[]string{"uptime score", "correctness score", "task completion rate", "role weight"},
 			},
 			{
-				ModuleName:          "mint",
-				ModulePath:          "x/mint",
-				ExtensionMode:       CosmosSDKExtensionModeExtend,
-				PreservedInterfaces: []string{"mint params", "minter", "fee collector emission"},
-				AddedState:          []string{"epoch reward budget", "workload-aware emission inputs", "security metric feedback"},
-				RewardInputs:        []string{"base emission", "participation rate", "security score", "performance budget"},
+				ModuleName:		"mint",
+				ModulePath:		"x/mint",
+				ExtensionMode:		CosmosSDKExtensionModeExtend,
+				PreservedInterfaces:	[]string{"mint params", "minter", "fee collector emission"},
+				AddedState:		[]string{"epoch reward budget", "workload-aware emission inputs", "security metric feedback"},
+				RewardInputs:		[]string{"base emission", "participation rate", "security score", "performance budget"},
 			},
 		},
 		Modules: []PosModuleRequirement{
@@ -1358,44 +1358,44 @@ func DefaultPoSModuleBoundaryManifest() PosModuleBoundaryManifest {
 	manifest := PosModuleBoundaryManifest{
 		Boundaries: []PosModuleBoundary{
 			{
-				ModuleName:     "epoch",
-				ModulePath:     "x/epoch",
-				Owns:           []string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"},
-				ReadsModules:   []string{"staking"},
-				WritesModules:  []string{"epoch"},
-				QueryEndpoints: []string{"QueryCurrentEpoch", "QueryEpochHistory"},
+				ModuleName:	"epoch",
+				ModulePath:	"x/epoch",
+				Owns:		[]string{"epoch lifecycle", "phase transitions", "epoch seed", "epoch queries"},
+				ReadsModules:	[]string{"staking"},
+				WritesModules:	[]string{"epoch"},
+				QueryEndpoints:	[]string{"QueryCurrentEpoch", "QueryEpochHistory"},
 			},
 			{
-				ModuleName:     "validator_economy",
-				ModulePath:     "x/validator-economy",
-				Owns:           []string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"},
-				ReadsModules:   []string{"staking", "slashing", "performance"},
-				WritesModules:  []string{"validator_economy"},
-				QueryEndpoints: []string{"QueryValidatorScore", "QueryElectionRanking", "QueryValidatorSaturation", "QueryRoleEligibility"},
+				ModuleName:	"validator_economy",
+				ModulePath:	"x/validator-economy",
+				Owns:		[]string{"validator score", "effective stake", "stake saturation", "election ranking", "role eligibility"},
+				ReadsModules:	[]string{"staking", "slashing", "performance"},
+				WritesModules:	[]string{"validator_economy"},
+				QueryEndpoints:	[]string{"QueryValidatorScore", "QueryElectionRanking", "QueryValidatorSaturation", "QueryRoleEligibility"},
 			},
 			{
-				ModuleName:     "taskgroups",
-				ModulePath:     "x/taskgroups",
-				Owns:           []string{"workload registry", "task group assignment", "proposer rotation", "verification groups"},
-				ReadsModules:   []string{"epoch", "validator_economy", "staking"},
-				WritesModules:  []string{"taskgroups"},
-				QueryEndpoints: []string{"QueryWorkloadRegistry", "QueryTaskGroup", "QueryProposerRotation", "QueryVerificationGroup"},
+				ModuleName:	"taskgroups",
+				ModulePath:	"x/taskgroups",
+				Owns:		[]string{"workload registry", "task group assignment", "proposer rotation", "verification groups"},
+				ReadsModules:	[]string{"epoch", "validator_economy", "staking"},
+				WritesModules:	[]string{"taskgroups"},
+				QueryEndpoints:	[]string{"QueryWorkloadRegistry", "QueryTaskGroup", "QueryProposerRotation", "QueryVerificationGroup"},
 			},
 			{
-				ModuleName:     "evidence",
-				ModulePath:     "x/evidence",
-				Owns:           []string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"},
-				ReadsModules:   []string{"taskgroups", "staking", "slashing"},
-				WritesModules:  []string{"evidence", "slashing", "distribution"},
-				QueryEndpoints: []string{"QueryEvidenceRecord", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
+				ModuleName:	"evidence",
+				ModulePath:	"x/evidence",
+				Owns:		[]string{"structured evidence records", "evidence deposits", "verification group decisions", "reporter rewards"},
+				ReadsModules:	[]string{"taskgroups", "staking", "slashing"},
+				WritesModules:	[]string{"evidence", "slashing", "distribution"},
+				QueryEndpoints:	[]string{"QueryEvidenceRecord", "QueryEvidenceDeposit", "QueryEvidenceDecision", "QueryReporterRewards"},
 			},
 			{
-				ModuleName:     "performance",
-				ModulePath:     "x/performance",
-				Owns:           []string{"uptime", "latency", "correctness", "task completion", "reward multipliers"},
-				ReadsModules:   []string{"taskgroups", "staking", "distribution"},
-				WritesModules:  []string{"performance", "distribution"},
-				QueryEndpoints: []string{"QueryPerformanceRecord", "QueryOperatorPerformanceHistory", "QueryRolePerformance", "QueryRewardMultiplier"},
+				ModuleName:	"performance",
+				ModulePath:	"x/performance",
+				Owns:		[]string{"uptime", "latency", "correctness", "task completion", "reward multipliers"},
+				ReadsModules:	[]string{"taskgroups", "staking", "distribution"},
+				WritesModules:	[]string{"performance", "distribution"},
+				QueryEndpoints:	[]string{"QueryPerformanceRecord", "QueryOperatorPerformanceHistory", "QueryRolePerformance", "QueryRewardMultiplier"},
 			},
 		},
 	}
@@ -1669,8 +1669,8 @@ func (h KeeperHookSpec) Validate(expectedSource string, knownModules map[string]
 
 func (r RewardMultiplierIntegration) Validate(knownModules map[string]struct{}) error {
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "reward source module", value: r.SourceModule},
 		{name: "reward distribution keeper", value: r.DistributionKeeper},
@@ -1945,7 +1945,7 @@ func ComputeStateModelRoot(manifest StateModelManifest) string {
 	})
 }
 
-func EpochCurrentKey() string { return "epoch/current" }
+func EpochCurrentKey() string	{ return "epoch/current" }
 func EpochRecordKey(epochID uint64) string {
 	return stateKey("epoch", "records", uint64StateComponent(epochID))
 }
@@ -2372,14 +2372,14 @@ func ComputePerformanceBasedReward(input PerformanceRewardInput) (PerformanceRew
 	reward = mulIntBps(reward, input.CorrectnessScoreBps)
 	reward = mulIntBps(reward, input.TaskCompletionRateBps)
 	record := PerformanceRewardRecord{
-		EpochID:               input.EpochID,
-		ValidatorID:           input.ValidatorID,
-		BaseEmissionNaet:      input.BaseEmissionNaet,
-		UptimeScoreBps:        input.UptimeScoreBps,
-		LatencyScoreBps:       input.LatencyScoreBps,
-		CorrectnessScoreBps:   input.CorrectnessScoreBps,
-		TaskCompletionRateBps: input.TaskCompletionRateBps,
-		RewardNaet:            reward,
+		EpochID:		input.EpochID,
+		ValidatorID:		input.ValidatorID,
+		BaseEmissionNaet:	input.BaseEmissionNaet,
+		UptimeScoreBps:		input.UptimeScoreBps,
+		LatencyScoreBps:	input.LatencyScoreBps,
+		CorrectnessScoreBps:	input.CorrectnessScoreBps,
+		TaskCompletionRateBps:	input.TaskCompletionRateBps,
+		RewardNaet:		reward,
 	}
 	record.RewardHash = ComputePerformanceRewardHash(record)
 	return record, record.Validate()
@@ -2466,8 +2466,8 @@ func BuildPerformanceRecord(input PerformanceRecordInput) (PerformanceRecord, er
 		return PerformanceRecord{}, errors.New("performance task counts exceed assigned tasks")
 	}
 	taskCompletion, err := ComputeTaskCompletionRate(TaskCompletionRateInput{
-		CompletedAssignedTasks: input.CompletedTasks,
-		ExpectedAssignedTasks:  input.AssignedTasks,
+		CompletedAssignedTasks:	input.CompletedTasks,
+		ExpectedAssignedTasks:	input.AssignedTasks,
 	})
 	if err != nil {
 		return PerformanceRecord{}, err
@@ -2477,18 +2477,18 @@ func BuildPerformanceRecord(input PerformanceRecordInput) (PerformanceRecord, er
 		return PerformanceRecord{}, err
 	}
 	record := PerformanceRecord{
-		EpochID:               input.EpochID,
-		OperatorAddress:       input.OperatorAddress,
-		Role:                  input.Role,
-		AssignedTasks:         input.AssignedTasks,
-		CompletedTasks:        input.CompletedTasks,
-		MissedTasks:           input.MissedTasks,
-		InvalidTasks:          input.InvalidTasks,
-		UptimeScoreBps:        input.UptimeScoreBps,
-		LatencyScoreBps:       input.LatencyScoreBps,
-		CorrectnessScoreBps:   input.CorrectnessScoreBps,
-		TaskCompletionRateBps: taskCompletion,
-		RewardMultiplierBps:   multiplier,
+		EpochID:		input.EpochID,
+		OperatorAddress:	input.OperatorAddress,
+		Role:			input.Role,
+		AssignedTasks:		input.AssignedTasks,
+		CompletedTasks:		input.CompletedTasks,
+		MissedTasks:		input.MissedTasks,
+		InvalidTasks:		input.InvalidTasks,
+		UptimeScoreBps:		input.UptimeScoreBps,
+		LatencyScoreBps:	input.LatencyScoreBps,
+		CorrectnessScoreBps:	input.CorrectnessScoreBps,
+		TaskCompletionRateBps:	taskCompletion,
+		RewardMultiplierBps:	multiplier,
 	}
 	return record, record.Validate()
 }
@@ -2559,15 +2559,15 @@ func ApplyPerformanceDampening(input PerformanceDampeningInput) (PerformanceDamp
 	}
 	multiplier := input.Record.RewardMultiplierBps
 	result := PerformanceDampeningResult{
-		EpochID:                          input.Record.EpochID,
-		OperatorAddress:                  input.Record.OperatorAddress,
-		Role:                             input.Record.Role,
-		RewardMultiplierBps:              multiplier,
-		CurrentRewardNaet:                mulIntBps(input.CurrentRewardNaet, multiplier),
-		FutureElectionScoreBps:           mulBps(input.FutureElectionScoreBps, multiplier),
-		DelegationAttractivenessBps:      mulBps(input.DelegationAttractivenessBps, multiplier),
-		RoleEligibilityBps:               mulBps(input.RoleEligibilityBps, multiplier),
-		CollatorAssignmentProbabilityBps: mulBps(input.CollatorAssignmentProbabilityBps, multiplier),
+		EpochID:				input.Record.EpochID,
+		OperatorAddress:			input.Record.OperatorAddress,
+		Role:					input.Record.Role,
+		RewardMultiplierBps:			multiplier,
+		CurrentRewardNaet:			mulIntBps(input.CurrentRewardNaet, multiplier),
+		FutureElectionScoreBps:			mulBps(input.FutureElectionScoreBps, multiplier),
+		DelegationAttractivenessBps:		mulBps(input.DelegationAttractivenessBps, multiplier),
+		RoleEligibilityBps:			mulBps(input.RoleEligibilityBps, multiplier),
+		CollatorAssignmentProbabilityBps:	mulBps(input.CollatorAssignmentProbabilityBps, multiplier),
 	}
 	if input.Record.Role != ValidatorRoleCollator {
 		result.CollatorAssignmentProbabilityBps = input.CollatorAssignmentProbabilityBps
@@ -2598,8 +2598,8 @@ func ComputeEconomicSecurityMetrics(input EconomicSecurityInput) (EconomicSecuri
 		return EconomicSecurityMetrics{}, errors.New("stake at risk cannot be negative")
 	}
 	taskCompletion, err := ComputeTaskCompletionRate(TaskCompletionRateInput{
-		CompletedAssignedTasks: input.CompletedTasks,
-		ExpectedAssignedTasks:  input.ExpectedTasks,
+		CompletedAssignedTasks:	input.CompletedTasks,
+		ExpectedAssignedTasks:	input.ExpectedTasks,
 	})
 	if err != nil {
 		return EconomicSecurityMetrics{}, err
@@ -2639,19 +2639,19 @@ func ComputeEconomicSecurityMetrics(input EconomicSecurityInput) (EconomicSecuri
 	security = mulIntBps(security, slashingEfficiency)
 
 	return EconomicSecurityMetrics{
-		TotalBondedStakeNaet:            totalBonded,
-		EffectiveStakeNaet:              effectiveStake,
-		TotalStakeAtRiskNaet:            stakeAtRisk,
-		StakeSaturationRatioBps:         intRatioBps(saturatedStake, totalBonded),
-		TopN:                            input.TopN,
-		TopNVotingPowerConcentrationBps: TopNVotingPowerConcentrationBps(input.Validators, input.TopN),
-		ParticipationRateBps:            participation,
-		SlashingEfficiencyBps:           slashingEfficiency,
-		EvidenceAcceptanceRateBps:       ratioBps(input.AcceptedEvidence, input.SubmittedEvidence),
-		AverageValidatorScore:           totalScore.QuoRaw(int64(len(input.Validators))),
-		DelegationRiskDistribution:      riskDistribution,
-		TaskCompletionRateBps:           taskCompletion,
-		SecurityNaet:                    security,
+		TotalBondedStakeNaet:			totalBonded,
+		EffectiveStakeNaet:			effectiveStake,
+		TotalStakeAtRiskNaet:			stakeAtRisk,
+		StakeSaturationRatioBps:		intRatioBps(saturatedStake, totalBonded),
+		TopN:					input.TopN,
+		TopNVotingPowerConcentrationBps:	TopNVotingPowerConcentrationBps(input.Validators, input.TopN),
+		ParticipationRateBps:			participation,
+		SlashingEfficiencyBps:			slashingEfficiency,
+		EvidenceAcceptanceRateBps:		ratioBps(input.AcceptedEvidence, input.SubmittedEvidence),
+		AverageValidatorScore:			totalScore.QuoRaw(int64(len(input.Validators))),
+		DelegationRiskDistribution:		riskDistribution,
+		TaskCompletionRateBps:			taskCompletion,
+		SecurityNaet:				security,
 	}, nil
 }
 
@@ -2669,14 +2669,14 @@ func DefaultCentralizationControlParams(params Params) CentralizationControlPara
 		maxValidatorShare = DefaultMaxVotingPowerBps
 	}
 	return CentralizationControlParams{
-		MaxValidatorShareBps:            maxValidatorShare,
-		MaxTopNConcentrationBps:         6_700,
-		MaxStakeSaturationRatioBps:      2_500,
-		MaxDelegationRiskBucketBps:      5_000,
-		MinBootstrapPerformanceBps:      9_000,
-		MinBootstrapReliabilityBps:      9_000,
-		MaxTaskAssignmentShareBps:       5_000,
-		BootstrapMaxVotingPowerShareBps: maxValidatorShare / 2,
+		MaxValidatorShareBps:			maxValidatorShare,
+		MaxTopNConcentrationBps:		6_700,
+		MaxStakeSaturationRatioBps:		2_500,
+		MaxDelegationRiskBucketBps:		5_000,
+		MinBootstrapPerformanceBps:		9_000,
+		MinBootstrapReliabilityBps:		9_000,
+		MaxTaskAssignmentShareBps:		5_000,
+		BootstrapMaxVotingPowerShareBps:	maxValidatorShare / 2,
 	}
 }
 
@@ -2696,18 +2696,18 @@ func BuildCentralizationDashboard(input CentralizationDashboardInput) (Centraliz
 	alerts := ValidateConcentrationInvariants(metrics, params)
 	if taskDiversity.MaxAssignmentShareBps > params.MaxTaskAssignmentShareBps {
 		alerts = append(alerts, ConcentrationInvariantAlert{
-			AlertType:    CentralizationWarningTaskAssignmentShare,
-			Severity:     ConcentrationAlertSeverityWarning,
-			ObservedBps:  taskDiversity.MaxAssignmentShareBps,
-			ThresholdBps: params.MaxTaskAssignmentShareBps,
+			AlertType:	CentralizationWarningTaskAssignmentShare,
+			Severity:	ConcentrationAlertSeverityWarning,
+			ObservedBps:	taskDiversity.MaxAssignmentShareBps,
+			ThresholdBps:	params.MaxTaskAssignmentShareBps,
 		})
 	}
 	return CentralizationDashboardData{
-		Metrics:                 metrics,
-		ValidatorControls:       BuildCentralizationValidatorControls(input.SecurityInput.Validators, metrics, params),
-		DelegationRiskWarnings:  BuildDelegationRiskWarnings(metrics.DelegationRiskDistribution, metrics.TotalStakeAtRiskNaet, params.MaxDelegationRiskBucketBps),
-		TaskAssignmentDiversity: taskDiversity,
-		Alerts:                  alerts,
+		Metrics:			metrics,
+		ValidatorControls:		BuildCentralizationValidatorControls(input.SecurityInput.Validators, metrics, params),
+		DelegationRiskWarnings:		BuildDelegationRiskWarnings(metrics.DelegationRiskDistribution, metrics.TotalStakeAtRiskNaet, params.MaxDelegationRiskBucketBps),
+		TaskAssignmentDiversity:	taskDiversity,
+		Alerts:				alerts,
 	}, nil
 }
 
@@ -2731,13 +2731,13 @@ func BuildCentralizationValidatorControls(validators []ScoredValidator, metrics 
 			warnings = append(warnings, CentralizationWarningBootstrapEligible)
 		}
 		out = append(out, CentralizationValidatorControl{
-			ValidatorAddress:    validator.ValidatorID,
-			VotingPowerShareBps: share,
-			EffectiveStakeNaet:  validator.EffectiveStakeNaet,
-			SaturatedStakeNaet:  validator.ScoreComponents.SaturatedStakeNaet,
-			RewardDampeningBps:  dampening,
-			BootstrapEligible:   bootstrap,
-			Warnings:            warnings,
+			ValidatorAddress:	validator.ValidatorID,
+			VotingPowerShareBps:	share,
+			EffectiveStakeNaet:	validator.EffectiveStakeNaet,
+			SaturatedStakeNaet:	validator.ScoreComponents.SaturatedStakeNaet,
+			RewardDampeningBps:	dampening,
+			BootstrapEligible:	bootstrap,
+			Warnings:		warnings,
 		})
 	}
 	sort.SliceStable(out, func(i, j int) bool {
@@ -2757,10 +2757,10 @@ func BuildDelegationRiskWarnings(distribution []DelegationRiskBucket, totalStake
 			continue
 		}
 		warnings = append(warnings, DelegationRiskWarning{
-			ValidatorAddress: bucket.ValidatorAddress,
-			ExposureNaet:     bucket.ExposureNaet,
-			ExposureShareBps: share,
-			ThresholdBps:     thresholdBps,
+			ValidatorAddress:	bucket.ValidatorAddress,
+			ExposureNaet:		bucket.ExposureNaet,
+			ExposureShareBps:	share,
+			ThresholdBps:		thresholdBps,
 		})
 	}
 	return warnings
@@ -2872,8 +2872,8 @@ func SimulateStakeConcentration(input StakeConcentrationSimulationInput) (StakeC
 		if afterCandidates[i].ValidatorID == input.TargetValidatorID {
 			afterCandidates[i].DelegatedStakeNaet = afterCandidates[i].DelegatedStakeNaet.Add(input.AddedDelegatedStakeNaet)
 			afterCandidates[i].Nominations = append(afterCandidates[i].Nominations, Nomination{
-				NominatorID: "simulated-concentration-delegator",
-				StakeNaet:   input.AddedDelegatedStakeNaet,
+				NominatorID:	"simulated-concentration-delegator",
+				StakeNaet:	input.AddedDelegatedStakeNaet,
 			})
 		}
 	}
@@ -2898,11 +2898,11 @@ func SimulateStakeConcentration(input StakeConcentrationSimulationInput) (StakeC
 		return StakeConcentrationSimulationResult{}, errors.New("target validator not found")
 	}
 	return StakeConcentrationSimulationResult{
-		Before:                        before,
-		After:                         after,
-		TopNConcentrationDeltaBps:     int32(after.TopNVotingPowerConcentrationBps) - int32(before.TopNVotingPowerConcentrationBps),
-		TargetEffectiveStakeDeltaNaet: afterTarget.EffectiveStakeNaet.Sub(beforeTarget.EffectiveStakeNaet),
-		Alerts:                        ValidateConcentrationInvariants(after, DefaultCentralizationControlParams(input.Params)),
+		Before:				before,
+		After:				after,
+		TopNConcentrationDeltaBps:	int32(after.TopNVotingPowerConcentrationBps) - int32(before.TopNVotingPowerConcentrationBps),
+		TargetEffectiveStakeDeltaNaet:	afterTarget.EffectiveStakeNaet.Sub(beforeTarget.EffectiveStakeNaet),
+		Alerts:				ValidateConcentrationInvariants(after, DefaultCentralizationControlParams(input.Params)),
 	}, nil
 }
 
@@ -2950,11 +2950,11 @@ func SimulateStakeSplitting(input StakeSplittingSimulationInput) (StakeSplitting
 		splitEffective = splitEffective.Add(validator.EffectiveStakeNaet)
 	}
 	return StakeSplittingSimulationResult{
-		SingleEffectiveStakeNaet: single.EffectiveStakeNaet,
-		SplitEffectiveStakeNaet:  splitEffective,
-		EffectiveStakeGainNaet:   splitEffective.Sub(single.EffectiveStakeNaet),
-		SingleConcentrationBps:   singleMetrics.TopNVotingPowerConcentrationBps,
-		SplitConcentrationBps:    splitMetrics.TopNVotingPowerConcentrationBps,
+		SingleEffectiveStakeNaet:	single.EffectiveStakeNaet,
+		SplitEffectiveStakeNaet:	splitEffective,
+		EffectiveStakeGainNaet:		splitEffective.Sub(single.EffectiveStakeNaet),
+		SingleConcentrationBps:		singleMetrics.TopNVotingPowerConcentrationBps,
+		SplitConcentrationBps:		splitMetrics.TopNVotingPowerConcentrationBps,
 	}, nil
 }
 
@@ -2975,16 +2975,16 @@ func ScoreCandidatesForSecurity(params Params, candidates []Candidate) ([]Scored
 
 func securityMetricsFromValidators(validators []ScoredValidator, topN uint32) (EconomicSecurityMetrics, error) {
 	return ComputeEconomicSecurityMetrics(EconomicSecurityInput{
-		Validators:              validators,
-		TopN:                    topN,
-		ParticipatingValidators: uint64(len(validators)),
-		EligibleValidators:      uint64(len(validators)),
-		AcceptedSlashEvents:     1,
-		DetectedFaultEvents:     1,
-		AcceptedEvidence:        1,
-		SubmittedEvidence:       1,
-		CompletedTasks:          1,
-		ExpectedTasks:           1,
+		Validators:			validators,
+		TopN:				topN,
+		ParticipatingValidators:	uint64(len(validators)),
+		EligibleValidators:		uint64(len(validators)),
+		AcceptedSlashEvents:		1,
+		DetectedFaultEvents:		1,
+		AcceptedEvidence:		1,
+		SubmittedEvidence:		1,
+		CompletedTasks:			1,
+		ExpectedTasks:			1,
 	})
 }
 
@@ -3003,10 +3003,10 @@ func concentrationAlert(alertType string, observedBps uint32, thresholdBps uint3
 		severity = ConcentrationAlertSeverityCritical
 	}
 	return ConcentrationInvariantAlert{
-		AlertType:    alertType,
-		Severity:     severity,
-		ObservedBps:  observedBps,
-		ThresholdBps: thresholdBps,
+		AlertType:	alertType,
+		Severity:	severity,
+		ObservedBps:	observedBps,
+		ThresholdBps:	thresholdBps,
 	}
 }
 
@@ -3200,9 +3200,9 @@ func UnbondingRiskWindowForParams(params Params) (UnbondingRiskWindow, error) {
 		return UnbondingRiskWindow{}, err
 	}
 	return UnbondingRiskWindow{
-		UnbondingEpochs:       unbondingEpochs,
-		SlashableWindowEpochs: params.EvidenceWindowEpochs,
-		TotalRiskEpochs:       totalRiskEpochs,
+		UnbondingEpochs:	unbondingEpochs,
+		SlashableWindowEpochs:	params.EvidenceWindowEpochs,
+		TotalRiskEpochs:	totalRiskEpochs,
 	}, nil
 }
 
@@ -3232,12 +3232,12 @@ func BeginUnbondingRisk(params Params, delegatorID string, validatorID string, a
 		return UnbondingRiskRecord{}, err
 	}
 	record := UnbondingRiskRecord{
-		DelegatorID:         strings.TrimSpace(delegatorID),
-		ValidatorID:         strings.TrimSpace(validatorID),
-		AmountNaet:          amount,
-		RequestedEpoch:      requestedEpoch,
-		ExitEpoch:           exitEpoch,
-		SlashableUntilEpoch: slashableUntil,
+		DelegatorID:		strings.TrimSpace(delegatorID),
+		ValidatorID:		strings.TrimSpace(validatorID),
+		AmountNaet:		amount,
+		RequestedEpoch:		requestedEpoch,
+		ExitEpoch:		exitEpoch,
+		SlashableUntilEpoch:	slashableUntil,
 	}
 	record.RiskHistoryKey = ComputeUnbondingRiskHistoryKey(record)
 	return record, record.Validate()
@@ -3309,13 +3309,13 @@ func CreateRedelegationRiskRecord(params Params, delegatorID string, sourceValid
 		return RedelegationRiskRecord{}, err
 	}
 	record := RedelegationRiskRecord{
-		DelegatorID:               delegatorID,
-		SourceValidatorID:         sourceValidatorID,
-		DestinationValidatorID:    destinationValidatorID,
-		AmountNaet:                amount,
-		RequestedEpoch:            requestedEpoch,
-		ActivationEpoch:           activationEpoch,
-		SourceSlashableUntilEpoch: sourceSlashableUntil,
+		DelegatorID:			delegatorID,
+		SourceValidatorID:		sourceValidatorID,
+		DestinationValidatorID:		destinationValidatorID,
+		AmountNaet:			amount,
+		RequestedEpoch:			requestedEpoch,
+		ActivationEpoch:		activationEpoch,
+		SourceSlashableUntilEpoch:	sourceSlashableUntil,
 	}
 	record.RiskHistoryKey = ComputeRedelegationRiskHistoryKey(record)
 	return record, record.Validate()
@@ -3374,11 +3374,11 @@ func PlanSelfBondChange(params Params, validatorID string, previousBond sdkmath.
 		return SelfBondChangeRecord{}, err
 	}
 	record := SelfBondChangeRecord{
-		ValidatorID:      validatorID,
-		PreviousBondNaet: previousBond,
-		NewBondNaet:      newBond,
-		RequestedEpoch:   requestedEpoch,
-		ActivationEpoch:  activationEpoch,
+		ValidatorID:		validatorID,
+		PreviousBondNaet:	previousBond,
+		NewBondNaet:		newBond,
+		RequestedEpoch:		requestedEpoch,
+		ActivationEpoch:	activationEpoch,
 	}
 	return record, record.Validate()
 }
@@ -3420,13 +3420,13 @@ func RiskWindowFromUnbonding(record UnbondingRiskRecord, currentEpoch uint64) (R
 		return RiskWindowRecord{}, err
 	}
 	window := RiskWindowRecord{
-		StakeOwner:          record.DelegatorID,
-		ValidatorAddress:    record.ValidatorID,
-		AmountNaet:          record.AmountNaet,
-		StartEpoch:          record.RequestedEpoch,
-		EndEpoch:            record.ExitEpoch,
-		SlashableUntilEpoch: record.SlashableUntilEpoch,
-		Status:              riskWindowStatus(record.ExitEpoch, record.SlashableUntilEpoch, currentEpoch),
+		StakeOwner:		record.DelegatorID,
+		ValidatorAddress:	record.ValidatorID,
+		AmountNaet:		record.AmountNaet,
+		StartEpoch:		record.RequestedEpoch,
+		EndEpoch:		record.ExitEpoch,
+		SlashableUntilEpoch:	record.SlashableUntilEpoch,
+		Status:			riskWindowStatus(record.ExitEpoch, record.SlashableUntilEpoch, currentEpoch),
 	}
 	window.RiskHistoryRoot = ComputeRiskWindowRoot(window)
 	return window, window.Validate()
@@ -3437,13 +3437,13 @@ func RiskWindowFromRedelegation(record RedelegationRiskRecord, currentEpoch uint
 		return RiskWindowRecord{}, err
 	}
 	window := RiskWindowRecord{
-		StakeOwner:          record.DelegatorID,
-		ValidatorAddress:    record.SourceValidatorID,
-		AmountNaet:          record.AmountNaet,
-		StartEpoch:          record.RequestedEpoch,
-		EndEpoch:            record.ActivationEpoch,
-		SlashableUntilEpoch: record.SourceSlashableUntilEpoch,
-		Status:              riskWindowStatus(record.ActivationEpoch, record.SourceSlashableUntilEpoch, currentEpoch),
+		StakeOwner:		record.DelegatorID,
+		ValidatorAddress:	record.SourceValidatorID,
+		AmountNaet:		record.AmountNaet,
+		StartEpoch:		record.RequestedEpoch,
+		EndEpoch:		record.ActivationEpoch,
+		SlashableUntilEpoch:	record.SourceSlashableUntilEpoch,
+		Status:			riskWindowStatus(record.ActivationEpoch, record.SourceSlashableUntilEpoch, currentEpoch),
 	}
 	window.RiskHistoryRoot = ComputeRiskWindowRoot(window)
 	return window, window.Validate()
@@ -3493,12 +3493,12 @@ func QuerySlashExposure(windows []RiskWindowRecord, query SlashExposureQuery) (S
 		return SlashExposureQueryResult{}, errors.New("slash exposure fault and evidence epochs are required")
 	}
 	result := SlashExposureQueryResult{
-		StakeOwner:       query.StakeOwner,
-		ValidatorAddress: query.ValidatorAddress,
-		FaultEpoch:       query.FaultEpoch,
-		EvidenceEpoch:    query.EvidenceEpoch,
-		ExposureNaet:     sdkmath.ZeroInt(),
-		MatchingWindows:  make([]RiskWindowRecord, 0),
+		StakeOwner:		query.StakeOwner,
+		ValidatorAddress:	query.ValidatorAddress,
+		FaultEpoch:		query.FaultEpoch,
+		EvidenceEpoch:		query.EvidenceEpoch,
+		ExposureNaet:		sdkmath.ZeroInt(),
+		MatchingWindows:	make([]RiskWindowRecord, 0),
 	}
 	for _, window := range windows {
 		if err := window.Validate(); err != nil {
@@ -3564,11 +3564,11 @@ func DefaultEpochPhaseDurations(epochDurationSeconds uint64) EpochPhaseDurations
 	settlement := epochDurationSeconds / 12
 	active := epochDurationSeconds - delegation - election - assignment - settlement
 	return EpochPhaseDurations{
-		DelegationSeconds:       delegation,
-		ElectionSeconds:         election,
-		AssignmentSeconds:       assignment,
-		ActiveValidationSeconds: active,
-		SettlementSeconds:       settlement,
+		DelegationSeconds:		delegation,
+		ElectionSeconds:		election,
+		AssignmentSeconds:		assignment,
+		ActiveValidationSeconds:	active,
+		SettlementSeconds:		settlement,
 	}
 }
 
@@ -3668,17 +3668,17 @@ func NewEpochRecord(params Params, epochID uint64, startHeight uint64, endHeight
 		return EpochRecord{}, err
 	}
 	record := EpochRecord{
-		EpochID:          epochID,
-		StartHeight:      startHeight,
-		EndHeight:        endHeight,
-		Phase:            phase,
-		Seed:             seed,
-		ValidatorSetHash: validatorSetHash,
-		TaskGroupRoot:    PosEmptyRootHash,
-		PerformanceRoot:  PosEmptyRootHash,
-		RewardRoot:       PosEmptyRootHash,
-		SlashRoot:        PosEmptyRootHash,
-		SettlementStatus: SettlementStatusPending,
+		EpochID:		epochID,
+		StartHeight:		startHeight,
+		EndHeight:		endHeight,
+		Phase:			phase,
+		Seed:			seed,
+		ValidatorSetHash:	validatorSetHash,
+		TaskGroupRoot:		PosEmptyRootHash,
+		PerformanceRoot:	PosEmptyRootHash,
+		RewardRoot:		PosEmptyRootHash,
+		SlashRoot:		PosEmptyRootHash,
+		SettlementStatus:	SettlementStatusPending,
 	}
 	if err := record.Validate(); err != nil {
 		return EpochRecord{}, err
@@ -3834,9 +3834,9 @@ func BuildTaskAssignments(params Params, epoch EpochRecord, validators []ScoredV
 	}
 	if len(tasks) == 0 {
 		return TaskAssignmentSet{
-			EpochID: epoch.EpochID,
-			Seed:    epoch.Seed,
-			Root:    PosEmptyRootHash,
+			EpochID:	epoch.EpochID,
+			Seed:		epoch.Seed,
+			Root:		PosEmptyRootHash,
 		}, nil
 	}
 
@@ -3864,14 +3864,14 @@ func BuildTaskAssignments(params Params, epoch EpochRecord, validators []ScoredV
 			selected := selectTaskValidatorIDs(epoch.Seed, task, role, eligible, task.RequiredValidators)
 			markTaskGroupAssignments(assignedTaskKeys, key, selected)
 			assignment := TaskAssignment{
-				TaskID:        task.TaskID,
-				WorkloadID:    task.WorkloadID,
-				WorkloadType:  task.WorkloadType,
-				ZoneID:        task.ZoneID,
-				ShardID:       task.ShardID,
-				WorkloadClass: task.WorkloadClass,
-				Role:          role,
-				Validators:    selected,
+				TaskID:		task.TaskID,
+				WorkloadID:	task.WorkloadID,
+				WorkloadType:	task.WorkloadType,
+				ZoneID:		task.ZoneID,
+				ShardID:	task.ShardID,
+				WorkloadClass:	task.WorkloadClass,
+				Role:		role,
+				Validators:	selected,
 			}
 			assignment.AssignmentHash = ComputeTaskAssignmentHash(epoch.EpochID, epoch.Seed, assignment)
 			assignments = append(assignments, assignment)
@@ -3911,12 +3911,12 @@ func BuildTaskGroups(params Params, epoch EpochRecord, validators []ScoredValida
 	assignmentsByTask := make(map[string][]TaskAssignment)
 	for _, assignment := range assignments.Assignments {
 		key := taskKey(WorkloadTask{
-			TaskID:        assignment.TaskID,
-			WorkloadID:    assignment.WorkloadID,
-			WorkloadType:  assignment.WorkloadType,
-			ZoneID:        assignment.ZoneID,
-			ShardID:       assignment.ShardID,
-			WorkloadClass: assignment.WorkloadClass,
+			TaskID:		assignment.TaskID,
+			WorkloadID:	assignment.WorkloadID,
+			WorkloadType:	assignment.WorkloadType,
+			ZoneID:		assignment.ZoneID,
+			ShardID:	assignment.ShardID,
+			WorkloadClass:	assignment.WorkloadClass,
 		})
 		assignmentsByTask[key] = append(assignmentsByTask[key], assignment)
 	}
@@ -3928,17 +3928,17 @@ func BuildTaskGroups(params Params, epoch EpochRecord, validators []ScoredValida
 		members := taskGroupMembers(taskAssignments)
 		verifiers := taskGroupVerifiers(taskAssignments, members)
 		group := TaskGroup{
-			EpochID:          epoch.EpochID,
-			WorkloadID:       task.WorkloadID,
-			WorkloadType:     task.WorkloadType,
-			ValidatorMembers: members,
-			ProposerOrder:    taskGroupProposerOrder(epoch.Seed, task, members),
-			VerifierSet:      verifiers,
-			MinimumGroupSize: task.RequiredValidators,
-			StakeWeightRoot:  ComputeTaskGroupStakeWeightRoot(epoch.EpochID, task, members, validatorByID),
-			AssignmentSeed:   epoch.Seed,
-			ActivationHeight: activationHeight,
-			ExpiryHeight:     expiryHeight,
+			EpochID:		epoch.EpochID,
+			WorkloadID:		task.WorkloadID,
+			WorkloadType:		task.WorkloadType,
+			ValidatorMembers:	members,
+			ProposerOrder:		taskGroupProposerOrder(epoch.Seed, task, members),
+			VerifierSet:		verifiers,
+			MinimumGroupSize:	task.RequiredValidators,
+			StakeWeightRoot:	ComputeTaskGroupStakeWeightRoot(epoch.EpochID, task, members, validatorByID),
+			AssignmentSeed:		epoch.Seed,
+			ActivationHeight:	activationHeight,
+			ExpiryHeight:		expiryHeight,
 		}
 		group.TaskGroupID = ComputeTaskGroupID(group)
 		groups = append(groups, group)
@@ -3947,10 +3947,10 @@ func BuildTaskGroups(params Params, epoch EpochRecord, validators []ScoredValida
 		return compareTaskGroups(groups[i], groups[j]) < 0
 	})
 	out := TaskGroupSet{
-		EpochID: epoch.EpochID,
-		Seed:    epoch.Seed,
-		Groups:  groups,
-		Root:    ComputeTaskGroupRoot(epoch.EpochID, epoch.Seed, groups),
+		EpochID:	epoch.EpochID,
+		Seed:		epoch.Seed,
+		Groups:		groups,
+		Root:		ComputeTaskGroupRoot(epoch.EpochID, epoch.Seed, groups),
 	}
 	return out, out.Validate()
 }
@@ -4279,13 +4279,13 @@ func SelectEvidenceVerificationGroup(input EvidenceVerificationGroupInput) (Evid
 	sort.Strings(members)
 	sort.Strings(excluded)
 	group := EvidenceVerificationGroup{
-		EvidenceID:           input.Evidence.EvidenceID,
-		EpochID:              input.Evidence.EpochID,
-		Members:              members,
-		ExcludedValidators:   excluded,
-		MinimumGroupSize:     minimum,
-		DecisionThresholdBps: threshold,
-		AssignmentSeed:       computeEvidenceVerificationAssignmentSeed(input.Epoch.Seed, input.Evidence.EvidenceID),
+		EvidenceID:		input.Evidence.EvidenceID,
+		EpochID:		input.Evidence.EpochID,
+		Members:		members,
+		ExcludedValidators:	excluded,
+		MinimumGroupSize:	minimum,
+		DecisionThresholdBps:	threshold,
+		AssignmentSeed:		computeEvidenceVerificationAssignmentSeed(input.Epoch.Seed, input.Evidence.EvidenceID),
 	}
 	group.VerificationGroupID = computeEvidenceVerificationGroupID(group)
 	group.GroupHash = computeEvidenceVerificationGroupHash(group)
@@ -4487,16 +4487,16 @@ func VerifyStructuredEvidenceBySubset(evidence StructuredEvidenceRecord, reviewe
 	acceptedBps := ratioBps(uint64(accepted), uint64(totalReviewers))
 	rejectedBps := ratioBps(uint64(rejected), uint64(totalReviewers))
 	result := EvidenceVerificationResult{
-		EvidenceID:        evidence.EvidenceID,
-		AcceptedVotes:     accepted,
-		RejectedVotes:     rejected,
-		TotalReviewers:    totalReviewers,
-		ParticipationBps:  ratioBps(uint64(len(votes)), uint64(totalReviewers)),
-		QuorumBps:         quorumBps,
-		Accepted:          acceptedBps >= quorumBps,
-		Rejected:          rejectedBps >= quorumBps,
-		Status:            EvidenceStatusSubmitted,
-		VerificationGroup: evidence.VerificationGroupID,
+		EvidenceID:		evidence.EvidenceID,
+		AcceptedVotes:		accepted,
+		RejectedVotes:		rejected,
+		TotalReviewers:		totalReviewers,
+		ParticipationBps:	ratioBps(uint64(len(votes)), uint64(totalReviewers)),
+		QuorumBps:		quorumBps,
+		Accepted:		acceptedBps >= quorumBps,
+		Rejected:		rejectedBps >= quorumBps,
+		Status:			EvidenceStatusSubmitted,
+		VerificationGroup:	evidence.VerificationGroupID,
 	}
 	if result.Accepted {
 		result.Status = EvidenceStatusVerified
@@ -4562,13 +4562,13 @@ func FinalizeStructuredEvidence(evidence StructuredEvidenceRecord, verification 
 		}
 	}
 	decision := EvidenceFinalityDecision{
-		EvidenceID:        evidence.EvidenceID,
-		AcceptedPowerBps:  uint32(acceptedPower),
-		RejectedPowerBps:  uint32(rejectedPower),
-		QuorumBps:         quorumBps,
-		FinalityVoteRoot:  computeEvidenceFinalityVoteRoot(evidence.EvidenceID, votes),
-		FinalityVoteCount: uint32(len(votes)),
-		Status:            EvidenceStatusVerified,
+		EvidenceID:		evidence.EvidenceID,
+		AcceptedPowerBps:	uint32(acceptedPower),
+		RejectedPowerBps:	uint32(rejectedPower),
+		QuorumBps:		quorumBps,
+		FinalityVoteRoot:	computeEvidenceFinalityVoteRoot(evidence.EvidenceID, votes),
+		FinalityVoteCount:	uint32(len(votes)),
+		Status:			EvidenceStatusVerified,
 	}
 	if uint32(acceptedPower) >= quorumBps {
 		decision.Finalized = true
@@ -4615,14 +4615,14 @@ func ExecuteStructuredEvidenceSlashing(params Params, currentEpoch uint64, evide
 		return EvidenceSettlement{}, err
 	}
 	return SettleEvidenceCase(params, currentEpoch, EvidenceCase{
-		EvidenceID:       evidence.EvidenceID,
-		ReporterID:       evidence.ReporterID,
-		ValidatorID:      evidence.AccusedValidatorID,
-		Misbehavior:      policy.Misbehavior,
-		SlashFractionBps: policy.SlashFractionBps,
-		EvidenceHeight:   evidence.EvidenceHeight,
-		EvidenceEpoch:    evidence.EvidenceEpoch,
-		Finalized:        true,
+		EvidenceID:		evidence.EvidenceID,
+		ReporterID:		evidence.ReporterID,
+		ValidatorID:		evidence.AccusedValidatorID,
+		Misbehavior:		policy.Misbehavior,
+		SlashFractionBps:	policy.SlashFractionBps,
+		EvidenceHeight:		evidence.EvidenceHeight,
+		EvidenceEpoch:		evidence.EvidenceEpoch,
+		Finalized:		true,
 	}, selfStake, nominations)
 }
 
@@ -4902,8 +4902,8 @@ func ActivateDelegationIntents(params Params, electionEpoch uint64, candidates [
 		}
 		seenNomination[nominationKey] = struct{}{}
 		nominationsByValidator[intent.ValidatorID] = append(nominationsByValidator[intent.ValidatorID], Nomination{
-			NominatorID: intent.NominatorID,
-			StakeNaet:   intent.StakeNaet,
+			NominatorID:	intent.NominatorID,
+			StakeNaet:	intent.StakeNaet,
 		})
 	}
 
@@ -4918,12 +4918,12 @@ func ActivateDelegationIntents(params Params, electionEpoch uint64, candidates [
 		nominations := sortNominations(nominationsByValidator[validatorID])
 		totalStake := sumNominations(nominations)
 		activation := DelegationActivation{
-			ValidatorID:   validatorID,
-			Nominations:   nominations,
-			ActivatedAt:   electionEpoch,
-			IntentCount:   uint32(len(nominations)),
-			TotalStake:    totalStake,
-			ActivationKey: computeDelegationActivationKey(electionEpoch, validatorID, nominations),
+			ValidatorID:	validatorID,
+			Nominations:	nominations,
+			ActivatedAt:	electionEpoch,
+			IntentCount:	uint32(len(nominations)),
+			TotalStake:	totalStake,
+			ActivationKey:	computeDelegationActivationKey(electionEpoch, validatorID, nominations),
 		}
 		activations = append(activations, activation)
 	}
@@ -4954,24 +4954,24 @@ func SettleEvidenceCase(params Params, currentEpoch uint64, evidence EvidenceCas
 		return EvidenceSettlement{}, err
 	}
 	slash, err := ComputeSlash(SlashInput{
-		ValidatorID:       evidence.ValidatorID,
-		Misbehavior:       evidence.Misbehavior,
-		SlashFractionBps:  evidence.SlashFractionBps,
-		SelfStakeNaet:     selfStake,
-		Nominations:       nominations,
-		EvidenceHeight:    evidence.EvidenceHeight,
-		EvidenceFinalized: true,
+		ValidatorID:		evidence.ValidatorID,
+		Misbehavior:		evidence.Misbehavior,
+		SlashFractionBps:	evidence.SlashFractionBps,
+		SelfStakeNaet:		selfStake,
+		Nominations:		nominations,
+		EvidenceHeight:		evidence.EvidenceHeight,
+		EvidenceFinalized:	true,
 	})
 	if err != nil {
 		return EvidenceSettlement{}, err
 	}
 	reporterReward := mulIntBps(slash.TotalSlashedNaet, params.ReporterRewardBps)
 	settlement := EvidenceSettlement{
-		EvidenceID:         evidence.EvidenceID,
-		ReporterID:         evidence.ReporterID,
-		Slash:              slash,
-		ReporterRewardNaet: reporterReward,
-		BurnNaet:           slash.TotalSlashedNaet.Sub(reporterReward),
+		EvidenceID:		evidence.EvidenceID,
+		ReporterID:		evidence.ReporterID,
+		Slash:			slash,
+		ReporterRewardNaet:	reporterReward,
+		BurnNaet:		slash.TotalSlashedNaet.Sub(reporterReward),
 	}
 	settlement.SettlementHash = computeEvidenceSettlementHash(settlement)
 	return settlement, nil
@@ -5081,16 +5081,16 @@ func SettleWorkloadRewards(input WorkloadRewardInput) (WorkloadRewardSettlement,
 	rewards := make([]ValidatorWorkloadReward, 0, len(validatorIDs))
 	for _, validatorID := range validatorIDs {
 		rewards = append(rewards, ValidatorWorkloadReward{
-			ValidatorID: validatorID,
-			RewardNaet:  rewardByValidator[validatorID],
-			WorkUnits:   workUnitsByValidator[validatorID],
+			ValidatorID:	validatorID,
+			RewardNaet:	rewardByValidator[validatorID],
+			WorkUnits:	workUnitsByValidator[validatorID],
 		})
 	}
 	settlement := WorkloadRewardSettlement{
-		EpochID:        input.EpochID,
-		Rewards:        rewards,
-		RemainderNaet:  remainder,
-		CompletedUnits: completedUnits,
+		EpochID:	input.EpochID,
+		Rewards:	rewards,
+		RemainderNaet:	remainder,
+		CompletedUnits:	completedUnits,
 	}
 	settlement.RewardRoot = computeWorkloadRewardRoot(settlement)
 	return settlement, nil
@@ -5316,19 +5316,19 @@ func BuildCollatorCandidateOutput(params Params, input CollatorCandidateOutputIn
 		return CollatorCandidateOutput{}, errors.New("collator candidate output epoch id is required")
 	}
 	output := CollatorCandidateOutput{
-		EpochID:                       input.EpochID,
-		CollatorID:                    collator.CollatorID,
-		OperatorAddress:               collator.OperatorAddress,
-		TaskID:                        task.TaskID,
-		TaskGroupIDOptional:           strings.TrimSpace(input.TaskGroupIDOptional),
-		WorkloadID:                    task.WorkloadID,
-		WorkloadType:                  task.WorkloadType,
-		TransactionRoot:               input.TransactionRoot,
-		StateTransitionRoot:           input.StateTransitionRoot,
-		ProofBundleRoot:               input.ProofBundleRoot,
-		RequiresValidatorVerification: true,
-		ValidatorSignatures:           nil,
-		Finalized:                     false,
+		EpochID:			input.EpochID,
+		CollatorID:			collator.CollatorID,
+		OperatorAddress:		collator.OperatorAddress,
+		TaskID:				task.TaskID,
+		TaskGroupIDOptional:		strings.TrimSpace(input.TaskGroupIDOptional),
+		WorkloadID:			task.WorkloadID,
+		WorkloadType:			task.WorkloadType,
+		TransactionRoot:		input.TransactionRoot,
+		StateTransitionRoot:		input.StateTransitionRoot,
+		ProofBundleRoot:		input.ProofBundleRoot,
+		RequiresValidatorVerification:	true,
+		ValidatorSignatures:		nil,
+		Finalized:			false,
 	}
 	output.CandidateOutputHash = ComputeCollatorCandidateOutputHash(output)
 	return output, output.Validate()
@@ -5506,11 +5506,11 @@ func NewCollatorOutputVerification(output CollatorCandidateOutput, validatorAddr
 		return CollatorOutputVerification{}, err
 	}
 	verification := CollatorOutputVerification{
-		OutputHash:       output.CandidateOutputHash,
-		ValidatorAddress: strings.TrimSpace(validatorAddress),
-		Result:           strings.TrimSpace(result),
-		SignatureHash:    strings.TrimSpace(signatureHash),
-		VerifiedHeight:   verifiedHeight,
+		OutputHash:		output.CandidateOutputHash,
+		ValidatorAddress:	strings.TrimSpace(validatorAddress),
+		Result:			strings.TrimSpace(result),
+		SignatureHash:		strings.TrimSpace(signatureHash),
+		VerifiedHeight:		verifiedHeight,
 	}
 	return verification, verification.Validate()
 }
@@ -5553,9 +5553,9 @@ func VerifyCollatorOutputByValidators(output CollatorCandidateOutput, validatorS
 	}
 	seen := make(map[string]struct{}, len(votes))
 	result := CollatorOutputVerificationResult{
-		OutputHash:           output.CandidateOutputHash,
-		TotalValidators:      uint32(len(validatorSet)),
-		DecisionThresholdBps: decisionThresholdBps,
+		OutputHash:		output.CandidateOutputHash,
+		TotalValidators:	uint32(len(validatorSet)),
+		DecisionThresholdBps:	decisionThresholdBps,
 	}
 	for _, vote := range votes {
 		if err := vote.Validate(); err != nil {
@@ -5680,16 +5680,16 @@ func BuildInvalidCollatorOutputEvidence(evidenceID string, reporterID string, co
 		return StructuredEvidenceRecord{}, errors.New("invalid collator evidence requires validator rejection")
 	}
 	return SubmitStructuredEvidence(StructuredEvidenceRecord{
-		EvidenceID:          evidenceID,
-		EvidenceType:        EvidenceTypeInvalidCollatorOutputProof,
-		ReporterID:          reporterID,
-		AccusedValidatorID:  collator.CollatorID,
-		SubjectID:           output.CandidateOutputHash,
-		EvidenceHash:        ComputeInvalidCollatorOutputEvidenceHash(collator, output, verification),
-		EvidenceHeight:      submittedHeight,
-		EvidenceEpoch:       output.EpochID,
-		SubmittedHeight:     submittedHeight,
-		VerificationGroupID: fmt.Sprintf("collator-output/%s", collator.CollatorID),
+		EvidenceID:		evidenceID,
+		EvidenceType:		EvidenceTypeInvalidCollatorOutputProof,
+		ReporterID:		reporterID,
+		AccusedValidatorID:	collator.CollatorID,
+		SubjectID:		output.CandidateOutputHash,
+		EvidenceHash:		ComputeInvalidCollatorOutputEvidenceHash(collator, output, verification),
+		EvidenceHeight:		submittedHeight,
+		EvidenceEpoch:		output.EpochID,
+		SubmittedHeight:	submittedHeight,
+		VerificationGroupID:	fmt.Sprintf("collator-output/%s", collator.CollatorID),
 	})
 }
 
@@ -5843,13 +5843,13 @@ func CheckRoleEligibility(registry RoleRegistry, input RoleEligibilityInput) (Ro
 	}
 	eligibility := uint32((uint64(performance) + uint64(uptime)) / 2)
 	record, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress: input.ActorAddress,
-		Role:             input.Role,
-		EpochID:          1,
-		Status:           RoleStatusEligible,
-		EligibilityScore: eligibility,
-		Capacity:         input.Candidate.Capacity,
-		PerformanceScore: performance,
+		ValidatorAddress:	input.ActorAddress,
+		Role:			input.Role,
+		EpochID:		1,
+		Status:			RoleStatusEligible,
+		EligibilityScore:	eligibility,
+		Capacity:		input.Candidate.Capacity,
+		PerformanceScore:	performance,
 	})
 	if err != nil {
 		return RoleRecord{}, err
@@ -5879,14 +5879,14 @@ func ComputeRolePerformanceMetrics(record RoleRecord, completedTasks uint32, fau
 		}
 	}
 	return RolePerformanceMetrics{
-		ValidatorAddress: record.ValidatorAddress,
-		Role:             record.Role,
-		EpochID:          record.EpochID,
-		AssignedTasks:    record.AssignedTaskCount,
-		CompletedTasks:   completedTasks,
-		FaultedTasks:     faultedTasks,
-		MissedTasks:      missedTasks,
-		PerformanceScore: score,
+		ValidatorAddress:	record.ValidatorAddress,
+		Role:			record.Role,
+		EpochID:		record.EpochID,
+		AssignedTasks:		record.AssignedTaskCount,
+		CompletedTasks:		completedTasks,
+		FaultedTasks:		faultedTasks,
+		MissedTasks:		missedTasks,
+		PerformanceScore:	score,
 	}, nil
 }
 
@@ -5897,19 +5897,19 @@ func SettleRoleRewards(input RoleRewardInput) (WorkloadRewardSettlement, error) 
 			return WorkloadRewardSettlement{}, err
 		}
 		outcomes = append(outcomes, AssignmentOutcome{
-			TaskID:      fmt.Sprintf("role/%s/%d", record.Role, record.EpochID),
-			Role:        record.Role,
-			ValidatorID: record.ValidatorAddress,
-			Completed:   record.Status == RoleStatusAssigned || record.Status == RoleStatusEligible,
-			Faulted:     record.Status == RoleStatusSuspended,
-			WorkUnits:   uint64(record.PerformanceScore) * uint64(roleMaxUint32(record.AssignedTaskCount, 1)),
+			TaskID:		fmt.Sprintf("role/%s/%d", record.Role, record.EpochID),
+			Role:		record.Role,
+			ValidatorID:	record.ValidatorAddress,
+			Completed:	record.Status == RoleStatusAssigned || record.Status == RoleStatusEligible,
+			Faulted:	record.Status == RoleStatusSuspended,
+			WorkUnits:	uint64(record.PerformanceScore) * uint64(roleMaxUint32(record.AssignedTaskCount, 1)),
 		})
 	}
 	return SettleWorkloadRewards(WorkloadRewardInput{
-		EpochID:          input.EpochID,
-		TotalRewardsNaet: input.TotalRewardsNaet,
-		RoleWeights:      input.Weights,
-		Outcomes:         outcomes,
+		EpochID:		input.EpochID,
+		TotalRewardsNaet:	input.TotalRewardsNaet,
+		RoleWeights:		input.Weights,
+		Outcomes:		outcomes,
 	})
 }
 
@@ -6220,15 +6220,15 @@ func isExcludedValidator(validatorID string, excluded []string) bool {
 
 func selectTaskValidatorIDs(seed string, task WorkloadTask, role ValidatorRole, validators []ScoredValidator, required uint32) []string {
 	type rankedValidator struct {
-		validatorID string
-		rankHash    string
-		score       sdkmath.Int
+		validatorID	string
+		rankHash	string
+		score		sdkmath.Int
 	}
 	ranked := make([]rankedValidator, len(validators))
 	for i, validator := range validators {
 		ranked[i] = rankedValidator{
-			validatorID: validator.ValidatorID,
-			score:       validator.Score,
+			validatorID:	validator.ValidatorID,
+			score:		validator.Score,
 			rankHash: posHashRoot("aetheris-pos-task-rank-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)
@@ -6312,13 +6312,13 @@ func taskGroupVerifiers(assignments []TaskAssignment, members []string) []string
 
 func taskGroupProposerOrder(seed string, task WorkloadTask, members []string) []string {
 	type proposerRank struct {
-		validatorID string
-		hash        string
+		validatorID	string
+		hash		string
 	}
 	ranks := make([]proposerRank, len(members))
 	for i, validatorID := range members {
 		ranks[i] = proposerRank{
-			validatorID: validatorID,
+			validatorID:	validatorID,
 			hash: posHashRoot("aetheris-pos-task-group-proposer-v1", func(w posByteWriter) {
 				posWritePart(w, seed)
 				posWritePart(w, task.TaskID)

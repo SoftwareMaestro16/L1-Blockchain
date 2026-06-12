@@ -115,30 +115,30 @@ func TestKeeperABCILifecycleHooksAndInvariants(t *testing.T) {
 
 	ctx := types.KernelConsensusContext{ChainID: "aetra-testnet", Height: 11, BlockTimeUnix: 1_700_000_011}
 	envelope := types.KernelMessageEnvelope{
-		Kind:             types.KernelMessageLocalTx,
-		TxHash:           keeperHash("keeper-abci-local"),
-		SourceZone:       types.ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  types.ZoneIDFinancial,
-		DestinationShard: "0",
-		Sender:           "keeper.sender",
-		Nonce:            1,
-		GasLimit:         100,
-		PriorityClass:    1,
-		AdmissionHeight:  11,
+		Kind:			types.KernelMessageLocalTx,
+		TxHash:			keeperHash("keeper-abci-local"),
+		SourceZone:		types.ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	types.ZoneIDFinancial,
+		DestinationShard:	"0",
+		Sender:			"keeper.sender",
+		Nonce:			1,
+		GasLimit:		100,
+		PriorityClass:		1,
+		AdmissionHeight:	11,
 	}
 	proposal, err := keeper.PrepareKernelABCIProposal(ctx, []types.KernelMessageEnvelope{envelope}, nil, types.KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500})
 	require.NoError(t, err)
 	require.NoError(t, keeper.ProcessKernelABCIProposal(ctx, proposal, []types.KernelMessageEnvelope{envelope}, types.KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500}))
 
 	classified, err := types.ClassifyTransaction(keeper.ExportGenesis().State, types.ClassificationInput{
-		Height:           11,
-		TxHash:           envelope.TxHash,
-		SourceZone:       types.ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  types.ZoneIDFinancial,
-		DestinationShard: "0",
-		AdmissionHeight:  11,
+		Height:			11,
+		TxHash:			envelope.TxHash,
+		SourceZone:		types.ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	types.ZoneIDFinancial,
+		DestinationShard:	"0",
+		AdmissionHeight:	11,
 	})
 	require.NoError(t, err)
 	receipt, err := types.ExecuteSync(classified, types.ExecutionResult{Success: true, ResultHash: keeperHash("keeper-abci-result")}, 11, 1)
@@ -152,8 +152,8 @@ func TestKeeperABCILifecycleHooksAndInvariants(t *testing.T) {
 			keeperCommitment(t, 11, types.ZoneIDFinancial),
 			keeperCommitment(t, 11, types.ZoneIDContract),
 		},
-		Receipts:      []types.ExecutionReceipt{receipt},
-		Contributions: contributions,
+		Receipts:	[]types.ExecutionReceipt{receipt},
+		Contributions:	contributions,
 	}, []types.KernelCleanupItem{{QueueID: "receipts", ItemID: "old", HeightDue: 11, DeleteRoot: keeperHash("cleanup")}}, 1)
 	require.NoError(t, err)
 	require.Len(t, cleanup.Processed, 1)
@@ -180,12 +180,12 @@ func TestExportImportRoundTripDeterministic(t *testing.T) {
 
 func keeperProposalItem(zoneID types.ZoneID, shardID types.ShardID, seed string, priority uint32, height uint64, txIndex uint32) types.ProposalItem {
 	return types.ProposalItem{
-		ZoneID:          zoneID,
-		ShardID:         shardID,
-		TxHash:          keeperHash(seed),
-		PriorityClass:   priority,
-		AdmissionHeight: height,
-		TxIndex:         txIndex,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		TxHash:			keeperHash(seed),
+		PriorityClass:		priority,
+		AdmissionHeight:	height,
+		TxIndex:		txIndex,
 	}
 }
 
@@ -209,17 +209,17 @@ func keeperWithState(t *testing.T, order []types.ZoneID) Keeper {
 
 func keeperZone(zoneID types.ZoneID, zoneType types.ZoneType, moduleName string) types.ZoneDescriptor {
 	return types.ZoneDescriptor{
-		ZoneID:              zoneID,
-		ZoneType:            zoneType,
-		ModuleName:          moduleName,
-		Enabled:             true,
-		StateMachineVersion: 1,
-		MempoolPolicyID:     types.DefaultMempoolPolicy,
-		FeePolicyID:         types.NativeFeePolicyID,
-		ShardLayoutEpoch:    1,
-		MaxShards:           4,
-		MessageCapabilities: []string{"async-inbox", "async-outbox"},
-		ProofCapabilities:   []string{"account", "message", "receipt"},
+		ZoneID:			zoneID,
+		ZoneType:		zoneType,
+		ModuleName:		moduleName,
+		Enabled:		true,
+		StateMachineVersion:	1,
+		MempoolPolicyID:	types.DefaultMempoolPolicy,
+		FeePolicyID:		types.NativeFeePolicyID,
+		ShardLayoutEpoch:	1,
+		MaxShards:		4,
+		MessageCapabilities:	[]string{"async-inbox", "async-outbox"},
+		ProofCapabilities:	[]string{"account", "message", "receipt"},
 	}
 }
 
@@ -246,11 +246,11 @@ func keeperLayout(t *testing.T, zoneID types.ZoneID, epoch uint64, shardIDs []ty
 	shards := make([]types.ShardDescriptor, len(shardIDs))
 	for i, shardID := range shardIDs {
 		shards[i] = types.ShardDescriptor{
-			ShardID:          shardID,
-			StatePrefix:      fmt.Sprintf("zone/%s/shard/%s", zoneID, shardID),
-			ActivationHeight: 1,
-			ValidatorSetHash: keeperHash(fmt.Sprintf("%s/%s/validators", zoneID, shardID)),
-			Available:        true,
+			ShardID:		shardID,
+			StatePrefix:		fmt.Sprintf("zone/%s/shard/%s", zoneID, shardID),
+			ActivationHeight:	1,
+			ValidatorSetHash:	keeperHash(fmt.Sprintf("%s/%s/validators", zoneID, shardID)),
+			Available:		true,
 		}
 	}
 	layout, err := types.NewShardLayout(zoneID, epoch, 1, keeperHash(fmt.Sprintf("%s/%d/routing-seed", zoneID, epoch)), shards)
@@ -260,15 +260,15 @@ func keeperLayout(t *testing.T, zoneID types.ZoneID, epoch uint64, shardIDs []ty
 
 func keeperContributions(height uint64) types.RootContributions {
 	return types.RootContributions{
-		IdentityRoot:  keeperHash(fmt.Sprintf("%d/identity", height)),
-		StorageRoot:   keeperHash(fmt.Sprintf("%d/storage", height)),
-		MessageRoot:   keeperHash(fmt.Sprintf("%d/messages", height)),
-		ReceiptsRoot:  keeperHash(fmt.Sprintf("%d/receipts", height)),
-		RoutingRoot:   keeperHash(fmt.Sprintf("%d/routing", height)),
-		PaymentsRoot:  keeperHash(fmt.Sprintf("%d/payments", height)),
-		ContractsRoot: keeperHash(fmt.Sprintf("%d/contracts", height)),
-		VMRoot:        keeperHash(fmt.Sprintf("%d/vm", height)),
-		ParamsHash:    keeperHash(fmt.Sprintf("%d/params", height)),
+		IdentityRoot:	keeperHash(fmt.Sprintf("%d/identity", height)),
+		StorageRoot:	keeperHash(fmt.Sprintf("%d/storage", height)),
+		MessageRoot:	keeperHash(fmt.Sprintf("%d/messages", height)),
+		ReceiptsRoot:	keeperHash(fmt.Sprintf("%d/receipts", height)),
+		RoutingRoot:	keeperHash(fmt.Sprintf("%d/routing", height)),
+		PaymentsRoot:	keeperHash(fmt.Sprintf("%d/payments", height)),
+		ContractsRoot:	keeperHash(fmt.Sprintf("%d/contracts", height)),
+		VMRoot:		keeperHash(fmt.Sprintf("%d/vm", height)),
+		ParamsHash:	keeperHash(fmt.Sprintf("%d/params", height)),
 	}
 }
 

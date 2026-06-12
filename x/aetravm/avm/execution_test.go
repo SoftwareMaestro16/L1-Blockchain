@@ -13,25 +13,23 @@ func TestAVMExecutionPhases(t *testing.T) {
 	msgPayload, _ := chunk.NewBuilder().SetData([]byte("message"), 56).Build()
 
 	msg := Message{
-		Type:     MessageExternal,
-		Sender:   "user_a",
-		Target:   "contract_a",
-		Payload:  msgPayload,
-		GasLimit: 10000,
+		Type:		MessageExternal,
+		Sender:		"user_a",
+		Target:		"contract_a",
+		Payload:	msgPayload,
+		GasLimit:	10000,
 	}
 
 	blockCtx := BlockContext{Height: 1, ChainID: "test-chain"}
 
 	engine := NewEngine()
 
-	// 1. Success execution (External)
 	newState, actions, receipt, err := engine.Execute(state, msg, blockCtx, 10000, 256)
 	require.NoError(t, err)
 	require.Equal(t, uint32(contractstypes.ExitCodeOK), receipt.ExitCode)
 	require.Equal(t, uint64(2100), receipt.GasUsed)
 	require.Equal(t, 5, len(receipt.PhaseGas))
 
-	// Granular Gas Audit:
 	require.Equal(t, uint64(500), receipt.PhaseGas[PhaseStorage])
 	require.Equal(t, uint64(100), receipt.PhaseGas[PhaseCredit])
 	require.Equal(t, uint64(1000), receipt.PhaseGas[PhaseCompute])
@@ -39,10 +37,9 @@ func TestAVMExecutionPhases(t *testing.T) {
 	require.Equal(t, uint64(300), receipt.PhaseGas[PhaseFinalization])
 
 	require.NotNil(t, newState)
-	require.Equal(t, state.Hash(), newState.Hash()) // No changes in simulation
+	require.Equal(t, state.Hash(), newState.Hash())
 	require.NotEmpty(t, receipt.ExecutionTraceHash)
 
-	// 2. Out of gas in compute phase
 	_, _, receipt2, err := engine.Execute(state, msg, blockCtx, 1000, 256)
 	require.NoError(t, err)
 	require.Equal(t, uint32(contractstypes.ExitCodeOutOfGas), receipt2.ExitCode)
@@ -50,7 +47,6 @@ func TestAVMExecutionPhases(t *testing.T) {
 	require.Equal(t, receipt2.StateRootBefore, receipt2.StateRootAfter)
 	require.Empty(t, actions)
 
-	// 3. Abort exit code
 	abortPayload, _ := chunk.NewBuilder().SetData([]byte("trigger_abort"), 13).Build()
 	msg.Payload = abortPayload
 	_, _, receipt3, err := engine.Execute(state, msg, blockCtx, 10000, 256)
@@ -58,7 +54,6 @@ func TestAVMExecutionPhases(t *testing.T) {
 	require.Equal(t, uint32(contractstypes.ExitCodeContractAbort), receipt3.ExitCode)
 	require.Equal(t, receipt3.StateRootBefore, receipt3.StateRootAfter)
 
-	// 4. Forbidden opcode rejection
 	forbiddenPayload, _ := chunk.NewBuilder().SetData([]byte("use_forbidden_opcode"), 20).Build()
 	msg.Payload = forbiddenPayload
 	_, _, receipt4, err := engine.Execute(state, msg, blockCtx, 10000, 256)
@@ -71,11 +66,11 @@ func TestDeterministicExecution(t *testing.T) {
 	msgPayload, _ := chunk.NewBuilder().SetData([]byte("emit_actions"), 12).Build()
 
 	msg := Message{
-		Type:     MessageInternal,
-		Sender:   "contract_a",
-		Target:   "contract_b",
-		Payload:  msgPayload,
-		GasLimit: 5000,
+		Type:		MessageInternal,
+		Sender:		"contract_a",
+		Target:		"contract_b",
+		Payload:	msgPayload,
+		GasLimit:	5000,
 	}
 	blockCtx := BlockContext{Height: 1, ChainID: "test-chain"}
 
@@ -91,8 +86,7 @@ func TestDeterministicExecution(t *testing.T) {
 	require.Equal(t, res1_receipt.ExecutionTraceHash, res2_receipt.ExecutionTraceHash)
 
 	require.Equal(t, 2, len(res1_actions))
-	// Verify sorting: External action should come after Internal action (based on ActionType enum)
-	// ActionInternal = 0, ActionExternal = 1
+
 	require.Equal(t, ActionInternal, res1_actions[0].Type)
 	require.Equal(t, ActionExternal, res1_actions[1].Type)
 }
@@ -102,17 +96,16 @@ func TestSystemBounceOnRevert(t *testing.T) {
 	msgPayload, _ := chunk.NewBuilder().SetData([]byte("emit_with_bounce"), 16).Build()
 
 	msg := Message{
-		Type:     MessageExternal,
-		Sender:   "user_a",
-		Target:   "contract_a",
-		Payload:  msgPayload,
-		GasLimit: 1500, // Will fail in Compute phase (requires ~1600 total to pass Compute)
+		Type:		MessageExternal,
+		Sender:		"user_a",
+		Target:		"contract_a",
+		Payload:	msgPayload,
+		GasLimit:	1500,
 	}
 	blockCtx := BlockContext{Height: 1, ChainID: "test-chain"}
 
 	engine := NewEngine()
 
-	// This should fail with OutOfGas, but preserve the system bounce action
 	_, actions, receipt, err := engine.Execute(state, msg, blockCtx, 1500, 256)
 	require.NoError(t, err)
 	require.Equal(t, uint32(contractstypes.ExitCodeOutOfGas), receipt.ExitCode)

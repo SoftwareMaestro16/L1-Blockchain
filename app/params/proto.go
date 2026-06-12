@@ -18,9 +18,9 @@ func MakeTestEncodingConfig() EncodingConfig {
 	codec := codec.NewProtoCodec(interfaceRegistry)
 
 	return EncodingConfig{
-		InterfaceRegistry: interfaceRegistry,
-		Codec:             codec,
-		TxConfig:          tx.NewTxConfig(codec, tx.DefaultSignModes),
-		Amino:             cdc,
+		InterfaceRegistry:	interfaceRegistry,
+		Codec:			codec,
+		TxConfig:		tx.NewTxConfig(codec, tx.DefaultSignModes),
+		Amino:			cdc,
 	}
 }

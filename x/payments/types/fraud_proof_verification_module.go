@@ -14,102 +14,102 @@ import (
 type FraudProofVerificationMessageType string
 
 const (
-	FraudProofMsgSubmitStaleCloseProof        FraudProofVerificationMessageType = "MsgSubmitStaleCloseProof"
-	FraudProofMsgSubmitDoubleSignProof        FraudProofVerificationMessageType = "MsgSubmitDoubleSignProof"
-	FraudProofMsgSubmitInvalidConditionProof  FraudProofVerificationMessageType = "MsgSubmitInvalidConditionProof"
-	FraudProofMsgSubmitReplayProof            FraudProofVerificationMessageType = "MsgSubmitReplayProof"
-	FraudProofMsgSubmitAsyncOverexposureProof FraudProofVerificationMessageType = "MsgSubmitAsyncOverexposureProof"
-	FraudProofMsgClaimReporterReward          FraudProofVerificationMessageType = "MsgClaimReporterReward"
+	FraudProofMsgSubmitStaleCloseProof		FraudProofVerificationMessageType	= "MsgSubmitStaleCloseProof"
+	FraudProofMsgSubmitDoubleSignProof		FraudProofVerificationMessageType	= "MsgSubmitDoubleSignProof"
+	FraudProofMsgSubmitInvalidConditionProof	FraudProofVerificationMessageType	= "MsgSubmitInvalidConditionProof"
+	FraudProofMsgSubmitReplayProof			FraudProofVerificationMessageType	= "MsgSubmitReplayProof"
+	FraudProofMsgSubmitAsyncOverexposureProof	FraudProofVerificationMessageType	= "MsgSubmitAsyncOverexposureProof"
+	FraudProofMsgClaimReporterReward		FraudProofVerificationMessageType	= "MsgClaimReporterReward"
 )
 
 type EvidenceRecord struct {
-	EvidenceID       string
-	ChannelID        string
-	ProofID          string
-	ProofType        FraudProofType
-	CanonicalHash    string
-	SubmittedBy      string
-	OffendingSigner  string
-	SubmittedHeight  uint64
-	ExpiresHeight    uint64
-	GasUsed          uint64
-	VerificationHash string
+	EvidenceID		string
+	ChannelID		string
+	ProofID			string
+	ProofType		FraudProofType
+	CanonicalHash		string
+	SubmittedBy		string
+	OffendingSigner		string
+	SubmittedHeight		uint64
+	ExpiresHeight		uint64
+	GasUsed			uint64
+	VerificationHash	string
 }
 
 type PenaltyRecord struct {
-	PenaltyID        string
-	EvidenceID       string
-	ChannelID        string
-	ProofID          string
-	Offender         string
-	TotalPenalty     string
-	ReporterReward   string
-	CounterpartyComp string
-	Allocations      []PenaltyAllocation
-	Penalties        []Penalty
-	RecordedHeight   uint64
-	RecordHash       string
+	PenaltyID		string
+	EvidenceID		string
+	ChannelID		string
+	ProofID			string
+	Offender		string
+	TotalPenalty		string
+	ReporterReward		string
+	CounterpartyComp	string
+	Allocations		[]PenaltyAllocation
+	Penalties		[]Penalty
+	RecordedHeight		uint64
+	RecordHash		string
 }
 
 type ReporterReward struct {
-	RewardID      string
-	EvidenceID    string
-	ChannelID     string
-	ProofID       string
-	Reporter      string
-	Denom         string
-	Amount        string
-	Claimed       bool
-	ClaimedHeight uint64
-	RewardHash    string
+	RewardID	string
+	EvidenceID	string
+	ChannelID	string
+	ProofID		string
+	Reporter	string
+	Denom		string
+	Amount		string
+	Claimed		bool
+	ClaimedHeight	uint64
+	RewardHash	string
 }
 
 type DoubleSignEvidence struct {
-	EvidenceID      string
-	ChannelID       string
-	OffendingSigner string
-	Epoch           uint64
-	Nonce           uint64
-	StateHashA      string
-	StateHashB      string
-	CanonicalHash   string
+	EvidenceID	string
+	ChannelID	string
+	OffendingSigner	string
+	Epoch		uint64
+	Nonce		uint64
+	StateHashA	string
+	StateHashB	string
+	CanonicalHash	string
 }
 
 type ReplayEvidence struct {
-	EvidenceID      string
-	ChannelID       string
-	ChainID         string
-	ReplayChainID   string
-	ReplayChannelID string
-	Nonce           uint64
-	FinalizedNonce  uint64
-	StateHash       string
-	CanonicalHash   string
+	EvidenceID	string
+	ChannelID	string
+	ChainID		string
+	ReplayChainID	string
+	ReplayChannelID	string
+	Nonce		uint64
+	FinalizedNonce	uint64
+	StateHash	string
+	CanonicalHash	string
 }
 
 type FraudProofVerificationState struct {
-	EvidenceRecords    []EvidenceRecord
-	PenaltyRecords     []PenaltyRecord
-	ReporterRewards    []ReporterReward
-	DoubleSignEvidence []DoubleSignEvidence
-	ReplayEvidence     []ReplayEvidence
+	EvidenceRecords		[]EvidenceRecord
+	PenaltyRecords		[]PenaltyRecord
+	ReporterRewards		[]ReporterReward
+	DoubleSignEvidence	[]DoubleSignEvidence
+	ReplayEvidence		[]ReplayEvidence
 }
 
 type FraudProofGasMeter struct {
-	ProofID     string
-	ProofType   FraudProofType
-	GasLimit    uint64
-	GasUsed     uint64
-	WithinLimit bool
-	MeterHash   string
+	ProofID		string
+	ProofType	FraudProofType
+	GasLimit	uint64
+	GasUsed		uint64
+	WithinLimit	bool
+	MeterHash	string
 }
 
 type FraudProofSubmission struct {
-	ChannelID     string
-	Proof         FraudProof
-	CurrentHeight uint64
-	Policy        FraudPenaltyPolicy
-	GasLimit      uint64
+	ChannelID	string
+	Proof		FraudProof
+	CurrentHeight	uint64
+	Policy		FraudPenaltyPolicy
+	GasLimit	uint64
 }
 
 type FraudProofVerificationMessage interface {
@@ -125,9 +125,9 @@ type MsgSubmitReplayProof struct{ Input FraudProofSubmission }
 type MsgSubmitAsyncOverexposureProof struct{ Input FraudProofSubmission }
 
 type MsgClaimReporterReward struct {
-	RewardID      string
-	Reporter      string
-	CurrentHeight uint64
+	RewardID	string
+	Reporter	string
+	CurrentHeight	uint64
 }
 
 func EmptyFraudProofVerificationState() FraudProofVerificationState {
@@ -207,17 +207,17 @@ func SubmitFraudProofVerification(chain PaymentsState, module FraudProofVerifica
 		channel = chain.Channels[index]
 	}
 	evidence := EvidenceRecord{
-		EvidenceID:       HashParts("fraud-evidence-record", canonicalHash),
-		ChannelID:        input.ChannelID,
-		ProofID:          proof.ProofID,
-		ProofType:        proof.ProofType,
-		CanonicalHash:    canonicalHash,
-		SubmittedBy:      proof.SubmittedBy,
-		OffendingSigner:  proof.OffendingSigner,
-		SubmittedHeight:  input.CurrentHeight,
-		ExpiresHeight:    input.CurrentHeight + DefaultReplayHorizon,
-		GasUsed:          meter.GasUsed,
-		VerificationHash: meter.MeterHash,
+		EvidenceID:		HashParts("fraud-evidence-record", canonicalHash),
+		ChannelID:		input.ChannelID,
+		ProofID:		proof.ProofID,
+		ProofType:		proof.ProofType,
+		CanonicalHash:		canonicalHash,
+		SubmittedBy:		proof.SubmittedBy,
+		OffendingSigner:	proof.OffendingSigner,
+		SubmittedHeight:	input.CurrentHeight,
+		ExpiresHeight:		input.CurrentHeight + DefaultReplayHorizon,
+		GasUsed:		meter.GasUsed,
+		VerificationHash:	meter.MeterHash,
 	}.WithHash()
 	penalty := PenaltyRecordFromAccounting(evidence, accounting, input.CurrentHeight)
 	reward := ReporterRewardFromPenaltyRecord(evidence, penalty)
@@ -292,10 +292,10 @@ func MeterFraudProofVerification(channel ChannelRecord, proof FraudProof, gasLim
 	channel = channel.Normalize()
 	proof = proof.Normalize()
 	estimate, err := EstimateSettlementMessageGas(SettlementArbitrationInput{
-		Operation:     SettlementArbitrationFraudProof,
-		ChannelID:     channel.ChannelID,
-		FraudProof:    proof,
-		CurrentHeight: channel.OpenHeight,
+		Operation:	SettlementArbitrationFraudProof,
+		ChannelID:	channel.ChannelID,
+		FraudProof:	proof,
+		CurrentHeight:	channel.OpenHeight,
 	}, SettlementGasCostSchedule{})
 	if err != nil {
 		return FraudProofGasMeter{}, err
@@ -308,11 +308,11 @@ func MeterFraudProofVerification(channel ChannelRecord, proof FraudProof, gasLim
 		return FraudProofGasMeter{}, errors.New("payments fraud proof verification gas limit exceeded")
 	}
 	meter := FraudProofGasMeter{
-		ProofID:     proof.ProofID,
-		ProofType:   proof.ProofType,
-		GasLimit:    gasLimit,
-		GasUsed:     gasUsed,
-		WithinLimit: true,
+		ProofID:	proof.ProofID,
+		ProofType:	proof.ProofType,
+		GasLimit:	gasLimit,
+		GasUsed:	gasUsed,
+		WithinLimit:	true,
 	}
 	meter.MeterHash = HashParts("fraud-proof-gas-meter", meter.ProofID, string(meter.ProofType), fmt.Sprintf("%020d", meter.GasLimit), fmt.Sprintf("%020d", meter.GasUsed))
 	return meter, nil
@@ -359,44 +359,44 @@ func ValidatePenaltyWithinAvailableBalance(channel ChannelRecord, accounting Pen
 func PenaltyRecordFromAccounting(evidence EvidenceRecord, accounting PenaltyRouteAccounting, height uint64) PenaltyRecord {
 	accounting = accounting.Normalize()
 	record := PenaltyRecord{
-		PenaltyID:        HashParts("fraud-penalty-record", evidence.EvidenceID),
-		EvidenceID:       evidence.EvidenceID,
-		ChannelID:        evidence.ChannelID,
-		ProofID:          evidence.ProofID,
-		Offender:         evidence.OffendingSigner,
-		TotalPenalty:     accounting.TotalPenalty,
-		ReporterReward:   accounting.ReporterReward,
-		CounterpartyComp: accounting.CounterpartyComp,
-		Allocations:      accounting.Allocations,
-		Penalties:        accounting.Penalties,
-		RecordedHeight:   height,
+		PenaltyID:		HashParts("fraud-penalty-record", evidence.EvidenceID),
+		EvidenceID:		evidence.EvidenceID,
+		ChannelID:		evidence.ChannelID,
+		ProofID:		evidence.ProofID,
+		Offender:		evidence.OffendingSigner,
+		TotalPenalty:		accounting.TotalPenalty,
+		ReporterReward:		accounting.ReporterReward,
+		CounterpartyComp:	accounting.CounterpartyComp,
+		Allocations:		accounting.Allocations,
+		Penalties:		accounting.Penalties,
+		RecordedHeight:		height,
 	}
 	return record.WithHash()
 }
 
 func ReporterRewardFromPenaltyRecord(evidence EvidenceRecord, penalty PenaltyRecord) ReporterReward {
 	return ReporterReward{
-		RewardID:   HashParts("fraud-reporter-reward", evidence.EvidenceID, evidence.SubmittedBy),
-		EvidenceID: evidence.EvidenceID,
-		ChannelID:  evidence.ChannelID,
-		ProofID:    evidence.ProofID,
-		Reporter:   evidence.SubmittedBy,
-		Denom:      NativeDenom,
-		Amount:     penalty.ReporterReward,
+		RewardID:	HashParts("fraud-reporter-reward", evidence.EvidenceID, evidence.SubmittedBy),
+		EvidenceID:	evidence.EvidenceID,
+		ChannelID:	evidence.ChannelID,
+		ProofID:	evidence.ProofID,
+		Reporter:	evidence.SubmittedBy,
+		Denom:		NativeDenom,
+		Amount:		penalty.ReporterReward,
 	}.WithHash()
 }
 
 func DoubleSignEvidenceFromProof(evidence EvidenceRecord, proof FraudProof) DoubleSignEvidence {
 	left, right := orderedPair(proof.StateA.StateHash, proof.StateB.StateHash)
 	return DoubleSignEvidence{
-		EvidenceID:      evidence.EvidenceID,
-		ChannelID:       evidence.ChannelID,
-		OffendingSigner: proof.OffendingSigner,
-		Epoch:           proof.StateA.Epoch,
-		Nonce:           proof.StateA.Nonce,
-		StateHashA:      left,
-		StateHashB:      right,
-		CanonicalHash:   evidence.CanonicalHash,
+		EvidenceID:		evidence.EvidenceID,
+		ChannelID:		evidence.ChannelID,
+		OffendingSigner:	proof.OffendingSigner,
+		Epoch:			proof.StateA.Epoch,
+		Nonce:			proof.StateA.Nonce,
+		StateHashA:		left,
+		StateHashB:		right,
+		CanonicalHash:		evidence.CanonicalHash,
 	}.Normalize()
 }
 
@@ -404,15 +404,15 @@ func ReplayEvidenceFromProof(channel ChannelRecord, evidence EvidenceRecord, pro
 	channel = channel.Normalize()
 	proof = proof.Normalize()
 	return ReplayEvidence{
-		EvidenceID:      evidence.EvidenceID,
-		ChannelID:       channel.ChannelID,
-		ChainID:         channel.ChainID,
-		ReplayChainID:   proof.StateA.ChainID,
-		ReplayChannelID: proof.StateA.ChannelID,
-		Nonce:           proof.StateA.Nonce,
-		FinalizedNonce:  channel.FinalizedNonce,
-		StateHash:       proof.StateA.StateHash,
-		CanonicalHash:   evidence.CanonicalHash,
+		EvidenceID:		evidence.EvidenceID,
+		ChannelID:		channel.ChannelID,
+		ChainID:		channel.ChainID,
+		ReplayChainID:		proof.StateA.ChainID,
+		ReplayChannelID:	proof.StateA.ChannelID,
+		Nonce:			proof.StateA.Nonce,
+		FinalizedNonce:		channel.FinalizedNonce,
+		StateHash:		proof.StateA.StateHash,
+		CanonicalHash:		evidence.CanonicalHash,
 	}.Normalize()
 }
 
@@ -422,11 +422,11 @@ func (s FraudProofVerificationState) Export() FraudProofVerificationState {
 
 func (s FraudProofVerificationState) Clone() FraudProofVerificationState {
 	out := FraudProofVerificationState{
-		EvidenceRecords:    make([]EvidenceRecord, len(s.EvidenceRecords)),
-		PenaltyRecords:     make([]PenaltyRecord, len(s.PenaltyRecords)),
-		ReporterRewards:    make([]ReporterReward, len(s.ReporterRewards)),
-		DoubleSignEvidence: make([]DoubleSignEvidence, len(s.DoubleSignEvidence)),
-		ReplayEvidence:     make([]ReplayEvidence, len(s.ReplayEvidence)),
+		EvidenceRecords:	make([]EvidenceRecord, len(s.EvidenceRecords)),
+		PenaltyRecords:		make([]PenaltyRecord, len(s.PenaltyRecords)),
+		ReporterRewards:	make([]ReporterReward, len(s.ReporterRewards)),
+		DoubleSignEvidence:	make([]DoubleSignEvidence, len(s.DoubleSignEvidence)),
+		ReplayEvidence:		make([]ReplayEvidence, len(s.ReplayEvidence)),
 	}
 	copy(out.EvidenceRecords, s.EvidenceRecords)
 	copy(out.PenaltyRecords, s.PenaltyRecords)
@@ -595,8 +595,8 @@ func (r PenaltyRecord) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments penalty record total", record.TotalPenalty},
 		{"payments penalty record reporter", record.ReporterReward},
@@ -741,7 +741,7 @@ func (s FraudProofSubmission) ValidateBasic() error {
 func (m MsgSubmitStaleCloseProof) FraudProofVerificationType() FraudProofVerificationMessageType {
 	return FraudProofMsgSubmitStaleCloseProof
 }
-func (m MsgSubmitStaleCloseProof) Submission() FraudProofSubmission { return m.Input.Normalize() }
+func (m MsgSubmitStaleCloseProof) Submission() FraudProofSubmission	{ return m.Input.Normalize() }
 func (m MsgSubmitStaleCloseProof) ValidateBasic() error {
 	return validateProofMessage(m.Input, FraudProofTypeStaleClose)
 }
@@ -749,7 +749,7 @@ func (m MsgSubmitStaleCloseProof) ValidateBasic() error {
 func (m MsgSubmitDoubleSignProof) FraudProofVerificationType() FraudProofVerificationMessageType {
 	return FraudProofMsgSubmitDoubleSignProof
 }
-func (m MsgSubmitDoubleSignProof) Submission() FraudProofSubmission { return m.Input.Normalize() }
+func (m MsgSubmitDoubleSignProof) Submission() FraudProofSubmission	{ return m.Input.Normalize() }
 func (m MsgSubmitDoubleSignProof) ValidateBasic() error {
 	return validateProofMessage(m.Input, FraudProofTypeDoubleSign)
 }
@@ -757,7 +757,7 @@ func (m MsgSubmitDoubleSignProof) ValidateBasic() error {
 func (m MsgSubmitInvalidConditionProof) FraudProofVerificationType() FraudProofVerificationMessageType {
 	return FraudProofMsgSubmitInvalidConditionProof
 }
-func (m MsgSubmitInvalidConditionProof) Submission() FraudProofSubmission { return m.Input.Normalize() }
+func (m MsgSubmitInvalidConditionProof) Submission() FraudProofSubmission	{ return m.Input.Normalize() }
 func (m MsgSubmitInvalidConditionProof) ValidateBasic() error {
 	return validateProofMessage(m.Input, FraudProofTypeInvalidCondition)
 }
@@ -765,7 +765,7 @@ func (m MsgSubmitInvalidConditionProof) ValidateBasic() error {
 func (m MsgSubmitReplayProof) FraudProofVerificationType() FraudProofVerificationMessageType {
 	return FraudProofMsgSubmitReplayProof
 }
-func (m MsgSubmitReplayProof) Submission() FraudProofSubmission { return m.Input.Normalize() }
+func (m MsgSubmitReplayProof) Submission() FraudProofSubmission	{ return m.Input.Normalize() }
 func (m MsgSubmitReplayProof) ValidateBasic() error {
 	return validateProofMessage(m.Input, FraudProofTypeReplayAttempt)
 }

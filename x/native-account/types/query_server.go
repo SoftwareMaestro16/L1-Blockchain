@@ -118,8 +118,8 @@ func _Query_AccountStatus_Handler(srv interface{}, ctx context.Context, dec func
 var Query_serviceDesc = _Query_serviceDesc
 
 var _Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.nativeaccount.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.nativeaccount.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		{MethodName: "Account", Handler: _Query_Account_Handler},
 		{MethodName: "AccountByRaw", Handler: _Query_AccountByRaw_Handler},
@@ -127,69 +127,69 @@ var _Query_serviceDesc = grpcgo.ServiceDesc{
 		{MethodName: "Params", Handler: _Query_Params_Handler},
 		{MethodName: "AccountStatus", Handler: _Query_AccountStatus_Handler},
 	},
-	Streams:  []grpcgo.StreamDesc{},
-	Metadata: "l1/nativeaccount/v1/query.proto",
+	Streams:	[]grpcgo.StreamDesc{},
+	Metadata:	"l1/nativeaccount/v1/query.proto",
 }
 
-func (m *QueryAccountRequest) Reset()         { *m = QueryAccountRequest{} }
-func (m *QueryAccountRequest) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryAccountRequest) ProtoMessage()    {}
+func (m *QueryAccountRequest) Reset()		{ *m = QueryAccountRequest{} }
+func (m *QueryAccountRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryAccountRequest) ProtoMessage()	{}
 func (*QueryAccountRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{0}
 }
 
-func (m *QueryAccountResponse) Reset()         { *m = QueryAccountResponse{} }
-func (m *QueryAccountResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryAccountResponse) ProtoMessage()    {}
+func (m *QueryAccountResponse) Reset()		{ *m = QueryAccountResponse{} }
+func (m *QueryAccountResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryAccountResponse) ProtoMessage()	{}
 func (*QueryAccountResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{1}
 }
 
-func (m *QueryAccountByRawRequest) Reset()         { *m = QueryAccountByRawRequest{} }
-func (m *QueryAccountByRawRequest) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryAccountByRawRequest) ProtoMessage()    {}
+func (m *QueryAccountByRawRequest) Reset()		{ *m = QueryAccountByRawRequest{} }
+func (m *QueryAccountByRawRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryAccountByRawRequest) ProtoMessage()		{}
 func (*QueryAccountByRawRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{2}
 }
 
-func (m *QueryVirtualAccountRequest) Reset()         { *m = QueryVirtualAccountRequest{} }
-func (m *QueryVirtualAccountRequest) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryVirtualAccountRequest) ProtoMessage()    {}
+func (m *QueryVirtualAccountRequest) Reset()		{ *m = QueryVirtualAccountRequest{} }
+func (m *QueryVirtualAccountRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryVirtualAccountRequest) ProtoMessage()	{}
 func (*QueryVirtualAccountRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{3}
 }
 
-func (m *QueryVirtualAccountResponse) Reset()         { *m = QueryVirtualAccountResponse{} }
-func (m *QueryVirtualAccountResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryVirtualAccountResponse) ProtoMessage()    {}
+func (m *QueryVirtualAccountResponse) Reset()		{ *m = QueryVirtualAccountResponse{} }
+func (m *QueryVirtualAccountResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryVirtualAccountResponse) ProtoMessage()	{}
 func (*QueryVirtualAccountResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{4}
 }
 
-func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
-func (m *QueryParamsRequest) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryParamsRequest) ProtoMessage()    {}
+func (m *QueryParamsRequest) Reset()		{ *m = QueryParamsRequest{} }
+func (m *QueryParamsRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()	{}
 func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{5}
 }
 
-func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
-func (m *QueryParamsResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryParamsResponse) ProtoMessage()    {}
+func (m *QueryParamsResponse) Reset()		{ *m = QueryParamsResponse{} }
+func (m *QueryParamsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryParamsResponse) ProtoMessage()	{}
 func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{6}
 }
 
-func (m *QueryAccountStatusRequest) Reset()         { *m = QueryAccountStatusRequest{} }
-func (m *QueryAccountStatusRequest) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryAccountStatusRequest) ProtoMessage()    {}
+func (m *QueryAccountStatusRequest) Reset()		{ *m = QueryAccountStatusRequest{} }
+func (m *QueryAccountStatusRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryAccountStatusRequest) ProtoMessage()	{}
 func (*QueryAccountStatusRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{7}
 }
 
-func (m *QueryAccountStatusResponse) Reset()         { *m = QueryAccountStatusResponse{} }
-func (m *QueryAccountStatusResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryAccountStatusResponse) ProtoMessage()    {}
+func (m *QueryAccountStatusResponse) Reset()		{ *m = QueryAccountStatusResponse{} }
+func (m *QueryAccountStatusResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryAccountStatusResponse) ProtoMessage()	{}
 func (*QueryAccountStatusResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNativeAccountQuery, []int{8}
 }

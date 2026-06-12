@@ -119,20 +119,20 @@ func TestUpdateParamsRejectsNonCanonicalNormalCaller(t *testing.T) {
 	params := state.Params
 	params.NormalEmissionCaller = "x/treasury"
 	_, err := ApplyUpdateMintAuthorityParams(state, MsgUpdateMintAuthorityParams{
-		Authority:      state.Params.Authority,
-		Params:         params,
-		Registration:   state.Registration,
-		AllowedCallers: []AllowedCaller{{Caller: "x/treasury", Enabled: true}},
-		Caps:           state.Caps,
+		Authority:	state.Params.Authority,
+		Params:		params,
+		Registration:	state.Registration,
+		AllowedCallers:	[]AllowedCaller{{Caller: "x/treasury", Enabled: true}},
+		Caps:		state.Caps,
 	})
 	require.ErrorContains(t, err, "normal emission caller must be x/emissions")
 
 	_, err = ApplyUpdateMintAuthorityParams(state, MsgUpdateMintAuthorityParams{
-		Authority:      "wrong",
-		Params:         state.Params,
-		Registration:   state.Registration,
-		AllowedCallers: state.AllowedCallers,
-		Caps:           state.Caps,
+		Authority:	"wrong",
+		Params:		state.Params,
+		Registration:	state.Registration,
+		AllowedCallers:	state.AllowedCallers,
+		Caps:		state.Caps,
 	})
 	require.ErrorContains(t, err, "requires authority")
 }
@@ -213,24 +213,24 @@ func defaultCap(params MintAuthorityParams, epochCap int64, lifetimeCap int64) M
 
 func mintMsg(caller string, denom string, amount int64, epoch uint64, height uint64, decisionHash string) MsgMintProtocolCoins {
 	return MsgMintProtocolCoins{
-		Caller:                caller,
-		Recipient:             "module:fee-distributor",
-		Denom:                 denom,
-		Amount:                sdkmath.NewInt(amount),
-		Epoch:                 epoch,
-		Height:                height,
-		EmissionsDecisionHash: decisionHash,
+		Caller:			caller,
+		Recipient:		"module:fee-distributor",
+		Denom:			denom,
+		Amount:			sdkmath.NewInt(amount),
+		Epoch:			epoch,
+		Height:			height,
+		EmissionsDecisionHash:	decisionHash,
 	}
 }
 
 func emissionDecision(caller string, denom string, amount int64, epoch uint64, height uint64, approved bool) EmissionDecision {
 	decision := EmissionDecision{
-		Caller:   caller,
-		Denom:    denom,
-		Amount:   sdkmath.NewInt(amount),
-		Epoch:    epoch,
-		Height:   height,
-		Approved: approved,
+		Caller:		caller,
+		Denom:		denom,
+		Amount:		sdkmath.NewInt(amount),
+		Epoch:		epoch,
+		Height:		height,
+		Approved:	approved,
 	}
 	decision.DecisionHash = ComputeEmissionDecisionHash(decision)
 	return decision
@@ -238,13 +238,13 @@ func emissionDecision(caller string, denom string, amount int64, epoch uint64, h
 
 func emergencyAuthorization(caller string, denom string, amount int64, epoch uint64, height uint64, enabled bool, bounded bool) ConstitutionEmergencyAuthorization {
 	auth := ConstitutionEmergencyAuthorization{
-		Caller:  caller,
-		Denom:   denom,
-		Amount:  sdkmath.NewInt(amount),
-		Epoch:   epoch,
-		Height:  height,
-		Enabled: enabled,
-		Bounded: bounded,
+		Caller:		caller,
+		Denom:		denom,
+		Amount:		sdkmath.NewInt(amount),
+		Epoch:		epoch,
+		Height:		height,
+		Enabled:	enabled,
+		Bounded:	bounded,
 	}
 	auth.AuthorizationHash = ComputeConstitutionEmergencyAuthorizationHash(auth)
 	return auth

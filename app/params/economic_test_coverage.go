@@ -7,70 +7,70 @@ import (
 )
 
 const (
-	EconomicTestCoverageKindInvariant  = "invariant"
-	EconomicTestCoverageKindSimulation = "simulation"
-	EconomicTestCoverageKindUpgrade    = "upgrade"
+	EconomicTestCoverageKindInvariant	= "invariant"
+	EconomicTestCoverageKindSimulation	= "simulation"
+	EconomicTestCoverageKindUpgrade		= "upgrade"
 
-	EconomicInvariantMintedSupplyReconciles     = "minted_supply_equals_rewards_plus_module_balances"
-	EconomicInvariantBurnRemovedFromSpendable   = "burned_supply_removed_from_spendable_supply"
-	EconomicInvariantFeeBucketsSum              = "fee_allocation_buckets_sum_to_collected_fees"
-	EconomicInvariantSlashedFundsRouteExactly   = "slashed_funds_route_by_configured_splits"
-	EconomicInvariantRewardAdjustmentsBounded   = "reward_adjustment_factors_within_bounds"
-	EconomicInvariantInflationBounded           = "inflation_within_configured_bounds"
-	EconomicInvariantDeflationGuardNetFloor     = "deflation_guard_enforces_net_issuance_floor"
-	EconomicInvariantStorageRefundCapped        = "storage_refunds_cannot_exceed_configured_maximum"
-	EconomicInvariantMempoolExecutionFeeAligned = "mempool_execution_fee_checks_cannot_diverge"
+	EconomicInvariantMintedSupplyReconciles		= "minted_supply_equals_rewards_plus_module_balances"
+	EconomicInvariantBurnRemovedFromSpendable	= "burned_supply_removed_from_spendable_supply"
+	EconomicInvariantFeeBucketsSum			= "fee_allocation_buckets_sum_to_collected_fees"
+	EconomicInvariantSlashedFundsRouteExactly	= "slashed_funds_route_by_configured_splits"
+	EconomicInvariantRewardAdjustmentsBounded	= "reward_adjustment_factors_within_bounds"
+	EconomicInvariantInflationBounded		= "inflation_within_configured_bounds"
+	EconomicInvariantDeflationGuardNetFloor		= "deflation_guard_enforces_net_issuance_floor"
+	EconomicInvariantStorageRefundCapped		= "storage_refunds_cannot_exceed_configured_maximum"
+	EconomicInvariantMempoolExecutionFeeAligned	= "mempool_execution_fee_checks_cannot_diverge"
 
-	EconomicSimulationLowActivityLowFees      = "low_activity_low_fee_revenue"
-	EconomicSimulationNormalTargetStake       = "normal_activity_near_target_stake_ratio"
-	EconomicSimulationHighSustainedCongestion = "high_activity_sustained_congestion"
-	EconomicSimulationHighBurnPressure        = "high_burn_pressure"
-	EconomicSimulationLowBondedStakeSafety    = "low_bonded_stake_below_safety_threshold"
-	EconomicSimulationValidatorConcentration  = "validator_concentration_above_soft_cap"
-	EconomicSimulationStakeSplit              = "stake_split_across_multiple_validators"
-	EconomicSimulationRepeatedDowntime        = "repeated_validator_downtime"
-	EconomicSimulationEquivocationReporter    = "equivocation_with_reporter_reward"
-	EconomicSimulationFeeSpamSingleAccount    = "fee_spam_from_one_account"
-	EconomicSimulationStateBloatAttack        = "state_bloat_attack"
-	EconomicSimulationDeploymentCongestion    = "deployment_congestion"
-	EconomicSimulationRapidCommissionIncrease = "rapid_commission_increase"
-	EconomicSimulationSuddenDelegationInflow  = "sudden_delegation_inflow_to_one_validator"
+	EconomicSimulationLowActivityLowFees		= "low_activity_low_fee_revenue"
+	EconomicSimulationNormalTargetStake		= "normal_activity_near_target_stake_ratio"
+	EconomicSimulationHighSustainedCongestion	= "high_activity_sustained_congestion"
+	EconomicSimulationHighBurnPressure		= "high_burn_pressure"
+	EconomicSimulationLowBondedStakeSafety		= "low_bonded_stake_below_safety_threshold"
+	EconomicSimulationValidatorConcentration	= "validator_concentration_above_soft_cap"
+	EconomicSimulationStakeSplit			= "stake_split_across_multiple_validators"
+	EconomicSimulationRepeatedDowntime		= "repeated_validator_downtime"
+	EconomicSimulationEquivocationReporter		= "equivocation_with_reporter_reward"
+	EconomicSimulationFeeSpamSingleAccount		= "fee_spam_from_one_account"
+	EconomicSimulationStateBloatAttack		= "state_bloat_attack"
+	EconomicSimulationDeploymentCongestion		= "deployment_congestion"
+	EconomicSimulationRapidCommissionIncrease	= "rapid_commission_increase"
+	EconomicSimulationSuddenDelegationInflow	= "sudden_delegation_inflow_to_one_validator"
 
-	EconomicUpgradeParameterMigrationPreservesBalances        = "parameter_migration_preserves_existing_balances"
-	EconomicUpgradeExistingDelegationsRemainValid             = "existing_delegations_remain_valid"
-	EconomicUpgradeExistingValidatorsRemainQueryable          = "existing_validators_remain_queryable"
-	EconomicUpgradeFeeDistributionDoesNotStrandBalances       = "fee_distribution_changes_do_not_strand_module_balances"
-	EconomicUpgradeBurnActivationKeepsRewardDistribution      = "burn_controller_activation_keeps_reward_distribution"
-	EconomicUpgradeStatePricingDefinedStartingState           = "state_pricing_activation_has_defined_starting_state"
-	EconomicUpgradeInflationControllerStartsFromCurrentParams = "inflation_controller_upgrade_starts_from_current_parameters"
+	EconomicUpgradeParameterMigrationPreservesBalances		= "parameter_migration_preserves_existing_balances"
+	EconomicUpgradeExistingDelegationsRemainValid			= "existing_delegations_remain_valid"
+	EconomicUpgradeExistingValidatorsRemainQueryable		= "existing_validators_remain_queryable"
+	EconomicUpgradeFeeDistributionDoesNotStrandBalances		= "fee_distribution_changes_do_not_strand_module_balances"
+	EconomicUpgradeBurnActivationKeepsRewardDistribution		= "burn_controller_activation_keeps_reward_distribution"
+	EconomicUpgradeStatePricingDefinedStartingState			= "state_pricing_activation_has_defined_starting_state"
+	EconomicUpgradeInflationControllerStartsFromCurrentParams	= "inflation_controller_upgrade_starts_from_current_parameters"
 )
 
 type EconomicTestCoverageCase struct {
-	ID            string
-	Kind          string
-	Description   string
-	Required      bool
-	Deterministic bool
-	CIEnabled     bool
-	Evidence      []string
+	ID		string
+	Kind		string
+	Description	string
+	Required	bool
+	Deterministic	bool
+	CIEnabled	bool
+	Evidence	[]string
 }
 
 type EconomicTestCoverageReport struct {
-	InvariantCases        []EconomicTestCoverageCase
-	SimulationCases       []EconomicTestCoverageCase
-	UpgradeCases          []EconomicTestCoverageCase
-	RequiredInvariants    int
-	RequiredSimulations   int
-	RequiredUpgrades      int
-	CoveredInvariants     int
-	CoveredSimulations    int
-	CoveredUpgrades       int
-	InvariantCoverageBps  int64
-	SimulationCoverageBps int64
-	UpgradeCoverageBps    int64
-	Passed                bool
-	Failed                []string
-	GovernanceSummary     string
+	InvariantCases		[]EconomicTestCoverageCase
+	SimulationCases		[]EconomicTestCoverageCase
+	UpgradeCases		[]EconomicTestCoverageCase
+	RequiredInvariants	int
+	RequiredSimulations	int
+	RequiredUpgrades	int
+	CoveredInvariants	int
+	CoveredSimulations	int
+	CoveredUpgrades		int
+	InvariantCoverageBps	int64
+	SimulationCoverageBps	int64
+	UpgradeCoverageBps	int64
+	Passed			bool
+	Failed			[]string
+	GovernanceSummary	string
 }
 
 func DefaultRequiredEconomicInvariantCoverageCases() []EconomicTestCoverageCase {
@@ -141,33 +141,33 @@ func BuildRequiredEconomicTestCoverageReport(invariantCases, simulationCases []E
 	simulationCoverage := coverageBps(coveredSimulations, requiredSimulations)
 	upgradeCoverage := coverageBps(coveredUpgrades, requiredUpgrades)
 	return EconomicTestCoverageReport{
-		InvariantCases:        invariants,
-		SimulationCases:       simulations,
-		UpgradeCases:          upgrades,
-		RequiredInvariants:    requiredInvariants,
-		RequiredSimulations:   requiredSimulations,
-		RequiredUpgrades:      requiredUpgrades,
-		CoveredInvariants:     coveredInvariants,
-		CoveredSimulations:    coveredSimulations,
-		CoveredUpgrades:       coveredUpgrades,
-		InvariantCoverageBps:  invariantCoverage,
-		SimulationCoverageBps: simulationCoverage,
-		UpgradeCoverageBps:    upgradeCoverage,
-		Passed:                len(failed) == 0 && invariantCoverage == BasisPoints && simulationCoverage == BasisPoints && upgradeCoverage == BasisPoints,
-		Failed:                failed,
-		GovernanceSummary:     fmt.Sprintf("required_invariants=%d/%d required_simulations=%d/%d required_upgrades=%d/%d invariant_coverage_bps=%d simulation_coverage_bps=%d upgrade_coverage_bps=%d", coveredInvariants, requiredInvariants, coveredSimulations, requiredSimulations, coveredUpgrades, requiredUpgrades, invariantCoverage, simulationCoverage, upgradeCoverage),
+		InvariantCases:		invariants,
+		SimulationCases:	simulations,
+		UpgradeCases:		upgrades,
+		RequiredInvariants:	requiredInvariants,
+		RequiredSimulations:	requiredSimulations,
+		RequiredUpgrades:	requiredUpgrades,
+		CoveredInvariants:	coveredInvariants,
+		CoveredSimulations:	coveredSimulations,
+		CoveredUpgrades:	coveredUpgrades,
+		InvariantCoverageBps:	invariantCoverage,
+		SimulationCoverageBps:	simulationCoverage,
+		UpgradeCoverageBps:	upgradeCoverage,
+		Passed:			len(failed) == 0 && invariantCoverage == BasisPoints && simulationCoverage == BasisPoints && upgradeCoverage == BasisPoints,
+		Failed:			failed,
+		GovernanceSummary:	fmt.Sprintf("required_invariants=%d/%d required_simulations=%d/%d required_upgrades=%d/%d invariant_coverage_bps=%d simulation_coverage_bps=%d upgrade_coverage_bps=%d", coveredInvariants, requiredInvariants, coveredSimulations, requiredSimulations, coveredUpgrades, requiredUpgrades, invariantCoverage, simulationCoverage, upgradeCoverage),
 	}
 }
 
 func requiredCoverageCase(kind, id, description string, evidence ...string) EconomicTestCoverageCase {
 	return EconomicTestCoverageCase{
-		ID:            id,
-		Kind:          kind,
-		Description:   description,
-		Required:      true,
-		Deterministic: true,
-		CIEnabled:     true,
-		Evidence:      append([]string{}, evidence...),
+		ID:		id,
+		Kind:		kind,
+		Description:	description,
+		Required:	true,
+		Deterministic:	true,
+		CIEnabled:	true,
+		Evidence:	append([]string{}, evidence...),
 	}
 }
 

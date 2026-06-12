@@ -10,12 +10,8 @@ import (
 	"github.com/sovereign-l1/l1/app/addressing"
 )
 
-// ---------------------------------------------------------------------------
-// AWCE-1.2A: 256-bit high-entropy raw address v2 policy
-// ---------------------------------------------------------------------------
-
 func TestValidateRawAddressPolicyGoldenVectors(t *testing.T) {
-	// system addresses — accepted by both policy versions
+
 	systemAddrs := []string{
 		addressing.SystemAddressAETMintRaw,
 		addressing.SystemAddressAETBurnRaw,
@@ -31,7 +27,6 @@ func TestValidateRawAddressPolicyGoldenVectors(t *testing.T) {
 		require.NoError(t, err, "v2 policy should accept system address %s", raw)
 	}
 
-	// legacy padded (20-byte Cosmos address zero-padded to 32 bytes)
 	legacyCosmos, err := hex.DecodeString("00000000000000000000000000112233445566778899aabbccddeeff00112233")
 	require.NoError(t, err)
 	require.Len(t, legacyCosmos, 32)
@@ -40,7 +35,6 @@ func TestValidateRawAddressPolicyGoldenVectors(t *testing.T) {
 	err = addressing.ValidateRawAddressPolicy(legacyCosmos, addressing.RawAddressPolicyVersionV2)
 	require.ErrorContains(t, err, "avoid legacy padding", "v2 policy must reject legacy padded address")
 
-	// v2 256-bit (no leading zero padding)
 	v2Addr := make([]byte, 32)
 	for i := range v2Addr {
 		v2Addr[i] = byte(i*17 + 0xa3)
@@ -52,7 +46,7 @@ func TestValidateRawAddressPolicyGoldenVectors(t *testing.T) {
 }
 
 func TestLegacyPaddedRejectedAfterV2Gate(t *testing.T) {
-	// simulate a 20-byte Cosmos key extended to 32 bytes with leading zeros
+
 	legacyBytes := []byte{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -89,7 +83,7 @@ func TestSystemAddressesAcceptedByBothPolicies(t *testing.T) {
 }
 
 func TestNormalizeV2RawAddressForcesHighEntropy(t *testing.T) {
-	// a legacy padded address should be re-derived into v2 by NormalizeV2RawAddress
+
 	legacyBytes := []byte{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -104,14 +98,13 @@ func TestNormalizeV2RawAddressForcesHighEntropy(t *testing.T) {
 	require.True(t, addressing.IsV2RawAddress(v2),
 		"normalized address must classify as v2, got %s", addressing.ClassifyRawAddressBytes(v2))
 
-	// a v2 address should pass through unchanged
 	v2Direct, err := addressing.NormalizeV2RawAddress("aetra", v2)
 	require.NoError(t, err)
 	require.Equal(t, v2, v2Direct, "v2 address must roundtrip unchanged through NormalizeV2RawAddress")
 }
 
 func TestV2RawAddressClassifiesCorrectly(t *testing.T) {
-	// not padded — all random bytes → V2
+
 	nonPadded := make([]byte, 32)
 	for i := range nonPadded {
 		nonPadded[i] = byte(i*31 + 0x77)
@@ -119,11 +112,9 @@ func TestV2RawAddressClassifiesCorrectly(t *testing.T) {
 	require.False(t, addressing.IsLegacyPaddedRawAddress(nonPadded))
 	require.True(t, addressing.IsV2RawAddress(nonPadded))
 
-	// zero-length — unknown
 	require.Equal(t, addressing.RawAddressClassUnknown, addressing.ClassifyRawAddressBytes(nil))
 	require.Equal(t, addressing.RawAddressClassUnknown, addressing.ClassifyRawAddressBytes([]byte{}))
 
-	// wrong length — unknown
 	require.Equal(t, addressing.RawAddressClassUnknown, addressing.ClassifyRawAddressBytes(make([]byte, 16)))
 }
 
@@ -181,7 +172,6 @@ func TestLegacyPaddedRoundTripConsistency(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, parsed, parsed2, "AE and 4: must decode to same bytes")
 
-	// re-format AE-parsed bytes back to 4: and re-parse
 	reformatted := addressing.Format(parsed2)
 	parsed3, err := addressing.Parse(reformatted)
 	require.NoError(t, err)
@@ -189,17 +179,15 @@ func TestLegacyPaddedRoundTripConsistency(t *testing.T) {
 }
 
 func TestClassifyRawAddressTextInterface(t *testing.T) {
-	// legacy padded from user-friendly
+
 	user := addressing.SystemAddressAETMintUserFriendly
 	class, err := addressing.ClassifyRawAddressText(user)
 	require.NoError(t, err)
 	require.Equal(t, addressing.RawAddressClassSystemFixed, class)
 
-	// valid 4: workchain legacy padded
 	_, err = addressing.ClassifyRawAddressText(addressing.SystemAddressAETMintRaw)
 	require.NoError(t, err)
 
-	// invalid text
 	_, err = addressing.ClassifyRawAddressText("garbage")
 	require.Error(t, err)
 }

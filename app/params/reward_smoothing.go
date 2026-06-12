@@ -8,81 +8,81 @@ import (
 )
 
 const (
-	RewardSmoothingEventEpochDistributed = "reward_smoothing_epoch_distributed"
-	RewardSmoothingEventBoundApplied     = "reward_smoothing_bound_applied"
+	RewardSmoothingEventEpochDistributed	= "reward_smoothing_epoch_distributed"
+	RewardSmoothingEventBoundApplied	= "reward_smoothing_bound_applied"
 
-	DefaultRewardSmoothingMaxEpochChangeBps = int64(2_000)
-	DefaultRewardSmoothingEpochLengthBlocks = uint64(10_000)
+	DefaultRewardSmoothingMaxEpochChangeBps	= int64(2_000)
+	DefaultRewardSmoothingEpochLengthBlocks	= uint64(10_000)
 )
 
 type RewardSmoothingParams struct {
-	MaxRewardChangeBps int64
-	EpochLengthBlocks  uint64
+	MaxRewardChangeBps	int64
+	EpochLengthBlocks	uint64
 }
 
 type DelegatorRewardParticipant struct {
-	DelegatorID string
-	StakeNaet   sdkmath.Int
+	DelegatorID	string
+	StakeNaet	sdkmath.Int
 }
 
 type ValidatorRewardParticipant struct {
-	ValidatorID    string
-	VotingPower    uint64
-	CommissionBps  int64
-	DelegatorStake []DelegatorRewardParticipant
+	ValidatorID	string
+	VotingPower	uint64
+	CommissionBps	int64
+	DelegatorStake	[]DelegatorRewardParticipant
 }
 
 type RewardSmoothingInput struct {
-	EpochID                  uint64
-	GrossRewardsNaet         sdkmath.Int
-	PreviousEpochRewardsNaet sdkmath.Int
-	Validators               []ValidatorRewardParticipant
-	Params                   RewardSmoothingParams
+	EpochID				uint64
+	GrossRewardsNaet		sdkmath.Int
+	PreviousEpochRewardsNaet	sdkmath.Int
+	Validators			[]ValidatorRewardParticipant
+	Params				RewardSmoothingParams
 }
 
 type DelegatorRewardAllocation struct {
-	DelegatorID string
-	RewardNaet  sdkmath.Int
+	DelegatorID	string
+	RewardNaet	sdkmath.Int
 }
 
 type ValidatorRewardAllocation struct {
-	ValidatorID             string
-	GrossRewardNaet         sdkmath.Int
-	CommissionNaet          sdkmath.Int
-	DelegatorRewardPoolNaet sdkmath.Int
-	DelegatorRewards        []DelegatorRewardAllocation
+	ValidatorID		string
+	GrossRewardNaet		sdkmath.Int
+	CommissionNaet		sdkmath.Int
+	DelegatorRewardPoolNaet	sdkmath.Int
+	DelegatorRewards	[]DelegatorRewardAllocation
 }
 
 type RewardSmoothingState struct {
-	EpochID           uint64
-	EpochLengthBlocks uint64
-	TotalRewardsNaet  sdkmath.Int
-	ValidatorRewards  []ValidatorRewardAllocation
+	EpochID			uint64
+	EpochLengthBlocks	uint64
+	TotalRewardsNaet	sdkmath.Int
+	ValidatorRewards	[]ValidatorRewardAllocation
 }
 
 type RewardSmoothingEvent struct {
-	Type                string
-	EpochID             uint64
-	GrossRewardsNaet    sdkmath.Int
-	SmoothedRewardsNaet sdkmath.Int
-	BoundApplied        bool
+	Type			string
+	EpochID			uint64
+	GrossRewardsNaet	sdkmath.Int
+	SmoothedRewardsNaet	sdkmath.Int
+	BoundApplied		bool
 }
 
 type RewardSmoothingOutput struct {
-	EpochID             uint64
-	GrossRewardsNaet    sdkmath.Int
-	SmoothedRewardsNaet sdkmath.Int
-	BoundApplied        bool
-	TotalVotingPower    uint64
-	ValidatorRewards    []ValidatorRewardAllocation
-	State               RewardSmoothingState
-	Events              []RewardSmoothingEvent
+	EpochID			uint64
+	GrossRewardsNaet	sdkmath.Int
+	SmoothedRewardsNaet	sdkmath.Int
+	BoundApplied		bool
+	TotalVotingPower	uint64
+	ValidatorRewards	[]ValidatorRewardAllocation
+	State			RewardSmoothingState
+	Events			[]RewardSmoothingEvent
 }
 
 func DefaultRewardSmoothingParams() RewardSmoothingParams {
 	return RewardSmoothingParams{
-		MaxRewardChangeBps: DefaultRewardSmoothingMaxEpochChangeBps,
-		EpochLengthBlocks:  DefaultRewardSmoothingEpochLengthBlocks,
+		MaxRewardChangeBps:	DefaultRewardSmoothingMaxEpochChangeBps,
+		EpochLengthBlocks:	DefaultRewardSmoothingEpochLengthBlocks,
 	}
 }
 
@@ -126,39 +126,39 @@ func SmoothEpochRewards(input RewardSmoothingInput) (RewardSmoothingOutput, erro
 	smoothed, boundApplied := boundEpochRewards(grossRewards, previousRewards, params.MaxRewardChangeBps)
 	validatorRewards := allocateValidatorRewards(smoothed, validators, totalPower)
 	state := RewardSmoothingState{
-		EpochID:           input.EpochID,
-		EpochLengthBlocks: params.EpochLengthBlocks,
-		TotalRewardsNaet:  smoothed,
-		ValidatorRewards:  validatorRewards,
+		EpochID:		input.EpochID,
+		EpochLengthBlocks:	params.EpochLengthBlocks,
+		TotalRewardsNaet:	smoothed,
+		ValidatorRewards:	validatorRewards,
 	}
 	if err := state.Validate(); err != nil {
 		return RewardSmoothingOutput{}, err
 	}
 	events := []RewardSmoothingEvent{{
-		Type:                RewardSmoothingEventEpochDistributed,
-		EpochID:             input.EpochID,
-		GrossRewardsNaet:    grossRewards,
-		SmoothedRewardsNaet: smoothed,
-		BoundApplied:        boundApplied,
+		Type:			RewardSmoothingEventEpochDistributed,
+		EpochID:		input.EpochID,
+		GrossRewardsNaet:	grossRewards,
+		SmoothedRewardsNaet:	smoothed,
+		BoundApplied:		boundApplied,
 	}}
 	if boundApplied {
 		events = append(events, RewardSmoothingEvent{
-			Type:                RewardSmoothingEventBoundApplied,
-			EpochID:             input.EpochID,
-			GrossRewardsNaet:    grossRewards,
-			SmoothedRewardsNaet: smoothed,
-			BoundApplied:        true,
+			Type:			RewardSmoothingEventBoundApplied,
+			EpochID:		input.EpochID,
+			GrossRewardsNaet:	grossRewards,
+			SmoothedRewardsNaet:	smoothed,
+			BoundApplied:		true,
 		})
 	}
 	return RewardSmoothingOutput{
-		EpochID:             input.EpochID,
-		GrossRewardsNaet:    grossRewards,
-		SmoothedRewardsNaet: smoothed,
-		BoundApplied:        boundApplied,
-		TotalVotingPower:    totalPower,
-		ValidatorRewards:    validatorRewards,
-		State:               state,
-		Events:              events,
+		EpochID:		input.EpochID,
+		GrossRewardsNaet:	grossRewards,
+		SmoothedRewardsNaet:	smoothed,
+		BoundApplied:		boundApplied,
+		TotalVotingPower:	totalPower,
+		ValidatorRewards:	validatorRewards,
+		State:			state,
+		Events:			events,
 	}, nil
 }
 
@@ -288,7 +288,7 @@ func allocateValidatorRewards(total sdkmath.Int, validators []ValidatorRewardPar
 	out := make([]ValidatorRewardAllocation, 0, len(validators))
 	allocated := sdkmath.ZeroInt()
 	for i, validator := range validators {
-		gross := total.MulRaw(int64(validator.VotingPower)).QuoRaw(int64(totalPower)) // #nosec G115 -- validated total power is bounded by uint64 and test powers are protocol-sized.
+		gross := total.MulRaw(int64(validator.VotingPower)).QuoRaw(int64(totalPower))
 		if i == len(validators)-1 {
 			gross = total.Sub(allocated)
 		}
@@ -296,11 +296,11 @@ func allocateValidatorRewards(total sdkmath.Int, validators []ValidatorRewardPar
 		commission := ApplyBps(gross, validator.CommissionBps)
 		delegatorPool := gross.Sub(commission)
 		out = append(out, ValidatorRewardAllocation{
-			ValidatorID:             validator.ValidatorID,
-			GrossRewardNaet:         gross,
-			CommissionNaet:          commission,
-			DelegatorRewardPoolNaet: delegatorPool,
-			DelegatorRewards:        allocateDelegatorRewards(delegatorPool, validator.DelegatorStake),
+			ValidatorID:			validator.ValidatorID,
+			GrossRewardNaet:		gross,
+			CommissionNaet:			commission,
+			DelegatorRewardPoolNaet:	delegatorPool,
+			DelegatorRewards:		allocateDelegatorRewards(delegatorPool, validator.DelegatorStake),
 		})
 	}
 	return out

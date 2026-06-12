@@ -16,10 +16,10 @@ const UpgradeName = appupgrades.Name
 
 func (app L1App) RegisterUpgradeHandlers() {
 	appupgrades.RegisterHandlers(appupgrades.HandlerDependencies{
-		UpgradeKeeper:  app.UpgradeKeeper,
-		ModuleManager:  app.ModuleManager,
-		Configurator:   app.Configurator(),
-		SetStoreLoader: app.SetStoreLoader,
+		UpgradeKeeper:	app.UpgradeKeeper,
+		ModuleManager:	app.ModuleManager,
+		Configurator:	app.Configurator(),
+		SetStoreLoader:	app.SetStoreLoader,
 	})
 }
 

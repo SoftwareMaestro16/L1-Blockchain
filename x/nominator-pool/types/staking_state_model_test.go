@@ -47,12 +47,12 @@ func TestLiquidStakingPoolAddressPairValidation(t *testing.T) {
 
 func TestPoolShareRejectsRawUserFacingOwner(t *testing.T) {
 	share := PoolShare{
-		Owner:           rawAddress("22"),
-		PoolID:          "pool-a",
-		Shares:          10,
-		PrincipalAmount: 10,
-		CreatedHeight:   1,
-		UpdatedHeight:   1,
+		Owner:			rawAddress("22"),
+		PoolID:			"pool-a",
+		Shares:			10,
+		PrincipalAmount:	10,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 	}
 	require.ErrorContains(t, share.Validate(DefaultParams()), "AE user-facing")
 }
@@ -61,19 +61,19 @@ func TestPoolAllocationRequiresActiveEligibleValidator(t *testing.T) {
 	params := DefaultParams()
 	validator := validStateValidator(t, "11")
 	allocation := PoolValidatorAllocation{
-		PoolID:           "pool-a",
-		Validator:        validator.Address,
-		TargetWeightBps:  params.MinPoolValidatorAllocationBps,
-		ActiveStake:      10,
-		PerformanceScore: 9_000,
-		CommissionBps:    1_000,
-		SlashingRiskBps:  100,
-		UpdatedHeight:    2,
+		PoolID:			"pool-a",
+		Validator:		validator.Address,
+		TargetWeightBps:	params.MinPoolValidatorAllocationBps,
+		ActiveStake:		10,
+		PerformanceScore:	9_000,
+		CommissionBps:		1_000,
+		SlashingRiskBps:	100,
+		UpdatedHeight:		2,
 	}
 	require.NoError(t, allocation.Validate(params, validator))
 
 	validator.Status = StateValidatorStatusJailed
-	require.ErrorContains(t, allocation.Validate(params, validator), "active eligible")
+	require.ErrorContains(t, allocation.Validate(params, validator), "non-active validator must have zero target weight")
 }
 
 func TestPaginatedStateQueriesAreDeterministic(t *testing.T) {
@@ -111,44 +111,44 @@ func TestSnapshotExportIsDeterministicAndStateRoundTrips(t *testing.T) {
 	validator := validStateValidator(t, "11")
 	pool := validLiquidPool(t, "pool-a", rawAddress("66"))
 	state := State{
-		Validators:                 []Validator{validator},
-		ValidatorPerformanceScores: []ValidatorPerformanceScore{{Validator: validator.Address, Epoch: 1, ScoreBps: 9_000}},
-		ValidatorCommissions:       []ValidatorCommission{{Validator: validator.Address, Epoch: 1, RateBps: 1_000}},
-		ValidatorSlashingRisks:     []ValidatorSlashingRisk{{Validator: validator.Address, Epoch: 1, RiskBps: 100}},
-		ValidatorAllocationLimits:  []ValidatorAllocationLimit{{Validator: validator.Address, Epoch: 1, LimitBps: params.MaxPoolValidatorAllocationBps}},
-		LiquidStakingPools:         []LiquidStakingPool{pool},
+		Validators:			[]Validator{validator},
+		ValidatorPerformanceScores:	[]ValidatorPerformanceScore{{Validator: validator.Address, Epoch: 1, ScoreBps: 9_000}},
+		ValidatorCommissions:		[]ValidatorCommission{{Validator: validator.Address, Epoch: 1, RateBps: 1_000}},
+		ValidatorSlashingRisks:		[]ValidatorSlashingRisk{{Validator: validator.Address, Epoch: 1, RiskBps: 100}},
+		ValidatorAllocationLimits:	[]ValidatorAllocationLimit{{Validator: validator.Address, Epoch: 1, LimitBps: params.MaxPoolValidatorAllocationBps}},
+		LiquidStakingPools:		[]LiquidStakingPool{pool},
 		PoolShares: []PoolShare{{
-			Owner:           owner,
-			PoolID:          pool.PoolID,
-			Shares:          10,
-			PrincipalAmount: 10,
-			CreatedHeight:   1,
-			UpdatedHeight:   2,
+			Owner:			owner,
+			PoolID:			pool.PoolID,
+			Shares:			10,
+			PrincipalAmount:	10,
+			CreatedHeight:		1,
+			UpdatedHeight:		2,
 		}},
 		PoolValidatorAllocations: []PoolValidatorAllocation{{
-			PoolID:           pool.PoolID,
-			Validator:        validator.Address,
-			TargetWeightBps:  params.MinPoolValidatorAllocationBps,
-			ActiveStake:      10,
-			PerformanceScore: 9_000,
-			CommissionBps:    1_000,
-			SlashingRiskBps:  100,
-			UpdatedHeight:    2,
+			PoolID:			pool.PoolID,
+			Validator:		validator.Address,
+			TargetWeightBps:	params.MinPoolValidatorAllocationBps,
+			ActiveStake:		10,
+			PerformanceScore:	9_000,
+			CommissionBps:		1_000,
+			SlashingRiskBps:	100,
+			UpdatedHeight:		2,
 		}},
 		PoolUnbondingRequests: []PoolUnbondingRequest{{
-			PoolID:         pool.PoolID,
-			Owner:          owner,
-			RequestID:      "req-1",
-			Shares:         1,
-			Amount:         1,
-			RequestHeight:  3,
-			CompleteHeight: 4,
-			Status:         WithdrawalStatusPending,
+			PoolID:		pool.PoolID,
+			Owner:		owner,
+			RequestID:	"req-1",
+			Shares:		1,
+			Amount:		1,
+			RequestHeight:	3,
+			CompleteHeight:	4,
+			Status:		WithdrawalStatusPending,
 		}},
-		PoolRewardIndexes: []PoolRewardIndex{{PoolID: pool.PoolID, RewardIndex: 7, Epoch: 1}},
-		RewardClaims:            []RewardClaim{{PoolID: pool.PoolID, Owner: owner, Epoch: 1, Amount: 2}},
-		EpochStakingSnapshots:   []EpochStakingSnapshot{{Epoch: 1, TotalActiveStake: 10, TotalPools: 1, ValidatorCount: 1, SnapshotHash: "hash-a"}},
-		ValidatorSetSnapshots: []ValidatorSetSnapshot{{HeightOrEpoch: 10, Validators: []string{validator.Address}, TotalPower: 10, SnapshotHash: "hash-b"}},
+		PoolRewardIndexes:	[]PoolRewardIndex{{PoolID: pool.PoolID, RewardIndex: 7, Epoch: 1}},
+		RewardClaims:		[]RewardClaim{{PoolID: pool.PoolID, Owner: owner, Epoch: 1, Amount: 2}},
+		EpochStakingSnapshots:	[]EpochStakingSnapshot{{Epoch: 1, TotalActiveStake: 10, TotalPools: 1, ValidatorCount: 1, SnapshotHash: "hash-a"}},
+		ValidatorSetSnapshots:	[]ValidatorSetSnapshot{{HeightOrEpoch: 10, Validators: []string{validator.Address}, TotalPower: 10, SnapshotHash: "hash-b"}},
 	}
 	normalized := state.Normalize(params)
 	require.NoError(t, normalized.Validate(params))
@@ -172,20 +172,20 @@ func TestSnapshotExportIsDeterministicAndStateRoundTrips(t *testing.T) {
 func validLiquidPool(t *testing.T, poolID string, raw string) LiquidStakingPool {
 	t.Helper()
 	return LiquidStakingPool{
-		PoolID:                  poolID,
-		ContractAddressUser:     aeAddressFromRaw(t, raw),
-		ContractAddressRaw:      raw,
-		ReceiptToken:            "aet-liquid-staking-share-v1",
-		TotalDeposited:          100,
-		TotalActiveStake:        70,
-		TotalUnbonding:          30,
-		TotalShares:             100,
-		RewardIndex:             7,
-		AllocationEpoch:         1,
-		LastStorageChargeHeight: 10,
-		StorageRentDebt:         5,
-		RentPayerPolicy:         RentPayerPolicyPoolReserve,
-		Status:                  PoolStatusActive,
+		PoolID:				poolID,
+		ContractAddressUser:		aeAddressFromRaw(t, raw),
+		ContractAddressRaw:		raw,
+		ReceiptToken:			"aet-liquid-staking-share-v1",
+		TotalDeposited:			100,
+		TotalActiveStake:		70,
+		TotalUnbonding:			30,
+		TotalShares:			100,
+		RewardIndex:			7,
+		AllocationEpoch:		1,
+		LastStorageChargeHeight:	10,
+		StorageRentDebt:		5,
+		RentPayerPolicy:		RentPayerPolicyPoolReserve,
+		Status:				PoolStatusActive,
 	}
 }
 
@@ -193,15 +193,15 @@ func validStateValidator(t *testing.T, hexByte string) Validator {
 	t.Helper()
 	params := DefaultParams()
 	return Validator{
-		Address:            aeAddressFromRaw(t, rawAddress(hexByte)),
-		SelfStake:          params.PoolBackedValidatorMinSelfStake,
-		NominatorStake:     params.PoolBackedValidatorMaxNominatorStake,
-		Status:             StateValidatorStatusActive,
-		PerformanceScore:   9_000,
-		CommissionBps:      1_000,
-		SlashingRiskBps:    100,
-		AllocationLimitBps: params.MaxPoolValidatorAllocationBps,
-		UpdatedHeight:      1,
+		Address:		aeAddressFromRaw(t, rawAddress(hexByte)),
+		SelfStake:		params.PoolBackedValidatorMinSelfStake,
+		NominatorStake:		params.PoolBackedValidatorMaxNominatorStake,
+		Status:			StateValidatorStatusActive,
+		PerformanceScore:	9_000,
+		CommissionBps:		1_000,
+		SlashingRiskBps:	100,
+		AllocationLimitBps:	params.MaxPoolValidatorAllocationBps,
+		UpdatedHeight:		1,
 	}
 }
 

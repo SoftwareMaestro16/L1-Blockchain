@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "avmscheduler"
-	StoreKey   = ModuleName
+	ModuleName	= "avmscheduler"
+	StoreKey	= ModuleName
 )

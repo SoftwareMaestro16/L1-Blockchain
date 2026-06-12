@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	MaxIDLength         = 64
-	MaxNameLength       = 128
-	MaxScopeLength      = 128
-	MaxCapabilityLength = 64
+	MaxIDLength		= 64
+	MaxNameLength		= 128
+	MaxScopeLength		= 128
+	MaxCapabilityLength	= 64
 )
 
 func validateZoneID(id string) error {

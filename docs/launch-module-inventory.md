@@ -1,6 +1,10 @@
 # Launch Module Inventory
 
 This document classifies every `x/*` module for testnet launch purposes.
+Canonical source of truth is `app/launch_module_inventory.json`; this markdown
+must mirror its launch scope and contract-only asset model.
+Token/NFT/DEX behavior remains contract-only through AVM contracts, not native
+application modules.
 
 ## Classification Legend
 
@@ -55,7 +59,6 @@ This document classifies every `x/*` module for testnet launch purposes.
 | `compute` | Yes | Yes | Full | Yes | Compute resources |
 | `storage` | Yes | Yes | Full | Yes | Storage resources |
 | `scheduler` | Yes | Yes | Full | Yes | Task scheduling |
-| `schedulerv2` | Yes | Yes | Full | Yes | Task scheduling v2 |
 | `mesh` | Yes | Yes | Full | Yes | Mesh networking |
 | `zones` | Yes | Yes | Full | Yes | Zone management |
 | `routing` | Yes | Yes | Full | Yes | Message routing |
@@ -91,15 +94,15 @@ This document classifies every `x/*` module for testnet launch purposes.
 
 AVM contract standards are deployed as contracts.
 
-## Launch Support (In-Memory Calculation Surface)
+## Launch Support (KV-Backed Calculation Surface)
 
 | Module | State | Notes |
 |--------|-------|-------|
-| `aetra-economics` | In-memory | Governance-owned economic policy calculations and query surface |
-| `aetra-staking-policy` | In-memory | Pool/validator allocation policy calculations and query surface |
-| `aetra-validator-score` | In-memory | Deterministic validator score calculation surface |
+| `aetra-economics` | KV-backed runtime | Governance-owned economic policy calculations and query surface |
+| `aetra-staking-policy` | KV-backed runtime | Pool/validator allocation policy calculations and query surface |
+| `aetra-validator-score` | KV-backed runtime | Deterministic validator score calculation surface |
 
-**Note**: These modules are wired into app as `launch_support` calculation/query surfaces. They use in-memory state (`owns_consensus_state: false`, `kv_backed_runtime_mutations: false`) and do not require KV persistence for launch.
+**Note**: These modules are wired into app as `launch_support` calculation/query surfaces. Historical in-memory prototype wording is obsolete; current inventory marks them with `owns_consensus_state: true` and `kv_backed_runtime_mutations: true`.
 
 ## Prototype Only Modules (Not Wired)
 

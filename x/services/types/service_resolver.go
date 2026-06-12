@@ -12,71 +12,71 @@ import (
 type ServiceResolutionSource string
 
 const (
-	ServiceResolutionOnChainRegistry ServiceResolutionSource = "on_chain_registry"
-	ServiceResolutionOffChainIndex   ServiceResolutionSource = "off_chain_index"
-	ServiceResolutionSignedCache     ServiceResolutionSource = "signed_cache"
-	ServiceResolutionIdentityRecord  ServiceResolutionSource = "aet_identity_record"
-	ServiceResolutionDistributedMesh ServiceResolutionSource = "distributed_service_mesh"
+	ServiceResolutionOnChainRegistry	ServiceResolutionSource	= "on_chain_registry"
+	ServiceResolutionOffChainIndex		ServiceResolutionSource	= "off_chain_index"
+	ServiceResolutionSignedCache		ServiceResolutionSource	= "signed_cache"
+	ServiceResolutionIdentityRecord		ServiceResolutionSource	= "aet_identity_record"
+	ServiceResolutionDistributedMesh	ServiceResolutionSource	= "distributed_service_mesh"
 )
 
 type ServiceResolverInput struct {
-	ServiceName       string
-	Registry          ServiceRegistryState
-	Distributed       DistributedServiceDiscoveryState
-	OffChainIndex     []ServiceResolverSourceRecord
-	CachedSigned      []ServiceResolverSourceRecord
-	IdentityBindings  []IdentityServiceBinding
-	ResolutionHeight  uint64
-	RequireFreshProof bool
+	ServiceName		string
+	Registry		ServiceRegistryState
+	Distributed		DistributedServiceDiscoveryState
+	OffChainIndex		[]ServiceResolverSourceRecord
+	CachedSigned		[]ServiceResolverSourceRecord
+	IdentityBindings	[]IdentityServiceBinding
+	ResolutionHeight	uint64
+	RequireFreshProof	bool
 }
 
 type ServiceResolverSourceRecord struct {
-	Source               ServiceResolutionSource
-	ServiceName          string
-	ServiceID            string
-	Descriptor           ServiceDescriptor
-	Endpoint             string
-	InterfaceDescriptor  ServiceInterface
-	TrustMetadata        string
-	PaymentModel         string
-	VerificationModel    coretypes.ServiceVerificationModel
-	ExpiryHeight         uint64
-	ProofHash            string
-	SignatureHash        string
-	IdentityBinding      IdentityServiceBinding
-	DistributedRecord    DistributedServiceRecord
-	DistributedEndpoint  DistributedServiceEndpoint
-	DistributedInterface DistributedInterfaceDescriptor
-	SourceHash           string
+	Source			ServiceResolutionSource
+	ServiceName		string
+	ServiceID		string
+	Descriptor		ServiceDescriptor
+	Endpoint		string
+	InterfaceDescriptor	ServiceInterface
+	TrustMetadata		string
+	PaymentModel		string
+	VerificationModel	coretypes.ServiceVerificationModel
+	ExpiryHeight		uint64
+	ProofHash		string
+	SignatureHash		string
+	IdentityBinding		IdentityServiceBinding
+	DistributedRecord	DistributedServiceRecord
+	DistributedEndpoint	DistributedServiceEndpoint
+	DistributedInterface	DistributedInterfaceDescriptor
+	SourceHash		string
 }
 
 type ServiceResolutionProofChain struct {
-	SourceHashes                []string
-	RegistryProofHash           string
-	SignatureHashes             []string
-	IdentityBindingHashes       []string
-	DistributedRecordHashes     []string
-	DistributedEndpointHashes   []string
-	DistributedInterfaceHashes  []string
-	DistributedCommitmentHashes []string
-	ChainHash                   string
+	SourceHashes			[]string
+	RegistryProofHash		string
+	SignatureHashes			[]string
+	IdentityBindingHashes		[]string
+	DistributedRecordHashes		[]string
+	DistributedEndpointHashes	[]string
+	DistributedInterfaceHashes	[]string
+	DistributedCommitmentHashes	[]string
+	ChainHash			string
 }
 
 type ServiceResolutionOutput struct {
-	ServiceName         string
-	ServiceID           string
-	Source              ServiceResolutionSource
-	Descriptor          ServiceDescriptor
-	Endpoint            string
-	InterfaceHash       string
-	InterfaceDescriptor ServiceInterface
-	TrustModel          coretypes.ServiceTrustModel
-	TrustMetadata       string
-	PaymentModel        string
-	VerificationModel   coretypes.ServiceVerificationModel
-	ExpiryHeight        uint64
-	ProofChain          ServiceResolutionProofChain
-	ResolutionHash      string
+	ServiceName		string
+	ServiceID		string
+	Source			ServiceResolutionSource
+	Descriptor		ServiceDescriptor
+	Endpoint		string
+	InterfaceHash		string
+	InterfaceDescriptor	ServiceInterface
+	TrustModel		coretypes.ServiceTrustModel
+	TrustMetadata		string
+	PaymentModel		string
+	VerificationModel	coretypes.ServiceVerificationModel
+	ExpiryHeight		uint64
+	ProofChain		ServiceResolutionProofChain
+	ResolutionHash		string
 }
 
 func ResolveService(input ServiceResolverInput) (ServiceResolutionOutput, error) {
@@ -240,8 +240,8 @@ func (record ServiceResolverSourceRecord) Validate() error {
 
 func (chain ServiceResolutionProofChain) Validate() error {
 	for _, item := range []struct {
-		name   string
-		hashes []string
+		name	string
+		hashes	[]string
 	}{
 		{name: "service resolver source hash", hashes: chain.SourceHashes},
 		{name: "service resolver signature hash", hashes: chain.SignatureHashes},
@@ -395,16 +395,16 @@ func resolveOnChainRegistryCandidate(input ServiceResolverInput) (ServiceResolve
 		return ServiceResolverSourceRecord{}, nil
 	}
 	record := ServiceResolverSourceRecord{
-		Source:              ServiceResolutionOnChainRegistry,
-		ServiceName:         input.ServiceName,
-		ServiceID:           response.Descriptor.ServiceID,
-		Descriptor:          response.Descriptor,
-		Endpoint:            resolverEndpointFromDescriptor(response.Descriptor),
-		InterfaceDescriptor: response.Descriptor.Interface,
-		PaymentModel:        registryPaymentModelFromDescriptor(response.Descriptor),
-		VerificationModel:   response.Descriptor.Verification.Model,
-		ExpiryHeight:        resolverExpiryHeight(response.Descriptor),
-		ProofHash:           response.Proof.ProofHash,
+		Source:			ServiceResolutionOnChainRegistry,
+		ServiceName:		input.ServiceName,
+		ServiceID:		response.Descriptor.ServiceID,
+		Descriptor:		response.Descriptor,
+		Endpoint:		resolverEndpointFromDescriptor(response.Descriptor),
+		InterfaceDescriptor:	response.Descriptor.Interface,
+		PaymentModel:		registryPaymentModelFromDescriptor(response.Descriptor),
+		VerificationModel:	response.Descriptor.Verification.Model,
+		ExpiryHeight:		resolverExpiryHeight(response.Descriptor),
+		ProofHash:		response.Proof.ProofHash,
 	}
 	record.TrustMetadata = resolverTrustMetadata(record.Descriptor)
 	return NewServiceResolverSourceRecord(record)
@@ -438,17 +438,17 @@ func resolveIdentityCandidates(input ServiceResolverInput) ([]ServiceResolverSou
 			return nil, fmt.Errorf("identity binding descriptor hash mismatch for %s", binding.ServiceID)
 		}
 		record := ServiceResolverSourceRecord{
-			Source:              ServiceResolutionIdentityRecord,
-			ServiceName:         input.ServiceName,
-			ServiceID:           descriptor.ServiceID,
-			Descriptor:          descriptor,
-			Endpoint:            resolverEndpointFromDescriptor(descriptor),
-			InterfaceDescriptor: descriptor.Interface,
-			PaymentModel:        registryPaymentModelFromDescriptor(descriptor),
-			VerificationModel:   descriptor.Verification.Model,
-			ExpiryHeight:        minNonZero(resolverExpiryHeight(descriptor), binding.ExpiryHeight),
-			IdentityBinding:     binding,
-			ProofHash:           resolverRegistryProofHash(input.Registry, descriptor.ServiceID),
+			Source:			ServiceResolutionIdentityRecord,
+			ServiceName:		input.ServiceName,
+			ServiceID:		descriptor.ServiceID,
+			Descriptor:		descriptor,
+			Endpoint:		resolverEndpointFromDescriptor(descriptor),
+			InterfaceDescriptor:	descriptor.Interface,
+			PaymentModel:		registryPaymentModelFromDescriptor(descriptor),
+			VerificationModel:	descriptor.Verification.Model,
+			ExpiryHeight:		minNonZero(resolverExpiryHeight(descriptor), binding.ExpiryHeight),
+			IdentityBinding:	binding,
+			ProofHash:		resolverRegistryProofHash(input.Registry, descriptor.ServiceID),
 		}
 		record.TrustMetadata = resolverTrustMetadata(record.Descriptor)
 		built, err := NewServiceResolverSourceRecord(record)
@@ -540,20 +540,20 @@ func resolveDistributedCandidates(input ServiceResolverInput) ([]ServiceResolver
 			return nil, fmt.Errorf("distributed interface hash mismatch for %s", record.ServiceID)
 		}
 		source := ServiceResolverSourceRecord{
-			Source:               ServiceResolutionDistributedMesh,
-			ServiceName:          input.ServiceName,
-			ServiceID:            descriptor.ServiceID,
-			Descriptor:           descriptor,
-			Endpoint:             endpoint.Target,
-			InterfaceDescriptor:  descriptor.Interface,
-			TrustMetadata:        resolverTrustMetadata(descriptor),
-			PaymentModel:         registryPaymentModelFromDescriptor(descriptor),
-			VerificationModel:    descriptor.Verification.Model,
-			ExpiryHeight:         minNonZero(resolverExpiryHeight(descriptor), record.ExpiryHeight),
-			ProofHash:            resolverRegistryProofHash(input.Registry, descriptor.ServiceID),
-			DistributedRecord:    record,
-			DistributedEndpoint:  endpoint,
-			DistributedInterface: iface,
+			Source:			ServiceResolutionDistributedMesh,
+			ServiceName:		input.ServiceName,
+			ServiceID:		descriptor.ServiceID,
+			Descriptor:		descriptor,
+			Endpoint:		endpoint.Target,
+			InterfaceDescriptor:	descriptor.Interface,
+			TrustMetadata:		resolverTrustMetadata(descriptor),
+			PaymentModel:		registryPaymentModelFromDescriptor(descriptor),
+			VerificationModel:	descriptor.Verification.Model,
+			ExpiryHeight:		minNonZero(resolverExpiryHeight(descriptor), record.ExpiryHeight),
+			ProofHash:		resolverRegistryProofHash(input.Registry, descriptor.ServiceID),
+			DistributedRecord:	record,
+			DistributedEndpoint:	endpoint,
+			DistributedInterface:	iface,
 		}
 		built, err := NewServiceResolverSourceRecord(source)
 		if err != nil {
@@ -571,19 +571,19 @@ func buildServiceResolutionOutput(input ServiceResolverInput, record ServiceReso
 	chain := buildResolutionProofChain(input, record)
 	chain.ChainHash = ComputeServiceResolutionProofChainHash(chain)
 	out := ServiceResolutionOutput{
-		ServiceName:         input.ServiceName,
-		ServiceID:           record.Descriptor.ServiceID,
-		Source:              record.Source,
-		Descriptor:          record.Descriptor,
-		Endpoint:            record.Endpoint,
-		InterfaceHash:       record.Descriptor.Interface.InterfaceHash,
-		InterfaceDescriptor: record.InterfaceDescriptor,
-		TrustModel:          record.Descriptor.Verification.TrustModel,
-		TrustMetadata:       record.TrustMetadata,
-		PaymentModel:        record.PaymentModel,
-		VerificationModel:   record.VerificationModel,
-		ExpiryHeight:        record.ExpiryHeight,
-		ProofChain:          chain,
+		ServiceName:		input.ServiceName,
+		ServiceID:		record.Descriptor.ServiceID,
+		Source:			record.Source,
+		Descriptor:		record.Descriptor,
+		Endpoint:		record.Endpoint,
+		InterfaceHash:		record.Descriptor.Interface.InterfaceHash,
+		InterfaceDescriptor:	record.InterfaceDescriptor,
+		TrustModel:		record.Descriptor.Verification.TrustModel,
+		TrustMetadata:		record.TrustMetadata,
+		PaymentModel:		record.PaymentModel,
+		VerificationModel:	record.VerificationModel,
+		ExpiryHeight:		record.ExpiryHeight,
+		ProofChain:		chain,
 	}
 	if out.TrustMetadata == "" {
 		out.TrustMetadata = resolverTrustMetadata(out.Descriptor)

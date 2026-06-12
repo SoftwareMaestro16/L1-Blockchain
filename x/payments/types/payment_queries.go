@@ -10,116 +10,116 @@ import (
 type PaymentProofObjectType string
 
 const (
-	PaymentProofObjectIntent     PaymentProofObjectType = "intent"
-	PaymentProofObjectChannel    PaymentProofObjectType = "channel"
-	PaymentProofObjectCondition  PaymentProofObjectType = "condition"
-	PaymentProofObjectRoute      PaymentProofObjectType = "route"
-	PaymentProofObjectSettlement PaymentProofObjectType = "settlement"
-	PaymentProofObjectDispute    PaymentProofObjectType = "dispute"
-	PaymentProofObjectReceipt    PaymentProofObjectType = "receipt"
+	PaymentProofObjectIntent	PaymentProofObjectType	= "intent"
+	PaymentProofObjectChannel	PaymentProofObjectType	= "channel"
+	PaymentProofObjectCondition	PaymentProofObjectType	= "condition"
+	PaymentProofObjectRoute		PaymentProofObjectType	= "route"
+	PaymentProofObjectSettlement	PaymentProofObjectType	= "settlement"
+	PaymentProofObjectDispute	PaymentProofObjectType	= "dispute"
+	PaymentProofObjectReceipt	PaymentProofObjectType	= "receipt"
 )
 
 type PaymentProofEnvelope struct {
-	ObjectType    PaymentProofObjectType
-	ObjectID      string
-	StateKey      string
-	ObjectHash    string
-	PaymentRoot   string
-	RootAtHeight  string
-	Height        uint64
-	ProofMetadata []string
-	ProofHash     string
+	ObjectType	PaymentProofObjectType
+	ObjectID	string
+	StateKey	string
+	ObjectHash	string
+	PaymentRoot	string
+	RootAtHeight	string
+	Height		uint64
+	ProofMetadata	[]string
+	ProofHash	string
 }
 
 type QueryPaymentIntent struct {
-	PaymentID string
-	Height    uint64
+	PaymentID	string
+	Height		uint64
 }
 
 type QueryPaymentChannel struct {
-	ChannelID string
-	Height    uint64
+	ChannelID	string
+	Height		uint64
 }
 
 type QueryConditionalPayment struct {
-	ConditionID string
-	Height      uint64
+	ConditionID	string
+	Height		uint64
 }
 
 type QueryPaymentRoute struct {
-	RouteID string
-	Height  uint64
+	RouteID	string
+	Height	uint64
 }
 
 type QueryPaymentSettlement struct {
-	PaymentID string
-	Height    uint64
+	PaymentID	string
+	Height		uint64
 }
 
 type QueryPaymentDispute struct {
-	DisputeID string
-	Height    uint64
+	DisputeID	string
+	Height		uint64
 }
 
 type QueryPaymentProof struct {
-	ObjectType PaymentProofObjectType
-	ObjectID   string
-	Height     uint64
+	ObjectType	PaymentProofObjectType
+	ObjectID	string
+	Height		uint64
 }
 
 type QueryPaymentIntentResponse struct {
-	Intent        PaymentIntent
-	Found         bool
-	ExpiryHeight  uint64
-	RoutePolicy   string
-	ProofMetadata PaymentProofEnvelope
+	Intent		PaymentIntent
+	Found		bool
+	ExpiryHeight	uint64
+	RoutePolicy	string
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryPaymentChannelResponse struct {
-	Channel       PaymentChannel
-	Found         bool
-	ProofMetadata PaymentProofEnvelope
+	Channel		PaymentChannel
+	Found		bool
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryConditionalPaymentResponse struct {
-	Condition     NativeConditionalPayment
-	Found         bool
-	ProofMetadata PaymentProofEnvelope
+	Condition	NativeConditionalPayment
+	Found		bool
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryPaymentRouteResponse struct {
-	Route         PaymentRouteCommitment
-	Found         bool
-	Metadata      PaymentRouteQueryMetadata
-	ProofMetadata PaymentProofEnvelope
+	Route		PaymentRouteCommitment
+	Found		bool
+	Metadata	PaymentRouteQueryMetadata
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryPaymentSettlementResponse struct {
-	Settlement    PaymentSettlement
-	Found         bool
-	ProofMetadata PaymentProofEnvelope
+	Settlement	PaymentSettlement
+	Found		bool
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryPaymentDisputeResponse struct {
-	Dispute       PaymentDispute
-	Found         bool
-	ProofMetadata PaymentProofEnvelope
+	Dispute		PaymentDispute
+	Found		bool
+	ProofMetadata	PaymentProofEnvelope
 }
 
 type QueryPaymentProofResponse struct {
-	Proof PaymentProofEnvelope
-	Found bool
+	Proof	PaymentProofEnvelope
+	Found	bool
 }
 
 type PaymentRouteQueryMetadata struct {
-	RouteID           string
-	Committer         string
-	CommitmentHash    string
-	Signed            bool
-	Reserved          bool
-	ExpiresHeight     uint64
-	RouteRoot         string
-	ReservationStatus string
+	RouteID			string
+	Committer		string
+	CommitmentHash		string
+	Signed			bool
+	Reserved		bool
+	ExpiresHeight		uint64
+	RouteRoot		string
+	ReservationStatus	string
 }
 
 func QueryPaymentIntentFromState(state FinancialZonePaymentState, query QueryPaymentIntent) (QueryPaymentIntentResponse, error) {
@@ -140,11 +140,11 @@ func QueryPaymentIntentFromState(state FinancialZonePaymentState, query QueryPay
 			return QueryPaymentIntentResponse{}, err
 		}
 		return QueryPaymentIntentResponse{
-			Intent:        intent,
-			Found:         true,
-			ExpiryHeight:  intent.ExpiryHeight,
-			RoutePolicy:   "committed-or-reserved-route",
-			ProofMetadata: proof,
+			Intent:		intent,
+			Found:		true,
+			ExpiryHeight:	intent.ExpiryHeight,
+			RoutePolicy:	"committed-or-reserved-route",
+			ProofMetadata:	proof,
 		}, nil
 	}
 	return QueryPaymentIntentResponse{}, nil
@@ -223,14 +223,14 @@ func PaymentRouteQueryMetadataFromCommitment(route PaymentRouteCommitment, route
 		status = "reserved"
 	}
 	return PaymentRouteQueryMetadata{
-		RouteID:           route.RouteID,
-		Committer:         route.Committer,
-		CommitmentHash:    route.CommitmentHash,
-		Signed:            route.Signed,
-		Reserved:          route.Reserved,
-		ExpiresHeight:     route.ExpiresHeight,
-		RouteRoot:         normalizeHash(routeRoot),
-		ReservationStatus: status,
+		RouteID:		route.RouteID,
+		Committer:		route.Committer,
+		CommitmentHash:		route.CommitmentHash,
+		Signed:			route.Signed,
+		Reserved:		route.Reserved,
+		ExpiresHeight:		route.ExpiresHeight,
+		RouteRoot:		normalizeHash(routeRoot),
+		ReservationStatus:	status,
 	}
 }
 
@@ -308,14 +308,14 @@ func BuildPaymentProofEnvelope(state FinancialZonePaymentState, objectType Payme
 		return PaymentProofEnvelope{}, errors.New("payments proof object not found")
 	}
 	proof := PaymentProofEnvelope{
-		ObjectType:    objectType,
-		ObjectID:      objectID,
-		StateKey:      stateKey,
-		ObjectHash:    objectHash,
-		PaymentRoot:   state.PaymentRoot,
-		RootAtHeight:  state.PaymentRoot,
-		Height:        state.Height,
-		ProofMetadata: metadata,
+		ObjectType:	objectType,
+		ObjectID:	objectID,
+		StateKey:	stateKey,
+		ObjectHash:	objectHash,
+		PaymentRoot:	state.PaymentRoot,
+		RootAtHeight:	state.PaymentRoot,
+		Height:		state.Height,
+		ProofMetadata:	metadata,
 	}
 	proof.ProofHash = ComputePaymentProofEnvelopeHash(proof)
 	return proof, proof.Validate()

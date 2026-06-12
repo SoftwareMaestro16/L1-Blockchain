@@ -81,16 +81,16 @@ func TestExtendedSafetyRulesSpecRootIsCanonicalAndRejectsTamper(t *testing.T) {
 
 func TestShardSafetyEvidenceRequiresEpochMigrationAndProofHorizon(t *testing.T) {
 	evidence := ShardSafetyEvidence{
-		SourceLayoutEpoch:    7,
-		TargetLayoutEpoch:    8,
-		ActivationHeight:     110,
-		DecisionHeight:       100,
-		DecisionHash:         hashParts("decision"),
-		CommittedMetricsRoot: hashParts("metrics"),
-		DeliveryEpoch:        8,
-		MigrationRoot:        hashParts("migration"),
-		OldLayoutHash:        hashParts("old-layout"),
-		ProofHorizonUntil:    200,
+		SourceLayoutEpoch:	7,
+		TargetLayoutEpoch:	8,
+		ActivationHeight:	110,
+		DecisionHeight:		100,
+		DecisionHash:		hashParts("decision"),
+		CommittedMetricsRoot:	hashParts("metrics"),
+		DeliveryEpoch:		8,
+		MigrationRoot:		hashParts("migration"),
+		OldLayoutHash:		hashParts("old-layout"),
+		ProofHorizonUntil:	200,
 	}
 	evidence.EvidenceHash = ComputeShardSafetyEvidenceHash(evidence)
 	require.NoError(t, ValidateShardSafetyEvidence(evidence))
@@ -118,15 +118,15 @@ func TestShardSafetyEvidenceRequiresEpochMigrationAndProofHorizon(t *testing.T) 
 
 func TestVMSafetyEvidenceRequiresMeteringFeeAndDeterministicTimeout(t *testing.T) {
 	evidence := VMSafetyEvidence{
-		GasTableHash:             hashParts("gas-table"),
-		GasLimit:                 1_000,
-		GasUsed:                  500,
-		MaxStorageIterationItems: 64,
-		ProofVerificationGas:     20,
-		ForwardingFeeReserved:    5,
-		CreatedMessageCount:      1,
-		PromiseTimeoutHeight:     120,
-		ConsensusHeight:          100,
+		GasTableHash:			hashParts("gas-table"),
+		GasLimit:			1_000,
+		GasUsed:			500,
+		MaxStorageIterationItems:	64,
+		ProofVerificationGas:		20,
+		ForwardingFeeReserved:		5,
+		CreatedMessageCount:		1,
+		PromiseTimeoutHeight:		120,
+		ConsensusHeight:		100,
 	}
 	evidence.EvidenceHash = ComputeVMSafetyEvidenceHash(evidence)
 	require.NoError(t, ValidateVMSafetyEvidence(evidence))
@@ -164,15 +164,15 @@ func TestVMSafetyEvidenceRequiresMeteringFeeAndDeterministicTimeout(t *testing.T
 
 func TestProofSafetyEvidenceRequiresHeightScopeKeyAbsenceAndVersion(t *testing.T) {
 	evidence := ProofSafetyEvidence{
-		ProofVersion:        UniversalProofVersionV1,
-		TrustedHeaderHeight: 55,
-		ProofHeight:         55,
-		ZoneID:              ZoneIDIdentity,
-		ShardID:             "2",
-		RootType:            ResolverProofRootType,
-		ObjectKey:           []byte("identity/resolvers/alice.aet"),
-		NonExistenceProof:   true,
-		AbsenceMarker:       []byte("between:alice:bob"),
+		ProofVersion:		UniversalProofVersionV1,
+		TrustedHeaderHeight:	55,
+		ProofHeight:		55,
+		ZoneID:			ZoneIDIdentity,
+		ShardID:		"2",
+		RootType:		ResolverProofRootType,
+		ObjectKey:		[]byte("identity/resolvers/alice.aet"),
+		NonExistenceProof:	true,
+		AbsenceMarker:		[]byte("between:alice:bob"),
 	}
 	evidence.EvidenceHash = ComputeProofSafetyEvidenceHash(evidence)
 	require.NoError(t, ValidateProofSafetyEvidence(evidence))

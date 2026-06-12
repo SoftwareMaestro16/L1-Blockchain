@@ -28,7 +28,7 @@ func TestAVMRequiredTestCoverageSpecMatchesSection20(t *testing.T) {
 
 func TestAVMRequiredUnitCoverageMatchesSection201(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryUnit,
+		Category:	AVMTestCoverageCategoryUnit,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMUnitCoverageMessageIDDerivation,
 			AVMUnitCoverageSenderNonceValidation,
@@ -63,7 +63,7 @@ func TestAVMRequiredUnitCoverageMatchesSection201(t *testing.T) {
 
 func TestAVMRequiredIntegrationCoverageMatchesSection202(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryIntegration,
+		Category:	AVMTestCoverageCategoryIntegration,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMIntegrationCoverageSyncRouterExecution,
 			AVMIntegrationCoverageAsyncFutureBlockExecution,
@@ -96,7 +96,7 @@ func TestAVMRequiredIntegrationCoverageMatchesSection202(t *testing.T) {
 
 func TestAVMRequiredInvariantCoverageMatchesSection203(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryInvariant,
+		Category:	AVMTestCoverageCategoryInvariant,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMInvariantCoverageExecutedMessageOneReceipt,
 			AVMInvariantCoverageQueuedMessageStoredRecord,
@@ -127,7 +127,7 @@ func TestAVMRequiredInvariantCoverageMatchesSection203(t *testing.T) {
 
 func TestAVMRequiredFuzzCoverageMatchesSection204(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryFuzz,
+		Category:	AVMTestCoverageCategoryFuzz,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMFuzzCoverageMalformedAsyncMessages,
 			AVMFuzzCoverageRandomNonceOrdering,
@@ -158,7 +158,7 @@ func TestAVMRequiredFuzzCoverageMatchesSection204(t *testing.T) {
 
 func TestAVMRequiredPerformanceCoverageMatchesSection205(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryPerformance,
+		Category:	AVMTestCoverageCategoryPerformance,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMPerformanceCoverageQueueInsertThroughput,
 			AVMPerformanceCoverageQueueDrainThroughput,
@@ -225,7 +225,7 @@ func TestAVMRequiredCoverageRejectsMissingDuplicateCrossCategoryAndHashMismatch(
 
 func TestAVMRequiredCoverageRejectsInvalidNames(t *testing.T) {
 	group, err := NewAVMRequiredTestCoverageGroup(AVMRequiredTestCoverageGroup{
-		Category: AVMTestCoverageCategoryUnit,
+		Category:	AVMTestCoverageCategoryUnit,
 		Cases: []AVMRequiredTestCoverageCase{
 			AVMUnitCoverageMessageIDDerivation,
 		},
@@ -234,8 +234,8 @@ func TestAVMRequiredCoverageRejectsInvalidNames(t *testing.T) {
 	require.NotEmpty(t, group.GroupHash)
 
 	_, err = NewAVMRequiredTestCoverageSpec(AVMRequiredTestCoverageSpec{
-		SpecName: "AVM|required test coverage",
-		Groups:   []AVMRequiredTestCoverageGroup{},
+		SpecName:	"AVM|required test coverage",
+		Groups:		[]AVMRequiredTestCoverageGroup{},
 	})
 	require.ErrorContains(t, err, "invalid character")
 }

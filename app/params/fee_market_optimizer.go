@@ -8,176 +8,176 @@ import (
 )
 
 const (
-	FeeMarketEventBaseFeeUpdated      = "fee_market_base_fee_updated"
-	FeeMarketEventCongestionDetected  = "fee_market_congestion_detected"
-	FeeMarketEventSenderSurcharge     = "fee_market_sender_surcharge"
-	FeeMarketEventAllocationAccounted = "fee_market_allocation_accounted"
+	FeeMarketEventBaseFeeUpdated		= "fee_market_base_fee_updated"
+	FeeMarketEventCongestionDetected	= "fee_market_congestion_detected"
+	FeeMarketEventSenderSurcharge		= "fee_market_sender_surcharge"
+	FeeMarketEventAllocationAccounted	= "fee_market_allocation_accounted"
 
-	FeeBucketValidatorDelegator = "validator_delegator"
-	FeeBucketCommunityPool      = "community_pool"
-	FeeBucketBurn               = "burn"
-	FeeBucketStateReserve       = "state_maintenance_reserve"
-	FeeBucketSecurityReserve    = "security_reserve"
+	FeeBucketValidatorDelegator	= "validator_delegator"
+	FeeBucketCommunityPool		= "community_pool"
+	FeeBucketBurn			= "burn"
+	FeeBucketStateReserve		= "state_maintenance_reserve"
+	FeeBucketSecurityReserve	= "security_reserve"
 
-	DefaultFeeMarketBaseFeeNaet             = int64(10)
-	DefaultFeeMarketMinBaseFeeNaet          = int64(1)
-	DefaultFeeMarketMaxBaseFeeNaet          = int64(1_000_000)
-	DefaultFeeMarketMaxBaseFeeAdjustmentBps = int64(1_250)
-	DefaultFeeMarketSmoothingWindow         = uint32(4)
-	DefaultFeeMarketStateWriteThreshold     = int64(1_000)
-	DefaultFeeMarketDeploymentThreshold     = int64(10_000)
-	DefaultFeeMarketForwardingThreshold     = uint64(100)
-	DefaultFeeMarketForwardingUnitGas       = uint64(50)
-	DefaultFeeMarketSurchargeStepBps        = int64(500)
-	DefaultFeeMarketMaxSurchargeBps         = int64(10_000)
-	DefaultFeeMarketMaxMultiplierBps        = int64(40_000)
+	DefaultFeeMarketBaseFeeNaet		= int64(10)
+	DefaultFeeMarketMinBaseFeeNaet		= int64(1)
+	DefaultFeeMarketMaxBaseFeeNaet		= int64(1_000_000)
+	DefaultFeeMarketMaxBaseFeeAdjustmentBps	= int64(1_250)
+	DefaultFeeMarketSmoothingWindow		= uint32(4)
+	DefaultFeeMarketStateWriteThreshold	= int64(1_000)
+	DefaultFeeMarketDeploymentThreshold	= int64(10_000)
+	DefaultFeeMarketForwardingThreshold	= uint64(100)
+	DefaultFeeMarketForwardingUnitGas	= uint64(50)
+	DefaultFeeMarketSurchargeStepBps	= int64(500)
+	DefaultFeeMarketMaxSurchargeBps		= int64(10_000)
+	DefaultFeeMarketMaxMultiplierBps	= int64(40_000)
 )
 
 type FeeMarketOptimizerParams struct {
-	MinBaseFeeNaet              sdkmath.Int
-	MaxBaseFeeNaet              sdkmath.Int
-	DefaultBaseFeeNaet          sdkmath.Int
-	TargetBlockUtilizationBps   int64
-	MaxBaseFeeAdjustmentBps     int64
-	SmoothingWindow             uint32
-	MinResourceMultiplierBps    int64
-	MaxResourceMultiplierBps    int64
-	StateWriteThresholdBytes    int64
-	DeploymentThresholdBytes    int64
-	ForwardingThresholdMessages uint64
-	ForwardingUnitGas           uint64
-	SurchargeStepBps            int64
-	MaxSenderSurchargeBps       int64
-	ValidatorRewardBps          int64
-	CommunityPoolBps            int64
-	BurnBps                     int64
-	StateReserveBps             int64
-	SecurityReserveBps          int64
-	EpochBurnCapNaet            sdkmath.Int
-	EpochStateReserveCapNaet    sdkmath.Int
-	EpochSecurityReserveCapNaet sdkmath.Int
+	MinBaseFeeNaet			sdkmath.Int
+	MaxBaseFeeNaet			sdkmath.Int
+	DefaultBaseFeeNaet		sdkmath.Int
+	TargetBlockUtilizationBps	int64
+	MaxBaseFeeAdjustmentBps		int64
+	SmoothingWindow			uint32
+	MinResourceMultiplierBps	int64
+	MaxResourceMultiplierBps	int64
+	StateWriteThresholdBytes	int64
+	DeploymentThresholdBytes	int64
+	ForwardingThresholdMessages	uint64
+	ForwardingUnitGas		uint64
+	SurchargeStepBps		int64
+	MaxSenderSurchargeBps		int64
+	ValidatorRewardBps		int64
+	CommunityPoolBps		int64
+	BurnBps				int64
+	StateReserveBps			int64
+	SecurityReserveBps		int64
+	EpochBurnCapNaet		sdkmath.Int
+	EpochStateReserveCapNaet	sdkmath.Int
+	EpochSecurityReserveCapNaet	sdkmath.Int
 }
 
 type FeeMarketOptimizerInput struct {
-	EpochID                      uint64
-	BlockHeight                  uint64
-	CurrentBaseFeeNaet           sdkmath.Int
-	RecentBaseFeesNaet           []sdkmath.Int
-	BlockGasUsed                 uint64
-	BlockGasLimit                uint64
-	TxGasUsed                    uint64
-	MempoolPressureBps           int64
-	FailedExecutionRateBps       int64
-	SenderFailedTxCount          uint64
-	StateWriteBytes              int64
-	DeploymentBytes              int64
-	ForwardingMessages           uint64
-	OfferedFeeNaet               sdkmath.Int
-	CollectedFeesNaet            sdkmath.Int
-	ExistingEpochBurnNaet        sdkmath.Int
-	ExistingEpochStateReserve    sdkmath.Int
-	ExistingEpochSecurityReserve sdkmath.Int
-	Params                       FeeMarketOptimizerParams
+	EpochID				uint64
+	BlockHeight			uint64
+	CurrentBaseFeeNaet		sdkmath.Int
+	RecentBaseFeesNaet		[]sdkmath.Int
+	BlockGasUsed			uint64
+	BlockGasLimit			uint64
+	TxGasUsed			uint64
+	MempoolPressureBps		int64
+	FailedExecutionRateBps		int64
+	SenderFailedTxCount		uint64
+	StateWriteBytes			int64
+	DeploymentBytes			int64
+	ForwardingMessages		uint64
+	OfferedFeeNaet			sdkmath.Int
+	CollectedFeesNaet		sdkmath.Int
+	ExistingEpochBurnNaet		sdkmath.Int
+	ExistingEpochStateReserve	sdkmath.Int
+	ExistingEpochSecurityReserve	sdkmath.Int
+	Params				FeeMarketOptimizerParams
 }
 
 type FeeResourceMultipliers struct {
-	ComputeBps    int64
-	StorageBps    int64
-	DeploymentBps int64
-	ForwardingBps int64
+	ComputeBps	int64
+	StorageBps	int64
+	DeploymentBps	int64
+	ForwardingBps	int64
 }
 
 type SenderLocalSurcharge struct {
-	FailedTxCount uint64
-	SurchargeBps  int64
-	SurchargeNaet sdkmath.Int
+	FailedTxCount	uint64
+	SurchargeBps	int64
+	SurchargeNaet	sdkmath.Int
 }
 
 type FeeValidationResult struct {
-	RequiredFeeNaet         sdkmath.Int
-	OfferedFeeNaet          sdkmath.Int
-	MempoolAccepted         bool
-	ExecutionAccepted       bool
-	MempoolExecutionAligned bool
+	RequiredFeeNaet		sdkmath.Int
+	OfferedFeeNaet		sdkmath.Int
+	MempoolAccepted		bool
+	ExecutionAccepted	bool
+	MempoolExecutionAligned	bool
 }
 
 type FeeAllocationBuckets struct {
-	CollectedFeesNaet        sdkmath.Int
-	ValidatorDelegatorNaet   sdkmath.Int
-	CommunityPoolNaet        sdkmath.Int
-	BurnNaet                 sdkmath.Int
-	StateReserveNaet         sdkmath.Int
-	SecurityReserveNaet      sdkmath.Int
-	BurnCapRemainderNaet     sdkmath.Int
-	StateCapRemainderNaet    sdkmath.Int
-	SecurityCapRemainderNaet sdkmath.Int
-	SumsExactly              bool
+	CollectedFeesNaet		sdkmath.Int
+	ValidatorDelegatorNaet		sdkmath.Int
+	CommunityPoolNaet		sdkmath.Int
+	BurnNaet			sdkmath.Int
+	StateReserveNaet		sdkmath.Int
+	SecurityReserveNaet		sdkmath.Int
+	BurnCapRemainderNaet		sdkmath.Int
+	StateCapRemainderNaet		sdkmath.Int
+	SecurityCapRemainderNaet	sdkmath.Int
+	SumsExactly			bool
 }
 
 type FeeEstimateData struct {
-	BaseFeeNaet         sdkmath.Int
-	RequiredFeeNaet     sdkmath.Int
-	ConservativeFeeNaet sdkmath.Int
-	ResourceMultipliers FeeResourceMultipliers
-	SenderSurchargeBps  int64
+	BaseFeeNaet		sdkmath.Int
+	RequiredFeeNaet		sdkmath.Int
+	ConservativeFeeNaet	sdkmath.Int
+	ResourceMultipliers	FeeResourceMultipliers
+	SenderSurchargeBps	int64
 }
 
 type FeeMarketCongestionEvent struct {
-	Type        string
-	EpochID     uint64
-	BlockHeight uint64
-	Reason      string
-	ValueBps    int64
-	AmountNaet  sdkmath.Int
+	Type		string
+	EpochID		uint64
+	BlockHeight	uint64
+	Reason		string
+	ValueBps	int64
+	AmountNaet	sdkmath.Int
 }
 
 type FeeMarketOptimizerOutput struct {
-	BaseFeeNaet         sdkmath.Int
-	PreviousBaseFeeNaet sdkmath.Int
-	AppliedDeltaBps     int64
-	BlockUtilizationBps int64
-	ResourceMultipliers FeeResourceMultipliers
-	SenderSurcharge     SenderLocalSurcharge
-	Validation          FeeValidationResult
-	Allocation          FeeAllocationBuckets
-	Estimate            FeeEstimateData
-	CongestionEvents    []FeeMarketCongestionEvent
+	BaseFeeNaet		sdkmath.Int
+	PreviousBaseFeeNaet	sdkmath.Int
+	AppliedDeltaBps		int64
+	BlockUtilizationBps	int64
+	ResourceMultipliers	FeeResourceMultipliers
+	SenderSurcharge		SenderLocalSurcharge
+	Validation		FeeValidationResult
+	Allocation		FeeAllocationBuckets
+	Estimate		FeeEstimateData
+	CongestionEvents	[]FeeMarketCongestionEvent
 }
 
 type FeeMarketSimulationStep struct {
-	Name  string
-	Input FeeMarketOptimizerInput
+	Name	string
+	Input	FeeMarketOptimizerInput
 }
 
 type FeeMarketSimulationReport struct {
-	Steps          []FeeMarketOptimizerOutput
-	MinBaseFeeNaet sdkmath.Int
-	MaxBaseFeeNaet sdkmath.Int
-	Passed         bool
-	Failed         []string
+	Steps		[]FeeMarketOptimizerOutput
+	MinBaseFeeNaet	sdkmath.Int
+	MaxBaseFeeNaet	sdkmath.Int
+	Passed		bool
+	Failed		[]string
 }
 
 func DefaultFeeMarketOptimizerParams() FeeMarketOptimizerParams {
 	return FeeMarketOptimizerParams{
-		MinBaseFeeNaet:              sdkmath.NewInt(DefaultFeeMarketMinBaseFeeNaet),
-		MaxBaseFeeNaet:              sdkmath.NewInt(DefaultFeeMarketMaxBaseFeeNaet),
-		DefaultBaseFeeNaet:          sdkmath.NewInt(DefaultFeeMarketBaseFeeNaet),
-		TargetBlockUtilizationBps:   DefaultTargetLoadBps,
-		MaxBaseFeeAdjustmentBps:     DefaultFeeMarketMaxBaseFeeAdjustmentBps,
-		SmoothingWindow:             DefaultFeeMarketSmoothingWindow,
-		MinResourceMultiplierBps:    BasisPoints,
-		MaxResourceMultiplierBps:    DefaultFeeMarketMaxMultiplierBps,
-		StateWriteThresholdBytes:    DefaultFeeMarketStateWriteThreshold,
-		DeploymentThresholdBytes:    DefaultFeeMarketDeploymentThreshold,
-		ForwardingThresholdMessages: DefaultFeeMarketForwardingThreshold,
-		ForwardingUnitGas:           DefaultFeeMarketForwardingUnitGas,
-		SurchargeStepBps:            DefaultFeeMarketSurchargeStepBps,
-		MaxSenderSurchargeBps:       DefaultFeeMarketMaxSurchargeBps,
-		ValidatorRewardBps:          6_000,
-		CommunityPoolBps:            500,
-		BurnBps:                     2_000,
-		StateReserveBps:             1_000,
-		SecurityReserveBps:          500,
+		MinBaseFeeNaet:			sdkmath.NewInt(DefaultFeeMarketMinBaseFeeNaet),
+		MaxBaseFeeNaet:			sdkmath.NewInt(DefaultFeeMarketMaxBaseFeeNaet),
+		DefaultBaseFeeNaet:		sdkmath.NewInt(DefaultFeeMarketBaseFeeNaet),
+		TargetBlockUtilizationBps:	DefaultTargetLoadBps,
+		MaxBaseFeeAdjustmentBps:	DefaultFeeMarketMaxBaseFeeAdjustmentBps,
+		SmoothingWindow:		DefaultFeeMarketSmoothingWindow,
+		MinResourceMultiplierBps:	BasisPoints,
+		MaxResourceMultiplierBps:	DefaultFeeMarketMaxMultiplierBps,
+		StateWriteThresholdBytes:	DefaultFeeMarketStateWriteThreshold,
+		DeploymentThresholdBytes:	DefaultFeeMarketDeploymentThreshold,
+		ForwardingThresholdMessages:	DefaultFeeMarketForwardingThreshold,
+		ForwardingUnitGas:		DefaultFeeMarketForwardingUnitGas,
+		SurchargeStepBps:		DefaultFeeMarketSurchargeStepBps,
+		MaxSenderSurchargeBps:		DefaultFeeMarketMaxSurchargeBps,
+		ValidatorRewardBps:		6_000,
+		CommunityPoolBps:		500,
+		BurnBps:			2_000,
+		StateReserveBps:		1_000,
+		SecurityReserveBps:		500,
 	}
 }
 
@@ -202,11 +202,11 @@ func OptimizeFeeMarket(input FeeMarketOptimizerInput) (FeeMarketOptimizerOutput,
 	required := requiredWithoutSurcharge.Add(surcharge.SurchargeNaet)
 	offered := normalizeInt(input.OfferedFeeNaet)
 	validation := FeeValidationResult{
-		RequiredFeeNaet:         required,
-		OfferedFeeNaet:          offered,
-		MempoolAccepted:         offered.GTE(required),
-		ExecutionAccepted:       offered.GTE(required),
-		MempoolExecutionAligned: true,
+		RequiredFeeNaet:		required,
+		OfferedFeeNaet:			offered,
+		MempoolAccepted:		offered.GTE(required),
+		ExecutionAccepted:		offered.GTE(required),
+		MempoolExecutionAligned:	true,
 	}
 	collected := normalizeInt(input.CollectedFeesNaet)
 	if collected.IsZero() {
@@ -214,24 +214,24 @@ func OptimizeFeeMarket(input FeeMarketOptimizerInput) (FeeMarketOptimizerOutput,
 	}
 	allocation := allocateFeeBuckets(collected, input, params)
 	estimate := FeeEstimateData{
-		BaseFeeNaet:         nextBaseFee,
-		RequiredFeeNaet:     required,
-		ConservativeFeeNaet: ApplyBps(required, BasisPoints+params.MaxBaseFeeAdjustmentBps),
-		ResourceMultipliers: multipliers,
-		SenderSurchargeBps:  surcharge.SurchargeBps,
+		BaseFeeNaet:		nextBaseFee,
+		RequiredFeeNaet:	required,
+		ConservativeFeeNaet:	ApplyBps(required, BasisPoints+params.MaxBaseFeeAdjustmentBps),
+		ResourceMultipliers:	multipliers,
+		SenderSurchargeBps:	surcharge.SurchargeBps,
 	}
 	events := feeMarketEvents(input, utilizationBps, deltaBps, nextBaseFee, multipliers, surcharge, allocation, params)
 	return FeeMarketOptimizerOutput{
-		BaseFeeNaet:         nextBaseFee,
-		PreviousBaseFeeNaet: previousBaseFee,
-		AppliedDeltaBps:     deltaBps,
-		BlockUtilizationBps: utilizationBps,
-		ResourceMultipliers: multipliers,
-		SenderSurcharge:     surcharge,
-		Validation:          validation,
-		Allocation:          allocation,
-		Estimate:            estimate,
-		CongestionEvents:    events,
+		BaseFeeNaet:		nextBaseFee,
+		PreviousBaseFeeNaet:	previousBaseFee,
+		AppliedDeltaBps:	deltaBps,
+		BlockUtilizationBps:	utilizationBps,
+		ResourceMultipliers:	multipliers,
+		SenderSurcharge:	surcharge,
+		Validation:		validation,
+		Allocation:		allocation,
+		Estimate:		estimate,
+		CongestionEvents:	events,
 	}, nil
 }
 
@@ -284,8 +284,8 @@ func SimulateFeeMarket(params FeeMarketOptimizerParams, steps []FeeMarketSimulat
 
 func (p FeeMarketOptimizerParams) Validate() error {
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "min_base_fee_naet", value: p.MinBaseFeeNaet},
 		{name: "max_base_fee_naet", value: p.MaxBaseFeeNaet},
@@ -406,8 +406,8 @@ func (input FeeMarketOptimizerInput) Validate(params FeeMarketOptimizerParams) e
 		return fmt.Errorf("block_gas_used must not exceed block_gas_limit")
 	}
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "current_base_fee_naet", value: input.CurrentBaseFeeNaet},
 		{name: "offered_fee_naet", value: input.OfferedFeeNaet},
@@ -484,9 +484,9 @@ func requiredResourceFee(input FeeMarketOptimizerInput, baseFee sdkmath.Int, mul
 func senderLocalSurcharge(failedTxCount uint64, required sdkmath.Int, params FeeMarketOptimizerParams) SenderLocalSurcharge {
 	surchargeBps := clampInt64(int64(failedTxCount)*params.SurchargeStepBps, 0, params.MaxSenderSurchargeBps)
 	return SenderLocalSurcharge{
-		FailedTxCount: failedTxCount,
-		SurchargeBps:  surchargeBps,
-		SurchargeNaet: ApplyBps(normalizeInt(required), surchargeBps),
+		FailedTxCount:	failedTxCount,
+		SurchargeBps:	surchargeBps,
+		SurchargeNaet:	ApplyBps(normalizeInt(required), surchargeBps),
 	}
 }
 
@@ -502,27 +502,27 @@ func allocateFeeBuckets(collected sdkmath.Int, input FeeMarketOptimizerInput, pa
 	}
 	total := validator.Add(community).Add(burn).Add(state).Add(security)
 	return FeeAllocationBuckets{
-		CollectedFeesNaet:        fees,
-		ValidatorDelegatorNaet:   validator,
-		CommunityPoolNaet:        community,
-		BurnNaet:                 burn,
-		StateReserveNaet:         state,
-		SecurityReserveNaet:      security,
-		BurnCapRemainderNaet:     capRemainder(normalizeInt(input.ExistingEpochBurnNaet).Add(burn), normalizeInt(params.EpochBurnCapNaet)),
-		StateCapRemainderNaet:    capRemainder(normalizeInt(input.ExistingEpochStateReserve).Add(state), normalizeInt(params.EpochStateReserveCapNaet)),
-		SecurityCapRemainderNaet: capRemainder(normalizeInt(input.ExistingEpochSecurityReserve).Add(security), normalizeInt(params.EpochSecurityReserveCapNaet)),
-		SumsExactly:              total.Equal(fees),
+		CollectedFeesNaet:		fees,
+		ValidatorDelegatorNaet:		validator,
+		CommunityPoolNaet:		community,
+		BurnNaet:			burn,
+		StateReserveNaet:		state,
+		SecurityReserveNaet:		security,
+		BurnCapRemainderNaet:		capRemainder(normalizeInt(input.ExistingEpochBurnNaet).Add(burn), normalizeInt(params.EpochBurnCapNaet)),
+		StateCapRemainderNaet:		capRemainder(normalizeInt(input.ExistingEpochStateReserve).Add(state), normalizeInt(params.EpochStateReserveCapNaet)),
+		SecurityCapRemainderNaet:	capRemainder(normalizeInt(input.ExistingEpochSecurityReserve).Add(security), normalizeInt(params.EpochSecurityReserveCapNaet)),
+		SumsExactly:			total.Equal(fees),
 	}
 }
 
 func feeMarketEvents(input FeeMarketOptimizerInput, utilizationBps, deltaBps int64, baseFee sdkmath.Int, multipliers FeeResourceMultipliers, surcharge SenderLocalSurcharge, allocation FeeAllocationBuckets, params FeeMarketOptimizerParams) []FeeMarketCongestionEvent {
 	events := []FeeMarketCongestionEvent{{
-		Type:        FeeMarketEventBaseFeeUpdated,
-		EpochID:     input.EpochID,
-		BlockHeight: input.BlockHeight,
-		Reason:      "base_fee_formula_applied",
-		ValueBps:    deltaBps,
-		AmountNaet:  baseFee,
+		Type:		FeeMarketEventBaseFeeUpdated,
+		EpochID:	input.EpochID,
+		BlockHeight:	input.BlockHeight,
+		Reason:		"base_fee_formula_applied",
+		ValueBps:	deltaBps,
+		AmountNaet:	baseFee,
 	}}
 	if utilizationBps > params.TargetBlockUtilizationBps || input.MempoolPressureBps > 0 || input.FailedExecutionRateBps > 0 {
 		events = append(events, FeeMarketCongestionEvent{Type: FeeMarketEventCongestionDetected, EpochID: input.EpochID, BlockHeight: input.BlockHeight, Reason: "congestion_signal_nonzero", ValueBps: maxInt64(utilizationBps, maxInt64(input.MempoolPressureBps, input.FailedExecutionRateBps))})

@@ -10,74 +10,74 @@ import (
 type NetworkingTestCoverageCategory string
 
 const (
-	NetworkingTestCoverageUnit        NetworkingTestCoverageCategory = "unit"
-	NetworkingTestCoverageIntegration NetworkingTestCoverageCategory = "integration"
-	NetworkingTestCoverageSecurity    NetworkingTestCoverageCategory = "security"
-	NetworkingTestCoveragePerformance NetworkingTestCoverageCategory = "performance"
+	NetworkingTestCoverageUnit		NetworkingTestCoverageCategory	= "unit"
+	NetworkingTestCoverageIntegration	NetworkingTestCoverageCategory	= "integration"
+	NetworkingTestCoverageSecurity		NetworkingTestCoverageCategory	= "security"
+	NetworkingTestCoveragePerformance	NetworkingTestCoverageCategory	= "performance"
 )
 
 type NetworkingRequiredTest string
 
 const (
-	RequiredTestNodeIDDerivation          NetworkingRequiredTest = "node_id_derivation"
-	RequiredTestNodeRecordSignature       NetworkingRequiredTest = "node_record_signature_verification"
-	RequiredTestSessionHandshake          NetworkingRequiredTest = "session_handshake_validation"
-	RequiredTestStreamPriority            NetworkingRequiredTest = "stream_priority_classification"
-	RequiredTestOverlayMembership         NetworkingRequiredTest = "overlay_membership_validation"
-	RequiredTestRouteCost                 NetworkingRequiredTest = "route_cost_calculation"
-	RequiredTestNetworkMessageID          NetworkingRequiredTest = "network_message_id_derivation"
-	RequiredTestDiscoveryRecordExpiry     NetworkingRequiredTest = "discovery_record_expiry"
-	RequiredTestChunkHashVerification     NetworkingRequiredTest = "chunk_hash_verification"
-	RequiredTestBroadcastDeduplication    NetworkingRequiredTest = "broadcast_deduplication"
-	RequiredTestCometBFTANAConsensus      NetworkingRequiredTest = "cometbft_consensus_traffic_with_ana_enabled"
-	RequiredTestMultiplexedSessionStreams NetworkingRequiredTest = "multiplexed_streams_over_one_session"
-	RequiredTestZoneOverlayFormation      NetworkingRequiredTest = "zone_overlay_formation"
-	RequiredTestServiceOverlayFormation   NetworkingRequiredTest = "service_overlay_formation"
-	RequiredTestCrossZoneDelivery         NetworkingRequiredTest = "cross_zone_message_delivery"
-	RequiredTestRL2BlockChunkTransfer     NetworkingRequiredTest = "rl2_block_chunk_transfer"
-	RequiredTestResumableStateSnapshot    NetworkingRequiredTest = "resumable_state_snapshot_transfer"
-	RequiredTestDiscoveryProofLookup      NetworkingRequiredTest = "discovery_lookup_with_proof_attached_response"
-	RequiredTestHeaderFirstPropagation    NetworkingRequiredTest = "header_first_block_propagation"
-	RequiredTestReplayedHandshake         NetworkingRequiredTest = "replayed_handshake"
-	RequiredTestForgedNodeAdvertisement   NetworkingRequiredTest = "forged_node_advertisement"
-	RequiredTestExpiredDiscoverySecurity  NetworkingRequiredTest = "expired_discovery_record"
-	RequiredTestConflictingBroadcast      NetworkingRequiredTest = "conflicting_broadcast_payload"
-	RequiredTestInvalidChunkSecurity      NetworkingRequiredTest = "invalid_chunk"
-	RequiredTestEclipsePeerSetSimulation  NetworkingRequiredTest = "eclipse_peer_set_simulation"
-	RequiredTestServiceSpamFlood          NetworkingRequiredTest = "spam_flood_on_service_channel"
-	RequiredTestConsensusUnderBulkLoad    NetworkingRequiredTest = "consensus_traffic_under_bulk_data_load"
-	RequiredTestCrossZoneReplaySecurity   NetworkingRequiredTest = "cross_zone_message_replay"
-	RequiredTestBlockHeaderLatency        NetworkingRequiredTest = "block_header_propagation_latency"
-	RequiredTestBlockReconstructionTime   NetworkingRequiredTest = "block_reconstruction_time"
-	RequiredTestChunkStreamingThroughput  NetworkingRequiredTest = "chunk_streaming_throughput"
-	RequiredTestDiscoveryQueryLatency     NetworkingRequiredTest = "discovery_query_latency"
-	RequiredTestOverlayJoinLatency        NetworkingRequiredTest = "overlay_join_latency"
-	RequiredTestCrossZonePropagation      NetworkingRequiredTest = "cross_zone_message_propagation_latency"
-	RequiredTestServiceTrafficThroughput  NetworkingRequiredTest = "service_traffic_throughput"
-	RequiredTestConsensusMixedLoadLatency NetworkingRequiredTest = "consensus_traffic_latency_under_mixed_load"
-	RequiredTestPeerRotationStability     NetworkingRequiredTest = "peer_rotation_stability"
+	RequiredTestNodeIDDerivation		NetworkingRequiredTest	= "node_id_derivation"
+	RequiredTestNodeRecordSignature		NetworkingRequiredTest	= "node_record_signature_verification"
+	RequiredTestSessionHandshake		NetworkingRequiredTest	= "session_handshake_validation"
+	RequiredTestStreamPriority		NetworkingRequiredTest	= "stream_priority_classification"
+	RequiredTestOverlayMembership		NetworkingRequiredTest	= "overlay_membership_validation"
+	RequiredTestRouteCost			NetworkingRequiredTest	= "route_cost_calculation"
+	RequiredTestNetworkMessageID		NetworkingRequiredTest	= "network_message_id_derivation"
+	RequiredTestDiscoveryRecordExpiry	NetworkingRequiredTest	= "discovery_record_expiry"
+	RequiredTestChunkHashVerification	NetworkingRequiredTest	= "chunk_hash_verification"
+	RequiredTestBroadcastDeduplication	NetworkingRequiredTest	= "broadcast_deduplication"
+	RequiredTestCometBFTANAConsensus	NetworkingRequiredTest	= "cometbft_consensus_traffic_with_ana_enabled"
+	RequiredTestMultiplexedSessionStreams	NetworkingRequiredTest	= "multiplexed_streams_over_one_session"
+	RequiredTestZoneOverlayFormation	NetworkingRequiredTest	= "zone_overlay_formation"
+	RequiredTestServiceOverlayFormation	NetworkingRequiredTest	= "service_overlay_formation"
+	RequiredTestCrossZoneDelivery		NetworkingRequiredTest	= "cross_zone_message_delivery"
+	RequiredTestRL2BlockChunkTransfer	NetworkingRequiredTest	= "rl2_block_chunk_transfer"
+	RequiredTestResumableStateSnapshot	NetworkingRequiredTest	= "resumable_state_snapshot_transfer"
+	RequiredTestDiscoveryProofLookup	NetworkingRequiredTest	= "discovery_lookup_with_proof_attached_response"
+	RequiredTestHeaderFirstPropagation	NetworkingRequiredTest	= "header_first_block_propagation"
+	RequiredTestReplayedHandshake		NetworkingRequiredTest	= "replayed_handshake"
+	RequiredTestForgedNodeAdvertisement	NetworkingRequiredTest	= "forged_node_advertisement"
+	RequiredTestExpiredDiscoverySecurity	NetworkingRequiredTest	= "expired_discovery_record"
+	RequiredTestConflictingBroadcast	NetworkingRequiredTest	= "conflicting_broadcast_payload"
+	RequiredTestInvalidChunkSecurity	NetworkingRequiredTest	= "invalid_chunk"
+	RequiredTestEclipsePeerSetSimulation	NetworkingRequiredTest	= "eclipse_peer_set_simulation"
+	RequiredTestServiceSpamFlood		NetworkingRequiredTest	= "spam_flood_on_service_channel"
+	RequiredTestConsensusUnderBulkLoad	NetworkingRequiredTest	= "consensus_traffic_under_bulk_data_load"
+	RequiredTestCrossZoneReplaySecurity	NetworkingRequiredTest	= "cross_zone_message_replay"
+	RequiredTestBlockHeaderLatency		NetworkingRequiredTest	= "block_header_propagation_latency"
+	RequiredTestBlockReconstructionTime	NetworkingRequiredTest	= "block_reconstruction_time"
+	RequiredTestChunkStreamingThroughput	NetworkingRequiredTest	= "chunk_streaming_throughput"
+	RequiredTestDiscoveryQueryLatency	NetworkingRequiredTest	= "discovery_query_latency"
+	RequiredTestOverlayJoinLatency		NetworkingRequiredTest	= "overlay_join_latency"
+	RequiredTestCrossZonePropagation	NetworkingRequiredTest	= "cross_zone_message_propagation_latency"
+	RequiredTestServiceTrafficThroughput	NetworkingRequiredTest	= "service_traffic_throughput"
+	RequiredTestConsensusMixedLoadLatency	NetworkingRequiredTest	= "consensus_traffic_latency_under_mixed_load"
+	RequiredTestPeerRotationStability	NetworkingRequiredTest	= "peer_rotation_stability"
 )
 
 type NetworkingTestCoverageSpec struct {
-	Test     NetworkingRequiredTest
-	Category NetworkingTestCoverageCategory
-	Title    string
+	Test		NetworkingRequiredTest
+	Category	NetworkingTestCoverageCategory
+	Title		string
 }
 
 type NetworkingTestCoverageEvidence struct {
-	Test      NetworkingRequiredTest
-	Category  NetworkingTestCoverageCategory
-	TestNames []string
-	Passed    bool
+	Test		NetworkingRequiredTest
+	Category	NetworkingTestCoverageCategory
+	TestNames	[]string
+	Passed		bool
 }
 
 type NetworkingTestCoverageReport struct {
-	Required   []NetworkingTestCoverageSpec
-	Evidence   []NetworkingTestCoverageEvidence
-	Missing    []NetworkingRequiredTest
-	Failed     []NetworkingRequiredTest
-	Ready      bool
-	ReportHash string
+	Required	[]NetworkingTestCoverageSpec
+	Evidence	[]NetworkingTestCoverageEvidence
+	Missing		[]NetworkingRequiredTest
+	Failed		[]NetworkingRequiredTest
+	Ready		bool
+	ReportHash	string
 }
 
 func DefaultRequiredNetworkingTestCoverage() []NetworkingTestCoverageSpec {
@@ -163,8 +163,8 @@ func EvaluateNetworkingTestCoverage(evidence []NetworkingTestCoverageEvidence) (
 	}
 	normalized := NormalizeNetworkingTestCoverageEvidence(evidence)
 	report := NetworkingTestCoverageReport{
-		Required: required,
-		Evidence: normalized,
+		Required:	required,
+		Evidence:	normalized,
 	}
 	byTest := make(map[NetworkingRequiredTest]NetworkingTestCoverageEvidence, len(normalized))
 	for _, item := range normalized {

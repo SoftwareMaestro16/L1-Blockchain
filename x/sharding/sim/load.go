@@ -12,33 +12,33 @@ import (
 const MaxSimActiveShards = uint32(64)
 
 type ShardActivationPolicy struct {
-	WorkchainID       int32
-	LoadParams        loadtypes.Params
-	PartialShardCount uint32
-	MaxShardCount     uint32
-	CooldownBlocks    uint64
-	RoutingEpoch      uint64
+	WorkchainID		int32
+	LoadParams		loadtypes.Params
+	PartialShardCount	uint32
+	MaxShardCount		uint32
+	CooldownBlocks		uint64
+	RoutingEpoch		uint64
 }
 
 type LoadShardTransition struct {
-	WorkchainID         int32
-	Height              uint64
-	LoadResult          loadtypes.Result
-	PreviousShardCount  uint32
-	DesiredShardCount   uint32
-	AppliedShardCount   uint32
-	CooldownStarted     bool
-	CooldownSatisfied   bool
-	ValidatorReassigned bool
+	WorkchainID		int32
+	Height			uint64
+	LoadResult		loadtypes.Result
+	PreviousShardCount	uint32
+	DesiredShardCount	uint32
+	AppliedShardCount	uint32
+	CooldownStarted		bool
+	CooldownSatisfied	bool
+	ValidatorReassigned	bool
 }
 
 func DefaultShardActivationPolicy(workchainID int32) ShardActivationPolicy {
 	return ShardActivationPolicy{
-		WorkchainID:       workchainID,
-		LoadParams:        loadtypes.DefaultParams(),
-		PartialShardCount: 2,
-		MaxShardCount:     4,
-		CooldownBlocks:    2,
+		WorkchainID:		workchainID,
+		LoadParams:		loadtypes.DefaultParams(),
+		PartialShardCount:	2,
+		MaxShardCount:		4,
+		CooldownBlocks:		2,
 	}
 }
 
@@ -135,15 +135,15 @@ func (s *Simulator) UpdateLoadAndShards(policy ShardActivationPolicy, metrics lo
 	s.state.Height = max(s.state.Height, height)
 
 	return LoadShardTransition{
-		WorkchainID:         policy.WorkchainID,
-		Height:              height,
-		LoadResult:          loadResult,
-		PreviousShardCount:  current,
-		DesiredShardCount:   desired,
-		AppliedShardCount:   loadState.ActiveShardCount,
-		CooldownStarted:     cooldownStarted,
-		CooldownSatisfied:   cooldownSatisfied,
-		ValidatorReassigned: validatorReassigned,
+		WorkchainID:		policy.WorkchainID,
+		Height:			height,
+		LoadResult:		loadResult,
+		PreviousShardCount:	current,
+		DesiredShardCount:	desired,
+		AppliedShardCount:	loadState.ActiveShardCount,
+		CooldownStarted:	cooldownStarted,
+		CooldownSatisfied:	cooldownSatisfied,
+		ValidatorReassigned:	validatorReassigned,
 	}, nil
 }
 
@@ -234,9 +234,9 @@ func (s *Simulator) ensureLoadState(workchainID int32) {
 		count = 1
 	}
 	s.state.LoadStates[workchainID] = WorkchainLoadState{
-		WorkchainID:      workchainID,
-		ActiveShardCount: count,
-		TargetShardCount: count,
+		WorkchainID:		workchainID,
+		ActiveShardCount:	count,
+		TargetShardCount:	count,
 	}
 }
 

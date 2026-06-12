@@ -9,78 +9,78 @@ import (
 type KernelMessageKind string
 
 const (
-	KernelMessageLocalTx       KernelMessageKind = "LOCAL_TX"
-	KernelMessageRoutedInbound KernelMessageKind = "ROUTED_INBOUND"
+	KernelMessageLocalTx		KernelMessageKind	= "LOCAL_TX"
+	KernelMessageRoutedInbound	KernelMessageKind	= "ROUTED_INBOUND"
 )
 
 type KernelGasLimits struct {
-	MaxBlockGas uint64
-	MaxZoneGas  uint64
+	MaxBlockGas	uint64
+	MaxZoneGas	uint64
 }
 
 type KernelMessageEnvelope struct {
-	Kind             KernelMessageKind
-	TxHash           string
-	SourceZone       ZoneID
-	SourceShard      ShardID
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	Sender           string
-	Nonce            uint64
-	GasLimit         uint64
-	PriorityClass    uint32
-	AdmissionHeight  uint64
-	TxIndex          uint32
-	MessageIndex     uint32
-	CommittedHeight  uint64
-	EligibleHeight   uint64
+	Kind			KernelMessageKind
+	TxHash			string
+	SourceZone		ZoneID
+	SourceShard		ShardID
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	Sender			string
+	Nonce			uint64
+	GasLimit		uint64
+	PriorityClass		uint32
+	AdmissionHeight		uint64
+	TxIndex			uint32
+	MessageIndex		uint32
+	CommittedHeight		uint64
+	EligibleHeight		uint64
 }
 
 type KernelZoneWorkload struct {
-	ZoneID   ZoneID
-	ShardID  ShardID
-	GasLimit uint64
-	Items    []ProposalItem
+	ZoneID		ZoneID
+	ShardID		ShardID
+	GasLimit	uint64
+	Items		[]ProposalItem
 }
 
 type KernelABCIProposal struct {
-	Plan              KernelBlockPlan
-	Workloads         []KernelZoneWorkload
-	RoutedMessageRoot string
-	EnvelopeRoot      string
-	BlockGas          uint64
-	ZoneGas           []KernelZoneGas
-	ProposalHash      string
+	Plan			KernelBlockPlan
+	Workloads		[]KernelZoneWorkload
+	RoutedMessageRoot	string
+	EnvelopeRoot		string
+	BlockGas		uint64
+	ZoneGas			[]KernelZoneGas
+	ProposalHash		string
 }
 
 type KernelZoneGas struct {
-	ZoneID   ZoneID
-	GasLimit uint64
+	ZoneID		ZoneID
+	GasLimit	uint64
 }
 
 type KernelCleanupItem struct {
-	QueueID    string
-	ItemID     string
-	HeightDue  uint64
-	DeleteRoot string
+	QueueID		string
+	ItemID		string
+	HeightDue	uint64
+	DeleteRoot	string
 }
 
 type KernelCleanupResult struct {
-	Height      uint64
-	Processed   []KernelCleanupItem
-	CleanupRoot string
+	Height		uint64
+	Processed	[]KernelCleanupItem
+	CleanupRoot	string
 }
 
 type KernelABCICommitRecord struct {
-	Height          uint64
-	AppHash         string
-	HeaderHash      string
-	GlobalRoot      string
-	MessageRoot     string
-	ReceiptsRoot    string
-	ProofRootCount  uint64
-	CommitmentCount uint64
-	CommitHash      string
+	Height		uint64
+	AppHash		string
+	HeaderHash	string
+	GlobalRoot	string
+	MessageRoot	string
+	ReceiptsRoot	string
+	ProofRootCount	uint64
+	CommitmentCount	uint64
+	CommitHash	string
 }
 
 func PrepareKernelABCIProposal(ctx KernelConsensusContext, state CoreState, localTxs, routedMessages []KernelMessageEnvelope, limits KernelGasLimits) (KernelABCIProposal, error) {
@@ -102,12 +102,12 @@ func PrepareKernelABCIProposal(ctx KernelConsensusContext, state CoreState, loca
 		return KernelABCIProposal{}, err
 	}
 	proposal := KernelABCIProposal{
-		Plan:              plan,
-		Workloads:         buildKernelWorkloads(envelopes),
-		RoutedMessageRoot: ComputeKernelRoutedMessageRoot(routedMessages),
-		EnvelopeRoot:      ComputeKernelEnvelopeRoot(envelopes),
-		BlockGas:          sumKernelGas(envelopes),
-		ZoneGas:           buildKernelZoneGas(envelopes),
+		Plan:			plan,
+		Workloads:		buildKernelWorkloads(envelopes),
+		RoutedMessageRoot:	ComputeKernelRoutedMessageRoot(routedMessages),
+		EnvelopeRoot:		ComputeKernelEnvelopeRoot(envelopes),
+		BlockGas:		sumKernelGas(envelopes),
+		ZoneGas:		buildKernelZoneGas(envelopes),
 	}
 	proposal.ProposalHash = ComputeKernelABCIProposalHash(proposal)
 	return proposal, ProcessKernelABCIProposal(ctx, state, proposal, envelopes, limits)
@@ -185,14 +185,14 @@ func CommitKernelABCIBlock(finalization KernelFinalization, appHash string) (Ker
 		return KernelABCICommitRecord{}, err
 	}
 	record := KernelABCICommitRecord{
-		Height:          finalization.Height,
-		AppHash:         appHash,
-		HeaderHash:      finalization.Header.HeaderHash,
-		GlobalRoot:      finalization.GlobalRoot.GlobalRoot,
-		MessageRoot:     finalization.RootSnapshot.Finality.GlobalMessageRoot,
-		ReceiptsRoot:    finalization.RootSnapshot.Finality.ExecutionReceiptRoot,
-		ProofRootCount:  uint64(len(finalization.RootSnapshot.ProofRoots)),
-		CommitmentCount: finalization.CommitmentCount,
+		Height:			finalization.Height,
+		AppHash:		appHash,
+		HeaderHash:		finalization.Header.HeaderHash,
+		GlobalRoot:		finalization.GlobalRoot.GlobalRoot,
+		MessageRoot:		finalization.RootSnapshot.Finality.GlobalMessageRoot,
+		ReceiptsRoot:		finalization.RootSnapshot.Finality.ExecutionReceiptRoot,
+		ProofRootCount:		uint64(len(finalization.RootSnapshot.ProofRoots)),
+		CommitmentCount:	finalization.CommitmentCount,
 	}
 	record.CommitHash = ComputeKernelABCICommitHash(record)
 	return record, record.Validate()
@@ -230,13 +230,13 @@ func (e KernelMessageEnvelope) ProposalItem() ProposalItem {
 		admission = e.EligibleHeight
 	}
 	return ProposalItem{
-		ZoneID:          e.DestinationZone,
-		ShardID:         e.DestinationShard,
-		TxHash:          e.TxHash,
-		PriorityClass:   e.PriorityClass,
-		AdmissionHeight: admission,
-		TxIndex:         e.TxIndex,
-		MessageIndex:    e.MessageIndex,
+		ZoneID:			e.DestinationZone,
+		ShardID:		e.DestinationShard,
+		TxHash:			e.TxHash,
+		PriorityClass:		e.PriorityClass,
+		AdmissionHeight:	admission,
+		TxIndex:		e.TxIndex,
+		MessageIndex:		e.MessageIndex,
 	}
 }
 

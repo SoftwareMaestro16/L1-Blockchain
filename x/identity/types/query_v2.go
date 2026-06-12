@@ -9,35 +9,35 @@ import (
 )
 
 const (
-	DefaultIdentityQueryLimitV2 = uint64(50)
-	MaxIdentityQueryLimitV2     = uint64(100)
+	DefaultIdentityQueryLimitV2	= uint64(50)
+	MaxIdentityQueryLimitV2		= uint64(100)
 )
 
 type IdentityQueryCodeV2 string
 
 const (
-	IdentityQueryOK                 IdentityQueryCodeV2 = "ok"
-	IdentityQueryInvalidRequest     IdentityQueryCodeV2 = "invalid_request"
-	IdentityQueryNotFound           IdentityQueryCodeV2 = "not_found"
-	IdentityQueryExpired            IdentityQueryCodeV2 = "expired"
-	IdentityQueryVerificationFailed IdentityQueryCodeV2 = "verification_failed"
+	IdentityQueryOK			IdentityQueryCodeV2	= "ok"
+	IdentityQueryInvalidRequest	IdentityQueryCodeV2	= "invalid_request"
+	IdentityQueryNotFound		IdentityQueryCodeV2	= "not_found"
+	IdentityQueryExpired		IdentityQueryCodeV2	= "expired"
+	IdentityQueryVerificationFailed	IdentityQueryCodeV2	= "verification_failed"
 )
 
 type IdentityQueryPageRequestV2 struct {
-	Offset uint64
-	Limit  uint64
+	Offset	uint64
+	Limit	uint64
 }
 
 type IdentityQueryPageResponseV2 struct {
-	Total      uint64
-	NextOffset uint64
+	Total		uint64
+	NextOffset	uint64
 }
 
 type IdentityQueryContextV2 struct {
-	State       IdentityState
-	Height      uint64
-	DefaultTTL  uint64
-	Delegations []DelegationRecordV2
+	State		IdentityState
+	Height		uint64
+	DefaultTTL	uint64
+	Delegations	[]DelegationRecordV2
 }
 
 type IdentityQueryServiceV2 struct {
@@ -45,37 +45,37 @@ type IdentityQueryServiceV2 struct {
 }
 
 type IdentityQueryResponseV2 struct {
-	Code              IdentityQueryCodeV2
-	FailureCode       IdentityLightClientFailureCodeV2
-	Error             string
-	Height            uint64
-	RecordVersion     uint64
-	Page              IdentityQueryPageResponseV2
-	Proof             *IdentityResolutionProof
-	RecursiveProof    *RecursiveResolutionProofV2
-	PathCommitment    *IdentityPathCommitmentV2
-	AbsenceProof      *IdentityAbsenceProof
-	Domain            *DomainRecordV2
-	Domains           []DomainRecordV2
-	Binding           *DomainNFTBinding
-	Resolver          *UnifiedResolutionRecordV2
-	Address           sdk.AccAddress
-	Target            *NamedExecutionTarget
-	ContractTarget    *ContractTargetV2
-	Service           *ServiceEndpointV2
-	Services          []ServiceEndpointV2
-	Interface         *InterfaceDescriptorV2
-	Route             *RoutingMetadataV2
-	Reverse           *ReverseResolutionRecordV2
-	Subdomains        []SubdomainRecord
-	Delegations       []DelegationRecordV2
-	Auction           *AuctionRecordV2
-	Consistency       *IdentityConsistencyAuditResultV2
-	ProofResult       *IdentityResolution
-	Lifecycle         DomainLifecycleStatus
-	Params            *IdentityParams
-	RegistrationPrice *IdentityDomainPriceQuoteV2
-	RenewalPrice      *IdentityDomainPriceQuoteV2
+	Code			IdentityQueryCodeV2
+	FailureCode		IdentityLightClientFailureCodeV2
+	Error			string
+	Height			uint64
+	RecordVersion		uint64
+	Page			IdentityQueryPageResponseV2
+	Proof			*IdentityResolutionProof
+	RecursiveProof		*RecursiveResolutionProofV2
+	PathCommitment		*IdentityPathCommitmentV2
+	AbsenceProof		*IdentityAbsenceProof
+	Domain			*DomainRecordV2
+	Domains			[]DomainRecordV2
+	Binding			*DomainNFTBinding
+	Resolver		*UnifiedResolutionRecordV2
+	Address			sdk.AccAddress
+	Target			*NamedExecutionTarget
+	ContractTarget		*ContractTargetV2
+	Service			*ServiceEndpointV2
+	Services		[]ServiceEndpointV2
+	Interface		*InterfaceDescriptorV2
+	Route			*RoutingMetadataV2
+	Reverse			*ReverseResolutionRecordV2
+	Subdomains		[]SubdomainRecord
+	Delegations		[]DelegationRecordV2
+	Auction			*AuctionRecordV2
+	Consistency		*IdentityConsistencyAuditResultV2
+	ProofResult		*IdentityResolution
+	Lifecycle		DomainLifecycleStatus
+	Params			*IdentityParams
+	RegistrationPrice	*IdentityDomainPriceQuoteV2
+	RenewalPrice		*IdentityDomainPriceQuoteV2
 }
 
 func NewIdentityQueryServiceV2(ctx IdentityQueryContextV2) IdentityQueryServiceV2 {
@@ -379,18 +379,18 @@ func (q IdentityQueryServiceV2) QueryRecursiveResolutionProof(name string) Ident
 
 func (q IdentityQueryServiceV2) QueryOptimizedRecursiveResolutionProof(rootName string, targetName string, cache *ResolutionCacheRecordV2, sourceVersion uint64, parentEpoch uint64, childEpoch uint64, lightClient bool, proofVerified bool) IdentityQueryResponseV2 {
 	proof, commitment, err := BuildOptimizedRecursiveResolutionProofV2(OptimizedRecursiveResolutionProofRequestV2{
-		State:         q.ctx.State,
-		ChainID:       "identity-query-local",
-		RootName:      rootName,
-		TargetName:    targetName,
-		Height:        q.ctx.Height,
-		TTL:           q.ctx.DefaultTTL,
-		Cache:         cache,
-		SourceVersion: sourceVersion,
-		ParentEpoch:   parentEpoch,
-		ChildEpoch:    childEpoch,
-		LightClient:   lightClient,
-		ProofVerified: proofVerified,
+		State:		q.ctx.State,
+		ChainID:	"identity-query-local",
+		RootName:	rootName,
+		TargetName:	targetName,
+		Height:		q.ctx.Height,
+		TTL:		q.ctx.DefaultTTL,
+		Cache:		cache,
+		SourceVersion:	sourceVersion,
+		ParentEpoch:	parentEpoch,
+		ChildEpoch:	childEpoch,
+		LightClient:	lightClient,
+		ProofVerified:	proofVerified,
 	})
 	if err != nil {
 		return q.failure(IdentityQueryVerificationFailed, err)
@@ -422,12 +422,12 @@ func (q IdentityQueryServiceV2) QueryIdentityParams() IdentityQueryResponseV2 {
 
 func (q IdentityQueryServiceV2) QueryRegistrationPrice(name string, durationBlocks uint64, demandClass IdentityDemandClassV2, auction bool, resolverPayloadBytes uint64, subdomainMode IdentitySubdomainModeV2) IdentityQueryResponseV2 {
 	quote, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-		Name:                 name,
-		DurationBlocks:       durationBlocks,
-		DemandClass:          demandClass,
-		Auction:              auction,
-		ResolverPayloadBytes: resolverPayloadBytes,
-		SubdomainMode:        subdomainMode,
+		Name:			name,
+		DurationBlocks:		durationBlocks,
+		DemandClass:		demandClass,
+		Auction:		auction,
+		ResolverPayloadBytes:	resolverPayloadBytes,
+		SubdomainMode:		subdomainMode,
 	}, DefaultIdentityPricingParamsV2())
 	if err != nil {
 		return q.failure(IdentityQueryInvalidRequest, err)
@@ -451,9 +451,9 @@ func (q IdentityQueryServiceV2) QueryRenewalPrice(name string, periods uint32, r
 
 func (q IdentityQueryServiceV2) QueryPeriodicConsistencyAudit() IdentityQueryResponseV2 {
 	audit := QueryIdentityPeriodicConsistencyAuditV2(IdentityConsistencyAuditRequestV2{
-		State:       q.ctx.State,
-		Height:      q.ctx.Height,
-		Delegations: q.ctx.Delegations,
+		State:		q.ctx.State,
+		Height:		q.ctx.Height,
+		Delegations:	q.ctx.Delegations,
 	})
 	resp := q.ok()
 	resp.Consistency = &audit

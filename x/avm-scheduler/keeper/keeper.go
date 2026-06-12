@@ -14,16 +14,16 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version         uint64
-	Params          prototype.Params
-	SchedulerParams types.AVMSchedulerParams
-	State           types.AVMSchedulerState
+	Version		uint64
+	Params		prototype.Params
+	SchedulerParams	types.AVMSchedulerParams
+	State		types.AVMSchedulerState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
 func NewKeeper() Keeper {
@@ -36,10 +36,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:         prototype.CurrentGenesisVersion,
-		Params:          prototype.DefaultParams(),
-		SchedulerParams: types.DefaultAVMSchedulerParams(),
-		State:           types.EmptyAVMSchedulerState(),
+		Version:		prototype.CurrentGenesisVersion,
+		Params:			prototype.DefaultParams(),
+		SchedulerParams:	types.DefaultAVMSchedulerParams(),
+		State:			types.EmptyAVMSchedulerState(),
 	}
 }
 
@@ -270,17 +270,17 @@ func finalizeBatch(batch types.AVMExecutionBatch, graph types.AVMDependencyGraph
 			root = types.ApplyTaskStateRoot(root, task)
 		}
 		receipt := types.AVMExecutionReceipt{
-			BatchID:         batch.BatchID,
-			TaskID:          task.TaskID,
-			ContractAddress: task.ContractAddress,
-			Height:          height,
-			Order:           uint32(i),
-			Status:          status,
-			GasUsed:         gasUsed,
-			StateRootBefore: before,
-			StateRootAfter:  root,
-			Error:           errText,
-			FallbackSerial:  graph.FallbackSerial,
+			BatchID:		batch.BatchID,
+			TaskID:			task.TaskID,
+			ContractAddress:	task.ContractAddress,
+			Height:			height,
+			Order:			uint32(i),
+			Status:			status,
+			GasUsed:		gasUsed,
+			StateRootBefore:	before,
+			StateRootAfter:		root,
+			Error:			errText,
+			FallbackSerial:		graph.FallbackSerial,
 		}
 		receipt.ReceiptID = types.ComputeReceiptID(receipt)
 		if err := receipt.Validate(); err != nil {

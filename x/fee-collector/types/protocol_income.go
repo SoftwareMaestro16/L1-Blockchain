@@ -10,40 +10,40 @@ import (
 )
 
 const (
-	BucketValidatorRewards          = "validator_rewards"
-	BucketTreasury                  = "treasury"
-	BucketDelegatorProtection       = "delegator_protection"
-	BucketValidatorInsuranceReserve = "validator_insurance_reserve"
-	BucketEcosystemGrants           = "ecosystem_grants"
-	BucketStorageRentReserve        = "storage_rent_reserve"
-	BucketBurn                      = "burn"
-	BucketReporterRewards           = "reporter_rewards"
+	BucketValidatorRewards		= "validator_rewards"
+	BucketTreasury			= "treasury"
+	BucketDelegatorProtection	= "delegator_protection"
+	BucketValidatorInsuranceReserve	= "validator_insurance_reserve"
+	BucketEcosystemGrants		= "ecosystem_grants"
+	BucketStorageRentReserve	= "storage_rent_reserve"
+	BucketBurn			= "burn"
+	BucketReporterRewards		= "reporter_rewards"
 )
 
 type ProtocolIncomePolicy struct {
-	Scale   uint32                     `json:"scale"`
-	Buckets []ProtocolIncomeBucketRule `json:"buckets"`
+	Scale	uint32				`json:"scale"`
+	Buckets	[]ProtocolIncomeBucketRule	`json:"buckets"`
 }
 
 type ProtocolIncomeBucketRule struct {
-	Bucket          string `json:"bucket"`
-	ModuleAccount   string `json:"module_account"`
-	Weight          uint32 `json:"weight"`
-	AllowZeroWeight bool   `json:"allow_zero_weight"`
-	ConstitutionMin uint32 `json:"constitution_min"`
-	Burn            bool   `json:"burn"`
+	Bucket		string	`json:"bucket"`
+	ModuleAccount	string	`json:"module_account"`
+	Weight		uint32	`json:"weight"`
+	AllowZeroWeight	bool	`json:"allow_zero_weight"`
+	ConstitutionMin	uint32	`json:"constitution_min"`
+	Burn		bool	`json:"burn"`
 }
 
 type ProtocolIncomeAllocation struct {
-	Bucket        string
-	ModuleAccount string
-	Amount        sdk.Coins
-	Burn          bool
+	Bucket		string
+	ModuleAccount	string
+	Amount		sdk.Coins
+	Burn		bool
 }
 
 func DefaultProtocolIncomePolicy() ProtocolIncomePolicy {
 	return ProtocolIncomePolicy{
-		Scale: BasisPoints,
+		Scale:	BasisPoints,
 		Buckets: []ProtocolIncomeBucketRule{
 			{Bucket: BucketValidatorRewards, ModuleAccount: authtypes.FeeCollectorName, Weight: 3_800},
 			{Bucket: BucketTreasury, ModuleAccount: TreasuryModuleName, Weight: 2_500},
@@ -131,8 +131,8 @@ func SplitProtocolIncome(policy ProtocolIncomePolicy, fees sdk.Coins) ([]Protoco
 }
 
 type fractionalRemainder struct {
-	index     int
-	remainder sdkmath.Int
+	index		int
+	remainder	sdkmath.Int
 }
 
 func splitCoinByLargestRemainder(policy ProtocolIncomePolicy, fee sdk.Coin) ([]sdkmath.Int, sdkmath.Int) {

@@ -43,9 +43,9 @@ func TestFeeDistributionBucketsSumExactlyAndEmitEvents(t *testing.T) {
 func TestFeeDistributionRaisesBurnAndStateReserveButPreservesValidatorFloor(t *testing.T) {
 	params := DefaultFeeDistributionParams()
 	result, err := DistributeFeeBuckets(sdk.NewInt64Coin(BondDenom, 10_000), params, CongestionSignals{
-		BlockGasUtilizationBps: 10_000,
-		MempoolPressureBps:     10_000,
-		FailedExecutionRateBps: 10_000,
+		BlockGasUtilizationBps:	10_000,
+		MempoolPressureBps:	10_000,
+		FailedExecutionRateBps:	10_000,
 	}, 10_000)
 	if err != nil {
 		t.Fatalf("fee buckets should distribute under high activity: %v", err)
@@ -100,23 +100,23 @@ func TestAntiSpamAdmissionUsesCompatibleMempoolAndExecutionRules(t *testing.T) {
 	base := sdk.NewInt64Coin(BondDenom, 100)
 	paid := sdk.NewInt64Coin(BondDenom, 250)
 	mempool, err := ValidateAntiSpamFee(AntiSpamFeeInput{
-		Mode:            AdmissionModeMempool,
-		BaseRequiredFee: base,
-		PaidFee:         paid,
-		Activity:        activity,
-		Params:          params,
-		Executable:      true,
+		Mode:			AdmissionModeMempool,
+		BaseRequiredFee:	base,
+		PaidFee:		paid,
+		Activity:		activity,
+		Params:			params,
+		Executable:		true,
 	})
 	if err != nil {
 		t.Fatalf("mempool anti-spam fee should validate: %v", err)
 	}
 	execution, err := ValidateAntiSpamFee(AntiSpamFeeInput{
-		Mode:            AdmissionModeBlockExecution,
-		BaseRequiredFee: base,
-		PaidFee:         paid,
-		Activity:        activity,
-		Params:          params,
-		Executable:      true,
+		Mode:			AdmissionModeBlockExecution,
+		BaseRequiredFee:	base,
+		PaidFee:		paid,
+		Activity:		activity,
+		Params:			params,
+		Executable:		true,
 	})
 	if err != nil {
 		t.Fatalf("execution anti-spam fee should validate: %v", err)
@@ -133,12 +133,12 @@ func TestAntiSpamFeeBypassAttemptsAreRejected(t *testing.T) {
 	params := DefaultAntiSpamParams(DefaultParams())
 	activity := AccountActivityWindow{Sender: "sender-b", WindowID: 8, TxCount: 2, FailedTxCount: 10, StateWriteCount: 1, DeploymentCount: 0}
 	decision, err := ValidateAntiSpamFee(AntiSpamFeeInput{
-		Mode:            AdmissionModeMempool,
-		BaseRequiredFee: sdk.NewInt64Coin(BondDenom, 100),
-		PaidFee:         sdk.NewInt64Coin(BondDenom, 100),
-		Activity:        activity,
-		Params:          params,
-		Executable:      true,
+		Mode:			AdmissionModeMempool,
+		BaseRequiredFee:	sdk.NewInt64Coin(BondDenom, 100),
+		PaidFee:		sdk.NewInt64Coin(BondDenom, 100),
+		Activity:		activity,
+		Params:			params,
+		Executable:		true,
 	})
 	if err != nil {
 		t.Fatalf("underpaid bypass attempt should return decision, not panic: %v", err)
@@ -147,23 +147,23 @@ func TestAntiSpamFeeBypassAttemptsAreRejected(t *testing.T) {
 		t.Fatalf("underpaid spam should be rejected, got %+v", decision)
 	}
 	_, err = ValidateAntiSpamFee(AntiSpamFeeInput{
-		Mode:            AdmissionModeMempool,
-		BaseRequiredFee: sdk.NewInt64Coin("uatom", 100),
-		PaidFee:         sdk.NewInt64Coin(BondDenom, 1_000),
-		Activity:        activity,
-		Params:          params,
-		Executable:      true,
+		Mode:			AdmissionModeMempool,
+		BaseRequiredFee:	sdk.NewInt64Coin("uatom", 100),
+		PaidFee:		sdk.NewInt64Coin(BondDenom, 1_000),
+		Activity:		activity,
+		Params:			params,
+		Executable:		true,
 	})
 	if err == nil {
 		t.Fatalf("wrong-denom base fee bypass should fail")
 	}
 	_, err = ValidateAntiSpamFee(AntiSpamFeeInput{
-		Mode:            AdmissionModeMempool,
-		BaseRequiredFee: sdk.NewInt64Coin(BondDenom, 100),
-		PaidFee:         sdk.NewInt64Coin("uatom", 1_000),
-		Activity:        activity,
-		Params:          params,
-		Executable:      true,
+		Mode:			AdmissionModeMempool,
+		BaseRequiredFee:	sdk.NewInt64Coin(BondDenom, 100),
+		PaidFee:		sdk.NewInt64Coin("uatom", 1_000),
+		Activity:		activity,
+		Params:			params,
+		Executable:		true,
 	})
 	if err == nil {
 		t.Fatalf("wrong-denom paid fee bypass should fail")

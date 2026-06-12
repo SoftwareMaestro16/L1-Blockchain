@@ -16,51 +16,51 @@ import (
 )
 
 const (
-	MaxPayloadTypeLength = 96
-	MaxReplyModeLength   = 32
+	MaxPayloadTypeLength	= 96
+	MaxReplyModeLength	= 32
 
-	ReplyModeNone   = "none"
-	ReplyModeCaller = "caller"
-	ReplyModeCallee = "callee"
-	ReplyModeError  = "error"
+	ReplyModeNone	= "none"
+	ReplyModeCaller	= "caller"
+	ReplyModeCallee	= "callee"
+	ReplyModeError	= "error"
 )
 
 type MsgCrossZoneCall struct {
-	Caller            sdk.AccAddress
-	Callee            sdk.AccAddress
-	SourceZoneID      zonestypes.ZoneID
-	DestinationZoneID zonestypes.ZoneID
-	PayloadType       string
-	Payload           []byte
-	ValueNAET         sdkmath.Int
-	GasLimit          uint64
-	ForwardingFee     sdkmath.Int
-	ReplyMode         string
-	ExpiryHeight      uint64
+	Caller			sdk.AccAddress
+	Callee			sdk.AccAddress
+	SourceZoneID		zonestypes.ZoneID
+	DestinationZoneID	zonestypes.ZoneID
+	PayloadType		string
+	Payload			[]byte
+	ValueNAET		sdkmath.Int
+	GasLimit		uint64
+	ForwardingFee		sdkmath.Int
+	ReplyMode		string
+	ExpiryHeight		uint64
 }
 
 type CrossZoneCallEscrow struct {
-	Caller            sdk.AccAddress
-	SourceZoneID      zonestypes.ZoneID
-	DestinationZoneID zonestypes.ZoneID
-	ValueNAET         sdkmath.Int
-	ForwardingFee     sdkmath.Int
-	ExpiryHeight      uint64
-	Escrowed          bool
+	Caller			sdk.AccAddress
+	SourceZoneID		zonestypes.ZoneID
+	DestinationZoneID	zonestypes.ZoneID
+	ValueNAET		sdkmath.Int
+	ForwardingFee		sdkmath.Int
+	ExpiryHeight		uint64
+	Escrowed		bool
 }
 
 type CrossZoneCallAdmission struct {
-	CreatedHeight         uint64
-	Nonce                 uint64
-	SourceSequence        uint64
-	SupportedPayloadTypes []DestinationPayloadTypes
-	SupportedReplyModes   []string
-	Escrows               []CrossZoneCallEscrow
+	CreatedHeight		uint64
+	Nonce			uint64
+	SourceSequence		uint64
+	SupportedPayloadTypes	[]DestinationPayloadTypes
+	SupportedReplyModes	[]string
+	Escrows			[]CrossZoneCallEscrow
 }
 
 type DestinationPayloadTypes struct {
-	ZoneID       zonestypes.ZoneID
-	PayloadTypes []string
+	ZoneID		zonestypes.ZoneID
+	PayloadTypes	[]string
 }
 
 func (k MessageKeeper) SubmitCrossZoneCall(req MsgCrossZoneCall, admission CrossZoneCallAdmission) (MessageKeeper, SubmitCrossZoneMessageResponse, error) {
@@ -90,22 +90,22 @@ func NewMessageFromCrossZoneCall(req MsgCrossZoneCall, admission CrossZoneCallAd
 		return Message{}, err
 	}
 	return NewMessage(Message{
-		SourceZone:      req.SourceZoneID,
-		DestinationZone: req.DestinationZoneID,
-		Sender:          req.Caller,
-		Recipient:       req.Callee,
-		Value:           req.ValueNAET,
-		Opcode:          req.PayloadType,
-		Payload:         req.Payload,
-		GasLimit:        req.GasLimit,
-		Deadline:        req.ExpiryHeight,
-		Nonce:           admission.Nonce,
-		SourceSequence:  admission.SourceSequence,
-		RouteID:         CrossZoneCallRouteID(req),
-		Bounce:          req.ReplyMode != ReplyModeNone,
-		FeeLimit:        req.ForwardingFee,
-		CreatedHeight:   admission.CreatedHeight,
-		AuthScope:       "cross-zone-call/" + req.ReplyMode,
+		SourceZone:		req.SourceZoneID,
+		DestinationZone:	req.DestinationZoneID,
+		Sender:			req.Caller,
+		Recipient:		req.Callee,
+		Value:			req.ValueNAET,
+		Opcode:			req.PayloadType,
+		Payload:		req.Payload,
+		GasLimit:		req.GasLimit,
+		Deadline:		req.ExpiryHeight,
+		Nonce:			admission.Nonce,
+		SourceSequence:		admission.SourceSequence,
+		RouteID:		CrossZoneCallRouteID(req),
+		Bounce:			req.ReplyMode != ReplyModeNone,
+		FeeLimit:		req.ForwardingFee,
+		CreatedHeight:		admission.CreatedHeight,
+		AuthScope:		"cross-zone-call/" + req.ReplyMode,
 	}, params)
 }
 
@@ -328,8 +328,8 @@ func normalizeDestinationPayloadTypes(values []DestinationPayloadTypes) []Destin
 	out := make([]DestinationPayloadTypes, len(values))
 	for i, value := range values {
 		out[i] = DestinationPayloadTypes{
-			ZoneID:       value.ZoneID,
-			PayloadTypes: normalizeStringList(value.PayloadTypes),
+			ZoneID:		value.ZoneID,
+			PayloadTypes:	normalizeStringList(value.PayloadTypes),
 		}
 	}
 	sort.SliceStable(out, func(i, j int) bool {

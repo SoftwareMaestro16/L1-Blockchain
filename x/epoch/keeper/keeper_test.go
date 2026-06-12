@@ -88,9 +88,9 @@ func TestEndHookClosesEpochAndStartsNextFromCommittedValidators(t *testing.T) {
 	nextValidators := testScoredValidators(t, params, 4)
 
 	closed, err := keeper.EndEpoch(124, 2_000, postypes.EpochSettlementRoots{
-		PerformanceRoot: postypes.PosEmptyRootHash,
-		RewardRoot:      postypes.PosEmptyRootHash,
-		SlashRoot:       postypes.PosEmptyRootHash,
+		PerformanceRoot:	postypes.PosEmptyRootHash,
+		RewardRoot:		postypes.PosEmptyRootHash,
+		SlashRoot:		postypes.PosEmptyRootHash,
 	}, nextValidators)
 	require.NoError(t, err)
 	require.Equal(t, postypes.EpochPhaseClosed, closed.Phase)
@@ -121,17 +121,17 @@ func TestEndHookRequiresSettlementPhaseAndFinalityRoots(t *testing.T) {
 	params := keeper.ExportState().Params
 
 	_, err := keeper.EndEpoch(124, 2_000, postypes.EpochSettlementRoots{
-		PerformanceRoot: postypes.PosEmptyRootHash,
-		RewardRoot:      postypes.PosEmptyRootHash,
-		SlashRoot:       postypes.PosEmptyRootHash,
+		PerformanceRoot:	postypes.PosEmptyRootHash,
+		RewardRoot:		postypes.PosEmptyRootHash,
+		SlashRoot:		postypes.PosEmptyRootHash,
 	}, testScoredValidators(t, params, 3))
 	require.ErrorContains(t, err, "settlement phase")
 
 	transitionToSettlement(t, &keeper)
 	_, err = keeper.EndEpoch(124, 2_000, postypes.EpochSettlementRoots{
-		PerformanceRoot: postypes.PosEmptyRootHash,
-		RewardRoot:      "not-a-root",
-		SlashRoot:       postypes.PosEmptyRootHash,
+		PerformanceRoot:	postypes.PosEmptyRootHash,
+		RewardRoot:		"not-a-root",
+		SlashRoot:		postypes.PosEmptyRootHash,
 	}, testScoredValidators(t, params, 3))
 	require.ErrorContains(t, err, "reward root")
 }
@@ -192,12 +192,12 @@ func testScoredValidators(t *testing.T, params postypes.Params, count int) []pos
 	validators := make([]postypes.ScoredValidator, count)
 	for i := range validators {
 		candidate := postypes.Candidate{
-			ValidatorID:         "val-" + string(rune('a'+i)),
-			SelfStakeNaet:       sdkmath.NewInt(1_000 + int64(i)),
-			DelegatedStakeNaet:  sdkmath.ZeroInt(),
-			PerformanceScoreBps: postypes.BasisPoints,
-			UptimeFactorBps:     postypes.BasisPoints,
-			CommissionBps:       500,
+			ValidatorID:		"val-" + string(rune('a'+i)),
+			SelfStakeNaet:		sdkmath.NewInt(1_000 + int64(i)),
+			DelegatedStakeNaet:	sdkmath.ZeroInt(),
+			PerformanceScoreBps:	postypes.BasisPoints,
+			UptimeFactorBps:	postypes.BasisPoints,
+			CommissionBps:		500,
 		}
 		scored, err := postypes.ScoreCandidate(params, candidate)
 		require.NoError(t, err)

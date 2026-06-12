@@ -8,109 +8,109 @@ import (
 )
 
 const (
-	JobTypePeriodic = "periodic"
-	JobTypeDelayed  = "delayed"
-	JobTypeEpoch    = "epoch"
+	JobTypePeriodic	= "periodic"
+	JobTypeDelayed	= "delayed"
+	JobTypeEpoch	= "epoch"
 
-	HistoryStatusSuccess = "success"
-	HistoryStatusFailure = "failure"
-	HistoryStatusSkipped = "skipped"
+	HistoryStatusSuccess	= "success"
+	HistoryStatusFailure	= "failure"
+	HistoryStatusSkipped	= "skipped"
 )
 
 type SchedulerParams struct {
-	MaxJobsPerBlock   uint32
-	MaxSchedulerGas   uint64
-	MaxGasPerJob      uint64
-	AuthorizedModules []string
-	HistoryRetention  uint32
+	MaxJobsPerBlock		uint32
+	MaxSchedulerGas		uint64
+	MaxGasPerJob		uint64
+	AuthorizedModules	[]string
+	HistoryRetention	uint32
 }
 
 type RetryPolicy struct {
-	MaxRetries      uint32
-	BackoffInterval uint64
+	MaxRetries	uint32
+	BackoffInterval	uint64
 }
 
 type ScheduledJob struct {
-	ID                  string
-	OwnerModule         string
-	Type                string
-	NextExecutionHeight uint64
-	Interval            uint64
-	MaxGas              uint64
-	RetryPolicy         RetryPolicy
-	FailureCount        uint32
-	Paused              bool
-	Cancelled           bool
-	Payload             []byte
-	ExecutionCount      uint64
+	ID			string
+	OwnerModule		string
+	Type			string
+	NextExecutionHeight	uint64
+	Interval		uint64
+	MaxGas			uint64
+	RetryPolicy		RetryPolicy
+	FailureCount		uint32
+	Paused			bool
+	Cancelled		bool
+	Payload			[]byte
+	ExecutionCount		uint64
 }
 
 type SchedulerState struct {
-	Jobs                []ScheduledJob
-	History             []JobHistoryRecord
-	LastExecutionHeight uint64
+	Jobs			[]ScheduledJob
+	History			[]JobHistoryRecord
+	LastExecutionHeight	uint64
 }
 
 type JobHistoryRecord struct {
-	JobID       string
-	OwnerModule string
-	Height      uint64
-	Status      string
-	GasUsed     uint64
-	Error       string
-	Attempt     uint32
+	JobID		string
+	OwnerModule	string
+	Height		uint64
+	Status		string
+	GasUsed		uint64
+	Error		string
+	Attempt		uint32
 }
 
 type JobExecutionResult struct {
-	Success bool
-	GasUsed uint64
-	Error   string
+	Success	bool
+	GasUsed	uint64
+	Error	string
 }
 
 type ExecutionBatchResult struct {
-	Height       uint64
-	ExecutedJobs uint32
-	SkippedJobs  uint32
-	GasReserved  uint64
-	GasUsed      uint64
-	History      []JobHistoryRecord
-	RemainingDue []ScheduledJob
+	Height		uint64
+	ExecutedJobs	uint32
+	SkippedJobs	uint32
+	GasReserved	uint64
+	GasUsed		uint64
+	History		[]JobHistoryRecord
+	RemainingDue	[]ScheduledJob
 }
 
 type MsgRegisterScheduledJob struct {
-	Authority string
-	Job       ScheduledJob
+	Authority	string
+	Job		ScheduledJob
 }
 
 type MsgPauseScheduledJob struct {
-	Authority   string
-	OwnerModule string
-	JobID       string
+	Authority	string
+	OwnerModule	string
+	JobID		string
 }
 
 type MsgResumeScheduledJob struct {
-	Authority   string
-	OwnerModule string
-	JobID       string
+	Authority	string
+	OwnerModule	string
+	JobID		string
 }
 
 type MsgCancelScheduledJob struct {
-	Authority   string
-	OwnerModule string
-	JobID       string
+	Authority	string
+	OwnerModule	string
+	JobID		string
 }
 
 type MsgExecuteDueJobs struct {
-	Authority     string
-	CurrentHeight uint64
+	Authority	string
+	CurrentHeight	uint64
 }
 
 func DefaultSchedulerParams() SchedulerParams {
 	return SchedulerParams{
-		MaxJobsPerBlock:  25,
-		MaxSchedulerGas:  2_000_000,
-		MaxGasPerJob:     100_000,
-		HistoryRetention: 200,
+		MaxJobsPerBlock:	25,
+		MaxSchedulerGas:	2_000_000,
+		MaxGasPerJob:		100_000,
+		HistoryRetention:	200,
 		AuthorizedModules: []string{
 			"aetracore",
 			"avm-dex-contract",
@@ -227,9 +227,9 @@ func (j ScheduledJob) Validate(params SchedulerParams) error {
 
 func (s SchedulerState) Export() SchedulerState {
 	out := SchedulerState{
-		Jobs:                cloneJobs(s.Jobs),
-		History:             cloneHistory(s.History),
-		LastExecutionHeight: s.LastExecutionHeight,
+		Jobs:			cloneJobs(s.Jobs),
+		History:		cloneHistory(s.History),
+		LastExecutionHeight:	s.LastExecutionHeight,
 	}
 	SortJobs(out.Jobs)
 	return out

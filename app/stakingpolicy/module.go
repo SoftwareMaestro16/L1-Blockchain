@@ -29,20 +29,20 @@ import (
 const consensusVersion uint64 = 5
 
 var (
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	_ module.AppModuleSimulation = AppModule{}
-	_ module.HasServices         = AppModule{}
-	_ module.HasABCIGenesis      = AppModule{}
-	_ module.HasABCIEndBlock     = AppModule{}
-	_ appmodule.AppModule        = AppModule{}
-	_ appmodule.HasBeginBlocker  = AppModule{}
+	_	module.AppModuleBasic		= AppModuleBasic{}
+	_	module.AppModuleSimulation	= AppModule{}
+	_	module.HasServices		= AppModule{}
+	_	module.HasABCIGenesis		= AppModule{}
+	_	module.HasABCIEndBlock		= AppModule{}
+	_	appmodule.AppModule		= AppModule{}
+	_	appmodule.HasBeginBlocker	= AppModule{}
 )
 
 type AppModuleBasic struct {
 	cdc codec.Codec
 }
 
-func (AppModuleBasic) Name() string { return stakingtypes.ModuleName }
+func (AppModuleBasic) Name() string	{ return stakingtypes.ModuleName }
 
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	stakingtypes.RegisterLegacyAminoCodec(cdc)
@@ -77,10 +77,10 @@ func (amb AppModuleBasic) GetTxCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper         *stakingkeeper.Keeper
-	accountKeeper  stakingtypes.AccountKeeper
-	bankKeeper     stakingtypes.BankKeeper
-	legacySubspace exported.Subspace
+	keeper		*stakingkeeper.Keeper
+	accountKeeper	stakingtypes.AccountKeeper
+	bankKeeper	stakingtypes.BankKeeper
+	legacySubspace	exported.Subspace
 }
 
 func NewAppModule(
@@ -91,16 +91,16 @@ func NewAppModule(
 	legacySubspace exported.Subspace,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{cdc: cdc},
-		keeper:         keeper,
-		accountKeeper:  accountKeeper,
-		bankKeeper:     bankKeeper,
-		legacySubspace: legacySubspace,
+		AppModuleBasic:	AppModuleBasic{cdc: cdc},
+		keeper:		keeper,
+		accountKeeper:	accountKeeper,
+		bankKeeper:	bankKeeper,
+		legacySubspace:	legacySubspace,
 	}
 }
 
-func (am AppModule) IsOnePerModuleType() {}
-func (am AppModule) IsAppModule()        {}
+func (am AppModule) IsOnePerModuleType()	{}
+func (am AppModule) IsAppModule()		{}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	inner := stakingkeeper.NewMsgServerImpl(am.keeper)
@@ -133,7 +133,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return cdc.MustMarshalJSON(am.keeper.ExportGenesis(ctx))
 }
 
-func (AppModule) ConsensusVersion() uint64 { return consensusVersion }
+func (AppModule) ConsensusVersion() uint64	{ return consensusVersion }
 
 func (am AppModule) BeginBlock(ctx context.Context) error {
 	return am.keeper.BeginBlocker(ctx)

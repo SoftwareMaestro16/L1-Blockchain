@@ -102,18 +102,18 @@ func testIdentityZoneUpgradeArtifacts(t *testing.T) IdentityZoneUpgradeArtifacts
 	require.NoError(t, err)
 
 	hook, err := NewIdentityResolverVMHook(IdentityResolverVMHook{
-		HookID:     "primary-hook",
-		NameHash:   nameHash,
-		RecordKey:  ResolverKeyPrimary,
-		InputHash:  identityHash("resolver-input"),
-		OutputHash: identityHash("resolver-output"),
-		GasLimit:   10000,
-		Version:    1,
+		HookID:		"primary-hook",
+		NameHash:	nameHash,
+		RecordKey:	ResolverKeyPrimary,
+		InputHash:	identityHash("resolver-input"),
+		OutputHash:	identityHash("resolver-output"),
+		GasLimit:	10000,
+		Version:	1,
 	})
 	require.NoError(t, err)
 
 	graph, err := NewIdentityResolutionGraph(IdentityResolutionGraph{
-		Height: 13,
+		Height:	13,
 		Nodes: []IdentityResolutionGraphNode{
 			{NodeID: "domain", NameHash: nameHash, TargetHash: stateRoot},
 			{NodeID: "resolver", NameHash: nameHash, RecordKey: ResolverKeyPrimary, TargetHash: identityHash("resolver-target")},
@@ -127,11 +127,11 @@ func testIdentityZoneUpgradeArtifacts(t *testing.T) IdentityZoneUpgradeArtifacts
 	require.NoError(t, err)
 
 	binding, err := NewIdentityCrossZoneBinding(IdentityCrossZoneBinding{
-		NameHash:    nameHash,
-		ZoneID:      "APPLICATION_ZONE",
-		BindingKey:  "apps/app/alice",
-		BindingRoot: identityHash("application-binding-root"),
-		Height:      13,
+		NameHash:	nameHash,
+		ZoneID:		"APPLICATION_ZONE",
+		BindingKey:	"apps/app/alice",
+		BindingRoot:	identityHash("application-binding-root"),
+		Height:		13,
 	})
 	require.NoError(t, err)
 
@@ -143,11 +143,11 @@ func testIdentityZoneUpgradeArtifacts(t *testing.T) IdentityZoneUpgradeArtifacts
 	require.NoError(t, err)
 
 	return IdentityZoneUpgradeArtifacts{
-		State:    state,
-		Hooks:    []IdentityResolverVMHook{hook},
-		Graphs:   []IdentityResolutionGraph{graph},
-		Bindings: []IdentityCrossZoneBinding{binding},
-		Proofs:   []IdentityZoneProofIndexEntry{domainProof, resolverProof, reverseProof},
-		Height:   13,
+		State:		state,
+		Hooks:		[]IdentityResolverVMHook{hook},
+		Graphs:		[]IdentityResolutionGraph{graph},
+		Bindings:	[]IdentityCrossZoneBinding{binding},
+		Proofs:		[]IdentityZoneProofIndexEntry{domainProof, resolverProof, reverseProof},
+		Height:		13,
 	}
 }

@@ -38,14 +38,14 @@ type QueryServer interface {
 	AllValidatorScores(context.Context, *QueryAllValidatorScoresRequest) (*QueryAllValidatorScoresResponse, error)
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetravalidatorscore.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.aetravalidatorscore.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("UpdateValidatorScoreParams", serviceHandler("UpdateValidatorScoreParams", func() interface{} { return new(MsgUpdateValidatorScoreParams) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).UpdateValidatorScoreParams(ctx, req.(*MsgUpdateValidatorScoreParams))
@@ -54,12 +54,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).UpdateValidatorScores(ctx, req.(*MsgUpdateValidatorScores))
 		})),
 	},
-	Metadata: "l1/aetravalidatorscore/v1/tx.proto",
+	Metadata:	"l1/aetravalidatorscore/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetravalidatorscore.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.aetravalidatorscore.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("Params", serviceHandler("Params", func() interface{} { return new(QueryParamsRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -74,7 +74,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).AllValidatorScores(ctx, req.(*QueryAllValidatorScoresRequest))
 		})),
 	},
-	Metadata: "l1/aetravalidatorscore/v1/query.proto",
+	Metadata:	"l1/aetravalidatorscore/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -127,7 +127,7 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgUpdateValidatorScoreParams)(nil), "l1.aetravalidatorscore.v1.MsgUpdateValidatorScoreParams")
@@ -136,46 +136,46 @@ func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgUpdateValidatorScoresResponse)(nil), "l1.aetravalidatorscore.v1.MsgUpdateValidatorScoresResponse")
 }
 
-func (m *MsgUpdateValidatorScoreParams) Reset()         { *m = MsgUpdateValidatorScoreParams{} }
-func (m *MsgUpdateValidatorScores) Reset()              { *m = MsgUpdateValidatorScores{} }
-func (m *MsgUpdateValidatorScoreParamsResponse) Reset() { *m = MsgUpdateValidatorScoreParamsResponse{} }
-func (m *MsgUpdateValidatorScoresResponse) Reset()      { *m = MsgUpdateValidatorScoresResponse{} }
+func (m *MsgUpdateValidatorScoreParams) Reset()		{ *m = MsgUpdateValidatorScoreParams{} }
+func (m *MsgUpdateValidatorScores) Reset()		{ *m = MsgUpdateValidatorScores{} }
+func (m *MsgUpdateValidatorScoreParamsResponse) Reset()	{ *m = MsgUpdateValidatorScoreParamsResponse{} }
+func (m *MsgUpdateValidatorScoresResponse) Reset()	{ *m = MsgUpdateValidatorScoresResponse{} }
 
-func (m *MsgUpdateValidatorScoreParams) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateValidatorScores) String() string      { return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateValidatorScoreParams) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateValidatorScores) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *MsgUpdateValidatorScoreParamsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *MsgUpdateValidatorScoresResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateValidatorScoresResponse) String() string	{ return gogoproto.CompactTextString(m) }
 
-func (*MsgUpdateValidatorScoreParams) ProtoMessage()         {}
-func (*MsgUpdateValidatorScores) ProtoMessage()              {}
-func (*MsgUpdateValidatorScoreParamsResponse) ProtoMessage() {}
-func (*MsgUpdateValidatorScoresResponse) ProtoMessage()      {}
+func (*MsgUpdateValidatorScoreParams) ProtoMessage()		{}
+func (*MsgUpdateValidatorScores) ProtoMessage()			{}
+func (*MsgUpdateValidatorScoreParamsResponse) ProtoMessage()	{}
+func (*MsgUpdateValidatorScoresResponse) ProtoMessage()		{}
 
-func (m *QueryParamsRequest) Reset()                         { *m = QueryParamsRequest{} }
-func (m *QueryParamsResponse) Reset()                        { *m = QueryParamsResponse{} }
-func (m *QueryValidatorScoreRequest) Reset()                 { *m = QueryValidatorScoreRequest{} }
-func (m *QueryValidatorScoreResponse) Reset()                { *m = QueryValidatorScoreResponse{} }
-func (m *QueryPublicValidatorMetricsRequest) Reset()         { *m = QueryPublicValidatorMetricsRequest{} }
-func (m *QueryPublicValidatorMetricsResponse) Reset()        { *m = QueryPublicValidatorMetricsResponse{} }
-func (m *QueryAllValidatorScoresRequest) Reset()             { *m = QueryAllValidatorScoresRequest{} }
-func (m *QueryAllValidatorScoresResponse) Reset()            { *m = QueryAllValidatorScoresResponse{} }
-func (m *QueryParamsRequest) String() string                 { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsResponse) String() string                { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorScoreRequest) String() string         { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorScoreResponse) String() string        { return gogoproto.CompactTextString(m) }
-func (m *QueryPublicValidatorMetricsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryParamsRequest) Reset()				{ *m = QueryParamsRequest{} }
+func (m *QueryParamsResponse) Reset()				{ *m = QueryParamsResponse{} }
+func (m *QueryValidatorScoreRequest) Reset()			{ *m = QueryValidatorScoreRequest{} }
+func (m *QueryValidatorScoreResponse) Reset()			{ *m = QueryValidatorScoreResponse{} }
+func (m *QueryPublicValidatorMetricsRequest) Reset()		{ *m = QueryPublicValidatorMetricsRequest{} }
+func (m *QueryPublicValidatorMetricsResponse) Reset()		{ *m = QueryPublicValidatorMetricsResponse{} }
+func (m *QueryAllValidatorScoresRequest) Reset()		{ *m = QueryAllValidatorScoresRequest{} }
+func (m *QueryAllValidatorScoresResponse) Reset()		{ *m = QueryAllValidatorScoresResponse{} }
+func (m *QueryParamsRequest) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsResponse) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorScoreRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorScoreResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryPublicValidatorMetricsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryPublicValidatorMetricsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryAllValidatorScoresRequest) String() string   { return gogoproto.CompactTextString(m) }
-func (m *QueryAllValidatorScoresResponse) String() string  { return gogoproto.CompactTextString(m) }
-func (*QueryParamsRequest) ProtoMessage()                  {}
-func (*QueryParamsResponse) ProtoMessage()                 {}
-func (*QueryValidatorScoreRequest) ProtoMessage()          {}
-func (*QueryValidatorScoreResponse) ProtoMessage()         {}
-func (*QueryPublicValidatorMetricsRequest) ProtoMessage()  {}
-func (*QueryPublicValidatorMetricsResponse) ProtoMessage() {}
-func (*QueryAllValidatorScoresRequest) ProtoMessage()      {}
-func (*QueryAllValidatorScoresResponse) ProtoMessage()     {}
+func (m *QueryAllValidatorScoresRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryAllValidatorScoresResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()			{}
+func (*QueryParamsResponse) ProtoMessage()			{}
+func (*QueryValidatorScoreRequest) ProtoMessage()		{}
+func (*QueryValidatorScoreResponse) ProtoMessage()		{}
+func (*QueryPublicValidatorMetricsRequest) ProtoMessage()	{}
+func (*QueryPublicValidatorMetricsResponse) ProtoMessage()	{}
+func (*QueryAllValidatorScoresRequest) ProtoMessage()		{}
+func (*QueryAllValidatorScoresResponse) ProtoMessage()		{}

@@ -9,112 +9,112 @@ import (
 )
 
 const (
-	IdentityGovernanceInvalidSpoofPatternSetVersionV2 uint64 = 1
-	IdentityGovernanceCommitmentTombstoneRetentionV2  uint64 = DefaultCommitTTLBlocks * 30
-	IdentityGovernanceExpiryProcessingLimitV2         uint32 = 100
-	IdentityGovernanceMinimumRegistrationDurationV2   uint64 = DefaultRegistrationPeriodBlocks / 12
-	IdentityGovernanceMaximumResolverTTLV2            uint64 = DefaultRegistrationPeriodBlocks
-	IdentityGovernanceMaximumDelegationDurationV2     uint64 = DefaultRegistrationPeriodBlocks
-	IdentityGovernanceMaximumScopedDelegatesPerDomain uint32 = 64
-	IdentityGovernanceMaximumZonePolicyBytesV2        uint64 = 4 * 1024
-	IdentityGovernanceAuctionFinalizationDelayV2      uint64 = 1
-	IdentityGovernanceCacheRecordMaximumLifetimeV2    uint64 = DefaultRegistrationPeriodBlocks
-	IdentityGovernanceStorePruningHorizonV2           uint64 = DefaultRegistrationPeriodBlocks
+	IdentityGovernanceInvalidSpoofPatternSetVersionV2	uint64	= 1
+	IdentityGovernanceCommitmentTombstoneRetentionV2	uint64	= DefaultCommitTTLBlocks * 30
+	IdentityGovernanceExpiryProcessingLimitV2		uint32	= 100
+	IdentityGovernanceMinimumRegistrationDurationV2		uint64	= DefaultRegistrationPeriodBlocks / 12
+	IdentityGovernanceMaximumResolverTTLV2			uint64	= DefaultRegistrationPeriodBlocks
+	IdentityGovernanceMaximumDelegationDurationV2		uint64	= DefaultRegistrationPeriodBlocks
+	IdentityGovernanceMaximumScopedDelegatesPerDomain	uint32	= 64
+	IdentityGovernanceMaximumZonePolicyBytesV2		uint64	= 4 * 1024
+	IdentityGovernanceAuctionFinalizationDelayV2		uint64	= 1
+	IdentityGovernanceCacheRecordMaximumLifetimeV2		uint64	= DefaultRegistrationPeriodBlocks
+	IdentityGovernanceStorePruningHorizonV2			uint64	= DefaultRegistrationPeriodBlocks
 )
 
 type IdentityGovernanceNameParamsV2 struct {
-	MaximumLabels                    uint8
-	MaximumNameBytes                 uint16
-	SupportedNormalizationVersion    uint64
-	ReservedLabels                   []string
-	InvalidSpoofingPatternSetVersion uint64
-	MaximumSubdomainDepth            uint8
+	MaximumLabels				uint8
+	MaximumNameBytes			uint16
+	SupportedNormalizationVersion		uint64
+	ReservedLabels				[]string
+	InvalidSpoofingPatternSetVersion	uint64
+	MaximumSubdomainDepth			uint8
 }
 
 type IdentityGovernanceLifecycleParamsV2 struct {
-	MinimumRegistrationDuration   uint64
-	MaximumRegistrationDuration   uint64
-	RenewalWindowDuration         uint64
-	GracePeriodDuration           uint64
-	CommitmentRevealWindow        uint64
-	CommitmentTombstoneRetention  uint64
-	ExpiryProcessingLimitPerBlock uint32
+	MinimumRegistrationDuration	uint64
+	MaximumRegistrationDuration	uint64
+	RenewalWindowDuration		uint64
+	GracePeriodDuration		uint64
+	CommitmentRevealWindow		uint64
+	CommitmentTombstoneRetention	uint64
+	ExpiryProcessingLimitPerBlock	uint32
 }
 
 type IdentityGovernancePricingParamsV2 struct {
-	Denom                      string
-	BaseRegistrationFee        sdkmath.Int
-	ShortNameMultiplierBps     uint32
-	LabelDepthFee              sdkmath.Int
-	RenewalFeeMultiplierBps    uint32
-	GraceRecoveryMultiplierBps uint32
-	ResolverByteFee            sdkmath.Int
-	SubdomainCreationFee       sdkmath.Int
-	DetachedSubdomainFee       sdkmath.Int
-	AuctionMinimumBid          sdkmath.Int
+	Denom				string
+	BaseRegistrationFee		sdkmath.Int
+	ShortNameMultiplierBps		uint32
+	LabelDepthFee			sdkmath.Int
+	RenewalFeeMultiplierBps		uint32
+	GraceRecoveryMultiplierBps	uint32
+	ResolverByteFee			sdkmath.Int
+	SubdomainCreationFee		sdkmath.Int
+	DetachedSubdomainFee		sdkmath.Int
+	AuctionMinimumBid		sdkmath.Int
 }
 
 type IdentityGovernanceResolverParamsV2 struct {
-	MaximumResolverRecordBytes  uint64
-	MaximumContractTargets      uint32
-	MaximumServiceEndpoints     uint32
-	MaximumInterfaceDescriptors uint32
-	MaximumRoutingMetadataBytes uint64
-	MaximumInlineSchemaBytes    uint64
-	MinimumResolverTTL          uint64
-	MaximumResolverTTL          uint64
-	AllowedEndpointSchemes      []string
+	MaximumResolverRecordBytes	uint64
+	MaximumContractTargets		uint32
+	MaximumServiceEndpoints		uint32
+	MaximumInterfaceDescriptors	uint32
+	MaximumRoutingMetadataBytes	uint64
+	MaximumInlineSchemaBytes	uint64
+	MinimumResolverTTL		uint64
+	MaximumResolverTTL		uint64
+	AllowedEndpointSchemes		[]string
 }
 
 type IdentityGovernanceDelegationParamsV2 struct {
-	MaximumDelegationDuration       uint64
-	MaximumScopedDelegatesPerDomain uint32
-	MaximumZonePolicySizeBytes      uint64
-	DetachedSubdomainAllowed        bool
-	TimeLockedDelegationAllowed     bool
+	MaximumDelegationDuration	uint64
+	MaximumScopedDelegatesPerDomain	uint32
+	MaximumZonePolicySizeBytes	uint64
+	DetachedSubdomainAllowed	bool
+	TimeLockedDelegationAllowed	bool
 }
 
 type IdentityGovernanceAuctionParamsV2 struct {
-	CommitPhaseDuration      uint64
-	RevealPhaseDuration      uint64
-	BidDepositMinimum        sdkmath.Int
-	UnrevealedBidPenaltyBps  uint32
-	TieBreakRule             IdentityAuctionTieBreakRuleV2
-	AuctionFinalizationDelay uint64
-	FeeBurnBps               uint32
-	FeeTreasuryBps           uint32
-	FeeRewardsBps            uint32
-	FeeCommunityPoolBps      uint32
+	CommitPhaseDuration		uint64
+	RevealPhaseDuration		uint64
+	BidDepositMinimum		sdkmath.Int
+	UnrevealedBidPenaltyBps		uint32
+	TieBreakRule			IdentityAuctionTieBreakRuleV2
+	AuctionFinalizationDelay	uint64
+	FeeBurnBps			uint32
+	FeeTreasuryBps			uint32
+	FeeRewardsBps			uint32
+	FeeCommunityPoolBps		uint32
 }
 
 type IdentityGovernancePerformanceParamsV2 struct {
-	BatchResolverUpdateMaximumSize          uint32
-	BatchRenewalMaximumSize                 uint32
-	RecursiveProofMaximumDepth              uint8
-	CacheRecordMaximumLifetime              uint64
-	StorePruningHorizonForProofAvailability uint64
-	ABCIExpiryWorkLimit                     uint32
+	BatchResolverUpdateMaximumSize		uint32
+	BatchRenewalMaximumSize			uint32
+	RecursiveProofMaximumDepth		uint8
+	CacheRecordMaximumLifetime		uint64
+	StorePruningHorizonForProofAvailability	uint64
+	ABCIExpiryWorkLimit			uint32
 }
 
 type IdentityGovernanceParamsV2 struct {
-	NameParams        IdentityGovernanceNameParamsV2
-	LifecycleParams   IdentityGovernanceLifecycleParamsV2
-	PricingParams     IdentityGovernancePricingParamsV2
-	ResolverParams    IdentityGovernanceResolverParamsV2
-	DelegationParams  IdentityGovernanceDelegationParamsV2
-	AuctionParams     IdentityGovernanceAuctionParamsV2
-	PerformanceParams IdentityGovernancePerformanceParamsV2
-	ParamsHash        string
+	NameParams		IdentityGovernanceNameParamsV2
+	LifecycleParams		IdentityGovernanceLifecycleParamsV2
+	PricingParams		IdentityGovernancePricingParamsV2
+	ResolverParams		IdentityGovernanceResolverParamsV2
+	DelegationParams	IdentityGovernanceDelegationParamsV2
+	AuctionParams		IdentityGovernanceAuctionParamsV2
+	PerformanceParams	IdentityGovernancePerformanceParamsV2
+	ParamsHash		string
 }
 
 func DefaultIdentityGovernanceNameParamsV2() IdentityGovernanceNameParamsV2 {
 	return IdentityGovernanceNameParamsV2{
-		MaximumLabels:                    MaxDomainLabels,
-		MaximumNameBytes:                 MaxDomainFullBytes,
-		SupportedNormalizationVersion:    NameNormalizationVersionV2,
-		ReservedLabels:                   []string{"admin", "aet", "null", "root", "undefined"},
-		InvalidSpoofingPatternSetVersion: IdentityGovernanceInvalidSpoofPatternSetVersionV2,
-		MaximumSubdomainDepth:            MaxDomainLabels - 1,
+		MaximumLabels:				MaxDomainLabels,
+		MaximumNameBytes:			MaxDomainFullBytes,
+		SupportedNormalizationVersion:		NameNormalizationVersionV2,
+		ReservedLabels:				[]string{"admin", "aet", "null", "root", "undefined"},
+		InvalidSpoofingPatternSetVersion:	IdentityGovernanceInvalidSpoofPatternSetVersionV2,
+		MaximumSubdomainDepth:			MaxDomainLabels - 1,
 	}
 }
 
@@ -123,13 +123,13 @@ func DefaultIdentityGovernanceLifecycleParamsV2() IdentityGovernanceLifecyclePar
 	pricing := DefaultIdentityPricingParamsV2()
 	antiSquatting := pricing.AntiSquattingParams
 	return IdentityGovernanceLifecycleParamsV2{
-		MinimumRegistrationDuration:   IdentityGovernanceMinimumRegistrationDurationV2,
-		MaximumRegistrationDuration:   pricing.MaxRegistrationDuration,
-		RenewalWindowDuration:         identityParams.RenewalWindowBlocks,
-		GracePeriodDuration:           antiSquatting.ExpiredDomainGracePeriodBlocks,
-		CommitmentRevealWindow:        identityParams.CommitTTLBlocks,
-		CommitmentTombstoneRetention:  IdentityGovernanceCommitmentTombstoneRetentionV2,
-		ExpiryProcessingLimitPerBlock: IdentityGovernanceExpiryProcessingLimitV2,
+		MinimumRegistrationDuration:	IdentityGovernanceMinimumRegistrationDurationV2,
+		MaximumRegistrationDuration:	pricing.MaxRegistrationDuration,
+		RenewalWindowDuration:		identityParams.RenewalWindowBlocks,
+		GracePeriodDuration:		antiSquatting.ExpiredDomainGracePeriodBlocks,
+		CommitmentRevealWindow:		identityParams.CommitTTLBlocks,
+		CommitmentTombstoneRetention:	IdentityGovernanceCommitmentTombstoneRetentionV2,
+		ExpiryProcessingLimitPerBlock:	IdentityGovernanceExpiryProcessingLimitV2,
 	}
 }
 
@@ -137,79 +137,79 @@ func DefaultIdentityGovernancePricingParamsV2() IdentityGovernancePricingParamsV
 	pricing := DefaultIdentityPricingParamsV2()
 	antiSquatting := pricing.AntiSquattingParams
 	return IdentityGovernancePricingParamsV2{
-		Denom:                      "naet",
-		BaseRegistrationFee:        antiSquatting.DomainParams.LowStartPrice,
-		ShortNameMultiplierBps:     pricing.ShortNameScarcityBps,
-		LabelDepthFee:              pricing.LabelDepthFee,
-		RenewalFeeMultiplierBps:    antiSquatting.DomainParams.RenewalDiscountBps,
-		GraceRecoveryMultiplierBps: pricing.GraceRecoveryMultiplierBps,
-		ResolverByteFee:            antiSquatting.ResolverStorageFeePerByte,
-		SubdomainCreationFee:       sdkmath.NewInt(DefaultIdentitySpamSubdomainCreationFeeNaet),
-		DetachedSubdomainFee:       pricing.DetachedSubdomainFee,
-		AuctionMinimumBid:          antiSquatting.DomainParams.LowStartPrice,
+		Denom:				"naet",
+		BaseRegistrationFee:		antiSquatting.DomainParams.LowStartPrice,
+		ShortNameMultiplierBps:		pricing.ShortNameScarcityBps,
+		LabelDepthFee:			pricing.LabelDepthFee,
+		RenewalFeeMultiplierBps:	antiSquatting.DomainParams.RenewalDiscountBps,
+		GraceRecoveryMultiplierBps:	pricing.GraceRecoveryMultiplierBps,
+		ResolverByteFee:		antiSquatting.ResolverStorageFeePerByte,
+		SubdomainCreationFee:		sdkmath.NewInt(DefaultIdentitySpamSubdomainCreationFeeNaet),
+		DetachedSubdomainFee:		pricing.DetachedSubdomainFee,
+		AuctionMinimumBid:		antiSquatting.DomainParams.LowStartPrice,
 	}
 }
 
 func DefaultIdentityGovernanceResolverParamsV2() IdentityGovernanceResolverParamsV2 {
 	return IdentityGovernanceResolverParamsV2{
-		MaximumResolverRecordBytes:  MaxUnifiedPayloadBytesV2,
-		MaximumContractTargets:      MaxUnifiedContractTargets,
-		MaximumServiceEndpoints:     MaxUnifiedServiceEndpoints,
-		MaximumInterfaceDescriptors: MaxUnifiedInterfaceDescriptors,
-		MaximumRoutingMetadataBytes: MaxUnifiedRoutingMetadataBytes,
-		MaximumInlineSchemaBytes:    MaxInterfaceInlineSchemaBytesV2,
-		MinimumResolverTTL:          1,
-		MaximumResolverTTL:          IdentityGovernanceMaximumResolverTTLV2,
-		AllowedEndpointSchemes:      []string{"aetra", "grpcs", "https", "ipfs", "wss"},
+		MaximumResolverRecordBytes:	MaxUnifiedPayloadBytesV2,
+		MaximumContractTargets:		MaxUnifiedContractTargets,
+		MaximumServiceEndpoints:	MaxUnifiedServiceEndpoints,
+		MaximumInterfaceDescriptors:	MaxUnifiedInterfaceDescriptors,
+		MaximumRoutingMetadataBytes:	MaxUnifiedRoutingMetadataBytes,
+		MaximumInlineSchemaBytes:	MaxInterfaceInlineSchemaBytesV2,
+		MinimumResolverTTL:		1,
+		MaximumResolverTTL:		IdentityGovernanceMaximumResolverTTLV2,
+		AllowedEndpointSchemes:		[]string{"aetra", "grpcs", "https", "ipfs", "wss"},
 	}
 }
 
 func DefaultIdentityGovernanceDelegationParamsV2() IdentityGovernanceDelegationParamsV2 {
 	return IdentityGovernanceDelegationParamsV2{
-		MaximumDelegationDuration:       IdentityGovernanceMaximumDelegationDurationV2,
-		MaximumScopedDelegatesPerDomain: IdentityGovernanceMaximumScopedDelegatesPerDomain,
-		MaximumZonePolicySizeBytes:      IdentityGovernanceMaximumZonePolicyBytesV2,
-		DetachedSubdomainAllowed:        true,
-		TimeLockedDelegationAllowed:     true,
+		MaximumDelegationDuration:		IdentityGovernanceMaximumDelegationDurationV2,
+		MaximumScopedDelegatesPerDomain:	IdentityGovernanceMaximumScopedDelegatesPerDomain,
+		MaximumZonePolicySizeBytes:		IdentityGovernanceMaximumZonePolicyBytesV2,
+		DetachedSubdomainAllowed:		true,
+		TimeLockedDelegationAllowed:		true,
 	}
 }
 
 func DefaultIdentityGovernanceAuctionParamsV2() IdentityGovernanceAuctionParamsV2 {
 	fairness := DefaultIdentityAuctionFairnessParamsV2("aetra-local-1")
 	return IdentityGovernanceAuctionParamsV2{
-		CommitPhaseDuration:      DefaultAuctionCommitBlocks,
-		RevealPhaseDuration:      DefaultAuctionRevealBlocks,
-		BidDepositMinimum:        fairness.BidDeposit,
-		UnrevealedBidPenaltyBps:  fairness.UnrevealedForfeitBps,
-		TieBreakRule:             fairness.TieBreakRule,
-		AuctionFinalizationDelay: IdentityGovernanceAuctionFinalizationDelayV2,
-		FeeBurnBps:               fairness.FeeBurnBps,
-		FeeTreasuryBps:           fairness.FeeTreasuryBps,
-		FeeRewardsBps:            fairness.FeeRewardsBps,
-		FeeCommunityPoolBps:      fairness.FeeCommunityPoolBps,
+		CommitPhaseDuration:		DefaultAuctionCommitBlocks,
+		RevealPhaseDuration:		DefaultAuctionRevealBlocks,
+		BidDepositMinimum:		fairness.BidDeposit,
+		UnrevealedBidPenaltyBps:	fairness.UnrevealedForfeitBps,
+		TieBreakRule:			fairness.TieBreakRule,
+		AuctionFinalizationDelay:	IdentityGovernanceAuctionFinalizationDelayV2,
+		FeeBurnBps:			fairness.FeeBurnBps,
+		FeeTreasuryBps:			fairness.FeeTreasuryBps,
+		FeeRewardsBps:			fairness.FeeRewardsBps,
+		FeeCommunityPoolBps:		fairness.FeeCommunityPoolBps,
 	}
 }
 
 func DefaultIdentityGovernancePerformanceParamsV2() IdentityGovernancePerformanceParamsV2 {
 	return IdentityGovernancePerformanceParamsV2{
-		BatchResolverUpdateMaximumSize:          MaxIdentityTxBatchResolverUpdatesV2,
-		BatchRenewalMaximumSize:                 MaxIdentityTxBatchRenewDomainsV2,
-		RecursiveProofMaximumDepth:              MaxDomainLabels,
-		CacheRecordMaximumLifetime:              IdentityGovernanceCacheRecordMaximumLifetimeV2,
-		StorePruningHorizonForProofAvailability: IdentityGovernanceStorePruningHorizonV2,
-		ABCIExpiryWorkLimit:                     IdentityGovernanceExpiryProcessingLimitV2,
+		BatchResolverUpdateMaximumSize:			MaxIdentityTxBatchResolverUpdatesV2,
+		BatchRenewalMaximumSize:			MaxIdentityTxBatchRenewDomainsV2,
+		RecursiveProofMaximumDepth:			MaxDomainLabels,
+		CacheRecordMaximumLifetime:			IdentityGovernanceCacheRecordMaximumLifetimeV2,
+		StorePruningHorizonForProofAvailability:	IdentityGovernanceStorePruningHorizonV2,
+		ABCIExpiryWorkLimit:				IdentityGovernanceExpiryProcessingLimitV2,
 	}
 }
 
 func DefaultIdentityGovernanceParamsV2() (IdentityGovernanceParamsV2, error) {
 	params := IdentityGovernanceParamsV2{
-		NameParams:        DefaultIdentityGovernanceNameParamsV2(),
-		LifecycleParams:   DefaultIdentityGovernanceLifecycleParamsV2(),
-		PricingParams:     DefaultIdentityGovernancePricingParamsV2(),
-		ResolverParams:    DefaultIdentityGovernanceResolverParamsV2(),
-		DelegationParams:  DefaultIdentityGovernanceDelegationParamsV2(),
-		AuctionParams:     DefaultIdentityGovernanceAuctionParamsV2(),
-		PerformanceParams: DefaultIdentityGovernancePerformanceParamsV2(),
+		NameParams:		DefaultIdentityGovernanceNameParamsV2(),
+		LifecycleParams:	DefaultIdentityGovernanceLifecycleParamsV2(),
+		PricingParams:		DefaultIdentityGovernancePricingParamsV2(),
+		ResolverParams:		DefaultIdentityGovernanceResolverParamsV2(),
+		DelegationParams:	DefaultIdentityGovernanceDelegationParamsV2(),
+		AuctionParams:		DefaultIdentityGovernanceAuctionParamsV2(),
+		PerformanceParams:	DefaultIdentityGovernancePerformanceParamsV2(),
 	}
 	params.ParamsHash = ComputeIdentityGovernanceParamsHashV2(params)
 	return params, ValidateIdentityGovernanceParamsV2(params)
@@ -298,8 +298,8 @@ func ValidateIdentityGovernancePricingParamsV2(params IdentityGovernancePricingP
 		return errors.New("identity governance pricing denom must be naet")
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "base registration fee", value: params.BaseRegistrationFee},
 		{label: "label depth fee", value: params.LabelDepthFee},
@@ -313,8 +313,8 @@ func ValidateIdentityGovernancePricingParamsV2(params IdentityGovernancePricingP
 		}
 	}
 	for _, bps := range []struct {
-		label string
-		value uint32
+		label	string
+		value	uint32
 	}{
 		{label: "short name multiplier bps", value: params.ShortNameMultiplierBps},
 		{label: "renewal fee multiplier bps", value: params.RenewalFeeMultiplierBps},

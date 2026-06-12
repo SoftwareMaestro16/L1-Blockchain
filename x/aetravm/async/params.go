@@ -9,26 +9,26 @@ import (
 
 func DefaultParams() Params {
 	return Params{
-		MaxMessagesPerTx:             32,
-		MaxMessagesPerBlock:          128,
-		MaxQueuedMessagesPerContract: 1024,
-		MaxProcessingAttempts:        4,
-		MaxRecursionDepth:            8,
-		MaxBodySize:                  4096,
-		MaxStateSize:                 64 * 1024,
-		MaxContractDeploysPerTx:      4,
-		MaxContractDeploysPerBlock:   16,
-		MaxEmittedMessagesPerExec:    16,
-		MaxStorageWritesPerExec:      64,
-		MaxActionsPerExecution:       256,
-		MaxRetriesPerMessage:         3,
-		DefaultRetryDelayBlocks:      1,
-		MaxRetryDelayBlocks:          64,
-		MaxDeadLetters:               1024,
-		ExecutionGasPerMessage:       10_000,
-		StorageFeePerByte:            sdkmath.NewInt(1),
-		ForwardingFee:                sdkmath.NewInt(1),
-		ContractDeploymentCost:       sdkmath.NewInt(1_000),
+		MaxMessagesPerTx:		32,
+		MaxMessagesPerBlock:		128,
+		MaxQueuedMessagesPerContract:	1024,
+		MaxProcessingAttempts:		4,
+		MaxRecursionDepth:		8,
+		MaxBodySize:			4096,
+		MaxStateSize:			64 * 1024,
+		MaxContractDeploysPerTx:	4,
+		MaxContractDeploysPerBlock:	16,
+		MaxEmittedMessagesPerExec:	16,
+		MaxStorageWritesPerExec:	64,
+		MaxActionsPerExecution:		256,
+		MaxRetriesPerMessage:		3,
+		DefaultRetryDelayBlocks:	1,
+		MaxRetryDelayBlocks:		64,
+		MaxDeadLetters:			1024,
+		ExecutionGasPerMessage:		10_000,
+		StorageFeePerByte:		sdkmath.NewInt(1),
+		ForwardingFee:			sdkmath.NewInt(1),
+		ContractDeploymentCost:		sdkmath.NewInt(1_000),
 	}
 }
 
@@ -88,8 +88,8 @@ func (p Params) Validate() error {
 		return errors.New("execution gas per message must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "storage fee per byte", value: p.StorageFeePerByte},
 		{name: "forwarding fee", value: p.ForwardingFee},

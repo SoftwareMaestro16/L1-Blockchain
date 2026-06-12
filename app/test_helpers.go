@@ -33,9 +33,9 @@ import (
 
 // SetupOptions defines arguments that are passed into `Simapp` constructor.
 type SetupOptions struct {
-	Logger  log.Logger
-	DB      *dbm.MemDB
-	AppOpts servertypes.AppOptions
+	Logger	log.Logger
+	DB	*dbm.MemDB
+	AppOpts	servertypes.AppOptions
 }
 
 func setup(withGenesis bool, invCheckPeriod uint) (*L1App, GenesisState) {
@@ -58,16 +58,15 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
-	// create validator set with single validator
+
 	validator := cmttypes.NewValidator(pubKey, 1)
 	valSet := cmttypes.NewValidatorSet([]*cmttypes.Validator{validator})
 
-	// generate genesis account
 	senderPrivKey := secp256k1.GenPrivKey()
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
+		Address:	acc.GetAddress().String(),
+		Coins:		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
 	}
 
 	app := NewL1App(options.Logger, options.DB, true, options.AppOpts)
@@ -77,15 +76,14 @@ func NewSimappWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptio
 	genesisState = withNativeTokenMetadata(app.AppCodec(), genesisState)
 
 	if !isCheckTx {
-		// init chain must be called to stop deliverState from being nil
+
 		stateBytes, err := cmtjson.MarshalIndent(genesisState, "", " ")
 		require.NoError(t, err)
 
-		// Initialize the chain
 		_, err = app.InitChain(&abci.RequestInitChain{
-			Validators:      []abci.ValidatorUpdate{},
-			ConsensusParams: simtestutil.DefaultConsensusParams,
-			AppStateBytes:   stateBytes,
+			Validators:		[]abci.ValidatorUpdate{},
+			ConsensusParams:	simtestutil.DefaultConsensusParams,
+			AppStateBytes:		stateBytes,
 		})
 		require.NoError(t, err)
 	}
@@ -101,16 +99,14 @@ func Setup(t testing.TB, isCheckTx bool) *L1App {
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
 
-	// create validator set with single validator
 	validator := cmttypes.NewValidator(pubKey, 1)
 	valSet := cmttypes.NewValidatorSet([]*cmttypes.Validator{validator})
 
-	// generate genesis account
 	senderPrivKey := secp256k1.GenPrivKey()
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
+		Address:	acc.GetAddress().String(),
+		Coins:		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
 	}
 
 	app := SetupWithGenesisValSet(t, valSet, []authtypes.GenesisAccount{acc}, balance)
@@ -133,20 +129,19 @@ func SetupWithGenesisValSet(t testing.TB, valSet *cmttypes.ValidatorSet, genAccs
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
 
-	// init chain will set the validator set and initialize the genesis accounts
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: simtestutil.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	simtestutil.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	},
 	)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
 	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height:             app.LastBlockHeight() + 1,
-		Hash:               app.LastCommitID().Hash,
-		NextValidatorsHash: valSet.Hash(),
+		Height:			app.LastBlockHeight() + 1,
+		Hash:			app.LastCommitID().Hash,
+		NextValidatorsHash:	valSet.Hash(),
 	})
 	require.NoError(t, err)
 
@@ -162,17 +157,15 @@ func GenesisStateWithSingleValidator(t *testing.T, app *L1App) GenesisState {
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
 
-	// create validator set with single validator
 	validator := cmttypes.NewValidator(pubKey, 1)
 	valSet := cmttypes.NewValidatorSet([]*cmttypes.Validator{validator})
 
-	// generate genesis account
 	senderPrivKey := secp256k1.GenPrivKey()
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balances := []banktypes.Balance{
 		{
-			Address: acc.GetAddress().String(),
-			Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
+			Address:	acc.GetAddress().String(),
+			Coins:		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
 		},
 	}
 
@@ -271,13 +264,13 @@ func NewTestNetworkFixture() network.TestFixture {
 	}
 
 	return network.TestFixture{
-		AppConstructor: appCtr,
-		GenesisState:   app.DefaultGenesis(),
+		AppConstructor:	appCtr,
+		GenesisState:	app.DefaultGenesis(),
 		EncodingConfig: testutil.TestEncodingConfig{
-			InterfaceRegistry: app.InterfaceRegistry(),
-			Codec:             app.AppCodec(),
-			TxConfig:          app.TxConfig(),
-			Amino:             app.LegacyAmino(),
+			InterfaceRegistry:	app.InterfaceRegistry(),
+			Codec:			app.AppCodec(),
+			TxConfig:		app.TxConfig(),
+			Amino:			app.LegacyAmino(),
 		},
 	}
 }

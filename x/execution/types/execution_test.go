@@ -45,21 +45,21 @@ func TestDeliverTxIntegratesResolverReputationAsyncAndEvents(t *testing.T) {
 	envelope.ResolverDomain = "alice.aet"
 	envelope.TimestampUnix = 100
 	domain := identitytypes.DomainRecord{
-		Name:          "alice",
-		TLD:           identitytypes.DomainTLD,
-		Owner:         addr(8),
-		ExpiryUnix:    1_000,
-		NFTItemID:     identitytypes.DomainNFTItemID("alice"),
-		Status:        identitytypes.DomainStatusActive,
-		CreatedAtUnix: 1,
-		UpdatedAtUnix: 2,
+		Name:		"alice",
+		TLD:		identitytypes.DomainTLD,
+		Owner:		addr(8),
+		ExpiryUnix:	1_000,
+		NFTItemID:	identitytypes.DomainNFTItemID("alice"),
+		Status:		identitytypes.DomainStatusActive,
+		CreatedAtUnix:	1,
+		UpdatedAtUnix:	2,
 	}
 	resolver := identitytypes.ResolverRecord{
-		Domain:        "alice.aet",
-		Owner:         addr(8),
-		Primary:       addr(9),
-		Records:       map[string]sdk.AccAddress{identitytypes.ResolverKeyWallet: addr(9)},
-		UpdatedAtUnix: 3,
+		Domain:		"alice.aet",
+		Owner:		addr(8),
+		Primary:	addr(9),
+		Records:	map[string]sdk.AccAddress{identitytypes.ResolverKeyWallet: addr(9)},
+		UpdatedAtUnix:	3,
 	}
 	envelope.DomainRecord = &domain
 	envelope.ResolverRecord = &resolver
@@ -104,29 +104,29 @@ func testEnvelope() ExecutionEnvelope {
 	identity.Score = 2000
 	identity.Confidence = 1000
 	return ExecutionEnvelope{
-		TxHash:      []byte("tx"),
-		Sender:      addr(1),
-		Receiver:    addr(2),
-		Route:       RouteBankTransfer,
-		GasLimit:    200_000,
-		Fee:         sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 10)),
-		Memo:        memotypes.TxMetadata{Memo: "note", MemoVisible: true},
-		Identity:    identity,
-		SenderStake: sdkmath.NewInt(1_000_000_000),
+		TxHash:		[]byte("tx"),
+		Sender:		addr(1),
+		Receiver:	addr(2),
+		Route:		RouteBankTransfer,
+		GasLimit:	200_000,
+		Fee:		sdk.NewCoins(sdk.NewInt64Coin(appparams.BaseDenom, 10)),
+		Memo:		memotypes.TxMetadata{Memo: "note", MemoVisible: true},
+		Identity:	identity,
+		SenderStake:	sdkmath.NewInt(1_000_000_000),
 	}
 }
 
 func testAsyncMessage(source, destination sdk.AccAddress) async.MessageEnvelope {
 	return async.MessageEnvelope{
-		Source:      source,
-		Destination: destination,
-		Value:       sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
-		Opcode:      1,
-		QueryID:     1,
-		Body:        []byte("body"),
-		Bounce:      true,
-		GasLimit:    100_000,
-		ForwardFee:  sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
+		Source:		source,
+		Destination:	destination,
+		Value:		sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
+		Opcode:		1,
+		QueryID:	1,
+		Body:		[]byte("body"),
+		Bounce:		true,
+		GasLimit:	100_000,
+		ForwardFee:	sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
 	}
 }
 

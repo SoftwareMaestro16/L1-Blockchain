@@ -192,14 +192,14 @@ func testProofRegistrySnapshotWithRoots(t *testing.T, height uint64, appHash str
 		metadata = append(metadata, item)
 	}
 	snapshot, err := NewProofRegistrySnapshot(ProofRegistrySnapshot{
-		Height:            height,
-		AppHash:           appHash,
-		AetraCoreRoot:     proofRegistryTestHash("core", fmt.Sprint(height)),
-		GlobalZoneRoot:    proofRegistryTestHash("zones", fmt.Sprint(height)),
-		GlobalMessageRoot: proofRegistryTestHash("messages", fmt.Sprint(height)),
-		ReceiptRoot:       proofRegistryTestHash("receipts", fmt.Sprint(height)),
-		Roots:             roots,
-		Metadata:          metadata,
+		Height:			height,
+		AppHash:		appHash,
+		AetraCoreRoot:		proofRegistryTestHash("core", fmt.Sprint(height)),
+		GlobalZoneRoot:		proofRegistryTestHash("zones", fmt.Sprint(height)),
+		GlobalMessageRoot:	proofRegistryTestHash("messages", fmt.Sprint(height)),
+		ReceiptRoot:		proofRegistryTestHash("receipts", fmt.Sprint(height)),
+		Roots:			roots,
+		Metadata:		metadata,
 	})
 	require.NoError(t, err)
 	return snapshot
@@ -220,19 +220,19 @@ func testProofRegistryEnvelope(t *testing.T, proofType coretypes.UniversalProofT
 	t.Helper()
 	path := testProofRegistryPath(t, appHash, rootType, storeRoot)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
-		ProofType:          proofType,
-		ChainID:            "aetra-test",
-		Height:             height,
-		AppHash:            appHash,
-		RootType:           rootType,
-		ZoneID:             zoneID,
-		ShardID:            shardID,
-		Key:                key,
-		Value:              value,
-		NonExistenceMarker: absence,
-		StoreRoot:          storeRoot,
-		ProofOps:           []string{proofRegistryTestHash("op", string(key))},
-		VerificationPath:   path,
+		ProofType:		proofType,
+		ChainID:		"aetra-test",
+		Height:			height,
+		AppHash:		appHash,
+		RootType:		rootType,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Key:			key,
+		Value:			value,
+		NonExistenceMarker:	absence,
+		StoreRoot:		storeRoot,
+		ProofOps:		[]string{proofRegistryTestHash("op", string(key))},
+		VerificationPath:	path,
 	})
 	require.NoError(t, err)
 	return proof
@@ -244,18 +244,18 @@ func testProofRegistryZoneProof(t *testing.T, height uint64, appHash string, zon
 	zone, err := coretypes.NewZoneCommitment(height, zoneID, stateRoot, proofRegistryTestHash("inbox"), proofRegistryTestHash("outbox"), proofRegistryTestHash("receipts"), proofRegistryTestHash("events"), proofRegistryTestHash("shards"), proofRegistryTestHash("params"), proofRegistryTestHash("summary"))
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
-		ProofType:        coretypes.ProofTypeZoneRoot,
-		ChainID:          "aetra-test",
-		Height:           height,
-		AppHash:          appHash,
-		RootType:         coretypes.ZoneStateProofRootType,
-		ZoneID:           zoneID,
-		Key:              []byte("zone/" + string(zoneID)),
-		Value:            []byte("zone-root"),
-		StoreRoot:        stateRoot,
-		ProofOps:         []string{proofRegistryTestHash("zone-op")},
-		VerificationPath: testProofRegistryPath(t, appHash, coretypes.ZoneStateProofRootType, stateRoot),
-		ZoneCommitment:   zone,
+		ProofType:		coretypes.ProofTypeZoneRoot,
+		ChainID:		"aetra-test",
+		Height:			height,
+		AppHash:		appHash,
+		RootType:		coretypes.ZoneStateProofRootType,
+		ZoneID:			zoneID,
+		Key:			[]byte("zone/" + string(zoneID)),
+		Value:			[]byte("zone-root"),
+		StoreRoot:		stateRoot,
+		ProofOps:		[]string{proofRegistryTestHash("zone-op")},
+		VerificationPath:	testProofRegistryPath(t, appHash, coretypes.ZoneStateProofRootType, stateRoot),
+		ZoneCommitment:		zone,
 	})
 	require.NoError(t, err)
 	return proof
@@ -270,20 +270,20 @@ func testProofRegistryShardProof(t *testing.T, height uint64, appHash string, zo
 	shard, err := coretypes.NewUniversalShardCommitment(coretypes.UniversalShardCommitment{Height: height, ZoneID: zoneID, ShardID: shardID, ShardRoot: shardRoot, ShardRootsRoot: shardAggregate})
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
-		ProofType:        coretypes.ProofTypeShardRoot,
-		ChainID:          "aetra-test",
-		Height:           height,
-		AppHash:          appHash,
-		RootType:         coretypes.ShardStateProofRootType,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		Key:              []byte("shard/" + string(shardID)),
-		Value:            []byte("shard-root"),
-		StoreRoot:        shardRoot,
-		ProofOps:         []string{proofRegistryTestHash("shard-op")},
-		VerificationPath: testProofRegistryPath(t, appHash, coretypes.ShardStateProofRootType, shardRoot),
-		ZoneCommitment:   zone,
-		ShardCommitment:  shard,
+		ProofType:		coretypes.ProofTypeShardRoot,
+		ChainID:		"aetra-test",
+		Height:			height,
+		AppHash:		appHash,
+		RootType:		coretypes.ShardStateProofRootType,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Key:			[]byte("shard/" + string(shardID)),
+		Value:			[]byte("shard-root"),
+		StoreRoot:		shardRoot,
+		ProofOps:		[]string{proofRegistryTestHash("shard-op")},
+		VerificationPath:	testProofRegistryPath(t, appHash, coretypes.ShardStateProofRootType, shardRoot),
+		ZoneCommitment:		zone,
+		ShardCommitment:	shard,
 	})
 	require.NoError(t, err)
 	return proof
@@ -298,20 +298,20 @@ func testProofRegistryScopedProof(t *testing.T, height uint64, appHash string, p
 	shard, err := coretypes.NewUniversalShardCommitment(coretypes.UniversalShardCommitment{Height: height, ZoneID: zoneID, ShardID: shardID, ShardRoot: storeRoot, ShardRootsRoot: shardAggregate})
 	require.NoError(t, err)
 	proof, err := BuildStoreV2ProofEnvelope(StoreV2ProofAdapterRequest{
-		ProofType:        proofType,
-		ChainID:          "aetra-test",
-		Height:           height,
-		AppHash:          appHash,
-		RootType:         rootType,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		Key:              key,
-		Value:            value,
-		StoreRoot:        storeRoot,
-		ProofOps:         []string{proofRegistryTestHash("scoped-op", string(key))},
-		VerificationPath: testProofRegistryPath(t, appHash, rootType, storeRoot),
-		ZoneCommitment:   zone,
-		ShardCommitment:  shard,
+		ProofType:		proofType,
+		ChainID:		"aetra-test",
+		Height:			height,
+		AppHash:		appHash,
+		RootType:		rootType,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Key:			key,
+		Value:			value,
+		StoreRoot:		storeRoot,
+		ProofOps:		[]string{proofRegistryTestHash("scoped-op", string(key))},
+		VerificationPath:	testProofRegistryPath(t, appHash, rootType, storeRoot),
+		ZoneCommitment:		zone,
+		ShardCommitment:	shard,
 	})
 	require.NoError(t, err)
 	return proof
@@ -324,13 +324,13 @@ func testProofRegistryMessageCommitment(t *testing.T, height uint64, messageRoot
 		receiptHash = coretypes.EmptyRootHash
 	}
 	commitment, err := coretypes.NewUniversalMessageCommitment(coretypes.UniversalMessageCommitment{
-		Height:               height,
-		MessageID:            proofRegistryTestHash("message-id"),
-		MessageRoot:          messageRoot,
-		SourceOutboxRoot:     proofRegistryTestHash("outbox"),
-		DestinationInboxRoot: proofRegistryTestHash("inbox"),
-		ReceiptRoot:          receiptRoot,
-		ReceiptHash:          receiptHash,
+		Height:			height,
+		MessageID:		proofRegistryTestHash("message-id"),
+		MessageRoot:		messageRoot,
+		SourceOutboxRoot:	proofRegistryTestHash("outbox"),
+		DestinationInboxRoot:	proofRegistryTestHash("inbox"),
+		ReceiptRoot:		receiptRoot,
+		ReceiptHash:		receiptHash,
 	})
 	require.NoError(t, err)
 	return commitment
@@ -339,12 +339,12 @@ func testProofRegistryMessageCommitment(t *testing.T, height uint64, messageRoot
 func testProofRegistryPath(t *testing.T, appHash string, rootType coretypes.RootType, storeRoot string) []coretypes.UniversalRootStep {
 	t.Helper()
 	step, err := coretypes.NewUniversalRootStep(coretypes.UniversalRootStep{
-		Index:        0,
-		FromRootType: coretypes.DefaultProofRootType,
-		FromRoot:     appHash,
-		ToRootType:   rootType,
-		ToRoot:       storeRoot,
-		Scope:        "proofregistry",
+		Index:		0,
+		FromRootType:	coretypes.DefaultProofRootType,
+		FromRoot:	appHash,
+		ToRootType:	rootType,
+		ToRoot:		storeRoot,
+		Scope:		"proofregistry",
 	})
 	require.NoError(t, err)
 	return []coretypes.UniversalRootStep{step}

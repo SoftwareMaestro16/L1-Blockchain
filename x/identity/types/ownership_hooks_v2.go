@@ -10,8 +10,8 @@ import (
 type IdentityNFTTransferHookModeV2 string
 
 const (
-	IdentityNFTTransferHookRejectOnRegistryMismatchV2 IdentityNFTTransferHookModeV2 = "reject_on_registry_mismatch"
-	IdentityNFTTransferHookUpdateRegistryV2           IdentityNFTTransferHookModeV2 = "update_registry"
+	IdentityNFTTransferHookRejectOnRegistryMismatchV2	IdentityNFTTransferHookModeV2	= "reject_on_registry_mismatch"
+	IdentityNFTTransferHookUpdateRegistryV2			IdentityNFTTransferHookModeV2	= "update_registry"
 )
 
 func ApplyIdentityNFTTransferHookStateV2(state IdentityState, nftID string, newOwner sdk.AccAddress, height uint64, mode IdentityNFTTransferHookModeV2) (IdentityState, Domain, error) {

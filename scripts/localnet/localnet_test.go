@@ -45,7 +45,6 @@ func TestLocalnetGetNodeCountFunction(t *testing.T) {
 		t.Error("profiles.ps1 missing Get-LocalnetProfileNodeCount function")
 	}
 
-	// Check that function returns correct counts
 	if !strings.Contains(text, `"localnet-4" { return 4 }`) {
 		t.Error("Get-LocalnetProfileNodeCount should return 4 for localnet-4 profile")
 	}
@@ -103,12 +102,10 @@ func TestLocalnetInitScriptSupportsValidatorCount(t *testing.T) {
 
 	text := string(content)
 
-	// Check for ValidatorCount parameter
 	if !strings.Contains(text, "[int]$ValidatorCount") {
 		t.Error("init.ps1 should have ValidatorCount parameter")
 	}
 
-	// Check for validator-count in testnet init-files
 	if !strings.Contains(text, "--validator-count") {
 		t.Error("init.ps1 should pass --validator-count to testnet init-files")
 	}
@@ -127,12 +124,10 @@ func TestLocalnetStartScriptSupportsValidatorCount(t *testing.T) {
 
 	text := string(content)
 
-	// Check for ValidatorCount parameter
 	if !strings.Contains(text, "[int]$ValidatorCount") {
 		t.Error("start.ps1 should have ValidatorCount parameter")
 	}
 
-	// Check for validator count validation
 	if !strings.Contains(text, "$ValidatorCount") && !strings.Contains(text, "validator count") {
 		t.Log("warning: start.ps1 may not validate validator count")
 	}
@@ -191,7 +186,6 @@ func TestLocalnetProfilesAllowedList(t *testing.T) {
 		t.Fatalf("error reading profiles.ps1: %v", err)
 	}
 
-	// Extract the profiles array
 	text := string(content)
 	expectedProfiles := []string{
 		"base",

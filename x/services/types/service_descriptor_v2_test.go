@@ -10,20 +10,20 @@ import (
 
 func TestCanonicalServiceDescriptorFieldsAndHash(t *testing.T) {
 	descriptor, err := NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        "svc-api",
-		EndpointType:     CanonicalEndpointAPI,
-		InterfaceHash:    testDistributedHash("iface"),
-		SupportedMethods: []string{"submit", "query", "query"},
-		AuthModel:        "owner-or-provider",
-		StateDependency:  "message-or-proof",
-		Owner:            coretypes.DefaultAuthority,
-		ZoneID:           coretypes.ZoneIDApplication,
-		Version:          2,
-		EndpointURIHash:  testDistributedHash("endpoint"),
-		MetadataHash:     testDistributedHash("metadata"),
-		TTLHeight:        100,
-		Status:           CanonicalServiceStatusActive,
-		Capabilities:     []string{"proofs", "callbacks", "proofs"},
+		ServiceID:		"svc-api",
+		EndpointType:		CanonicalEndpointAPI,
+		InterfaceHash:		testDistributedHash("iface"),
+		SupportedMethods:	[]string{"submit", "query", "query"},
+		AuthModel:		"owner-or-provider",
+		StateDependency:	"message-or-proof",
+		Owner:			coretypes.DefaultAuthority,
+		ZoneID:			coretypes.ZoneIDApplication,
+		Version:		2,
+		EndpointURIHash:	testDistributedHash("endpoint"),
+		MetadataHash:		testDistributedHash("metadata"),
+		TTLHeight:		100,
+		Status:			CanonicalServiceStatusActive,
+		Capabilities:		[]string{"proofs", "callbacks", "proofs"},
 	})
 	require.NoError(t, err)
 	require.Equal(t, "svc-api", descriptor.ServiceID)
@@ -52,20 +52,20 @@ func TestProjectDistributedServiceDescriptor(t *testing.T) {
 
 func TestCanonicalServiceDescriptorValidationRejectsMalformedFields(t *testing.T) {
 	descriptor, err := NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        "svc-api",
-		EndpointType:     CanonicalEndpointAPI,
-		InterfaceHash:    testDistributedHash("iface"),
-		SupportedMethods: []string{"query"},
-		AuthModel:        "owner-or-provider",
-		StateDependency:  "messages/proofs",
-		Owner:            coretypes.DefaultAuthority,
-		ZoneID:           coretypes.ZoneIDApplication,
-		Version:          1,
-		EndpointURIHash:  testDistributedHash("endpoint"),
-		MetadataHash:     testDistributedHash("metadata"),
-		TTLHeight:        100,
-		Status:           CanonicalServiceStatusActive,
-		Capabilities:     []string{"proofs"},
+		ServiceID:		"svc-api",
+		EndpointType:		CanonicalEndpointAPI,
+		InterfaceHash:		testDistributedHash("iface"),
+		SupportedMethods:	[]string{"query"},
+		AuthModel:		"owner-or-provider",
+		StateDependency:	"messages/proofs",
+		Owner:			coretypes.DefaultAuthority,
+		ZoneID:			coretypes.ZoneIDApplication,
+		Version:		1,
+		EndpointURIHash:	testDistributedHash("endpoint"),
+		MetadataHash:		testDistributedHash("metadata"),
+		TTLHeight:		100,
+		Status:			CanonicalServiceStatusActive,
+		Capabilities:		[]string{"proofs"},
 	})
 	require.NoError(t, err)
 

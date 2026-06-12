@@ -10,50 +10,50 @@ import (
 type CommitmentProofType string
 
 const (
-	ZoneProofType         CommitmentProofType = "zone"
-	ServiceProofType      CommitmentProofType = "service"
-	IdentityProofType     CommitmentProofType = "identity"
-	StorageProofType      CommitmentProofType = "storage"
-	MessageProofType      CommitmentProofType = "message"
-	ReceiptProofType      CommitmentProofType = "receipt"
-	PaymentProofType      CommitmentProofType = "payment"
-	ContractProofType     CommitmentProofType = "contract"
-	RoutingProofType      CommitmentProofType = "routing"
-	NonExistenceProofType CommitmentProofType = "non_existence"
+	ZoneProofType		CommitmentProofType	= "zone"
+	ServiceProofType	CommitmentProofType	= "service"
+	IdentityProofType	CommitmentProofType	= "identity"
+	StorageProofType	CommitmentProofType	= "storage"
+	MessageProofType	CommitmentProofType	= "message"
+	ReceiptProofType	CommitmentProofType	= "receipt"
+	PaymentProofType	CommitmentProofType	= "payment"
+	ContractProofType	CommitmentProofType	= "contract"
+	RoutingProofType	CommitmentProofType	= "routing"
+	NonExistenceProofType	CommitmentProofType	= "non_existence"
 )
 
 type RootContribution struct {
-	RootType         RootType
-	ID               string
-	RootHash         string
-	ContributionHash string
+	RootType		RootType
+	ID			string
+	RootHash		string
+	ContributionHash	string
 }
 
 type ZoneRootAggregation struct {
-	Height      uint64
-	ZoneID      ZoneID
-	ModuleRoots []RootContribution
-	ZoneRoot    string
+	Height		uint64
+	ZoneID		ZoneID
+	ModuleRoots	[]RootContribution
+	ZoneRoot	string
 }
 
 type AEKRootAggregation struct {
-	Height        uint64
-	ZoneRoots     []RootContribution
-	GlobalRoots   []RootContribution
-	AggregateRoot string
+	Height		uint64
+	ZoneRoots	[]RootContribution
+	GlobalRoots	[]RootContribution
+	AggregateRoot	string
 }
 
 type StateCommitmentProof struct {
-	ProofType CommitmentProofType
-	Height    uint64
-	RootType  RootType
-	SubjectID string
-	KeyHash   string
-	ValueHash string
-	RootHash  string
-	Path      []string
-	Exists    bool
-	ProofHash string
+	ProofType	CommitmentProofType
+	Height		uint64
+	RootType	RootType
+	SubjectID	string
+	KeyHash		string
+	ValueHash	string
+	RootHash	string
+	Path		[]string
+	Exists		bool
+	ProofHash	string
 }
 
 type ZoneProof = StateCommitmentProof
@@ -69,9 +69,9 @@ type NonExistenceProof = StateCommitmentProof
 
 func NewRootContribution(rootType RootType, id string, rootHash string) (RootContribution, error) {
 	contribution := RootContribution{
-		RootType: RootType(strings.TrimSpace(string(rootType))),
-		ID:       strings.TrimSpace(id),
-		RootHash: strings.ToLower(strings.TrimSpace(rootHash)),
+		RootType:	RootType(strings.TrimSpace(string(rootType))),
+		ID:		strings.TrimSpace(id),
+		RootHash:	strings.ToLower(strings.TrimSpace(rootHash)),
 	}
 	if contribution.RootHash == "" {
 		contribution.RootHash = DeterministicEmptyRootCommitment(contribution.RootType, contribution.ID)
@@ -85,9 +85,9 @@ func NewRootContribution(rootType RootType, id string, rootHash string) (RootCon
 
 func BuildZoneRootAggregation(height uint64, zoneID ZoneID, moduleRoots []RootContribution) (ZoneRootAggregation, error) {
 	aggregation := ZoneRootAggregation{
-		Height:      height,
-		ZoneID:      zoneID,
-		ModuleRoots: normalizeRootContributions(moduleRoots),
+		Height:		height,
+		ZoneID:		zoneID,
+		ModuleRoots:	normalizeRootContributions(moduleRoots),
 	}
 	if err := aggregation.ValidateFormat(); err != nil {
 		return ZoneRootAggregation{}, err
@@ -98,9 +98,9 @@ func BuildZoneRootAggregation(height uint64, zoneID ZoneID, moduleRoots []RootCo
 
 func BuildAEKRootAggregation(height uint64, zoneRoots []RootContribution, globalRoots []RootContribution) (AEKRootAggregation, error) {
 	aggregation := AEKRootAggregation{
-		Height:      height,
-		ZoneRoots:   normalizeRootContributions(zoneRoots),
-		GlobalRoots: normalizeRootContributions(globalRoots),
+		Height:		height,
+		ZoneRoots:	normalizeRootContributions(zoneRoots),
+		GlobalRoots:	normalizeRootContributions(globalRoots),
 	}
 	if err := aggregation.ValidateFormat(); err != nil {
 		return AEKRootAggregation{}, err
@@ -111,15 +111,15 @@ func BuildAEKRootAggregation(height uint64, zoneRoots []RootContribution, global
 
 func NewStateCommitmentProof(proofType CommitmentProofType, height uint64, rootType RootType, subjectID string, keyHash string, valueHash string, rootHash string, path []string, exists bool) (StateCommitmentProof, error) {
 	proof := StateCommitmentProof{
-		ProofType: CommitmentProofType(strings.TrimSpace(string(proofType))),
-		Height:    height,
-		RootType:  RootType(strings.TrimSpace(string(rootType))),
-		SubjectID: strings.TrimSpace(subjectID),
-		KeyHash:   strings.ToLower(strings.TrimSpace(keyHash)),
-		ValueHash: strings.ToLower(strings.TrimSpace(valueHash)),
-		RootHash:  strings.ToLower(strings.TrimSpace(rootHash)),
-		Path:      normalizeProofPath(path),
-		Exists:    exists,
+		ProofType:	CommitmentProofType(strings.TrimSpace(string(proofType))),
+		Height:		height,
+		RootType:	RootType(strings.TrimSpace(string(rootType))),
+		SubjectID:	strings.TrimSpace(subjectID),
+		KeyHash:	strings.ToLower(strings.TrimSpace(keyHash)),
+		ValueHash:	strings.ToLower(strings.TrimSpace(valueHash)),
+		RootHash:	strings.ToLower(strings.TrimSpace(rootHash)),
+		Path:		normalizeProofPath(path),
+		Exists:		exists,
 	}
 	if !proof.Exists && proof.ValueHash == "" {
 		proof.ValueHash = DeterministicEmptyRootCommitment(proof.RootType, proof.SubjectID)

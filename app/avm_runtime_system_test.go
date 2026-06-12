@@ -31,8 +31,8 @@ func TestAVMRuntimeAppLevelDeployExecuteQueueStorageReceiptsAndExportImport(t *t
 	storeRoute := app.MsgServiceRouter().Handler(&contractstypes.MsgStoreCode{})
 	bytecode := []byte("AVM1 app-runtime deterministic")
 	_, err := storeRoute(ctx, &contractstypes.MsgStoreCode{
-		Authority: account.AddressUser,
-		Bytecode:  bytecode,
+		Authority:	account.AddressUser,
+		Bytecode:	bytecode,
 	})
 	require.NoError(t, err)
 	codeID := contractstypes.CanonicalCodeHash(bytecode)
@@ -43,33 +43,33 @@ func TestAVMRuntimeAppLevelDeployExecuteQueueStorageReceiptsAndExportImport(t *t
 
 	deployRoute := app.MsgServiceRouter().Handler(&contractstypes.MsgDeployContract{})
 	_, err = deployRoute(ctx.WithBlockHeight(101), &contractstypes.MsgDeployContract{
-		Creator:        account.AddressUser,
-		CodeID:         codeID,
-		InitPayload:    []byte("init"),
-		InitialBalance: 1_000,
-		Admin:          account.AddressUser,
-		Salt:           "app-runtime",
-		Height:         101,
+		Creator:	account.AddressUser,
+		CodeID:		codeID,
+		InitPayload:	[]byte("init"),
+		InitialBalance:	1_000,
+		Admin:		account.AddressUser,
+		Salt:		"app-runtime",
+		Height:		101,
 	})
 	require.NoError(t, err)
 	contracts, err := app.ContractsKeeper.Contracts(contractstypes.QueryContractsRequest{Pagination: contractstypes.PageRequest{Limit: 10}})
 	require.NoError(t, err)
 	require.Len(t, contracts, 1)
 	deployed := contractstypes.InstantiateContractResponse{
-		ContractAddressUser: contracts[0].AddressUser,
-		ContractAddressRaw:  contracts[0].AddressRaw,
+		ContractAddressUser:	contracts[0].AddressUser,
+		ContractAddressRaw:	contracts[0].AddressRaw,
 	}
 	require.True(t, bytes.HasPrefix([]byte(deployed.ContractAddressUser), []byte("AE")))
 	require.True(t, bytes.HasPrefix([]byte(deployed.ContractAddressRaw), []byte("4:")))
 
 	executeRoute := app.MsgServiceRouter().Handler(&contractstypes.MsgExecuteExternal{})
 	_, err = executeRoute(ctx.WithBlockHeight(102), &contractstypes.MsgExecuteExternal{
-		Sender:          account.AddressUser,
-		ContractAddress: deployed.ContractAddressUser,
-		Payload:         []byte("call"),
-		Funds:           25,
-		GasLimit:        app.ContractsKeeper.Params().MaxGasPerExecution,
-		Height:          102,
+		Sender:			account.AddressUser,
+		ContractAddress:	deployed.ContractAddressUser,
+		Payload:		[]byte("call"),
+		Funds:			25,
+		GasLimit:		app.ContractsKeeper.Params().MaxGasPerExecution,
+		Height:			102,
 	})
 	require.NoError(t, err)
 	executed, err := app.ContractsKeeper.Contract(contractstypes.QueryContractRequest{ContractAddress: deployed.ContractAddressUser})
@@ -80,37 +80,37 @@ func TestAVMRuntimeAppLevelDeployExecuteQueueStorageReceiptsAndExportImport(t *t
 	internalRoute := app.MsgServiceRouter().Handler(&contractstypes.MsgSendInternalMessage{})
 	_, err = internalRoute(ctx.WithBlockHeight(103), &contractstypes.MsgSendInternalMessage{
 		Message: contractstypes.InternalMessage{
-			SourceContractUser: deployed.ContractAddressUser,
-			DestinationAccount: destination,
-			Funds:              7,
-			Opcode:             1,
-			QueryID:            2,
-			Body:               []byte("internal"),
-			GasLimit:           100,
-			LogicalTime:        3,
-			Height:             103,
+			SourceContractUser:	deployed.ContractAddressUser,
+			DestinationAccount:	destination,
+			Funds:			7,
+			Opcode:			1,
+			QueryID:		2,
+			Body:			[]byte("internal"),
+			GasLimit:		100,
+			LogicalTime:		3,
+			Height:			103,
 		},
-		Height: 103,
+		Height:	103,
 	})
 	require.NoError(t, err)
 	queue, err := app.ContractsKeeper.ContractQueue(contractstypes.QueryContractQueueRequest{
-		ContractAddress: deployed.ContractAddressUser,
-		Pagination:      contractstypes.PageRequest{Limit: 10},
+		ContractAddress:	deployed.ContractAddressUser,
+		Pagination:		contractstypes.PageRequest{Limit: 10},
 	})
 	require.NoError(t, err)
 	require.Len(t, queue, 1)
 
 	storage, err := app.ContractsKeeper.ContractStorage(contractstypes.QueryContractStorageRequest{
-		ContractAddress: deployed.ContractAddressUser,
-		Pagination:      contractstypes.PageRequest{Limit: 10},
+		ContractAddress:	deployed.ContractAddressUser,
+		Pagination:		contractstypes.PageRequest{Limit: 10},
 	})
 	require.NoError(t, err)
 	require.Equal(t, []byte("data"), storage[0].Key)
 	require.Equal(t, []byte("call"), storage[0].Value)
 
 	receipts, err := app.ContractsKeeper.ContractReceipts(contractstypes.QueryContractReceiptsRequest{
-		ContractAddress: deployed.ContractAddressUser,
-		Pagination:      contractstypes.PageRequest{Limit: 10},
+		ContractAddress:	deployed.ContractAddressUser,
+		Pagination:		contractstypes.PageRequest{Limit: 10},
 	})
 	require.NoError(t, err)
 	require.Len(t, receipts, 3)
@@ -125,14 +125,14 @@ func TestAVMRuntimeAppLevelDeployExecuteQueueStorageReceiptsAndExportImport(t *t
 	restartedCtx := restarted.NewContext(false).WithBlockHeight(200)
 	require.NoError(t, restarted.ContractsKeeper.InitGenesisState(restartedCtx, exported))
 	roundTrip, err := restarted.ContractsKeeper.ContractStorage(contractstypes.QueryContractStorageRequest{
-		ContractAddress: deployed.ContractAddressUser,
-		Pagination:      contractstypes.PageRequest{Limit: 10},
+		ContractAddress:	deployed.ContractAddressUser,
+		Pagination:		contractstypes.PageRequest{Limit: 10},
 	})
 	require.NoError(t, err)
 	require.Equal(t, storage, roundTrip)
 	roundTripReceipts, err := restarted.ContractsKeeper.ContractReceipts(contractstypes.QueryContractReceiptsRequest{
-		ContractAddress: deployed.ContractAddressUser,
-		Pagination:      contractstypes.PageRequest{Limit: 10},
+		ContractAddress:	deployed.ContractAddressUser,
+		Pagination:		contractstypes.PageRequest{Limit: 10},
 	})
 	require.NoError(t, err)
 	require.Equal(t, receipts, roundTripReceipts)
@@ -149,33 +149,33 @@ func TestAVMRuntimeRejectsFrozenAccountsReservedZeroAndRecoversFrozenContracts(t
 	require.NoError(t, app.NativeAccountKeeper.SetAccount(ctx, account))
 	executeRoute := app.MsgServiceRouter().Handler(&contractstypes.MsgExecuteExternal{})
 	_, err := executeRoute(ctx.WithBlockHeight(302), &contractstypes.MsgExecuteExternal{
-		Sender:          account.AddressUser,
-		ContractAddress: contract.ContractAddressUser,
-		Payload:         []byte("blocked"),
-		GasLimit:        app.ContractsKeeper.Params().MaxGasPerExecution,
-		Height:          302,
+		Sender:			account.AddressUser,
+		ContractAddress:	contract.ContractAddressUser,
+		Payload:		[]byte("blocked"),
+		GasLimit:		app.ContractsKeeper.Params().MaxGasPerExecution,
+		Height:			302,
 	})
 	require.ErrorContains(t, err, contractstypes.ErrAccountFrozen)
 
 	_, err = app.ContractsKeeper.StoreCodeState(ctx, contractstypes.MsgStoreCode{
-		Authority: addressing.SystemAddressAETMintUserFriendly,
-		Bytecode:  []byte("AVM1 reserved"),
+		Authority:	addressing.SystemAddressAETMintUserFriendly,
+		Bytecode:	[]byte("AVM1 reserved"),
 	})
 	require.ErrorContains(t, err, "reserved system address")
 	_, err = app.ContractsKeeper.StoreCodeState(ctx, contractstypes.MsgStoreCode{
-		Authority: addressing.ZeroUserFriendly,
-		Bytecode:  []byte("AVM1 zero"),
+		Authority:	addressing.ZeroUserFriendly,
+		Bytecode:	[]byte("AVM1 zero"),
 	})
 	require.ErrorContains(t, err, "zero address")
 
 	account.Status = nativeaccounttypes.AccountStatusActive
 	require.NoError(t, app.NativeAccountKeeper.SetAccount(ctx, account))
 	_, err = executeRoute(ctx.WithBlockHeight(400), &contractstypes.MsgExecuteExternal{
-		Sender:          account.AddressUser,
-		ContractAddress: contract.ContractAddressUser,
-		Payload:         []byte("rent-freeze"),
-		GasLimit:        app.ContractsKeeper.Params().MaxGasPerExecution,
-		Height:          400,
+		Sender:			account.AddressUser,
+		ContractAddress:	contract.ContractAddressUser,
+		Payload:		[]byte("rent-freeze"),
+		GasLimit:		app.ContractsKeeper.Params().MaxGasPerExecution,
+		Height:			400,
 	})
 	require.ErrorContains(t, err, contractstypes.ErrStorageRent)
 	frozen, err := app.ContractsKeeper.Contract(contractstypes.QueryContractRequest{ContractAddress: contract.ContractAddressUser})
@@ -184,23 +184,23 @@ func TestAVMRuntimeRejectsFrozenAccountsReservedZeroAndRecoversFrozenContracts(t
 	require.NotZero(t, frozen.Contract.StorageRentDebt)
 
 	_, err = app.ContractsKeeper.TopUpContractState(ctx.WithBlockHeight(401), contractstypes.MsgTopUpContract{
-		Sender:          account.AddressUser,
-		ContractAddress: contract.ContractAddressUser,
-		Amount:          frozen.Contract.StorageRentDebt + 100,
-		Height:          401,
+		Sender:			account.AddressUser,
+		ContractAddress:	contract.ContractAddressUser,
+		Amount:			frozen.Contract.StorageRentDebt + 100,
+		Height:			401,
 	})
 	require.NoError(t, err)
 	_, err = app.ContractsKeeper.PayContractStorageDebtState(ctx.WithBlockHeight(402), contractstypes.MsgPayContractStorageDebt{
-		Sender:          account.AddressUser,
-		ContractAddress: contract.ContractAddressUser,
-		Amount:          frozen.Contract.StorageRentDebt,
-		Height:          402,
+		Sender:			account.AddressUser,
+		ContractAddress:	contract.ContractAddressUser,
+		Amount:			frozen.Contract.StorageRentDebt,
+		Height:			402,
 	})
 	require.NoError(t, err)
 	unfrozen, err := app.ContractsKeeper.UnfreezeContractState(ctx.WithBlockHeight(403), contractstypes.MsgUnfreezeContract{
-		Sender:          account.AddressUser,
-		ContractAddress: contract.ContractAddressUser,
-		Height:          403,
+		Sender:			account.AddressUser,
+		ContractAddress:	contract.ContractAddressUser,
+		Height:			403,
 	})
 	require.NoError(t, err)
 	require.Equal(t, contractstypes.ContractStatusActive, unfrozen.Status)
@@ -227,8 +227,8 @@ func TestAVMRuntimeDeterminismGateRejectsNondeterminismAndKeepsStableRoots(t *te
 func appAVMRuntimeStoreCode(t *testing.T, app *L1App, ctx sdk.Context, authority string) string {
 	t.Helper()
 	resp, err := app.ContractsKeeper.StoreCodeState(ctx, contractstypes.MsgStoreCode{
-		Authority: authority,
-		Bytecode:  []byte("AVM1 app-runtime helper"),
+		Authority:	authority,
+		Bytecode:	[]byte("AVM1 app-runtime helper"),
 	})
 	require.NoError(t, err)
 	return resp.CodeID
@@ -237,13 +237,13 @@ func appAVMRuntimeStoreCode(t *testing.T, app *L1App, ctx sdk.Context, authority
 func appAVMRuntimeDeploy(t *testing.T, app *L1App, ctx sdk.Context, creator string, codeID string, salt string, initialBalance uint64, height uint64) contractstypes.InstantiateContractResponse {
 	t.Helper()
 	resp, err := app.ContractsKeeper.DeployContractState(ctx, contractstypes.MsgDeployContract{
-		Creator:        creator,
-		CodeID:         codeID,
-		InitPayload:    []byte("init"),
-		InitialBalance: initialBalance,
-		Admin:          creator,
-		Salt:           salt,
-		Height:         height,
+		Creator:	creator,
+		CodeID:		codeID,
+		InitPayload:	[]byte("init"),
+		InitialBalance:	initialBalance,
+		Admin:		creator,
+		Salt:		salt,
+		Height:		height,
 	})
 	require.NoError(t, err)
 	return resp

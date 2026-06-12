@@ -14,93 +14,93 @@ import (
 )
 
 const (
-	VerificationDutyReexecuteStateTransition  = "reexecute_state_transition"
-	VerificationDutyValidateCrossDomainProof  = "validate_cross_domain_proof"
-	VerificationDutyVerifyTaskGroup           = "verify_task_group"
-	VerificationDutyValidateConsensusOrdering = "validate_consensus_ordering"
-	VerificationDutyVerifyMessageReceipt      = "verify_message_inclusion_receipt"
-	VerificationDutySignValidOutput           = "sign_valid_output"
-	VerificationDutyRejectInvalidOutput       = "reject_invalid_output"
-	VerificationDutySubmitEvidence            = "submit_evidence"
+	VerificationDutyReexecuteStateTransition	= "reexecute_state_transition"
+	VerificationDutyValidateCrossDomainProof	= "validate_cross_domain_proof"
+	VerificationDutyVerifyTaskGroup			= "verify_task_group"
+	VerificationDutyValidateConsensusOrdering	= "validate_consensus_ordering"
+	VerificationDutyVerifyMessageReceipt		= "verify_message_inclusion_receipt"
+	VerificationDutySignValidOutput			= "sign_valid_output"
+	VerificationDutyRejectInvalidOutput		= "reject_invalid_output"
+	VerificationDutySubmitEvidence			= "submit_evidence"
 
-	VerificationResultValid       = "valid"
-	VerificationResultInvalid     = "invalid"
-	VerificationResultAbstain     = "abstain"
-	VerificationResultUnavailable = "unavailable"
+	VerificationResultValid		= "valid"
+	VerificationResultInvalid	= "invalid"
+	VerificationResultAbstain	= "abstain"
+	VerificationResultUnavailable	= "unavailable"
 
-	ProofKindZoneRoot          = "zone_root"
-	ProofKindShardRoot         = "shard_root"
-	ProofKindMessageRoot       = "message_root"
-	ProofKindReceiptRoot       = "receipt_root"
-	ProofKindIdentity          = "identity_proof"
-	ProofKindPaymentSettlement = "payment_settlement_proof"
-	ProofKindContractExecution = "contract_execution_proof"
+	ProofKindZoneRoot		= "zone_root"
+	ProofKindShardRoot		= "shard_root"
+	ProofKindMessageRoot		= "message_root"
+	ProofKindReceiptRoot		= "receipt_root"
+	ProofKindIdentity		= "identity_proof"
+	ProofKindPaymentSettlement	= "payment_settlement_proof"
+	ProofKindContractExecution	= "contract_execution_proof"
 )
 
 type VerificationReceipt struct {
-	EpochID            uint64
-	TaskGroupID        string
-	WorkloadID         string
-	ValidatorAddress   string
-	VerifiedObjectHash string
-	Result             string
-	Signature          string
-	GasOrCostOptional  sdkmath.Int
-	CreatedHeight      uint64
+	EpochID			uint64
+	TaskGroupID		string
+	WorkloadID		string
+	ValidatorAddress	string
+	VerifiedObjectHash	string
+	Result			string
+	Signature		string
+	GasOrCostOptional	sdkmath.Int
+	CreatedHeight		uint64
 }
 
 type CrossDomainProof struct {
-	ProofID                   string
-	WorkloadID                string
-	ProofKind                 string
-	SubjectID                 string
-	RootHash                  string
-	ParentRootHash            string
-	ProofHash                 string
-	ContractExecutionRequired bool
-	CreatedHeight             uint64
+	ProofID				string
+	WorkloadID			string
+	ProofKind			string
+	SubjectID			string
+	RootHash			string
+	ParentRootHash			string
+	ProofHash			string
+	ContractExecutionRequired	bool
+	CreatedHeight			uint64
 }
 
 type VerificationReceiptSet struct {
-	EpochID  uint64
-	Receipts []VerificationReceipt
-	Root     string
+	EpochID		uint64
+	Receipts	[]VerificationReceipt
+	Root		string
 }
 
 type VerifierParticipation struct {
-	EpochID            uint64
-	TaskGroupID        string
-	WorkloadID         string
-	ValidatorAddress   string
-	VerifiedObjectHash string
-	Result             string
-	Participated       bool
-	ReceiptHash        string
+	EpochID			uint64
+	TaskGroupID		string
+	WorkloadID		string
+	ValidatorAddress	string
+	VerifiedObjectHash	string
+	Result			string
+	Participated		bool
+	ReceiptHash		string
 }
 
 type InvalidResultEvidence struct {
-	EpochID            uint64
-	TaskGroupID        string
-	WorkloadID         string
-	VerifiedObjectHash string
-	InvalidReceipts    []VerificationReceipt
-	EvidenceHash       string
+	EpochID			uint64
+	TaskGroupID		string
+	WorkloadID		string
+	VerifiedObjectHash	string
+	InvalidReceipts		[]VerificationReceipt
+	EvidenceHash		string
 }
 
 type VerificationAggregation struct {
-	EpochID            uint64
-	TaskGroupID        string
-	WorkloadID         string
-	VerifiedObjectHash string
-	ReceiptRoot        string
-	ValidCount         uint32
-	InvalidCount       uint32
-	AbstainCount       uint32
-	UnavailableCount   uint32
-	ParticipationBps   uint32
-	QuorumBps          uint32
-	QuorumReached      bool
-	InvalidEvidence    *InvalidResultEvidence
+	EpochID			uint64
+	TaskGroupID		string
+	WorkloadID		string
+	VerifiedObjectHash	string
+	ReceiptRoot		string
+	ValidCount		uint32
+	InvalidCount		uint32
+	AbstainCount		uint32
+	UnavailableCount	uint32
+	ParticipationBps	uint32
+	QuorumBps		uint32
+	QuorumReached		bool
+	InvalidEvidence		*InvalidResultEvidence
 }
 
 func RequiredVerificationDuties() []string {
@@ -118,15 +118,15 @@ func RequiredVerificationDuties() []string {
 
 func NewVerificationReceipt(group postypes.TaskGroup, validatorAddress string, verifiedObjectHash string, result string, signature string, gasOrCostOptional sdkmath.Int, createdHeight uint64) (VerificationReceipt, error) {
 	receipt := VerificationReceipt{
-		EpochID:            group.EpochID,
-		TaskGroupID:        group.TaskGroupID,
-		WorkloadID:         group.WorkloadID,
-		ValidatorAddress:   strings.TrimSpace(validatorAddress),
-		VerifiedObjectHash: strings.TrimSpace(verifiedObjectHash),
-		Result:             strings.TrimSpace(result),
-		Signature:          strings.TrimSpace(signature),
-		GasOrCostOptional:  gasOrCostOptional,
-		CreatedHeight:      createdHeight,
+		EpochID:		group.EpochID,
+		TaskGroupID:		group.TaskGroupID,
+		WorkloadID:		group.WorkloadID,
+		ValidatorAddress:	strings.TrimSpace(validatorAddress),
+		VerifiedObjectHash:	strings.TrimSpace(verifiedObjectHash),
+		Result:			strings.TrimSpace(result),
+		Signature:		strings.TrimSpace(signature),
+		GasOrCostOptional:	gasOrCostOptional,
+		CreatedHeight:		createdHeight,
 	}
 	if receipt.GasOrCostOptional.IsNil() {
 		receipt.GasOrCostOptional = sdkmath.ZeroInt()
@@ -208,9 +208,9 @@ func NewVerificationReceiptSet(group postypes.TaskGroup, receipts []Verification
 	copy(ordered, receipts)
 	sortVerificationReceipts(ordered)
 	set := VerificationReceiptSet{
-		EpochID:  group.EpochID,
-		Receipts: ordered,
-		Root:     ComputeVerificationReceiptRoot(group, ordered),
+		EpochID:	group.EpochID,
+		Receipts:	ordered,
+		Root:		ComputeVerificationReceiptRoot(group, ordered),
 	}
 	return set, set.Validate(group)
 }
@@ -252,12 +252,12 @@ func AggregateVerificationReceipts(group postypes.TaskGroup, set VerificationRec
 		return VerificationAggregation{}, err
 	}
 	aggregation := VerificationAggregation{
-		EpochID:            group.EpochID,
-		TaskGroupID:        group.TaskGroupID,
-		WorkloadID:         group.WorkloadID,
-		VerifiedObjectHash: verifiedObjectHash,
-		ReceiptRoot:        set.Root,
-		QuorumBps:          quorumBps,
+		EpochID:		group.EpochID,
+		TaskGroupID:		group.TaskGroupID,
+		WorkloadID:		group.WorkloadID,
+		VerifiedObjectHash:	verifiedObjectHash,
+		ReceiptRoot:		set.Root,
+		QuorumBps:		quorumBps,
 	}
 	invalidReceipts := make([]VerificationReceipt, 0)
 	for _, receipt := range set.Receipts {
@@ -317,14 +317,14 @@ func TrackVerifierParticipation(group postypes.TaskGroup, set VerificationReceip
 			receiptHash = ComputeVerificationReceiptHash(receipt)
 		}
 		out = append(out, VerifierParticipation{
-			EpochID:            group.EpochID,
-			TaskGroupID:        group.TaskGroupID,
-			WorkloadID:         group.WorkloadID,
-			ValidatorAddress:   validatorID,
-			VerifiedObjectHash: verifiedObjectHash,
-			Result:             result,
-			Participated:       found && receipt.Result != VerificationResultUnavailable,
-			ReceiptHash:        receiptHash,
+			EpochID:		group.EpochID,
+			TaskGroupID:		group.TaskGroupID,
+			WorkloadID:		group.WorkloadID,
+			ValidatorAddress:	validatorID,
+			VerifiedObjectHash:	verifiedObjectHash,
+			Result:			result,
+			Participated:		found && receipt.Result != VerificationResultUnavailable,
+			ReceiptHash:		receiptHash,
 		})
 	}
 	return out, nil
@@ -350,11 +350,11 @@ func BuildInvalidResultEvidence(group postypes.TaskGroup, verifiedObjectHash str
 	}
 	sortVerificationReceipts(ordered)
 	evidence := InvalidResultEvidence{
-		EpochID:            group.EpochID,
-		TaskGroupID:        group.TaskGroupID,
-		WorkloadID:         group.WorkloadID,
-		VerifiedObjectHash: verifiedObjectHash,
-		InvalidReceipts:    ordered,
+		EpochID:		group.EpochID,
+		TaskGroupID:		group.TaskGroupID,
+		WorkloadID:		group.WorkloadID,
+		VerifiedObjectHash:	verifiedObjectHash,
+		InvalidReceipts:	ordered,
 	}
 	evidence.EvidenceHash = ComputeInvalidResultEvidenceHash(evidence)
 	return evidence, nil

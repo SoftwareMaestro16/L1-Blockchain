@@ -8,382 +8,382 @@ import (
 )
 
 const (
-	BasisPoints = int64(10_000)
+	BasisPoints	= int64(10_000)
 
-	MinCommissionBps            = int64(100)
-	MaxCommissionBps            = int64(2_000)
-	MaxDailyCommissionChangeBps = int64(100)
+	MinCommissionBps		= int64(100)
+	MaxCommissionBps		= int64(2_000)
+	MaxDailyCommissionChangeBps	= int64(100)
 
-	MinInflationBps             = int64(150)
-	MaxInflationBps             = int64(500)
-	DefaultTargetInflationBps   = int64(300)
-	DefaultTargetStakeBps       = int64(6_000)
-	DefaultResponsivenessBps    = int64(800)
-	DefaultActivityCouplingBps  = int64(100)
-	NormalBurnRatioBps          = int64(3_000)
-	CongestedBurnRatioBps       = int64(4_000)
-	MinBurnRatioBps             = int64(1_000)
-	MaxBurnRatioBps             = int64(5_000)
-	TreasuryFeeRatioBps         = int64(1_000)
-	DefaultTargetLoadBps        = int64(7_000)
-	HighCongestionLoadBps       = int64(9_000)
-	DeflationGuardBurnToMintBps = int64(12_500)
-	DeflationGuardStepBps       = int64(500)
-	RateLimitFailedTxBps        = int64(1_000)
-	DefaultMaxLoadMultiplierBps = int64(40_000)
+	MinInflationBps			= int64(150)
+	MaxInflationBps			= int64(500)
+	DefaultTargetInflationBps	= int64(300)
+	DefaultTargetStakeBps		= int64(6_000)
+	DefaultResponsivenessBps	= int64(800)
+	DefaultActivityCouplingBps	= int64(100)
+	NormalBurnRatioBps		= int64(3_000)
+	CongestedBurnRatioBps		= int64(4_000)
+	MinBurnRatioBps			= int64(1_000)
+	MaxBurnRatioBps			= int64(5_000)
+	TreasuryFeeRatioBps		= int64(1_000)
+	DefaultTargetLoadBps		= int64(7_000)
+	HighCongestionLoadBps		= int64(9_000)
+	DeflationGuardBurnToMintBps	= int64(12_500)
+	DeflationGuardStepBps		= int64(500)
+	RateLimitFailedTxBps		= int64(1_000)
+	DefaultMaxLoadMultiplierBps	= int64(40_000)
 
-	DefaultStakeTargetToleranceBps    = int64(500)
-	MaxTopValidatorConcentrationBps   = int64(3_334)
-	MinValidatorRewardCoverageBps     = BasisPoints
-	MinDelegatorRiskSignalCoverageBps = BasisPoints
-	MinFeeResponseBps                 = BasisPoints
-	MinSpamCostMultiplierBps          = BasisPoints
-	MinStorageCostCoverageBps         = BasisPoints
-	MinSlashingPenaltyCoverageBps     = BasisPoints
-	MinTreasuryFundingCoverageBps     = BasisPoints
+	DefaultStakeTargetToleranceBps		= int64(500)
+	MaxTopValidatorConcentrationBps		= int64(3_334)
+	MinValidatorRewardCoverageBps		= BasisPoints
+	MinDelegatorRiskSignalCoverageBps	= BasisPoints
+	MinFeeResponseBps			= BasisPoints
+	MinSpamCostMultiplierBps		= BasisPoints
+	MinStorageCostCoverageBps		= BasisPoints
+	MinSlashingPenaltyCoverageBps		= BasisPoints
+	MinTreasuryFundingCoverageBps		= BasisPoints
 
-	DefaultCircuitBreakerFeeSpikeBps        = int64(20_000)
-	DefaultCircuitBreakerControllerDriftBps = int64(1_000)
-	DefaultCircuitBreakerFailedTxRateBps    = int64(2_000)
-	DefaultInflationNoiseToleranceBps       = int64(500)
-	DefaultCleanupRewardBps                 = int64(2_000)
-	DefaultValidatorReliabilityTargetBps    = int64(9_900)
-	DefaultSoftFaultPenaltyStepBps          = int64(250)
-	MaxValidatorRewardDampeningBps          = int64(3_000)
-	DefaultValidatorBootstrapBonusBps       = int64(500)
-	DefaultMaxBootstrapStakeBps             = int64(100)
-	DefaultMinSustainableCommissionBps      = int64(300)
-	DefaultMinSelfDelegationBps             = int64(100)
-	DefaultMaxSelfDelegationBps             = int64(2_500)
-	DefaultTopNConcentrationThresholdBps    = int64(6_700)
-	DefaultGovernanceCaptureThresholdBps    = int64(3_334)
-	DefaultMaxVotingPowerHHIBps             = int64(1_800)
-	DefaultMaxRedelegationLagBlocks         = uint64(43_200)
+	DefaultCircuitBreakerFeeSpikeBps	= int64(20_000)
+	DefaultCircuitBreakerControllerDriftBps	= int64(1_000)
+	DefaultCircuitBreakerFailedTxRateBps	= int64(2_000)
+	DefaultInflationNoiseToleranceBps	= int64(500)
+	DefaultCleanupRewardBps			= int64(2_000)
+	DefaultValidatorReliabilityTargetBps	= int64(9_900)
+	DefaultSoftFaultPenaltyStepBps		= int64(250)
+	MaxValidatorRewardDampeningBps		= int64(3_000)
+	DefaultValidatorBootstrapBonusBps	= int64(500)
+	DefaultMaxBootstrapStakeBps		= int64(100)
+	DefaultMinSustainableCommissionBps	= int64(300)
+	DefaultMinSelfDelegationBps		= int64(100)
+	DefaultMaxSelfDelegationBps		= int64(2_500)
+	DefaultTopNConcentrationThresholdBps	= int64(6_700)
+	DefaultGovernanceCaptureThresholdBps	= int64(3_334)
+	DefaultMaxVotingPowerHHIBps		= int64(1_800)
+	DefaultMaxRedelegationLagBlocks		= uint64(43_200)
 )
 
 type ValidatorIncomeInput struct {
-	TotalMintRewards sdkmath.Int
-	TotalFeeRewards  sdkmath.Int
-	ValidatorPower   sdkmath.Int
-	TotalPower       sdkmath.Int
-	CommissionBps    int64
+	TotalMintRewards	sdkmath.Int
+	TotalFeeRewards		sdkmath.Int
+	ValidatorPower		sdkmath.Int
+	TotalPower		sdkmath.Int
+	CommissionBps		int64
 }
 
 type ValidatorIncome struct {
-	RewardWeightBps       int64
-	MintRewardShare       sdkmath.Int
-	FeeRewardShare        sdkmath.Int
-	ValidatorCommission   sdkmath.Int
-	ValidatorIncome       sdkmath.Int
-	DelegatorIncome       sdkmath.Int
-	DelegatorGrossRewards sdkmath.Int
+	RewardWeightBps		int64
+	MintRewardShare		sdkmath.Int
+	FeeRewardShare		sdkmath.Int
+	ValidatorCommission	sdkmath.Int
+	ValidatorIncome		sdkmath.Int
+	DelegatorIncome		sdkmath.Int
+	DelegatorGrossRewards	sdkmath.Int
 }
 
 type BalanceControllerInput struct {
-	CurrentInflationBps int64
-	StakeRatioBps       int64
-	BlockLoadBps        int64
-	AnnualMint          sdkmath.Int
-	AnnualBurn          sdkmath.Int
-	Activity            ProtocolEconomicActivity
-	AsyncQueueDepth     uint64
-	FailedTxRateBps     int64
+	CurrentInflationBps	int64
+	StakeRatioBps		int64
+	BlockLoadBps		int64
+	AnnualMint		sdkmath.Int
+	AnnualBurn		sdkmath.Int
+	Activity		ProtocolEconomicActivity
+	AsyncQueueDepth		uint64
+	FailedTxRateBps		int64
 }
 
 type BalanceControllerParams struct {
-	MinInflationBps              int64
-	MaxInflationBps              int64
-	TargetStakeBps               int64
-	InflationResponsivenessBps   int64
-	ActivityInflationCouplingBps int64
-	NormalBurnRatioBps           int64
-	CongestedBurnRatioBps        int64
-	MinBurnRatioBps              int64
-	MaxBurnRatioBps              int64
-	TreasuryFeeRatioBps          int64
-	TargetLoadBps                int64
-	HighCongestionLoadBps        int64
-	DeflationGuardBurnToMintBps  int64
-	DeflationGuardStepBps        int64
-	RateLimitFailedTxBps         int64
+	MinInflationBps			int64
+	MaxInflationBps			int64
+	TargetStakeBps			int64
+	InflationResponsivenessBps	int64
+	ActivityInflationCouplingBps	int64
+	NormalBurnRatioBps		int64
+	CongestedBurnRatioBps		int64
+	MinBurnRatioBps			int64
+	MaxBurnRatioBps			int64
+	TreasuryFeeRatioBps		int64
+	TargetLoadBps			int64
+	HighCongestionLoadBps		int64
+	DeflationGuardBurnToMintBps	int64
+	DeflationGuardStepBps		int64
+	RateLimitFailedTxBps		int64
 }
 
 type BalanceControllerOutput struct {
-	InflationBps              int64
-	StakeInflationDeltaBps    int64
-	ActivityInflationDeltaBps int64
-	BurnRatioBps              int64
-	ValidatorFeeRatioBps      int64
-	Congested                 bool
-	DeflationGuardActive      bool
-	QueueLimited              bool
-	RateLimited               bool
+	InflationBps			int64
+	StakeInflationDeltaBps		int64
+	ActivityInflationDeltaBps	int64
+	BurnRatioBps			int64
+	ValidatorFeeRatioBps		int64
+	Congested			bool
+	DeflationGuardActive		bool
+	QueueLimited			bool
+	RateLimited			bool
 }
 
 type ProtocolEconomicActivity struct {
-	TxFeeNaet             sdkmath.Int
-	AVMStorageFeeNaet     sdkmath.Int
-	AVMForwardingFeeNaet  sdkmath.Int
-	AVMDeploymentCostNaet sdkmath.Int
+	TxFeeNaet		sdkmath.Int
+	AVMStorageFeeNaet	sdkmath.Int
+	AVMForwardingFeeNaet	sdkmath.Int
+	AVMDeploymentCostNaet	sdkmath.Int
 }
 
 type ProtocolEconomicFlowInput struct {
-	Activity         ProtocolEconomicActivity
-	BurnRatioBps     int64
-	TreasuryRatioBps int64
+	Activity		ProtocolEconomicActivity
+	BurnRatioBps		int64
+	TreasuryRatioBps	int64
 }
 
 type ProtocolEconomicFlowOutput struct {
-	TotalChargesNaet     sdkmath.Int
-	BurnNaet             sdkmath.Int
-	TreasuryNaet         sdkmath.Int
-	ValidatorRewardsNaet sdkmath.Int
+	TotalChargesNaet	sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ValidatorRewardsNaet	sdkmath.Int
 }
 
 type OptimalEconomicStateInput struct {
-	StakeRatioBps                  int64
-	StakeTargetToleranceBps        int64
-	InflationBps                   int64
-	ValidatorRewardCoverageBps     int64
-	DelegatorRiskSignalCoverageBps int64
-	ActiveValidatorCount           uint64
-	MinActiveValidatorCount        uint64
-	TopValidatorStakeBps           int64
-	BlockLoadBps                   int64
-	FeeResponseBps                 int64
-	SpamCostMultiplierBps          int64
-	StorageCostCoverageBps         int64
-	BurnToMintBps                  int64
-	SlashingPenaltyCoverageBps     int64
-	TreasuryFundingCoverageBps     int64
+	StakeRatioBps			int64
+	StakeTargetToleranceBps		int64
+	InflationBps			int64
+	ValidatorRewardCoverageBps	int64
+	DelegatorRiskSignalCoverageBps	int64
+	ActiveValidatorCount		uint64
+	MinActiveValidatorCount		uint64
+	TopValidatorStakeBps		int64
+	BlockLoadBps			int64
+	FeeResponseBps			int64
+	SpamCostMultiplierBps		int64
+	StorageCostCoverageBps		int64
+	BurnToMintBps			int64
+	SlashingPenaltyCoverageBps	int64
+	TreasuryFundingCoverageBps	int64
 }
 
 type OptimalEconomicState struct {
-	Optimal          bool
-	FailedConditions []string
+	Optimal			bool
+	FailedConditions	[]string
 }
 
 type EconomicInvariantInput struct {
-	StakingDenom                  string
-	FeeDenom                      string
-	RewardDenom                   string
-	SlashingDenom                 string
-	ExecutionChargeDenom          string
-	CirculatingSupply             sdkmath.Int
-	AnnualMint                    sdkmath.Int
-	AnnualBurn                    sdkmath.Int
-	MaxNetIssuanceBps             int64
-	MaxNetBurnBps                 int64
-	ControllerParams              BalanceControllerParams
-	ControllerOutput              BalanceControllerOutput
-	FeeFlow                       ProtocolEconomicFlowOutput
-	MaxBlockFeeNaet               sdkmath.Int
-	BlockFeeNaet                  sdkmath.Int
-	ValidatorRewardsDeterministic bool
-	FeeComputationDeterministic   bool
-	SlashingDeterministic         bool
-	SlashingAuditable             bool
-	SlashingRewardSafe            bool
-	ControllerParamsExposed       bool
-	ControllerStateExposed        bool
-	ControllerEventsExposed       bool
-	StorageFeePerByteNaet         sdkmath.Int
-	LongLivedStorageBytes         int64
-	StorageRetentionPeriods       int64
-	TransientExecutionChargeNaet  sdkmath.Int
+	StakingDenom			string
+	FeeDenom			string
+	RewardDenom			string
+	SlashingDenom			string
+	ExecutionChargeDenom		string
+	CirculatingSupply		sdkmath.Int
+	AnnualMint			sdkmath.Int
+	AnnualBurn			sdkmath.Int
+	MaxNetIssuanceBps		int64
+	MaxNetBurnBps			int64
+	ControllerParams		BalanceControllerParams
+	ControllerOutput		BalanceControllerOutput
+	FeeFlow				ProtocolEconomicFlowOutput
+	MaxBlockFeeNaet			sdkmath.Int
+	BlockFeeNaet			sdkmath.Int
+	ValidatorRewardsDeterministic	bool
+	FeeComputationDeterministic	bool
+	SlashingDeterministic		bool
+	SlashingAuditable		bool
+	SlashingRewardSafe		bool
+	ControllerParamsExposed		bool
+	ControllerStateExposed		bool
+	ControllerEventsExposed		bool
+	StorageFeePerByteNaet		sdkmath.Int
+	LongLivedStorageBytes		int64
+	StorageRetentionPeriods		int64
+	TransientExecutionChargeNaet	sdkmath.Int
 }
 
 type EconomicInvariantReport struct {
-	Passed           bool
-	FailedInvariants []string
+	Passed			bool
+	FailedInvariants	[]string
 }
 
 type EconomicWeaknessControlInput struct {
-	BurnControllerWired               bool
-	InflationUsesNetworkActivity      bool
-	DeflationGuardEnforced            bool
-	SlashingFlowIntegrated            bool
-	EpochValidatorSelectionProduction bool
-	AVMFeesInGlobalFeeMarket          bool
-	StateRentOrCleanupIncentive       bool
-	ValidatorReputationInDelegation   bool
-	StakeConcentrationDampening       bool
-	EconomicCircuitBreakerEnabled     bool
+	BurnControllerWired			bool
+	InflationUsesNetworkActivity		bool
+	DeflationGuardEnforced			bool
+	SlashingFlowIntegrated			bool
+	EpochValidatorSelectionProduction	bool
+	AVMFeesInGlobalFeeMarket		bool
+	StateRentOrCleanupIncentive		bool
+	ValidatorReputationInDelegation		bool
+	StakeConcentrationDampening		bool
+	EconomicCircuitBreakerEnabled		bool
 }
 
 type EconomicWeaknessControlReport struct {
-	ProductionReady bool
-	MissingControls []string
+	ProductionReady	bool
+	MissingControls	[]string
 }
 
 type InflationRiskInput struct {
-	CirculatingSupply              sdkmath.Int
-	AnnualMint                     sdkmath.Int
-	AnnualBurn                     sdkmath.Int
-	ValidatorRewardPoolNaet        sdkmath.Int
-	ValidatorOperatingCostNaet     sdkmath.Int
-	CurrentInflationBps            int64
-	StakeRatioBps                  int64
-	TopValidatorStakeBps           int64
-	DelegatorRiskSignalCoverageBps int64
-	ActivitySamplesBps             []int64
-	BurnIntegratedWithIssuance     bool
-	NetIssuanceTargetConfigured    bool
-	MaxNetIssuanceBps              int64
-	ActivityNoiseToleranceBps      int64
+	CirculatingSupply		sdkmath.Int
+	AnnualMint			sdkmath.Int
+	AnnualBurn			sdkmath.Int
+	ValidatorRewardPoolNaet		sdkmath.Int
+	ValidatorOperatingCostNaet	sdkmath.Int
+	CurrentInflationBps		int64
+	StakeRatioBps			int64
+	TopValidatorStakeBps		int64
+	DelegatorRiskSignalCoverageBps	int64
+	ActivitySamplesBps		[]int64
+	BurnIntegratedWithIssuance	bool
+	NetIssuanceTargetConfigured	bool
+	MaxNetIssuanceBps		int64
+	ActivityNoiseToleranceBps	int64
 }
 
 type InflationRiskReport struct {
-	Stable                bool
-	NetIssuanceBps        int64
-	RewardCoverageBps     int64
-	ActivityVolatilityBps int64
-	Risks                 []string
+	Stable			bool
+	NetIssuanceBps		int64
+	RewardCoverageBps	int64
+	ActivityVolatilityBps	int64
+	Risks			[]string
 }
 
 type EconomicCircuitBreakerParams struct {
-	MaxBlockLoadBps       int64
-	MaxFeeSpikeBps        int64
-	MaxControllerDriftBps int64
-	MaxFailedTxRateBps    int64
-	MaxBurnToMintBps      int64
-	MinCooldownBlocks     uint64
+	MaxBlockLoadBps		int64
+	MaxFeeSpikeBps		int64
+	MaxControllerDriftBps	int64
+	MaxFailedTxRateBps	int64
+	MaxBurnToMintBps	int64
+	MinCooldownBlocks	uint64
 }
 
 type EconomicCircuitBreakerInput struct {
-	BlockLoadBps       int64
-	FeeSpikeBps        int64
-	ControllerDriftBps int64
-	FailedTxRateBps    int64
-	BurnToMintBps      int64
+	BlockLoadBps		int64
+	FeeSpikeBps		int64
+	ControllerDriftBps	int64
+	FailedTxRateBps		int64
+	BurnToMintBps		int64
 }
 
 type EconomicCircuitBreakerOutput struct {
-	Active         bool
-	Reasons        []string
-	CooldownBlocks uint64
+	Active		bool
+	Reasons		[]string
+	CooldownBlocks	uint64
 }
 
 type SlashingEconomyFlowInput struct {
-	PenaltyNaet       sdkmath.Int
-	BurnRatioBps      int64
-	TreasuryRatioBps  int64
-	ReporterRewardBps int64
+	PenaltyNaet		sdkmath.Int
+	BurnRatioBps		int64
+	TreasuryRatioBps	int64
+	ReporterRewardBps	int64
 }
 
 type SlashingEconomyFlowOutput struct {
-	PenaltyNaet        sdkmath.Int
-	BurnNaet           sdkmath.Int
-	TreasuryNaet       sdkmath.Int
-	ReporterRewardNaet sdkmath.Int
-	ValidatorPoolNaet  sdkmath.Int
+	PenaltyNaet		sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ValidatorPoolNaet	sdkmath.Int
 }
 
 type StateRentInput struct {
-	StorageBytes          int64
-	RetentionPeriods      int64
-	FeePerByteNaet        sdkmath.Int
-	CleanupRewardRatioBps int64
-	CleanupEligible       bool
+	StorageBytes		int64
+	RetentionPeriods	int64
+	FeePerByteNaet		sdkmath.Int
+	CleanupRewardRatioBps	int64
+	CleanupEligible		bool
 }
 
 type StateRentOutput struct {
-	RentNaet          sdkmath.Int
-	CleanupRewardNaet sdkmath.Int
-	BurnableRentNaet  sdkmath.Int
+	RentNaet		sdkmath.Int
+	CleanupRewardNaet	sdkmath.Int
+	BurnableRentNaet	sdkmath.Int
 }
 
 type ValidatorIncentiveInput struct {
-	ValidatorStakeBps           int64
-	CommissionBps               int64
-	UptimeBps                   int64
-	MissedBlockRateBps          int64
-	RepeatedFaultCount          uint64
-	ReporterRewardBps           int64
-	ReporterRewardsWired        bool
-	SelectionEconomyLinked      bool
-	PerformanceRiskSignals      bool
-	StakeConcentrationDampening bool
-	BootstrapSupportEnabled     bool
-	NewValidator                bool
-	ReliabilityTargetBps        int64
-	MaxConcentrationBps         int64
-	BootstrapStakeBps           int64
-	BootstrapBonusBps           int64
+	ValidatorStakeBps		int64
+	CommissionBps			int64
+	UptimeBps			int64
+	MissedBlockRateBps		int64
+	RepeatedFaultCount		uint64
+	ReporterRewardBps		int64
+	ReporterRewardsWired		bool
+	SelectionEconomyLinked		bool
+	PerformanceRiskSignals		bool
+	StakeConcentrationDampening	bool
+	BootstrapSupportEnabled		bool
+	NewValidator			bool
+	ReliabilityTargetBps		int64
+	MaxConcentrationBps		int64
+	BootstrapStakeBps		int64
+	BootstrapBonusBps		int64
 }
 
 type ValidatorIncentiveReport struct {
-	Healthy                 bool
-	RewardMultiplierBps     int64
-	ConcentrationPenaltyBps int64
-	ReliabilityPenaltyBps   int64
-	BootstrapBonusBps       int64
-	Findings                []string
+	Healthy			bool
+	RewardMultiplierBps	int64
+	ConcentrationPenaltyBps	int64
+	ReliabilityPenaltyBps	int64
+	BootstrapBonusBps	int64
+	Findings		[]string
 }
 
 type StakingCentralizationInput struct {
-	ValidatorStakeBps              []int64
-	TopValidatorStakeBps           int64
-	TopValidatorsStakeBps          int64
-	TopValidatorCount              int
-	CommissionBps                  []int64
-	SelfDelegationRequirementBps   int64
-	RedelegationLagBlocks          uint64
-	DelegatorRiskSignalCoverageBps int64
-	GovernanceVotingPowerBps       int64
-	MinSelfDelegationBps           int64
-	MaxSelfDelegationBps           int64
-	MaxTopValidatorStakeBps        int64
-	TopNConcentrationThresholdBps  int64
-	MaxRedelegationLagBlocks       uint64
-	MaxGovernanceVotingPowerBps    int64
-	MaxVotingPowerHHIBps           int64
+	ValidatorStakeBps		[]int64
+	TopValidatorStakeBps		int64
+	TopValidatorsStakeBps		int64
+	TopValidatorCount		int
+	CommissionBps			[]int64
+	SelfDelegationRequirementBps	int64
+	RedelegationLagBlocks		uint64
+	DelegatorRiskSignalCoverageBps	int64
+	GovernanceVotingPowerBps	int64
+	MinSelfDelegationBps		int64
+	MaxSelfDelegationBps		int64
+	MaxTopValidatorStakeBps		int64
+	TopNConcentrationThresholdBps	int64
+	MaxRedelegationLagBlocks	uint64
+	MaxGovernanceVotingPowerBps	int64
+	MaxVotingPowerHHIBps		int64
 }
 
 type StakingCentralizationReport struct {
-	Healthy               bool
-	TopValidatorStakeBps  int64
-	TopValidatorsStakeBps int64
-	VotingPowerHHIBps     int64
-	Risks                 []string
+	Healthy			bool
+	TopValidatorStakeBps	int64
+	TopValidatorsStakeBps	int64
+	VotingPowerHHIBps	int64
+	Risks			[]string
 }
 
 func DefaultBalanceControllerParams() BalanceControllerParams {
 	return BalanceControllerParams{
-		MinInflationBps:              MinInflationBps,
-		MaxInflationBps:              MaxInflationBps,
-		TargetStakeBps:               DefaultTargetStakeBps,
-		InflationResponsivenessBps:   DefaultResponsivenessBps,
-		ActivityInflationCouplingBps: DefaultActivityCouplingBps,
-		NormalBurnRatioBps:           NormalBurnRatioBps,
-		CongestedBurnRatioBps:        CongestedBurnRatioBps,
-		MinBurnRatioBps:              MinBurnRatioBps,
-		MaxBurnRatioBps:              MaxBurnRatioBps,
-		TreasuryFeeRatioBps:          TreasuryFeeRatioBps,
-		TargetLoadBps:                DefaultTargetLoadBps,
-		HighCongestionLoadBps:        HighCongestionLoadBps,
-		DeflationGuardBurnToMintBps:  DeflationGuardBurnToMintBps,
-		DeflationGuardStepBps:        DeflationGuardStepBps,
-		RateLimitFailedTxBps:         RateLimitFailedTxBps,
+		MinInflationBps:		MinInflationBps,
+		MaxInflationBps:		MaxInflationBps,
+		TargetStakeBps:			DefaultTargetStakeBps,
+		InflationResponsivenessBps:	DefaultResponsivenessBps,
+		ActivityInflationCouplingBps:	DefaultActivityCouplingBps,
+		NormalBurnRatioBps:		NormalBurnRatioBps,
+		CongestedBurnRatioBps:		CongestedBurnRatioBps,
+		MinBurnRatioBps:		MinBurnRatioBps,
+		MaxBurnRatioBps:		MaxBurnRatioBps,
+		TreasuryFeeRatioBps:		TreasuryFeeRatioBps,
+		TargetLoadBps:			DefaultTargetLoadBps,
+		HighCongestionLoadBps:		HighCongestionLoadBps,
+		DeflationGuardBurnToMintBps:	DeflationGuardBurnToMintBps,
+		DeflationGuardStepBps:		DeflationGuardStepBps,
+		RateLimitFailedTxBps:		RateLimitFailedTxBps,
 	}
 }
 
 func DefaultEconomicCircuitBreakerParams() EconomicCircuitBreakerParams {
 	return EconomicCircuitBreakerParams{
-		MaxBlockLoadBps:       HighCongestionLoadBps,
-		MaxFeeSpikeBps:        DefaultCircuitBreakerFeeSpikeBps,
-		MaxControllerDriftBps: DefaultCircuitBreakerControllerDriftBps,
-		MaxFailedTxRateBps:    DefaultCircuitBreakerFailedTxRateBps,
-		MaxBurnToMintBps:      DeflationGuardBurnToMintBps,
-		MinCooldownBlocks:     1,
+		MaxBlockLoadBps:	HighCongestionLoadBps,
+		MaxFeeSpikeBps:		DefaultCircuitBreakerFeeSpikeBps,
+		MaxControllerDriftBps:	DefaultCircuitBreakerControllerDriftBps,
+		MaxFailedTxRateBps:	DefaultCircuitBreakerFailedTxRateBps,
+		MaxBurnToMintBps:	DeflationGuardBurnToMintBps,
+		MinCooldownBlocks:	1,
 	}
 }
 
 func EvaluateEconomicWeaknessControls(input EconomicWeaknessControlInput) EconomicWeaknessControlReport {
 	failed := make([]string, 0, 10)
 	for _, item := range []struct {
-		name string
-		ok   bool
+		name	string
+		ok	bool
 	}{
 		{name: "burn_controller_not_wired_to_fee_reward_flow", ok: input.BurnControllerWired},
 		{name: "inflation_controller_not_activity_coupled", ok: input.InflationUsesNetworkActivity},
@@ -401,8 +401,8 @@ func EvaluateEconomicWeaknessControls(input EconomicWeaknessControlInput) Econom
 		}
 	}
 	return EconomicWeaknessControlReport{
-		ProductionReady: len(failed) == 0,
-		MissingControls: failed,
+		ProductionReady:	len(failed) == 0,
+		MissingControls:	failed,
 	}
 }
 
@@ -437,8 +437,8 @@ func EvaluateInflationRisks(input InflationRiskInput) (InflationRiskReport, erro
 		}
 	}
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "circulating_supply", value: input.CirculatingSupply},
 		{name: "annual_mint", value: input.AnnualMint},
@@ -498,11 +498,11 @@ func EvaluateInflationRisks(input InflationRiskInput) (InflationRiskReport, erro
 	}
 
 	return InflationRiskReport{
-		Stable:                len(risks) == 0,
-		NetIssuanceBps:        netIssuanceBps,
-		RewardCoverageBps:     rewardCoverageBps,
-		ActivityVolatilityBps: volatility,
-		Risks:                 risks,
+		Stable:			len(risks) == 0,
+		NetIssuanceBps:		netIssuanceBps,
+		RewardCoverageBps:	rewardCoverageBps,
+		ActivityVolatilityBps:	volatility,
+		Risks:			risks,
 	}, nil
 }
 
@@ -514,8 +514,8 @@ func EvaluateEconomicCircuitBreaker(input EconomicCircuitBreakerInput, params Ec
 		return EconomicCircuitBreakerOutput{}, err
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "block_load_bps", value: input.BlockLoadBps},
 		{name: "failed_tx_rate_bps", value: input.FailedTxRateBps},
@@ -549,9 +549,9 @@ func EvaluateEconomicCircuitBreaker(input EconomicCircuitBreakerInput, params Ec
 		reasons = append(reasons, "burn_pressure_abnormal")
 	}
 	return EconomicCircuitBreakerOutput{
-		Active:         len(reasons) > 0,
-		Reasons:        reasons,
-		CooldownBlocks: params.MinCooldownBlocks,
+		Active:		len(reasons) > 0,
+		Reasons:	reasons,
+		CooldownBlocks:	params.MinCooldownBlocks,
 	}, nil
 }
 
@@ -583,8 +583,8 @@ func ComputeSlashingEconomyFlow(input SlashingEconomyFlowInput) (SlashingEconomy
 		return SlashingEconomyFlowOutput{}, fmt.Errorf("penalty_naet must not be negative")
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "burn_ratio_bps", value: input.BurnRatioBps},
 		{name: "treasury_ratio_bps", value: input.TreasuryRatioBps},
@@ -601,11 +601,11 @@ func ComputeSlashingEconomyFlow(input SlashingEconomyFlowInput) (SlashingEconomy
 	treasury := ApplyBps(penalty, input.TreasuryRatioBps)
 	reporter := ApplyBps(penalty, input.ReporterRewardBps)
 	return SlashingEconomyFlowOutput{
-		PenaltyNaet:        penalty,
-		BurnNaet:           burn,
-		TreasuryNaet:       treasury,
-		ReporterRewardNaet: reporter,
-		ValidatorPoolNaet:  penalty.Sub(burn).Sub(treasury).Sub(reporter),
+		PenaltyNaet:		penalty,
+		BurnNaet:		burn,
+		TreasuryNaet:		treasury,
+		ReporterRewardNaet:	reporter,
+		ValidatorPoolNaet:	penalty.Sub(burn).Sub(treasury).Sub(reporter),
 	}, nil
 }
 
@@ -632,9 +632,9 @@ func ComputeStateRent(input StateRentInput) (StateRentOutput, error) {
 		cleanupReward = ApplyBps(rent, input.CleanupRewardRatioBps)
 	}
 	return StateRentOutput{
-		RentNaet:          rent,
-		CleanupRewardNaet: cleanupReward,
-		BurnableRentNaet:  rent.Sub(cleanupReward),
+		RentNaet:		rent,
+		CleanupRewardNaet:	cleanupReward,
+		BurnableRentNaet:	rent.Sub(cleanupReward),
 	}, nil
 }
 
@@ -652,8 +652,8 @@ func EvaluateValidatorIncentives(input ValidatorIncentiveInput) (ValidatorIncent
 		input.BootstrapBonusBps = DefaultValidatorBootstrapBonusBps
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "validator_stake_bps", value: input.ValidatorStakeBps},
 		{name: "uptime_bps", value: input.UptimeBps},
@@ -724,12 +724,12 @@ func EvaluateValidatorIncentives(input ValidatorIncentiveInput) (ValidatorIncent
 	}
 	rewardMultiplier := clampInt64(BasisPoints-concentrationPenalty-reliabilityPenalty+bootstrapBonus, 0, BasisPoints+input.BootstrapBonusBps)
 	return ValidatorIncentiveReport{
-		Healthy:                 len(findings) == 0,
-		RewardMultiplierBps:     rewardMultiplier,
-		ConcentrationPenaltyBps: concentrationPenalty,
-		ReliabilityPenaltyBps:   reliabilityPenalty,
-		BootstrapBonusBps:       bootstrapBonus,
-		Findings:                findings,
+		Healthy:			len(findings) == 0,
+		RewardMultiplierBps:		rewardMultiplier,
+		ConcentrationPenaltyBps:	concentrationPenalty,
+		ReliabilityPenaltyBps:		reliabilityPenalty,
+		BootstrapBonusBps:		bootstrapBonus,
+		Findings:			findings,
 	}, nil
 }
 
@@ -759,8 +759,8 @@ func EvaluateStakingCentralization(input StakingCentralizationInput) (StakingCen
 		input.MaxVotingPowerHHIBps = DefaultMaxVotingPowerHHIBps
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "top_validator_stake_bps", value: input.TopValidatorStakeBps},
 		{name: "top_validators_stake_bps", value: input.TopValidatorsStakeBps},
@@ -838,11 +838,11 @@ func EvaluateStakingCentralization(input StakingCentralizationInput) (StakingCen
 	}
 
 	return StakingCentralizationReport{
-		Healthy:               len(risks) == 0,
-		TopValidatorStakeBps:  topValidator,
-		TopValidatorsStakeBps: topValidators,
-		VotingPowerHHIBps:     hhi,
-		Risks:                 risks,
+		Healthy:		len(risks) == 0,
+		TopValidatorStakeBps:	topValidator,
+		TopValidatorsStakeBps:	topValidators,
+		VotingPowerHHIBps:	hhi,
+		Risks:			risks,
 	}, nil
 }
 
@@ -890,8 +890,8 @@ func EvaluateEconomicInvariants(input EconomicInvariantInput) (EconomicInvariant
 		return EconomicInvariantReport{}, fmt.Errorf("storage_retention_periods must not be negative")
 	}
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "circulating_supply", value: input.CirculatingSupply},
 		{name: "annual_mint", value: input.AnnualMint},
@@ -909,8 +909,8 @@ func EvaluateEconomicInvariants(input EconomicInvariantInput) (EconomicInvariant
 
 	failed := make([]string, 0, 8)
 	for _, item := range []struct {
-		name  string
-		denom string
+		name	string
+		denom	string
 	}{
 		{name: "staking", denom: input.StakingDenom},
 		{name: "fees", denom: input.FeeDenom},
@@ -963,8 +963,8 @@ func EvaluateEconomicInvariants(input EconomicInvariantInput) (EconomicInvariant
 	}
 
 	return EconomicInvariantReport{
-		Passed:           len(failed) == 0,
-		FailedInvariants: failed,
+		Passed:			len(failed) == 0,
+		FailedInvariants:	failed,
 	}, nil
 }
 
@@ -985,8 +985,8 @@ func EvaluateOptimalEconomicState(input OptimalEconomicStateInput) (OptimalEcono
 		return OptimalEconomicState{}, err
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "validator_reward_coverage_bps", value: input.ValidatorRewardCoverageBps},
 		{name: "delegator_risk_signal_coverage_bps", value: input.DelegatorRiskSignalCoverageBps},
@@ -1044,8 +1044,8 @@ func EvaluateOptimalEconomicState(input OptimalEconomicStateInput) (OptimalEcono
 	}
 
 	return OptimalEconomicState{
-		Optimal:          len(failed) == 0,
-		FailedConditions: failed,
+		Optimal:		len(failed) == 0,
+		FailedConditions:	failed,
 	}, nil
 }
 
@@ -1136,13 +1136,13 @@ func ComputeValidatorIncome(input ValidatorIncomeInput) (ValidatorIncome, error)
 	delegatorIncome := gross.Sub(commission)
 
 	return ValidatorIncome{
-		RewardWeightBps:       rewardWeightBps,
-		MintRewardShare:       mintShare,
-		FeeRewardShare:        feeShare,
-		ValidatorCommission:   commission,
-		ValidatorIncome:       gross.Add(commission),
-		DelegatorIncome:       delegatorIncome,
-		DelegatorGrossRewards: gross,
+		RewardWeightBps:	rewardWeightBps,
+		MintRewardShare:	mintShare,
+		FeeRewardShare:		feeShare,
+		ValidatorCommission:	commission,
+		ValidatorIncome:	gross.Add(commission),
+		DelegatorIncome:	delegatorIncome,
+		DelegatorGrossRewards:	gross,
 	}, nil
 }
 
@@ -1204,22 +1204,22 @@ func BalanceControllerWithParams(input BalanceControllerInput, params BalanceCon
 	}
 
 	return BalanceControllerOutput{
-		InflationBps:              inflation,
-		StakeInflationDeltaBps:    stakeDelta,
-		ActivityInflationDeltaBps: activityDelta,
-		BurnRatioBps:              burnRatio,
-		ValidatorFeeRatioBps:      validatorFeeRatio,
-		Congested:                 congested,
-		DeflationGuardActive:      deflationGuard,
-		QueueLimited:              input.AsyncQueueDepth > 0 && input.BlockLoadBps > params.TargetLoadBps,
-		RateLimited:               input.FailedTxRateBps > params.RateLimitFailedTxBps || input.BlockLoadBps >= params.HighCongestionLoadBps,
+		InflationBps:			inflation,
+		StakeInflationDeltaBps:		stakeDelta,
+		ActivityInflationDeltaBps:	activityDelta,
+		BurnRatioBps:			burnRatio,
+		ValidatorFeeRatioBps:		validatorFeeRatio,
+		Congested:			congested,
+		DeflationGuardActive:		deflationGuard,
+		QueueLimited:			input.AsyncQueueDepth > 0 && input.BlockLoadBps > params.TargetLoadBps,
+		RateLimited:			input.FailedTxRateBps > params.RateLimitFailedTxBps || input.BlockLoadBps >= params.HighCongestionLoadBps,
 	}, nil
 }
 
 func (a ProtocolEconomicActivity) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "tx_fee_naet", value: a.TxFeeNaet},
 		{name: "avm_storage_fee_naet", value: a.AVMStorageFeeNaet},
@@ -1259,17 +1259,17 @@ func ComputeProtocolEconomicFlow(input ProtocolEconomicFlowInput) (ProtocolEcono
 	treasury := ApplyBps(total, input.TreasuryRatioBps)
 	validator := total.Sub(burn).Sub(treasury)
 	return ProtocolEconomicFlowOutput{
-		TotalChargesNaet:     total,
-		BurnNaet:             burn,
-		TreasuryNaet:         treasury,
-		ValidatorRewardsNaet: validator,
+		TotalChargesNaet:	total,
+		BurnNaet:		burn,
+		TreasuryNaet:		treasury,
+		ValidatorRewardsNaet:	validator,
 	}, nil
 }
 
 func (f ProtocolEconomicFlowOutput) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "total_charges_naet", value: f.TotalChargesNaet},
 		{name: "burn_naet", value: f.BurnNaet},

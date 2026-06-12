@@ -12,44 +12,44 @@ import (
 type UnifiedInteractionClass string
 
 const (
-	InteractionOnChainTransaction  UnifiedInteractionClass = "on_chain_transaction"
-	InteractionOffChainServiceCall UnifiedInteractionClass = "off_chain_service_call"
-	InteractionHybridExecutionFlow UnifiedInteractionClass = "hybrid_execution_flow"
-	InteractionAsyncCallback       UnifiedInteractionClass = "async_callback"
-	InteractionRetry               UnifiedInteractionClass = "retry"
-	InteractionEventedSubscription UnifiedInteractionClass = "evented_subscription"
+	InteractionOnChainTransaction	UnifiedInteractionClass	= "on_chain_transaction"
+	InteractionOffChainServiceCall	UnifiedInteractionClass	= "off_chain_service_call"
+	InteractionHybridExecutionFlow	UnifiedInteractionClass	= "hybrid_execution_flow"
+	InteractionAsyncCallback	UnifiedInteractionClass	= "async_callback"
+	InteractionRetry		UnifiedInteractionClass	= "retry"
+	InteractionEventedSubscription	UnifiedInteractionClass	= "evented_subscription"
 )
 
 type UnifiedInteractionPlan struct {
-	CallID           string
-	ServiceID        string
-	MethodID         string
-	InteractionClass UnifiedInteractionClass
-	Kind             coretypes.ServiceCallKind
-	ExecutionType    coretypes.ServiceMethodExecutionType
-	Routes           []UnifiedServiceRoute
-	ReplaySafe       bool
-	PlanHash         string
+	CallID			string
+	ServiceID		string
+	MethodID		string
+	InteractionClass	UnifiedInteractionClass
+	Kind			coretypes.ServiceCallKind
+	ExecutionType		coretypes.ServiceMethodExecutionType
+	Routes			[]UnifiedServiceRoute
+	ReplaySafe		bool
+	PlanHash		string
 }
 
 type UnifiedServiceCallback struct {
-	OriginalCallID        string
-	CallbackTarget        string
-	CallbackMethod        string
-	CallbackPayloadHash   string
-	CallbackDeadline      uint64
-	CallbackPaymentPolicy string
-	Caller                string
-	Nonce                 uint64
-	IdempotencyKey        string
-	CallbackCallID        string
-	CallbackHash          string
+	OriginalCallID		string
+	CallbackTarget		string
+	CallbackMethod		string
+	CallbackPayloadHash	string
+	CallbackDeadline	uint64
+	CallbackPaymentPolicy	string
+	Caller			string
+	Nonce			uint64
+	IdempotencyKey		string
+	CallbackCallID		string
+	CallbackHash		string
 }
 
 type ServiceCallbackReceiptEmission struct {
-	CallbackHash string
-	Receipt      ServiceReceipt
-	EmissionHash string
+	CallbackHash	string
+	Receipt		ServiceReceipt
+	EmissionHash	string
 }
 
 func ClassifyUnifiedInteraction(descriptor ServiceDescriptor, call UnifiedServiceCall) (UnifiedInteractionClass, error) {
@@ -93,14 +93,14 @@ func BuildUnifiedInteractionPlan(ctx coretypes.ServiceConsensusContext, descript
 	}
 	method, _ := descriptor.Interface.MethodByID(call.MethodID)
 	plan := UnifiedInteractionPlan{
-		CallID:           call.CallID,
-		ServiceID:        call.TargetService,
-		MethodID:         call.MethodID,
-		InteractionClass: class,
-		Kind:             call.Kind,
-		ExecutionType:    method.ExecutionType,
-		Routes:           append([]UnifiedServiceRoute(nil), routing.Routes...),
-		ReplaySafe:       call.Nonce != 0 && call.IdempotencyKey != "",
+		CallID:			call.CallID,
+		ServiceID:		call.TargetService,
+		MethodID:		call.MethodID,
+		InteractionClass:	class,
+		Kind:			call.Kind,
+		ExecutionType:		method.ExecutionType,
+		Routes:			append([]UnifiedServiceRoute(nil), routing.Routes...),
+		ReplaySafe:		call.Nonce != 0 && call.IdempotencyKey != "",
 	}
 	sortUnifiedRoutes(plan.Routes)
 	plan.PlanHash = ComputeUnifiedInteractionPlanHash(plan)
@@ -119,15 +119,15 @@ func NewUnifiedServiceCallback(ctx coretypes.ServiceConsensusContext, original U
 		return UnifiedServiceCallback{}, err
 	}
 	callback := UnifiedServiceCallback{
-		OriginalCallID:        original.CallID,
-		CallbackTarget:        target.ServiceID,
-		CallbackMethod:        strings.TrimSpace(callbackMethod),
-		CallbackPayloadHash:   strings.ToLower(strings.TrimSpace(payloadHash)),
-		CallbackDeadline:      deadline,
-		CallbackPaymentPolicy: strings.TrimSpace(paymentPolicy),
-		Caller:                original.Caller,
-		Nonce:                 nonce,
-		IdempotencyKey:        strings.TrimSpace(idempotencyKey),
+		OriginalCallID:		original.CallID,
+		CallbackTarget:		target.ServiceID,
+		CallbackMethod:		strings.TrimSpace(callbackMethod),
+		CallbackPayloadHash:	strings.ToLower(strings.TrimSpace(payloadHash)),
+		CallbackDeadline:	deadline,
+		CallbackPaymentPolicy:	strings.TrimSpace(paymentPolicy),
+		Caller:			original.Caller,
+		Nonce:			nonce,
+		IdempotencyKey:		strings.TrimSpace(idempotencyKey),
 	}
 	envelope := coretypes.NormalizeServiceCall(ctx, callback.ToServiceCallEnvelope(target))
 	callback.CallbackCallID = envelope.CallID
@@ -146,24 +146,24 @@ func (callback UnifiedServiceCallback) ToServiceCallEnvelope(target ServiceDescr
 		methodID = method.MethodID
 	}
 	return coretypes.ServiceCallEnvelope{
-		CallID:           strings.ToLower(strings.TrimSpace(callback.CallbackCallID)),
-		ServiceID:        strings.TrimSpace(callback.CallbackTarget),
-		Caller:           strings.TrimSpace(callback.Caller),
-		Nonce:            callback.Nonce,
-		IdempotencyKey:   strings.TrimSpace(callback.IdempotencyKey),
-		MethodID:         strings.TrimSpace(methodID),
-		InterfaceHash:    strings.ToLower(strings.TrimSpace(interfaceHash)),
-		PayloadHash:      strings.ToLower(strings.TrimSpace(callback.CallbackPayloadHash)),
-		PaymentDenom:     strings.TrimSpace(paymentDenom),
-		MaxFeeAmount:     "0",
-		ProofRequirement: proofRequirement,
-		Kind:             coretypes.ServiceCallKindCallback,
-		CreatedHeight:    1,
-		DeadlineHeight:   callback.CallbackDeadline,
-		Callback:         true,
-		RetryOf:          strings.ToLower(strings.TrimSpace(callback.OriginalCallID)),
-		StateReadSet:     []string{callback.CallbackTarget + "/" + methodID + "/callback/read"},
-		StateWriteSet:    []string{callback.CallbackTarget + "/" + methodID + "/callback/write"},
+		CallID:			strings.ToLower(strings.TrimSpace(callback.CallbackCallID)),
+		ServiceID:		strings.TrimSpace(callback.CallbackTarget),
+		Caller:			strings.TrimSpace(callback.Caller),
+		Nonce:			callback.Nonce,
+		IdempotencyKey:		strings.TrimSpace(callback.IdempotencyKey),
+		MethodID:		strings.TrimSpace(methodID),
+		InterfaceHash:		strings.ToLower(strings.TrimSpace(interfaceHash)),
+		PayloadHash:		strings.ToLower(strings.TrimSpace(callback.CallbackPayloadHash)),
+		PaymentDenom:		strings.TrimSpace(paymentDenom),
+		MaxFeeAmount:		"0",
+		ProofRequirement:	proofRequirement,
+		Kind:			coretypes.ServiceCallKindCallback,
+		CreatedHeight:		1,
+		DeadlineHeight:		callback.CallbackDeadline,
+		Callback:		true,
+		RetryOf:		strings.ToLower(strings.TrimSpace(callback.OriginalCallID)),
+		StateReadSet:		[]string{callback.CallbackTarget + "/" + methodID + "/callback/read"},
+		StateWriteSet:		[]string{callback.CallbackTarget + "/" + methodID + "/callback/write"},
 	}
 }
 
@@ -256,8 +256,8 @@ func EmitServiceCallbackReceipt(ctx coretypes.ServiceConsensusContext, target Se
 		return ServiceCallbackReceiptEmission{}, err
 	}
 	emission := ServiceCallbackReceiptEmission{
-		CallbackHash: callback.CallbackHash,
-		Receipt:      receipt,
+		CallbackHash:	callback.CallbackHash,
+		Receipt:	receipt,
 	}
 	emission.EmissionHash = ComputeServiceCallbackReceiptEmissionHash(emission)
 	return emission, emission.Validate()
@@ -367,5 +367,3 @@ func ComputeUnifiedServiceCallbackHash(callback UnifiedServiceCallback) string {
 func ComputeServiceCallbackReceiptEmissionHash(emission ServiceCallbackReceiptEmission) string {
 	return servicesHashParts("aetra-services-callback-receipt-emission-v1", emission.CallbackHash, emission.Receipt.ReceiptHash)
 }
-
-

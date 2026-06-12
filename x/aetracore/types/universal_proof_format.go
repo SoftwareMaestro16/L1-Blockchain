@@ -11,125 +11,125 @@ type UniversalProofType string
 type UniversalProofFailureCode string
 
 const (
-	ProofTypeAccountState      UniversalProofType = "AccountStateProof"
-	ProofTypeBalance           UniversalProofType = "BalanceProof"
-	ProofTypeZoneRoot          UniversalProofType = "ZoneRootProof"
-	ProofTypeShardRoot         UniversalProofType = "ShardRootProof"
-	ProofTypeMessageInclusion  UniversalProofType = "MessageInclusionProof"
-	ProofTypeMessageReceipt    UniversalProofType = "MessageReceiptProof"
-	ProofTypeDomainOwnership   UniversalProofType = "DomainOwnershipProof"
-	ProofTypeResolverRecord    UniversalProofType = "ResolverRecordProof"
-	ProofTypeContractState     UniversalProofType = "ContractStateProof"
-	ProofTypePaymentSettlement UniversalProofType = "PaymentSettlementProof"
-	ProofTypeNonExistence      UniversalProofType = "NonExistenceProof"
+	ProofTypeAccountState		UniversalProofType	= "AccountStateProof"
+	ProofTypeBalance		UniversalProofType	= "BalanceProof"
+	ProofTypeZoneRoot		UniversalProofType	= "ZoneRootProof"
+	ProofTypeShardRoot		UniversalProofType	= "ShardRootProof"
+	ProofTypeMessageInclusion	UniversalProofType	= "MessageInclusionProof"
+	ProofTypeMessageReceipt		UniversalProofType	= "MessageReceiptProof"
+	ProofTypeDomainOwnership	UniversalProofType	= "DomainOwnershipProof"
+	ProofTypeResolverRecord		UniversalProofType	= "ResolverRecordProof"
+	ProofTypeContractState		UniversalProofType	= "ContractStateProof"
+	ProofTypePaymentSettlement	UniversalProofType	= "PaymentSettlementProof"
+	ProofTypeNonExistence		UniversalProofType	= "NonExistenceProof"
 )
 
 const (
-	ProofFailureNone                     UniversalProofFailureCode = ""
-	ProofFailureUntrustedHeader          UniversalProofFailureCode = "ERR_UNTRUSTED_HEADER"
-	ProofFailureChainIDMismatch          UniversalProofFailureCode = "ERR_CHAIN_ID_MISMATCH"
-	ProofFailureHeightUnavailable        UniversalProofFailureCode = "ERR_HEIGHT_UNAVAILABLE"
-	ProofFailureRootMismatch             UniversalProofFailureCode = "ERR_ROOT_MISMATCH"
-	ProofFailureZoneNotFound             UniversalProofFailureCode = "ERR_ZONE_NOT_FOUND"
-	ProofFailureShardNotFound            UniversalProofFailureCode = "ERR_SHARD_NOT_FOUND"
-	ProofFailureStoreProofInvalid        UniversalProofFailureCode = "ERR_STORE_PROOF_INVALID"
-	ProofFailureMessageNotIncluded       UniversalProofFailureCode = "ERR_MESSAGE_NOT_INCLUDED"
-	ProofFailureReceiptNotFound          UniversalProofFailureCode = "ERR_RECEIPT_NOT_FOUND"
-	ProofFailureObjectExpired            UniversalProofFailureCode = "ERR_OBJECT_EXPIRED"
-	ProofFailureNonExistenceProofInvalid UniversalProofFailureCode = "ERR_NON_EXISTENCE_PROOF_INVALID"
+	ProofFailureNone			UniversalProofFailureCode	= ""
+	ProofFailureUntrustedHeader		UniversalProofFailureCode	= "ERR_UNTRUSTED_HEADER"
+	ProofFailureChainIDMismatch		UniversalProofFailureCode	= "ERR_CHAIN_ID_MISMATCH"
+	ProofFailureHeightUnavailable		UniversalProofFailureCode	= "ERR_HEIGHT_UNAVAILABLE"
+	ProofFailureRootMismatch		UniversalProofFailureCode	= "ERR_ROOT_MISMATCH"
+	ProofFailureZoneNotFound		UniversalProofFailureCode	= "ERR_ZONE_NOT_FOUND"
+	ProofFailureShardNotFound		UniversalProofFailureCode	= "ERR_SHARD_NOT_FOUND"
+	ProofFailureStoreProofInvalid		UniversalProofFailureCode	= "ERR_STORE_PROOF_INVALID"
+	ProofFailureMessageNotIncluded		UniversalProofFailureCode	= "ERR_MESSAGE_NOT_INCLUDED"
+	ProofFailureReceiptNotFound		UniversalProofFailureCode	= "ERR_RECEIPT_NOT_FOUND"
+	ProofFailureObjectExpired		UniversalProofFailureCode	= "ERR_OBJECT_EXPIRED"
+	ProofFailureNonExistenceProofInvalid	UniversalProofFailureCode	= "ERR_NON_EXISTENCE_PROOF_INVALID"
 )
 
 type UniversalTrustedHeader struct {
-	ChainID    string
-	Height     uint64
-	AppHash    string
-	HeaderHash string
-	Trusted    bool
+	ChainID		string
+	Height		uint64
+	AppHash		string
+	HeaderHash	string
+	Trusted		bool
 }
 
 type UniversalStoreProof struct {
-	ProofVersion       uint64
-	Key                []byte
-	Value              []byte
-	NonExistenceMarker []byte
-	StoreRoot          string
-	ProofOps           []string
-	ProofHash          string
+	ProofVersion		uint64
+	Key			[]byte
+	Value			[]byte
+	NonExistenceMarker	[]byte
+	StoreRoot		string
+	ProofOps		[]string
+	ProofHash		string
 }
 
 type UniversalRootStep struct {
-	Index        uint32
-	FromRootType RootType
-	FromRoot     string
-	ToRootType   RootType
-	ToRoot       string
-	Scope        string
-	StepHash     string
+	Index		uint32
+	FromRootType	RootType
+	FromRoot	string
+	ToRootType	RootType
+	ToRoot		string
+	Scope		string
+	StepHash	string
 }
 
 type UniversalShardCommitment struct {
-	Height         uint64
-	ZoneID         ZoneID
-	ShardID        ShardID
-	ShardRoot      string
-	ShardRootsRoot string
-	CommitmentHash string
+	Height		uint64
+	ZoneID		ZoneID
+	ShardID		ShardID
+	ShardRoot	string
+	ShardRootsRoot	string
+	CommitmentHash	string
 }
 
 type UniversalMessageCommitment struct {
-	Height                 uint64
-	MessageID              string
-	MessageRoot            string
-	SourceOutboxRoot       string
-	DestinationInboxRoot   string
-	ReceiptRoot            string
-	ReceiptHash            string
-	MessageCommitmentHash  string
-	ReceiptCommitmentHash  string
-	DeliveryCommitmentHash string
+	Height			uint64
+	MessageID		string
+	MessageRoot		string
+	SourceOutboxRoot	string
+	DestinationInboxRoot	string
+	ReceiptRoot		string
+	ReceiptHash		string
+	MessageCommitmentHash	string
+	ReceiptCommitmentHash	string
+	DeliveryCommitmentHash	string
 }
 
 type UniversalProofEnvelope struct {
-	ProofType          UniversalProofType
-	ProofVersion       uint64
-	ChainID            string
-	Height             uint64
-	AppHash            string
-	RootType           RootType
-	ZoneID             ZoneID
-	ShardID            ShardID
-	Key                []byte
-	Value              []byte
-	AbsenceMarker      []byte
-	ObjectExpiryHeight uint64
-	StoreProof         UniversalStoreProof
-	ZoneCommitment     ZoneCommitment
-	HasZoneCommit      bool
-	ShardCommitment    UniversalShardCommitment
-	HasShardCommit     bool
-	MessageCommit      UniversalMessageCommitment
-	HasMessageCommit   bool
-	VerificationPath   []UniversalRootStep
-	ProofHash          string
+	ProofType		UniversalProofType
+	ProofVersion		uint64
+	ChainID			string
+	Height			uint64
+	AppHash			string
+	RootType		RootType
+	ZoneID			ZoneID
+	ShardID			ShardID
+	Key			[]byte
+	Value			[]byte
+	AbsenceMarker		[]byte
+	ObjectExpiryHeight	uint64
+	StoreProof		UniversalStoreProof
+	ZoneCommitment		ZoneCommitment
+	HasZoneCommit		bool
+	ShardCommitment		UniversalShardCommitment
+	HasShardCommit		bool
+	MessageCommit		UniversalMessageCommitment
+	HasMessageCommit	bool
+	VerificationPath	[]UniversalRootStep
+	ProofHash		string
 }
 
 type UniversalProofVerificationResult struct {
-	Verified       bool
-	VerifiedAbsent bool
-	Value          []byte
-	FailureCode    UniversalProofFailureCode
-	FailureMessage string
-	ProofHash      string
+	Verified	bool
+	VerifiedAbsent	bool
+	Value		[]byte
+	FailureCode	UniversalProofFailureCode
+	FailureMessage	string
+	ProofHash	string
 }
 
 type universalProofRequirement struct {
-	RootType        RootType
-	ZoneID          ZoneID
-	RequiresZone    bool
-	RequiresShard   bool
-	RequiresMessage bool
-	RequiresReceipt bool
-	RequiresAbsence bool
+	RootType	RootType
+	ZoneID		ZoneID
+	RequiresZone	bool
+	RequiresShard	bool
+	RequiresMessage	bool
+	RequiresReceipt	bool
+	RequiresAbsence	bool
 }
 
 func NewUniversalStoreProof(proof UniversalStoreProof) (UniversalStoreProof, error) {
@@ -262,12 +262,12 @@ func VerifyUniversalProof(proof UniversalProofEnvelope, trusted UniversalTrusted
 		return universalProofFailure(proof, failureCodeForProofError(proof, err), err.Error())
 	}
 	return UniversalProofVerificationResult{
-		Verified:       true,
-		VerifiedAbsent: proof.ProofType == ProofTypeNonExistence,
-		Value:          append([]byte(nil), proof.Value...),
-		FailureCode:    ProofFailureNone,
-		ProofHash:      proof.ProofHash,
-		FailureMessage: "",
+		Verified:	true,
+		VerifiedAbsent:	proof.ProofType == ProofTypeNonExistence,
+		Value:		append([]byte(nil), proof.Value...),
+		FailureCode:	ProofFailureNone,
+		ProofHash:	proof.ProofHash,
+		FailureMessage:	"",
 	}
 }
 
@@ -368,8 +368,8 @@ func (c UniversalMessageCommitment) Validate() error {
 		return errors.New("aetracore universal message commitment height must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore universal message commitment message id", c.MessageID},
 		{"aetracore universal message root", c.MessageRoot},
@@ -735,11 +735,11 @@ func failureCodeForProofError(proof UniversalProofEnvelope, err error) Universal
 
 func universalProofFailure(proof UniversalProofEnvelope, code UniversalProofFailureCode, message string) UniversalProofVerificationResult {
 	return UniversalProofVerificationResult{
-		Verified:       false,
-		VerifiedAbsent: false,
-		FailureCode:    code,
-		FailureMessage: message,
-		ProofHash:      proof.ProofHash,
+		Verified:	false,
+		VerifiedAbsent:	false,
+		FailureCode:	code,
+		FailureMessage:	message,
+		ProofHash:	proof.ProofHash,
 	}
 }
 

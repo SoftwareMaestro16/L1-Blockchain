@@ -6,92 +6,92 @@ import (
 )
 
 const (
-	AetraAcceptanceCategoryBaseNode           = "base_node"
-	AetraAcceptanceCategoryStaking            = "staking"
-	AetraAcceptanceCategoryAntiCentralization = "anti_centralization"
-	AetraAcceptanceCategorySlashing           = "slashing"
-	AetraAcceptanceCategoryEconomics          = "economics"
-	AetraAcceptanceCategoryAVM                = "avm"
-	AetraAcceptanceCategoryGovernance         = "governance"
-	AetraAcceptanceCategoryObservability      = "observability"
+	AetraAcceptanceCategoryBaseNode			= "base_node"
+	AetraAcceptanceCategoryStaking			= "staking"
+	AetraAcceptanceCategoryAntiCentralization	= "anti_centralization"
+	AetraAcceptanceCategorySlashing			= "slashing"
+	AetraAcceptanceCategoryEconomics		= "economics"
+	AetraAcceptanceCategoryAVM			= "avm"
+	AetraAcceptanceCategoryGovernance		= "governance"
+	AetraAcceptanceCategoryObservability		= "observability"
 )
 
 const (
-	AetraAcceptanceBaseNodeBootSingle               = "boot_single_node"
-	AetraAcceptanceBaseNodeBootMultiValidator       = "boot_multi_validator_localnet"
-	AetraAcceptanceBaseNodeRestart                  = "restart"
-	AetraAcceptanceBaseNodeExportImport             = "export_import"
-	AetraAcceptanceBaseNodeStateSyncSnapshotRestore = "state_sync_or_snapshot_restore"
+	AetraAcceptanceBaseNodeBootSingle		= "boot_single_node"
+	AetraAcceptanceBaseNodeBootMultiValidator	= "boot_multi_validator_localnet"
+	AetraAcceptanceBaseNodeRestart			= "restart"
+	AetraAcceptanceBaseNodeExportImport		= "export_import"
+	AetraAcceptanceBaseNodeStateSyncSnapshotRestore	= "state_sync_or_snapshot_restore"
 )
 
 const (
-	AetraAcceptanceStakingCreateValidator           = "create_validator"
-	AetraAcceptanceStakingDelegate                  = "delegate"
-	AetraAcceptanceStakingRedelegate                = "redelegate"
-	AetraAcceptanceStakingUnbond                    = "unbond"
-	AetraAcceptanceStakingWithdrawRewards           = "withdraw_rewards"
-	AetraAcceptanceStakingValidatorCommissionUpdate = "validator_commission_update"
+	AetraAcceptanceStakingCreateValidator		= "create_validator"
+	AetraAcceptanceStakingDelegate			= "delegate"
+	AetraAcceptanceStakingRedelegate		= "redelegate"
+	AetraAcceptanceStakingUnbond			= "unbond"
+	AetraAcceptanceStakingWithdrawRewards		= "withdraw_rewards"
+	AetraAcceptanceStakingValidatorCommissionUpdate	= "validator_commission_update"
 )
 
 const (
-	AetraAcceptanceAntiCentralizationValidatorReachesCap = "validator_reaches_cap"
-	AetraAcceptanceAntiCentralizationValidatorExceedsCap = "validator_exceeds_cap"
-	AetraAcceptanceAntiCentralizationRewardPenalty       = "excess_stake_reward_penalty_applied"
-	AetraAcceptanceAntiCentralizationTopNQuery           = "top_n_concentration_query_works"
-	AetraAcceptanceAntiCentralizationCommissionFloor     = "commission_floor_enforced"
+	AetraAcceptanceAntiCentralizationValidatorReachesCap	= "validator_reaches_cap"
+	AetraAcceptanceAntiCentralizationValidatorExceedsCap	= "validator_exceeds_cap"
+	AetraAcceptanceAntiCentralizationRewardPenalty		= "excess_stake_reward_penalty_applied"
+	AetraAcceptanceAntiCentralizationTopNQuery		= "top_n_concentration_query_works"
+	AetraAcceptanceAntiCentralizationCommissionFloor	= "commission_floor_enforced"
 )
 
 const (
-	AetraAcceptanceSlashingDowntimeTracked     = "downtime_tracked"
-	AetraAcceptanceSlashingDowntimeJail        = "downtime_jail"
-	AetraAcceptanceSlashingDoubleSignEvidence  = "double_sign_evidence_path_where_feasible"
-	AetraAcceptanceSlashingTombstoneBehavior   = "tombstone_behavior"
-	AetraAcceptanceSlashingDelegatorAccounting = "delegator_slash_accounting"
+	AetraAcceptanceSlashingDowntimeTracked		= "downtime_tracked"
+	AetraAcceptanceSlashingDowntimeJail		= "downtime_jail"
+	AetraAcceptanceSlashingDoubleSignEvidence	= "double_sign_evidence_path_where_feasible"
+	AetraAcceptanceSlashingTombstoneBehavior	= "tombstone_behavior"
+	AetraAcceptanceSlashingDelegatorAccounting	= "delegator_slash_accounting"
 )
 
 const (
-	AetraAcceptanceEconomicsInflationUpdate    = "inflation_update"
-	AetraAcceptanceEconomicsFeeBurn            = "fee_burn"
-	AetraAcceptanceEconomicsTreasuryAllocation = "treasury_allocation"
-	AetraAcceptanceEconomicsRewardsAllocation  = "rewards_allocation"
-	AetraAcceptanceEconomicsAPRQuery           = "apr_query"
-	AetraAcceptanceEconomicsSupplyInvariant    = "supply_invariant"
+	AetraAcceptanceEconomicsInflationUpdate		= "inflation_update"
+	AetraAcceptanceEconomicsFeeBurn			= "fee_burn"
+	AetraAcceptanceEconomicsTreasuryAllocation	= "treasury_allocation"
+	AetraAcceptanceEconomicsRewardsAllocation	= "rewards_allocation"
+	AetraAcceptanceEconomicsAPRQuery		= "apr_query"
+	AetraAcceptanceEconomicsSupplyInvariant		= "supply_invariant"
 )
 
 const (
-	AetraAcceptanceAVMUploadCode             = "upload_code"
-	AetraAcceptanceAVMInstantiate            = "instantiate"
-	AetraAcceptanceAVMExecute                = "execute"
-	AetraAcceptanceAVMQuery                  = "query"
-	AetraAcceptanceAVMMigrateIfEnabled       = "migrate_if_enabled"
-	AetraAcceptanceAVMGasExhaustionContained = "gas_exhaustion_contained"
+	AetraAcceptanceAVMUploadCode			= "upload_code"
+	AetraAcceptanceAVMInstantiate			= "instantiate"
+	AetraAcceptanceAVMExecute			= "execute"
+	AetraAcceptanceAVMQuery				= "query"
+	AetraAcceptanceAVMMigrateIfEnabled		= "migrate_if_enabled"
+	AetraAcceptanceAVMGasExhaustionContained	= "gas_exhaustion_contained"
 )
 
 const (
-	AetraAcceptanceGovernanceValidParamProposal        = "valid_param_proposal"
-	AetraAcceptanceGovernanceInvalidParamProposal      = "invalid_param_proposal"
-	AetraAcceptanceGovernanceTreasuryProposal          = "treasury_proposal"
-	AetraAcceptanceGovernanceDelayedCriticalActivation = "delayed_critical_param_activation"
+	AetraAcceptanceGovernanceValidParamProposal		= "valid_param_proposal"
+	AetraAcceptanceGovernanceInvalidParamProposal		= "invalid_param_proposal"
+	AetraAcceptanceGovernanceTreasuryProposal		= "treasury_proposal"
+	AetraAcceptanceGovernanceDelayedCriticalActivation	= "delayed_critical_param_activation"
 )
 
 const (
-	AetraAcceptanceObservabilityPrometheusMetrics = "prometheus_metrics"
-	AetraAcceptanceObservabilityCLIQueries        = "cli_queries"
-	AetraAcceptanceObservabilityGRPCQueries       = "grpc_queries"
-	AetraAcceptanceObservabilityEventsIndexable   = "events_indexable"
+	AetraAcceptanceObservabilityPrometheusMetrics	= "prometheus_metrics"
+	AetraAcceptanceObservabilityCLIQueries		= "cli_queries"
+	AetraAcceptanceObservabilityGRPCQueries		= "grpc_queries"
+	AetraAcceptanceObservabilityEventsIndexable	= "events_indexable"
 )
 
 type AetraAcceptanceCategoryEvidence struct {
-	Category  string
-	Scenarios []string
+	Category	string
+	Scenarios	[]string
 }
 
 type AetraAcceptanceMatrixReport struct {
-	Categories []AetraAcceptanceCategoryEvidence
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	Categories	[]AetraAcceptanceCategoryEvidence
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraAcceptanceMatrixEvidence() []AetraAcceptanceCategoryEvidence {
@@ -154,11 +154,11 @@ func BuildAetraAcceptanceMatrixReport(evidence []AetraAcceptanceCategoryEvidence
 
 	sort.Strings(failed)
 	return AetraAcceptanceMatrixReport{
-		Categories: evidence,
-		Required:   required,
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		Categories:	evidence,
+		Required:	required,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -245,14 +245,14 @@ func RequiredAetraAcceptanceObservabilityScenarios() []string {
 
 func requiredAcceptanceCategories() map[string][]string {
 	return map[string][]string{
-		AetraAcceptanceCategoryBaseNode:           RequiredAetraAcceptanceBaseNodeScenarios(),
-		AetraAcceptanceCategoryStaking:            RequiredAetraAcceptanceStakingScenarios(),
-		AetraAcceptanceCategoryAntiCentralization: RequiredAetraAcceptanceAntiCentralizationScenarios(),
-		AetraAcceptanceCategorySlashing:           RequiredAetraAcceptanceSlashingScenarios(),
-		AetraAcceptanceCategoryEconomics:          RequiredAetraAcceptanceEconomicsScenarios(),
-		AetraAcceptanceCategoryAVM:                RequiredAetraAcceptanceAVMScenarios(),
-		AetraAcceptanceCategoryGovernance:         RequiredAetraAcceptanceGovernanceScenarios(),
-		AetraAcceptanceCategoryObservability:      RequiredAetraAcceptanceObservabilityScenarios(),
+		AetraAcceptanceCategoryBaseNode:		RequiredAetraAcceptanceBaseNodeScenarios(),
+		AetraAcceptanceCategoryStaking:			RequiredAetraAcceptanceStakingScenarios(),
+		AetraAcceptanceCategoryAntiCentralization:	RequiredAetraAcceptanceAntiCentralizationScenarios(),
+		AetraAcceptanceCategorySlashing:		RequiredAetraAcceptanceSlashingScenarios(),
+		AetraAcceptanceCategoryEconomics:		RequiredAetraAcceptanceEconomicsScenarios(),
+		AetraAcceptanceCategoryAVM:			RequiredAetraAcceptanceAVMScenarios(),
+		AetraAcceptanceCategoryGovernance:		RequiredAetraAcceptanceGovernanceScenarios(),
+		AetraAcceptanceCategoryObservability:		RequiredAetraAcceptanceObservabilityScenarios(),
 	}
 }
 

@@ -12,54 +12,54 @@ import (
 type RetryPaymentPolicy string
 
 const (
-	RetryPaymentOriginalOnly   RetryPaymentPolicy = "original_call_only"
-	RetryPaymentChargeAttempts RetryPaymentPolicy = "charge_attempts"
+	RetryPaymentOriginalOnly	RetryPaymentPolicy	= "original_call_only"
+	RetryPaymentChargeAttempts	RetryPaymentPolicy	= "charge_attempts"
 )
 
 type ServiceRetryPolicy struct {
-	MaxAttempts      uint32
-	MaxDeadlineDelta uint64
-	PaymentPolicy    RetryPaymentPolicy
-	PolicyHash       string
+	MaxAttempts		uint32
+	MaxDeadlineDelta	uint64
+	PaymentPolicy		RetryPaymentPolicy
+	PolicyHash		string
 }
 
 type ServiceRetryAttempt struct {
-	OriginalCallID    string
-	RetryCallID       string
-	AttemptNumber     uint32
-	IdempotencyKey    string
-	CreatedHeight     uint64
-	DeadlineHeight    uint64
-	ChargeAttempt     bool
-	PaymentChargeHash string
-	AttemptHash       string
+	OriginalCallID		string
+	RetryCallID		string
+	AttemptNumber		uint32
+	IdempotencyKey		string
+	CreatedHeight		uint64
+	DeadlineHeight		uint64
+	ChargeAttempt		bool
+	PaymentChargeHash	string
+	AttemptHash		string
 }
 
 type ServiceRetryReceiptLink struct {
-	OriginalCallID string
-	RetryCallID    string
-	ReceiptHash    string
-	LinkHash       string
+	OriginalCallID	string
+	RetryCallID	string
+	ReceiptHash	string
+	LinkHash	string
 }
 
 type ReceiptCommitment struct {
-	ReceiptID      string
-	ReceiptHash    string
-	CommitmentHash string
+	ReceiptID	string
+	ReceiptHash	string
+	CommitmentHash	string
 }
 
 type DeterministicReceiptRequirements struct {
-	OnChainCallIDs         []string
-	OffChainResultCallIDs  []string
-	MixedSettlementCallIDs []string
+	OnChainCallIDs		[]string
+	OffChainResultCallIDs	[]string
+	MixedSettlementCallIDs	[]string
 }
 
 type DeterministicReceiptRoots struct {
-	ServiceReceiptsRoot string
-	CallReceiptsRoot    string
-	PaymentReceiptsRoot string
-	StorageReceiptsRoot string
-	ReceiptRootsHash    string
+	ServiceReceiptsRoot	string
+	CallReceiptsRoot	string
+	PaymentReceiptsRoot	string
+	StorageReceiptsRoot	string
+	ReceiptRootsHash	string
 }
 
 func NewServiceRetryPolicy(policy ServiceRetryPolicy) (ServiceRetryPolicy, error) {
@@ -106,13 +106,13 @@ func NewServiceRetryAttempt(ctx coretypes.ServiceConsensusContext, policy Servic
 	}
 	chargeAttempt := policy.PaymentPolicy == RetryPaymentChargeAttempts
 	attempt := ServiceRetryAttempt{
-		OriginalCallID: original.CallID,
-		RetryCallID:    retry.CallID,
-		AttemptNumber:  uint32(len(previous)) + 1,
-		IdempotencyKey: retry.IdempotencyKey,
-		CreatedHeight:  retry.CreatedHeight,
-		DeadlineHeight: retry.DeadlineHeight,
-		ChargeAttempt:  chargeAttempt,
+		OriginalCallID:	original.CallID,
+		RetryCallID:	retry.CallID,
+		AttemptNumber:	uint32(len(previous)) + 1,
+		IdempotencyKey:	retry.IdempotencyKey,
+		CreatedHeight:	retry.CreatedHeight,
+		DeadlineHeight:	retry.DeadlineHeight,
+		ChargeAttempt:	chargeAttempt,
 	}
 	attempt.PaymentChargeHash = ComputeServiceRetryPaymentChargeHash(policy, original, retry, chargeAttempt)
 	attempt.AttemptHash = ComputeServiceRetryAttemptHash(attempt)
@@ -130,9 +130,9 @@ func NewServiceRetryReceiptLink(original UnifiedServiceCall, retry UnifiedServic
 		return ServiceRetryReceiptLink{}, errors.New("services retry receipt link call mismatch")
 	}
 	link := ServiceRetryReceiptLink{
-		OriginalCallID: original.CallID,
-		RetryCallID:    retry.CallID,
-		ReceiptHash:    receipt.ReceiptHash,
+		OriginalCallID:	original.CallID,
+		RetryCallID:	retry.CallID,
+		ReceiptHash:	receipt.ReceiptHash,
 	}
 	link.LinkHash = ComputeServiceRetryReceiptLinkHash(link)
 	return link, link.Validate()
@@ -140,8 +140,8 @@ func NewServiceRetryReceiptLink(original UnifiedServiceCall, retry UnifiedServic
 
 func NewReceiptCommitment(receiptID, receiptHash string) (ReceiptCommitment, error) {
 	commitment := ReceiptCommitment{
-		ReceiptID:   strings.TrimSpace(receiptID),
-		ReceiptHash: strings.ToLower(strings.TrimSpace(receiptHash)),
+		ReceiptID:	strings.TrimSpace(receiptID),
+		ReceiptHash:	strings.ToLower(strings.TrimSpace(receiptHash)),
 	}
 	if err := commitment.ValidateFormat(); err != nil {
 		return ReceiptCommitment{}, err
@@ -168,10 +168,10 @@ func BuildDeterministicReceiptRoots(serviceReceipts []ServiceReceipt, paymentRec
 		return DeterministicReceiptRoots{}, err
 	}
 	roots := DeterministicReceiptRoots{
-		ServiceReceiptsRoot: serviceRoot,
-		CallReceiptsRoot:    callRoot,
-		PaymentReceiptsRoot: ComputeReceiptCommitmentRoot("payment_receipts_root", paymentReceipts),
-		StorageReceiptsRoot: ComputeReceiptCommitmentRoot("storage_receipts_root", storageReceipts),
+		ServiceReceiptsRoot:	serviceRoot,
+		CallReceiptsRoot:	callRoot,
+		PaymentReceiptsRoot:	ComputeReceiptCommitmentRoot("payment_receipts_root", paymentReceipts),
+		StorageReceiptsRoot:	ComputeReceiptCommitmentRoot("storage_receipts_root", storageReceipts),
 	}
 	roots.ReceiptRootsHash = ComputeDeterministicReceiptRootsHash(roots)
 	return roots, roots.Validate()
@@ -285,9 +285,9 @@ func (requirements DeterministicReceiptRequirements) ValidateForReceipts(receipt
 		byCall[receipt.CallID] = struct{}{}
 	}
 	for label, calls := range map[string][]string{
-		"on-chain service call":     requirements.OnChainCallIDs,
-		"anchored off-chain result": requirements.OffChainResultCallIDs,
-		"mixed-service settlement":  requirements.MixedSettlementCallIDs,
+		"on-chain service call":	requirements.OnChainCallIDs,
+		"anchored off-chain result":	requirements.OffChainResultCallIDs,
+		"mixed-service settlement":	requirements.MixedSettlementCallIDs,
 	} {
 		for _, callID := range normalizeReceiptCallIDs(calls) {
 			if err := coretypes.ValidateHash("services deterministic receipt required "+label, callID); err != nil {

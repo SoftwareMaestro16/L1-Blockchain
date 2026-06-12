@@ -128,13 +128,13 @@ func TestFeatureDisabledMainnetProfileHasNoActiveProductionShardingBehavior(t *t
 	err = app.AetraCoreKeeper.RegisterZoneDescriptor(aetracoretypes.ZoneDescriptor{})
 	require.ErrorContains(t, err, "disabled")
 	err = app.SchedulerKeeper.RegisterScheduledJob(schedulertypes.MsgRegisterScheduledJob{
-		Authority: "4:0000000000000000000000000000000000000000000000000000000000000001",
+		Authority:	"4:0000000000000000000000000000000000000000000000000000000000000001",
 		Job: schedulertypes.ScheduledJob{
-			ID:                  "disabled",
-			OwnerModule:         "aetracore",
-			Type:                schedulertypes.JobTypeDelayed,
-			NextExecutionHeight: 1,
-			MaxGas:              1,
+			ID:			"disabled",
+			OwnerModule:		"aetracore",
+			Type:			schedulertypes.JobTypeDelayed,
+			NextExecutionHeight:	1,
+			MaxGas:			1,
 		},
 	})
 	require.ErrorContains(t, err, "disabled")
@@ -152,9 +152,9 @@ func TestPrototypeGenesisInitializesRuntimeKeeperState(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
@@ -172,14 +172,14 @@ func TestAetraCorePrototypeStateSurvivesRestartWhenDisabled(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

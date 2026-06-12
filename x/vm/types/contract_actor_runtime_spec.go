@@ -12,132 +12,132 @@ import (
 )
 
 const (
-	AVMActorContractActive  AVMActorContractStatus = "active"
-	AVMActorContractPaused  AVMActorContractStatus = "paused"
-	AVMActorContractStopped AVMActorContractStatus = "stopped"
+	AVMActorContractActive	AVMActorContractStatus	= "active"
+	AVMActorContractPaused	AVMActorContractStatus	= "paused"
+	AVMActorContractStopped	AVMActorContractStatus	= "stopped"
 
-	AVMContractProofCode     AVMContractProofKind = "code"
-	AVMContractProofInstance AVMContractProofKind = "instance"
-	AVMContractProofStorage  AVMContractProofKind = "storage"
-	AVMContractProofReceipt  AVMContractProofKind = "receipt"
+	AVMContractProofCode		AVMContractProofKind	= "code"
+	AVMContractProofInstance	AVMContractProofKind	= "instance"
+	AVMContractProofStorage		AVMContractProofKind	= "storage"
+	AVMContractProofReceipt		AVMContractProofKind	= "receipt"
 
-	MaxAVMContractRuntimeToken = 128
-	MaxAVMContractProofRecords = 4096
+	MaxAVMContractRuntimeToken	= 128
+	MaxAVMContractProofRecords	= 4096
 )
 
 type AVMActorContractStatus string
 type AVMContractProofKind string
 
 type AVMContractBackendInterface struct {
-	Name                 string
-	BackendKind          AVMContractBackendKind
-	RouterBackend        RouterBackend
-	SupportsSync         bool
-	SupportsAsync        bool
-	EmitsReceipt         bool
-	SupportsProofQuery   bool
-	InterfaceHash        string
-	BackendInterfaceHash string
+	Name			string
+	BackendKind		AVMContractBackendKind
+	RouterBackend		RouterBackend
+	SupportsSync		bool
+	SupportsAsync		bool
+	EmitsReceipt		bool
+	SupportsProofQuery	bool
+	InterfaceHash		string
+	BackendInterfaceHash	string
 }
 
 type AVMNativeModuleAdapter struct {
-	Interface   AVMContractBackendInterface
-	Descriptor  AVMNativeModuleDescriptor
-	AdapterHash string
+	Interface	AVMContractBackendInterface
+	Descriptor	AVMNativeModuleDescriptor
+	AdapterHash	string
 }
 
 type AVMWASMAdapterBoundary struct {
-	Interface     AVMContractBackendInterface
-	SandboxPolicy AVMWASMSandboxPolicy
-	AdapterHash   string
+	Interface	AVMContractBackendInterface
+	SandboxPolicy	AVMWASMSandboxPolicy
+	AdapterHash	string
 }
 
 type AVMActorContractState struct {
-	ActorID          string
-	CodeID           uint64
-	Owner            string
-	MailboxRoot      string
-	StateRoot        string
-	ContinuationRoot string
-	InterfaceHash    string
-	Status           AVMActorContractStatus
-	StateHash        string
+	ActorID			string
+	CodeID			uint64
+	Owner			string
+	MailboxRoot		string
+	StateRoot		string
+	ContinuationRoot	string
+	InterfaceHash		string
+	Status			AVMActorContractStatus
+	StateHash		string
 }
 
 type AVMActorStateRead struct {
-	ActorID string
-	Key     string
-	Hash    string
+	ActorID	string
+	Key	string
+	Hash	string
 }
 
 type AVMActorContractExecution struct {
-	Actor               AVMActorContractState
-	Message             AVMAsyncMessage
-	ActiveMessageCount  uint32
-	StateReads          []AVMActorStateRead
-	StateWrites         []ActorStateWrite
-	EmittedMessages     []AVMAsyncMessage
-	StoredContinuations []ContinuationRecord
-	Receipt             AVMExecutionReceipt
-	DirectMutableReads  bool
-	ExecutionHash       string
+	Actor			AVMActorContractState
+	Message			AVMAsyncMessage
+	ActiveMessageCount	uint32
+	StateReads		[]AVMActorStateRead
+	StateWrites		[]ActorStateWrite
+	EmittedMessages		[]AVMAsyncMessage
+	StoredContinuations	[]ContinuationRecord
+	Receipt			AVMExecutionReceipt
+	DirectMutableReads	bool
+	ExecutionHash		string
 }
 
 type AVMContractCodeRegistryRecord struct {
-	CodeID        uint64
-	BackendKind   AVMContractBackendKind
-	CodeHash      string
-	InterfaceHash string
-	Owner         string
-	Enabled       bool
-	CodeKey       string
-	RecordHash    string
+	CodeID		uint64
+	BackendKind	AVMContractBackendKind
+	CodeHash	string
+	InterfaceHash	string
+	Owner		string
+	Enabled		bool
+	CodeKey		string
+	RecordHash	string
 }
 
 type AVMContractCodeRegistry struct {
-	Codes        []AVMContractCodeRegistryRecord
-	RegistryRoot string
+	Codes		[]AVMContractCodeRegistryRecord
+	RegistryRoot	string
 }
 
 type AVMContractInstanceRegistryRecord struct {
-	ContractAddress string
-	CodeID          uint64
-	BackendKind     AVMContractBackendKind
-	ActorID         string
-	Owner           string
-	StoragePrefix   string
-	StateRoot       string
-	InterfaceHash   string
-	Status          AVMActorContractStatus
-	InstanceKey     string
-	RecordHash      string
+	ContractAddress	string
+	CodeID		uint64
+	BackendKind	AVMContractBackendKind
+	ActorID		string
+	Owner		string
+	StoragePrefix	string
+	StateRoot	string
+	InterfaceHash	string
+	Status		AVMActorContractStatus
+	InstanceKey	string
+	RecordHash	string
 }
 
 type AVMContractInstanceRegistry struct {
-	Instances    []AVMContractInstanceRegistryRecord
-	RegistryRoot string
+	Instances	[]AVMContractInstanceRegistryRecord
+	RegistryRoot	string
 }
 
 type AVMContractStoragePrefixDescriptor struct {
-	ContractAddress string
-	Prefix          string
-	StorageRoot     string
-	PrefixHash      string
+	ContractAddress	string
+	Prefix		string
+	StorageRoot	string
+	PrefixHash	string
 }
 
 type AVMContractProof struct {
-	Kind       AVMContractProofKind
-	QueryKey   string
-	Root       string
-	RecordHash string
-	ProofHash  string
+	Kind		AVMContractProofKind
+	QueryKey	string
+	Root		string
+	RecordHash	string
+	ProofHash	string
 }
 
 type AVMContractProofIndex struct {
-	CodeRegistry     AVMContractCodeRegistry
-	InstanceRegistry AVMContractInstanceRegistry
-	StoragePrefixes  []AVMContractStoragePrefixDescriptor
-	Receipts         []AVMExecutionReceipt
+	CodeRegistry		AVMContractCodeRegistry
+	InstanceRegistry	AVMContractInstanceRegistry
+	StoragePrefixes		[]AVMContractStoragePrefixDescriptor
+	Receipts		[]AVMExecutionReceipt
 }
 
 func NewAVMContractBackendInterface(iface AVMContractBackendInterface) (AVMContractBackendInterface, error) {
@@ -337,8 +337,8 @@ func (s AVMActorContractState) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM actor contract mailbox root", value: s.MailboxRoot},
 		{name: "AVM actor contract state root", value: s.StateRoot},

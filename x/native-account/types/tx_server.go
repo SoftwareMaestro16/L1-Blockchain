@@ -175,8 +175,8 @@ func _Msg_UpdateAccountMetadata_Handler(srv interface{}, ctx context.Context, de
 var Msg_serviceDesc = _Msg_serviceDesc
 
 var _Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.nativeaccount.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.nativeaccount.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		{MethodName: "ActivateAccount", Handler: _Msg_ActivateAccount_Handler},
 		{MethodName: "UpdateAuthPolicy", Handler: _Msg_UpdateAuthPolicy_Handler},
@@ -187,8 +187,8 @@ var _Msg_serviceDesc = grpcgo.ServiceDesc{
 		{MethodName: "UnfreezeAccount", Handler: _Msg_UnfreezeAccount_Handler},
 		{MethodName: "UpdateAccountMetadata", Handler: _Msg_UpdateAccountMetadata_Handler},
 	},
-	Streams:  []grpcgo.StreamDesc{},
-	Metadata: "l1/nativeaccount/v1/tx.proto",
+	Streams:	[]grpcgo.StreamDesc{},
+	Metadata:	"l1/nativeaccount/v1/tx.proto",
 }
 
 func init() {

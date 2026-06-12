@@ -9,43 +9,43 @@ import (
 func TestStorageDeclarationModelsMatchServiceSpec(t *testing.T) {
 	cases := []StorageDeclaration{
 		{
-			StorageModel:        StorageModelEphemeral,
-			ContentHashOptional: storageDeclarationTestHash("ephemeral/content"),
-			RetrievalMethod:     StorageRetrievalInline,
-			VerificationMethod:  StorageVerificationContentHash,
-			RetentionPolicy:     StorageRetentionNone,
-			AccessPolicy:        AccessPolicyPrivate,
-			MaxPayloadBytes:     1024,
+			StorageModel:		StorageModelEphemeral,
+			ContentHashOptional:	storageDeclarationTestHash("ephemeral/content"),
+			RetrievalMethod:	StorageRetrievalInline,
+			VerificationMethod:	StorageVerificationContentHash,
+			RetentionPolicy:	StorageRetentionNone,
+			AccessPolicy:		AccessPolicyPrivate,
+			MaxPayloadBytes:	1024,
 		},
 		{
-			StorageModel:       StorageModelPersistentOnChain,
-			StateRootOptional:  storageDeclarationTestHash("on-chain/root"),
-			RetrievalMethod:    StorageRetrievalOnChainState,
-			VerificationMethod: StorageVerificationStateRoot,
-			RetentionPolicy:    StorageRetentionPermanent,
-			AccessPolicy:       AccessPolicyPermissioned,
-			MaxPayloadBytes:    DefaultMaxStateBytes,
+			StorageModel:		StorageModelPersistentOnChain,
+			StateRootOptional:	storageDeclarationTestHash("on-chain/root"),
+			RetrievalMethod:	StorageRetrievalOnChainState,
+			VerificationMethod:	StorageVerificationStateRoot,
+			RetentionPolicy:	StorageRetentionPermanent,
+			AccessPolicy:		AccessPolicyPermissioned,
+			MaxPayloadBytes:	DefaultMaxStateBytes,
 		},
 		{
-			StorageModel:        StorageModelDistributedOffChain,
-			ContentHashOptional: storageDeclarationTestHash("distributed/content"),
-			RetrievalMethod:     StorageRetrievalContentAddressed,
-			VerificationMethod:  StorageVerificationChunkProof,
-			RetentionPolicy:     StorageRetentionExpiry,
-			AccessPolicy:        AccessPolicyPublicRead,
-			MaxPayloadBytes:     1 << 20,
+			StorageModel:		StorageModelDistributedOffChain,
+			ContentHashOptional:	storageDeclarationTestHash("distributed/content"),
+			RetrievalMethod:	StorageRetrievalContentAddressed,
+			VerificationMethod:	StorageVerificationChunkProof,
+			RetentionPolicy:	StorageRetentionExpiry,
+			AccessPolicy:		AccessPolicyPublicRead,
+			MaxPayloadBytes:	1 << 20,
 		},
 		{
-			StorageModel:            StorageModelHybrid,
-			ContentHashOptional:     storageDeclarationTestHash("hybrid/content"),
-			StateRootOptional:       storageDeclarationTestHash("hybrid/root"),
-			ContentLocationOptional: "ipfs/bafy-storage-object",
-			RetrievalMethod:         StorageRetrievalHybridEndpoint,
-			VerificationMethod:      StorageVerificationHybridCommitment,
-			RetentionPolicy:         StorageRetentionHeight,
-			AccessPolicy:            AccessPolicyPermissioned,
-			AccessReceiptOptional:   storageDeclarationTestHash("hybrid/receipt"),
-			MaxPayloadBytes:         1 << 22,
+			StorageModel:			StorageModelHybrid,
+			ContentHashOptional:		storageDeclarationTestHash("hybrid/content"),
+			StateRootOptional:		storageDeclarationTestHash("hybrid/root"),
+			ContentLocationOptional:	"ipfs/bafy-storage-object",
+			RetrievalMethod:		StorageRetrievalHybridEndpoint,
+			VerificationMethod:		StorageVerificationHybridCommitment,
+			RetentionPolicy:		StorageRetentionHeight,
+			AccessPolicy:			AccessPolicyPermissioned,
+			AccessReceiptOptional:		storageDeclarationTestHash("hybrid/receipt"),
+			MaxPayloadBytes:		1 << 22,
 		},
 	}
 
@@ -82,59 +82,59 @@ func TestHybridStorageDeclarationDoesNotRequireOffchainPayloadForConsensus(t *te
 
 func TestStorageDeclarationRejectsInvalidModelRules(t *testing.T) {
 	_, err := NewStorageDeclaration(StorageDeclaration{
-		StorageModel:       StorageModelPersistentOnChain,
-		RetrievalMethod:    StorageRetrievalOnChainState,
-		VerificationMethod: StorageVerificationStateRoot,
-		RetentionPolicy:    StorageRetentionPermanent,
-		AccessPolicy:       AccessPolicyPrivate,
-		MaxPayloadBytes:    1,
+		StorageModel:		StorageModelPersistentOnChain,
+		RetrievalMethod:	StorageRetrievalOnChainState,
+		VerificationMethod:	StorageVerificationStateRoot,
+		RetentionPolicy:	StorageRetentionPermanent,
+		AccessPolicy:		AccessPolicyPrivate,
+		MaxPayloadBytes:	1,
 	})
 	require.ErrorContains(t, err, "state root")
 
 	_, err = NewStorageDeclaration(StorageDeclaration{
-		StorageModel:       StorageModelDistributedOffChain,
-		RetrievalMethod:    StorageRetrievalContentAddressed,
-		VerificationMethod: StorageVerificationContentHash,
-		RetentionPolicy:    StorageRetentionExpiry,
-		AccessPolicy:       AccessPolicyPublicRead,
-		MaxPayloadBytes:    1,
+		StorageModel:		StorageModelDistributedOffChain,
+		RetrievalMethod:	StorageRetrievalContentAddressed,
+		VerificationMethod:	StorageVerificationContentHash,
+		RetentionPolicy:	StorageRetentionExpiry,
+		AccessPolicy:		AccessPolicyPublicRead,
+		MaxPayloadBytes:	1,
 	})
 	require.ErrorContains(t, err, "content hash")
 
 	_, err = NewStorageDeclaration(StorageDeclaration{
-		StorageModel:        StorageModelHybrid,
-		ContentHashOptional: storageDeclarationTestHash("hybrid/content"),
-		StateRootOptional:   storageDeclarationTestHash("hybrid/root"),
-		RetrievalMethod:     StorageRetrievalHybridEndpoint,
-		VerificationMethod:  StorageVerificationHybridCommitment,
-		RetentionPolicy:     StorageRetentionHeight,
-		AccessPolicy:        AccessPolicyPermissioned,
-		MaxPayloadBytes:     1,
+		StorageModel:		StorageModelHybrid,
+		ContentHashOptional:	storageDeclarationTestHash("hybrid/content"),
+		StateRootOptional:	storageDeclarationTestHash("hybrid/root"),
+		RetrievalMethod:	StorageRetrievalHybridEndpoint,
+		VerificationMethod:	StorageVerificationHybridCommitment,
+		RetentionPolicy:	StorageRetentionHeight,
+		AccessPolicy:		AccessPolicyPermissioned,
+		MaxPayloadBytes:	1,
 	})
 	require.ErrorContains(t, err, "content location")
 
 	_, err = NewStorageDeclaration(StorageDeclaration{
-		StorageModel:       StorageModelEphemeral,
-		RetrievalMethod:    StorageRetrievalProviderRPC,
-		VerificationMethod: StorageVerificationNone,
-		RetentionPolicy:    StorageRetentionNone,
-		AccessPolicy:       AccessPolicyPrivate,
-		MaxPayloadBytes:    1,
+		StorageModel:		StorageModelEphemeral,
+		RetrievalMethod:	StorageRetrievalProviderRPC,
+		VerificationMethod:	StorageVerificationNone,
+		RetentionPolicy:	StorageRetentionNone,
+		AccessPolicy:		AccessPolicyPrivate,
+		MaxPayloadBytes:	1,
 	})
 	require.ErrorContains(t, err, "ephemeral")
 }
 
 func TestStorageConsensusPlanRejectsOffchainPayloadRequirement(t *testing.T) {
 	declaration, err := NewStorageDeclaration(StorageDeclaration{
-		StorageModel:            StorageModelHybrid,
-		ContentHashOptional:     storageDeclarationTestHash("hybrid/content"),
-		StateRootOptional:       storageDeclarationTestHash("hybrid/root"),
-		ContentLocationOptional: "provider/object",
-		RetrievalMethod:         StorageRetrievalHybridEndpoint,
-		VerificationMethod:      StorageVerificationHybridCommitment,
-		RetentionPolicy:         StorageRetentionHeight,
-		AccessPolicy:            AccessPolicyPermissioned,
-		MaxPayloadBytes:         512,
+		StorageModel:			StorageModelHybrid,
+		ContentHashOptional:		storageDeclarationTestHash("hybrid/content"),
+		StateRootOptional:		storageDeclarationTestHash("hybrid/root"),
+		ContentLocationOptional:	"provider/object",
+		RetrievalMethod:		StorageRetrievalHybridEndpoint,
+		VerificationMethod:		StorageVerificationHybridCommitment,
+		RetentionPolicy:		StorageRetentionHeight,
+		AccessPolicy:			AccessPolicyPermissioned,
+		MaxPayloadBytes:		512,
 	})
 	require.NoError(t, err)
 	plan, err := BuildStorageConsensusValidationPlan(declaration)
@@ -147,17 +147,17 @@ func TestStorageConsensusPlanRejectsOffchainPayloadRequirement(t *testing.T) {
 func storageDeclarationTestObject(t *testing.T) StorageObject {
 	t.Helper()
 	object, err := NewStorageObject(StorageObject{
-		ContentHash:            storageDeclarationTestHash("object/content"),
-		ChunkRoots:             []string{storageDeclarationTestHash("object/chunk-1"), storageDeclarationTestHash("object/chunk-2")},
-		Size:                   2048,
-		ReplicationPolicy:      ReplicationPolicyErasure,
-		AccessPolicy:           AccessPolicyPermissioned,
-		Owner:                  "alice",
-		StorageClass:           StorageClassWarm,
-		CreatedHeight:          10,
-		ExpiresHeightOptional:  100,
-		MetadataHashOptional:   storageDeclarationTestHash("object/metadata"),
-		AvailabilityCommitment: storageDeclarationTestHash("object/availability"),
+		ContentHash:		storageDeclarationTestHash("object/content"),
+		ChunkRoots:		[]string{storageDeclarationTestHash("object/chunk-1"), storageDeclarationTestHash("object/chunk-2")},
+		Size:			2048,
+		ReplicationPolicy:	ReplicationPolicyErasure,
+		AccessPolicy:		AccessPolicyPermissioned,
+		Owner:			"alice",
+		StorageClass:		StorageClassWarm,
+		CreatedHeight:		10,
+		ExpiresHeightOptional:	100,
+		MetadataHashOptional:	storageDeclarationTestHash("object/metadata"),
+		AvailabilityCommitment:	storageDeclarationTestHash("object/availability"),
 	})
 	require.NoError(t, err)
 	return object

@@ -67,19 +67,19 @@ func TestConsensusFinalityReportValidatesMatureBlockTimeRange(t *testing.T) {
 
 func validConsensusFinalityReport() ConsensusFinalityReport {
 	return ConsensusFinalityReport{
-		ValidatorCount:              100,
-		BlocksObserved:              100,
-		LocalnetStable:              true,
-		LoadProfileExecuted:         true,
-		ObservedBlockTimeMinSeconds: 5,
-		ObservedBlockTimeMaxSeconds: 6,
-		NormalFinalitySeconds:       10,
-		StressFinalitySeconds:       60,
-		WorstFinalitySeconds:        90,
-		DegradedScenarioExecuted:    true,
-		HealthyVotingPowerBps:       AetraHealthyVotingPowerBps,
-		LivenessPreserved:           true,
-		IncludedInTestnetReport:     true,
+		ValidatorCount:			100,
+		BlocksObserved:			100,
+		LocalnetStable:			true,
+		LoadProfileExecuted:		true,
+		ObservedBlockTimeMinSeconds:	5,
+		ObservedBlockTimeMaxSeconds:	6,
+		NormalFinalitySeconds:		10,
+		StressFinalitySeconds:		60,
+		WorstFinalitySeconds:		90,
+		DegradedScenarioExecuted:	true,
+		HealthyVotingPowerBps:		AetraHealthyVotingPowerBps,
+		LivenessPreserved:		true,
+		IncludedInTestnetReport:	true,
 	}
 }
 

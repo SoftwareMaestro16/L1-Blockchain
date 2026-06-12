@@ -10,38 +10,38 @@ import (
 )
 
 type PaymentLockedByChannelType struct {
-	ChannelType ChannelType
-	Amount      string
+	ChannelType	ChannelType
+	Amount		string
 }
 
 type PaymentObservabilityMetrics struct {
-	Height                              uint64
-	ActiveChannels                      uint64
-	PendingCloses                       uint64
-	ActiveDisputes                      uint64
-	FinalizableChannels                 uint64
-	SettledChannelsPerBlock             uint64
-	AverageChannelLifetime              uint64
-	TotalLockedNaet                     string
-	LockedNaetByChannelType             []PaymentLockedByChannelType
-	ConditionalPromisesActive           uint64
-	ConditionalPromisesExpired          uint64
-	ConditionalPromisesResolved         uint64
-	VirtualChannelsActive               uint64
-	RoutingAdvertisementsActive         uint64
-	FraudProofsSubmitted                uint64
-	FraudProofsAccepted                 uint64
-	FraudProofsRejected                 uint64
-	PenaltiesApplied                    uint64
-	ReporterRewardsPaid                 uint64
-	SettlementFeesCollected             string
-	ChannelOpenFeeAverage               string
-	DisputeInclusionLatency             uint64
-	ChallengePeriodNearExpiryCount      uint64
-	BlockSTMConflictRateBps             uint64
-	StoreV2PaymentModuleReadLatencyOps  uint64
-	StoreV2PaymentModuleWriteLatencyOps uint64
-	MetricsHash                         string
+	Height					uint64
+	ActiveChannels				uint64
+	PendingCloses				uint64
+	ActiveDisputes				uint64
+	FinalizableChannels			uint64
+	SettledChannelsPerBlock			uint64
+	AverageChannelLifetime			uint64
+	TotalLockedNaet				string
+	LockedNaetByChannelType			[]PaymentLockedByChannelType
+	ConditionalPromisesActive		uint64
+	ConditionalPromisesExpired		uint64
+	ConditionalPromisesResolved		uint64
+	VirtualChannelsActive			uint64
+	RoutingAdvertisementsActive		uint64
+	FraudProofsSubmitted			uint64
+	FraudProofsAccepted			uint64
+	FraudProofsRejected			uint64
+	PenaltiesApplied			uint64
+	ReporterRewardsPaid			uint64
+	SettlementFeesCollected			string
+	ChannelOpenFeeAverage			string
+	DisputeInclusionLatency			uint64
+	ChallengePeriodNearExpiryCount		uint64
+	BlockSTMConflictRateBps			uint64
+	StoreV2PaymentModuleReadLatencyOps	uint64
+	StoreV2PaymentModuleWriteLatencyOps	uint64
+	MetricsHash				string
 }
 
 func BuildPaymentObservabilityMetrics(state PaymentsState, fraud FraudProofVerificationState, profile BlockSTMConflictProfile, currentHeight uint64, nearExpiryThreshold uint64) (PaymentObservabilityMetrics, error) {
@@ -65,11 +65,11 @@ func BuildPaymentObservabilityMetrics(state PaymentsState, fraud FraudProofVerif
 		return PaymentObservabilityMetrics{}, err
 	}
 	metrics := PaymentObservabilityMetrics{
-		Height:                         currentHeight,
-		VirtualChannelsActive:          uint64(len(state.VirtualChannels)),
-		FraudProofsAccepted:            uint64(len(fraud.EvidenceRecords)),
-		PenaltiesApplied:               uint64(len(fraud.PenaltyRecords)),
-		ChallengePeriodNearExpiryCount: uint64(len(alerts)),
+		Height:				currentHeight,
+		VirtualChannelsActive:		uint64(len(state.VirtualChannels)),
+		FraudProofsAccepted:		uint64(len(fraud.EvidenceRecords)),
+		PenaltiesApplied:		uint64(len(fraud.PenaltyRecords)),
+		ChallengePeriodNearExpiryCount:	uint64(len(alerts)),
 	}
 	lockedByType := map[ChannelType]sdkmath.Int{}
 	totalLocked := sdkmath.ZeroInt()

@@ -19,17 +19,17 @@ func TestHighPerformanceBonus(t *testing.T) {
 	validator := validatorAddress()
 
 	_, err := msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	res, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
-		PerformanceScoreBps: 9_500,
-		ReputationScoreBps:  6_000,
-		Height:              2,
+		Authority:		app.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	validator,
+		PerformanceScoreBps:	9_500,
+		ReputationScoreBps:	6_000,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(1_100), res.Commission.EffectiveCommissionBps)
@@ -53,17 +53,17 @@ func TestLowPerformancePenalty(t *testing.T) {
 	validator := validatorAddress()
 
 	_, err := msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	res, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
-		PerformanceScoreBps: 4_000,
-		ReputationScoreBps:  6_000,
-		Height:              2,
+		Authority:		app.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	validator,
+		PerformanceScoreBps:	4_000,
+		ReputationScoreBps:	6_000,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(900), res.Commission.EffectiveCommissionBps)
@@ -80,51 +80,51 @@ func TestFloorCeilingAndJailedBonusRules(t *testing.T) {
 	params.CommissionFloorBps = 900
 	params.CommissionCeilingBps = 1_100
 	_, err := msgServer.UpdateCommissionParams(ctx, &types.MsgUpdateCommissionParams{
-		Authority: app.DynamicCommissionKeeper.Authority(),
-		Params:    params,
+		Authority:	app.DynamicCommissionKeeper.Authority(),
+		Params:		params,
 	})
 	require.NoError(t, err)
 	_, err = msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 
 	ceiling, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
-		PerformanceScoreBps: 9_500,
-		ReputationScoreBps:  9_000,
-		Height:              2,
+		Authority:		app.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	validator,
+		PerformanceScoreBps:	9_500,
+		ReputationScoreBps:	9_000,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(1_100), ceiling.Commission.EffectiveCommissionBps)
 
 	floorValidator := validatorAddressN(2)
 	_, err = msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  floorValidator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	floorValidator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	floor, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    floorValidator,
-		PerformanceScoreBps: 1_000,
-		ReputationScoreBps:  1_000,
-		Height:              3,
+		Authority:		app.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	floorValidator,
+		PerformanceScoreBps:	1_000,
+		ReputationScoreBps:	1_000,
+		Height:			3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(900), floor.Commission.EffectiveCommissionBps)
 
 	jailed, err := msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           app.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    floorValidator,
-		PerformanceScoreBps: 9_500,
-		ReputationScoreBps:  6_000,
-		Jailed:              true,
-		Height:              4,
+		Authority:		app.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	floorValidator,
+		PerformanceScoreBps:	9_500,
+		ReputationScoreBps:	6_000,
+		Jailed:			true,
+		Height:			4,
 	})
 	require.NoError(t, err)
 	require.Equal(t, int32(0), jailed.Commission.PerformanceModifierBps)
@@ -138,15 +138,15 @@ func TestRateLimitEnforcedWithoutMutation(t *testing.T) {
 	validator := validatorAddress()
 
 	_, err := msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	_, err = msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_800,
-		Height:            2,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_800,
+		Height:			2,
 	})
 	require.ErrorIs(t, err, types.ErrRateLimited)
 
@@ -163,17 +163,17 @@ func TestExportImportPreservesEffectiveCommission(t *testing.T) {
 	validator := validatorAddress()
 
 	_, err := msgServer.SetBaseCommission(ctx, &types.MsgSetBaseCommission{
-		ValidatorAddress:  validator,
-		BaseCommissionBps: 1_000,
-		Height:            1,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	1_000,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	_, err = msgServer.RecomputeEffectiveCommission(ctx, &types.MsgRecomputeEffectiveCommission{
-		Authority:           source.DynamicCommissionKeeper.Authority(),
-		ValidatorAddress:    validator,
-		PerformanceScoreBps: 9_500,
-		ReputationScoreBps:  9_000,
-		Height:              2,
+		Authority:		source.DynamicCommissionKeeper.Authority(),
+		ValidatorAddress:	validator,
+		PerformanceScoreBps:	9_500,
+		ReputationScoreBps:	9_000,
+		Height:			2,
 	})
 	require.NoError(t, err)
 

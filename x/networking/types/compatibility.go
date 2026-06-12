@@ -10,117 +10,117 @@ import (
 type CompatibilitySurface string
 
 const (
-	CompatibilityCometBFTP2P               CompatibilitySurface = "cometbft_p2p_transport"
-	CompatibilityCometBFTConsensusMessages CompatibilitySurface = "cometbft_consensus_messages"
-	CompatibilityCosmosSDKTxFlow           CompatibilitySurface = "cosmos_sdk_transaction_flow"
-	CompatibilityABCIPlusPlus              CompatibilitySurface = "abci_plus_plus_lifecycle"
-	CompatibilityBlockSTM                  CompatibilitySurface = "blockstm_execution_grouping"
-	CompatibilityGRPC                      CompatibilitySurface = "grpc_external_api"
-	CompatibilityREST                      CompatibilitySurface = "rest_external_api"
-	CompatibilityRPC                       CompatibilitySurface = "rpc_external_api"
-	CompatibilityStateSyncSnapshots        CompatibilitySurface = "state_sync_snapshots"
+	CompatibilityCometBFTP2P		CompatibilitySurface	= "cometbft_p2p_transport"
+	CompatibilityCometBFTConsensusMessages	CompatibilitySurface	= "cometbft_consensus_messages"
+	CompatibilityCosmosSDKTxFlow		CompatibilitySurface	= "cosmos_sdk_transaction_flow"
+	CompatibilityABCIPlusPlus		CompatibilitySurface	= "abci_plus_plus_lifecycle"
+	CompatibilityBlockSTM			CompatibilitySurface	= "blockstm_execution_grouping"
+	CompatibilityGRPC			CompatibilitySurface	= "grpc_external_api"
+	CompatibilityREST			CompatibilitySurface	= "rest_external_api"
+	CompatibilityRPC			CompatibilitySurface	= "rpc_external_api"
+	CompatibilityStateSyncSnapshots		CompatibilitySurface	= "state_sync_snapshots"
 )
 
 type ABCILifecyclePhase string
 
 const (
-	ABCIPrepareProposal ABCILifecyclePhase = "PrepareProposal"
-	ABCIProcessProposal ABCILifecyclePhase = "ProcessProposal"
-	ABCIFinalizeBlock   ABCILifecyclePhase = "FinalizeBlock"
+	ABCIPrepareProposal	ABCILifecyclePhase	= "PrepareProposal"
+	ABCIProcessProposal	ABCILifecyclePhase	= "ProcessProposal"
+	ABCIFinalizeBlock	ABCILifecyclePhase	= "FinalizeBlock"
 )
 
 type CosmosCometBFTCompatibilityPlan struct {
-	Adapter                               AetherNetworkingAdapter
-	Surfaces                              []CompatibilitySurface
-	Phases                                []ABCILifecyclePhase
-	PreserveCometBFTTransport             bool
-	PreserveCometBFTConsensusMessages     bool
-	PreserveCosmosSDKTransactionFlow      bool
-	SupportsBlockSTMExecutionGrouping     bool
-	SupportsGRPCExternalAPI               bool
-	SupportsRESTExternalAPI               bool
-	SupportsRPCExternalAPI                bool
-	SupportsStateSyncAndSnapshotMechanism bool
+	Adapter					AetherNetworkingAdapter
+	Surfaces				[]CompatibilitySurface
+	Phases					[]ABCILifecyclePhase
+	PreserveCometBFTTransport		bool
+	PreserveCometBFTConsensusMessages	bool
+	PreserveCosmosSDKTransactionFlow	bool
+	SupportsBlockSTMExecutionGrouping	bool
+	SupportsGRPCExternalAPI			bool
+	SupportsRESTExternalAPI			bool
+	SupportsRPCExternalAPI			bool
+	SupportsStateSyncAndSnapshotMechanism	bool
 }
 
 type ANAProposalHint struct {
-	HintID                 string
-	ScheduleID             string
-	ScheduleHash           string
-	ZoneID                 string
-	ShardID                string
-	DeterminismSource      DeterminismSource
-	CommittedStateDerived  bool
-	PeerLocal              bool
-	AdvisoryOnly           bool
-	UsedForValidity        bool
-	UsedForOrdering        bool
-	Priority               uint32
-	BlockSTMGroupID        string
-	ExecutionGroupID       string
-	DeterministicHintProof string
+	HintID			string
+	ScheduleID		string
+	ScheduleHash		string
+	ZoneID			string
+	ShardID			string
+	DeterminismSource	DeterminismSource
+	CommittedStateDerived	bool
+	PeerLocal		bool
+	AdvisoryOnly		bool
+	UsedForValidity		bool
+	UsedForOrdering		bool
+	Priority		uint32
+	BlockSTMGroupID		string
+	ExecutionGroupID	string
+	DeterministicHintProof	string
 }
 
 type ABCIProposalGroup struct {
-	GroupID         string
-	ZoneID          string
-	ShardID         string
-	ScheduleID      string
-	ScheduleHash    string
-	TransactionIDs  []string
-	MessageIDs      []string
-	HintIDs         []string
-	BlockSTMGroupID string
-	Deterministic   bool
+	GroupID		string
+	ZoneID		string
+	ShardID		string
+	ScheduleID	string
+	ScheduleHash	string
+	TransactionIDs	[]string
+	MessageIDs	[]string
+	HintIDs		[]string
+	BlockSTMGroupID	string
+	Deterministic	bool
 }
 
 type ABCIPrepareProposalInput struct {
-	Height    uint64
-	Adapter   AetherNetworkingAdapter
-	Schedules []ExecutionMessageSchedule
-	Hints     []ANAProposalHint
+	Height		uint64
+	Adapter		AetherNetworkingAdapter
+	Schedules	[]ExecutionMessageSchedule
+	Hints		[]ANAProposalHint
 }
 
 type ABCIProposalPlan struct {
-	Height                     uint64
-	Phase                      ABCILifecyclePhase
-	Groups                     []ABCIProposalGroup
-	ScheduleRoot               string
-	OrderingCommitment         string
-	UsesPeerLocalValidityInput bool
-	LiveNetworkStateRead       bool
-	TransactionCount           uint64
-	MessageCount               uint64
+	Height				uint64
+	Phase				ABCILifecyclePhase
+	Groups				[]ABCIProposalGroup
+	ScheduleRoot			string
+	OrderingCommitment		string
+	UsesPeerLocalValidityInput	bool
+	LiveNetworkStateRead		bool
+	TransactionCount		uint64
+	MessageCount			uint64
 }
 
 type ABCIProcessProposalInput struct {
-	Height                     uint64
-	Proposal                   ABCIProposalPlan
-	ExpectedScheduleRoot       string
-	ExpectedOrderingCommitment string
-	DependsOnPeerLocalData     bool
-	VerifiesOrderingCommitment bool
+	Height				uint64
+	Proposal			ABCIProposalPlan
+	ExpectedScheduleRoot		string
+	ExpectedOrderingCommitment	string
+	DependsOnPeerLocalData		bool
+	VerifiesOrderingCommitment	bool
 }
 
 type ABCIFinalizeBlockInput struct {
-	Height               uint64
-	Proposal             ABCIProposalPlan
-	ExecutionMessages    []ExecutionZoneMessage
-	Receipts             []CrossZoneReceipt
-	LiveNetworkStateRead bool
+	Height			uint64
+	Proposal		ABCIProposalPlan
+	ExecutionMessages	[]ExecutionZoneMessage
+	Receipts		[]CrossZoneReceipt
+	LiveNetworkStateRead	bool
 }
 
 type ABCIFinalizeBlockResult struct {
-	Height             uint64
-	ExecutedMessageIDs []string
-	ExecutionRoot      string
-	ReceiptsRoot       string
-	ScheduleRoot       string
+	Height			uint64
+	ExecutedMessageIDs	[]string
+	ExecutionRoot		string
+	ReceiptsRoot		string
+	ScheduleRoot		string
 }
 
 func DefaultCosmosCometBFTCompatibilityPlan() CosmosCometBFTCompatibilityPlan {
 	return CosmosCometBFTCompatibilityPlan{
-		Adapter: DefaultAetherNetworkingAdapter(),
+		Adapter:	DefaultAetherNetworkingAdapter(),
 		Surfaces: []CompatibilitySurface{
 			CompatibilityCometBFTP2P,
 			CompatibilityCometBFTConsensusMessages,
@@ -137,14 +137,14 @@ func DefaultCosmosCometBFTCompatibilityPlan() CosmosCometBFTCompatibilityPlan {
 			ABCIProcessProposal,
 			ABCIFinalizeBlock,
 		},
-		PreserveCometBFTTransport:             true,
-		PreserveCometBFTConsensusMessages:     true,
-		PreserveCosmosSDKTransactionFlow:      true,
-		SupportsBlockSTMExecutionGrouping:     true,
-		SupportsGRPCExternalAPI:               true,
-		SupportsRESTExternalAPI:               true,
-		SupportsRPCExternalAPI:                true,
-		SupportsStateSyncAndSnapshotMechanism: true,
+		PreserveCometBFTTransport:		true,
+		PreserveCometBFTConsensusMessages:	true,
+		PreserveCosmosSDKTransactionFlow:	true,
+		SupportsBlockSTMExecutionGrouping:	true,
+		SupportsGRPCExternalAPI:		true,
+		SupportsRESTExternalAPI:		true,
+		SupportsRPCExternalAPI:			true,
+		SupportsStateSyncAndSnapshotMechanism:	true,
 	}
 }
 
@@ -219,10 +219,10 @@ func BuildPrepareProposalCompatibility(input ABCIPrepareProposalInput) (ABCIProp
 	}
 	sortProposalGroups(groups)
 	plan := ABCIProposalPlan{
-		Height:       input.Height,
-		Phase:        ABCIPrepareProposal,
-		Groups:       groups,
-		ScheduleRoot: ComputeABCIProposalScheduleRoot(groups),
+		Height:		input.Height,
+		Phase:		ABCIPrepareProposal,
+		Groups:		groups,
+		ScheduleRoot:	ComputeABCIProposalScheduleRoot(groups),
 	}
 	plan.OrderingCommitment = ComputeABCIOrderingCommitment(groups)
 	plan.TransactionCount, plan.MessageCount = countProposalItems(groups)
@@ -303,11 +303,11 @@ func FinalizeBlockCompatibility(input ABCIFinalizeBlockInput) (ABCIFinalizeBlock
 	}
 	sort.Strings(receiptIDs)
 	return ABCIFinalizeBlockResult{
-		Height:             input.Height,
-		ExecutedMessageIDs: executed,
-		ExecutionRoot:      HashParts(append([]string{"abci-finalize-execution-root"}, executed...)...),
-		ReceiptsRoot:       HashParts(append([]string{"abci-finalize-receipts-root"}, receiptIDs...)...),
-		ScheduleRoot:       proposal.ScheduleRoot,
+		Height:			input.Height,
+		ExecutedMessageIDs:	executed,
+		ExecutionRoot:		HashParts(append([]string{"abci-finalize-execution-root"}, executed...)...),
+		ReceiptsRoot:		HashParts(append([]string{"abci-finalize-receipts-root"}, receiptIDs...)...),
+		ScheduleRoot:		proposal.ScheduleRoot,
 	}, nil
 }
 
@@ -573,13 +573,13 @@ func normalizeCommittedExecutionSchedules(schedules []ExecutionMessageSchedule) 
 
 func proposalGroupFromSchedule(schedule ExecutionMessageSchedule, hints []ANAProposalHint) ABCIProposalGroup {
 	group := ABCIProposalGroup{
-		ZoneID:         schedule.ZoneID,
-		ShardID:        schedule.ShardID,
-		ScheduleID:     schedule.ScheduleID,
-		ScheduleHash:   schedule.ScheduleHash,
-		TransactionIDs: append([]string(nil), schedule.TransactionIDs...),
-		MessageIDs:     append([]string(nil), schedule.MessageIDs...),
-		Deterministic:  true,
+		ZoneID:		schedule.ZoneID,
+		ShardID:	schedule.ShardID,
+		ScheduleID:	schedule.ScheduleID,
+		ScheduleHash:	schedule.ScheduleHash,
+		TransactionIDs:	append([]string(nil), schedule.TransactionIDs...),
+		MessageIDs:	append([]string(nil), schedule.MessageIDs...),
+		Deterministic:	true,
 	}
 	for _, hint := range hints {
 		if hint.ScheduleHash != schedule.ScheduleHash || hint.ZoneID != schedule.ZoneID || hint.ShardID != schedule.ShardID {

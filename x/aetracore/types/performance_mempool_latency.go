@@ -7,123 +7,123 @@ import (
 )
 
 const (
-	MempoolSeparationSpecVersion = uint64(1)
-	LatencyStrategySpecVersion   = uint64(1)
+	MempoolSeparationSpecVersion	= uint64(1)
+	LatencyStrategySpecVersion	= uint64(1)
 )
 
 type MempoolMessageClass string
 type LatencyOperationClass string
 
 const (
-	MempoolClassAccount  MempoolMessageClass = "account"
-	MempoolClassContract MempoolMessageClass = "contract"
-	MempoolClassIdentity MempoolMessageClass = "identity"
-	MempoolClassPayment  MempoolMessageClass = "payment"
-	MempoolClassSystem   MempoolMessageClass = "system"
+	MempoolClassAccount	MempoolMessageClass	= "account"
+	MempoolClassContract	MempoolMessageClass	= "contract"
+	MempoolClassIdentity	MempoolMessageClass	= "identity"
+	MempoolClassPayment	MempoolMessageClass	= "payment"
+	MempoolClassSystem	MempoolMessageClass	= "system"
 
-	LatencySingleZoneLocal        LatencyOperationClass = "single-zone-local"
-	LatencySameZoneCrossShard     LatencyOperationClass = "same-zone-cross-shard"
-	LatencyCrossZoneAsync         LatencyOperationClass = "cross-zone-async"
-	LatencyContractPromiseResolve LatencyOperationClass = "contract-promise-resolution"
+	LatencySingleZoneLocal		LatencyOperationClass	= "single-zone-local"
+	LatencySameZoneCrossShard	LatencyOperationClass	= "same-zone-cross-shard"
+	LatencyCrossZoneAsync		LatencyOperationClass	= "cross-zone-async"
+	LatencyContractPromiseResolve	LatencyOperationClass	= "contract-promise-resolution"
 )
 
 type MempoolSeparationParams struct {
-	MaxPerSender       uint32
-	MaxPerTargetObject uint32
-	SystemShardID      ShardID
-	ParamsHash         string
+	MaxPerSender		uint32
+	MaxPerTargetObject	uint32
+	SystemShardID		ShardID
+	ParamsHash		string
 }
 
 type MempoolAdmissionTx struct {
-	TxHash          string
-	Sender          string
-	TargetZoneID    ZoneID
-	TargetShardID   ShardID
-	RouteKey        string
-	TargetObject    string
-	MessageClass    MempoolMessageClass
-	FeeNAET         uint64
-	ExpiryHeight    uint64
-	AdmissionHeight uint64
-	PriorityClass   uint32
-	TargetKnown     bool
-	PreResolved     bool
+	TxHash		string
+	Sender		string
+	TargetZoneID	ZoneID
+	TargetShardID	ShardID
+	RouteKey	string
+	TargetObject	string
+	MessageClass	MempoolMessageClass
+	FeeNAET		uint64
+	ExpiryHeight	uint64
+	AdmissionHeight	uint64
+	PriorityClass	uint32
+	TargetKnown	bool
+	PreResolved	bool
 }
 
 type MempoolLane struct {
-	ZoneID       ZoneID
-	ShardID      ShardID
-	MessageClass MempoolMessageClass
-	Transactions []MempoolAdmissionTx
-	LaneHash     string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	MessageClass	MempoolMessageClass
+	Transactions	[]MempoolAdmissionTx
+	LaneHash	string
 }
 
 type MempoolSeparationPlan struct {
-	Height   uint64
-	Params   MempoolSeparationParams
-	Lanes    []MempoolLane
-	PlanHash string
+	Height		uint64
+	Params		MempoolSeparationParams
+	Lanes		[]MempoolLane
+	PlanHash	string
 }
 
 type LatencyTarget struct {
-	OperationClass LatencyOperationClass
-	TargetBlocks   uint64
-	Description    string
-	TargetHash     string
+	OperationClass	LatencyOperationClass
+	TargetBlocks	uint64
+	Description	string
+	TargetHash	string
 }
 
 type LatencyMetric struct {
-	OperationClass LatencyOperationClass
-	ObservedBlocks uint64
-	SampleCount    uint64
-	Height         uint64
-	MetricHash     string
+	OperationClass	LatencyOperationClass
+	ObservedBlocks	uint64
+	SampleCount	uint64
+	Height		uint64
+	MetricHash	string
 }
 
 type CrossZoneMessageSLAParams struct {
-	MaxFinalityDelayBlocks uint64
-	MaxQueueDelayBlocks    uint64
-	MaxDeliveryBlocks      uint64
-	ParamsHash             string
+	MaxFinalityDelayBlocks	uint64
+	MaxQueueDelayBlocks	uint64
+	MaxDeliveryBlocks	uint64
+	ParamsHash		string
 }
 
 type CongestionForwardingFeePolicy struct {
-	BaseFeeNAET             uint64
-	CongestionWeightBps     uint64
-	NearExpiryPremiumBps    uint64
-	MaxForwardingFeeNAET    uint64
-	CriticalLaneDiscountBps uint64
-	PolicyHash              string
+	BaseFeeNAET		uint64
+	CongestionWeightBps	uint64
+	NearExpiryPremiumBps	uint64
+	MaxForwardingFeeNAET	uint64
+	CriticalLaneDiscountBps	uint64
+	PolicyHash		string
 }
 
 type DeliveryPriorityItem struct {
-	MessageID        string
-	OperationClass   LatencyOperationClass
-	DestinationZone  ZoneID
-	DestinationShard ShardID
-	FeeNAET          uint64
-	CongestionScore  uint64
-	ExpiryHeight     uint64
-	EnqueuedHeight   uint64
-	Critical         bool
-	ItemHash         string
+	MessageID		string
+	OperationClass		LatencyOperationClass
+	DestinationZone		ZoneID
+	DestinationShard	ShardID
+	FeeNAET			uint64
+	CongestionScore		uint64
+	ExpiryHeight		uint64
+	EnqueuedHeight		uint64
+	Critical		bool
+	ItemHash		string
 }
 
 type LatencyStrategySpec struct {
-	Version      uint64
-	Targets      []LatencyTarget
-	SLA          CrossZoneMessageSLAParams
-	FeePolicy    CongestionForwardingFeePolicy
-	MetricsRoot  string
-	DeliveryRoot string
-	Root         string
+	Version		uint64
+	Targets		[]LatencyTarget
+	SLA		CrossZoneMessageSLAParams
+	FeePolicy	CongestionForwardingFeePolicy
+	MetricsRoot	string
+	DeliveryRoot	string
+	Root		string
 }
 
 func DefaultMempoolSeparationParams() MempoolSeparationParams {
 	params := MempoolSeparationParams{
-		MaxPerSender:       1024,
-		MaxPerTargetObject: 2048,
-		SystemShardID:      "0",
+		MaxPerSender:		1024,
+		MaxPerTargetObject:	2048,
+		SystemShardID:		"0",
 	}
 	params.ParamsHash = ComputeMempoolSeparationParamsHash(params)
 	return params
@@ -158,9 +158,9 @@ func BuildMempoolSeparationPlan(height uint64, txs []MempoolAdmissionTx, params 
 		lane, found := laneMap[laneKey]
 		if !found {
 			laneMap[laneKey] = &MempoolLane{
-				ZoneID:       tx.TargetZoneID,
-				ShardID:      tx.TargetShardID,
-				MessageClass: tx.MessageClass,
+				ZoneID:		tx.TargetZoneID,
+				ShardID:	tx.TargetShardID,
+				MessageClass:	tx.MessageClass,
 			}
 			lane = laneMap[laneKey]
 		}
@@ -173,9 +173,9 @@ func BuildMempoolSeparationPlan(height uint64, txs []MempoolAdmissionTx, params 
 		lanes = append(lanes, normalized)
 	}
 	plan := MempoolSeparationPlan{
-		Height: height,
-		Params: params,
-		Lanes:  normalizeMempoolLanes(lanes),
+		Height:	height,
+		Params:	params,
+		Lanes:	normalizeMempoolLanes(lanes),
 	}
 	plan.PlanHash = ComputeMempoolSeparationPlanHash(plan)
 	return plan, plan.Validate()
@@ -192,9 +192,9 @@ func DefaultLatencyTargets() []LatencyTarget {
 
 func DefaultCrossZoneMessageSLAParams() CrossZoneMessageSLAParams {
 	sla := CrossZoneMessageSLAParams{
-		MaxFinalityDelayBlocks: 1,
-		MaxQueueDelayBlocks:    2,
-		MaxDeliveryBlocks:      3,
+		MaxFinalityDelayBlocks:	1,
+		MaxQueueDelayBlocks:	2,
+		MaxDeliveryBlocks:	3,
 	}
 	sla.ParamsHash = ComputeCrossZoneMessageSLAParamsHash(sla)
 	return sla
@@ -202,11 +202,11 @@ func DefaultCrossZoneMessageSLAParams() CrossZoneMessageSLAParams {
 
 func DefaultCongestionForwardingFeePolicy() CongestionForwardingFeePolicy {
 	policy := CongestionForwardingFeePolicy{
-		BaseFeeNAET:             1,
-		CongestionWeightBps:     100,
-		NearExpiryPremiumBps:    250,
-		MaxForwardingFeeNAET:    1_000_000,
-		CriticalLaneDiscountBps: 500,
+		BaseFeeNAET:			1,
+		CongestionWeightBps:		100,
+		NearExpiryPremiumBps:		250,
+		MaxForwardingFeeNAET:		1_000_000,
+		CriticalLaneDiscountBps:	500,
 	}
 	policy.PolicyHash = ComputeCongestionForwardingFeePolicyHash(policy)
 	return policy
@@ -229,12 +229,12 @@ func BuildLatencyStrategySpec(metrics []LatencyMetric, queue []DeliveryPriorityI
 		}
 	}
 	spec := LatencyStrategySpec{
-		Version:      LatencyStrategySpecVersion,
-		Targets:      targets,
-		SLA:          sla,
-		FeePolicy:    feePolicy,
-		MetricsRoot:  ComputeLatencyMetricsRoot(metrics),
-		DeliveryRoot: ComputeDeliveryPriorityQueueRoot(queue),
+		Version:	LatencyStrategySpecVersion,
+		Targets:	targets,
+		SLA:		sla,
+		FeePolicy:	feePolicy,
+		MetricsRoot:	ComputeLatencyMetricsRoot(metrics),
+		DeliveryRoot:	ComputeDeliveryPriorityQueueRoot(queue),
 	}
 	spec.Root = ComputeLatencyStrategySpecRoot(spec)
 	return spec, spec.Validate()
@@ -592,8 +592,8 @@ func (s LatencyStrategySpec) Validate() error {
 		}
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore latency metrics root", s.MetricsRoot},
 		{"aetracore latency delivery root", s.DeliveryRoot},

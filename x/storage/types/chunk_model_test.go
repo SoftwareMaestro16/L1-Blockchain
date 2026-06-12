@@ -53,25 +53,25 @@ func TestStorageObjectBuiltFromChunksAndInclusionProofVerifiesObjectRoot(t *test
 	require.NoError(t, err)
 
 	object, err := BuildStorageObjectFromChunkDescriptors(StorageObject{
-		Size:                   768,
-		ReplicationPolicy:      ReplicationPolicyMultiZone,
-		AccessPolicy:           AccessPolicyPermissioned,
-		Owner:                  "alice",
-		StorageClass:           StorageClassHot,
-		CreatedHeight:          10,
-		AvailabilityCommitment: storageTestHash("availability"),
+		Size:			768,
+		ReplicationPolicy:	ReplicationPolicyMultiZone,
+		AccessPolicy:		AccessPolicyPermissioned,
+		Owner:			"alice",
+		StorageClass:		StorageClassHot,
+		CreatedHeight:		10,
+		AvailabilityCommitment:	storageTestHash("availability"),
 	}, chunks, params)
 	require.NoError(t, err)
 	require.NoError(t, VerifyStorageObjectContentHash(object, chunks, params))
 
 	proof, err := NewStorageChunkInclusionProof(StorageChunkInclusionProof{
-		ObjectID:       object.ObjectID,
-		ContentHash:    object.ContentHash,
-		ObjectRoot:     object.ObjectHash,
-		ChunkIndex:     chunks[0].ChunkIndex,
-		ChunkHash:      chunks[0].ChunkHash,
-		ChunkProofRoot: chunks[0].ChunkProofRoot,
-		ProofPath:      []string{chunks[1].ChunkProofRoot},
+		ObjectID:	object.ObjectID,
+		ContentHash:	object.ContentHash,
+		ObjectRoot:	object.ObjectHash,
+		ChunkIndex:	chunks[0].ChunkIndex,
+		ChunkHash:	chunks[0].ChunkHash,
+		ChunkProofRoot:	chunks[0].ChunkProofRoot,
+		ProofPath:	[]string{chunks[1].ChunkProofRoot},
 	})
 	require.NoError(t, err)
 	require.NoError(t, VerifyStorageChunkInclusionInObject(proof, object))
@@ -114,13 +114,13 @@ func TestUnrelatedStorageTransitionRequiresCommitmentsOnly(t *testing.T) {
 	chunks, _, err := BuildStorageChunkDescriptors([]string{storageTestHash("chunk-0")}, []uint64{512}, nil, params)
 	require.NoError(t, err)
 	object, err := BuildStorageObjectFromChunkDescriptors(StorageObject{
-		Size:                   512,
-		ReplicationPolicy:      ReplicationPolicySingle,
-		AccessPolicy:           AccessPolicyPrivate,
-		Owner:                  "alice",
-		StorageClass:           StorageClassCold,
-		CreatedHeight:          10,
-		AvailabilityCommitment: storageTestHash("availability"),
+		Size:			512,
+		ReplicationPolicy:	ReplicationPolicySingle,
+		AccessPolicy:		AccessPolicyPrivate,
+		Owner:			"alice",
+		StorageClass:		StorageClassCold,
+		CreatedHeight:		10,
+		AvailabilityCommitment:	storageTestHash("availability"),
 	}, chunks, params)
 	require.NoError(t, err)
 	require.NoError(t, ValidateUnrelatedStorageTransitionDoesNotRequireChunks(object))

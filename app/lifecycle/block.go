@@ -15,7 +15,7 @@ import (
 
 func FinalizeBlock(req *abci.RequestFinalizeBlock, finalize func(*abci.RequestFinalizeBlock) (*abci.ResponseFinalizeBlock, error)) (*abci.ResponseFinalizeBlock, error) {
 	res, err := finalize(req)
-	// Avoid wall-clock measurement inside ABCI; consensus-adjacent telemetry only uses request data here.
+
 	observability.RecordFinalizeBlock(req.Height, req.Time, len(req.Txs), -1)
 	if err != nil {
 		observability.RecordModuleError("app", "finalize_block", "error")
@@ -24,11 +24,11 @@ func FinalizeBlock(req *abci.RequestFinalizeBlock, finalize func(*abci.RequestFi
 }
 
 type InitChainDependencies struct {
-	AppCodec                     codec.Codec
-	ModuleManager                *module.Manager
-	SetModuleVersionMap          func(sdk.Context, module.VersionMap) error
-	ValidateGenesis              func(genesisconfig.State) error
-	EnsureCoreGenesisCollections func(sdk.Context) error
+	AppCodec			codec.Codec
+	ModuleManager			*module.Manager
+	SetModuleVersionMap		func(sdk.Context, module.VersionMap) error
+	ValidateGenesis			func(genesisconfig.State) error
+	EnsureCoreGenesisCollections	func(sdk.Context) error
 }
 
 func InitChain(ctx sdk.Context, req *abci.RequestInitChain, deps InitChainDependencies) (*abci.ResponseInitChain, error) {

@@ -33,11 +33,11 @@ func TestStoreV2BenchmarkCoverageRequiresAllOperations(t *testing.T) {
 	results := make([]StoreV2BenchmarkResult, 0, len(RequiredStoreV2Benchmarks()))
 	for _, operation := range RequiredStoreV2Benchmarks() {
 		results = append(results, StoreV2BenchmarkResult{
-			Operation:        operation,
-			Samples:          1,
-			Operations:       1,
-			MaxRangeLimit:    8,
-			ObservedRootHash: hashStrings("benchmark-root", string(operation)),
+			Operation:		operation,
+			Samples:		1,
+			Operations:		1,
+			MaxRangeLimit:		8,
+			ObservedRootHash:	hashStrings("benchmark-root", string(operation)),
 		})
 	}
 	require.NoError(t, ValidateStoreV2BenchmarkCoverage(results))
@@ -116,14 +116,14 @@ func sampleStoreV2State(t *testing.T) StoreV2ShardState {
 
 func storeV2Record(zoneID, shardID string, kind StoreV2RecordKind, objectKey, value string, version uint64) StoreV2ObjectRecord {
 	record := StoreV2ObjectRecord{
-		ZoneID:        zoneID,
-		ShardID:       shardID,
-		Kind:          kind,
-		ObjectKey:     objectKey,
-		ValueHash:     hashStrings("storev2-value", value),
-		Version:       version,
-		UpdatedHeight: 20,
-		SizeBytes:     uint32(len(value)),
+		ZoneID:		zoneID,
+		ShardID:	shardID,
+		Kind:		kind,
+		ObjectKey:	objectKey,
+		ValueHash:	hashStrings("storev2-value", value),
+		Version:	version,
+		UpdatedHeight:	20,
+		SizeBytes:	uint32(len(value)),
 	}
 	record.RecordHash = ComputeStoreV2RecordHash(record)
 	return record
@@ -131,13 +131,13 @@ func storeV2Record(zoneID, shardID string, kind StoreV2RecordKind, objectKey, va
 
 func storeV2Field(zoneID, shardID, objectKey, fieldPath, value string, version uint64) StoreV2KVField {
 	field := StoreV2KVField{
-		ZoneID:        zoneID,
-		ShardID:       shardID,
-		ObjectKey:     objectKey,
-		FieldPath:     fieldPath,
-		ValueHash:     hashStrings("storev2-field-value", value),
-		Version:       version,
-		UpdatedHeight: 20,
+		ZoneID:		zoneID,
+		ShardID:	shardID,
+		ObjectKey:	objectKey,
+		FieldPath:	fieldPath,
+		ValueHash:	hashStrings("storev2-field-value", value),
+		Version:	version,
+		UpdatedHeight:	20,
 	}
 	field.FieldHash = ComputeStoreV2FieldHash(field)
 	return field
@@ -145,19 +145,19 @@ func storeV2Field(zoneID, shardID, objectKey, fieldPath, value string, version u
 
 func sampleMempoolTx(txID, sender, zoneID, shardID, objectID string, class MempoolMessageClass, fee string, expiry uint64) SeparatedMempoolTx {
 	tx := SeparatedMempoolTx{
-		TxID:          txID,
-		Sender:        sender,
-		TargetZoneID:  zoneID,
-		TargetShardID: shardID,
-		TargetObject:  objectID,
-		RouteKey:      objectID,
-		MessageClass:  class,
-		FeeAmount:     fee,
-		GasWanted:     100,
-		SizeBytes:     256,
-		CreatedHeight: 10,
-		ExpiryHeight:  expiry,
-		PreResolved:   true,
+		TxID:		txID,
+		Sender:		sender,
+		TargetZoneID:	zoneID,
+		TargetShardID:	shardID,
+		TargetObject:	objectID,
+		RouteKey:	objectID,
+		MessageClass:	class,
+		FeeAmount:	fee,
+		GasWanted:	100,
+		SizeBytes:	256,
+		CreatedHeight:	10,
+		ExpiryHeight:	expiry,
+		PreResolved:	true,
 	}
 	tx.TxHash = ComputeSeparatedMempoolTxHash(tx)
 	return tx

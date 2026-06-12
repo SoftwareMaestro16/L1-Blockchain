@@ -6,118 +6,118 @@ import (
 )
 
 const (
-	RequiredAPIModuleStakingPolicy  = "aetra-staking-policy"
-	RequiredAPIModuleEconomics      = "aetra-economics"
-	RequiredAPIModuleValidatorScore = "aetra-validator-score"
+	RequiredAPIModuleStakingPolicy	= "aetra-staking-policy"
+	RequiredAPIModuleEconomics	= "aetra-economics"
+	RequiredAPIModuleValidatorScore	= "aetra-validator-score"
 )
 
 const (
-	CommandCategoryQuery = "query"
-	CommandCategoryTx    = "tx"
+	CommandCategoryQuery	= "query"
+	CommandCategoryTx	= "tx"
 )
 
 const (
-	RequiredAPISurfaceCLIQuery        = "cli_query"
-	RequiredAPISurfaceCLITx           = "cli_tx"
-	RequiredAPISurfaceProtobuf        = "protobuf_definition"
-	RequiredAPISurfaceGRPCService     = "grpc_service"
-	RequiredAPISurfaceGRPCQuery       = "grpc_query"
-	RequiredAPISurfaceRESTGateway     = "rest_gateway_mapping_where_supported"
-	RequiredAPISurfaceRESTQuery       = "rest_query_where_applicable"
-	RequiredAPISurfaceEvents          = "events"
-	RequiredAPISurfaceResponseExample = "response_examples"
-	RequiredAPISurfaceQueryTests      = "query_tests_where_feasible"
-	RequiredAPISurfaceExamplesInDocs  = "examples_in_docs"
-	RequiredAPISurfaceJSONOutput      = "json_output"
-	RequiredAPISurfaceClearErrors     = "clear_errors"
-	RequiredAPISurfaceHeightQuery     = "height_query_where_applicable"
-	RequiredAPISurfacePagination      = "pagination_where_applicable"
-	RequiredAPISurfaceBoundedAttrs    = "bounded_event_attributes"
-	RequiredAPISurfaceStableResponses = "stable_query_responses"
+	RequiredAPISurfaceCLIQuery		= "cli_query"
+	RequiredAPISurfaceCLITx			= "cli_tx"
+	RequiredAPISurfaceProtobuf		= "protobuf_definition"
+	RequiredAPISurfaceGRPCService		= "grpc_service"
+	RequiredAPISurfaceGRPCQuery		= "grpc_query"
+	RequiredAPISurfaceRESTGateway		= "rest_gateway_mapping_where_supported"
+	RequiredAPISurfaceRESTQuery		= "rest_query_where_applicable"
+	RequiredAPISurfaceEvents		= "events"
+	RequiredAPISurfaceResponseExample	= "response_examples"
+	RequiredAPISurfaceQueryTests		= "query_tests_where_feasible"
+	RequiredAPISurfaceExamplesInDocs	= "examples_in_docs"
+	RequiredAPISurfaceJSONOutput		= "json_output"
+	RequiredAPISurfaceClearErrors		= "clear_errors"
+	RequiredAPISurfaceHeightQuery		= "height_query_where_applicable"
+	RequiredAPISurfacePagination		= "pagination_where_applicable"
+	RequiredAPISurfaceBoundedAttrs		= "bounded_event_attributes"
+	RequiredAPISurfaceStableResponses	= "stable_query_responses"
 )
 
 const (
-	RequiredAPIEventValidatorCapCrossing      = "validator_cap_crossing"
-	RequiredAPIEventDelegationOverflow        = "delegation_overflow"
-	RequiredAPIEventRewardMultiplierChange    = "reward_multiplier_change"
-	RequiredAPIEventFeeBurn                   = "fee_burn"
-	RequiredAPIEventTreasuryAllocation        = "treasury_allocation"
-	RequiredAPIEventInflationUpdate           = "inflation_update"
-	RequiredAPIEventAPREstimateEpochUpdate    = "apr_estimate_update_by_epoch"
-	RequiredAPIEventValidatorScoreUpdate      = "validator_score_update"
-	RequiredAPIEventDowntimeOffense           = "downtime_offense"
-	RequiredAPIEventSlash                     = "slash_event"
-	RequiredAPIEventJailUnjail                = "jail_unjail"
-	RequiredAPIEventGovernanceParamActivation = "governance_param_activation"
+	RequiredAPIEventValidatorCapCrossing		= "validator_cap_crossing"
+	RequiredAPIEventDelegationOverflow		= "delegation_overflow"
+	RequiredAPIEventRewardMultiplierChange		= "reward_multiplier_change"
+	RequiredAPIEventFeeBurn				= "fee_burn"
+	RequiredAPIEventTreasuryAllocation		= "treasury_allocation"
+	RequiredAPIEventInflationUpdate			= "inflation_update"
+	RequiredAPIEventAPREstimateEpochUpdate		= "apr_estimate_update_by_epoch"
+	RequiredAPIEventValidatorScoreUpdate		= "validator_score_update"
+	RequiredAPIEventDowntimeOffense			= "downtime_offense"
+	RequiredAPIEventSlash				= "slash_event"
+	RequiredAPIEventJailUnjail			= "jail_unjail"
+	RequiredAPIEventGovernanceParamActivation	= "governance_param_activation"
 )
 
 const (
-	RequiredAPIEventAttrValidator = "validator"
-	RequiredAPIEventAttrDelegator = "delegator"
-	RequiredAPIEventAttrAmount    = "amount"
-	RequiredAPIEventAttrDenom     = "denom"
-	RequiredAPIEventAttrHeight    = "height"
-	RequiredAPIEventAttrEpoch     = "epoch"
-	RequiredAPIEventAttrOldValue  = "old_value"
-	RequiredAPIEventAttrNewValue  = "new_value"
-	RequiredAPIEventAttrReason    = "reason"
-	RequiredAPIEventAttrModule    = "module"
+	RequiredAPIEventAttrValidator	= "validator"
+	RequiredAPIEventAttrDelegator	= "delegator"
+	RequiredAPIEventAttrAmount	= "amount"
+	RequiredAPIEventAttrDenom	= "denom"
+	RequiredAPIEventAttrHeight	= "height"
+	RequiredAPIEventAttrEpoch	= "epoch"
+	RequiredAPIEventAttrOldValue	= "old_value"
+	RequiredAPIEventAttrNewValue	= "new_value"
+	RequiredAPIEventAttrReason	= "reason"
+	RequiredAPIEventAttrModule	= "module"
 )
 
 type CLICommandSpec struct {
-	Module              string
-	Category            string
-	Command             string
-	JSONOutput          bool
-	HeightQuery         bool
-	Pagination          bool
-	ClearErrors         bool
-	ExamplesInDocs      bool
-	SignerValidation    bool
-	AuthorityValidation bool
+	Module			string
+	Category		string
+	Command			string
+	JSONOutput		bool
+	HeightQuery		bool
+	Pagination		bool
+	ClearErrors		bool
+	ExamplesInDocs		bool
+	SignerValidation	bool
+	AuthorityValidation	bool
 }
 
 type APISurfaceModuleSpec struct {
-	Module             string
-	CLICommands        []CLICommandSpec
-	ProtobufDefinition bool
-	GRPCService        bool
-	GRPCQuery          bool
-	RESTGatewayMapping bool
-	RESTQuery          bool
-	Events             bool
-	ResponseExamples   bool
-	QueryTests         bool
-	BoundedAttrs       bool
-	StableResponses    bool
-	ExamplesInDocs     bool
-	Required           bool
+	Module			string
+	CLICommands		[]CLICommandSpec
+	ProtobufDefinition	bool
+	GRPCService		bool
+	GRPCQuery		bool
+	RESTGatewayMapping	bool
+	RESTQuery		bool
+	Events			bool
+	ResponseExamples	bool
+	QueryTests		bool
+	BoundedAttrs		bool
+	StableResponses		bool
+	ExamplesInDocs		bool
+	Required		bool
 }
 
 type APISurfaceReadinessReport struct {
-	Modules       []APISurfaceModuleSpec
-	RequiredCount int
-	ReadyCount    int
-	Failed        []string
-	Ready         bool
+	Modules		[]APISurfaceModuleSpec
+	RequiredCount	int
+	ReadyCount	int
+	Failed		[]string
+	Ready		bool
 }
 
 type APIEventSpec struct {
-	ID         string
-	Module     string
-	Attributes []string
-	StableName bool
-	Bounded    bool
-	Indexed    bool
-	Tested     bool
+	ID		string
+	Module		string
+	Attributes	[]string
+	StableName	bool
+	Bounded		bool
+	Indexed		bool
+	Tested		bool
 }
 
 type APIEventReadinessReport struct {
-	Events        []APIEventSpec
-	RequiredCount int
-	ReadyCount    int
-	Failed        []string
-	Ready         bool
+	Events		[]APIEventSpec
+	RequiredCount	int
+	ReadyCount	int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAPISurfaceModuleSpecs() []APISurfaceModuleSpec {
@@ -199,23 +199,23 @@ func BuildAPIEventReadinessReport(events []APIEventSpec) APIEventReadinessReport
 
 	sort.Strings(failed)
 	return APIEventReadinessReport{
-		Events:        events,
-		RequiredCount: requiredCount,
-		ReadyCount:    readyCount,
-		Failed:        failed,
-		Ready:         len(failed) == 0,
+		Events:		events,
+		RequiredCount:	requiredCount,
+		ReadyCount:	readyCount,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func apiEvent(id, module string) APIEventSpec {
 	return APIEventSpec{
-		ID:         id,
-		Module:     module,
-		Attributes: requiredAPIEventAttributes(),
-		StableName: true,
-		Bounded:    true,
-		Indexed:    true,
-		Tested:     true,
+		ID:		id,
+		Module:		module,
+		Attributes:	requiredAPIEventAttributes(),
+		StableName:	true,
+		Bounded:	true,
+		Indexed:	true,
+		Tested:		true,
 	}
 }
 
@@ -259,49 +259,49 @@ func BuildAPISurfaceReadinessReport(modules []APISurfaceModuleSpec) APISurfaceRe
 
 	sort.Strings(failed)
 	return APISurfaceReadinessReport{
-		Modules:       modules,
-		RequiredCount: requiredCount,
-		ReadyCount:    readyCount,
-		Failed:        failed,
-		Ready:         len(failed) == 0,
+		Modules:	modules,
+		RequiredCount:	requiredCount,
+		ReadyCount:	readyCount,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func apiSurfaceModule(module string, rest bool) APISurfaceModuleSpec {
 	return APISurfaceModuleSpec{
-		Module: module,
+		Module:	module,
 		CLICommands: []CLICommandSpec{
 			apiSurfaceCLICommand(module, CommandCategoryQuery),
 			apiSurfaceCLICommand(module, CommandCategoryTx),
 		},
-		ProtobufDefinition: true,
-		GRPCService:        true,
-		GRPCQuery:          true,
-		RESTGatewayMapping: rest,
-		RESTQuery:          rest,
-		Events:             true,
-		ResponseExamples:   true,
-		QueryTests:         true,
-		BoundedAttrs:       true,
-		StableResponses:    true,
-		ExamplesInDocs:     true,
-		Required:           true,
+		ProtobufDefinition:	true,
+		GRPCService:		true,
+		GRPCQuery:		true,
+		RESTGatewayMapping:	rest,
+		RESTQuery:		rest,
+		Events:			true,
+		ResponseExamples:	true,
+		QueryTests:		true,
+		BoundedAttrs:		true,
+		StableResponses:	true,
+		ExamplesInDocs:		true,
+		Required:		true,
 	}
 }
 
 func apiSurfaceCLICommand(module, category string) CLICommandSpec {
 	command := "aetrad " + category + " " + module + " ..."
 	return CLICommandSpec{
-		Module:              module,
-		Category:            category,
-		Command:             command,
-		JSONOutput:          true,
-		HeightQuery:         category == CommandCategoryQuery,
-		Pagination:          category == CommandCategoryQuery,
-		ClearErrors:         true,
-		ExamplesInDocs:      true,
-		SignerValidation:    category == CommandCategoryTx,
-		AuthorityValidation: category == CommandCategoryTx,
+		Module:			module,
+		Category:		category,
+		Command:		command,
+		JSONOutput:		true,
+		HeightQuery:		category == CommandCategoryQuery,
+		Pagination:		category == CommandCategoryQuery,
+		ClearErrors:		true,
+		ExamplesInDocs:		true,
+		SignerValidation:	category == CommandCategoryTx,
+		AuthorityValidation:	category == CommandCategoryTx,
 	}
 }
 
@@ -451,26 +451,26 @@ func validateAPIEvent(event APIEventSpec) []string {
 
 func requiredAPIModules() map[string]bool {
 	return map[string]bool{
-		RequiredAPIModuleStakingPolicy:  true,
-		RequiredAPIModuleEconomics:      true,
-		RequiredAPIModuleValidatorScore: true,
+		RequiredAPIModuleStakingPolicy:		true,
+		RequiredAPIModuleEconomics:		true,
+		RequiredAPIModuleValidatorScore:	true,
 	}
 }
 
 func requiredAPIEvents() map[string]bool {
 	return map[string]bool{
-		RequiredAPIEventValidatorCapCrossing:      true,
-		RequiredAPIEventDelegationOverflow:        true,
-		RequiredAPIEventRewardMultiplierChange:    true,
-		RequiredAPIEventFeeBurn:                   true,
-		RequiredAPIEventTreasuryAllocation:        true,
-		RequiredAPIEventInflationUpdate:           true,
-		RequiredAPIEventAPREstimateEpochUpdate:    true,
-		RequiredAPIEventValidatorScoreUpdate:      true,
-		RequiredAPIEventDowntimeOffense:           true,
-		RequiredAPIEventSlash:                     true,
-		RequiredAPIEventJailUnjail:                true,
-		RequiredAPIEventGovernanceParamActivation: true,
+		RequiredAPIEventValidatorCapCrossing:		true,
+		RequiredAPIEventDelegationOverflow:		true,
+		RequiredAPIEventRewardMultiplierChange:		true,
+		RequiredAPIEventFeeBurn:			true,
+		RequiredAPIEventTreasuryAllocation:		true,
+		RequiredAPIEventInflationUpdate:		true,
+		RequiredAPIEventAPREstimateEpochUpdate:		true,
+		RequiredAPIEventValidatorScoreUpdate:		true,
+		RequiredAPIEventDowntimeOffense:		true,
+		RequiredAPIEventSlash:				true,
+		RequiredAPIEventJailUnjail:			true,
+		RequiredAPIEventGovernanceParamActivation:	true,
 	}
 }
 

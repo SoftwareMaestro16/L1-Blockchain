@@ -14,17 +14,17 @@ func (e *Executor) EconomicActivity() appparams.ProtocolEconomicActivity {
 		forwardingFees = forwardingFees.Add(normalizeEconomicInt(receipt.ForwardFeeNaet))
 	}
 	return appparams.ProtocolEconomicActivity{
-		AVMStorageFeeNaet:     storageFees,
-		AVMForwardingFeeNaet:  forwardingFees,
-		AVMDeploymentCostNaet: sdkmath.NewIntFromUint64(e.metrics.DeploymentCostsNaet),
+		AVMStorageFeeNaet:	storageFees,
+		AVMForwardingFeeNaet:	forwardingFees,
+		AVMDeploymentCostNaet:	sdkmath.NewIntFromUint64(e.metrics.DeploymentCostsNaet),
 	}
 }
 
 func (e *Executor) EconomicFlow(control appparams.BalanceControllerOutput) (appparams.ProtocolEconomicFlowOutput, error) {
 	return appparams.ComputeProtocolEconomicFlow(appparams.ProtocolEconomicFlowInput{
-		Activity:         e.EconomicActivity(),
-		BurnRatioBps:     control.BurnRatioBps,
-		TreasuryRatioBps: appparams.TreasuryFeeRatioBps,
+		Activity:		e.EconomicActivity(),
+		BurnRatioBps:		control.BurnRatioBps,
+		TreasuryRatioBps:	appparams.TreasuryFeeRatioBps,
 	})
 }
 

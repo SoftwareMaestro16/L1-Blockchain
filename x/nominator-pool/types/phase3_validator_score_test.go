@@ -67,22 +67,22 @@ func TestPhase35ExportImportPreservesScoresAndSnapshots(t *testing.T) {
 	validator := chat3AEAddress(0xd4)
 	state := State{
 		ValidatorPerformanceScores: []ValidatorPerformanceScore{{
-			Validator: validator,
-			Epoch:     7,
-			ScoreBps:  8_765,
+			Validator:	validator,
+			Epoch:		7,
+			ScoreBps:	8_765,
 		}},
 		EpochStakingSnapshots: []EpochStakingSnapshot{{
-			Epoch:            7,
-			TotalActiveStake: 100,
-			TotalPools:       1,
-			ValidatorCount:   1,
-			SnapshotHash:     "epoch-hash",
+			Epoch:			7,
+			TotalActiveStake:	100,
+			TotalPools:		1,
+			ValidatorCount:		1,
+			SnapshotHash:		"epoch-hash",
 		}},
 		ValidatorSetSnapshots: []ValidatorSetSnapshot{{
-			HeightOrEpoch: 7,
-			Validators:    []string{validator},
-			TotalPower:    100,
-			SnapshotHash:  "set-hash",
+			HeightOrEpoch:	7,
+			Validators:	[]string{validator},
+			TotalPower:	100,
+			SnapshotHash:	"set-hash",
 		}},
 	}
 	normalized := state.Normalize(params)
@@ -96,18 +96,18 @@ func TestPhase35ExportImportPreservesScoresAndSnapshots(t *testing.T) {
 
 func phase35Candidate(validator string, mutate func(*ValidatorPolicyCandidate)) ValidatorPolicyCandidate {
 	candidate := ValidatorPolicyCandidate{
-		ValidatorAddress:      validator,
-		ReputationScore:       MaxBasisPoints,
-		UptimeBps:             MaxBasisPoints,
-		UptimeWindow:          100,
-		MissedBlocks:          0,
-		CommissionBps:         DefaultParams().ValidatorCommissionFloorBps,
-		StakeEfficiencyBps:    MaxBasisPoints,
-		SlashingRiskBps:       0,
-		NetworkLoadBps:        0,
-		AllocationLimitBps:    DefaultParams().MaxPoolValidatorAllocationBps,
-		OperationalHistoryBps: MaxBasisPoints,
-		CurrentAllocationBps:  0,
+		ValidatorAddress:	validator,
+		ReputationScore:	MaxBasisPoints,
+		UptimeBps:		MaxBasisPoints,
+		UptimeWindow:		100,
+		MissedBlocks:		0,
+		CommissionBps:		DefaultParams().ValidatorCommissionFloorBps,
+		StakeEfficiencyBps:	MaxBasisPoints,
+		SlashingRiskBps:	0,
+		NetworkLoadBps:		0,
+		AllocationLimitBps:	DefaultParams().MaxPoolValidatorAllocationBps,
+		OperationalHistoryBps:	MaxBasisPoints,
+		CurrentAllocationBps:	0,
 	}
 	if mutate != nil {
 		mutate(&candidate)

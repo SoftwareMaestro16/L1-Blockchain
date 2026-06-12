@@ -10,32 +10,32 @@ import (
 type HardConstraintID string
 
 const (
-	HardConstraintNoNondeterministicConsensusLogic HardConstraintID = "no-nondeterministic-consensus-logic"
-	HardConstraintNoExternalNetworkStateTransition HardConstraintID = "no-external-network-calls-state-transitions"
-	HardConstraintCrossZoneInteractionsMessageOnly HardConstraintID = "cross-zone-interactions-message-based"
-	HardConstraintModulesExposeMsgQueryKeeper      HardConstraintID = "modules-expose-msgserver-queryserver-keeper"
-	HardConstraintStateExportableReproducible      HardConstraintID = "state-exportable-reproducible"
-	HardConstraintCriticalOutputsCommitmentBacked  HardConstraintID = "critical-outputs-commitment-backed"
-	HardConstraintNoDirectCrossZoneWrites          HardConstraintID = "no-direct-writes-across-zones"
-	HardConstraintBoundedQueueDraining             HardConstraintID = "no-unbounded-queue-draining"
-	HardConstraintBoundedStorageIteration          HardConstraintID = "no-unbounded-storage-iteration"
-	HardConstraintGasAccountedProofVerification    HardConstraintID = "gas-accounted-proof-verification"
+	HardConstraintNoNondeterministicConsensusLogic	HardConstraintID	= "no-nondeterministic-consensus-logic"
+	HardConstraintNoExternalNetworkStateTransition	HardConstraintID	= "no-external-network-calls-state-transitions"
+	HardConstraintCrossZoneInteractionsMessageOnly	HardConstraintID	= "cross-zone-interactions-message-based"
+	HardConstraintModulesExposeMsgQueryKeeper	HardConstraintID	= "modules-expose-msgserver-queryserver-keeper"
+	HardConstraintStateExportableReproducible	HardConstraintID	= "state-exportable-reproducible"
+	HardConstraintCriticalOutputsCommitmentBacked	HardConstraintID	= "critical-outputs-commitment-backed"
+	HardConstraintNoDirectCrossZoneWrites		HardConstraintID	= "no-direct-writes-across-zones"
+	HardConstraintBoundedQueueDraining		HardConstraintID	= "no-unbounded-queue-draining"
+	HardConstraintBoundedStorageIteration		HardConstraintID	= "no-unbounded-storage-iteration"
+	HardConstraintGasAccountedProofVerification	HardConstraintID	= "gas-accounted-proof-verification"
 )
 
 type HardConstraint struct {
-	ID                   HardConstraintID
-	EnforcementTarget    string
-	Modules              []CosmosSDKModuleName
-	ConsensusCritical    bool
-	StateTransitionGuard bool
-	CommitmentBacked     bool
-	Evidence             []string
-	ConstraintHash       string
+	ID			HardConstraintID
+	EnforcementTarget	string
+	Modules			[]CosmosSDKModuleName
+	ConsensusCritical	bool
+	StateTransitionGuard	bool
+	CommitmentBacked	bool
+	Evidence		[]string
+	ConstraintHash		string
 }
 
 type HardConstraintManifest struct {
-	Constraints  []HardConstraint
-	ManifestHash string
+	Constraints	[]HardConstraint
+	ManifestHash	string
 }
 
 func DefaultHardConstraintManifest() (HardConstraintManifest, error) {
@@ -231,13 +231,13 @@ func ComputeHardConstraintManifestHash(manifest HardConstraintManifest) string {
 
 func hardConstraint(id HardConstraintID, target string, modules []CosmosSDKModuleName, evidence ...string) HardConstraint {
 	return HardConstraint{
-		ID:                   id,
-		EnforcementTarget:    target,
-		Modules:              modules,
-		ConsensusCritical:    true,
-		StateTransitionGuard: true,
-		CommitmentBacked:     true,
-		Evidence:             evidence,
+		ID:			id,
+		EnforcementTarget:	target,
+		Modules:		modules,
+		ConsensusCritical:	true,
+		StateTransitionGuard:	true,
+		CommitmentBacked:	true,
+		Evidence:		evidence,
 	}
 }
 

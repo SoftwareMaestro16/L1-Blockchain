@@ -68,9 +68,9 @@ func TestPaymentProofQueryReturnsTypedObjectEnvelope(t *testing.T) {
 	state := buildPaymentQueryState(t, fixture)
 
 	for _, tc := range []struct {
-		objectType PaymentProofObjectType
-		objectID   string
-		stateKey   string
+		objectType	PaymentProofObjectType
+		objectID	string
+		stateKey	string
 	}{
 		{PaymentProofObjectIntent, fixture.Intent.PaymentID, FinancialPaymentIntentsPrefix + "/" + fixture.Intent.PaymentID},
 		{PaymentProofObjectChannel, fixture.Channel.ChannelID, FinancialPaymentChannelsPrefix + "/" + fixture.Channel.ChannelID},
@@ -81,9 +81,9 @@ func TestPaymentProofQueryReturnsTypedObjectEnvelope(t *testing.T) {
 		{PaymentProofObjectReceipt, fixture.Receipt.PaymentID, FinancialPaymentReceiptsPrefix + "/" + fixture.Receipt.PaymentID},
 	} {
 		resp, err := QueryPaymentProofFromState(state, QueryPaymentProof{
-			ObjectType: tc.objectType,
-			ObjectID:   tc.objectID,
-			Height:     state.Height,
+			ObjectType:	tc.objectType,
+			ObjectID:	tc.objectID,
+			Height:		state.Height,
 		})
 		require.NoError(t, err)
 		require.True(t, resp.Found, tc.objectType)
@@ -101,9 +101,9 @@ func TestPaymentQueriesRejectUnavailableHeightAndMissingObjects(t *testing.T) {
 	require.ErrorContains(t, err, "outside available root history")
 
 	missing, err := QueryPaymentProofFromState(state, QueryPaymentProof{
-		ObjectType: PaymentProofObjectReceipt,
-		ObjectID:   HashParts("missing-receipt"),
-		Height:     state.Height,
+		ObjectType:	PaymentProofObjectReceipt,
+		ObjectID:	HashParts("missing-receipt"),
+		Height:		state.Height,
 	})
 	require.NoError(t, err)
 	require.False(t, missing.Found)
@@ -113,9 +113,9 @@ func TestPaymentProofEnvelopeRejectsTampering(t *testing.T) {
 	fixture := financialPaymentStateFixture(t)
 	state := buildPaymentQueryState(t, fixture)
 	resp, err := QueryPaymentProofFromState(state, QueryPaymentProof{
-		ObjectType: PaymentProofObjectSettlement,
-		ObjectID:   fixture.Settlement.PaymentID,
-		Height:     state.Height,
+		ObjectType:	PaymentProofObjectSettlement,
+		ObjectID:	fixture.Settlement.PaymentID,
+		Height:		state.Height,
 	})
 	require.NoError(t, err)
 	require.True(t, resp.Found)
@@ -128,18 +128,18 @@ func TestPaymentProofEnvelopeRejectsTampering(t *testing.T) {
 func buildPaymentQueryState(t *testing.T, fixture financialPaymentStateFixtureSet) FinancialZonePaymentState {
 	t.Helper()
 	state, err := BuildFinancialZonePaymentState(FinancialZonePaymentState{
-		Height:             121,
-		Intents:            []PaymentIntent{fixture.Intent},
-		Channels:           []PaymentChannel{fixture.Channel},
-		Conditions:         []NativeConditionalPayment{fixture.Condition},
-		Routes:             []PaymentRouteCommitment{fixture.RouteCommitment},
-		Settlements:        []PaymentSettlement{fixture.Settlement},
-		Disputes:           []PaymentDispute{fixture.Dispute},
-		Receipts:           []PaymentReceipt{fixture.Receipt},
-		Proofs:             []SettlementProof{fixture.Proof},
-		Fees:               []PaymentFeeAccountingRecord{fixture.Fee},
-		Messages:           []CrossZonePaymentMessage{fixture.Message},
-		CanonicalEnvelopes: []PaymentEnvelopeCanonicalRecord{fixture.CanonicalIntent, fixture.CanonicalSettlement},
+		Height:			121,
+		Intents:		[]PaymentIntent{fixture.Intent},
+		Channels:		[]PaymentChannel{fixture.Channel},
+		Conditions:		[]NativeConditionalPayment{fixture.Condition},
+		Routes:			[]PaymentRouteCommitment{fixture.RouteCommitment},
+		Settlements:		[]PaymentSettlement{fixture.Settlement},
+		Disputes:		[]PaymentDispute{fixture.Dispute},
+		Receipts:		[]PaymentReceipt{fixture.Receipt},
+		Proofs:			[]SettlementProof{fixture.Proof},
+		Fees:			[]PaymentFeeAccountingRecord{fixture.Fee},
+		Messages:		[]CrossZonePaymentMessage{fixture.Message},
+		CanonicalEnvelopes:	[]PaymentEnvelopeCanonicalRecord{fixture.CanonicalIntent, fixture.CanonicalSettlement},
 	})
 	require.NoError(t, err)
 	return state

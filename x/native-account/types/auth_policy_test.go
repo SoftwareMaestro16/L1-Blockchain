@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	authKeyPrimaryPub  = "ed25519:primary"
-	authKeyDevicePub   = "ed25519:device"
-	authKeyRecoveryPub = "ed25519:recovery"
-	authKeyBackupPub   = "ed25519:backup"
+	authKeyPrimaryPub	= "ed25519:primary"
+	authKeyDevicePub	= "ed25519:device"
+	authKeyRecoveryPub	= "ed25519:recovery"
+	authKeyBackupPub	= "ed25519:backup"
 )
 
 func TestSingleKeyPolicyAuthorizesNormalTx(t *testing.T) {
@@ -20,11 +20,11 @@ func TestSingleKeyPolicyAuthorizesNormalTx(t *testing.T) {
 	account.AuthPolicy = AuthPolicy{Version: 1, Mode: AuthModeSingleKey}
 
 	next, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{account.PubKeys[0]},
-		Operation:   AuthOperationTransfer,
-		Amount:      10,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{account.PubKeys[0]},
+		Operation:	AuthOperationTransfer,
+		Amount:		10,
 	})
 
 	require.NoError(t, err)
@@ -33,25 +33,25 @@ func TestSingleKeyPolicyAuthorizesNormalTx(t *testing.T) {
 
 func TestMultisigThresholdPolicyRejectsInsufficientSignatures(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version:   1,
-		Mode:      AuthModeThreshold,
-		Keys:      authKeys(),
-		Threshold: 2,
+		Version:	1,
+		Mode:		AuthModeThreshold,
+		Keys:		authKeys(),
+		Threshold:	2,
 	})
 
 	_, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary"},
-		Operation:   AuthOperationTransfer,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary"},
+		Operation:	AuthOperationTransfer,
 	})
 	require.ErrorContains(t, err, "below threshold")
 
 	next, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary", "device"},
-		Operation:   AuthOperationTransfer,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary", "device"},
+		Operation:	AuthOperationTransfer,
 	})
 	require.NoError(t, err)
 	require.Equal(t, account.Sequence+1, next.Sequence)
@@ -59,10 +59,10 @@ func TestMultisigThresholdPolicyRejectsInsufficientSignatures(t *testing.T) {
 
 func TestWeightedMultisigSumsWeightsDeterministically(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version:   1,
-		Mode:      AuthModeWeighted,
-		Keys:      authKeys(),
-		Threshold: 7,
+		Version:	1,
+		Mode:		AuthModeWeighted,
+		Keys:		authKeys(),
+		Threshold:	7,
 		Weights: []AuthWeight{
 			{KeyID: "recovery", Weight: 1},
 			{KeyID: "primary", Weight: 5},
@@ -71,18 +71,18 @@ func TestWeightedMultisigSumsWeightsDeterministically(t *testing.T) {
 	})
 
 	_, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary"},
-		Operation:   AuthOperationTransfer,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary"},
+		Operation:	AuthOperationTransfer,
 	})
 	require.ErrorContains(t, err, "below threshold")
 
 	result, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"device", "primary"},
-		Operation:   AuthOperationTransfer,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"device", "primary"},
+		Operation:	AuthOperationTransfer,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(8), result.Weight)
@@ -97,25 +97,25 @@ func TestWeightedMultisigSumsWeightsDeterministically(t *testing.T) {
 
 func TestTwoDevicePolicyRequiresBothKeysForProtectedOperations(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version:   1,
-		Mode:      AuthModeTwoDevice,
-		Keys:      authKeys(),
-		Threshold: 2,
+		Version:	1,
+		Mode:		AuthModeTwoDevice,
+		Keys:		authKeys(),
+		Threshold:	2,
 	})
 
 	_, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary"},
-		Operation:   AuthOperationStakingChange,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary"},
+		Operation:	AuthOperationStakingChange,
 	})
 	require.ErrorContains(t, err, "primary and device")
 
 	next, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary", "device"},
-		Operation:   AuthOperationStakingChange,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary", "device"},
+		Operation:	AuthOperationStakingChange,
 	})
 	require.NoError(t, err)
 	require.Equal(t, account.Sequence+1, next.Sequence)
@@ -123,29 +123,29 @@ func TestTwoDevicePolicyRequiresBothKeysForProtectedOperations(t *testing.T) {
 
 func TestSpendingLimitAllowsSmallTransferAndRejectsLargeTransfer(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version: 1,
-		Mode:    AuthModeTwoDevice,
-		Keys:    authKeys(),
+		Version:	1,
+		Mode:		AuthModeTwoDevice,
+		Keys:		authKeys(),
 		SpendingLimits: []SpendingLimit{
 			{Operation: AuthOperationTransfer, MaxAmount: 100},
 		},
 	})
 
 	_, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary"},
-		Operation:   AuthOperationTransfer,
-		Amount:      100,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary"},
+		Operation:	AuthOperationTransfer,
+		Amount:		100,
 	})
 	require.NoError(t, err)
 
 	_, err = ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"primary"},
-		Operation:   AuthOperationTransfer,
-		Amount:      101,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"primary"},
+		Operation:	AuthOperationTransfer,
+		Amount:		101,
 	})
 	require.ErrorContains(t, err, "primary and device")
 }
@@ -154,17 +154,17 @@ func TestTimelockPreventsEarlyRecoveryAndAuthChange(t *testing.T) {
 	account := accountWithPolicy(t, recoveryPolicy(100))
 
 	_, err := ApplyMsgRecoverAccount(account, MsgRecoverAccount{
-		AccountUser:   account.AddressUser,
-		Signers:       []string{authKeyRecoveryPub},
-		CurrentHeight: 99,
+		AccountUser:	account.AddressUser,
+		Signers:	[]string{authKeyRecoveryPub},
+		CurrentHeight:	99,
 	})
 	require.ErrorContains(t, err, "timelock")
 
 	_, err = ApplyMsgUpdateAuthPolicy(account, MsgUpdateAuthPolicy{
-		AccountUser:   account.AddressUser,
-		NewAuthPolicy: AuthPolicy{Version: 1, Mode: AuthModeSingleKey},
-		Signers:       []string{"primary", "device"},
-		CurrentHeight: 99,
+		AccountUser:	account.AddressUser,
+		NewAuthPolicy:	AuthPolicy{Version: 1, Mode: AuthModeSingleKey},
+		Signers:	[]string{"primary", "device"},
+		CurrentHeight:	99,
 	})
 	require.ErrorContains(t, err, "timelock")
 }
@@ -174,9 +174,9 @@ func TestRecoveryPolicyChangesStatusAfterValidAuthorization(t *testing.T) {
 	account.Status = AccountStatusFrozen
 
 	recovered, err := ApplyMsgRecoverAccount(account, MsgRecoverAccount{
-		AccountUser:   account.AddressUser,
-		Signers:       []string{authKeyRecoveryPub},
-		CurrentHeight: 10,
+		AccountUser:	account.AddressUser,
+		Signers:	[]string{authKeyRecoveryPub},
+		CurrentHeight:	10,
 	})
 
 	require.NoError(t, err)
@@ -187,16 +187,16 @@ func TestRecoveryPolicyChangesStatusAfterValidAuthorization(t *testing.T) {
 
 func TestKeyRotationPreservesAEAndRawAddresses(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version: 1,
-		Mode:    AuthModeTwoDevice,
-		Keys:    authKeys(),
+		Version:	1,
+		Mode:		AuthModeTwoDevice,
+		Keys:		authKeys(),
 	})
 
 	rotated, err := ApplyMsgRotateKey(account, MsgRotateKey{
-		AccountUser: account.AddressUser,
-		OldKeyID:    "device",
-		NewKey:      AuthKey{ID: "device", PublicKey: "ed25519:new-device", Role: AuthKeyRoleDevice},
-		Signers:     []string{"primary", "device"},
+		AccountUser:	account.AddressUser,
+		OldKeyID:	"device",
+		NewKey:		AuthKey{ID: "device", PublicKey: "ed25519:new-device", Role: AuthKeyRoleDevice},
+		Signers:	[]string{"primary", "device"},
 	})
 
 	require.NoError(t, err)
@@ -207,28 +207,28 @@ func TestKeyRotationPreservesAEAndRawAddresses(t *testing.T) {
 
 func TestAuthPolicyUpdateRequiresAuthorization(t *testing.T) {
 	account := accountWithPolicy(t, AuthPolicy{
-		Version: 1,
-		Mode:    AuthModeTwoDevice,
-		Keys:    authKeys(),
+		Version:	1,
+		Mode:		AuthModeTwoDevice,
+		Keys:		authKeys(),
 	})
 	nextPolicy := AuthPolicy{
-		Version:   1,
-		Mode:      AuthModeThreshold,
-		Keys:      authKeys(),
-		Threshold: 2,
+		Version:	1,
+		Mode:		AuthModeThreshold,
+		Keys:		authKeys(),
+		Threshold:	2,
 	}
 
 	_, err := ApplyMsgUpdateAuthPolicy(account, MsgUpdateAuthPolicy{
-		AccountUser:   account.AddressUser,
-		NewAuthPolicy: nextPolicy,
-		Signers:       []string{"primary"},
+		AccountUser:	account.AddressUser,
+		NewAuthPolicy:	nextPolicy,
+		Signers:	[]string{"primary"},
 	})
 	require.ErrorContains(t, err, "primary and device")
 
 	updated, err := ApplyMsgUpdateAuthPolicy(account, MsgUpdateAuthPolicy{
-		AccountUser:   account.AddressUser,
-		NewAuthPolicy: nextPolicy,
-		Signers:       []string{"primary", "device"},
+		AccountUser:	account.AddressUser,
+		NewAuthPolicy:	nextPolicy,
+		Signers:	[]string{"primary", "device"},
 	})
 	require.NoError(t, err)
 	require.Equal(t, AuthModeThreshold, updated.AuthPolicy.Mode)
@@ -285,17 +285,17 @@ func authKeyByID(keys []AuthKey, id string) AuthKey {
 
 func recoveryPolicy(height uint64) AuthPolicy {
 	return AuthPolicy{
-		Version: 1,
-		Mode:    AuthModeTwoDevice,
-		Keys:    authKeys(),
+		Version:	1,
+		Mode:		AuthModeTwoDevice,
+		Keys:		authKeys(),
 		RecoveryPolicy: RecoveryPolicy{
-			Keys:              []string{authKeyRecoveryPub, authKeyBackupPub},
-			Threshold:         1,
-			TimelockEndHeight: height,
+			Keys:			[]string{authKeyRecoveryPub, authKeyBackupPub},
+			Threshold:		1,
+			TimelockEndHeight:	height,
 		},
 		Timelock: TimelockPolicy{
-			AuthPolicyUpdateEndHeight: height,
-			RecoveryEndHeight:         height,
+			AuthPolicyUpdateEndHeight:	height,
+			RecoveryEndHeight:		height,
 		},
 	}
 }

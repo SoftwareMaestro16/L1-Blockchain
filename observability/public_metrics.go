@@ -6,64 +6,64 @@ import (
 )
 
 const (
-	RequiredMetricBlockTime              = "block_time"
-	RequiredMetricFinalityLatency        = "finality_latency"
-	RequiredMetricMissedBlocks           = "missed_blocks"
-	RequiredMetricValidatorUptime        = "validator_uptime"
-	RequiredMetricValidatorConcentration = "validator_concentration"
-	RequiredMetricTopNVotingPower        = "top_10_top_20_top_33_voting_power"
-	RequiredMetricInflation              = "inflation"
-	RequiredMetricBondedRatio            = "bonded_ratio"
-	RequiredMetricEstimatedAPR           = "estimated_apr"
-	RequiredMetricBurnedFees             = "burned_fees"
-	RequiredMetricTreasuryBalance        = "treasury_balance"
-	RequiredMetricSlashingEvents         = "slashing_events"
-	RequiredMetricJailUnjailEvents       = "jail_unjail_events"
-	RequiredMetricContractExecutionGas   = "contract_execution_gas"
-	RequiredMetricFailedTxReasons        = "failed_tx_reasons"
-	RequiredMetricNodeSyncStatus         = "node_sync_status"
+	RequiredMetricBlockTime			= "block_time"
+	RequiredMetricFinalityLatency		= "finality_latency"
+	RequiredMetricMissedBlocks		= "missed_blocks"
+	RequiredMetricValidatorUptime		= "validator_uptime"
+	RequiredMetricValidatorConcentration	= "validator_concentration"
+	RequiredMetricTopNVotingPower		= "top_10_top_20_top_33_voting_power"
+	RequiredMetricInflation			= "inflation"
+	RequiredMetricBondedRatio		= "bonded_ratio"
+	RequiredMetricEstimatedAPR		= "estimated_apr"
+	RequiredMetricBurnedFees		= "burned_fees"
+	RequiredMetricTreasuryBalance		= "treasury_balance"
+	RequiredMetricSlashingEvents		= "slashing_events"
+	RequiredMetricJailUnjailEvents		= "jail_unjail_events"
+	RequiredMetricContractExecutionGas	= "contract_execution_gas"
+	RequiredMetricFailedTxReasons		= "failed_tx_reasons"
+	RequiredMetricNodeSyncStatus		= "node_sync_status"
 )
 
 const (
-	RequiredSurfaceCLIQueries        = "cli_queries"
-	RequiredSurfaceGRPCQueries       = "grpc_queries"
-	RequiredSurfaceRESTQueries       = "rest_queries_where_applicable"
-	RequiredSurfacePrometheusMetrics = "prometheus_metrics"
-	RequiredSurfaceIndexerEvents     = "explorer_indexer_compatibility_events"
-	RequiredSurfacePublicDashboards  = "public_testnet_dashboards"
+	RequiredSurfaceCLIQueries		= "cli_queries"
+	RequiredSurfaceGRPCQueries		= "grpc_queries"
+	RequiredSurfaceRESTQueries		= "rest_queries_where_applicable"
+	RequiredSurfacePrometheusMetrics	= "prometheus_metrics"
+	RequiredSurfaceIndexerEvents		= "explorer_indexer_compatibility_events"
+	RequiredSurfacePublicDashboards		= "public_testnet_dashboards"
 )
 
 type PublicMetricSpec struct {
-	ID                    string
-	PrometheusName        string
-	Required              bool
-	CLIQuery              bool
-	GRPCQuery             bool
-	RESTQuery             bool
-	Prometheus            bool
-	IndexerEvent          bool
-	PublicDashboard       bool
-	BoundedLabels         bool
-	ExplorerCompatible    bool
-	TestnetDashboardReady bool
+	ID			string
+	PrometheusName		string
+	Required		bool
+	CLIQuery		bool
+	GRPCQuery		bool
+	RESTQuery		bool
+	Prometheus		bool
+	IndexerEvent		bool
+	PublicDashboard		bool
+	BoundedLabels		bool
+	ExplorerCompatible	bool
+	TestnetDashboardReady	bool
 }
 
 type PublicSurfaceSpec struct {
-	ID       string
-	Ready    bool
-	Required bool
+	ID		string
+	Ready		bool
+	Required	bool
 }
 
 type PublicMetricsReadinessReport struct {
-	Metrics        []PublicMetricSpec
-	Surfaces       []PublicSurfaceSpec
-	RequiredCount  int
-	ReadyCount     int
-	SurfaceCount   int
-	SurfacesReady  int
-	PrometheusOnly []string
-	Failed         []string
-	Ready          bool
+	Metrics		[]PublicMetricSpec
+	Surfaces	[]PublicSurfaceSpec
+	RequiredCount	int
+	ReadyCount	int
+	SurfaceCount	int
+	SurfacesReady	int
+	PrometheusOnly	[]string
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultPublicMetricSpecs() []PublicMetricSpec {
@@ -189,32 +189,32 @@ func BuildPublicMetricsReadinessReport(metrics []PublicMetricSpec, surfaces []Pu
 	sort.Strings(failed)
 	sort.Strings(prometheusOnly)
 	return PublicMetricsReadinessReport{
-		Metrics:        metrics,
-		Surfaces:       surfaces,
-		RequiredCount:  requiredCount,
-		ReadyCount:     readyCount,
-		SurfaceCount:   surfaceCount,
-		SurfacesReady:  surfacesReady,
-		PrometheusOnly: prometheusOnly,
-		Failed:         failed,
-		Ready:          len(failed) == 0 && len(prometheusOnly) == 0,
+		Metrics:	metrics,
+		Surfaces:	surfaces,
+		RequiredCount:	requiredCount,
+		ReadyCount:	readyCount,
+		SurfaceCount:	surfaceCount,
+		SurfacesReady:	surfacesReady,
+		PrometheusOnly:	prometheusOnly,
+		Failed:		failed,
+		Ready:		len(failed) == 0 && len(prometheusOnly) == 0,
 	}
 }
 
 func publicMetric(id, prometheusName string, cli, grpc, rest, prometheus, indexer, dashboard bool) PublicMetricSpec {
 	return PublicMetricSpec{
-		ID:                    id,
-		PrometheusName:        prometheusName,
-		Required:              true,
-		CLIQuery:              cli,
-		GRPCQuery:             grpc,
-		RESTQuery:             rest,
-		Prometheus:            prometheus,
-		IndexerEvent:          indexer,
-		PublicDashboard:       dashboard,
-		BoundedLabels:         true,
-		ExplorerCompatible:    true,
-		TestnetDashboardReady: true,
+		ID:			id,
+		PrometheusName:		prometheusName,
+		Required:		true,
+		CLIQuery:		cli,
+		GRPCQuery:		grpc,
+		RESTQuery:		rest,
+		Prometheus:		prometheus,
+		IndexerEvent:		indexer,
+		PublicDashboard:	dashboard,
+		BoundedLabels:		true,
+		ExplorerCompatible:	true,
+		TestnetDashboardReady:	true,
 	}
 }
 
@@ -255,32 +255,32 @@ func prometheusDefinitionNames() map[string]bool {
 
 func requiredPublicMetricIDs() map[string]bool {
 	return map[string]bool{
-		RequiredMetricBlockTime:              true,
-		RequiredMetricFinalityLatency:        true,
-		RequiredMetricMissedBlocks:           true,
-		RequiredMetricValidatorUptime:        true,
-		RequiredMetricValidatorConcentration: true,
-		RequiredMetricTopNVotingPower:        true,
-		RequiredMetricInflation:              true,
-		RequiredMetricBondedRatio:            true,
-		RequiredMetricEstimatedAPR:           true,
-		RequiredMetricBurnedFees:             true,
-		RequiredMetricTreasuryBalance:        true,
-		RequiredMetricSlashingEvents:         true,
-		RequiredMetricJailUnjailEvents:       true,
-		RequiredMetricContractExecutionGas:   true,
-		RequiredMetricFailedTxReasons:        true,
-		RequiredMetricNodeSyncStatus:         true,
+		RequiredMetricBlockTime:		true,
+		RequiredMetricFinalityLatency:		true,
+		RequiredMetricMissedBlocks:		true,
+		RequiredMetricValidatorUptime:		true,
+		RequiredMetricValidatorConcentration:	true,
+		RequiredMetricTopNVotingPower:		true,
+		RequiredMetricInflation:		true,
+		RequiredMetricBondedRatio:		true,
+		RequiredMetricEstimatedAPR:		true,
+		RequiredMetricBurnedFees:		true,
+		RequiredMetricTreasuryBalance:		true,
+		RequiredMetricSlashingEvents:		true,
+		RequiredMetricJailUnjailEvents:		true,
+		RequiredMetricContractExecutionGas:	true,
+		RequiredMetricFailedTxReasons:		true,
+		RequiredMetricNodeSyncStatus:		true,
 	}
 }
 
 func requiredPublicSurfaceIDs() map[string]bool {
 	return map[string]bool{
-		RequiredSurfaceCLIQueries:        true,
-		RequiredSurfaceGRPCQueries:       true,
-		RequiredSurfaceRESTQueries:       true,
-		RequiredSurfacePrometheusMetrics: true,
-		RequiredSurfaceIndexerEvents:     true,
-		RequiredSurfacePublicDashboards:  true,
+		RequiredSurfaceCLIQueries:		true,
+		RequiredSurfaceGRPCQueries:		true,
+		RequiredSurfaceRESTQueries:		true,
+		RequiredSurfacePrometheusMetrics:	true,
+		RequiredSurfaceIndexerEvents:		true,
+		RequiredSurfacePublicDashboards:	true,
 	}
 }

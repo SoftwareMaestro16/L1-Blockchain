@@ -41,28 +41,28 @@ func TestReporterStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	reporterGenesis := reporterkeeper.DefaultGenesis()
 	reporterAddress := reporterRawAddress("11")
 	reporterGenesis.State.Reporters = []reportertypes.ReporterRecord{{
-		ReporterAddress: reporterAddress,
-		BondedAmount:    reportertypes.DefaultMinBondAmount,
-		ReporterScore:   reporterGenesis.Params.InitialScore,
-		AcceptedReports: 1,
-		Status:          reportertypes.StatusActive,
+		ReporterAddress:	reporterAddress,
+		BondedAmount:		reportertypes.DefaultMinBondAmount,
+		ReporterScore:		reporterGenesis.Params.InitialScore,
+		AcceptedReports:	1,
+		Status:			reportertypes.StatusActive,
 		RewardHistory: []reportertypes.ReporterReward{{
-			ReportID:  "app-report-1",
-			Amount:    77,
-			CreatedAt: 1,
+			ReportID:	"app-report-1",
+			Amount:		77,
+			CreatedAt:	1,
 		}},
 	}}
 	reporterGenesis.State.Reports = []reportertypes.ReportRecord{{
-		ReportID:         "app-report-1",
-		ReporterAddress:  reporterAddress,
-		ReportType:       reportertypes.ReportTypeAvailability,
-		Subject:          "availability-window",
-		PayloadHash:      reporterPayloadHash("app-report-1"),
-		PayloadSizeBytes: 128,
-		Status:           reportertypes.ReportStatusAccepted,
-		SubmittedHeight:  1,
-		FinalizedHeight:  1,
-		RewardAmount:     77,
+		ReportID:		"app-report-1",
+		ReporterAddress:	reporterAddress,
+		ReportType:		reportertypes.ReportTypeAvailability,
+		Subject:		"availability-window",
+		PayloadHash:		reporterPayloadHash("app-report-1"),
+		PayloadSizeBytes:	128,
+		Status:			reportertypes.ReportStatusAccepted,
+		SubmittedHeight:	1,
+		FinalizedHeight:	1,
+		RewardAmount:		77,
 	}}
 	reporterGenesis.State = reporterGenesis.State.Normalize(reporterGenesis.Params)
 	require.NoError(t, reporterGenesis.Validate())
@@ -73,15 +73,15 @@ func TestReporterStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

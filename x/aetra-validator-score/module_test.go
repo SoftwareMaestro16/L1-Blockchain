@@ -33,9 +33,9 @@ func TestMsgServiceRejectsUnauthorizedScoreUpdate(t *testing.T) {
 	require.NotNil(t, handler)
 
 	_, err := handler(sdk.Context{}, &types.MsgUpdateValidatorScores{
-		Authority: "bad-authority",
-		Epoch:     1,
-		Metrics:   []types.ValidatorMetricInput{},
+		Authority:	"bad-authority",
+		Epoch:		1,
+		Metrics:	[]types.ValidatorMetricInput{},
 	})
 	require.ErrorContains(t, err, "invalid authority")
 }

@@ -17,38 +17,38 @@ type AuctionModuleFailureModeV2 string
 type AuctionModuleIntegrationPointV2 string
 
 const (
-	AuctionModulePathV2 = "auction-module"
+	AuctionModulePathV2	= "auction-module"
 
-	AuctionModuleStateAuctionRecord   AuctionModuleStateObjectV2 = "AuctionRecord"
-	AuctionModuleStateBidCommitment   AuctionModuleStateObjectV2 = "BidCommitment"
-	AuctionModuleStateRevealedBid     AuctionModuleStateObjectV2 = "RevealedBid"
-	AuctionModuleStateAuctionParams   AuctionModuleStateObjectV2 = "AuctionParams"
-	AuctionModuleStateAuctionFeeSplit AuctionModuleStateObjectV2 = "AuctionFeeSplit"
+	AuctionModuleStateAuctionRecord		AuctionModuleStateObjectV2	= "AuctionRecord"
+	AuctionModuleStateBidCommitment		AuctionModuleStateObjectV2	= "BidCommitment"
+	AuctionModuleStateRevealedBid		AuctionModuleStateObjectV2	= "RevealedBid"
+	AuctionModuleStateAuctionParams		AuctionModuleStateObjectV2	= "AuctionParams"
+	AuctionModuleStateAuctionFeeSplit	AuctionModuleStateObjectV2	= "AuctionFeeSplit"
 
-	AuctionModuleMsgStartAuction         AuctionModuleMessageNameV2 = "MsgStartAuction"
-	AuctionModuleMsgCommitBid            AuctionModuleMessageNameV2 = "MsgCommitBid"
-	AuctionModuleMsgRevealBid            AuctionModuleMessageNameV2 = "MsgRevealBid"
-	AuctionModuleMsgFinalizeAuction      AuctionModuleMessageNameV2 = "MsgFinalizeAuction"
-	AuctionModuleMsgCancelExpiredAuction AuctionModuleMessageNameV2 = "MsgCancelExpiredAuction"
-	AuctionModuleMsgClaimAuctionRefund   AuctionModuleMessageNameV2 = "MsgClaimAuctionRefund"
+	AuctionModuleMsgStartAuction		AuctionModuleMessageNameV2	= "MsgStartAuction"
+	AuctionModuleMsgCommitBid		AuctionModuleMessageNameV2	= "MsgCommitBid"
+	AuctionModuleMsgRevealBid		AuctionModuleMessageNameV2	= "MsgRevealBid"
+	AuctionModuleMsgFinalizeAuction		AuctionModuleMessageNameV2	= "MsgFinalizeAuction"
+	AuctionModuleMsgCancelExpiredAuction	AuctionModuleMessageNameV2	= "MsgCancelExpiredAuction"
+	AuctionModuleMsgClaimAuctionRefund	AuctionModuleMessageNameV2	= "MsgClaimAuctionRefund"
 
-	AuctionModuleQueryAuction           AuctionModuleQueryNameV2 = "QueryAuction"
-	AuctionModuleQueryAuctionByName     AuctionModuleQueryNameV2 = "QueryAuctionByName"
-	AuctionModuleQueryBidCommitment     AuctionModuleQueryNameV2 = "QueryBidCommitment"
-	AuctionModuleQueryAuctionParams     AuctionModuleQueryNameV2 = "QueryAuctionParams"
-	AuctionModuleQueryAuctionPriceFloor AuctionModuleQueryNameV2 = "QueryAuctionPriceFloor"
+	AuctionModuleQueryAuction		AuctionModuleQueryNameV2	= "QueryAuction"
+	AuctionModuleQueryAuctionByName		AuctionModuleQueryNameV2	= "QueryAuctionByName"
+	AuctionModuleQueryBidCommitment		AuctionModuleQueryNameV2	= "QueryBidCommitment"
+	AuctionModuleQueryAuctionParams		AuctionModuleQueryNameV2	= "QueryAuctionParams"
+	AuctionModuleQueryAuctionPriceFloor	AuctionModuleQueryNameV2	= "QueryAuctionPriceFloor"
 
-	AuctionModuleFailureBidReplay                 AuctionModuleFailureModeV2 = "bid_replay"
-	AuctionModuleFailureRevealOutsideWindow       AuctionModuleFailureModeV2 = "reveal_outside_window"
-	AuctionModuleFailureNonDeterministicTie       AuctionModuleFailureModeV2 = "non_deterministic_tie_handling"
-	AuctionModuleFailureFinalizeBeforeRevealEnd   AuctionModuleFailureModeV2 = "finalization_before_reveal_end"
-	AuctionModuleFailureIncorrectRefundAccounting AuctionModuleFailureModeV2 = "incorrect_refund_accounting"
+	AuctionModuleFailureBidReplay			AuctionModuleFailureModeV2	= "bid_replay"
+	AuctionModuleFailureRevealOutsideWindow		AuctionModuleFailureModeV2	= "reveal_outside_window"
+	AuctionModuleFailureNonDeterministicTie		AuctionModuleFailureModeV2	= "non_deterministic_tie_handling"
+	AuctionModuleFailureFinalizeBeforeRevealEnd	AuctionModuleFailureModeV2	= "finalization_before_reveal_end"
+	AuctionModuleFailureIncorrectRefundAccounting	AuctionModuleFailureModeV2	= "incorrect_refund_accounting"
 
-	AuctionModuleIntegrationIdentityCore                     AuctionModuleIntegrationPointV2 = "identity_core"
-	AuctionModuleIntegrationBankModule                       AuctionModuleIntegrationPointV2 = "bank_module"
-	AuctionModuleIntegrationFeeModule                        AuctionModuleIntegrationPointV2 = "fee_module"
-	AuctionModuleIntegrationTreasuryBurnRewardsCommunityPool AuctionModuleIntegrationPointV2 = "treasury_burn_rewards_community_pool"
-	AuctionModuleIntegrationStoreV2                          AuctionModuleIntegrationPointV2 = "store_v2"
+	AuctionModuleIntegrationIdentityCore				AuctionModuleIntegrationPointV2	= "identity_core"
+	AuctionModuleIntegrationBankModule				AuctionModuleIntegrationPointV2	= "bank_module"
+	AuctionModuleIntegrationFeeModule				AuctionModuleIntegrationPointV2	= "fee_module"
+	AuctionModuleIntegrationTreasuryBurnRewardsCommunityPool	AuctionModuleIntegrationPointV2	= "treasury_burn_rewards_community_pool"
+	AuctionModuleIntegrationStoreV2					AuctionModuleIntegrationPointV2	= "store_v2"
 )
 
 type ProofModuleStateObjectV2 string
@@ -58,84 +58,84 @@ type ProofModuleFailureModeV2 string
 type ProofModuleIntegrationPointV2 string
 
 const (
-	ProofVerificationModulePathV2 = "proof-verification-module"
+	ProofVerificationModulePathV2	= "proof-verification-module"
 
-	ProofModuleStateProofParams           ProofModuleStateObjectV2 = "ProofParams"
-	ProofModuleStateProofSchemaVersion    ProofModuleStateObjectV2 = "ProofSchemaVersion"
-	ProofModuleStateResolutionCacheRecord ProofModuleStateObjectV2 = "ResolutionCacheRecord"
-	ProofModuleStateProofPathDescriptor   ProofModuleStateObjectV2 = "ProofPathDescriptor"
+	ProofModuleStateProofParams		ProofModuleStateObjectV2	= "ProofParams"
+	ProofModuleStateProofSchemaVersion	ProofModuleStateObjectV2	= "ProofSchemaVersion"
+	ProofModuleStateResolutionCacheRecord	ProofModuleStateObjectV2	= "ResolutionCacheRecord"
+	ProofModuleStateProofPathDescriptor	ProofModuleStateObjectV2	= "ProofPathDescriptor"
 
-	ProofModuleMsgInvalidateResolutionCache ProofModuleMessageNameV2 = "MsgInvalidateResolutionCache"
+	ProofModuleMsgInvalidateResolutionCache	ProofModuleMessageNameV2	= "MsgInvalidateResolutionCache"
 
-	ProofModuleQueryResolutionProof          ProofModuleQueryNameV2 = "QueryResolutionProof"
-	ProofModuleQueryRecursiveResolutionProof ProofModuleQueryNameV2 = "QueryRecursiveResolutionProof"
-	ProofModuleQueryReverseResolutionProof   ProofModuleQueryNameV2 = "QueryReverseResolutionProof"
-	ProofModuleQueryNonExistenceProof        ProofModuleQueryNameV2 = "QueryNonExistenceProof"
-	ProofModuleQueryProofSchema              ProofModuleQueryNameV2 = "QueryProofSchema"
+	ProofModuleQueryResolutionProof			ProofModuleQueryNameV2	= "QueryResolutionProof"
+	ProofModuleQueryRecursiveResolutionProof	ProofModuleQueryNameV2	= "QueryRecursiveResolutionProof"
+	ProofModuleQueryReverseResolutionProof		ProofModuleQueryNameV2	= "QueryReverseResolutionProof"
+	ProofModuleQueryNonExistenceProof		ProofModuleQueryNameV2	= "QueryNonExistenceProof"
+	ProofModuleQueryProofSchema			ProofModuleQueryNameV2	= "QueryProofSchema"
 
-	ProofModuleFailureInconsistentRecordVersions  ProofModuleFailureModeV2 = "proof_inconsistent_record_versions"
-	ProofModuleFailureMissingDelegationConstraint ProofModuleFailureModeV2 = "recursive_path_omits_delegation_constraint"
-	ProofModuleFailureStaleCacheAfterInvalidation ProofModuleFailureModeV2 = "cache_proof_remains_after_invalidation"
-	ProofModuleFailureMalformedNameNonExistence   ProofModuleFailureModeV2 = "non_existence_proof_for_malformed_name"
-	ProofModuleFailureProofHeightPruned           ProofModuleFailureModeV2 = "proof_height_unavailable_after_pruning"
+	ProofModuleFailureInconsistentRecordVersions	ProofModuleFailureModeV2	= "proof_inconsistent_record_versions"
+	ProofModuleFailureMissingDelegationConstraint	ProofModuleFailureModeV2	= "recursive_path_omits_delegation_constraint"
+	ProofModuleFailureStaleCacheAfterInvalidation	ProofModuleFailureModeV2	= "cache_proof_remains_after_invalidation"
+	ProofModuleFailureMalformedNameNonExistence	ProofModuleFailureModeV2	= "non_existence_proof_for_malformed_name"
+	ProofModuleFailureProofHeightPruned		ProofModuleFailureModeV2	= "proof_height_unavailable_after_pruning"
 
-	ProofModuleIntegrationIdentityCore     ProofModuleIntegrationPointV2 = "identity_core"
-	ProofModuleIntegrationResolverModule   ProofModuleIntegrationPointV2 = "resolver_module"
-	ProofModuleIntegrationSubdomainModule  ProofModuleIntegrationPointV2 = "subdomain_module"
-	ProofModuleIntegrationStoreV2ProofAPIs ProofModuleIntegrationPointV2 = "store_v2_proof_apis"
-	ProofModuleIntegrationAdaptiveSync     ProofModuleIntegrationPointV2 = "adaptive_sync_state_snapshots"
+	ProofModuleIntegrationIdentityCore	ProofModuleIntegrationPointV2	= "identity_core"
+	ProofModuleIntegrationResolverModule	ProofModuleIntegrationPointV2	= "resolver_module"
+	ProofModuleIntegrationSubdomainModule	ProofModuleIntegrationPointV2	= "subdomain_module"
+	ProofModuleIntegrationStoreV2ProofAPIs	ProofModuleIntegrationPointV2	= "store_v2_proof_apis"
+	ProofModuleIntegrationAdaptiveSync	ProofModuleIntegrationPointV2	= "adaptive_sync_state_snapshots"
 )
 
 type AuctionModuleFailureCoverageV2 struct {
-	Mode       AuctionModuleFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		AuctionModuleFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type AuctionModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []AuctionModuleStateObjectV2
-	Messages          []AuctionModuleMessageNameV2
-	Queries           []AuctionModuleQueryNameV2
-	FailureModes      []AuctionModuleFailureCoverageV2
-	IntegrationPoints []AuctionModuleIntegrationPointV2
-	BackingPrimitives []string
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]AuctionModuleStateObjectV2
+	Messages		[]AuctionModuleMessageNameV2
+	Queries			[]AuctionModuleQueryNameV2
+	FailureModes		[]AuctionModuleFailureCoverageV2
+	IntegrationPoints	[]AuctionModuleIntegrationPointV2
+	BackingPrimitives	[]string
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type ProofModuleFailureCoverageV2 struct {
-	Mode       ProofModuleFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		ProofModuleFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type ProofVerificationModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []ProofModuleStateObjectV2
-	Messages          []ProofModuleMessageNameV2
-	Queries           []ProofModuleQueryNameV2
-	FailureModes      []ProofModuleFailureCoverageV2
-	IntegrationPoints []ProofModuleIntegrationPointV2
-	BackingPrimitives []string
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]ProofModuleStateObjectV2
+	Messages		[]ProofModuleMessageNameV2
+	Queries			[]ProofModuleQueryNameV2
+	FailureModes		[]ProofModuleFailureCoverageV2
+	IntegrationPoints	[]ProofModuleIntegrationPointV2
+	BackingPrimitives	[]string
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type ProofModuleSchemaDescriptorV2 struct {
-	SchemaVersion    uint64
-	ResolutionFields []string
-	RecursiveFields  []string
-	SupportedQueries []ProofModuleQueryNameV2
-	OptionalMessage  ProofModuleMessageNameV2
-	DescriptorHash   string
+	SchemaVersion		uint64
+	ResolutionFields	[]string
+	RecursiveFields		[]string
+	SupportedQueries	[]ProofModuleQueryNameV2
+	OptionalMessage		ProofModuleMessageNameV2
+	DescriptorHash		string
 }
 
 func DefaultAuctionModuleBreakdownV2() (AuctionModuleBreakdownV2, error) {
 	breakdown := AuctionModuleBreakdownV2{
-		ModulePath: AuctionModulePathV2,
+		ModulePath:	AuctionModulePathV2,
 		Purpose: []string{
 			"deterministic_winner_selection",
 			"fee_split_accounting",
@@ -143,9 +143,9 @@ func DefaultAuctionModuleBreakdownV2() (AuctionModuleBreakdownV2, error) {
 			"sealed_bid_commit_reveal",
 			"timestamp_based_auction_flow",
 		},
-		StateObjects: requiredAuctionModuleStateObjectsV2(),
-		Messages:     requiredAuctionModuleMessagesV2(),
-		Queries:      requiredAuctionModuleQueriesV2(),
+		StateObjects:	requiredAuctionModuleStateObjectsV2(),
+		Messages:	requiredAuctionModuleMessagesV2(),
+		Queries:	requiredAuctionModuleQueriesV2(),
 		FailureModes: []AuctionModuleFailureCoverageV2{
 			{Mode: AuctionModuleFailureBidReplay, Guard: "CommitAuctionBid", StoreScope: IdentityStoreV2SpecAuctionsPrefix},
 			{Mode: AuctionModuleFailureFinalizeBeforeRevealEnd, Guard: "FinalizeSealedAuctionFairV2", StoreScope: IdentityStoreV2SpecAuctionsPrefix},
@@ -153,7 +153,7 @@ func DefaultAuctionModuleBreakdownV2() (AuctionModuleBreakdownV2, error) {
 			{Mode: AuctionModuleFailureNonDeterministicTie, Guard: "ValidateAuctionModuleDeterministicWinnerV2", StoreScope: IdentityStoreV2SpecAuctionsPrefix},
 			{Mode: AuctionModuleFailureRevealOutsideWindow, Guard: "RevealAuctionBid", StoreScope: IdentityStoreV2SpecAuctionsPrefix},
 		},
-		IntegrationPoints: requiredAuctionModuleIntegrationPointsV2(),
+		IntegrationPoints:	requiredAuctionModuleIntegrationPointsV2(),
 		BackingPrimitives: []string{
 			"ComputeAuctionCommitmentV2",
 			"DescribeIdentityAuctionStateMachineV2",
@@ -171,7 +171,7 @@ func DefaultAuctionModuleBreakdownV2() (AuctionModuleBreakdownV2, error) {
 
 func DefaultProofVerificationModuleBreakdownV2() (ProofVerificationModuleBreakdownV2, error) {
 	breakdown := ProofVerificationModuleBreakdownV2{
-		ModulePath: ProofVerificationModulePathV2,
+		ModulePath:	ProofVerificationModulePathV2,
 		Purpose: []string{
 			"full_node_proof_assembly",
 			"light_client_verification",
@@ -179,9 +179,9 @@ func DefaultProofVerificationModuleBreakdownV2() (ProofVerificationModuleBreakdo
 			"recursive_resolution_proofs",
 			"wallet_tooling_verification",
 		},
-		StateObjects: requiredProofModuleStateObjectsV2(),
-		Messages:     requiredProofModuleMessagesV2(),
-		Queries:      requiredProofModuleQueriesV2(),
+		StateObjects:	requiredProofModuleStateObjectsV2(),
+		Messages:	requiredProofModuleMessagesV2(),
+		Queries:	requiredProofModuleQueriesV2(),
 		FailureModes: []ProofModuleFailureCoverageV2{
 			{Mode: ProofModuleFailureInconsistentRecordVersions, Guard: "ValidateProofModuleResolutionProofV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
 			{Mode: ProofModuleFailureMalformedNameNonExistence, Guard: "BuildProofModuleNonExistenceProofV2", StoreScope: IdentityStoreV2SpecDomainNamesPrefix},
@@ -189,7 +189,7 @@ func DefaultProofVerificationModuleBreakdownV2() (ProofVerificationModuleBreakdo
 			{Mode: ProofModuleFailureProofHeightPruned, Guard: "ValidateProofModuleHeightAvailableV2", StoreScope: IdentityStoreV2Prefix + "/proof_window"},
 			{Mode: ProofModuleFailureStaleCacheAfterInvalidation, Guard: "ValidateProofModuleCacheUseV2", StoreScope: IdentityStoreV2SpecResolutionCachePrefix},
 		},
-		IntegrationPoints: requiredProofModuleIntegrationPointsV2(),
+		IntegrationPoints:	requiredProofModuleIntegrationPointsV2(),
 		BackingPrimitives: []string{
 			"BuildIdentityResolutionProofFormatV2",
 			"BuildRecursiveResolutionProofV2",
@@ -452,11 +452,11 @@ func BuildProofModuleNonExistenceProofV2(state IdentityState, chainID string, ap
 
 func BuildProofModuleSchemaDescriptorV2() ProofModuleSchemaDescriptorV2 {
 	descriptor := ProofModuleSchemaDescriptorV2{
-		SchemaVersion:    IdentityProofSchemaVersionV2,
-		ResolutionFields: append([]string(nil), IdentityResolutionProofFormatV2FieldOrder...),
-		RecursiveFields:  append([]string(nil), RecursiveResolutionProofV2FieldOrder...),
-		SupportedQueries: requiredProofModuleQueriesV2(),
-		OptionalMessage:  ProofModuleMsgInvalidateResolutionCache,
+		SchemaVersion:		IdentityProofSchemaVersionV2,
+		ResolutionFields:	append([]string(nil), IdentityResolutionProofFormatV2FieldOrder...),
+		RecursiveFields:	append([]string(nil), RecursiveResolutionProofV2FieldOrder...),
+		SupportedQueries:	requiredProofModuleQueriesV2(),
+		OptionalMessage:	ProofModuleMsgInvalidateResolutionCache,
 	}
 	descriptor.DescriptorHash = ComputeProofModuleSchemaDescriptorHashV2(descriptor)
 	return descriptor

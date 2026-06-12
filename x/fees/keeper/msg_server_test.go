@@ -43,8 +43,8 @@ func TestUpdateParamsRequiresAuthority(t *testing.T) {
 	msgServer := feeskeeper.NewMsgServerImpl(app.FeesKeeper)
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: "ae1notgov",
-		Params:    types.DefaultParams(),
+		Authority:	"ae1notgov",
+		Params:		types.DefaultParams(),
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 
@@ -60,8 +60,8 @@ func TestUpdateParamsRejectsZeroAuthority(t *testing.T) {
 	msgServer := feeskeeper.NewMsgServerImpl(app.FeesKeeper)
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: aetraaddress.ZeroRawAddress,
-		Params:    types.DefaultParams(),
+		Authority:	aetraaddress.ZeroRawAddress,
+		Params:		types.DefaultParams(),
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 	require.Contains(t, err.Error(), "authority must not be zero address")
@@ -73,8 +73,8 @@ func TestUpdateParamsAcceptsGovernanceAuthority(t *testing.T) {
 	msgServer := feeskeeper.NewMsgServerImpl(app.FeesKeeper)
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: app.FeesKeeper.Authority(),
-		Params:    types.DefaultParams(),
+		Authority:	app.FeesKeeper.Authority(),
+		Params:		types.DefaultParams(),
 	})
 	require.NoError(t, err)
 
@@ -82,10 +82,10 @@ func TestUpdateParamsAcceptsGovernanceAuthority(t *testing.T) {
 	require.NoError(t, getErr)
 	require.Equal(t, types.DefaultParams(), params)
 	requireEvent(t, ctx, types.EventTypeUpdateParams, map[string]string{
-		types.AttributeKeyAuthority:             app.FeesKeeper.Authority(),
-		types.AttributeKeyAllowedFeeDenom:       types.DefaultParams().AllowedFeeDenoms[0],
-		types.AttributeKeyValidatorRewardsRatio: types.DefaultParams().ValidatorRewardsRatio,
-		types.AttributeKeyCommunityPoolRatio:    types.DefaultParams().CommunityPoolRatio,
+		types.AttributeKeyAuthority:			app.FeesKeeper.Authority(),
+		types.AttributeKeyAllowedFeeDenom:		types.DefaultParams().AllowedFeeDenoms[0],
+		types.AttributeKeyValidatorRewardsRatio:	types.DefaultParams().ValidatorRewardsRatio,
+		types.AttributeKeyCommunityPoolRatio:		types.DefaultParams().CommunityPoolRatio,
 	})
 }
 
@@ -101,8 +101,8 @@ func TestUpdateParamsAcceptsBoundedGovernanceFeePolicyAndSyncsDistribution(t *te
 	next.CommunityPoolRatio = "0.10"
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: app.FeesKeeper.Authority(),
-		Params:    next,
+		Authority:	app.FeesKeeper.Authority(),
+		Params:		next,
 	})
 	require.NoError(t, err)
 
@@ -124,8 +124,8 @@ func TestUpdateParamsRejectsInvalidParamsWithoutMutatingState(t *testing.T) {
 	invalid.AllowedFeeDenoms = []string{l1testutil.TestAssetDenom}
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: app.FeesKeeper.Authority(),
-		Params:    invalid,
+		Authority:	app.FeesKeeper.Authority(),
+		Params:		invalid,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidParams)
 
@@ -144,8 +144,8 @@ func TestUpdateParamsRejectsOutOfBoundsMinFeeWithoutMutatingState(t *testing.T) 
 	invalid.MinFeeAmount = "1000000000000000001"
 
 	_, err := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-		Authority: app.FeesKeeper.Authority(),
-		Params:    invalid,
+		Authority:	app.FeesKeeper.Authority(),
+		Params:		invalid,
 	})
 	require.ErrorIs(t, err, types.ErrInvalidParams)
 

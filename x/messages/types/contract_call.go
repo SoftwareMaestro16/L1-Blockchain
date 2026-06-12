@@ -16,51 +16,51 @@ import (
 )
 
 const (
-	ContractCallPayloadType = "contract.call"
-	ContractCallAuthScope   = "contract-zone-call"
-	MaxContractMethodLength = 96
+	ContractCallPayloadType	= "contract.call"
+	ContractCallAuthScope	= "contract-zone-call"
+	MaxContractMethodLength	= 96
 )
 
 type MsgContractCall struct {
-	Caller          sdk.AccAddress
-	ContractAddr    sdk.AccAddress
-	Method          string
-	Args            []byte
-	Funds           sdkmath.Int
-	GasLimit        uint64
-	ReplyToOptional sdk.AccAddress
-	ExpiryHeight    uint64
+	Caller		sdk.AccAddress
+	ContractAddr	sdk.AccAddress
+	Method		string
+	Args		[]byte
+	Funds		sdkmath.Int
+	GasLimit	uint64
+	ReplyToOptional	sdk.AccAddress
+	ExpiryHeight	uint64
 }
 
 type ContractCallAdmission struct {
-	CreatedHeight      uint64
-	Nonce              uint64
-	SourceSequence     uint64
-	ContractExists     bool
-	ContractEnabled    bool
-	EnabledMethods     []ContractCallMethod
-	FundEscrows        []ContractCallFundsEscrow
-	MaxArgsBytes       uint64
-	MinGasLimit        uint64
-	MaxGasLimit        uint64
-	ContractShardID    string
-	ReplyShardID       string
-	CommittedRouteHash string
+	CreatedHeight		uint64
+	Nonce			uint64
+	SourceSequence		uint64
+	ContractExists		bool
+	ContractEnabled		bool
+	EnabledMethods		[]ContractCallMethod
+	FundEscrows		[]ContractCallFundsEscrow
+	MaxArgsBytes		uint64
+	MinGasLimit		uint64
+	MaxGasLimit		uint64
+	ContractShardID		string
+	ReplyShardID		string
+	CommittedRouteHash	string
 }
 
 type ContractCallMethod struct {
-	ContractAddr sdk.AccAddress
-	Method       string
-	SelectorHash string
-	Enabled      bool
+	ContractAddr	sdk.AccAddress
+	Method		string
+	SelectorHash	string
+	Enabled		bool
 }
 
 type ContractCallFundsEscrow struct {
-	Caller       sdk.AccAddress
-	ContractAddr sdk.AccAddress
-	Amount       sdkmath.Int
-	ExpiryHeight uint64
-	Escrowed     bool
+	Caller		sdk.AccAddress
+	ContractAddr	sdk.AccAddress
+	Amount		sdkmath.Int
+	ExpiryHeight	uint64
+	Escrowed	bool
 }
 
 func (k MessageKeeper) SubmitContractCall(req MsgContractCall, admission ContractCallAdmission) (MessageKeeper, SubmitCrossZoneMessageResponse, error) {
@@ -90,22 +90,22 @@ func NewMessageFromContractCall(req MsgContractCall, admission ContractCallAdmis
 		return Message{}, err
 	}
 	return NewMessage(Message{
-		SourceZone:      zonestypes.ZoneIDContract,
-		DestinationZone: zonestypes.ZoneIDContract,
-		Sender:          req.Caller,
-		Recipient:       req.ContractAddr,
-		Value:           req.Funds,
-		Opcode:          ContractCallPayloadType,
-		Payload:         req.CanonicalPayload(),
-		GasLimit:        req.GasLimit,
-		Deadline:        req.ExpiryHeight,
-		Nonce:           admission.Nonce,
-		SourceSequence:  admission.SourceSequence,
-		RouteID:         ContractCallRouteID(req),
-		Bounce:          len(req.ReplyToOptional) > 0,
-		FeeLimit:        params.MinFeeLimit,
-		CreatedHeight:   admission.CreatedHeight,
-		AuthScope:       ContractCallAuthScope,
+		SourceZone:		zonestypes.ZoneIDContract,
+		DestinationZone:	zonestypes.ZoneIDContract,
+		Sender:			req.Caller,
+		Recipient:		req.ContractAddr,
+		Value:			req.Funds,
+		Opcode:			ContractCallPayloadType,
+		Payload:		req.CanonicalPayload(),
+		GasLimit:		req.GasLimit,
+		Deadline:		req.ExpiryHeight,
+		Nonce:			admission.Nonce,
+		SourceSequence:		admission.SourceSequence,
+		RouteID:		ContractCallRouteID(req),
+		Bounce:			len(req.ReplyToOptional) > 0,
+		FeeLimit:		params.MinFeeLimit,
+		CreatedHeight:		admission.CreatedHeight,
+		AuthScope:		ContractCallAuthScope,
 	}, params)
 }
 
@@ -119,25 +119,25 @@ func NewAetherMessageFromContractCall(req MsgContractCall, admission ContractCal
 		routeCommitment = ComputeContractCallRouteCommitment(req, admission)
 	}
 	return NewAetherMessage(AetherMessage{
-		Sender:          hex.EncodeToString(msg.Sender),
-		SenderZoneID:    msg.SourceZone,
-		SenderShardID:   admission.ContractShardID,
-		Receiver:        hex.EncodeToString(msg.Recipient),
-		ReceiverZoneID:  msg.DestinationZone,
-		ReceiverShardID: admission.ContractShardID,
-		ValueNAET:       msg.Value,
-		Payload:         msg.Payload,
-		PayloadType:     ContractCallPayloadType,
-		GasLimit:        msg.GasLimit,
-		GasPrice:        msg.FeeLimit,
-		ForwardingFee:   msg.FeeLimit,
-		ExpiryHeight:    msg.Deadline,
-		Bounce:          msg.Bounce,
-		ExecutionMode:   ExecutionModeAsync,
-		OrderingClass:   OrderingClassObjectOrdered,
-		RouteCommitment: routeCommitment,
-		CreatedAtHeight: msg.CreatedHeight,
-		Nonce:           msg.Nonce,
+		Sender:			hex.EncodeToString(msg.Sender),
+		SenderZoneID:		msg.SourceZone,
+		SenderShardID:		admission.ContractShardID,
+		Receiver:		hex.EncodeToString(msg.Recipient),
+		ReceiverZoneID:		msg.DestinationZone,
+		ReceiverShardID:	admission.ContractShardID,
+		ValueNAET:		msg.Value,
+		Payload:		msg.Payload,
+		PayloadType:		ContractCallPayloadType,
+		GasLimit:		msg.GasLimit,
+		GasPrice:		msg.FeeLimit,
+		ForwardingFee:		msg.FeeLimit,
+		ExpiryHeight:		msg.Deadline,
+		Bounce:			msg.Bounce,
+		ExecutionMode:		ExecutionModeAsync,
+		OrderingClass:		OrderingClassObjectOrdered,
+		RouteCommitment:	routeCommitment,
+		CreatedAtHeight:	msg.CreatedHeight,
+		Nonce:			msg.Nonce,
 	})
 }
 

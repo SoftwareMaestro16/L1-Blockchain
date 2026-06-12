@@ -7,105 +7,105 @@ import (
 )
 
 const (
-	StateClassWallet            = "wallet"
-	StateClassContract          = "contract"
-	StateClassPoolContract      = "pool_contract"
-	StateClassPoolShare         = "pool_share"
-	StateClassPoolAllocation    = "pool_allocation"
-	StateClassPoolRewardIndex   = "pool_reward_index"
-	StateClassPoolUnbonding     = "pool_unbonding"
-	StateClassDomainRecord      = "domain_record"
-	StateClassStakingReputation = "staking_reputation"
-	StateClassSystemModule      = "system_module"
-	StateClassValidatorRecord   = "validator_record"
+	StateClassWallet		= "wallet"
+	StateClassContract		= "contract"
+	StateClassPoolContract		= "pool_contract"
+	StateClassPoolShare		= "pool_share"
+	StateClassPoolAllocation	= "pool_allocation"
+	StateClassPoolRewardIndex	= "pool_reward_index"
+	StateClassPoolUnbonding		= "pool_unbonding"
+	StateClassDomainRecord		= "domain_record"
+	StateClassStakingReputation	= "staking_reputation"
+	StateClassSystemModule		= "system_module"
+	StateClassValidatorRecord	= "validator_record"
 
-	ContractStatusFrozenLimited = "frozen_limited"
+	ContractStatusFrozenLimited	= "frozen_limited"
 
-	PoolActionDeposit            = "deposit"
-	PoolActionClaim              = "claim"
-	PoolActionUnbond             = "unbond"
-	PoolActionMaturedWithdrawal  = "matured_withdrawal"
-	PoolActionGovernanceRecovery = "governance_recovery"
+	PoolActionDeposit		= "deposit"
+	PoolActionClaim			= "claim"
+	PoolActionUnbond		= "unbond"
+	PoolActionMaturedWithdrawal	= "matured_withdrawal"
+	PoolActionGovernanceRecovery	= "governance_recovery"
 
-	SystemRentAlertWarning   = "warning"
-	SystemRentAlertCritical  = "critical"
-	SystemRentAlertInvariant = "invariant"
+	SystemRentAlertWarning		= "warning"
+	SystemRentAlertCritical		= "critical"
+	SystemRentAlertInvariant	= "invariant"
 
-	SystemRentPayerFeeCollector = "fee_collector"
-	SystemRentPayerTreasury     = "treasury"
-	SystemRentPayerGovernance   = "governance_configured_payer"
+	SystemRentPayerFeeCollector	= "fee_collector"
+	SystemRentPayerTreasury		= "treasury"
+	SystemRentPayerGovernance	= "governance_configured_payer"
 
-	RentProcessingStepSystemTopUp = "system_top_up"
-	RentProcessingStepUserFreeze  = "user_freeze"
+	RentProcessingStepSystemTopUp	= "system_top_up"
+	RentProcessingStepUserFreeze	= "user_freeze"
 )
 
 type PersistentStateRecord struct {
-	SubjectID         string
-	Class             string
-	CodeBytes         uint64
-	DataBytes         uint64
-	IndexBytes        uint64
-	Persistent        bool
-	Status            string
-	ProtocolCritical  bool
-	OfficialPool      bool
-	RentDebt          uint64
-	LastChargedHeight uint64
+	SubjectID		string
+	Class			string
+	CodeBytes		uint64
+	DataBytes		uint64
+	IndexBytes		uint64
+	Persistent		bool
+	Status			string
+	ProtocolCritical	bool
+	OfficialPool		bool
+	RentDebt		uint64
+	LastChargedHeight	uint64
 }
 
 type SubjectRentResult struct {
-	Subject       PersistentStateRecord
-	StorageBytes  uint64
-	RentDelta     uint64
-	ProtocolPaid  bool
-	UserFacingFee bool
+	Subject		PersistentStateRecord
+	StorageBytes	uint64
+	RentDelta	uint64
+	ProtocolPaid	bool
+	UserFacingFee	bool
 }
 
 type PoolRentPayer struct {
-	ProtocolFeeReserve uint64
-	GovernanceReserve  uint64
-	UserFacingCharge   uint64
+	ProtocolFeeReserve	uint64
+	GovernanceReserve	uint64
+	UserFacingCharge	uint64
 }
 
 type SystemRentAccounting struct {
-	AvailableFunds                   uint64
-	ProjectedRentPerBlock            uint64
-	WarningRunwayBlocks              uint64
-	CriticalRunwayBlocks             uint64
-	FeeCollectorBalance              uint64
-	TreasuryBalance                  uint64
-	GovernanceConfiguredPayerBalance uint64
-	RequiredTopUp                    uint64
-	ProtocolCriticalExecutable       bool
+	AvailableFunds				uint64
+	ProjectedRentPerBlock			uint64
+	WarningRunwayBlocks			uint64
+	CriticalRunwayBlocks			uint64
+	FeeCollectorBalance			uint64
+	TreasuryBalance				uint64
+	GovernanceConfiguredPayerBalance	uint64
+	RequiredTopUp				uint64
+	ProtocolCriticalExecutable		bool
 }
 
 type SystemRentResult struct {
-	RunwayBlocks    uint64
-	Alert           string
-	TopUpAmount     uint64
-	TopUpSources    []SystemRentTopUpSource
-	RemainingDebt   uint64
-	FreezeForbidden bool
-	Executable      bool
+	RunwayBlocks	uint64
+	Alert		string
+	TopUpAmount	uint64
+	TopUpSources	[]SystemRentTopUpSource
+	RemainingDebt	uint64
+	FreezeForbidden	bool
+	Executable	bool
 }
 
 type SystemRentTopUpSource struct {
-	Source string
-	Amount uint64
+	Source	string
+	Amount	uint64
 }
 
 type RentProcessingInput struct {
-	Params              StorageRentParams
-	System              SystemRentAccounting
-	Subjects            []PersistentStateRecord
-	CurrentUnixSeconds  uint64
-	FreezeDebtThreshold uint64
+	Params			StorageRentParams
+	System			SystemRentAccounting
+	Subjects		[]PersistentStateRecord
+	CurrentUnixSeconds	uint64
+	FreezeDebtThreshold	uint64
 }
 
 type RentProcessingResult struct {
-	System   SystemRentResult
-	Subjects []PersistentStateRecord
-	Order    []string
+	System		SystemRentResult
+	Subjects	[]PersistentStateRecord
+	Order		[]string
 }
 
 func PersistentStorageSize(record PersistentStateRecord) (uint64, error) {
@@ -141,11 +141,11 @@ func AccruePersistentStateRent(record PersistentStateRecord, params StorageRentP
 	}
 	record.RentDebt += delta
 	return SubjectRentResult{
-		Subject:       record,
-		StorageBytes:  size,
-		RentDelta:     delta,
-		ProtocolPaid:  record.ProtocolCritical || record.Class == StateClassSystemModule || record.Class == StateClassValidatorRecord,
-		UserFacingFee: record.Class == StateClassWallet,
+		Subject:	record,
+		StorageBytes:	size,
+		RentDelta:	delta,
+		ProtocolPaid:	record.ProtocolCritical || record.Class == StateClassSystemModule || record.Class == StateClassValidatorRecord,
+		UserFacingFee:	record.Class == StateClassWallet,
 	}, nil
 }
 
@@ -249,9 +249,9 @@ func ComputeSystemRentAccounting(input SystemRentAccounting) SystemRentResult {
 	}
 	runway := input.AvailableFunds / input.ProjectedRentPerBlock
 	result := SystemRentResult{
-		RunwayBlocks:    runway,
-		FreezeForbidden: true,
-		Executable:      input.ProtocolCriticalExecutable,
+		RunwayBlocks:		runway,
+		FreezeForbidden:	true,
+		Executable:		input.ProtocolCriticalExecutable,
 	}
 	if runway < input.WarningRunwayBlocks {
 		result.Alert = SystemRentAlertWarning
@@ -298,8 +298,8 @@ func ProcessStorageRent(input RentProcessingInput) (RentProcessingResult, error)
 	}
 	system := ComputeSystemRentAccounting(input.System)
 	result := RentProcessingResult{
-		System: system,
-		Order:  []string{RentProcessingStepSystemTopUp},
+		System:	system,
+		Order:	[]string{RentProcessingStepSystemTopUp},
 	}
 	for _, subject := range input.Subjects {
 		accrued, err := AccruePersistentStateRent(subject, input.Params, input.CurrentUnixSeconds)

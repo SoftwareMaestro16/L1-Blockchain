@@ -6,72 +6,72 @@ import (
 )
 
 const (
-	PriorityUrgencyLow    = "Low"
-	PriorityUrgencyMedium = "Medium"
-	PriorityUrgencyHigh   = "High"
+	PriorityUrgencyLow	= "Low"
+	PriorityUrgencyMedium	= "Medium"
+	PriorityUrgencyHigh	= "High"
 
-	PriorityWaveCritical = "wave_0_critical"
-	PriorityWaveHigh     = "wave_1_high"
-	PriorityWaveMedium   = "wave_2_medium"
-	PriorityWaveBacklog  = "wave_3_backlog"
+	PriorityWaveCritical	= "wave_0_critical"
+	PriorityWaveHigh	= "wave_1_high"
+	PriorityWaveMedium	= "wave_2_medium"
+	PriorityWaveBacklog	= "wave_3_backlog"
 )
 
 type EconomicPriorityItem struct {
-	Improvement              string
-	SecurityImpact           int64
-	DecentralizationImpact   int64
-	ImplementationComplexity int64
-	Urgency                  string
+	Improvement			string
+	SecurityImpact			int64
+	DecentralizationImpact		int64
+	ImplementationComplexity	int64
+	Urgency				string
 }
 
 type EconomicPriorityParams struct {
-	SecurityWeight             int64
-	DecentralizationWeight     int64
-	UrgencyWeight              int64
-	ComplexityPenaltyWeight    int64
-	CriticalPriorityScore      int64
-	HighPriorityScore          int64
-	MediumPriorityScore        int64
-	RequireKnownMatrixComplete bool
+	SecurityWeight			int64
+	DecentralizationWeight		int64
+	UrgencyWeight			int64
+	ComplexityPenaltyWeight		int64
+	CriticalPriorityScore		int64
+	HighPriorityScore		int64
+	MediumPriorityScore		int64
+	RequireKnownMatrixComplete	bool
 }
 
 type RankedEconomicPriority struct {
 	EconomicPriorityItem
-	UrgencyScore        int64
-	PriorityScore       int64
-	ExecutionWave       string
-	GovernanceRationale string
+	UrgencyScore		int64
+	PriorityScore		int64
+	ExecutionWave		string
+	GovernanceRationale	string
 }
 
 type EconomicPriorityWaveSummary struct {
-	Wave     string
-	Count    int
-	Items    []string
-	ScoreMin int64
-	ScoreMax int64
+	Wave		string
+	Count		int
+	Items		[]string
+	ScoreMin	int64
+	ScoreMax	int64
 }
 
 type EconomicPriorityMatrixReport struct {
-	Ranked            []RankedEconomicPriority
-	Waves             []EconomicPriorityWaveSummary
-	HighestPriority   RankedEconomicPriority
-	HighUrgencyCount  int
-	AverageComplexity int64
-	GovernanceSummary string
-	Passed            bool
-	Failed            []string
+	Ranked			[]RankedEconomicPriority
+	Waves			[]EconomicPriorityWaveSummary
+	HighestPriority		RankedEconomicPriority
+	HighUrgencyCount	int
+	AverageComplexity	int64
+	GovernanceSummary	string
+	Passed			bool
+	Failed			[]string
 }
 
 func DefaultEconomicPriorityParams() EconomicPriorityParams {
 	return EconomicPriorityParams{
-		SecurityWeight:             400,
-		DecentralizationWeight:     300,
-		UrgencyWeight:              200,
-		ComplexityPenaltyWeight:    100,
-		CriticalPriorityScore:      7_000,
-		HighPriorityScore:          5_500,
-		MediumPriorityScore:        4_000,
-		RequireKnownMatrixComplete: true,
+		SecurityWeight:			400,
+		DecentralizationWeight:		300,
+		UrgencyWeight:			200,
+		ComplexityPenaltyWeight:	100,
+		CriticalPriorityScore:		7_000,
+		HighPriorityScore:		5_500,
+		MediumPriorityScore:		4_000,
+		RequireKnownMatrixComplete:	true,
 	}
 }
 
@@ -129,11 +129,11 @@ func BuildEconomicPriorityMatrixReport(items []EconomicPriorityItem, params Econ
 			urgencyScore*params.UrgencyWeight -
 			item.ImplementationComplexity*params.ComplexityPenaltyWeight
 		ranked = append(ranked, RankedEconomicPriority{
-			EconomicPriorityItem: item,
-			UrgencyScore:         urgencyScore,
-			PriorityScore:        score,
-			ExecutionWave:        priorityExecutionWave(score, params),
-			GovernanceRationale:  priorityRationale(item, score),
+			EconomicPriorityItem:	item,
+			UrgencyScore:		urgencyScore,
+			PriorityScore:		score,
+			ExecutionWave:		priorityExecutionWave(score, params),
+			GovernanceRationale:	priorityRationale(item, score),
 		})
 		totalComplexity += item.ImplementationComplexity
 		if item.Urgency == PriorityUrgencyHigh {
@@ -151,21 +151,21 @@ func BuildEconomicPriorityMatrixReport(items []EconomicPriorityItem, params Econ
 		averageComplexity = totalComplexity / int64(len(items))
 	}
 	return EconomicPriorityMatrixReport{
-		Ranked:            ranked,
-		Waves:             waves,
-		HighestPriority:   highest,
-		HighUrgencyCount:  highUrgency,
-		AverageComplexity: averageComplexity,
-		GovernanceSummary: fmt.Sprintf("items=%d high_urgency=%d top=%q top_score=%d waves=%d", len(items), highUrgency, highest.Improvement, highest.PriorityScore, len(waves)),
-		Passed:            len(failed) == 0,
-		Failed:            failed,
+		Ranked:			ranked,
+		Waves:			waves,
+		HighestPriority:	highest,
+		HighUrgencyCount:	highUrgency,
+		AverageComplexity:	averageComplexity,
+		GovernanceSummary:	fmt.Sprintf("items=%d high_urgency=%d top=%q top_score=%d waves=%d", len(items), highUrgency, highest.Improvement, highest.PriorityScore, len(waves)),
+		Passed:			len(failed) == 0,
+		Failed:			failed,
 	}, nil
 }
 
 func (p EconomicPriorityParams) Validate() error {
 	for _, field := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "security_weight", value: p.SecurityWeight},
 		{name: "decentralization_weight", value: p.DecentralizationWeight},
@@ -223,8 +223,8 @@ func validatePriorityItems(items []EconomicPriorityItem, params EconomicPriority
 		}
 		seen[item.Improvement] = true
 		for _, field := range []struct {
-			name  string
-			value int64
+			name	string
+			value	int64
 		}{
 			{name: "security_impact", value: item.SecurityImpact},
 			{name: "decentralization_impact", value: item.DecentralizationImpact},

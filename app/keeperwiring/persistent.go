@@ -63,34 +63,34 @@ import (
 )
 
 type PersistentKeepers struct {
-	ConstitutionKeeper        constitutionkeeper.Keeper
-	ConfigKeeper              configkeeper.Keeper
-	ConfigVotingKeeper        configvotingkeeper.Keeper
-	SystemRegistryKeeper      systemregistrykeeper.Keeper
-	NativeEvidenceKeeper      nativeevidencekeeper.Keeper
-	ReporterKeeper            reporterkeeper.Keeper
-	NominatorPoolKeeper       nominatorpoolkeeper.Keeper
-	SingleNominatorPoolKeeper singlenominatorpoolkeeper.Keeper
-	ValidatorElectionKeeper   validatorelectionkeeper.Keeper
-	ValidatorInsuranceKeeper  validatorinsurancekeeper.Keeper
-	ValidatorRegistryKeeper   validatorregistrykeeper.Keeper
-	AetraCoreKeeper           aetracorekeeper.Keeper
-	LoadKeeper                loadkeeper.Keeper
-	RoutingKeeper             routingkeeper.Keeper
-	ZonesKeeper               zoneskeeper.Keeper
-	MeshKeeper                meshkeeper.Keeper
-	NetworkingKeeper          networkingkeeper.Keeper
-	NativeAccountKeeper       nativeaccountkeeper.Keeper
-	PaymentsKeeper            paymentskeeper.Keeper
-	SchedulerKeeper           schedulerkeeper.Keeper
-	AVMSchedulerKeeper        avmschedulerkeeper.Keeper
-	ActorRegistryKeeper       actorregistrykeeper.Keeper
-	ContractsKeeper           contractskeeper.Keeper
-	StorageRentKeeper         storagerentkeeper.Keeper
-	IdentityRootKeeper        identityrootkeeper.Keeper
-	BridgeHubKeeper           bridgehubkeeper.Keeper
-	CrossChainRegistryKeeper  crosschainregistrykeeper.Keeper
-	ShardingCoordinatorKeeper shardingcoordinatorkeeper.Keeper
+	ConstitutionKeeper		constitutionkeeper.Keeper
+	ConfigKeeper			configkeeper.Keeper
+	ConfigVotingKeeper		configvotingkeeper.Keeper
+	SystemRegistryKeeper		systemregistrykeeper.Keeper
+	NativeEvidenceKeeper		nativeevidencekeeper.Keeper
+	ReporterKeeper			reporterkeeper.Keeper
+	NominatorPoolKeeper		nominatorpoolkeeper.Keeper
+	SingleNominatorPoolKeeper	singlenominatorpoolkeeper.Keeper
+	ValidatorElectionKeeper		validatorelectionkeeper.Keeper
+	ValidatorInsuranceKeeper	validatorinsurancekeeper.Keeper
+	ValidatorRegistryKeeper		validatorregistrykeeper.Keeper
+	AetraCoreKeeper			aetracorekeeper.Keeper
+	LoadKeeper			loadkeeper.Keeper
+	RoutingKeeper			routingkeeper.Keeper
+	ZonesKeeper			zoneskeeper.Keeper
+	MeshKeeper			meshkeeper.Keeper
+	NetworkingKeeper		networkingkeeper.Keeper
+	NativeAccountKeeper		nativeaccountkeeper.Keeper
+	PaymentsKeeper			paymentskeeper.Keeper
+	SchedulerKeeper			schedulerkeeper.Keeper
+	AVMSchedulerKeeper		avmschedulerkeeper.Keeper
+	ActorRegistryKeeper		actorregistrykeeper.Keeper
+	ContractsKeeper			contractskeeper.Keeper
+	StorageRentKeeper		storagerentkeeper.Keeper
+	IdentityRootKeeper		identityrootkeeper.Keeper
+	BridgeHubKeeper			bridgehubkeeper.Keeper
+	CrossChainRegistryKeeper	crosschainregistrykeeper.Keeper
+	ShardingCoordinatorKeeper	shardingcoordinatorkeeper.Keeper
 }
 
 func NewPersistentKeepers(keys map[string]*storetypes.KVStoreKey, bankKeeper storagerentkeeper.BankKeeper) PersistentKeepers {
@@ -101,33 +101,33 @@ func NewPersistentKeepers(keys map[string]*storetypes.KVStoreKey, bankKeeper sto
 	contractsKeeper = contractsKeeper.WithAccountStatusReader(nativeAccountKeeper).WithBankKeeper(bankKeeper).WithStorageRentRateProvider(storageRentKeeper)
 
 	return PersistentKeepers{
-		ConstitutionKeeper:        constitutionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[constitutiontypes.StoreKey])),
-		ConfigKeeper:              configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey])),
-		ConfigVotingKeeper:        configvotingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configvotingtypes.StoreKey])),
-		SystemRegistryKeeper:      systemregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[systemregistrytypes.StoreKey])),
-		NativeEvidenceKeeper:      nativeevidencekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nativeevidencetypes.StoreKey])),
-		ReporterKeeper:            reporterkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[reportertypes.StoreKey])),
-		NominatorPoolKeeper:       nominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nominatorpooltypes.StoreKey])),
-		SingleNominatorPoolKeeper: singlenominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[singlenominatorpooltypes.StoreKey])),
-		ValidatorElectionKeeper:   validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey])),
-		ValidatorInsuranceKeeper:  validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey])),
-		ValidatorRegistryKeeper:   validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey])),
-		AetraCoreKeeper:           aetracorekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[aetracoretypes.StoreKey])),
-		LoadKeeper:                loadkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[loadtypes.StoreKey])),
-		RoutingKeeper:             routingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[routingtypes.StoreKey])),
-		ZonesKeeper:               zoneskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[zonestypes.StoreKey])),
-		MeshKeeper:                meshkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[meshtypes.StoreKey])),
-		NetworkingKeeper:          networkingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[networkingtypes.StoreKey])),
-		NativeAccountKeeper:       nativeAccountKeeper,
-		PaymentsKeeper:            paymentskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[paymentstypes.StoreKey])),
-		SchedulerKeeper:           schedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[schedulertypes.StoreKey])),
-		AVMSchedulerKeeper:        avmschedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[avmschedulertypes.StoreKey])),
-		ActorRegistryKeeper:       actorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[actorregistrytypes.StoreKey])),
-		ContractsKeeper:           contractsKeeper,
-		StorageRentKeeper:         storageRentKeeper,
-		IdentityRootKeeper:        identityrootkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[identityroottypes.StoreKey])),
-		BridgeHubKeeper:           bridgehubkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[bridgehubtypes.StoreKey])),
-		CrossChainRegistryKeeper:  crosschainregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[crosschainregistrytypes.StoreKey])),
-		ShardingCoordinatorKeeper: shardingcoordinatorkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[shardingcoordinatortypes.StoreKey])),
+		ConstitutionKeeper:		constitutionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[constitutiontypes.StoreKey])),
+		ConfigKeeper:			configkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configtypes.StoreKey])),
+		ConfigVotingKeeper:		configvotingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[configvotingtypes.StoreKey])),
+		SystemRegistryKeeper:		systemregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[systemregistrytypes.StoreKey])),
+		NativeEvidenceKeeper:		nativeevidencekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nativeevidencetypes.StoreKey])),
+		ReporterKeeper:			reporterkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[reportertypes.StoreKey])),
+		NominatorPoolKeeper:		nominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[nominatorpooltypes.StoreKey])),
+		SingleNominatorPoolKeeper:	singlenominatorpoolkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[singlenominatorpooltypes.StoreKey])),
+		ValidatorElectionKeeper:	validatorelectionkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorelectiontypes.StoreKey])),
+		ValidatorInsuranceKeeper:	validatorinsurancekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorinsurancetypes.StoreKey])),
+		ValidatorRegistryKeeper:	validatorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[validatorregistrytypes.StoreKey])),
+		AetraCoreKeeper:		aetracorekeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[aetracoretypes.StoreKey])),
+		LoadKeeper:			loadkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[loadtypes.StoreKey])),
+		RoutingKeeper:			routingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[routingtypes.StoreKey])),
+		ZonesKeeper:			zoneskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[zonestypes.StoreKey])),
+		MeshKeeper:			meshkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[meshtypes.StoreKey])),
+		NetworkingKeeper:		networkingkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[networkingtypes.StoreKey])),
+		NativeAccountKeeper:		nativeAccountKeeper,
+		PaymentsKeeper:			paymentskeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[paymentstypes.StoreKey])),
+		SchedulerKeeper:		schedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[schedulertypes.StoreKey])),
+		AVMSchedulerKeeper:		avmschedulerkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[avmschedulertypes.StoreKey])),
+		ActorRegistryKeeper:		actorregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[actorregistrytypes.StoreKey])),
+		ContractsKeeper:		contractsKeeper,
+		StorageRentKeeper:		storageRentKeeper,
+		IdentityRootKeeper:		identityrootkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[identityroottypes.StoreKey])),
+		BridgeHubKeeper:		bridgehubkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[bridgehubtypes.StoreKey])),
+		CrossChainRegistryKeeper:	crosschainregistrykeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[crosschainregistrytypes.StoreKey])),
+		ShardingCoordinatorKeeper:	shardingcoordinatorkeeper.NewPersistentKeeper(runtime.NewKVStoreService(keys[shardingcoordinatortypes.StoreKey])),
 	}
 }

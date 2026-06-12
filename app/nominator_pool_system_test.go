@@ -40,18 +40,18 @@ func TestNominatorPoolStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	genesis := GenesisStateWithSingleValidator(t, source)
 	poolGenesis := nominatorpoolkeeper.DefaultGenesis()
 	poolGenesis.State.Pools = []nominatorpooltypes.NominatorPool{{
-		PoolID:            "app-pool-1",
-		PoolOperator:      nominatorPoolRawAddress("11"),
-		ValidatorTarget:   nominatorPoolRawAddress("12"),
-		TotalShares:       1_000,
-		TotalBondedStake:  1_100,
-		RewardIndex:       100 * nominatorpooltypes.IndexScale / 1_000,
-		PoolCommissionBps: 100,
-		Status:            nominatorpooltypes.PoolStatusActive,
+		PoolID:			"app-pool-1",
+		PoolOperator:		nominatorPoolRawAddress("11"),
+		ValidatorTarget:	nominatorPoolRawAddress("12"),
+		TotalShares:		1_000,
+		TotalBondedStake:	1_100,
+		RewardIndex:		100 * nominatorpooltypes.IndexScale / 1_000,
+		PoolCommissionBps:	100,
+		Status:			nominatorpooltypes.PoolStatusActive,
 		DelegatorShares: []nominatorpooltypes.DelegatorShare{{
-			Delegator:             nominatorPoolRawAddress("22"),
-			Shares:                1_000,
-			RewardIndexCheckpoint: 0,
+			Delegator:		nominatorPoolRawAddress("22"),
+			Shares:			1_000,
+			RewardIndexCheckpoint:	0,
 		}},
 	}}
 	poolGenesis.State = poolGenesis.State.Normalize(poolGenesis.Params)
@@ -63,15 +63,15 @@ func TestNominatorPoolStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()
@@ -94,9 +94,9 @@ func TestNominatorPoolRuntimeMutationPersistsToKVStore(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
@@ -108,19 +108,19 @@ func TestNominatorPoolRuntimeMutationPersistsToKVStore(t *testing.T) {
 
 	poolID := "runtime-kv-official-pool"
 	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
-		Authority:           initial.Params.Authority,
-		PoolID:              poolID,
-		ContractAddressUser: contractUser,
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        nominatorPoolRawAddress("11"),
-		PoolCommissionBps:   100,
-		Height:              2,
+		Authority:		initial.Params.Authority,
+		PoolID:			poolID,
+		ContractAddressUser:	contractUser,
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		nominatorPoolRawAddress("11"),
+		PoolCommissionBps:	100,
+		Height:			2,
 	})
 	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        poolID,
-		WalletAddress: userAddress,
-		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
-		Height:        3,
+		PoolID:		poolID,
+		WalletAddress:	userAddress,
+		Amount:		nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:		3,
 	})
 
 	source.SimWriteState()
@@ -150,20 +150,20 @@ func TestFinalAppWiringOfficialStakingPoolFlowExportImportRestart(t *testing.T) 
 
 	poolID := "final-app-official-pool"
 	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
-		Authority:           initial.Params.Authority,
-		PoolID:              poolID,
-		ContractAddressUser: contractUser,
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        nominatorPoolRawAddress("11"),
-		PoolCommissionBps:   100,
-		Height:              2,
+		Authority:		initial.Params.Authority,
+		PoolID:			poolID,
+		ContractAddressUser:	contractUser,
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		nominatorPoolRawAddress("11"),
+		PoolCommissionBps:	100,
+		Height:			2,
 	})
 
 	nominatorPoolMsg(t, source, sourceCtx, &nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        poolID,
-		WalletAddress: userAddress,
-		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
-		Height:        3,
+		PoolID:		poolID,
+		WalletAddress:	userAddress,
+		Amount:		nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:		3,
 	})
 	pool, found := source.NominatorPoolKeeper.NominatorPool(poolID)
 	require.True(t, found)

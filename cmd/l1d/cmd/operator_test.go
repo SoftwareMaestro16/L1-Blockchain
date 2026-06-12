@@ -60,9 +60,9 @@ func TestSystemAddressesCommandReturnsAEAndRawCatalog(t *testing.T) {
 	require.NoError(t, err)
 
 	var res struct {
-		Command   string                     `json:"command"`
-		Count     int                        `json:"count"`
-		Addresses []addressing.SystemAddress `json:"addresses"`
+		Command		string				`json:"command"`
+		Count		int				`json:"count"`
+		Addresses	[]addressing.SystemAddress	`json:"addresses"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(out), &res), out)
 	require.Equal(t, "system-addresses", res.Command)

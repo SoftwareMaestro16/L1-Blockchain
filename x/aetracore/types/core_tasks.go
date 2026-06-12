@@ -10,53 +10,53 @@ type CoreImplementationPriority string
 type CoreImplementationTaskID string
 
 const (
-	CoreTaskPriorityP0 CoreImplementationPriority = "P0"
-	CoreTaskPriorityP1 CoreImplementationPriority = "P1"
-	CoreTaskPriorityP2 CoreImplementationPriority = "P2"
+	CoreTaskPriorityP0	CoreImplementationPriority	= "P0"
+	CoreTaskPriorityP1	CoreImplementationPriority	= "P1"
+	CoreTaskPriorityP2	CoreImplementationPriority	= "P2"
 
-	CoreTaskZoneRegistry              CoreImplementationTaskID = "zone-registry"
-	CoreTaskZoneDescriptorUpgrade     CoreImplementationTaskID = "zone-descriptor-upgrade-metadata"
-	CoreTaskZoneCommitmentAggregation CoreImplementationTaskID = "zone-commitment-aggregation"
-	CoreTaskGlobalMessageRoot         CoreImplementationTaskID = "global-message-root-construction"
-	CoreTaskProposalGrouping          CoreImplementationTaskID = "proposal-grouping-by-zone-and-shard"
-	CoreTaskInboundMessageScheduler   CoreImplementationTaskID = "deterministic-inbound-message-scheduler"
-	CoreTaskProofRootRegistry         CoreImplementationTaskID = "proof-root-registry"
-	CoreTaskRootConsistencyInvariants CoreImplementationTaskID = "root-consistency-invariants"
-	CoreTaskBlockReplayTests          CoreImplementationTaskID = "block-replay-tests"
-	CoreTaskKeeperIntegration         CoreImplementationTaskID = "keeper-integration"
-	CoreTaskOperationalExportImport   CoreImplementationTaskID = "operational-export-import"
+	CoreTaskZoneRegistry			CoreImplementationTaskID	= "zone-registry"
+	CoreTaskZoneDescriptorUpgrade		CoreImplementationTaskID	= "zone-descriptor-upgrade-metadata"
+	CoreTaskZoneCommitmentAggregation	CoreImplementationTaskID	= "zone-commitment-aggregation"
+	CoreTaskGlobalMessageRoot		CoreImplementationTaskID	= "global-message-root-construction"
+	CoreTaskProposalGrouping		CoreImplementationTaskID	= "proposal-grouping-by-zone-and-shard"
+	CoreTaskInboundMessageScheduler		CoreImplementationTaskID	= "deterministic-inbound-message-scheduler"
+	CoreTaskProofRootRegistry		CoreImplementationTaskID	= "proof-root-registry"
+	CoreTaskRootConsistencyInvariants	CoreImplementationTaskID	= "root-consistency-invariants"
+	CoreTaskBlockReplayTests		CoreImplementationTaskID	= "block-replay-tests"
+	CoreTaskKeeperIntegration		CoreImplementationTaskID	= "keeper-integration"
+	CoreTaskOperationalExportImport		CoreImplementationTaskID	= "operational-export-import"
 )
 
 type CoreImplementationTaskSpec struct {
-	Priority           CoreImplementationPriority
-	TaskID             CoreImplementationTaskID
-	Task               string
-	Target             string
-	AcceptanceCriteria []string
-	TaskHash           string
+	Priority		CoreImplementationPriority
+	TaskID			CoreImplementationTaskID
+	Task			string
+	Target			string
+	AcceptanceCriteria	[]string
+	TaskHash		string
 }
 
 type CoreImplementationEvidence struct {
-	ZoneRegistry              bool
-	ZoneDescriptorMetadata    bool
-	ZoneCommitmentAggregation bool
-	GlobalMessageRoot         bool
-	ProposalGrouping          bool
-	InboundMessageScheduler   bool
-	ProofRootRegistry         bool
-	RootConsistencyInvariants bool
-	BlockReplayTests          bool
-	KeeperIntegration         bool
-	OperationalExportImport   bool
+	ZoneRegistry			bool
+	ZoneDescriptorMetadata		bool
+	ZoneCommitmentAggregation	bool
+	GlobalMessageRoot		bool
+	ProposalGrouping		bool
+	InboundMessageScheduler		bool
+	ProofRootRegistry		bool
+	RootConsistencyInvariants	bool
+	BlockReplayTests		bool
+	KeeperIntegration		bool
+	OperationalExportImport		bool
 }
 
 type CoreImplementationReadiness struct {
-	TaskCount         uint64
-	ReadyTaskIDs      []CoreImplementationTaskID
-	MissingTaskIDs    []CoreImplementationTaskID
-	RequiredP0Missing []CoreImplementationTaskID
-	Ready             bool
-	ReadinessHash     string
+	TaskCount		uint64
+	ReadyTaskIDs		[]CoreImplementationTaskID
+	MissingTaskIDs		[]CoreImplementationTaskID
+	RequiredP0Missing	[]CoreImplementationTaskID
+	Ready			bool
+	ReadinessHash		string
 }
 
 func DefaultCoreImplementationTasks() ([]CoreImplementationTaskSpec, error) {
@@ -105,11 +105,11 @@ func AssessCoreImplementationReadiness(tasks []CoreImplementationTaskSpec, evide
 	sortCoreTaskIDs(missing)
 	sortCoreTaskIDs(requiredP0Missing)
 	result := CoreImplementationReadiness{
-		TaskCount:         uint64(len(tasks)),
-		ReadyTaskIDs:      ready,
-		MissingTaskIDs:    missing,
-		RequiredP0Missing: requiredP0Missing,
-		Ready:             len(requiredP0Missing) == 0,
+		TaskCount:		uint64(len(tasks)),
+		ReadyTaskIDs:		ready,
+		MissingTaskIDs:		missing,
+		RequiredP0Missing:	requiredP0Missing,
+		Ready:			len(requiredP0Missing) == 0,
 	}
 	result.ReadinessHash = ComputeCoreImplementationReadinessHash(result)
 	return result, nil

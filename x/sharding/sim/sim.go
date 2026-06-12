@@ -25,18 +25,18 @@ func New(validators []Validator, seed string) (*Simulator, error) {
 	}
 	return &Simulator{
 		state: MasterchainState{
-			Validators:         normalized,
-			StakingSnapshot:    staking,
-			Workchains:         make(map[int32]WorkchainConfig),
-			Shards:             make(map[string]ShardState),
-			Headers:            make(map[string]ShardHeader),
-			CrossShardReceipts: make(map[string]Receipt),
-			LoadStates:         make(map[int32]WorkchainLoadState),
-			FinalityLag:        2,
-			RandomnessSeed:     seed,
+			Validators:		normalized,
+			StakingSnapshot:	staking,
+			Workchains:		make(map[int32]WorkchainConfig),
+			Shards:			make(map[string]ShardState),
+			Headers:		make(map[string]ShardHeader),
+			CrossShardReceipts:	make(map[string]Receipt),
+			LoadStates:		make(map[int32]WorkchainLoadState),
+			FinalityLag:		2,
+			RandomnessSeed:		seed,
 		},
-		processed:      make(map[string]struct{}),
-		pendingReceipt: make(map[string]CrossShardMessage),
+		processed:	make(map[string]struct{}),
+		pendingReceipt:	make(map[string]CrossShardMessage),
 	}, nil
 }
 
@@ -67,9 +67,9 @@ func (s *Simulator) AddWorkchain(config WorkchainConfig) error {
 		return err
 	}
 	s.state.LoadStates[config.ID] = WorkchainLoadState{
-		WorkchainID:      config.ID,
-		ActiveShardCount: 1,
-		TargetShardCount: 1,
+		WorkchainID:		config.ID,
+		ActiveShardCount:	1,
+		TargetShardCount:	1,
 	}
 	return nil
 }
@@ -83,11 +83,11 @@ func (s *Simulator) AddShard(id ShardID) error {
 		return errors.New("shard already registered")
 	}
 	shard := ShardState{
-		ID:              id,
-		StateRoot:       HashParts("state", key, "0"),
-		ValidatorSubset: s.AssignValidators(id, 0),
-		Receipts:        make(map[string]Receipt),
-		Available:       true,
+		ID:			id,
+		StateRoot:		HashParts("state", key, "0"),
+		ValidatorSubset:	s.AssignValidators(id, 0),
+		Receipts:		make(map[string]Receipt),
+		Available:		true,
 	}
 	shard.MessageQueueRoot = hashQueue(shard.Queue)
 	shard.ReceiptRoot = hashReceipts(shard.Receipts)
@@ -194,12 +194,12 @@ func (s *Simulator) Deliver(msg CrossShardMessage, height uint64) (Receipt, erro
 		return Receipt{}, errors.New("destination shard data unavailable")
 	}
 	receipt := Receipt{
-		MessageID:   msg.MessageID,
-		Source:      msg.Source,
-		Destination: msg.Destination,
-		Success:     true,
-		Height:      height,
-		Proof:       HashParts("receipt", msg.MessageID, fmt.Sprint(height), dest.StateRoot),
+		MessageID:	msg.MessageID,
+		Source:		msg.Source,
+		Destination:	msg.Destination,
+		Success:	true,
+		Height:		height,
+		Proof:		HashParts("receipt", msg.MessageID, fmt.Sprint(height), dest.StateRoot),
 	}
 	if err := s.CommitReceipt(receipt); err != nil {
 		return Receipt{}, err
@@ -300,13 +300,13 @@ func (s *Simulator) MergeShards(leftID ShardID, rightID ShardID) error {
 	}
 	parentID := ShardID{WorkchainID: leftID.WorkchainID, Prefix: leftID.Prefix[:len(leftID.Prefix)-1]}
 	parent := ShardState{
-		ID:              parentID,
-		Height:          max(left.Height, right.Height) + 1,
-		StateRoot:       HashParts(left.StateRoot, right.StateRoot, "merge"),
-		ValidatorSubset: s.AssignValidators(parentID, max(left.Height, right.Height)+1),
-		Queue:           append(cloneQueue(left.Queue), right.Queue...),
-		Receipts:        mergeReceipts(left.Receipts, right.Receipts),
-		Available:       left.Available && right.Available,
+		ID:			parentID,
+		Height:			max(left.Height, right.Height) + 1,
+		StateRoot:		HashParts(left.StateRoot, right.StateRoot, "merge"),
+		ValidatorSubset:	s.AssignValidators(parentID, max(left.Height, right.Height)+1),
+		Queue:			append(cloneQueue(left.Queue), right.Queue...),
+		Receipts:		mergeReceipts(left.Receipts, right.Receipts),
+		Available:		left.Available && right.Available,
 	}
 	sort.Slice(parent.Queue, func(i, j int) bool { return parent.Queue[i].MessageID < parent.Queue[j].MessageID })
 	parent.MessageQueueRoot = hashQueue(parent.Queue)

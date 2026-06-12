@@ -53,8 +53,8 @@ func TestServiceRegistryV2StrictMessagesAndOwnerAuthorization(t *testing.T) {
 	require.NoError(t, err)
 
 	state, err = RegisterServiceInRegistryWithParamsV2(state, MsgRegisterServiceV2{
-		Authority:  "owner-alpha",
-		Descriptor: descriptor,
+		Authority:	"owner-alpha",
+		Descriptor:	descriptor,
 	}, params, 11)
 	require.NoError(t, err)
 	require.NoError(t, ValidateServiceOwnerAuthorizationV2(state, descriptor.ServiceID, "owner-alpha"))
@@ -67,8 +67,8 @@ func TestServiceRegistryV2StrictMessagesAndOwnerAuthorization(t *testing.T) {
 	updated, err = NewCanonicalServiceDescriptor(updated)
 	require.NoError(t, err)
 	state, err = UpdateServiceInRegistryWithParamsV2(state, MsgUpdateServiceV2{
-		Authority:  "owner-alpha",
-		Descriptor: updated,
+		Authority:	"owner-alpha",
+		Descriptor:	updated,
 	}, params, 12)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), state.Descriptors[0].Version)
@@ -78,8 +78,8 @@ func TestServiceRegistryV2StrictMessagesAndOwnerAuthorization(t *testing.T) {
 	updated, err = NewCanonicalServiceDescriptor(updated)
 	require.NoError(t, err)
 	_, err = UpdateServiceInRegistryWithParamsV2(state, MsgUpdateServiceV2{
-		Authority:  "owner-beta",
-		Descriptor: updated,
+		Authority:	"owner-beta",
+		Descriptor:	updated,
 	}, params, 13)
 	require.ErrorContains(t, err, "owner must authorize")
 }
@@ -155,10 +155,10 @@ func TestServiceRegistryV2VersionedInterfaceRejectsHashNotCommittingToBytes(t *t
 func testServiceRegistryParamsV2(t *testing.T, maxTTL uint64, endpoints []CanonicalServiceEndpointType, dependencies []string) ServiceRegistryParamsV2 {
 	t.Helper()
 	params, err := NewServiceRegistryParamsV2(ServiceRegistryParamsV2{
-		MaxTTLDelta:                 maxTTL,
-		AllowedEndpointTypes:        endpoints,
-		AllowedStateDependencyRoots: dependencies,
-		ProofHorizon:                128,
+		MaxTTLDelta:			maxTTL,
+		AllowedEndpointTypes:		endpoints,
+		AllowedStateDependencyRoots:	dependencies,
+		ProofHorizon:			128,
 	})
 	require.NoError(t, err)
 	return params
@@ -167,12 +167,12 @@ func testServiceRegistryParamsV2(t *testing.T, maxTTL uint64, endpoints []Canoni
 func testVersionedRegistryInterface(t *testing.T, name string, version uint64) DistributedInterfaceDescriptor {
 	t.Helper()
 	iface, err := NewVersionedServiceInterfaceDescriptorV2(DistributedInterfaceDescriptor{
-		InterfaceName: name,
-		Version:       version,
-		SchemaHash:    testDistributedHash(name + "/" + string(rune('0'+version)) + "/schema"),
-		MethodRoot:    testDistributedHash(name + "/" + string(rune('0'+version)) + "/methods"),
-		EventRoot:     testDistributedHash(name + "/" + string(rune('0'+version)) + "/events"),
-		ErrorRoot:     testDistributedHash(name + "/" + string(rune('0'+version)) + "/errors"),
+		InterfaceName:	name,
+		Version:	version,
+		SchemaHash:	testDistributedHash(name + "/" + string(rune('0'+version)) + "/schema"),
+		MethodRoot:	testDistributedHash(name + "/" + string(rune('0'+version)) + "/methods"),
+		EventRoot:	testDistributedHash(name + "/" + string(rune('0'+version)) + "/events"),
+		ErrorRoot:	testDistributedHash(name + "/" + string(rune('0'+version)) + "/errors"),
 	})
 	require.NoError(t, err)
 	return iface
@@ -181,20 +181,20 @@ func testVersionedRegistryInterface(t *testing.T, name string, version uint64) D
 func testStrictRegistryDescriptor(t *testing.T, serviceID, interfaceHash, owner, zoneID string, endpointType CanonicalServiceEndpointType, stateDependency string, ttl uint64) CanonicalServiceDescriptor {
 	t.Helper()
 	descriptor, err := NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        serviceID,
-		EndpointType:     endpointType,
-		InterfaceHash:    interfaceHash,
-		SupportedMethods: []string{"call"},
-		AuthModel:        "account",
-		StateDependency:  stateDependency,
-		Owner:            owner,
-		ZoneID:           zoneID,
-		Version:          1,
-		EndpointURIHash:  testDistributedHash(serviceID + "/strict-endpoint"),
-		MetadataHash:     testDistributedHash(serviceID + "/strict-metadata"),
-		TTLHeight:        ttl,
-		Status:           CanonicalServiceStatusActive,
-		Capabilities:     []string{"proofs"},
+		ServiceID:		serviceID,
+		EndpointType:		endpointType,
+		InterfaceHash:		interfaceHash,
+		SupportedMethods:	[]string{"call"},
+		AuthModel:		"account",
+		StateDependency:	stateDependency,
+		Owner:			owner,
+		ZoneID:			zoneID,
+		Version:		1,
+		EndpointURIHash:	testDistributedHash(serviceID + "/strict-endpoint"),
+		MetadataHash:		testDistributedHash(serviceID + "/strict-metadata"),
+		TTLHeight:		ttl,
+		Status:			CanonicalServiceStatusActive,
+		Capabilities:		[]string{"proofs"},
 	})
 	require.NoError(t, err)
 	return descriptor

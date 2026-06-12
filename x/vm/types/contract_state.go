@@ -48,13 +48,13 @@ func UploadAVMCode(state ContractZoneState, actor sdk.AccAddress, module avm.Mod
 		return ContractZoneState{}, ContractCode{}, err
 	}
 	code := ContractCode{
-		CodeID:       state.NextCodeID,
-		Runtime:      RuntimeAVM,
-		CodeHash:     codeHash[:],
-		Owner:        cloneAddress(actor),
-		AVMModule:    cloneAVMModule(module),
-		UploadedAt:   height,
-		EncodedBytes: uint64(len(encoded)),
+		CodeID:		state.NextCodeID,
+		Runtime:	RuntimeAVM,
+		CodeHash:	codeHash[:],
+		Owner:		cloneAddress(actor),
+		AVMModule:	cloneAVMModule(module),
+		UploadedAt:	height,
+		EncodedBytes:	uint64(len(encoded)),
 	}
 	next := state.Clone()
 	next.Codes = append(next.Codes, code)
@@ -94,14 +94,14 @@ func InstantiateAVMContract(state ContractZoneState, actor sdk.AccAddress, codeI
 		return ContractZoneState{}, ContractInstance{}, ContractReceipt{}, err
 	}
 	instance := ContractInstance{
-		Address:       address,
-		CodeID:        codeID,
-		Runtime:       RuntimeAVM,
-		Owner:         cloneAddress(actor),
-		Admin:         cloneAddress(admin),
-		Storage:       storage,
-		CreatedHeight: height,
-		UpdatedHeight: height,
+		Address:	address,
+		CodeID:		codeID,
+		Runtime:	RuntimeAVM,
+		Owner:		cloneAddress(actor),
+		Admin:		cloneAddress(admin),
+		Storage:	storage,
+		CreatedHeight:	height,
+		UpdatedHeight:	height,
 	}
 	exec, receipt, err := runAVMCall(state.Policy, code, instance, avm.EntryDeploy, gasLimit, height, nil, nil)
 	if err != nil {
@@ -209,14 +209,14 @@ func (s ContractZoneState) Export() ContractZoneState {
 
 func (s ContractZoneState) Clone() ContractZoneState {
 	return ContractZoneState{
-		Policy:            clonePolicy(s.Policy),
-		Codes:             cloneCodes(s.Codes),
-		Contracts:         cloneContracts(s.Contracts),
-		QueuedMessages:    cloneQueuedMessages(s.QueuedMessages),
-		Receipts:          cloneReceipts(s.Receipts),
-		NextCodeID:        s.NextCodeID,
-		NextReceiptSeq:    s.NextReceiptSeq,
-		BlockMessageCount: s.BlockMessageCount,
+		Policy:			clonePolicy(s.Policy),
+		Codes:			cloneCodes(s.Codes),
+		Contracts:		cloneContracts(s.Contracts),
+		QueuedMessages:		cloneQueuedMessages(s.QueuedMessages),
+		Receipts:		cloneReceipts(s.Receipts),
+		NextCodeID:		s.NextCodeID,
+		NextReceiptSeq:		s.NextReceiptSeq,
+		BlockMessageCount:	s.BlockMessageCount,
 	}
 }
 
@@ -267,18 +267,18 @@ func runAVMCall(policy ContractZonePolicy, code ContractCode, contract ContractI
 		return avm.Execution{}, ContractReceipt{}, err
 	}
 	exec, err := runner.Run(code.AVMModule, StorageToAVM(contract.Storage), avm.RuntimeContext{
-		Entry:           entry,
-		ContractAddress: contract.Address,
+		Entry:			entry,
+		ContractAddress:	contract.Address,
 		Message: async.MessageEnvelope{
-			Source:      contract.Owner,
-			Destination: contract.Address,
-			Value:       sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
-			Body:        append([]byte(nil), body...),
-			GasLimit:    gasLimit,
+			Source:		contract.Owner,
+			Destination:	contract.Address,
+			Value:		sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
+			Body:		append([]byte(nil), body...),
+			GasLimit:	gasLimit,
 		},
-		BlockHeight:     height,
-		GasLimit:        gasLimit,
-		EmitDestination: emitDestination,
+		BlockHeight:		height,
+		GasLimit:		gasLimit,
+		EmitDestination:	emitDestination,
 	})
 	if err != nil {
 		return avm.Execution{}, ContractReceipt{}, err
@@ -314,13 +314,13 @@ func runAVMCall(policy ContractZonePolicy, code ContractCode, contract ContractI
 		}
 	}
 	receipt := ContractReceipt{
-		Contract:        cloneAddress(contract.Address),
-		Entrypoint:      entry,
-		ResultCode:      exec.ResultCode,
-		GasUsed:         totalGas,
-		StorageWrites:   exec.StorageWrites,
-		EmittedMessages: uint32(len(exec.Outgoing)),
-		ReturnValue:     exec.ReturnValue,
+		Contract:		cloneAddress(contract.Address),
+		Entrypoint:		entry,
+		ResultCode:		exec.ResultCode,
+		GasUsed:		totalGas,
+		StorageWrites:		exec.StorageWrites,
+		EmittedMessages:	uint32(len(exec.Outgoing)),
+		ReturnValue:		exec.ReturnValue,
 	}
 	return exec, receipt, nil
 }

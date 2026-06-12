@@ -102,10 +102,10 @@ func TestDisabledTelemetryNoPanic(t *testing.T) {
 func TestLabelsAreBoundedAndRedacted(t *testing.T) {
 	reg := NewRegistry()
 	reg.IncCounter(MetricModuleErrors, Labels{
-		"module":  "dex",
-		"action":  "swap",
-		"address": "orb1notallowed",
-		"reason":  "contains@secret",
+		"module":	"dex",
+		"action":	"swap",
+		"address":	"orb1notallowed",
+		"reason":	"contains@secret",
 	}, 1)
 
 	out := renderRegistry(t, reg)

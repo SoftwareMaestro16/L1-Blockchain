@@ -12,61 +12,61 @@ import (
 )
 
 const (
-	HashHexLength             = 64
-	BasisPoints               = uint32(10_000)
-	MaxRolesPerNode           = 16
-	MaxZonesPerNode           = 128
-	MaxServicesPerNode        = 128
-	MaxProtocolsPerNode       = 32
-	MaxNetworkAddressBytes    = 256
-	MaxProtocolIDBytes        = 64
-	MaxServiceIDBytes         = 96
-	MaxZoneIDBytes            = 64
-	MaxNonceBytes             = 64
-	MaxChannelPolicies        = 32
-	MaxStreamsPerSession      = 32
-	SessionEphemeralKeyBytes  = 32
-	MaxEncryptionContextBytes = 128
-	MaxQoSClassPolicies       = 16
-	MaxPayloadChunks          = 65_536
-	MaxChunkBytes             = 4 << 20
-	MaxStreamMessageBytes     = 64 << 20
-	DefaultMaxMessageBytes    = 1 << 20
-	DefaultFlowWindowBytes    = 4 << 20
-	DefaultHandshakeVersion   = uint32(1)
-	DefaultProtocolVersion    = "aetra-networking-v1"
-	DefaultCipherSuite        = CipherSuiteEd25519X25519ChaCha20Poly1305
-	DefaultCompressionMode    = CompressionModeNone
-	DefaultQoSPolicy          = QoSPolicyBalanced
+	HashHexLength			= 64
+	BasisPoints			= uint32(10_000)
+	MaxRolesPerNode			= 16
+	MaxZonesPerNode			= 128
+	MaxServicesPerNode		= 128
+	MaxProtocolsPerNode		= 32
+	MaxNetworkAddressBytes		= 256
+	MaxProtocolIDBytes		= 64
+	MaxServiceIDBytes		= 96
+	MaxZoneIDBytes			= 64
+	MaxNonceBytes			= 64
+	MaxChannelPolicies		= 32
+	MaxStreamsPerSession		= 32
+	SessionEphemeralKeyBytes	= 32
+	MaxEncryptionContextBytes	= 128
+	MaxQoSClassPolicies		= 16
+	MaxPayloadChunks		= 65_536
+	MaxChunkBytes			= 4 << 20
+	MaxStreamMessageBytes		= 64 << 20
+	DefaultMaxMessageBytes		= 1 << 20
+	DefaultFlowWindowBytes		= 4 << 20
+	DefaultHandshakeVersion		= uint32(1)
+	DefaultProtocolVersion		= "aetra-networking-v1"
+	DefaultCipherSuite		= CipherSuiteEd25519X25519ChaCha20Poly1305
+	DefaultCompressionMode		= CompressionModeNone
+	DefaultQoSPolicy		= QoSPolicyBalanced
 )
 
 type NodeRole string
 
 const (
-	NodeRoleValidator       NodeRole = "VALIDATOR"
-	NodeRoleFull            NodeRole = "FULL_NODE"
-	NodeRoleArchive         NodeRole = "ARCHIVE_NODE"
-	NodeRoleStateSync       NodeRole = "STATE_SYNC_NODE"
-	NodeRoleZoneExecution   NodeRole = "ZONE_EXECUTION_NODE"
-	NodeRoleService         NodeRole = "SERVICE_NODE"
-	NodeRoleStorageProvider NodeRole = "STORAGE_PROVIDER_NODE"
-	NodeRoleRouting         NodeRole = "ROUTING_NODE"
-	NodeRoleIndex           NodeRole = "INDEX_NODE"
-	NodeRoleLightGateway    NodeRole = "LIGHT_CLIENT_GATEWAY"
+	NodeRoleValidator	NodeRole	= "VALIDATOR"
+	NodeRoleFull		NodeRole	= "FULL_NODE"
+	NodeRoleArchive		NodeRole	= "ARCHIVE_NODE"
+	NodeRoleStateSync	NodeRole	= "STATE_SYNC_NODE"
+	NodeRoleZoneExecution	NodeRole	= "ZONE_EXECUTION_NODE"
+	NodeRoleService		NodeRole	= "SERVICE_NODE"
+	NodeRoleStorageProvider	NodeRole	= "STORAGE_PROVIDER_NODE"
+	NodeRoleRouting		NodeRole	= "ROUTING_NODE"
+	NodeRoleIndex		NodeRole	= "INDEX_NODE"
+	NodeRoleLightGateway	NodeRole	= "LIGHT_CLIENT_GATEWAY"
 )
 
 type ChannelClass string
 
 const (
-	ChannelConsensus ChannelClass = "CONSENSUS_CHANNEL"
-	ChannelMempool   ChannelClass = "MEMPOOL_CHANNEL"
-	ChannelBlock     ChannelClass = "BLOCK_CHANNEL"
-	ChannelStateSync ChannelClass = "STATE_SYNC_CHANNEL"
-	ChannelData      ChannelClass = "DATA_CHANNEL"
-	ChannelExecution ChannelClass = "EXECUTION_CHANNEL"
-	ChannelService   ChannelClass = "SERVICE_CHANNEL"
-	ChannelRouting   ChannelClass = "ROUTING_CHANNEL"
-	ChannelDiscovery ChannelClass = "DISCOVERY_CHANNEL"
+	ChannelConsensus	ChannelClass	= "CONSENSUS_CHANNEL"
+	ChannelMempool		ChannelClass	= "MEMPOOL_CHANNEL"
+	ChannelBlock		ChannelClass	= "BLOCK_CHANNEL"
+	ChannelStateSync	ChannelClass	= "STATE_SYNC_CHANNEL"
+	ChannelData		ChannelClass	= "DATA_CHANNEL"
+	ChannelExecution	ChannelClass	= "EXECUTION_CHANNEL"
+	ChannelService		ChannelClass	= "SERVICE_CHANNEL"
+	ChannelRouting		ChannelClass	= "ROUTING_CHANNEL"
+	ChannelDiscovery	ChannelClass	= "DISCOVERY_CHANNEL"
 )
 
 type CipherSuite string
@@ -78,171 +78,171 @@ const (
 type CompressionMode string
 
 const (
-	CompressionModeNone CompressionMode = "NONE"
-	CompressionModeZstd CompressionMode = "ZSTD"
+	CompressionModeNone	CompressionMode	= "NONE"
+	CompressionModeZstd	CompressionMode	= "ZSTD"
 )
 
 type QoSPolicy string
 
 const (
-	QoSPolicyConsensusFirst QoSPolicy = "CONSENSUS_FIRST"
-	QoSPolicyBalanced       QoSPolicy = "BALANCED"
-	QoSPolicyBulk           QoSPolicy = "BULK"
+	QoSPolicyConsensusFirst	QoSPolicy	= "CONSENSUS_FIRST"
+	QoSPolicyBalanced	QoSPolicy	= "BALANCED"
+	QoSPolicyBulk		QoSPolicy	= "BULK"
 )
 
 type QoSClass string
 
 const (
-	QoSClassCriticalConsensus QoSClass = "critical_consensus"
-	QoSClassBlockPropagation  QoSClass = "block_propagation"
-	QoSClassStateSync         QoSClass = "state_sync"
-	QoSClassExecutionMessage  QoSClass = "execution_message"
-	QoSClassServiceCall       QoSClass = "service_call"
-	QoSClassDiscovery         QoSClass = "discovery"
-	QoSClassBulkData          QoSClass = "bulk_data"
+	QoSClassCriticalConsensus	QoSClass	= "critical_consensus"
+	QoSClassBlockPropagation	QoSClass	= "block_propagation"
+	QoSClassStateSync		QoSClass	= "state_sync"
+	QoSClassExecutionMessage	QoSClass	= "execution_message"
+	QoSClassServiceCall		QoSClass	= "service_call"
+	QoSClassDiscovery		QoSClass	= "discovery"
+	QoSClassBulkData		QoSClass	= "bulk_data"
 )
 
 type NodeRecord struct {
-	NodeID               string
-	NodePubKey           []byte
-	PublicKey            []byte
-	ValidatorPubKey      []byte
-	OperatorAddress      string
-	Roles                []NodeRole
-	NetworkAddressesHash string
-	ZonesSupported       []string
-	Services             []string
-	ServicesSupported    []string
-	ServiceIDs           []string
-	ProtocolVersions     []string
-	SupportedProtocols   []string
-	Reputation           ReputationCommitment
-	LatencyVector        []NodeLatencyVectorEntry
-	RecordVersion        uint64
-	ExpiresHeight        uint64
-	Signature            []byte
+	NodeID			string
+	NodePubKey		[]byte
+	PublicKey		[]byte
+	ValidatorPubKey		[]byte
+	OperatorAddress		string
+	Roles			[]NodeRole
+	NetworkAddressesHash	string
+	ZonesSupported		[]string
+	Services		[]string
+	ServicesSupported	[]string
+	ServiceIDs		[]string
+	ProtocolVersions	[]string
+	SupportedProtocols	[]string
+	Reputation		ReputationCommitment
+	LatencyVector		[]NodeLatencyVectorEntry
+	RecordVersion		uint64
+	ExpiresHeight		uint64
+	Signature		[]byte
 }
 
 type ChannelPolicy struct {
-	Channel         ChannelClass
-	Priority        uint32
-	MaxMessageBytes uint64
-	BandwidthWeight uint32
-	BurstBytes      uint64
+	Channel		ChannelClass
+	Priority	uint32
+	MaxMessageBytes	uint64
+	BandwidthWeight	uint32
+	BurstBytes	uint64
 }
 
 type StreamSpec struct {
-	StreamID          string
-	Channel           ChannelClass
-	Priority          uint32
-	FlowControlWindow uint64
-	MaxMessageBytes   uint64
-	Compression       CompressionMode
-	EncryptionContext string
+	StreamID		string
+	Channel			ChannelClass
+	Priority		uint32
+	FlowControlWindow	uint64
+	MaxMessageBytes		uint64
+	Compression		CompressionMode
+	EncryptionContext	string
 }
 
 type SessionRequest struct {
-	LocalNodeID                 string
-	RemoteNodeID                string
-	HandshakeVersion            uint32
-	CipherSuites                []CipherSuite
-	ProtocolVersions            []string
-	ChannelClasses              []ChannelClass
-	LocalEphemeralPubKey        []byte
-	RemoteEphemeralPubKey       []byte
-	SessionSecretCommitmentHash string
-	OpenedHeight                uint64
-	ExpiresHeight               uint64
-	Nonce                       []byte
-	QOSPolicy                   QoSPolicy
+	LocalNodeID			string
+	RemoteNodeID			string
+	HandshakeVersion		uint32
+	CipherSuites			[]CipherSuite
+	ProtocolVersions		[]string
+	ChannelClasses			[]ChannelClass
+	LocalEphemeralPubKey		[]byte
+	RemoteEphemeralPubKey		[]byte
+	SessionSecretCommitmentHash	string
+	OpenedHeight			uint64
+	ExpiresHeight			uint64
+	Nonce				[]byte
+	QOSPolicy			QoSPolicy
 }
 
 type SessionChannel struct {
-	LocalNodeID      string
-	RemoteNodeID     string
-	SessionID        string
-	HandshakeVersion uint32
-	CipherSuite      CipherSuite
-	ProtocolVersions []string
-	OpenedHeight     uint64
-	ExpiresHeight    uint64
-	SessionKeys      SessionKeySet
-	Streams          []StreamSpec
-	QOSPolicy        QoSPolicy
+	LocalNodeID		string
+	RemoteNodeID		string
+	SessionID		string
+	HandshakeVersion	uint32
+	CipherSuite		CipherSuite
+	ProtocolVersions	[]string
+	OpenedHeight		uint64
+	ExpiresHeight		uint64
+	SessionKeys		SessionKeySet
+	Streams			[]StreamSpec
+	QOSPolicy		QoSPolicy
 }
 
 type SessionKeySet struct {
-	KeyID                 string
-	CipherSuite           CipherSuite
-	LocalEphemeralPubKey  []byte
-	RemoteEphemeralPubKey []byte
-	TranscriptHash        string
-	SecretCommitmentHash  string
-	EstablishedHeight     uint64
-	ExpiresHeight         uint64
+	KeyID			string
+	CipherSuite		CipherSuite
+	LocalEphemeralPubKey	[]byte
+	RemoteEphemeralPubKey	[]byte
+	TranscriptHash		string
+	SecretCommitmentHash	string
+	EstablishedHeight	uint64
+	ExpiresHeight		uint64
 }
 
 type TransportEnvelope struct {
-	ID             string
-	Channel        ChannelClass
-	SizeBytes      uint64
-	EnqueuedHeight uint64
-	Sequence       uint64
-	PayloadHash    string
+	ID		string
+	Channel		ChannelClass
+	SizeBytes	uint64
+	EnqueuedHeight	uint64
+	Sequence	uint64
+	PayloadHash	string
 }
 
 type PayloadChunk struct {
-	PayloadID   string
-	PayloadHash string
-	Index       uint32
-	Total       uint32
-	ChunkHash   string
-	Bytes       []byte
+	PayloadID	string
+	PayloadHash	string
+	Index		uint32
+	Total		uint32
+	ChunkHash	string
+	Bytes		[]byte
 }
 
 type PeerMetrics struct {
-	LatencyMillis         uint64
-	ReliabilityBps        uint32
-	ThroughputBytesPerSec uint64
-	InvalidMessageCount   uint64
+	LatencyMillis		uint64
+	ReliabilityBps		uint32
+	ThroughputBytesPerSec	uint64
+	InvalidMessageCount	uint64
 }
 
 type PeerScore struct {
-	ScoreBps       uint32
-	LatencyBps     uint32
-	ReliabilityBps uint32
-	ThroughputBps  uint32
-	PenaltyBps     uint32
+	ScoreBps	uint32
+	LatencyBps	uint32
+	ReliabilityBps	uint32
+	ThroughputBps	uint32
+	PenaltyBps	uint32
 }
 
 type QoSClassPolicy struct {
-	Class             QoSClass
-	Channel           ChannelClass
-	Priority          uint32
-	BandwidthFloorBps uint32
-	BandwidthCeilBps  uint32
-	ReservedCapacity  bool
-	Backpressure      bool
+	Class			QoSClass
+	Channel			ChannelClass
+	Priority		uint32
+	BandwidthFloorBps	uint32
+	BandwidthCeilBps	uint32
+	ReservedCapacity	bool
+	Backpressure		bool
 }
 
 type StreamResetPolicy string
 
 const (
-	StreamResetKeepSession  StreamResetPolicy = "KEEP_SESSION"
-	StreamResetCloseSession StreamResetPolicy = "CLOSE_SESSION"
+	StreamResetKeepSession	StreamResetPolicy	= "KEEP_SESSION"
+	StreamResetCloseSession	StreamResetPolicy	= "CLOSE_SESSION"
 )
 
 type StreamResetDecision struct {
-	StreamID         string
-	SessionClosed    bool
-	RemainingStreams []StreamSpec
+	StreamID		string
+	SessionClosed		bool
+	RemainingStreams	[]StreamSpec
 }
 
 type PeerQoSDecision struct {
-	Class                   QoSClass
-	DowngradeServiceTraffic bool
-	DisconnectConsensus     bool
-	Reason                  string
+	Class			QoSClass
+	DowngradeServiceTraffic	bool
+	DisconnectConsensus	bool
+	Reason			string
 }
 
 func DefaultChannelPolicies() []ChannelPolicy {
@@ -641,16 +641,16 @@ func NegotiateSession(local, remote NodeRecord, req SessionRequest) (SessionChan
 		return SessionChannel{}, err
 	}
 	session := SessionChannel{
-		LocalNodeID:      req.LocalNodeID,
-		RemoteNodeID:     req.RemoteNodeID,
-		HandshakeVersion: req.HandshakeVersion,
-		CipherSuite:      cipher,
-		ProtocolVersions: protocols,
-		OpenedHeight:     req.OpenedHeight,
-		ExpiresHeight:    req.ExpiresHeight,
-		SessionKeys:      sessionKeys,
-		Streams:          defaultStreams(channels, sessionKeys.KeyID),
-		QOSPolicy:        req.QOSPolicy,
+		LocalNodeID:		req.LocalNodeID,
+		RemoteNodeID:		req.RemoteNodeID,
+		HandshakeVersion:	req.HandshakeVersion,
+		CipherSuite:		cipher,
+		ProtocolVersions:	protocols,
+		OpenedHeight:		req.OpenedHeight,
+		ExpiresHeight:		req.ExpiresHeight,
+		SessionKeys:		sessionKeys,
+		Streams:		defaultStreams(channels, sessionKeys.KeyID),
+		QOSPolicy:		req.QOSPolicy,
 	}
 	session.SessionID = ComputeSessionID(req, cipher, protocols, channels)
 	if err := session.Validate(); err != nil {
@@ -736,14 +736,14 @@ func BuildSessionKeySet(req SessionRequest, cipher CipherSuite, protocols []stri
 	}
 	transcriptHash := ComputeSessionTranscriptHash(req, cipher, protocols, channels)
 	keySet := SessionKeySet{
-		KeyID:                 HashParts("session-key", transcriptHash, req.SessionSecretCommitmentHash),
-		CipherSuite:           cipher,
-		LocalEphemeralPubKey:  cloneBytes(req.LocalEphemeralPubKey),
-		RemoteEphemeralPubKey: cloneBytes(req.RemoteEphemeralPubKey),
-		TranscriptHash:        transcriptHash,
-		SecretCommitmentHash:  req.SessionSecretCommitmentHash,
-		EstablishedHeight:     req.OpenedHeight,
-		ExpiresHeight:         req.ExpiresHeight,
+		KeyID:			HashParts("session-key", transcriptHash, req.SessionSecretCommitmentHash),
+		CipherSuite:		cipher,
+		LocalEphemeralPubKey:	cloneBytes(req.LocalEphemeralPubKey),
+		RemoteEphemeralPubKey:	cloneBytes(req.RemoteEphemeralPubKey),
+		TranscriptHash:		transcriptHash,
+		SecretCommitmentHash:	req.SessionSecretCommitmentHash,
+		EstablishedHeight:	req.OpenedHeight,
+		ExpiresHeight:		req.ExpiresHeight,
 	}
 	return keySet, keySet.Validate()
 }
@@ -907,10 +907,10 @@ func EvaluatePeerServiceQuota(usedBytes, quotaBytes uint64) PeerQoSDecision {
 		return PeerQoSDecision{Class: QoSClassServiceCall}
 	}
 	return PeerQoSDecision{
-		Class:                   QoSClassServiceCall,
-		DowngradeServiceTraffic: true,
-		DisconnectConsensus:     false,
-		Reason:                  "service quota exceeded",
+		Class:				QoSClassServiceCall,
+		DowngradeServiceTraffic:	true,
+		DisconnectConsensus:		false,
+		Reason:				"service quota exceeded",
 	}
 }
 
@@ -1009,11 +1009,11 @@ func ChunkPayload(payload []byte, maxChunkBytes uint64) ([]PayloadChunk, error) 
 		}
 		body := cloneBytes(payload[offset:end])
 		chunk := PayloadChunk{
-			PayloadID:   payloadID,
-			PayloadHash: payloadHash,
-			Index:       index,
-			Total:       uint32(total),
-			Bytes:       body,
+			PayloadID:	payloadID,
+			PayloadHash:	payloadHash,
+			Index:		index,
+			Total:		uint32(total),
+			Bytes:		body,
 		}
 		chunk.ChunkHash = ComputeChunkHash(chunk)
 		chunks = append(chunks, chunk)
@@ -1104,11 +1104,11 @@ func ComputePeerScore(metrics PeerMetrics) (PeerScore, error) {
 		raw = uint64(BasisPoints)
 	}
 	return PeerScore{
-		ScoreBps:       uint32(raw),
-		LatencyBps:     latency,
-		ReliabilityBps: metrics.ReliabilityBps,
-		ThroughputBps:  throughput,
-		PenaltyBps:     penalty,
+		ScoreBps:	uint32(raw),
+		LatencyBps:	latency,
+		ReliabilityBps:	metrics.ReliabilityBps,
+		ThroughputBps:	throughput,
+		PenaltyBps:	penalty,
 	}, nil
 }
 
@@ -1204,13 +1204,13 @@ func defaultStreams(channels []ChannelClass, sessionKeyID string) []StreamSpec {
 		}
 		streamID := strings.ToLower(strings.TrimSuffix(string(channel), "_CHANNEL"))
 		streams[i] = StreamSpec{
-			StreamID:          streamID,
-			Channel:           channel,
-			Priority:          PriorityForChannel(channel),
-			FlowControlWindow: maxUint64(DefaultFlowWindowBytes, maxMessageBytes),
-			MaxMessageBytes:   maxMessageBytes,
-			Compression:       DefaultCompressionMode,
-			EncryptionContext: streamEncryptionContext(sessionKeyID, streamID),
+			StreamID:		streamID,
+			Channel:		channel,
+			Priority:		PriorityForChannel(channel),
+			FlowControlWindow:	maxUint64(DefaultFlowWindowBytes, maxMessageBytes),
+			MaxMessageBytes:	maxMessageBytes,
+			Compression:		DefaultCompressionMode,
+			EncryptionContext:	streamEncryptionContext(sessionKeyID, streamID),
 		}
 	}
 	return streams

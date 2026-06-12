@@ -17,9 +17,9 @@ func StorageFromAVM(namespace string, storage avm.Storage) []StorageEntry {
 	entries := make([]StorageEntry, 0, len(storage))
 	for _, entry := range avm.Snapshot(storage) {
 		entries = append(entries, StorageEntry{
-			Namespace: namespace,
-			Key:       entry.Key,
-			Value:     append([]byte(nil), entry.Value...),
+			Namespace:	namespace,
+			Key:		entry.Key,
+			Value:		append([]byte(nil), entry.Value...),
 		})
 	}
 	sortStorage(entries)

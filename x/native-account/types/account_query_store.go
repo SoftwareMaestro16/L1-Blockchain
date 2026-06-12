@@ -16,17 +16,17 @@ type AccountQueryStore interface {
 }
 
 type indexedAccountStore struct {
-	byUser map[string]Account
-	byRaw  map[string]Account
-	byRep  map[string]Account
-	sorted []Account
+	byUser	map[string]Account
+	byRaw	map[string]Account
+	byRep	map[string]Account
+	sorted	[]Account
 }
 
 func NewIndexedAccountStore(accounts ...Account) (AccountQueryStore, error) {
 	store := &indexedAccountStore{
-		byUser: make(map[string]Account, len(accounts)),
-		byRaw:  make(map[string]Account, len(accounts)),
-		byRep:  make(map[string]Account),
+		byUser:	make(map[string]Account, len(accounts)),
+		byRaw:	make(map[string]Account, len(accounts)),
+		byRep:	make(map[string]Account),
 	}
 	for _, account := range accounts {
 		if err := ValidateAccountInvariant(account); err != nil {
@@ -88,9 +88,9 @@ func (s *indexedAccountStore) AccountsAfter(cursor string, limit uint64) ([]Acco
 }
 
 type AccountsResult struct {
-	Accounts   []Account
-	NextCursor string
-	Limit      uint64
+	Accounts	[]Account
+	NextCursor	string
+	Limit		uint64
 }
 
 type AccountQueryService interface {
@@ -101,8 +101,8 @@ type AccountQueryService interface {
 }
 
 type accountQueryService struct {
-	store  AccountQueryStore
-	params prototype.Params
+	store	AccountQueryStore
+	params	prototype.Params
 }
 
 func NewAccountQueryService(store AccountQueryStore, params prototype.Params) (AccountQueryService, error) {
@@ -146,8 +146,8 @@ func (s *accountQueryService) Accounts(cursor string, limit uint64) (AccountsRes
 		return AccountsResult{}, err
 	}
 	result := AccountsResult{
-		Accounts: accounts,
-		Limit:    limit,
+		Accounts:	accounts,
+		Limit:		limit,
 	}
 	if len(accounts) > 0 {
 		result.NextCursor = accounts[len(accounts)-1].AddressUser

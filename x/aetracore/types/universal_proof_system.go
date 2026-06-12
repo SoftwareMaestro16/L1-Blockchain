@@ -7,65 +7,65 @@ import (
 )
 
 const (
-	BalanceProofRootType           RootType = "balance"
-	ZoneStateProofRootType         RootType = "zone_state"
-	ShardStateProofRootType        RootType = "shard_state"
-	DomainOwnershipProofRootType   RootType = "domain_ownership"
-	ContractStateProofRootType     RootType = "contract_state"
-	PaymentSettlementProofRootType RootType = "payment_settlement"
+	BalanceProofRootType		RootType	= "balance"
+	ZoneStateProofRootType		RootType	= "zone_state"
+	ShardStateProofRootType		RootType	= "shard_state"
+	DomainOwnershipProofRootType	RootType	= "domain_ownership"
+	ContractStateProofRootType	RootType	= "contract_state"
+	PaymentSettlementProofRootType	RootType	= "payment_settlement"
 )
 
 type UniversalProofObjective string
 
 const (
-	ProofObjectiveAccountState      UniversalProofObjective = "account_state"
-	ProofObjectiveBalanceState      UniversalProofObjective = "balance_state"
-	ProofObjectiveMessageInclusion  UniversalProofObjective = "message_inclusion"
-	ProofObjectiveMessageReceipt    UniversalProofObjective = "message_receipt"
-	ProofObjectiveZoneStateRoot     UniversalProofObjective = "zone_state_root"
-	ProofObjectiveShardStateRoot    UniversalProofObjective = "shard_state_root"
-	ProofObjectiveDomainOwnership   UniversalProofObjective = "domain_ownership"
-	ProofObjectiveResolverRecords   UniversalProofObjective = "resolver_records"
-	ProofObjectiveContractState     UniversalProofObjective = "contract_state"
-	ProofObjectivePaymentSettlement UniversalProofObjective = "payment_settlement"
+	ProofObjectiveAccountState	UniversalProofObjective	= "account_state"
+	ProofObjectiveBalanceState	UniversalProofObjective	= "balance_state"
+	ProofObjectiveMessageInclusion	UniversalProofObjective	= "message_inclusion"
+	ProofObjectiveMessageReceipt	UniversalProofObjective	= "message_receipt"
+	ProofObjectiveZoneStateRoot	UniversalProofObjective	= "zone_state_root"
+	ProofObjectiveShardStateRoot	UniversalProofObjective	= "shard_state_root"
+	ProofObjectiveDomainOwnership	UniversalProofObjective	= "domain_ownership"
+	ProofObjectiveResolverRecords	UniversalProofObjective	= "resolver_records"
+	ProofObjectiveContractState	UniversalProofObjective	= "contract_state"
+	ProofObjectivePaymentSettlement	UniversalProofObjective	= "payment_settlement"
 )
 
 type UniversalProofObjectiveDescriptor struct {
-	Objective      UniversalProofObjective
-	VerifiedObject string
-	RootType       RootType
-	ZoneID         ZoneID
-	RequiresShard  bool
+	Objective	UniversalProofObjective
+	VerifiedObject	string
+	RootType	RootType
+	ZoneID		ZoneID
+	RequiresShard	bool
 }
 
 type UniversalShardRootBranch struct {
-	ZoneID    ZoneID
-	ShardID   ShardID
-	ShardRoot string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	ShardRoot	string
 }
 
 type UniversalZoneRootBranch struct {
-	ZoneID         ZoneID
-	ZoneRoot       string
-	ShardRootsRoot string
-	ShardRoots     []UniversalShardRootBranch
+	ZoneID		ZoneID
+	ZoneRoot	string
+	ShardRootsRoot	string
+	ShardRoots	[]UniversalShardRootBranch
 }
 
 type UniversalMessageRootBranch struct {
-	ZoneOutboxRoot string
-	ZoneInboxRoot  string
-	ReceiptRoot    string
-	MessageRoot    string
+	ZoneOutboxRoot	string
+	ZoneInboxRoot	string
+	ReceiptRoot	string
+	MessageRoot	string
 }
 
 type UniversalRootHierarchy struct {
-	Height            uint64
-	AetraCoreRoot     string
-	GlobalZoneRoot    string
-	GlobalMessageRoot string
-	AppHash           string
-	Zones             []UniversalZoneRootBranch
-	Messages          UniversalMessageRootBranch
+	Height			uint64
+	AetraCoreRoot		string
+	GlobalZoneRoot		string
+	GlobalMessageRoot	string
+	AppHash			string
+	Zones			[]UniversalZoneRootBranch
+	Messages		UniversalMessageRootBranch
 }
 
 func SupportedUniversalProofObjectives() []UniversalProofObjectiveDescriptor {
@@ -111,9 +111,9 @@ func ValidateProofRootForObjective(objective UniversalProofObjective, root Proof
 
 func NewUniversalZoneRootBranch(height uint64, zoneID ZoneID, zoneRoot string, shards []UniversalShardRootBranch) (UniversalZoneRootBranch, error) {
 	branch := UniversalZoneRootBranch{
-		ZoneID:     zoneID,
-		ZoneRoot:   zoneRoot,
-		ShardRoots: canonicalUniversalShardRootBranches(shards),
+		ZoneID:		zoneID,
+		ZoneRoot:	zoneRoot,
+		ShardRoots:	canonicalUniversalShardRootBranches(shards),
 	}
 	root, err := ComputeUniversalShardRootsRoot(height, zoneID, branch.ShardRoots)
 	if err != nil {
@@ -125,9 +125,9 @@ func NewUniversalZoneRootBranch(height uint64, zoneID ZoneID, zoneRoot string, s
 
 func NewUniversalMessageRootBranch(height uint64, outboxRoot string, inboxRoot string, receiptRoot string) (UniversalMessageRootBranch, error) {
 	branch := UniversalMessageRootBranch{
-		ZoneOutboxRoot: outboxRoot,
-		ZoneInboxRoot:  inboxRoot,
-		ReceiptRoot:    receiptRoot,
+		ZoneOutboxRoot:	outboxRoot,
+		ZoneInboxRoot:	inboxRoot,
+		ReceiptRoot:	receiptRoot,
 	}
 	if err := branch.ValidateFormat(); err != nil {
 		return UniversalMessageRootBranch{}, err
@@ -138,10 +138,10 @@ func NewUniversalMessageRootBranch(height uint64, outboxRoot string, inboxRoot s
 
 func NewUniversalRootHierarchy(height uint64, aetherCoreRoot string, zones []UniversalZoneRootBranch, messages UniversalMessageRootBranch) (UniversalRootHierarchy, error) {
 	hierarchy := UniversalRootHierarchy{
-		Height:        height,
-		AetraCoreRoot: aetherCoreRoot,
-		Zones:         canonicalUniversalZoneRootBranches(zones),
-		Messages:      messages,
+		Height:		height,
+		AetraCoreRoot:	aetherCoreRoot,
+		Zones:		canonicalUniversalZoneRootBranches(zones),
+		Messages:	messages,
 	}
 	if err := hierarchy.ValidateFormatOnly(); err != nil {
 		return UniversalRootHierarchy{}, err

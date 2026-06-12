@@ -10,10 +10,10 @@ func TestExternalMessageFromActiveAccountSucceedsWithValidAuth(t *testing.T) {
 	account := completeActiveAccount(t, 0xb1, 500, 7)
 
 	next, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{account.PubKeys[0]},
-		Operation:   "send",
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{account.PubKeys[0]},
+		Operation:	"send",
 	})
 
 	require.NoError(t, err)
@@ -26,18 +26,18 @@ func TestExternalMessageFromInactiveOrFrozenAccountRejected(t *testing.T) {
 	inactive := completeActiveAccount(t, 0xb2, 501, 0)
 	inactive.Status = AccountStatusInactive
 	_, err := ApplyExternalMessage(inactive, ExternalMessage{
-		AccountUser: inactive.AddressUser,
-		Sequence:    inactive.Sequence,
-		Signers:     []string{inactive.PubKeys[0]},
+		AccountUser:	inactive.AddressUser,
+		Sequence:	inactive.Sequence,
+		Signers:	[]string{inactive.PubKeys[0]},
 	})
 	require.ErrorContains(t, err, "inactive account cannot send external messages")
 
 	frozen := completeActiveAccount(t, 0xb3, 502, 0)
 	frozen.Status = AccountStatusFrozen
 	_, err = ApplyExternalMessage(frozen, ExternalMessage{
-		AccountUser: frozen.AddressUser,
-		Sequence:    frozen.Sequence,
-		Signers:     []string{frozen.PubKeys[0]},
+		AccountUser:	frozen.AddressUser,
+		Sequence:	frozen.Sequence,
+		Signers:	[]string{frozen.PubKeys[0]},
 	})
 	require.ErrorContains(t, err, "frozen account cannot send external messages")
 }
@@ -46,16 +46,16 @@ func TestExternalMessageRejectsInvalidAuthAndSequence(t *testing.T) {
 	account := completeActiveAccount(t, 0xb4, 503, 9)
 
 	_, err := ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence + 1,
-		Signers:     []string{account.PubKeys[0]},
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence + 1,
+		Signers:	[]string{account.PubKeys[0]},
 	})
 	require.ErrorContains(t, err, "does not match account sequence")
 
 	_, err = ApplyExternalMessage(account, ExternalMessage{
-		AccountUser: account.AddressUser,
-		Sequence:    account.Sequence,
-		Signers:     []string{"ed25519:not-authorized"},
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	[]string{"ed25519:not-authorized"},
 	})
 	require.ErrorContains(t, err, "missing authorized")
 }
@@ -65,10 +65,10 @@ func TestInternalMessageAcceptedByEnabledFeatureRule(t *testing.T) {
 	policy := InternalMessagePolicy{Version: 1, EnabledFeature: AccountFeatureInternalMessagesV2}
 
 	next, err := ApplyInternalMessage(account, InternalMessage{
-		AccountUser: account.AddressUser,
-		Source:      InternalMessageSourceContract,
-		Feature:     AccountFeatureInternalMessagesV2,
-		Operation:   "contract_callback",
+		AccountUser:	account.AddressUser,
+		Source:		InternalMessageSourceContract,
+		Feature:	AccountFeatureInternalMessagesV2,
+		Operation:	"contract_callback",
 	}, policy)
 
 	require.NoError(t, err)
@@ -81,10 +81,10 @@ func TestInternalMessageRejectedWhenFeatureDisabled(t *testing.T) {
 	policy := InternalMessagePolicy{Version: 1, EnabledFeature: AccountFeatureInternalMessagesV2}
 
 	_, err := ApplyInternalMessage(account, InternalMessage{
-		AccountUser: account.AddressUser,
-		Source:      InternalMessageSourceModule,
-		Feature:     AccountFeatureInternalMessagesV2,
-		Operation:   "module_notice",
+		AccountUser:	account.AddressUser,
+		Source:		InternalMessageSourceModule,
+		Feature:	AccountFeatureInternalMessagesV2,
+		Operation:	"module_notice",
 	}, policy)
 
 	require.ErrorContains(t, err, "feature disabled")
@@ -96,10 +96,10 @@ func TestInternalMessageRulesMigrationPreservesExistingAccountAddresses(t *testi
 	require.NoError(t, err)
 
 	next, err := ApplyInternalMessage(migrated, InternalMessage{
-		AccountUser: migrated.AddressUser,
-		Source:      InternalMessageSourceSystem,
-		Feature:     AccountFeatureInternalMessagesV2,
-		Operation:   "system_notice",
+		AccountUser:	migrated.AddressUser,
+		Source:		InternalMessageSourceSystem,
+		Feature:	AccountFeatureInternalMessagesV2,
+		Operation:	"system_notice",
 	}, InternalMessagePolicy{Version: 2, EnabledFeature: AccountFeatureInternalMessagesV2})
 
 	require.NoError(t, err)
@@ -112,10 +112,10 @@ func TestInternalMessageHandlingDoesNotIncrementUserSequence(t *testing.T) {
 	account := completeActiveAccount(t, 0xb8, 507, 15)
 
 	next, err := ApplyInternalMessage(account, InternalMessage{
-		AccountUser: account.AddressUser,
-		Source:      InternalMessageSourceModule,
-		Feature:     AccountFeatureInternalMessagesV2,
-		Operation:   "module_update",
+		AccountUser:	account.AddressUser,
+		Source:		InternalMessageSourceModule,
+		Feature:	AccountFeatureInternalMessagesV2,
+		Operation:	"module_update",
 	}, InternalMessagePolicy{Version: 1, EnabledFeature: AccountFeatureInternalMessagesV2})
 
 	require.NoError(t, err)
@@ -128,19 +128,19 @@ func TestInternalMessagesRespectFrozenRestrictionsUnlessWhitelisted(t *testing.T
 	policy := InternalMessagePolicy{Version: 1, EnabledFeature: AccountFeatureInternalMessagesV2}
 
 	_, err := ApplyInternalMessage(account, InternalMessage{
-		AccountUser: account.AddressUser,
-		Source:      InternalMessageSourceContract,
-		Feature:     AccountFeatureInternalMessagesV2,
-		Operation:   "contract_callback",
+		AccountUser:	account.AddressUser,
+		Source:		InternalMessageSourceContract,
+		Feature:	AccountFeatureInternalMessagesV2,
+		Operation:	"contract_callback",
 	}, policy)
 	require.ErrorContains(t, err, "explicit whitelist")
 
 	next, err := ApplyInternalMessage(account, InternalMessage{
-		AccountUser:            account.AddressUser,
-		Source:                 InternalMessageSourceContract,
-		Feature:                AccountFeatureInternalMessagesV2,
-		Operation:              "storage_debt_payment",
-		WhitelistedWhileFrozen: true,
+		AccountUser:		account.AddressUser,
+		Source:			InternalMessageSourceContract,
+		Feature:		AccountFeatureInternalMessagesV2,
+		Operation:		"storage_debt_payment",
+		WhitelistedWhileFrozen:	true,
 	}, policy)
 	require.NoError(t, err)
 	require.Equal(t, account.Sequence, next.Sequence)

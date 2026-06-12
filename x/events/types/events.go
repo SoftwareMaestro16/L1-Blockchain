@@ -11,47 +11,47 @@ import (
 )
 
 const (
-	EventTransfer                 = "EventTransfer"
-	EventMemoAttached             = "EventMemoAttached"
-	EventDomainAuctionStarted     = "EventDomainAuctionStarted"
-	EventDomainResolved           = "EventDomainResolved"
-	EventContractMessageQueued    = "EventContractMessageQueued"
-	EventContractMessageProcessed = "EventContractMessageProcessed"
-	EventReputationUpdated        = "EventReputationUpdated"
-	EventFeeDistributed           = "EventFeeDistributed"
+	EventTransfer			= "EventTransfer"
+	EventMemoAttached		= "EventMemoAttached"
+	EventDomainAuctionStarted	= "EventDomainAuctionStarted"
+	EventDomainResolved		= "EventDomainResolved"
+	EventContractMessageQueued	= "EventContractMessageQueued"
+	EventContractMessageProcessed	= "EventContractMessageProcessed"
+	EventReputationUpdated		= "EventReputationUpdated"
+	EventFeeDistributed		= "EventFeeDistributed"
 
-	CategoryProtocol   = "protocol"
-	CategoryIndexer    = "indexer"
-	CategoryContract   = "contract"
-	CategoryMemo       = "memo"
-	CategoryDomain     = "domain"
-	CategoryReputation = "reputation"
+	CategoryProtocol	= "protocol"
+	CategoryIndexer		= "indexer"
+	CategoryContract	= "contract"
+	CategoryMemo		= "memo"
+	CategoryDomain		= "domain"
+	CategoryReputation	= "reputation"
 )
 
 type ProtocolEvent struct {
-	Type       string
-	Category   string
-	TxHash     []byte
-	Height     uint64
-	Sequence   uint64
-	Actor      sdk.AccAddress
-	Attributes []Attribute
+	Type		string
+	Category	string
+	TxHash		[]byte
+	Height		uint64
+	Sequence	uint64
+	Actor		sdk.AccAddress
+	Attributes	[]Attribute
 }
 
 type Attribute struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 func NewEvent(eventType, category string, txHash []byte, height uint64, sequence uint64, actor sdk.AccAddress, attrs []Attribute) (ProtocolEvent, error) {
 	event := ProtocolEvent{
-		Type:       eventType,
-		Category:   category,
-		TxHash:     append([]byte(nil), txHash...),
-		Height:     height,
-		Sequence:   sequence,
-		Actor:      append(sdk.AccAddress(nil), actor...),
-		Attributes: CanonicalAttributes(attrs),
+		Type:		eventType,
+		Category:	category,
+		TxHash:		append([]byte(nil), txHash...),
+		Height:		height,
+		Sequence:	sequence,
+		Actor:		append(sdk.AccAddress(nil), actor...),
+		Attributes:	CanonicalAttributes(attrs),
 	}
 	if err := event.Validate(); err != nil {
 		return ProtocolEvent{}, err

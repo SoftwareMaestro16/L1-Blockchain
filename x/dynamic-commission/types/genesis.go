@@ -8,41 +8,41 @@ import (
 )
 
 const (
-	DefaultBaseCommissionBps        = uint32(1_000)
-	DefaultCommissionFloorBps       = uint32(300)
-	DefaultCommissionCeilingBps     = uint32(2_000)
-	DefaultMaxRateChangeBps         = uint32(100)
-	DefaultHighPerformanceThreshold = uint32(9_000)
-	DefaultLowPerformanceThreshold  = uint32(5_000)
-	DefaultHighReputationThreshold  = uint32(8_500)
-	DefaultLowReputationThreshold   = uint32(4_000)
-	DefaultPerformanceBonusBps      = uint32(100)
-	DefaultPerformancePenaltyBps    = uint32(100)
-	DefaultReputationBonusBps       = uint32(0)
-	DefaultReputationPenaltyBps     = uint32(0)
+	DefaultBaseCommissionBps	= uint32(1_000)
+	DefaultCommissionFloorBps	= uint32(300)
+	DefaultCommissionCeilingBps	= uint32(2_000)
+	DefaultMaxRateChangeBps		= uint32(100)
+	DefaultHighPerformanceThreshold	= uint32(9_000)
+	DefaultLowPerformanceThreshold	= uint32(5_000)
+	DefaultHighReputationThreshold	= uint32(8_500)
+	DefaultLowReputationThreshold	= uint32(4_000)
+	DefaultPerformanceBonusBps	= uint32(100)
+	DefaultPerformancePenaltyBps	= uint32(100)
+	DefaultReputationBonusBps	= uint32(0)
+	DefaultReputationPenaltyBps	= uint32(0)
 )
 
 func DefaultParams() Params {
 	return Params{
-		CommissionFloorBps:          DefaultCommissionFloorBps,
-		CommissionCeilingBps:        DefaultCommissionCeilingBps,
-		MaxRateChangeBps:            DefaultMaxRateChangeBps,
-		HighPerformanceThresholdBps: DefaultHighPerformanceThreshold,
-		LowPerformanceThresholdBps:  DefaultLowPerformanceThreshold,
-		HighReputationThresholdBps:  DefaultHighReputationThreshold,
-		LowReputationThresholdBps:   DefaultLowReputationThreshold,
-		PerformanceBonusBps:         DefaultPerformanceBonusBps,
-		PerformancePenaltyBps:       DefaultPerformancePenaltyBps,
-		ReputationBonusBps:          DefaultReputationBonusBps,
-		ReputationPenaltyBps:        DefaultReputationPenaltyBps,
+		CommissionFloorBps:		DefaultCommissionFloorBps,
+		CommissionCeilingBps:		DefaultCommissionCeilingBps,
+		MaxRateChangeBps:		DefaultMaxRateChangeBps,
+		HighPerformanceThresholdBps:	DefaultHighPerformanceThreshold,
+		LowPerformanceThresholdBps:	DefaultLowPerformanceThreshold,
+		HighReputationThresholdBps:	DefaultHighReputationThreshold,
+		LowReputationThresholdBps:	DefaultLowReputationThreshold,
+		PerformanceBonusBps:		DefaultPerformanceBonusBps,
+		PerformancePenaltyBps:		DefaultPerformancePenaltyBps,
+		ReputationBonusBps:		DefaultReputationBonusBps,
+		ReputationPenaltyBps:		DefaultReputationPenaltyBps,
 	}
 }
 
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Params:            DefaultParams(),
-		Commissions:       []ValidatorCommission{},
-		CommissionHistory: []CommissionHistoryEntry{},
+		Params:			DefaultParams(),
+		Commissions:		[]ValidatorCommission{},
+		CommissionHistory:	[]CommissionHistoryEntry{},
 	}
 }
 
@@ -110,10 +110,10 @@ func (p Params) Validate() error {
 		return fmt.Errorf("reputation thresholds must be ordered and <= %d bps", BasisPoints)
 	}
 	for name, value := range map[string]uint32{
-		"performance_bonus_bps":   p.PerformanceBonusBps,
-		"performance_penalty_bps": p.PerformancePenaltyBps,
-		"reputation_bonus_bps":    p.ReputationBonusBps,
-		"reputation_penalty_bps":  p.ReputationPenaltyBps,
+		"performance_bonus_bps":	p.PerformanceBonusBps,
+		"performance_penalty_bps":	p.PerformancePenaltyBps,
+		"reputation_bonus_bps":		p.ReputationBonusBps,
+		"reputation_penalty_bps":	p.ReputationPenaltyBps,
 	} {
 		if value > BasisPoints {
 			return fmt.Errorf("%s must be <= %d", name, BasisPoints)
@@ -183,15 +183,15 @@ func (e CommissionHistoryEntry) Validate(params Params) error {
 		return fmt.Errorf("commission history height must be positive")
 	}
 	commission := ValidatorCommission{
-		ValidatorAddress:       e.ValidatorAddress,
-		BaseCommissionBps:      e.BaseCommissionBps,
-		EffectiveCommissionBps: e.EffectiveCommissionBps,
-		PerformanceModifierBps: e.PerformanceModifierBps,
-		ReputationModifierBps:  e.ReputationModifierBps,
-		CommissionFloorBps:     params.CommissionFloorBps,
-		CommissionCeilingBps:   params.CommissionCeilingBps,
-		LastUpdateHeight:       e.Height,
-		Jailed:                 e.Jailed,
+		ValidatorAddress:	e.ValidatorAddress,
+		BaseCommissionBps:	e.BaseCommissionBps,
+		EffectiveCommissionBps:	e.EffectiveCommissionBps,
+		PerformanceModifierBps:	e.PerformanceModifierBps,
+		ReputationModifierBps:	e.ReputationModifierBps,
+		CommissionFloorBps:	params.CommissionFloorBps,
+		CommissionCeilingBps:	params.CommissionCeilingBps,
+		LastUpdateHeight:	e.Height,
+		Jailed:			e.Jailed,
 	}
 	return commission.Validate(params)
 }
@@ -199,11 +199,11 @@ func (e CommissionHistoryEntry) Validate(params Params) error {
 func DefaultCommission(validator string, params Params) ValidatorCommission {
 	params = NormalizeParams(params)
 	return ValidatorCommission{
-		ValidatorAddress:       validator,
-		BaseCommissionBps:      clamp(DefaultBaseCommissionBps, params.CommissionFloorBps, params.CommissionCeilingBps),
-		EffectiveCommissionBps: clamp(DefaultBaseCommissionBps, params.CommissionFloorBps, params.CommissionCeilingBps),
-		CommissionFloorBps:     params.CommissionFloorBps,
-		CommissionCeilingBps:   params.CommissionCeilingBps,
+		ValidatorAddress:	validator,
+		BaseCommissionBps:	clamp(DefaultBaseCommissionBps, params.CommissionFloorBps, params.CommissionCeilingBps),
+		EffectiveCommissionBps:	clamp(DefaultBaseCommissionBps, params.CommissionFloorBps, params.CommissionCeilingBps),
+		CommissionFloorBps:	params.CommissionFloorBps,
+		CommissionCeilingBps:	params.CommissionCeilingBps,
 	}
 }
 
@@ -218,16 +218,16 @@ func ComputeModifiers(params Params, performanceScoreBps, reputationScoreBps uin
 	performance := int32(0)
 	switch {
 	case performanceScoreBps >= params.HighPerformanceThresholdBps && !jailed:
-		performance = int32(params.PerformanceBonusBps) // #nosec G115 -- params validation bounds this to <= BasisPoints.
+		performance = int32(params.PerformanceBonusBps)
 	case performanceScoreBps <= params.LowPerformanceThresholdBps:
-		performance = -int32(params.PerformancePenaltyBps) // #nosec G115 -- params validation bounds this to <= BasisPoints.
+		performance = -int32(params.PerformancePenaltyBps)
 	}
 	reputation := int32(0)
 	switch {
 	case reputationScoreBps >= params.HighReputationThresholdBps:
-		reputation = int32(params.ReputationBonusBps) // #nosec G115
+		reputation = int32(params.ReputationBonusBps)
 	case reputationScoreBps <= params.LowReputationThresholdBps:
-		reputation = -int32(params.ReputationPenaltyBps) // #nosec G115
+		reputation = -int32(params.ReputationPenaltyBps)
 	}
 	return performance, reputation, nil
 }
@@ -241,7 +241,7 @@ func EffectiveCommission(params Params, base uint32, performanceModifier, reputa
 	if total > int64(params.CommissionCeilingBps) {
 		return params.CommissionCeilingBps
 	}
-	return uint32(total) // #nosec G115 -- total is clamped to [0, BasisPoints].
+	return uint32(total)
 }
 
 func RateLimitExceeded(previous, next, maxDelta uint32) bool {

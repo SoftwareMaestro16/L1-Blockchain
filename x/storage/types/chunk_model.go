@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	DefaultMaxStorageChunkBytes = uint64(4 * 1024 * 1024)
-	MaxStorageErasureGroupBytes = 64
+	DefaultMaxStorageChunkBytes	= uint64(4 * 1024 * 1024)
+	MaxStorageErasureGroupBytes	= 64
 )
 
 type StorageChunkParams struct {
@@ -16,23 +16,23 @@ type StorageChunkParams struct {
 }
 
 type StorageChunkDescriptor struct {
-	ChunkIndex           uint32
-	ChunkHash            string
-	ChunkSize            uint64
-	ChunkProofRoot       string
-	ErasureGroupOptional string
-	DescriptorHash       string
+	ChunkIndex		uint32
+	ChunkHash		string
+	ChunkSize		uint64
+	ChunkProofRoot		string
+	ErasureGroupOptional	string
+	DescriptorHash		string
 }
 
 type StorageChunkInclusionProof struct {
-	ObjectID       string
-	ContentHash    string
-	ObjectRoot     string
-	ChunkIndex     uint32
-	ChunkHash      string
-	ChunkProofRoot string
-	ProofPath      []string
-	ProofHash      string
+	ObjectID	string
+	ContentHash	string
+	ObjectRoot	string
+	ChunkIndex	uint32
+	ChunkHash	string
+	ChunkProofRoot	string
+	ProofPath	[]string
+	ProofHash	string
 }
 
 func DefaultStorageChunkParams() StorageChunkParams {
@@ -92,11 +92,11 @@ func BuildStorageChunkDescriptors(chunkHashes []string, chunkSizes []uint64, era
 		}
 		proofRoot := ComputeStorageChunkProofRoot(uint32(i), chunkHash, chunkSizes[i], erasureGroup)
 		descriptor, err := NewStorageChunkDescriptor(StorageChunkDescriptor{
-			ChunkIndex:           uint32(i),
-			ChunkHash:            chunkHash,
-			ChunkSize:            chunkSizes[i],
-			ChunkProofRoot:       proofRoot,
-			ErasureGroupOptional: erasureGroup,
+			ChunkIndex:		uint32(i),
+			ChunkHash:		chunkHash,
+			ChunkSize:		chunkSizes[i],
+			ChunkProofRoot:		proofRoot,
+			ErasureGroupOptional:	erasureGroup,
 		}, params)
 		if err != nil {
 			return nil, "", err

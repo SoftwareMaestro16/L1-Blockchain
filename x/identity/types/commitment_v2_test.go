@@ -145,12 +145,12 @@ func FuzzDomainCommitmentV2RevealReplayProtection(f *testing.F) {
 
 func commitmentV2TestContext(currentHeight uint64) DomainCommitmentV2Context {
 	return DomainCommitmentV2Context{
-		CurrentHeight:      currentHeight,
-		RevealWindowBlocks: 20,
-		ChainID:            "aetra-local-1",
-		ModuleVersion:      DefaultDomainCommitmentVersion,
-		RegistrationIntent: DomainRegistrationIntent,
-		RegistrationClass:  DefaultRegistrationClass,
-		MaxPrice:           sdkmath.ZeroInt(),
+		CurrentHeight:		currentHeight,
+		RevealWindowBlocks:	20,
+		ChainID:		"aetra-local-1",
+		ModuleVersion:		DefaultDomainCommitmentVersion,
+		RegistrationIntent:	DomainRegistrationIntent,
+		RegistrationClass:	DefaultRegistrationClass,
+		MaxPrice:		sdkmath.ZeroInt(),
 	}
 }

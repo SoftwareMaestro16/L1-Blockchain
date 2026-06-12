@@ -16,11 +16,11 @@ func TestApplyResolverUpdateSetAndChange(t *testing.T) {
 	domain := activeDomainRecord(owner, now+1000)
 
 	record, event, err := ApplyResolverUpdate(nil, domain, owner, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       wallet,
-		Records:       map[string]sdk.AccAddress{ResolverKeyContract: contract},
-		Metadata:      []byte("profile"),
-		UpdatedAtUnix: now,
+		Domain:		"alice.aet",
+		Primary:	wallet,
+		Records:	map[string]sdk.AccAddress{ResolverKeyContract: contract},
+		Metadata:	[]byte("profile"),
+		UpdatedAtUnix:	now,
 	}, nil, now)
 	require.NoError(t, err)
 	require.Equal(t, ResolverEventSet, event.Type)
@@ -30,10 +30,10 @@ func TestApplyResolverUpdateSetAndChange(t *testing.T) {
 
 	nextWallet := addr(4)
 	changed, event, err := ApplyResolverUpdate(&record, domain, owner, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       nextWallet,
-		Records:       map[string]sdk.AccAddress{ResolverKeyWallet: nextWallet},
-		UpdatedAtUnix: now + 1,
+		Domain:		"alice.aet",
+		Primary:	nextWallet,
+		Records:	map[string]sdk.AccAddress{ResolverKeyWallet: nextWallet},
+		UpdatedAtUnix:	now + 1,
 	}, nil, now)
 	require.NoError(t, err)
 	require.Equal(t, ResolverEventChanged, event.Type)
@@ -47,16 +47,16 @@ func TestApplyResolverUpdateRejectsZeroAndUnauthorized(t *testing.T) {
 	domain := activeDomainRecord(owner, now+1000)
 
 	_, _, err := ApplyResolverUpdate(nil, domain, manager, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       addr(3),
-		UpdatedAtUnix: now,
+		Domain:		"alice.aet",
+		Primary:	addr(3),
+		UpdatedAtUnix:	now,
 	}, nil, now)
 	require.ErrorContains(t, err, "unauthorized")
 
 	_, _, err = ApplyResolverUpdate(nil, domain, owner, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       bytes.Repeat([]byte{0}, 20),
-		UpdatedAtUnix: now,
+		Domain:		"alice.aet",
+		Primary:	bytes.Repeat([]byte{0}, 20),
+		UpdatedAtUnix:	now,
 	}, nil, now)
 	require.ErrorContains(t, err, "resolver primary")
 }
@@ -67,34 +67,34 @@ func TestDelegatedResolverManager(t *testing.T) {
 	manager := addr(2)
 	domain := activeDomainRecord(owner, now+1000)
 	grant := &ResolverGrant{
-		Domain:        "alice.aet",
-		Owner:         owner,
-		Manager:       manager,
-		Keys:          []string{ResolverKeyPrimary, ResolverKeyWallet},
-		ExpiresAtUnix: now + 100,
+		Domain:		"alice.aet",
+		Owner:		owner,
+		Manager:	manager,
+		Keys:		[]string{ResolverKeyPrimary, ResolverKeyWallet},
+		ExpiresAtUnix:	now + 100,
 	}
 
 	record, _, err := ApplyResolverUpdate(nil, domain, manager, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       addr(3),
-		Records:       map[string]sdk.AccAddress{ResolverKeyWallet: addr(3)},
-		UpdatedAtUnix: now,
+		Domain:		"alice.aet",
+		Primary:	addr(3),
+		Records:	map[string]sdk.AccAddress{ResolverKeyWallet: addr(3)},
+		UpdatedAtUnix:	now,
 	}, grant, now)
 	require.NoError(t, err)
 	require.Equal(t, addr(3), record.Primary)
 
 	_, _, err = ApplyResolverUpdate(&record, domain, manager, ResolverUpdate{
-		Domain:        "alice.aet",
-		Records:       map[string]sdk.AccAddress{ResolverKeyDEX: addr(4)},
-		UpdatedAtUnix: now + 1,
+		Domain:		"alice.aet",
+		Records:	map[string]sdk.AccAddress{ResolverKeyDEX: addr(4)},
+		UpdatedAtUnix:	now + 1,
 	}, grant, now)
 	require.ErrorContains(t, err, "does not allow")
 
 	grant.ExpiresAtUnix = now
 	_, _, err = ApplyResolverUpdate(&record, domain, manager, ResolverUpdate{
-		Domain:        "alice.aet",
-		Primary:       addr(5),
-		UpdatedAtUnix: now + 1,
+		Domain:		"alice.aet",
+		Primary:	addr(5),
+		UpdatedAtUnix:	now + 1,
 	}, grant, now)
 	require.ErrorContains(t, err, "expired")
 }
@@ -177,24 +177,24 @@ func TestValidateResolverKeyAndBounds(t *testing.T) {
 
 func activeDomainRecord(owner sdk.AccAddress, expiry int64) DomainRecord {
 	return DomainRecord{
-		Name:          "alice",
-		TLD:           DomainTLD,
-		Owner:         owner,
-		ExpiryUnix:    expiry,
-		NFTItemID:     DomainNFTItemID("alice"),
-		Status:        DomainStatusActive,
-		CreatedAtUnix: 1,
-		UpdatedAtUnix: 2,
+		Name:		"alice",
+		TLD:		DomainTLD,
+		Owner:		owner,
+		ExpiryUnix:	expiry,
+		NFTItemID:	DomainNFTItemID("alice"),
+		Status:		DomainStatusActive,
+		CreatedAtUnix:	1,
+		UpdatedAtUnix:	2,
 	}
 }
 
 func resolverRecord(owner sdk.AccAddress, domain string, primary sdk.AccAddress) ResolverRecord {
 	return ResolverRecord{
-		Domain:        domain,
-		Owner:         owner,
-		Primary:       primary,
-		Records:       map[string]sdk.AccAddress{ResolverKeyWallet: primary},
-		UpdatedAtUnix: 1,
+		Domain:		domain,
+		Owner:		owner,
+		Primary:	primary,
+		Records:	map[string]sdk.AccAddress{ResolverKeyWallet: primary},
+		UpdatedAtUnix:	1,
 	}
 }
 

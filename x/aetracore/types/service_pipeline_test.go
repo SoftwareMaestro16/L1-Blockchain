@@ -35,26 +35,26 @@ func TestServicePipelinePrepareProcessFinalizeAndEndBlock(t *testing.T) {
 
 	finalization, err := FinalizeServiceProposal(ctx, state, plan, []ServiceExecutionOutcome{
 		{
-			CallID:        onchain.CallID,
-			Status:        ServiceCallStatusExecuted,
-			ResponseHash:  testHash("identity-response"),
-			PaymentStatus: ServicePaymentStatusSettled,
-			GasUsed:       100,
+			CallID:		onchain.CallID,
+			Status:		ServiceCallStatusExecuted,
+			ResponseHash:	testHash("identity-response"),
+			PaymentStatus:	ServicePaymentStatusSettled,
+			GasUsed:	100,
 		},
 		{
-			CallID:        offchain.CallID,
-			Status:        ServiceCallStatusAccepted,
-			ResponseHash:  testHash("indexer-response"),
-			PaymentStatus: ServicePaymentStatusReserved,
-			ProviderID:    "provider-indexer",
+			CallID:		offchain.CallID,
+			Status:		ServiceCallStatusAccepted,
+			ResponseHash:	testHash("indexer-response"),
+			PaymentStatus:	ServicePaymentStatusReserved,
+			ProviderID:	"provider-indexer",
 		},
 		{
-			CallID:        mixedDispute.CallID,
-			Status:        ServiceCallStatusChallenged,
-			ResponseHash:  testHash("challenge-response"),
-			ProofHash:     testHash("challenge-proof"),
-			PaymentStatus: ServicePaymentStatusEscrowed,
-			ProviderID:    "provider-storage",
+			CallID:		mixedDispute.CallID,
+			Status:		ServiceCallStatusChallenged,
+			ResponseHash:	testHash("challenge-response"),
+			ProofHash:	testHash("challenge-proof"),
+			PaymentStatus:	ServicePaymentStatusEscrowed,
+			ProviderID:	"provider-storage",
 		},
 	})
 	require.NoError(t, err)
@@ -102,15 +102,15 @@ func TestServiceSTFRejectsNonDeterministicOrUnmeteredExecution(t *testing.T) {
 	call := servicePipelineCall(ctx, hybrid, "put", ServiceCallKindMixedSettlement, 1, "storage/settlements/1", "5")
 
 	transition := ServiceStateTransition{
-		CurrentStateRoot:     testHash("current-state"),
-		NextStateRoot:        testHash("next-state"),
-		Call:                 call,
-		Context:              ctx,
-		StateReadSet:         []string{"storage/settlements/1"},
-		StateWriteSet:        []string{"storage/settlements/1"},
-		ExternalCalls:        []string{"https://storage.aetra.local"},
-		IterationLimit:       100,
-		ProofVerificationGas: 50,
+		CurrentStateRoot:	testHash("current-state"),
+		NextStateRoot:		testHash("next-state"),
+		Call:			call,
+		Context:		ctx,
+		StateReadSet:		[]string{"storage/settlements/1"},
+		StateWriteSet:		[]string{"storage/settlements/1"},
+		ExternalCalls:		[]string{"https://storage.aetra.local"},
+		IterationLimit:		100,
+		ProofVerificationGas:	50,
 	}
 	require.ErrorContains(t, transition.Validate(state), "external network calls")
 
@@ -159,22 +159,22 @@ func servicePipelineState(t *testing.T) CoreState {
 func servicePipelineCall(ctx ServiceConsensusContext, descriptor ServiceDescriptor, methodID string, kind ServiceCallKind, nonce uint64, writeKey string, maxFee string) ServiceCallEnvelope {
 	method, _ := descriptor.Interface.MethodByID(methodID)
 	call := ServiceCallEnvelope{
-		ServiceID:        descriptor.ServiceID,
-		Caller:           DefaultAuthority,
-		Nonce:            nonce,
-		IdempotencyKey:   descriptor.ServiceID + "/" + methodID + "/idem",
-		MethodID:         methodID,
-		InterfaceHash:    descriptor.Interface.InterfaceHash,
-		PayloadHash:      testHash(descriptor.ServiceID + "/" + methodID + "/payload"),
-		PaymentDenom:     descriptor.Payment.Denom,
-		MaxFeeAmount:     maxFee,
-		ProofRequirement: method.VerificationModel,
-		Kind:             kind,
-		CreatedHeight:    ctx.Height,
-		DeadlineHeight:   ctx.Height + 10,
-		PriorityClass:    1,
-		StateReadSet:     []string{writeKey},
-		StateWriteSet:    []string{writeKey},
+		ServiceID:		descriptor.ServiceID,
+		Caller:			DefaultAuthority,
+		Nonce:			nonce,
+		IdempotencyKey:		descriptor.ServiceID + "/" + methodID + "/idem",
+		MethodID:		methodID,
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		PayloadHash:		testHash(descriptor.ServiceID + "/" + methodID + "/payload"),
+		PaymentDenom:		descriptor.Payment.Denom,
+		MaxFeeAmount:		maxFee,
+		ProofRequirement:	method.VerificationModel,
+		Kind:			kind,
+		CreatedHeight:		ctx.Height,
+		DeadlineHeight:		ctx.Height + 10,
+		PriorityClass:		1,
+		StateReadSet:		[]string{writeKey},
+		StateWriteSet:		[]string{writeKey},
 	}
 	call.CallID = ComputeServiceCallID(ctx, call)
 	return call

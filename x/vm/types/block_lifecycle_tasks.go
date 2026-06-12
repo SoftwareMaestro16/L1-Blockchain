@@ -12,45 +12,45 @@ import (
 )
 
 const (
-	AVMHookPrepareClassifyTransactions     AVMAppPipelineHookName = "prepare.classify_transactions"
-	AVMHookPrepareGroupByZoneActor         AVMAppPipelineHookName = "prepare.group_by_zone_actor"
-	AVMHookPrepareIncludeEligibleScheduled AVMAppPipelineHookName = "prepare.include_eligible_scheduled"
-	AVMHookPrepareReserveZoneBudgets       AVMAppPipelineHookName = "prepare.reserve_zone_budgets"
-	AVMHookProcessVerifyQueueOrdering      AVMAppPipelineHookName = "process.verify_queue_ordering"
-	AVMHookProcessVerifyBudgetBounds       AVMAppPipelineHookName = "process.verify_budget_bounds"
-	AVMHookProcessVerifyMessageEligibility AVMAppPipelineHookName = "process.verify_message_eligibility"
-	AVMHookProcessRejectExpiredMessages    AVMAppPipelineHookName = "process.reject_expired_messages"
-	AVMHookFinalizeExecuteSyncTransactions AVMAppPipelineHookName = "finalize.execute_sync_transactions"
-	AVMHookFinalizeDrainAsyncQueues        AVMAppPipelineHookName = "finalize.drain_async_queues"
-	AVMHookFinalizeExecuteActorHandlers    AVMAppPipelineHookName = "finalize.execute_actor_handlers"
-	AVMHookFinalizeResumeContinuations     AVMAppPipelineHookName = "finalize.resume_continuations"
-	AVMHookFinalizeEmitReceipts            AVMAppPipelineHookName = "finalize.emit_receipts"
-	AVMHookFinalizeCommitRoots             AVMAppPipelineHookName = "finalize.commit_roots"
-	AVMHookEndBlockBoundedCleanup          AVMAppPipelineHookName = "end_block.bounded_cleanup"
-	AVMHookEndBlockMarkExpiredMessages     AVMAppPipelineHookName = "end_block.mark_expired_messages"
-	AVMHookEndBlockPruneTombstones         AVMAppPipelineHookName = "end_block.prune_tombstones"
-	AVMHookEndBlockEmitZoneSummaries       AVMAppPipelineHookName = "end_block.emit_zone_summaries"
+	AVMHookPrepareClassifyTransactions	AVMAppPipelineHookName	= "prepare.classify_transactions"
+	AVMHookPrepareGroupByZoneActor		AVMAppPipelineHookName	= "prepare.group_by_zone_actor"
+	AVMHookPrepareIncludeEligibleScheduled	AVMAppPipelineHookName	= "prepare.include_eligible_scheduled"
+	AVMHookPrepareReserveZoneBudgets	AVMAppPipelineHookName	= "prepare.reserve_zone_budgets"
+	AVMHookProcessVerifyQueueOrdering	AVMAppPipelineHookName	= "process.verify_queue_ordering"
+	AVMHookProcessVerifyBudgetBounds	AVMAppPipelineHookName	= "process.verify_budget_bounds"
+	AVMHookProcessVerifyMessageEligibility	AVMAppPipelineHookName	= "process.verify_message_eligibility"
+	AVMHookProcessRejectExpiredMessages	AVMAppPipelineHookName	= "process.reject_expired_messages"
+	AVMHookFinalizeExecuteSyncTransactions	AVMAppPipelineHookName	= "finalize.execute_sync_transactions"
+	AVMHookFinalizeDrainAsyncQueues		AVMAppPipelineHookName	= "finalize.drain_async_queues"
+	AVMHookFinalizeExecuteActorHandlers	AVMAppPipelineHookName	= "finalize.execute_actor_handlers"
+	AVMHookFinalizeResumeContinuations	AVMAppPipelineHookName	= "finalize.resume_continuations"
+	AVMHookFinalizeEmitReceipts		AVMAppPipelineHookName	= "finalize.emit_receipts"
+	AVMHookFinalizeCommitRoots		AVMAppPipelineHookName	= "finalize.commit_roots"
+	AVMHookEndBlockBoundedCleanup		AVMAppPipelineHookName	= "end_block.bounded_cleanup"
+	AVMHookEndBlockMarkExpiredMessages	AVMAppPipelineHookName	= "end_block.mark_expired_messages"
+	AVMHookEndBlockPruneTombstones		AVMAppPipelineHookName	= "end_block.prune_tombstones"
+	AVMHookEndBlockEmitZoneSummaries	AVMAppPipelineHookName	= "end_block.emit_zone_summaries"
 )
 
 type AVMAppPipelineHookName string
 
 type AVMAppPipelineHook struct {
-	Name     AVMAppPipelineHookName
-	Phase    AVMABCIPhase
-	Stage    AVMBlockStage
-	Sequence uint32
-	Root     string
+	Name		AVMAppPipelineHookName
+	Phase		AVMABCIPhase
+	Stage		AVMBlockStage
+	Sequence	uint32
+	Root		string
 }
 
 type AVMAppExecutionPipeline struct {
-	Hooks []AVMAppPipelineHook
-	Root  string
+	Hooks	[]AVMAppPipelineHook
+	Root	string
 }
 
 type AVMZoneBudgetAccounting struct {
-	ZoneID zonestypes.ZoneID
-	Before zonestypes.ZoneExecutionBudget
-	After  zonestypes.ZoneExecutionBudget
+	ZoneID	zonestypes.ZoneID
+	Before	zonestypes.ZoneExecutionBudget
+	After	zonestypes.ZoneExecutionBudget
 }
 
 func DefaultAVMAppExecutionPipeline() (AVMAppExecutionPipeline, error) {
@@ -150,12 +150,12 @@ func SelectEligibleAVMProposalMessages(height uint64, queue AVMZoneQueue, messag
 		proposed = append(proposed, proposal)
 	}
 	plan, err := NewAVMABCIProposalPlan(AVMABCIProposalPlan{
-		Height:   height,
-		Phase:    AVMABCIPrepareProposal,
-		Messages: proposed,
+		Height:		height,
+		Phase:		AVMABCIPrepareProposal,
+		Messages:	proposed,
 		ZoneBudgets: []AVMBlockZoneBudget{{
-			ZoneID: queue.ZoneID,
-			Budget: budget,
+			ZoneID:	queue.ZoneID,
+			Budget:	budget,
 		}},
 	})
 	if err != nil {
@@ -200,9 +200,9 @@ func ComputeAVMProposalBudgetAccounting(plan AVMABCIProposalPlan) ([]AVMZoneBudg
 	byZone := make(map[zonestypes.ZoneID]int, len(plan.ZoneBudgets))
 	for _, item := range plan.ZoneBudgets {
 		accounting = append(accounting, AVMZoneBudgetAccounting{
-			ZoneID: item.ZoneID,
-			Before: item.Budget,
-			After:  item.Budget,
+			ZoneID:	item.ZoneID,
+			Before:	item.Budget,
+			After:	item.Budget,
 		})
 		byZone[item.ZoneID] = len(accounting) - 1
 	}
@@ -219,14 +219,14 @@ func ComputeAVMProposalBudgetAccounting(plan AVMABCIProposalPlan) ([]AVMZoneBudg
 
 func FinalizeAVMBlockRoots(height uint64, routerRoot, asyncRoot, actorRoot, contractRoot, continuationRoot, interfaceRoot, receiptRoot string, zoneRoots []AVMZoneStateRoot) (AVMRoot, error) {
 	root, err := NewAVMRoot(AVMRoot{
-		Height:           height,
-		RouterRoot:       routerRoot,
-		AsyncMessageRoot: asyncRoot,
-		ActorRoot:        actorRoot,
-		ContractRoot:     contractRoot,
-		ContinuationRoot: continuationRoot,
-		InterfaceRoot:    interfaceRoot,
-		ReceiptRoot:      receiptRoot,
+		Height:			height,
+		RouterRoot:		routerRoot,
+		AsyncMessageRoot:	asyncRoot,
+		ActorRoot:		actorRoot,
+		ContractRoot:		contractRoot,
+		ContinuationRoot:	continuationRoot,
+		InterfaceRoot:		interfaceRoot,
+		ReceiptRoot:		receiptRoot,
 	})
 	if err != nil {
 		return AVMRoot{}, err

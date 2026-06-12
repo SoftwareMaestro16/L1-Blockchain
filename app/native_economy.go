@@ -27,31 +27,29 @@ func (app *L1App) FinalizeNativeEconomyEpoch(ctx sdk.Context, epoch uint64, stak
 	if record.EmissionAmount.Amount.IsZero() {
 		return record, nil
 	}
-	// Mint to fee_collector directly (SendCoinsFromModuleToModule bypasses BlockedAddr).
-	// Cannot use MintProtocolCoins because its internal SendCoinsFromModuleToAccount
-	// rejects all module accounts (CanReceiveUserFunds=false).
+
 	decision := mintauthoritytypes.EmissionDecision{
-		Caller:   mintauthoritytypes.DefaultEmissionCaller,
-		Denom:    record.EmissionAmount.Denom,
-		Amount:   record.EmissionAmount.Amount,
-		Epoch:    epoch,
-		Height:   uint64(ctx.BlockHeight()),
-		Approved: true,
+		Caller:		mintauthoritytypes.DefaultEmissionCaller,
+		Denom:		record.EmissionAmount.Denom,
+		Amount:		record.EmissionAmount.Amount,
+		Epoch:		epoch,
+		Height:		uint64(ctx.BlockHeight()),
+		Approved:	true,
 	}
 	decision.DecisionHash = mintauthoritytypes.ComputeEmissionDecisionHash(decision)
-	// Update mint authority state
+
 	state, err := app.MintAuthorityKeeper.GetState(ctx)
 	if err != nil {
 		return emissionstypes.EmissionEpoch{}, err
 	}
 	newState, _, err := mintauthoritytypes.ApplyMintProtocolCoins(state, mintauthoritytypes.MsgMintProtocolCoins{
-		Caller:                mintauthoritytypes.DefaultEmissionCaller,
-		Recipient:             aetraaddress.FormatAccAddress(app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)),
-		Denom:                 record.EmissionAmount.Denom,
-		Amount:                record.EmissionAmount.Amount,
-		Epoch:                 epoch,
-		Height:                uint64(ctx.BlockHeight()),
-		EmissionsDecisionHash: decision.DecisionHash,
+		Caller:			mintauthoritytypes.DefaultEmissionCaller,
+		Recipient:		aetraaddress.FormatAccAddress(app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)),
+		Denom:			record.EmissionAmount.Denom,
+		Amount:			record.EmissionAmount.Amount,
+		Epoch:			epoch,
+		Height:			uint64(ctx.BlockHeight()),
+		EmissionsDecisionHash:	decision.DecisionHash,
 	}, decision, mintauthoritytypes.ConstitutionEmergencyAuthorization{})
 	if err != nil {
 		return emissionstypes.EmissionEpoch{}, err
@@ -59,7 +57,7 @@ func (app *L1App) FinalizeNativeEconomyEpoch(ctx sdk.Context, epoch uint64, stak
 	if err := app.MintAuthorityKeeper.SetState(ctx, newState); err != nil {
 		return emissionstypes.EmissionEpoch{}, err
 	}
-	// Mint to mint module, then send to fee_collector via ModuleToModule
+
 	if err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, sdk.NewCoins(record.EmissionAmount)); err != nil {
 		return emissionstypes.EmissionEpoch{}, err
 	}
@@ -96,7 +94,7 @@ func (app *L1App) maybeFinalizeNativeEmissionEpoch(ctx sdk.Context) error {
 }
 
 func (app *L1App) distributeNativeEmission(ctx sdk.Context, epoch uint64, record emissionstypes.EmissionEpoch) error {
-	// Validator reward stays in fee_collector (already there after mint)
+
 	treasury := record.Treasury
 	if record.RoundingRemainder.Amount.IsPositive() {
 		treasury = treasury.Add(record.RoundingRemainder)

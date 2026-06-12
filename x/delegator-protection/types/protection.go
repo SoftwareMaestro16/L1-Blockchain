@@ -12,121 +12,121 @@ import (
 )
 
 const (
-	ModuleName = "delegator-protection"
-	StoreKey   = ModuleName
+	ModuleName	= "delegator-protection"
+	StoreKey	= ModuleName
 
-	DefaultProtectionAuthority = "4:0000000000000000000000000000000000000000000000000000000000000001"
-	DefaultBondDenom           = "naet"
-	BasisPoints                = uint32(10_000)
+	DefaultProtectionAuthority	= "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultBondDenom		= "naet"
+	BasisPoints			= uint32(10_000)
 
-	ClaimStatusSubmitted = "submitted"
-	ClaimStatusApproved  = "approved"
-	ClaimStatusRejected  = "rejected"
-	ClaimStatusPaid      = "paid"
+	ClaimStatusSubmitted	= "submitted"
+	ClaimStatusApproved	= "approved"
+	ClaimStatusRejected	= "rejected"
+	ClaimStatusPaid		= "paid"
 )
 
 type ProtectionParams struct {
-	Authority               string
-	Denom                   string
-	IncomingFeeShareBps     uint32
-	TreasuryDistributionBps uint32
-	ReserveFloor            sdkmath.Int
-	MaxPayoutPerEpoch       sdkmath.Int
-	MinClaimLoss            sdkmath.Int
-	MaxActiveClaims         uint32
-	MaxPayoutHistory        uint32
-	RequireEligibilityHash  bool
+	Authority		string
+	Denom			string
+	IncomingFeeShareBps	uint32
+	TreasuryDistributionBps	uint32
+	ReserveFloor		sdkmath.Int
+	MaxPayoutPerEpoch	sdkmath.Int
+	MinClaimLoss		sdkmath.Int
+	MaxActiveClaims		uint32
+	MaxPayoutHistory	uint32
+	RequireEligibilityHash	bool
 }
 
 type ProtectionFund struct {
-	Balance          sdkmath.Int
-	IncomingFeeShare uint32
-	ReserveFloor     sdkmath.Int
-	Denom            string
-	FundHash         string
+	Balance			sdkmath.Int
+	IncomingFeeShare	uint32
+	ReserveFloor		sdkmath.Int
+	Denom			string
+	FundHash		string
 }
 
 type ProtectionClaim struct {
-	ClaimID         string
-	Delegator       string
-	Validator       string
-	LossAmount      sdkmath.Int
-	RequestedPayout sdkmath.Int
-	ApprovedPayout  sdkmath.Int
-	EligibilityHash string
-	Reason          string
-	Epoch           uint64
-	SubmittedHeight uint64
-	ApprovedHeight  uint64
-	Status          string
-	Paid            bool
-	ClaimHash       string
+	ClaimID		string
+	Delegator	string
+	Validator	string
+	LossAmount	sdkmath.Int
+	RequestedPayout	sdkmath.Int
+	ApprovedPayout	sdkmath.Int
+	EligibilityHash	string
+	Reason		string
+	Epoch		uint64
+	SubmittedHeight	uint64
+	ApprovedHeight	uint64
+	Status		string
+	Paid		bool
+	ClaimHash	string
 }
 
 type ProtectionPayout struct {
-	PayoutID   string
-	ClaimID    string
-	Delegator  string
-	Amount     sdkmath.Int
-	Epoch      uint64
-	Height     uint64
-	PayoutHash string
+	PayoutID	string
+	ClaimID		string
+	Delegator	string
+	Amount		sdkmath.Int
+	Epoch		uint64
+	Height		uint64
+	PayoutHash	string
 }
 
 type DelegatorProtectionState struct {
-	Params  ProtectionParams
-	Fund    ProtectionFund
-	Claims  []ProtectionClaim
-	Payouts []ProtectionPayout
+	Params	ProtectionParams
+	Fund	ProtectionFund
+	Claims	[]ProtectionClaim
+	Payouts	[]ProtectionPayout
 }
 
 type FeeShareAllocation struct {
-	CollectedFee sdkmath.Int
-	AddedToFund  sdkmath.Int
-	Remainder    sdkmath.Int
-	ShareBps     uint32
+	CollectedFee	sdkmath.Int
+	AddedToFund	sdkmath.Int
+	Remainder	sdkmath.Int
+	ShareBps	uint32
 }
 
 type MsgSubmitDelegatorProtectionClaim struct {
-	Delegator       string
-	Validator       string
-	LossAmount      sdkmath.Int
-	RequestedPayout sdkmath.Int
-	EligibilityHash string
-	Reason          string
-	Epoch           uint64
-	Height          uint64
+	Delegator	string
+	Validator	string
+	LossAmount	sdkmath.Int
+	RequestedPayout	sdkmath.Int
+	EligibilityHash	string
+	Reason		string
+	Epoch		uint64
+	Height		uint64
 }
 
 type MsgApproveDelegatorProtectionClaim struct {
-	Authority      string
-	ClaimID        string
-	ApprovedPayout sdkmath.Int
-	Height         uint64
+	Authority	string
+	ClaimID		string
+	ApprovedPayout	sdkmath.Int
+	Height		uint64
 }
 
 type MsgRejectDelegatorProtectionClaim struct {
-	Authority string
-	ClaimID   string
-	Reason    string
-	Height    uint64
+	Authority	string
+	ClaimID		string
+	Reason		string
+	Height		uint64
 }
 
 type MsgClaimDelegatorCompensation struct {
-	Delegator string
-	ClaimID   string
-	Epoch     uint64
-	Height    uint64
+	Delegator	string
+	ClaimID		string
+	Epoch		uint64
+	Height		uint64
 }
 
 type MsgUpdateProtectionParams struct {
-	Authority string
-	Params    ProtectionParams
+	Authority	string
+	Params		ProtectionParams
 }
 
 type QueryProtectionClaimsRequest struct {
-	Delegator string
-	Status    string
+	Delegator	string
+	Status		string
 }
 
 type QueryDelegatorCompensationRequest struct {
@@ -135,16 +135,16 @@ type QueryDelegatorCompensationRequest struct {
 
 func DefaultProtectionParams() ProtectionParams {
 	return ProtectionParams{
-		Authority:               DefaultProtectionAuthority,
-		Denom:                   DefaultBondDenom,
-		IncomingFeeShareBps:     250,
-		TreasuryDistributionBps: 1_000,
-		ReserveFloor:            sdkmath.NewInt(1_000),
-		MaxPayoutPerEpoch:       sdkmath.NewInt(10_000),
-		MinClaimLoss:            sdkmath.NewInt(1),
-		MaxActiveClaims:         10_000,
-		MaxPayoutHistory:        10_000,
-		RequireEligibilityHash:  true,
+		Authority:			DefaultProtectionAuthority,
+		Denom:				DefaultBondDenom,
+		IncomingFeeShareBps:		250,
+		TreasuryDistributionBps:	1_000,
+		ReserveFloor:			sdkmath.NewInt(1_000),
+		MaxPayoutPerEpoch:		sdkmath.NewInt(10_000),
+		MinClaimLoss:			sdkmath.NewInt(1),
+		MaxActiveClaims:		10_000,
+		MaxPayoutHistory:		10_000,
+		RequireEligibilityHash:		true,
 	}
 }
 
@@ -156,10 +156,10 @@ func NewDelegatorProtectionState(params ProtectionParams) (DelegatorProtectionSt
 		return DelegatorProtectionState{}, err
 	}
 	fund := ProtectionFund{
-		Balance:          sdkmath.ZeroInt(),
-		IncomingFeeShare: params.IncomingFeeShareBps,
-		ReserveFloor:     params.ReserveFloor,
-		Denom:            params.Denom,
+		Balance:		sdkmath.ZeroInt(),
+		IncomingFeeShare:	params.IncomingFeeShareBps,
+		ReserveFloor:		params.ReserveFloor,
+		Denom:			params.Denom,
 	}
 	fund.FundHash = ComputeProtectionFundHash(fund)
 	return DelegatorProtectionState{Params: params, Fund: fund}, nil
@@ -370,10 +370,10 @@ func ApplyProtocolFeeShare(state DelegatorProtectionState, collectedFee sdkmath.
 	state.Fund.Balance = state.Fund.Balance.Add(added)
 	state.Fund.FundHash = ComputeProtectionFundHash(state.Fund)
 	allocation := FeeShareAllocation{
-		CollectedFee: collectedFee,
-		AddedToFund:  added,
-		Remainder:    collectedFee.Sub(added),
-		ShareBps:     state.Params.IncomingFeeShareBps,
+		CollectedFee:	collectedFee,
+		AddedToFund:	added,
+		Remainder:	collectedFee.Sub(added),
+		ShareBps:	state.Params.IncomingFeeShareBps,
 	}
 	state = NormalizeDelegatorProtectionState(state)
 	return state, allocation, state.Validate()
@@ -385,15 +385,15 @@ func ApplySubmitDelegatorProtectionClaim(state DelegatorProtectionState, msg Msg
 		return DelegatorProtectionState{}, ProtectionClaim{}, err
 	}
 	claim := ProtectionClaim{
-		Delegator:       strings.TrimSpace(msg.Delegator),
-		Validator:       strings.TrimSpace(msg.Validator),
-		LossAmount:      normalizeInt(msg.LossAmount),
-		RequestedPayout: normalizeInt(msg.RequestedPayout),
-		EligibilityHash: strings.ToLower(strings.TrimSpace(msg.EligibilityHash)),
-		Reason:          strings.TrimSpace(msg.Reason),
-		Epoch:           msg.Epoch,
-		SubmittedHeight: msg.Height,
-		Status:          ClaimStatusSubmitted,
+		Delegator:		strings.TrimSpace(msg.Delegator),
+		Validator:		strings.TrimSpace(msg.Validator),
+		LossAmount:		normalizeInt(msg.LossAmount),
+		RequestedPayout:	normalizeInt(msg.RequestedPayout),
+		EligibilityHash:	strings.ToLower(strings.TrimSpace(msg.EligibilityHash)),
+		Reason:			strings.TrimSpace(msg.Reason),
+		Epoch:			msg.Epoch,
+		SubmittedHeight:	msg.Height,
+		Status:			ClaimStatusSubmitted,
 	}
 	if claim.RequestedPayout.IsNil() || !claim.RequestedPayout.IsPositive() {
 		claim.RequestedPayout = claim.LossAmount
@@ -498,11 +498,11 @@ func ApplyClaimDelegatorCompensation(state DelegatorProtectionState, msg MsgClai
 	claim.ClaimHash = ComputeProtectionClaimHash(claim)
 	state.Claims[index] = claim
 	payout := ProtectionPayout{
-		ClaimID:   claim.ClaimID,
-		Delegator: claim.Delegator,
-		Amount:    amount,
-		Epoch:     msg.Epoch,
-		Height:    msg.Height,
+		ClaimID:	claim.ClaimID,
+		Delegator:	claim.Delegator,
+		Amount:		amount,
+		Epoch:		msg.Epoch,
+		Height:		msg.Height,
 	}
 	payout.PayoutID = ComputeProtectionPayoutID(payout)
 	payout.PayoutHash = ComputeProtectionPayoutHash(payout)
@@ -737,10 +737,10 @@ func normalizePayouts(payouts []ProtectionPayout) []ProtectionPayout {
 func cloneState(state DelegatorProtectionState) DelegatorProtectionState {
 	state = NormalizeDelegatorProtectionState(state)
 	return DelegatorProtectionState{
-		Params:  state.Params,
-		Fund:    state.Fund,
-		Claims:  append([]ProtectionClaim(nil), state.Claims...),
-		Payouts: append([]ProtectionPayout(nil), state.Payouts...),
+		Params:		state.Params,
+		Fund:		state.Fund,
+		Claims:		append([]ProtectionClaim(nil), state.Claims...),
+		Payouts:	append([]ProtectionPayout(nil), state.Payouts...),
 	}
 }
 

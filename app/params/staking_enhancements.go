@@ -8,182 +8,182 @@ import (
 )
 
 const (
-	ValidatorEconomicEventScored          = "validator_economic_scored"
-	ValidatorEconomicEventSelected        = "validator_economic_selected"
-	ValidatorEconomicEventConcentration   = "validator_concentration_dampened"
-	ValidatorEconomicEventEpochTransition = "validator_epoch_transition_recommended"
+	ValidatorEconomicEventScored		= "validator_economic_scored"
+	ValidatorEconomicEventSelected		= "validator_economic_selected"
+	ValidatorEconomicEventConcentration	= "validator_concentration_dampened"
+	ValidatorEconomicEventEpochTransition	= "validator_epoch_transition_recommended"
 
-	DefaultValidatorScoreWeightStakeBps          = int64(2_000)
-	DefaultValidatorScoreWeightSelfDelegationBps = int64(1_500)
-	DefaultValidatorScoreWeightUptimeBps         = int64(2_000)
-	DefaultValidatorScoreWeightMissedBlocksBps   = int64(1_000)
-	DefaultValidatorScoreWeightSlashHistoryBps   = int64(1_500)
-	DefaultValidatorScoreWeightCommissionBps     = int64(1_000)
-	DefaultValidatorScoreWeightConcentrationBps  = int64(750)
-	DefaultValidatorScoreWeightMetadataBps       = int64(250)
-	DefaultValidatorMinEligibilityScoreBps       = int64(7_000)
-	DefaultValidatorMinUptimeBps                 = int64(9_500)
-	DefaultValidatorSlashPenaltyStepBps          = int64(1_000)
-	DefaultValidatorMaxSlashPenaltyBps           = int64(5_000)
-	DefaultValidatorMaxCommissionPenaltyBps      = int64(3_000)
-	DefaultValidatorMaxEpochChurnBps             = int64(2_500)
-	DefaultValidatorMinRewardAdjustmentBps       = int64(7_000)
-	DefaultValidatorMaxRewardAdjustmentBps       = int64(10_500)
+	DefaultValidatorScoreWeightStakeBps		= int64(2_000)
+	DefaultValidatorScoreWeightSelfDelegationBps	= int64(1_500)
+	DefaultValidatorScoreWeightUptimeBps		= int64(2_000)
+	DefaultValidatorScoreWeightMissedBlocksBps	= int64(1_000)
+	DefaultValidatorScoreWeightSlashHistoryBps	= int64(1_500)
+	DefaultValidatorScoreWeightCommissionBps	= int64(1_000)
+	DefaultValidatorScoreWeightConcentrationBps	= int64(750)
+	DefaultValidatorScoreWeightMetadataBps		= int64(250)
+	DefaultValidatorMinEligibilityScoreBps		= int64(7_000)
+	DefaultValidatorMinUptimeBps			= int64(9_500)
+	DefaultValidatorSlashPenaltyStepBps		= int64(1_000)
+	DefaultValidatorMaxSlashPenaltyBps		= int64(5_000)
+	DefaultValidatorMaxCommissionPenaltyBps		= int64(3_000)
+	DefaultValidatorMaxEpochChurnBps		= int64(2_500)
+	DefaultValidatorMinRewardAdjustmentBps		= int64(7_000)
+	DefaultValidatorMaxRewardAdjustmentBps		= int64(10_500)
 )
 
 type StakingEnhancementParams struct {
-	MinSelfDelegationRatioBps    int64
-	MaxCommissionBps             int64
-	MaxActiveSet                 uint32
-	ConcentrationSoftCapBps      int64
-	MaxConcentrationDampeningBps int64
-	MinUptimeBps                 int64
-	MinEligibilityScoreBps       int64
-	MaxEpochChurnBps             int64
-	EpochLengthBlocks            uint64
-	RequireMetadataComplete      bool
-	MinRewardAdjustmentBps       int64
-	MaxRewardAdjustmentBps       int64
-	SlashPenaltyStepBps          int64
-	MaxSlashPenaltyBps           int64
-	MaxCommissionScorePenaltyBps int64
-	ScoreWeights                 ValidatorScoreWeights
+	MinSelfDelegationRatioBps	int64
+	MaxCommissionBps		int64
+	MaxActiveSet			uint32
+	ConcentrationSoftCapBps		int64
+	MaxConcentrationDampeningBps	int64
+	MinUptimeBps			int64
+	MinEligibilityScoreBps		int64
+	MaxEpochChurnBps		int64
+	EpochLengthBlocks		uint64
+	RequireMetadataComplete		bool
+	MinRewardAdjustmentBps		int64
+	MaxRewardAdjustmentBps		int64
+	SlashPenaltyStepBps		int64
+	MaxSlashPenaltyBps		int64
+	MaxCommissionScorePenaltyBps	int64
+	ScoreWeights			ValidatorScoreWeights
 }
 
 type ValidatorScoreWeights struct {
-	StakeBps          int64
-	SelfDelegationBps int64
-	UptimeBps         int64
-	MissedBlocksBps   int64
-	SlashHistoryBps   int64
-	CommissionBps     int64
-	ConcentrationBps  int64
-	MetadataBps       int64
+	StakeBps		int64
+	SelfDelegationBps	int64
+	UptimeBps		int64
+	MissedBlocksBps		int64
+	SlashHistoryBps		int64
+	CommissionBps		int64
+	ConcentrationBps	int64
+	MetadataBps		int64
 }
 
 type ValidatorEconomicRecord struct {
-	ValidatorID            string
-	BondedStakeNaet        sdkmath.Int
-	SelfDelegationNaet     sdkmath.Int
-	CommissionBps          int64
-	UptimeBps              int64
-	MissedBlockRateBps     int64
-	SlashEvents            uint64
-	RecentSlashSeverityBps int64
-	MetadataComplete       bool
-	CurrentlyActive        bool
+	ValidatorID		string
+	BondedStakeNaet		sdkmath.Int
+	SelfDelegationNaet	sdkmath.Int
+	CommissionBps		int64
+	UptimeBps		int64
+	MissedBlockRateBps	int64
+	SlashEvents		uint64
+	RecentSlashSeverityBps	int64
+	MetadataComplete	bool
+	CurrentlyActive		bool
 }
 
 type ValidatorEconomicScore struct {
-	ValidatorID               string
-	Eligible                  bool
-	RejectReasons             []string
-	BondedStakeNaet           sdkmath.Int
-	SelfDelegationRatioBps    int64
-	VotingPowerBps            int64
-	StakeScoreBps             int64
-	SelfDelegationScoreBps    int64
-	UptimeScoreBps            int64
-	MissedBlockScoreBps       int64
-	SlashHistoryScoreBps      int64
-	CommissionScoreBps        int64
-	ConcentrationScoreBps     int64
-	MetadataScoreBps          int64
-	ScoreBps                  int64
-	ConcentrationPenaltyBps   int64
-	ReliabilityPenaltyBps     int64
-	SlashPenaltyBps           int64
-	RewardAdjustmentFactorBps int64
+	ValidatorID			string
+	Eligible			bool
+	RejectReasons			[]string
+	BondedStakeNaet			sdkmath.Int
+	SelfDelegationRatioBps		int64
+	VotingPowerBps			int64
+	StakeScoreBps			int64
+	SelfDelegationScoreBps		int64
+	UptimeScoreBps			int64
+	MissedBlockScoreBps		int64
+	SlashHistoryScoreBps		int64
+	CommissionScoreBps		int64
+	ConcentrationScoreBps		int64
+	MetadataScoreBps		int64
+	ScoreBps			int64
+	ConcentrationPenaltyBps		int64
+	ReliabilityPenaltyBps		int64
+	SlashPenaltyBps			int64
+	RewardAdjustmentFactorBps	int64
 }
 
 type ValidatorEconomicEvent struct {
-	Type                      string
-	EpochID                   uint64
-	ValidatorID               string
-	Eligible                  bool
-	ScoreBps                  int64
-	ConcentrationScoreBps     int64
-	RewardAdjustmentFactorBps int64
-	RejectReasons             []string
+	Type				string
+	EpochID				uint64
+	ValidatorID			string
+	Eligible			bool
+	ScoreBps			int64
+	ConcentrationScoreBps		int64
+	RewardAdjustmentFactorBps	int64
+	RejectReasons			[]string
 }
 
 type ActiveSetRecommendationInput struct {
-	EpochID                   uint64
-	CurrentActiveValidatorIDs []string
-	Candidates                []ValidatorEconomicRecord
-	Params                    StakingEnhancementParams
+	EpochID				uint64
+	CurrentActiveValidatorIDs	[]string
+	Candidates			[]ValidatorEconomicRecord
+	Params				StakingEnhancementParams
 }
 
 type ActiveSetRecommendation struct {
-	EpochID       uint64
-	Selected      []ValidatorEconomicScore
-	Standby       []ValidatorEconomicScore
-	AllScores     []ValidatorEconomicScore
-	ChurnCount    uint32
-	AllowedChurn  uint32
-	Deterministic bool
-	Events        []ValidatorEconomicEvent
-	Failed        []string
+	EpochID		uint64
+	Selected	[]ValidatorEconomicScore
+	Standby		[]ValidatorEconomicScore
+	AllScores	[]ValidatorEconomicScore
+	ChurnCount	uint32
+	AllowedChurn	uint32
+	Deterministic	bool
+	Events		[]ValidatorEconomicEvent
+	Failed		[]string
 }
 
 type ValidatorDistributionScenario struct {
-	Name                      string
-	CurrentActiveValidatorIDs []string
-	Candidates                []ValidatorEconomicRecord
+	Name				string
+	CurrentActiveValidatorIDs	[]string
+	Candidates			[]ValidatorEconomicRecord
 }
 
 type ValidatorDistributionScenarioReport struct {
-	Name                         string
-	Recommendation               ActiveSetRecommendation
-	RewardAdjustmentBoundsPassed bool
-	ChurnBounded                 bool
-	ConcentrationWarnings        uint32
-	Warnings                     []string
+	Name				string
+	Recommendation			ActiveSetRecommendation
+	RewardAdjustmentBoundsPassed	bool
+	ChurnBounded			bool
+	ConcentrationWarnings		uint32
+	Warnings			[]string
 }
 
 type ValidatorDistributionSimulationInput struct {
-	EpochID   uint64
-	Scenarios []ValidatorDistributionScenario
-	Params    StakingEnhancementParams
+	EpochID		uint64
+	Scenarios	[]ValidatorDistributionScenario
+	Params		StakingEnhancementParams
 }
 
 type ValidatorDistributionSimulationReport struct {
-	Scenarios []ValidatorDistributionScenarioReport
-	Passed    bool
-	Failed    []string
+	Scenarios	[]ValidatorDistributionScenarioReport
+	Passed		bool
+	Failed		[]string
 }
 
 type StakingEnhancementInvariantReport struct {
-	Passed bool
-	Failed []string
+	Passed	bool
+	Failed	[]string
 }
 
 func DefaultStakingEnhancementParams() StakingEnhancementParams {
 	return StakingEnhancementParams{
-		MinSelfDelegationRatioBps:    DefaultMinSelfDelegationBps,
-		MaxCommissionBps:             MaxCommissionBps,
-		MaxActiveSet:                 uint32(DefaultActiveValidatorTarget),
-		ConcentrationSoftCapBps:      MaxTopValidatorConcentrationBps,
-		MaxConcentrationDampeningBps: MaxValidatorRewardDampeningBps,
-		MinUptimeBps:                 DefaultValidatorMinUptimeBps,
-		MinEligibilityScoreBps:       DefaultValidatorMinEligibilityScoreBps,
-		MaxEpochChurnBps:             DefaultValidatorMaxEpochChurnBps,
-		EpochLengthBlocks:            10_000,
-		RequireMetadataComplete:      true,
-		MinRewardAdjustmentBps:       DefaultValidatorMinRewardAdjustmentBps,
-		MaxRewardAdjustmentBps:       DefaultValidatorMaxRewardAdjustmentBps,
-		SlashPenaltyStepBps:          DefaultValidatorSlashPenaltyStepBps,
-		MaxSlashPenaltyBps:           DefaultValidatorMaxSlashPenaltyBps,
-		MaxCommissionScorePenaltyBps: DefaultValidatorMaxCommissionPenaltyBps,
+		MinSelfDelegationRatioBps:	DefaultMinSelfDelegationBps,
+		MaxCommissionBps:		MaxCommissionBps,
+		MaxActiveSet:			uint32(DefaultActiveValidatorTarget),
+		ConcentrationSoftCapBps:	MaxTopValidatorConcentrationBps,
+		MaxConcentrationDampeningBps:	MaxValidatorRewardDampeningBps,
+		MinUptimeBps:			DefaultValidatorMinUptimeBps,
+		MinEligibilityScoreBps:		DefaultValidatorMinEligibilityScoreBps,
+		MaxEpochChurnBps:		DefaultValidatorMaxEpochChurnBps,
+		EpochLengthBlocks:		10_000,
+		RequireMetadataComplete:	true,
+		MinRewardAdjustmentBps:		DefaultValidatorMinRewardAdjustmentBps,
+		MaxRewardAdjustmentBps:		DefaultValidatorMaxRewardAdjustmentBps,
+		SlashPenaltyStepBps:		DefaultValidatorSlashPenaltyStepBps,
+		MaxSlashPenaltyBps:		DefaultValidatorMaxSlashPenaltyBps,
+		MaxCommissionScorePenaltyBps:	DefaultValidatorMaxCommissionPenaltyBps,
 		ScoreWeights: ValidatorScoreWeights{
-			StakeBps:          DefaultValidatorScoreWeightStakeBps,
-			SelfDelegationBps: DefaultValidatorScoreWeightSelfDelegationBps,
-			UptimeBps:         DefaultValidatorScoreWeightUptimeBps,
-			MissedBlocksBps:   DefaultValidatorScoreWeightMissedBlocksBps,
-			SlashHistoryBps:   DefaultValidatorScoreWeightSlashHistoryBps,
-			CommissionBps:     DefaultValidatorScoreWeightCommissionBps,
-			ConcentrationBps:  DefaultValidatorScoreWeightConcentrationBps,
-			MetadataBps:       DefaultValidatorScoreWeightMetadataBps,
+			StakeBps:		DefaultValidatorScoreWeightStakeBps,
+			SelfDelegationBps:	DefaultValidatorScoreWeightSelfDelegationBps,
+			UptimeBps:		DefaultValidatorScoreWeightUptimeBps,
+			MissedBlocksBps:	DefaultValidatorScoreWeightMissedBlocksBps,
+			SlashHistoryBps:	DefaultValidatorScoreWeightSlashHistoryBps,
+			CommissionBps:		DefaultValidatorScoreWeightCommissionBps,
+			ConcentrationBps:	DefaultValidatorScoreWeightConcentrationBps,
+			MetadataBps:		DefaultValidatorScoreWeightMetadataBps,
 		},
 	}
 }
@@ -214,22 +214,22 @@ func ScoreValidatorEconomics(record ValidatorEconomicRecord, totalBondedStake sd
 	slashPenalty := clampInt64(int64(record.SlashEvents)*params.SlashPenaltyStepBps+record.RecentSlashSeverityBps, 0, params.MaxSlashPenaltyBps)
 
 	score := ValidatorEconomicScore{
-		ValidatorID:               record.ValidatorID,
-		BondedStakeNaet:           bonded,
-		SelfDelegationRatioBps:    selfRatioBps,
-		VotingPowerBps:            votingPowerBps,
-		StakeScoreBps:             validatorStakeScore(votingPowerBps, params.ConcentrationSoftCapBps),
-		SelfDelegationScoreBps:    ratioScore(selfRatioBps, params.MinSelfDelegationRatioBps),
-		UptimeScoreBps:            clampInt64(record.UptimeBps, 0, BasisPoints),
-		MissedBlockScoreBps:       BasisPoints - clampInt64(record.MissedBlockRateBps, 0, BasisPoints),
-		SlashHistoryScoreBps:      BasisPoints - slashPenalty,
-		CommissionScoreBps:        BasisPoints - ApplyBps(sdkmath.NewInt(params.MaxCommissionScorePenaltyBps), commissionPressureBps(record.CommissionBps, params.MaxCommissionBps)).Int64(),
-		ConcentrationScoreBps:     BasisPoints - concentrationPenalty,
-		MetadataScoreBps:          metadataScore(record.MetadataComplete),
-		ConcentrationPenaltyBps:   concentrationPenalty,
-		ReliabilityPenaltyBps:     reliabilityPenalty,
-		SlashPenaltyBps:           slashPenalty,
-		RewardAdjustmentFactorBps: rewardAdjustmentBps(concentrationPenalty, reliabilityPenalty, slashPenalty, params),
+		ValidatorID:			record.ValidatorID,
+		BondedStakeNaet:		bonded,
+		SelfDelegationRatioBps:		selfRatioBps,
+		VotingPowerBps:			votingPowerBps,
+		StakeScoreBps:			validatorStakeScore(votingPowerBps, params.ConcentrationSoftCapBps),
+		SelfDelegationScoreBps:		ratioScore(selfRatioBps, params.MinSelfDelegationRatioBps),
+		UptimeScoreBps:			clampInt64(record.UptimeBps, 0, BasisPoints),
+		MissedBlockScoreBps:		BasisPoints - clampInt64(record.MissedBlockRateBps, 0, BasisPoints),
+		SlashHistoryScoreBps:		BasisPoints - slashPenalty,
+		CommissionScoreBps:		BasisPoints - ApplyBps(sdkmath.NewInt(params.MaxCommissionScorePenaltyBps), commissionPressureBps(record.CommissionBps, params.MaxCommissionBps)).Int64(),
+		ConcentrationScoreBps:		BasisPoints - concentrationPenalty,
+		MetadataScoreBps:		metadataScore(record.MetadataComplete),
+		ConcentrationPenaltyBps:	concentrationPenalty,
+		ReliabilityPenaltyBps:		reliabilityPenalty,
+		SlashPenaltyBps:		slashPenalty,
+		RewardAdjustmentFactorBps:	rewardAdjustmentBps(concentrationPenalty, reliabilityPenalty, slashPenalty, params),
 	}
 	score.ScoreBps = weightedValidatorScore(score, params.ScoreWeights)
 	score.RejectReasons = validatorRejectReasons(record, score, params)
@@ -293,23 +293,23 @@ func RecommendActiveSetForEpoch(input ActiveSetRecommendationInput) (ActiveSetRe
 
 	events := validatorEconomicEvents(input.EpochID, scores, selectedIDs)
 	events = append(events, ValidatorEconomicEvent{
-		Type:          ValidatorEconomicEventEpochTransition,
-		EpochID:       input.EpochID,
-		Eligible:      len(failed) == 0,
-		ScoreBps:      averageSelectedScore(selected),
-		RejectReasons: failed,
+		Type:		ValidatorEconomicEventEpochTransition,
+		EpochID:	input.EpochID,
+		Eligible:	len(failed) == 0,
+		ScoreBps:	averageSelectedScore(selected),
+		RejectReasons:	failed,
 	})
 
 	return ActiveSetRecommendation{
-		EpochID:       input.EpochID,
-		Selected:      selected,
-		Standby:       standby,
-		AllScores:     scores,
-		ChurnCount:    churn,
-		AllowedChurn:  allowedChurn,
-		Deterministic: true,
-		Events:        events,
-		Failed:        failed,
+		EpochID:	input.EpochID,
+		Selected:	selected,
+		Standby:	standby,
+		AllScores:	scores,
+		ChurnCount:	churn,
+		AllowedChurn:	allowedChurn,
+		Deterministic:	true,
+		Events:		events,
+		Failed:		failed,
 	}, nil
 }
 
@@ -332,10 +332,10 @@ func RunValidatorDistributionSimulation(input ValidatorDistributionSimulationInp
 			return ValidatorDistributionSimulationReport{}, fmt.Errorf("scenario name is required")
 		}
 		recommendation, err := RecommendActiveSetForEpoch(ActiveSetRecommendationInput{
-			EpochID:                   input.EpochID + uint64(i),
-			CurrentActiveValidatorIDs: scenario.CurrentActiveValidatorIDs,
-			Candidates:                scenario.Candidates,
-			Params:                    params,
+			EpochID:			input.EpochID + uint64(i),
+			CurrentActiveValidatorIDs:	scenario.CurrentActiveValidatorIDs,
+			Candidates:			scenario.Candidates,
+			Params:				params,
 		})
 		if err != nil {
 			return ValidatorDistributionSimulationReport{}, err
@@ -351,19 +351,19 @@ func RunValidatorDistributionSimulation(input ValidatorDistributionSimulationInp
 			}
 		}
 		reports = append(reports, ValidatorDistributionScenarioReport{
-			Name:                         scenario.Name,
-			Recommendation:               recommendation,
-			RewardAdjustmentBoundsPassed: !containsString(invariants.Failed, "reward_adjustment_out_of_bounds"),
-			ChurnBounded:                 !containsString(invariants.Failed, "epoch_churn_exceeds_bound"),
-			ConcentrationWarnings:        concentrationWarningCount(recommendation.Events),
-			Warnings:                     warnings,
+			Name:				scenario.Name,
+			Recommendation:			recommendation,
+			RewardAdjustmentBoundsPassed:	!containsString(invariants.Failed, "reward_adjustment_out_of_bounds"),
+			ChurnBounded:			!containsString(invariants.Failed, "epoch_churn_exceeds_bound"),
+			ConcentrationWarnings:		concentrationWarningCount(recommendation.Events),
+			Warnings:			warnings,
 		})
 	}
 
 	return ValidatorDistributionSimulationReport{
-		Scenarios: reports,
-		Passed:    len(failed) == 0,
-		Failed:    failed,
+		Scenarios:	reports,
+		Passed:		len(failed) == 0,
+		Failed:		failed,
 	}, nil
 }
 
@@ -500,8 +500,8 @@ func (p StakingEnhancementParams) withDefaults() StakingEnhancementParams {
 
 func (w ValidatorScoreWeights) Validate() error {
 	for _, field := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "score_weight_stake_bps", value: w.StakeBps},
 		{name: "score_weight_self_delegation_bps", value: w.SelfDelegationBps},
@@ -743,35 +743,35 @@ func validatorEconomicEvents(epochID uint64, scores []ValidatorEconomicScore, se
 	events := make([]ValidatorEconomicEvent, 0, len(scores)*2)
 	for _, score := range scores {
 		events = append(events, ValidatorEconomicEvent{
-			Type:                      ValidatorEconomicEventScored,
-			EpochID:                   epochID,
-			ValidatorID:               score.ValidatorID,
-			Eligible:                  score.Eligible,
-			ScoreBps:                  score.ScoreBps,
-			ConcentrationScoreBps:     score.ConcentrationScoreBps,
-			RewardAdjustmentFactorBps: score.RewardAdjustmentFactorBps,
-			RejectReasons:             append([]string(nil), score.RejectReasons...),
+			Type:				ValidatorEconomicEventScored,
+			EpochID:			epochID,
+			ValidatorID:			score.ValidatorID,
+			Eligible:			score.Eligible,
+			ScoreBps:			score.ScoreBps,
+			ConcentrationScoreBps:		score.ConcentrationScoreBps,
+			RewardAdjustmentFactorBps:	score.RewardAdjustmentFactorBps,
+			RejectReasons:			append([]string(nil), score.RejectReasons...),
 		})
 		if score.ConcentrationPenaltyBps > 0 {
 			events = append(events, ValidatorEconomicEvent{
-				Type:                      ValidatorEconomicEventConcentration,
-				EpochID:                   epochID,
-				ValidatorID:               score.ValidatorID,
-				Eligible:                  score.Eligible,
-				ScoreBps:                  score.ScoreBps,
-				ConcentrationScoreBps:     score.ConcentrationScoreBps,
-				RewardAdjustmentFactorBps: score.RewardAdjustmentFactorBps,
+				Type:				ValidatorEconomicEventConcentration,
+				EpochID:			epochID,
+				ValidatorID:			score.ValidatorID,
+				Eligible:			score.Eligible,
+				ScoreBps:			score.ScoreBps,
+				ConcentrationScoreBps:		score.ConcentrationScoreBps,
+				RewardAdjustmentFactorBps:	score.RewardAdjustmentFactorBps,
 			})
 		}
 		if selectedIDs[score.ValidatorID] {
 			events = append(events, ValidatorEconomicEvent{
-				Type:                      ValidatorEconomicEventSelected,
-				EpochID:                   epochID,
-				ValidatorID:               score.ValidatorID,
-				Eligible:                  true,
-				ScoreBps:                  score.ScoreBps,
-				ConcentrationScoreBps:     score.ConcentrationScoreBps,
-				RewardAdjustmentFactorBps: score.RewardAdjustmentFactorBps,
+				Type:				ValidatorEconomicEventSelected,
+				EpochID:			epochID,
+				ValidatorID:			score.ValidatorID,
+				Eligible:			true,
+				ScoreBps:			score.ScoreBps,
+				ConcentrationScoreBps:		score.ConcentrationScoreBps,
+				RewardAdjustmentFactorBps:	score.RewardAdjustmentFactorBps,
 			})
 		}
 	}

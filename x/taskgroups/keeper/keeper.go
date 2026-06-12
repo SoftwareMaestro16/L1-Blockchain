@@ -9,14 +9,14 @@ import (
 )
 
 type Keeper struct {
-	groups   map[string]postypes.TaskGroup
-	receipts map[string]taskgrouptypes.VerificationReceiptSet
+	groups		map[string]postypes.TaskGroup
+	receipts	map[string]taskgrouptypes.VerificationReceiptSet
 }
 
 func NewKeeper(groups []postypes.TaskGroup) (Keeper, error) {
 	k := Keeper{
-		groups:   make(map[string]postypes.TaskGroup, len(groups)),
-		receipts: make(map[string]taskgrouptypes.VerificationReceiptSet),
+		groups:		make(map[string]postypes.TaskGroup, len(groups)),
+		receipts:	make(map[string]taskgrouptypes.VerificationReceiptSet),
 	}
 	for _, group := range groups {
 		if err := k.SetTaskGroup(group); err != nil {

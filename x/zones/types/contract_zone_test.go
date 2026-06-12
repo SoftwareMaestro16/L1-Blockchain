@@ -61,22 +61,22 @@ func TestContractZoneBoundaryAndSpecStateKeys(t *testing.T) {
 
 func TestContractBytecodeAndCosmWasmBoundaryCommitments(t *testing.T) {
 	iface, err := NewContractBytecodeInterface(ContractBytecodeInterface{
-		Runtime:         ContractRuntimeAVM,
-		InstructionSet:  "avm-v1",
-		BytecodeHash:    hash("bytecode"),
-		ABIHash:         hash("abi"),
-		DeterminismHash: hash("determinism"),
-		MaxCodeBytes:    1 << 20,
+		Runtime:		ContractRuntimeAVM,
+		InstructionSet:		"avm-v1",
+		BytecodeHash:		hash("bytecode"),
+		ABIHash:		hash("abi"),
+		DeterminismHash:	hash("determinism"),
+		MaxCodeBytes:		1 << 20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeContractBytecodeInterfaceHash(iface), iface.InterfaceHash)
 	require.NoError(t, iface.Validate())
 
 	adapter, err := NewContractCosmWasmAdapterDescriptor(ContractCosmWasmAdapterDescriptor{
-		AdapterID:      "cw-adapter",
-		Version:        "v1",
-		PolicyHash:     hash("adapter-policy"),
-		CapabilityRoot: hash("adapter-capability"),
+		AdapterID:	"cw-adapter",
+		Version:	"v1",
+		PolicyHash:	hash("adapter-policy"),
+		CapabilityRoot:	hash("adapter-capability"),
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeContractCosmWasmAdapterHash(adapter), adapter.DescriptorHash)
@@ -127,13 +127,13 @@ func TestContractAVMExecutionShardingAsyncCallsAndProofRoots(t *testing.T) {
 	require.NoError(t, keeper.ValidateHash())
 
 	instance := ContractInstance{
-		ContractAddr:  "contract-1",
-		CodeID:        "code-1",
-		Runtime:       ContractRuntimeAVM,
-		Admin:         "alice",
-		StorageRoot:   hash("storage"),
-		CreatedHeight: 77,
-		UpdatedHeight: 77,
+		ContractAddr:	"contract-1",
+		CodeID:		"code-1",
+		Runtime:	ContractRuntimeAVM,
+		Admin:		"alice",
+		StorageRoot:	hash("storage"),
+		CreatedHeight:	77,
+		UpdatedHeight:	77,
 	}
 	msg := contractInbox("contract-1", "msg-1", 1)
 	receipt, err := keeper.Execute(instance, msg, []AVMInstruction{
@@ -156,14 +156,14 @@ func TestContractAVMExecutionShardingAsyncCallsAndProofRoots(t *testing.T) {
 	require.Equal(t, ContractRouteCodeRegistry, codeRoute.RoutingMode)
 
 	call, outboxMsg, err := NewContractAsyncCall(ContractAsyncCall{
-		Source:         "workflow-1",
-		SourceZone:     ZoneIDApplication,
-		TargetContract: "contract-1",
-		PayloadHash:    hash("call-payload"),
-		GasLimit:       1_000,
-		RetryNonce:     2,
-		ExpiryHeight:   100,
-		CreatedHeight:  77,
+		Source:		"workflow-1",
+		SourceZone:	ZoneIDApplication,
+		TargetContract:	"contract-1",
+		PayloadHash:	hash("call-payload"),
+		GasLimit:	1_000,
+		RetryNonce:	2,
+		ExpiryHeight:	100,
+		CreatedHeight:	77,
 	})
 	require.NoError(t, err)
 	require.NoError(t, call.ValidateHash())
@@ -177,20 +177,20 @@ func TestContractAVMExecutionShardingAsyncCallsAndProofRoots(t *testing.T) {
 	require.NoError(t, event.ValidateHash())
 
 	roots := ContractZoneRoots{
-		Height:                77,
-		CodeRoot:              hash("code-root"),
-		InstanceRoot:          hash("instance-root"),
-		StorageRoot:           hash("storage-root"),
-		ABIRoot:               hash("abi-root"),
-		InboxRoot:             ComputeContractInboxRoot([]ContractInboxMessage{msg}),
-		OutboxRoot:            ComputeContractOutboxRoot(outbox),
-		ReceiptRoot:           ComputeContractReceiptRoot([]ContractExecutionReceipt{receipt}),
-		GasTableRoot:          ComputeAVMGasTableRoot(table),
-		EventRoot:             ComputeContractEventRoot([]ContractEvent{event}),
-		BytecodeInterfaceRoot: hash("iface-root"),
-		CosmWasmAdapterRoot:   hash("adapter-root"),
-		ExecutionRoot:         ComputeContractExecutionRoot([]ContractExecutionReceipt{receipt}),
-		ProofRoot:             hash("proof-root"),
+		Height:			77,
+		CodeRoot:		hash("code-root"),
+		InstanceRoot:		hash("instance-root"),
+		StorageRoot:		hash("storage-root"),
+		ABIRoot:		hash("abi-root"),
+		InboxRoot:		ComputeContractInboxRoot([]ContractInboxMessage{msg}),
+		OutboxRoot:		ComputeContractOutboxRoot(outbox),
+		ReceiptRoot:		ComputeContractReceiptRoot([]ContractExecutionReceipt{receipt}),
+		GasTableRoot:		ComputeAVMGasTableRoot(table),
+		EventRoot:		ComputeContractEventRoot([]ContractEvent{event}),
+		BytecodeInterfaceRoot:	hash("iface-root"),
+		CosmWasmAdapterRoot:	hash("adapter-root"),
+		ExecutionRoot:		ComputeContractExecutionRoot([]ContractExecutionReceipt{receipt}),
+		ProofRoot:		hash("proof-root"),
 	}
 	exports, err := BuildContractProofRootExports(77, roots)
 	require.NoError(t, err)
@@ -201,19 +201,19 @@ func TestContractAVMExecutionShardingAsyncCallsAndProofRoots(t *testing.T) {
 
 func TestContractZoneStateRootAndProofRequest(t *testing.T) {
 	iface, err := NewContractBytecodeInterface(ContractBytecodeInterface{
-		Runtime:         ContractRuntimeAVM,
-		InstructionSet:  "avm-v1",
-		BytecodeHash:    hash("bytecode"),
-		ABIHash:         hash("abi"),
-		DeterminismHash: hash("determinism"),
-		MaxCodeBytes:    1 << 20,
+		Runtime:		ContractRuntimeAVM,
+		InstructionSet:		"avm-v1",
+		BytecodeHash:		hash("bytecode"),
+		ABIHash:		hash("abi"),
+		DeterminismHash:	hash("determinism"),
+		MaxCodeBytes:		1 << 20,
 	})
 	require.NoError(t, err)
 	adapter, err := NewContractCosmWasmAdapterDescriptor(ContractCosmWasmAdapterDescriptor{
-		AdapterID:      "cw-adapter",
-		Version:        "v1",
-		PolicyHash:     hash("adapter-policy"),
-		CapabilityRoot: hash("adapter-capability"),
+		AdapterID:	"cw-adapter",
+		Version:	"v1",
+		PolicyHash:	hash("adapter-policy"),
+		CapabilityRoot:	hash("adapter-capability"),
 	})
 	require.NoError(t, err)
 	receipt, err := NewContractExecutionReceipt(contractReceipt("contract-1", "receipt-1", "msg-1", 1))
@@ -224,35 +224,35 @@ func TestContractZoneStateRootAndProofRequest(t *testing.T) {
 	event.EventHash = ComputeContractEventHash(event)
 
 	state := ContractZoneState{
-		Height: 77,
+		Height:	77,
 		Codes: []ContractCode{{
-			CodeID:         "code-1",
-			Runtime:        ContractRuntimeAVM,
-			BytecodeHash:   hash("bytecode"),
-			BytecodeSize:   4096,
-			ABIHash:        hash("abi"),
-			InterfaceHash:  iface.InterfaceHash,
-			Uploader:       "alice",
-			UploadedHeight: 77,
+			CodeID:		"code-1",
+			Runtime:	ContractRuntimeAVM,
+			BytecodeHash:	hash("bytecode"),
+			BytecodeSize:	4096,
+			ABIHash:	hash("abi"),
+			InterfaceHash:	iface.InterfaceHash,
+			Uploader:	"alice",
+			UploadedHeight:	77,
 		}},
 		Instances: []ContractInstance{{
-			ContractAddr:  "contract-1",
-			CodeID:        "code-1",
-			Runtime:       ContractRuntimeAVM,
-			Admin:         "alice",
-			StorageRoot:   hash("storage"),
-			CreatedHeight: 77,
-			UpdatedHeight: 77,
+			ContractAddr:	"contract-1",
+			CodeID:		"code-1",
+			Runtime:	ContractRuntimeAVM,
+			Admin:		"alice",
+			StorageRoot:	hash("storage"),
+			CreatedHeight:	77,
+			UpdatedHeight:	77,
 		}},
-		Storage:            []ContractStorageEntry{contractStorage("contract-1", "slot-1", "value-1")},
-		ABIs:               []ContractABIDescriptor{{CodeID: "code-1", ABIHash: hash("abi"), InterfaceHash: iface.InterfaceHash, ExportedMethods: []string{"execute", "query"}, RegisteredHeight: 77}},
-		Inbox:              []ContractInboxMessage{contractInbox("contract-1", "msg-1", 1)},
-		Outbox:             []ContractInboxMessage{contractInbox("contract-1", "msg-2", 2)},
-		Receipts:           []ContractExecutionReceipt{receipt},
-		BytecodeInterfaces: []ContractBytecodeInterface{iface},
-		CosmWasmAdapters:   []ContractCosmWasmAdapterDescriptor{adapter},
-		GasTable:           gasTable,
-		Events:             []ContractEvent{event},
+		Storage:		[]ContractStorageEntry{contractStorage("contract-1", "slot-1", "value-1")},
+		ABIs:			[]ContractABIDescriptor{{CodeID: "code-1", ABIHash: hash("abi"), InterfaceHash: iface.InterfaceHash, ExportedMethods: []string{"execute", "query"}, RegisteredHeight: 77}},
+		Inbox:			[]ContractInboxMessage{contractInbox("contract-1", "msg-1", 1)},
+		Outbox:			[]ContractInboxMessage{contractInbox("contract-1", "msg-2", 2)},
+		Receipts:		[]ContractExecutionReceipt{receipt},
+		BytecodeInterfaces:	[]ContractBytecodeInterface{iface},
+		CosmWasmAdapters:	[]ContractCosmWasmAdapterDescriptor{adapter},
+		GasTable:		gasTable,
+		Events:			[]ContractEvent{event},
 	}
 	require.NoError(t, state.Validate())
 
@@ -277,37 +277,37 @@ func hasContractProofRoot(exports []ContractProofRootExport, rootType ContractPr
 
 func contractStorage(contractAddr, key, value string) ContractStorageEntry {
 	return ContractStorageEntry{
-		ContractAddr: contractAddr,
-		Key:          key,
-		ValueHash:    hash(value),
+		ContractAddr:	contractAddr,
+		Key:		key,
+		ValueHash:	hash(value),
 	}
 }
 
 func contractInbox(contractAddr, msgID string, sequence uint64) ContractInboxMessage {
 	return ContractInboxMessage{
-		ContractAddr:   contractAddr,
-		MsgID:          msgID,
-		MessageKind:    ContractMessageExecute,
-		Source:         "application-zone",
-		PayloadHash:    hash(msgID),
-		GasLimit:       1_000,
-		Sequence:       sequence,
-		ReceivedHeight: 77,
+		ContractAddr:	contractAddr,
+		MsgID:		msgID,
+		MessageKind:	ContractMessageExecute,
+		Source:		"application-zone",
+		PayloadHash:	hash(msgID),
+		GasLimit:	1_000,
+		Sequence:	sequence,
+		ReceivedHeight:	77,
 	}
 }
 
 func contractReceipt(contractAddr, receiptID, msgID string, sequence uint64) ContractExecutionReceipt {
 	return ContractExecutionReceipt{
-		ContractAddr:    contractAddr,
-		ReceiptID:       receiptID,
-		MsgID:           msgID,
-		MessageKind:     ContractMessageExecute,
-		Status:          ZoneReceiptStatusSuccess,
-		GasUsed:         500,
-		OutputHash:      hash(receiptID + "-output"),
-		StorageRoot:     hash(receiptID + "-storage"),
-		EmittedMessages: 1,
-		Height:          77,
-		Sequence:        sequence,
+		ContractAddr:		contractAddr,
+		ReceiptID:		receiptID,
+		MsgID:			msgID,
+		MessageKind:		ContractMessageExecute,
+		Status:			ZoneReceiptStatusSuccess,
+		GasUsed:		500,
+		OutputHash:		hash(receiptID + "-output"),
+		StorageRoot:		hash(receiptID + "-storage"),
+		EmittedMessages:	1,
+		Height:			77,
+		Sequence:		sequence,
 	}
 }

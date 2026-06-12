@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	IdentityGraphNodePrefix = IdentityZonePrefix + "/graph/node"
-	IdentityGraphEdgePrefix = IdentityZonePrefix + "/graph/edge"
-	IdentityGraphRootPrefix = IdentityZonePrefix + "/graph/root"
+	IdentityGraphNodePrefix	= IdentityZonePrefix + "/graph/node"
+	IdentityGraphEdgePrefix	= IdentityZonePrefix + "/graph/edge"
+	IdentityGraphRootPrefix	= IdentityZonePrefix + "/graph/root"
 )
 
 type IdentityResolverOutputType string
@@ -20,83 +20,83 @@ type IdentityGraphNodeType string
 type IdentityGraphEdgeType string
 
 const (
-	IdentityResolverOutputAccountAddress          IdentityResolverOutputType = "account_address"
-	IdentityResolverOutputZoneEndpoint            IdentityResolverOutputType = "zone_endpoint"
-	IdentityResolverOutputServiceEndpoint         IdentityResolverOutputType = "service_endpoint"
-	IdentityResolverOutputContractEndpoint        IdentityResolverOutputType = "contract_endpoint"
-	IdentityResolverOutputCompositeIdentityObject IdentityResolverOutputType = "composite_identity_object"
+	IdentityResolverOutputAccountAddress		IdentityResolverOutputType	= "account_address"
+	IdentityResolverOutputZoneEndpoint		IdentityResolverOutputType	= "zone_endpoint"
+	IdentityResolverOutputServiceEndpoint		IdentityResolverOutputType	= "service_endpoint"
+	IdentityResolverOutputContractEndpoint		IdentityResolverOutputType	= "contract_endpoint"
+	IdentityResolverOutputCompositeIdentityObject	IdentityResolverOutputType	= "composite_identity_object"
 
-	IdentityGraphNodeDomain                  IdentityGraphNodeType = "domain"
-	IdentityGraphNodeAccount                 IdentityGraphNodeType = "account"
-	IdentityGraphNodeService                 IdentityGraphNodeType = "service"
-	IdentityGraphNodeContract                IdentityGraphNodeType = "contract"
-	IdentityGraphNodeZoneEndpoint            IdentityGraphNodeType = "zone_endpoint"
-	IdentityGraphNodeCompositeIdentityObject IdentityGraphNodeType = "composite_identity_object"
+	IdentityGraphNodeDomain				IdentityGraphNodeType	= "domain"
+	IdentityGraphNodeAccount			IdentityGraphNodeType	= "account"
+	IdentityGraphNodeService			IdentityGraphNodeType	= "service"
+	IdentityGraphNodeContract			IdentityGraphNodeType	= "contract"
+	IdentityGraphNodeZoneEndpoint			IdentityGraphNodeType	= "zone_endpoint"
+	IdentityGraphNodeCompositeIdentityObject	IdentityGraphNodeType	= "composite_identity_object"
 
-	IdentityGraphEdgeOwns        IdentityGraphEdgeType = "owns"
-	IdentityGraphEdgeResolvesTo  IdentityGraphEdgeType = "resolves_to"
-	IdentityGraphEdgeDelegatesTo IdentityGraphEdgeType = "delegates_to"
-	IdentityGraphEdgeBoundTo     IdentityGraphEdgeType = "bound_to"
-	IdentityGraphEdgeReverseOf   IdentityGraphEdgeType = "reverse_of"
-	IdentityGraphEdgeServiceFor  IdentityGraphEdgeType = "service_for"
-	IdentityGraphEdgeContractFor IdentityGraphEdgeType = "contract_for"
+	IdentityGraphEdgeOwns		IdentityGraphEdgeType	= "owns"
+	IdentityGraphEdgeResolvesTo	IdentityGraphEdgeType	= "resolves_to"
+	IdentityGraphEdgeDelegatesTo	IdentityGraphEdgeType	= "delegates_to"
+	IdentityGraphEdgeBoundTo	IdentityGraphEdgeType	= "bound_to"
+	IdentityGraphEdgeReverseOf	IdentityGraphEdgeType	= "reverse_of"
+	IdentityGraphEdgeServiceFor	IdentityGraphEdgeType	= "service_for"
+	IdentityGraphEdgeContractFor	IdentityGraphEdgeType	= "contract_for"
 )
 
 type CompositeIdentityObjectV2 struct {
-	ObjectID     string
-	NameHash     string
-	ComponentIDs []string
-	MetadataHash string
-	ObjectHash   string
+	ObjectID	string
+	NameHash	string
+	ComponentIDs	[]string
+	MetadataHash	string
+	ObjectHash	string
 }
 
 type IdentityResolverOutputV2 struct {
-	OutputID     string
-	NameHash     string
-	OutputType   IdentityResolverOutputType
-	Account      sdk.AccAddress
-	ZoneEndpoint string
-	Service      *ServiceEndpointV2
-	Contract     *ContractTargetV2
-	Composite    *CompositeIdentityObjectV2
-	Height       uint64
-	OutputHash   string
+	OutputID	string
+	NameHash	string
+	OutputType	IdentityResolverOutputType
+	Account		sdk.AccAddress
+	ZoneEndpoint	string
+	Service		*ServiceEndpointV2
+	Contract	*ContractTargetV2
+	Composite	*CompositeIdentityObjectV2
+	Height		uint64
+	OutputHash	string
 }
 
 type IdentityNode struct {
-	IdentityID  string
-	NodeType    IdentityGraphNodeType
-	NameHash    string
-	Owner       sdk.AccAddress
-	Label       string
-	PayloadHash string
-	NodeHash    string
+	IdentityID	string
+	NodeType	IdentityGraphNodeType
+	NameHash	string
+	Owner		sdk.AccAddress
+	Label		string
+	PayloadHash	string
+	NodeHash	string
 }
 
 type IdentityEdge struct {
-	IdentityID string
-	TargetType IdentityGraphNodeType
-	TargetID   string
-	EdgeType   IdentityGraphEdgeType
-	TargetHash string
-	Height     uint64
-	EdgeHash   string
+	IdentityID	string
+	TargetType	IdentityGraphNodeType
+	TargetID	string
+	EdgeType	IdentityGraphEdgeType
+	TargetHash	string
+	Height		uint64
+	EdgeHash	string
 }
 
 type IdentityGraphRoot struct {
-	Height             uint64
-	NodeRoot           string
-	EdgeRoot           string
-	ResolverOutputRoot string
-	RootHash           string
+	Height			uint64
+	NodeRoot		string
+	EdgeRoot		string
+	ResolverOutputRoot	string
+	RootHash		string
 }
 
 type IdentityGraphStateV2 struct {
-	Nodes   []IdentityNode
-	Edges   []IdentityEdge
-	Outputs []IdentityResolverOutputV2
-	Height  uint64
-	Root    IdentityGraphRoot
+	Nodes	[]IdentityNode
+	Edges	[]IdentityEdge
+	Outputs	[]IdentityResolverOutputV2
+	Height	uint64
+	Root	IdentityGraphRoot
 }
 
 func IdentityGraphNodeKey(identityID string) (string, error) {
@@ -173,10 +173,10 @@ func NewIdentityEdge(edge IdentityEdge) (IdentityEdge, error) {
 
 func BuildIdentityGraphStateV2(nodes []IdentityNode, edges []IdentityEdge, outputs []IdentityResolverOutputV2, height uint64) (IdentityGraphStateV2, error) {
 	state := IdentityGraphStateV2{
-		Nodes:   normalizeIdentityNodes(nodes),
-		Edges:   normalizeIdentityEdges(edges),
-		Outputs: normalizeIdentityResolverOutputsV2(outputs),
-		Height:  height,
+		Nodes:		normalizeIdentityNodes(nodes),
+		Edges:		normalizeIdentityEdges(edges),
+		Outputs:	normalizeIdentityResolverOutputsV2(outputs),
+		Height:		height,
 	}
 	root, err := BuildIdentityGraphRoot(height, state.Nodes, state.Edges, state.Outputs)
 	if err != nil {
@@ -191,10 +191,10 @@ func BuildIdentityGraphRoot(height uint64, nodes []IdentityNode, edges []Identit
 		return IdentityGraphRoot{}, errors.New("identity graph root height must be positive")
 	}
 	root := IdentityGraphRoot{
-		Height:             height,
-		NodeRoot:           ComputeIdentityNodeRoot(nodes),
-		EdgeRoot:           ComputeIdentityEdgeRoot(edges),
-		ResolverOutputRoot: ComputeIdentityResolverOutputRootV2(outputs),
+		Height:			height,
+		NodeRoot:		ComputeIdentityNodeRoot(nodes),
+		EdgeRoot:		ComputeIdentityEdgeRoot(edges),
+		ResolverOutputRoot:	ComputeIdentityResolverOutputRootV2(outputs),
 	}
 	root.RootHash = ComputeIdentityGraphRootHash(root)
 	return root, root.Validate()
@@ -210,39 +210,39 @@ func BuildIdentityResolverOutputsFromUnifiedRecordV2(record UnifiedResolutionRec
 	outputs := []IdentityResolverOutputV2{}
 	if len(record.PrimaryAddress) > 0 {
 		outputs = append(outputs, IdentityResolverOutputV2{
-			OutputID:   "account/" + fmt.Sprintf("%x", []byte(record.PrimaryAddress)),
-			NameHash:   record.NameHash,
-			OutputType: IdentityResolverOutputAccountAddress,
-			Account:    cloneSpecAddress(record.PrimaryAddress),
-			Height:     height,
+			OutputID:	"account/" + fmt.Sprintf("%x", []byte(record.PrimaryAddress)),
+			NameHash:	record.NameHash,
+			OutputType:	IdentityResolverOutputAccountAddress,
+			Account:	cloneSpecAddress(record.PrimaryAddress),
+			Height:		height,
 		})
 	}
 	if record.RoutingMetadata.ZoneID != "" || record.RoutingMetadata.RouteID != "" {
 		endpoint := strings.Join([]string{record.RoutingMetadata.ZoneID, record.RoutingMetadata.ShardID, record.RoutingMetadata.RouteID}, "/")
 		outputs = append(outputs, IdentityResolverOutputV2{
-			OutputID:     "zone/" + identityHash(endpoint),
-			NameHash:     record.NameHash,
-			OutputType:   IdentityResolverOutputZoneEndpoint,
-			ZoneEndpoint: endpoint,
-			Height:       height,
+			OutputID:	"zone/" + identityHash(endpoint),
+			NameHash:	record.NameHash,
+			OutputType:	IdentityResolverOutputZoneEndpoint,
+			ZoneEndpoint:	endpoint,
+			Height:		height,
 		})
 	}
 	for _, service := range record.ServiceEndpoints {
 		outputs = append(outputs, IdentityResolverOutputV2{
-			OutputID:   "service/" + serviceEndpointIDV2(service),
-			NameHash:   record.NameHash,
-			OutputType: IdentityResolverOutputServiceEndpoint,
-			Service:    cloneServiceEndpointPtrV2(service),
-			Height:     height,
+			OutputID:	"service/" + serviceEndpointIDV2(service),
+			NameHash:	record.NameHash,
+			OutputType:	IdentityResolverOutputServiceEndpoint,
+			Service:	cloneServiceEndpointPtrV2(service),
+			Height:		height,
 		})
 	}
 	for _, contract := range record.ContractTargets {
 		outputs = append(outputs, IdentityResolverOutputV2{
-			OutputID:   "contract/" + contractTargetIDV2(contract),
-			NameHash:   record.NameHash,
-			OutputType: IdentityResolverOutputContractEndpoint,
-			Contract:   cloneContractTargetPtrV2(contract),
-			Height:     height,
+			OutputID:	"contract/" + contractTargetIDV2(contract),
+			NameHash:	record.NameHash,
+			OutputType:	IdentityResolverOutputContractEndpoint,
+			Contract:	cloneContractTargetPtrV2(contract),
+			Height:		height,
 		})
 	}
 	constructed := make([]IdentityResolverOutputV2, 0, len(outputs))
@@ -258,12 +258,12 @@ func BuildIdentityResolverOutputsFromUnifiedRecordV2(record UnifiedResolutionRec
 
 func BuildIdentityGraphFromResolverOutputsV2(nameHash string, owner sdk.AccAddress, outputs []IdentityResolverOutputV2, height uint64) (IdentityGraphStateV2, error) {
 	domainNode, err := NewIdentityNode(IdentityNode{
-		IdentityID:  "domain/" + nameHash,
-		NodeType:    IdentityGraphNodeDomain,
-		NameHash:    nameHash,
-		Owner:       cloneSpecAddress(owner),
-		Label:       "domain",
-		PayloadHash: nameHash,
+		IdentityID:	"domain/" + nameHash,
+		NodeType:	IdentityGraphNodeDomain,
+		NameHash:	nameHash,
+		Owner:		cloneSpecAddress(owner),
+		Label:		"domain",
+		PayloadHash:	nameHash,
 	})
 	if err != nil {
 		return IdentityGraphStateV2{}, err
@@ -456,8 +456,8 @@ func (root IdentityGraphRoot) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "identity graph node root", value: root.NodeRoot},
 		{name: "identity graph edge root", value: root.EdgeRoot},
@@ -629,22 +629,22 @@ func identityGraphNodeAndEdgeFromOutputV2(domainID string, output IdentityResolv
 		return IdentityNode{}, IdentityEdge{}, fmt.Errorf("unknown identity resolver output type %q", output.OutputType)
 	}
 	node, err := NewIdentityNode(IdentityNode{
-		IdentityID:  string(nodeType) + "/" + output.OutputID,
-		NodeType:    nodeType,
-		NameHash:    output.NameHash,
-		Label:       string(output.OutputType),
-		PayloadHash: output.OutputHash,
+		IdentityID:	string(nodeType) + "/" + output.OutputID,
+		NodeType:	nodeType,
+		NameHash:	output.NameHash,
+		Label:		string(output.OutputType),
+		PayloadHash:	output.OutputHash,
 	})
 	if err != nil {
 		return IdentityNode{}, IdentityEdge{}, err
 	}
 	edge, err := NewIdentityEdge(IdentityEdge{
-		IdentityID: domainID,
-		TargetType: nodeType,
-		TargetID:   output.OutputID,
-		EdgeType:   edgeType,
-		TargetHash: node.NodeHash,
-		Height:     output.Height,
+		IdentityID:	domainID,
+		TargetType:	nodeType,
+		TargetID:	output.OutputID,
+		EdgeType:	edgeType,
+		TargetHash:	node.NodeHash,
+		Height:		output.Height,
 	})
 	if err != nil {
 		return IdentityNode{}, IdentityEdge{}, err

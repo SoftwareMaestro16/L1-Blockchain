@@ -14,16 +14,16 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis          GenesisState
-	storeService     corestore.KVStoreService
-	runtimeCtx       context.Context
-	reputationKeeper types.ReputationKeeper
+	genesis			GenesisState
+	storeService		corestore.KVStoreService
+	runtimeCtx		context.Context
+	reputationKeeper	types.ReputationKeeper
 }
 
 func NewKeeper() Keeper {
@@ -42,9 +42,9 @@ func (k Keeper) WithReputationKeeper(rk types.ReputationKeeper) Keeper {
 func DefaultGenesis() GenesisState {
 	params := types.DefaultParams()
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  params,
-		State:   types.State{Validators: []types.ValidatorRecord{}},
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		params,
+		State:		types.State{Validators: []types.ValidatorRecord{}},
 	}
 }
 

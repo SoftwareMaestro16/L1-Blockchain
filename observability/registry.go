@@ -4,11 +4,11 @@ import "time"
 
 func NewRegistry() *Registry {
 	r := &Registry{
-		enabled:   true,
-		startedAt: time.Now(),
-		counters:  make(map[metricKey]sample),
-		gauges:    make(map[metricKey]sample),
-		summaries: make(map[metricKey]observation),
+		enabled:	true,
+		startedAt:	time.Now(),
+		counters:	make(map[metricKey]sample),
+		gauges:		make(map[metricKey]sample),
+		summaries:	make(map[metricKey]observation),
 	}
 	r.SetGauge(MetricLocalnetHealth, Labels{"component": "metrics"}, 1)
 	return r

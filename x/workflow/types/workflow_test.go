@@ -10,9 +10,9 @@ import (
 
 func TestValidateWorkflow(t *testing.T) {
 	workflow := Workflow{
-		ID:        "deploy-and-call",
-		Authority: []byte{1, 2, 3},
-		Atomic:    true,
+		ID:		"deploy-and-call",
+		Authority:	[]byte{1, 2, 3},
+		Atomic:		true,
 		Steps: []Step{
 			{ID: "deploy", Kind: StepKindContractDeployFirstMsg, Payload: []byte("deploy")},
 			{ID: "resolve", Kind: StepKindResolverPayment, Payload: []byte("pay")},
@@ -41,9 +41,9 @@ func TestValidateWorkflowBounds(t *testing.T) {
 	require.ErrorContains(t, err, "must not exceed")
 
 	err = ValidateStep(Step{
-		ID:      "oversized",
-		Kind:    StepKindContractDeployFirstMsg,
-		Payload: bytes.Repeat([]byte{1}, MaxWorkflowPayloadBytes+1),
+		ID:		"oversized",
+		Kind:		StepKindContractDeployFirstMsg,
+		Payload:	bytes.Repeat([]byte{1}, MaxWorkflowPayloadBytes+1),
 	})
 	require.ErrorContains(t, err, "payload")
 }

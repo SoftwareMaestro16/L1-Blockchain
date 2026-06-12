@@ -35,12 +35,12 @@ func TestConfigMsgServiceDelayEventsAndQueries(t *testing.T) {
 
 	submit := msgRouter.Handler(&types.MsgSubmitConfigChange{})
 	result, err := submit(ctx, &types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
+		Authority:	prototype.DefaultAuthority,
 		Change: types.ConfigChange{
-			ID:        "service-gas",
-			Key:       types.KeyConsensusMaxBlockGas,
-			Value:     "1000000",
-			Operation: types.OperationSet,
+			ID:		"service-gas",
+			Key:		types.KeyConsensusMaxBlockGas,
+			Value:		"1000000",
+			Operation:	types.OperationSet,
 		},
 	})
 	require.NoError(t, err)

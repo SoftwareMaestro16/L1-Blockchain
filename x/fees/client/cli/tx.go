@@ -10,11 +10,11 @@ import (
 
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      "Fee policy transactions",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
+		Use:				types.ModuleName,
+		Short:				"Fee policy transactions",
+		DisableFlagParsing:		true,
+		SuggestionsMinimumDistance:	2,
+		RunE:				client.ValidateCmd,
 	}
 	return cmd
 }

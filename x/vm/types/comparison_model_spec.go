@@ -10,31 +10,31 @@ import (
 )
 
 const (
-	AVMComparisonFeatureExecution  AVMExecutionComparisonFeature = "Execution"
-	AVMComparisonFeatureState      AVMExecutionComparisonFeature = "State"
-	AVMComparisonFeatureMessaging  AVMExecutionComparisonFeature = "Messaging"
-	AVMComparisonFeatureScheduling AVMExecutionComparisonFeature = "Scheduling"
-	AVMComparisonFeatureContracts  AVMExecutionComparisonFeature = "Contracts"
-	AVMComparisonFeatureUXModel    AVMExecutionComparisonFeature = "UX model"
+	AVMComparisonFeatureExecution	AVMExecutionComparisonFeature	= "Execution"
+	AVMComparisonFeatureState	AVMExecutionComparisonFeature	= "State"
+	AVMComparisonFeatureMessaging	AVMExecutionComparisonFeature	= "Messaging"
+	AVMComparisonFeatureScheduling	AVMExecutionComparisonFeature	= "Scheduling"
+	AVMComparisonFeatureContracts	AVMExecutionComparisonFeature	= "Contracts"
+	AVMComparisonFeatureUXModel	AVMExecutionComparisonFeature	= "UX model"
 
-	MaxAVMComparisonRows      = 32
-	MaxAVMComparisonTextBytes = 128
+	MaxAVMComparisonRows		= 32
+	MaxAVMComparisonTextBytes	= 128
 )
 
 type AVMExecutionComparisonFeature string
 
 type AVMExecutionComparisonRow struct {
-	Feature              AVMExecutionComparisonFeature
-	ClassicCosmosSDK     string
-	AVM                  string
-	RequiresAVMExtension bool
-	RowHash              string
+	Feature			AVMExecutionComparisonFeature
+	ClassicCosmosSDK	string
+	AVM			string
+	RequiresAVMExtension	bool
+	RowHash			string
 }
 
 type AVMExecutionModelComparison struct {
-	ModelName  string
-	Rows       []AVMExecutionComparisonRow
-	MatrixHash string
+	ModelName	string
+	Rows		[]AVMExecutionComparisonRow
+	MatrixHash	string
 }
 
 func DefaultAVMExecutionModelComparison() (AVMExecutionModelComparison, error) {
@@ -54,8 +54,8 @@ func DefaultAVMExecutionModelComparison() (AVMExecutionModelComparison, error) {
 		rows[i] = row
 	}
 	return NewAVMExecutionModelComparison(AVMExecutionModelComparison{
-		ModelName: "Classic Cosmos SDK vs AVM",
-		Rows:      rows,
+		ModelName:	"Classic Cosmos SDK vs AVM",
+		Rows:		rows,
 	})
 }
 
@@ -228,12 +228,12 @@ func canonicalAVMExecutionModelComparison(model AVMExecutionModelComparison) AVM
 func sortAVMExecutionComparisonRowsByDocumentOrder(rows []AVMExecutionComparisonRow) []AVMExecutionComparisonRow {
 	out := append([]AVMExecutionComparisonRow(nil), rows...)
 	order := map[AVMExecutionComparisonFeature]int{
-		AVMComparisonFeatureExecution:  0,
-		AVMComparisonFeatureState:      1,
-		AVMComparisonFeatureMessaging:  2,
-		AVMComparisonFeatureScheduling: 3,
-		AVMComparisonFeatureContracts:  4,
-		AVMComparisonFeatureUXModel:    5,
+		AVMComparisonFeatureExecution:	0,
+		AVMComparisonFeatureState:	1,
+		AVMComparisonFeatureMessaging:	2,
+		AVMComparisonFeatureScheduling:	3,
+		AVMComparisonFeatureContracts:	4,
+		AVMComparisonFeatureUXModel:	5,
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		return order[out[i].Feature] < order[out[j].Feature]

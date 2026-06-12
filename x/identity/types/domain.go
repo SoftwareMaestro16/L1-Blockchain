@@ -11,29 +11,29 @@ import (
 )
 
 const (
-	DomainTLD           = ".aet"
-	MinDomainLabelBytes = 1
-	MaxDomainLabelBytes = 64
+	DomainTLD		= ".aet"
+	MinDomainLabelBytes	= 1
+	MaxDomainLabelBytes	= 64
 )
 
 type DomainStatus string
 
 const (
-	DomainStatusAuction DomainStatus = "auction"
-	DomainStatusActive  DomainStatus = "active"
-	DomainStatusExpired DomainStatus = "expired"
+	DomainStatusAuction	DomainStatus	= "auction"
+	DomainStatusActive	DomainStatus	= "active"
+	DomainStatusExpired	DomainStatus	= "expired"
 )
 
 type DomainRecord struct {
-	Name          string
-	TLD           string
-	Owner         sdk.AccAddress
-	Resolver      sdk.AccAddress
-	ExpiryUnix    int64
-	NFTItemID     string
-	Status        DomainStatus
-	CreatedAtUnix int64
-	UpdatedAtUnix int64
+	Name		string
+	TLD		string
+	Owner		sdk.AccAddress
+	Resolver	sdk.AccAddress
+	ExpiryUnix	int64
+	NFTItemID	string
+	Status		DomainStatus
+	CreatedAtUnix	int64
+	UpdatedAtUnix	int64
 }
 
 func NormalizeDomainName(name string) (string, error) {

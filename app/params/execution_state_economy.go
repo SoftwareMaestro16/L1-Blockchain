@@ -8,192 +8,192 @@ import (
 )
 
 const (
-	ExecutionCostClassCompute           = "compute"
-	ExecutionCostClassStorageRead       = "storage_read"
-	ExecutionCostClassStorageWrite      = "storage_write"
-	ExecutionCostClassMessageForwarding = "message_forwarding"
+	ExecutionCostClassCompute		= "compute"
+	ExecutionCostClassStorageRead		= "storage_read"
+	ExecutionCostClassStorageWrite		= "storage_write"
+	ExecutionCostClassMessageForwarding	= "message_forwarding"
 
-	ExecutionTraceKindOperation  = "operation"
-	ExecutionTraceKindDeployment = "deployment"
-	ExecutionTraceKindAsyncFlow  = "async_flow"
+	ExecutionTraceKindOperation	= "operation"
+	ExecutionTraceKindDeployment	= "deployment"
+	ExecutionTraceKindAsyncFlow	= "async_flow"
 
-	StateGrowthAlertAbnormal = "abnormal_state_growth"
+	StateGrowthAlertAbnormal	= "abnormal_state_growth"
 
-	DefaultComputeGasUnit                     = uint64(1)
-	DefaultStorageReadGasUnit                 = uint64(5)
-	DefaultStorageWriteGasUnit                = uint64(20)
-	DefaultMessageForwardingGasUnit           = uint64(100)
-	DefaultDeploymentBaseGas                  = uint64(10_000)
-	DefaultDeploymentCodeByteGas              = uint64(2)
-	DefaultDeploymentInitStateByteGas         = uint64(4)
-	DefaultExecutionGasPriceNaet              = int64(1)
-	DefaultForwardingWorkloadToleranceBps     = int64(500)
-	DefaultBenchmarkToleranceBps              = int64(1_000)
-	DefaultDeploymentEstimateToleranceBps     = int64(500)
-	DefaultStateGrowthSurchargeThresholdBytes = int64(10_000)
-	DefaultStateGrowthSurchargeStepBps        = int64(1_000)
-	DefaultStateGrowthSurchargeMaxBps         = int64(10_000)
-	DefaultStateMaintenanceReserveBps         = int64(1_000)
+	DefaultComputeGasUnit				= uint64(1)
+	DefaultStorageReadGasUnit			= uint64(5)
+	DefaultStorageWriteGasUnit			= uint64(20)
+	DefaultMessageForwardingGasUnit			= uint64(100)
+	DefaultDeploymentBaseGas			= uint64(10_000)
+	DefaultDeploymentCodeByteGas			= uint64(2)
+	DefaultDeploymentInitStateByteGas		= uint64(4)
+	DefaultExecutionGasPriceNaet			= int64(1)
+	DefaultForwardingWorkloadToleranceBps		= int64(500)
+	DefaultBenchmarkToleranceBps			= int64(1_000)
+	DefaultDeploymentEstimateToleranceBps		= int64(500)
+	DefaultStateGrowthSurchargeThresholdBytes	= int64(10_000)
+	DefaultStateGrowthSurchargeStepBps		= int64(1_000)
+	DefaultStateGrowthSurchargeMaxBps		= int64(10_000)
+	DefaultStateMaintenanceReserveBps		= int64(1_000)
 )
 
 type ExecutionGasTable struct {
-	ComputeGasUnit                 uint64
-	StorageReadGasUnit             uint64
-	StorageWriteGasUnit            uint64
-	MessageForwardingGasUnit       uint64
-	DeploymentBaseGas              uint64
-	DeploymentCodeByteGas          uint64
-	DeploymentInitStateByteGas     uint64
-	GasPriceNaet                   sdkmath.Int
-	BenchmarkToleranceBps          int64
-	DeploymentEstimateToleranceBps int64
-	ForwardingWorkloadToleranceBps int64
+	ComputeGasUnit			uint64
+	StorageReadGasUnit		uint64
+	StorageWriteGasUnit		uint64
+	MessageForwardingGasUnit	uint64
+	DeploymentBaseGas		uint64
+	DeploymentCodeByteGas		uint64
+	DeploymentInitStateByteGas	uint64
+	GasPriceNaet			sdkmath.Int
+	BenchmarkToleranceBps		int64
+	DeploymentEstimateToleranceBps	int64
+	ForwardingWorkloadToleranceBps	int64
 }
 
 type ExecutionOperation struct {
-	Class string
-	Count uint64
+	Class	string
+	Count	uint64
 }
 
 type ExecutionTraceEntry struct {
-	Kind    string
-	Class   string
-	Count   uint64
-	GasUnit uint64
-	GasUsed uint64
-	FeeNaet sdkmath.Int
+	Kind	string
+	Class	string
+	Count	uint64
+	GasUnit	uint64
+	GasUsed	uint64
+	FeeNaet	sdkmath.Int
 }
 
 type ExecutionCostInput struct {
-	Operations []ExecutionOperation
-	GasTable   ExecutionGasTable
+	Operations	[]ExecutionOperation
+	GasTable	ExecutionGasTable
 }
 
 type ExecutionCostOutput struct {
-	TotalGas     uint64
-	TotalFeeNaet sdkmath.Int
-	Traces       []ExecutionTraceEntry
+	TotalGas	uint64
+	TotalFeeNaet	sdkmath.Int
+	Traces		[]ExecutionTraceEntry
 }
 
 type DeploymentFeeEstimateInput struct {
-	CodeSizeBytes         uint64
-	InitStateBytes        uint64
-	ExpectedActualFeeNaet sdkmath.Int
-	GasTable              ExecutionGasTable
+	CodeSizeBytes		uint64
+	InitStateBytes		uint64
+	ExpectedActualFeeNaet	sdkmath.Int
+	GasTable		ExecutionGasTable
 }
 
 type DeploymentFeeEstimateOutput struct {
-	GasUsed               uint64
-	FeeNaet               sdkmath.Int
-	ExpectedActualFeeNaet sdkmath.Int
-	DeltaBps              int64
-	WithinTolerance       bool
-	Trace                 ExecutionTraceEntry
+	GasUsed			uint64
+	FeeNaet			sdkmath.Int
+	ExpectedActualFeeNaet	sdkmath.Int
+	DeltaBps		int64
+	WithinTolerance		bool
+	Trace			ExecutionTraceEntry
 }
 
 type AsyncMessageFeeEstimateInput struct {
-	MessageCount            uint64
-	RouteHops               uint64
-	PayloadBytes            uint64
-	ExpectedWorkloadFeeNaet sdkmath.Int
-	GasTable                ExecutionGasTable
+	MessageCount		uint64
+	RouteHops		uint64
+	PayloadBytes		uint64
+	ExpectedWorkloadFeeNaet	sdkmath.Int
+	GasTable		ExecutionGasTable
 }
 
 type AsyncMessageFeeEstimateOutput struct {
-	GasUsed                 uint64
-	FeeNaet                 sdkmath.Int
-	ExpectedWorkloadFeeNaet sdkmath.Int
-	DeltaBps                int64
-	CoversWorkload          bool
-	Trace                   ExecutionTraceEntry
+	GasUsed			uint64
+	FeeNaet			sdkmath.Int
+	ExpectedWorkloadFeeNaet	sdkmath.Int
+	DeltaBps		int64
+	CoversWorkload		bool
+	Trace			ExecutionTraceEntry
 }
 
 type GasBenchmarkSample struct {
-	Name        string
-	Class       string
-	MeasuredGas uint64
-	TableGas    uint64
+	Name		string
+	Class		string
+	MeasuredGas	uint64
+	TableGas	uint64
 }
 
 type GasBenchmarkReport struct {
-	Passed  bool
-	Failed  []string
-	Samples []GasBenchmarkSample
+	Passed	bool
+	Failed	[]string
+	Samples	[]GasBenchmarkSample
 }
 
 type StateGrowthAccountDelta struct {
-	ID           string
-	BytesAdded   int64
-	BytesRemoved int64
+	ID		string
+	BytesAdded	int64
+	BytesRemoved	int64
 }
 
 type StateGrowthTelemetryInput struct {
-	BlockHeight                 uint64
-	EpochID                     uint64
-	AccountDeltas               []StateGrowthAccountDelta
-	PreviousEpochNetGrowthBytes int64
-	BaseStorageExpansionFeeNaet sdkmath.Int
-	DeleteOriginalCostNaet      sdkmath.Int
-	DeleteRefundNaet            sdkmath.Int
-	StorageAgePeriods           uint64
-	Params                      StateGrowthParams
+	BlockHeight			uint64
+	EpochID				uint64
+	AccountDeltas			[]StateGrowthAccountDelta
+	PreviousEpochNetGrowthBytes	int64
+	BaseStorageExpansionFeeNaet	sdkmath.Int
+	DeleteOriginalCostNaet		sdkmath.Int
+	DeleteRefundNaet		sdkmath.Int
+	StorageAgePeriods		uint64
+	Params				StateGrowthParams
 }
 
 type StateGrowthParams struct {
-	HighGrowthThresholdBytes      int64
-	SurchargeStepBps              int64
-	MaxSurchargeBps               int64
-	StateMaintenanceReserveBps    int64
-	DeleteRefundDecayBpsPerPeriod int64
-	AbnormalGrowthAlertBps        int64
+	HighGrowthThresholdBytes	int64
+	SurchargeStepBps		int64
+	MaxSurchargeBps			int64
+	StateMaintenanceReserveBps	int64
+	DeleteRefundDecayBpsPerPeriod	int64
+	AbnormalGrowthAlertBps		int64
 }
 
 type StateGrowthTopAccount struct {
-	ID             string
-	BytesAdded     int64
-	BytesRemoved   int64
-	NetGrowthBytes int64
+	ID		string
+	BytesAdded	int64
+	BytesRemoved	int64
+	NetGrowthBytes	int64
 }
 
 type StateGrowthTelemetryOutput struct {
-	BlockHeight                 uint64
-	EpochID                     uint64
-	BytesAddedPerBlock          int64
-	BytesRemovedPerBlock        int64
-	NetGrowthBytes              int64
-	NetStateGrowthPerEpochBytes int64
-	TopStateGrowthAccounts      []StateGrowthTopAccount
-	SurchargeBps                int64
-	StorageExpansionFeeNaet     sdkmath.Int
-	StateMaintenanceReserveNaet sdkmath.Int
-	DeleteRefundAfterDecayNaet  sdkmath.Int
-	Alerts                      []string
+	BlockHeight			uint64
+	EpochID				uint64
+	BytesAddedPerBlock		int64
+	BytesRemovedPerBlock		int64
+	NetGrowthBytes			int64
+	NetStateGrowthPerEpochBytes	int64
+	TopStateGrowthAccounts		[]StateGrowthTopAccount
+	SurchargeBps			int64
+	StorageExpansionFeeNaet		sdkmath.Int
+	StateMaintenanceReserveNaet	sdkmath.Int
+	DeleteRefundAfterDecayNaet	sdkmath.Int
+	Alerts				[]string
 }
 
 func DefaultExecutionGasTable() ExecutionGasTable {
 	return ExecutionGasTable{
-		ComputeGasUnit:                 DefaultComputeGasUnit,
-		StorageReadGasUnit:             DefaultStorageReadGasUnit,
-		StorageWriteGasUnit:            DefaultStorageWriteGasUnit,
-		MessageForwardingGasUnit:       DefaultMessageForwardingGasUnit,
-		DeploymentBaseGas:              DefaultDeploymentBaseGas,
-		DeploymentCodeByteGas:          DefaultDeploymentCodeByteGas,
-		DeploymentInitStateByteGas:     DefaultDeploymentInitStateByteGas,
-		GasPriceNaet:                   sdkmath.NewInt(DefaultExecutionGasPriceNaet),
-		BenchmarkToleranceBps:          DefaultBenchmarkToleranceBps,
-		DeploymentEstimateToleranceBps: DefaultDeploymentEstimateToleranceBps,
-		ForwardingWorkloadToleranceBps: DefaultForwardingWorkloadToleranceBps,
+		ComputeGasUnit:			DefaultComputeGasUnit,
+		StorageReadGasUnit:		DefaultStorageReadGasUnit,
+		StorageWriteGasUnit:		DefaultStorageWriteGasUnit,
+		MessageForwardingGasUnit:	DefaultMessageForwardingGasUnit,
+		DeploymentBaseGas:		DefaultDeploymentBaseGas,
+		DeploymentCodeByteGas:		DefaultDeploymentCodeByteGas,
+		DeploymentInitStateByteGas:	DefaultDeploymentInitStateByteGas,
+		GasPriceNaet:			sdkmath.NewInt(DefaultExecutionGasPriceNaet),
+		BenchmarkToleranceBps:		DefaultBenchmarkToleranceBps,
+		DeploymentEstimateToleranceBps:	DefaultDeploymentEstimateToleranceBps,
+		ForwardingWorkloadToleranceBps:	DefaultForwardingWorkloadToleranceBps,
 	}
 }
 
 func DefaultStateGrowthParams() StateGrowthParams {
 	return StateGrowthParams{
-		HighGrowthThresholdBytes:      DefaultStateGrowthSurchargeThresholdBytes,
-		SurchargeStepBps:              DefaultStateGrowthSurchargeStepBps,
-		MaxSurchargeBps:               DefaultStateGrowthSurchargeMaxBps,
-		StateMaintenanceReserveBps:    DefaultStateMaintenanceReserveBps,
-		DeleteRefundDecayBpsPerPeriod: DefaultDeleteRefundDecayBpsPerPeriod,
-		AbnormalGrowthAlertBps:        BasisPoints,
+		HighGrowthThresholdBytes:	DefaultStateGrowthSurchargeThresholdBytes,
+		SurchargeStepBps:		DefaultStateGrowthSurchargeStepBps,
+		MaxSurchargeBps:		DefaultStateGrowthSurchargeMaxBps,
+		StateMaintenanceReserveBps:	DefaultStateMaintenanceReserveBps,
+		DeleteRefundDecayBpsPerPeriod:	DefaultDeleteRefundDecayBpsPerPeriod,
+		AbnormalGrowthAlertBps:		BasisPoints,
 	}
 }
 
@@ -221,18 +221,18 @@ func EstimateExecutionCost(input ExecutionCostInput) (ExecutionCostOutput, error
 			return ExecutionCostOutput{}, fmt.Errorf("execution gas overflow")
 		}
 		traces = append(traces, ExecutionTraceEntry{
-			Kind:    ExecutionTraceKindOperation,
-			Class:   op.Class,
-			Count:   op.Count,
-			GasUnit: gasUnit,
-			GasUsed: gasUsed,
-			FeeNaet: table.feeForGas(gasUsed),
+			Kind:		ExecutionTraceKindOperation,
+			Class:		op.Class,
+			Count:		op.Count,
+			GasUnit:	gasUnit,
+			GasUsed:	gasUsed,
+			FeeNaet:	table.feeForGas(gasUsed),
 		})
 	}
 	return ExecutionCostOutput{
-		TotalGas:     totalGas,
-		TotalFeeNaet: table.feeForGas(totalGas),
-		Traces:       traces,
+		TotalGas:	totalGas,
+		TotalFeeNaet:	table.feeForGas(totalGas),
+		Traces:		traces,
 	}, nil
 }
 
@@ -261,17 +261,17 @@ func EstimateDeploymentFee(input DeploymentFeeEstimateInput) (DeploymentFeeEstim
 	expected := normalizeInt(input.ExpectedActualFeeNaet)
 	delta := estimateDeltaBps(fee, expected)
 	return DeploymentFeeEstimateOutput{
-		GasUsed:               totalGas,
-		FeeNaet:               fee,
-		ExpectedActualFeeNaet: expected,
-		DeltaBps:              delta,
-		WithinTolerance:       expected.IsZero() || delta <= table.DeploymentEstimateToleranceBps,
+		GasUsed:		totalGas,
+		FeeNaet:		fee,
+		ExpectedActualFeeNaet:	expected,
+		DeltaBps:		delta,
+		WithinTolerance:	expected.IsZero() || delta <= table.DeploymentEstimateToleranceBps,
 		Trace: ExecutionTraceEntry{
-			Kind:    ExecutionTraceKindDeployment,
-			Class:   ExecutionTraceKindDeployment,
-			Count:   input.CodeSizeBytes + input.InitStateBytes,
-			GasUsed: totalGas,
-			FeeNaet: fee,
+			Kind:		ExecutionTraceKindDeployment,
+			Class:		ExecutionTraceKindDeployment,
+			Count:		input.CodeSizeBytes + input.InitStateBytes,
+			GasUsed:	totalGas,
+			FeeNaet:	fee,
 		},
 	}, nil
 }
@@ -298,18 +298,18 @@ func EstimateAsyncMessageFlowFee(input AsyncMessageFeeEstimateInput) (AsyncMessa
 	expected := normalizeInt(input.ExpectedWorkloadFeeNaet)
 	delta := estimateDeltaBps(fee, expected)
 	return AsyncMessageFeeEstimateOutput{
-		GasUsed:                 gasUsed,
-		FeeNaet:                 fee,
-		ExpectedWorkloadFeeNaet: expected,
-		DeltaBps:                delta,
-		CoversWorkload:          expected.IsZero() || fee.GTE(expected) || delta <= table.ForwardingWorkloadToleranceBps,
+		GasUsed:			gasUsed,
+		FeeNaet:			fee,
+		ExpectedWorkloadFeeNaet:	expected,
+		DeltaBps:			delta,
+		CoversWorkload:			expected.IsZero() || fee.GTE(expected) || delta <= table.ForwardingWorkloadToleranceBps,
 		Trace: ExecutionTraceEntry{
-			Kind:    ExecutionTraceKindAsyncFlow,
-			Class:   ExecutionCostClassMessageForwarding,
-			Count:   workUnits,
-			GasUnit: table.MessageForwardingGasUnit,
-			GasUsed: gasUsed,
-			FeeNaet: fee,
+			Kind:		ExecutionTraceKindAsyncFlow,
+			Class:		ExecutionCostClassMessageForwarding,
+			Count:		workUnits,
+			GasUnit:	table.MessageForwardingGasUnit,
+			GasUsed:	gasUsed,
+			FeeNaet:	fee,
 		},
 	}, nil
 }
@@ -367,10 +367,10 @@ func ComputeStateGrowthTelemetry(input StateGrowthTelemetryInput) (StateGrowthTe
 		added += delta.BytesAdded
 		removed += delta.BytesRemoved
 		top = append(top, StateGrowthTopAccount{
-			ID:             delta.ID,
-			BytesAdded:     delta.BytesAdded,
-			BytesRemoved:   delta.BytesRemoved,
-			NetGrowthBytes: delta.BytesAdded - delta.BytesRemoved,
+			ID:		delta.ID,
+			BytesAdded:	delta.BytesAdded,
+			BytesRemoved:	delta.BytesRemoved,
+			NetGrowthBytes:	delta.BytesAdded - delta.BytesRemoved,
 		})
 	}
 	sort.SliceStable(top, func(i, j int) bool {
@@ -398,25 +398,25 @@ func ComputeStateGrowthTelemetry(input StateGrowthTelemetryInput) (StateGrowthTe
 		alerts = append(alerts, StateGrowthAlertAbnormal)
 	}
 	return StateGrowthTelemetryOutput{
-		BlockHeight:                 input.BlockHeight,
-		EpochID:                     input.EpochID,
-		BytesAddedPerBlock:          added,
-		BytesRemovedPerBlock:        removed,
-		NetGrowthBytes:              net,
-		NetStateGrowthPerEpochBytes: epochNet,
-		TopStateGrowthAccounts:      top,
-		SurchargeBps:                surchargeBps,
-		StorageExpansionFeeNaet:     expansionFee,
-		StateMaintenanceReserveNaet: reserve,
-		DeleteRefundAfterDecayNaet:  refundAfterDecay,
-		Alerts:                      alerts,
+		BlockHeight:			input.BlockHeight,
+		EpochID:			input.EpochID,
+		BytesAddedPerBlock:		added,
+		BytesRemovedPerBlock:		removed,
+		NetGrowthBytes:			net,
+		NetStateGrowthPerEpochBytes:	epochNet,
+		TopStateGrowthAccounts:		top,
+		SurchargeBps:			surchargeBps,
+		StorageExpansionFeeNaet:	expansionFee,
+		StateMaintenanceReserveNaet:	reserve,
+		DeleteRefundAfterDecayNaet:	refundAfterDecay,
+		Alerts:				alerts,
 	}, nil
 }
 
 func (t ExecutionGasTable) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value uint64
+		name	string
+		value	uint64
 	}{
 		{name: "compute_gas_unit", value: t.ComputeGasUnit},
 		{name: "storage_read_gas_unit", value: t.StorageReadGasUnit},

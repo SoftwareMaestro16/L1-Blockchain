@@ -11,80 +11,80 @@ import (
 )
 
 const (
-	NativeFeeDenom = "naet"
+	NativeFeeDenom	= "naet"
 
-	MaxFeeClass        FeeClass        = 10
-	MaxReputationClass ReputationClass = 10
+	MaxFeeClass		FeeClass	= 10
+	MaxReputationClass	ReputationClass	= 10
 )
 
 const (
-	MsgTypeSoftwareUpgrade = "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade"
-	MsgTypeCancelUpgrade   = "/cosmos.upgrade.v1beta1.MsgCancelUpgrade"
+	MsgTypeSoftwareUpgrade	= "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade"
+	MsgTypeCancelUpgrade	= "/cosmos.upgrade.v1beta1.MsgCancelUpgrade"
 
-	MsgTypeCreateValidator       = "/cosmos.staking.v1beta1.MsgCreateValidator"
-	MsgTypeEditValidator         = "/cosmos.staking.v1beta1.MsgEditValidator"
-	MsgTypeDelegate              = "/cosmos.staking.v1beta1.MsgDelegate"
-	MsgTypeUndelegate            = "/cosmos.staking.v1beta1.MsgUndelegate"
-	MsgTypeBeginRedelegate       = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
-	MsgTypeCancelUnbonding       = "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation"
-	MsgTypeUnjail                = "/cosmos.slashing.v1beta1.MsgUnjail"
-	MsgTypeSubmitEvidence        = "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
-	MsgTypeGovSubmitProposal     = "/cosmos.gov.v1.MsgSubmitProposal"
-	MsgTypeGovVote               = "/cosmos.gov.v1.MsgVote"
-	MsgTypeGovVoteWeighted       = "/cosmos.gov.v1.MsgVoteWeighted"
-	MsgTypeGovDeposit            = "/cosmos.gov.v1.MsgDeposit"
-	MsgTypeGovExecLegacyContent  = "/cosmos.gov.v1.MsgExecLegacyContent"
-	MsgTypeGovUpdateParams       = "/cosmos.gov.v1.MsgUpdateParams"
-	MsgTypeMintUpdateParams      = "/cosmos.mint.v1beta1.MsgUpdateParams"
-	MsgTypeDistributionWithdraw  = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
-	MsgTypeDistributionSetAddr   = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress"
-	MsgTypeDistributionWithdrawV = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
+	MsgTypeCreateValidator		= "/cosmos.staking.v1beta1.MsgCreateValidator"
+	MsgTypeEditValidator		= "/cosmos.staking.v1beta1.MsgEditValidator"
+	MsgTypeDelegate			= "/cosmos.staking.v1beta1.MsgDelegate"
+	MsgTypeUndelegate		= "/cosmos.staking.v1beta1.MsgUndelegate"
+	MsgTypeBeginRedelegate		= "/cosmos.staking.v1beta1.MsgBeginRedelegate"
+	MsgTypeCancelUnbonding		= "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation"
+	MsgTypeUnjail			= "/cosmos.slashing.v1beta1.MsgUnjail"
+	MsgTypeSubmitEvidence		= "/cosmos.evidence.v1beta1.MsgSubmitEvidence"
+	MsgTypeGovSubmitProposal	= "/cosmos.gov.v1.MsgSubmitProposal"
+	MsgTypeGovVote			= "/cosmos.gov.v1.MsgVote"
+	MsgTypeGovVoteWeighted		= "/cosmos.gov.v1.MsgVoteWeighted"
+	MsgTypeGovDeposit		= "/cosmos.gov.v1.MsgDeposit"
+	MsgTypeGovExecLegacyContent	= "/cosmos.gov.v1.MsgExecLegacyContent"
+	MsgTypeGovUpdateParams		= "/cosmos.gov.v1.MsgUpdateParams"
+	MsgTypeMintUpdateParams		= "/cosmos.mint.v1beta1.MsgUpdateParams"
+	MsgTypeDistributionWithdraw	= "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
+	MsgTypeDistributionSetAddr	= "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress"
+	MsgTypeDistributionWithdrawV	= "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"
 
-	MsgTypeBankSend      = "/cosmos.bank.v1beta1.MsgSend"
-	MsgTypeBankMultiSend = "/cosmos.bank.v1beta1.MsgMultiSend"
+	MsgTypeBankSend		= "/cosmos.bank.v1beta1.MsgSend"
+	MsgTypeBankMultiSend	= "/cosmos.bank.v1beta1.MsgMultiSend"
 
-	MsgTypeIdentityRegister = "/l1.identity.v1.MsgRegisterDomain"
-	MsgTypeIdentityRenew    = "/l1.identity.v1.MsgRenewDomain"
-	MsgTypeIdentityResolver = "/l1.identity.v1.MsgSetResolver"
-	MsgTypeIdentityReverse  = "/l1.identity.v1.MsgSetReverse"
+	MsgTypeIdentityRegister	= "/l1.identity.v1.MsgRegisterDomain"
+	MsgTypeIdentityRenew	= "/l1.identity.v1.MsgRenewDomain"
+	MsgTypeIdentityResolver	= "/l1.identity.v1.MsgSetResolver"
+	MsgTypeIdentityReverse	= "/l1.identity.v1.MsgSetReverse"
 
-	MsgTypeWasmStore       = "/cosmwasm.wasm.v1.MsgStoreCode"
-	MsgTypeWasmInstantiate = "/cosmwasm.wasm.v1.MsgInstantiateContract"
-	MsgTypeWasmExecute     = "/cosmwasm.wasm.v1.MsgExecuteContract"
-	MsgTypeWasmMigrate     = "/cosmwasm.wasm.v1.MsgMigrateContract"
-	MsgTypeAVMDeploy       = "/aetra.avm.v1.MsgDeploy"
-	MsgTypeAVMExecute      = "/aetra.avm.v1.MsgExecute"
+	MsgTypeWasmStore	= "/cosmwasm.wasm.v1.MsgStoreCode"
+	MsgTypeWasmInstantiate	= "/cosmwasm.wasm.v1.MsgInstantiateContract"
+	MsgTypeWasmExecute	= "/cosmwasm.wasm.v1.MsgExecuteContract"
+	MsgTypeWasmMigrate	= "/cosmwasm.wasm.v1.MsgMigrateContract"
+	MsgTypeAVMDeploy	= "/aetra.avm.v1.MsgDeploy"
+	MsgTypeAVMExecute	= "/aetra.avm.v1.MsgExecute"
 
-	MsgTypeAsyncSend    = "/l1.messaging.v1.MsgSendAsync"
-	MsgTypeAsyncEnqueue = "/l1.queue.v1.MsgEnqueue"
-	MsgTypeAsyncDeliver = "/l1.aetravm.async.v1.MsgDeliver"
+	MsgTypeAsyncSend	= "/l1.messaging.v1.MsgSendAsync"
+	MsgTypeAsyncEnqueue	= "/l1.queue.v1.MsgEnqueue"
+	MsgTypeAsyncDeliver	= "/l1.aetravm.async.v1.MsgDeliver"
 
-	MsgTypeMemoAttach      = "/l1.memo.v1.MsgAttachMemo"
-	MsgTypePermissionsSet  = "/l1.permissions.v1.MsgSetPermission"
-	MsgTypeWorkflowExecute = "/l1.workflow.v1.MsgExecute"
-	MsgTypeMarketOrder     = "/l1.market.v1.MsgSubmitOrder"
+	MsgTypeMemoAttach	= "/l1.memo.v1.MsgAttachMemo"
+	MsgTypePermissionsSet	= "/l1.permissions.v1.MsgSetPermission"
+	MsgTypeWorkflowExecute	= "/l1.workflow.v1.MsgExecute"
+	MsgTypeMarketOrder	= "/l1.market.v1.MsgSubmitOrder"
 )
 
 type TxClass string
 
 const (
-	TxClassCriticalSystem     TxClass = "CRITICAL_SYSTEM"
-	TxClassStakingGovSecurity TxClass = "STAKING_GOV_SECURITY"
-	TxClassFinancial          TxClass = "FINANCIAL"
-	TxClassIdentity           TxClass = "IDENTITY"
-	TxClassContract           TxClass = "CONTRACT"
-	TxClassApplication        TxClass = "APPLICATION"
-	TxClassAsyncMessage       TxClass = "ASYNC_MESSAGE"
+	TxClassCriticalSystem		TxClass	= "CRITICAL_SYSTEM"
+	TxClassStakingGovSecurity	TxClass	= "STAKING_GOV_SECURITY"
+	TxClassFinancial		TxClass	= "FINANCIAL"
+	TxClassIdentity			TxClass	= "IDENTITY"
+	TxClassContract			TxClass	= "CONTRACT"
+	TxClassApplication		TxClass	= "APPLICATION"
+	TxClassAsyncMessage		TxClass	= "ASYNC_MESSAGE"
 )
 
 type ZoneID string
 
 const (
-	ZoneAetraCore   ZoneID = "AETHER_CORE"
-	ZoneFinancial   ZoneID = "FINANCIAL_ZONE"
-	ZoneIdentity    ZoneID = "IDENTITY_ZONE"
-	ZoneContract    ZoneID = "CONTRACT_ZONE"
-	ZoneApplication ZoneID = "APPLICATION_ZONE"
+	ZoneAetraCore	ZoneID	= "AETHER_CORE"
+	ZoneFinancial	ZoneID	= "FINANCIAL_ZONE"
+	ZoneIdentity	ZoneID	= "IDENTITY_ZONE"
+	ZoneContract	ZoneID	= "CONTRACT_ZONE"
+	ZoneApplication	ZoneID	= "APPLICATION_ZONE"
 )
 
 type ShardID uint32
@@ -94,40 +94,40 @@ type ReputationClass uint32
 type FeeClass uint32
 
 type Locality struct {
-	AccountKey       []byte
-	ContractAddress  []byte
-	Domain           string
-	AssetDenom       string
-	AsyncDestination []byte
+	AccountKey		[]byte
+	ContractAddress		[]byte
+	Domain			string
+	AssetDenom		string
+	AsyncDestination	[]byte
 }
 
 type RouteInput struct {
-	MsgType         string
-	FeeDenom        string
-	FeeClass        FeeClass
-	ReputationClass ReputationClass
-	AdmissionHeight uint64
-	TxHash          []byte
-	RoutingEpoch    uint64
-	ActiveShards    map[ZoneID]uint32
-	Locality        Locality
+	MsgType		string
+	FeeDenom	string
+	FeeClass	FeeClass
+	ReputationClass	ReputationClass
+	AdmissionHeight	uint64
+	TxHash		[]byte
+	RoutingEpoch	uint64
+	ActiveShards	map[ZoneID]uint32
+	Locality	Locality
 }
 
 type RouteDecision struct {
-	TxClass      TxClass
-	ZoneID       ZoneID
-	ShardID      ShardID
-	ActiveShards uint32
-	PrimaryActor []byte
-	PriorityKey  PriorityKey
+	TxClass		TxClass
+	ZoneID		ZoneID
+	ShardID		ShardID
+	ActiveShards	uint32
+	PrimaryActor	[]byte
+	PriorityKey	PriorityKey
 }
 
 type PriorityKey struct {
-	PriorityClass   uint32
-	FeeClass        FeeClass
-	ReputationClass ReputationClass
-	AdmissionHeight uint64
-	TxHash          []byte
+	PriorityClass	uint32
+	FeeClass	FeeClass
+	ReputationClass	ReputationClass
+	AdmissionHeight	uint64
+	TxHash		[]byte
 }
 
 func ClassifyTx(msgType string) (TxClass, error) {
@@ -193,10 +193,10 @@ func Route(input RouteInput) (RouteDecision, error) {
 	}
 
 	decision := RouteDecision{
-		TxClass:      txClass,
-		ZoneID:       zone,
-		PrimaryActor: cloneBytes(primaryActor),
-		PriorityKey:  BuildPriorityKey(txClass, input.FeeClass, input.ReputationClass, input.AdmissionHeight, input.TxHash),
+		TxClass:	txClass,
+		ZoneID:		zone,
+		PrimaryActor:	cloneBytes(primaryActor),
+		PriorityKey:	BuildPriorityKey(txClass, input.FeeClass, input.ReputationClass, input.AdmissionHeight, input.TxHash),
 	}
 	if zone == ZoneAetraCore {
 		decision.ActiveShards = 1
@@ -252,11 +252,11 @@ func AssignShard(zone ZoneID, primaryActor []byte, routingEpoch uint64, activeSh
 
 func BuildPriorityKey(txClass TxClass, feeClass FeeClass, reputation ReputationClass, admissionHeight uint64, txHash []byte) PriorityKey {
 	return PriorityKey{
-		PriorityClass:   PriorityClassForTx(txClass),
-		FeeClass:        BoundFeeClass(feeClass),
-		ReputationClass: BoundReputationClass(reputation),
-		AdmissionHeight: admissionHeight,
-		TxHash:          cloneBytes(txHash),
+		PriorityClass:		PriorityClassForTx(txClass),
+		FeeClass:		BoundFeeClass(feeClass),
+		ReputationClass:	BoundReputationClass(reputation),
+		AdmissionHeight:	admissionHeight,
+		TxHash:			cloneBytes(txHash),
 	}
 }
 

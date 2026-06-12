@@ -12,142 +12,142 @@ import (
 )
 
 const (
-	ClaimStatusPending  = "pending"
-	ClaimStatusPaid     = "paid"
-	ClaimStatusRejected = "rejected"
+	ClaimStatusPending	= "pending"
+	ClaimStatusPaid		= "paid"
+	ClaimStatusRejected	= "rejected"
 
-	WithdrawalStatusNone      = ""
-	WithdrawalStatusPending   = "pending"
-	WithdrawalStatusCompleted = "completed"
+	WithdrawalStatusNone		= ""
+	WithdrawalStatusPending		= "pending"
+	WithdrawalStatusCompleted	= "completed"
 
-	DefaultMinimumInsurance     = uint64(1_000)
-	DefaultWithdrawalLockBlocks = uint64(1_000)
-	DefaultSlashCoverageBps     = uint32(10_000)
-	MaxValidatorsV1             = uint32(100_000)
-	MaxClaimsV1                 = uint32(200_000)
-	MaxClaimIDBytesV1           = uint32(96)
-	MaxReasonBytesV1            = uint32(512)
-	MaxCoverageRulesV1          = uint32(128)
-	MaxFaultTypeBytesV1         = uint32(128)
-	MaxBasisPoints              = uint32(10_000)
+	DefaultMinimumInsurance		= uint64(1_000)
+	DefaultWithdrawalLockBlocks	= uint64(1_000)
+	DefaultSlashCoverageBps		= uint32(10_000)
+	MaxValidatorsV1			= uint32(100_000)
+	MaxClaimsV1			= uint32(200_000)
+	MaxClaimIDBytesV1		= uint32(96)
+	MaxReasonBytesV1		= uint32(512)
+	MaxCoverageRulesV1		= uint32(128)
+	MaxFaultTypeBytesV1		= uint32(128)
+	MaxBasisPoints			= uint32(10_000)
 )
 
 type Params struct {
-	Authority               string
-	Enabled                 bool
-	MinimumInsurance        uint64
-	WithdrawalLockBlocks    uint64
-	DefaultSlashCoverageBps uint32
-	MaxValidators           uint32
-	MaxClaims               uint32
-	MaxClaimIDBytes         uint32
-	MaxReasonBytes          uint32
-	MaxCoverageRules        uint32
-	MaxFaultTypeBytes       uint32
+	Authority		string
+	Enabled			bool
+	MinimumInsurance	uint64
+	WithdrawalLockBlocks	uint64
+	DefaultSlashCoverageBps	uint32
+	MaxValidators		uint32
+	MaxClaims		uint32
+	MaxClaimIDBytes		uint32
+	MaxReasonBytes		uint32
+	MaxCoverageRules	uint32
+	MaxFaultTypeBytes	uint32
 }
 
 type State struct {
-	Insurances    []ValidatorInsurance
-	Claims        []InsuranceClaim
-	CoverageRules []SlashCoverageRule
+	Insurances	[]ValidatorInsurance
+	Claims		[]InsuranceClaim
+	CoverageRules	[]SlashCoverageRule
 }
 
 type ValidatorInsurance struct {
-	ValidatorAddress  string
-	Balance           uint64
-	PendingWithdrawal PendingInsuranceWithdrawal
-	ValidatorStatus   string
+	ValidatorAddress	string
+	Balance			uint64
+	PendingWithdrawal	PendingInsuranceWithdrawal
+	ValidatorStatus		string
 }
 
 type PendingInsuranceWithdrawal struct {
-	Amount         uint64
-	Recipient      string
-	RequestHeight  uint64
-	CompleteHeight uint64
-	Status         string
+	Amount		uint64
+	Recipient	string
+	RequestHeight	uint64
+	CompleteHeight	uint64
+	Status		string
 }
 
 type InsuranceClaim struct {
-	ClaimID          string
-	ValidatorAddress string
-	Claimant         string
-	Amount           uint64
-	PayoutAmount     uint64
-	Status           string
-	Reason           string
-	SubmittedHeight  uint64
-	ResolvedHeight   uint64
-	Paid             bool
+	ClaimID			string
+	ValidatorAddress	string
+	Claimant		string
+	Amount			uint64
+	PayoutAmount		uint64
+	Status			string
+	Reason			string
+	SubmittedHeight		uint64
+	ResolvedHeight		uint64
+	Paid			bool
 }
 
 type SlashCoverageRule struct {
-	FaultType   string
-	CoverageBps uint32
+	FaultType	string
+	CoverageBps	uint32
 }
 
 type SlashCoverageResult struct {
-	ValidatorAddress string
-	SlashAmount      uint64
-	CoveredAmount    uint64
-	RemainingPenalty uint64
-	CoverageBps      uint32
+	ValidatorAddress	string
+	SlashAmount		uint64
+	CoveredAmount		uint64
+	RemainingPenalty	uint64
+	CoverageBps		uint32
 }
 
 type MsgFundValidatorInsurance struct {
-	Authority        string
-	ValidatorAddress string
-	Funder           string
-	Amount           uint64
-	Height           uint64
+	Authority		string
+	ValidatorAddress	string
+	Funder			string
+	Amount			uint64
+	Height			uint64
 }
 
 type MsgWithdrawValidatorInsurance struct {
-	Authority        string
-	ValidatorAddress string
-	Recipient        string
-	Amount           uint64
-	Height           uint64
-	ValidatorStatus  string
+	Authority		string
+	ValidatorAddress	string
+	Recipient		string
+	Amount			uint64
+	Height			uint64
+	ValidatorStatus		string
 }
 
 type MsgSubmitInsuranceClaim struct {
-	Authority        string
-	ClaimID          string
-	ValidatorAddress string
-	Claimant         string
-	Amount           uint64
-	Reason           string
-	Height           uint64
+	Authority		string
+	ClaimID			string
+	ValidatorAddress	string
+	Claimant		string
+	Amount			uint64
+	Reason			string
+	Height			uint64
 }
 
 type MsgResolveInsuranceClaim struct {
-	Authority string
-	ClaimID   string
-	Approved  bool
-	Height    uint64
+	Authority	string
+	ClaimID		string
+	Approved	bool
+	Height		uint64
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:               prototype.DefaultAuthority,
-		Enabled:                 true,
-		MinimumInsurance:        DefaultMinimumInsurance,
-		WithdrawalLockBlocks:    DefaultWithdrawalLockBlocks,
-		DefaultSlashCoverageBps: DefaultSlashCoverageBps,
-		MaxValidators:           MaxValidatorsV1,
-		MaxClaims:               MaxClaimsV1,
-		MaxClaimIDBytes:         MaxClaimIDBytesV1,
-		MaxReasonBytes:          MaxReasonBytesV1,
-		MaxCoverageRules:        MaxCoverageRulesV1,
-		MaxFaultTypeBytes:       MaxFaultTypeBytesV1,
+		Authority:			prototype.DefaultAuthority,
+		Enabled:			true,
+		MinimumInsurance:		DefaultMinimumInsurance,
+		WithdrawalLockBlocks:		DefaultWithdrawalLockBlocks,
+		DefaultSlashCoverageBps:	DefaultSlashCoverageBps,
+		MaxValidators:			MaxValidatorsV1,
+		MaxClaims:			MaxClaimsV1,
+		MaxClaimIDBytes:		MaxClaimIDBytesV1,
+		MaxReasonBytes:			MaxReasonBytesV1,
+		MaxCoverageRules:		MaxCoverageRulesV1,
+		MaxFaultTypeBytes:		MaxFaultTypeBytesV1,
 	}
 }
 
 func DefaultState(params Params) State {
 	return State{
 		CoverageRules: []SlashCoverageRule{{
-			FaultType:   "default",
-			CoverageBps: params.DefaultSlashCoverageBps,
+			FaultType:	"default",
+			CoverageBps:	params.DefaultSlashCoverageBps,
 		}},
 	}.Normalize(params)
 }

@@ -89,23 +89,23 @@ func TestShardStateKeysRootsAndLocksAreCanonical(t *testing.T) {
 	require.Equal(t, "zones/CONTRACT_ZONE/shards/2/root/00000000000000000099", rootKey)
 
 	task, err := NewShardMigrationTask(ShardMigrationTask{
-		ZoneID:             ZoneIDContract,
-		SourceShardID:      "2",
-		DestinationShardID: "3",
-		SourceLayoutEpoch:  9,
-		TargetLayoutEpoch:  10,
-		KeyPrefix:          "contract/storage",
-		DeliveryEpoch:      10,
+		ZoneID:			ZoneIDContract,
+		SourceShardID:		"2",
+		DestinationShardID:	"3",
+		SourceLayoutEpoch:	9,
+		TargetLayoutEpoch:	10,
+		KeyPrefix:		"contract/storage",
+		DeliveryEpoch:		10,
 	})
 	require.NoError(t, err)
 	lock, err := NewObjectLock(ObjectLock{
-		ZoneID:        ZoneIDContract,
-		ShardID:       "2",
-		ObjectID:      "contract/storage/a",
-		Reason:        "migration",
-		OwnerTaskID:   task.TaskID,
-		CreatedHeight: 100,
-		ExpiryHeight:  120,
+		ZoneID:		ZoneIDContract,
+		ShardID:	"2",
+		ObjectID:	"contract/storage/a",
+		Reason:		"migration",
+		OwnerTaskID:	task.TaskID,
+		CreatedHeight:	100,
+		ExpiryHeight:	120,
 	})
 	require.NoError(t, err)
 	lockKey, err := ShardLockKey(ZoneIDContract, "2", lock.ObjectID)
@@ -124,33 +124,33 @@ func TestShardStateKeysRootsAndLocksAreCanonical(t *testing.T) {
 
 func shardRebalanceThresholds() ShardRebalanceThresholds {
 	return ShardRebalanceThresholds{
-		GasLimitPerShard:          1_000,
-		SplitGasUtilization:       90,
-		SplitStateSizeBytes:       1_000,
-		SplitWriteConflictCount:   10,
-		SplitQueueBacklog:         20,
-		SplitProofLatencyMicros:   1_000,
-		MergeGasUtilization:       10,
-		MergeStateSizeBytes:       100,
-		MergeQueueBacklog:         2,
-		MergeWriteConflictCount:   1,
-		DecisionWindow:            3,
-		FutureLayoutEpochDelta:    2,
-		FutureActivationHeightGap: 5,
+		GasLimitPerShard:		1_000,
+		SplitGasUtilization:		90,
+		SplitStateSizeBytes:		1_000,
+		SplitWriteConflictCount:	10,
+		SplitQueueBacklog:		20,
+		SplitProofLatencyMicros:	1_000,
+		MergeGasUtilization:		10,
+		MergeStateSizeBytes:		100,
+		MergeQueueBacklog:		2,
+		MergeWriteConflictCount:	1,
+		DecisionWindow:			3,
+		FutureLayoutEpochDelta:		2,
+		FutureActivationHeightGap:	5,
 	}
 }
 
 func shardMetric(t *testing.T, zoneID ZoneID, shardID ShardID, height uint64, gas uint64, inbox uint64, outbox uint64, size uint64, proofLatency uint64) ShardMetrics {
 	t.Helper()
 	metric, err := NewShardMetrics(ShardMetrics{
-		ZoneID:             zoneID,
-		ShardID:            shardID,
-		Height:             height,
-		GasUsed:            gas,
-		InboxBacklog:       inbox,
-		OutboxBacklog:      outbox,
-		StateSizeBytes:     size,
-		ProofLatencyMicros: proofLatency,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Height:			height,
+		GasUsed:		gas,
+		InboxBacklog:		inbox,
+		OutboxBacklog:		outbox,
+		StateSizeBytes:		size,
+		ProofLatencyMicros:	proofLatency,
 	})
 	require.NoError(t, err)
 	return metric
@@ -159,14 +159,14 @@ func shardMetric(t *testing.T, zoneID ZoneID, shardID ShardID, height uint64, ga
 func shardRoot(t *testing.T, zoneID ZoneID, shardID ShardID, height uint64) ShardRoot {
 	t.Helper()
 	root, err := NewShardRoot(ShardRoot{
-		ZoneID:       zoneID,
-		ShardID:      shardID,
-		Height:       height,
-		StateRoot:    testHash(string(zoneID) + "/" + string(shardID) + "/state"),
-		InboxRoot:    testHash(string(zoneID) + "/" + string(shardID) + "/inbox"),
-		OutboxRoot:   testHash(string(zoneID) + "/" + string(shardID) + "/outbox"),
-		ReceiptsRoot: testHash(string(zoneID) + "/" + string(shardID) + "/receipts"),
-		MetricsHash:  testHash(string(zoneID) + "/" + string(shardID) + "/metrics"),
+		ZoneID:		zoneID,
+		ShardID:	shardID,
+		Height:		height,
+		StateRoot:	testHash(string(zoneID) + "/" + string(shardID) + "/state"),
+		InboxRoot:	testHash(string(zoneID) + "/" + string(shardID) + "/inbox"),
+		OutboxRoot:	testHash(string(zoneID) + "/" + string(shardID) + "/outbox"),
+		ReceiptsRoot:	testHash(string(zoneID) + "/" + string(shardID) + "/receipts"),
+		MetricsHash:	testHash(string(zoneID) + "/" + string(shardID) + "/metrics"),
 	})
 	require.NoError(t, err)
 	return root

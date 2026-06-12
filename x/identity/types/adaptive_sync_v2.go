@@ -9,46 +9,46 @@ import (
 )
 
 const (
-	IdentityAdaptiveSyncSnapshotVersionV2 uint64 = 1
+	IdentityAdaptiveSyncSnapshotVersionV2	uint64	= 1
 
-	IdentityAdaptiveSyncEventSnapshotV2    = "identity_adaptive_sync_snapshot"
-	IdentityAdaptiveSyncEventRecoveredV2   = "identity_adaptive_sync_recovered"
-	IdentityAdaptiveSyncEventCacheResyncV2 = "identity_adaptive_sync_cache_resync"
+	IdentityAdaptiveSyncEventSnapshotV2	= "identity_adaptive_sync_snapshot"
+	IdentityAdaptiveSyncEventRecoveredV2	= "identity_adaptive_sync_recovered"
+	IdentityAdaptiveSyncEventCacheResyncV2	= "identity_adaptive_sync_cache_resync"
 )
 
 type IdentitySnapshotExpiryIndexEntryV2 struct {
-	ExpiryHeight uint64
-	Name         string
-	NameHash     string
-	StoreKey     string
+	ExpiryHeight	uint64
+	Name		string
+	NameHash	string
+	StoreKey	string
 }
 
 type IdentityAdaptiveSyncSnapshotV2 struct {
-	SnapshotVersion uint64
-	Height          uint64
-	State           IdentityState
-	Delegations     []DelegationRecordV2
-	ExpiryIndex     []IdentitySnapshotExpiryIndexEntryV2
-	StateRoot       string
-	DelegationRoot  string
-	ExpiryIndexRoot string
-	SnapshotHash    string
+	SnapshotVersion	uint64
+	Height		uint64
+	State		IdentityState
+	Delegations	[]DelegationRecordV2
+	ExpiryIndex	[]IdentitySnapshotExpiryIndexEntryV2
+	StateRoot	string
+	DelegationRoot	string
+	ExpiryIndexRoot	string
+	SnapshotHash	string
 }
 
 type IdentityAdaptiveSyncRestoreResultV2 struct {
-	State       IdentityState
-	Delegations []DelegationRecordV2
-	StateRoot   string
-	ProofReady  bool
-	Events      []IdentityABCIEventV2
+	State		IdentityState
+	Delegations	[]DelegationRecordV2
+	StateRoot	string
+	ProofReady	bool
+	Events		[]IdentityABCIEventV2
 }
 
 type IdentityCacheResyncPlanV2 struct {
-	NameHash      string
-	RecordVersion uint64
-	Height        uint64
-	Events        []IdentityABCIEventV2
-	QueryNames    []string
+	NameHash	string
+	RecordVersion	uint64
+	Height		uint64
+	Events		[]IdentityABCIEventV2
+	QueryNames	[]string
 }
 
 func BuildIdentityAdaptiveSyncSnapshotV2(state IdentityState, delegations []DelegationRecordV2, height uint64) (IdentityAdaptiveSyncSnapshotV2, error) {
@@ -72,14 +72,14 @@ func BuildIdentityAdaptiveSyncSnapshotV2(state IdentityState, delegations []Dele
 		return IdentityAdaptiveSyncSnapshotV2{}, err
 	}
 	snapshot := IdentityAdaptiveSyncSnapshotV2{
-		SnapshotVersion: IdentityAdaptiveSyncSnapshotVersionV2,
-		Height:          height,
-		State:           exported,
-		Delegations:     canonicalDelegations,
-		ExpiryIndex:     expiryIndex,
-		StateRoot:       stateRoot,
-		DelegationRoot:  ComputeIdentityZoneGrantRoot(canonicalDelegations),
-		ExpiryIndexRoot: ComputeIdentitySnapshotExpiryIndexRootV2(expiryIndex),
+		SnapshotVersion:	IdentityAdaptiveSyncSnapshotVersionV2,
+		Height:			height,
+		State:			exported,
+		Delegations:		canonicalDelegations,
+		ExpiryIndex:		expiryIndex,
+		StateRoot:		stateRoot,
+		DelegationRoot:		ComputeIdentityZoneGrantRoot(canonicalDelegations),
+		ExpiryIndexRoot:	ComputeIdentitySnapshotExpiryIndexRootV2(expiryIndex),
 	}
 	snapshot.SnapshotHash = ComputeIdentityAdaptiveSyncSnapshotHashV2(snapshot)
 	return snapshot, nil
@@ -146,10 +146,10 @@ func RestoreIdentityAdaptiveSyncSnapshotV2(snapshot IdentityAdaptiveSyncSnapshot
 		return IdentityAdaptiveSyncRestoreResultV2{}, err
 	}
 	events := []IdentityABCIEventV2{{
-		Type:       IdentityAdaptiveSyncEventRecoveredV2,
-		Height:     snapshot.Height,
-		Message:    "identity adaptive sync snapshot restored",
-		Attributes: []string{"snapshot=" + snapshot.SnapshotHash, "state_root=" + stateRoot},
+		Type:		IdentityAdaptiveSyncEventRecoveredV2,
+		Height:		snapshot.Height,
+		Message:	"identity adaptive sync snapshot restored",
+		Attributes:	[]string{"snapshot=" + snapshot.SnapshotHash, "state_root=" + stateRoot},
 	}}
 	plan, err := BuildIdentityAdaptiveSyncCacheResyncPlanV2(snapshot, proofProbeNames)
 	if err != nil {
@@ -157,11 +157,11 @@ func RestoreIdentityAdaptiveSyncSnapshotV2(snapshot IdentityAdaptiveSyncSnapshot
 	}
 	events = append(events, plan.Events...)
 	return IdentityAdaptiveSyncRestoreResultV2{
-		State:       restored,
-		Delegations: cloneIdentityDelegationsV2(snapshot.Delegations),
-		StateRoot:   stateRoot,
-		ProofReady:  true,
-		Events:      events,
+		State:		restored,
+		Delegations:	cloneIdentityDelegationsV2(snapshot.Delegations),
+		StateRoot:	stateRoot,
+		ProofReady:	true,
+		Events:		events,
 	}, nil
 }
 
@@ -174,9 +174,9 @@ func BuildIdentityAdaptiveSyncCacheResyncPlanV2(snapshot IdentityAdaptiveSyncSna
 		return IdentityCacheResyncPlanV2{}, err
 	}
 	plan := IdentityCacheResyncPlanV2{
-		Height:        snapshot.Height,
-		RecordVersion: IdentityAdaptiveSyncSnapshotVersionV2,
-		QueryNames:    queryNames,
+		Height:		snapshot.Height,
+		RecordVersion:	IdentityAdaptiveSyncSnapshotVersionV2,
+		QueryNames:	queryNames,
 	}
 	for _, name := range queryNames {
 		nameHash, err := DomainRecordV2NameHash(name)
@@ -187,11 +187,11 @@ func BuildIdentityAdaptiveSyncCacheResyncPlanV2(snapshot IdentityAdaptiveSyncSna
 			plan.NameHash = nameHash
 		}
 		plan.Events = append(plan.Events, IdentityABCIEventV2{
-			Type:     IdentityAdaptiveSyncEventCacheResyncV2,
-			Height:   snapshot.Height,
-			Name:     name,
-			NameHash: nameHash,
-			Message:  "identity watcher and wallet cache must resync",
+			Type:		IdentityAdaptiveSyncEventCacheResyncV2,
+			Height:		snapshot.Height,
+			Name:		name,
+			NameHash:	nameHash,
+			Message:	"identity watcher and wallet cache must resync",
 			Attributes: []string{
 				"snapshot=" + snapshot.SnapshotHash,
 				"state_root=" + snapshot.StateRoot,
@@ -218,10 +218,10 @@ func BuildIdentitySnapshotExpiryIndexV2(state IdentityState) ([]IdentitySnapshot
 			return nil, err
 		}
 		entries = append(entries, IdentitySnapshotExpiryIndexEntryV2{
-			ExpiryHeight: domain.ExpiryHeight,
-			Name:         domain.Name,
-			NameHash:     nameHash,
-			StoreKey:     storeKey,
+			ExpiryHeight:	domain.ExpiryHeight,
+			Name:		domain.Name,
+			NameHash:	nameHash,
+			StoreKey:	storeKey,
 		})
 	}
 	return canonicalIdentitySnapshotExpiryIndexV2(entries), nil

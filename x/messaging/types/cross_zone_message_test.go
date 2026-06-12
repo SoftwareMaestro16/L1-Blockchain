@@ -102,32 +102,32 @@ func TestCrossZoneEnvelopeRejectsInvalidDeadlineAndFee(t *testing.T) {
 
 func testCrossZoneParams() CrossZoneMessageParams {
 	return CrossZoneMessageParams{
-		MaxPayloadSize: 256,
-		MinGasLimit:    1,
-		MaxGasLimit:    1_000,
-		MinFeeLimit:    sdkmath.NewInt(3),
+		MaxPayloadSize:	256,
+		MinGasLimit:	1,
+		MaxGasLimit:	1_000,
+		MinFeeLimit:	sdkmath.NewInt(3),
 	}
 }
 
 func testCrossZoneMessage(t *testing.T, params CrossZoneMessageParams, nonce uint64, sequence uint64, payload []byte) CrossZoneMessageEnvelope {
 	t.Helper()
 	msg, err := NewCrossZoneMessageEnvelope(CrossZoneMessageEnvelope{
-		SourceZone:      zonestypes.ZoneIDFinancial,
-		DestinationZone: zonestypes.ZoneIDContract,
-		Sender:          addr(1),
-		Recipient:       addr(2),
-		Value:           sdkmath.NewInt(10),
-		Opcode:          "contract.execute",
-		Payload:         payload,
-		GasLimit:        10,
-		Deadline:        100,
-		Nonce:           nonce,
-		SourceSequence:  sequence,
-		RouteID:         "route-fin-contract",
-		Bounce:          true,
-		FeeLimit:        sdkmath.NewInt(3),
-		CreatedHeight:   20,
-		AuthScope:       "owner",
+		SourceZone:		zonestypes.ZoneIDFinancial,
+		DestinationZone:	zonestypes.ZoneIDContract,
+		Sender:			addr(1),
+		Recipient:		addr(2),
+		Value:			sdkmath.NewInt(10),
+		Opcode:			"contract.execute",
+		Payload:		payload,
+		GasLimit:		10,
+		Deadline:		100,
+		Nonce:			nonce,
+		SourceSequence:		sequence,
+		RouteID:		"route-fin-contract",
+		Bounce:			true,
+		FeeLimit:		sdkmath.NewInt(3),
+		CreatedHeight:		20,
+		AuthScope:		"owner",
 	}, params)
 	require.NoError(t, err)
 	return msg

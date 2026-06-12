@@ -10,16 +10,16 @@ import (
 
 func TestServiceStorageDescriptorProjectsDeclarationFields(t *testing.T) {
 	descriptor := coretypes.ServiceStorageDescriptor{
-		Model:              coretypes.ServiceStorageHybridCommitment,
-		CommitmentHash:     storageTestHash("descriptor/commitment"),
-		ContentHash:        storageTestHash("descriptor/content"),
-		StateRoot:          storageTestHash("descriptor/state-root"),
-		RetrievalMethod:    StorageRetrievalHybridEndpoint,
-		VerificationMethod: StorageVerificationHybridCommitment,
-		RetentionPolicy:    StorageRetentionHeight,
-		AccessPolicy:       AccessPolicyPermissioned,
-		MaxPayloadBytes:    4096,
-		ProofRequired:      true,
+		Model:			coretypes.ServiceStorageHybridCommitment,
+		CommitmentHash:		storageTestHash("descriptor/commitment"),
+		ContentHash:		storageTestHash("descriptor/content"),
+		StateRoot:		storageTestHash("descriptor/state-root"),
+		RetrievalMethod:	StorageRetrievalHybridEndpoint,
+		VerificationMethod:	StorageVerificationHybridCommitment,
+		RetentionPolicy:	StorageRetentionHeight,
+		AccessPolicy:		AccessPolicyPermissioned,
+		MaxPayloadBytes:	4096,
+		ProofRequired:		true,
 	}
 	require.NoError(t, descriptor.Validate())
 
@@ -39,24 +39,24 @@ func TestServiceStorageReceiptAnchoringAndProofHook(t *testing.T) {
 	chunkSet, err := NewStorageChunkSet(object.ObjectID, object.ChunkRoots)
 	require.NoError(t, err)
 	proof, err := NewStorageRetrievalProof(StorageRetrievalProof{
-		ObjectID:    object.ObjectID,
-		ContentHash: object.ContentHash,
-		ChunkRoot:   chunkSet.ChunkRoot,
-		ChunkIndex:  0,
-		ChunkHash:   object.ChunkRoots[0],
-		ProofPath:   []string{object.ChunkRoots[1]},
+		ObjectID:	object.ObjectID,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	chunkSet.ChunkRoot,
+		ChunkIndex:	0,
+		ChunkHash:	object.ChunkRoots[0],
+		ProofPath:	[]string{object.ChunkRoots[1]},
 	})
 	require.NoError(t, err)
 
 	receipt, err := NewServiceStorageReceipt(ServiceStorageReceipt{
-		ServiceID:     "service/storage",
-		ObjectID:      object.ObjectID,
-		RequestHash:   storageTestHash("request/read"),
-		ContentHash:   object.ContentHash,
-		ProviderID:    "provider-1",
-		AccessHeight:  42,
-		Signature:     storageTestHash("provider/signature"),
-		ProofOptional: proof.ProofHash,
+		ServiceID:	"service/storage",
+		ObjectID:	object.ObjectID,
+		RequestHash:	storageTestHash("request/read"),
+		ContentHash:	object.ContentHash,
+		ProviderID:	"provider-1",
+		AccessHeight:	42,
+		Signature:	storageTestHash("provider/signature"),
+		ProofOptional:	proof.ProofHash,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, receipt.ReceiptID)
@@ -76,32 +76,32 @@ func TestServiceStorageReceiptAnchoringAndProofHook(t *testing.T) {
 func TestServiceStorageReceiptRequiresSignature(t *testing.T) {
 	object := testStorageObject(t, "alice", []string{storageTestHash("chunk-a")})
 	_, err := NewServiceStorageReceipt(ServiceStorageReceipt{
-		ServiceID:    "service/storage",
-		ObjectID:     object.ObjectID,
-		RequestHash:  storageTestHash("request/read"),
-		ContentHash:  object.ContentHash,
-		ProviderID:   "provider-1",
-		AccessHeight: 42,
+		ServiceID:	"service/storage",
+		ObjectID:	object.ObjectID,
+		RequestHash:	storageTestHash("request/read"),
+		ContentHash:	object.ContentHash,
+		ProviderID:	"provider-1",
+		AccessHeight:	42,
 	})
 	require.ErrorContains(t, err, "signature")
 }
 
 func TestOnChainStorageFeeModelQuotesPayloads(t *testing.T) {
 	declaration, err := NewStorageDeclaration(StorageDeclaration{
-		StorageModel:       StorageModelPersistentOnChain,
-		StateRootOptional:  storageTestHash("state/root"),
-		RetrievalMethod:    StorageRetrievalOnChainState,
-		VerificationMethod: StorageVerificationStateRoot,
-		RetentionPolicy:    StorageRetentionPermanent,
-		AccessPolicy:       AccessPolicyPermissioned,
-		MaxPayloadBytes:    1024,
+		StorageModel:		StorageModelPersistentOnChain,
+		StateRootOptional:	storageTestHash("state/root"),
+		RetrievalMethod:	StorageRetrievalOnChainState,
+		VerificationMethod:	StorageVerificationStateRoot,
+		RetentionPolicy:	StorageRetentionPermanent,
+		AccessPolicy:		AccessPolicyPermissioned,
+		MaxPayloadBytes:	1024,
 	})
 	require.NoError(t, err)
 	model, err := NewOnChainStorageFeeModel(OnChainStorageFeeModel{
-		Denom:           "naet",
-		PricePerByte:    2,
-		MinimumFee:      500,
-		MaxPayloadBytes: 2048,
+		Denom:			"naet",
+		PricePerByte:		2,
+		MinimumFee:		500,
+		MaxPayloadBytes:	2048,
 	})
 	require.NoError(t, err)
 

@@ -7,13 +7,13 @@ import (
 
 func EmptyState(params MeshParams) MeshState {
 	return MeshState{
-		Params:               NormalizeParams(params),
-		Destinations:         []MeshDestination{},
-		FinalizedCommitments: []FinalizedCommitment{},
-		ReplayMarkers:        []ReplayMarker{},
-		Receipts:             []MeshReceipt{},
-		BounceReceipts:       []BounceReceipt{},
-		RefundReceipts:       []RefundReceipt{},
+		Params:			NormalizeParams(params),
+		Destinations:		[]MeshDestination{},
+		FinalizedCommitments:	[]FinalizedCommitment{},
+		ReplayMarkers:		[]ReplayMarker{},
+		Receipts:		[]MeshReceipt{},
+		BounceReceipts:		[]BounceReceipt{},
+		RefundReceipts:		[]RefundReceipt{},
 	}
 }
 
@@ -164,14 +164,14 @@ func (s MeshState) Export() MeshState {
 
 func (s MeshState) Clone() MeshState {
 	out := MeshState{
-		CurrentHeight:        s.CurrentHeight,
-		Params:               s.Params,
-		Destinations:         append([]MeshDestination(nil), s.Destinations...),
-		FinalizedCommitments: append([]FinalizedCommitment(nil), s.FinalizedCommitments...),
-		ReplayMarkers:        append([]ReplayMarker(nil), s.ReplayMarkers...),
-		Receipts:             append([]MeshReceipt(nil), s.Receipts...),
-		BounceReceipts:       append([]BounceReceipt(nil), s.BounceReceipts...),
-		RefundReceipts:       make([]RefundReceipt, len(s.RefundReceipts)),
+		CurrentHeight:		s.CurrentHeight,
+		Params:			s.Params,
+		Destinations:		append([]MeshDestination(nil), s.Destinations...),
+		FinalizedCommitments:	append([]FinalizedCommitment(nil), s.FinalizedCommitments...),
+		ReplayMarkers:		append([]ReplayMarker(nil), s.ReplayMarkers...),
+		Receipts:		append([]MeshReceipt(nil), s.Receipts...),
+		BounceReceipts:		append([]BounceReceipt(nil), s.BounceReceipts...),
+		RefundReceipts:		make([]RefundReceipt, len(s.RefundReceipts)),
 	}
 	for i, receipt := range s.RefundReceipts {
 		receipt.Recipient = cloneBytes(receipt.Recipient)
@@ -215,9 +215,9 @@ func commitSuccess(state MeshState, msg MeshMessage, height uint64, result Execu
 
 func commitFailure(state MeshState, msg MeshMessage, height uint64, reason FailureReason) (MeshState, MeshReceipt, error) {
 	result := ExecutionResult{
-		Success:    false,
-		Code:       1,
-		ResultHash: HashParts("mesh-failure", msg.MessageID, string(reason)),
+		Success:	false,
+		Code:		1,
+		ResultHash:	HashParts("mesh-failure", msg.MessageID, string(reason)),
 	}
 	return commitFailureWithResult(state, msg, height, reason, result)
 }
@@ -248,10 +248,10 @@ func commitDelivery(state MeshState, msg MeshMessage, receipt MeshReceipt, bounc
 		return MeshState{}, MeshReceipt{}, errors.New("mesh duplicate receipt detected")
 	}
 	marker := ReplayMarker{
-		MessageID:   msg.MessageID,
-		ReceiptHash: receipt.ReceiptHash,
-		Reason:      receipt.Reason,
-		Height:      receipt.Height,
+		MessageID:	msg.MessageID,
+		ReceiptHash:	receipt.ReceiptHash,
+		Reason:		receipt.Reason,
+		Height:		receipt.Height,
 	}
 	if err := marker.Validate(); err != nil {
 		return MeshState{}, MeshReceipt{}, err
@@ -284,17 +284,17 @@ func commitDelivery(state MeshState, msg MeshMessage, receipt MeshReceipt, bounc
 
 func buildReceipt(msg MeshMessage, status ReceiptStatus, reason FailureReason, height uint64, result ExecutionResult) MeshReceipt {
 	receipt := MeshReceipt{
-		MessageID:        msg.MessageID,
-		SourceZone:       msg.SourceZone,
-		SourceShard:      msg.SourceShard,
-		DestinationZone:  msg.DestinationZone,
-		DestinationShard: msg.DestinationShard,
-		Status:           status,
-		Reason:           reason,
-		Height:           height,
-		Sequence:         msg.Sequence,
-		ExecutionCode:    result.Code,
-		ResultHash:       result.ResultHash,
+		MessageID:		msg.MessageID,
+		SourceZone:		msg.SourceZone,
+		SourceShard:		msg.SourceShard,
+		DestinationZone:	msg.DestinationZone,
+		DestinationShard:	msg.DestinationShard,
+		Status:			status,
+		Reason:			reason,
+		Height:			height,
+		Sequence:		msg.Sequence,
+		ExecutionCode:		result.Code,
+		ResultHash:		result.ResultHash,
 	}
 	receipt.ReceiptHash = ComputeReceiptHash(receipt)
 	return receipt
@@ -311,13 +311,13 @@ func buildBounceReceipt(msg MeshMessage, receipt MeshReceipt) BounceReceipt {
 	bounce.ParentMessageID = msg.MessageID
 	bounce.MessageID = ComputeMessageID(bounce)
 	out := BounceReceipt{
-		MessageID:        HashParts("bounce-receipt", msg.MessageID, receipt.ReceiptHash),
-		SourceMessageID:  msg.MessageID,
-		BounceMessageID:  bounce.MessageID,
-		DestinationZone:  bounce.DestinationZone,
-		DestinationShard: bounce.DestinationShard,
-		Reason:           receipt.Reason,
-		Height:           receipt.Height,
+		MessageID:		HashParts("bounce-receipt", msg.MessageID, receipt.ReceiptHash),
+		SourceMessageID:	msg.MessageID,
+		BounceMessageID:	bounce.MessageID,
+		DestinationZone:	bounce.DestinationZone,
+		DestinationShard:	bounce.DestinationShard,
+		Reason:			receipt.Reason,
+		Height:			receipt.Height,
 	}
 	out.ReceiptHash = ComputeBounceReceiptHash(out)
 	return out
@@ -325,12 +325,12 @@ func buildBounceReceipt(msg MeshMessage, receipt MeshReceipt) BounceReceipt {
 
 func buildRefundReceipt(msg MeshMessage, receipt MeshReceipt) RefundReceipt {
 	out := RefundReceipt{
-		MessageID:       HashParts("refund-receipt", msg.MessageID, receipt.ReceiptHash),
-		SourceMessageID: msg.MessageID,
-		Recipient:       cloneBytes(msg.Sender),
-		AssetCommitment: msg.AssetCommitment,
-		Reason:          receipt.Reason,
-		Height:          receipt.Height,
+		MessageID:		HashParts("refund-receipt", msg.MessageID, receipt.ReceiptHash),
+		SourceMessageID:	msg.MessageID,
+		Recipient:		cloneBytes(msg.Sender),
+		AssetCommitment:	msg.AssetCommitment,
+		Reason:			receipt.Reason,
+		Height:			receipt.Height,
 	}
 	out.ReceiptHash = ComputeRefundReceiptHash(out)
 	return out

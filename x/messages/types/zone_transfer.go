@@ -15,60 +15,60 @@ import (
 )
 
 const (
-	ZoneTransferPayloadType = "zone.transfer"
-	ZoneTransferAuthScope   = "financial-zone-transfer"
-	MaxDenomLength          = 128
-	MaxDeliveryWindow       = uint64(1_000_000)
+	ZoneTransferPayloadType	= "zone.transfer"
+	ZoneTransferAuthScope	= "financial-zone-transfer"
+	MaxDenomLength		= 128
+	MaxDeliveryWindow	= uint64(1_000_000)
 )
 
 type MsgZoneTransfer struct {
-	FromAddress       sdk.AccAddress
-	ToAddress         sdk.AccAddress
-	SourceZoneID      zonestypes.ZoneID
-	DestinationZoneID zonestypes.ZoneID
-	Amount            sdkmath.Int
-	Denom             string
-	GasLimit          uint64
-	ForwardingFee     sdkmath.Int
-	ExpiryHeight      uint64
-	MemoHashOptional  string
+	FromAddress		sdk.AccAddress
+	ToAddress		sdk.AccAddress
+	SourceZoneID		zonestypes.ZoneID
+	DestinationZoneID	zonestypes.ZoneID
+	Amount			sdkmath.Int
+	Denom			string
+	GasLimit		uint64
+	ForwardingFee		sdkmath.Int
+	ExpiryHeight		uint64
+	MemoHashOptional	string
 }
 
 type ZoneTransferAdmission struct {
-	CreatedHeight       uint64
-	Nonce               uint64
-	SourceSequence      uint64
-	SourceSpendable     sdkmath.Int
-	EnabledZones        []zonestypes.ZoneID
-	RoutableDenoms      []RoutableDenom
-	MinimumRouteFees    []ZoneTransferRouteFee
-	SourceShardID       string
-	DestinationShardID  string
-	MaxDeliveryWindow   uint64
-	CommittedRouteHash  string
-	SourceEscrowed      bool
-	DestinationCredited bool
+	CreatedHeight		uint64
+	Nonce			uint64
+	SourceSequence		uint64
+	SourceSpendable		sdkmath.Int
+	EnabledZones		[]zonestypes.ZoneID
+	RoutableDenoms		[]RoutableDenom
+	MinimumRouteFees	[]ZoneTransferRouteFee
+	SourceShardID		string
+	DestinationShardID	string
+	MaxDeliveryWindow	uint64
+	CommittedRouteHash	string
+	SourceEscrowed		bool
+	DestinationCredited	bool
 }
 
 type RoutableDenom struct {
-	Denom             string
-	SourceZoneID      zonestypes.ZoneID
-	DestinationZoneID zonestypes.ZoneID
-	AuthorityPath     string
+	Denom			string
+	SourceZoneID		zonestypes.ZoneID
+	DestinationZoneID	zonestypes.ZoneID
+	AuthorityPath		string
 }
 
 type ZoneTransferRouteFee struct {
-	SourceZoneID      zonestypes.ZoneID
-	DestinationZoneID zonestypes.ZoneID
-	Denom             string
-	MinimumFee        sdkmath.Int
+	SourceZoneID		zonestypes.ZoneID
+	DestinationZoneID	zonestypes.ZoneID
+	Denom			string
+	MinimumFee		sdkmath.Int
 }
 
 type MsgZoneTransferResult struct {
-	Message       Message
-	AetherMessage AetherMessage
-	Escrow        AetherValueEscrow
-	Receipt       AetherMessageReceipt
+	Message		Message
+	AetherMessage	AetherMessage
+	Escrow		AetherValueEscrow
+	Receipt		AetherMessageReceipt
 }
 
 func (k MessageKeeper) SubmitZoneTransfer(req MsgZoneTransfer, admission ZoneTransferAdmission) (MessageKeeper, SubmitCrossZoneMessageResponse, error) {
@@ -98,22 +98,22 @@ func NewMessageFromZoneTransfer(req MsgZoneTransfer, admission ZoneTransferAdmis
 		return Message{}, err
 	}
 	return NewMessage(Message{
-		SourceZone:      req.SourceZoneID,
-		DestinationZone: req.DestinationZoneID,
-		Sender:          req.FromAddress,
-		Recipient:       req.ToAddress,
-		Value:           req.Amount,
-		Opcode:          ZoneTransferPayloadType,
-		Payload:         req.CanonicalPayload(),
-		GasLimit:        req.GasLimit,
-		Deadline:        req.ExpiryHeight,
-		Nonce:           admission.Nonce,
-		SourceSequence:  admission.SourceSequence,
-		RouteID:         ZoneTransferRouteID(req),
-		Bounce:          true,
-		FeeLimit:        req.ForwardingFee,
-		CreatedHeight:   admission.CreatedHeight,
-		AuthScope:       ZoneTransferAuthScope,
+		SourceZone:		req.SourceZoneID,
+		DestinationZone:	req.DestinationZoneID,
+		Sender:			req.FromAddress,
+		Recipient:		req.ToAddress,
+		Value:			req.Amount,
+		Opcode:			ZoneTransferPayloadType,
+		Payload:		req.CanonicalPayload(),
+		GasLimit:		req.GasLimit,
+		Deadline:		req.ExpiryHeight,
+		Nonce:			admission.Nonce,
+		SourceSequence:		admission.SourceSequence,
+		RouteID:		ZoneTransferRouteID(req),
+		Bounce:			true,
+		FeeLimit:		req.ForwardingFee,
+		CreatedHeight:		admission.CreatedHeight,
+		AuthScope:		ZoneTransferAuthScope,
 	}, params)
 }
 
@@ -127,25 +127,25 @@ func NewAetherMessageFromZoneTransfer(req MsgZoneTransfer, admission ZoneTransfe
 		routeCommitment = ComputeZoneTransferRouteCommitment(req, admission)
 	}
 	return NewAetherMessage(AetherMessage{
-		Sender:          hex.EncodeToString(msg.Sender),
-		SenderZoneID:    msg.SourceZone,
-		SenderShardID:   admission.SourceShardID,
-		Receiver:        hex.EncodeToString(msg.Recipient),
-		ReceiverZoneID:  msg.DestinationZone,
-		ReceiverShardID: admission.DestinationShardID,
-		ValueNAET:       msg.Value,
-		Payload:         msg.Payload,
-		PayloadType:     ZoneTransferPayloadType,
-		GasLimit:        msg.GasLimit,
-		GasPrice:        msg.FeeLimit,
-		ForwardingFee:   msg.FeeLimit,
-		ExpiryHeight:    msg.Deadline,
-		Bounce:          true,
-		ExecutionMode:   ExecutionModeAsync,
-		OrderingClass:   OrderingClassSenderOrdered,
-		RouteCommitment: routeCommitment,
-		CreatedAtHeight: msg.CreatedHeight,
-		Nonce:           msg.Nonce,
+		Sender:			hex.EncodeToString(msg.Sender),
+		SenderZoneID:		msg.SourceZone,
+		SenderShardID:		admission.SourceShardID,
+		Receiver:		hex.EncodeToString(msg.Recipient),
+		ReceiverZoneID:		msg.DestinationZone,
+		ReceiverShardID:	admission.DestinationShardID,
+		ValueNAET:		msg.Value,
+		Payload:		msg.Payload,
+		PayloadType:		ZoneTransferPayloadType,
+		GasLimit:		msg.GasLimit,
+		GasPrice:		msg.FeeLimit,
+		ForwardingFee:		msg.FeeLimit,
+		ExpiryHeight:		msg.Deadline,
+		Bounce:			true,
+		ExecutionMode:		ExecutionModeAsync,
+		OrderingClass:		OrderingClassSenderOrdered,
+		RouteCommitment:	routeCommitment,
+		CreatedAtHeight:	msg.CreatedHeight,
+		Nonce:			msg.Nonce,
 	})
 }
 
@@ -159,10 +159,10 @@ func BuildZoneTransferAcceptedResult(req MsgZoneTransfer, admission ZoneTransfer
 		return MsgZoneTransferResult{}, err
 	}
 	escrow, err := NewAetherValueEscrow(AetherValueEscrow{
-		MsgID:       aether.MsgID,
-		ValueLocked: aether.ValueNAET,
-		FeeLocked:   aether.ForwardingFee,
-		Status:      AetherEscrowLocked,
+		MsgID:		aether.MsgID,
+		ValueLocked:	aether.ValueNAET,
+		FeeLocked:	aether.ForwardingFee,
+		Status:		AetherEscrowLocked,
 	})
 	if err != nil {
 		return MsgZoneTransferResult{}, err
@@ -528,5 +528,3 @@ func normalizeZoneTransferRouteFees(values []ZoneTransferRouteFee) []ZoneTransfe
 	})
 	return out
 }
-
-

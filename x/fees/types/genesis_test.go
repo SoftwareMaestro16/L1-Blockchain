@@ -32,10 +32,10 @@ func TestDefaultParamsValidate(t *testing.T) {
 
 func TestParamsRejectInvalidAllowedFeeDenoms(t *testing.T) {
 	tests := map[string][]string{
-		"empty list":       {},
-		"non native denom": {"uatom"},
-		"duplicate native": {appparams.BaseDenom, appparams.BaseDenom},
-		"mixed denoms":     {appparams.BaseDenom, fixtureTestAssetDenom},
+		"empty list":		{},
+		"non native denom":	{"uatom"},
+		"duplicate native":	{appparams.BaseDenom, appparams.BaseDenom},
+		"mixed denoms":		{appparams.BaseDenom, fixtureTestAssetDenom},
 	}
 
 	for name, denoms := range tests {
@@ -190,12 +190,12 @@ func TestQuoteFeeIncludesEconomicControlSurface(t *testing.T) {
 func TestValidateAdmissionRejectsSpamWithoutUnboundedFeeEscalation(t *testing.T) {
 	params := DefaultParams()
 	quote, err := ValidateAdmission(params, AdmissionInput{
-		Fee:              sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1000)),
-		GasLimit:         params.MaxTxGas,
-		BlockGasConsumed: params.MaxBlockGas - params.MaxTxGas,
-		BlockTxCount:     1,
-		SenderTxCount:    1,
-		SenderStake:      sdkmath.ZeroInt(),
+		Fee:			sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1000)),
+		GasLimit:		params.MaxTxGas,
+		BlockGasConsumed:	params.MaxBlockGas - params.MaxTxGas,
+		BlockTxCount:		1,
+		SenderTxCount:		1,
+		SenderStake:		sdkmath.ZeroInt(),
 	})
 	if err != nil {
 		t.Fatalf("max capped fee should be accepted at full utilization: %v", err)
@@ -205,36 +205,36 @@ func TestValidateAdmissionRejectsSpamWithoutUnboundedFeeEscalation(t *testing.T)
 	}
 
 	_, err = ValidateAdmission(params, AdmissionInput{
-		Fee:              sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1001)),
-		GasLimit:         100_000,
-		BlockGasConsumed: 0,
-		BlockTxCount:     1,
-		SenderTxCount:    1,
-		SenderStake:      sdkmath.ZeroInt(),
+		Fee:			sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1001)),
+		GasLimit:		100_000,
+		BlockGasConsumed:	0,
+		BlockTxCount:		1,
+		SenderTxCount:		1,
+		SenderStake:		sdkmath.ZeroInt(),
 	})
 	if err == nil {
 		t.Fatal("expected over-cap fee to be rejected")
 	}
 
 	_, err = ValidateAdmission(params, AdmissionInput{
-		Fee:              sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
-		GasLimit:         params.MaxTxGas + 1,
-		BlockGasConsumed: 0,
-		BlockTxCount:     1,
-		SenderTxCount:    1,
-		SenderStake:      sdkmath.ZeroInt(),
+		Fee:			sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
+		GasLimit:		params.MaxTxGas + 1,
+		BlockGasConsumed:	0,
+		BlockTxCount:		1,
+		SenderTxCount:		1,
+		SenderStake:		sdkmath.ZeroInt(),
 	})
 	if err == nil {
 		t.Fatal("expected over-sized tx gas to be rejected")
 	}
 
 	_, err = ValidateAdmission(params, AdmissionInput{
-		Fee:              sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
-		GasLimit:         100_000,
-		BlockGasConsumed: 0,
-		BlockTxCount:     1,
-		SenderTxCount:    params.MaxSenderTxsPerBlock,
-		SenderStake:      sdkmath.ZeroInt(),
+		Fee:			sdk.NewCoins(sdk.NewInt64Coin(BondDenom, 1)),
+		GasLimit:		100_000,
+		BlockGasConsumed:	0,
+		BlockTxCount:		1,
+		SenderTxCount:		params.MaxSenderTxsPerBlock,
+		SenderStake:		sdkmath.ZeroInt(),
 	})
 	if err == nil {
 		t.Fatal("expected sender rate limit to be rejected")
@@ -323,23 +323,23 @@ func TestFeeModelEfficiencyAcceptsBoundedIntegratedFees(t *testing.T) {
 	params.CommunityPoolRatio = "0.15"
 
 	report, err := EvaluateFeeModelEfficiency(FeeModelEfficiencyInput{
-		Params:                        params,
-		SimulationLoadsBps:            []uint32{0, 5_000, 8_000, 10_000},
-		CurrentBlockLoadBps:           7_000,
-		ValidatorRewardCoverageBps:    appparams.MinValidatorRewardCoverageBps,
-		MaintenanceFundingCoverageBps: appparams.BasisPoints,
-		NativeLiquidityDepthNaet:      sdkmath.NewInt(100_000),
-		DailyFeePressureNaet:          sdkmath.NewInt(100),
-		AntiSpamMultiplierBps:         appparams.MinSpamCostMultiplierBps,
-		BurnIntegratedWithIssuance:    true,
-		FeeBurnRatioBps:               appparams.NormalBurnRatioBps,
-		BlockTxFeeNaet:                sdkmath.NewInt(1_000),
-		StorageFeeNaet:                sdkmath.NewInt(60),
-		ExecutionFeeNaet:              sdkmath.NewInt(40),
-		ExpectedBlockProcessingMs:     1_000,
-		ObservedBlockProcessingMs:     500,
-		ExpectedValidatorMemoryMB:     1_000,
-		ObservedValidatorMemoryMB:     600,
+		Params:				params,
+		SimulationLoadsBps:		[]uint32{0, 5_000, 8_000, 10_000},
+		CurrentBlockLoadBps:		7_000,
+		ValidatorRewardCoverageBps:	appparams.MinValidatorRewardCoverageBps,
+		MaintenanceFundingCoverageBps:	appparams.BasisPoints,
+		NativeLiquidityDepthNaet:	sdkmath.NewInt(100_000),
+		DailyFeePressureNaet:		sdkmath.NewInt(100),
+		AntiSpamMultiplierBps:		appparams.MinSpamCostMultiplierBps,
+		BurnIntegratedWithIssuance:	true,
+		FeeBurnRatioBps:		appparams.NormalBurnRatioBps,
+		BlockTxFeeNaet:			sdkmath.NewInt(1_000),
+		StorageFeeNaet:			sdkmath.NewInt(60),
+		ExecutionFeeNaet:		sdkmath.NewInt(40),
+		ExpectedBlockProcessingMs:	1_000,
+		ObservedBlockProcessingMs:	500,
+		ExpectedValidatorMemoryMB:	1_000,
+		ObservedValidatorMemoryMB:	600,
 	})
 	if err != nil {
 		t.Fatalf("fee model efficiency should evaluate: %v", err)
@@ -360,23 +360,23 @@ func TestFeeModelEfficiencyAcceptsBoundedIntegratedFees(t *testing.T) {
 
 func TestFeeModelEfficiencyReportsSectionRisks(t *testing.T) {
 	report, err := EvaluateFeeModelEfficiency(FeeModelEfficiencyInput{
-		Params:                        DefaultParams(),
-		SimulationLoadsBps:            []uint32{0, 10_000},
-		CurrentBlockLoadBps:           9_000,
-		ValidatorRewardCoverageBps:    appparams.MinValidatorRewardCoverageBps,
-		MaintenanceFundingCoverageBps: appparams.BasisPoints - 1,
-		NativeLiquidityDepthNaet:      sdkmath.NewInt(10_000),
-		DailyFeePressureNaet:          sdkmath.NewInt(2_000),
-		AntiSpamMultiplierBps:         appparams.MinSpamCostMultiplierBps - 1,
-		BurnIntegratedWithIssuance:    false,
-		FeeBurnRatioBps:               0,
-		BlockTxFeeNaet:                sdkmath.NewInt(1_000),
-		StorageFeeNaet:                sdkmath.NewInt(1),
-		ExecutionFeeNaet:              sdkmath.ZeroInt(),
-		ExpectedBlockProcessingMs:     100,
-		ObservedBlockProcessingMs:     90,
-		ExpectedValidatorMemoryMB:     1_000,
-		ObservedValidatorMemoryMB:     900,
+		Params:				DefaultParams(),
+		SimulationLoadsBps:		[]uint32{0, 10_000},
+		CurrentBlockLoadBps:		9_000,
+		ValidatorRewardCoverageBps:	appparams.MinValidatorRewardCoverageBps,
+		MaintenanceFundingCoverageBps:	appparams.BasisPoints - 1,
+		NativeLiquidityDepthNaet:	sdkmath.NewInt(10_000),
+		DailyFeePressureNaet:		sdkmath.NewInt(2_000),
+		AntiSpamMultiplierBps:		appparams.MinSpamCostMultiplierBps - 1,
+		BurnIntegratedWithIssuance:	false,
+		FeeBurnRatioBps:		0,
+		BlockTxFeeNaet:			sdkmath.NewInt(1_000),
+		StorageFeeNaet:			sdkmath.NewInt(1),
+		ExecutionFeeNaet:		sdkmath.ZeroInt(),
+		ExpectedBlockProcessingMs:	100,
+		ObservedBlockProcessingMs:	90,
+		ExpectedValidatorMemoryMB:	1_000,
+		ObservedValidatorMemoryMB:	900,
 	})
 	if err != nil {
 		t.Fatalf("fee model efficiency should evaluate: %v", err)
@@ -400,18 +400,18 @@ func TestFeeModelEfficiencyReportsSectionRisks(t *testing.T) {
 
 func TestFeeModelEfficiencyReportsMissingHardwareCalibration(t *testing.T) {
 	report, err := EvaluateFeeModelEfficiency(FeeModelEfficiencyInput{
-		Params:                        DefaultParams(),
-		SimulationLoadsBps:            []uint32{0, 5_000, 8_000, 10_000},
-		CurrentBlockLoadBps:           7_000,
-		ValidatorRewardCoverageBps:    appparams.MinValidatorRewardCoverageBps,
-		MaintenanceFundingCoverageBps: appparams.BasisPoints,
-		NativeLiquidityDepthNaet:      sdkmath.NewInt(100_000),
-		DailyFeePressureNaet:          sdkmath.NewInt(100),
-		AntiSpamMultiplierBps:         appparams.MinSpamCostMultiplierBps,
-		BurnIntegratedWithIssuance:    true,
-		FeeBurnRatioBps:               appparams.NormalBurnRatioBps,
-		BlockTxFeeNaet:                sdkmath.NewInt(1_000),
-		StorageFeeNaet:                sdkmath.NewInt(100),
+		Params:				DefaultParams(),
+		SimulationLoadsBps:		[]uint32{0, 5_000, 8_000, 10_000},
+		CurrentBlockLoadBps:		7_000,
+		ValidatorRewardCoverageBps:	appparams.MinValidatorRewardCoverageBps,
+		MaintenanceFundingCoverageBps:	appparams.BasisPoints,
+		NativeLiquidityDepthNaet:	sdkmath.NewInt(100_000),
+		DailyFeePressureNaet:		sdkmath.NewInt(100),
+		AntiSpamMultiplierBps:		appparams.MinSpamCostMultiplierBps,
+		BurnIntegratedWithIssuance:	true,
+		FeeBurnRatioBps:		appparams.NormalBurnRatioBps,
+		BlockTxFeeNaet:			sdkmath.NewInt(1_000),
+		StorageFeeNaet:			sdkmath.NewInt(100),
 	})
 	if err != nil {
 		t.Fatalf("fee model efficiency should evaluate: %v", err)

@@ -12,35 +12,35 @@ import (
 
 func DefaultParams() Params {
 	return Params{
-		BaseDenom:              BaseDenom,
-		TreasuryModule:         TreasuryModuleName,
-		ReserveBps:             5_000,
-		EcosystemBps:           3_000,
-		ValidatorIncentivesBps: 1_500,
-		BurnBps:                500,
-		PerEpochSpendCap:       sdk.NewInt64Coin(BaseDenom, 1_000_000_000_000),
-		MaxMetadataBytes:       DefaultMaxMetadataBytes,
+		BaseDenom:		BaseDenom,
+		TreasuryModule:		TreasuryModuleName,
+		ReserveBps:		5_000,
+		EcosystemBps:		3_000,
+		ValidatorIncentivesBps:	1_500,
+		BurnBps:		500,
+		PerEpochSpendCap:	sdk.NewInt64Coin(BaseDenom, 1_000_000_000_000),
+		MaxMetadataBytes:	DefaultMaxMetadataBytes,
 	}
 }
 
 func DefaultAllocations() TreasuryAllocations {
 	return TreasuryAllocations{
-		ReserveBalance:            sdk.NewCoins(),
-		EcosystemBalance:          sdk.NewCoins(),
-		ValidatorIncentiveBalance: sdk.NewCoins(),
-		BurnBalance:               sdk.NewCoins(),
-		TotalReceived:             sdk.NewCoins(),
-		TotalSpent:                sdk.NewCoins(),
+		ReserveBalance:			sdk.NewCoins(),
+		EcosystemBalance:		sdk.NewCoins(),
+		ValidatorIncentiveBalance:	sdk.NewCoins(),
+		BurnBalance:			sdk.NewCoins(),
+		TotalReceived:			sdk.NewCoins(),
+		TotalSpent:			sdk.NewCoins(),
 	}
 }
 
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Params:      DefaultParams(),
-		Allocations: DefaultAllocations(),
-		Spends:      []TreasurySpend{},
-		EpochSpends: []EpochSpend{},
-		NextSpendId: 1,
+		Params:		DefaultParams(),
+		Allocations:	DefaultAllocations(),
+		Spends:		[]TreasurySpend{},
+		EpochSpends:	[]EpochSpend{},
+		NextSpendId:	1,
 	}
 }
 
@@ -92,12 +92,12 @@ func (p Params) Validate() error {
 
 func (a TreasuryAllocations) Validate(params Params) error {
 	for name, coins := range map[string]sdk.Coins{
-		"reserve_balance":             a.ReserveBalance,
-		"ecosystem_balance":           a.EcosystemBalance,
-		"validator_incentive_balance": a.ValidatorIncentiveBalance,
-		"burn_balance":                a.BurnBalance,
-		"total_received":              a.TotalReceived,
-		"total_spent":                 a.TotalSpent,
+		"reserve_balance":		a.ReserveBalance,
+		"ecosystem_balance":		a.EcosystemBalance,
+		"validator_incentive_balance":	a.ValidatorIncentiveBalance,
+		"burn_balance":			a.BurnBalance,
+		"total_received":		a.TotalReceived,
+		"total_spent":			a.TotalSpent,
 	} {
 		if err := ValidateTreasuryCoins(params, coins, true); err != nil {
 			return fmt.Errorf("%s: %w", name, err)

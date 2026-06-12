@@ -12,66 +12,66 @@ type ServiceObservabilityAlertID string
 type ServiceObservabilityAlertSeverity string
 
 const (
-	ServiceEventRegistered               ServiceObservabilityEventID = "service_registered"
-	ServiceEventUpdated                  ServiceObservabilityEventID = "service_updated"
-	ServiceEventRenewed                  ServiceObservabilityEventID = "service_renewed"
-	ServiceEventDisabled                 ServiceObservabilityEventID = "service_disabled"
-	ServiceEventIdentityBound            ServiceObservabilityEventID = "service_identity_bound"
-	ServiceEventInterfaceRegistered      ServiceObservabilityEventID = "interface_registered"
-	ServiceEventInterfaceDeprecated      ServiceObservabilityEventID = "interface_deprecated"
-	ServiceEventCallSubmitted            ServiceObservabilityEventID = "service_call_submitted"
-	ServiceEventCallExecuted             ServiceObservabilityEventID = "service_call_executed"
-	ServiceEventCallFailed               ServiceObservabilityEventID = "service_call_failed"
-	ServiceEventResultAnchored           ServiceObservabilityEventID = "service_result_anchored"
-	ServiceEventReceiptCommitted         ServiceObservabilityEventID = "service_receipt_committed"
-	ServiceEventPaymentEscrowed          ServiceObservabilityEventID = "service_payment_escrowed"
-	ServiceEventPaymentSettled           ServiceObservabilityEventID = "service_payment_settled"
-	ServiceEventProviderRegistered       ServiceObservabilityEventID = "provider_registered"
-	ServiceEventProviderCollateralStaked ServiceObservabilityEventID = "provider_collateral_staked"
-	ServiceEventProviderFaultSubmitted   ServiceObservabilityEventID = "provider_fault_submitted"
-	ServiceEventProviderPenalized        ServiceObservabilityEventID = "provider_penalized"
+	ServiceEventRegistered			ServiceObservabilityEventID	= "service_registered"
+	ServiceEventUpdated			ServiceObservabilityEventID	= "service_updated"
+	ServiceEventRenewed			ServiceObservabilityEventID	= "service_renewed"
+	ServiceEventDisabled			ServiceObservabilityEventID	= "service_disabled"
+	ServiceEventIdentityBound		ServiceObservabilityEventID	= "service_identity_bound"
+	ServiceEventInterfaceRegistered		ServiceObservabilityEventID	= "interface_registered"
+	ServiceEventInterfaceDeprecated		ServiceObservabilityEventID	= "interface_deprecated"
+	ServiceEventCallSubmitted		ServiceObservabilityEventID	= "service_call_submitted"
+	ServiceEventCallExecuted		ServiceObservabilityEventID	= "service_call_executed"
+	ServiceEventCallFailed			ServiceObservabilityEventID	= "service_call_failed"
+	ServiceEventResultAnchored		ServiceObservabilityEventID	= "service_result_anchored"
+	ServiceEventReceiptCommitted		ServiceObservabilityEventID	= "service_receipt_committed"
+	ServiceEventPaymentEscrowed		ServiceObservabilityEventID	= "service_payment_escrowed"
+	ServiceEventPaymentSettled		ServiceObservabilityEventID	= "service_payment_settled"
+	ServiceEventProviderRegistered		ServiceObservabilityEventID	= "provider_registered"
+	ServiceEventProviderCollateralStaked	ServiceObservabilityEventID	= "provider_collateral_staked"
+	ServiceEventProviderFaultSubmitted	ServiceObservabilityEventID	= "provider_fault_submitted"
+	ServiceEventProviderPenalized		ServiceObservabilityEventID	= "provider_penalized"
 
-	ServiceEventCategoryRegistry  ServiceObservabilityEventCategory = "registry"
-	ServiceEventCategoryInterface ServiceObservabilityEventCategory = "interface"
-	ServiceEventCategoryCall      ServiceObservabilityEventCategory = "call"
-	ServiceEventCategoryReceipt   ServiceObservabilityEventCategory = "receipt"
-	ServiceEventCategoryPayment   ServiceObservabilityEventCategory = "payment"
-	ServiceEventCategoryProvider  ServiceObservabilityEventCategory = "provider"
+	ServiceEventCategoryRegistry	ServiceObservabilityEventCategory	= "registry"
+	ServiceEventCategoryInterface	ServiceObservabilityEventCategory	= "interface"
+	ServiceEventCategoryCall	ServiceObservabilityEventCategory	= "call"
+	ServiceEventCategoryReceipt	ServiceObservabilityEventCategory	= "receipt"
+	ServiceEventCategoryPayment	ServiceObservabilityEventCategory	= "payment"
+	ServiceEventCategoryProvider	ServiceObservabilityEventCategory	= "provider"
 
-	ServiceAlertCallFailureSpike               ServiceObservabilityAlertID = "service_call_failure_spike"
-	ServiceAlertReceiptAnchoringBacklog        ServiceObservabilityAlertID = "receipt_anchoring_backlog"
-	ServiceAlertProviderFaultSpike             ServiceObservabilityAlertID = "provider_fault_spike"
-	ServiceAlertInterfaceHashMismatchAttempt   ServiceObservabilityAlertID = "interface_hash_mismatch_attempt"
-	ServiceAlertExpiredServiceReceivingCalls   ServiceObservabilityAlertID = "expired_service_receiving_calls"
-	ServiceAlertPaymentEscrowSettlementBacklog ServiceObservabilityAlertID = "payment_escrow_settlement_backlog"
-	ServiceAlertReceiptProofLatencyThreshold   ServiceObservabilityAlertID = "receipt_proof_latency_above_threshold"
-	ServiceAlertRegistryLookupLatencyThreshold ServiceObservabilityAlertID = "registry_lookup_latency_above_threshold"
+	ServiceAlertCallFailureSpike			ServiceObservabilityAlertID	= "service_call_failure_spike"
+	ServiceAlertReceiptAnchoringBacklog		ServiceObservabilityAlertID	= "receipt_anchoring_backlog"
+	ServiceAlertProviderFaultSpike			ServiceObservabilityAlertID	= "provider_fault_spike"
+	ServiceAlertInterfaceHashMismatchAttempt	ServiceObservabilityAlertID	= "interface_hash_mismatch_attempt"
+	ServiceAlertExpiredServiceReceivingCalls	ServiceObservabilityAlertID	= "expired_service_receiving_calls"
+	ServiceAlertPaymentEscrowSettlementBacklog	ServiceObservabilityAlertID	= "payment_escrow_settlement_backlog"
+	ServiceAlertReceiptProofLatencyThreshold	ServiceObservabilityAlertID	= "receipt_proof_latency_above_threshold"
+	ServiceAlertRegistryLookupLatencyThreshold	ServiceObservabilityAlertID	= "registry_lookup_latency_above_threshold"
 
-	ServiceAlertSeverityWarning  ServiceObservabilityAlertSeverity = "warning"
-	ServiceAlertSeverityCritical ServiceObservabilityAlertSeverity = "critical"
+	ServiceAlertSeverityWarning	ServiceObservabilityAlertSeverity	= "warning"
+	ServiceAlertSeverityCritical	ServiceObservabilityAlertSeverity	= "critical"
 )
 
 type ServiceObservabilityEvent struct {
-	EventID   ServiceObservabilityEventID
-	Category  ServiceObservabilityEventCategory
-	Source    string
-	EventHash string
+	EventID		ServiceObservabilityEventID
+	Category	ServiceObservabilityEventCategory
+	Source		string
+	EventHash	string
 }
 
 type ServiceObservabilityAlert struct {
-	AlertID        ServiceObservabilityAlertID
-	Severity       ServiceObservabilityAlertSeverity
-	MetricID       ServiceObservabilityMetricID
-	TriggerEventID ServiceObservabilityEventID
-	WindowBlocks   uint64
-	Threshold      uint64
-	AlertHash      string
+	AlertID		ServiceObservabilityAlertID
+	Severity	ServiceObservabilityAlertSeverity
+	MetricID	ServiceObservabilityMetricID
+	TriggerEventID	ServiceObservabilityEventID
+	WindowBlocks	uint64
+	Threshold	uint64
+	AlertHash	string
 }
 
 type ServiceObservabilitySignalsManifest struct {
-	Events       []ServiceObservabilityEvent
-	Alerts       []ServiceObservabilityAlert
-	ManifestHash string
+	Events		[]ServiceObservabilityEvent
+	Alerts		[]ServiceObservabilityAlert
+	ManifestHash	string
 }
 
 func DefaultServiceObservabilitySignalsManifest() (ServiceObservabilitySignalsManifest, error) {
@@ -80,8 +80,8 @@ func DefaultServiceObservabilitySignalsManifest() (ServiceObservabilitySignalsMa
 
 func NewServiceObservabilitySignalsManifest(events []ServiceObservabilityEvent, alerts []ServiceObservabilityAlert) (ServiceObservabilitySignalsManifest, error) {
 	manifest := ServiceObservabilitySignalsManifest{
-		Events: canonicalServiceObservabilityEvents(events),
-		Alerts: canonicalServiceObservabilityAlerts(alerts),
+		Events:	canonicalServiceObservabilityEvents(events),
+		Alerts:	canonicalServiceObservabilityAlerts(alerts),
 	}
 	if err := manifest.ValidateFormat(); err != nil {
 		return ServiceObservabilitySignalsManifest{}, err
@@ -318,20 +318,20 @@ func defaultServiceObservabilityAlerts() []ServiceObservabilityAlert {
 
 func newServiceObservabilityEvent(eventID ServiceObservabilityEventID, category ServiceObservabilityEventCategory, source string) ServiceObservabilityEvent {
 	return ServiceObservabilityEvent{
-		EventID:  eventID,
-		Category: category,
-		Source:   source,
+		EventID:	eventID,
+		Category:	category,
+		Source:		source,
 	}
 }
 
 func newServiceObservabilityAlert(alertID ServiceObservabilityAlertID, severity ServiceObservabilityAlertSeverity, metricID ServiceObservabilityMetricID, triggerEventID ServiceObservabilityEventID, windowBlocks uint64, threshold uint64) ServiceObservabilityAlert {
 	return ServiceObservabilityAlert{
-		AlertID:        alertID,
-		Severity:       severity,
-		MetricID:       metricID,
-		TriggerEventID: triggerEventID,
-		WindowBlocks:   windowBlocks,
-		Threshold:      threshold,
+		AlertID:	alertID,
+		Severity:	severity,
+		MetricID:	metricID,
+		TriggerEventID:	triggerEventID,
+		WindowBlocks:	windowBlocks,
+		Threshold:	threshold,
 	}
 }
 

@@ -9,27 +9,27 @@ import (
 type ExecutionZoneSurface string
 
 const (
-	ExecutionZoneSurfaceKeeperSet        ExecutionZoneSurface = "module-keeper-set"
-	ExecutionZoneSurfaceStatePrefix      ExecutionZoneSurface = "state-prefix"
-	ExecutionZoneSurfaceMempoolPolicy    ExecutionZoneSurface = "mempool-policy"
-	ExecutionZoneSurfaceShardLayout      ExecutionZoneSurface = "shard-layout"
-	ExecutionZoneSurfaceMessageQueues    ExecutionZoneSurface = "message-inbox-outbox"
-	ExecutionZoneSurfaceFeePolicy        ExecutionZoneSurface = "fee-policy"
-	ExecutionZoneSurfaceProofRoot        ExecutionZoneSurface = "proof-root"
-	ExecutionZoneSurfaceExecutionMetrics ExecutionZoneSurface = "execution-metrics"
+	ExecutionZoneSurfaceKeeperSet		ExecutionZoneSurface	= "module-keeper-set"
+	ExecutionZoneSurfaceStatePrefix		ExecutionZoneSurface	= "state-prefix"
+	ExecutionZoneSurfaceMempoolPolicy	ExecutionZoneSurface	= "mempool-policy"
+	ExecutionZoneSurfaceShardLayout		ExecutionZoneSurface	= "shard-layout"
+	ExecutionZoneSurfaceMessageQueues	ExecutionZoneSurface	= "message-inbox-outbox"
+	ExecutionZoneSurfaceFeePolicy		ExecutionZoneSurface	= "fee-policy"
+	ExecutionZoneSurfaceProofRoot		ExecutionZoneSurface	= "proof-root"
+	ExecutionZoneSurfaceExecutionMetrics	ExecutionZoneSurface	= "execution-metrics"
 )
 
 type ExecutionZoneSurfaceRule struct {
-	Surface     ExecutionZoneSurface
-	Requirement string
+	Surface		ExecutionZoneSurface
+	Requirement	string
 }
 
 type ExecutionZoneModelSpec struct {
-	ZoneID       ZoneID
-	Kind         ZoneKind
-	StatePrefix  string
-	Surfaces     []ExecutionZoneSurfaceRule
-	BoundaryHash string
+	ZoneID		ZoneID
+	Kind		ZoneKind
+	StatePrefix	string
+	Surfaces	[]ExecutionZoneSurfaceRule
+	BoundaryHash	string
 }
 
 func NewExecutionZoneModelSpec(zone Zone) (ExecutionZoneModelSpec, error) {
@@ -37,9 +37,9 @@ func NewExecutionZoneModelSpec(zone Zone) (ExecutionZoneModelSpec, error) {
 		return ExecutionZoneModelSpec{}, err
 	}
 	spec := ExecutionZoneModelSpec{
-		ZoneID:      zone.ID,
-		Kind:        zone.Kind,
-		StatePrefix: ZoneKVPrefix(zone.ID),
+		ZoneID:		zone.ID,
+		Kind:		zone.Kind,
+		StatePrefix:	ZoneKVPrefix(zone.ID),
 		Surfaces: []ExecutionZoneSurfaceRule{
 			{Surface: ExecutionZoneSurfaceKeeperSet, Requirement: "zone-adapter-no-direct-cross-zone-mutation"},
 			{Surface: ExecutionZoneSurfaceStatePrefix, Requirement: "prefix-isolated-exportable-state"},

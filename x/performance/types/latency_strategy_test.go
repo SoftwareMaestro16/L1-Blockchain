@@ -10,50 +10,50 @@ func TestLatencyMetricsByOperationClass(t *testing.T) {
 	params := DefaultCrossZoneMessageSLAParams()
 
 	local, err := BuildLatencyMetric(LatencyMetricInput{
-		OperationClass: LatencyOpSingleZoneLocalTx,
-		ZoneID:         "financial",
-		ShardID:        "shard-a",
-		CreatedHeight:  10,
-		ExecutedHeight: 11,
+		OperationClass:	LatencyOpSingleZoneLocalTx,
+		ZoneID:		"financial",
+		ShardID:	"shard-a",
+		CreatedHeight:	10,
+		ExecutedHeight:	11,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, local.Satisfied)
 	require.Equal(t, uint64(1), local.TargetBlocks)
 
 	crossShard, err := BuildLatencyMetric(LatencyMetricInput{
-		OperationClass:     LatencyOpSameZoneCrossShard,
-		ZoneID:             "financial",
-		ShardID:            "shard-a",
-		DestinationZoneID:  "financial",
-		DestinationShardID: "shard-b",
-		CreatedHeight:      10,
-		ExecutedHeight:     12,
+		OperationClass:		LatencyOpSameZoneCrossShard,
+		ZoneID:			"financial",
+		ShardID:		"shard-a",
+		DestinationZoneID:	"financial",
+		DestinationShardID:	"shard-b",
+		CreatedHeight:		10,
+		ExecutedHeight:		12,
 	}, params)
 	require.NoError(t, err)
 	require.False(t, crossShard.Satisfied)
 	require.Equal(t, uint64(2), crossShard.ObservedBlocks)
 
 	crossZone, err := BuildLatencyMetric(LatencyMetricInput{
-		OperationClass:         LatencyOpCrossZoneAsyncMessage,
-		ZoneID:                 "identity",
-		ShardID:                "shard-a",
-		DestinationZoneID:      "contract",
-		DestinationShardID:     "shard-c",
-		CreatedHeight:          20,
-		SourceCommitmentHeight: 21,
-		ExecutedHeight:         23,
+		OperationClass:		LatencyOpCrossZoneAsyncMessage,
+		ZoneID:			"identity",
+		ShardID:		"shard-a",
+		DestinationZoneID:	"contract",
+		DestinationShardID:	"shard-c",
+		CreatedHeight:		20,
+		SourceCommitmentHeight:	21,
+		ExecutedHeight:		23,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, crossZone.Satisfied)
 	require.Equal(t, uint64(2), crossZone.ObservedBlocks)
 
 	promise, err := BuildLatencyMetric(LatencyMetricInput{
-		OperationClass: LatencyOpContractPromiseResolution,
-		ZoneID:         "contract",
-		ShardID:        "shard-c",
-		CreatedHeight:  30,
-		EligibleHeight: 32,
-		ExecutedHeight: 33,
+		OperationClass:	LatencyOpContractPromiseResolution,
+		ZoneID:		"contract",
+		ShardID:	"shard-c",
+		CreatedHeight:	30,
+		EligibleHeight:	32,
+		ExecutedHeight:	33,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, promise.Satisfied)
@@ -64,24 +64,24 @@ func TestLatencyRejectsCrossZoneBeforeSourceCommitmentAndNonFuturePromise(t *tes
 	params := DefaultCrossZoneMessageSLAParams()
 
 	_, err := BuildLatencyMetric(LatencyMetricInput{
-		OperationClass:         LatencyOpCrossZoneAsyncMessage,
-		ZoneID:                 "identity",
-		ShardID:                "shard-a",
-		DestinationZoneID:      "contract",
-		DestinationShardID:     "shard-c",
-		CreatedHeight:          20,
-		SourceCommitmentHeight: 22,
-		ExecutedHeight:         21,
+		OperationClass:		LatencyOpCrossZoneAsyncMessage,
+		ZoneID:			"identity",
+		ShardID:		"shard-a",
+		DestinationZoneID:	"contract",
+		DestinationShardID:	"shard-c",
+		CreatedHeight:		20,
+		SourceCommitmentHeight:	22,
+		ExecutedHeight:		21,
 	}, params)
 	require.ErrorContains(t, err, "before source commitment")
 
 	_, err = BuildLatencyMetric(LatencyMetricInput{
-		OperationClass: LatencyOpContractPromiseResolution,
-		ZoneID:         "contract",
-		ShardID:        "shard-c",
-		CreatedHeight:  30,
-		EligibleHeight: 30,
-		ExecutedHeight: 31,
+		OperationClass:	LatencyOpContractPromiseResolution,
+		ZoneID:		"contract",
+		ShardID:	"shard-c",
+		CreatedHeight:	30,
+		EligibleHeight:	30,
+		ExecutedHeight:	31,
 	}, params)
 	require.ErrorContains(t, err, "future message")
 }
@@ -135,19 +135,19 @@ func TestLatencyDeliveryQueueValidatesPromiseFutureMessages(t *testing.T) {
 
 func latencyDeliveryMessage(seed string, class LatencyOperationClass, sourceZone, destinationZone string, created, committed, eligible, expiry uint64, fee string, congestion uint32, queueDepth uint32) LatencyDeliveryMessage {
 	msg := LatencyDeliveryMessage{
-		MessageID:              hashStrings("latency-message", seed),
-		OperationClass:         class,
-		SourceZoneID:           sourceZone,
-		SourceShardID:          "shard-a",
-		DestinationZoneID:      destinationZone,
-		DestinationShardID:     "shard-b",
-		CreatedHeight:          created,
-		SourceCommitmentHeight: committed,
-		EligibleHeight:         eligible,
-		ExpiryHeight:           expiry,
-		BaseForwardingFee:      fee,
-		CongestionBps:          congestion,
-		QueueDepth:             queueDepth,
+		MessageID:		hashStrings("latency-message", seed),
+		OperationClass:		class,
+		SourceZoneID:		sourceZone,
+		SourceShardID:		"shard-a",
+		DestinationZoneID:	destinationZone,
+		DestinationShardID:	"shard-b",
+		CreatedHeight:		created,
+		SourceCommitmentHeight:	committed,
+		EligibleHeight:		eligible,
+		ExpiryHeight:		expiry,
+		BaseForwardingFee:	fee,
+		CongestionBps:		congestion,
+		QueueDepth:		queueDepth,
 	}
 	return msg
 }

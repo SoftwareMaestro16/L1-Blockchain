@@ -112,22 +112,22 @@ func TestPoSOfficialPoolDepositPathWorksWhileDirectDelegationDisabled(t *testing
 	poolID := "pos-official-pool"
 	contractRaw := posRawAddress("66")
 	pool, err := app.NominatorPoolKeeper.CreateOfficialLiquidStakingPool(nominatorpooltypes.MsgCreateOfficialLiquidStakingPool{
-		Authority:           nominatorpooltypes.DefaultParams().Authority,
-		PoolID:              poolID,
-		ContractAddressUser: aeFromRawForPoSTest(t, contractRaw),
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        posRawAddress("11"),
-		PoolCommissionBps:   100,
-		Height:              1,
+		Authority:		nominatorpooltypes.DefaultParams().Authority,
+		PoolID:			poolID,
+		ContractAddressUser:	aeFromRawForPoSTest(t, contractRaw),
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		posRawAddress("11"),
+		PoolCommissionBps:	100,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	user := aeFromRawForPoSTest(t, posRawAddress("22"))
 
 	msg := &nominatorpooltypes.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        nominatorpooltypes.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		nominatorpooltypes.DefaultMinPoolDeposit,
+		Height:		2,
 	}
 	handler := app.MsgServiceRouter().Handler(msg)
 	require.NotNil(t, handler)
@@ -135,8 +135,8 @@ func TestPoSOfficialPoolDepositPathWorksWhileDirectDelegationDisabled(t *testing
 	require.NoError(t, err)
 
 	query, found := app.NominatorPoolKeeper.PoolShare(nominatorpooltypes.QueryPoolShareRequest{
-		PoolID:    pool.PoolID,
-		Delegator: posRawAddress("22"),
+		PoolID:		pool.PoolID,
+		Delegator:	posRawAddress("22"),
 	})
 	require.True(t, found)
 	require.Equal(t, nominatorpooltypes.DefaultMinPoolDeposit, query.Share.Shares)

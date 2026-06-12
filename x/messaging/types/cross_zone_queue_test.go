@@ -122,14 +122,14 @@ func TestCrossZoneReceiptAndTombstoneHashesValidate(t *testing.T) {
 	require.Equal(t, ComputeCrossZoneReceiptHash(receipt), receipt.ReceiptHash)
 
 	tombstone, err := NewCrossZoneReplayTombstone(CrossZoneReplayTombstone{
-		MessageID:       msg.MessageID,
-		SourceZone:      msg.SourceZone,
-		Sender:          msg.Sender,
-		Nonce:           msg.Nonce,
-		SourceSequence:  msg.SourceSequence,
-		CreatedHeight:   msg.CreatedHeight,
-		TombstoneHeight: 30,
-		ExpiryHeight:    msg.Deadline,
+		MessageID:		msg.MessageID,
+		SourceZone:		msg.SourceZone,
+		Sender:			msg.Sender,
+		Nonce:			msg.Nonce,
+		SourceSequence:		msg.SourceSequence,
+		CreatedHeight:		msg.CreatedHeight,
+		TombstoneHeight:	30,
+		ExpiryHeight:		msg.Deadline,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeCrossZoneReplayTombstoneHash(tombstone), tombstone.TombstoneHash)

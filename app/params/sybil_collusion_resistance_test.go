@@ -14,40 +14,40 @@ func TestStakeSplittingDoesNotBypassConcentrationPolicy(t *testing.T) {
 	params.DeterministicCorrelationThresholdBps = 9_000
 
 	report, err := SimulateStakeSplitting(StakeSplitSimulationInput{
-		RewardPoolNaet: sdkmath.NewInt(100_000),
+		RewardPoolNaet:	sdkmath.NewInt(100_000),
 		Original: ValidatorSybilRecord{
-			ValidatorID:                   "val-original",
-			EconomicGroupID:               "operator-a",
-			VotingPowerBps:                4_000,
-			PerformanceBps:                BasisPoints,
-			SelfDelegationRatioBps:        1_000,
-			SelfDelegationNaet:            sdkmath.NewInt(10_000),
-			CorrelationScoreBps:           9_500,
-			CorrelationProofDeterministic: true,
+			ValidatorID:			"val-original",
+			EconomicGroupID:		"operator-a",
+			VotingPowerBps:			4_000,
+			PerformanceBps:			BasisPoints,
+			SelfDelegationRatioBps:		1_000,
+			SelfDelegationNaet:		sdkmath.NewInt(10_000),
+			CorrelationScoreBps:		9_500,
+			CorrelationProofDeterministic:	true,
 		},
 		Split: []ValidatorSybilRecord{
 			{
-				ValidatorID:                   "val-a1",
-				EconomicGroupID:               "operator-a",
-				VotingPowerBps:                2_000,
-				PerformanceBps:                BasisPoints,
-				SelfDelegationRatioBps:        1_000,
-				SelfDelegationNaet:            sdkmath.NewInt(5_000),
-				CorrelationScoreBps:           9_500,
-				CorrelationProofDeterministic: true,
+				ValidatorID:			"val-a1",
+				EconomicGroupID:		"operator-a",
+				VotingPowerBps:			2_000,
+				PerformanceBps:			BasisPoints,
+				SelfDelegationRatioBps:		1_000,
+				SelfDelegationNaet:		sdkmath.NewInt(5_000),
+				CorrelationScoreBps:		9_500,
+				CorrelationProofDeterministic:	true,
 			},
 			{
-				ValidatorID:                   "val-a2",
-				EconomicGroupID:               "operator-a",
-				VotingPowerBps:                2_000,
-				PerformanceBps:                BasisPoints,
-				SelfDelegationRatioBps:        1_000,
-				SelfDelegationNaet:            sdkmath.NewInt(5_000),
-				CorrelationScoreBps:           9_500,
-				CorrelationProofDeterministic: true,
+				ValidatorID:			"val-a2",
+				EconomicGroupID:		"operator-a",
+				VotingPowerBps:			2_000,
+				PerformanceBps:			BasisPoints,
+				SelfDelegationRatioBps:		1_000,
+				SelfDelegationNaet:		sdkmath.NewInt(5_000),
+				CorrelationScoreBps:		9_500,
+				CorrelationProofDeterministic:	true,
 			},
 		},
-		Params: params,
+		Params:	params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, int64(4_000), report.OriginalGroupPowerBps)
@@ -63,24 +63,24 @@ func TestAdvisoryCorrelationDoesNotAffectConsensusWithoutDeterministicProof(t *t
 	params := DefaultSybilCollusionResistanceParams()
 	report, err := EvaluateCorrelationTelemetry("operator-advisory", []ValidatorSybilRecord{
 		{
-			ValidatorID:            "val-b1",
-			EconomicGroupID:        "operator-advisory",
-			VotingPowerBps:         2_000,
-			PerformanceBps:         BasisPoints,
-			SelfDelegationRatioBps: 1_000,
-			SelfDelegationNaet:     sdkmath.NewInt(5_000),
-			CorrelationScoreBps:    7_000,
-			CommissionChangeBps:    400,
+			ValidatorID:		"val-b1",
+			EconomicGroupID:	"operator-advisory",
+			VotingPowerBps:		2_000,
+			PerformanceBps:		BasisPoints,
+			SelfDelegationRatioBps:	1_000,
+			SelfDelegationNaet:	sdkmath.NewInt(5_000),
+			CorrelationScoreBps:	7_000,
+			CommissionChangeBps:	400,
 		},
 		{
-			ValidatorID:            "val-b2",
-			EconomicGroupID:        "operator-advisory",
-			VotingPowerBps:         1_500,
-			PerformanceBps:         BasisPoints,
-			SelfDelegationRatioBps: 1_000,
-			SelfDelegationNaet:     sdkmath.NewInt(5_000),
-			CorrelationScoreBps:    7_000,
-			CommissionChangeBps:    400,
+			ValidatorID:		"val-b2",
+			EconomicGroupID:	"operator-advisory",
+			VotingPowerBps:		1_500,
+			PerformanceBps:		BasisPoints,
+			SelfDelegationRatioBps:	1_000,
+			SelfDelegationNaet:	sdkmath.NewInt(5_000),
+			CorrelationScoreBps:	7_000,
+			CommissionChangeBps:	400,
 		},
 	}, params)
 	require.NoError(t, err)
@@ -95,13 +95,13 @@ func TestLegitimateNewValidatorRetainsBootstrapPathOncePerWindow(t *testing.T) {
 	params.BootstrapMaxStakeBps = 500
 	params.BootstrapBonusBps = 400
 	validator := ValidatorSybilRecord{
-		ValidatorID:                "val-new",
-		VotingPowerBps:             300,
-		PerformanceBps:             BasisPoints,
-		SelfDelegationRatioBps:     1_000,
-		SelfDelegationNaet:         sdkmath.NewInt(2_000),
-		BootstrapWindowID:          12,
-		BootstrapRewardAlreadyUsed: false,
+		ValidatorID:			"val-new",
+		VotingPowerBps:			300,
+		PerformanceBps:			BasisPoints,
+		SelfDelegationRatioBps:		1_000,
+		SelfDelegationNaet:		sdkmath.NewInt(2_000),
+		BootstrapWindowID:		12,
+		BootstrapRewardAlreadyUsed:	false,
 	}
 	report, err := EvaluateValidatorActiveSetEligibility(validator, params)
 	require.NoError(t, err)
@@ -120,12 +120,12 @@ func TestLegitimateNewValidatorRetainsBootstrapPathOncePerWindow(t *testing.T) {
 
 func TestActiveSetEligibilityRequiresSelfDelegationAndPerformance(t *testing.T) {
 	report, err := EvaluateValidatorActiveSetEligibility(ValidatorSybilRecord{
-		ValidatorID:            "val-weak",
-		VotingPowerBps:         300,
-		PerformanceBps:         9_000,
-		SelfDelegationRatioBps: 10,
-		SelfDelegationNaet:     sdkmath.NewInt(10),
-		BootstrapWindowID:      1,
+		ValidatorID:		"val-weak",
+		VotingPowerBps:		300,
+		PerformanceBps:		9_000,
+		SelfDelegationRatioBps:	10,
+		SelfDelegationNaet:	sdkmath.NewInt(10),
+		BootstrapWindowID:	1,
 	}, DefaultSybilCollusionResistanceParams())
 	require.NoError(t, err)
 	require.False(t, report.Eligible)
@@ -143,9 +143,9 @@ func TestValidatorCollusionSimulationDampensTopNAndReportsCorrelation(t *testing
 	params.GroupMaxRewardDampeningBps = 3_000
 	params.CorrelatedDowntimeThresholdBps = 5_000
 	report, err := SimulateValidatorCollusion(CollusionScenarioInput{
-		TopN:           3,
-		RewardPoolNaet: sdkmath.NewInt(100_000),
-		Params:         params,
+		TopN:		3,
+		RewardPoolNaet:	sdkmath.NewInt(100_000),
+		Params:		params,
 		Validators: []ValidatorSybilRecord{
 			collusionValidator("val1", "group-a", 2_500, 400, true, true),
 			collusionValidator("val2", "group-a", 2_000, 400, true, true),
@@ -169,11 +169,11 @@ func TestEvidenceRoutingCapsReporterRewardsAndRejectsDuplicates(t *testing.T) {
 	params := DefaultSybilCollusionResistanceParams()
 	params.EvidenceRoutingRewardCapNaet = sdkmath.NewInt(500)
 	accepted, err := RouteConsensusFaultEvidence(EvidenceRoutingInput{
-		ValidatorID:                 "val1",
-		EvidenceType:                "equivocation",
-		Accepted:                    true,
-		RequestedReporterRewardNaet: sdkmath.NewInt(900),
-		Params:                      params,
+		ValidatorID:			"val1",
+		EvidenceType:			"equivocation",
+		Accepted:			true,
+		RequestedReporterRewardNaet:	sdkmath.NewInt(900),
+		Params:				params,
 	})
 	require.NoError(t, err)
 	require.True(t, accepted.Accepted)
@@ -182,11 +182,11 @@ func TestEvidenceRoutingCapsReporterRewardsAndRejectsDuplicates(t *testing.T) {
 	require.True(t, accepted.Auditable)
 
 	duplicate, err := RouteConsensusFaultEvidence(EvidenceRoutingInput{
-		ValidatorID:                 "val1",
-		EvidenceType:                "downtime",
-		Duplicate:                   true,
-		RequestedReporterRewardNaet: sdkmath.NewInt(100),
-		Params:                      params,
+		ValidatorID:			"val1",
+		EvidenceType:			"downtime",
+		Duplicate:			true,
+		RequestedReporterRewardNaet:	sdkmath.NewInt(100),
+		Params:				params,
 	})
 	require.NoError(t, err)
 	require.False(t, duplicate.Accepted)
@@ -197,15 +197,15 @@ func TestEvidenceRoutingCapsReporterRewardsAndRejectsDuplicates(t *testing.T) {
 
 func collusionValidator(id, group string, power int64, commissionChange int64, downtime bool, deterministic bool) ValidatorSybilRecord {
 	return ValidatorSybilRecord{
-		ValidatorID:                   id,
-		EconomicGroupID:               group,
-		VotingPowerBps:                power,
-		PerformanceBps:                BasisPoints,
-		SelfDelegationRatioBps:        1_000,
-		SelfDelegationNaet:            sdkmath.NewInt(5_000),
-		CommissionChangeBps:           commissionChange,
-		DowntimeObserved:              downtime,
-		CorrelationScoreBps:           9_500,
-		CorrelationProofDeterministic: deterministic,
+		ValidatorID:			id,
+		EconomicGroupID:		group,
+		VotingPowerBps:			power,
+		PerformanceBps:			BasisPoints,
+		SelfDelegationRatioBps:		1_000,
+		SelfDelegationNaet:		sdkmath.NewInt(5_000),
+		CommissionChangeBps:		commissionChange,
+		DowntimeObserved:		downtime,
+		CorrelationScoreBps:		9_500,
+		CorrelationProofDeterministic:	deterministic,
 	}
 }

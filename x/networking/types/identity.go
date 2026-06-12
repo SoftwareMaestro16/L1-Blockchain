@@ -9,20 +9,20 @@ import (
 )
 
 type IdentityTransitionRecord struct {
-	TransitionID        string
-	FromNodeID          string
-	ToNodeID            string
-	FromNodePubKey      []byte
-	ToNodePubKey        []byte
-	FromValidatorPubKey []byte
-	ToValidatorPubKey   []byte
-	FromRoles           []NodeRole
-	ToRoles             []NodeRole
-	EffectiveHeight     uint64
-	ExpiresHeight       uint64
-	Nonce               []byte
-	OldSignature        []byte
-	NewSignature        []byte
+	TransitionID		string
+	FromNodeID		string
+	ToNodeID		string
+	FromNodePubKey		[]byte
+	ToNodePubKey		[]byte
+	FromValidatorPubKey	[]byte
+	ToValidatorPubKey	[]byte
+	FromRoles		[]NodeRole
+	ToRoles			[]NodeRole
+	EffectiveHeight		uint64
+	ExpiresHeight		uint64
+	Nonce			[]byte
+	OldSignature		[]byte
+	NewSignature		[]byte
 }
 
 func NormalizeIdentityTransition(record IdentityTransitionRecord) IdentityTransitionRecord {
@@ -85,17 +85,17 @@ func SignIdentityTransition(oldRecord, newRecord NodeRecord, oldPrivateKey, newP
 		return IdentityTransitionRecord{}, errors.New("networking identity transition new private key does not match new node record")
 	}
 	record := NormalizeIdentityTransition(IdentityTransitionRecord{
-		FromNodeID:          oldRecord.NodeID,
-		ToNodeID:            newRecord.NodeID,
-		FromNodePubKey:      oldRecord.NodePubKey,
-		ToNodePubKey:        newRecord.NodePubKey,
-		FromValidatorPubKey: oldRecord.ValidatorPubKey,
-		ToValidatorPubKey:   newRecord.ValidatorPubKey,
-		FromRoles:           oldRecord.Roles,
-		ToRoles:             newRecord.Roles,
-		EffectiveHeight:     effectiveHeight,
-		ExpiresHeight:       expiresHeight,
-		Nonce:               nonce,
+		FromNodeID:		oldRecord.NodeID,
+		ToNodeID:		newRecord.NodeID,
+		FromNodePubKey:		oldRecord.NodePubKey,
+		ToNodePubKey:		newRecord.NodePubKey,
+		FromValidatorPubKey:	oldRecord.ValidatorPubKey,
+		ToValidatorPubKey:	newRecord.ValidatorPubKey,
+		FromRoles:		oldRecord.Roles,
+		ToRoles:		newRecord.Roles,
+		EffectiveHeight:	effectiveHeight,
+		ExpiresHeight:		expiresHeight,
+		Nonce:			nonce,
 	})
 	record.TransitionID = ComputeIdentityTransitionID(record)
 	payload, err := record.SigningPayload()

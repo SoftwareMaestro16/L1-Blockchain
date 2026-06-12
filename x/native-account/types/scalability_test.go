@@ -10,22 +10,22 @@ func TestBlockLifecycleRejectsFullUserScansAndAllowsBoundedValidators(t *testing
 	limits := DefaultScalabilityLimits()
 
 	require.NoError(t, ValidateOperationMetrics(OperationMetrics{
-		Operation:                 OperationBeginBlock,
-		ValidatorSetItemsIterated: 300,
-		AllocationItemsIterated:   300,
-		MaintenanceItemsProcessed: 50,
+		Operation:			OperationBeginBlock,
+		ValidatorSetItemsIterated:	300,
+		AllocationItemsIterated:	300,
+		MaintenanceItemsProcessed:	50,
 	}, limits))
 
 	err := ValidateOperationMetrics(OperationMetrics{
-		Operation:         OperationEndBlock,
-		FullPoolUserScan:  true,
-		PoolUsersIterated: 1_000_000,
+		Operation:		OperationEndBlock,
+		FullPoolUserScan:	true,
+		PoolUsersIterated:	1_000_000,
 	}, limits)
 	require.ErrorContains(t, err, "full account, pool user, or pool share scans are forbidden")
 
 	err = ValidateOperationMetrics(OperationMetrics{
-		Operation:                 OperationBeginBlock,
-		ValidatorSetItemsIterated: 301,
+		Operation:			OperationBeginBlock,
+		ValidatorSetItemsIterated:	301,
 	}, limits)
 	require.ErrorContains(t, err, "validator iteration exceeds")
 }
@@ -108,9 +108,9 @@ func TestPaginatedQueriesEnforceMaxPageSize(t *testing.T) {
 	require.ErrorContains(t, err, "exceeds max")
 
 	require.NoError(t, ValidateOperationMetrics(OperationMetrics{
-		Operation: OperationQuery,
-		PageLimit: limits.MaxPageSize,
-		PrefixKey: "pool/share/pool-a/",
+		Operation:	OperationQuery,
+		PageLimit:	limits.MaxPageSize,
+		PrefixKey:	"pool/share/pool-a/",
 	}, limits))
 }
 
@@ -132,18 +132,18 @@ func TestHotPathValidatorsRejectAccidentalONUserLoops(t *testing.T) {
 	limits := DefaultScalabilityLimits()
 
 	err := ValidateRewardClaimMetrics(OperationMetrics{
-		Operation:          OperationRewardClaim,
-		PoolSharesIterated: 2,
-		KeysRead:           2,
-		KeysWritten:        2,
+		Operation:		OperationRewardClaim,
+		PoolSharesIterated:	2,
+		KeysRead:		2,
+		KeysWritten:		2,
 	}, limits)
 	require.ErrorContains(t, err, "touch only caller state")
 
 	err = ValidateReputationClaimMetrics(OperationMetrics{
-		Operation:         OperationReputationClaim,
-		PoolUsersIterated: 10,
-		KeysRead:          2,
-		KeysWritten:       2,
+		Operation:		OperationReputationClaim,
+		PoolUsersIterated:	10,
+		KeysRead:		2,
+		KeysWritten:		2,
 	}, limits)
 	require.ErrorContains(t, err, "touch only caller state")
 }
@@ -164,13 +164,13 @@ func (f TemporaryScalabilityFixture) DepositToPool(poolID, user string) Operatio
 	_ = poolID
 	_ = user
 	return OperationMetrics{
-		Operation:          OperationDeposit,
-		AccountsIterated:   1,
-		PoolUsersIterated:  1,
-		PoolSharesIterated: 1,
-		KeysRead:           4,
-		KeysWritten:        5,
-		PrefixKey:          "pool/share/",
+		Operation:		OperationDeposit,
+		AccountsIterated:	1,
+		PoolUsersIterated:	1,
+		PoolSharesIterated:	1,
+		KeysRead:		4,
+		KeysWritten:		5,
+		PrefixKey:		"pool/share/",
 	}
 }
 
@@ -179,12 +179,12 @@ func (f TemporaryScalabilityFixture) ClaimReward(poolID, user string) OperationM
 	_ = poolID
 	_ = user
 	return OperationMetrics{
-		Operation:          OperationRewardClaim,
-		AccountsIterated:   1,
-		PoolSharesIterated: 1,
-		KeysRead:           3,
-		KeysWritten:        3,
-		PrefixKey:          "pool/reward/",
+		Operation:		OperationRewardClaim,
+		AccountsIterated:	1,
+		PoolSharesIterated:	1,
+		KeysRead:		3,
+		KeysWritten:		3,
+		PrefixKey:		"pool/reward/",
 	}
 }
 
@@ -192,12 +192,12 @@ func (f TemporaryScalabilityFixture) ClaimReputation(user string) OperationMetri
 	_ = f.TotalUsers
 	_ = user
 	return OperationMetrics{
-		Operation:          OperationReputationClaim,
-		AccountsIterated:   1,
-		PoolSharesIterated: 1,
-		KeysRead:           4,
-		KeysWritten:        4,
-		PrefixKey:          "reputation/account/",
+		Operation:		OperationReputationClaim,
+		AccountsIterated:	1,
+		PoolSharesIterated:	1,
+		KeysRead:		4,
+		KeysWritten:		4,
+		PrefixKey:		"reputation/account/",
 	}
 }
 
@@ -205,10 +205,10 @@ func (f TemporaryScalabilityFixture) ChargeStorageRent(user string) OperationMet
 	_ = f.TotalUsers
 	_ = user
 	return OperationMetrics{
-		Operation:        OperationStorageRentCharge,
-		AccountsIterated: 1,
-		KeysRead:         3,
-		KeysWritten:      3,
-		PrefixKey:        "storage-rent/debt/",
+		Operation:		OperationStorageRentCharge,
+		AccountsIterated:	1,
+		KeysRead:		3,
+		KeysWritten:		3,
+		PrefixKey:		"storage-rent/debt/",
 	}
 }

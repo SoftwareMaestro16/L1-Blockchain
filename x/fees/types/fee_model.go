@@ -10,62 +10,62 @@ import (
 )
 
 const (
-	BasisPoints                   = uint64(10_000)
-	DefaultBaseFeeAmount          = MinDefaultFeeAmount
-	DefaultMaxFeeAmount           = "1000"
-	DefaultTargetUtilizationBps   = uint32(5_000)
-	DefaultCongestionBps          = uint32(8_000)
-	DefaultMaxTxGas               = uint64(1_000_000)
-	DefaultMaxBlockGas            = uint64(20_000_000)
-	DefaultMaxBlockTxs            = uint64(5_000)
-	DefaultMaxTxBytes             = uint64(256 * 1024)
-	DefaultMaxMemoBytes           = uint64(1024)
-	DefaultMaxMessagesPerTx       = uint64(16)
-	DefaultMinGasPriceUnitGas     = uint64(100_000)
-	DefaultSenderTxsPerBlock      = uint64(25)
-	DefaultStakeAllowanceStep     = "1000000000"
-	DefaultStakeSenderTxsPerBlock = uint64(250)
-	DefaultFeePriorityWeightBps   = uint32(1_000)
-	DefaultStakePriorityWeightBps = uint32(9_000)
+	BasisPoints			= uint64(10_000)
+	DefaultBaseFeeAmount		= MinDefaultFeeAmount
+	DefaultMaxFeeAmount		= "1000"
+	DefaultTargetUtilizationBps	= uint32(5_000)
+	DefaultCongestionBps		= uint32(8_000)
+	DefaultMaxTxGas			= uint64(1_000_000)
+	DefaultMaxBlockGas		= uint64(20_000_000)
+	DefaultMaxBlockTxs		= uint64(5_000)
+	DefaultMaxTxBytes		= uint64(256 * 1024)
+	DefaultMaxMemoBytes		= uint64(1024)
+	DefaultMaxMessagesPerTx		= uint64(16)
+	DefaultMinGasPriceUnitGas	= uint64(100_000)
+	DefaultSenderTxsPerBlock	= uint64(25)
+	DefaultStakeAllowanceStep	= "1000000000"
+	DefaultStakeSenderTxsPerBlock	= uint64(250)
+	DefaultFeePriorityWeightBps	= uint32(1_000)
+	DefaultStakePriorityWeightBps	= uint32(9_000)
 )
 
 type FeeQuote struct {
-	RequiredFee       sdk.Coin
-	BaseFee           sdk.Coin
-	MaxFee            sdk.Coin
-	UtilizationBps    uint32
-	Congested         bool
-	AtHardCap         bool
-	AcceptedFeeAmount sdkmath.Int
-	EconomicControl   appparams.BalanceControllerOutput
+	RequiredFee		sdk.Coin
+	BaseFee			sdk.Coin
+	MaxFee			sdk.Coin
+	UtilizationBps		uint32
+	Congested		bool
+	AtHardCap		bool
+	AcceptedFeeAmount	sdkmath.Int
+	EconomicControl		appparams.BalanceControllerOutput
 }
 
 type AdmissionInput struct {
-	Fee              sdk.Coins
-	GasLimit         uint64
-	BlockGasConsumed uint64
-	BlockTxCount     uint64
-	SenderTxCount    uint64
-	SenderStake      sdkmath.Int
+	Fee			sdk.Coins
+	GasLimit		uint64
+	BlockGasConsumed	uint64
+	BlockTxCount		uint64
+	SenderTxCount		uint64
+	SenderStake		sdkmath.Int
 }
 
 type TxEnvelopeLimits struct {
-	MaxTxBytes       uint64
-	MaxMemoBytes     uint64
-	MaxMessagesPerTx uint64
+	MaxTxBytes		uint64
+	MaxMemoBytes		uint64
+	MaxMessagesPerTx	uint64
 }
 
 type TxEnvelopeInput struct {
-	TxBytes  uint64
-	Memo     string
-	MsgCount uint64
+	TxBytes		uint64
+	Memo		string
+	MsgCount	uint64
 }
 
 func DefaultTxEnvelopeLimits() TxEnvelopeLimits {
 	return TxEnvelopeLimits{
-		MaxTxBytes:       DefaultMaxTxBytes,
-		MaxMemoBytes:     DefaultMaxMemoBytes,
-		MaxMessagesPerTx: DefaultMaxMessagesPerTx,
+		MaxTxBytes:		DefaultMaxTxBytes,
+		MaxMemoBytes:		DefaultMaxMemoBytes,
+		MaxMessagesPerTx:	DefaultMaxMessagesPerTx,
 	}
 }
 
@@ -118,22 +118,22 @@ func QuoteFee(params Params, gasLimit, blockGasConsumed uint64) (FeeQuote, error
 		accepted = maxFee
 	}
 	economicControl, err := appparams.BalanceController(appparams.BalanceControllerInput{
-		CurrentInflationBps: appparams.DefaultTargetInflationBps,
-		StakeRatioBps:       appparams.DefaultTargetStakeBps,
-		BlockLoadBps:        int64(utilization),
+		CurrentInflationBps:	appparams.DefaultTargetInflationBps,
+		StakeRatioBps:		appparams.DefaultTargetStakeBps,
+		BlockLoadBps:		int64(utilization),
 	})
 	if err != nil {
 		return FeeQuote{}, err
 	}
 	return FeeQuote{
-		RequiredFee:       sdk.NewCoin(BondDenom, accepted),
-		BaseFee:           sdk.NewCoin(BondDenom, baseFee),
-		MaxFee:            sdk.NewCoin(BondDenom, maxFee),
-		UtilizationBps:    utilization,
-		Congested:         utilization >= params.CongestionThresholdBps,
-		AtHardCap:         accepted.Equal(maxFee),
-		AcceptedFeeAmount: accepted,
-		EconomicControl:   economicControl,
+		RequiredFee:		sdk.NewCoin(BondDenom, accepted),
+		BaseFee:		sdk.NewCoin(BondDenom, baseFee),
+		MaxFee:			sdk.NewCoin(BondDenom, maxFee),
+		UtilizationBps:		utilization,
+		Congested:		utilization >= params.CongestionThresholdBps,
+		AtHardCap:		accepted.Equal(maxFee),
+		AcceptedFeeAmount:	accepted,
+		EconomicControl:	economicControl,
 	}, nil
 }
 
@@ -147,7 +147,7 @@ func MinimumGasPriceFee(params Params, gasLimit uint64) (sdkmath.Int, error) {
 		return minFee, nil
 	}
 	units := (gasLimit + DefaultMinGasPriceUnitGas - 1) / DefaultMinGasPriceUnitGas
-	return minFee.MulRaw(int64(units)), nil // #nosec G115 -- gas units are bounded by MaxTxGas validation before admission.
+	return minFee.MulRaw(int64(units)), nil
 }
 
 func ValidateAdmission(params Params, in AdmissionInput) (FeeQuote, error) {

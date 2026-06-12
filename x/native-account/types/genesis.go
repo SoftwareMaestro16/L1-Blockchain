@@ -9,8 +9,8 @@ import (
 )
 
 type GenesisState struct {
-	Version  uint64
-	Accounts []Account
+	Version		uint64
+	Accounts	[]Account
 }
 
 func DefaultGenesis() GenesisState {

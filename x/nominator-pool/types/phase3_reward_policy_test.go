@@ -24,24 +24,24 @@ func TestPhase33DefaultRewardPolicyV1CapturesLaunchRules(t *testing.T) {
 func TestPhase33RewardIndexDeterministicAndCappedByFeesPlusInflation(t *testing.T) {
 	params := DefaultParams()
 	pool := NominatorPool{
-		PoolID:            "phase33-rewards",
-		TotalShares:       3,
-		TotalBondedStake:  3,
-		PoolCommissionBps: 0,
-		Status:            PoolStatusActive,
+		PoolID:			"phase33-rewards",
+		TotalShares:		3,
+		TotalBondedStake:	3,
+		PoolCommissionBps:	0,
+		Status:			PoolStatusActive,
 	}
 	msg := MsgSyncPoolRewards{
-		Authority:          params.Authority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		Height:             10,
-		RewardRateBps:      3_334,
-		EmissionsAllocated: 0,
-		FeesAllocated:      1,
+		Authority:		params.Authority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		Height:			10,
+		RewardRateBps:		3_334,
+		EmissionsAllocated:	0,
+		FeesAllocated:		1,
 		Allocations: []ValidatorRewardAllocation{{
-			Validator:          chat3AEAddress(0xc1),
-			PoolAllocatedStake: 3,
-			PerformanceBps:     MaxBasisPoints,
+			Validator:		chat3AEAddress(0xc1),
+			PoolAllocatedStake:	3,
+			PerformanceBps:		MaxBasisPoints,
 		}},
 	}
 
@@ -63,27 +63,27 @@ func TestPhase33RewardIndexDeterministicAndCappedByFeesPlusInflation(t *testing.
 func TestPhase33SlashedValidatorDoesNotProducePositiveOperatorBonus(t *testing.T) {
 	params := DefaultParams()
 	pool := NominatorPool{
-		PoolID:            "phase33-slashed",
-		TotalShares:       1_000,
-		TotalBondedStake:  100_000,
-		PoolCommissionBps: 0,
-		Status:            PoolStatusActive,
+		PoolID:			"phase33-slashed",
+		TotalShares:		1_000,
+		TotalBondedStake:	100_000,
+		PoolCommissionBps:	0,
+		Status:			PoolStatusActive,
 	}
 	next, summary, err := SyncPoolRewards(params, pool, MsgSyncPoolRewards{
-		Authority:          params.Authority,
-		PoolID:             pool.PoolID,
-		Epoch:              1,
-		Height:             10,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: 30_000,
+		Authority:		params.Authority,
+		PoolID:			pool.PoolID,
+		Epoch:			1,
+		Height:			10,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	30_000,
 		Allocations: []ValidatorRewardAllocation{{
-			Validator:                   chat3AEAddress(0xc2),
-			PoolAllocatedStake:          100_000,
-			ValidatorSelfStake:          50_000,
-			PerformanceBps:              MaxBasisPoints,
-			CommissionBps:               500,
-			OperatorPerformanceBonusBps: 500,
-			SlashingLoss:                1,
+			Validator:			chat3AEAddress(0xc2),
+			PoolAllocatedStake:		100_000,
+			ValidatorSelfStake:		50_000,
+			PerformanceBps:			MaxBasisPoints,
+			CommissionBps:			500,
+			OperatorPerformanceBonusBps:	500,
+			SlashingLoss:			1,
 		}},
 	})
 	require.NoError(t, err)

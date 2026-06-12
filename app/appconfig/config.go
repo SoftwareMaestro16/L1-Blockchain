@@ -13,19 +13,19 @@ const AppName = appparams.ChainName
 const (
 	// SDKBech32AccountPrefix is a Cosmos SDK compatibility prefix only.
 	// User-facing Aetra addresses use app/addressing's AE... base64url format.
-	SDKBech32AccountPrefix = "ae"
-	BondDenom              = appparams.BaseDenom
+	SDKBech32AccountPrefix	= "ae"
+	BondDenom		= appparams.BaseDenom
 )
 
 const (
-	AccountAddressPrefix   = addressing.UserFriendlyPrefix
-	ValidatorAddressPrefix = addressing.UserFriendlyPrefix
-	ConsensusAddressPrefix = addressing.UserFriendlyPrefix
+	AccountAddressPrefix	= addressing.UserFriendlyPrefix
+	ValidatorAddressPrefix	= addressing.UserFriendlyPrefix
+	ConsensusAddressPrefix	= addressing.UserFriendlyPrefix
 )
 
 const (
-	sdkBech32ValidatorPrefix = SDKBech32AccountPrefix
-	sdkBech32ConsensusPrefix = SDKBech32AccountPrefix
+	sdkBech32ValidatorPrefix	= SDKBech32AccountPrefix
+	sdkBech32ConsensusPrefix	= SDKBech32AccountPrefix
 )
 
 func ConfigureSDK(homeName string) string {

@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	DefaultMaxGasPerMessage = 100_000_000
-	DefaultMaxGasPerBlock   = 1_000_000_000
+	DefaultMaxGasPerMessage	= 100_000_000
+	DefaultMaxGasPerBlock	= 1_000_000_000
 
-	GasRefundNone GasRefundPolicy = "none"
+	GasRefundNone	GasRefundPolicy	= "none"
 
-	ExitCodeOutOfGas = contractstypes.ExitCodeOutOfGas
+	ExitCodeOutOfGas	= contractstypes.ExitCodeOutOfGas
 )
 
 var ErrOutOfGas = errors.New("AVM out of gas")
@@ -21,69 +21,69 @@ var ErrOutOfGas = errors.New("AVM out of gas")
 type GasRefundPolicy string
 
 type GasTable struct {
-	BaseTx                      uint64
-	StoreCodeBase               uint64
-	DeployBase                  uint64
-	ExecuteBase                 uint64
-	BytecodeVerificationPerByte uint64
-	CodeLoadPerByte             uint64
-	InstructionCost             uint64
-	MemoryAllocationPerByte     uint64
-	MemoryAllocationPerPage     uint64
-	StorageReadPerKeyByte       uint64
-	StorageReadPerValueByte     uint64
-	StorageWritePerKeyByte      uint64
-	StorageWritePerValueByte    uint64
-	StorageDelete               uint64
-	HashFunction                uint64
-	SignatureVerify             uint64
-	EmitEvent                   uint64
-	SendInternalMessage         uint64
-	SerializeDeserializePerByte uint64
-	QueueEnqueue                uint64
-	QueueDequeue                uint64
-	ReceiptWrite                uint64
-	RefundPolicy                GasRefundPolicy
+	BaseTx				uint64
+	StoreCodeBase			uint64
+	DeployBase			uint64
+	ExecuteBase			uint64
+	BytecodeVerificationPerByte	uint64
+	CodeLoadPerByte			uint64
+	InstructionCost			uint64
+	MemoryAllocationPerByte		uint64
+	MemoryAllocationPerPage		uint64
+	StorageReadPerKeyByte		uint64
+	StorageReadPerValueByte		uint64
+	StorageWritePerKeyByte		uint64
+	StorageWritePerValueByte	uint64
+	StorageDelete			uint64
+	HashFunction			uint64
+	SignatureVerify			uint64
+	EmitEvent			uint64
+	SendInternalMessage		uint64
+	SerializeDeserializePerByte	uint64
+	QueueEnqueue			uint64
+	QueueDequeue			uint64
+	ReceiptWrite			uint64
+	RefundPolicy			GasRefundPolicy
 }
 
 type GasMeter struct {
-	limit    uint64
-	used     uint64
-	refunded uint64
+	limit		uint64
+	used		uint64
+	refunded	uint64
 }
 
 type OutOfGasError struct {
-	Reason string
-	Limit  uint64
-	Used   uint64
-	Wanted uint64
+	Reason	string
+	Limit	uint64
+	Used	uint64
+	Wanted	uint64
 }
 
 func DefaultGasTable() GasTable {
 	return GasTable{
-		BaseTx:                      1_000,
-		StoreCodeBase:               5_000,
-		DeployBase:                  10_000,
-		ExecuteBase:                 700,
-		BytecodeVerificationPerByte: 2,
-		CodeLoadPerByte:             1,
-		InstructionCost:             10,
-		MemoryAllocationPerByte:     1,
-		MemoryAllocationPerPage:     64,
-		StorageReadPerKeyByte:       3,
-		StorageReadPerValueByte:     2,
-		StorageWritePerKeyByte:      5,
-		StorageWritePerValueByte:    8,
-		StorageDelete:               200,
-		HashFunction:                80,
-		SignatureVerify:             5_000,
-		EmitEvent:                   100,
-		SendInternalMessage:         250,
-		SerializeDeserializePerByte: 1,
-		QueueEnqueue:                50,
-		QueueDequeue:                50,
-		ReceiptWrite:                75,
-		RefundPolicy:                GasRefundNone,
+		BaseTx:				1_000,
+		StoreCodeBase:			5_000,
+		DeployBase:			10_000,
+		ExecuteBase:			700,
+		BytecodeVerificationPerByte:	2,
+		CodeLoadPerByte:		1,
+		InstructionCost:		10,
+		MemoryAllocationPerByte:	1,
+		MemoryAllocationPerPage:	64,
+		StorageReadPerKeyByte:		3,
+		StorageReadPerValueByte:	2,
+		StorageWritePerKeyByte:		5,
+		StorageWritePerValueByte:	8,
+		StorageDelete:			200,
+		HashFunction:			80,
+		SignatureVerify:		5_000,
+		EmitEvent:			100,
+		SendInternalMessage:		250,
+		SerializeDeserializePerByte:	1,
+		QueueEnqueue:			50,
+		QueueDequeue:			50,
+		ReceiptWrite:			75,
+		RefundPolicy:			GasRefundNone,
 	}
 }
 
@@ -158,8 +158,8 @@ func (e OutOfGasError) Is(target error) bool {
 
 func (t GasTable) Validate() error {
 	checks := []struct {
-		name  string
-		value uint64
+		name	string
+		value	uint64
 	}{
 		{"base tx", t.BaseTx},
 		{"store code base", t.StoreCodeBase},
@@ -197,5 +197,3 @@ func (t GasTable) Validate() error {
 	}
 	return nil
 }
-
-

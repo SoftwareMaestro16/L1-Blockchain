@@ -8,46 +8,46 @@ import (
 )
 
 const (
-	KindState  = "state"
-	KindEvent  = "event"
-	KindMemo   = "memo"
-	KindDomain = "domain"
+	KindState	= "state"
+	KindEvent	= "event"
+	KindMemo	= "memo"
+	KindDomain	= "domain"
 )
 
 type Field struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 type Record struct {
-	Kind   string
-	Key    string
-	Owner  string
-	Height uint64
-	TxHash []byte
-	Value  []byte
-	Fields []Field
+	Kind	string
+	Key	string
+	Owner	string
+	Height	uint64
+	TxHash	[]byte
+	Value	[]byte
+	Fields	[]Field
 }
 
 type Query struct {
-	Kind  string
-	Key   string
-	Field Field
-	Limit uint32
+	Kind	string
+	Key	string
+	Field	Field
+	Limit	uint32
 }
 
 type Projection struct {
-	Records []Record
-	byKind  map[string][]Record
-	byKey   map[string][]Record
-	byField map[string][]Record
+	Records	[]Record
+	byKind	map[string][]Record
+	byKey	map[string][]Record
+	byField	map[string][]Record
 }
 
 func BuildProjection(records []Record) (Projection, error) {
 	projection := Projection{
-		byKind:  make(map[string][]Record),
-		byKey:   make(map[string][]Record),
-		byField: make(map[string][]Record),
+		byKind:		make(map[string][]Record),
+		byKey:		make(map[string][]Record),
+		byField:	make(map[string][]Record),
 	}
 	for _, record := range records {
 		if err := record.Validate(); err != nil {

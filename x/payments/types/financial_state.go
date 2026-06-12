@@ -10,191 +10,191 @@ import (
 )
 
 const (
-	FinancialPaymentsPrefix           = "financial/payments"
-	FinancialPaymentIntentsPrefix     = FinancialPaymentsPrefix + "/intents"
-	FinancialPaymentChannelsPrefix    = FinancialPaymentsPrefix + "/channels"
-	FinancialPaymentConditionsPrefix  = FinancialPaymentsPrefix + "/conditions"
-	FinancialPaymentRoutesPrefix      = FinancialPaymentsPrefix + "/routes"
-	FinancialPaymentSettlementsPrefix = FinancialPaymentsPrefix + "/settlements"
-	FinancialPaymentDisputesPrefix    = FinancialPaymentsPrefix + "/disputes"
-	FinancialPaymentReceiptsPrefix    = FinancialPaymentsPrefix + "/receipts"
-	FinancialPaymentProofsPrefix      = FinancialPaymentsPrefix + "/proofs"
-	FinancialPaymentFeesPrefix        = FinancialPaymentsPrefix + "/fees"
-	FinancialPaymentMessagesPrefix    = FinancialPaymentsPrefix + "/messages"
-	FinancialPaymentCanonicalPrefix   = FinancialPaymentsPrefix + "/canonical"
+	FinancialPaymentsPrefix			= "financial/payments"
+	FinancialPaymentIntentsPrefix		= FinancialPaymentsPrefix + "/intents"
+	FinancialPaymentChannelsPrefix		= FinancialPaymentsPrefix + "/channels"
+	FinancialPaymentConditionsPrefix	= FinancialPaymentsPrefix + "/conditions"
+	FinancialPaymentRoutesPrefix		= FinancialPaymentsPrefix + "/routes"
+	FinancialPaymentSettlementsPrefix	= FinancialPaymentsPrefix + "/settlements"
+	FinancialPaymentDisputesPrefix		= FinancialPaymentsPrefix + "/disputes"
+	FinancialPaymentReceiptsPrefix		= FinancialPaymentsPrefix + "/receipts"
+	FinancialPaymentProofsPrefix		= FinancialPaymentsPrefix + "/proofs"
+	FinancialPaymentFeesPrefix		= FinancialPaymentsPrefix + "/fees"
+	FinancialPaymentMessagesPrefix		= FinancialPaymentsPrefix + "/messages"
+	FinancialPaymentCanonicalPrefix		= FinancialPaymentsPrefix + "/canonical"
 )
 
 type PaymentImplementationPriority string
 
 const (
-	PaymentImplementationP0 PaymentImplementationPriority = "P0"
-	PaymentImplementationP1 PaymentImplementationPriority = "P1"
+	PaymentImplementationP0	PaymentImplementationPriority	= "P0"
+	PaymentImplementationP1	PaymentImplementationPriority	= "P1"
 )
 
 type PaymentImplementationTaskID string
 
 const (
-	PaymentTaskFinancialZoneModule     PaymentImplementationTaskID = "financial-zone-payments-module"
-	PaymentTaskCanonicalEnvelope       PaymentImplementationTaskID = "payment-envelope-canonical-encoding"
-	PaymentTaskChannelCollateralEscrow PaymentImplementationTaskID = "channel-collateral-escrow"
-	PaymentTaskSettlementStateProof    PaymentImplementationTaskID = "settlement-state-and-proof"
-	PaymentTaskConditionalLocks        PaymentImplementationTaskID = "conditional-hash-time-locks"
-	PaymentTaskVirtualChannelProof     PaymentImplementationTaskID = "virtual-channel-proof-model"
-	PaymentTaskRouteCommitmentFormat   PaymentImplementationTaskID = "route-commitment-format"
-	PaymentTaskSettlementProofQuery    PaymentImplementationTaskID = "settlement-proof-query"
-	PaymentTaskChannelDisputeReplay    PaymentImplementationTaskID = "channel-dispute-replay"
-	PaymentTaskRouteFeeAccounting      PaymentImplementationTaskID = "route-fee-accounting"
-	PaymentTaskCrossZoneMessages       PaymentImplementationTaskID = "cross-zone-settlement-messages"
-	PaymentTaskReceiptRoot             PaymentImplementationTaskID = "payment-receipt-root"
-	PaymentTaskAdversarialTests        PaymentImplementationTaskID = "adversarial-payment-tests"
+	PaymentTaskFinancialZoneModule		PaymentImplementationTaskID	= "financial-zone-payments-module"
+	PaymentTaskCanonicalEnvelope		PaymentImplementationTaskID	= "payment-envelope-canonical-encoding"
+	PaymentTaskChannelCollateralEscrow	PaymentImplementationTaskID	= "channel-collateral-escrow"
+	PaymentTaskSettlementStateProof		PaymentImplementationTaskID	= "settlement-state-and-proof"
+	PaymentTaskConditionalLocks		PaymentImplementationTaskID	= "conditional-hash-time-locks"
+	PaymentTaskVirtualChannelProof		PaymentImplementationTaskID	= "virtual-channel-proof-model"
+	PaymentTaskRouteCommitmentFormat	PaymentImplementationTaskID	= "route-commitment-format"
+	PaymentTaskSettlementProofQuery		PaymentImplementationTaskID	= "settlement-proof-query"
+	PaymentTaskChannelDisputeReplay		PaymentImplementationTaskID	= "channel-dispute-replay"
+	PaymentTaskRouteFeeAccounting		PaymentImplementationTaskID	= "route-fee-accounting"
+	PaymentTaskCrossZoneMessages		PaymentImplementationTaskID	= "cross-zone-settlement-messages"
+	PaymentTaskReceiptRoot			PaymentImplementationTaskID	= "payment-receipt-root"
+	PaymentTaskAdversarialTests		PaymentImplementationTaskID	= "adversarial-payment-tests"
 )
 
 type PaymentImplementationTask struct {
-	Priority           PaymentImplementationPriority
-	TaskID             PaymentImplementationTaskID
-	Task               string
-	Target             string
-	AcceptanceCriteria []string
+	Priority		PaymentImplementationPriority
+	TaskID			PaymentImplementationTaskID
+	Task			string
+	Target			string
+	AcceptanceCriteria	[]string
 }
 
 type PaymentIntentType string
 
 const (
-	PaymentIntentInitiate     PaymentIntentType = "initiate_payment"
-	PaymentIntentReserveRoute PaymentIntentType = "reserve_route"
-	PaymentIntentSettle       PaymentIntentType = "settle_payment"
+	PaymentIntentInitiate		PaymentIntentType	= "initiate_payment"
+	PaymentIntentReserveRoute	PaymentIntentType	= "reserve_route"
+	PaymentIntentSettle		PaymentIntentType	= "settle_payment"
 )
 
 type PaymentDisputeStatus string
 
 const (
-	PaymentDisputeOpen     PaymentDisputeStatus = "open"
-	PaymentDisputeAccepted PaymentDisputeStatus = "accepted"
-	PaymentDisputeRejected PaymentDisputeStatus = "rejected"
-	PaymentDisputeResolved PaymentDisputeStatus = "resolved"
+	PaymentDisputeOpen	PaymentDisputeStatus	= "open"
+	PaymentDisputeAccepted	PaymentDisputeStatus	= "accepted"
+	PaymentDisputeRejected	PaymentDisputeStatus	= "rejected"
+	PaymentDisputeResolved	PaymentDisputeStatus	= "resolved"
 )
 
 type PaymentEnvelopeObjectType string
 
 const (
-	PaymentEnvelopeIntent     PaymentEnvelopeObjectType = "intent"
-	PaymentEnvelopeRoute      PaymentEnvelopeObjectType = "route"
-	PaymentEnvelopeChannel    PaymentEnvelopeObjectType = "channel_update"
-	PaymentEnvelopeCondition  PaymentEnvelopeObjectType = "condition"
-	PaymentEnvelopeSettlement PaymentEnvelopeObjectType = "settlement"
-	PaymentEnvelopeReceipt    PaymentEnvelopeObjectType = "receipt"
-	PaymentEnvelopeDispute    PaymentEnvelopeObjectType = "dispute"
-	PaymentEnvelopeFee        PaymentEnvelopeObjectType = "fee"
-	PaymentEnvelopeMessage    PaymentEnvelopeObjectType = "message"
+	PaymentEnvelopeIntent		PaymentEnvelopeObjectType	= "intent"
+	PaymentEnvelopeRoute		PaymentEnvelopeObjectType	= "route"
+	PaymentEnvelopeChannel		PaymentEnvelopeObjectType	= "channel_update"
+	PaymentEnvelopeCondition	PaymentEnvelopeObjectType	= "condition"
+	PaymentEnvelopeSettlement	PaymentEnvelopeObjectType	= "settlement"
+	PaymentEnvelopeReceipt		PaymentEnvelopeObjectType	= "receipt"
+	PaymentEnvelopeDispute		PaymentEnvelopeObjectType	= "dispute"
+	PaymentEnvelopeFee		PaymentEnvelopeObjectType	= "fee"
+	PaymentEnvelopeMessage		PaymentEnvelopeObjectType	= "message"
 )
 
 type CrossZonePaymentMessageType string
 
 const (
-	CrossZonePaymentMessageRoute   CrossZonePaymentMessageType = "payment_route"
-	CrossZonePaymentMessageReserve CrossZonePaymentMessageType = "payment_reserve"
-	CrossZonePaymentMessageSettle  CrossZonePaymentMessageType = "payment_settle"
-	CrossZonePaymentMessageRefund  CrossZonePaymentMessageType = "payment_refund"
-	CrossZonePaymentMessageBounce  CrossZonePaymentMessageType = "payment_bounce"
-	CrossZonePaymentMessageReceipt CrossZonePaymentMessageType = "payment_receipt"
+	CrossZonePaymentMessageRoute	CrossZonePaymentMessageType	= "payment_route"
+	CrossZonePaymentMessageReserve	CrossZonePaymentMessageType	= "payment_reserve"
+	CrossZonePaymentMessageSettle	CrossZonePaymentMessageType	= "payment_settle"
+	CrossZonePaymentMessageRefund	CrossZonePaymentMessageType	= "payment_refund"
+	CrossZonePaymentMessageBounce	CrossZonePaymentMessageType	= "payment_bounce"
+	CrossZonePaymentMessageReceipt	CrossZonePaymentMessageType	= "payment_receipt"
 )
 
 type PaymentIntent struct {
-	PaymentID       string
-	IntentType      PaymentIntentType
-	Payer           string
-	Payee           string
-	TargetIdentity  string
-	Amount          string
-	MaxFee          string
-	RouteIDOptional string
-	ExpiryHeight    uint64
-	IntentHash      string
+	PaymentID	string
+	IntentType	PaymentIntentType
+	Payer		string
+	Payee		string
+	TargetIdentity	string
+	Amount		string
+	MaxFee		string
+	RouteIDOptional	string
+	ExpiryHeight	uint64
+	IntentHash	string
 }
 
 type PaymentSettlement struct {
-	PaymentID      string
-	ChannelID      string
-	RouteID        string
-	FinalStateHash string
-	ReceiptHash    string
-	RefundHash     string
-	TimeoutHash    string
-	CloseStatus    NativePaymentSettlementStatus
-	ProofRoot      string
-	SettledHeight  uint64
-	SettlementHash string
+	PaymentID	string
+	ChannelID	string
+	RouteID		string
+	FinalStateHash	string
+	ReceiptHash	string
+	RefundHash	string
+	TimeoutHash	string
+	CloseStatus	NativePaymentSettlementStatus
+	ProofRoot	string
+	SettledHeight	uint64
+	SettlementHash	string
 }
 
 type PaymentDispute struct {
-	DisputeID      string
-	PaymentID      string
-	ChannelID      string
-	FraudProofHash string
-	StaleStateHash string
-	NewerStateHash string
-	SubmittedBy    string
-	OpenedHeight   uint64
-	ChallengeEnd   uint64
-	Status         PaymentDisputeStatus
-	DisputeRoot    string
+	DisputeID	string
+	PaymentID	string
+	ChannelID	string
+	FraudProofHash	string
+	StaleStateHash	string
+	NewerStateHash	string
+	SubmittedBy	string
+	OpenedHeight	uint64
+	ChallengeEnd	uint64
+	Status		PaymentDisputeStatus
+	DisputeRoot	string
 }
 
 type PaymentFeeAccountingRecord struct {
-	FeeID            string
-	RouteID          string
-	ForwardingFee    string
-	RouteFee         string
-	ReserveFee       string
-	SettlementGasFee string
-	RecordedHeight   uint64
-	FeeRoot          string
+	FeeID			string
+	RouteID			string
+	ForwardingFee		string
+	RouteFee		string
+	ReserveFee		string
+	SettlementGasFee	string
+	RecordedHeight		uint64
+	FeeRoot			string
 }
 
 type PaymentEnvelopeCanonicalRecord struct {
-	ObjectType      PaymentEnvelopeObjectType
-	ObjectID        string
-	StateKey        string
-	ObjectHash      string
-	EncodingVersion byte
-	EnvelopeHash    string
+	ObjectType	PaymentEnvelopeObjectType
+	ObjectID	string
+	StateKey	string
+	ObjectHash	string
+	EncodingVersion	byte
+	EnvelopeHash	string
 }
 
 type PaymentSettlementProofQuery struct {
-	PaymentID string
-	ProofType SettlementProofType
+	PaymentID	string
+	ProofType	SettlementProofType
 }
 
 type PaymentSettlementProofQueryResponse struct {
-	Proof SettlementProof
-	Found bool
+	Proof	SettlementProof
+	Found	bool
 }
 
 type FinancialZonePaymentState struct {
-	Height             uint64
-	Intents            []PaymentIntent
-	Channels           []PaymentChannel
-	Conditions         []NativeConditionalPayment
-	Routes             []PaymentRouteCommitment
-	Settlements        []PaymentSettlement
-	Disputes           []PaymentDispute
-	Receipts           []PaymentReceipt
-	Proofs             []SettlementProof
-	Fees               []PaymentFeeAccountingRecord
-	Messages           []CrossZonePaymentMessage
-	CanonicalEnvelopes []PaymentEnvelopeCanonicalRecord
-	IntentRoot         string
-	ChannelRoot        string
-	ConditionRoot      string
-	RouteRoot          string
-	SettlementRoot     string
-	DisputeRoot        string
-	ReceiptRoot        string
-	ProofRoot          string
-	FeeRoot            string
-	MessageRoot        string
-	CanonicalRoot      string
-	PaymentRoot        string
+	Height			uint64
+	Intents			[]PaymentIntent
+	Channels		[]PaymentChannel
+	Conditions		[]NativeConditionalPayment
+	Routes			[]PaymentRouteCommitment
+	Settlements		[]PaymentSettlement
+	Disputes		[]PaymentDispute
+	Receipts		[]PaymentReceipt
+	Proofs			[]SettlementProof
+	Fees			[]PaymentFeeAccountingRecord
+	Messages		[]CrossZonePaymentMessage
+	CanonicalEnvelopes	[]PaymentEnvelopeCanonicalRecord
+	IntentRoot		string
+	ChannelRoot		string
+	ConditionRoot		string
+	RouteRoot		string
+	SettlementRoot		string
+	DisputeRoot		string
+	ReceiptRoot		string
+	ProofRoot		string
+	FeeRoot			string
+	MessageRoot		string
+	CanonicalRoot		string
+	PaymentRoot		string
 }
 
 func PaymentImplementationTasks() []PaymentImplementationTask {
@@ -744,17 +744,17 @@ func (state FinancialZonePaymentState) Validate() error {
 		return err
 	}
 	expectedRoots := map[string][2]string{
-		"payments financial intent root":     {state.IntentRoot, ComputePaymentIntentSetRoot(state.Intents)},
-		"payments financial channel root":    {state.ChannelRoot, ComputePaymentChannelSetRoot(state.Channels)},
-		"payments financial condition root":  {state.ConditionRoot, ComputeNativeConditionalPaymentSetRoot(state.Conditions)},
-		"payments financial route root":      {state.RouteRoot, ComputePaymentRouteCommitmentSetRoot(state.Routes)},
-		"payments financial settlement root": {state.SettlementRoot, ComputePaymentSettlementSetRoot(state.Settlements)},
-		"payments financial dispute root":    {state.DisputeRoot, ComputePaymentDisputeSetRoot(state.Disputes)},
-		"payments financial receipt root":    {state.ReceiptRoot, ComputeNativePaymentReceiptSetRoot(state.Receipts)},
-		"payments financial proof root":      {state.ProofRoot, ComputeSettlementProofSetRoot(state.Proofs)},
-		"payments financial fee root":        {state.FeeRoot, ComputePaymentFeeAccountingSetRoot(state.Fees)},
-		"payments financial message root":    {state.MessageRoot, ComputeCrossZonePaymentMessageSetRoot(state.Messages)},
-		"payments financial canonical root":  {state.CanonicalRoot, ComputePaymentEnvelopeCanonicalSetRoot(state.CanonicalEnvelopes)},
+		"payments financial intent root":	{state.IntentRoot, ComputePaymentIntentSetRoot(state.Intents)},
+		"payments financial channel root":	{state.ChannelRoot, ComputePaymentChannelSetRoot(state.Channels)},
+		"payments financial condition root":	{state.ConditionRoot, ComputeNativeConditionalPaymentSetRoot(state.Conditions)},
+		"payments financial route root":	{state.RouteRoot, ComputePaymentRouteCommitmentSetRoot(state.Routes)},
+		"payments financial settlement root":	{state.SettlementRoot, ComputePaymentSettlementSetRoot(state.Settlements)},
+		"payments financial dispute root":	{state.DisputeRoot, ComputePaymentDisputeSetRoot(state.Disputes)},
+		"payments financial receipt root":	{state.ReceiptRoot, ComputeNativePaymentReceiptSetRoot(state.Receipts)},
+		"payments financial proof root":	{state.ProofRoot, ComputeSettlementProofSetRoot(state.Proofs)},
+		"payments financial fee root":		{state.FeeRoot, ComputePaymentFeeAccountingSetRoot(state.Fees)},
+		"payments financial message root":	{state.MessageRoot, ComputeCrossZonePaymentMessageSetRoot(state.Messages)},
+		"payments financial canonical root":	{state.CanonicalRoot, ComputePaymentEnvelopeCanonicalSetRoot(state.CanonicalEnvelopes)},
 	}
 	for field, roots := range expectedRoots {
 		if roots[0] == "" {

@@ -10,54 +10,54 @@ import (
 )
 
 const (
-	AVMMetricAsyncMessagesSubmitted    AVMObservabilityMetric = "async_messages_submitted"
-	AVMMetricAsyncMessagesExecuted     AVMObservabilityMetric = "async_messages_executed"
-	AVMMetricAsyncMessagesExpired      AVMObservabilityMetric = "async_messages_expired"
-	AVMMetricAsyncMessagesBounced      AVMObservabilityMetric = "async_messages_bounced"
-	AVMMetricDeadLetterCount           AVMObservabilityMetric = "dead_letter_count"
-	AVMMetricRetryQueueSize            AVMObservabilityMetric = "retry_queue_size"
-	AVMMetricDelayedQueueSize          AVMObservabilityMetric = "delayed_queue_size"
-	AVMMetricActorCount                AVMObservabilityMetric = "actor_count"
-	AVMMetricActorMailboxDepth         AVMObservabilityMetric = "actor_mailbox_depth"
-	AVMMetricContinuationsActive       AVMObservabilityMetric = "continuations_active"
-	AVMMetricContinuationsExpired      AVMObservabilityMetric = "continuations_expired"
-	AVMMetricContractExecutions        AVMObservabilityMetric = "contract_executions"
-	AVMMetricContractFailures          AVMObservabilityMetric = "contract_failures"
-	AVMMetricGasReserved               AVMObservabilityMetric = "gas_reserved"
-	AVMMetricGasConsumed               AVMObservabilityMetric = "gas_consumed"
-	AVMMetricZoneAsyncBudgetUsage      AVMObservabilityMetric = "zone_async_budget_usage"
-	AVMMetricQueueDrainLatency         AVMObservabilityMetric = "queue_drain_latency"
-	AVMMetricReceiptRootGenerationTime AVMObservabilityMetric = "receipt_root_generation_time"
+	AVMMetricAsyncMessagesSubmitted		AVMObservabilityMetric	= "async_messages_submitted"
+	AVMMetricAsyncMessagesExecuted		AVMObservabilityMetric	= "async_messages_executed"
+	AVMMetricAsyncMessagesExpired		AVMObservabilityMetric	= "async_messages_expired"
+	AVMMetricAsyncMessagesBounced		AVMObservabilityMetric	= "async_messages_bounced"
+	AVMMetricDeadLetterCount		AVMObservabilityMetric	= "dead_letter_count"
+	AVMMetricRetryQueueSize			AVMObservabilityMetric	= "retry_queue_size"
+	AVMMetricDelayedQueueSize		AVMObservabilityMetric	= "delayed_queue_size"
+	AVMMetricActorCount			AVMObservabilityMetric	= "actor_count"
+	AVMMetricActorMailboxDepth		AVMObservabilityMetric	= "actor_mailbox_depth"
+	AVMMetricContinuationsActive		AVMObservabilityMetric	= "continuations_active"
+	AVMMetricContinuationsExpired		AVMObservabilityMetric	= "continuations_expired"
+	AVMMetricContractExecutions		AVMObservabilityMetric	= "contract_executions"
+	AVMMetricContractFailures		AVMObservabilityMetric	= "contract_failures"
+	AVMMetricGasReserved			AVMObservabilityMetric	= "gas_reserved"
+	AVMMetricGasConsumed			AVMObservabilityMetric	= "gas_consumed"
+	AVMMetricZoneAsyncBudgetUsage		AVMObservabilityMetric	= "zone_async_budget_usage"
+	AVMMetricQueueDrainLatency		AVMObservabilityMetric	= "queue_drain_latency"
+	AVMMetricReceiptRootGenerationTime	AVMObservabilityMetric	= "receipt_root_generation_time"
 
-	AVMEventMessageSubmitted        AVMObservabilityEvent = "avm_message_submitted"
-	AVMEventMessageScheduled        AVMObservabilityEvent = "avm_message_scheduled"
-	AVMEventMessageExecuted         AVMObservabilityEvent = "avm_message_executed"
-	AVMEventMessageFailed           AVMObservabilityEvent = "avm_message_failed"
-	AVMEventMessageRetried          AVMObservabilityEvent = "avm_message_retried"
-	AVMEventMessageExpired          AVMObservabilityEvent = "avm_message_expired"
-	AVMEventMessageBounced          AVMObservabilityEvent = "avm_message_bounced"
-	AVMEventDeadLettered            AVMObservabilityEvent = "avm_dead_lettered"
-	AVMEventActorCreated            AVMObservabilityEvent = "avm_actor_created"
-	AVMEventActorMessageHandled     AVMObservabilityEvent = "avm_actor_message_handled"
-	AVMEventContinuationCreated     AVMObservabilityEvent = "avm_continuation_created"
-	AVMEventContinuationResumed     AVMObservabilityEvent = "avm_continuation_resumed"
-	AVMEventContinuationExpired     AVMObservabilityEvent = "avm_continuation_expired"
-	AVMEventContractExecuted        AVMObservabilityEvent = "avm_contract_executed"
-	AVMEventInterfaceRegistered     AVMObservabilityEvent = "avm_interface_registered"
-	AVMEventRuntimeUpgradeScheduled AVMObservabilityEvent = "avm_runtime_upgrade_scheduled"
+	AVMEventMessageSubmitted	AVMObservabilityEvent	= "avm_message_submitted"
+	AVMEventMessageScheduled	AVMObservabilityEvent	= "avm_message_scheduled"
+	AVMEventMessageExecuted		AVMObservabilityEvent	= "avm_message_executed"
+	AVMEventMessageFailed		AVMObservabilityEvent	= "avm_message_failed"
+	AVMEventMessageRetried		AVMObservabilityEvent	= "avm_message_retried"
+	AVMEventMessageExpired		AVMObservabilityEvent	= "avm_message_expired"
+	AVMEventMessageBounced		AVMObservabilityEvent	= "avm_message_bounced"
+	AVMEventDeadLettered		AVMObservabilityEvent	= "avm_dead_lettered"
+	AVMEventActorCreated		AVMObservabilityEvent	= "avm_actor_created"
+	AVMEventActorMessageHandled	AVMObservabilityEvent	= "avm_actor_message_handled"
+	AVMEventContinuationCreated	AVMObservabilityEvent	= "avm_continuation_created"
+	AVMEventContinuationResumed	AVMObservabilityEvent	= "avm_continuation_resumed"
+	AVMEventContinuationExpired	AVMObservabilityEvent	= "avm_continuation_expired"
+	AVMEventContractExecuted	AVMObservabilityEvent	= "avm_contract_executed"
+	AVMEventInterfaceRegistered	AVMObservabilityEvent	= "avm_interface_registered"
+	AVMEventRuntimeUpgradeScheduled	AVMObservabilityEvent	= "avm_runtime_upgrade_scheduled"
 
-	AVMAlertDeadLetterSpike                     AVMObservabilityAlert = "dead_letter_spike"
-	AVMAlertRetryQueueBacklog                   AVMObservabilityAlert = "retry_queue_backlog"
-	AVMAlertDelayedQueueBacklog                 AVMObservabilityAlert = "delayed_queue_backlog"
-	AVMAlertZoneAsyncBudgetSaturation           AVMObservabilityAlert = "zone_async_budget_saturation"
-	AVMAlertActorMailboxBacklog                 AVMObservabilityAlert = "actor_mailbox_backlog"
-	AVMAlertContinuationExpirySpike             AVMObservabilityAlert = "continuation_expiry_spike"
-	AVMAlertContractFailureSpike                AVMObservabilityAlert = "contract_failure_spike"
-	AVMAlertReceiptGenerationLatencyThreshold   AVMObservabilityAlert = "receipt_generation_latency_above_threshold"
-	AVMAlertQueueRootGenerationLatencyThreshold AVMObservabilityAlert = "queue_root_generation_latency_above_threshold"
+	AVMAlertDeadLetterSpike				AVMObservabilityAlert	= "dead_letter_spike"
+	AVMAlertRetryQueueBacklog			AVMObservabilityAlert	= "retry_queue_backlog"
+	AVMAlertDelayedQueueBacklog			AVMObservabilityAlert	= "delayed_queue_backlog"
+	AVMAlertZoneAsyncBudgetSaturation		AVMObservabilityAlert	= "zone_async_budget_saturation"
+	AVMAlertActorMailboxBacklog			AVMObservabilityAlert	= "actor_mailbox_backlog"
+	AVMAlertContinuationExpirySpike			AVMObservabilityAlert	= "continuation_expiry_spike"
+	AVMAlertContractFailureSpike			AVMObservabilityAlert	= "contract_failure_spike"
+	AVMAlertReceiptGenerationLatencyThreshold	AVMObservabilityAlert	= "receipt_generation_latency_above_threshold"
+	AVMAlertQueueRootGenerationLatencyThreshold	AVMObservabilityAlert	= "queue_root_generation_latency_above_threshold"
 
-	MaxAVMObservabilityItems     = 64
-	MaxAVMObservabilityNameBytes = 128
+	MaxAVMObservabilityItems	= 64
+	MaxAVMObservabilityNameBytes	= 128
 )
 
 type AVMObservabilityMetric string
@@ -65,17 +65,17 @@ type AVMObservabilityEvent string
 type AVMObservabilityAlert string
 
 type AVMObservabilitySpec struct {
-	Metrics  []AVMObservabilityMetric
-	Events   []AVMObservabilityEvent
-	Alerts   []AVMObservabilityAlert
-	SpecHash string
+	Metrics		[]AVMObservabilityMetric
+	Events		[]AVMObservabilityEvent
+	Alerts		[]AVMObservabilityAlert
+	SpecHash	string
 }
 
 func DefaultAVMObservabilitySpec() (AVMObservabilitySpec, error) {
 	spec := AVMObservabilitySpec{
-		Metrics: AllAVMObservabilityMetrics(),
-		Events:  AllAVMObservabilityEvents(),
-		Alerts:  AllAVMObservabilityAlerts(),
+		Metrics:	AllAVMObservabilityMetrics(),
+		Events:		AllAVMObservabilityEvents(),
+		Alerts:		AllAVMObservabilityAlerts(),
 	}
 	spec.SpecHash = ComputeAVMObservabilitySpecHash(spec)
 	return spec, spec.Validate()

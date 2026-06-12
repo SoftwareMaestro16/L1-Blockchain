@@ -12,10 +12,10 @@ import (
 )
 
 type Keeper struct {
-	cdc              codec.BinaryCodec
-	storeService     corestore.KVStoreService
-	authority        string
-	reputationKeeper types.ReputationKeeper
+	cdc			codec.BinaryCodec
+	storeService		corestore.KVStoreService
+	authority		string
+	reputationKeeper	types.ReputationKeeper
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, authority string) Keeper {
@@ -27,7 +27,7 @@ func (k Keeper) WithReputationKeeper(rk types.ReputationKeeper) Keeper {
 	return k
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)
@@ -135,14 +135,14 @@ func (k Keeper) commitCommission(ctx context.Context, commission types.Validator
 		return types.ValidatorCommission{}, err
 	}
 	entry := types.CommissionHistoryEntry{
-		ValidatorAddress:       commission.ValidatorAddress,
-		Height:                 height,
-		BaseCommissionBps:      commission.BaseCommissionBps,
-		EffectiveCommissionBps: commission.EffectiveCommissionBps,
-		PerformanceModifierBps: commission.PerformanceModifierBps,
-		ReputationModifierBps:  commission.ReputationModifierBps,
-		Jailed:                 commission.Jailed,
-		Reason:                 reason,
+		ValidatorAddress:	commission.ValidatorAddress,
+		Height:			height,
+		BaseCommissionBps:	commission.BaseCommissionBps,
+		EffectiveCommissionBps:	commission.EffectiveCommissionBps,
+		PerformanceModifierBps:	commission.PerformanceModifierBps,
+		ReputationModifierBps:	commission.ReputationModifierBps,
+		Jailed:			commission.Jailed,
+		Reason:			reason,
 	}
 	if err := k.SetCommissionHistory(ctx, entry); err != nil {
 		return types.ValidatorCommission{}, err

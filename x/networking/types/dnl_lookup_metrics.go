@@ -8,76 +8,76 @@ import (
 )
 
 const (
-	DefaultDNLRecursiveDepth = uint32(2)
-	MaxDNLRecursiveDepth     = uint32(8)
-	MaxDNLRecursiveHops      = 512
-	MaxDNLMetricSnapshots    = 8192
+	DefaultDNLRecursiveDepth	= uint32(2)
+	MaxDNLRecursiveDepth		= uint32(8)
+	MaxDNLRecursiveHops		= 512
+	MaxDNLMetricSnapshots		= 8192
 )
 
 type DNLRecursiveLookupRequest struct {
-	ServiceID            string
-	ZoneID               string
-	InterfaceHash        string
-	CurrentHeight        uint64
-	MaxDepth             uint32
-	Limit                uint32
-	ConsensusRoutingOnly bool
-	AllowNodeLocalHints  bool
+	ServiceID		string
+	ZoneID			string
+	InterfaceHash		string
+	CurrentHeight		uint64
+	MaxDepth		uint32
+	Limit			uint32
+	ConsensusRoutingOnly	bool
+	AllowNodeLocalHints	bool
 }
 
 type DNLLookupHop struct {
-	Depth     uint32
-	LookupKey string
-	NodeID    string
-	ServiceID string
-	ZoneID    string
-	RouteID   string
-	ProofHash string
-	HopHash   string
+	Depth		uint32
+	LookupKey	string
+	NodeID		string
+	ServiceID	string
+	ZoneID		string
+	RouteID		string
+	ProofHash	string
+	HopHash		string
 }
 
 type DNLRecursiveLookupResponse struct {
-	RequestHash  string
-	Hops         []DNLLookupHop
-	Entries      []DNLServiceDiscoveryEntry
-	Routes       []DNLRoutingTableEntry
-	Proofs       []DNLProof
-	ExpiryHeight uint64
-	ResponseHash string
+	RequestHash	string
+	Hops		[]DNLLookupHop
+	Entries		[]DNLServiceDiscoveryEntry
+	Routes		[]DNLRoutingTableEntry
+	Proofs		[]DNLProof
+	ExpiryHeight	uint64
+	ResponseHash	string
 }
 
 type DNLRoutingMetricSnapshot struct {
-	SnapshotID          string
-	RouteID             string
-	NodeID              string
-	ZoneID              string
-	ServiceID           string
-	LatencyMillis       uint64
-	GasCost             uint64
-	ReliabilityScoreBps uint32
-	CongestionWeightBps uint32
-	ZoneSupport         bool
-	ServiceSupport      bool
-	Committed           bool
-	SnapshotHeight      uint64
-	SnapshotHash        string
+	SnapshotID		string
+	RouteID			string
+	NodeID			string
+	ZoneID			string
+	ServiceID		string
+	LatencyMillis		uint64
+	GasCost			uint64
+	ReliabilityScoreBps	uint32
+	CongestionWeightBps	uint32
+	ZoneSupport		bool
+	ServiceSupport		bool
+	Committed		bool
+	SnapshotHeight		uint64
+	SnapshotHash		string
 }
 
 type DNLLiveRoutingHint struct {
-	RouteID        string
-	NodeID         string
-	LatencyMillis  uint64
-	ObservedHeight uint64
-	HintHash       string
+	RouteID		string
+	NodeID		string
+	LatencyMillis	uint64
+	ObservedHeight	uint64
+	HintHash	string
 }
 
 type DNLRouteSelection struct {
-	Route              DNLRoutingTableEntry
-	Metric             DNLRoutingMetricSnapshot
-	Score              uint64
-	UsedCommittedTable bool
-	UsedLiveHint       bool
-	SelectionHash      string
+	Route			DNLRoutingTableEntry
+	Metric			DNLRoutingMetricSnapshot
+	Score			uint64
+	UsedCommittedTable	bool
+	UsedLiveHint		bool
+	SelectionHash		string
 }
 
 func RecursiveDNLLookup(dnl DNLState, routing DNLRoutingState, request DNLRecursiveLookupRequest) (DNLRecursiveLookupResponse, error) {
@@ -96,19 +96,19 @@ func RecursiveDNLLookup(dnl DNLState, routing DNLRoutingState, request DNLRecurs
 	}
 
 	type pendingQuery struct {
-		query DNLQuery
-		depth uint32
+		query	DNLQuery
+		depth	uint32
 	}
 	queue := []pendingQuery{{
 		query: DNLQuery{
-			ServiceID:     request.ServiceID,
-			ZoneID:        request.ZoneID,
-			InterfaceHash: request.InterfaceHash,
-			CurrentHeight: request.CurrentHeight,
-			Limit:         request.Limit,
-			RequireProof:  true,
+			ServiceID:	request.ServiceID,
+			ZoneID:		request.ZoneID,
+			InterfaceHash:	request.InterfaceHash,
+			CurrentHeight:	request.CurrentHeight,
+			Limit:		request.Limit,
+			RequireProof:	true,
 		},
-		depth: 0,
+		depth:	0,
 	}}
 	seenQueries := map[string]struct{}{}
 	entriesByID := map[string]DNLServiceDiscoveryEntry{}
@@ -183,13 +183,13 @@ func RecursiveDNLLookup(dnl DNLState, routing DNLRoutingState, request DNLRecurs
 				routeProofHash = attachmentProof.ProofHash
 			}
 			hop, err := NewDNLLookupHop(DNLLookupHop{
-				Depth:     next.depth,
-				LookupKey: DNLQueryProofKey(next.query),
-				NodeID:    route.NextHopNodeID,
-				ServiceID: route.ServiceID,
-				ZoneID:    route.ZoneID,
-				RouteID:   route.RouteID,
-				ProofHash: routeProofHash,
+				Depth:		next.depth,
+				LookupKey:	DNLQueryProofKey(next.query),
+				NodeID:		route.NextHopNodeID,
+				ServiceID:	route.ServiceID,
+				ZoneID:		route.ZoneID,
+				RouteID:	route.RouteID,
+				ProofHash:	routeProofHash,
 			})
 			if err != nil {
 				return DNLRecursiveLookupResponse{}, err
@@ -198,11 +198,11 @@ func RecursiveDNLLookup(dnl DNLState, routing DNLRoutingState, request DNLRecurs
 			if next.depth+1 < request.MaxDepth {
 				for _, serviceID := range node.ServiceIDs {
 					child := DNLQuery{
-						ServiceID:     serviceID,
-						ZoneID:        route.ZoneID,
-						CurrentHeight: request.CurrentHeight,
-						Limit:         request.Limit,
-						RequireProof:  true,
+						ServiceID:	serviceID,
+						ZoneID:		route.ZoneID,
+						CurrentHeight:	request.CurrentHeight,
+						Limit:		request.Limit,
+						RequireProof:	true,
 					}
 					queue = append(queue, pendingQuery{query: child, depth: next.depth + 1})
 				}
@@ -239,12 +239,12 @@ func RecursiveDNLLookup(dnl DNLState, routing DNLRoutingState, request DNLRecurs
 	}
 	sortDNLLookupHops(hops)
 	response := DNLRecursiveLookupResponse{
-		RequestHash:  ComputeDNLRecursiveLookupRequestHash(request),
-		Hops:         hops,
-		Entries:      entries,
-		Routes:       routes,
-		Proofs:       proofs,
-		ExpiryHeight: minDNLExpiry(entries, routes),
+		RequestHash:	ComputeDNLRecursiveLookupRequestHash(request),
+		Hops:		hops,
+		Entries:	entries,
+		Routes:		routes,
+		Proofs:		proofs,
+		ExpiryHeight:	minDNLExpiry(entries, routes),
 	}
 	response.ResponseHash = ComputeDNLRecursiveLookupResponseHash(response)
 	if len(response.Proofs) == 0 && lastLookupErr != nil {
@@ -263,10 +263,10 @@ func NewDNLLookupHop(hop DNLLookupHop) (DNLLookupHop, error) {
 
 func NewDNLRootAttachmentProof(state DNLState, key, valueHash string) DNLProof {
 	proof := DNLProof{
-		Key:       strings.TrimSpace(key),
-		ValueHash: normalizeHashText(valueHash),
-		StateRoot: state.StateRoot,
-		Height:    state.Height,
+		Key:		strings.TrimSpace(key),
+		ValueHash:	normalizeHashText(valueHash),
+		StateRoot:	state.StateRoot,
+		Height:		state.Height,
 	}
 	proof.ProofHash = ComputeDNLProofHash(proof)
 	return proof
@@ -342,11 +342,11 @@ func SelectConsensusRouteFromCommittedMetrics(state DNLRoutingState, epoch uint6
 			continue
 		}
 		selection := DNLRouteSelection{
-			Route:              route,
-			Metric:             metric,
-			Score:              ComputeDNLRouteMetricScore(route, metric),
-			UsedCommittedTable: true,
-			UsedLiveHint:       false,
+			Route:			route,
+			Metric:			metric,
+			Score:			ComputeDNLRouteMetricScore(route, metric),
+			UsedCommittedTable:	true,
+			UsedLiveHint:		false,
 		}
 		selection.SelectionHash = ComputeDNLRouteSelectionHash(selection)
 		candidates = append(candidates, selection)

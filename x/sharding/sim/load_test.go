@@ -22,8 +22,8 @@ func TestMediumLoadActivatesPartialSharding(t *testing.T) {
 	sim := newTestSimulator(t)
 	policy := immediatePolicy()
 	metrics := loadtypes.Metrics{
-		CanonicalMempoolSize: policy.LoadParams.TargetMempoolSize,
-		UsedBlockGas:         policy.LoadParams.TargetBlockGas,
+		CanonicalMempoolSize:	policy.LoadParams.TargetMempoolSize,
+		UsedBlockGas:		policy.LoadParams.TargetBlockGas,
 	}
 
 	transition, err := sim.UpdateLoadAndShards(policy, metrics, 1)
@@ -220,22 +220,22 @@ func immediatePolicy() ShardActivationPolicy {
 	params.AlphaDenominator = 1
 	params.MaxDeltaBps = loadtypes.BasisPoints
 	return ShardActivationPolicy{
-		WorkchainID:       BaseWorkchain,
-		LoadParams:        params,
-		PartialShardCount: 2,
-		MaxShardCount:     4,
-		CooldownBlocks:    2,
+		WorkchainID:		BaseWorkchain,
+		LoadParams:		params,
+		PartialShardCount:	2,
+		MaxShardCount:		4,
+		CooldownBlocks:		2,
 	}
 }
 
 func saturatedLoadMetrics(params loadtypes.Params) loadtypes.Metrics {
 	return loadtypes.Metrics{
-		CanonicalMempoolSize:        params.TargetMempoolSize,
-		UsedBlockGas:                params.TargetBlockGas,
-		AverageInclusionDelayBlocks: params.TargetLatencyBlocks,
-		FailedTxCount:               1,
-		TotalTxCount:                1,
-		ExecutionStepCount:          params.TargetExecutionSteps,
+		CanonicalMempoolSize:		params.TargetMempoolSize,
+		UsedBlockGas:			params.TargetBlockGas,
+		AverageInclusionDelayBlocks:	params.TargetLatencyBlocks,
+		FailedTxCount:			1,
+		TotalTxCount:			1,
+		ExecutionStepCount:		params.TargetExecutionSteps,
 	}
 }
 
@@ -246,11 +246,11 @@ func seedRootQueue(t *testing.T, sim *Simulator, root ShardID, ids []string) []s
 	out := append([]string(nil), ids...)
 	for _, id := range ids {
 		shard.Queue = append(shard.Queue, CrossShardMessage{
-			Source:      root,
-			Destination: root,
-			MessageID:   id,
-			RoutingKey:  []byte(id),
-			Timeout:     10,
+			Source:		root,
+			Destination:	root,
+			MessageID:	id,
+			RoutingKey:	[]byte(id),
+			Timeout:	10,
 		})
 	}
 	shard.MessageQueueRoot = hashQueue(shard.Queue)

@@ -15,17 +15,17 @@ func TestBurnIntegratedFeeDistributionGuardsDeflationAndPreservesRewards(t *test
 	params.FeeSpikeThresholdBps = 15_000
 
 	out, err := ComputeBurnIntegratedFeeDistribution(BurnIntegratedFeeDistributionInput{
-		EpochID:                    7,
-		BlockHeight:                100,
-		CollectedFeesNaet:          sdkmath.NewInt(1_000),
-		BurnRatioBps:               5_000,
-		CommunityPoolRatioBps:      1_000,
-		StateMaintenanceReserveBps: 1_000,
-		GrossMintedNaet:            sdkmath.NewInt(300),
-		CumulativeBurnedNaet:       sdkmath.NewInt(1_000),
-		FeeSpikeBps:                25_000,
-		BondedStakeRatioBps:        DefaultTargetStakeBps,
-		Params:                     params,
+		EpochID:			7,
+		BlockHeight:			100,
+		CollectedFeesNaet:		sdkmath.NewInt(1_000),
+		BurnRatioBps:			5_000,
+		CommunityPoolRatioBps:		1_000,
+		StateMaintenanceReserveBps:	1_000,
+		GrossMintedNaet:		sdkmath.NewInt(300),
+		CumulativeBurnedNaet:		sdkmath.NewInt(1_000),
+		FeeSpikeBps:			25_000,
+		BondedStakeRatioBps:		DefaultTargetStakeBps,
+		Params:				params,
 	})
 	require.NoError(t, err)
 	require.Zero(t, out.BurnNaet.Int64())
@@ -51,14 +51,14 @@ func TestBurnIntegratedFeeDistributionEnforcesNetIssuanceFloor(t *testing.T) {
 	params.NetIssuanceFloorNaet = sdkmath.NewInt(50)
 
 	out, err := ComputeBurnIntegratedFeeDistribution(BurnIntegratedFeeDistributionInput{
-		EpochID:              8,
-		BlockHeight:          120,
-		CollectedFeesNaet:    sdkmath.NewInt(1_000),
-		BurnRatioBps:         5_000,
-		GrossMintedNaet:      sdkmath.NewInt(100),
-		CumulativeBurnedNaet: sdkmath.NewInt(2_000),
-		BondedStakeRatioBps:  DefaultTargetStakeBps,
-		Params:               params,
+		EpochID:		8,
+		BlockHeight:		120,
+		CollectedFeesNaet:	sdkmath.NewInt(1_000),
+		BurnRatioBps:		5_000,
+		GrossMintedNaet:	sdkmath.NewInt(100),
+		CumulativeBurnedNaet:	sdkmath.NewInt(2_000),
+		BondedStakeRatioBps:	DefaultTargetStakeBps,
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(50), out.BurnNaet)
@@ -78,13 +78,13 @@ func TestBurnFloorDisabledByDefault(t *testing.T) {
 	require.True(t, params.BurnFloorNaet.IsZero())
 
 	out, err := ComputeBurnIntegratedFeeDistribution(BurnIntegratedFeeDistributionInput{
-		EpochID:             9,
-		BlockHeight:         140,
-		CollectedFeesNaet:   sdkmath.NewInt(1_000),
-		BurnRatioBps:        0,
-		GrossMintedNaet:     sdkmath.NewInt(1_000),
-		BondedStakeRatioBps: DefaultTargetStakeBps,
-		Params:              params,
+		EpochID:		9,
+		BlockHeight:		140,
+		CollectedFeesNaet:	sdkmath.NewInt(1_000),
+		BurnRatioBps:		0,
+		GrossMintedNaet:	sdkmath.NewInt(1_000),
+		BondedStakeRatioBps:	DefaultTargetStakeBps,
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.True(t, out.BurnNaet.IsZero())
@@ -96,15 +96,15 @@ func TestBurnIntegratedSlashingDistributionAppliesBurnCapWithoutMisrouting(t *te
 	params := DefaultBurnMechanicsParams()
 	params.EpochBurnCapNaet = sdkmath.NewInt(200)
 	out, err := ComputeBurnIntegratedSlashingDistribution(BurnIntegratedSlashingDistributionInput{
-		EpochID:              10,
-		BlockHeight:          160,
-		PenaltyNaet:          sdkmath.NewInt(1_000),
-		BurnRatioBps:         5_000,
-		TreasuryRatioBps:     1_000,
-		ReporterRewardBps:    500,
-		GrossMintedNaet:      sdkmath.NewInt(1_000),
-		CumulativeBurnedNaet: sdkmath.NewInt(3_000),
-		Params:               params,
+		EpochID:		10,
+		BlockHeight:		160,
+		PenaltyNaet:		sdkmath.NewInt(1_000),
+		BurnRatioBps:		5_000,
+		TreasuryRatioBps:	1_000,
+		ReporterRewardBps:	500,
+		GrossMintedNaet:	sdkmath.NewInt(1_000),
+		CumulativeBurnedNaet:	sdkmath.NewInt(3_000),
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(200), out.BurnNaet)
@@ -124,9 +124,9 @@ func TestBurnIntegratedSlashingDistributionAppliesBurnCapWithoutMisrouting(t *te
 
 func TestBurnSupplyQueryReportsCumulativeAndRecentRate(t *testing.T) {
 	query, err := QueryBurnSupply(BurnSupplyQueryInput{
-		CumulativeBurnedNaet: sdkmath.NewInt(5_000),
-		CurrentBlockHeight:   200,
-		RecentWindowBlocks:   20,
+		CumulativeBurnedNaet:	sdkmath.NewInt(5_000),
+		CurrentBlockHeight:	200,
+		RecentWindowBlocks:	20,
 		Events: []BurnAccountingEvent{
 			{BlockHeight: 170, BurnedNaet: sdkmath.NewInt(1_000)},
 			{BlockHeight: 185, BurnedNaet: sdkmath.NewInt(600)},
@@ -146,13 +146,13 @@ func TestDeflationGuardCanBeExplicitlyRelaxedByGovernance(t *testing.T) {
 	params.GovernanceAllowsBelowFloor = true
 
 	out, err := ComputeBurnIntegratedFeeDistribution(BurnIntegratedFeeDistributionInput{
-		EpochID:             11,
-		BlockHeight:         220,
-		CollectedFeesNaet:   sdkmath.NewInt(1_000),
-		BurnRatioBps:        5_000,
-		GrossMintedNaet:     sdkmath.NewInt(100),
-		BondedStakeRatioBps: DefaultTargetStakeBps,
-		Params:              params,
+		EpochID:		11,
+		BlockHeight:		220,
+		CollectedFeesNaet:	sdkmath.NewInt(1_000),
+		BurnRatioBps:		5_000,
+		GrossMintedNaet:	sdkmath.NewInt(100),
+		BondedStakeRatioBps:	DefaultTargetStakeBps,
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(500), out.BurnNaet)

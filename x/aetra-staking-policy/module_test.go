@@ -33,8 +33,8 @@ func TestMsgServiceRejectsUnauthorizedIdentityRegistration(t *testing.T) {
 	require.NotNil(t, handler)
 
 	_, err := handler(sdk.Context{}, &types.MsgRegisterValidatorIdentity{
-		Authority: "bad-authority",
-		Identity:  types.ValidatorIdentityMetadata{OperatorAddress: "AEvalidator", Moniker: "validator"},
+		Authority:	"bad-authority",
+		Identity:	types.ValidatorIdentityMetadata{OperatorAddress: "AEvalidator", Moniker: "validator"},
 	})
 	require.ErrorContains(t, err, "invalid authority")
 }

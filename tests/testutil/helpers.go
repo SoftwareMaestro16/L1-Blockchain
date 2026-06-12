@@ -38,10 +38,10 @@ func NewInitializedApp(t *testing.T, chainID string) *l1app.L1App {
 	stateBytes, err := json.MarshalIndent(genesis, "", " ")
 	require.NoError(t, err)
 	_, err = app.InitChain(&abci.RequestInitChain{
-		ChainId:         chainID,
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		ChainId:		chainID,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 	return app
@@ -100,7 +100,7 @@ func EncodeSignedTxWithChainID(
 	acc := app.AccountKeeper.GetAccount(ctx, addr)
 	require.NotNil(t, acc)
 	tx, err := sims.GenSignedMockTx(
-		rand.New(rand.NewSource(1)), // #nosec G404 deterministic test signing only, not consensus or key generation
+		rand.New(rand.NewSource(1)),
 		app.TxConfig(),
 		msgs,
 		fee,
@@ -119,9 +119,9 @@ func EncodeSignedTxWithChainID(
 func FinalizeBlock(t *testing.T, app *l1app.L1App, height int64, txs ...[]byte) *abci.ResponseFinalizeBlock {
 	t.Helper()
 	res, err := app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: height,
-		Hash:   app.LastCommitID().Hash,
-		Txs:    txs,
+		Height:	height,
+		Hash:	app.LastCommitID().Hash,
+		Txs:	txs,
 	})
 	require.NoError(t, err)
 	return res

@@ -14,9 +14,9 @@ func TestServiceRetryPolicyBoundsAttemptsDeadlineAndPayment(t *testing.T) {
 	original := testRetryCall(t, ctx, descriptor, 1, "original")
 	retry := testRetryAttemptCall(t, ctx, descriptor, original, 2, "retry")
 	policy, err := NewServiceRetryPolicy(ServiceRetryPolicy{
-		MaxAttempts:      1,
-		MaxDeadlineDelta: 20,
-		PaymentPolicy:    RetryPaymentOriginalOnly,
+		MaxAttempts:		1,
+		MaxDeadlineDelta:	20,
+		PaymentPolicy:		RetryPaymentOriginalOnly,
 	})
 	require.NoError(t, err)
 
@@ -53,9 +53,9 @@ func TestServiceRetryCanChargeAttemptsWhenPolicyAllows(t *testing.T) {
 	original := testRetryCall(t, ctx, descriptor, 1, "original")
 	retry := testRetryAttemptCall(t, ctx, descriptor, original, 2, "retry")
 	policy, err := NewServiceRetryPolicy(ServiceRetryPolicy{
-		MaxAttempts:      2,
-		MaxDeadlineDelta: 20,
-		PaymentPolicy:    RetryPaymentChargeAttempts,
+		MaxAttempts:		2,
+		MaxDeadlineDelta:	20,
+		PaymentPolicy:		RetryPaymentChargeAttempts,
 	})
 	require.NoError(t, err)
 
@@ -104,9 +104,9 @@ func TestDeterministicReceiptRootsCommitAllReceiptClasses(t *testing.T) {
 	storage, err := NewReceiptCommitment("storage/"+mixed.CallID, testInterfaceHash("storage/receipt"))
 	require.NoError(t, err)
 	requirements := DeterministicReceiptRequirements{
-		OnChainCallIDs:         []string{onChain.CallID},
-		OffChainResultCallIDs:  []string{offChain.CallID},
-		MixedSettlementCallIDs: []string{mixed.CallID},
+		OnChainCallIDs:		[]string{onChain.CallID},
+		OffChainResultCallIDs:	[]string{offChain.CallID},
+		MixedSettlementCallIDs:	[]string{mixed.CallID},
 	}
 
 	roots, err := BuildDeterministicReceiptRoots(serviceReceipts, []ReceiptCommitment{payment}, []ReceiptCommitment{storage}, requirements)
@@ -150,11 +150,11 @@ func testRetryAttemptCall(t *testing.T, ctx coretypes.ServiceConsensusContext, d
 func testReceiptForCall(t *testing.T, ctx coretypes.ServiceConsensusContext, call UnifiedServiceCall, status coretypes.ServiceCallStatus) ServiceReceipt {
 	t.Helper()
 	outcome := coretypes.NormalizeServiceExecutionOutcome(ctx, coretypes.ServiceExecutionOutcome{
-		CallID:        call.CallID,
-		Status:        status,
-		ResponseHash:  testInterfaceHash(call.CallID + "/response"),
-		PaymentStatus: coretypes.ServicePaymentStatusSettled,
-		GasUsed:       1,
+		CallID:		call.CallID,
+		Status:		status,
+		ResponseHash:	testInterfaceHash(call.CallID + "/response"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	1,
 	})
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), outcome)
 	require.NoError(t, err)

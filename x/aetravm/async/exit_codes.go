@@ -3,10 +3,10 @@ package async
 import contractstypes "github.com/sovereign-l1/l1/x/contracts/types"
 
 type RuntimeExitCodeSpec struct {
-	Code                 uint32
-	Name                 string
-	ContractExitCode     uint32
-	ContractExitCodeName string
+	Code			uint32
+	Name			string
+	ContractExitCode	uint32
+	ContractExitCodeName	string
 }
 
 var runtimeExitCodes = []RuntimeExitCodeSpec{
@@ -79,7 +79,7 @@ func ContractExitCodeForRuntime(code uint32, failedPhase string) uint32 {
 	case ResultLimitExceeded:
 		switch failedPhase {
 		case FailedPhaseExecution:
-		return contractstypes.ExitCodeOutOfGas
+			return contractstypes.ExitCodeOutOfGas
 		case FailedPhaseStorage:
 			return contractstypes.ExitCodeStorageLimit
 		case FailedPhaseValidation:

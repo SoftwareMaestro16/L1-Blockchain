@@ -8,157 +8,157 @@ import (
 )
 
 const (
-	EconomicSecurityAlertReserveLow        = "security_reserve_below_minimum"
-	EconomicSecurityAlertConcentration     = "validator_concentration_above_threshold"
-	EconomicSecurityAlertTopNConcentration = "top_n_concentration_above_threshold"
-	EconomicSecurityAlertFeeInstability    = "fee_market_instability"
-	EconomicSecurityAlertStateGrowth       = "state_growth_abnormal"
-	EconomicSecurityAlertStakeMovement     = "stake_movement_abnormal"
-	EconomicSecurityAlertEvidenceDuplicate = "duplicate_evidence_rejected"
-	EconomicSecurityAlertCircuitBreaker    = "economic_circuit_breaker_active"
+	EconomicSecurityAlertReserveLow		= "security_reserve_below_minimum"
+	EconomicSecurityAlertConcentration	= "validator_concentration_above_threshold"
+	EconomicSecurityAlertTopNConcentration	= "top_n_concentration_above_threshold"
+	EconomicSecurityAlertFeeInstability	= "fee_market_instability"
+	EconomicSecurityAlertStateGrowth	= "state_growth_abnormal"
+	EconomicSecurityAlertStakeMovement	= "stake_movement_abnormal"
+	EconomicSecurityAlertEvidenceDuplicate	= "duplicate_evidence_rejected"
+	EconomicSecurityAlertCircuitBreaker	= "economic_circuit_breaker_active"
 
-	EconomicSecurityEventInvariantViolation = "economic_security_invariant_violation"
-	EconomicSecurityEventReserveFunding     = "economic_security_reserve_funding_request"
-	EconomicSecurityEventPenaltyRouting     = "economic_security_penalty_routing"
-	EconomicSecurityEventCircuitBreaker     = "economic_security_circuit_breaker"
-	EconomicSecurityEventAudit              = "economic_security_audit"
+	EconomicSecurityEventInvariantViolation	= "economic_security_invariant_violation"
+	EconomicSecurityEventReserveFunding	= "economic_security_reserve_funding_request"
+	EconomicSecurityEventPenaltyRouting	= "economic_security_penalty_routing"
+	EconomicSecurityEventCircuitBreaker	= "economic_security_circuit_breaker"
+	EconomicSecurityEventAudit		= "economic_security_audit"
 
-	EconomicSecuritySeverityInfo     = "info"
-	EconomicSecuritySeverityWarning  = "warning"
-	EconomicSecuritySeverityCritical = "critical"
+	EconomicSecuritySeverityInfo		= "info"
+	EconomicSecuritySeverityWarning		= "warning"
+	EconomicSecuritySeverityCritical	= "critical"
 
-	DefaultSecurityReserveMinimumNaet    = int64(1_000_000)
-	DefaultSecurityReserveTargetNaet     = int64(5_000_000)
-	DefaultSecurityReserveMaxRequestNaet = int64(10_000_000)
-	DefaultSecuritySlashingBurnRatioBps  = int64(2_000)
-	DefaultSecuritySlashingTreasuryBps   = int64(3_000)
-	DefaultSecurityReporterRewardCapNaet = int64(1_000)
-	DefaultSecurityGovernanceVersion     = "economic-security/v1"
+	DefaultSecurityReserveMinimumNaet	= int64(1_000_000)
+	DefaultSecurityReserveTargetNaet	= int64(5_000_000)
+	DefaultSecurityReserveMaxRequestNaet	= int64(10_000_000)
+	DefaultSecuritySlashingBurnRatioBps	= int64(2_000)
+	DefaultSecuritySlashingTreasuryBps	= int64(3_000)
+	DefaultSecurityReporterRewardCapNaet	= int64(1_000)
+	DefaultSecurityGovernanceVersion	= "economic-security/v1"
 )
 
 type EconomicSecurityParams struct {
-	MaxValidatorConcentrationBps int64
-	MaxTopNConcentrationBps      int64
-	MaxStateGrowthBytes          int64
-	MaxStakeMovementBps          int64
-	SecurityReserveMinimumNaet   sdkmath.Int
-	SecurityReserveTargetNaet    sdkmath.Int
-	MaxReserveFundingRequestNaet sdkmath.Int
-	SlashingBurnRatioBps         int64
-	SlashingTreasuryRatioBps     int64
-	ReporterRewardCapNaet        sdkmath.Int
-	GovernanceThresholdVersion   string
-	CircuitBreakerParams         EconomicCircuitBreakerParams
+	MaxValidatorConcentrationBps	int64
+	MaxTopNConcentrationBps		int64
+	MaxStateGrowthBytes		int64
+	MaxStakeMovementBps		int64
+	SecurityReserveMinimumNaet	sdkmath.Int
+	SecurityReserveTargetNaet	sdkmath.Int
+	MaxReserveFundingRequestNaet	sdkmath.Int
+	SlashingBurnRatioBps		int64
+	SlashingTreasuryRatioBps	int64
+	ReporterRewardCapNaet		sdkmath.Int
+	GovernanceThresholdVersion	string
+	CircuitBreakerParams		EconomicCircuitBreakerParams
 }
 
 type EconomicSecurityEpochInput struct {
-	EpochID                     uint64
-	BlockHeight                 uint64
-	SlashingPenaltyNaet         sdkmath.Int
-	EvidenceAccepted            bool
-	EvidenceDuplicate           bool
-	RequestedReporterRewardNaet sdkmath.Int
-	ValidatorConcentrationBps   int64
-	TopNConcentrationBps        int64
-	BlockLoadBps                int64
-	FeeSpikeBps                 int64
-	ControllerDriftBps          int64
-	FailedTxRateBps             int64
-	BurnToMintBps               int64
-	StateGrowthBytes            int64
-	StakeInflowBps              int64
-	StakeOutflowBps             int64
-	SecurityReserveBalanceNaet  sdkmath.Int
-	SecurityReserveInflowNaet   sdkmath.Int
-	SecurityReserveOutflowNaet  sdkmath.Int
-	GovernanceThresholdVersion  string
+	EpochID				uint64
+	BlockHeight			uint64
+	SlashingPenaltyNaet		sdkmath.Int
+	EvidenceAccepted		bool
+	EvidenceDuplicate		bool
+	RequestedReporterRewardNaet	sdkmath.Int
+	ValidatorConcentrationBps	int64
+	TopNConcentrationBps		int64
+	BlockLoadBps			int64
+	FeeSpikeBps			int64
+	ControllerDriftBps		int64
+	FailedTxRateBps			int64
+	BurnToMintBps			int64
+	StateGrowthBytes		int64
+	StakeInflowBps			int64
+	StakeOutflowBps			int64
+	SecurityReserveBalanceNaet	sdkmath.Int
+	SecurityReserveInflowNaet	sdkmath.Int
+	SecurityReserveOutflowNaet	sdkmath.Int
+	GovernanceThresholdVersion	string
 }
 
 type EconomicSecurityAlert struct {
-	Type           string
-	Severity       string
-	ObservedBps    int64
-	ThresholdBps   int64
-	ObservedBytes  int64
-	ThresholdBytes int64
-	AmountNaet     sdkmath.Int
-	Message        string
+	Type		string
+	Severity	string
+	ObservedBps	int64
+	ThresholdBps	int64
+	ObservedBytes	int64
+	ThresholdBytes	int64
+	AmountNaet	sdkmath.Int
+	Message		string
 }
 
 type PenaltyRoutingDecision struct {
-	PenaltyNaet        sdkmath.Int
-	BurnNaet           sdkmath.Int
-	TreasuryNaet       sdkmath.Int
-	ReporterRewardNaet sdkmath.Int
-	ValidatorPoolNaet  sdkmath.Int
-	EvidenceAccepted   bool
-	EvidenceDuplicate  bool
-	Routed             bool
+	PenaltyNaet		sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ValidatorPoolNaet	sdkmath.Int
+	EvidenceAccepted	bool
+	EvidenceDuplicate	bool
+	Routed			bool
 }
 
 type SecurityReserveAccounting struct {
-	StartingBalanceNaet sdkmath.Int
-	InflowNaet          sdkmath.Int
-	OutflowNaet         sdkmath.Int
-	EndingBalanceNaet   sdkmath.Int
-	MinimumBalanceNaet  sdkmath.Int
-	TargetBalanceNaet   sdkmath.Int
-	FundingRequestNaet  sdkmath.Int
-	Consistent          bool
+	StartingBalanceNaet	sdkmath.Int
+	InflowNaet		sdkmath.Int
+	OutflowNaet		sdkmath.Int
+	EndingBalanceNaet	sdkmath.Int
+	MinimumBalanceNaet	sdkmath.Int
+	TargetBalanceNaet	sdkmath.Int
+	FundingRequestNaet	sdkmath.Int
+	Consistent		bool
 }
 
 type EconomicSecurityIncidentEvent struct {
-	Type        string
-	EpochID     uint64
-	BlockHeight uint64
-	Severity    string
-	Reason      string
-	AmountNaet  sdkmath.Int
-	Reconciled  bool
+	Type		string
+	EpochID		uint64
+	BlockHeight	uint64
+	Severity	string
+	Reason		string
+	AmountNaet	sdkmath.Int
+	Reconciled	bool
 }
 
 type EconomicSecurityAuditLog struct {
-	EpochID       uint64
-	Action        string
-	Deterministic bool
-	Details       string
+	EpochID		uint64
+	Action		string
+	Deterministic	bool
+	Details		string
 }
 
 type EconomicSecurityGovernanceReport struct {
-	ThresholdVersion      string
-	Summary               string
-	ActiveRestrictions    []string
-	ReserveFundingRequest sdkmath.Int
-	AlertTypes            []string
+	ThresholdVersion	string
+	Summary			string
+	ActiveRestrictions	[]string
+	ReserveFundingRequest	sdkmath.Int
+	AlertTypes		[]string
 }
 
 type EconomicSecurityEpochReport struct {
-	EpochID           uint64
-	Alerts            []EconomicSecurityAlert
-	CircuitBreaker    EconomicCircuitBreakerOutput
-	PenaltyRouting    PenaltyRoutingDecision
-	ReserveAccounting SecurityReserveAccounting
-	InvariantEvents   []EconomicSecurityIncidentEvent
-	GovernanceReport  EconomicSecurityGovernanceReport
-	AuditLogs         []EconomicSecurityAuditLog
-	Passed            bool
-	Failed            []string
+	EpochID			uint64
+	Alerts			[]EconomicSecurityAlert
+	CircuitBreaker		EconomicCircuitBreakerOutput
+	PenaltyRouting		PenaltyRoutingDecision
+	ReserveAccounting	SecurityReserveAccounting
+	InvariantEvents		[]EconomicSecurityIncidentEvent
+	GovernanceReport	EconomicSecurityGovernanceReport
+	AuditLogs		[]EconomicSecurityAuditLog
+	Passed			bool
+	Failed			[]string
 }
 
 func DefaultEconomicSecurityParams() EconomicSecurityParams {
 	return EconomicSecurityParams{
-		MaxValidatorConcentrationBps: MaxTopValidatorConcentrationBps,
-		MaxTopNConcentrationBps:      DefaultTopNConcentrationThresholdBps,
-		MaxStateGrowthBytes:          DefaultStateGrowthSurchargeThresholdBytes,
-		MaxStakeMovementBps:          DefaultStakeMovementThresholdBps,
-		SecurityReserveMinimumNaet:   sdkmath.NewInt(DefaultSecurityReserveMinimumNaet),
-		SecurityReserveTargetNaet:    sdkmath.NewInt(DefaultSecurityReserveTargetNaet),
-		MaxReserveFundingRequestNaet: sdkmath.NewInt(DefaultSecurityReserveMaxRequestNaet),
-		SlashingBurnRatioBps:         DefaultSecuritySlashingBurnRatioBps,
-		SlashingTreasuryRatioBps:     DefaultSecuritySlashingTreasuryBps,
-		ReporterRewardCapNaet:        sdkmath.NewInt(DefaultSecurityReporterRewardCapNaet),
-		GovernanceThresholdVersion:   DefaultSecurityGovernanceVersion,
-		CircuitBreakerParams:         DefaultEconomicCircuitBreakerParams(),
+		MaxValidatorConcentrationBps:	MaxTopValidatorConcentrationBps,
+		MaxTopNConcentrationBps:	DefaultTopNConcentrationThresholdBps,
+		MaxStateGrowthBytes:		DefaultStateGrowthSurchargeThresholdBytes,
+		MaxStakeMovementBps:		DefaultStakeMovementThresholdBps,
+		SecurityReserveMinimumNaet:	sdkmath.NewInt(DefaultSecurityReserveMinimumNaet),
+		SecurityReserveTargetNaet:	sdkmath.NewInt(DefaultSecurityReserveTargetNaet),
+		MaxReserveFundingRequestNaet:	sdkmath.NewInt(DefaultSecurityReserveMaxRequestNaet),
+		SlashingBurnRatioBps:		DefaultSecuritySlashingBurnRatioBps,
+		SlashingTreasuryRatioBps:	DefaultSecuritySlashingTreasuryBps,
+		ReporterRewardCapNaet:		sdkmath.NewInt(DefaultSecurityReporterRewardCapNaet),
+		GovernanceThresholdVersion:	DefaultSecurityGovernanceVersion,
+		CircuitBreakerParams:		DefaultEconomicCircuitBreakerParams(),
 	}
 }
 
@@ -177,11 +177,11 @@ func EvaluateEconomicSecurityEpoch(input EconomicSecurityEpochInput, params Econ
 	}
 	reserve := accountSecurityReserve(input, params)
 	breaker, err := EvaluateEconomicCircuitBreaker(EconomicCircuitBreakerInput{
-		BlockLoadBps:       input.BlockLoadBps,
-		FeeSpikeBps:        input.FeeSpikeBps,
-		ControllerDriftBps: input.ControllerDriftBps,
-		FailedTxRateBps:    input.FailedTxRateBps,
-		BurnToMintBps:      input.BurnToMintBps,
+		BlockLoadBps:		input.BlockLoadBps,
+		FeeSpikeBps:		input.FeeSpikeBps,
+		ControllerDriftBps:	input.ControllerDriftBps,
+		FailedTxRateBps:	input.FailedTxRateBps,
+		BurnToMintBps:		input.BurnToMintBps,
 	}, params.CircuitBreakerParams)
 	if err != nil {
 		return EconomicSecurityEpochReport{}, err
@@ -194,16 +194,16 @@ func EvaluateEconomicSecurityEpoch(input EconomicSecurityEpochInput, params Econ
 	governance := economicSecurityGovernanceReport(input, params, alerts, reserve, breaker)
 
 	return EconomicSecurityEpochReport{
-		EpochID:           input.EpochID,
-		Alerts:            alerts,
-		CircuitBreaker:    breaker,
-		PenaltyRouting:    routing,
-		ReserveAccounting: reserve,
-		InvariantEvents:   events,
-		GovernanceReport:  governance,
-		AuditLogs:         auditLogs,
-		Passed:            len(failed) == 0,
-		Failed:            failed,
+		EpochID:		input.EpochID,
+		Alerts:			alerts,
+		CircuitBreaker:		breaker,
+		PenaltyRouting:		routing,
+		ReserveAccounting:	reserve,
+		InvariantEvents:	events,
+		GovernanceReport:	governance,
+		AuditLogs:		auditLogs,
+		Passed:			len(failed) == 0,
+		Failed:			failed,
 	}, nil
 }
 
@@ -221,8 +221,8 @@ func (p EconomicSecurityParams) Validate() error {
 		return err
 	}
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "security_reserve_minimum_naet", value: p.SecurityReserveMinimumNaet},
 		{name: "security_reserve_target_naet", value: p.SecurityReserveTargetNaet},
@@ -297,8 +297,8 @@ func (input EconomicSecurityEpochInput) Validate(params EconomicSecurityParams) 
 		return fmt.Errorf("epoch_id must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "slashing_penalty_naet", value: input.SlashingPenaltyNaet},
 		{name: "requested_reporter_reward_naet", value: input.RequestedReporterRewardNaet},
@@ -311,8 +311,8 @@ func (input EconomicSecurityEpochInput) Validate(params EconomicSecurityParams) 
 		}
 	}
 	for _, field := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "validator_concentration_bps", value: input.ValidatorConcentrationBps},
 		{name: "top_n_concentration_bps", value: input.TopNConcentrationBps},
@@ -345,9 +345,9 @@ func routeSecurityPenalty(input EconomicSecurityEpochInput, params EconomicSecur
 	penalty := normalizeInt(input.SlashingPenaltyNaet)
 	if !penalty.IsPositive() {
 		return PenaltyRoutingDecision{
-			PenaltyNaet:       sdkmath.ZeroInt(),
-			EvidenceAccepted:  input.EvidenceAccepted,
-			EvidenceDuplicate: input.EvidenceDuplicate,
+			PenaltyNaet:		sdkmath.ZeroInt(),
+			EvidenceAccepted:	input.EvidenceAccepted,
+			EvidenceDuplicate:	input.EvidenceDuplicate,
 		}, nil
 	}
 	reporterReward := sdkmath.ZeroInt()
@@ -360,23 +360,23 @@ func routeSecurityPenalty(input EconomicSecurityEpochInput, params EconomicSecur
 		reporterRatio = reporterReward.MulRaw(BasisPoints).Quo(penalty).Int64()
 	}
 	flow, err := ComputeSlashingEconomyFlow(SlashingEconomyFlowInput{
-		PenaltyNaet:       penalty,
-		BurnRatioBps:      params.SlashingBurnRatioBps,
-		TreasuryRatioBps:  params.SlashingTreasuryRatioBps,
-		ReporterRewardBps: reporterRatio,
+		PenaltyNaet:		penalty,
+		BurnRatioBps:		params.SlashingBurnRatioBps,
+		TreasuryRatioBps:	params.SlashingTreasuryRatioBps,
+		ReporterRewardBps:	reporterRatio,
 	})
 	if err != nil {
 		return PenaltyRoutingDecision{}, err
 	}
 	return PenaltyRoutingDecision{
-		PenaltyNaet:        flow.PenaltyNaet,
-		BurnNaet:           flow.BurnNaet,
-		TreasuryNaet:       flow.TreasuryNaet,
-		ReporterRewardNaet: flow.ReporterRewardNaet,
-		ValidatorPoolNaet:  flow.ValidatorPoolNaet,
-		EvidenceAccepted:   input.EvidenceAccepted,
-		EvidenceDuplicate:  input.EvidenceDuplicate,
-		Routed:             true,
+		PenaltyNaet:		flow.PenaltyNaet,
+		BurnNaet:		flow.BurnNaet,
+		TreasuryNaet:		flow.TreasuryNaet,
+		ReporterRewardNaet:	flow.ReporterRewardNaet,
+		ValidatorPoolNaet:	flow.ValidatorPoolNaet,
+		EvidenceAccepted:	input.EvidenceAccepted,
+		EvidenceDuplicate:	input.EvidenceDuplicate,
+		Routed:			true,
 	}, nil
 }
 
@@ -396,14 +396,14 @@ func accountSecurityReserve(input EconomicSecurityEpochInput, params EconomicSec
 		request = minInt(request, normalizeInt(params.MaxReserveFundingRequestNaet))
 	}
 	return SecurityReserveAccounting{
-		StartingBalanceNaet: starting,
-		InflowNaet:          inflow,
-		OutflowNaet:         outflow,
-		EndingBalanceNaet:   ending,
-		MinimumBalanceNaet:  minimum,
-		TargetBalanceNaet:   target,
-		FundingRequestNaet:  request,
-		Consistent:          !ending.IsNegative(),
+		StartingBalanceNaet:	starting,
+		InflowNaet:		inflow,
+		OutflowNaet:		outflow,
+		EndingBalanceNaet:	ending,
+		MinimumBalanceNaet:	minimum,
+		TargetBalanceNaet:	target,
+		FundingRequestNaet:	request,
+		Consistent:		!ending.IsNegative(),
 	}
 }
 
@@ -509,11 +509,11 @@ func economicSecurityGovernanceReport(input EconomicSecurityEpochInput, params E
 	sort.Strings(alertTypes)
 	sort.Strings(restrictions)
 	return EconomicSecurityGovernanceReport{
-		ThresholdVersion:      params.GovernanceThresholdVersion,
-		Summary:               fmt.Sprintf("epoch=%d alerts=%d circuit_breaker=%t reserve_request=%s", input.EpochID, len(alerts), breaker.Active, reserve.FundingRequestNaet.String()),
-		ActiveRestrictions:    restrictions,
-		ReserveFundingRequest: reserve.FundingRequestNaet,
-		AlertTypes:            alertTypes,
+		ThresholdVersion:	params.GovernanceThresholdVersion,
+		Summary:		fmt.Sprintf("epoch=%d alerts=%d circuit_breaker=%t reserve_request=%s", input.EpochID, len(alerts), breaker.Active, reserve.FundingRequestNaet.String()),
+		ActiveRestrictions:	restrictions,
+		ReserveFundingRequest:	reserve.FundingRequestNaet,
+		AlertTypes:		alertTypes,
 	}
 }
 

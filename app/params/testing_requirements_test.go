@@ -55,13 +55,13 @@ func TestTestingRequirementsTreatFeasibleOptionalAsRequiredToImplement(t *testin
 
 func TestFeatureTestingEvidenceRequiresTestsForCompletion(t *testing.T) {
 	evidence := FeatureTestingEvidence{
-		FeatureID:           "x/aetra-staking-policy",
-		ImplementationReady: true,
-		UnitTests:           true,
-		IntegrationTests:    true,
-		E2ELocalnetTests:    true,
-		AdversarialTests:    true,
-		PerformanceTests:    true,
+		FeatureID:		"x/aetra-staking-policy",
+		ImplementationReady:	true,
+		UnitTests:		true,
+		IntegrationTests:	true,
+		E2ELocalnetTests:	true,
+		AdversarialTests:	true,
+		PerformanceTests:	true,
 	}
 	require.NoError(t, ValidateFeatureTestingEvidence(evidence))
 
@@ -84,14 +84,14 @@ func TestFeatureTestingEvidenceRejectsMissingIdentityOrImplementation(t *testing
 
 func TestModuleProductionReadinessRequiresAcceptanceRule(t *testing.T) {
 	evidence := ModuleProductionReadinessEvidence{
-		ModuleName:             "x/aetra-staking-policy",
-		UnitTestsPass:          true,
-		IntegrationTestsPass:   true,
-		GenesisValidationTests: true,
-		ExportImportTests:      true,
-		DeterministicRestart:   true,
-		AdversarialTests:       true,
-		CriticalCISubset:       true,
+		ModuleName:		"x/aetra-staking-policy",
+		UnitTestsPass:		true,
+		IntegrationTestsPass:	true,
+		GenesisValidationTests:	true,
+		ExportImportTests:	true,
+		DeterministicRestart:	true,
+		AdversarialTests:	true,
+		CriticalCISubset:	true,
 	}
 	report := BuildModuleProductionReadinessReport(evidence)
 	require.True(t, report.Ready)
@@ -108,13 +108,13 @@ func TestModuleProductionReadinessRequiresAcceptanceRule(t *testing.T) {
 
 func TestModuleProductionReadinessRejectsMissingModuleNameAndCI(t *testing.T) {
 	evidence := ModuleProductionReadinessEvidence{
-		UnitTestsPass:          true,
-		IntegrationTestsPass:   true,
-		GenesisValidationTests: true,
-		ExportImportTests:      true,
-		DeterministicRestart:   true,
-		AdversarialTests:       true,
-		CriticalCISubset:       false,
+		UnitTestsPass:		true,
+		IntegrationTestsPass:	true,
+		GenesisValidationTests:	true,
+		ExportImportTests:	true,
+		DeterministicRestart:	true,
+		AdversarialTests:	true,
+		CriticalCISubset:	false,
 	}
 
 	report := BuildModuleProductionReadinessReport(evidence)

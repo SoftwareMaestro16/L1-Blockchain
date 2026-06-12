@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	IdentityNodeAPIProofPassthroughVersionV2 uint64 = 1
-	IdentityIndexerEventSchemaVersionV2      uint64 = 1
+	IdentityNodeAPIProofPassthroughVersionV2	uint64	= 1
+	IdentityIndexerEventSchemaVersionV2		uint64	= 1
 )
 
 type IdentityNodeAPIEndpointV2 string
@@ -19,193 +19,193 @@ type IdentityWalletSDKHelperNameV2 string
 type IdentityIndexerEventTypeV2 string
 
 const (
-	IdentityNodeAPIResolvePrimary         IdentityNodeAPIEndpointV2 = "ResolvePrimaryAddress"
-	IdentityNodeAPIResolveContractTarget  IdentityNodeAPIEndpointV2 = "ResolveContractTarget"
-	IdentityNodeAPIResolveServiceEndpoint IdentityNodeAPIEndpointV2 = "ResolveServiceEndpoint"
-	IdentityNodeAPIResolveInterface       IdentityNodeAPIEndpointV2 = "ResolveInterfaceDescriptor"
-	IdentityNodeAPIResolveRoutingMetadata IdentityNodeAPIEndpointV2 = "ResolveRoutingMetadata"
-	IdentityNodeAPIResolveReverse         IdentityNodeAPIEndpointV2 = "ResolveReverseRecord"
-	IdentityNodeAPIQueryDomainLifecycle   IdentityNodeAPIEndpointV2 = "QueryDomainLifecycleState"
-	IdentityNodeAPIQueryRegistrationPrice IdentityNodeAPIEndpointV2 = "QueryRegistrationPrice"
-	IdentityNodeAPIQueryRenewalPrice      IdentityNodeAPIEndpointV2 = "QueryRenewalPrice"
-	IdentityNodeAPIQueryDelegationAuth    IdentityNodeAPIEndpointV2 = "QueryDelegationAuthorization"
+	IdentityNodeAPIResolvePrimary		IdentityNodeAPIEndpointV2	= "ResolvePrimaryAddress"
+	IdentityNodeAPIResolveContractTarget	IdentityNodeAPIEndpointV2	= "ResolveContractTarget"
+	IdentityNodeAPIResolveServiceEndpoint	IdentityNodeAPIEndpointV2	= "ResolveServiceEndpoint"
+	IdentityNodeAPIResolveInterface		IdentityNodeAPIEndpointV2	= "ResolveInterfaceDescriptor"
+	IdentityNodeAPIResolveRoutingMetadata	IdentityNodeAPIEndpointV2	= "ResolveRoutingMetadata"
+	IdentityNodeAPIResolveReverse		IdentityNodeAPIEndpointV2	= "ResolveReverseRecord"
+	IdentityNodeAPIQueryDomainLifecycle	IdentityNodeAPIEndpointV2	= "QueryDomainLifecycleState"
+	IdentityNodeAPIQueryRegistrationPrice	IdentityNodeAPIEndpointV2	= "QueryRegistrationPrice"
+	IdentityNodeAPIQueryRenewalPrice	IdentityNodeAPIEndpointV2	= "QueryRenewalPrice"
+	IdentityNodeAPIQueryDelegationAuth	IdentityNodeAPIEndpointV2	= "QueryDelegationAuthorization"
 )
 
 const (
-	IdentityWalletSDKNormalizeName                 IdentityWalletSDKHelperNameV2 = "NormalizeName"
-	IdentityWalletSDKValidateName                  IdentityWalletSDKHelperNameV2 = "ValidateName"
-	IdentityWalletSDKResolvePrimaryVerified        IdentityWalletSDKHelperNameV2 = "ResolvePrimaryVerified"
-	IdentityWalletSDKResolveContractTargetVerified IdentityWalletSDKHelperNameV2 = "ResolveContractTargetVerified"
-	IdentityWalletSDKResolveServiceVerified        IdentityWalletSDKHelperNameV2 = "ResolveServiceVerified"
-	IdentityWalletSDKResolveInterfaceVerified      IdentityWalletSDKHelperNameV2 = "ResolveInterfaceVerified"
-	IdentityWalletSDKVerifyResolutionProof         IdentityWalletSDKHelperNameV2 = "VerifyResolutionProof"
-	IdentityWalletSDKBuildSendByNameTx             IdentityWalletSDKHelperNameV2 = "BuildSendByNameTx"
-	IdentityWalletSDKBuildInvokeByNameTx           IdentityWalletSDKHelperNameV2 = "BuildInvokeByNameTx"
-	IdentityWalletSDKRenderVerifiedInterface       IdentityWalletSDKHelperNameV2 = "RenderVerifiedInterface"
-	IdentityWalletSDKCheckReverseResolution        IdentityWalletSDKHelperNameV2 = "CheckReverseResolution"
+	IdentityWalletSDKNormalizeName			IdentityWalletSDKHelperNameV2	= "NormalizeName"
+	IdentityWalletSDKValidateName			IdentityWalletSDKHelperNameV2	= "ValidateName"
+	IdentityWalletSDKResolvePrimaryVerified		IdentityWalletSDKHelperNameV2	= "ResolvePrimaryVerified"
+	IdentityWalletSDKResolveContractTargetVerified	IdentityWalletSDKHelperNameV2	= "ResolveContractTargetVerified"
+	IdentityWalletSDKResolveServiceVerified		IdentityWalletSDKHelperNameV2	= "ResolveServiceVerified"
+	IdentityWalletSDKResolveInterfaceVerified	IdentityWalletSDKHelperNameV2	= "ResolveInterfaceVerified"
+	IdentityWalletSDKVerifyResolutionProof		IdentityWalletSDKHelperNameV2	= "VerifyResolutionProof"
+	IdentityWalletSDKBuildSendByNameTx		IdentityWalletSDKHelperNameV2	= "BuildSendByNameTx"
+	IdentityWalletSDKBuildInvokeByNameTx		IdentityWalletSDKHelperNameV2	= "BuildInvokeByNameTx"
+	IdentityWalletSDKRenderVerifiedInterface	IdentityWalletSDKHelperNameV2	= "RenderVerifiedInterface"
+	IdentityWalletSDKCheckReverseResolution		IdentityWalletSDKHelperNameV2	= "CheckReverseResolution"
 )
 
 const (
-	IdentityIndexerEventDomainV2     IdentityIndexerEventTypeV2 = "identity.domain"
-	IdentityIndexerEventOwnerV2      IdentityIndexerEventTypeV2 = "identity.owner"
-	IdentityIndexerEventResolverV2   IdentityIndexerEventTypeV2 = "identity.resolver"
-	IdentityIndexerEventExpiryV2     IdentityIndexerEventTypeV2 = "identity.expiry"
-	IdentityIndexerEventDelegationV2 IdentityIndexerEventTypeV2 = "identity.delegation"
-	IdentityIndexerEventReverseV2    IdentityIndexerEventTypeV2 = "identity.reverse"
+	IdentityIndexerEventDomainV2		IdentityIndexerEventTypeV2	= "identity.domain"
+	IdentityIndexerEventOwnerV2		IdentityIndexerEventTypeV2	= "identity.owner"
+	IdentityIndexerEventResolverV2		IdentityIndexerEventTypeV2	= "identity.resolver"
+	IdentityIndexerEventExpiryV2		IdentityIndexerEventTypeV2	= "identity.expiry"
+	IdentityIndexerEventDelegationV2	IdentityIndexerEventTypeV2	= "identity.delegation"
+	IdentityIndexerEventReverseV2		IdentityIndexerEventTypeV2	= "identity.reverse"
 )
 
 const (
-	IdentityIndexerAttrName          = "name"
-	IdentityIndexerAttrNameHash      = "name_hash"
-	IdentityIndexerAttrOwner         = "owner"
-	IdentityIndexerAttrResolver      = "resolver"
-	IdentityIndexerAttrExpiryHeight  = "expiry_height"
-	IdentityIndexerAttrRecordVersion = "record_version"
-	IdentityIndexerAttrDelegate      = "delegate"
-	IdentityIndexerAttrScope         = "scope"
-	IdentityIndexerAttrAddress       = "address"
-	IdentityIndexerAttrProofRef      = "proof_ref"
+	IdentityIndexerAttrName			= "name"
+	IdentityIndexerAttrNameHash		= "name_hash"
+	IdentityIndexerAttrOwner		= "owner"
+	IdentityIndexerAttrResolver		= "resolver"
+	IdentityIndexerAttrExpiryHeight		= "expiry_height"
+	IdentityIndexerAttrRecordVersion	= "record_version"
+	IdentityIndexerAttrDelegate		= "delegate"
+	IdentityIndexerAttrScope		= "scope"
+	IdentityIndexerAttrAddress		= "address"
+	IdentityIndexerAttrProofRef		= "proof_ref"
 )
 
 type IdentityAPIAndSDKRequirementsV2 struct {
-	NodeAPIEndpoints []IdentityNodeAPIEndpointV2
-	WalletSDKHelpers []IdentityWalletSDKHelperNameV2
-	IndexerSchemas   []IdentityIndexerEventSchemaV2
-	RequirementsHash string
+	NodeAPIEndpoints	[]IdentityNodeAPIEndpointV2
+	WalletSDKHelpers	[]IdentityWalletSDKHelperNameV2
+	IndexerSchemas		[]IdentityIndexerEventSchemaV2
+	RequirementsHash	string
 }
 
 type IdentityNodeAPIRequestV2 struct {
-	Name                 string
-	TargetKey            string
-	InterfaceID          string
-	ExpectedHash         string
-	Method               string
-	PayloadHash          string
-	Address              sdk.AccAddress
-	IncludeProof         bool
-	ChainID              string
-	AppHash              string
-	CurrentHeight        uint64
-	FreshnessThreshold   uint64
-	DurationBlocks       uint64
-	RenewalPeriods       uint32
-	DemandClass          IdentityDemandClassV2
-	Auction              bool
-	ResolverPayloadBytes uint64
-	SubdomainMode        IdentitySubdomainModeV2
-	Delegation           *DelegationRecordV2
-	DelegationAuth       PartialDelegationAuthorizationV2
-	AuthorizedAliasKeys  []string
+	Name			string
+	TargetKey		string
+	InterfaceID		string
+	ExpectedHash		string
+	Method			string
+	PayloadHash		string
+	Address			sdk.AccAddress
+	IncludeProof		bool
+	ChainID			string
+	AppHash			string
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
+	DurationBlocks		uint64
+	RenewalPeriods		uint32
+	DemandClass		IdentityDemandClassV2
+	Auction			bool
+	ResolverPayloadBytes	uint64
+	SubdomainMode		IdentitySubdomainModeV2
+	Delegation		*DelegationRecordV2
+	DelegationAuth		PartialDelegationAuthorizationV2
+	AuthorizedAliasKeys	[]string
 }
 
 type IdentityNodeAPIResponseV2 struct {
-	Endpoint             IdentityNodeAPIEndpointV2
-	QueryCode            IdentityQueryCodeV2
-	FailureCode          IdentityLightClientFailureCodeV2
-	Error                string
-	Height               uint64
-	RecordVersion        uint64
-	Address              sdk.AccAddress
-	ContractTarget       *ContractTargetV2
-	ServiceEndpoint      *ServiceEndpointV2
-	InterfaceDescriptor  *InterfaceDescriptorV2
-	RoutingMetadata      *RoutingMetadataV2
-	ReverseRecord        *ReverseResolutionRecordV2
-	Lifecycle            DomainLifecycleStatus
-	RegistrationPrice    *IdentityDomainPriceQuoteV2
-	RenewalPrice         *IdentityDomainPriceQuoteV2
-	DelegationAuthorized bool
-	Delegation           *DelegationRecordV2
-	ProofPassthrough     *IdentityProofPassthroughFormatV2
-	ResponseHash         string
+	Endpoint		IdentityNodeAPIEndpointV2
+	QueryCode		IdentityQueryCodeV2
+	FailureCode		IdentityLightClientFailureCodeV2
+	Error			string
+	Height			uint64
+	RecordVersion		uint64
+	Address			sdk.AccAddress
+	ContractTarget		*ContractTargetV2
+	ServiceEndpoint		*ServiceEndpointV2
+	InterfaceDescriptor	*InterfaceDescriptorV2
+	RoutingMetadata		*RoutingMetadataV2
+	ReverseRecord		*ReverseResolutionRecordV2
+	Lifecycle		DomainLifecycleStatus
+	RegistrationPrice	*IdentityDomainPriceQuoteV2
+	RenewalPrice		*IdentityDomainPriceQuoteV2
+	DelegationAuthorized	bool
+	Delegation		*DelegationRecordV2
+	ProofPassthrough	*IdentityProofPassthroughFormatV2
+	ResponseHash		string
 }
 
 type IdentityNodeAPIV2 struct {
-	query      IdentityQueryServiceV2
-	chainID    string
-	appHash    string
-	defaultTTL uint64
+	query		IdentityQueryServiceV2
+	chainID		string
+	appHash		string
+	defaultTTL	uint64
 }
 
 type IdentityProofPassthroughFormatV2 struct {
-	FormatVersion       uint64
-	ChainID             string
-	Height              uint64
-	AppHash             string
-	QueryType           IdentityProofQueryTypeV2
-	Name                string
-	TargetType          IdentityResolutionTargetTypeV2
-	TargetKey           string
-	RecordVersion       uint64
-	ProofCommitmentHash string
-	ProofReference      string
-	TrustlessMode       bool
-	Proof               *IdentityResolutionProofFormatV2
-	FormatHash          string
+	FormatVersion		uint64
+	ChainID			string
+	Height			uint64
+	AppHash			string
+	QueryType		IdentityProofQueryTypeV2
+	Name			string
+	TargetType		IdentityResolutionTargetTypeV2
+	TargetKey		string
+	RecordVersion		uint64
+	ProofCommitmentHash	string
+	ProofReference		string
+	TrustlessMode		bool
+	Proof			*IdentityResolutionProofFormatV2
+	FormatHash		string
 }
 
 type IdentityWalletSendByNameTxV2 struct {
-	Name          string
-	ToAddress     sdk.AccAddress
-	AmountDenom   string
-	Amount        string
-	Memo          string
-	ProofHeight   uint64
-	RecordVersion uint64
-	ProofVerified bool
-	BuildHash     string
+	Name		string
+	ToAddress	sdk.AccAddress
+	AmountDenom	string
+	Amount		string
+	Memo		string
+	ProofHeight	uint64
+	RecordVersion	uint64
+	ProofVerified	bool
+	BuildHash	string
 }
 
 type IdentityWalletInvokeByNameTxV2 struct {
-	Name            string
-	ContractAddress sdk.AccAddress
-	TargetID        string
-	Entrypoint      string
-	Method          string
-	PayloadHash     string
-	InterfaceID     string
-	InterfaceHash   string
-	ProofHeight     uint64
-	RecordVersion   uint64
-	ProofVerified   bool
-	BuildHash       string
+	Name		string
+	ContractAddress	sdk.AccAddress
+	TargetID	string
+	Entrypoint	string
+	Method		string
+	PayloadHash	string
+	InterfaceID	string
+	InterfaceHash	string
+	ProofHeight	uint64
+	RecordVersion	uint64
+	ProofVerified	bool
+	BuildHash	string
 }
 
 type IdentityIndexerEventSchemaV2 struct {
-	SchemaVersion          uint64
-	EventType              IdentityIndexerEventTypeV2
-	RequiredKeys           []string
-	MaintainsIndexes       []string
-	RequiresProofReference bool
-	ProofPassthroughFormat uint64
-	SchemaHash             string
+	SchemaVersion		uint64
+	EventType		IdentityIndexerEventTypeV2
+	RequiredKeys		[]string
+	MaintainsIndexes	[]string
+	RequiresProofReference	bool
+	ProofPassthroughFormat	uint64
+	SchemaHash		string
 }
 
 type IdentityIndexerEventV2 struct {
-	EventType        IdentityIndexerEventTypeV2
-	Height           uint64
-	Attributes       map[string]string
-	ProofPassthrough *IdentityProofPassthroughFormatV2
-	EventHash        string
+	EventType		IdentityIndexerEventTypeV2
+	Height			uint64
+	Attributes		map[string]string
+	ProofPassthrough	*IdentityProofPassthroughFormatV2
+	EventHash		string
 }
 
 type IdentityIndexerReplayResultV2 struct {
-	DomainIndex     map[string]string
-	OwnerIndex      map[string][]string
-	ResolverIndex   map[string][]string
-	ExpiryIndex     map[string][]string
-	DelegationIndex map[string][]string
-	ReverseIndex    map[string]string
-	ProofReferences map[string]string
-	EventsReplayed  uint64
-	ReplayHash      string
+	DomainIndex	map[string]string
+	OwnerIndex	map[string][]string
+	ResolverIndex	map[string][]string
+	ExpiryIndex	map[string][]string
+	DelegationIndex	map[string][]string
+	ReverseIndex	map[string]string
+	ProofReferences	map[string]string
+	EventsReplayed	uint64
+	ReplayHash	string
 }
 
 func DefaultIdentityAPIAndSDKRequirementsV2() (IdentityAPIAndSDKRequirementsV2, error) {
 	requirements := IdentityAPIAndSDKRequirementsV2{
-		NodeAPIEndpoints: requiredIdentityNodeAPIEndpointsV2(),
-		WalletSDKHelpers: requiredIdentityWalletSDKHelpersV2(),
-		IndexerSchemas:   DefaultIdentityIndexerEventSchemasV2(),
+		NodeAPIEndpoints:	requiredIdentityNodeAPIEndpointsV2(),
+		WalletSDKHelpers:	requiredIdentityWalletSDKHelpersV2(),
+		IndexerSchemas:		DefaultIdentityIndexerEventSchemasV2(),
 	}
 	requirements.RequirementsHash = ComputeIdentityAPIAndSDKRequirementsHashV2(requirements)
 	return requirements, ValidateIdentityAPIAndSDKRequirementsV2(requirements)
@@ -362,19 +362,19 @@ func (api IdentityNodeAPIV2) QueryDelegationAuthorization(request IdentityNodeAP
 
 func BuildIdentityProofPassthroughFormatV2(proof IdentityResolutionProofFormatV2, targetType IdentityResolutionTargetTypeV2, targetKey string, trustless bool, proofReference string) (IdentityProofPassthroughFormatV2, error) {
 	out := IdentityProofPassthroughFormatV2{
-		FormatVersion:       IdentityNodeAPIProofPassthroughVersionV2,
-		ChainID:             proof.ChainID,
-		Height:              proof.Height,
-		AppHash:             proof.AppHash,
-		QueryType:           proof.QueryType,
-		Name:                proof.Name,
-		TargetType:          targetType,
-		TargetKey:           targetKey,
-		RecordVersion:       proof.RecordVersion,
-		ProofCommitmentHash: proof.ProofCommitmentHash,
-		ProofReference:      proofReference,
-		TrustlessMode:       trustless,
-		Proof:               &proof,
+		FormatVersion:		IdentityNodeAPIProofPassthroughVersionV2,
+		ChainID:		proof.ChainID,
+		Height:			proof.Height,
+		AppHash:		proof.AppHash,
+		QueryType:		proof.QueryType,
+		Name:			proof.Name,
+		TargetType:		targetType,
+		TargetKey:		targetKey,
+		RecordVersion:		proof.RecordVersion,
+		ProofCommitmentHash:	proof.ProofCommitmentHash,
+		ProofReference:		proofReference,
+		TrustlessMode:		trustless,
+		Proof:			&proof,
 	}
 	out.FormatHash = ComputeIdentityProofPassthroughHashV2(out)
 	return out, ValidateIdentityProofPassthroughFormatV2(out)
@@ -507,14 +507,14 @@ func IdentityWalletSDKBuildSendByNameTxV2(result IdentitySendByNameResultV2, amo
 		return IdentityWalletSendByNameTxV2{}, errors.New("wallet sdk send-by-name tx amount is required")
 	}
 	tx := IdentityWalletSendByNameTxV2{
-		Name:          result.NormalizedName,
-		ToAddress:     cloneSpecAddress(result.Address),
-		AmountDenom:   amountDenom,
-		Amount:        amount,
-		Memo:          result.AuditMemo,
-		ProofHeight:   result.ProofHeight,
-		RecordVersion: result.RecordVersion,
-		ProofVerified: result.ProofVerified,
+		Name:		result.NormalizedName,
+		ToAddress:	cloneSpecAddress(result.Address),
+		AmountDenom:	amountDenom,
+		Amount:		amount,
+		Memo:		result.AuditMemo,
+		ProofHeight:	result.ProofHeight,
+		RecordVersion:	result.RecordVersion,
+		ProofVerified:	result.ProofVerified,
 	}
 	tx.BuildHash = ComputeIdentityWalletSendByNameTxHashV2(tx)
 	return tx, ValidateIdentityWalletSendByNameTxV2(tx)
@@ -528,17 +528,17 @@ func IdentityWalletSDKBuildInvokeByNameTxV2(result IdentityInvokeByNameResultV2)
 		return IdentityWalletInvokeByNameTxV2{}, errors.New("wallet sdk invoke-by-name tx requires verified interface descriptor")
 	}
 	tx := IdentityWalletInvokeByNameTxV2{
-		Name:            result.NormalizedName,
-		ContractAddress: cloneSpecAddress(result.ContractAddress),
-		TargetID:        result.TargetID,
-		Entrypoint:      result.Entrypoint,
-		Method:          result.Method,
-		PayloadHash:     result.PayloadHash,
-		InterfaceID:     result.InterfaceID,
-		InterfaceHash:   result.InterfaceHash,
-		ProofHeight:     result.ProofHeight,
-		RecordVersion:   result.RecordVersion,
-		ProofVerified:   result.ProofVerified,
+		Name:			result.NormalizedName,
+		ContractAddress:	cloneSpecAddress(result.ContractAddress),
+		TargetID:		result.TargetID,
+		Entrypoint:		result.Entrypoint,
+		Method:			result.Method,
+		PayloadHash:		result.PayloadHash,
+		InterfaceID:		result.InterfaceID,
+		InterfaceHash:		result.InterfaceHash,
+		ProofHeight:		result.ProofHeight,
+		RecordVersion:		result.RecordVersion,
+		ProofVerified:		result.ProofVerified,
 	}
 	tx.BuildHash = ComputeIdentityWalletInvokeByNameTxHashV2(tx)
 	return tx, ValidateIdentityWalletInvokeByNameTxV2(tx)
@@ -621,10 +621,10 @@ func DefaultIdentityIndexerEventSchemasV2() []IdentityIndexerEventSchemaV2 {
 
 func BuildIdentityIndexerEventV2(eventType IdentityIndexerEventTypeV2, height uint64, attributes map[string]string, proof *IdentityProofPassthroughFormatV2) (IdentityIndexerEventV2, error) {
 	event := IdentityIndexerEventV2{
-		EventType:        eventType,
-		Height:           height,
-		Attributes:       cloneStringMapV2(attributes),
-		ProofPassthrough: proof,
+		EventType:		eventType,
+		Height:			height,
+		Attributes:		cloneStringMapV2(attributes),
+		ProofPassthrough:	proof,
 	}
 	event.EventHash = ComputeIdentityIndexerEventHashV2(event)
 	return event, ValidateIdentityIndexerEventV2(event, DefaultIdentityIndexerEventSchemasV2())
@@ -689,13 +689,13 @@ func ReplayIdentityIndexerEventsV2(events []IdentityIndexerEventV2, schemas []Id
 		schemas = DefaultIdentityIndexerEventSchemasV2()
 	}
 	result := IdentityIndexerReplayResultV2{
-		DomainIndex:     map[string]string{},
-		OwnerIndex:      map[string][]string{},
-		ResolverIndex:   map[string][]string{},
-		ExpiryIndex:     map[string][]string{},
-		DelegationIndex: map[string][]string{},
-		ReverseIndex:    map[string]string{},
-		ProofReferences: map[string]string{},
+		DomainIndex:		map[string]string{},
+		OwnerIndex:		map[string][]string{},
+		ResolverIndex:		map[string][]string{},
+		ExpiryIndex:		map[string][]string{},
+		DelegationIndex:	map[string][]string{},
+		ReverseIndex:		map[string]string{},
+		ProofReferences:	map[string]string{},
 	}
 	var lastHeight uint64
 	for _, event := range events {
@@ -832,12 +832,12 @@ func (api IdentityNodeAPIV2) attachProof(resp *IdentityNodeAPIResponseV2, reques
 
 func identityNodeAPIResponseFromQueryV2(endpoint IdentityNodeAPIEndpointV2, queryResp IdentityQueryResponseV2) IdentityNodeAPIResponseV2 {
 	return IdentityNodeAPIResponseV2{
-		Endpoint:      endpoint,
-		QueryCode:     queryResp.Code,
-		FailureCode:   queryResp.FailureCode,
-		Error:         queryResp.Error,
-		Height:        queryResp.Height,
-		RecordVersion: queryResp.RecordVersion,
+		Endpoint:	endpoint,
+		QueryCode:	queryResp.Code,
+		FailureCode:	queryResp.FailureCode,
+		Error:		queryResp.Error,
+		Height:		queryResp.Height,
+		RecordVersion:	queryResp.RecordVersion,
 	}
 }
 
@@ -871,12 +871,12 @@ func ComputeIdentityNodeAPIResponseHashV2(resp IdentityNodeAPIResponseV2) string
 
 func newIdentityIndexerEventSchemaV2(eventType IdentityIndexerEventTypeV2, required []string, indexes []string) IdentityIndexerEventSchemaV2 {
 	schema := IdentityIndexerEventSchemaV2{
-		SchemaVersion:          IdentityIndexerEventSchemaVersionV2,
-		EventType:              eventType,
-		RequiredKeys:           sortedBreakdownStringsV2(required),
-		MaintainsIndexes:       sortedBreakdownStringsV2(indexes),
-		RequiresProofReference: true,
-		ProofPassthroughFormat: IdentityNodeAPIProofPassthroughVersionV2,
+		SchemaVersion:		IdentityIndexerEventSchemaVersionV2,
+		EventType:		eventType,
+		RequiredKeys:		sortedBreakdownStringsV2(required),
+		MaintainsIndexes:	sortedBreakdownStringsV2(indexes),
+		RequiresProofReference:	true,
+		ProofPassthroughFormat:	IdentityNodeAPIProofPassthroughVersionV2,
 	}
 	schema.SchemaHash = ComputeIdentityIndexerEventSchemaHashV2(schema)
 	return schema

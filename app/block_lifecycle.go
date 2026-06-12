@@ -8,7 +8,7 @@ import (
 	"github.com/sovereign-l1/l1/app/lifecycle"
 )
 
-func (app *L1App) Name() string { return app.BaseApp.Name() }
+func (app *L1App) Name() string	{ return app.BaseApp.Name() }
 
 func (app *L1App) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
 	return app.ModuleManager.PreBlock(ctx)
@@ -46,12 +46,12 @@ func (a *L1App) Configurator() module.Configurator {
 
 func (app *L1App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
 	return lifecycle.InitChain(ctx, req, lifecycle.InitChainDependencies{
-		AppCodec:      app.appCodec,
-		ModuleManager: app.ModuleManager,
+		AppCodec:	app.appCodec,
+		ModuleManager:	app.ModuleManager,
 		SetModuleVersionMap: func(ctx sdk.Context, versionMap module.VersionMap) error {
 			return app.UpgradeKeeper.SetModuleVersionMap(ctx, versionMap)
 		},
-		ValidateGenesis:              app.validateAetraGenesis,
-		EnsureCoreGenesisCollections: app.ensureCoreGenesisCollections,
+		ValidateGenesis:		app.validateAetraGenesis,
+		EnsureCoreGenesisCollections:	app.ensureCoreGenesisCollections,
 	})
 }

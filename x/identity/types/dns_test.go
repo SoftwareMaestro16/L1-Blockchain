@@ -11,13 +11,13 @@ func TestIdentityDNSPatchPreservesAndDeletesRecords(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 
 	state, record, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:      addr(2),
-		Contract:     addr(3),
-		ZoneEndpoint: "contract-zone/0:1",
+		Primary:	addr(2),
+		Contract:	addr(3),
+		ZoneEndpoint:	"contract-zone/0:1",
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(4),
 		},
-		Metadata: []byte("profile-v1"),
+		Metadata:	[]byte("profile-v1"),
 	}, 12)
 	require.NoError(t, err)
 	require.Equal(t, addr(2), record.Primary)
@@ -28,9 +28,9 @@ func TestIdentityDNSPatchPreservesAndDeletesRecords(t *testing.T) {
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyDEX: addr(5),
 		},
-		DeleteRecords:     []string{ResolverKeyWallet},
-		ClearMetadata:     true,
-		ClearZoneEndpoint: true,
+		DeleteRecords:		[]string{ResolverKeyWallet},
+		ClearMetadata:		true,
+		ClearZoneEndpoint:	true,
 	}, 13)
 	require.NoError(t, err)
 	require.Equal(t, addr(2), record.Primary)
@@ -46,9 +46,9 @@ func TestIdentityDNSRecursiveResolutionForUnregisteredSubdomain(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 
 	state, record, err := PatchIdentityResolver(state, "api.dex.alice.aet", addr(1), ResolverPatch{
-		Primary:      addr(2),
-		Contract:     addr(3),
-		ZoneEndpoint: "contract-zone/0:1",
+		Primary:	addr(2),
+		Contract:	addr(3),
+		ZoneEndpoint:	"contract-zone/0:1",
 	}, 12)
 	require.NoError(t, err)
 	require.Equal(t, "api.dex.alice.aet", record.Domain)
@@ -108,10 +108,10 @@ func TestIdentityDNSTransferUpdatesSubtreeResolverOwnership(t *testing.T) {
 func TestIdentityDNSValidateRejectsResolverOwnerMismatch(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	state.Resolvers = append(state.Resolvers, ResolverRecord{
-		Domain:        "alice.aet",
-		Owner:         addr(9),
-		Primary:       addr(2),
-		UpdatedAtUnix: 12,
+		Domain:		"alice.aet",
+		Owner:		addr(9),
+		Primary:	addr(2),
+		UpdatedAtUnix:	12,
 	})
 
 	require.ErrorContains(t, state.Validate(), "resolver owner must match registry owner")

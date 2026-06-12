@@ -12,71 +12,71 @@ import (
 )
 
 const (
-	NativeDenom                   = "naet"
-	CanonicalEncodingVersion      = byte(1)
-	CurrentAppVersion             = uint32(1)
-	CurrentStateVersion           = uint32(1)
-	SignatureSchemeEd25519        = "ed25519-aetra-v1"
-	SignatureObjectState          = "channel_state"
-	SignatureObjectClaim          = "unidirectional_claim"
-	SignatureObjectDelta          = "async_delta"
-	SignatureObjectPromise        = "conditional_promise"
-	SignatureObjectGossip         = "payment_gossip"
-	SignatureObjectLiquidity      = "liquidity_reservation"
-	SignatureObjectRoutingFee     = "routing_fee_policy"
-	SignatureObjectVirtual        = "virtual_channel"
-	SignatureObjectVirtualReserve = "virtual_reservation"
-	SignatureObjectVirtualClose   = "virtual_close"
-	DefaultDisputePeriod          = uint64(16)
-	DefaultOpeningFee             = "1"
-	MaxDisputeExtensions          = uint32(2)
-	MinCloseDelay                 = uint64(1)
-	MaxCloseDelay                 = uint64(10_000)
-	MinChallengePeriod            = uint64(1)
-	MaxChallengePeriod            = uint64(20_000)
-	MaxParticipants               = 8
-	MaxConditionsPerState         = 128
-	MaxParentChannels             = 16
-	MaxSettlementBatchOps         = 256
-	MaxRoutingHops                = 16
-	MaxTokenLength                = 128
-	MaxSettlementFeeFraction      = int64(10_000)
-	MaxPenaltyRouteBps            = uint32(10_000)
-	DefaultGossipTTL              = uint64(512)
-	InvalidGossipPenalty          = int64(25)
-	DefaultTimeoutMargin          = uint64(16)
-	DefaultReplayHorizon          = uint64(100_000)
-	SignerIsolationProcess        = "process"
-	SignerIsolationHardware       = "hardware"
+	NativeDenom			= "naet"
+	CanonicalEncodingVersion	= byte(1)
+	CurrentAppVersion		= uint32(1)
+	CurrentStateVersion		= uint32(1)
+	SignatureSchemeEd25519		= "ed25519-aetra-v1"
+	SignatureObjectState		= "channel_state"
+	SignatureObjectClaim		= "unidirectional_claim"
+	SignatureObjectDelta		= "async_delta"
+	SignatureObjectPromise		= "conditional_promise"
+	SignatureObjectGossip		= "payment_gossip"
+	SignatureObjectLiquidity	= "liquidity_reservation"
+	SignatureObjectRoutingFee	= "routing_fee_policy"
+	SignatureObjectVirtual		= "virtual_channel"
+	SignatureObjectVirtualReserve	= "virtual_reservation"
+	SignatureObjectVirtualClose	= "virtual_close"
+	DefaultDisputePeriod		= uint64(16)
+	DefaultOpeningFee		= "1"
+	MaxDisputeExtensions		= uint32(2)
+	MinCloseDelay			= uint64(1)
+	MaxCloseDelay			= uint64(10_000)
+	MinChallengePeriod		= uint64(1)
+	MaxChallengePeriod		= uint64(20_000)
+	MaxParticipants			= 8
+	MaxConditionsPerState		= 128
+	MaxParentChannels		= 16
+	MaxSettlementBatchOps		= 256
+	MaxRoutingHops			= 16
+	MaxTokenLength			= 128
+	MaxSettlementFeeFraction	= int64(10_000)
+	MaxPenaltyRouteBps		= uint32(10_000)
+	DefaultGossipTTL		= uint64(512)
+	InvalidGossipPenalty		= int64(25)
+	DefaultTimeoutMargin		= uint64(16)
+	DefaultReplayHorizon		= uint64(100_000)
+	SignerIsolationProcess		= "process"
+	SignerIsolationHardware		= "hardware"
 )
 
 type ChannelType string
 
 const (
-	ChannelTypeBidirectional  ChannelType = "BIDIRECTIONAL"
-	ChannelTypeUnidirectional ChannelType = "UNIDIRECTIONAL"
-	ChannelTypeAsync          ChannelType = "ASYNC"
+	ChannelTypeBidirectional	ChannelType	= "BIDIRECTIONAL"
+	ChannelTypeUnidirectional	ChannelType	= "UNIDIRECTIONAL"
+	ChannelTypeAsync		ChannelType	= "ASYNC"
 )
 
 type ChannelStatus string
 
 const (
-	ChannelStatusOpen         ChannelStatus = "OPEN"
-	ChannelStatusPendingClose ChannelStatus = "PENDING_CLOSE"
-	ChannelStatusSettled      ChannelStatus = "SETTLED"
+	ChannelStatusOpen		ChannelStatus	= "OPEN"
+	ChannelStatusPendingClose	ChannelStatus	= "PENDING_CLOSE"
+	ChannelStatusSettled		ChannelStatus	= "SETTLED"
 )
 
 type ChannelFinality string
 
 const (
-	ChannelFinalityOpen                       ChannelFinality = "OPEN"
-	ChannelFinalityPendingClose               ChannelFinality = "PENDING_CLOSE"
-	ChannelFinalityInDispute                  ChannelFinality = "IN_DISPUTE"
-	ChannelFinalityPendingConditionResolution ChannelFinality = "PENDING_CONDITION_RESOLUTION"
-	ChannelFinalityFinalizable                ChannelFinality = "FINALIZABLE"
-	ChannelFinalitySettled                    ChannelFinality = "SETTLED"
-	ChannelFinalityPenalized                  ChannelFinality = "PENALIZED"
-	ChannelFinalityExpired                    ChannelFinality = "EXPIRED"
+	ChannelFinalityOpen				ChannelFinality	= "OPEN"
+	ChannelFinalityPendingClose			ChannelFinality	= "PENDING_CLOSE"
+	ChannelFinalityInDispute			ChannelFinality	= "IN_DISPUTE"
+	ChannelFinalityPendingConditionResolution	ChannelFinality	= "PENDING_CONDITION_RESOLUTION"
+	ChannelFinalityFinalizable			ChannelFinality	= "FINALIZABLE"
+	ChannelFinalitySettled				ChannelFinality	= "SETTLED"
+	ChannelFinalityPenalized			ChannelFinality	= "PENALIZED"
+	ChannelFinalityExpired				ChannelFinality	= "EXPIRED"
 )
 
 func CanonicalStateRequiredFields() []string {
@@ -108,218 +108,218 @@ func CanonicalStateRequiredFields() []string {
 type ConditionType string
 
 const (
-	ConditionTypeHashLock ConditionType = "HASH_LOCK"
-	ConditionTypeTimeLock ConditionType = "TIME_LOCK"
+	ConditionTypeHashLock	ConditionType	= "HASH_LOCK"
+	ConditionTypeTimeLock	ConditionType	= "TIME_LOCK"
 )
 
 type FraudProofType string
 
 const (
-	FraudProofTypeDoubleSign        FraudProofType = "DOUBLE_SIGN"
-	FraudProofTypeStaleClose        FraudProofType = "STALE_CLOSE"
-	FraudProofTypeInvalidClose      FraudProofType = "INVALID_CLOSE"
-	FraudProofTypeInvalidBalance    FraudProofType = "INVALID_BALANCE"
-	FraudProofTypeInvalidCondition  FraudProofType = "INVALID_CONDITION"
-	FraudProofTypeReplayAttempt     FraudProofType = "REPLAY_ATTEMPT"
-	FraudProofTypeAsyncOverexposure FraudProofType = "ASYNC_OVEREXPOSURE"
+	FraudProofTypeDoubleSign	FraudProofType	= "DOUBLE_SIGN"
+	FraudProofTypeStaleClose	FraudProofType	= "STALE_CLOSE"
+	FraudProofTypeInvalidClose	FraudProofType	= "INVALID_CLOSE"
+	FraudProofTypeInvalidBalance	FraudProofType	= "INVALID_BALANCE"
+	FraudProofTypeInvalidCondition	FraudProofType	= "INVALID_CONDITION"
+	FraudProofTypeReplayAttempt	FraudProofType	= "REPLAY_ATTEMPT"
+	FraudProofTypeAsyncOverexposure	FraudProofType	= "ASYNC_OVEREXPOSURE"
 )
 
 type BatchOperationType string
 
 const (
-	BatchOperationOpen    BatchOperationType = "OPEN"
-	BatchOperationClose   BatchOperationType = "CLOSE"
-	BatchOperationDispute BatchOperationType = "DISPUTE"
-	BatchOperationSettle  BatchOperationType = "SETTLE"
+	BatchOperationOpen	BatchOperationType	= "OPEN"
+	BatchOperationClose	BatchOperationType	= "CLOSE"
+	BatchOperationDispute	BatchOperationType	= "DISPUTE"
+	BatchOperationSettle	BatchOperationType	= "SETTLE"
 )
 
 type BlockSTMTransactionClass string
 
 const (
-	BlockSTMClassOpenChannel       BlockSTMTransactionClass = "OPEN_CHANNEL"
-	BlockSTMClassUpdateCheckpoint  BlockSTMTransactionClass = "UPDATE_CHECKPOINT"
-	BlockSTMClassCloseChannel      BlockSTMTransactionClass = "CLOSE_CHANNEL"
-	BlockSTMClassDisputeChannel    BlockSTMTransactionClass = "DISPUTE_CHANNEL"
-	BlockSTMClassSettleChannel     BlockSTMTransactionClass = "SETTLE_CHANNEL"
-	BlockSTMClassResolveCondition  BlockSTMTransactionClass = "RESOLVE_CONDITION"
-	BlockSTMClassBatchConditions   BlockSTMTransactionClass = "BATCH_CONDITIONS"
-	BlockSTMClassPenaltyAccounting BlockSTMTransactionClass = "PENALTY_ACCOUNTING"
+	BlockSTMClassOpenChannel	BlockSTMTransactionClass	= "OPEN_CHANNEL"
+	BlockSTMClassUpdateCheckpoint	BlockSTMTransactionClass	= "UPDATE_CHECKPOINT"
+	BlockSTMClassCloseChannel	BlockSTMTransactionClass	= "CLOSE_CHANNEL"
+	BlockSTMClassDisputeChannel	BlockSTMTransactionClass	= "DISPUTE_CHANNEL"
+	BlockSTMClassSettleChannel	BlockSTMTransactionClass	= "SETTLE_CHANNEL"
+	BlockSTMClassResolveCondition	BlockSTMTransactionClass	= "RESOLVE_CONDITION"
+	BlockSTMClassBatchConditions	BlockSTMTransactionClass	= "BATCH_CONDITIONS"
+	BlockSTMClassPenaltyAccounting	BlockSTMTransactionClass	= "PENALTY_ACCOUNTING"
 )
 
 type CloseReason string
 
 const (
-	CloseReasonUnilateral  CloseReason = "UNILATERAL"
-	CloseReasonCooperative CloseReason = "COOPERATIVE"
-	CloseReasonTimeout     CloseReason = "TIMEOUT"
-	CloseReasonFraud       CloseReason = "FRAUD"
+	CloseReasonUnilateral	CloseReason	= "UNILATERAL"
+	CloseReasonCooperative	CloseReason	= "COOPERATIVE"
+	CloseReasonTimeout	CloseReason	= "TIMEOUT"
+	CloseReasonFraud	CloseReason	= "FRAUD"
 )
 
 type SettlementArbitrationOperation string
 
 const (
-	SettlementArbitrationOpen                SettlementArbitrationOperation = "OPEN"
-	SettlementArbitrationCollateralCustody   SettlementArbitrationOperation = "COLLATERAL_CUSTODY"
-	SettlementArbitrationCooperativeClose    SettlementArbitrationOperation = "COOPERATIVE_CLOSE"
-	SettlementArbitrationUnilateralClose     SettlementArbitrationOperation = "UNILATERAL_CLOSE"
-	SettlementArbitrationDispute             SettlementArbitrationOperation = "DISPUTE"
-	SettlementArbitrationFraudProof          SettlementArbitrationOperation = "FRAUD_PROOF"
-	SettlementArbitrationConditionResolution SettlementArbitrationOperation = "CONDITION_RESOLUTION"
-	SettlementArbitrationPenaltyRouting      SettlementArbitrationOperation = "PENALTY_ROUTING"
-	SettlementArbitrationFinalSettlement     SettlementArbitrationOperation = "FINAL_SETTLEMENT"
-	SettlementArbitrationReplayProtection    SettlementArbitrationOperation = "REPLAY_PROTECTION"
+	SettlementArbitrationOpen			SettlementArbitrationOperation	= "OPEN"
+	SettlementArbitrationCollateralCustody		SettlementArbitrationOperation	= "COLLATERAL_CUSTODY"
+	SettlementArbitrationCooperativeClose		SettlementArbitrationOperation	= "COOPERATIVE_CLOSE"
+	SettlementArbitrationUnilateralClose		SettlementArbitrationOperation	= "UNILATERAL_CLOSE"
+	SettlementArbitrationDispute			SettlementArbitrationOperation	= "DISPUTE"
+	SettlementArbitrationFraudProof			SettlementArbitrationOperation	= "FRAUD_PROOF"
+	SettlementArbitrationConditionResolution	SettlementArbitrationOperation	= "CONDITION_RESOLUTION"
+	SettlementArbitrationPenaltyRouting		SettlementArbitrationOperation	= "PENALTY_ROUTING"
+	SettlementArbitrationFinalSettlement		SettlementArbitrationOperation	= "FINAL_SETTLEMENT"
+	SettlementArbitrationReplayProtection		SettlementArbitrationOperation	= "REPLAY_PROTECTION"
 )
 
 type ConditionSettlementMode string
 
 const (
-	ConditionSettlementModePreimage ConditionSettlementMode = "PREIMAGE"
-	ConditionSettlementModeExpiry   ConditionSettlementMode = "EXPIRY"
+	ConditionSettlementModePreimage	ConditionSettlementMode	= "PREIMAGE"
+	ConditionSettlementModeExpiry	ConditionSettlementMode	= "EXPIRY"
 )
 
 type GossipMessageType string
 
 const (
-	GossipChannelAnnouncement GossipMessageType = "ChannelAnnouncement"
-	GossipChannelUpdate       GossipMessageType = "ChannelUpdate"
-	GossipLiquidityHint       GossipMessageType = "LiquidityHint"
-	GossipFeePolicyUpdate     GossipMessageType = "FeePolicyUpdate"
-	GossipNodeAnnouncement    GossipMessageType = "NodeAnnouncement"
-	GossipRouteFailure        GossipMessageType = "RouteFailure"
-	GossipCapacityProbe       GossipMessageType = "CapacityProbe"
+	GossipChannelAnnouncement	GossipMessageType	= "ChannelAnnouncement"
+	GossipChannelUpdate		GossipMessageType	= "ChannelUpdate"
+	GossipLiquidityHint		GossipMessageType	= "LiquidityHint"
+	GossipFeePolicyUpdate		GossipMessageType	= "FeePolicyUpdate"
+	GossipNodeAnnouncement		GossipMessageType	= "NodeAnnouncement"
+	GossipRouteFailure		GossipMessageType	= "RouteFailure"
+	GossipCapacityProbe		GossipMessageType	= "CapacityProbe"
 )
 
 type VirtualChannelStatus string
 
 const (
-	VirtualChannelStatusOpen    VirtualChannelStatus = "OPEN"
-	VirtualChannelStatusSettled VirtualChannelStatus = "SETTLED"
+	VirtualChannelStatusOpen	VirtualChannelStatus	= "OPEN"
+	VirtualChannelStatusSettled	VirtualChannelStatus	= "SETTLED"
 )
 
 type VirtualCloseMode string
 
 const (
-	VirtualCloseModeCooperative      VirtualCloseMode = "COOPERATIVE_ENDPOINT"
-	VirtualCloseModeExpired          VirtualCloseMode = "EXPIRED"
-	VirtualCloseModeIntermediaryRisk VirtualCloseMode = "INTERMEDIARY_RISK"
-	VirtualCloseModeDisputed         VirtualCloseMode = "DISPUTED"
+	VirtualCloseModeCooperative		VirtualCloseMode	= "COOPERATIVE_ENDPOINT"
+	VirtualCloseModeExpired			VirtualCloseMode	= "EXPIRED"
+	VirtualCloseModeIntermediaryRisk	VirtualCloseMode	= "INTERMEDIARY_RISK"
+	VirtualCloseModeDisputed		VirtualCloseMode	= "DISPUTED"
 )
 
 type PenaltyRoute string
 
 const (
-	PenaltyRouteReporter        PenaltyRoute = "REPORTER"
-	PenaltyRouteCounterparty    PenaltyRoute = "COUNTERPARTY"
-	PenaltyRouteBurn            PenaltyRoute = "BURN"
-	PenaltyRouteSecurityReserve PenaltyRoute = "SECURITY_RESERVE"
-	PenaltyRouteCommunityPool   PenaltyRoute = "COMMUNITY_POOL"
+	PenaltyRouteReporter		PenaltyRoute	= "REPORTER"
+	PenaltyRouteCounterparty	PenaltyRoute	= "COUNTERPARTY"
+	PenaltyRouteBurn		PenaltyRoute	= "BURN"
+	PenaltyRouteSecurityReserve	PenaltyRoute	= "SECURITY_RESERVE"
+	PenaltyRouteCommunityPool	PenaltyRoute	= "COMMUNITY_POOL"
 )
 
 type PaymentPenaltyClass string
 
 const (
-	PenaltyClassInvalidClose      PaymentPenaltyClass = "INVALID_CLOSE_SUBMISSION"
-	PenaltyClassStaleClose        PaymentPenaltyClass = "STALE_CLOSE"
-	PenaltyClassDoubleSign        PaymentPenaltyClass = "SAME_NONCE_DOUBLE_SIGN"
-	PenaltyClassInvalidCondition  PaymentPenaltyClass = "INVALID_CONDITION_CLAIM"
-	PenaltyClassReplayAttempt     PaymentPenaltyClass = "REPLAY_ATTEMPT"
-	PenaltyClassAsyncOverexposure PaymentPenaltyClass = "ASYNC_OVEREXPOSURE"
-	PenaltyClassInvalidFraudProof PaymentPenaltyClass = "INVALID_FRAUD_PROOF"
+	PenaltyClassInvalidClose	PaymentPenaltyClass	= "INVALID_CLOSE_SUBMISSION"
+	PenaltyClassStaleClose		PaymentPenaltyClass	= "STALE_CLOSE"
+	PenaltyClassDoubleSign		PaymentPenaltyClass	= "SAME_NONCE_DOUBLE_SIGN"
+	PenaltyClassInvalidCondition	PaymentPenaltyClass	= "INVALID_CONDITION_CLAIM"
+	PenaltyClassReplayAttempt	PaymentPenaltyClass	= "REPLAY_ATTEMPT"
+	PenaltyClassAsyncOverexposure	PaymentPenaltyClass	= "ASYNC_OVEREXPOSURE"
+	PenaltyClassInvalidFraudProof	PaymentPenaltyClass	= "INVALID_FRAUD_PROOF"
 )
 
 type PaymentFeeClass string
 
 const (
-	PaymentFeeClassChannelOpen                  PaymentFeeClass = "CHANNEL_OPEN"
-	PaymentFeeClassChannelCheckpoint            PaymentFeeClass = "CHANNEL_CHECKPOINT"
-	PaymentFeeClassCooperativeClose             PaymentFeeClass = "COOPERATIVE_CLOSE"
-	PaymentFeeClassUnilateralClose              PaymentFeeClass = "UNILATERAL_CLOSE"
-	PaymentFeeClassDispute                      PaymentFeeClass = "DISPUTE"
-	PaymentFeeClassFraudProofVerification       PaymentFeeClass = "FRAUD_PROOF_VERIFICATION"
-	PaymentFeeClassConditionalPromiseSettlement PaymentFeeClass = "CONDITIONAL_PROMISE_SETTLEMENT"
-	PaymentFeeClassVirtualChannelAnchor         PaymentFeeClass = "VIRTUAL_CHANNEL_ANCHOR"
-	PaymentFeeClassRoutingAdvertisement         PaymentFeeClass = "ROUTING_ADVERTISEMENT"
+	PaymentFeeClassChannelOpen			PaymentFeeClass	= "CHANNEL_OPEN"
+	PaymentFeeClassChannelCheckpoint		PaymentFeeClass	= "CHANNEL_CHECKPOINT"
+	PaymentFeeClassCooperativeClose			PaymentFeeClass	= "COOPERATIVE_CLOSE"
+	PaymentFeeClassUnilateralClose			PaymentFeeClass	= "UNILATERAL_CLOSE"
+	PaymentFeeClassDispute				PaymentFeeClass	= "DISPUTE"
+	PaymentFeeClassFraudProofVerification		PaymentFeeClass	= "FRAUD_PROOF_VERIFICATION"
+	PaymentFeeClassConditionalPromiseSettlement	PaymentFeeClass	= "CONDITIONAL_PROMISE_SETTLEMENT"
+	PaymentFeeClassVirtualChannelAnchor		PaymentFeeClass	= "VIRTUAL_CHANNEL_ANCHOR"
+	PaymentFeeClassRoutingAdvertisement		PaymentFeeClass	= "ROUTING_ADVERTISEMENT"
 )
 
 type Balance struct {
-	Participant string
-	Amount      string
+	Participant	string
+	Amount		string
 }
 
 type ConditionalPayment struct {
-	ConditionID   string
-	ConditionType ConditionType
-	Payer         string
-	Payee         string
-	Amount        string
-	HashLock      string
-	TimeoutHeight uint64
-	NonceStart    uint64
-	NonceEnd      uint64
+	ConditionID	string
+	ConditionType	ConditionType
+	Payer		string
+	Payee		string
+	Amount		string
+	HashLock	string
+	TimeoutHeight	uint64
+	NonceStart	uint64
+	NonceEnd	uint64
 }
 
 type ConditionalPromise struct {
-	PromiseID                 string
-	ChannelID                 string
-	Source                    string
-	Destination               string
-	Amount                    string
-	Fee                       string
-	HashLock                  string
-	TimeoutHeight             uint64
-	TimeoutTimestamp          int64
-	ConditionType             ConditionType
-	RouteIDOptional           string
-	PreviousPromiseIDOptional string
-	NextPromiseIDOptional     string
-	Nonce                     uint64
-	PromiseHash               string
-	Signature                 PromiseSignature
+	PromiseID			string
+	ChannelID			string
+	Source				string
+	Destination			string
+	Amount				string
+	Fee				string
+	HashLock			string
+	TimeoutHeight			uint64
+	TimeoutTimestamp		int64
+	ConditionType			ConditionType
+	RouteIDOptional			string
+	PreviousPromiseIDOptional	string
+	NextPromiseIDOptional		string
+	Nonce				uint64
+	PromiseHash			string
+	Signature			PromiseSignature
 }
 
 type PromiseSignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Nonce            uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	PromiseHash      string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Nonce			uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	PromiseHash		string
+	SignatureHash		string
 }
 
 type StateSignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Nonce            uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	StateHash        string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Nonce			uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	StateHash		string
+	SignatureHash		string
 }
 
 type SignedNonceRecord struct {
-	Signer        string
-	ChainID       string
-	ChannelID     string
-	Epoch         uint64
-	Nonce         uint64
-	StateHash     string
-	WALHash       string
-	Released      bool
-	IsolationMode string
+	Signer		string
+	ChainID		string
+	ChannelID	string
+	Epoch		uint64
+	Nonce		uint64
+	StateHash	string
+	WALHash		string
+	Released	bool
+	IsolationMode	string
 }
 
 type SignerPersistence struct {
-	Records       []SignedNonceRecord
-	IsolationMode string
+	Records		[]SignedNonceRecord
+	IsolationMode	string
 }
 
 func (r SignedNonceRecord) Normalize() SignedNonceRecord {
@@ -369,1380 +369,1380 @@ func (p SignerPersistence) SignState(state ChannelState, signer string) (SignerP
 }
 
 type ClaimSignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Nonce            uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	ClaimHash        string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Nonce			uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	ClaimHash		string
+	SignatureHash		string
 }
 
 type DeltaSignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Nonce            uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	DeltaHash        string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Nonce			uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	DeltaHash		string
+	SignatureHash		string
 }
 
 type GossipSignature struct {
-	Signer           string
-	ChainID          string
-	ObjectType       string
-	Version          uint32
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ObjectType		string
+	Version			uint32
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	SignatureHash		string
 }
 
 type ChannelOpenRequest struct {
-	ChainID                      string
-	ChannelID                    string
-	Participants                 []string
-	InitialBalances              []Balance
-	ChannelType                  ChannelType
-	Collateral                   string
-	CloseDelay                   uint64
-	ChallengePeriod              uint64
-	FeePolicyID                  string
-	OpeningFeeDenom              string
-	OpeningFeePaid               string
-	RoutingAdvertised            bool
-	ConditionalPaymentsSupported bool
-	OpenHeight                   uint64
-	ExpirationHeight             uint64
-	ExpirationTimestamp          int64
+	ChainID				string
+	ChannelID			string
+	Participants			[]string
+	InitialBalances			[]Balance
+	ChannelType			ChannelType
+	Collateral			string
+	CloseDelay			uint64
+	ChallengePeriod			uint64
+	FeePolicyID			string
+	OpeningFeeDenom			string
+	OpeningFeePaid			string
+	RoutingAdvertised		bool
+	ConditionalPaymentsSupported	bool
+	OpenHeight			uint64
+	ExpirationHeight		uint64
+	ExpirationTimestamp		int64
 }
 
 type ChannelUpdateRequest struct {
-	ChannelID            string
-	State                ChannelState
-	ConditionCommitments []ConditionalPayment
-	AsyncDeltas          []AsyncPaymentDelta
-	RegisterCheckpoint   bool
-	Submitter            string
-	CurrentHeight        uint64
-	CheckpointFeePaid    string
+	ChannelID		string
+	State			ChannelState
+	ConditionCommitments	[]ConditionalPayment
+	AsyncDeltas		[]AsyncPaymentDelta
+	RegisterCheckpoint	bool
+	Submitter		string
+	CurrentHeight		uint64
+	CheckpointFeePaid	string
 }
 
 type ChannelUpdateResult struct {
-	ChannelID            string
-	StateHash            string
-	Nonce                uint64
-	ValidatedOffChain    bool
-	CheckpointRegistered bool
-	Liquidity            []Balance
+	ChannelID		string
+	StateHash		string
+	Nonce			uint64
+	ValidatedOffChain	bool
+	CheckpointRegistered	bool
+	Liquidity		[]Balance
 }
 
 type GossipMessage struct {
-	MessageID         string
-	MessageType       GossipMessageType
-	ChainID           string
-	ChannelID         string
-	NodeID            string
-	From              string
-	To                string
-	Capacity          string
-	Liquidity         string
-	FeeDenom          string
-	FeeAmount         string
-	MaxFee            string
-	ValidAfterHeight  uint64
-	ValidUntilHeight  uint64
-	ChannelCommitment string
-	FailureCode       string
-	ProbeAmount       string
-	ReputationDelta   int64
-	Sequence          uint64
-	Advisory          bool
+	MessageID		string
+	MessageType		GossipMessageType
+	ChainID			string
+	ChannelID		string
+	NodeID			string
+	From			string
+	To			string
+	Capacity		string
+	Liquidity		string
+	FeeDenom		string
+	FeeAmount		string
+	MaxFee			string
+	ValidAfterHeight	uint64
+	ValidUntilHeight	uint64
+	ChannelCommitment	string
+	FailureCode		string
+	ProbeAmount		string
+	ReputationDelta		int64
+	Sequence		uint64
+	Advisory		bool
 }
 
 type SignedGossipEnvelope struct {
-	Message      GossipMessage
-	MessageHash  string
-	Signature    GossipSignature
-	ReceivedFrom string
-	ReceivedAt   uint64
+	Message		GossipMessage
+	MessageHash	string
+	Signature	GossipSignature
+	ReceivedFrom	string
+	ReceivedAt	uint64
 }
 
 type GossipReputation struct {
-	NodeID           string
-	Score            int64
-	InvalidGossip    uint64
-	LastUpdateHeight uint64
+	NodeID			string
+	Score			int64
+	InvalidGossip		uint64
+	LastUpdateHeight	uint64
 }
 
 type TopologyStore struct {
-	Messages     []SignedGossipEnvelope
-	Edges        []ChannelEdge
-	Reputation   []GossipReputation
-	LastPrunedAt uint64
+	Messages	[]SignedGossipEnvelope
+	Edges		[]ChannelEdge
+	Reputation	[]GossipReputation
+	LastPrunedAt	uint64
 }
 
 type EdgeRoutingStats struct {
-	ChannelID              string
-	From                   string
-	To                     string
-	SuccessRateBps         uint32
-	LiquidityUpdatedHeight uint64
-	CongestionBps          uint32
-	NodeAvailabilityBps    uint32
-	FailureCount           uint32
-	TimeoutMargin          uint64
-	PendingConditionCount  uint32
-	AvgResolutionLatency   uint64
-	RetryCount             uint32
-	ReservePressureBps     uint32
-	NodeQueueDelay         uint64
-	LastFailureHeight      uint64
-	LastUpdatedHeight      uint64
+	ChannelID		string
+	From			string
+	To			string
+	SuccessRateBps		uint32
+	LiquidityUpdatedHeight	uint64
+	CongestionBps		uint32
+	NodeAvailabilityBps	uint32
+	FailureCount		uint32
+	TimeoutMargin		uint64
+	PendingConditionCount	uint32
+	AvgResolutionLatency	uint64
+	RetryCount		uint32
+	ReservePressureBps	uint32
+	NodeQueueDelay		uint64
+	LastFailureHeight	uint64
+	LastUpdatedHeight	uint64
 }
 
 type RoutePolicy struct {
-	MaxHops                 int
-	RequiredTimeoutMargin   uint64
-	StaleLiquidityAfter     uint64
-	HopPenalty              string
-	CongestionPenalty       string
-	StaleLiquidityPenalty   string
-	FailurePenalty          string
-	TimeoutPenalty          string
-	SuccessPenalty          string
-	AvailabilityPenalty     string
-	ReservePressurePenalty  string
-	QueueDelayPenalty       string
-	PendingConditionPenalty string
-	LatencyPenalty          string
-	ProportionalFeeBps      uint32
-	DecayHalfLife           uint64
-	MaxCongestedPaymentBps  uint32
-	MaxFeeAmount            string
-	EnableMultiPath         bool
-	MaxSplits               int
-	ExcludedNodes           []string
-	ExcludedChannels        []string
-	EdgeStats               []EdgeRoutingStats
+	MaxHops			int
+	RequiredTimeoutMargin	uint64
+	StaleLiquidityAfter	uint64
+	HopPenalty		string
+	CongestionPenalty	string
+	StaleLiquidityPenalty	string
+	FailurePenalty		string
+	TimeoutPenalty		string
+	SuccessPenalty		string
+	AvailabilityPenalty	string
+	ReservePressurePenalty	string
+	QueueDelayPenalty	string
+	PendingConditionPenalty	string
+	LatencyPenalty		string
+	ProportionalFeeBps	uint32
+	DecayHalfLife		uint64
+	MaxCongestedPaymentBps	uint32
+	MaxFeeAmount		string
+	EnableMultiPath		bool
+	MaxSplits		int
+	ExcludedNodes		[]string
+	ExcludedChannels	[]string
+	EdgeStats		[]EdgeRoutingStats
 }
 
 type RoutingFeePolicyUpdate struct {
-	PolicyID                string
-	ChainID                 string
-	ChannelID               string
-	From                    string
-	To                      string
-	FeeDenom                string
-	BaseHopFee              string
-	ProportionalFeeBps      uint32
-	LiquidityReservationFee string
-	VirtualChannelSetupFee  string
-	CongestionSurcharge     string
-	FailurePenalty          string
-	MaxHopFee               string
-	ValidAfterHeight        uint64
-	ValidUntilHeight        uint64
-	Sequence                uint64
-	PolicyHash              string
-	Signature               RoutingFeePolicySignature
+	PolicyID		string
+	ChainID			string
+	ChannelID		string
+	From			string
+	To			string
+	FeeDenom		string
+	BaseHopFee		string
+	ProportionalFeeBps	uint32
+	LiquidityReservationFee	string
+	VirtualChannelSetupFee	string
+	CongestionSurcharge	string
+	FailurePenalty		string
+	MaxHopFee		string
+	ValidAfterHeight	uint64
+	ValidUntilHeight	uint64
+	Sequence		uint64
+	PolicyHash		string
+	Signature		RoutingFeePolicySignature
 }
 
 type RoutingFeePolicySignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Sequence         uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Sequence		uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	SignatureHash		string
 }
 
 type HopFeeCalculationRequest struct {
-	Amount                  string
-	Policy                  RoutingFeePolicyUpdate
-	CurrentHeight           uint64
-	IncludeVirtualSetup     bool
-	RepeatedInvalidAttempts uint32
+	Amount			string
+	Policy			RoutingFeePolicyUpdate
+	CurrentHeight		uint64
+	IncludeVirtualSetup	bool
+	RepeatedInvalidAttempts	uint32
 }
 
 type RoutingHopFee struct {
-	Denom                   string
-	BaseHopFee              string
-	ProportionalFee         string
-	LiquidityReservationFee string
-	VirtualChannelSetupFee  string
-	CongestionSurcharge     string
-	FailurePenalty          string
-	RepeatedInvalidAttempts uint32
-	TotalFee                string
-	PolicyHash              string
+	Denom			string
+	BaseHopFee		string
+	ProportionalFee		string
+	LiquidityReservationFee	string
+	VirtualChannelSetupFee	string
+	CongestionSurcharge	string
+	FailurePenalty		string
+	RepeatedInvalidAttempts	uint32
+	TotalFee		string
+	PolicyHash		string
 }
 
 type RouteFailureClass string
 
 const (
-	RouteFailureCapacity        RouteFailureClass = "CAPACITY"
-	RouteFailureTimeout         RouteFailureClass = "TIMEOUT"
-	RouteFailureCongestion      RouteFailureClass = "CONGESTION"
-	RouteFailureLiquidityStale  RouteFailureClass = "LIQUIDITY_STALE"
-	RouteFailureNodeUnavailable RouteFailureClass = "NODE_UNAVAILABLE"
-	RouteFailurePolicyRejected  RouteFailureClass = "POLICY_REJECTED"
-	RouteFailureUnknown         RouteFailureClass = "UNKNOWN"
+	RouteFailureCapacity		RouteFailureClass	= "CAPACITY"
+	RouteFailureTimeout		RouteFailureClass	= "TIMEOUT"
+	RouteFailureCongestion		RouteFailureClass	= "CONGESTION"
+	RouteFailureLiquidityStale	RouteFailureClass	= "LIQUIDITY_STALE"
+	RouteFailureNodeUnavailable	RouteFailureClass	= "NODE_UNAVAILABLE"
+	RouteFailurePolicyRejected	RouteFailureClass	= "POLICY_REJECTED"
+	RouteFailureUnknown		RouteFailureClass	= "UNKNOWN"
 )
 
 type RouteFailureReport struct {
-	ChannelID      string
-	From           string
-	To             string
-	FailureClass   RouteFailureClass
-	Retryable      bool
-	ObservedHeight uint64
+	ChannelID	string
+	From		string
+	To		string
+	FailureClass	RouteFailureClass
+	Retryable	bool
+	ObservedHeight	uint64
 }
 
 type CongestionSnapshot struct {
-	ChannelID                   string
-	From                        string
-	To                          string
-	ChannelUpdateFailureRateBps uint32
-	PendingConditionCount       uint32
-	AvgResolutionLatency        uint64
-	RouteRetryCount             uint32
-	ReservePressureBps          uint32
-	NodeQueueDelay              uint64
-	LiquidityUpdatedHeight      uint64
-	ObservedHeight              uint64
+	ChannelID			string
+	From				string
+	To				string
+	ChannelUpdateFailureRateBps	uint32
+	PendingConditionCount		uint32
+	AvgResolutionLatency		uint64
+	RouteRetryCount			uint32
+	ReservePressureBps		uint32
+	NodeQueueDelay			uint64
+	LiquidityUpdatedHeight		uint64
+	ObservedHeight			uint64
 }
 
 type RouteSelectionRequest struct {
-	From          string
-	To            string
-	Amount        string
-	CurrentHeight uint64
-	Policy        RoutePolicy
+	From		string
+	To		string
+	Amount		string
+	CurrentHeight	uint64
+	Policy		RoutePolicy
 }
 
 type RouteRetryPolicy struct {
-	MaxAttempts          uint32
-	AlternateRouteLimit  uint32
-	ExcludeFailedEdges   bool
-	CongestionRetryDelay uint64
+	MaxAttempts		uint32
+	AlternateRouteLimit	uint32
+	ExcludeFailedEdges	bool
+	CongestionRetryDelay	uint64
 }
 
 type RouteRetryRequest struct {
-	Selection RouteSelectionRequest
-	Failures  []RouteFailureReport
-	Policy    RouteRetryPolicy
+	Selection	RouteSelectionRequest
+	Failures	[]RouteFailureReport
+	Policy		RouteRetryPolicy
 }
 
 type RouteRetryResult struct {
-	Route      ScoredRoute
-	Attempts   uint32
-	Retryable  bool
-	Reason     string
-	PolicyHash string
+	Route		ScoredRoute
+	Attempts	uint32
+	Retryable	bool
+	Reason		string
+	PolicyHash	string
 }
 
 type ScoredRoute struct {
-	Edges       []ChannelEdge
-	Amount      string
-	TotalFee    string
-	TotalCost   string
-	MinCapacity string
-	ScoreHash   string
+	Edges		[]ChannelEdge
+	Amount		string
+	TotalFee	string
+	TotalCost	string
+	MinCapacity	string
+	ScoreHash	string
 }
 
 type RouteSimulationResult struct {
-	Route       ScoredRoute
-	Attemptable bool
-	Reason      string
-	TotalFee    string
+	Route		ScoredRoute
+	Attemptable	bool
+	Reason		string
+	TotalFee	string
 }
 
 type MultiPathRoute struct {
-	Parts       []ScoredRoute
-	TotalAmount string
-	TotalFee    string
-	ScoreHash   string
+	Parts		[]ScoredRoute
+	TotalAmount	string
+	TotalFee	string
+	ScoreHash	string
 }
 
 type ForwardingPacket struct {
-	PacketID       string
-	RouteID        string
-	HopPaymentID   string
-	ChannelID      string
-	ForwardingNode string
-	NextNode       string
-	Amount         string
-	FeeAmount      string
-	TimeoutHeight  uint64
-	NextPacketHash string
-	PacketHash     string
+	PacketID	string
+	RouteID		string
+	HopPaymentID	string
+	ChannelID	string
+	ForwardingNode	string
+	NextNode	string
+	Amount		string
+	FeeAmount	string
+	TimeoutHeight	uint64
+	NextPacketHash	string
+	PacketHash	string
 }
 
 type ForwardingPacketReplayRecord struct {
-	PacketID       string
-	RouteID        string
-	HopPaymentID   string
-	RecordedHeight uint64
-	ExpiresHeight  uint64
+	PacketID	string
+	RouteID		string
+	HopPaymentID	string
+	RecordedHeight	uint64
+	ExpiresHeight	uint64
 }
 
 type ForwardingLogRecord struct {
-	PacketID       string
-	RouteID        string
-	HopPaymentID   string
-	ChannelID      string
-	ForwardingNode string
-	NextNodeHash   string
-	AmountHash     string
-	RecordedHeight uint64
+	PacketID	string
+	RouteID		string
+	HopPaymentID	string
+	ChannelID	string
+	ForwardingNode	string
+	NextNodeHash	string
+	AmountHash	string
+	RecordedHeight	uint64
 }
 
 type ChannelCloseRequest struct {
-	ChannelID     string
-	ClosingState  ChannelState
-	Signatures    []StateSignature
-	CloseReason   CloseReason
-	Submitter     string
-	CurrentHeight uint64
-	SettlementFee string
+	ChannelID	string
+	ClosingState	ChannelState
+	Signatures	[]StateSignature
+	CloseReason	CloseReason
+	Submitter	string
+	CurrentHeight	uint64
+	SettlementFee	string
 }
 
 type ConditionResolution struct {
-	ConditionID  string
-	Resolver     string
-	Recipient    string
-	Amount       string
-	Expired      bool
-	EvidenceHash string
+	ConditionID	string
+	Resolver	string
+	Recipient	string
+	Amount		string
+	Expired		bool
+	EvidenceHash	string
 }
 
 type ClosedChannelTombstone struct {
-	ChainID        string
-	ChannelID      string
-	FinalizedNonce uint64
-	StateHash      string
-	ClosedHeight   uint64
-	ExpiresHeight  uint64
+	ChainID		string
+	ChannelID	string
+	FinalizedNonce	uint64
+	StateHash	string
+	ClosedHeight	uint64
+	ExpiresHeight	uint64
 }
 
 type ConditionClaimRecord struct {
-	ChainID        string
-	ChannelID      string
-	ConditionID    string
-	EvidenceHash   string
-	PreimageHash   string
-	ResolvedHeight uint64
-	ExpiresHeight  uint64
+	ChainID		string
+	ChannelID	string
+	ConditionID	string
+	EvidenceHash	string
+	PreimageHash	string
+	ResolvedHeight	uint64
+	ExpiresHeight	uint64
 }
 
 type AsyncFinalizationJob struct {
-	JobID           string
-	ChannelID       string
-	FinalizeHeight  uint64
-	EnqueuedHeight  uint64
-	Attempts        uint32
-	LastRunHeight   uint64
-	LastError       string
-	Completed       bool
-	CompletedHeight uint64
-	SettlementHash  string
+	JobID		string
+	ChannelID	string
+	FinalizeHeight	uint64
+	EnqueuedHeight	uint64
+	Attempts	uint32
+	LastRunHeight	uint64
+	LastError	string
+	Completed	bool
+	CompletedHeight	uint64
+	SettlementHash	string
 }
 
 type AsyncPromiseExpiryJob struct {
-	JobID             string
-	ChannelID         string
-	PromiseID         string
-	Promise           ConditionalPromise
-	Resolver          string
-	ExpireAfterHeight uint64
-	EnqueuedHeight    uint64
-	Attempts          uint32
-	LastRunHeight     uint64
-	LastError         string
-	Completed         bool
-	CompletedHeight   uint64
-	ResolutionHash    string
+	JobID			string
+	ChannelID		string
+	PromiseID		string
+	Promise			ConditionalPromise
+	Resolver		string
+	ExpireAfterHeight	uint64
+	EnqueuedHeight		uint64
+	Attempts		uint32
+	LastRunHeight		uint64
+	LastError		string
+	Completed		bool
+	CompletedHeight		uint64
+	ResolutionHash		string
 }
 
 type AsyncSettlementCompletion struct {
-	CompletionID string
-	JobID        string
-	JobType      string
-	ChannelID    string
-	ObjectID     string
-	ResultHash   string
-	Height       uint64
+	CompletionID	string
+	JobID		string
+	JobType		string
+	ChannelID	string
+	ObjectID	string
+	ResultHash	string
+	Height		uint64
 }
 
 type AsyncExecutionResult struct {
-	ProcessedFinalizations   uint64
-	ProcessedPromiseExpiries uint64
-	CompletedJobIDs          []string
-	FailedJobIDs             []string
-	EmittedCompletionIDs     []string
+	ProcessedFinalizations		uint64
+	ProcessedPromiseExpiries	uint64
+	CompletedJobIDs			[]string
+	FailedJobIDs			[]string
+	EmittedCompletionIDs		[]string
 }
 
 type PreimageRevealRequest struct {
-	ChannelID     string
-	Promises      []ConditionalPromise
-	Preimage      string
-	Revealer      string
-	CurrentHeight uint64
+	ChannelID	string
+	Promises	[]ConditionalPromise
+	Preimage	string
+	Revealer	string
+	CurrentHeight	uint64
 }
 
 type PromiseExpiryRequest struct {
-	ChannelID     string
-	Promises      []ConditionalPromise
-	Resolver      string
-	CurrentHeight uint64
+	ChannelID	string
+	Promises	[]ConditionalPromise
+	Resolver	string
+	CurrentHeight	uint64
 }
 
 type ConditionLinkageProof struct {
-	RouteID                    string
-	Promises                   []ConditionalPromise
-	Sender                     string
-	Receiver                   string
-	Amount                     string
-	TotalFees                  string
-	HashLock                   string
-	TimeoutMargin              uint64
-	PartialDispute             bool
-	OffchainResolvedPromiseIDs []string
-	EvidenceHash               string
+	RouteID				string
+	Promises			[]ConditionalPromise
+	Sender				string
+	Receiver			string
+	Amount				string
+	TotalFees			string
+	HashLock			string
+	TimeoutMargin			uint64
+	PartialDispute			bool
+	OffchainResolvedPromiseIDs	[]string
+	EvidenceHash			string
 }
 
 type RouteFeeClaim struct {
-	ChannelID    string
-	PromiseID    string
-	Recipient    string
-	Amount       string
-	EvidenceHash string
+	ChannelID	string
+	PromiseID	string
+	Recipient	string
+	Amount		string
+	EvidenceHash	string
 }
 
 type BatchConditionSettlementRequest struct {
-	LinkageProof      ConditionLinkageProof
-	Mode              ConditionSettlementMode
-	Preimage          string
-	Resolver          string
-	CurrentHeight     uint64
-	SettlementFeePaid string
+	LinkageProof		ConditionLinkageProof
+	Mode			ConditionSettlementMode
+	Preimage		string
+	Resolver		string
+	CurrentHeight		uint64
+	SettlementFeePaid	string
 }
 
 type BatchConditionSettlementResult struct {
-	RouteID              string
-	Resolutions          []ConditionResolution
-	FeeClaims            []RouteFeeClaim
-	ConditionRootUpdates []ConditionRootUpdate
-	EvidenceHash         string
+	RouteID			string
+	Resolutions		[]ConditionResolution
+	FeeClaims		[]RouteFeeClaim
+	ConditionRootUpdates	[]ConditionRootUpdate
+	EvidenceHash		string
 }
 
 type ConditionRootUpdate struct {
-	ChannelID      string
-	Nonce          uint64
-	ConditionRoot  string
-	ConditionCount uint32
-	Conditions     []ConditionalPayment
+	ChannelID	string
+	Nonce		uint64
+	ConditionRoot	string
+	ConditionCount	uint32
+	Conditions	[]ConditionalPayment
 }
 
 type ChannelDisputeRequest struct {
-	ChannelID             string
-	ClosingStateReference string
-	NewerState            ChannelState
-	FraudProof            FraudProof
-	ConditionProofs       []ConditionResolution
-	Submitter             string
-	CurrentHeight         uint64
-	DisputeFeePaid        string
+	ChannelID		string
+	ClosingStateReference	string
+	NewerState		ChannelState
+	FraudProof		FraudProof
+	ConditionProofs		[]ConditionResolution
+	Submitter		string
+	CurrentHeight		uint64
+	DisputeFeePaid		string
 }
 
 type WatchDisputeSubmission struct {
-	WatchService          string
-	Delegator             string
-	ChannelID             string
-	ClosingStateReference string
-	NewerState            ChannelState
-	CurrentHeight         uint64
-	EvidenceHash          string
+	WatchService		string
+	Delegator		string
+	ChannelID		string
+	ClosingStateReference	string
+	NewerState		ChannelState
+	CurrentHeight		uint64
+	EvidenceHash		string
 }
 
 type ValidatorPaymentServiceMetadata struct {
-	ValidatorAddress string
-	ServiceAddress   string
-	WatchEndpoint    string
-	RoutingEndpoint  string
-	PublicKey        string
-	MinDelegation    string
-	CommissionBps    uint32
-	Active           bool
-	UpdatedHeight    uint64
-	MetadataHash     string
+	ValidatorAddress	string
+	ServiceAddress		string
+	WatchEndpoint		string
+	RoutingEndpoint		string
+	PublicKey		string
+	MinDelegation		string
+	CommissionBps		uint32
+	Active			bool
+	UpdatedHeight		uint64
+	MetadataHash		string
 }
 
 type ValidatorWatchRegistration struct {
-	ValidatorAddress string
-	ServiceAddress   string
-	Delegator        string
-	MinDelegation    string
-	RegisteredHeight uint64
-	MetadataHash     string
+	ValidatorAddress	string
+	ServiceAddress		string
+	Delegator		string
+	MinDelegation		string
+	RegisteredHeight	uint64
+	MetadataHash		string
 }
 
 type ValidatorAssistedDisputeSubmission struct {
-	ValidatorAddress      string
-	ServiceAddress        string
-	Delegator             string
-	ChannelID             string
-	ClosingStateReference string
-	NewerState            ChannelState
-	CurrentHeight         uint64
-	EvidenceHash          string
+	ValidatorAddress	string
+	ServiceAddress		string
+	Delegator		string
+	ChannelID		string
+	ClosingStateReference	string
+	NewerState		ChannelState
+	CurrentHeight		uint64
+	EvidenceHash		string
 }
 
 type FinalSettlementRequest struct {
-	ChannelID           string
-	ResolvedConditions  []ConditionResolution
-	CurrentHeight       uint64
-	FeeAccountingState  string
-	RoutingFeeClaimHash string
+	ChannelID		string
+	ResolvedConditions	[]ConditionResolution
+	CurrentHeight		uint64
+	FeeAccountingState	string
+	RoutingFeeClaimHash	string
 }
 
 type SettlementArbitrationInput struct {
-	Operation         SettlementArbitrationOperation
-	ChannelID         string
-	SignedState       ChannelState
-	Claim             UnidirectionalClaim
-	FraudProof        FraudProof
-	ConditionProofs   []ConditionResolution
-	RouteHints        []ChannelEdge
-	GossipStateHash   string
-	ExternalLiquidity []Balance
-	UnsignedBalances  []Balance
-	OffchainIntent    string
-	CurrentHeight     uint64
+	Operation		SettlementArbitrationOperation
+	ChannelID		string
+	SignedState		ChannelState
+	Claim			UnidirectionalClaim
+	FraudProof		FraudProof
+	ConditionProofs		[]ConditionResolution
+	RouteHints		[]ChannelEdge
+	GossipStateHash		string
+	ExternalLiquidity	[]Balance
+	UnsignedBalances	[]Balance
+	OffchainIntent		string
+	CurrentHeight		uint64
 }
 
 type StateHashDebug struct {
-	ChannelID                string
-	Status                   ChannelStatus
-	LatestNonce              uint64
-	LatestStateHash          string
-	ComputedLatestStateHash  string
-	PendingNonce             uint64
-	PendingStateHash         string
-	ComputedPendingStateHash string
-	FinalizedNonce           uint64
-	DisputedNonce            uint64
+	ChannelID			string
+	Status				ChannelStatus
+	LatestNonce			uint64
+	LatestStateHash			string
+	ComputedLatestStateHash		string
+	PendingNonce			uint64
+	PendingStateHash		string
+	ComputedPendingStateHash	string
+	FinalizedNonce			uint64
+	DisputedNonce			uint64
 }
 
 type ChannelState struct {
-	ChainID               string
-	AppVersion            uint32
-	ModuleName            string
-	RequiredFields        []string
-	ChannelID             string
-	ChannelType           ChannelType
-	ParticipantSetHash    string
-	Denom                 string
-	Version               uint32
-	ParticipantA          string
-	ParticipantB          string
-	BalanceA              string
-	BalanceB              string
-	ReserveA              string
-	ReserveB              string
-	AccruedFees           string
-	Epoch                 uint64
-	Nonce                 uint64
-	PendingConditionsRoot string
-	ConditionRoot         string
-	ConditionCount        uint32
-	Balances              []Balance
-	Conditions            []ConditionalPayment
-	PreviousStateHash     string
-	StateHash             string
-	TimeoutHeight         uint64
-	TimeoutTimestamp      int64
-	ChallengePeriod       uint64
-	CloseDelay            uint64
-	FeePolicyID           string
-	RequiredSignerBitmap  string
-	SignatureScheme       string
-	SignaturePreimageHash string
-	CheckpointNonce       uint64
-	CheckpointBalances    []Balance
-	AsyncUpdateRoot       string
-	AcceptedUpdateRoot    string
-	SendWindow            uint64
-	ReceiveWindow         uint64
-	MaxUnackedAmount      string
-	ExpiryHeight          uint64
-	Signatures            []StateSignature
+	ChainID			string
+	AppVersion		uint32
+	ModuleName		string
+	RequiredFields		[]string
+	ChannelID		string
+	ChannelType		ChannelType
+	ParticipantSetHash	string
+	Denom			string
+	Version			uint32
+	ParticipantA		string
+	ParticipantB		string
+	BalanceA		string
+	BalanceB		string
+	ReserveA		string
+	ReserveB		string
+	AccruedFees		string
+	Epoch			uint64
+	Nonce			uint64
+	PendingConditionsRoot	string
+	ConditionRoot		string
+	ConditionCount		uint32
+	Balances		[]Balance
+	Conditions		[]ConditionalPayment
+	PreviousStateHash	string
+	StateHash		string
+	TimeoutHeight		uint64
+	TimeoutTimestamp	int64
+	ChallengePeriod		uint64
+	CloseDelay		uint64
+	FeePolicyID		string
+	RequiredSignerBitmap	string
+	SignatureScheme		string
+	SignaturePreimageHash	string
+	CheckpointNonce		uint64
+	CheckpointBalances	[]Balance
+	AsyncUpdateRoot		string
+	AcceptedUpdateRoot	string
+	SendWindow		uint64
+	ReceiveWindow		uint64
+	MaxUnackedAmount	string
+	ExpiryHeight		uint64
+	Signatures		[]StateSignature
 }
 
 type AsyncPaymentDelta struct {
-	UpdateID     string
-	ChainID      string
-	ChannelID    string
-	From         string
-	To           string
-	Direction    string
-	Amount       string
-	NonceStart   uint64
-	NonceEnd     uint64
-	ExpiryHeight uint64
-	DeltaHash    string
-	Signature    DeltaSignature
+	UpdateID	string
+	ChainID		string
+	ChannelID	string
+	From		string
+	To		string
+	Direction	string
+	Amount		string
+	NonceStart	uint64
+	NonceEnd	uint64
+	ExpiryHeight	uint64
+	DeltaHash	string
+	Signature	DeltaSignature
 }
 
 type AsyncDeltaDisputeProof struct {
-	ProofID         string
-	ChannelID       string
-	CheckpointState ChannelState
-	Deltas          []AsyncPaymentDelta
-	EvidenceHash    string
+	ProofID		string
+	ChannelID	string
+	CheckpointState	ChannelState
+	Deltas		[]AsyncPaymentDelta
+	EvidenceHash	string
 }
 
 type UnidirectionalClaim struct {
-	ChainID             string
-	ChannelID           string
-	Payer               string
-	Receiver            string
-	LockedAmount        string
-	ClaimedAmount       string
-	Nonce               uint64
-	ExpirationHeight    uint64
-	ExpirationTimestamp int64
-	StateHash           string
-	PayerSignature      ClaimSignature
-	ReceiverAckOptional ClaimSignature
+	ChainID			string
+	ChannelID		string
+	Payer			string
+	Receiver		string
+	LockedAmount		string
+	ClaimedAmount		string
+	Nonce			uint64
+	ExpirationHeight	uint64
+	ExpirationTimestamp	int64
+	StateHash		string
+	PayerSignature		ClaimSignature
+	ReceiverAckOptional	ClaimSignature
 }
 
 type StreamingPaymentFrame struct {
-	ChannelID           string
-	StreamID            string
-	Payer               string
-	Receiver            string
-	PreviousClaimed     string
-	RatePerBlock        string
-	StartHeight         uint64
-	CurrentHeight       uint64
-	Nonce               uint64
-	ExpirationHeight    uint64
-	ExpirationTimestamp int64
+	ChannelID		string
+	StreamID		string
+	Payer			string
+	Receiver		string
+	PreviousClaimed		string
+	RatePerBlock		string
+	StartHeight		uint64
+	CurrentHeight		uint64
+	Nonce			uint64
+	ExpirationHeight	uint64
+	ExpirationTimestamp	int64
 }
 
 type PendingClose struct {
-	Submitter          string
-	SubmittedHeight    uint64
-	SettleAfterHeight  uint64
-	DisputeCount       uint32
-	CloseReason        CloseReason
-	SettlementFeeDenom string
-	SettlementFee      string
-	State              ChannelState
-	FraudProofs        []FraudProof
-	ConditionProofs    []ConditionResolution
-	Penalties          []Penalty
-	PenaltyAllocations []PenaltyAllocation
+	Submitter		string
+	SubmittedHeight		uint64
+	SettleAfterHeight	uint64
+	DisputeCount		uint32
+	CloseReason		CloseReason
+	SettlementFeeDenom	string
+	SettlementFee		string
+	State			ChannelState
+	FraudProofs		[]FraudProof
+	ConditionProofs		[]ConditionResolution
+	Penalties		[]Penalty
+	PenaltyAllocations	[]PenaltyAllocation
 }
 
 type FraudProof struct {
-	ProofID             string
-	ProofType           FraudProofType
-	SubmittedBy         string
-	OffendingSigner     string
-	StateA              ChannelState
-	StateB              ChannelState
-	AsyncProof          AsyncDeltaDisputeProof
-	PenaltyDenom        string
-	PenaltyAmount       string
-	EvidenceHash        string
-	VerificationFeePaid string
+	ProofID			string
+	ProofType		FraudProofType
+	SubmittedBy		string
+	OffendingSigner		string
+	StateA			ChannelState
+	StateB			ChannelState
+	AsyncProof		AsyncDeltaDisputeProof
+	PenaltyDenom		string
+	PenaltyAmount		string
+	EvidenceHash		string
+	VerificationFeePaid	string
 }
 
 type Penalty struct {
-	Offender  string
-	Recipient string
-	Denom     string
-	Amount    string
+	Offender	string
+	Recipient	string
+	Denom		string
+	Amount		string
 }
 
 type PenaltyAllocation struct {
-	Offender string
-	Route    PenaltyRoute
-	Denom    string
-	Amount   string
+	Offender	string
+	Route		PenaltyRoute
+	Denom		string
+	Amount		string
 }
 
 type FraudPenaltyPolicy struct {
-	ReporterRewardCap       string
-	CounterpartyRewardCap   string
-	CounterpartyRewardBps   uint32
-	BurnShareBps            uint32
-	SecurityReserveShareBps uint32
-	CommunityPoolShareBps   uint32
-	SecurityReserveHook     bool
+	ReporterRewardCap	string
+	CounterpartyRewardCap	string
+	CounterpartyRewardBps	uint32
+	BurnShareBps		uint32
+	SecurityReserveShareBps	uint32
+	CommunityPoolShareBps	uint32
+	SecurityReserveHook	bool
 }
 
 type PenaltySource string
 
 const (
-	PenaltySourceChannelBalance              PenaltySource = "CHANNEL_BALANCE"
-	PenaltySourceParticipantBond             PenaltySource = "PARTICIPANT_BOND"
-	PenaltySourceRoutingAdvertisementDeposit PenaltySource = "ROUTING_ADVERTISEMENT_DEPOSIT"
-	PenaltySourceFraudProofDeposit           PenaltySource = "FRAUD_PROOF_DEPOSIT"
+	PenaltySourceChannelBalance			PenaltySource	= "CHANNEL_BALANCE"
+	PenaltySourceParticipantBond			PenaltySource	= "PARTICIPANT_BOND"
+	PenaltySourceRoutingAdvertisementDeposit	PenaltySource	= "ROUTING_ADVERTISEMENT_DEPOSIT"
+	PenaltySourceFraudProofDeposit			PenaltySource	= "FRAUD_PROOF_DEPOSIT"
 )
 
 type PenaltyMatrixEntry struct {
-	Class                    PaymentPenaltyClass
-	ProofType                FraudProofType
-	Source                   PenaltySource
-	BasePenalty              string
-	ReporterRewardCap        string
-	CounterpartyCompensation string
-	BurnShareBps             uint32
-	SecurityReserveShareBps  uint32
-	CommunityPoolShareBps    uint32
-	InvalidProofVerifierCost string
-	Bounded                  bool
+	Class				PaymentPenaltyClass
+	ProofType			FraudProofType
+	Source				PenaltySource
+	BasePenalty			string
+	ReporterRewardCap		string
+	CounterpartyCompensation	string
+	BurnShareBps			uint32
+	SecurityReserveShareBps		uint32
+	CommunityPoolShareBps		uint32
+	InvalidProofVerifierCost	string
+	Bounded				bool
 }
 
 type PenaltyRouteAccounting struct {
-	Class            PaymentPenaltyClass
-	Source           PenaltySource
-	TotalPenalty     string
-	ReporterReward   string
-	CounterpartyComp string
-	Allocations      []PenaltyAllocation
-	Penalties        []Penalty
+	Class			PaymentPenaltyClass
+	Source			PenaltySource
+	TotalPenalty		string
+	ReporterReward		string
+	CounterpartyComp	string
+	Allocations		[]PenaltyAllocation
+	Penalties		[]Penalty
 }
 
 type InvalidFraudProofSubmissionPenalty struct {
-	Submitter        string
-	Denom            string
-	DepositAmount    string
-	VerificationCost string
-	ForfeitedAmount  string
-	RefundAmount     string
+	Submitter		string
+	Denom			string
+	DepositAmount		string
+	VerificationCost	string
+	ForfeitedAmount		string
+	RefundAmount		string
 }
 
 type LiquidityAdvertisement struct {
-	AdvertisementID     string
-	ChannelID           string
-	Advertiser          string
-	Counterparty        string
-	Capacity            string
-	FeeDenom            string
-	BaseFee             string
-	ReservationFee      string
-	VirtualSetupFee     string
-	ReliabilityBps      uint32
-	ValidUntilHeight    uint64
-	DepositAmount       string
-	BackedByReservation bool
-	AdvertisementHash   string
+	AdvertisementID		string
+	ChannelID		string
+	Advertiser		string
+	Counterparty		string
+	Capacity		string
+	FeeDenom		string
+	BaseFee			string
+	ReservationFee		string
+	VirtualSetupFee		string
+	ReliabilityBps		uint32
+	ValidUntilHeight	uint64
+	DepositAmount		string
+	BackedByReservation	bool
+	AdvertisementHash	string
 }
 
 type LiquidityReservationSignature struct {
-	Signer           string
-	ChainID          string
-	ChannelID        string
-	ObjectType       string
-	Version          uint32
-	Nonce            uint64
-	ObjectID         string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	ChannelID		string
+	ObjectType		string
+	Version			uint32
+	Nonce			uint64
+	ObjectID		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	SignatureHash		string
 }
 
 type SignedLiquidityReservation struct {
-	ReservationID    string
-	AdvertisementID  string
-	ChainID          string
-	ChannelID        string
-	Reserver         string
-	Counterparty     string
-	Capacity         string
-	FeeAmount        string
-	ExpirationHeight uint64
-	Nonce            uint64
-	CommitmentHash   string
-	Signature        LiquidityReservationSignature
+	ReservationID		string
+	AdvertisementID		string
+	ChainID			string
+	ChannelID		string
+	Reserver		string
+	Counterparty		string
+	Capacity		string
+	FeeAmount		string
+	ExpirationHeight	uint64
+	Nonce			uint64
+	CommitmentHash		string
+	Signature		LiquidityReservationSignature
 }
 
 type PaymentFeeSchedule struct {
-	Denom                           string
-	ChannelOpenFee                  string
-	ChannelOpenPerParticipantFee    string
-	ChannelCheckpointFee            string
-	CooperativeCloseFee             string
-	UnilateralCloseFee              string
-	DisputeFee                      string
-	FraudProofVerificationFee       string
-	ConditionalPromiseSettlementFee string
-	VirtualChannelAnchorFee         string
-	RoutingAdvertisementFee         string
-	RoutingAdvertisementDeposit     string
-	ConditionalCapabilitySurcharge  string
-	VirtualChannelAnchorSurcharge   string
-	StorageByteFee                  string
-	StorageFeeEnabled               bool
-	OpenFeeMin                      string
-	OpenFeeMax                      string
-	StorageRentPerBlock             string
-	RenewalPeriod                   uint64
-	BaseMultiplierBps               uint32
-	MaxMultiplierBps                uint32
+	Denom				string
+	ChannelOpenFee			string
+	ChannelOpenPerParticipantFee	string
+	ChannelCheckpointFee		string
+	CooperativeCloseFee		string
+	UnilateralCloseFee		string
+	DisputeFee			string
+	FraudProofVerificationFee	string
+	ConditionalPromiseSettlementFee	string
+	VirtualChannelAnchorFee		string
+	RoutingAdvertisementFee		string
+	RoutingAdvertisementDeposit	string
+	ConditionalCapabilitySurcharge	string
+	VirtualChannelAnchorSurcharge	string
+	StorageByteFee			string
+	StorageFeeEnabled		bool
+	OpenFeeMin			string
+	OpenFeeMax			string
+	StorageRentPerBlock		string
+	RenewalPeriod			uint64
+	BaseMultiplierBps		uint32
+	MaxMultiplierBps		uint32
 }
 
 type PaymentFeeMultiplier struct {
-	FeeClass      PaymentFeeClass
-	MultiplierBps uint32
-	CongestionBps uint32
-	UpdatedHeight uint64
+	FeeClass	PaymentFeeClass
+	MultiplierBps	uint32
+	CongestionBps	uint32
+	UpdatedHeight	uint64
 }
 
 type PaymentFeeCharge struct {
-	FeeID          string
-	FeeClass       PaymentFeeClass
-	ChannelID      string
-	ObjectID       string
-	Payer          string
-	Denom          string
-	Amount         string
-	RequiredAmount string
-	StorageBytes   uint64
-	MultiplierBps  uint32
-	Height         uint64
-	Refunded       bool
+	FeeID		string
+	FeeClass	PaymentFeeClass
+	ChannelID	string
+	ObjectID	string
+	Payer		string
+	Denom		string
+	Amount		string
+	RequiredAmount	string
+	StorageBytes	uint64
+	MultiplierBps	uint32
+	Height		uint64
+	Refunded	bool
 }
 
 type PaymentFeeRefund struct {
-	RefundID  string
-	FeeID     string
-	Recipient string
-	Denom     string
-	Amount    string
-	Reason    string
-	Height    uint64
+	RefundID	string
+	FeeID		string
+	Recipient	string
+	Denom		string
+	Amount		string
+	Reason		string
+	Height		uint64
 }
 
 type SecurityReserveAllocationHook struct {
-	HookID     string
-	ChannelID  string
-	ProofID    string
-	Offender   string
-	Denom      string
-	Amount     string
-	Height     uint64
-	Route      PenaltyRoute
-	Allocation string
+	HookID		string
+	ChannelID	string
+	ProofID		string
+	Offender	string
+	Denom		string
+	Amount		string
+	Height		uint64
+	Route		PenaltyRoute
+	Allocation	string
 }
 
 type SettlementInclusionLatency struct {
-	RecordID        string
-	OperationID     string
-	ChannelID       string
-	Operation       SettlementArbitrationOperation
-	SubmittedHeight uint64
-	IncludedHeight  uint64
-	LatencyBlocks   uint64
-	SLOThreshold    uint64
-	Breached        bool
+	RecordID	string
+	OperationID	string
+	ChannelID	string
+	Operation	SettlementArbitrationOperation
+	SubmittedHeight	uint64
+	IncludedHeight	uint64
+	LatencyBlocks	uint64
+	SLOThreshold	uint64
+	Breached	bool
 }
 
 type SettlementGasCostSchedule struct {
-	OpenGas                 uint64
-	CooperativeCloseGas     uint64
-	UnilateralCloseGas      uint64
-	DisputeGas              uint64
-	FraudProofGas           uint64
-	ConditionResolutionGas  uint64
-	PenaltyRoutingGas       uint64
-	FinalSettlementGas      uint64
-	ReplayProtectionGas     uint64
-	PerSignatureGas         uint64
-	PerConditionGas         uint64
-	PerFraudProofGas        uint64
-	PerPenaltyAllocationGas uint64
-	PerStateByteGas         uint64
+	OpenGas			uint64
+	CooperativeCloseGas	uint64
+	UnilateralCloseGas	uint64
+	DisputeGas		uint64
+	FraudProofGas		uint64
+	ConditionResolutionGas	uint64
+	PenaltyRoutingGas	uint64
+	FinalSettlementGas	uint64
+	ReplayProtectionGas	uint64
+	PerSignatureGas		uint64
+	PerConditionGas		uint64
+	PerFraudProofGas	uint64
+	PerPenaltyAllocationGas	uint64
+	PerStateByteGas		uint64
 }
 
 type SettlementGasEstimate struct {
-	Operation            SettlementArbitrationOperation
-	BaseGas              uint64
-	SignatureGas         uint64
-	ConditionGas         uint64
-	FraudProofGas        uint64
-	PenaltyAllocationGas uint64
-	StateByteGas         uint64
-	TotalGas             uint64
+	Operation		SettlementArbitrationOperation
+	BaseGas			uint64
+	SignatureGas		uint64
+	ConditionGas		uint64
+	FraudProofGas		uint64
+	PenaltyAllocationGas	uint64
+	StateByteGas		uint64
+	TotalGas		uint64
 }
 
 type ChannelOpenFeeFormula struct {
-	Denom                  string
-	BaseFee                string
-	ParticipantFee         string
-	ParticipantCount       uint64
-	StorageByteFee         string
-	StorageBytes           uint64
-	StorageFee             string
-	ConditionalSurcharge   string
-	VirtualAnchorSurcharge string
-	RoutingDeposit         string
-	RentReserve            string
-	MultiplierBps          uint32
-	MinFee                 string
-	MaxFee                 string
-	TotalFee               string
+	Denom			string
+	BaseFee			string
+	ParticipantFee		string
+	ParticipantCount	uint64
+	StorageByteFee		string
+	StorageBytes		uint64
+	StorageFee		string
+	ConditionalSurcharge	string
+	VirtualAnchorSurcharge	string
+	RoutingDeposit		string
+	RentReserve		string
+	MultiplierBps		uint32
+	MinFee			string
+	MaxFee			string
+	TotalFee		string
 }
 
 func DefaultPaymentFeeSchedule() PaymentFeeSchedule {
 	return PaymentFeeSchedule{
-		Denom:                           NativeDenom,
-		ChannelOpenFee:                  DefaultOpeningFee,
-		ChannelOpenPerParticipantFee:    "0",
-		ChannelCheckpointFee:            "0",
-		CooperativeCloseFee:             "0",
-		UnilateralCloseFee:              "0",
-		DisputeFee:                      "0",
-		FraudProofVerificationFee:       "0",
-		ConditionalPromiseSettlementFee: "0",
-		VirtualChannelAnchorFee:         "0",
-		RoutingAdvertisementFee:         "0",
-		RoutingAdvertisementDeposit:     "0",
-		ConditionalCapabilitySurcharge:  "0",
-		VirtualChannelAnchorSurcharge:   "0",
-		StorageByteFee:                  "0",
-		OpenFeeMin:                      DefaultOpeningFee,
-		OpenFeeMax:                      "0",
-		StorageRentPerBlock:             "0",
-		BaseMultiplierBps:               10_000,
-		MaxMultiplierBps:                100_000,
+		Denom:					NativeDenom,
+		ChannelOpenFee:				DefaultOpeningFee,
+		ChannelOpenPerParticipantFee:		"0",
+		ChannelCheckpointFee:			"0",
+		CooperativeCloseFee:			"0",
+		UnilateralCloseFee:			"0",
+		DisputeFee:				"0",
+		FraudProofVerificationFee:		"0",
+		ConditionalPromiseSettlementFee:	"0",
+		VirtualChannelAnchorFee:		"0",
+		RoutingAdvertisementFee:		"0",
+		RoutingAdvertisementDeposit:		"0",
+		ConditionalCapabilitySurcharge:		"0",
+		VirtualChannelAnchorSurcharge:		"0",
+		StorageByteFee:				"0",
+		OpenFeeMin:				DefaultOpeningFee,
+		OpenFeeMax:				"0",
+		StorageRentPerBlock:			"0",
+		BaseMultiplierBps:			10_000,
+		MaxMultiplierBps:			100_000,
 	}
 }
 
 type ChannelRecord struct {
-	ChainID             string
-	ChannelID           string
-	ChannelType         ChannelType
-	Participants        []string
-	RequiredSigners     []string
-	Payer               string
-	Receiver            string
-	ReceiverAckRequired bool
-	Denom               string
-	Collateral          string
-	OpenHeight          uint64
-	CloseDelay          uint64
-	DisputePeriod       uint64
-	ExpirationHeight    uint64
-	ExpirationTimestamp int64
-	OpeningFeeDenom     string
-	OpeningFeePaid      string
-	RoutingAdvertised   bool
-	ConditionalPayments bool
-	CustodyDenom        string
-	CustodyAmount       string
-	Status              ChannelStatus
-	Finality            ChannelFinality
-	OpeningStateHash    string
-	FinalizedNonce      uint64
-	DisputedNonce       uint64
-	LatestState         ChannelState
-	LatestClaim         UnidirectionalClaim
-	PendingClose        PendingClose
+	ChainID			string
+	ChannelID		string
+	ChannelType		ChannelType
+	Participants		[]string
+	RequiredSigners		[]string
+	Payer			string
+	Receiver		string
+	ReceiverAckRequired	bool
+	Denom			string
+	Collateral		string
+	OpenHeight		uint64
+	CloseDelay		uint64
+	DisputePeriod		uint64
+	ExpirationHeight	uint64
+	ExpirationTimestamp	int64
+	OpeningFeeDenom		string
+	OpeningFeePaid		string
+	RoutingAdvertised	bool
+	ConditionalPayments	bool
+	CustodyDenom		string
+	CustodyAmount		string
+	Status			ChannelStatus
+	Finality		ChannelFinality
+	OpeningStateHash	string
+	FinalizedNonce		uint64
+	DisputedNonce		uint64
+	LatestState		ChannelState
+	LatestClaim		UnidirectionalClaim
+	PendingClose		PendingClose
 }
 
 type SettlementRecord struct {
-	ChainID            string
-	ChannelID          string
-	StateHash          string
-	Nonce              uint64
-	FinalBalances      []Balance
-	SettlementFeeDenom string
-	SettlementFee      string
-	Penalties          []Penalty
-	PenaltyAllocations []PenaltyAllocation
-	SettledHeight      uint64
-	SettlementHash     string
+	ChainID			string
+	ChannelID		string
+	StateHash		string
+	Nonce			uint64
+	FinalBalances		[]Balance
+	SettlementFeeDenom	string
+	SettlementFee		string
+	Penalties		[]Penalty
+	PenaltyAllocations	[]PenaltyAllocation
+	SettledHeight		uint64
+	SettlementHash		string
 }
 
 type CustodyLock struct {
-	ChannelID string
-	Denom     string
-	Amount    string
+	ChannelID	string
+	Denom		string
+	Amount		string
 }
 
 type PaymentEventAttribute struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 type PaymentEvent struct {
-	EventID    string
-	EventType  string
-	ChannelID  string
-	Height     uint64
-	Attributes []PaymentEventAttribute
+	EventID		string
+	EventType	string
+	ChannelID	string
+	Height		uint64
+	Attributes	[]PaymentEventAttribute
 }
 
 type StoreV2ChannelRecord struct {
-	Key                     string
-	Version                 uint64
-	ChannelID               string
-	Channel                 ChannelRecord
-	LatestStateHash         string
-	LatestStateNonce        uint64
-	PendingCloseKey         string
-	ParticipantIndexKeys    []string
-	RoutingAdvertisementKey string
+	Key			string
+	Version			uint64
+	ChannelID		string
+	Channel			ChannelRecord
+	LatestStateHash		string
+	LatestStateNonce	uint64
+	PendingCloseKey		string
+	ParticipantIndexKeys	[]string
+	RoutingAdvertisementKey	string
 }
 
 type StoreV2ChannelStateRecord struct {
-	Key              string
-	Version          uint64
-	ChannelID        string
-	Nonce            uint64
-	StateHash        string
-	FullState        ChannelState
-	SubmittedOnChain bool
-	CheckpointHeight uint64
+	Key			string
+	Version			uint64
+	ChannelID		string
+	Nonce			uint64
+	StateHash		string
+	FullState		ChannelState
+	SubmittedOnChain	bool
+	CheckpointHeight	uint64
 }
 
 type StoreV2PendingCloseRecord struct {
-	Key       string
-	Version   uint64
-	ChannelID string
-	Close     PendingClose
+	Key		string
+	Version		uint64
+	ChannelID	string
+	Close		PendingClose
 }
 
 type StoreV2ConditionRecord struct {
-	Key           string
-	Version       uint64
-	ConditionID   string
-	ChannelID     string
-	Promise       ConditionalPromise
-	ExpiresHeight uint64
-	Settled       bool
-	ClaimEvidence string
+	Key		string
+	Version		uint64
+	ConditionID	string
+	ChannelID	string
+	Promise		ConditionalPromise
+	ExpiresHeight	uint64
+	Settled		bool
+	ClaimEvidence	string
 }
 
 type StoreV2VirtualChannelRecord struct {
-	Key              string
-	Version          uint64
-	VirtualChannelID string
-	Channel          VirtualChannel
-	AnchorHash       string
+	Key			string
+	Version			uint64
+	VirtualChannelID	string
+	Channel			VirtualChannel
+	AnchorHash		string
 }
 
 type StoreV2ParticipantChannelRecord struct {
-	Key         string
-	Version     uint64
-	Participant string
-	ChannelID   string
+	Key		string
+	Version		uint64
+	Participant	string
+	ChannelID	string
 }
 
 type StoreV2SettlementTombstoneRecord struct {
-	Key              string
-	Version          uint64
-	ChannelID        string
-	Tombstone        ClosedChannelTombstone
-	PruneAfterHeight uint64
+	Key			string
+	Version			uint64
+	ChannelID		string
+	Tombstone		ClosedChannelTombstone
+	PruneAfterHeight	uint64
 }
 
 type StoreV2FeeAccumulatorRecord struct {
-	Key          string
-	Version      uint64
-	BlockOrEpoch string
-	Bucket       string
-	Amount       string
+	Key		string
+	Version		uint64
+	BlockOrEpoch	string
+	Bucket		string
+	Amount		string
 }
 
 type StoreV2FraudProofRecord struct {
-	Key       string
-	Version   uint64
-	ProofID   string
-	ChannelID string
-	Proof     FraudProof
+	Key		string
+	Version		uint64
+	ProofID		string
+	ChannelID	string
+	Proof		FraudProof
 }
 
 type StoreV2Layout struct {
-	Version              uint64
-	Channels             []StoreV2ChannelRecord
-	ChannelStates        []StoreV2ChannelStateRecord
-	PendingCloses        []StoreV2PendingCloseRecord
-	Conditions           []StoreV2ConditionRecord
-	VirtualChannels      []StoreV2VirtualChannelRecord
-	ParticipantChannels  []StoreV2ParticipantChannelRecord
-	SettlementTombstones []StoreV2SettlementTombstoneRecord
-	FeeAccumulators      []StoreV2FeeAccumulatorRecord
-	FraudProofs          []StoreV2FraudProofRecord
+	Version			uint64
+	Channels		[]StoreV2ChannelRecord
+	ChannelStates		[]StoreV2ChannelStateRecord
+	PendingCloses		[]StoreV2PendingCloseRecord
+	Conditions		[]StoreV2ConditionRecord
+	VirtualChannels		[]StoreV2VirtualChannelRecord
+	ParticipantChannels	[]StoreV2ParticipantChannelRecord
+	SettlementTombstones	[]StoreV2SettlementTombstoneRecord
+	FeeAccumulators		[]StoreV2FeeAccumulatorRecord
+	FraudProofs		[]StoreV2FraudProofRecord
 }
 
 type ParticipantChannelPageRequest struct {
-	Address string
-	Offset  uint64
-	Limit   uint64
+	Address	string
+	Offset	uint64
+	Limit	uint64
 }
 
 type ParticipantChannelPageResponse struct {
-	Entries    []StoreV2ParticipantChannelRecord
-	NextOffset uint64
-	Total      uint64
+	Entries		[]StoreV2ParticipantChannelRecord
+	NextOffset	uint64
+	Total		uint64
 }
 
 type AdaptiveSyncSnapshot struct {
-	Key                     string
-	Version                 uint64
-	Height                  uint64
-	Layout                  StoreV2Layout
-	ActiveDisputes          []AdaptiveSyncActiveDisputeIndex
-	PendingFinalizations    []AdaptiveSyncPendingFinalizationIndex
-	WatcherReplayEvents     []AdaptiveSyncWatcherReplayEvent
-	SnapshotHash            string
-	ConsensusOnly           bool
-	RoutingTopologyExcluded bool
+	Key			string
+	Version			uint64
+	Height			uint64
+	Layout			StoreV2Layout
+	ActiveDisputes		[]AdaptiveSyncActiveDisputeIndex
+	PendingFinalizations	[]AdaptiveSyncPendingFinalizationIndex
+	WatcherReplayEvents	[]AdaptiveSyncWatcherReplayEvent
+	SnapshotHash		string
+	ConsensusOnly		bool
+	RoutingTopologyExcluded	bool
 }
 
 type AdaptiveSyncActiveDisputeIndex struct {
-	Key               string
-	ChannelID         string
-	PendingStateHash  string
-	PendingNonce      uint64
-	SubmittedHeight   uint64
-	SettleAfterHeight uint64
-	DisputeCount      uint32
-	Submitter         string
+	Key			string
+	ChannelID		string
+	PendingStateHash	string
+	PendingNonce		uint64
+	SubmittedHeight		uint64
+	SettleAfterHeight	uint64
+	DisputeCount		uint32
+	Submitter		string
 }
 
 type AdaptiveSyncPendingFinalizationIndex struct {
-	Key              string
-	ChannelID        string
-	PendingHeight    uint64
-	Finality         ChannelFinality
-	PendingStateHash string
-	PendingNonce     uint64
+	Key			string
+	ChannelID		string
+	PendingHeight		uint64
+	Finality		ChannelFinality
+	PendingStateHash	string
+	PendingNonce		uint64
 }
 
 type AdaptiveSyncWatcherReplayEvent struct {
-	Key       string
-	Event     PaymentEvent
-	EventHash string
+	Key		string
+	Event		PaymentEvent
+	EventHash	string
 }
 
 type AdaptiveSyncRecoveryState struct {
-	ActiveChannelIDs          []string
-	PendingCloseChannelIDs    []string
-	UnresolvedConditionIDs    []string
-	VirtualChannelIDs         []string
-	SettlementTombstoneIDs    []string
-	ActiveDisputeChannelIDs   []string
-	PendingFinalizationIDs    []string
-	WatcherReplayEventIDs     []string
-	RecoveredFromSnapshotHash string
+	ActiveChannelIDs		[]string
+	PendingCloseChannelIDs		[]string
+	UnresolvedConditionIDs		[]string
+	VirtualChannelIDs		[]string
+	SettlementTombstoneIDs		[]string
+	ActiveDisputeChannelIDs		[]string
+	PendingFinalizationIDs		[]string
+	WatcherReplayEventIDs		[]string
+	RecoveredFromSnapshotHash	string
 }
 
 type ChannelEdge struct {
-	ChannelID            string
-	From                 string
-	To                   string
-	Capacity             string
-	FeeDenom             string
-	FeeAmount            string
-	AdvertisementFeePaid string
-	ExpiresHeight        uint64
-	Active               bool
+	ChannelID		string
+	From			string
+	To			string
+	Capacity		string
+	FeeDenom		string
+	FeeAmount		string
+	AdvertisementFeePaid	string
+	ExpiresHeight		uint64
+	Active			bool
 }
 
 type VirtualChannel struct {
-	VirtualChannelID         string
-	ChainID                  string
-	Nonce                    uint64
-	ParentRouteID            string
-	ParentChannelIDs         []string
-	ParentReserveCommitments []string
-	Endpoints                []string
-	EndpointA                string
-	EndpointB                string
-	Intermediaries           []string
-	IntermediarySetHash      string
-	Capacity                 string
-	BalanceA                 string
-	BalanceB                 string
-	RoutingFeeAmount         string
-	AnchorFeePaid            string
-	ExpiresHeight            uint64
-	Status                   VirtualChannelStatus
-	AnchorCommitment         string
-	ConditionRoot            string
-	StateHash                string
-	Signatures               []StateSignature
+	VirtualChannelID		string
+	ChainID				string
+	Nonce				uint64
+	ParentRouteID			string
+	ParentChannelIDs		[]string
+	ParentReserveCommitments	[]string
+	Endpoints			[]string
+	EndpointA			string
+	EndpointB			string
+	Intermediaries			[]string
+	IntermediarySetHash		string
+	Capacity			string
+	BalanceA			string
+	BalanceB			string
+	RoutingFeeAmount		string
+	AnchorFeePaid			string
+	ExpiresHeight			uint64
+	Status				VirtualChannelStatus
+	AnchorCommitment		string
+	ConditionRoot			string
+	StateHash			string
+	Signatures			[]StateSignature
 }
 
 type VirtualReservationSignature struct {
-	Signer           string
-	ChainID          string
-	VirtualChannelID string
-	ParentRouteID    string
-	ParentChannelID  string
-	ObjectType       string
-	Version          uint32
-	Capacity         string
-	SplitAmount      string
-	FeeAmount        string
-	ExpirationHeight uint64
-	CommitmentHash   string
-	SignatureHash    string
+	Signer			string
+	ChainID			string
+	VirtualChannelID	string
+	ParentRouteID		string
+	ParentChannelID		string
+	ObjectType		string
+	Version			uint32
+	Capacity		string
+	SplitAmount		string
+	FeeAmount		string
+	ExpirationHeight	uint64
+	CommitmentHash		string
+	SignatureHash		string
 }
 
 type VirtualParentReserve struct {
-	SegmentID         string
-	ParentChannelID   string
-	ReservedBy        string
-	Capacity          string
-	SplitAmount       string
-	FeeAmount         string
-	ReserveCommitment string
-	Signature         VirtualReservationSignature
+	SegmentID		string
+	ParentChannelID		string
+	ReservedBy		string
+	Capacity		string
+	SplitAmount		string
+	FeeAmount		string
+	ReserveCommitment	string
+	Signature		VirtualReservationSignature
 }
 
 type VirtualActivationProof struct {
-	VirtualChannel     VirtualChannel
-	ParentReserves     []VirtualParentReserve
-	RouteTimeoutHeight uint64
-	AggregatedCapacity bool
-	ProofHash          string
+	VirtualChannel		VirtualChannel
+	ParentReserves		[]VirtualParentReserve
+	RouteTimeoutHeight	uint64
+	AggregatedCapacity	bool
+	ProofHash		string
 }
 
 type VirtualReserveRelease struct {
-	SegmentID         string
-	VirtualChannelID  string
-	ParentChannelID   string
-	ReserveCommitment string
-	Capacity          string
-	BalanceA          string
-	BalanceB          string
-	FeeAmount         string
-	ReleaseHeight     uint64
-	ReleaseHash       string
+	SegmentID		string
+	VirtualChannelID	string
+	ParentChannelID		string
+	ReserveCommitment	string
+	Capacity		string
+	BalanceA		string
+	BalanceB		string
+	FeeAmount		string
+	ReleaseHeight		uint64
+	ReleaseHash		string
 }
 
 type VirtualCloseProof struct {
-	VirtualChannelID         string
-	ParentRouteID            string
-	CloseMode                VirtualCloseMode
-	FinalState               VirtualChannel
-	ParentReserveCommitments []string
-	SubmittedBy              string
-	CloseHeight              uint64
-	ReleaseHeight            uint64
-	ProofHash                string
+	VirtualChannelID		string
+	ParentRouteID			string
+	CloseMode			VirtualCloseMode
+	FinalState			VirtualChannel
+	ParentReserveCommitments	[]string
+	SubmittedBy			string
+	CloseHeight			uint64
+	ReleaseHeight			uint64
+	ProofHash			string
 }
 
 type VirtualChannelDisputeProof struct {
-	VirtualChannelID         string
-	ParentRouteID            string
-	LatestState              VirtualChannel
-	ParentReserveCommitments []string
-	SubmittedBy              string
-	EvidenceHash             string
+	VirtualChannelID		string
+	ParentRouteID			string
+	LatestState			VirtualChannel
+	ParentReserveCommitments	[]string
+	SubmittedBy			string
+	EvidenceHash			string
 }
 
 type VirtualReserveSegment struct {
-	SegmentID         string
-	VirtualChannelID  string
-	ParentChannelID   string
-	ReserveCommitment string
-	Capacity          string
-	BalanceA          string
-	BalanceB          string
-	FeeAmount         string
-	SegmentHash       string
+	SegmentID		string
+	VirtualChannelID	string
+	ParentChannelID		string
+	ReserveCommitment	string
+	Capacity		string
+	BalanceA		string
+	BalanceB		string
+	FeeAmount		string
+	SegmentHash		string
 }
 
 type VirtualSegmentSettlementProof struct {
-	SegmentID         string
-	VirtualChannelID  string
-	ParentChannelID   string
-	FinalStateHash    string
-	ReserveCommitment string
-	BalanceA          string
-	BalanceB          string
-	SettlementHash    string
+	SegmentID		string
+	VirtualChannelID	string
+	ParentChannelID		string
+	FinalStateHash		string
+	ReserveCommitment	string
+	BalanceA		string
+	BalanceB		string
+	SettlementHash		string
 }
 
 type VirtualPartialActivationFailure struct {
-	VirtualChannelID  string
-	FailedSegmentID   string
-	Reason            string
-	RefundCommitments []string
-	FailureHash       string
+	VirtualChannelID	string
+	FailedSegmentID		string
+	Reason			string
+	RefundCommitments	[]string
+	FailureHash		string
 }
 
 type SettlementOperation struct {
-	OperationID   string
-	OperationType BatchOperationType
-	ChannelID     string
-	Nonce         uint64
-	StateHash     string
+	OperationID	string
+	OperationType	BatchOperationType
+	ChannelID	string
+	Nonce		uint64
+	StateHash	string
 }
 
 type BlockSTMAccessPlan struct {
-	OperationID        string
-	TxClass            BlockSTMTransactionClass
-	ChannelID          string
-	ConditionIDs       []string
-	ReadKeys           []string
-	WriteKeys          []string
-	AccumulatorKeys    []string
-	ConflictDomain     string
-	DeterministicGroup string
+	OperationID		string
+	TxClass			BlockSTMTransactionClass
+	ChannelID		string
+	ConditionIDs		[]string
+	ReadKeys		[]string
+	WriteKeys		[]string
+	AccumulatorKeys		[]string
+	ConflictDomain		string
+	DeterministicGroup	string
 }
 
 type BlockSTMConflict struct {
-	LeftOperationID  string
-	RightOperationID string
-	Key              string
-	Reason           string
+	LeftOperationID		string
+	RightOperationID	string
+	Key			string
+	Reason			string
 }
 
 type BlockSTMConflictProfile struct {
-	Plans                    []BlockSTMAccessPlan
-	Conflicts                []BlockSTMConflict
-	ParallelizableGroups     [][]string
-	ConflictFree             bool
-	GlobalAccountingDeferred bool
+	Plans				[]BlockSTMAccessPlan
+	Conflicts			[]BlockSTMConflict
+	ParallelizableGroups		[][]string
+	ConflictFree			bool
+	GlobalAccountingDeferred	bool
 }
 
 type PaymentBlockAccumulator struct {
-	BlockHeight    uint64
-	FeeAmount      string
-	BurnAmount     string
-	PenaltyAmount  string
-	OperationCount uint64
-	AccumulatorKey string
+	BlockHeight	uint64
+	FeeAmount	string
+	BurnAmount	string
+	PenaltyAmount	string
+	OperationCount	uint64
+	AccumulatorKey	string
 }
 
 type SettlementBatch struct {
-	BatchID    string
-	Operations []SettlementOperation
-	RootHash   string
+	BatchID		string
+	Operations	[]SettlementOperation
+	RootHash	string
 }
 
 func BuildState(state ChannelState) (ChannelState, error) {
@@ -1768,16 +1768,16 @@ func SignatureForState(state ChannelState, signer string) (StateSignature, error
 		return StateSignature{}, err
 	}
 	return StateSignature{
-		Signer:           signer,
-		ChainID:          state.ChainID,
-		ChannelID:        state.ChannelID,
-		ObjectType:       SignatureObjectState,
-		Version:          state.Version,
-		Nonce:            state.Nonce,
-		ObjectID:         state.StateHash,
-		ExpirationHeight: state.TimeoutHeight,
-		CommitmentHash:   state.StateHash,
-		StateHash:        state.StateHash,
+		Signer:			signer,
+		ChainID:		state.ChainID,
+		ChannelID:		state.ChannelID,
+		ObjectType:		SignatureObjectState,
+		Version:		state.Version,
+		Nonce:			state.Nonce,
+		ObjectID:		state.StateHash,
+		ExpirationHeight:	state.TimeoutHeight,
+		CommitmentHash:		state.StateHash,
+		StateHash:		state.StateHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			state.ChainID,
@@ -1838,13 +1838,13 @@ func SignStateWithWriteAhead(records []SignedNonceRecord, state ChannelState, si
 		return normalized, sig, err
 	}
 	record := SignedNonceRecord{
-		Signer:        signer,
-		ChainID:       state.ChainID,
-		ChannelID:     state.ChannelID,
-		Epoch:         state.Epoch,
-		Nonce:         state.Nonce,
-		StateHash:     state.StateHash,
-		IsolationMode: isolationMode,
+		Signer:		signer,
+		ChainID:	state.ChainID,
+		ChannelID:	state.ChannelID,
+		Epoch:		state.Epoch,
+		Nonce:		state.Nonce,
+		StateHash:	state.StateHash,
+		IsolationMode:	isolationMode,
 	}
 	record.WALHash = ComputeSignedNonceWALHash(record)
 	normalized = append(normalized, record)
@@ -1868,24 +1868,24 @@ func BuildChannelFromOpenRequest(req ChannelOpenRequest) (ChannelRecord, error) 
 		return ChannelRecord{}, err
 	}
 	channel := ChannelRecord{
-		ChainID:             req.ChainID,
-		ChannelID:           req.ChannelID,
-		ChannelType:         req.ChannelType,
-		Participants:        req.Participants,
-		Denom:               NativeDenom,
-		Collateral:          req.Collateral,
-		OpenHeight:          req.OpenHeight,
-		CloseDelay:          req.CloseDelay,
-		DisputePeriod:       req.ChallengePeriod,
-		ExpirationHeight:    req.ExpirationHeight,
-		ExpirationTimestamp: req.ExpirationTimestamp,
-		OpeningFeeDenom:     req.OpeningFeeDenom,
-		OpeningFeePaid:      req.OpeningFeePaid,
-		RoutingAdvertised:   req.RoutingAdvertised,
-		ConditionalPayments: req.ConditionalPaymentsSupported,
-		CustodyDenom:        NativeDenom,
-		CustodyAmount:       req.Collateral,
-		Status:              ChannelStatusOpen,
+		ChainID:		req.ChainID,
+		ChannelID:		req.ChannelID,
+		ChannelType:		req.ChannelType,
+		Participants:		req.Participants,
+		Denom:			NativeDenom,
+		Collateral:		req.Collateral,
+		OpenHeight:		req.OpenHeight,
+		CloseDelay:		req.CloseDelay,
+		DisputePeriod:		req.ChallengePeriod,
+		ExpirationHeight:	req.ExpirationHeight,
+		ExpirationTimestamp:	req.ExpirationTimestamp,
+		OpeningFeeDenom:	req.OpeningFeeDenom,
+		OpeningFeePaid:		req.OpeningFeePaid,
+		RoutingAdvertised:	req.RoutingAdvertised,
+		ConditionalPayments:	req.ConditionalPaymentsSupported,
+		CustodyDenom:		NativeDenom,
+		CustodyAmount:		req.Collateral,
+		Status:			ChannelStatusOpen,
 	}
 	if req.ChannelType == ChannelTypeUnidirectional && len(req.Participants) == 2 {
 		channel.Payer = req.Participants[0]
@@ -2203,13 +2203,13 @@ func (s ValidatorAssistedDisputeSubmission) ValidateForChannel(channel ChannelRe
 		return errors.New("payments validator assisted dispute service mismatch")
 	}
 	return (WatchDisputeSubmission{
-		WatchService:          metadata.ServiceAddress,
-		Delegator:             s.Delegator,
-		ChannelID:             s.ChannelID,
-		ClosingStateReference: s.ClosingStateReference,
-		NewerState:            s.NewerState,
-		CurrentHeight:         s.CurrentHeight,
-		EvidenceHash:          s.EvidenceHash,
+		WatchService:		metadata.ServiceAddress,
+		Delegator:		s.Delegator,
+		ChannelID:		s.ChannelID,
+		ClosingStateReference:	s.ClosingStateReference,
+		NewerState:		s.NewerState,
+		CurrentHeight:		s.CurrentHeight,
+		EvidenceHash:		s.EvidenceHash,
 	}).ValidateForChannel(channel)
 }
 
@@ -2244,16 +2244,16 @@ func SignatureForPromise(channel ChannelRecord, promise ConditionalPromise, sign
 		return PromiseSignature{}, err
 	}
 	return PromiseSignature{
-		Signer:           signer,
-		ChainID:          channel.ChainID,
-		ChannelID:        promise.ChannelID,
-		ObjectType:       SignatureObjectPromise,
-		Version:          CurrentStateVersion,
-		Nonce:            promise.Nonce,
-		ObjectID:         promise.PromiseHash,
-		ExpirationHeight: promise.TimeoutHeight,
-		CommitmentHash:   promise.PromiseHash,
-		PromiseHash:      promise.PromiseHash,
+		Signer:			signer,
+		ChainID:		channel.ChainID,
+		ChannelID:		promise.ChannelID,
+		ObjectType:		SignatureObjectPromise,
+		Version:		CurrentStateVersion,
+		Nonce:			promise.Nonce,
+		ObjectID:		promise.PromiseHash,
+		ExpirationHeight:	promise.TimeoutHeight,
+		CommitmentHash:		promise.PromiseHash,
+		PromiseHash:		promise.PromiseHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			channel.ChainID,
@@ -2362,15 +2362,15 @@ func (p ConditionalPromise) ValidateForChannel(channel ChannelRecord) error {
 func (p ConditionalPromise) ToConditionalPayment() ConditionalPayment {
 	promise := p.Normalize()
 	return ConditionalPayment{
-		ConditionID:   promise.PromiseID,
-		ConditionType: promise.ConditionType,
-		Payer:         promise.Source,
-		Payee:         promise.Destination,
-		Amount:        promise.Amount,
-		HashLock:      promise.HashLock,
-		TimeoutHeight: promise.TimeoutHeight,
-		NonceStart:    promise.Nonce,
-		NonceEnd:      promise.Nonce,
+		ConditionID:	promise.PromiseID,
+		ConditionType:	promise.ConditionType,
+		Payer:		promise.Source,
+		Payee:		promise.Destination,
+		Amount:		promise.Amount,
+		HashLock:	promise.HashLock,
+		TimeoutHeight:	promise.TimeoutHeight,
+		NonceStart:	promise.Nonce,
+		NonceEnd:	promise.Nonce,
 	}.Normalize()
 }
 
@@ -2749,14 +2749,14 @@ func (m GossipMessage) ToChannelEdge() (ChannelEdge, bool) {
 			return ChannelEdge{}, false
 		}
 		edge := ChannelEdge{
-			ChannelID:     message.ChannelID,
-			From:          message.From,
-			To:            message.To,
-			Capacity:      capacity,
-			FeeDenom:      message.FeeDenom,
-			FeeAmount:     message.FeeAmount,
-			ExpiresHeight: message.ValidUntilHeight,
-			Active:        true,
+			ChannelID:	message.ChannelID,
+			From:		message.From,
+			To:		message.To,
+			Capacity:	capacity,
+			FeeDenom:	message.FeeDenom,
+			FeeAmount:	message.FeeAmount,
+			ExpiresHeight:	message.ValidUntilHeight,
+			Active:		true,
 		}.Normalize()
 		return edge, true
 	default:
@@ -2960,23 +2960,23 @@ func (s CongestionSnapshot) Validate() error {
 
 func DefaultRoutePolicy() RoutePolicy {
 	return RoutePolicy{
-		MaxHops:                 MaxRoutingHops,
-		RequiredTimeoutMargin:   DefaultTimeoutMargin,
-		StaleLiquidityAfter:     DefaultGossipTTL,
-		HopPenalty:              "1",
-		CongestionPenalty:       "10",
-		StaleLiquidityPenalty:   "25",
-		FailurePenalty:          "25",
-		TimeoutPenalty:          "50",
-		SuccessPenalty:          "25",
-		AvailabilityPenalty:     "25",
-		ReservePressurePenalty:  "25",
-		QueueDelayPenalty:       "10",
-		PendingConditionPenalty: "5",
-		LatencyPenalty:          "10",
-		DecayHalfLife:           DefaultGossipTTL,
-		MaxCongestedPaymentBps:  5_000,
-		MaxSplits:               1,
+		MaxHops:			MaxRoutingHops,
+		RequiredTimeoutMargin:		DefaultTimeoutMargin,
+		StaleLiquidityAfter:		DefaultGossipTTL,
+		HopPenalty:			"1",
+		CongestionPenalty:		"10",
+		StaleLiquidityPenalty:		"25",
+		FailurePenalty:			"25",
+		TimeoutPenalty:			"50",
+		SuccessPenalty:			"25",
+		AvailabilityPenalty:		"25",
+		ReservePressurePenalty:		"25",
+		QueueDelayPenalty:		"10",
+		PendingConditionPenalty:	"5",
+		LatencyPenalty:			"10",
+		DecayHalfLife:			DefaultGossipTTL,
+		MaxCongestedPaymentBps:		5_000,
+		MaxSplits:			1,
 	}
 }
 
@@ -3059,8 +3059,8 @@ func (p RoutePolicy) Normalize() RoutePolicy {
 func (p RoutePolicy) Validate() error {
 	policy := p.Normalize()
 	for _, value := range []struct {
-		field string
-		text  string
+		field	string
+		text	string
 	}{
 		{"payments route hop penalty", policy.HopPenalty},
 		{"payments route congestion penalty", policy.CongestionPenalty},
@@ -3165,15 +3165,15 @@ func SignatureForRoutingFeePolicy(update RoutingFeePolicyUpdate, signer string) 
 		update.PolicyHash = ComputeRoutingFeePolicyHash(update)
 	}
 	return RoutingFeePolicySignature{
-		Signer:           signer,
-		ChainID:          update.ChainID,
-		ChannelID:        update.ChannelID,
-		ObjectType:       SignatureObjectRoutingFee,
-		Version:          CurrentStateVersion,
-		Sequence:         update.Sequence,
-		ObjectID:         update.PolicyHash,
-		ExpirationHeight: update.ValidUntilHeight,
-		CommitmentHash:   update.PolicyHash,
+		Signer:			signer,
+		ChainID:		update.ChainID,
+		ChannelID:		update.ChannelID,
+		ObjectType:		SignatureObjectRoutingFee,
+		Version:		CurrentStateVersion,
+		Sequence:		update.Sequence,
+		ObjectID:		update.PolicyHash,
+		ExpirationHeight:	update.ValidUntilHeight,
+		CommitmentHash:		update.PolicyHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			update.ChainID,
@@ -3238,8 +3238,8 @@ func (u RoutingFeePolicyUpdate) ValidateAtHeight(currentHeight uint64) error {
 		return fmt.Errorf("payments routing fee policy denom must be %s", NativeDenom)
 	}
 	for _, value := range []struct {
-		field string
-		text  string
+		field	string
+		text	string
 	}{
 		{"payments routing base hop fee", update.BaseHopFee},
 		{"payments routing liquidity reservation fee", update.LiquidityReservationFee},
@@ -3668,11 +3668,11 @@ func ValidateOffchainUpdate(channel ChannelRecord, req ChannelUpdateRequest) (Ch
 		}
 	}
 	return ChannelUpdateResult{
-		ChannelID:         channel.ChannelID,
-		StateHash:         req.State.StateHash,
-		Nonce:             req.State.Nonce,
-		ValidatedOffChain: true,
-		Liquidity:         req.State.Balances,
+		ChannelID:		channel.ChannelID,
+		StateHash:		req.State.StateHash,
+		Nonce:			req.State.Nonce,
+		ValidatedOffChain:	true,
+		Liquidity:		req.State.Balances,
 	}, nil
 }
 
@@ -3698,16 +3698,16 @@ func SignatureForClaim(claim UnidirectionalClaim, signer string) (ClaimSignature
 		return ClaimSignature{}, err
 	}
 	return ClaimSignature{
-		Signer:           signer,
-		ChainID:          claim.ChainID,
-		ChannelID:        claim.ChannelID,
-		ObjectType:       SignatureObjectClaim,
-		Version:          CurrentStateVersion,
-		Nonce:            claim.Nonce,
-		ObjectID:         claim.StateHash,
-		ExpirationHeight: claim.ExpirationHeight,
-		CommitmentHash:   claim.StateHash,
-		ClaimHash:        claim.StateHash,
+		Signer:			signer,
+		ChainID:		claim.ChainID,
+		ChannelID:		claim.ChannelID,
+		ObjectType:		SignatureObjectClaim,
+		Version:		CurrentStateVersion,
+		Nonce:			claim.Nonce,
+		ObjectID:		claim.StateHash,
+		ExpirationHeight:	claim.ExpirationHeight,
+		CommitmentHash:		claim.StateHash,
+		ClaimHash:		claim.StateHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			claim.ChainID,
@@ -3745,13 +3745,13 @@ func SignatureForGossip(message GossipMessage, signer string) (GossipSignature, 
 		return GossipSignature{}, err
 	}
 	return GossipSignature{
-		Signer:           signer,
-		ChainID:          message.ChainID,
-		ObjectType:       SignatureObjectGossip,
-		Version:          CurrentStateVersion,
-		ObjectID:         message.MessageID,
-		ExpirationHeight: message.ValidUntilHeight,
-		CommitmentHash:   message.MessageID,
+		Signer:			signer,
+		ChainID:		message.ChainID,
+		ObjectType:		SignatureObjectGossip,
+		Version:		CurrentStateVersion,
+		ObjectID:		message.MessageID,
+		ExpirationHeight:	message.ValidUntilHeight,
+		CommitmentHash:		message.MessageID,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			message.ChainID,
@@ -3788,16 +3788,16 @@ func SignatureForAsyncDelta(delta AsyncPaymentDelta, signer string) (DeltaSignat
 		return DeltaSignature{}, err
 	}
 	return DeltaSignature{
-		Signer:           signer,
-		ChainID:          delta.ChainID,
-		ChannelID:        delta.ChannelID,
-		ObjectType:       SignatureObjectDelta,
-		Version:          CurrentStateVersion,
-		Nonce:            delta.NonceStart,
-		ObjectID:         delta.UpdateID,
-		ExpirationHeight: delta.ExpiryHeight,
-		CommitmentHash:   delta.DeltaHash,
-		DeltaHash:        delta.DeltaHash,
+		Signer:			signer,
+		ChainID:		delta.ChainID,
+		ChannelID:		delta.ChannelID,
+		ObjectType:		SignatureObjectDelta,
+		Version:		CurrentStateVersion,
+		Nonce:			delta.NonceStart,
+		ObjectID:		delta.UpdateID,
+		ExpirationHeight:	delta.ExpiryHeight,
+		CommitmentHash:		delta.DeltaHash,
+		DeltaHash:		delta.DeltaHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			delta.ChainID,
@@ -3846,32 +3846,32 @@ func BuildAsyncCheckpointState(channel ChannelRecord, deltas []AsyncPaymentDelta
 		return ChannelState{}, err
 	}
 	state, err := BuildState(ChannelState{
-		ChainID:              channel.ChainID,
-		AppVersion:           CurrentAppVersion,
-		ModuleName:           ModuleName,
-		ChannelID:            channel.ChannelID,
-		ChannelType:          ChannelTypeAsync,
-		ParticipantSetHash:   ComputeParticipantSetHash(channel.Participants),
-		Denom:                channel.Denom,
-		Version:              CurrentStateVersion,
-		Epoch:                base.Epoch,
-		Nonce:                checkpointNonce,
-		Balances:             nextBalances,
-		CheckpointNonce:      checkpointNonce,
-		CheckpointBalances:   nextBalances,
-		AsyncUpdateRoot:      ComputeAsyncDeltaRootForChannel(channel, normalizedDeltas),
-		AcceptedUpdateRoot:   ComputeAsyncDeltaRootForChannel(channel, normalizedDeltas),
-		SendWindow:           base.SendWindow,
-		ReceiveWindow:        base.ReceiveWindow,
-		MaxUnackedAmount:     base.MaxUnackedAmount,
-		ExpiryHeight:         base.ExpiryHeight,
-		TimeoutHeight:        base.TimeoutHeight,
-		TimeoutTimestamp:     base.TimeoutTimestamp,
-		ChallengePeriod:      base.ChallengePeriod,
-		CloseDelay:           base.CloseDelay,
-		FeePolicyID:          NativeDenom,
-		RequiredSignerBitmap: ComputeRequiredSignerBitmap(channel.Participants, channel.RequiredSigners),
-		SignatureScheme:      SignatureSchemeEd25519,
+		ChainID:		channel.ChainID,
+		AppVersion:		CurrentAppVersion,
+		ModuleName:		ModuleName,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		ChannelTypeAsync,
+		ParticipantSetHash:	ComputeParticipantSetHash(channel.Participants),
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			base.Epoch,
+		Nonce:			checkpointNonce,
+		Balances:		nextBalances,
+		CheckpointNonce:	checkpointNonce,
+		CheckpointBalances:	nextBalances,
+		AsyncUpdateRoot:	ComputeAsyncDeltaRootForChannel(channel, normalizedDeltas),
+		AcceptedUpdateRoot:	ComputeAsyncDeltaRootForChannel(channel, normalizedDeltas),
+		SendWindow:		base.SendWindow,
+		ReceiveWindow:		base.ReceiveWindow,
+		MaxUnackedAmount:	base.MaxUnackedAmount,
+		ExpiryHeight:		base.ExpiryHeight,
+		TimeoutHeight:		base.TimeoutHeight,
+		TimeoutTimestamp:	base.TimeoutTimestamp,
+		ChallengePeriod:	base.ChallengePeriod,
+		CloseDelay:		base.CloseDelay,
+		FeePolicyID:		NativeDenom,
+		RequiredSignerBitmap:	ComputeRequiredSignerBitmap(channel.Participants, channel.RequiredSigners),
+		SignatureScheme:	SignatureSchemeEd25519,
 	})
 	if err != nil {
 		return ChannelState{}, err
@@ -3915,15 +3915,15 @@ func StreamingClaimForChannel(channel ChannelRecord, frame StreamingPaymentFrame
 		claimed = collateral
 	}
 	return BuildUnidirectionalClaim(UnidirectionalClaim{
-		ChainID:             channel.ChainID,
-		ChannelID:           channel.ChannelID,
-		Payer:               channel.Payer,
-		Receiver:            channel.Receiver,
-		LockedAmount:        channel.Collateral,
-		ClaimedAmount:       claimed.String(),
-		Nonce:               frame.Nonce,
-		ExpirationHeight:    frame.ExpirationHeight,
-		ExpirationTimestamp: frame.ExpirationTimestamp,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Payer:			channel.Payer,
+		Receiver:		channel.Receiver,
+		LockedAmount:		channel.Collateral,
+		ClaimedAmount:		claimed.String(),
+		Nonce:			frame.Nonce,
+		ExpirationHeight:	frame.ExpirationHeight,
+		ExpirationTimestamp:	frame.ExpirationTimestamp,
 	})
 }
 
@@ -5470,8 +5470,8 @@ func (e PenaltyMatrixEntry) Validate() error {
 		return fmt.Errorf("unknown payments penalty source %q", entry.Source)
 	}
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments penalty matrix base", entry.BasePenalty},
 		{"payments penalty reporter cap", entry.ReporterRewardCap},
@@ -5540,8 +5540,8 @@ func (s PaymentFeeSchedule) Validate() error {
 		return fmt.Errorf("payments fee schedule denom must be %s", NativeDenom)
 	}
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments channel open fee", s.ChannelOpenFee},
 		{"payments channel open per participant fee", s.ChannelOpenPerParticipantFee},
@@ -5695,20 +5695,20 @@ func (r PaymentFeeRefund) Validate() error {
 
 func DefaultSettlementGasCostSchedule() SettlementGasCostSchedule {
 	return SettlementGasCostSchedule{
-		OpenGas:                 30_000,
-		CooperativeCloseGas:     22_000,
-		UnilateralCloseGas:      35_000,
-		DisputeGas:              45_000,
-		FraudProofGas:           60_000,
-		ConditionResolutionGas:  40_000,
-		PenaltyRoutingGas:       20_000,
-		FinalSettlementGas:      50_000,
-		ReplayProtectionGas:     10_000,
-		PerSignatureGas:         2_000,
-		PerConditionGas:         3_000,
-		PerFraudProofGas:        8_000,
-		PerPenaltyAllocationGas: 1_500,
-		PerStateByteGas:         8,
+		OpenGas:			30_000,
+		CooperativeCloseGas:		22_000,
+		UnilateralCloseGas:		35_000,
+		DisputeGas:			45_000,
+		FraudProofGas:			60_000,
+		ConditionResolutionGas:		40_000,
+		PenaltyRoutingGas:		20_000,
+		FinalSettlementGas:		50_000,
+		ReplayProtectionGas:		10_000,
+		PerSignatureGas:		2_000,
+		PerConditionGas:		3_000,
+		PerFraudProofGas:		8_000,
+		PerPenaltyAllocationGas:	1_500,
+		PerStateByteGas:		8,
 	}
 }
 
@@ -6050,13 +6050,13 @@ func BuildPenaltyRouteAccounting(channel ChannelRecord, proof FraudProof, matrix
 		return PenaltyRouteAccounting{}, err
 	}
 	return PenaltyRouteAccounting{
-		Class:            entry.Class,
-		Source:           entry.Source,
-		TotalPenalty:     penaltyAmount.String(),
-		ReporterReward:   reporterReward.String(),
-		CounterpartyComp: counterpartyComp.String(),
-		Allocations:      allocations,
-		Penalties:        normalizePenalties(penalties),
+		Class:			entry.Class,
+		Source:			entry.Source,
+		TotalPenalty:		penaltyAmount.String(),
+		ReporterReward:		reporterReward.String(),
+		CounterpartyComp:	counterpartyComp.String(),
+		Allocations:		allocations,
+		Penalties:		normalizePenalties(penalties),
 	}, nil
 }
 
@@ -6078,12 +6078,12 @@ func ComputeInvalidFraudProofSubmissionPenalty(submitter, depositAmount, verific
 		forfeited = deposit
 	}
 	return InvalidFraudProofSubmissionPenalty{
-		Submitter:        submitter,
-		Denom:            NativeDenom,
-		DepositAmount:    deposit.String(),
-		VerificationCost: cost.String(),
-		ForfeitedAmount:  forfeited.String(),
-		RefundAmount:     deposit.Sub(forfeited).String(),
+		Submitter:		submitter,
+		Denom:			NativeDenom,
+		DepositAmount:		deposit.String(),
+		VerificationCost:	cost.String(),
+		ForfeitedAmount:	forfeited.String(),
+		RefundAmount:		deposit.Sub(forfeited).String(),
 	}, nil
 }
 
@@ -6240,10 +6240,10 @@ func (e PaymentEvent) Validate() error {
 func ChannelOpenEvent(channel ChannelRecord) PaymentEvent {
 	channel = channel.Normalize()
 	event := PaymentEvent{
-		EventID:   HashParts("channel-open", channel.ChannelID, channel.OpeningStateHash),
-		EventType: "channel-open",
-		ChannelID: channel.ChannelID,
-		Height:    channel.OpenHeight,
+		EventID:	HashParts("channel-open", channel.ChannelID, channel.OpeningStateHash),
+		EventType:	"channel-open",
+		ChannelID:	channel.ChannelID,
+		Height:		channel.OpenHeight,
 		Attributes: []PaymentEventAttribute{
 			{Key: "channel_type", Value: string(channel.ChannelType)},
 			{Key: "collateral", Value: channel.Collateral},
@@ -6259,10 +6259,10 @@ func ChannelOpenEvent(channel ChannelRecord) PaymentEvent {
 func ChannelDisputeEvent(channel ChannelRecord, submitter string, height uint64) PaymentEvent {
 	channel = channel.Normalize()
 	event := PaymentEvent{
-		EventID:   HashParts("channel-dispute", channel.ChannelID, channel.PendingClose.State.StateHash, fmt.Sprintf("%d", height)),
-		EventType: "channel-dispute",
-		ChannelID: channel.ChannelID,
-		Height:    height,
+		EventID:	HashParts("channel-dispute", channel.ChannelID, channel.PendingClose.State.StateHash, fmt.Sprintf("%d", height)),
+		EventType:	"channel-dispute",
+		ChannelID:	channel.ChannelID,
+		Height:		height,
 		Attributes: []PaymentEventAttribute{
 			{Key: "submitter", Value: strings.TrimSpace(submitter)},
 			{Key: "state_hash", Value: channel.PendingClose.State.StateHash},
@@ -6277,10 +6277,10 @@ func ValidatorAssistedDisputeEvent(metadata ValidatorPaymentServiceMetadata, cha
 	metadata = metadata.Normalize()
 	channel = channel.Normalize()
 	event := PaymentEvent{
-		EventID:   HashParts("validator-assisted-dispute", metadata.ValidatorAddress, channel.ChannelID, delegator, fmt.Sprintf("%d", height)),
-		EventType: "validator-assisted-dispute",
-		ChannelID: channel.ChannelID,
-		Height:    height,
+		EventID:	HashParts("validator-assisted-dispute", metadata.ValidatorAddress, channel.ChannelID, delegator, fmt.Sprintf("%d", height)),
+		EventType:	"validator-assisted-dispute",
+		ChannelID:	channel.ChannelID,
+		Height:		height,
 		Attributes: []PaymentEventAttribute{
 			{Key: "validator", Value: metadata.ValidatorAddress},
 			{Key: "watch_service", Value: metadata.ServiceAddress},
@@ -6302,11 +6302,11 @@ func ChannelFinalityTransitionEvent(channel ChannelRecord, previous, next Channe
 		attrs = append(attrs, PaymentEventAttribute{Key: "pending_finalization_height", Value: fmt.Sprintf("%d", pendingHeight)})
 	}
 	event := PaymentEvent{
-		EventID:    HashParts("channel-finality", channel.ChannelID, string(previous), string(next), fmt.Sprintf("%d", height)),
-		EventType:  "channel-finality-transition",
-		ChannelID:  channel.ChannelID,
-		Height:     height,
-		Attributes: attrs,
+		EventID:	HashParts("channel-finality", channel.ChannelID, string(previous), string(next), fmt.Sprintf("%d", height)),
+		EventType:	"channel-finality-transition",
+		ChannelID:	channel.ChannelID,
+		Height:		height,
+		Attributes:	attrs,
 	}
 	return event.Normalize()
 }
@@ -6314,10 +6314,10 @@ func ChannelFinalityTransitionEvent(channel ChannelRecord, previous, next Channe
 func AsyncSettlementCompletionEvent(completion AsyncSettlementCompletion) PaymentEvent {
 	completion = completion.Normalize()
 	event := PaymentEvent{
-		EventID:   HashParts("async-settlement-completion-event", completion.CompletionID),
-		EventType: "async-settlement-completion",
-		ChannelID: completion.ChannelID,
-		Height:    completion.Height,
+		EventID:	HashParts("async-settlement-completion-event", completion.CompletionID),
+		EventType:	"async-settlement-completion",
+		ChannelID:	completion.ChannelID,
+		Height:		completion.Height,
 		Attributes: []PaymentEventAttribute{
 			{Key: "job_id", Value: completion.JobID},
 			{Key: "job_type", Value: completion.JobType},
@@ -6445,8 +6445,8 @@ func (ad LiquidityAdvertisement) Validate(requiredDeposit string) error {
 		return fmt.Errorf("payments liquidity advertisement fee denom must be %s", NativeDenom)
 	}
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments liquidity base fee", ad.BaseFee},
 		{"payments liquidity reservation fee", ad.ReservationFee},
@@ -6567,15 +6567,15 @@ func SignatureForLiquidityReservation(reservation SignedLiquidityReservation, si
 		reservation.CommitmentHash = ComputeLiquidityReservationHash(reservation)
 	}
 	return LiquidityReservationSignature{
-		Signer:           signer,
-		ChainID:          reservation.ChainID,
-		ChannelID:        reservation.ChannelID,
-		ObjectType:       SignatureObjectLiquidity,
-		Version:          CurrentStateVersion,
-		Nonce:            reservation.Nonce,
-		ObjectID:         reservation.ReservationID,
-		ExpirationHeight: reservation.ExpirationHeight,
-		CommitmentHash:   reservation.CommitmentHash,
+		Signer:			signer,
+		ChainID:		reservation.ChainID,
+		ChannelID:		reservation.ChannelID,
+		ObjectType:		SignatureObjectLiquidity,
+		Version:		CurrentStateVersion,
+		Nonce:			reservation.Nonce,
+		ObjectID:		reservation.ReservationID,
+		ExpirationHeight:	reservation.ExpirationHeight,
+		CommitmentHash:		reservation.CommitmentHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			reservation.ChainID,
@@ -6720,16 +6720,16 @@ func SignatureForVirtualChannel(vc VirtualChannel, signer string) (StateSignatur
 		return StateSignature{}, err
 	}
 	return StateSignature{
-		Signer:           signer,
-		ChainID:          vc.ChainID,
-		ChannelID:        vc.VirtualChannelID,
-		ObjectType:       SignatureObjectVirtual,
-		Version:          CurrentStateVersion,
-		Nonce:            vc.Nonce,
-		ObjectID:         vc.StateHash,
-		ExpirationHeight: vc.ExpiresHeight,
-		CommitmentHash:   vc.StateHash,
-		StateHash:        vc.StateHash,
+		Signer:			signer,
+		ChainID:		vc.ChainID,
+		ChannelID:		vc.VirtualChannelID,
+		ObjectType:		SignatureObjectVirtual,
+		Version:		CurrentStateVersion,
+		Nonce:			vc.Nonce,
+		ObjectID:		vc.StateHash,
+		ExpirationHeight:	vc.ExpiresHeight,
+		CommitmentHash:		vc.StateHash,
+		StateHash:		vc.StateHash,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			vc.ChainID,
@@ -6845,18 +6845,18 @@ func SignatureForVirtualReservation(vc VirtualChannel, reserve VirtualParentRese
 		reserve.ReserveCommitment = ComputeVirtualReserveCommitment(vc, reserve)
 	}
 	return VirtualReservationSignature{
-		Signer:           signer,
-		ChainID:          vc.ChainID,
-		VirtualChannelID: vc.VirtualChannelID,
-		ParentRouteID:    vc.ParentRouteID,
-		ParentChannelID:  reserve.ParentChannelID,
-		ObjectType:       SignatureObjectVirtualReserve,
-		Version:          CurrentStateVersion,
-		Capacity:         reserve.Capacity,
-		SplitAmount:      reserve.SplitAmount,
-		FeeAmount:        reserve.FeeAmount,
-		ExpirationHeight: vc.ExpiresHeight,
-		CommitmentHash:   reserve.ReserveCommitment,
+		Signer:			signer,
+		ChainID:		vc.ChainID,
+		VirtualChannelID:	vc.VirtualChannelID,
+		ParentRouteID:		vc.ParentRouteID,
+		ParentChannelID:	reserve.ParentChannelID,
+		ObjectType:		SignatureObjectVirtualReserve,
+		Version:		CurrentStateVersion,
+		Capacity:		reserve.Capacity,
+		SplitAmount:		reserve.SplitAmount,
+		FeeAmount:		reserve.FeeAmount,
+		ExpirationHeight:	vc.ExpiresHeight,
+		CommitmentHash:		reserve.ReserveCommitment,
 		SignatureHash: ComputeSignatureEnvelopeHash(
 			signer,
 			vc.ChainID,
@@ -6930,9 +6930,9 @@ func BuildVirtualActivationProof(vc VirtualChannel, reserves []VirtualParentRese
 		vc = built.Normalize()
 	}
 	proof := VirtualActivationProof{
-		VirtualChannel:     vc,
-		ParentReserves:     normalizeVirtualParentReserves(reserves),
-		RouteTimeoutHeight: routeTimeoutHeight,
+		VirtualChannel:		vc,
+		ParentReserves:		normalizeVirtualParentReserves(reserves),
+		RouteTimeoutHeight:	routeTimeoutHeight,
 	}
 	proof.ProofHash = ComputeVirtualActivationProofHash(proof)
 	return proof.Normalize(), nil
@@ -7046,14 +7046,14 @@ func BuildVirtualCloseProof(final VirtualChannel, mode VirtualCloseMode, commitm
 		final = built.Normalize()
 	}
 	proof := VirtualCloseProof{
-		VirtualChannelID:         final.VirtualChannelID,
-		ParentRouteID:            final.ParentRouteID,
-		CloseMode:                mode,
-		FinalState:               final,
-		ParentReserveCommitments: normalizeHashSlice(commitments),
-		SubmittedBy:              strings.TrimSpace(submittedBy),
-		CloseHeight:              closeHeight,
-		ReleaseHeight:            VirtualCloseReleaseHeight(mode, closeHeight, final.ExpiresHeight),
+		VirtualChannelID:		final.VirtualChannelID,
+		ParentRouteID:			final.ParentRouteID,
+		CloseMode:			mode,
+		FinalState:			final,
+		ParentReserveCommitments:	normalizeHashSlice(commitments),
+		SubmittedBy:			strings.TrimSpace(submittedBy),
+		CloseHeight:			closeHeight,
+		ReleaseHeight:			VirtualCloseReleaseHeight(mode, closeHeight, final.ExpiresHeight),
 	}
 	proof.ProofHash = ComputeVirtualCloseProofHash(proof)
 	return proof.Normalize(), nil
@@ -7158,14 +7158,14 @@ func VirtualReserveSegmentsFromProof(proof VirtualActivationProof) []VirtualRese
 	out := make([]VirtualReserveSegment, 0, len(proof.ParentReserves))
 	for _, reserve := range proof.ParentReserves {
 		segment := VirtualReserveSegment{
-			SegmentID:         reserve.SegmentID,
-			VirtualChannelID:  proof.VirtualChannel.VirtualChannelID,
-			ParentChannelID:   reserve.ParentChannelID,
-			ReserveCommitment: reserve.ReserveCommitment,
-			Capacity:          reserve.SplitAmount,
-			BalanceA:          reserve.SplitAmount,
-			BalanceB:          "0",
-			FeeAmount:         reserve.FeeAmount,
+			SegmentID:		reserve.SegmentID,
+			VirtualChannelID:	proof.VirtualChannel.VirtualChannelID,
+			ParentChannelID:	reserve.ParentChannelID,
+			ReserveCommitment:	reserve.ReserveCommitment,
+			Capacity:		reserve.SplitAmount,
+			BalanceA:		reserve.SplitAmount,
+			BalanceB:		"0",
+			FeeAmount:		reserve.FeeAmount,
 		}
 		segment.SegmentHash = ComputeVirtualReserveSegmentHash(segment)
 		out = append(out, segment.Normalize())
@@ -7219,13 +7219,13 @@ func BuildVirtualSegmentSettlementProofs(vc VirtualChannel, segments []VirtualRe
 	out := make([]VirtualSegmentSettlementProof, 0, len(segments))
 	for _, segment := range segments {
 		proof := VirtualSegmentSettlementProof{
-			SegmentID:         segment.SegmentID,
-			VirtualChannelID:  vc.VirtualChannelID,
-			ParentChannelID:   segment.ParentChannelID,
-			FinalStateHash:    vc.StateHash,
-			ReserveCommitment: segment.ReserveCommitment,
-			BalanceA:          segment.BalanceA,
-			BalanceB:          segment.BalanceB,
+			SegmentID:		segment.SegmentID,
+			VirtualChannelID:	vc.VirtualChannelID,
+			ParentChannelID:	segment.ParentChannelID,
+			FinalStateHash:		vc.StateHash,
+			ReserveCommitment:	segment.ReserveCommitment,
+			BalanceA:		segment.BalanceA,
+			BalanceB:		segment.BalanceB,
 		}
 		proof.SettlementHash = ComputeVirtualSegmentSettlementHash(proof)
 		out = append(out, proof.Normalize())
@@ -7241,10 +7241,10 @@ func ComputeVirtualSegmentSettlementHash(proof VirtualSegmentSettlementProof) st
 func BuildVirtualPartialActivationFailure(vc VirtualChannel, failedSegmentID, reason string, refundCommitments []string) (VirtualPartialActivationFailure, error) {
 	vc = vc.Normalize()
 	failure := VirtualPartialActivationFailure{
-		VirtualChannelID:  vc.VirtualChannelID,
-		FailedSegmentID:   normalizeHash(failedSegmentID),
-		Reason:            strings.TrimSpace(reason),
-		RefundCommitments: normalizeHashSlice(refundCommitments),
+		VirtualChannelID:	vc.VirtualChannelID,
+		FailedSegmentID:	normalizeHash(failedSegmentID),
+		Reason:			strings.TrimSpace(reason),
+		RefundCommitments:	normalizeHashSlice(refundCommitments),
 	}
 	failure.FailureHash = ComputeVirtualPartialActivationFailureHash(failure)
 	if err := failure.ValidateForVirtualChannel(vc); err != nil {
@@ -7271,11 +7271,11 @@ func BuildVirtualChannelDisputeProof(latest VirtualChannel, commitments []string
 		latest = built.Normalize()
 	}
 	proof := VirtualChannelDisputeProof{
-		VirtualChannelID:         latest.VirtualChannelID,
-		ParentRouteID:            latest.ParentRouteID,
-		LatestState:              latest,
-		ParentReserveCommitments: normalizeHashSlice(commitments),
-		SubmittedBy:              strings.TrimSpace(submittedBy),
+		VirtualChannelID:		latest.VirtualChannelID,
+		ParentRouteID:			latest.ParentRouteID,
+		LatestState:			latest,
+		ParentReserveCommitments:	normalizeHashSlice(commitments),
+		SubmittedBy:			strings.TrimSpace(submittedBy),
 	}
 	proof.EvidenceHash = ComputeVirtualDisputeEvidenceHash(proof)
 	return proof.Normalize(), nil
@@ -7875,8 +7875,8 @@ func (b SettlementBatch) Validate() error {
 
 func NewSettlementBatch(batchID string, operations []SettlementOperation) (SettlementBatch, error) {
 	batch := SettlementBatch{
-		BatchID:    normalizeHash(batchID),
-		Operations: SortSettlementOperations(operations),
+		BatchID:	normalizeHash(batchID),
+		Operations:	SortSettlementOperations(operations),
 	}
 	batch.RootHash = ComputeBatchRoot(batch.Operations)
 	if err := batch.Validate(); err != nil {
@@ -7934,14 +7934,14 @@ func AccessPlanForSettlementOperation(op SettlementOperation, blockHeight uint64
 	}
 	txClass := blockSTMClassForBatchOperation(op.OperationType)
 	plan := BlockSTMAccessPlan{
-		OperationID:        op.OperationID,
-		TxClass:            txClass,
-		ChannelID:          op.ChannelID,
-		ReadKeys:           []string{PaymentChannelKey(op.ChannelID)},
-		WriteKeys:          []string{PaymentChannelKey(op.ChannelID)},
-		AccumulatorKeys:    []string{PaymentBlockAccumulatorKey(blockHeight)},
-		ConflictDomain:     PaymentChannelKey(op.ChannelID),
-		DeterministicGroup: PaymentChannelKey(op.ChannelID),
+		OperationID:		op.OperationID,
+		TxClass:		txClass,
+		ChannelID:		op.ChannelID,
+		ReadKeys:		[]string{PaymentChannelKey(op.ChannelID)},
+		WriteKeys:		[]string{PaymentChannelKey(op.ChannelID)},
+		AccumulatorKeys:	[]string{PaymentBlockAccumulatorKey(blockHeight)},
+		ConflictDomain:		PaymentChannelKey(op.ChannelID),
+		DeterministicGroup:	PaymentChannelKey(op.ChannelID),
 	}
 	switch op.OperationType {
 	case BatchOperationOpen:
@@ -7969,15 +7969,15 @@ func AccessPlanForConditionResolution(channelID string, conditionIDs []string, b
 		writeKeys = append(writeKeys, PaymentConditionIndexKey(channelID, conditionID))
 	}
 	plan := BlockSTMAccessPlan{
-		OperationID:        HashParts("condition-resolution", channelID, strings.Join(conditionIDs, "/")),
-		TxClass:            BlockSTMClassResolveCondition,
-		ChannelID:          channelID,
-		ConditionIDs:       conditionIDs,
-		ReadKeys:           readKeys,
-		WriteKeys:          writeKeys,
-		AccumulatorKeys:    []string{PaymentBlockAccumulatorKey(blockHeight)},
-		ConflictDomain:     PaymentChannelKey(channelID),
-		DeterministicGroup: PaymentChannelKey(channelID),
+		OperationID:		HashParts("condition-resolution", channelID, strings.Join(conditionIDs, "/")),
+		TxClass:		BlockSTMClassResolveCondition,
+		ChannelID:		channelID,
+		ConditionIDs:		conditionIDs,
+		ReadKeys:		readKeys,
+		WriteKeys:		writeKeys,
+		AccumulatorKeys:	[]string{PaymentBlockAccumulatorKey(blockHeight)},
+		ConflictDomain:		PaymentChannelKey(channelID),
+		DeterministicGroup:	PaymentChannelKey(channelID),
 	}
 	return plan.Normalize(), nil
 }
@@ -7999,11 +7999,11 @@ func ProfileBlockSTMConflicts(plans []BlockSTMAccessPlan) BlockSTMConflictProfil
 		}
 	}
 	return BlockSTMConflictProfile{
-		Plans:                    normalized,
-		Conflicts:                conflicts,
-		ParallelizableGroups:     blockSTMParallelizableGroups(normalized),
-		ConflictFree:             len(conflicts) == 0,
-		GlobalAccountingDeferred: blockSTMAccountingDeferred(normalized),
+		Plans:				normalized,
+		Conflicts:			conflicts,
+		ParallelizableGroups:		blockSTMParallelizableGroups(normalized),
+		ConflictFree:			len(conflicts) == 0,
+		GlobalAccountingDeferred:	blockSTMAccountingDeferred(normalized),
 	}
 }
 
@@ -8738,10 +8738,10 @@ func blockSTMPlanConflicts(left, right BlockSTMAccessPlan) []BlockSTMConflict {
 	for key := range leftWrites {
 		if _, found := rightWrites[key]; found {
 			conflicts = append(conflicts, BlockSTMConflict{
-				LeftOperationID:  left.OperationID,
-				RightOperationID: right.OperationID,
-				Key:              key,
-				Reason:           "write/write",
+				LeftOperationID:	left.OperationID,
+				RightOperationID:	right.OperationID,
+				Key:			key,
+				Reason:			"write/write",
 			}.Normalize())
 		}
 	}
@@ -9054,23 +9054,23 @@ func validateUnsignedStateShape(state ChannelState) error {
 func openingStateForRequest(req ChannelOpenRequest, channel ChannelRecord) ChannelState {
 	channel = channel.Normalize()
 	state := ChannelState{
-		ChainID:              req.ChainID,
-		AppVersion:           CurrentAppVersion,
-		ModuleName:           ModuleName,
-		ChannelID:            req.ChannelID,
-		ChannelType:          req.ChannelType,
-		ParticipantSetHash:   ComputeParticipantSetHash(channel.Participants),
-		Denom:                NativeDenom,
-		Version:              CurrentStateVersion,
-		Epoch:                1,
-		Nonce:                1,
-		Balances:             req.InitialBalances,
-		TimeoutHeight:        req.OpenHeight + req.ChallengePeriod,
-		ChallengePeriod:      req.ChallengePeriod,
-		CloseDelay:           req.CloseDelay,
-		FeePolicyID:          req.FeePolicyID,
-		RequiredSignerBitmap: ComputeRequiredSignerBitmap(channel.Participants, channel.RequiredSigners),
-		SignatureScheme:      SignatureSchemeEd25519,
+		ChainID:		req.ChainID,
+		AppVersion:		CurrentAppVersion,
+		ModuleName:		ModuleName,
+		ChannelID:		req.ChannelID,
+		ChannelType:		req.ChannelType,
+		ParticipantSetHash:	ComputeParticipantSetHash(channel.Participants),
+		Denom:			NativeDenom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			1,
+		Balances:		req.InitialBalances,
+		TimeoutHeight:		req.OpenHeight + req.ChallengePeriod,
+		ChallengePeriod:	req.ChallengePeriod,
+		CloseDelay:		req.CloseDelay,
+		FeePolicyID:		req.FeePolicyID,
+		RequiredSignerBitmap:	ComputeRequiredSignerBitmap(channel.Participants, channel.RequiredSigners),
+		SignatureScheme:	SignatureSchemeEd25519,
 	}
 	if req.ChannelType == ChannelTypeUnidirectional {
 		state.TimeoutHeight = req.ExpirationHeight
@@ -10011,11 +10011,11 @@ func BuildConditionRootUpdateFromPromises(channel ChannelRecord, base ChannelSta
 	next.SignaturePreimageHash = ComputeStateSignaturePreimageHash(next)
 	next.StateHash = ComputeStateHash(next)
 	return next.Normalize(), ConditionRootUpdate{
-		ChannelID:      channel.ChannelID,
-		Nonce:          next.Nonce,
-		ConditionRoot:  next.ConditionRoot,
-		ConditionCount: next.ConditionCount,
-		Conditions:     next.Conditions,
+		ChannelID:	channel.ChannelID,
+		Nonce:		next.Nonce,
+		ConditionRoot:	next.ConditionRoot,
+		ConditionCount:	next.ConditionCount,
+		Conditions:	next.Conditions,
 	}, nil
 }
 
@@ -10043,11 +10043,11 @@ func BuildConditionRootAfterExpiry(base ChannelState, expired []ConditionalPromi
 	next.SignaturePreimageHash = ComputeStateSignaturePreimageHash(next)
 	next.StateHash = ComputeStateHash(next)
 	return next.Normalize(), ConditionRootUpdate{
-		ChannelID:      next.ChannelID,
-		Nonce:          next.Nonce,
-		ConditionRoot:  next.ConditionRoot,
-		ConditionCount: next.ConditionCount,
-		Conditions:     next.Conditions,
+		ChannelID:	next.ChannelID,
+		Nonce:		next.Nonce,
+		ConditionRoot:	next.ConditionRoot,
+		ConditionCount:	next.ConditionCount,
+		Conditions:	next.Conditions,
 	}, nil
 }
 
@@ -10237,8 +10237,8 @@ func splitPenaltyRemainder(offender string, remaining sdkmath.Int, policy FraudP
 		return nil, nil
 	}
 	shares := []struct {
-		route PenaltyRoute
-		bps   uint32
+		route	PenaltyRoute
+		bps	uint32
 	}{
 		{route: PenaltyRouteBurn, bps: policy.BurnShareBps},
 		{route: PenaltyRouteSecurityReserve, bps: policy.SecurityReserveShareBps},
@@ -10286,8 +10286,8 @@ func normalizeBalances(balances []Balance) []Balance {
 	out := make([]Balance, len(balances))
 	for i, balance := range balances {
 		out[i] = Balance{
-			Participant: strings.TrimSpace(balance.Participant),
-			Amount:      strings.TrimSpace(balance.Amount),
+			Participant:	strings.TrimSpace(balance.Participant),
+			Amount:		strings.TrimSpace(balance.Amount),
 		}
 	}
 	sort.SliceStable(out, func(i, j int) bool {
@@ -10724,14 +10724,14 @@ func compactStoreV2Channel(channel ChannelRecord) ChannelRecord {
 func compactStoreV2State(state ChannelState) ChannelState {
 	state = state.Normalize()
 	return ChannelState{
-		ChainID:     state.ChainID,
-		ChannelID:   state.ChannelID,
-		ChannelType: state.ChannelType,
-		Denom:       state.Denom,
-		Version:     state.Version,
-		Nonce:       state.Nonce,
-		Epoch:       state.Epoch,
-		StateHash:   state.StateHash,
+		ChainID:	state.ChainID,
+		ChannelID:	state.ChannelID,
+		ChannelType:	state.ChannelType,
+		Denom:		state.Denom,
+		Version:	state.Version,
+		Nonce:		state.Nonce,
+		Epoch:		state.Epoch,
+		StateHash:	state.StateHash,
 	}
 }
 
@@ -10747,12 +10747,12 @@ func storeV2ConditionFromPayment(channel ChannelRecord, condition ConditionalPay
 	channel = channel.Normalize()
 	condition = condition.Normalize()
 	return StoreV2ConditionRecord{
-		Key:           StoreV2ConditionKey(condition.ConditionID),
-		Version:       StoreV2MigrationVersion,
-		ConditionID:   condition.ConditionID,
-		ChannelID:     channel.ChannelID,
-		ExpiresHeight: condition.TimeoutHeight,
-		Settled:       settled,
+		Key:		StoreV2ConditionKey(condition.ConditionID),
+		Version:	StoreV2MigrationVersion,
+		ConditionID:	condition.ConditionID,
+		ChannelID:	channel.ChannelID,
+		ExpiresHeight:	condition.TimeoutHeight,
+		Settled:	settled,
 	}.Normalize()
 }
 

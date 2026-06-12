@@ -9,80 +9,80 @@ import (
 type ShardLayoutChangeKind string
 
 const (
-	ShardLayoutChangeNone  ShardLayoutChangeKind = "none"
-	ShardLayoutChangeSplit ShardLayoutChangeKind = "split"
-	ShardLayoutChangeMerge ShardLayoutChangeKind = "merge"
+	ShardLayoutChangeNone	ShardLayoutChangeKind	= "none"
+	ShardLayoutChangeSplit	ShardLayoutChangeKind	= "split"
+	ShardLayoutChangeMerge	ShardLayoutChangeKind	= "merge"
 )
 
 type ShardRebalanceThresholds struct {
-	GasLimitPerShard          uint64
-	SplitGasUtilization       uint64
-	SplitStateSizeBytes       uint64
-	SplitWriteConflictCount   uint64
-	SplitQueueBacklog         uint64
-	SplitProofLatencyMicros   uint64
-	MergeGasUtilization       uint64
-	MergeStateSizeBytes       uint64
-	MergeQueueBacklog         uint64
-	MergeWriteConflictCount   uint64
-	DecisionWindow            uint64
-	FutureLayoutEpochDelta    uint64
-	FutureActivationHeightGap uint64
+	GasLimitPerShard		uint64
+	SplitGasUtilization		uint64
+	SplitStateSizeBytes		uint64
+	SplitWriteConflictCount		uint64
+	SplitQueueBacklog		uint64
+	SplitProofLatencyMicros		uint64
+	MergeGasUtilization		uint64
+	MergeStateSizeBytes		uint64
+	MergeQueueBacklog		uint64
+	MergeWriteConflictCount		uint64
+	DecisionWindow			uint64
+	FutureLayoutEpochDelta		uint64
+	FutureActivationHeightGap	uint64
 }
 
 type ShardRebalanceDecision struct {
-	ZoneID            ZoneID
-	SourceLayoutEpoch uint64
-	TargetLayoutEpoch uint64
-	DecisionHeight    uint64
-	ActivationHeight  uint64
-	ChangeKind        ShardLayoutChangeKind
-	Reason            string
-	SourceShardIDs    []ShardID
-	TargetShardIDs    []ShardID
-	SourceMetricsHash string
-	SourceLayoutHash  string
-	MigrationTasks    []ShardMigrationTask
-	DecisionHash      string
+	ZoneID			ZoneID
+	SourceLayoutEpoch	uint64
+	TargetLayoutEpoch	uint64
+	DecisionHeight		uint64
+	ActivationHeight	uint64
+	ChangeKind		ShardLayoutChangeKind
+	Reason			string
+	SourceShardIDs		[]ShardID
+	TargetShardIDs		[]ShardID
+	SourceMetricsHash	string
+	SourceLayoutHash	string
+	MigrationTasks		[]ShardMigrationTask
+	DecisionHash		string
 }
 
 type ShardMigrationTask struct {
-	TaskID             string
-	ZoneID             ZoneID
-	SourceShardID      ShardID
-	DestinationShardID ShardID
-	SourceLayoutEpoch  uint64
-	TargetLayoutEpoch  uint64
-	KeyPrefix          string
-	ObjectKey          string
-	HashRangeStart     uint64
-	HashRangeEnd       uint64
-	DeliveryEpoch      uint64
-	TaskHash           string
+	TaskID			string
+	ZoneID			ZoneID
+	SourceShardID		ShardID
+	DestinationShardID	ShardID
+	SourceLayoutEpoch	uint64
+	TargetLayoutEpoch	uint64
+	KeyPrefix		string
+	ObjectKey		string
+	HashRangeStart		uint64
+	HashRangeEnd		uint64
+	DeliveryEpoch		uint64
+	TaskHash		string
 }
 
 type ObjectLock struct {
-	ZoneID        ZoneID
-	ShardID       ShardID
-	ObjectID      string
-	LockID        string
-	Reason        string
-	OwnerTaskID   string
-	CreatedHeight uint64
-	ExpiryHeight  uint64
-	LockHash      string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	ObjectID	string
+	LockID		string
+	Reason		string
+	OwnerTaskID	string
+	CreatedHeight	uint64
+	ExpiryHeight	uint64
+	LockHash	string
 }
 
 type ShardRoot struct {
-	ZoneID       ZoneID
-	ShardID      ShardID
-	Height       uint64
-	StateRoot    string
-	InboxRoot    string
-	OutboxRoot   string
-	ReceiptsRoot string
-	MetricsHash  string
-	RootHash     string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	Height		uint64
+	StateRoot	string
+	InboxRoot	string
+	OutboxRoot	string
+	ReceiptsRoot	string
+	MetricsHash	string
+	RootHash	string
 }
 
 func NewShardRebalanceDecision(layout ShardLayout, metrics []ShardMetrics, thresholds ShardRebalanceThresholds, decisionHeight uint64) (ShardRebalanceDecision, error) {
@@ -115,24 +115,24 @@ func NewShardRebalanceDecision(layout ShardLayout, metrics []ShardMetrics, thres
 		}
 	}
 	decision := ShardRebalanceDecision{
-		ZoneID:            layout.ZoneID,
-		SourceLayoutEpoch: layout.LayoutEpoch,
-		TargetLayoutEpoch: layout.LayoutEpoch + thresholds.FutureLayoutEpochDelta,
-		DecisionHeight:    decisionHeight,
-		ActivationHeight:  decisionHeight + thresholds.FutureActivationHeightGap,
-		ChangeKind:        ShardLayoutChangeNone,
-		SourceLayoutHash:  layout.LayoutHash,
-		SourceMetricsHash: ComputeShardMetricsWindowHash(ordered),
+		ZoneID:			layout.ZoneID,
+		SourceLayoutEpoch:	layout.LayoutEpoch,
+		TargetLayoutEpoch:	layout.LayoutEpoch + thresholds.FutureLayoutEpochDelta,
+		DecisionHeight:		decisionHeight,
+		ActivationHeight:	decisionHeight + thresholds.FutureActivationHeightGap,
+		ChangeKind:		ShardLayoutChangeNone,
+		SourceLayoutHash:	layout.LayoutHash,
+		SourceMetricsHash:	ComputeShardMetricsWindowHash(ordered),
 	}
 	if splitShard, reason, ok := selectSplitShard(ordered, thresholds); ok {
 		destination := nextShardID(layout)
 		task, err := NewShardMigrationTask(ShardMigrationTask{
-			ZoneID:             layout.ZoneID,
-			SourceShardID:      splitShard,
-			DestinationShardID: destination,
-			SourceLayoutEpoch:  layout.LayoutEpoch,
-			TargetLayoutEpoch:  decision.TargetLayoutEpoch,
-			DeliveryEpoch:      decision.TargetLayoutEpoch,
+			ZoneID:			layout.ZoneID,
+			SourceShardID:		splitShard,
+			DestinationShardID:	destination,
+			SourceLayoutEpoch:	layout.LayoutEpoch,
+			TargetLayoutEpoch:	decision.TargetLayoutEpoch,
+			DeliveryEpoch:		decision.TargetLayoutEpoch,
 		})
 		if err != nil {
 			return ShardRebalanceDecision{}, err
@@ -144,12 +144,12 @@ func NewShardRebalanceDecision(layout ShardLayout, metrics []ShardMetrics, thres
 		decision.MigrationTasks = []ShardMigrationTask{task}
 	} else if mergeA, mergeB, reason, ok := selectMergeShards(ordered, thresholds); ok {
 		task, err := NewShardMigrationTask(ShardMigrationTask{
-			ZoneID:             layout.ZoneID,
-			SourceShardID:      mergeB,
-			DestinationShardID: mergeA,
-			SourceLayoutEpoch:  layout.LayoutEpoch,
-			TargetLayoutEpoch:  decision.TargetLayoutEpoch,
-			DeliveryEpoch:      decision.TargetLayoutEpoch,
+			ZoneID:			layout.ZoneID,
+			SourceShardID:		mergeB,
+			DestinationShardID:	mergeA,
+			SourceLayoutEpoch:	layout.LayoutEpoch,
+			TargetLayoutEpoch:	decision.TargetLayoutEpoch,
+			DeliveryEpoch:		decision.TargetLayoutEpoch,
 		})
 		if err != nil {
 			return ShardRebalanceDecision{}, err
@@ -405,11 +405,11 @@ func (r ShardRoot) ValidateFormat() error {
 		return errors.New("aetracore shard root height must be positive")
 	}
 	for field, value := range map[string]string{
-		"state":    r.StateRoot,
-		"inbox":    r.InboxRoot,
-		"outbox":   r.OutboxRoot,
-		"receipts": r.ReceiptsRoot,
-		"metrics":  r.MetricsHash,
+		"state":	r.StateRoot,
+		"inbox":	r.InboxRoot,
+		"outbox":	r.OutboxRoot,
+		"receipts":	r.ReceiptsRoot,
+		"metrics":	r.MetricsHash,
 	} {
 		if err := ValidateHash("aetracore shard "+field+" root", value); err != nil {
 			return err

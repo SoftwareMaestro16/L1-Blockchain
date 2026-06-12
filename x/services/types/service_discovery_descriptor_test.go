@@ -14,9 +14,9 @@ func TestServiceDiscoveryDescriptorV1ProjectsResolutionOutput(t *testing.T) {
 	descriptor := testInterfaceSystemDescriptor()
 	state := testResolverRegistryState(t, descriptor, nil, 20)
 	resolution, err := ResolveService(ServiceResolverInput{
-		ServiceName:      descriptor.Discovery.ServiceName,
-		Registry:         state,
-		ResolutionHeight: 25,
+		ServiceName:		descriptor.Discovery.ServiceName,
+		Registry:		state,
+		ResolutionHeight:	25,
 	})
 	require.NoError(t, err)
 
@@ -58,13 +58,13 @@ func TestAETServiceBindingRequiresIdentityAndServiceProofs(t *testing.T) {
 	require.NoError(t, err)
 
 	proof, err := NewAETServiceBindingProof(AETServiceBindingProof{
-		Binding:              binding,
-		Descriptor:           discovery,
-		RegistryDescriptor:   descriptor,
-		IdentityTrustedRoot:  root,
-		IdentityProof:        identityProof,
-		ServiceRegistryProof: serviceProof.Proof,
-		Height:               13,
+		Binding:		binding,
+		Descriptor:		discovery,
+		RegistryDescriptor:	descriptor,
+		IdentityTrustedRoot:	root,
+		IdentityProof:		identityProof,
+		ServiceRegistryProof:	serviceProof.Proof,
+		Height:			13,
 	})
 	require.NoError(t, err)
 
@@ -112,13 +112,13 @@ func TestAETServiceBindingsSupportMultipleServices(t *testing.T) {
 	identityProof, err := identitytypes.BuildIdentityResolutionProof(identityState, "portable.aet", 13)
 	require.NoError(t, err)
 	proof, err := NewAETServiceBindingProof(AETServiceBindingProof{
-		Binding:              binding,
-		Descriptor:           discovery,
-		RegistryDescriptor:   descriptor,
-		IdentityTrustedRoot:  root,
-		IdentityProof:        identityProof,
-		ServiceRegistryProof: serviceProof.Proof,
-		Height:               13,
+		Binding:		binding,
+		Descriptor:		discovery,
+		RegistryDescriptor:	descriptor,
+		IdentityTrustedRoot:	root,
+		IdentityProof:		identityProof,
+		ServiceRegistryProof:	serviceProof.Proof,
+		Height:			13,
 	})
 	require.NoError(t, err)
 
@@ -141,8 +141,8 @@ func testAETIdentityState(t *testing.T, name string, endpoint string) identityty
 	state, _, err = identitytypes.RevealRegisterDomain(state, name, owner, "salt", 11)
 	require.NoError(t, err)
 	state, _, err = identitytypes.PatchIdentityResolver(state, name+".aet", owner, identitytypes.ResolverPatch{
-		ZoneEndpoint:  endpoint,
-		UpdatedAtUnix: 12,
+		ZoneEndpoint:	endpoint,
+		UpdatedAtUnix:	12,
 	}, 12)
 	require.NoError(t, err)
 	return state

@@ -12,7 +12,7 @@ var _ types.QueryServer = queryServer{}
 
 type queryServer struct{ keeper *Keeper }
 
-func NewQueryServerImpl(k *Keeper) types.QueryServer { return queryServer{keeper: k} }
+func NewQueryServerImpl(k *Keeper) types.QueryServer	{ return queryServer{keeper: k} }
 
 func (q queryServer) NominatorPool(_ context.Context, req *types.QueryNominatorPoolRequest) (*types.QueryNominatorPoolResponse, error) {
 	if req == nil {
@@ -31,11 +31,11 @@ func (q queryServer) NominatorPools(_ context.Context, req *types.QueryNominator
 	}
 	all := q.keeper.NominatorPools()
 	total := uint64(len(all))
-	// apply offset
+
 	off := req.Offset
-tlimit := req.Limit
+	tlimit := req.Limit
 	if tlimit == 0 {
-		// default to return all
+
 		tlimit = total
 	}
 	if off >= total {
@@ -45,7 +45,7 @@ tlimit := req.Limit
 	if end > total {
 		end = total
 	}
-	// slice and compute next offset
+
 	res := all[off:end]
 	next := uint64(0)
 	if end < total {
@@ -92,13 +92,13 @@ func (q queryServer) StakingProof(_ context.Context, req *types.QueryStakingProo
 		return nil, errors.New("empty staking proof query")
 	}
 	metadata, err := q.keeper.StakingProof(types.StakingProofRequest{
-		Kind:     types.StakingProofKind(req.Kind),
-		Height:   req.Height,
-		PoolID:   req.PoolID,
-		Account:  req.Account,
-		Epoch:    req.Epoch,
-		AppHash:  req.AppHash,
-		RootHash: req.RootHash,
+		Kind:		types.StakingProofKind(req.Kind),
+		Height:		req.Height,
+		PoolID:		req.PoolID,
+		Account:	req.Account,
+		Epoch:		req.Epoch,
+		AppHash:	req.AppHash,
+		RootHash:	req.RootHash,
 	})
 	if err != nil {
 		return nil, err

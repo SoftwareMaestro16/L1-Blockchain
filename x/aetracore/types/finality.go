@@ -6,18 +6,18 @@ import (
 )
 
 type FinalityRecord struct {
-	Height                 uint64
-	AppHash                string
-	GlobalStateRoot        string
-	GlobalMessageRoot      string
-	ExecutionReceiptRoot   string
-	ZoneCommitmentsRoot    string
-	RoutingTableRoot       string
-	CommitmentCount        uint64
-	ProofRootCount         uint64
-	CrossZoneFinalityDelay uint64
-	EligibleDeliveryHeight uint64
-	FinalityHash           string
+	Height			uint64
+	AppHash			string
+	GlobalStateRoot		string
+	GlobalMessageRoot	string
+	ExecutionReceiptRoot	string
+	ZoneCommitmentsRoot	string
+	RoutingTableRoot	string
+	CommitmentCount		uint64
+	ProofRootCount		uint64
+	CrossZoneFinalityDelay	uint64
+	EligibleDeliveryHeight	uint64
+	FinalityHash		string
 }
 
 func NewFinalityRecord(snapshot RootSnapshot, appHash string, commitmentCount uint64, routingTableRoot string, crossZoneDelay uint64) (FinalityRecord, error) {
@@ -36,16 +36,16 @@ func NewFinalityRecord(snapshot RootSnapshot, appHash string, commitmentCount ui
 		crossZoneDelay = 1
 	}
 	record := FinalityRecord{
-		Height:                 snapshot.Height,
-		AppHash:                appHash,
-		GlobalStateRoot:        snapshot.Finality.GlobalStateRoot,
-		GlobalMessageRoot:      snapshot.Finality.GlobalMessageRoot,
-		ExecutionReceiptRoot:   snapshot.Finality.ExecutionReceiptRoot,
-		RoutingTableRoot:       routingTableRoot,
-		CommitmentCount:        commitmentCount,
-		ProofRootCount:         uint64(len(snapshot.ProofRoots)),
-		CrossZoneFinalityDelay: crossZoneDelay,
-		EligibleDeliveryHeight: snapshot.Height + crossZoneDelay,
+		Height:			snapshot.Height,
+		AppHash:		appHash,
+		GlobalStateRoot:	snapshot.Finality.GlobalStateRoot,
+		GlobalMessageRoot:	snapshot.Finality.GlobalMessageRoot,
+		ExecutionReceiptRoot:	snapshot.Finality.ExecutionReceiptRoot,
+		RoutingTableRoot:	routingTableRoot,
+		CommitmentCount:	commitmentCount,
+		ProofRootCount:		uint64(len(snapshot.ProofRoots)),
+		CrossZoneFinalityDelay:	crossZoneDelay,
+		EligibleDeliveryHeight:	snapshot.Height + crossZoneDelay,
 	}
 	if record.CommitmentCount == 0 {
 		record.CommitmentCount = uint64(snapshot.GlobalStateRoot.ZoneCount)
@@ -74,8 +74,8 @@ func (r FinalityRecord) ValidateFormat() error {
 		return errors.New("aetracore finality record height must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore finality app hash", r.AppHash},
 		{"aetracore finality global state root", r.GlobalStateRoot},

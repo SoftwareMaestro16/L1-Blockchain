@@ -12,7 +12,7 @@ var _ mintauthoritypb.MsgServer = msgServer{}
 
 type msgServer struct{ Keeper }
 
-func NewMsgServerImpl(k Keeper) mintauthoritypb.MsgServer { return msgServer{Keeper: k} }
+func NewMsgServerImpl(k Keeper) mintauthoritypb.MsgServer	{ return msgServer{Keeper: k} }
 
 func (m msgServer) MintProtocolCoins(ctx context.Context, msg *mintauthoritypb.MsgMintProtocolCoins) (*mintauthoritypb.MsgMintProtocolCoinsResponse, error) {
 	amount, err := parseInt(msg.Amount)

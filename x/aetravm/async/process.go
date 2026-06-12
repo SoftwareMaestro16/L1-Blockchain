@@ -258,12 +258,12 @@ func (e *Executor) scheduleRetry(msg MessageEnvelope, receipt *ExecutionReceipt)
 
 func (e *Executor) recordDeadLetter(msg MessageEnvelope, receipt ExecutionReceipt) {
 	dead := DeadLetter{
-		Sequence:       e.nextDeadLetterSequence,
-		FailedSequence: receipt.Sequence,
-		RecordedBlock:  e.blockHeight,
-		Envelope:       cloneMessage(msg),
-		Receipt:        cloneReceipt(receipt),
-		Reason:         receipt.Error,
+		Sequence:	e.nextDeadLetterSequence,
+		FailedSequence:	receipt.Sequence,
+		RecordedBlock:	e.blockHeight,
+		Envelope:	cloneMessage(msg),
+		Receipt:	cloneReceipt(receipt),
+		Reason:		receipt.Error,
 	}
 	dead.Envelope.ExecutionBlockHeight = 0
 	if uint32(len(e.deadLetters)) >= e.params.MaxDeadLetters {

@@ -68,14 +68,14 @@ func TestMarketAccountShareCapsStarvation(t *testing.T) {
 
 func marketOrder(id string, account sdk.AccAddress, resource string, premium uint64, baseFeePaid bool, normal bool, sequence uint64) Order {
 	return Order{
-		ID:          id,
-		Account:     account,
-		Resource:    resource,
-		Quantity:    1,
-		PremiumNaet: premium,
-		BaseFeePaid: baseFeePaid,
-		NormalUser:  normal,
-		Sequence:    sequence,
+		ID:		id,
+		Account:	account,
+		Resource:	resource,
+		Quantity:	1,
+		PremiumNaet:	premium,
+		BaseFeePaid:	baseFeePaid,
+		NormalUser:	normal,
+		Sequence:	sequence,
 	}
 }
 

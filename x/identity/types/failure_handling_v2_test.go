@@ -45,8 +45,8 @@ func TestIdentityWalletResolutionStatusV2DoesNotTrustFailedProofs(t *testing.T) 
 
 func TestIdentityWalletResolutionStatusV2WarnsOnOldProofHeight(t *testing.T) {
 	target := IdentityLightClientVerifiedTargetV2{
-		Name:        "alice.aet",
-		ProofHeight: 10,
+		Name:		"alice.aet",
+		ProofHeight:	10,
 	}
 	fresh := EvaluateIdentityWalletResolutionStatusV2(&target, nil, 13, 5)
 	require.True(t, fresh.VerifiedStatusVisible)

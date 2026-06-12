@@ -11,37 +11,37 @@ import (
 type MigrationSource string
 
 const (
-	MigrationSourceAccount   MigrationSource = "account"
-	MigrationSourceStake     MigrationSource = "stake"
-	MigrationSourceValidator MigrationSource = "validator"
-	MigrationSourceReporter  MigrationSource = "reporter"
+	MigrationSourceAccount		MigrationSource	= "account"
+	MigrationSourceStake		MigrationSource	= "stake"
+	MigrationSourceValidator	MigrationSource	= "validator"
+	MigrationSourceReporter		MigrationSource	= "reporter"
 )
 
 type MigrationEntry struct {
-	Source        MigrationSource `json:"source"`
-	OriginalIndex int             `json:"original_index"`
-	Account       string          `json:"account"`
-	ScoreBefore  uint32          `json:"score_before"`
-	ScoreAfter   uint32          `json:"score_after"`
-	ConfidenceAfter uint32       `json:"confidence_after"`
-	Merged        bool           `json:"merged"`
-	MergeReason   string         `json:"merge_reason,omitempty"`
+	Source		MigrationSource	`json:"source"`
+	OriginalIndex	int		`json:"original_index"`
+	Account		string		`json:"account"`
+	ScoreBefore	uint32		`json:"score_before"`
+	ScoreAfter	uint32		`json:"score_after"`
+	ConfidenceAfter	uint32		`json:"confidence_after"`
+	Merged		bool		`json:"merged"`
+	MergeReason	string		`json:"merge_reason,omitempty"`
 }
 
 type MigrationReceipt struct {
-	Version            uint32           `json:"version"`
-	MigrationHeight    uint64           `json:"migration_height"`
-	TotalAccounts      int             `json:"total_accounts"`
-	TotalStakeRecords   int             `json:"total_stake_records"`
-	TotalValidators     int             `json:"total_validators"`
-	TotalReporters     int             `json:"total_reporters"`
-	IdentitiesCreated  int             `json:"identities_created"`
-	IdentitiesMerged   int             `json:"identities_merged"`
-	ValidatorScores    int             `json:"validator_scores_created"`
-	ServiceTrustScores int             `json:"service_trust_scores_created"`
-	ReportersDropped   int             `json:"reporters_dropped"`
-	Entries            []MigrationEntry `json:"entries"`
-	DeterministicHash  string          `json:"deterministic_hash"`
+	Version			uint32			`json:"version"`
+	MigrationHeight		uint64			`json:"migration_height"`
+	TotalAccounts		int			`json:"total_accounts"`
+	TotalStakeRecords	int			`json:"total_stake_records"`
+	TotalValidators		int			`json:"total_validators"`
+	TotalReporters		int			`json:"total_reporters"`
+	IdentitiesCreated	int			`json:"identities_created"`
+	IdentitiesMerged	int			`json:"identities_merged"`
+	ValidatorScores		int			`json:"validator_scores_created"`
+	ServiceTrustScores	int			`json:"service_trust_scores_created"`
+	ReportersDropped	int			`json:"reporters_dropped"`
+	Entries			[]MigrationEntry	`json:"entries"`
+	DeterministicHash	string			`json:"deterministic_hash"`
 }
 
 func (r MigrationReceipt) Validate() error {
@@ -75,33 +75,33 @@ func ComputeMigrationReceiptHash(r MigrationReceipt) string {
 	})
 
 	type receiptForHash struct {
-		Version            uint32           `json:"version"`
-		MigrationHeight    uint64           `json:"migration_height"`
-		TotalAccounts      int             `json:"total_accounts"`
-		TotalStakeRecords   int             `json:"total_stake_records"`
-		TotalValidators     int             `json:"total_validators"`
-		TotalReporters     int             `json:"total_reporters"`
-		IdentitiesCreated  int             `json:"identities_created"`
-		IdentitiesMerged   int             `json:"identities_merged"`
-		ValidatorScores    int             `json:"validator_scores_created"`
-		ServiceTrustScores int             `json:"service_trust_scores_created"`
-		ReportersDropped   int             `json:"reporters_dropped"`
-		Entries            []MigrationEntry `json:"entries"`
+		Version			uint32			`json:"version"`
+		MigrationHeight		uint64			`json:"migration_height"`
+		TotalAccounts		int			`json:"total_accounts"`
+		TotalStakeRecords	int			`json:"total_stake_records"`
+		TotalValidators		int			`json:"total_validators"`
+		TotalReporters		int			`json:"total_reporters"`
+		IdentitiesCreated	int			`json:"identities_created"`
+		IdentitiesMerged	int			`json:"identities_merged"`
+		ValidatorScores		int			`json:"validator_scores_created"`
+		ServiceTrustScores	int			`json:"service_trust_scores_created"`
+		ReportersDropped	int			`json:"reporters_dropped"`
+		Entries			[]MigrationEntry	`json:"entries"`
 	}
 
 	data, _ := json.Marshal(receiptForHash{
-		Version:            r.Version,
-		MigrationHeight:    r.MigrationHeight,
-		TotalAccounts:      r.TotalAccounts,
-		TotalStakeRecords:  r.TotalStakeRecords,
-		TotalValidators:    r.TotalValidators,
-		TotalReporters:     r.TotalReporters,
-		IdentitiesCreated:  r.IdentitiesCreated,
-		IdentitiesMerged:   r.IdentitiesMerged,
-		ValidatorScores:    r.ValidatorScores,
-		ServiceTrustScores: r.ServiceTrustScores,
-		ReportersDropped:   r.ReportersDropped,
-		Entries:            sorted,
+		Version:		r.Version,
+		MigrationHeight:	r.MigrationHeight,
+		TotalAccounts:		r.TotalAccounts,
+		TotalStakeRecords:	r.TotalStakeRecords,
+		TotalValidators:	r.TotalValidators,
+		TotalReporters:		r.TotalReporters,
+		IdentitiesCreated:	r.IdentitiesCreated,
+		IdentitiesMerged:	r.IdentitiesMerged,
+		ValidatorScores:	r.ValidatorScores,
+		ServiceTrustScores:	r.ServiceTrustScores,
+		ReportersDropped:	r.ReportersDropped,
+		Entries:		sorted,
 	})
 	h := sha256.Sum256(data)
 	return fmt.Sprintf("%x", h)
@@ -120,13 +120,13 @@ func MigrateFromReputationStateWithReceipt(old ReputationState, migrationHeight 
 	for i, acc := range old.Accounts {
 		id := identityFromAccountRecord(acc)
 		entry := MigrationEntry{
-			Source:        MigrationSourceAccount,
-			OriginalIndex: i,
-			Account:       id.Account,
-			ScoreBefore:   uint32(acc.Score) * 10000 / 255,
-			ScoreAfter:    id.Score,
-			ConfidenceAfter: id.Confidence,
-			Merged:        false,
+			Source:			MigrationSourceAccount,
+			OriginalIndex:		i,
+			Account:		id.Account,
+			ScoreBefore:		uint32(acc.Score) * 10000 / 255,
+			ScoreAfter:		id.Score,
+			ConfidenceAfter:	id.Confidence,
+			Merged:			false,
 		}
 		entries = append(entries, entry)
 		identities = append(identities, *id)
@@ -140,11 +140,11 @@ func MigrateFromReputationStateWithReceipt(old ReputationState, migrationHeight 
 		key := strings.ToLower(strings.TrimSpace(userAddr))
 		if _, alreadyClaimed := stakeTimeClaimed[key]; alreadyClaimed {
 			entries = append(entries, MigrationEntry{
-				Source:       MigrationSourceStake,
-				OriginalIndex: i,
-				Account:      userAddr,
-				Merged:       false,
-				MergeReason:  "duplicate_stake_time_rejected",
+				Source:		MigrationSourceStake,
+				OriginalIndex:	i,
+				Account:	userAddr,
+				Merged:		false,
+				MergeReason:	"duplicate_stake_time_rejected",
 			})
 			continue
 		}
@@ -166,14 +166,14 @@ func MigrateFromReputationStateWithReceipt(old ReputationState, migrationHeight 
 		stakeTimeClaimed[key] = stakeSeconds
 
 		entries = append(entries, MigrationEntry{
-			Source:         MigrationSourceStake,
-			OriginalIndex:  i,
-			Account:        userAddr,
-			ScoreBefore:    id.Score,
-			ScoreAfter:     ComputeIdentityScore(id),
-			ConfidenceAfter: id.Confidence,
-			Merged:         idx >= 0,
-			MergeReason:   "stake_time_merged_into_identity",
+			Source:			MigrationSourceStake,
+			OriginalIndex:		i,
+			Account:		userAddr,
+			ScoreBefore:		id.Score,
+			ScoreAfter:		ComputeIdentityScore(id),
+			ConfidenceAfter:	id.Confidence,
+			Merged:			idx >= 0,
+			MergeReason:		"stake_time_merged_into_identity",
 		})
 
 		if idx < 0 {
@@ -187,12 +187,12 @@ func MigrateFromReputationStateWithReceipt(old ReputationState, migrationHeight 
 	for i, val := range old.Validators {
 		vs := validatorScoreFromRecord(val)
 		entries = append(entries, MigrationEntry{
-			Source:        MigrationSourceValidator,
-			OriginalIndex: i,
-			Account:       vs.ValidatorAddress,
-			ScoreBefore:   uint32(val.Score) * 10000 / 255,
-			ScoreAfter:    vs.TotalScore,
-			Merged:        false,
+			Source:		MigrationSourceValidator,
+			OriginalIndex:	i,
+			Account:	vs.ValidatorAddress,
+			ScoreBefore:	uint32(val.Score) * 10000 / 255,
+			ScoreAfter:	vs.TotalScore,
+			Merged:		false,
 		})
 		validatorScores = append(validatorScores, *vs)
 	}
@@ -200,35 +200,35 @@ func MigrateFromReputationStateWithReceipt(old ReputationState, migrationHeight 
 	reportersDropped := len(old.Reporters)
 	for i, rep := range old.Reporters {
 		entries = append(entries, MigrationEntry{
-			Source:        MigrationSourceReporter,
-			OriginalIndex: i,
-			Account:       formatAddress(rep.Account),
-			Merged:        false,
-			MergeReason:   "reporter_dropped_no_separate_reputation",
+			Source:		MigrationSourceReporter,
+			OriginalIndex:	i,
+			Account:	formatAddress(rep.Account),
+			Merged:		false,
+			MergeReason:	"reporter_dropped_no_separate_reputation",
 		})
 	}
 
 	state := ConsolidatedReputationState{
-		Version:            ConsolidatedStateVersionV1,
-		Params:             params,
-		Identities:         normalizeIdentities(identities),
-		ValidatorScores:    normalizeValidatorScores(validatorScores),
-		ServiceTrustScores: nil,
+		Version:		ConsolidatedStateVersionV1,
+		Params:			params,
+		Identities:		normalizeIdentities(identities),
+		ValidatorScores:	normalizeValidatorScores(validatorScores),
+		ServiceTrustScores:	nil,
 	}
 
 	receipt := MigrationReceipt{
-		Version:            uint32(ConsolidatedStateVersionV1),
-		MigrationHeight:    migrationHeight,
-		TotalAccounts:      len(old.Accounts),
-		TotalStakeRecords:  len(old.StakeRecords),
-		TotalValidators:     len(old.Validators),
-		TotalReporters:     len(old.Reporters),
-		IdentitiesCreated:  len(state.Identities) - identitiesMerged,
-		IdentitiesMerged:   identitiesMerged,
-		ValidatorScores:    len(state.ValidatorScores),
-		ServiceTrustScores: 0,
-		ReportersDropped:   reportersDropped,
-		Entries:            entries,
+		Version:		uint32(ConsolidatedStateVersionV1),
+		MigrationHeight:	migrationHeight,
+		TotalAccounts:		len(old.Accounts),
+		TotalStakeRecords:	len(old.StakeRecords),
+		TotalValidators:	len(old.Validators),
+		TotalReporters:		len(old.Reporters),
+		IdentitiesCreated:	len(state.Identities) - identitiesMerged,
+		IdentitiesMerged:	identitiesMerged,
+		ValidatorScores:	len(state.ValidatorScores),
+		ServiceTrustScores:	0,
+		ReportersDropped:	reportersDropped,
+		Entries:		entries,
 	}
 	receipt.DeterministicHash = ComputeMigrationReceiptHash(receipt)
 

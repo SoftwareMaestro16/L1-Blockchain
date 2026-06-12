@@ -11,39 +11,39 @@ import (
 type IdentityZoneCapability string
 
 const (
-	IdentityCapabilityCommitRevealRegistration     IdentityZoneCapability = "commit_reveal_registration"
-	IdentityCapabilityNFTOwnershipBinding          IdentityZoneCapability = "nft_ownership_binding"
-	IdentityCapabilityResolverRecords              IdentityZoneCapability = "resolver_records"
-	IdentityCapabilityReverseLookup                IdentityZoneCapability = "reverse_lookup"
-	IdentityCapabilityAuctions                     IdentityZoneCapability = "auctions"
-	IdentityCapabilityDeterministicResolverVMHook  IdentityZoneCapability = "deterministic_resolver_vm_hooks"
-	IdentityCapabilityMultiRecordResolutionGraph   IdentityZoneCapability = "multi_record_resolution_graph"
-	IdentityCapabilityCrossZoneIdentityBinding     IdentityZoneCapability = "cross_zone_identity_binding"
-	IdentityCapabilityLightClientProofVerification IdentityZoneCapability = "light_client_proof_verification"
+	IdentityCapabilityCommitRevealRegistration	IdentityZoneCapability	= "commit_reveal_registration"
+	IdentityCapabilityNFTOwnershipBinding		IdentityZoneCapability	= "nft_ownership_binding"
+	IdentityCapabilityResolverRecords		IdentityZoneCapability	= "resolver_records"
+	IdentityCapabilityReverseLookup			IdentityZoneCapability	= "reverse_lookup"
+	IdentityCapabilityAuctions			IdentityZoneCapability	= "auctions"
+	IdentityCapabilityDeterministicResolverVMHook	IdentityZoneCapability	= "deterministic_resolver_vm_hooks"
+	IdentityCapabilityMultiRecordResolutionGraph	IdentityZoneCapability	= "multi_record_resolution_graph"
+	IdentityCapabilityCrossZoneIdentityBinding	IdentityZoneCapability	= "cross_zone_identity_binding"
+	IdentityCapabilityLightClientProofVerification	IdentityZoneCapability	= "light_client_proof_verification"
 )
 
 type IdentityZoneUpgradeManifest struct {
-	ZoneID               string
-	ZoneType             string
-	StorePrefix          string
-	ArchitectureHash     string
-	ZoneDescriptorHash   string
-	StateMachineHash     string
-	CapabilityRoot       string
-	RequiredCapabilities []IdentityZoneCapability
-	MessageRoot          string
-	ProofQueryRoot       string
-	StateRoot            string
-	UpgradeHash          string
+	ZoneID			string
+	ZoneType		string
+	StorePrefix		string
+	ArchitectureHash	string
+	ZoneDescriptorHash	string
+	StateMachineHash	string
+	CapabilityRoot		string
+	RequiredCapabilities	[]IdentityZoneCapability
+	MessageRoot		string
+	ProofQueryRoot		string
+	StateRoot		string
+	UpgradeHash		string
 }
 
 type IdentityZoneUpgradeArtifacts struct {
-	State    IdentityState
-	Hooks    []IdentityResolverVMHook
-	Graphs   []IdentityResolutionGraph
-	Bindings []IdentityCrossZoneBinding
-	Proofs   []IdentityZoneProofIndexEntry
-	Height   uint64
+	State		IdentityState
+	Hooks		[]IdentityResolverVMHook
+	Graphs		[]IdentityResolutionGraph
+	Bindings	[]IdentityCrossZoneBinding
+	Proofs		[]IdentityZoneProofIndexEntry
+	Height		uint64
 }
 
 func DefaultIdentityZoneCapabilities() []IdentityZoneCapability {
@@ -62,26 +62,26 @@ func DefaultIdentityZoneCapabilities() []IdentityZoneCapability {
 
 func DefaultAetraCoreIdentityZoneDescriptor() coretypes.ZoneDescriptor {
 	return coretypes.ZoneDescriptor{
-		ZoneID:              coretypes.ZoneIDIdentity,
-		ZoneName:            "identity",
-		ZoneType:            coretypes.ZoneTypeIdentity,
-		ModuleName:          "identity",
-		Enabled:             true,
-		StateMachineVersion: 1,
-		StateVersion:        1,
-		KeeperScope:         "identity.keeper",
-		MsgServerScope:      "identity.msg",
-		QueryServerScope:    "identity.query",
-		MempoolPolicyID:     coretypes.DefaultMempoolPolicy,
-		FeePolicyID:         coretypes.NativeFeePolicyID,
-		GasPolicyID:         coretypes.DefaultGasPolicy,
-		MessagePolicyID:     coretypes.DefaultMessagePolicy,
-		RootPrefix:          IdentityStoreV2Prefix,
-		ShardLayoutEpoch:    1,
-		MaxShards:           64,
-		MessageCapabilities: []string{"identity-async-lookup", "identity-receipts", "cross-zone-binding"},
-		ProofCapabilities:   []string{"domain", "resolver", "reverse", "nft-binding", "auction", "identity-root"},
-		Capabilities:        identityCapabilitiesAsStrings(DefaultIdentityZoneCapabilities()),
+		ZoneID:			coretypes.ZoneIDIdentity,
+		ZoneName:		"identity",
+		ZoneType:		coretypes.ZoneTypeIdentity,
+		ModuleName:		"identity",
+		Enabled:		true,
+		StateMachineVersion:	1,
+		StateVersion:		1,
+		KeeperScope:		"identity.keeper",
+		MsgServerScope:		"identity.msg",
+		QueryServerScope:	"identity.query",
+		MempoolPolicyID:	coretypes.DefaultMempoolPolicy,
+		FeePolicyID:		coretypes.NativeFeePolicyID,
+		GasPolicyID:		coretypes.DefaultGasPolicy,
+		MessagePolicyID:	coretypes.DefaultMessagePolicy,
+		RootPrefix:		IdentityStoreV2Prefix,
+		ShardLayoutEpoch:	1,
+		MaxShards:		64,
+		MessageCapabilities:	[]string{"identity-async-lookup", "identity-receipts", "cross-zone-binding"},
+		ProofCapabilities:	[]string{"domain", "resolver", "reverse", "nft-binding", "auction", "identity-root"},
+		Capabilities:		identityCapabilitiesAsStrings(DefaultIdentityZoneCapabilities()),
 	}
 }
 
@@ -107,17 +107,17 @@ func BuildIdentityZoneUpgradeManifest(aekDescriptor coretypes.ZoneDescriptor, zo
 		return IdentityZoneUpgradeManifest{}, err
 	}
 	manifest := IdentityZoneUpgradeManifest{
-		ZoneID:               string(aekDescriptor.ZoneID),
-		ZoneType:             string(aekDescriptor.ZoneType),
-		StorePrefix:          zoneDescriptor.StorePrefix,
-		ArchitectureHash:     architectureHash,
-		ZoneDescriptorHash:   coretypes.ComputeZoneDescriptorHash(aekDescriptor),
-		StateMachineHash:     ComputeIdentityZoneStateMachineDescriptorHash(zoneDescriptor),
-		CapabilityRoot:       ComputeIdentityZoneCapabilityRoot(capabilities),
-		RequiredCapabilities: capabilities,
-		MessageRoot:          ComputeIdentityZoneMessageRoot(zoneDescriptor.MessageHandlers),
-		ProofQueryRoot:       ComputeIdentityZoneProofQueryRoot(zoneDescriptor.ProofQueries),
-		StateRoot:            roots.StateRoot,
+		ZoneID:			string(aekDescriptor.ZoneID),
+		ZoneType:		string(aekDescriptor.ZoneType),
+		StorePrefix:		zoneDescriptor.StorePrefix,
+		ArchitectureHash:	architectureHash,
+		ZoneDescriptorHash:	coretypes.ComputeZoneDescriptorHash(aekDescriptor),
+		StateMachineHash:	ComputeIdentityZoneStateMachineDescriptorHash(zoneDescriptor),
+		CapabilityRoot:		ComputeIdentityZoneCapabilityRoot(capabilities),
+		RequiredCapabilities:	capabilities,
+		MessageRoot:		ComputeIdentityZoneMessageRoot(zoneDescriptor.MessageHandlers),
+		ProofQueryRoot:		ComputeIdentityZoneProofQueryRoot(zoneDescriptor.ProofQueries),
+		StateRoot:		roots.StateRoot,
 	}
 	manifest.UpgradeHash = ComputeIdentityZoneUpgradeManifestHash(manifest)
 	return manifest, manifest.Validate()
@@ -227,8 +227,8 @@ func (manifest IdentityZoneUpgradeManifest) Validate() error {
 		return errors.New("identity zone upgrade manifest store prefix mismatch")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "identity zone upgrade architecture hash", value: manifest.ArchitectureHash},
 		{name: "identity zone upgrade descriptor hash", value: manifest.ZoneDescriptorHash},

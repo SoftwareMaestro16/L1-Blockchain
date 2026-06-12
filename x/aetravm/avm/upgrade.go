@@ -9,20 +9,10 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.15: Contract Upgrade & Migration Model
-// ---------------
-// Contracts are immutable by default. Upgradeability is an explicit capability.
-// Migration is a deterministic pure function. Failed migration rolls back atomically.
-
-// ---------------
-// Contract Version Model
-// ---------------
-
 type ContractVersion struct {
-	SchemaVersion uint32
-	CodeVersion   uint32
-	StateVersion  uint32
+	SchemaVersion	uint32
+	CodeVersion	uint32
+	StateVersion	uint32
 }
 
 func (v ContractVersion) Equals(other ContractVersion) bool {
@@ -48,20 +38,16 @@ func DecodeContractVersion(data []byte) (ContractVersion, error) {
 		return ContractVersion{}, fmt.Errorf("AVM upgrade: version data too short: %d bytes", len(data))
 	}
 	return ContractVersion{
-		SchemaVersion: binary.BigEndian.Uint32(data[0:4]),
-		CodeVersion:   binary.BigEndian.Uint32(data[4:8]),
-		StateVersion:  binary.BigEndian.Uint32(data[8:12]),
+		SchemaVersion:	binary.BigEndian.Uint32(data[0:4]),
+		CodeVersion:	binary.BigEndian.Uint32(data[4:8]),
+		StateVersion:	binary.BigEndian.Uint32(data[8:12]),
 	}, nil
 }
-
-// ---------------
-// Upgrade Authority Hierarchy
-// ---------------
 
 type UpgradeAuthority uint8
 
 const (
-	AuthorityNone       UpgradeAuthority = iota
+	AuthorityNone	UpgradeAuthority	= iota
 	AuthorityAdmin
 	AuthorityGovernance
 	AuthoritySystem
@@ -82,15 +68,11 @@ func (a UpgradeAuthority) String() string {
 	}
 }
 
-// ---------------
-// Upgrade Capability Flags
-// ---------------
-
 type UpgradeCapability uint64
 
 const (
-	UpgradeFlagNone      UpgradeCapability = 0
-	UpgradeFlagAllowed   UpgradeCapability = 1 << iota
+	UpgradeFlagNone		UpgradeCapability	= 0
+	UpgradeFlagAllowed	UpgradeCapability	= 1 << iota
 	UpgradeFlagAdminOnly
 	UpgradeFlagGovernanceOnly
 	UpgradeFlagSystemOnly
@@ -106,14 +88,10 @@ func (c UpgradeCapability) RequiresMigration() bool {
 	return c&UpgradeFlagMigrationRequired != 0
 }
 
-// ---------------
-// Upgrade Messages
-// ---------------
-
 type UpgradeMessageType uint8
 
 const (
-	MsgUpgradeContractCode UpgradeMessageType = iota
+	MsgUpgradeContractCode	UpgradeMessageType	= iota
 	MsgMigrateContractState
 	MsgSetContractAdmin
 	MsgDisableContractUpgrades
@@ -135,50 +113,39 @@ func (m UpgradeMessageType) String() string {
 }
 
 type UpgradeMessage struct {
-	Type             UpgradeMessageType
-	ContractAddress  string
-	Caller           string
-	Authority        UpgradeAuthority
-	NewCodeHash      [32]byte
-	MigrationHandler [32]byte
-	TargetSchema     ContractVersion
-	GasLimit         uint64
-	Signature       []byte
+	Type			UpgradeMessageType
+	ContractAddress		string
+	Caller			string
+	Authority		UpgradeAuthority
+	NewCodeHash		[32]byte
+	MigrationHandler	[32]byte
+	TargetSchema		ContractVersion
+	GasLimit		uint64
+	Signature		[]byte
 }
-
-// ---------------
-// Contract State (Versioned)
-// ---------------
 
 type ContractState struct {
-	Address       string
-	Version       ContractVersion
-	CodeHash       [32]byte
-	Admin          string
-	Capabilities  UpgradeCapability
-	StateRoot      *chunk.Chunk
-	UpgradeCount   uint32
-	UpgradeDisabled bool
+	Address		string
+	Version		ContractVersion
+	CodeHash	[32]byte
+	Admin		string
+	Capabilities	UpgradeCapability
+	StateRoot	*chunk.Chunk
+	UpgradeCount	uint32
+	UpgradeDisabled	bool
 }
-
-// ---------------
-// Migration Handler Model
-// ---------------
-// Migration is a deterministic pure function:
-// State_old → State_new
-// Must be pure, deterministic, bounded in gas.
 
 type MigrationHandler func(oldRoot *chunk.Chunk, oldSchema, newSchema ContractVersion, gasLimit uint64) (*chunk.Chunk, uint64, error)
 
 type MigrationRegistry struct {
-	handlers map[[32]byte]MigrationHandler
-	schemas  map[string][]ContractVersion
+	handlers	map[[32]byte]MigrationHandler
+	schemas		map[string][]ContractVersion
 }
 
 func NewMigrationRegistry() *MigrationRegistry {
 	return &MigrationRegistry{
-		handlers: make(map[[32]byte]MigrationHandler),
-		schemas:  make(map[string][]ContractVersion),
+		handlers:	make(map[[32]byte]MigrationHandler),
+		schemas:	make(map[string][]ContractVersion),
 	}
 }
 
@@ -197,14 +164,10 @@ func (r *MigrationRegistry) Has(codeHash [32]byte) bool {
 	return ok
 }
 
-// ---------------
-// State Compatibility Verification
-// ---------------
-
 type CompatibilityResult uint8
 
 const (
-	CompatibleNoMigration  CompatibilityResult = iota
+	CompatibleNoMigration	CompatibilityResult	= iota
 	CompatibleWithMigration
 	Incompatible
 )
@@ -219,19 +182,15 @@ func CheckStateCompatibility(oldSchema, newSchema ContractVersion) Compatibility
 	return Incompatible
 }
 
-// ---------------
-// Upgrade Validation
-// ---------------
-
 var (
-	ErrContractImmutable            = errors.New("AVM upgrade: contract is permanently immutable")
-	ErrUnauthorizedUpgrade          = errors.New("AVM upgrade: unauthorized upgrade authority")
-	ErrUpgradeDisabled             = errors.New("AVM upgrade: upgrades have been disabled")
-	ErrMigrationHandlerMissing      = errors.New("AVM upgrade: migration handler required but missing")
-	ErrStateIncompatible           = errors.New("AVM upgrade: state schema incompatible, migration required")
-	ErrInvalidCodeHash              = errors.New("AVM upgrade: invalid code hash")
-	ErrSystemAuthorityRequired      = errors.New("AVM upgrade: system authority required for this operation")
-	ErrGovernanceSignatureInvalid   = errors.New("AVM upgrade: governance signature invalid")
+	ErrContractImmutable		= errors.New("AVM upgrade: contract is permanently immutable")
+	ErrUnauthorizedUpgrade		= errors.New("AVM upgrade: unauthorized upgrade authority")
+	ErrUpgradeDisabled		= errors.New("AVM upgrade: upgrades have been disabled")
+	ErrMigrationHandlerMissing	= errors.New("AVM upgrade: migration handler required but missing")
+	ErrStateIncompatible		= errors.New("AVM upgrade: state schema incompatible, migration required")
+	ErrInvalidCodeHash		= errors.New("AVM upgrade: invalid code hash")
+	ErrSystemAuthorityRequired	= errors.New("AVM upgrade: system authority required for this operation")
+	ErrGovernanceSignatureInvalid	= errors.New("AVM upgrade: governance signature invalid")
 )
 
 func ValidateUpgrade(state *ContractState, msg UpgradeMessage) error {
@@ -269,21 +228,14 @@ func ValidateUpgradeAuthority(state *ContractState, msg UpgradeMessage) bool {
 	}
 }
 
-// ---------------
-// Migration Execution (Atomic Boundary)
-// ---------------
-// success → commit new StateRootChunk
-// failure → full rollback to previous StateRootChunk
-// No partial state writes allowed.
-
 type MigrationResult struct {
-	OldStateRoot *chunk.Chunk
-	NewStateRoot *chunk.Chunk
-	OldVersion   ContractVersion
-	NewVersion   ContractVersion
-	GasUsed      uint64
-	Success      bool
-	RolledBack   bool
+	OldStateRoot	*chunk.Chunk
+	NewStateRoot	*chunk.Chunk
+	OldVersion	ContractVersion
+	NewVersion	ContractVersion
+	GasUsed		uint64
+	Success		bool
+	RolledBack	bool
 }
 
 func ExecuteMigration(
@@ -303,45 +255,41 @@ func ExecuteMigration(
 	newRoot, gasUsed, err := handler(oldRoot, oldVersion, newSchema, gasLimit)
 	if err != nil || newRoot == nil {
 		return &MigrationResult{
-			OldStateRoot: oldRoot,
-			NewStateRoot: oldRoot,
-			OldVersion:   oldVersion,
-			NewVersion:   oldVersion,
-			GasUsed:      gasUsed,
-			Success:      false,
-			RolledBack:   true,
+			OldStateRoot:	oldRoot,
+			NewStateRoot:	oldRoot,
+			OldVersion:	oldVersion,
+			NewVersion:	oldVersion,
+			GasUsed:	gasUsed,
+			Success:	false,
+			RolledBack:	true,
 		}, nil
 	}
 
 	return &MigrationResult{
-		OldStateRoot: oldRoot,
-		NewStateRoot: newRoot,
-		OldVersion:   oldVersion,
-		NewVersion:   newSchema,
-		GasUsed:      gasUsed,
-		Success:      true,
-		RolledBack:   false,
+		OldStateRoot:	oldRoot,
+		NewStateRoot:	newRoot,
+		OldVersion:	oldVersion,
+		NewVersion:	newSchema,
+		GasUsed:	gasUsed,
+		Success:	true,
+		RolledBack:	false,
 	}, nil
 }
 
-// ---------------
-// Migration Receipt Model
-// ---------------
-
 type MigrationReceipt struct {
-	SchemaVersionBefore ContractVersion
-	SchemaVersionAfter  ContractVersion
-	StateRootBefore     []byte
-	StateRootAfter      []byte
-	MigrationGasUsed    uint64
-	Success             bool
-	RolledBack          bool
-	AuthorityType       UpgradeAuthority
-	MigrationHandlerHash [32]byte
-	CodeHashBefore      [32]byte
-	CodeHashAfter       [32]byte
-	ContractAddress     string
-	UpgradeCount        uint32
+	SchemaVersionBefore	ContractVersion
+	SchemaVersionAfter	ContractVersion
+	StateRootBefore		[]byte
+	StateRootAfter		[]byte
+	MigrationGasUsed	uint64
+	Success			bool
+	RolledBack		bool
+	AuthorityType		UpgradeAuthority
+	MigrationHandlerHash	[32]byte
+	CodeHashBefore		[32]byte
+	CodeHashAfter		[32]byte
+	ContractAddress		string
+	UpgradeCount		uint32
 }
 
 func (r *MigrationReceipt) CanonicalEncode() []byte {
@@ -378,19 +326,15 @@ func MigrationReceiptHash(receipt *MigrationReceipt) [32]byte {
 	return blake3.Sum256(encoded)
 }
 
-// ---------------
-// Upgrade Engine
-// ---------------
-
 type UpgradeEngine struct {
-	registry   *MigrationRegistry
-	moduleHash map[[32]byte]bool
+	registry	*MigrationRegistry
+	moduleHash	map[[32]byte]bool
 }
 
 func NewUpgradeEngine(registry *MigrationRegistry) *UpgradeEngine {
 	return &UpgradeEngine{
-		registry:   registry,
-		moduleHash: make(map[[32]byte]bool),
+		registry:	registry,
+		moduleHash:	make(map[[32]byte]bool),
 	}
 }
 
@@ -462,30 +406,30 @@ func (e *UpgradeEngine) ProcessUpgrade(
 	}
 
 	receipt := &MigrationReceipt{
-		SchemaVersionBefore: state.Version,
-		SchemaVersionAfter:  msg.TargetSchema,
-		StateRootBefore:     stateRootBefore,
-		StateRootAfter:      stateRootAfter,
-		MigrationGasUsed:    gasUsed,
-		Success:             !rolledBack,
-		RolledBack:          rolledBack,
-		AuthorityType:       msg.Authority,
-		MigrationHandlerHash: msg.MigrationHandler,
-		CodeHashBefore:      state.CodeHash,
-		CodeHashAfter:       msg.NewCodeHash,
-		ContractAddress:     state.Address,
-		UpgradeCount:        state.UpgradeCount + 1,
+		SchemaVersionBefore:	state.Version,
+		SchemaVersionAfter:	msg.TargetSchema,
+		StateRootBefore:	stateRootBefore,
+		StateRootAfter:		stateRootAfter,
+		MigrationGasUsed:	gasUsed,
+		Success:		!rolledBack,
+		RolledBack:		rolledBack,
+		AuthorityType:		msg.Authority,
+		MigrationHandlerHash:	msg.MigrationHandler,
+		CodeHashBefore:		state.CodeHash,
+		CodeHashAfter:		msg.NewCodeHash,
+		ContractAddress:	state.Address,
+		UpgradeCount:		state.UpgradeCount + 1,
 	}
 
 	newState := &ContractState{
-		Address:      state.Address,
-		Version:      msg.TargetSchema,
-		CodeHash:      msg.NewCodeHash,
-		Admin:         state.Admin,
-		Capabilities:  state.Capabilities,
-		StateRoot:      newStateRoot,
-		UpgradeCount:  state.UpgradeCount + 1,
-		UpgradeDisabled: state.UpgradeDisabled,
+		Address:		state.Address,
+		Version:		msg.TargetSchema,
+		CodeHash:		msg.NewCodeHash,
+		Admin:			state.Admin,
+		Capabilities:		state.Capabilities,
+		StateRoot:		newStateRoot,
+		UpgradeCount:		state.UpgradeCount + 1,
+		UpgradeDisabled:	state.UpgradeDisabled,
 	}
 
 	if migrated && !rolledBack {
@@ -501,14 +445,14 @@ func (e *UpgradeEngine) DisableUpgrades(state *ContractState, msg UpgradeMessage
 	}
 
 	newState := &ContractState{
-		Address:        state.Address,
-		Version:        state.Version,
-		CodeHash:        state.CodeHash,
-		Admin:           state.Admin,
-		Capabilities:    state.Capabilities,
-		StateRoot:        state.StateRoot,
-		UpgradeCount:    state.UpgradeCount,
-		UpgradeDisabled: true,
+		Address:		state.Address,
+		Version:		state.Version,
+		CodeHash:		state.CodeHash,
+		Admin:			state.Admin,
+		Capabilities:		state.Capabilities,
+		StateRoot:		state.StateRoot,
+		UpgradeCount:		state.UpgradeCount,
+		UpgradeDisabled:	true,
 	}
 	return newState, nil
 }
@@ -522,21 +466,17 @@ func (e *UpgradeEngine) SetAdmin(state *ContractState, msg UpgradeMessage) (*Con
 	}
 
 	newState := &ContractState{
-		Address:        state.Address,
-		Version:        state.Version,
-		CodeHash:        state.CodeHash,
-		Admin:           msg.Caller,
-		Capabilities:    state.Capabilities,
-		StateRoot:        state.StateRoot,
-		UpgradeCount:    state.UpgradeCount,
-		UpgradeDisabled: state.UpgradeDisabled,
+		Address:		state.Address,
+		Version:		state.Version,
+		CodeHash:		state.CodeHash,
+		Admin:			msg.Caller,
+		Capabilities:		state.Capabilities,
+		StateRoot:		state.StateRoot,
+		UpgradeCount:		state.UpgradeCount,
+		UpgradeDisabled:	state.UpgradeDisabled,
 	}
 	return newState, nil
 }
-
-// ---------------
-// System Contract Override
-// ---------------
 
 func ValidateSystemUpgrade(state *ContractState, msg UpgradeMessage) error {
 	if msg.Authority != AuthoritySystem {
@@ -547,10 +487,6 @@ func ValidateSystemUpgrade(state *ContractState, msg UpgradeMessage) error {
 	}
 	return nil
 }
-
-// ---------------
-// Immutability Override Protection
-// ---------------
 
 func EnforceImmutability(state *ContractState) error {
 	if !state.Capabilities.IsUpgradeable() {

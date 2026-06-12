@@ -10,27 +10,27 @@ import (
 type IdentityLightClientFailureCodeV2 string
 
 const (
-	IdentityLightClientErrInvalidName                     IdentityLightClientFailureCodeV2 = "ERR_INVALID_NAME"
-	IdentityLightClientErrUnsupportedNormalizationVersion IdentityLightClientFailureCodeV2 = "ERR_UNSUPPORTED_NORMALIZATION_VERSION"
-	IdentityLightClientErrProofHeightUntrusted            IdentityLightClientFailureCodeV2 = "ERR_PROOF_HEIGHT_UNTRUSTED"
-	IdentityLightClientErrDomainNotFound                  IdentityLightClientFailureCodeV2 = "ERR_DOMAIN_NOT_FOUND"
-	IdentityLightClientErrDomainExpired                   IdentityLightClientFailureCodeV2 = "ERR_DOMAIN_EXPIRED"
-	IdentityLightClientErrDomainNotActive                 IdentityLightClientFailureCodeV2 = "ERR_DOMAIN_NOT_ACTIVE"
-	IdentityLightClientErrNFTBindingMismatch              IdentityLightClientFailureCodeV2 = "ERR_NFT_BINDING_MISMATCH"
-	IdentityLightClientErrResolverNotFound                IdentityLightClientFailureCodeV2 = "ERR_RESOLVER_NOT_FOUND"
-	IdentityLightClientErrResolverUnauthorized            IdentityLightClientFailureCodeV2 = "ERR_RESOLVER_UNAUTHORIZED"
-	IdentityLightClientErrTargetNotFound                  IdentityLightClientFailureCodeV2 = "ERR_TARGET_NOT_FOUND"
-	IdentityLightClientErrDelegationMissing               IdentityLightClientFailureCodeV2 = "ERR_DELEGATION_MISSING"
-	IdentityLightClientErrDelegationExpired               IdentityLightClientFailureCodeV2 = "ERR_DELEGATION_EXPIRED"
-	IdentityLightClientErrReverseNotVerified              IdentityLightClientFailureCodeV2 = "ERR_REVERSE_NOT_VERIFIED"
-	IdentityLightClientErrProofInvalid                    IdentityLightClientFailureCodeV2 = "ERR_PROOF_INVALID"
-	IdentityLightClientErrRecordStale                     IdentityLightClientFailureCodeV2 = "ERR_RECORD_STALE"
+	IdentityLightClientErrInvalidName			IdentityLightClientFailureCodeV2	= "ERR_INVALID_NAME"
+	IdentityLightClientErrUnsupportedNormalizationVersion	IdentityLightClientFailureCodeV2	= "ERR_UNSUPPORTED_NORMALIZATION_VERSION"
+	IdentityLightClientErrProofHeightUntrusted		IdentityLightClientFailureCodeV2	= "ERR_PROOF_HEIGHT_UNTRUSTED"
+	IdentityLightClientErrDomainNotFound			IdentityLightClientFailureCodeV2	= "ERR_DOMAIN_NOT_FOUND"
+	IdentityLightClientErrDomainExpired			IdentityLightClientFailureCodeV2	= "ERR_DOMAIN_EXPIRED"
+	IdentityLightClientErrDomainNotActive			IdentityLightClientFailureCodeV2	= "ERR_DOMAIN_NOT_ACTIVE"
+	IdentityLightClientErrNFTBindingMismatch		IdentityLightClientFailureCodeV2	= "ERR_NFT_BINDING_MISMATCH"
+	IdentityLightClientErrResolverNotFound			IdentityLightClientFailureCodeV2	= "ERR_RESOLVER_NOT_FOUND"
+	IdentityLightClientErrResolverUnauthorized		IdentityLightClientFailureCodeV2	= "ERR_RESOLVER_UNAUTHORIZED"
+	IdentityLightClientErrTargetNotFound			IdentityLightClientFailureCodeV2	= "ERR_TARGET_NOT_FOUND"
+	IdentityLightClientErrDelegationMissing			IdentityLightClientFailureCodeV2	= "ERR_DELEGATION_MISSING"
+	IdentityLightClientErrDelegationExpired			IdentityLightClientFailureCodeV2	= "ERR_DELEGATION_EXPIRED"
+	IdentityLightClientErrReverseNotVerified		IdentityLightClientFailureCodeV2	= "ERR_REVERSE_NOT_VERIFIED"
+	IdentityLightClientErrProofInvalid			IdentityLightClientFailureCodeV2	= "ERR_PROOF_INVALID"
+	IdentityLightClientErrRecordStale			IdentityLightClientFailureCodeV2	= "ERR_RECORD_STALE"
 )
 
 type IdentityLightClientVerificationErrorV2 struct {
-	Code    IdentityLightClientFailureCodeV2
-	Message string
-	Cause   error
+	Code	IdentityLightClientFailureCodeV2
+	Message	string
+	Cause	error
 }
 
 func (e IdentityLightClientVerificationErrorV2) Error() string {
@@ -53,40 +53,40 @@ func IdentityLightClientFailureCodeFromErrorV2(err error) (IdentityLightClientFa
 }
 
 type IdentityTrustedHeaderV2 struct {
-	ChainID string
-	Height  uint64
-	AppHash string
-	Trusted bool
+	ChainID	string
+	Height	uint64
+	AppHash	string
+	Trusted	bool
 }
 
 type IdentityLightClientVerificationRequestV2 struct {
-	ExpectedChainID          string
-	RequestedName            string
-	NormalizationVersion     uint64
-	TrustedHeader            IdentityTrustedHeaderV2
-	Proof                    IdentityResolutionProofFormatV2
-	RecursiveProof           *RecursiveResolutionProofV2
-	TargetType               IdentityResolutionTargetTypeV2
-	TargetKey                string
-	AllowRenewalWindow       bool
-	CurrentHeight            uint64
-	AuthorizedAliasKeys      []string
-	RequireReverseResolution bool
+	ExpectedChainID			string
+	RequestedName			string
+	NormalizationVersion		uint64
+	TrustedHeader			IdentityTrustedHeaderV2
+	Proof				IdentityResolutionProofFormatV2
+	RecursiveProof			*RecursiveResolutionProofV2
+	TargetType			IdentityResolutionTargetTypeV2
+	TargetKey			string
+	AllowRenewalWindow		bool
+	CurrentHeight			uint64
+	AuthorizedAliasKeys		[]string
+	RequireReverseResolution	bool
 }
 
 type IdentityLightClientVerifiedTargetV2 struct {
-	Name             string
-	NameHash         string
-	ResolverNameHash string
-	TargetType       IdentityResolutionTargetTypeV2
-	TargetKey        string
-	Address          sdk.AccAddress
-	Endpoint         string
-	Descriptor       string
-	Route            RoutingMetadataV2
-	RecordVersion    uint64
-	FreshUntilHeight uint64
-	ProofHeight      uint64
+	Name			string
+	NameHash		string
+	ResolverNameHash	string
+	TargetType		IdentityResolutionTargetTypeV2
+	TargetKey		string
+	Address			sdk.AccAddress
+	Endpoint		string
+	Descriptor		string
+	Route			RoutingMetadataV2
+	RecordVersion		uint64
+	FreshUntilHeight	uint64
+	ProofHeight		uint64
 }
 
 func VerifyIdentityResolutionProofLightClientV2(request IdentityLightClientVerificationRequestV2) (IdentityLightClientVerifiedTargetV2, error) {
@@ -225,9 +225,9 @@ func verifyLightClientNFTBindingV2(proof IdentityResolutionProofFormatV2) error 
 		return lightClientFailV2(IdentityLightClientErrNFTBindingMismatch, "registry domain record and nft binding identify different assets", nil)
 	}
 	if err := ValidateDomainNFTBinding(*proof.NFTBinding, DomainNFTBindingContext{
-		RegistryOwner:  proof.DomainRecord.Owner,
-		NFTModuleOwner: proof.NFTBinding.Owner,
-		CurrentHeight:  proof.Height,
+		RegistryOwner:	proof.DomainRecord.Owner,
+		NFTModuleOwner:	proof.NFTBinding.Owner,
+		CurrentHeight:	proof.Height,
 	}); err != nil {
 		return lightClientFailV2(IdentityLightClientErrNFTBindingMismatch, "registry owner does not match nft owner", err)
 	}

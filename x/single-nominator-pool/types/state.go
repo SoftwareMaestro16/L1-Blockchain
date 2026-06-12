@@ -13,23 +13,23 @@ import (
 )
 
 const (
-	StatusActive = "active"
-	StatusClosed = "closed"
+	StatusActive	= "active"
+	StatusClosed	= "closed"
 
-	WithdrawalStatusNone      = ""
-	WithdrawalStatusPending   = "pending"
-	WithdrawalStatusCompleted = "completed"
+	WithdrawalStatusNone		= ""
+	WithdrawalStatusPending		= "pending"
+	WithdrawalStatusCompleted	= "completed"
 
-	MaxPoolsV1             = uint32(100_000)
-	MaxPoolIDBytesV1       = uint32(96)
-	DefaultUnbondingBlocks = appparams.StakingUnbondingDefaultBlocks
+	MaxPoolsV1		= uint32(100_000)
+	MaxPoolIDBytesV1	= uint32(96)
+	DefaultUnbondingBlocks	= appparams.StakingUnbondingDefaultBlocks
 )
 
 type Params struct {
-	Authority       string
-	MaxPools        uint32
-	MaxPoolIDBytes  uint32
-	UnbondingBlocks uint64
+	Authority	string
+	MaxPools	uint32
+	MaxPoolIDBytes	uint32
+	UnbondingBlocks	uint64
 }
 
 type State struct {
@@ -37,78 +37,78 @@ type State struct {
 }
 
 type SingleNominatorPool struct {
-	PoolAddress       string
-	Owner             string
-	Validator         string
-	BondedStake       uint64
-	PendingWithdrawal PendingWithdrawal
-	RewardBalance     uint64
-	EmergencyLock     bool
-	Status            string
+	PoolAddress		string
+	Owner			string
+	Validator		string
+	BondedStake		uint64
+	PendingWithdrawal	PendingWithdrawal
+	RewardBalance		uint64
+	EmergencyLock		bool
+	Status			string
 }
 
 type PendingWithdrawal struct {
-	Amount         uint64
-	RequestHeight  uint64
-	CompleteHeight uint64
-	Status         string
+	Amount		uint64
+	RequestHeight	uint64
+	CompleteHeight	uint64
+	Status		string
 }
 
 type MsgCreateSingleNominatorPool struct {
-	Authority       string
-	PoolAddress     string
-	Owner           string
-	Validator       string
-	ValidatorStatus string
-	Height          uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Validator	string
+	ValidatorStatus	string
+	Height		uint64
 }
 
 type MsgDepositSingleNominator struct {
-	Authority   string
-	PoolAddress string
-	Owner       string
-	Amount      uint64
-	Height      uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgWithdrawSingleNominator struct {
-	Authority   string
-	PoolAddress string
-	Owner       string
-	Amount      uint64
-	Height      uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgClaimSingleNominatorRewards struct {
-	Authority   string
-	PoolAddress string
-	Owner       string
-	Height      uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Height		uint64
 }
 
 type MsgEmergencyLockSingleNominator struct {
-	Authority   string
-	PoolAddress string
-	Owner       string
-	Locked      bool
-	Height      uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Locked		bool
+	Height		uint64
 }
 
 type MsgChangeSingleNominatorValidator struct {
-	Authority       string
-	PoolAddress     string
-	Owner           string
-	Validator       string
-	ValidatorStatus string
-	Height          uint64
+	Authority	string
+	PoolAddress	string
+	Owner		string
+	Validator	string
+	ValidatorStatus	string
+	Height		uint64
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:       prototype.DefaultAuthority,
-		MaxPools:        MaxPoolsV1,
-		MaxPoolIDBytes:  MaxPoolIDBytesV1,
-		UnbondingBlocks: DefaultUnbondingBlocks,
+		Authority:		prototype.DefaultAuthority,
+		MaxPools:		MaxPoolsV1,
+		MaxPoolIDBytes:		MaxPoolIDBytesV1,
+		UnbondingBlocks:	DefaultUnbondingBlocks,
 	}
 }
 

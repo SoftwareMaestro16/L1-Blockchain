@@ -26,17 +26,17 @@ type BankKeeper interface {
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version    uint64
-	Params     prototype.Params
-	RentParams types.StorageRentParams
-	State      types.StorageRentState
+	Version		uint64
+	Params		prototype.Params
+	RentParams	types.StorageRentParams
+	State		types.StorageRentState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
-	bankKeeper   BankKeeper
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
+	bankKeeper	BankKeeper
 }
 
 func NewKeeper() Keeper {
@@ -58,10 +58,10 @@ func (k Keeper) StorageRentRatePerByteBlock() uint64 {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:    prototype.CurrentGenesisVersion,
-		Params:     prototype.DefaultParams(),
-		RentParams: types.DefaultStorageRentParams(),
-		State:      types.EmptyStorageRentState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		RentParams:	types.DefaultStorageRentParams(),
+		State:		types.EmptyStorageRentState(),
 	}
 }
 
@@ -164,13 +164,13 @@ func (k *Keeper) TrackContractStorageUsage(authority, contractAddress, actorID s
 		next.State.Contracts[index] = accrued.Normalize()
 	} else {
 		contract := types.ContractRentRecord{
-			ContractAddress:   contractAddress,
-			ActorID:           actorID,
-			StorageBytes:      storageBytes,
-			LastChargedHeight: height,
-			Status:            types.ContractStatusActive,
-			ArchivalProofRoot: types.DefaultProofRoot,
-			Exempt:            isExempt(next.State.Exemptions, contractAddress),
+			ContractAddress:	contractAddress,
+			ActorID:		actorID,
+			StorageBytes:		storageBytes,
+			LastChargedHeight:	height,
+			Status:			types.ContractStatusActive,
+			ArchivalProofRoot:	types.DefaultProofRoot,
+			Exempt:			isExempt(next.State.Exemptions, contractAddress),
 		}
 		if err := contract.Validate(); err != nil {
 			return types.ContractRentRecord{}, err

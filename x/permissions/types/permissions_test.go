@@ -49,13 +49,13 @@ func TestPermissionChecksAreDeterministicAndNoHiddenSuperuser(t *testing.T) {
 
 func permission(id, scope, resource string, grant uint64, expiry uint64) Permission {
 	return Permission{
-		ID:              id,
-		Owner:           permAddr(0x11),
-		Grantee:         permAddr(0x22),
-		Scope:           scope,
-		Resource:        resource,
-		GrantedAtHeight: grant,
-		ExpiresAtHeight: expiry,
+		ID:			id,
+		Owner:			permAddr(0x11),
+		Grantee:		permAddr(0x22),
+		Scope:			scope,
+		Resource:		resource,
+		GrantedAtHeight:	grant,
+		ExpiresAtHeight:	expiry,
 	}
 }
 

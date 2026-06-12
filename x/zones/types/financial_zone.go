@@ -8,20 +8,20 @@ import (
 )
 
 const (
-	FinancialZonePrefix = "zone/financial"
+	FinancialZonePrefix	= "zone/financial"
 
-	FinancialAccountsPrefix               = FinancialZonePrefix + "/accounts"
-	FinancialBalancesPrefix               = FinancialZonePrefix + "/balances"
-	FinancialFeeBucketPrefix              = FinancialZonePrefix + "/fees/buckets"
-	FinancialShardFeeBucketPrefix         = FinancialZonePrefix + "/fees/shards"
-	FinancialContractAssetDenomPrefix     = FinancialZonePrefix + "/contract-assets/denoms"
-	FinancialContractAssetAuthorityPrefix = FinancialZonePrefix + "/contract-assets/authority"
-	FinancialDEXPoolPrefix                = FinancialZonePrefix + "/dex/pools"
-	FinancialDEXOrderPrefix               = FinancialZonePrefix + "/dex/orders"
-	FinancialPaymentChannelPrefix         = FinancialZonePrefix + "/payments/channels"
-	FinancialPaymentConditionPrefix       = FinancialZonePrefix + "/payments/conditions"
-	FinancialTransferEscrowPrefix         = FinancialZonePrefix + "/payments/escrow"
-	FinancialMessageHandlerRoute          = FinancialZonePrefix + "/handler"
+	FinancialAccountsPrefix			= FinancialZonePrefix + "/accounts"
+	FinancialBalancesPrefix			= FinancialZonePrefix + "/balances"
+	FinancialFeeBucketPrefix		= FinancialZonePrefix + "/fees/buckets"
+	FinancialShardFeeBucketPrefix		= FinancialZonePrefix + "/fees/shards"
+	FinancialContractAssetDenomPrefix	= FinancialZonePrefix + "/contract-assets/denoms"
+	FinancialContractAssetAuthorityPrefix	= FinancialZonePrefix + "/contract-assets/authority"
+	FinancialDEXPoolPrefix			= FinancialZonePrefix + "/dex/pools"
+	FinancialDEXOrderPrefix			= FinancialZonePrefix + "/dex/orders"
+	FinancialPaymentChannelPrefix		= FinancialZonePrefix + "/payments/channels"
+	FinancialPaymentConditionPrefix		= FinancialZonePrefix + "/payments/conditions"
+	FinancialTransferEscrowPrefix		= FinancialZonePrefix + "/payments/escrow"
+	FinancialMessageHandlerRoute		= FinancialZonePrefix + "/handler"
 )
 
 type FinancialZoneComponent string
@@ -31,191 +31,191 @@ type FinancialShardRoutingMode string
 type FinancialTransferEscrowStatus string
 
 const (
-	FinancialComponentBank           FinancialZoneComponent = "bank"
-	FinancialComponentFees           FinancialZoneComponent = "fees"
-	FinancialComponentDEX            FinancialZoneComponent = "dex"
-	FinancialComponentContractAssets FinancialZoneComponent = "contract_assets"
-	FinancialComponentPayment        FinancialZoneComponent = "payments"
-	FinancialComponentMessageRouter  FinancialZoneComponent = "message_router"
-	FinancialComponentProofs         FinancialZoneComponent = "proofs"
+	FinancialComponentBank			FinancialZoneComponent	= "bank"
+	FinancialComponentFees			FinancialZoneComponent	= "fees"
+	FinancialComponentDEX			FinancialZoneComponent	= "dex"
+	FinancialComponentContractAssets	FinancialZoneComponent	= "contract_assets"
+	FinancialComponentPayment		FinancialZoneComponent	= "payments"
+	FinancialComponentMessageRouter		FinancialZoneComponent	= "message_router"
+	FinancialComponentProofs		FinancialZoneComponent	= "proofs"
 
-	FinancialMessageTransfer         FinancialMessageKind = "MsgFinancialTransfer"
-	FinancialMessageMintFactoryDenom FinancialMessageKind = "MsgMintFactoryDenom"
-	FinancialMessageBurnFactoryDenom FinancialMessageKind = "MsgBurnFactoryDenom"
-	FinancialMessageDexSwap          FinancialMessageKind = "MsgDexSwap"
-	FinancialMessageDexSettle        FinancialMessageKind = "MsgDexSettle"
-	FinancialMessagePaymentSettle    FinancialMessageKind = "MsgPaymentSettle"
-	FinancialMessagePaymentDispute   FinancialMessageKind = "MsgPaymentDispute"
+	FinancialMessageTransfer		FinancialMessageKind	= "MsgFinancialTransfer"
+	FinancialMessageMintFactoryDenom	FinancialMessageKind	= "MsgMintFactoryDenom"
+	FinancialMessageBurnFactoryDenom	FinancialMessageKind	= "MsgBurnFactoryDenom"
+	FinancialMessageDexSwap			FinancialMessageKind	= "MsgDexSwap"
+	FinancialMessageDexSettle		FinancialMessageKind	= "MsgDexSettle"
+	FinancialMessagePaymentSettle		FinancialMessageKind	= "MsgPaymentSettle"
+	FinancialMessagePaymentDispute		FinancialMessageKind	= "MsgPaymentDispute"
 
-	FinancialProofBalance          FinancialProofKind = "QueryBalance"
-	FinancialProofBalancesByOwner  FinancialProofKind = "QueryBalancesByOwner"
-	FinancialProofFeeBucket        FinancialProofKind = "QueryFeeBucket"
-	FinancialProofFactoryDenom     FinancialProofKind = "QueryFactoryDenom"
-	FinancialProofPool             FinancialProofKind = "QueryPool"
-	FinancialProofPaymentChannel   FinancialProofKind = "QueryPaymentChannel"
-	FinancialProofPaymentCondition FinancialProofKind = "QueryPaymentCondition"
+	FinancialProofBalance		FinancialProofKind	= "QueryBalance"
+	FinancialProofBalancesByOwner	FinancialProofKind	= "QueryBalancesByOwner"
+	FinancialProofFeeBucket		FinancialProofKind	= "QueryFeeBucket"
+	FinancialProofFactoryDenom	FinancialProofKind	= "QueryFactoryDenom"
+	FinancialProofPool		FinancialProofKind	= "QueryPool"
+	FinancialProofPaymentChannel	FinancialProofKind	= "QueryPaymentChannel"
+	FinancialProofPaymentCondition	FinancialProofKind	= "QueryPaymentCondition"
 
-	FinancialRouteAccountAddress FinancialShardRoutingMode = "account-address"
-	FinancialRoutePoolID         FinancialShardRoutingMode = "pool-id"
-	FinancialRoutePaymentChannel FinancialShardRoutingMode = "payment-channel"
-	FinancialRouteExplicitGlobal FinancialShardRoutingMode = "explicit-global"
+	FinancialRouteAccountAddress	FinancialShardRoutingMode	= "account-address"
+	FinancialRoutePoolID		FinancialShardRoutingMode	= "pool-id"
+	FinancialRoutePaymentChannel	FinancialShardRoutingMode	= "payment-channel"
+	FinancialRouteExplicitGlobal	FinancialShardRoutingMode	= "explicit-global"
 
-	FinancialEscrowDebited  FinancialTransferEscrowStatus = "DEBITED"
-	FinancialEscrowSettled  FinancialTransferEscrowStatus = "SETTLED"
-	FinancialEscrowRefunded FinancialTransferEscrowStatus = "REFUNDED"
+	FinancialEscrowDebited	FinancialTransferEscrowStatus	= "DEBITED"
+	FinancialEscrowSettled	FinancialTransferEscrowStatus	= "SETTLED"
+	FinancialEscrowRefunded	FinancialTransferEscrowStatus	= "REFUNDED"
 )
 
 type FinancialZoneKeeperBoundary struct {
-	ZoneID          ZoneID
-	OwnsPrefixes    []string
-	Components      []FinancialZoneComponent
-	MessageHandlers []FinancialMessageKind
-	ProofKinds      []FinancialProofKind
+	ZoneID		ZoneID
+	OwnsPrefixes	[]string
+	Components	[]FinancialZoneComponent
+	MessageHandlers	[]FinancialMessageKind
+	ProofKinds	[]FinancialProofKind
 }
 
 type FinancialBalance struct {
-	Address string
-	Denom   string
-	Amount  uint64
+	Address	string
+	Denom	string
+	Amount	uint64
 }
 
 type FinancialFeeBucket struct {
-	BucketID string
-	Denom    string
-	Amount   uint64
+	BucketID	string
+	Denom		string
+	Amount		uint64
 }
 
 type FinancialShardFeeBucket struct {
-	ShardID uint32
-	Denom   string
-	Amount  uint64
+	ShardID	uint32
+	Denom	string
+	Amount	uint64
 }
 
 type FinancialFactoryDenom struct {
-	Denom     string
-	Authority string
-	Supply    uint64
+	Denom		string
+	Authority	string
+	Supply		uint64
 }
 
 type FinancialDEXPool struct {
-	PoolID       uint64
-	BaseDenom    string
-	QuoteDenom   string
-	BaseReserve  uint64
-	QuoteReserve uint64
+	PoolID		uint64
+	BaseDenom	string
+	QuoteDenom	string
+	BaseReserve	uint64
+	QuoteReserve	uint64
 }
 
 type FinancialDEXOrder struct {
-	OrderID     string
-	PoolID      uint64
-	Owner       string
-	InputDenom  string
-	OutputDenom string
-	InputAmount uint64
-	Status      string
+	OrderID		string
+	PoolID		uint64
+	Owner		string
+	InputDenom	string
+	OutputDenom	string
+	InputAmount	uint64
+	Status		string
 }
 
 type FinancialPaymentChannel struct {
-	ChannelID       string
-	Payer           string
-	Receiver        string
-	Denom           string
-	EscrowAmount    uint64
-	Finalized       bool
-	Disputed        bool
-	FinalizedHeight uint64
+	ChannelID	string
+	Payer		string
+	Receiver	string
+	Denom		string
+	EscrowAmount	uint64
+	Finalized	bool
+	Disputed	bool
+	FinalizedHeight	uint64
 }
 
 type FinancialPaymentCondition struct {
-	ConditionID string
-	ChannelID   string
-	Amount      uint64
-	Resolved    bool
-	Disputed    bool
+	ConditionID	string
+	ChannelID	string
+	Amount		uint64
+	Resolved	bool
+	Disputed	bool
 }
 
 type FinancialTransferEscrow struct {
-	TransferID        string
-	FromAddress       string
-	ToAddress         string
-	Denom             string
-	Amount            uint64
-	LayoutEpoch       uint64
-	SourceShardID     uint32
-	ReceiverShardID   uint32
-	Status            FinancialTransferEscrowStatus
-	DebitReceiptHash  string
-	CreditReceiptHash string
-	RefundReceiptHash string
-	EscrowHash        string
+	TransferID		string
+	FromAddress		string
+	ToAddress		string
+	Denom			string
+	Amount			uint64
+	LayoutEpoch		uint64
+	SourceShardID		uint32
+	ReceiverShardID		uint32
+	Status			FinancialTransferEscrowStatus
+	DebitReceiptHash	string
+	CreditReceiptHash	string
+	RefundReceiptHash	string
+	EscrowHash		string
 }
 
 type FinancialShardRoute struct {
-	ZoneID      ZoneID
-	LayoutEpoch uint64
-	ShardCount  uint32
-	ShardID     uint32
-	RoutingMode FinancialShardRoutingMode
-	RouteKey    string
-	StateKey    string
-	RouteHash   string
+	ZoneID		ZoneID
+	LayoutEpoch	uint64
+	ShardCount	uint32
+	ShardID		uint32
+	RoutingMode	FinancialShardRoutingMode
+	RouteKey	string
+	StateKey	string
+	RouteHash	string
 }
 
 type FinancialZoneState struct {
-	Height            uint64
-	Accounts          []string
-	Balances          []FinancialBalance
-	FeeBuckets        []FinancialFeeBucket
-	ShardFeeBuckets   []FinancialShardFeeBucket
-	FactoryDenoms     []FinancialFactoryDenom
-	DEXPools          []FinancialDEXPool
-	DEXOrders         []FinancialDEXOrder
-	PaymentChannels   []FinancialPaymentChannel
-	PaymentConditions []FinancialPaymentCondition
-	TransferEscrows   []FinancialTransferEscrow
-	Receipts          []ZoneReceipt
+	Height			uint64
+	Accounts		[]string
+	Balances		[]FinancialBalance
+	FeeBuckets		[]FinancialFeeBucket
+	ShardFeeBuckets		[]FinancialShardFeeBucket
+	FactoryDenoms		[]FinancialFactoryDenom
+	DEXPools		[]FinancialDEXPool
+	DEXOrders		[]FinancialDEXOrder
+	PaymentChannels		[]FinancialPaymentChannel
+	PaymentConditions	[]FinancialPaymentCondition
+	TransferEscrows		[]FinancialTransferEscrow
+	Receipts		[]ZoneReceipt
 }
 
 type FinancialZoneMessage struct {
-	Kind            FinancialMessageKind
-	AccountKey      string
-	CounterpartyKey string
-	PoolID          uint64
-	OrderID         string
-	Denom           string
-	OutputDenom     string
-	BucketID        string
-	ChannelID       string
-	ConditionID     string
-	Authority       string
-	Amount          uint64
-	PayloadHash     string
-	Sequence        uint64
-	GasLimit        uint64
+	Kind		FinancialMessageKind
+	AccountKey	string
+	CounterpartyKey	string
+	PoolID		uint64
+	OrderID		string
+	Denom		string
+	OutputDenom	string
+	BucketID	string
+	ChannelID	string
+	ConditionID	string
+	Authority	string
+	Amount		uint64
+	PayloadHash	string
+	Sequence	uint64
+	GasLimit	uint64
 }
 
 type FinancialZoneRoots struct {
-	Height                   uint64
-	AccountRoot              string
-	BalanceRoot              string
-	FeeBucketRoot            string
-	ContractAssetRoot        string
-	DEXRoot                  string
-	PaymentRoot              string
-	InboxRoot                string
-	OutboxRoot               string
-	ReceiptRoot              string
-	ExecutionRoot            string
-	ProofRoot                string
-	FinancialStateRoot       string
-	DeprecatedBankRoot       string
-	DeprecatedDEXPoolRoot    string
-	DeprecatedSettlementRoot string
+	Height				uint64
+	AccountRoot			string
+	BalanceRoot			string
+	FeeBucketRoot			string
+	ContractAssetRoot		string
+	DEXRoot				string
+	PaymentRoot			string
+	InboxRoot			string
+	OutboxRoot			string
+	ReceiptRoot			string
+	ExecutionRoot			string
+	ProofRoot			string
+	FinancialStateRoot		string
+	DeprecatedBankRoot		string
+	DeprecatedDEXPoolRoot		string
+	DeprecatedSettlementRoot	string
 }
 
 func DefaultFinancialZoneKeeperBoundary() FinancialZoneKeeperBoundary {
 	return FinancialZoneKeeperBoundary{
-		ZoneID: ZoneIDFinancial,
+		ZoneID:	ZoneIDFinancial,
 		OwnsPrefixes: []string{
 			FinancialAccountsPrefix,
 			FinancialBalancesPrefix,
@@ -480,13 +480,13 @@ func (m FinancialZoneMessage) ZoneMessage() (ZoneMessage, error) {
 		gasLimit = 1
 	}
 	return ZoneMessage{
-		ZoneID:      ZoneIDFinancial,
-		MessageType: string(m.Kind),
-		Source:      FinancialMessageHandlerRoute,
-		Destination: FinancialMessageHandlerRoute + "/" + string(m.Kind),
-		GasLimit:    gasLimit,
-		PayloadHash: m.PayloadHash,
-		Sequence:    m.Sequence,
+		ZoneID:		ZoneIDFinancial,
+		MessageType:	string(m.Kind),
+		Source:		FinancialMessageHandlerRoute,
+		Destination:	FinancialMessageHandlerRoute + "/" + string(m.Kind),
+		GasLimit:	gasLimit,
+		PayloadHash:	m.PayloadHash,
+		Sequence:	m.Sequence,
 	}, nil
 }
 
@@ -505,12 +505,12 @@ func FinancialProofRequest(kind FinancialProofKind, key string, height uint64, r
 		return ZoneProofRequest{}, err
 	}
 	req := ZoneProofRequest{
-		ZoneID: ZoneIDFinancial,
-		Height: height,
-		Kind:   ZoneProofKindState,
-		Key:    string(kind) + "/" + key,
-		Root:   root,
-		Limit:  limit,
+		ZoneID:	ZoneIDFinancial,
+		Height:	height,
+		Kind:	ZoneProofKindState,
+		Key:	string(kind) + "/" + key,
+		Root:	root,
+		Limit:	limit,
 	}
 	return req, req.Validate()
 }
@@ -547,13 +547,13 @@ func ApplyFinancialMessage(state FinancialZoneState, msg FinancialZoneMessage, h
 		return FinancialZoneState{}, ZoneReceipt{}, err
 	}
 	receipt, err := NewZoneReceipt(ZoneReceipt{
-		ZoneID:     ZoneIDFinancial,
-		Height:     height,
-		ItemHash:   msg.PayloadHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    msg.GasLimit,
-		ResultHash: ComputeFinancialZoneStateRoot(next),
-		Sequence:   msg.Sequence,
+		ZoneID:		ZoneIDFinancial,
+		Height:		height,
+		ItemHash:	msg.PayloadHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	msg.GasLimit,
+		ResultHash:	ComputeFinancialZoneStateRoot(next),
+		Sequence:	msg.Sequence,
 	})
 	if err != nil {
 		return FinancialZoneState{}, ZoneReceipt{}, err
@@ -647,16 +647,16 @@ func OpenFinancialCrossShardTransferEscrow(state FinancialZoneState, from, to, d
 	transferID := hashRuntimeParts("financial-cross-shard-transfer-id-v1", from, to, denom, fmt.Sprint(amount), fmt.Sprint(layoutEpoch), fmt.Sprint(nonce))
 	receiptHash := hashRuntimeParts("financial-cross-shard-debit-receipt-v1", transferID, fmt.Sprint(source.ShardID), fmt.Sprint(receiver.ShardID))
 	escrow := FinancialTransferEscrow{
-		TransferID:       transferID,
-		FromAddress:      from,
-		ToAddress:        to,
-		Denom:            denom,
-		Amount:           amount,
-		LayoutEpoch:      layoutEpoch,
-		SourceShardID:    source.ShardID,
-		ReceiverShardID:  receiver.ShardID,
-		Status:           FinancialEscrowDebited,
-		DebitReceiptHash: receiptHash,
+		TransferID:		transferID,
+		FromAddress:		from,
+		ToAddress:		to,
+		Denom:			denom,
+		Amount:			amount,
+		LayoutEpoch:		layoutEpoch,
+		SourceShardID:		source.ShardID,
+		ReceiverShardID:	receiver.ShardID,
+		Status:			FinancialEscrowDebited,
+		DebitReceiptHash:	receiptHash,
 	}
 	escrow.EscrowHash = ComputeFinancialTransferEscrowHash(escrow)
 	if err := escrow.ValidateHash(); err != nil {
@@ -742,13 +742,13 @@ func BuildFinancialDEXSettlementReceipt(height uint64, order FinancialDEXOrder, 
 	}
 	itemHash := hashRuntimeParts("financial-dex-settlement-receipt-v1", order.OrderID, fmt.Sprint(order.PoolID), order.Status)
 	return NewZoneReceipt(ZoneReceipt{
-		ZoneID:     ZoneIDFinancial,
-		Height:     height,
-		ItemHash:   itemHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    0,
-		ResultHash: resultHash,
-		Sequence:   sequence,
+		ZoneID:		ZoneIDFinancial,
+		Height:		height,
+		ItemHash:	itemHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	0,
+		ResultHash:	resultHash,
+		Sequence:	sequence,
 	})
 }
 
@@ -767,13 +767,13 @@ func BuildFinancialPaymentFinalizationHook(height uint64, channel FinancialPayme
 	}
 	itemHash := hashRuntimeParts("financial-payment-finalization-hook-v1", channel.ChannelID, fmt.Sprint(channel.FinalizedHeight))
 	return NewZoneReceipt(ZoneReceipt{
-		ZoneID:     ZoneIDFinancial,
-		Height:     height,
-		ItemHash:   itemHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    0,
-		ResultHash: resultHash,
-		Sequence:   sequence,
+		ZoneID:		ZoneIDFinancial,
+		Height:		height,
+		ItemHash:	itemHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	0,
+		ResultHash:	resultHash,
+		Sequence:	sequence,
 	})
 }
 
@@ -794,15 +794,15 @@ func BuildFinancialZoneRoot(roots FinancialZoneRoots) (ZoneRoot, error) {
 		)
 	}
 	root := ZoneRoot{
-		ZoneID:              ZoneIDFinancial,
-		Height:              roots.Height,
-		ZoneStateRoot:       stateRoot,
-		InboxRoot:           roots.InboxRoot,
-		OutboxRoot:          roots.OutboxRoot,
-		ReceiptRoot:         roots.ReceiptRoot,
-		EventRoot:           EmptyRootHash(),
-		ExecutionResultRoot: roots.ExecutionRoot,
-		ProofRoot:           roots.ProofRoot,
+		ZoneID:			ZoneIDFinancial,
+		Height:			roots.Height,
+		ZoneStateRoot:		stateRoot,
+		InboxRoot:		roots.InboxRoot,
+		OutboxRoot:		roots.OutboxRoot,
+		ReceiptRoot:		roots.ReceiptRoot,
+		EventRoot:		EmptyRootHash(),
+		ExecutionResultRoot:	roots.ExecutionRoot,
+		ProofRoot:		roots.ProofRoot,
 	}
 	root.RootHash = ComputeZoneRootHash(root)
 	return root, root.Validate()
@@ -820,19 +820,19 @@ func BuildFinancialZoneRootFromState(height uint64, state FinancialZoneState, qu
 	}
 	normalized := state.Normalize()
 	roots := FinancialZoneRoots{
-		Height:             height,
-		AccountRoot:        ComputeFinancialAccountsRoot(normalized.Accounts),
-		BalanceRoot:        ComputeFinancialBalancesRoot(normalized.Balances),
-		FeeBucketRoot:      ComputeFinancialFeeBucketRoot(normalized.FeeBuckets),
-		ContractAssetRoot:  ComputeFinancialContractAssetRoot(normalized.FactoryDenoms),
-		DEXRoot:            ComputeFinancialDEXRoot(normalized.DEXPools, normalized.DEXOrders),
-		PaymentRoot:        ComputeFinancialPaymentRoot(normalized.PaymentChannels, normalized.PaymentConditions, normalized.TransferEscrows),
-		InboxRoot:          queues.InboxRoot(),
-		OutboxRoot:         queues.OutboxRoot(),
-		ReceiptRoot:        ComputeZoneReceiptRoot(normalized.Receipts),
-		ExecutionRoot:      ComputeZoneExecutionResultRoot(normalized.Receipts),
-		ProofRoot:          proofRoot,
-		FinancialStateRoot: ComputeFinancialZoneStateRoot(normalized),
+		Height:			height,
+		AccountRoot:		ComputeFinancialAccountsRoot(normalized.Accounts),
+		BalanceRoot:		ComputeFinancialBalancesRoot(normalized.Balances),
+		FeeBucketRoot:		ComputeFinancialFeeBucketRoot(normalized.FeeBuckets),
+		ContractAssetRoot:	ComputeFinancialContractAssetRoot(normalized.FactoryDenoms),
+		DEXRoot:		ComputeFinancialDEXRoot(normalized.DEXPools, normalized.DEXOrders),
+		PaymentRoot:		ComputeFinancialPaymentRoot(normalized.PaymentChannels, normalized.PaymentConditions, normalized.TransferEscrows),
+		InboxRoot:		queues.InboxRoot(),
+		OutboxRoot:		queues.OutboxRoot(),
+		ReceiptRoot:		ComputeZoneReceiptRoot(normalized.Receipts),
+		ExecutionRoot:		ComputeZoneExecutionResultRoot(normalized.Receipts),
+		ProofRoot:		proofRoot,
+		FinancialStateRoot:	ComputeFinancialZoneStateRoot(normalized),
 	}
 	return BuildFinancialZoneRoot(roots)
 }
@@ -851,8 +851,8 @@ func (r FinancialZoneRoots) Validate() error {
 		r.PaymentRoot = r.DeprecatedSettlementRoot
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "financial account root", value: r.AccountRoot},
 		{name: "financial balance root", value: r.BalanceRoot},
@@ -1340,13 +1340,13 @@ func applyFinancialDEXSwap(state FinancialZoneState, msg FinancialZoneMessage) (
 		}
 		next.DEXPools[i].BaseReserve = baseReserve
 		next.DEXOrders = append(next.DEXOrders, FinancialDEXOrder{
-			OrderID:     msg.OrderID,
-			PoolID:      msg.PoolID,
-			Owner:       msg.AccountKey,
-			InputDenom:  msg.Denom,
-			OutputDenom: msg.OutputDenom,
-			InputAmount: msg.Amount,
-			Status:      "open",
+			OrderID:	msg.OrderID,
+			PoolID:		msg.PoolID,
+			Owner:		msg.AccountKey,
+			InputDenom:	msg.Denom,
+			OutputDenom:	msg.OutputDenom,
+			InputAmount:	msg.Amount,
+			Status:		"open",
 		})
 		return next.Normalize(), nil
 	}
@@ -1455,13 +1455,13 @@ func routeFinancialStateKey(mode FinancialShardRoutingMode, stateKey string, rou
 	hash := hashRuntimeParts("aetra-financial-route-key-v1", string(mode), routeKey, fmt.Sprint(layoutEpoch))
 	shardID := uint32(binary.BigEndian.Uint64([]byte(hash[:8])) % uint64(shardCount))
 	route := FinancialShardRoute{
-		ZoneID:      ZoneIDFinancial,
-		LayoutEpoch: layoutEpoch,
-		ShardCount:  shardCount,
-		ShardID:     shardID,
-		RoutingMode: mode,
-		RouteKey:    routeKey,
-		StateKey:    stateKey,
+		ZoneID:		ZoneIDFinancial,
+		LayoutEpoch:	layoutEpoch,
+		ShardCount:	shardCount,
+		ShardID:	shardID,
+		RoutingMode:	mode,
+		RouteKey:	routeKey,
+		StateKey:	stateKey,
 	}
 	route.RouteHash = ComputeFinancialShardRouteHash(route)
 	return route, route.ValidateHash()

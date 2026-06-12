@@ -10,32 +10,18 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.12: StateInit & Counterfactual Deployment
-// ---------------
-// Deterministic contract identity and deployment system.
-// Contract address is derived from StateInit hash — same StateInit always produces same address.
-
-// ---------------
-// Constants & Limits
-// ---------------
-
 const (
-	MaxInitDataSize    uint32 = 1 << 20
-	MaxSaltSize        uint32 = 64
-	MaxDependencyCount uint32 = 256
-	MaxStateInitSize   uint32 = 2 << 20
-	StateInitABIVersion uint32 = 1
+	MaxInitDataSize		uint32	= 1 << 20
+	MaxSaltSize		uint32	= 64
+	MaxDependencyCount	uint32	= 256
+	MaxStateInitSize	uint32	= 2 << 20
+	StateInitABIVersion	uint32	= 1
 )
-
-// ---------------
-// Deployment Capability Flags
-// ---------------
 
 type DeployCapFlag uint64
 
 const (
-	DeployCapStorage   DeployCapFlag = 1 << iota
+	DeployCapStorage	DeployCapFlag	= 1 << iota
 	DeployCapMessaging
 	DeployCapHostFunc
 	DeployCapQueryOnly
@@ -57,14 +43,10 @@ func (c DeployCapabilityMask) IsEmpty() bool {
 
 var AllDeployCapabilities = DeployCapabilityMask{Flags: ^uint64(0)}
 
-// ---------------
-// Contract Deployment State
-// ---------------
-
 type ContractDeployState uint8
 
 const (
-	ContractNotDeployed ContractDeployState = iota
+	ContractNotDeployed	ContractDeployState	= iota
 	ContractDeployed
 	ContractInitialized
 )
@@ -87,33 +69,29 @@ func (s ContractDeployState) String() string {
 // ---------------
 // Any change in ANY field MUST change StateInitHash and ContractAddress.
 type StateInit struct {
-	ABIVersion       uint32
-	CodeHash         [32]byte
-	InitData         []byte
-	Salt             []byte
-	DeployerAddress  string
-	ChainID          string
-	Namespace        string
-	DependencyHashes [][32]byte
-	InitialStateRoot *chunk.Chunk
-	InitialBalance   uint64
-	Capabilities    DeployCapabilityMask
+	ABIVersion		uint32
+	CodeHash		[32]byte
+	InitData		[]byte
+	Salt			[]byte
+	DeployerAddress		string
+	ChainID			string
+	Namespace		string
+	DependencyHashes	[][32]byte
+	InitialStateRoot	*chunk.Chunk
+	InitialBalance		uint64
+	Capabilities		DeployCapabilityMask
 }
 
-// ---------------
-// Validation Errors
-// ---------------
-
 var (
-	ErrZeroDeployer        = errors.New("AVM: deployer address must not be zero/empty")
-	ErrEmptyCodeHash       = errors.New("AVM: code hash must not be empty")
-	ErrInitDataTooLarge    = errors.New("AVM: init data exceeds maximum size")
-	ErrSaltTooLarge        = errors.New("AVM: salt exceeds maximum size")
-	ErrTooManyDeps         = errors.New("AVM: too many dependencies")
-	ErrInvalidABI          = errors.New("AVM: invalid ABI version")
-	ErrEmptyChainID        = errors.New("AVM: chain ID must not be empty")
-	ErrStateInitTooLarge   = errors.New("AVM: StateInit encoded size exceeds maximum")
-	ErrDuplicateDeployment = errors.New("AVM: duplicate deployment")
+	ErrZeroDeployer		= errors.New("AVM: deployer address must not be zero/empty")
+	ErrEmptyCodeHash	= errors.New("AVM: code hash must not be empty")
+	ErrInitDataTooLarge	= errors.New("AVM: init data exceeds maximum size")
+	ErrSaltTooLarge		= errors.New("AVM: salt exceeds maximum size")
+	ErrTooManyDeps		= errors.New("AVM: too many dependencies")
+	ErrInvalidABI		= errors.New("AVM: invalid ABI version")
+	ErrEmptyChainID		= errors.New("AVM: chain ID must not be empty")
+	ErrStateInitTooLarge	= errors.New("AVM: StateInit encoded size exceeds maximum")
+	ErrDuplicateDeployment	= errors.New("AVM: duplicate deployment")
 )
 
 // Validate performs validation before deployment.
@@ -148,10 +126,6 @@ func (si *StateInit) Validate() error {
 	}
 	return nil
 }
-
-// ---------------
-// Canonical Encoding (Order-Sensitive, Size-Bounded)
-// ---------------
 
 func (si *StateInit) CanonicalEncode() ([]byte, error) {
 	buf := make([]byte, 0, 512)
@@ -194,10 +168,6 @@ func (si *StateInit) CanonicalEncode() ([]byte, error) {
 	return buf, nil
 }
 
-// ---------------
-// HashStateInit — BLAKE3 of canonical encoding
-// ---------------
-
 func HashStateInit(si *StateInit) ([32]byte, error) {
 	encoded, err := si.CanonicalEncode()
 	if err != nil {
@@ -206,17 +176,13 @@ func HashStateInit(si *StateInit) ([32]byte, error) {
 	return blake3.Sum256(encoded), nil
 }
 
-// ---------------
-// Contract Address Derivation
-// ---------------
-
 type ContractAddress struct {
-	Internal string
-	External string
-	rawHash  [32]byte
+	Internal	string
+	External	string
+	rawHash		[32]byte
 }
 
-func (a ContractAddress) RawHash() [32]byte { return a.rawHash }
+func (a ContractAddress) RawHash() [32]byte	{ return a.rawHash }
 
 func DeriveContractAddress(si *StateInit) (*ContractAddress, error) {
 	if err := si.Validate(); err != nil {
@@ -246,20 +212,16 @@ func DeriveContractAddress(si *StateInit) (*ContractAddress, error) {
 	external := fmt.Sprintf("AE:%s", base58Encode(rawHash[:]))
 
 	return &ContractAddress{
-		Internal: internal,
-		External: external,
-		rawHash:  rawHash,
+		Internal:	internal,
+		External:	external,
+		rawHash:	rawHash,
 	}, nil
 }
 
-// ---------------
-// Counterfactual State Model
-// ---------------
-
 type CounterfactualState struct {
-	Address  ContractAddress
-	State    ContractDeployState
-	InitData *StateInit
+	Address		ContractAddress
+	State		ContractDeployState
+	InitData	*StateInit
 }
 
 func QueryContractState(addr ContractAddress, deployed bool, initialized bool) CounterfactualState {
@@ -270,20 +232,16 @@ func QueryContractState(addr ContractAddress, deployed bool, initialized bool) C
 		state = ContractDeployed
 	}
 	return CounterfactualState{
-		Address:  addr,
-		State:    state,
+		Address:	addr,
+		State:		state,
 	}
 }
 
-// ---------------
-// Deployment Validation & Execution
-// ---------------
-
 type DeploymentResult struct {
-	Address       ContractAddress
-	StateInitHash [32]byte
-	State         ContractDeployState
-	Error         error
+	Address		ContractAddress
+	StateInitHash	[32]byte
+	State		ContractDeployState
+	Error		error
 }
 
 func DeployContract(si *StateInit, existingAddresses map[string]ContractDeployState) (*DeploymentResult, error) {
@@ -299,9 +257,9 @@ func DeployContract(si *StateInit, existingAddresses map[string]ContractDeploySt
 	if state, ok := existingAddresses[addr.Internal]; ok {
 		if state == ContractDeployed || state == ContractInitialized {
 			return &DeploymentResult{
-				Address: *addr,
-				State:   state,
-				Error:   ErrDuplicateDeployment,
+				Address:	*addr,
+				State:		state,
+				Error:		ErrDuplicateDeployment,
 			}, nil
 		}
 	}
@@ -316,9 +274,9 @@ func DeployContract(si *StateInit, existingAddresses map[string]ContractDeploySt
 	}
 
 	return &DeploymentResult{
-		Address:       *addr,
-		StateInitHash: stateInitHash,
-		State:         ContractDeployed,
+		Address:	*addr,
+		StateInitHash:	stateInitHash,
+		State:		ContractDeployed,
 	}, nil
 }
 
@@ -332,10 +290,6 @@ func validateDependencyDAG(deps [][32]byte) error {
 	}
 	return nil
 }
-
-// ---------------
-// Export/Import (Round-trip preservation)
-// ---------------
 
 func ExportStateInit(si *StateInit) ([]byte, error) {
 	return si.CanonicalEncode()
@@ -430,23 +384,19 @@ func ImportStateInit(data []byte) (*StateInit, error) {
 	}
 
 	return &StateInit{
-		ABIVersion:       abiVersion,
-		CodeHash:         codeHash,
-		InitData:         initData,
-		Salt:             salt,
-		DeployerAddress:  deployer,
-		ChainID:          chainID,
-		Namespace:        namespace,
-		DependencyHashes: deps,
-		InitialStateRoot:  initialStateRoot,
-		InitialBalance:   initialBalance,
-		Capabilities:     DeployCapabilityMask{Flags: capFlags},
+		ABIVersion:		abiVersion,
+		CodeHash:		codeHash,
+		InitData:		initData,
+		Salt:			salt,
+		DeployerAddress:	deployer,
+		ChainID:		chainID,
+		Namespace:		namespace,
+		DependencyHashes:	deps,
+		InitialStateRoot:	initialStateRoot,
+		InitialBalance:		initialBalance,
+		Capabilities:		DeployCapabilityMask{Flags: capFlags},
 	}, nil
 }
-
-// ---------------
-// Base58 Encoding
-// ---------------
 
 var base58Alphabet = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 

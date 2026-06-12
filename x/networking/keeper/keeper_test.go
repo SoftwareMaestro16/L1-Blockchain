@@ -61,24 +61,24 @@ func TestKeeperRegistersNodeAndSessionWhenEnabled(t *testing.T) {
 	require.Equal(t, expected.Sessions, sessions)
 
 	require.NoError(t, k.RegisterRoleCommitment(networkingtypes.RoleCommitment{
-		NodeID:         remote.NodeID,
-		Role:           networkingtypes.NodeRoleService,
-		Bonded:         true,
-		CommitmentHash: networkingtypes.HashParts("keeper-service-role"),
-		ExpiresHeight:  80,
+		NodeID:		remote.NodeID,
+		Role:		networkingtypes.NodeRoleService,
+		Bonded:		true,
+		CommitmentHash:	networkingtypes.HashParts("keeper-service-role"),
+		ExpiresHeight:	80,
 	}, 22))
 
 	overlay, err := networkingtypes.NewOverlayDescriptor(networkingtypes.OverlayDescriptor{
-		OverlayType:   networkingtypes.OverlayTypeService,
-		PolicyHash:    networkingtypes.HashParts("keeper-service-overlay"),
-		Membership:    networkingtypes.OverlayMembershipServiceAdvertisement,
-		Routing:       networkingtypes.RoutingStrategyLowLatencyAdvisory,
-		MinPeers:      2,
-		MaxPeers:      16,
-		Fanout:        4,
-		QoSClass:      networkingtypes.QoSClassServiceCall,
-		ExpiresHeight: 90,
-		Version:       2,
+		OverlayType:	networkingtypes.OverlayTypeService,
+		PolicyHash:	networkingtypes.HashParts("keeper-service-overlay"),
+		Membership:	networkingtypes.OverlayMembershipServiceAdvertisement,
+		Routing:	networkingtypes.RoutingStrategyLowLatencyAdvisory,
+		MinPeers:	2,
+		MaxPeers:	16,
+		Fanout:		4,
+		QoSClass:	networkingtypes.QoSClassServiceCall,
+		ExpiresHeight:	90,
+		Version:	2,
 	})
 	require.NoError(t, err)
 	require.NoError(t, k.RegisterOverlayDescriptor(overlay, 23))
@@ -118,10 +118,10 @@ func signedKeeperNode(t *testing.T, seed byte, salt []byte, expiresHeight uint64
 	addressHash, err := networkingtypes.HashNetworkAddresses([]string{"tcp://127.0.0.1:26656"})
 	require.NoError(t, err)
 	record, err := networkingtypes.SignNodeRecord(networkingtypes.NodeRecord{
-		Roles:                roles,
-		NetworkAddressesHash: addressHash,
-		ProtocolVersions:     []string{networkingtypes.DefaultProtocolVersion},
-		ExpiresHeight:        expiresHeight,
+		Roles:			roles,
+		NetworkAddressesHash:	addressHash,
+		ProtocolVersions:	[]string{networkingtypes.DefaultProtocolVersion},
+		ExpiresHeight:		expiresHeight,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
@@ -129,15 +129,15 @@ func signedKeeperNode(t *testing.T, seed byte, salt []byte, expiresHeight uint64
 
 func keeperSessionRequest(local, remote networkingtypes.NodeRecord, openedHeight, expiresHeight uint64, nonce string) networkingtypes.SessionRequest {
 	return networkingtypes.SessionRequest{
-		LocalNodeID:                 local.NodeID,
-		RemoteNodeID:                remote.NodeID,
-		ProtocolVersions:            []string{networkingtypes.DefaultProtocolVersion},
-		LocalEphemeralPubKey:        bytes.Repeat([]byte{0xc1}, networkingtypes.SessionEphemeralKeyBytes),
-		RemoteEphemeralPubKey:       bytes.Repeat([]byte{0xd2}, networkingtypes.SessionEphemeralKeyBytes),
-		SessionSecretCommitmentHash: networkingtypes.HashParts("keeper-session-secret", local.NodeID, remote.NodeID, nonce),
-		OpenedHeight:                openedHeight,
-		ExpiresHeight:               expiresHeight,
-		Nonce:                       []byte(nonce),
+		LocalNodeID:			local.NodeID,
+		RemoteNodeID:			remote.NodeID,
+		ProtocolVersions:		[]string{networkingtypes.DefaultProtocolVersion},
+		LocalEphemeralPubKey:		bytes.Repeat([]byte{0xc1}, networkingtypes.SessionEphemeralKeyBytes),
+		RemoteEphemeralPubKey:		bytes.Repeat([]byte{0xd2}, networkingtypes.SessionEphemeralKeyBytes),
+		SessionSecretCommitmentHash:	networkingtypes.HashParts("keeper-session-secret", local.NodeID, remote.NodeID, nonce),
+		OpenedHeight:			openedHeight,
+		ExpiresHeight:			expiresHeight,
+		Nonce:				[]byte(nonce),
 	}
 }
 

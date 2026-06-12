@@ -11,34 +11,34 @@ import (
 
 func DefaultDistributionWeights() DistributionWeights {
 	return DistributionWeights{
-		ValidatorRewardBps: 7_000,
-		TreasuryBps:        1_000,
-		ProtectionBps:      1_000,
-		BurnBps:            500,
-		EcosystemBps:       500,
+		ValidatorRewardBps:	7_000,
+		TreasuryBps:		1_000,
+		ProtectionBps:		1_000,
+		BurnBps:		500,
+		EcosystemBps:		500,
 	}
 }
 
 func DefaultParams() Params {
 	return Params{
-		BaseDenom:                     BaseDenom,
-		CurrentInflationBps:           uint32(appparams.DefaultTargetInflationBps),
-		TargetStakingRatioBps:         uint32(appparams.DefaultTargetStakeBps),
-		MinAnnualInflationBps:         uint32(appparams.MinInflationBps),
-		MaxAnnualInflationBps:         uint32(appparams.MaxInflationBps),
-		ConstitutionalMaxInflationBps: uint32(appparams.MaxInflationBps),
-		ResponsivenessBps:             uint32(appparams.DefaultResponsivenessBps),
-		AnnualReferenceSupply:         sdk.NewInt64Coin(BaseDenom, 365_000_000_000),
-		EpochsPerYear:                 365,
-		DistributionWeights:           DefaultDistributionWeights(),
+		BaseDenom:			BaseDenom,
+		CurrentInflationBps:		uint32(appparams.DefaultTargetInflationBps),
+		TargetStakingRatioBps:		uint32(appparams.DefaultTargetStakeBps),
+		MinAnnualInflationBps:		uint32(appparams.MinInflationBps),
+		MaxAnnualInflationBps:		uint32(appparams.MaxInflationBps),
+		ConstitutionalMaxInflationBps:	uint32(appparams.MaxInflationBps),
+		ResponsivenessBps:		uint32(appparams.DefaultResponsivenessBps),
+		AnnualReferenceSupply:		sdk.NewInt64Coin(BaseDenom, 365_000_000_000),
+		EpochsPerYear:			365,
+		DistributionWeights:		DefaultDistributionWeights(),
 	}
 }
 
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Params:                DefaultParams(),
-		EpochHistory:          []EmissionEpoch{},
-		TotalMintedAccounting: sdk.NewInt64Coin(BaseDenom, 0),
+		Params:			DefaultParams(),
+		EpochHistory:		[]EmissionEpoch{},
+		TotalMintedAccounting:	sdk.NewInt64Coin(BaseDenom, 0),
 	}
 }
 
@@ -123,13 +123,13 @@ func (e EmissionEpoch) Validate(params Params) error {
 		return fmt.Errorf("inflation cannot exceed constitutional maximum")
 	}
 	for name, coin := range map[string]sdk.Coin{
-		"emission_amount":    e.EmissionAmount,
-		"validator_reward":   e.ValidatorReward,
-		"treasury":           e.Treasury,
-		"protection_fund":    e.ProtectionFund,
-		"burn":               e.Burn,
-		"ecosystem":          e.Ecosystem,
-		"rounding_remainder": e.RoundingRemainder,
+		"emission_amount":	e.EmissionAmount,
+		"validator_reward":	e.ValidatorReward,
+		"treasury":		e.Treasury,
+		"protection_fund":	e.ProtectionFund,
+		"burn":			e.Burn,
+		"ecosystem":		e.Ecosystem,
+		"rounding_remainder":	e.RoundingRemainder,
 	} {
 		if err := validateCoin(params.BaseDenom, coin, false); err != nil {
 			return fmt.Errorf("%s: %w", name, err)
@@ -200,16 +200,16 @@ func ComputeEpochEmission(params Params, epoch, stakingRatioBps uint64, height i
 	amount := annual.QuoRaw(int64(params.EpochsPerYear))
 	emission := sdk.NewCoin(params.BaseDenom, amount)
 	epochRecord := EmissionEpoch{
-		Epoch:           epoch,
-		StakingRatioBps: uint32(stakingRatioBps),
-		InflationBps:    inflationBps,
-		EmissionAmount:  emission,
-		ValidatorReward: sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.ValidatorRewardBps)),
-		Treasury:        sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.TreasuryBps)),
-		ProtectionFund:  sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.ProtectionBps)),
-		Burn:            sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.BurnBps)),
-		Ecosystem:       sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.EcosystemBps)),
-		FinalizedHeight: height,
+		Epoch:			epoch,
+		StakingRatioBps:	uint32(stakingRatioBps),
+		InflationBps:		inflationBps,
+		EmissionAmount:		emission,
+		ValidatorReward:	sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.ValidatorRewardBps)),
+		Treasury:		sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.TreasuryBps)),
+		ProtectionFund:		sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.ProtectionBps)),
+		Burn:			sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.BurnBps)),
+		Ecosystem:		sdk.NewCoin(params.BaseDenom, bpsAmount(amount, params.DistributionWeights.EcosystemBps)),
+		FinalizedHeight:	height,
 	}
 	distributed := epochRecord.ValidatorReward.Amount.Add(epochRecord.Treasury.Amount).Add(epochRecord.ProtectionFund.Amount).Add(epochRecord.Burn.Amount).Add(epochRecord.Ecosystem.Amount)
 	epochRecord.RoundingRemainder = sdk.NewCoin(params.BaseDenom, amount.Sub(distributed))

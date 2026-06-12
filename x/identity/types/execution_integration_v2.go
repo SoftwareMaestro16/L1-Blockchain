@@ -10,85 +10,85 @@ import (
 )
 
 const (
-	IdentityAuditMemoPrefixV2        = "aet:v2"
-	MaxIdentityAuditMemoBytesV2      = 512
-	DefaultIdentityFreshnessWindowV2 = uint64(20)
+	IdentityAuditMemoPrefixV2		= "aet:v2"
+	MaxIdentityAuditMemoBytesV2		= 512
+	DefaultIdentityFreshnessWindowV2	= uint64(20)
 )
 
 type IdentityStaleProofPolicyV2 struct {
-	CurrentHeight      uint64
-	ProofHeight        uint64
-	FreshUntilHeight   uint64
-	FreshnessThreshold uint64
+	CurrentHeight		uint64
+	ProofHeight		uint64
+	FreshUntilHeight	uint64
+	FreshnessThreshold	uint64
 }
 
 type IdentitySendByNameRequestV2 struct {
-	Name               string
-	State              IdentityState
-	Height             uint64
-	RecordTTL          uint64
-	CurrentHeight      uint64
-	FreshnessThreshold uint64
-	IncludeAuditMemo   bool
+	Name			string
+	State			IdentityState
+	Height			uint64
+	RecordTTL		uint64
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
+	IncludeAuditMemo	bool
 
-	ExpectedChainID string
-	TrustedHeader   IdentityTrustedHeaderV2
-	Proof           *IdentityResolutionProofFormatV2
+	ExpectedChainID	string
+	TrustedHeader	IdentityTrustedHeaderV2
+	Proof		*IdentityResolutionProofFormatV2
 }
 
 type IdentitySendByNameResultV2 struct {
-	OriginalName       string
-	NormalizedName     string
-	Address            sdk.AccAddress
-	ProofVerified      bool
-	ProofHeight        uint64
-	ProofStatus        string
-	RecordVersion      uint64
-	FreshUntilHeight   uint64
-	StaleProofWarning  bool
-	AuditMemo          string
-	WalletDisplayLabel string
+	OriginalName		string
+	NormalizedName		string
+	Address			sdk.AccAddress
+	ProofVerified		bool
+	ProofHeight		uint64
+	ProofStatus		string
+	RecordVersion		uint64
+	FreshUntilHeight	uint64
+	StaleProofWarning	bool
+	AuditMemo		string
+	WalletDisplayLabel	string
 }
 
 type IdentityInvokeByNameRequestV2 struct {
-	Name                  string
-	TargetID              string
-	InterfaceID           string
-	ExpectedInterfaceHash string
-	Method                string
-	PayloadHash           string
-	State                 IdentityState
-	Height                uint64
-	RecordTTL             uint64
-	CurrentHeight         uint64
-	FreshnessThreshold    uint64
+	Name			string
+	TargetID		string
+	InterfaceID		string
+	ExpectedInterfaceHash	string
+	Method			string
+	PayloadHash		string
+	State			IdentityState
+	Height			uint64
+	RecordTTL		uint64
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
 
-	ExpectedChainID string
-	TrustedHeader   IdentityTrustedHeaderV2
-	Proof           *IdentityResolutionProofFormatV2
+	ExpectedChainID	string
+	TrustedHeader	IdentityTrustedHeaderV2
+	Proof		*IdentityResolutionProofFormatV2
 }
 
 type IdentityInvokeByNameResultV2 struct {
-	OriginalName                    string
-	NormalizedName                  string
-	TargetID                        string
-	ContractAddress                 sdk.AccAddress
-	Entrypoint                      string
-	Method                          string
-	PayloadHash                     string
-	InterfaceID                     string
-	InterfaceHash                   string
-	InterfaceDescriptorVerified     bool
-	ProofVerified                   bool
-	ProofHeight                     uint64
-	RecordVersion                   uint64
-	FreshUntilHeight                uint64
-	StaleProofWarning               bool
-	StaleInterfaceDescriptorWarning bool
-	RequiresInterfaceConfirmation   bool
-	SimulationRequiredBeforeSigning bool
-	ResolvedTarget                  ContractTargetV2
-	VerifiedInterfaceDescriptor     *InterfaceDescriptorV2
+	OriginalName			string
+	NormalizedName			string
+	TargetID			string
+	ContractAddress			sdk.AccAddress
+	Entrypoint			string
+	Method				string
+	PayloadHash			string
+	InterfaceID			string
+	InterfaceHash			string
+	InterfaceDescriptorVerified	bool
+	ProofVerified			bool
+	ProofHeight			uint64
+	RecordVersion			uint64
+	FreshUntilHeight		uint64
+	StaleProofWarning		bool
+	StaleInterfaceDescriptorWarning	bool
+	RequiresInterfaceConfirmation	bool
+	SimulationRequiredBeforeSigning	bool
+	ResolvedTarget			ContractTargetV2
+	VerifiedInterfaceDescriptor	*InterfaceDescriptorV2
 }
 
 func BuildIdentitySendByNameV2(request IdentitySendByNameRequestV2) (IdentitySendByNameResultV2, error) {
@@ -103,20 +103,20 @@ func BuildIdentitySendByNameV2(request IdentitySendByNameRequestV2) (IdentitySen
 		request.CurrentHeight = request.Height
 	}
 	out := IdentitySendByNameResultV2{
-		OriginalName:   request.Name,
-		NormalizedName: normalized,
-		ProofStatus:    "local_state",
+		OriginalName:	request.Name,
+		NormalizedName:	normalized,
+		ProofStatus:	"local_state",
 	}
 	if request.Proof != nil {
 		target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-			ExpectedChainID:      request.ExpectedChainID,
-			RequestedName:        normalized,
-			TrustedHeader:        request.TrustedHeader,
-			Proof:                *request.Proof,
-			TargetType:           IdentityResolutionTargetPrimary,
-			CurrentHeight:        request.CurrentHeight,
-			AllowRenewalWindow:   true,
-			NormalizationVersion: NameNormalizationVersionV2,
+			ExpectedChainID:	request.ExpectedChainID,
+			RequestedName:		normalized,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			*request.Proof,
+			TargetType:		IdentityResolutionTargetPrimary,
+			CurrentHeight:		request.CurrentHeight,
+			AllowRenewalWindow:	true,
+			NormalizationVersion:	NameNormalizationVersionV2,
 		})
 		if err != nil {
 			return IdentitySendByNameResultV2{}, err
@@ -141,10 +141,10 @@ func BuildIdentitySendByNameV2(request IdentitySendByNameRequestV2) (IdentitySen
 		out.FreshUntilHeight = request.Height + request.RecordTTL
 	}
 	out.StaleProofWarning = EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{
-		CurrentHeight:      request.CurrentHeight,
-		ProofHeight:        out.ProofHeight,
-		FreshUntilHeight:   out.FreshUntilHeight,
-		FreshnessThreshold: request.FreshnessThreshold,
+		CurrentHeight:		request.CurrentHeight,
+		ProofHeight:		out.ProofHeight,
+		FreshUntilHeight:	out.FreshUntilHeight,
+		FreshnessThreshold:	request.FreshnessThreshold,
 	})
 	out.WalletDisplayLabel = fmt.Sprintf("%s -> %s", out.NormalizedName, hex.EncodeToString(out.Address))
 	if request.IncludeAuditMemo {
@@ -252,15 +252,15 @@ func BuildIdentityInvokeByNameV2(request IdentityInvokeByNameRequestV2) (Identit
 	var freshUntil uint64
 	if request.Proof != nil {
 		verifiedTarget, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-			ExpectedChainID:      request.ExpectedChainID,
-			RequestedName:        normalized,
-			TrustedHeader:        request.TrustedHeader,
-			Proof:                *request.Proof,
-			TargetType:           IdentityResolutionTargetContract,
-			TargetKey:            targetID,
-			CurrentHeight:        request.CurrentHeight,
-			AllowRenewalWindow:   true,
-			NormalizationVersion: NameNormalizationVersionV2,
+			ExpectedChainID:	request.ExpectedChainID,
+			RequestedName:		normalized,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			*request.Proof,
+			TargetType:		IdentityResolutionTargetContract,
+			TargetKey:		targetID,
+			CurrentHeight:		request.CurrentHeight,
+			AllowRenewalWindow:	true,
+			NormalizationVersion:	NameNormalizationVersionV2,
 		})
 		if err != nil {
 			return IdentityInvokeByNameResultV2{}, err
@@ -302,24 +302,24 @@ func BuildIdentityInvokeByNameV2(request IdentityInvokeByNameRequestV2) (Identit
 		entrypoint = request.Method
 	}
 	out := IdentityInvokeByNameResultV2{
-		OriginalName:                    request.Name,
-		NormalizedName:                  normalized,
-		TargetID:                        contractTargetIDV2(target),
-		ContractAddress:                 cloneSpecAddress(contractTargetAddressV2(target)),
-		Entrypoint:                      entrypoint,
-		Method:                          request.Method,
-		PayloadHash:                     request.PayloadHash,
-		InterfaceID:                     request.InterfaceID,
-		InterfaceHash:                   interfaceHash,
-		InterfaceDescriptorVerified:     descriptor != nil,
-		ProofVerified:                   proofVerified,
-		ProofHeight:                     proofHeight,
-		RecordVersion:                   recordVersion,
-		FreshUntilHeight:                freshUntil,
-		StaleProofWarning:               EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
-		StaleInterfaceDescriptorWarning: EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: record.UpdatedAtHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
-		ResolvedTarget:                  target,
-		VerifiedInterfaceDescriptor:     descriptor,
+		OriginalName:				request.Name,
+		NormalizedName:				normalized,
+		TargetID:				contractTargetIDV2(target),
+		ContractAddress:			cloneSpecAddress(contractTargetAddressV2(target)),
+		Entrypoint:				entrypoint,
+		Method:					request.Method,
+		PayloadHash:				request.PayloadHash,
+		InterfaceID:				request.InterfaceID,
+		InterfaceHash:				interfaceHash,
+		InterfaceDescriptorVerified:		descriptor != nil,
+		ProofVerified:				proofVerified,
+		ProofHeight:				proofHeight,
+		RecordVersion:				recordVersion,
+		FreshUntilHeight:			freshUntil,
+		StaleProofWarning:			EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: proofHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
+		StaleInterfaceDescriptorWarning:	EvaluateIdentityStaleProofWarningV2(IdentityStaleProofPolicyV2{CurrentHeight: request.CurrentHeight, ProofHeight: record.UpdatedAtHeight, FreshUntilHeight: freshUntil, FreshnessThreshold: request.FreshnessThreshold}),
+		ResolvedTarget:				target,
+		VerifiedInterfaceDescriptor:		descriptor,
 	}
 	for _, hint := range record.ExecutionHints {
 		out.RequiresInterfaceConfirmation = out.RequiresInterfaceConfirmation || hint.RequiresInterfaceConfirmation

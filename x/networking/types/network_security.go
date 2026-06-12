@@ -10,264 +10,264 @@ import (
 )
 
 const (
-	DefaultSecurityReplayHorizon      = uint64(10_000)
-	DefaultMaxInvalidMessagesPerEpoch = uint64(16)
-	DefaultMaxBytesPerEpoch           = uint64(64 << 20)
-	DefaultMaxDelayedBlockHeights     = uint64(2)
-	DefaultMinPeerDiversityBps        = uint32(4_000)
-	DefaultSybilScoreThresholdBps     = uint32(2_500)
-	DefaultMaxPeersPerIdentityCluster = uint32(2)
-	DefaultReputationDecayBps         = uint32(500)
-	DefaultMaxPeerMessagesPerWindow   = uint64(128)
-	DefaultMaxHandshakeCostUnits      = uint64(10_000)
-	DefaultMaxChunkRequestsPerWindow  = uint32(256)
-	DefaultMinServiceStakeWeight      = uint64(1_000)
+	DefaultSecurityReplayHorizon		= uint64(10_000)
+	DefaultMaxInvalidMessagesPerEpoch	= uint64(16)
+	DefaultMaxBytesPerEpoch			= uint64(64 << 20)
+	DefaultMaxDelayedBlockHeights		= uint64(2)
+	DefaultMinPeerDiversityBps		= uint32(4_000)
+	DefaultSybilScoreThresholdBps		= uint32(2_500)
+	DefaultMaxPeersPerIdentityCluster	= uint32(2)
+	DefaultReputationDecayBps		= uint32(500)
+	DefaultMaxPeerMessagesPerWindow		= uint64(128)
+	DefaultMaxHandshakeCostUnits		= uint64(10_000)
+	DefaultMaxChunkRequestsPerWindow	= uint32(256)
+	DefaultMinServiceStakeWeight		= uint64(1_000)
 )
 
 type NetworkThreat string
 
 const (
-	ThreatMaliciousPeer             NetworkThreat = "malicious_peer"
-	ThreatEclipseAttack             NetworkThreat = "eclipse_attack"
-	ThreatRoutingManipulation       NetworkThreat = "routing_manipulation"
-	ThreatSpamFlood                 NetworkThreat = "spam_flood"
-	ThreatDiscoveryPoisoning        NetworkThreat = "discovery_poisoning"
-	ThreatServiceAdvertisementForge NetworkThreat = "service_advertisement_forgery"
-	ThreatChunkCorruption           NetworkThreat = "chunk_corruption"
-	ThreatBandwidthExhaustion       NetworkThreat = "bandwidth_exhaustion"
-	ThreatSybilPeers                NetworkThreat = "sybil_peers"
-	ThreatWithheldBlockChunks       NetworkThreat = "withheld_block_chunks"
-	ThreatCrossZoneReplay           NetworkThreat = "cross_zone_message_replay"
+	ThreatMaliciousPeer		NetworkThreat	= "malicious_peer"
+	ThreatEclipseAttack		NetworkThreat	= "eclipse_attack"
+	ThreatRoutingManipulation	NetworkThreat	= "routing_manipulation"
+	ThreatSpamFlood			NetworkThreat	= "spam_flood"
+	ThreatDiscoveryPoisoning	NetworkThreat	= "discovery_poisoning"
+	ThreatServiceAdvertisementForge	NetworkThreat	= "service_advertisement_forgery"
+	ThreatChunkCorruption		NetworkThreat	= "chunk_corruption"
+	ThreatBandwidthExhaustion	NetworkThreat	= "bandwidth_exhaustion"
+	ThreatSybilPeers		NetworkThreat	= "sybil_peers"
+	ThreatWithheldBlockChunks	NetworkThreat	= "withheld_block_chunks"
+	ThreatCrossZoneReplay		NetworkThreat	= "cross_zone_message_replay"
 )
 
 type SecurityControl string
 
 const (
-	ControlPeerReputation        SecurityControl = "peer_reputation_scoring"
-	ControlAdaptivePeerRotation  SecurityControl = "adaptive_peer_rotation"
-	ControlChannelBinding        SecurityControl = "cryptographic_channel_binding"
-	ControlMessageAuthentication SecurityControl = "message_authentication"
-	ControlReplayProtection      SecurityControl = "deterministic_replay_protection"
-	ControlOverlayIsolation      SecurityControl = "overlay_isolation"
-	ControlSignedDiscovery       SecurityControl = "signed_discovery_records"
-	ControlExpiringAds           SecurityControl = "expiring_advertisements"
-	ControlHashDedup             SecurityControl = "hash_based_deduplication"
-	ControlChunkMerkle           SecurityControl = "chunk_merkle_verification"
-	ControlRateLimits            SecurityControl = "per_channel_rate_limits"
-	ControlQoSIsolation          SecurityControl = "qos_isolation"
+	ControlPeerReputation		SecurityControl	= "peer_reputation_scoring"
+	ControlAdaptivePeerRotation	SecurityControl	= "adaptive_peer_rotation"
+	ControlChannelBinding		SecurityControl	= "cryptographic_channel_binding"
+	ControlMessageAuthentication	SecurityControl	= "message_authentication"
+	ControlReplayProtection		SecurityControl	= "deterministic_replay_protection"
+	ControlOverlayIsolation		SecurityControl	= "overlay_isolation"
+	ControlSignedDiscovery		SecurityControl	= "signed_discovery_records"
+	ControlExpiringAds		SecurityControl	= "expiring_advertisements"
+	ControlHashDedup		SecurityControl	= "hash_based_deduplication"
+	ControlChunkMerkle		SecurityControl	= "chunk_merkle_verification"
+	ControlRateLimits		SecurityControl	= "per_channel_rate_limits"
+	ControlQoSIsolation		SecurityControl	= "qos_isolation"
 )
 
 type PeerSecurityObservation struct {
-	PeerNodeID             string
-	InvalidMessages        uint64
-	DuplicateMessages      uint64
-	ConflictingBroadcasts  uint64
-	CorruptChunks          uint64
-	ExpiredAdvertisements  uint64
-	ForgedAdvertisements   uint64
-	BytesThisEpoch         uint64
-	SybilClusterPeers      uint32
-	DelayedBlockChunkCount uint32
-	CrossZoneReplayCount   uint64
-	LastObservedHeight     uint64
+	PeerNodeID		string
+	InvalidMessages		uint64
+	DuplicateMessages	uint64
+	ConflictingBroadcasts	uint64
+	CorruptChunks		uint64
+	ExpiredAdvertisements	uint64
+	ForgedAdvertisements	uint64
+	BytesThisEpoch		uint64
+	SybilClusterPeers	uint32
+	DelayedBlockChunkCount	uint32
+	CrossZoneReplayCount	uint64
+	LastObservedHeight	uint64
 }
 
 type NetworkSecurityPolicy struct {
-	ReplayHorizon             uint64
-	MaxInvalidMessages        uint64
-	MaxBytesPerEpoch          uint64
-	MaxDelayedBlockHeights    uint64
-	MaxPeerMessagesPerWindow  uint64
-	MaxHandshakeCostUnits     uint64
-	MaxChunkRequestsPerWindow uint32
-	MaxPayloadBytes           uint64
-	MinServiceStakeWeight     uint64
-	MinPeerDiversityBps       uint32
-	SybilScoreThresholdBps    uint32
-	ChannelRateLimits         []ChannelRateLimit
-	RequiredControls          []SecurityControl
-	ConsensusChannelRequired  bool
+	ReplayHorizon			uint64
+	MaxInvalidMessages		uint64
+	MaxBytesPerEpoch		uint64
+	MaxDelayedBlockHeights		uint64
+	MaxPeerMessagesPerWindow	uint64
+	MaxHandshakeCostUnits		uint64
+	MaxChunkRequestsPerWindow	uint32
+	MaxPayloadBytes			uint64
+	MinServiceStakeWeight		uint64
+	MinPeerDiversityBps		uint32
+	SybilScoreThresholdBps		uint32
+	ChannelRateLimits		[]ChannelRateLimit
+	RequiredControls		[]SecurityControl
+	ConsensusChannelRequired	bool
 }
 
 type ChannelRateLimit struct {
-	Channel        ChannelClass
-	MaxBytes       uint64
-	WindowHeight   uint64
-	DropOnExceeded bool
+	Channel		ChannelClass
+	MaxBytes	uint64
+	WindowHeight	uint64
+	DropOnExceeded	bool
 }
 
 type ChannelRateUsage struct {
-	Channel     ChannelClass
-	Bytes       uint64
-	WindowStart uint64
-	WindowEnd   uint64
+	Channel		ChannelClass
+	Bytes		uint64
+	WindowStart	uint64
+	WindowEnd	uint64
 }
 
 type NetworkSecurityDecision struct {
-	PeerNodeID        string
-	Accepted          bool
-	Quarantine        bool
-	RotatePeer        bool
-	DropMessage       bool
-	DowngradeQoS      bool
-	ConsensusIsolated bool
-	Score             PeerScore
-	Threats           []NetworkThreat
-	Controls          []SecurityControl
-	Reason            string
+	PeerNodeID		string
+	Accepted		bool
+	Quarantine		bool
+	RotatePeer		bool
+	DropMessage		bool
+	DowngradeQoS		bool
+	ConsensusIsolated	bool
+	Score			PeerScore
+	Threats			[]NetworkThreat
+	Controls		[]SecurityControl
+	Reason			string
 }
 
 type ReplayProtectionEntry struct {
-	ReplayID string
-	Height   uint64
+	ReplayID	string
+	Height		uint64
 }
 
 type ReplayProtectionCache struct {
-	Horizon uint64
-	Entries []ReplayProtectionEntry
+	Horizon	uint64
+	Entries	[]ReplayProtectionEntry
 }
 
 type PeerDiversityReport struct {
-	TotalPeers          uint32
-	UniqueNodeIDs       uint32
-	UniqueAddressHashes uint32
-	UniqueZoneSets      uint32
-	DiversityBps        uint32
-	EclipseRisk         bool
-	SybilRisk           bool
+	TotalPeers		uint32
+	UniqueNodeIDs		uint32
+	UniqueAddressHashes	uint32
+	UniqueZoneSets		uint32
+	DiversityBps		uint32
+	EclipseRisk		bool
+	SybilRisk		bool
 }
 
 type PeerReputationInput struct {
-	PeerNodeID                string
-	ValidMessages             uint64
-	InvalidMessages           uint64
-	LatencyMillis             uint64
-	ThroughputBytesPerSec     uint64
-	CorrectChunks             uint64
-	CorruptChunks             uint64
-	ValidDiscoveryResponses   uint64
-	InvalidDiscoveryResponses uint64
-	ValidServiceResponses     uint64
-	InvalidServiceResponses   uint64
-	Timeouts                  uint64
-	DuplicateBroadcasts       uint64
-	ConflictingBroadcasts     uint64
-	EvidenceHash              string
-	EvidenceHeight            uint64
-	CommittedEvidence         bool
-	UsedForConsensus          bool
-	ElapsedEpochs             uint64
-	DecayPolicy               PeerScoreDecayPolicy
+	PeerNodeID			string
+	ValidMessages			uint64
+	InvalidMessages			uint64
+	LatencyMillis			uint64
+	ThroughputBytesPerSec		uint64
+	CorrectChunks			uint64
+	CorruptChunks			uint64
+	ValidDiscoveryResponses		uint64
+	InvalidDiscoveryResponses	uint64
+	ValidServiceResponses		uint64
+	InvalidServiceResponses		uint64
+	Timeouts			uint64
+	DuplicateBroadcasts		uint64
+	ConflictingBroadcasts		uint64
+	EvidenceHash			string
+	EvidenceHeight			uint64
+	CommittedEvidence		bool
+	UsedForConsensus		bool
+	ElapsedEpochs			uint64
+	DecayPolicy			PeerScoreDecayPolicy
 }
 
 type PeerReputationDecision struct {
-	PeerNodeID        string
-	Score             PeerScore
-	LocalAdvisory     bool
-	ConsensusEligible bool
-	PenaltyBps        uint32
-	DecayAppliedBps   uint32
-	EvidenceHash      string
-	Reason            string
+	PeerNodeID		string
+	Score			PeerScore
+	LocalAdvisory		bool
+	ConsensusEligible	bool
+	PenaltyBps		uint32
+	DecayAppliedBps		uint32
+	EvidenceHash		string
+	Reason			string
 }
 
 type EclipseResistancePolicy struct {
-	MinRandomPeers             uint32
-	MinValidatorPeers          uint32
-	MinZonePeers               uint32
-	MaxPeersPerIdentityCluster uint32
-	PreferProofBackedRecords   bool
-	RotateDiscoverySources     bool
+	MinRandomPeers			uint32
+	MinValidatorPeers		uint32
+	MinZonePeers			uint32
+	MaxPeersPerIdentityCluster	uint32
+	PreferProofBackedRecords	bool
+	RotateDiscoverySources		bool
 }
 
 type EclipseResistancePlan struct {
-	RandomSetMaintained      bool
-	ValidatorDiversity       bool
-	ZoneDiversity            bool
-	DiscoverySourcesRotated  bool
-	IdentityClusterLimited   bool
-	ProofBackedCriticalRoute bool
-	PeersToDrop              []string
-	DiscoverySources         []string
-	CriticalRoutingPeers     []string
+	RandomSetMaintained		bool
+	ValidatorDiversity		bool
+	ZoneDiversity			bool
+	DiscoverySourcesRotated		bool
+	IdentityClusterLimited		bool
+	ProofBackedCriticalRoute	bool
+	PeersToDrop			[]string
+	DiscoverySources		[]string
+	CriticalRoutingPeers		[]string
 }
 
 type SignedTransportEnvelope struct {
-	Envelope     TransportEnvelope
-	SignerNodeID string
-	Height       uint64
-	Signature    []byte
+	Envelope	TransportEnvelope
+	SignerNodeID	string
+	Height		uint64
+	Signature	[]byte
 }
 
 type PeerRateUsage struct {
-	PeerNodeID  string
-	Channel     ChannelClass
-	Messages    uint64
-	Bytes       uint64
-	WindowStart uint64
-	WindowEnd   uint64
+	PeerNodeID	string
+	Channel		ChannelClass
+	Messages	uint64
+	Bytes		uint64
+	WindowStart	uint64
+	WindowEnd	uint64
 }
 
 type PeerRateLimitDecision struct {
-	Allowed          bool
-	DropMessage      bool
-	ThrottlePeer     bool
-	ExceededMessages bool
-	ExceededBytes    bool
-	Reason           string
+	Allowed			bool
+	DropMessage		bool
+	ThrottlePeer		bool
+	ExceededMessages	bool
+	ExceededBytes		bool
+	Reason			string
 }
 
 type HandshakeCostReport struct {
-	PeerNodeID        string
-	EphemeralKeyBytes uint64
-	ProtocolCount     uint32
-	ChannelCount      uint32
-	NonceBytes        uint64
-	CostUnits         uint64
-	Accepted          bool
+	PeerNodeID		string
+	EphemeralKeyBytes	uint64
+	ProtocolCount		uint32
+	ChannelCount		uint32
+	NonceBytes		uint64
+	CostUnits		uint64
+	Accepted		bool
 }
 
 type SpamSimulationResult struct {
-	TotalMessages uint64
-	Accepted      uint64
-	Dropped       uint64
-	Throttled     bool
-	Threats       []NetworkThreat
+	TotalMessages	uint64
+	Accepted	uint64
+	Dropped		uint64
+	Throttled	bool
+	Threats		[]NetworkThreat
 }
 
 type RoutingManipulationSimulationResult struct {
-	ConflictingBroadcasts uint64
-	FaultsDetected        uint64
-	Threats               []NetworkThreat
+	ConflictingBroadcasts	uint64
+	FaultsDetected		uint64
+	Threats			[]NetworkThreat
 }
 
 func DefaultNetworkSecurityPolicy() NetworkSecurityPolicy {
 	return NetworkSecurityPolicy{
-		ReplayHorizon:             DefaultSecurityReplayHorizon,
-		MaxInvalidMessages:        DefaultMaxInvalidMessagesPerEpoch,
-		MaxBytesPerEpoch:          DefaultMaxBytesPerEpoch,
-		MaxDelayedBlockHeights:    DefaultMaxDelayedBlockHeights,
-		MaxPeerMessagesPerWindow:  DefaultMaxPeerMessagesPerWindow,
-		MaxHandshakeCostUnits:     DefaultMaxHandshakeCostUnits,
-		MaxChunkRequestsPerWindow: DefaultMaxChunkRequestsPerWindow,
-		MaxPayloadBytes:           MaxStreamMessageBytes,
-		MinServiceStakeWeight:     DefaultMinServiceStakeWeight,
-		MinPeerDiversityBps:       DefaultMinPeerDiversityBps,
-		SybilScoreThresholdBps:    DefaultSybilScoreThresholdBps,
-		ChannelRateLimits:         DefaultChannelRateLimits(),
-		RequiredControls:          DefaultSecurityControls(),
-		ConsensusChannelRequired:  true,
+		ReplayHorizon:			DefaultSecurityReplayHorizon,
+		MaxInvalidMessages:		DefaultMaxInvalidMessagesPerEpoch,
+		MaxBytesPerEpoch:		DefaultMaxBytesPerEpoch,
+		MaxDelayedBlockHeights:		DefaultMaxDelayedBlockHeights,
+		MaxPeerMessagesPerWindow:	DefaultMaxPeerMessagesPerWindow,
+		MaxHandshakeCostUnits:		DefaultMaxHandshakeCostUnits,
+		MaxChunkRequestsPerWindow:	DefaultMaxChunkRequestsPerWindow,
+		MaxPayloadBytes:		MaxStreamMessageBytes,
+		MinServiceStakeWeight:		DefaultMinServiceStakeWeight,
+		MinPeerDiversityBps:		DefaultMinPeerDiversityBps,
+		SybilScoreThresholdBps:		DefaultSybilScoreThresholdBps,
+		ChannelRateLimits:		DefaultChannelRateLimits(),
+		RequiredControls:		DefaultSecurityControls(),
+		ConsensusChannelRequired:	true,
 	}
 }
 
 func DefaultEclipseResistancePolicy() EclipseResistancePolicy {
 	return EclipseResistancePolicy{
-		MinRandomPeers:             DefaultRandomDiversityBucket,
-		MinValidatorPeers:          2,
-		MinZonePeers:               2,
-		MaxPeersPerIdentityCluster: DefaultMaxPeersPerIdentityCluster,
-		PreferProofBackedRecords:   true,
-		RotateDiscoverySources:     true,
+		MinRandomPeers:			DefaultRandomDiversityBucket,
+		MinValidatorPeers:		2,
+		MinZonePeers:			2,
+		MaxPeersPerIdentityCluster:	DefaultMaxPeersPerIdentityCluster,
+		PreferProofBackedRecords:	true,
+		RotateDiscoverySources:		true,
 	}
 }
 
@@ -471,10 +471,10 @@ func EvaluatePeerRateLimit(policy NetworkSecurityPolicy, usage PeerRateUsage) (P
 			continue
 		}
 		ok, err := CheckChannelRateLimit(limit, ChannelRateUsage{
-			Channel:     usage.Channel,
-			Bytes:       usage.Bytes,
-			WindowStart: usage.WindowStart,
-			WindowEnd:   usage.WindowEnd,
+			Channel:	usage.Channel,
+			Bytes:		usage.Bytes,
+			WindowStart:	usage.WindowStart,
+			WindowEnd:	usage.WindowEnd,
 		})
 		if err != nil {
 			return PeerRateLimitDecision{}, err
@@ -513,13 +513,13 @@ func EvaluateHandshakeCost(req SessionRequest, policy NetworkSecurityPolicy) (Ha
 		uint64(len(req.ChannelClasses))*64 +
 		uint64(len(req.CipherSuites))*64
 	return HandshakeCostReport{
-		PeerNodeID:        req.RemoteNodeID,
-		EphemeralKeyBytes: uint64(len(req.LocalEphemeralPubKey) + len(req.RemoteEphemeralPubKey)),
-		ProtocolCount:     uint32(len(req.ProtocolVersions)),
-		ChannelCount:      uint32(len(req.ChannelClasses)),
-		NonceBytes:        uint64(len(req.Nonce)),
-		CostUnits:         cost,
-		Accepted:          cost <= policy.MaxHandshakeCostUnits,
+		PeerNodeID:		req.RemoteNodeID,
+		EphemeralKeyBytes:	uint64(len(req.LocalEphemeralPubKey) + len(req.RemoteEphemeralPubKey)),
+		ProtocolCount:		uint32(len(req.ProtocolVersions)),
+		ChannelCount:		uint32(len(req.ChannelClasses)),
+		NonceBytes:		uint64(len(req.Nonce)),
+		CostUnits:		cost,
+		Accepted:		cost <= policy.MaxHandshakeCostUnits,
 	}, nil
 }
 
@@ -614,12 +614,12 @@ func EvaluateNetworkSecurity(score PeerScore, observation PeerSecurityObservatio
 	threats := DetectNetworkThreats(observation, policy)
 	nextScore := ApplySecurityReputation(score, observation, policy)
 	decision := NetworkSecurityDecision{
-		PeerNodeID:        normalizeHashText(observation.PeerNodeID),
-		Accepted:          true,
-		ConsensusIsolated: true,
-		Score:             nextScore,
-		Threats:           threats,
-		Controls:          policy.RequiredControls,
+		PeerNodeID:		normalizeHashText(observation.PeerNodeID),
+		Accepted:		true,
+		ConsensusIsolated:	true,
+		Score:			nextScore,
+		Threats:		threats,
+		Controls:		policy.RequiredControls,
 	}
 	if hasThreat(threats, ThreatSpamFlood) || hasThreat(threats, ThreatBandwidthExhaustion) {
 		decision.DropMessage = true
@@ -721,8 +721,8 @@ func ComputePeerReputation(input PeerReputationInput) (PeerReputationDecision, e
 	}
 	if input.DecayPolicy.MaxDecayBpsPerEpoch == 0 {
 		input.DecayPolicy = PeerScoreDecayPolicy{
-			MaxDecayBpsPerEpoch: DefaultReputationDecayBps,
-			MinScoreBps:         DefaultPeerScoreDecayFloor,
+			MaxDecayBpsPerEpoch:	DefaultReputationDecayBps,
+			MinScoreBps:		DefaultPeerScoreDecayFloor,
 		}
 	}
 	if err := input.DecayPolicy.Validate(); err != nil {
@@ -777,11 +777,11 @@ func ComputePeerReputation(input PeerReputationInput) (PeerReputationDecision, e
 		scoreBps = 0
 	}
 	score := PeerScore{
-		ScoreBps:       scoreBps,
-		LatencyBps:     latencyBps,
-		ReliabilityBps: validRate,
-		ThroughputBps:  throughputBps,
-		PenaltyBps:     uint32(penalty),
+		ScoreBps:	scoreBps,
+		LatencyBps:	latencyBps,
+		ReliabilityBps:	validRate,
+		ThroughputBps:	throughputBps,
+		PenaltyBps:	uint32(penalty),
 	}
 	decayed, err := DecayPeerScore(score, input.ElapsedEpochs, input.DecayPolicy)
 	if err != nil {
@@ -792,13 +792,13 @@ func ComputePeerReputation(input PeerReputationInput) (PeerReputationDecision, e
 		decayApplied = score.ScoreBps - decayed.ScoreBps
 	}
 	return PeerReputationDecision{
-		PeerNodeID:        input.PeerNodeID,
-		Score:             decayed,
-		LocalAdvisory:     !input.UsedForConsensus,
-		ConsensusEligible: input.UsedForConsensus && input.CommittedEvidence,
-		PenaltyBps:        uint32(penalty),
-		DecayAppliedBps:   decayApplied,
-		EvidenceHash:      input.EvidenceHash,
+		PeerNodeID:		input.PeerNodeID,
+		Score:			decayed,
+		LocalAdvisory:		!input.UsedForConsensus,
+		ConsensusEligible:	input.UsedForConsensus && input.CommittedEvidence,
+		PenaltyBps:		uint32(penalty),
+		DecayAppliedBps:	decayApplied,
+		EvidenceHash:		input.EvidenceHash,
 	}, nil
 }
 
@@ -994,13 +994,13 @@ func EvaluatePeerDiversity(peers []NodeRecord, policy NetworkSecurityPolicy) (Pe
 		diversity = addressDiversity
 	}
 	report := PeerDiversityReport{
-		TotalPeers:          total,
-		UniqueNodeIDs:       uint32(len(nodeIDs)),
-		UniqueAddressHashes: uint32(len(addresses)),
-		UniqueZoneSets:      uint32(len(zoneSets)),
-		DiversityBps:        diversity,
-		EclipseRisk:         diversity < policy.MinPeerDiversityBps,
-		SybilRisk:           uint32(len(nodeIDs)) < total,
+		TotalPeers:		total,
+		UniqueNodeIDs:		uint32(len(nodeIDs)),
+		UniqueAddressHashes:	uint32(len(addresses)),
+		UniqueZoneSets:		uint32(len(zoneSets)),
+		DiversityBps:		diversity,
+		EclipseRisk:		diversity < policy.MinPeerDiversityBps,
+		SybilRisk:		uint32(len(nodeIDs)) < total,
 	}
 	return report, nil
 }
@@ -1037,15 +1037,15 @@ func BuildEclipseResistancePlan(graph AdaptiveOverlayGraph, records []DiscoveryR
 	}
 	sortStrings(peersToDrop)
 	return EclipseResistancePlan{
-		RandomSetMaintained:      uint32(len(randomSet)) >= policy.MinRandomPeers && distinctAdaptivePeerBuckets(randomSet) >= minUint32(policy.MinRandomPeers, uint32(len(randomSet))),
-		ValidatorDiversity:       countAdaptivePeersWithRole(allPeers, NodeRoleValidator) >= policy.MinValidatorPeers,
-		ZoneDiversity:            distinctAdaptiveZones(allPeers) >= policy.MinZonePeers,
-		DiscoverySourcesRotated:  policy.RotateDiscoverySources && len(discoverySources) > 0,
-		IdentityClusterLimited:   len(peersToDrop) == 0,
-		ProofBackedCriticalRoute: !policy.PreferProofBackedRecords || len(criticalPeers) > 0,
-		PeersToDrop:              peersToDrop,
-		DiscoverySources:         discoverySources,
-		CriticalRoutingPeers:     criticalPeers,
+		RandomSetMaintained:		uint32(len(randomSet)) >= policy.MinRandomPeers && distinctAdaptivePeerBuckets(randomSet) >= minUint32(policy.MinRandomPeers, uint32(len(randomSet))),
+		ValidatorDiversity:		countAdaptivePeersWithRole(allPeers, NodeRoleValidator) >= policy.MinValidatorPeers,
+		ZoneDiversity:			distinctAdaptiveZones(allPeers) >= policy.MinZonePeers,
+		DiscoverySourcesRotated:	policy.RotateDiscoverySources && len(discoverySources) > 0,
+		IdentityClusterLimited:		len(peersToDrop) == 0,
+		ProofBackedCriticalRoute:	!policy.PreferProofBackedRecords || len(criticalPeers) > 0,
+		PeersToDrop:			peersToDrop,
+		DiscoverySources:		discoverySources,
+		CriticalRoutingPeers:		criticalPeers,
 	}, nil
 }
 
@@ -1103,11 +1103,11 @@ func SimulateSpamResistance(policy NetworkSecurityPolicy, usage PeerRateUsage, d
 		threats = append(threats, ThreatBandwidthExhaustion)
 	}
 	return SpamSimulationResult{
-		TotalMessages: usage.Messages + uint64(len(duplicates)),
-		Accepted:      accepted,
-		Dropped:       dropped,
-		Throttled:     decision.ThrottlePeer,
-		Threats:       uniqueThreats(threats),
+		TotalMessages:	usage.Messages + uint64(len(duplicates)),
+		Accepted:	accepted,
+		Dropped:	dropped,
+		Throttled:	decision.ThrottlePeer,
+		Threats:	uniqueThreats(threats),
 	}, nil
 }
 
@@ -1130,9 +1130,9 @@ func SimulateRoutingManipulation(msgs []BroadcastMessage, peerNodeID string, cur
 		threats = append(threats, ThreatRoutingManipulation)
 	}
 	return RoutingManipulationSimulationResult{
-		ConflictingBroadcasts: conflicts,
-		FaultsDetected:        uint64(len(cache.Faults)),
-		Threats:               threats,
+		ConflictingBroadcasts:	conflicts,
+		FaultsDetected:		uint64(len(cache.Faults)),
+		Threats:		threats,
 	}, nil
 }
 

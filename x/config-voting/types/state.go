@@ -10,134 +10,134 @@ import (
 )
 
 const (
-	ProposalStatusVoting   = "voting"
-	ProposalStatusPassed   = "passed"
-	ProposalStatusRejected = "rejected"
-	ProposalStatusVetoed   = "vetoed"
-	ProposalStatusExecuted = "executed"
+	ProposalStatusVoting	= "voting"
+	ProposalStatusPassed	= "passed"
+	ProposalStatusRejected	= "rejected"
+	ProposalStatusVetoed	= "vetoed"
+	ProposalStatusExecuted	= "executed"
 
-	VoteOptionYes     = "yes"
-	VoteOptionNo      = "no"
-	VoteOptionAbstain = "abstain"
-	VoteOptionVeto    = "veto"
+	VoteOptionYes		= "yes"
+	VoteOptionNo		= "no"
+	VoteOptionAbstain	= "abstain"
+	VoteOptionVeto		= "veto"
 )
 
 type ConfigVotingParams struct {
-	MaxProposals         uint32
-	MaxVotes             uint32
-	MaxSnapshotEntries   uint32
-	QuorumBps            uint32
-	ThresholdBps         uint32
-	VetoThresholdBps     uint32
-	VotingPeriod         uint64
-	ExecutionDelay       uint64
-	EmergencyDelay       uint64
-	MaxMetadataBytes     uint32
-	MaxConstitutionBytes uint32
-	BpsScale             uint32
-	VetoAuthorities      []string
+	MaxProposals		uint32
+	MaxVotes		uint32
+	MaxSnapshotEntries	uint32
+	QuorumBps		uint32
+	ThresholdBps		uint32
+	VetoThresholdBps	uint32
+	VotingPeriod		uint64
+	ExecutionDelay		uint64
+	EmergencyDelay		uint64
+	MaxMetadataBytes	uint32
+	MaxConstitutionBytes	uint32
+	BpsScale		uint32
+	VetoAuthorities		[]string
 }
 
 type ConfigVotingState struct {
-	Proposals []ConfigProposal
-	Votes     []ConfigVote
+	Proposals	[]ConfigProposal
+	Votes		[]ConfigVote
 }
 
 type ConfigProposal struct {
-	ProposalID                       string
-	Title                            string
-	ConfigKey                        string
-	ConfigValue                      string
-	Operation                        string
-	SubmittedBy                      string
-	Status                           string
-	Metadata                         string
-	ConstitutionReference            string
-	Emergency                        bool
-	RequiresConstitutionalException  bool
-	SnapshotHeight                   uint64
-	SubmitHeight                     uint64
-	VotingEndHeight                  uint64
-	EarliestExecutionHeight          uint64
-	ExecutedHeight                   uint64
-	TotalVotingPower                 uint64
-	VotingPowerSnapshot              []VotingPowerSnapshotEntry
-	ExpectedPreviousVersion          uint64
-	AllowMissingExpectedPrevious     bool
-	ExecutionConstitutionValidatedAt uint64
+	ProposalID				string
+	Title					string
+	ConfigKey				string
+	ConfigValue				string
+	Operation				string
+	SubmittedBy				string
+	Status					string
+	Metadata				string
+	ConstitutionReference			string
+	Emergency				bool
+	RequiresConstitutionalException		bool
+	SnapshotHeight				uint64
+	SubmitHeight				uint64
+	VotingEndHeight				uint64
+	EarliestExecutionHeight			uint64
+	ExecutedHeight				uint64
+	TotalVotingPower			uint64
+	VotingPowerSnapshot			[]VotingPowerSnapshotEntry
+	ExpectedPreviousVersion			uint64
+	AllowMissingExpectedPrevious		bool
+	ExecutionConstitutionValidatedAt	uint64
 }
 
 type VotingPowerSnapshotEntry struct {
-	Voter string
-	Power uint64
+	Voter	string
+	Power	uint64
 }
 
 type ConfigVote struct {
-	ProposalID string
-	Voter      string
-	Option     string
-	Power      uint64
-	Height     uint64
+	ProposalID	string
+	Voter		string
+	Option		string
+	Power		uint64
+	Height		uint64
 }
 
 type VoteTally struct {
-	YesPower     uint64
-	NoPower      uint64
-	AbstainPower uint64
-	VetoPower    uint64
-	TotalVoted   uint64
-	TotalPower   uint64
+	YesPower	uint64
+	NoPower		uint64
+	AbstainPower	uint64
+	VetoPower	uint64
+	TotalVoted	uint64
+	TotalPower	uint64
 }
 
 type MsgSubmitConfigProposal struct {
-	Authority string
-	Proposal  ConfigProposal
+	Authority	string
+	Proposal	ConfigProposal
 }
 
 type MsgVoteConfigProposal struct {
-	Voter      string
-	ProposalID string
-	Option     string
-	Height     uint64
+	Voter		string
+	ProposalID	string
+	Option		string
+	Height		uint64
 }
 
 type MsgExecuteConfigProposal struct {
-	Authority    string
-	ProposalID   string
-	Height       uint64
-	ConfigState  configtypes.ConfigState
-	ConfigParams configtypes.Params
+	Authority	string
+	ProposalID	string
+	Height		uint64
+	ConfigState	configtypes.ConfigState
+	ConfigParams	configtypes.Params
 }
 
 type MsgVetoConfigProposal struct {
-	Authority  string
-	ProposalID string
-	Reason     string
-	Height     uint64
+	Authority	string
+	ProposalID	string
+	Reason		string
+	Height		uint64
 }
 
 func DefaultConfigVotingParams() ConfigVotingParams {
 	return ConfigVotingParams{
-		MaxProposals:         10_000,
-		MaxVotes:             1_000_000,
-		MaxSnapshotEntries:   10_000,
-		QuorumBps:            4_000,
-		ThresholdBps:         5_000,
-		VetoThresholdBps:     3_340,
-		VotingPeriod:         10_000,
-		ExecutionDelay:       100,
-		EmergencyDelay:       1,
-		MaxMetadataBytes:     4_096,
-		MaxConstitutionBytes: 512,
-		BpsScale:             10_000,
-		VetoAuthorities:      []string{},
+		MaxProposals:		10_000,
+		MaxVotes:		1_000_000,
+		MaxSnapshotEntries:	10_000,
+		QuorumBps:		4_000,
+		ThresholdBps:		5_000,
+		VetoThresholdBps:	3_340,
+		VotingPeriod:		10_000,
+		ExecutionDelay:		100,
+		EmergencyDelay:		1,
+		MaxMetadataBytes:	4_096,
+		MaxConstitutionBytes:	512,
+		BpsScale:		10_000,
+		VetoAuthorities:	[]string{},
 	}
 }
 
 func EmptyConfigVotingState() ConfigVotingState {
 	return ConfigVotingState{
-		Proposals: []ConfigProposal{},
-		Votes:     []ConfigVote{},
+		Proposals:	[]ConfigProposal{},
+		Votes:		[]ConfigVote{},
 	}
 }
 
@@ -162,8 +162,8 @@ func (p ConfigVotingParams) Validate() error {
 
 func (s ConfigVotingState) Export() ConfigVotingState {
 	out := ConfigVotingState{
-		Proposals: cloneProposals(s.Proposals),
-		Votes:     cloneVotes(s.Votes),
+		Proposals:	cloneProposals(s.Proposals),
+		Votes:		cloneVotes(s.Votes),
 	}
 	SortProposals(out.Proposals)
 	SortVotes(out.Votes)
@@ -317,17 +317,17 @@ func (p ConfigProposal) SnapshotPower(voter string) (uint64, bool) {
 
 func (p ConfigProposal) ToConfigChange(authority string) configtypes.ConfigChange {
 	return configtypes.ConfigChange{
-		ID:                                  p.ProposalID,
-		Key:                                 p.ConfigKey,
-		Value:                               p.ConfigValue,
-		Operation:                           p.Operation,
-		Status:                              configtypes.ChangeStatusPending,
-		SubmittedBy:                         authority,
-		RequiresConstitutionalException:     p.RequiresConstitutionalException,
-		ExpectedPreviousVersion:             p.ExpectedPreviousVersion,
-		AllowMissingExpectedPreviousVersion: p.AllowMissingExpectedPrevious,
-		CreatedHeight:                       int64(p.SubmitHeight),
-		UpdatedHeight:                       int64(p.SubmitHeight),
+		ID:					p.ProposalID,
+		Key:					p.ConfigKey,
+		Value:					p.ConfigValue,
+		Operation:				p.Operation,
+		Status:					configtypes.ChangeStatusPending,
+		SubmittedBy:				authority,
+		RequiresConstitutionalException:	p.RequiresConstitutionalException,
+		ExpectedPreviousVersion:		p.ExpectedPreviousVersion,
+		AllowMissingExpectedPreviousVersion:	p.AllowMissingExpectedPrevious,
+		CreatedHeight:				int64(p.SubmitHeight),
+		UpdatedHeight:				int64(p.SubmitHeight),
 	}
 }
 

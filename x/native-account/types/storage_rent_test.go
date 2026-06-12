@@ -14,12 +14,12 @@ func TestWalletStorageRentAccruesLazilyAndEffectiveFeeIsDeterministic(t *testing
 	params := walletRentParams(2)
 
 	result, err := CollectWalletStorageRent(WalletRentInput{
-		Account:       account,
-		Balance:       200,
-		Storage:       WalletStorageUsage{CodeBytes: 10, DataBytes: 5},
-		GasFee:        10,
-		CurrentHeight: 15,
-		Params:        params,
+		Account:	account,
+		Balance:	200,
+		Storage:	WalletStorageUsage{CodeBytes: 10, DataBytes: 5},
+		GasFee:		10,
+		CurrentHeight:	15,
+		Params:		params,
 	})
 
 	require.NoError(t, err)
@@ -40,12 +40,12 @@ func TestWalletStorageRentDoesNotApplyToInactiveEmptyClosedOrTransientState(t *t
 	inactive.StorageRentDebt = 0
 
 	result, err := CollectWalletStorageRent(WalletRentInput{
-		Account:       inactive,
-		Balance:       0,
-		Storage:       WalletStorageUsage{CodeBytes: 100, DataBytes: 100},
-		GasFee:        0,
-		CurrentHeight: 100,
-		Params:        params,
+		Account:	inactive,
+		Balance:	0,
+		Storage:	WalletStorageUsage{CodeBytes: 100, DataBytes: 100},
+		GasFee:		0,
+		CurrentHeight:	100,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Zero(t, result.StorageRentDelta)
@@ -54,12 +54,12 @@ func TestWalletStorageRentDoesNotApplyToInactiveEmptyClosedOrTransientState(t *t
 	empty := completeActiveAccount(t, 0xd3, 1002, 0)
 	empty.StorageRentDebt = 0
 	result, err = CollectWalletStorageRent(WalletRentInput{
-		Account:       empty,
-		Balance:       1,
-		Storage:       WalletStorageUsage{},
-		GasFee:        1,
-		CurrentHeight: 100,
-		Params:        params,
+		Account:	empty,
+		Balance:	1,
+		Storage:	WalletStorageUsage{},
+		GasFee:		1,
+		CurrentHeight:	100,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Zero(t, result.StorageRentDelta)
@@ -70,11 +70,11 @@ func TestWalletStorageRentDoesNotApplyToInactiveEmptyClosedOrTransientState(t *t
 	closed.Status = AccountStatusClosed
 	closed.StorageRentDebt = 7
 	result, err = CollectWalletStorageRent(WalletRentInput{
-		Account:       closed,
-		Balance:       0,
-		Storage:       WalletStorageUsage{DataBytes: 100},
-		CurrentHeight: 100,
-		Params:        params,
+		Account:	closed,
+		Balance:	0,
+		Storage:	WalletStorageUsage{DataBytes: 100},
+		CurrentHeight:	100,
+		Params:		params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(7), result.Account.StorageRentDebt)
@@ -88,13 +88,13 @@ func TestWalletInsufficientBalanceAccumulatesDebtFreezesAndPreservesState(t *tes
 	params := walletRentParams(1)
 
 	result, err := CollectWalletStorageRent(WalletRentInput{
-		Account:             account,
-		Balance:             0,
-		Storage:             WalletStorageUsage{CodeBytes: 3, DataBytes: 7, IndexBytes: 5},
-		GasFee:              2,
-		CurrentHeight:       14,
-		Params:              params,
-		FreezeDebtThreshold: 1,
+		Account:		account,
+		Balance:		0,
+		Storage:		WalletStorageUsage{CodeBytes: 3, DataBytes: 7, IndexBytes: 5},
+		GasFee:			2,
+		CurrentHeight:		14,
+		Params:			params,
+		FreezeDebtThreshold:	1,
 	})
 
 	require.NoError(t, err)
@@ -133,18 +133,18 @@ func TestFrozenWalletAllowsTopUpDebtPaymentAndUnfreezeButBlocksNormalActions(t *
 	require.Equal(t, uint64(10), balance)
 
 	_, err = ApplyMsgUnfreezeAccount(account, MsgUnfreezeAccount{
-		AccountUser:     account.AddressUser,
-		Signers:         []string{account.PubKeys[0]},
-		CurrentHeight:   20,
-		StorageDebtPaid: true,
+		AccountUser:		account.AddressUser,
+		Signers:		[]string{account.PubKeys[0]},
+		CurrentHeight:		20,
+		StorageDebtPaid:	true,
 	})
 	require.ErrorContains(t, err, "storage debt is paid")
 
 	paid, err := ApplyMsgPayStorageDebt(account, MsgPayStorageDebt{
-		AccountUser:   account.AddressUser,
-		Amount:        5,
-		Signers:       []string{account.PubKeys[0]},
-		CurrentHeight: 21,
+		AccountUser:	account.AddressUser,
+		Amount:		5,
+		Signers:	[]string{account.PubKeys[0]},
+		CurrentHeight:	21,
 	})
 	require.NoError(t, err)
 	require.Zero(t, paid.StorageRentDebt)
@@ -154,10 +154,10 @@ func TestFrozenWalletAllowsTopUpDebtPaymentAndUnfreezeButBlocksNormalActions(t *
 	require.Equal(t, account.Sequence, paid.Sequence)
 
 	unfrozen, err := ApplyMsgUnfreezeAccount(paid, MsgUnfreezeAccount{
-		AccountUser:     paid.AddressUser,
-		Signers:         []string{paid.PubKeys[0]},
-		CurrentHeight:   22,
-		StorageDebtPaid: true,
+		AccountUser:		paid.AddressUser,
+		Signers:		[]string{paid.PubKeys[0]},
+		CurrentHeight:		22,
+		StorageDebtPaid:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, AccountStatusActive, unfrozen.Status)
@@ -172,15 +172,15 @@ func TestFrozenWalletAllowsTopUpDebtPaymentAndUnfreezeButBlocksNormalActions(t *
 func TestWalletCloseAndArchiveRequireZeroObligations(t *testing.T) {
 	account := completeActiveAccount(t, 0xd7, 1006, 1)
 	obligations := AccountCloseObligations{
-		Balance:              1,
-		StorageDebt:          2,
-		Stake:                3,
-		PoolShares:           4,
-		Unbonding:            5,
-		PendingRewards:       6,
-		Domains:              7,
-		OwnershipObligations: 8,
-		RequiredReputation:   9,
+		Balance:		1,
+		StorageDebt:		2,
+		Stake:			3,
+		PoolShares:		4,
+		Unbonding:		5,
+		PendingRewards:		6,
+		Domains:		7,
+		OwnershipObligations:	8,
+		RequiredReputation:	9,
 	}
 
 	require.ErrorContains(t, CanCloseAccount(account, obligations), "outstanding obligations")

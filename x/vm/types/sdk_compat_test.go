@@ -85,16 +85,16 @@ func TestFinalizeBlockPlanRejectsInvalidLifecycleHeightAndStakingPower(t *testin
 
 func testSDKDispatch(zoneID zonestypes.ZoneID, msgType string, blockSTMKey string) SDKDispatch {
 	return SDKDispatch{
-		ZoneID:       zoneID,
-		MsgType:      msgType,
-		KVPrefix:     ContractZoneKVPrefix(zoneID),
-		BlockSTMKey:  blockSTMKey,
-		StakingPower: 1,
+		ZoneID:		zoneID,
+		MsgType:	msgType,
+		KVPrefix:	ContractZoneKVPrefix(zoneID),
+		BlockSTMKey:	blockSTMKey,
+		StakingPower:	1,
 		Call: VMCall{
-			Runtime:    RuntimeAVM,
-			Action:     ActionExternalCall,
-			GasLimit:   1,
-			Entrypoint: avm.EntryReceiveExternal,
+			Runtime:	RuntimeAVM,
+			Action:		ActionExternalCall,
+			GasLimit:	1,
+			Entrypoint:	avm.EntryReceiveExternal,
 		},
 	}
 }

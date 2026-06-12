@@ -33,13 +33,13 @@ func TestPerBytePaymentRequiresDeterministicMeteringRecord(t *testing.T) {
 	envelope.EnvelopeHash = ComputePaymentEnvelopeHash(envelope)
 
 	meter, err := NewPaymentMeteringRecord(PaymentMeteringRecord{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("call/bytes"),
-		RequestBytes:  10,
-		ResponseBytes: 20,
-		StorageBytes:  5,
-		MeterID:       "bytes-meter",
-		MeterHeight:   30,
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("call/bytes"),
+		RequestBytes:	10,
+		ResponseBytes:	20,
+		StorageBytes:	5,
+		MeterID:	"bytes-meter",
+		MeterHeight:	30,
 	})
 	require.NoError(t, err)
 	quote, err := QuotePerBytePayment(envelope, meter)
@@ -69,21 +69,21 @@ func TestPerComputeUnitPaymentRequiresSignedOrProofBackedUsageReceipt(t *testing
 	envelope.EnvelopeHash = ComputePaymentEnvelopeHash(envelope)
 
 	_, err := NewPaymentUsageReceipt(PaymentUsageReceipt{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("call/compute"),
-		ComputeUnits:  8,
-		ReceiptHeight: 40,
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("call/compute"),
+		ComputeUnits:	8,
+		ReceiptHeight:	40,
 	})
 	require.ErrorContains(t, err, "signature or proof")
 
 	receipt, err := NewPaymentUsageReceipt(PaymentUsageReceipt{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("call/compute"),
-		ProviderID:    "provider-1",
-		ComputeUnits:  8,
-		ReceiptHeight: 40,
-		SignedBy:      "provider-1",
-		SignatureHash: testInterfaceHash("compute/signature"),
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("call/compute"),
+		ProviderID:	"provider-1",
+		ComputeUnits:	8,
+		ReceiptHeight:	40,
+		SignedBy:	"provider-1",
+		SignatureHash:	testInterfaceHash("compute/signature"),
 	})
 	require.NoError(t, err)
 	quote, err := QuotePerComputeUnitPayment(envelope, receipt)
@@ -100,14 +100,14 @@ func TestPerComputeUnitPaymentRequiresSignedOrProofBackedUsageReceipt(t *testing
 func TestSubscriptionPaymentRequiresActiveEntitlement(t *testing.T) {
 	envelope := testPaymentModelEnvelope(t, coretypes.ServicePricingSubscription, coretypes.ServicePaymentPrepaid, "50")
 	entitlement, err := NewPaymentSubscriptionEntitlement(PaymentSubscriptionEntitlement{
-		SubscriptionID: "sub-1",
-		Payer:          envelope.Payer,
-		ServiceID:      envelope.PayeeService,
-		StartHeight:    10,
-		EndHeight:      20,
-		StartUnix:      100,
-		EndUnix:        200,
-		StateBacked:    true,
+		SubscriptionID:	"sub-1",
+		Payer:		envelope.Payer,
+		ServiceID:	envelope.PayeeService,
+		StartHeight:	10,
+		EndHeight:	20,
+		StartUnix:	100,
+		EndUnix:	200,
+		StateBacked:	true,
 	})
 	require.NoError(t, err)
 	quote, err := QuoteSubscriptionPayment(envelope, entitlement, 15, 150)
@@ -119,11 +119,11 @@ func TestSubscriptionPaymentRequiresActiveEntitlement(t *testing.T) {
 	require.ErrorContains(t, err, "not active")
 
 	_, err = NewPaymentSubscriptionEntitlement(PaymentSubscriptionEntitlement{
-		SubscriptionID: "sub-2",
-		Payer:          envelope.Payer,
-		ServiceID:      envelope.PayeeService,
-		StartHeight:    10,
-		EndHeight:      20,
+		SubscriptionID:	"sub-2",
+		Payer:		envelope.Payer,
+		ServiceID:	envelope.PayeeService,
+		StartHeight:	10,
+		EndHeight:	20,
 	})
 	require.ErrorContains(t, err, "state or proof")
 }
@@ -133,11 +133,11 @@ func TestEscrowPaymentSettlesAfterReceiptProofOrChallengeWindow(t *testing.T) {
 	envelope.EscrowIDOptional = "escrow-1"
 	envelope.EnvelopeHash = ComputePaymentEnvelopeHash(envelope)
 	settlement, err := NewPaymentEscrowSettlement(PaymentEscrowSettlement{
-		EscrowID:        "escrow-1",
-		ServiceID:       envelope.PayeeService,
-		ReceiptHeight:   30,
-		ProofHeight:     33,
-		ChallengeWindow: 7,
+		EscrowID:		"escrow-1",
+		ServiceID:		envelope.PayeeService,
+		ReceiptHeight:		30,
+		ProofHeight:		33,
+		ChallengeWindow:	7,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(40), settlement.SettleAfterHeight)
@@ -157,14 +157,14 @@ func TestEscrowPaymentSettlesAfterReceiptProofOrChallengeWindow(t *testing.T) {
 func testPaymentModelEnvelope(t *testing.T, unit coretypes.ServicePricingUnit, mode coretypes.ServicePaymentSettlementMode, amount string) PaymentEnvelope {
 	t.Helper()
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
-		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          testPaymentPayer(),
-		PayeeService:   "portable-service",
-		Denom:          coretypes.NativeFeePolicyID,
-		Amount:         amount,
-		PricingUnit:    unit,
-		SettlementMode: mode,
-		ExpiryHeight:   100,
+		Asset:		coretypes.NativeFeePolicyID,
+		Payer:		testPaymentPayer(),
+		PayeeService:	"portable-service",
+		Denom:		coretypes.NativeFeePolicyID,
+		Amount:		amount,
+		PricingUnit:	unit,
+		SettlementMode:	mode,
+		ExpiryHeight:	100,
 		MeterIDOptional: func() string {
 			if mode == coretypes.ServicePaymentMetered {
 				return "meter-1"

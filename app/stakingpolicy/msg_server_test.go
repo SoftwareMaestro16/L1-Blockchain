@@ -54,7 +54,7 @@ func TestValidateDelegateRejectsOrdinaryUserWhenGovernanceParamDisabled(t *testi
 
 type recordingStakingMsgServer struct {
 	stakingtypes.UnimplementedMsgServer
-	delegate *stakingtypes.MsgDelegate
+	delegate	*stakingtypes.MsgDelegate
 }
 
 func (s *recordingStakingMsgServer) Delegate(_ context.Context, msg *stakingtypes.MsgDelegate) (*stakingtypes.MsgDelegateResponse, error) {

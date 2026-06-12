@@ -175,24 +175,24 @@ func testIdentityStoreV2LargeState(t *testing.T, count int) IdentityState {
 		nftID, err := DomainNFTID(name)
 		require.NoError(t, err)
 		state.Domains = append(state.Domains, Domain{
-			Name:             name,
-			Owner:            owner,
-			NFTID:            nftID,
-			RegisteredHeight: benchmarkIdentityRevealHeight,
-			ExpiryHeight:     benchmarkIdentityRevealHeight + state.Params.RegistrationPeriodBlocks,
-			UpdatedHeight:    benchmarkIdentityResolveHeight,
+			Name:			name,
+			Owner:			owner,
+			NFTID:			nftID,
+			RegisteredHeight:	benchmarkIdentityRevealHeight,
+			ExpiryHeight:		benchmarkIdentityRevealHeight + state.Params.RegistrationPeriodBlocks,
+			UpdatedHeight:		benchmarkIdentityResolveHeight,
 		})
 		state.DomainNFTs = append(state.DomainNFTs, DomainNFT{
-			ID:         nftID,
-			Domain:     name,
-			Owner:      owner,
-			MintHeight: benchmarkIdentityRevealHeight,
+			ID:		nftID,
+			Domain:		name,
+			Owner:		owner,
+			MintHeight:	benchmarkIdentityRevealHeight,
 		})
 		state.Resolvers = append(state.Resolvers, ResolverRecord{
-			Domain:        name,
-			Owner:         owner,
-			Primary:       benchmarkIdentityAddress(i + 10_000),
-			UpdatedAtUnix: int64(benchmarkIdentityResolveHeight),
+			Domain:		name,
+			Owner:		owner,
+			Primary:	benchmarkIdentityAddress(i + 10_000),
+			UpdatedAtUnix:	int64(benchmarkIdentityResolveHeight),
 		})
 	}
 	state = state.Export()

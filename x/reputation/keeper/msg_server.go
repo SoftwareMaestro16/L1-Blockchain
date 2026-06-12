@@ -15,7 +15,7 @@ var _ reputationpb.MsgServer = msgServer{}
 
 type msgServer struct{ Keeper }
 
-func NewMsgServerImpl(k Keeper) reputationpb.MsgServer { return msgServer{Keeper: k} }
+func NewMsgServerImpl(k Keeper) reputationpb.MsgServer	{ return msgServer{Keeper: k} }
 
 func (m msgServer) UpdateReputationParams(ctx context.Context, msg *reputationpb.MsgUpdateReputationParams) (*reputationpb.MsgUpdateReputationParamsResponse, error) {
 	state, err := m.GetState(ctx)
@@ -272,11 +272,11 @@ func (k Keeper) ClaimStakeReputation(ctx context.Context, msg types.MsgClaimStak
 	state = types.UpsertIdentity(state, id)
 
 	claim := types.ReputationClaim{
-		Account:             userAddr,
-		Score:               id.Score,
-		Confidence:          id.Confidence,
-		StakeTimeAccumulator: id.StakeTimeAccumulator,
-		ClaimHeight:         msg.TimestampUnix,
+		Account:		userAddr,
+		Score:			id.Score,
+		Confidence:		id.Confidence,
+		StakeTimeAccumulator:	id.StakeTimeAccumulator,
+		ClaimHeight:		msg.TimestampUnix,
 	}
 	return claim, k.SetState(ctx, state)
 }

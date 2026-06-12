@@ -24,22 +24,22 @@ import (
 const ConsensusVersion = 1
 
 var (
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasGenesis     = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ appmodule.AppModule   = AppModule{}
+	_	module.AppModuleBasic	= AppModule{}
+	_	module.HasGenesis	= AppModule{}
+	_	module.HasServices	= AppModule{}
+	_	appmodule.AppModule	= AppModule{}
 )
 
 type AppModule struct {
-	cdc    codec.Codec
-	keeper keeper.Keeper
+	cdc	codec.Codec
+	keeper	keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, k keeper.Keeper) AppModule   { return AppModule{cdc: cdc, keeper: k} }
-func (AppModule) IsOnePerModuleType()                           {}
-func (AppModule) IsAppModule()                                  {}
-func (AppModule) Name() string                                  { return types.ModuleName }
-func (AppModule) RegisterLegacyAminoCodec(_ *codec.LegacyAmino) {}
+func NewAppModule(cdc codec.Codec, k keeper.Keeper) AppModule	{ return AppModule{cdc: cdc, keeper: k} }
+func (AppModule) IsOnePerModuleType()				{}
+func (AppModule) IsAppModule()					{}
+func (AppModule) Name() string					{ return types.ModuleName }
+func (AppModule) RegisterLegacyAminoCodec(_ *codec.LegacyAmino)	{}
 func (AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	delegatorprotectionpb.RegisterInterfaces(registry)
 }
@@ -93,6 +93,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return bz
 }
 
-func (am AppModule) ConsensusVersion() uint64    { return ConsensusVersion }
-func (am AppModule) GetTxCmd() *cobra.Command    { return nil }
-func (am AppModule) GetQueryCmd() *cobra.Command { return nil }
+func (am AppModule) ConsensusVersion() uint64		{ return ConsensusVersion }
+func (am AppModule) GetTxCmd() *cobra.Command		{ return nil }
+func (am AppModule) GetQueryCmd() *cobra.Command	{ return nil }

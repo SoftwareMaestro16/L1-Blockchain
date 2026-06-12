@@ -16,10 +16,10 @@ import (
 const Name = "v053-to-v054"
 
 type HandlerDependencies struct {
-	UpgradeKeeper  *upgradekeeper.Keeper
-	ModuleManager  *module.Manager
-	Configurator   module.Configurator
-	SetStoreLoader func(baseapp.StoreLoader)
+	UpgradeKeeper	*upgradekeeper.Keeper
+	ModuleManager	*module.Manager
+	Configurator	module.Configurator
+	SetStoreLoader	func(baseapp.StoreLoader)
 }
 
 func RegisterHandlers(deps HandlerDependencies) {

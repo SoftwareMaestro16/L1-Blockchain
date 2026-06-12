@@ -10,109 +10,109 @@ import (
 type RequiredCoverageClass string
 
 const (
-	RequiredCoverageDeterminism RequiredCoverageClass = "DETERMINISM"
-	RequiredCoverageInvariant   RequiredCoverageClass = "INVARIANT"
-	RequiredCoverageSimulation  RequiredCoverageClass = "SIMULATION"
-	RequiredCoveragePerformance RequiredCoverageClass = "PERFORMANCE"
+	RequiredCoverageDeterminism	RequiredCoverageClass	= "DETERMINISM"
+	RequiredCoverageInvariant	RequiredCoverageClass	= "INVARIANT"
+	RequiredCoverageSimulation	RequiredCoverageClass	= "SIMULATION"
+	RequiredCoveragePerformance	RequiredCoverageClass	= "PERFORMANCE"
 )
 
 const (
-	RequiredDeterminismZoneRoots    = "same_block_identical_zone_roots"
-	RequiredDeterminismMessageRoots = "same_block_identical_message_roots"
-	RequiredDeterminismRoutingPaths = "same_routing_table_identical_paths"
-	RequiredDeterminismShardIDs     = "same_shard_layout_identical_shard_ids"
-	RequiredDeterminismVMOutput     = "same_vm_bytecode_identical_output"
+	RequiredDeterminismZoneRoots	= "same_block_identical_zone_roots"
+	RequiredDeterminismMessageRoots	= "same_block_identical_message_roots"
+	RequiredDeterminismRoutingPaths	= "same_routing_table_identical_paths"
+	RequiredDeterminismShardIDs	= "same_shard_layout_identical_shard_ids"
+	RequiredDeterminismVMOutput	= "same_vm_bytecode_identical_output"
 
-	RequiredInvariantZoneRootIncludesShardRoots = "zone_root_includes_all_shard_roots"
-	RequiredInvariantOutboxReceiptOrPending     = "message_outbox_inclusion_receipt_or_pending"
-	RequiredInvariantCrossZoneValueConservation = "cross_zone_value_transfer_conserves_naet"
-	RequiredInvariantPaymentCollateralOverpay   = "payment_settlement_cannot_overpay_collateral"
-	RequiredInvariantIdentityProofRootMatch     = "identity_resolver_proof_matches_identity_zone_root"
-	RequiredInvariantContractProofRootMatch     = "contract_state_proof_matches_contract_zone_root"
-	RequiredInvariantShardSplitPreservesKeys    = "shard_split_preserves_all_state_keys"
-	RequiredInvariantShardMergePreservesKeys    = "shard_merge_preserves_all_state_keys"
+	RequiredInvariantZoneRootIncludesShardRoots	= "zone_root_includes_all_shard_roots"
+	RequiredInvariantOutboxReceiptOrPending		= "message_outbox_inclusion_receipt_or_pending"
+	RequiredInvariantCrossZoneValueConservation	= "cross_zone_value_transfer_conserves_naet"
+	RequiredInvariantPaymentCollateralOverpay	= "payment_settlement_cannot_overpay_collateral"
+	RequiredInvariantIdentityProofRootMatch		= "identity_resolver_proof_matches_identity_zone_root"
+	RequiredInvariantContractProofRootMatch		= "contract_state_proof_matches_contract_zone_root"
+	RequiredInvariantShardSplitPreservesKeys	= "shard_split_preserves_all_state_keys"
+	RequiredInvariantShardMergePreservesKeys	= "shard_merge_preserves_all_state_keys"
 
-	RequiredSimulationHighVolumeBankTransfers = "high_volume_bank_transfers_across_shards"
-	RequiredSimulationIdentityUpdateBursts    = "identity_resolver_update_bursts"
-	RequiredSimulationContractAsyncChains     = "contract_async_call_chains"
-	RequiredSimulationPaymentTimeoutBounce    = "payment_route_timeout_and_bounce"
-	RequiredSimulationCrossZoneCongestion     = "cross_zone_congestion"
-	RequiredSimulationShardSplitLoad          = "shard_split_under_sustained_load"
-	RequiredSimulationAdaptiveSyncQueues      = "node_recovery_adaptivesync_active_message_queues"
+	RequiredSimulationHighVolumeBankTransfers	= "high_volume_bank_transfers_across_shards"
+	RequiredSimulationIdentityUpdateBursts		= "identity_resolver_update_bursts"
+	RequiredSimulationContractAsyncChains		= "contract_async_call_chains"
+	RequiredSimulationPaymentTimeoutBounce		= "payment_route_timeout_and_bounce"
+	RequiredSimulationCrossZoneCongestion		= "cross_zone_congestion"
+	RequiredSimulationShardSplitLoad		= "shard_split_under_sustained_load"
+	RequiredSimulationAdaptiveSyncQueues		= "node_recovery_adaptivesync_active_message_queues"
 
-	RequiredPerformanceLocalZoneTPS           = "local_zone_tps"
-	RequiredPerformanceCrossShardThroughput   = "cross_shard_message_throughput"
-	RequiredPerformanceCrossZoneThroughput    = "cross_zone_message_throughput"
-	RequiredPerformanceAVMInstructionRate     = "avm_instruction_throughput"
-	RequiredPerformanceStoreV2ProofLatency    = "store_v2_proof_generation_latency"
-	RequiredPerformanceBlockSTMConflictRate   = "blockstm_conflict_rate_by_workload"
-	RequiredPerformanceMempoolGrouping        = "mempool_grouping_effectiveness"
-	RequiredPerformanceStateSyncMultipleZones = "state_sync_time_with_multiple_zones"
+	RequiredPerformanceLocalZoneTPS			= "local_zone_tps"
+	RequiredPerformanceCrossShardThroughput		= "cross_shard_message_throughput"
+	RequiredPerformanceCrossZoneThroughput		= "cross_zone_message_throughput"
+	RequiredPerformanceAVMInstructionRate		= "avm_instruction_throughput"
+	RequiredPerformanceStoreV2ProofLatency		= "store_v2_proof_generation_latency"
+	RequiredPerformanceBlockSTMConflictRate		= "blockstm_conflict_rate_by_workload"
+	RequiredPerformanceMempoolGrouping		= "mempool_grouping_effectiveness"
+	RequiredPerformanceStateSyncMultipleZones	= "state_sync_time_with_multiple_zones"
 )
 
 var requiredDeterminismCoverage = map[string]struct{}{
-	RequiredDeterminismZoneRoots:    {},
-	RequiredDeterminismMessageRoots: {},
-	RequiredDeterminismRoutingPaths: {},
-	RequiredDeterminismShardIDs:     {},
-	RequiredDeterminismVMOutput:     {},
+	RequiredDeterminismZoneRoots:		{},
+	RequiredDeterminismMessageRoots:	{},
+	RequiredDeterminismRoutingPaths:	{},
+	RequiredDeterminismShardIDs:		{},
+	RequiredDeterminismVMOutput:		{},
 }
 
 var requiredInvariantCoverage = map[string]struct{}{
-	RequiredInvariantZoneRootIncludesShardRoots: {},
-	RequiredInvariantOutboxReceiptOrPending:     {},
-	RequiredInvariantCrossZoneValueConservation: {},
-	RequiredInvariantPaymentCollateralOverpay:   {},
-	RequiredInvariantIdentityProofRootMatch:     {},
-	RequiredInvariantContractProofRootMatch:     {},
-	RequiredInvariantShardSplitPreservesKeys:    {},
-	RequiredInvariantShardMergePreservesKeys:    {},
+	RequiredInvariantZoneRootIncludesShardRoots:	{},
+	RequiredInvariantOutboxReceiptOrPending:	{},
+	RequiredInvariantCrossZoneValueConservation:	{},
+	RequiredInvariantPaymentCollateralOverpay:	{},
+	RequiredInvariantIdentityProofRootMatch:	{},
+	RequiredInvariantContractProofRootMatch:	{},
+	RequiredInvariantShardSplitPreservesKeys:	{},
+	RequiredInvariantShardMergePreservesKeys:	{},
 }
 
 var requiredSimulationCoverage = map[string]struct{}{
-	RequiredSimulationHighVolumeBankTransfers: {},
-	RequiredSimulationIdentityUpdateBursts:    {},
-	RequiredSimulationContractAsyncChains:     {},
-	RequiredSimulationPaymentTimeoutBounce:    {},
-	RequiredSimulationCrossZoneCongestion:     {},
-	RequiredSimulationShardSplitLoad:          {},
-	RequiredSimulationAdaptiveSyncQueues:      {},
+	RequiredSimulationHighVolumeBankTransfers:	{},
+	RequiredSimulationIdentityUpdateBursts:		{},
+	RequiredSimulationContractAsyncChains:		{},
+	RequiredSimulationPaymentTimeoutBounce:		{},
+	RequiredSimulationCrossZoneCongestion:		{},
+	RequiredSimulationShardSplitLoad:		{},
+	RequiredSimulationAdaptiveSyncQueues:		{},
 }
 
 var requiredPerformanceCoverage = map[string]struct{}{
-	RequiredPerformanceLocalZoneTPS:           {},
-	RequiredPerformanceCrossShardThroughput:   {},
-	RequiredPerformanceCrossZoneThroughput:    {},
-	RequiredPerformanceAVMInstructionRate:     {},
-	RequiredPerformanceStoreV2ProofLatency:    {},
-	RequiredPerformanceBlockSTMConflictRate:   {},
-	RequiredPerformanceMempoolGrouping:        {},
-	RequiredPerformanceStateSyncMultipleZones: {},
+	RequiredPerformanceLocalZoneTPS:		{},
+	RequiredPerformanceCrossShardThroughput:	{},
+	RequiredPerformanceCrossZoneThroughput:		{},
+	RequiredPerformanceAVMInstructionRate:		{},
+	RequiredPerformanceStoreV2ProofLatency:		{},
+	RequiredPerformanceBlockSTMConflictRate:	{},
+	RequiredPerformanceMempoolGrouping:		{},
+	RequiredPerformanceStateSyncMultipleZones:	{},
 }
 
 type RequiredTestCoverageCase struct {
-	CaseID        string
-	Class         RequiredCoverageClass
-	Target        string
-	EvidenceHash  string
-	Deterministic bool
-	Covered       bool
+	CaseID		string
+	Class		RequiredCoverageClass
+	Target		string
+	EvidenceHash	string
+	Deterministic	bool
+	Covered		bool
 }
 
 type RequiredTestCoverageInput struct {
-	CoverageVersion string
-	Determinism     []RequiredTestCoverageCase
-	Invariants      []RequiredTestCoverageCase
-	Simulations     []RequiredTestCoverageCase
-	Performance     []RequiredTestCoverageCase
+	CoverageVersion	string
+	Determinism	[]RequiredTestCoverageCase
+	Invariants	[]RequiredTestCoverageCase
+	Simulations	[]RequiredTestCoverageCase
+	Performance	[]RequiredTestCoverageCase
 }
 
 type RequiredTestCoverageReport struct {
-	CoverageVersion string
-	Passed          bool
-	Failed          []string
-	Evidence        []string
-	ReportHash      string
+	CoverageVersion	string
+	Passed		bool
+	Failed		[]string
+	Evidence	[]string
+	ReportHash	string
 }
 
 func BuildRequiredTestCoverageReport(input RequiredTestCoverageInput) RequiredTestCoverageReport {
@@ -145,10 +145,10 @@ func BuildRequiredTestCoverageReport(input RequiredTestCoverageInput) RequiredTe
 		evidence = append(evidence, "performance_tests:"+hashRequiredCoverageCases(RequiredCoveragePerformance, input.Performance))
 	}
 	report := RequiredTestCoverageReport{
-		CoverageVersion: input.CoverageVersion,
-		Passed:          len(failed) == 0,
-		Failed:          normalizeStringSet(failed),
-		Evidence:        normalizeStringSet(evidence),
+		CoverageVersion:	input.CoverageVersion,
+		Passed:			len(failed) == 0,
+		Failed:			normalizeStringSet(failed),
+		Evidence:		normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeRequiredTestCoverageReportHash(report)
 	return report

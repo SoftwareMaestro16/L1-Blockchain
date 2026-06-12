@@ -11,76 +11,76 @@ import (
 )
 
 type AetherMessageLifecycleRecord struct {
-	MsgID           string
-	Stage           MessageLifecycleStage
-	Height          uint64
-	RouteCommitment string
-	ReceiptHash     string
-	RecordHash      string
+	MsgID		string
+	Stage		MessageLifecycleStage
+	Height		uint64
+	RouteCommitment	string
+	ReceiptHash	string
+	RecordHash	string
 }
 
 type AetherRoutingParams struct {
-	MaxHopCount            uint32
-	BaseHopCost            uint64
-	CongestionWeight       uint64
-	QueueWeight            uint64
-	LatencyWeight          uint64
-	CapacityPenalty        uint64
-	RequiredCapacity       uint64
-	FailureRateWeight      uint64
-	GasUtilizationWeight   uint64
-	ExpiryRateWeight       uint64
-	FairnessCredit         uint64
-	CriticalPriorityCredit uint64
-	NormalPriorityFloor    uint64
-	GovernanceHash         string
+	MaxHopCount		uint32
+	BaseHopCost		uint64
+	CongestionWeight	uint64
+	QueueWeight		uint64
+	LatencyWeight		uint64
+	CapacityPenalty		uint64
+	RequiredCapacity	uint64
+	FailureRateWeight	uint64
+	GasUtilizationWeight	uint64
+	ExpiryRateWeight	uint64
+	FairnessCredit		uint64
+	CriticalPriorityCredit	uint64
+	NormalPriorityFloor	uint64
+	GovernanceHash		string
 }
 
 type AetherRoutingMetric struct {
-	ZoneID                zonestypes.ZoneID
-	ShardID               string
-	CommittedHeight       uint64
-	OutboxBacklog         uint64
-	InboxBacklog          uint64
-	AverageExecutionDelay uint64
-	FailedDeliveryRate    uint64
-	ShardGasUtilization   uint64
-	MessageExpiryRate     uint64
-	Capacity              uint64
-	CongestionScore       uint64
-	QueueBacklog          uint64
-	FairnessCredit        uint64
-	CriticalPriorityLane  bool
-	MetricHash            string
+	ZoneID			zonestypes.ZoneID
+	ShardID			string
+	CommittedHeight		uint64
+	OutboxBacklog		uint64
+	InboxBacklog		uint64
+	AverageExecutionDelay	uint64
+	FailedDeliveryRate	uint64
+	ShardGasUtilization	uint64
+	MessageExpiryRate	uint64
+	Capacity		uint64
+	CongestionScore		uint64
+	QueueBacklog		uint64
+	FairnessCredit		uint64
+	CriticalPriorityLane	bool
+	MetricHash		string
 }
 
 type AetherRoutingEdge struct {
-	FromZoneID  zonestypes.ZoneID
-	FromShardID string
-	ToZoneID    zonestypes.ZoneID
-	ToShardID   string
+	FromZoneID	zonestypes.ZoneID
+	FromShardID	string
+	ToZoneID	zonestypes.ZoneID
+	ToShardID	string
 }
 
 type AetherRoutingHop struct {
-	ZoneID     zonestypes.ZoneID
-	ShardID    string
-	Coordinate string
+	ZoneID		zonestypes.ZoneID
+	ShardID		string
+	Coordinate	string
 }
 
 type AetherRouteCandidate struct {
-	Path               []AetherRoutingHop
-	HopCount           uint32
-	TotalCost          uint64
-	PathCommitment     string
-	DestinationShardID string
+	Path			[]AetherRoutingHop
+	HopCount		uint32
+	TotalCost		uint64
+	PathCommitment		string
+	DestinationShardID	string
 }
 
 type AetherRoutePlan struct {
-	RoutingEpoch     uint64
-	RoutingTableHash string
-	MessageClassHash string
-	SelectedPath     AetherRouteCandidate
-	RouteCommitment  string
+	RoutingEpoch		uint64
+	RoutingTableHash	string
+	MessageClassHash	string
+	SelectedPath		AetherRouteCandidate
+	RouteCommitment		string
 }
 
 func NewAetherMessageLifecycleRecord(record AetherMessageLifecycleRecord) (AetherMessageLifecycleRecord, error) {
@@ -190,14 +190,14 @@ func SelectDeterministicAetherRoute(msg AetherMessage, table aetracoretypes.Rout
 		return AetherRoutePlan{}, err
 	}
 	source := AetherRoutingHop{
-		ZoneID:     msg.SenderZoneID,
-		ShardID:    msg.SenderShardID,
-		Coordinate: ComputeAetherRouteCoordinate(table, msg.SenderZoneID, msg.SenderShardID),
+		ZoneID:		msg.SenderZoneID,
+		ShardID:	msg.SenderShardID,
+		Coordinate:	ComputeAetherRouteCoordinate(table, msg.SenderZoneID, msg.SenderShardID),
 	}
 	destination := AetherRoutingHop{
-		ZoneID:     msg.ReceiverZoneID,
-		ShardID:    msg.ReceiverShardID,
-		Coordinate: ComputeAetherRouteCoordinate(table, msg.ReceiverZoneID, msg.ReceiverShardID),
+		ZoneID:		msg.ReceiverZoneID,
+		ShardID:	msg.ReceiverShardID,
+		Coordinate:	ComputeAetherRouteCoordinate(table, msg.ReceiverZoneID, msg.ReceiverShardID),
 	}
 	paths := generateAetherCandidatePaths(source, destination, adjacency, params.MaxHopCount)
 	if len(paths) == 0 {
@@ -215,10 +215,10 @@ func SelectDeterministicAetherRoute(msg AetherMessage, table aetracoretypes.Rout
 	}
 	sortAetherRouteCandidates(candidates)
 	plan := AetherRoutePlan{
-		RoutingEpoch:     table.RoutingEpoch,
-		RoutingTableHash: table.TableHash,
-		MessageClassHash: ComputeAetherMessageClassHash(msg),
-		SelectedPath:     candidates[0],
+		RoutingEpoch:		table.RoutingEpoch,
+		RoutingTableHash:	table.TableHash,
+		MessageClassHash:	ComputeAetherMessageClassHash(msg),
+		SelectedPath:		candidates[0],
 	}
 	plan.RouteCommitment = ComputeAetherRoutePlanCommitment(plan)
 	return plan, plan.Validate()
@@ -409,11 +409,11 @@ func buildAetherRouteCandidate(path []AetherRoutingHop, table aetracoretypes.Rou
 		hops[i].Coordinate = ComputeAetherRouteCoordinate(table, hops[i].ZoneID, hops[i].ShardID)
 	}
 	return AetherRouteCandidate{
-		Path:               hops,
-		HopCount:           hopCount,
-		TotalCost:          total,
-		PathCommitment:     ComputeAetherPathCommitment(hops),
-		DestinationShardID: hops[len(hops)-1].ShardID,
+		Path:			hops,
+		HopCount:		hopCount,
+		TotalCost:		total,
+		PathCommitment:		ComputeAetherPathCommitment(hops),
+		DestinationShardID:	hops[len(hops)-1].ShardID,
 	}
 }
 
@@ -537,14 +537,14 @@ func sortAetherRouteCandidates(candidates []AetherRouteCandidate) {
 
 func sortAetherLifecycleRecords(records []AetherMessageLifecycleRecord) {
 	order := map[MessageLifecycleStage]int{
-		MessageLifecycleCreated:                  0,
-		MessageLifecycleQueuedInSourceOutbox:     1,
-		MessageLifecycleCommittedInMessageRoot:   2,
-		MessageLifecycleEligibleForDelivery:      3,
-		MessageLifecycleQueuedInDestinationInbox: 4,
-		MessageLifecycleExecutedOrFailed:         5,
-		MessageLifecycleReceipt:                  6,
-		MessageLifecycleBounceOrFinalize:         7,
+		MessageLifecycleCreated:			0,
+		MessageLifecycleQueuedInSourceOutbox:		1,
+		MessageLifecycleCommittedInMessageRoot:		2,
+		MessageLifecycleEligibleForDelivery:		3,
+		MessageLifecycleQueuedInDestinationInbox:	4,
+		MessageLifecycleExecutedOrFailed:		5,
+		MessageLifecycleReceipt:			6,
+		MessageLifecycleBounceOrFinalize:		7,
 	}
 	sort.SliceStable(records, func(i, j int) bool {
 		if records[i].MsgID != records[j].MsgID {

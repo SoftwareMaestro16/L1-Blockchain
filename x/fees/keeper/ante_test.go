@@ -23,10 +23,10 @@ import (
 )
 
 type feeTx struct {
-	fees  sdk.Coins
-	payer sdk.AccAddress
-	msgs  []sdk.Msg
-	gas   uint64 // 0 → defaults to 100_000 for backward compat
+	fees	sdk.Coins
+	payer	sdk.AccAddress
+	msgs	[]sdk.Msg
+	gas	uint64	// 0 → defaults to 100_000 for backward compat
 }
 
 func (tx feeTx) GetMsgs() []sdk.Msg {
@@ -58,7 +58,7 @@ func (tx feeTx) FeeGranter() []byte {
 
 type sigFeeTx struct {
 	feeTx
-	signers [][]byte
+	signers	[][]byte
 }
 
 func (tx sigFeeTx) GetSigners() ([][]byte, error) {
@@ -111,201 +111,200 @@ func TestAnteHandlerDecoratorFeePolicy(t *testing.T) {
 	validSender := validRawAddress(1)
 	validRecipient := validRawAddress(2)
 	burn := reservedAddress(t, "AETBurn")
-	// fee is used for rejection tests (errors fire before formula check).
+
 	fee := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1))
-	// sufficientFee meets the full formula for 100_000 gas, 0 msgs, 0 bytes:
-	// max(1,1) + 100_000*1 = 100_001 naet. Use 110_000 to cover 1-msg cases (1000 msg fee).
+
 	sufficientFee := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 110_000))
 	require.True(t, burn.CanReceiveUserFunds)
 
 	tests := []struct {
-		name         string
-		tx           sdk.Tx
-		wantErr      string
-		wantNextCall bool
-		maxFeeAmount string // if non-empty, overrides MaxFeeAmount param before running
+		name		string
+		tx		sdk.Tx
+		wantErr		string
+		wantNextCall	bool
+		maxFeeAmount	string	// if non-empty, overrides MaxFeeAmount param before running
 	}{
 		{
-			name:         "accepts native fee denom",
-			tx:           feeTx{fees: sufficientFee},
-			wantNextCall: true,
-			maxFeeAmount: "1000000000000000000",
+			name:		"accepts native fee denom",
+			tx:		feeTx{fees: sufficientFee},
+			wantNextCall:	true,
+			maxFeeAmount:	"1000000000000000000",
 		},
 		{
-			name:    "rejects zero fee payer",
-			tx:      feeTx{fees: fee, payer: sdk.AccAddress(make([]byte, 20))},
-			wantErr: "fee payer must not be zero address",
+			name:		"rejects zero fee payer",
+			tx:		feeTx{fees: fee, payer: sdk.AccAddress(make([]byte, 20))},
+			wantErr:	"fee payer must not be zero address",
 		},
 		{
-			name:    "rejects zero signer",
-			tx:      sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{make([]byte, 20)}},
-			wantErr: "signer 0 must not be zero address",
+			name:		"rejects zero signer",
+			tx:		sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{make([]byte, 20)}},
+			wantErr:	"signer 0 must not be zero address",
 		},
 		{
-			name:    "rejects reserved core signer",
-			tx:      sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETElector")}},
-			wantErr: "signer 0 is reserved system address AETElector",
+			name:		"rejects reserved core signer",
+			tx:		sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETElector")}},
+			wantErr:	"signer 0 is reserved system address AETElector",
 		},
 		{
-			name:    "rejects reserved module signer",
-			tx:      sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETMint")}},
-			wantErr: "signer 0 is reserved system address AETMint",
+			name:		"rejects reserved module signer",
+			tx:		sigFeeTx{feeTx: feeTx{fees: fee}, signers: [][]byte{reservedBytes(t, "AETMint")}},
+			wantErr:	"signer 0 is reserved system address AETMint",
 		},
 		{
-			name:    "rejects reserved fee payer",
-			tx:      feeTx{fees: fee, payer: reservedBytes(t, "AETTreasury")},
-			wantErr: "fee payer is reserved system address AETTreasury",
+			name:		"rejects reserved fee payer",
+			tx:		feeTx{fees: fee, payer: reservedBytes(t, "AETTreasury")},
+			wantErr:	"fee payer is reserved system address AETTreasury",
 		},
 		{
-			name: "rejects zero bank send recipient",
+			name:	"rejects zero bank send recipient",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   aetraaddress.ZeroUserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	aetraaddress.ZeroUserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantErr: "bank send recipient must not be zero address",
+			wantErr:	"bank send recipient must not be zero address",
 		},
 		{
-			name: "rejects bank send to mint system address",
+			name:	"rejects bank send to mint system address",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETMint").UserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	reservedAddress(t, "AETMint").UserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantErr: "bank send recipient is reserved system address AETMint and cannot receive user funds",
+			wantErr:	"bank send recipient is reserved system address AETMint and cannot receive user funds",
 		},
 		{
-			name: "rejects bank send to core system address",
+			name:	"rejects bank send to core system address",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETConfig").UserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	reservedAddress(t, "AETConfig").UserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantErr: "bank send recipient is reserved system address AETConfig and cannot receive user funds",
+			wantErr:	"bank send recipient is reserved system address AETConfig and cannot receive user funds",
 		},
 		{
-			name: "rejects direct user funds to treasury",
+			name:	"rejects direct user funds to treasury",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETTreasury").UserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	reservedAddress(t, "AETTreasury").UserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantErr: "bank send recipient is reserved system address AETTreasury and cannot receive user funds",
+			wantErr:	"bank send recipient is reserved system address AETTreasury and cannot receive user funds",
 		},
 		{
-			name: "rejects direct user funds to fee collector",
+			name:	"rejects direct user funds to fee collector",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   reservedAddress(t, "AETFeeCollector").UserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	reservedAddress(t, "AETFeeCollector").UserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantErr: "bank send recipient is reserved system address AETFeeCollector and cannot receive user funds",
+			wantErr:	"bank send recipient is reserved system address AETFeeCollector and cannot receive user funds",
 		},
 		{
-			name: "allows bank send to burn when policy permits",
+			name:	"allows bank send to burn when policy permits",
 			tx: feeTx{
-				fees: sufficientFee,
+				fees:	sufficientFee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   burn.UserFriendly,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	burn.UserFriendly,
+					Amount:		fee,
 				}},
 			},
-			wantNextCall: true,
-			maxFeeAmount: "1000000000000000000",
+			wantNextCall:	true,
+			maxFeeAmount:	"1000000000000000000",
 		},
 		{
-			name: "accepts bank send between user addresses",
+			name:	"accepts bank send between user addresses",
 			tx: feeTx{
-				fees: sufficientFee,
+				fees:	sufficientFee,
 				msgs: []sdk.Msg{&banktypes.MsgSend{
-					FromAddress: validSender,
-					ToAddress:   validRecipient,
-					Amount:      fee,
+					FromAddress:	validSender,
+					ToAddress:	validRecipient,
+					Amount:		fee,
 				}},
 			},
-			wantNextCall: true,
-			maxFeeAmount: "1000000000000000000",
+			wantNextCall:	true,
+			maxFeeAmount:	"1000000000000000000",
 		},
 		{
-			name: "rejects zero bank multisend output",
+			name:	"rejects zero bank multisend output",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&banktypes.MsgMultiSend{
-					Inputs:  []banktypes.Input{{Address: validSender, Coins: fee}},
-					Outputs: []banktypes.Output{{Address: aetraaddress.ZeroUserFriendly, Coins: fee}},
+					Inputs:		[]banktypes.Input{{Address: validSender, Coins: fee}},
+					Outputs:	[]banktypes.Output{{Address: aetraaddress.ZeroUserFriendly, Coins: fee}},
 				}},
 			},
-			wantErr: "output 0: bank multisend output must not be zero address",
+			wantErr:	"output 0: bank multisend output must not be zero address",
 		},
 		{
-			name: "rejects zero distribution withdraw address",
+			name:	"rejects zero distribution withdraw address",
 			tx: feeTx{
-				fees: fee,
+				fees:	fee,
 				msgs: []sdk.Msg{&distrtypes.MsgSetWithdrawAddress{
-					DelegatorAddress: validSender,
-					WithdrawAddress:  aetraaddress.ZeroUserFriendly,
+					DelegatorAddress:	validSender,
+					WithdrawAddress:	aetraaddress.ZeroUserFriendly,
 				}},
 			},
-			wantErr: "distribution withdraw address must not be zero address",
+			wantErr:	"distribution withdraw address must not be zero address",
 		},
 		{
-			name:    "rejects empty fee list",
-			tx:      feeTx{fees: sdk.Coins{}},
-			wantErr: "fee must be positive",
+			name:		"rejects empty fee list",
+			tx:		feeTx{fees: sdk.Coins{}},
+			wantErr:	"fee must be positive",
 		},
 		{
-			name:    "rejects nil fee list",
-			tx:      feeTx{},
-			wantErr: "fee must be positive",
+			name:		"rejects nil fee list",
+			tx:		feeTx{},
+			wantErr:	"fee must be positive",
 		},
 		{
-			name:    "rejects zero native fee coin",
-			tx:      feeTx{fees: sdk.Coins{sdk.NewInt64Coin(types.BondDenom, 0)}},
-			wantErr: "invalid fee coins",
+			name:		"rejects zero native fee coin",
+			tx:		feeTx{fees: sdk.Coins{sdk.NewInt64Coin(types.BondDenom, 0)}},
+			wantErr:	"invalid fee coins",
 		},
 		{
-			name:    "rejects non native fee denom",
-			tx:      feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin("uatom", 1))},
-			wantErr: "fee denom uatom not accepted; use naet",
+			name:		"rejects non native fee denom",
+			tx:		feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin("uatom", 1))},
+			wantErr:	"fee denom uatom not accepted; use naet",
 		},
 		{
-			name:    "rejects mixed native and non native fee denoms",
-			tx:      feeTx{fees: sdk.Coins{sdk.NewInt64Coin(types.BondDenom, 1), sdk.NewInt64Coin(l1testutil.TestAssetDenom, 1)}},
-			wantErr: "fee denom testtoken not accepted; use naet",
+			name:		"rejects mixed native and non native fee denoms",
+			tx:		feeTx{fees: sdk.Coins{sdk.NewInt64Coin(types.BondDenom, 1), sdk.NewInt64Coin(l1testutil.TestAssetDenom, 1)}},
+			wantErr:	"fee denom testtoken not accepted; use naet",
 		},
 		{
-			name:    "rejects malformed fee coin",
-			tx:      feeTx{fees: sdk.Coins{{Denom: "!", Amount: sdkmath.NewInt(1)}}},
-			wantErr: "invalid fee coins",
+			name:		"rejects malformed fee coin",
+			tx:		feeTx{fees: sdk.Coins{{Denom: "!", Amount: sdkmath.NewInt(1)}}},
+			wantErr:	"invalid fee coins",
 		},
 		{
-			name: "rejects duplicate fee denom entries",
+			name:	"rejects duplicate fee denom entries",
 			tx: feeTx{fees: sdk.Coins{
 				sdk.NewInt64Coin(types.BondDenom, 1),
 				sdk.NewInt64Coin(types.BondDenom, 2),
 			}},
-			wantErr: "invalid fee coins",
+			wantErr:	"invalid fee coins",
 		},
 		{
-			name:    "rejects transaction without fee interface",
-			tx:      noFeeTx{},
-			wantErr: "transaction must expose fees",
+			name:		"rejects transaction without fee interface",
+			tx:		noFeeTx{},
+			wantErr:	"transaction must expose fees",
 		},
 	}
 
@@ -343,7 +342,6 @@ func TestAnteHandlerDecoratorPropagatesNextError(t *testing.T) {
 	ctx := app.NewContext(false)
 	nextErr := errors.New("next failed")
 
-	// Raise MaxFeeAmount so the full formula fee is within the hard cap.
 	p := types.DefaultParams()
 	p.MaxFeeAmount = "1000000000000000000"
 	require.NoError(t, app.FeesKeeper.SetParams(ctx, p))
@@ -352,7 +350,6 @@ func TestAnteHandlerDecoratorPropagatesNextError(t *testing.T) {
 		return ctx, nextErr
 	}
 
-	// Use sufficient fee so we reach the next handler; formula requires gas*1+base = 100_001 naet.
 	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 110_000))}, false)
 	require.ErrorIs(t, err, nextErr)
 }
@@ -368,11 +365,11 @@ func TestAnteHandlerDecoratorRejectsAddressPolicyBeforeFeesAndNext(t *testing.T)
 	}
 
 	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, feeTx{
-		fees: sdk.Coins{},
+		fees:	sdk.Coins{},
 		msgs: []sdk.Msg{&banktypes.MsgSend{
-			FromAddress: validRawAddress(1),
-			ToAddress:   aetraaddress.ZeroUserFriendly,
-			Amount:      sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1)),
+			FromAddress:	validRawAddress(1),
+			ToAddress:	aetraaddress.ZeroUserFriendly,
+			Amount:		sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 1)),
 		}},
 	}, false)
 
@@ -407,8 +404,8 @@ func TestAnteHandlerDecoratorAllowsGenesisCreateValidatorWithoutFee(t *testing.T
 	}
 
 	_, err := app.FeesKeeper.AnteHandlerDecorator(next)(ctx, feeTx{
-		fees: sdk.Coins{},
-		msgs: []sdk.Msg{&stakingtypes.MsgCreateValidator{}},
+		fees:	sdk.Coins{},
+		msgs:	[]sdk.Msg{&stakingtypes.MsgCreateValidator{}},
 	}, false)
 	require.NoError(t, err)
 	require.True(t, called)
@@ -456,7 +453,7 @@ func TestAnteHandlerDecoratorEnforcesSenderRateLimit(t *testing.T) {
 	params := types.DefaultParams()
 	params.MaxSenderTxsPerBlock = 2
 	params.MaxSenderTxsPerBlockWithStake = 2
-	// Raise MaxFeeAmount to accommodate the full formula fee (100_001 naet for 100k gas).
+
 	params.MaxFeeAmount = "1000000000000000000"
 	require.NoError(t, app.FeesKeeper.SetParams(ctx, params))
 
@@ -465,7 +462,7 @@ func TestAnteHandlerDecoratorEnforcesSenderRateLimit(t *testing.T) {
 		return ctx, nil
 	}
 	handler := app.FeesKeeper.AnteHandlerDecorator(next)
-	// sufficientFee = max(1,1) + 100_000*1 + 100 = 100_101 naet for zero-msg tx.
+
 	tx := feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100_101)), payer: payer}
 
 	_, err := handler(ctx, tx, false)
@@ -483,7 +480,7 @@ func TestAnteHandlerDecoratorResetsRateLimitByBlockHeight(t *testing.T) {
 	params := types.DefaultParams()
 	params.MaxSenderTxsPerBlock = 1
 	params.MaxSenderTxsPerBlockWithStake = 1
-	// Raise MaxFeeAmount to accommodate the full formula fee.
+
 	params.MaxFeeAmount = "1000000000000000000"
 	require.NoError(t, app.FeesKeeper.SetParams(ctx, params))
 
@@ -492,7 +489,7 @@ func TestAnteHandlerDecoratorResetsRateLimitByBlockHeight(t *testing.T) {
 		return ctx, nil
 	}
 	handler := app.FeesKeeper.AnteHandlerDecorator(next)
-	// sufficientFee = max(1,1) + 100_000*1 + 100 = 100_101 naet for zero-msg tx.
+
 	tx := feeTx{fees: sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 100_101)), payer: payer}
 
 	_, err := handler(ctx, tx, false)
@@ -509,13 +506,12 @@ func TestAnteHandlerDecoratorRecordsFeesAfterDeduction(t *testing.T) {
 	app := l1app.Setup(t, false)
 	ctx := app.NewContext(false).WithBlockHeight(1)
 
-	// Raise MaxFeeAmount so the formula-computed fee is within the hard cap.
 	params := types.DefaultParams()
 	params.MaxFeeAmount = "1000000000000000000"
 	require.NoError(t, app.FeesKeeper.SetParams(ctx, params))
 
 	payer := l1app.AddTestAddrsIncremental(app, ctx, 1, sdkmath.NewInt(10_000_000))[0]
-	// sufficientFee meets formula: max(1,1) + 100_000*1 + 100 = 100_101 naet.
+
 	feeAmount := int64(100_101)
 	fee := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, feeAmount))
 	feeCollector := app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
@@ -535,9 +531,7 @@ func TestAnteHandlerDecoratorRecordsFeesAfterDeduction(t *testing.T) {
 
 	state, err := app.FeesKeeper.GetProtocolFeeState(newCtx)
 	require.NoError(t, err)
-	// validator_rewards_ratio=0.98, community_pool_ratio=0.02
-	// communityAmount = floor(100_101 * 0.02) = floor(2002.02) = 2_002
-	// validatorAmount = 100_101 - 2_002 = 98_099
+
 	validatorExpected := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 98_099))
 	communityExpected := sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, 2_002))
 	require.Equal(t, sdk.NewCoins(sdk.NewInt64Coin(types.BondDenom, feeAmount)), state.TotalCollected)

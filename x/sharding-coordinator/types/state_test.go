@@ -64,18 +64,18 @@ func TestStateRootHexValidated(t *testing.T) {
 
 func testShard(id, status string) Shard {
 	return Shard{
-		ShardID:                id,
-		Status:                 status,
-		SecurityLevel:          ShardSecurityStandard,
-		RequiredValidatorCount: 2,
+		ShardID:		id,
+		Status:			status,
+		SecurityLevel:		ShardSecurityStandard,
+		RequiredValidatorCount:	2,
 		CrossShardRoutingParams: CrossShardRoutingParams{
-			AllowInbound:      true,
-			AllowOutbound:     true,
-			MaxMessageBytes:   1024,
-			MaxTimeoutBlocks:  100,
-			DefaultRouteLimit: 10,
+			AllowInbound:		true,
+			AllowOutbound:		true,
+			MaxMessageBytes:	1024,
+			MaxTimeoutBlocks:	100,
+			DefaultRouteLimit:	10,
 		},
-		RegisteredHeight: 1,
-		UpdatedHeight:    1,
+		RegisteredHeight:	1,
+		UpdatedHeight:		1,
 	}
 }

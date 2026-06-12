@@ -13,12 +13,12 @@ func TestAVMRetryPolicyModesAndDeterministicRetryHeights(t *testing.T) {
 	require.NoError(t, none.ValidateForMessage(20))
 
 	fixed := AVMRetryPolicy{
-		Mode:           AVMRetryModeFixed,
-		MaxAttempts:    3,
-		RetryDelay:     2,
-		BackoffMode:    AVMBackoffModeNone,
-		MaxRetryHeight: 20,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeFixed,
+		MaxAttempts:	3,
+		RetryDelay:	2,
+		BackoffMode:	AVMBackoffModeNone,
+		MaxRetryHeight:	20,
+		ChargeRetryGas:	true,
 	}
 	require.NoError(t, fixed.ValidateForMessage(20))
 	next, err := NextAVMRetryHeight(10, 2, fixed)
@@ -26,12 +26,12 @@ func TestAVMRetryPolicyModesAndDeterministicRetryHeights(t *testing.T) {
 	require.Equal(t, uint64(12), next)
 
 	backoff := AVMRetryPolicy{
-		Mode:           AVMRetryModeBoundedBackoff,
-		MaxAttempts:    4,
-		RetryDelay:     2,
-		BackoffMode:    AVMBackoffModeExponential,
-		MaxRetryHeight: 30,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeBoundedBackoff,
+		MaxAttempts:	4,
+		RetryDelay:	2,
+		BackoffMode:	AVMBackoffModeExponential,
+		MaxRetryHeight:	30,
+		ChargeRetryGas:	true,
 	}
 	next, err = NextAVMRetryHeight(10, 3, backoff)
 	require.NoError(t, err)
@@ -40,38 +40,38 @@ func TestAVMRetryPolicyModesAndDeterministicRetryHeights(t *testing.T) {
 
 func TestAVMRetryPolicyRejectsUnboundedExpiryAndGasDrift(t *testing.T) {
 	require.ErrorContains(t, AVMRetryPolicy{
-		Mode:           AVMRetryModeFixed,
-		RetryDelay:     1,
-		BackoffMode:    AVMBackoffModeNone,
-		MaxRetryHeight: 20,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeFixed,
+		RetryDelay:	1,
+		BackoffMode:	AVMBackoffModeNone,
+		MaxRetryHeight:	20,
+		ChargeRetryGas:	true,
 	}.ValidateForMessage(20), "bounded")
 
 	require.ErrorContains(t, AVMRetryPolicy{
-		Mode:           AVMRetryModeFixed,
-		MaxAttempts:    1,
-		RetryDelay:     0,
-		BackoffMode:    AVMBackoffModeNone,
-		MaxRetryHeight: 20,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeFixed,
+		MaxAttempts:	1,
+		RetryDelay:	0,
+		BackoffMode:	AVMBackoffModeNone,
+		MaxRetryHeight:	20,
+		ChargeRetryGas:	true,
 	}.ValidateForMessage(20), "deterministic")
 
 	require.ErrorContains(t, AVMRetryPolicy{
-		Mode:           AVMRetryModeBoundedBackoff,
-		MaxAttempts:    1,
-		RetryDelay:     1,
-		BackoffMode:    AVMBackoffModeLinear,
-		MaxRetryHeight: 21,
-		ChargeRetryGas: true,
+		Mode:		AVMRetryModeBoundedBackoff,
+		MaxAttempts:	1,
+		RetryDelay:	1,
+		BackoffMode:	AVMBackoffModeLinear,
+		MaxRetryHeight:	21,
+		ChargeRetryGas:	true,
 	}.ValidateForMessage(20), "expiry")
 
 	require.ErrorContains(t, AVMRetryPolicy{
-		Mode:           AVMRetryModeFixed,
-		MaxAttempts:    1,
-		RetryDelay:     1,
-		BackoffMode:    AVMBackoffModeNone,
-		MaxRetryHeight: 20,
-		ChargeRetryGas: false,
+		Mode:		AVMRetryModeFixed,
+		MaxAttempts:	1,
+		RetryDelay:	1,
+		BackoffMode:	AVMBackoffModeNone,
+		MaxRetryHeight:	20,
+		ChargeRetryGas:	false,
 	}.ValidateForMessage(20), "retry gas")
 }
 
@@ -79,15 +79,15 @@ func TestAVMExecutionReceiptHashesSection54Fields(t *testing.T) {
 	msg, err := NewAVMAsyncMessage(testAVMAsyncMessage("alice", zonestypes.ZoneIDApplication, "bob", zonestypes.ZoneIDContract, 1, 10))
 	require.NoError(t, err)
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          msg.ID,
-		ZoneID:             zonestypes.ZoneIDContract,
-		Executor:           "contract-executor",
-		Status:             AVMReceiptStatusExecuted,
-		GasUsed:            40,
-		StorageWritten:     2,
-		EventsHash:         engineHash("events"),
-		OutputMessagesRoot: engineHash("out"),
-		CreatedHeight:      12,
+		MessageID:		msg.ID,
+		ZoneID:			zonestypes.ZoneIDContract,
+		Executor:		"contract-executor",
+		Status:			AVMReceiptStatusExecuted,
+		GasUsed:		40,
+		StorageWritten:		2,
+		EventsHash:		engineHash("events"),
+		OutputMessagesRoot:	engineHash("out"),
+		CreatedHeight:		12,
 	})
 	require.NoError(t, err)
 	require.NoError(t, receipt.Validate())
@@ -103,15 +103,15 @@ func TestAVMExecutionReceiptRejectsInvalidStatusHashAndNonTerminalWrites(t *test
 	msg, err := NewAVMAsyncMessage(testAVMAsyncMessage("alice", zonestypes.ZoneIDApplication, "bob", zonestypes.ZoneIDContract, 2, 10))
 	require.NoError(t, err)
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          msg.ID,
-		ZoneID:             zonestypes.ZoneIDContract,
-		Executor:           "contract-executor",
-		Status:             AVMReceiptStatusFailed,
-		GasUsed:            1,
-		EventsHash:         engineHash("events"),
-		OutputMessagesRoot: engineHash("out"),
-		ErrorCodeOptional:  "handler_failed",
-		CreatedHeight:      12,
+		MessageID:		msg.ID,
+		ZoneID:			zonestypes.ZoneIDContract,
+		Executor:		"contract-executor",
+		Status:			AVMReceiptStatusFailed,
+		GasUsed:		1,
+		EventsHash:		engineHash("events"),
+		OutputMessagesRoot:	engineHash("out"),
+		ErrorCodeOptional:	"handler_failed",
+		CreatedHeight:		12,
 	})
 	require.NoError(t, err)
 
@@ -125,13 +125,13 @@ func TestAVMExecutionReceiptRejectsInvalidStatusHashAndNonTerminalWrites(t *test
 	require.ErrorContains(t, badHash.Validate(), "hash mismatch")
 
 	submitted, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          msg.ID,
-		ZoneID:             zonestypes.ZoneIDContract,
-		Executor:           "scheduler",
-		Status:             AVMReceiptStatusSubmitted,
-		EventsHash:         engineHash("events"),
-		OutputMessagesRoot: engineHash("out"),
-		CreatedHeight:      12,
+		MessageID:		msg.ID,
+		ZoneID:			zonestypes.ZoneIDContract,
+		Executor:		"scheduler",
+		Status:			AVMReceiptStatusSubmitted,
+		EventsHash:		engineHash("events"),
+		OutputMessagesRoot:	engineHash("out"),
+		CreatedHeight:		12,
 	})
 	require.NoError(t, err)
 	submitted.StorageWritten = 1

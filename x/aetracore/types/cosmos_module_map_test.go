@@ -63,10 +63,10 @@ func TestCosmosModuleDescriptorValidationRejectsMalformedEntries(t *testing.T) {
 	require.Empty(t, duplicate.Root)
 
 	noDeps := CosmosModuleDescriptor{
-		Module:           "x/test",
-		Responsibility:   "test module",
-		Zone:             "Core",
-		AcceptanceSignal: "test acceptance",
+		Module:			"x/test",
+		Responsibility:		"test module",
+		Zone:			"Core",
+		AcceptanceSignal:	"test acceptance",
 	}
 	_, err = BuildCosmosModuleDescriptor(noDeps)
 	require.ErrorContains(t, err, "dependencies are required")

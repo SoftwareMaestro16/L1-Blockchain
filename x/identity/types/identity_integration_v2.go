@@ -13,78 +13,78 @@ import (
 type IdentityAccessPathV2 string
 
 const (
-	IdentityAccessPathCrossZoneMessage IdentityAccessPathV2 = "verified_cross_zone_message"
-	IdentityAccessPathProofQuery       IdentityAccessPathV2 = "proof_query"
-	IdentityAccessPathVerifiedCache    IdentityAccessPathV2 = "cached_verified_resolver_record"
-	IdentityAccessPathPreSigning       IdentityAccessPathV2 = "pre_signing_client_side_resolution"
+	IdentityAccessPathCrossZoneMessage	IdentityAccessPathV2	= "verified_cross_zone_message"
+	IdentityAccessPathProofQuery		IdentityAccessPathV2	= "proof_query"
+	IdentityAccessPathVerifiedCache		IdentityAccessPathV2	= "cached_verified_resolver_record"
+	IdentityAccessPathPreSigning		IdentityAccessPathV2	= "pre_signing_client_side_resolution"
 )
 
 type IdentityAccessPathDescriptorV2 struct {
-	Path                 IdentityAccessPathV2
-	UseCase              string
-	ConsensusRequirement string
+	Path			IdentityAccessPathV2
+	UseCase			string
+	ConsensusRequirement	string
 }
 
 type IdentityLookupExecutionPlanV2 struct {
-	Request              MsgResolveIdentity
-	IdentityZoneID       string
-	ReadOnly             bool
-	MutatesIdentityState bool
-	ReplyToZoneID        string
-	RequiresProof        bool
-	ExecuteByHeight      uint64
-	RequestReceiptRoot   string
-	PlanHash             string
+	Request			MsgResolveIdentity
+	IdentityZoneID		string
+	ReadOnly		bool
+	MutatesIdentityState	bool
+	ReplyToZoneID		string
+	RequiresProof		bool
+	ExecuteByHeight		uint64
+	RequestReceiptRoot	string
+	PlanHash		string
 }
 
 type IdentityAsyncResolutionEnvelopeV2 struct {
-	Request            MsgResolveIdentity
-	Result             MsgIdentityResolutionResult
-	SourceZoneID       string
-	DestinationZoneID  string
-	ReplyTo            string
-	RequestReceiptRoot string
-	ResultReceiptRoot  string
-	EnvelopeHash       string
+	Request			MsgResolveIdentity
+	Result			MsgIdentityResolutionResult
+	SourceZoneID		string
+	DestinationZoneID	string
+	ReplyTo			string
+	RequestReceiptRoot	string
+	ResultReceiptRoot	string
+	EnvelopeHash		string
 }
 
 type IdentityVerifiedResolverCacheEntryV2 struct {
-	Name                  string
-	NameHash              string
-	TargetType            IdentityLookupTargetType
-	ResolvedValueHash     string
-	ResolverRecordVersion uint64
-	ProofHeight           uint64
-	ExpiryHeight          uint64
-	ProofHash             string
-	TrustedAppHash        string
-	InvalidationTriggers  []IdentityCacheInvalidationTriggerV2
-	EntryHash             string
+	Name			string
+	NameHash		string
+	TargetType		IdentityLookupTargetType
+	ResolvedValueHash	string
+	ResolverRecordVersion	uint64
+	ProofHeight		uint64
+	ExpiryHeight		uint64
+	ProofHash		string
+	TrustedAppHash		string
+	InvalidationTriggers	[]IdentityCacheInvalidationTriggerV2
+	EntryHash		string
 }
 
 type IdentityCacheUseV2 struct {
-	Height                uint64
-	ResolverRecordVersion uint64
-	ProofVerified         bool
-	InvalidationTrigger   IdentityCacheInvalidationTriggerV2
+	Height			uint64
+	ResolverRecordVersion	uint64
+	ProofVerified		bool
+	InvalidationTrigger	IdentityCacheInvalidationTriggerV2
 }
 
 type IdentityPreSigningResolutionBindingV2 struct {
-	Name              string
-	NameHash          string
-	TargetType        IdentityLookupTargetType
-	ResolvedValueHash string
-	TxPayloadHash     string
-	BoundPayloadHash  string
+	Name			string
+	NameHash		string
+	TargetType		IdentityLookupTargetType
+	ResolvedValueHash	string
+	TxPayloadHash		string
+	BoundPayloadHash	string
 }
 
 type IdentityContractResolutionUseV2 struct {
-	Result              MsgIdentityResolutionResult
-	CurrentHeight       uint64
-	ProofVerified       bool
-	MessageOriginZoneID string
-	ReceiptRoot         string
-	ReceiptHash         string
+	Result			MsgIdentityResolutionResult
+	CurrentHeight		uint64
+	ProofVerified		bool
+	MessageOriginZoneID	string
+	ReceiptRoot		string
+	ReceiptHash		string
 }
 
 func IdentityIntegrationAccessPathsV2() []IdentityAccessPathDescriptorV2 {
@@ -112,13 +112,13 @@ func NewIdentityLookupExecutionPlanV2(request MsgResolveIdentity, currentHeight 
 		}
 	}
 	plan := IdentityLookupExecutionPlanV2{
-		Request:            request,
-		IdentityZoneID:     IdentityZoneID,
-		ReadOnly:           true,
-		ReplyToZoneID:      request.SourceZoneID,
-		RequiresProof:      request.ProofRequired,
-		ExecuteByHeight:    request.ExpiryHeight,
-		RequestReceiptRoot: requestReceiptRoot,
+		Request:		request,
+		IdentityZoneID:		IdentityZoneID,
+		ReadOnly:		true,
+		ReplyToZoneID:		request.SourceZoneID,
+		RequiresProof:		request.ProofRequired,
+		ExecuteByHeight:	request.ExpiryHeight,
+		RequestReceiptRoot:	requestReceiptRoot,
 	}
 	plan.PlanHash = ComputeIdentityLookupExecutionPlanHashV2(plan)
 	return plan, plan.Validate()
@@ -138,8 +138,8 @@ func NewIdentityAsyncResolutionEnvelopeV2(request MsgResolveIdentity, result Msg
 		return IdentityAsyncResolutionEnvelopeV2{}, errors.New("identity async resolution proof is required by request")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"identity async resolution request receipt root", requestReceiptRoot},
 		{"identity async resolution result receipt root", resultReceiptRoot},
@@ -151,13 +151,13 @@ func NewIdentityAsyncResolutionEnvelopeV2(request MsgResolveIdentity, result Msg
 		}
 	}
 	envelope := IdentityAsyncResolutionEnvelopeV2{
-		Request:            request,
-		Result:             result,
-		SourceZoneID:       IdentityZoneID,
-		DestinationZoneID:  request.SourceZoneID,
-		ReplyTo:            request.ReplyTo,
-		RequestReceiptRoot: requestReceiptRoot,
-		ResultReceiptRoot:  resultReceiptRoot,
+		Request:		request,
+		Result:			result,
+		SourceZoneID:		IdentityZoneID,
+		DestinationZoneID:	request.SourceZoneID,
+		ReplyTo:		request.ReplyTo,
+		RequestReceiptRoot:	requestReceiptRoot,
+		ResultReceiptRoot:	resultReceiptRoot,
 	}
 	envelope.EnvelopeHash = ComputeIdentityAsyncResolutionEnvelopeHashV2(envelope)
 	return envelope, envelope.Validate()
@@ -187,16 +187,16 @@ func NewIdentityVerifiedResolverCacheEntryV2(result MsgIdentityResolutionResult,
 		return IdentityVerifiedResolverCacheEntryV2{}, err
 	}
 	entry := IdentityVerifiedResolverCacheEntryV2{
-		Name:                  mustNormalizeIdentityName(result.Name),
-		NameHash:              nameHash,
-		TargetType:            result.TargetType,
-		ResolvedValueHash:     identityHash("identity-v2-resolved-value", result.ResolvedValue),
-		ResolverRecordVersion: result.ResolverRecordVersion,
-		ProofHeight:           proofHeight,
-		ExpiryHeight:          result.ExpiryHeight,
-		ProofHash:             result.ProofHashOptional,
-		TrustedAppHash:        trustedAppHash,
-		InvalidationTriggers:  normalizeIdentityInvalidationTriggersV2(invalidations),
+		Name:			mustNormalizeIdentityName(result.Name),
+		NameHash:		nameHash,
+		TargetType:		result.TargetType,
+		ResolvedValueHash:	identityHash("identity-v2-resolved-value", result.ResolvedValue),
+		ResolverRecordVersion:	result.ResolverRecordVersion,
+		ProofHeight:		proofHeight,
+		ExpiryHeight:		result.ExpiryHeight,
+		ProofHash:		result.ProofHashOptional,
+		TrustedAppHash:		trustedAppHash,
+		InvalidationTriggers:	normalizeIdentityInvalidationTriggersV2(invalidations),
 	}
 	entry.EntryHash = ComputeIdentityVerifiedResolverCacheEntryHashV2(entry)
 	return entry, entry.Validate()
@@ -221,11 +221,11 @@ func NewIdentityPreSigningResolutionBindingV2(name string, targetType IdentityLo
 		return IdentityPreSigningResolutionBindingV2{}, err
 	}
 	binding := IdentityPreSigningResolutionBindingV2{
-		Name:              normalized,
-		NameHash:          nameHash,
-		TargetType:        targetType,
-		ResolvedValueHash: identityHash("identity-v2-pre-signing-resolved-value", hex.EncodeToString(resolvedValue)),
-		TxPayloadHash:     txPayloadHash,
+		Name:			normalized,
+		NameHash:		nameHash,
+		TargetType:		targetType,
+		ResolvedValueHash:	identityHash("identity-v2-pre-signing-resolved-value", hex.EncodeToString(resolvedValue)),
+		TxPayloadHash:		txPayloadHash,
 	}
 	binding.BoundPayloadHash = ComputeIdentityPreSigningResolutionBindingHashV2(binding)
 	return binding, binding.Validate()
@@ -343,8 +343,8 @@ func (e IdentityVerifiedResolverCacheEntryV2) Validate() error {
 		return fmt.Errorf("unknown identity lookup target type %q", e.TargetType)
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"identity verified cache resolved value hash", e.ResolvedValueHash},
 		{"identity verified cache proof hash", e.ProofHash},
@@ -410,8 +410,8 @@ func (b IdentityPreSigningResolutionBindingV2) Validate() error {
 		return fmt.Errorf("unknown identity lookup target type %q", b.TargetType)
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"identity pre-signing name hash", b.NameHash},
 		{"identity pre-signing resolved value hash", b.ResolvedValueHash},

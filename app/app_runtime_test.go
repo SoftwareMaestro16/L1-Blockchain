@@ -28,14 +28,14 @@ func TestDefaultGenesisInitExportValidateAcceptanceChain(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   app.LastCommitID().Hash,
+		Height:	1,
+		Hash:	app.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = app.Commit()
@@ -58,14 +58,14 @@ func TestAppGenesisExportImportRoundTripAndDeterminism(t *testing.T) {
 	stateBytes, err := json.MarshalIndent(genesis, "", " ")
 	require.NoError(t, err)
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()
@@ -88,14 +88,14 @@ func TestAppGenesisExportImportRoundTripAndDeterminism(t *testing.T) {
 		sims.AppOptionsMap{flags.FlagHome: DefaultNodeHome},
 	)
 	_, err = target.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: &exportedA.ConsensusParams,
-		AppStateBytes:   exportedA.AppState,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	&exportedA.ConsensusParams,
+		AppStateBytes:		exportedA.AppState,
 	})
 	require.NoError(t, err)
 	_, err = target.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   target.LastCommitID().Hash,
+		Height:	1,
+		Hash:	target.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = target.Commit()
@@ -153,15 +153,15 @@ func runSingleBlockForTelemetryTest(t *testing.T, stateBytes []byte, telemetryEn
 		sims.AppOptionsMap{flags.FlagHome: DefaultNodeHome},
 	)
 	_, err := app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   app.LastCommitID().Hash,
-		Time:   time.Unix(1_700_000_000, 0).UTC(),
+		Height:	1,
+		Hash:	app.LastCommitID().Hash,
+		Time:	time.Unix(1_700_000_000, 0).UTC(),
 	})
 	require.NoError(t, err)
 	_, err = app.Commit()

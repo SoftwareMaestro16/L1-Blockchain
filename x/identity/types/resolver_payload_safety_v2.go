@@ -7,42 +7,42 @@ import (
 )
 
 const (
-	DefaultIdentityResolverUpdateBaseFeeNaet      = int64(5_000_000)
-	DefaultIdentityResolverChurnWindowBlocks      = uint64(100)
-	DefaultIdentityResolverChurnFreeUpdates       = uint32(3)
-	DefaultIdentityResolverChurnMultiplierStepBps = uint32(2_500)
-	DefaultIdentityResolverChurnMaxMultiplierBps  = uint32(40_000)
-	IdentityResolverPayloadSafetyFormulaV2        = "base_fee*churn_multiplier + payload_bytes*storage_fee_per_byte"
+	DefaultIdentityResolverUpdateBaseFeeNaet	= int64(5_000_000)
+	DefaultIdentityResolverChurnWindowBlocks	= uint64(100)
+	DefaultIdentityResolverChurnFreeUpdates		= uint32(3)
+	DefaultIdentityResolverChurnMultiplierStepBps	= uint32(2_500)
+	DefaultIdentityResolverChurnMaxMultiplierBps	= uint32(40_000)
+	IdentityResolverPayloadSafetyFormulaV2		= "base_fee*churn_multiplier + payload_bytes*storage_fee_per_byte"
 )
 
 type IdentityResolverPayloadSafetyParamsV2 struct {
-	MaxRecordBytes         uint64
-	StorageFeePerByte      sdkmath.Int
-	UpdateBaseFee          sdkmath.Int
-	ChurnWindowBlocks      uint64
-	FreeUpdatesPerWindow   uint32
-	ChurnMultiplierStepBps uint32
-	MaxChurnMultiplierBps  uint32
+	MaxRecordBytes		uint64
+	StorageFeePerByte	sdkmath.Int
+	UpdateBaseFee		sdkmath.Int
+	ChurnWindowBlocks	uint64
+	FreeUpdatesPerWindow	uint32
+	ChurnMultiplierStepBps	uint32
+	MaxChurnMultiplierBps	uint32
 }
 
 type IdentityResolverPayloadFeeQuoteV2 struct {
-	PayloadBytes       uint64
-	StorageFee         sdkmath.Int
-	BaseUpdateFee      sdkmath.Int
-	ChurnMultiplierBps uint32
-	TotalUpdateFee     sdkmath.Int
-	Formula            string
+	PayloadBytes		uint64
+	StorageFee		sdkmath.Int
+	BaseUpdateFee		sdkmath.Int
+	ChurnMultiplierBps	uint32
+	TotalUpdateFee		sdkmath.Int
+	Formula			string
 }
 
 func DefaultIdentityResolverPayloadSafetyParamsV2() IdentityResolverPayloadSafetyParamsV2 {
 	return IdentityResolverPayloadSafetyParamsV2{
-		MaxRecordBytes:         MaxUnifiedPayloadBytesV2,
-		StorageFeePerByte:      sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
-		UpdateBaseFee:          sdkmath.NewInt(DefaultIdentityResolverUpdateBaseFeeNaet),
-		ChurnWindowBlocks:      DefaultIdentityResolverChurnWindowBlocks,
-		FreeUpdatesPerWindow:   DefaultIdentityResolverChurnFreeUpdates,
-		ChurnMultiplierStepBps: DefaultIdentityResolverChurnMultiplierStepBps,
-		MaxChurnMultiplierBps:  DefaultIdentityResolverChurnMaxMultiplierBps,
+		MaxRecordBytes:		MaxUnifiedPayloadBytesV2,
+		StorageFeePerByte:	sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
+		UpdateBaseFee:		sdkmath.NewInt(DefaultIdentityResolverUpdateBaseFeeNaet),
+		ChurnWindowBlocks:	DefaultIdentityResolverChurnWindowBlocks,
+		FreeUpdatesPerWindow:	DefaultIdentityResolverChurnFreeUpdates,
+		ChurnMultiplierStepBps:	DefaultIdentityResolverChurnMultiplierStepBps,
+		MaxChurnMultiplierBps:	DefaultIdentityResolverChurnMaxMultiplierBps,
 	}
 }
 
@@ -122,12 +122,12 @@ func QuoteIdentityResolverPayloadUpdateFeeV2(record UnifiedResolutionRecordV2, u
 	multiplier := IdentityResolverChurnMultiplierBpsV2(updatesInWindow, params)
 	baseFee := params.UpdateBaseFee.MulRaw(int64(multiplier)).QuoRaw(int64(DomainDistributionDenominatorBps))
 	return IdentityResolverPayloadFeeQuoteV2{
-		PayloadBytes:       payloadBytes,
-		StorageFee:         storageFee,
-		BaseUpdateFee:      params.UpdateBaseFee,
-		ChurnMultiplierBps: multiplier,
-		TotalUpdateFee:     baseFee.Add(storageFee),
-		Formula:            IdentityResolverPayloadSafetyFormulaV2,
+		PayloadBytes:		payloadBytes,
+		StorageFee:		storageFee,
+		BaseUpdateFee:		params.UpdateBaseFee,
+		ChurnMultiplierBps:	multiplier,
+		TotalUpdateFee:		baseFee.Add(storageFee),
+		Formula:		IdentityResolverPayloadSafetyFormulaV2,
 	}, nil
 }
 

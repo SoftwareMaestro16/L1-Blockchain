@@ -124,9 +124,9 @@ func TestRootEncodingRegistryQueryAndProofVerification(t *testing.T) {
 	proof, err := NewStateCommitmentProof(RoutingProofType, 7, RootType("routing"), "global", testHash("routing/key"), testHash("routing/value"), root.RoutingRoot, []string{testHash("routing/path")}, true)
 	require.NoError(t, err)
 	result, err := VerifyStateCommitmentProof(ProofVerificationRequest{
-		ExpectedRoot: root.RoutingRoot,
-		Registry:     registry,
-		Proof:        proof,
+		ExpectedRoot:	root.RoutingRoot,
+		Registry:	registry,
+		Proof:		proof,
 	})
 	require.NoError(t, err)
 	require.True(t, result.Verified)
@@ -154,9 +154,9 @@ func TestProofVerificationRejectsRegistryAndRootMismatch(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = VerifyStateCommitmentProof(ProofVerificationRequest{
-		ExpectedRoot: root.RoutingRoot,
-		Registry:     registry,
-		Proof:        proof,
+		ExpectedRoot:	root.RoutingRoot,
+		Registry:	registry,
+		Proof:		proof,
 	})
 	require.ErrorContains(t, err, "root mismatch")
 
@@ -170,9 +170,9 @@ func TestProofVerificationRejectsRegistryAndRootMismatch(t *testing.T) {
 	}
 	disabled.RegistryRoot = ComputeProofRegistryRoot(disabled)
 	_, err = VerifyStateCommitmentProof(ProofVerificationRequest{
-		ExpectedRoot: root.PaymentsRoot,
-		Registry:     disabled,
-		Proof:        proof,
+		ExpectedRoot:	root.PaymentsRoot,
+		Registry:	disabled,
+		Proof:		proof,
 	})
 	require.ErrorContains(t, err, "disabled")
 }

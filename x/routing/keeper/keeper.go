@@ -16,20 +16,20 @@ import (
 var genesisKey = []byte{0x01}
 
 type ShardConfig struct {
-	ZoneID       routingtypes.ZoneID
-	ActiveShards uint32
+	ZoneID		routingtypes.ZoneID
+	ActiveShards	uint32
 }
 
 type GenesisState struct {
-	Version      uint64
-	Params       prototype.Params
-	RoutingEpoch uint64
-	Shards       []ShardConfig
+	Version		uint64
+	Params		prototype.Params
+	RoutingEpoch	uint64
+	Shards		[]ShardConfig
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -42,8 +42,8 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  prototype.DefaultParams(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
 	}
 }
 

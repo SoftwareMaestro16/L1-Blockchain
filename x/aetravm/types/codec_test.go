@@ -41,7 +41,6 @@ func TestStringCodec(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, val.Payload, decoded.Payload)
 
-	// Invalid UTF-8
 	invalidVal := Value{Type: &StringType{MaxLength: 100}, Payload: string([]byte{0xff, 0xfe, 0xfd})}
 	err = codec.Encode(w, invalidVal)
 	require.Error(t, err)
@@ -72,6 +71,5 @@ func TestTypeLattice(t *testing.T) {
 	require.True(t, TypeUint32.IsAssignableFrom(TypeUint32))
 	require.False(t, TypeUint32.IsAssignableFrom(TypeInt32))
 
-	// Coins is an alias for Uint128
 	require.True(t, TypeCoins.IsAssignableFrom(TypeUint128))
 }

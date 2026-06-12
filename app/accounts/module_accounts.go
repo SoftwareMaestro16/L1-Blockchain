@@ -28,51 +28,51 @@ import (
 )
 
 type ReservedSystemModuleAccount struct {
-	Name                string
-	ModuleName          string
-	ModuleAccountName   string
-	Raw                 string
-	UserFriendly        string
-	Core                bool
-	CanHoldFunds        bool
-	CanReceiveUserFunds bool
-	CanSendFunds        bool
-	Permissions         []string
+	Name			string
+	ModuleName		string
+	ModuleAccountName	string
+	Raw			string
+	UserFriendly		string
+	Core			bool
+	CanHoldFunds		bool
+	CanReceiveUserFunds	bool
+	CanSendFunds		bool
+	Permissions		[]string
 }
 
 var moduleAccountPermissions = map[string][]string{
-	authtypes.FeeCollectorName:                     nil,
-	distrtypes.ModuleName:                          nil,
-	minttypes.ModuleName:                           {authtypes.Minter},
-	stakingtypes.BondedPoolName:                    {authtypes.Burner, authtypes.Staking},
-	stakingtypes.NotBondedPoolName:                 {authtypes.Burner, authtypes.Staking},
-	govtypes.ModuleName:                            {authtypes.Burner},
-	protocolpooltypes.ModuleName:                   nil,
-	protocolpooltypes.ProtocolPoolEscrowAccount:    nil,
-	burntypes.ModuleName:                           {authtypes.Burner},
-	feecollectortypes.CollectorModuleName:          {authtypes.Burner},
-	feecollectortypes.TreasuryModuleName:           nil,
-	feecollectortypes.ProtectionModuleName:         nil,
-	feecollectortypes.ValidatorInsuranceModuleName: nil,
-	feecollectortypes.EcosystemGrantsModuleName:    nil,
-	feecollectortypes.StorageRentReserveModuleName: nil,
-	feecollectortypes.BurnModuleName:               nil,
-	feecollectortypes.ReporterRewardsModuleName:    nil,
-	mintauthoritytypes.ModuleName:                  {authtypes.Minter},
-	storagerenttypes.ModuleName:                    nil,
-	delegatorprotectiontypes.ModuleName:            nil,
-	validatorinsurancetypes.ModuleName:             nil,
-	configtypes.ModuleName:                         nil,
-	systemregistrytypes.ModuleName:                 nil,
-	validatorelectiontypes.ModuleName:              nil,
-	feestypes.ModuleName:                           nil,
+	authtypes.FeeCollectorName:			nil,
+	distrtypes.ModuleName:				nil,
+	minttypes.ModuleName:				{authtypes.Minter},
+	stakingtypes.BondedPoolName:			{authtypes.Burner, authtypes.Staking},
+	stakingtypes.NotBondedPoolName:			{authtypes.Burner, authtypes.Staking},
+	govtypes.ModuleName:				{authtypes.Burner},
+	protocolpooltypes.ModuleName:			nil,
+	protocolpooltypes.ProtocolPoolEscrowAccount:	nil,
+	burntypes.ModuleName:				{authtypes.Burner},
+	feecollectortypes.CollectorModuleName:		{authtypes.Burner},
+	feecollectortypes.TreasuryModuleName:		nil,
+	feecollectortypes.ProtectionModuleName:		nil,
+	feecollectortypes.ValidatorInsuranceModuleName:	nil,
+	feecollectortypes.EcosystemGrantsModuleName:	nil,
+	feecollectortypes.StorageRentReserveModuleName:	nil,
+	feecollectortypes.BurnModuleName:		nil,
+	feecollectortypes.ReporterRewardsModuleName:	nil,
+	mintauthoritytypes.ModuleName:			{authtypes.Minter},
+	storagerenttypes.ModuleName:			nil,
+	delegatorprotectiontypes.ModuleName:		nil,
+	validatorinsurancetypes.ModuleName:		nil,
+	configtypes.ModuleName:				nil,
+	systemregistrytypes.ModuleName:			nil,
+	validatorelectiontypes.ModuleName:		nil,
+	feestypes.ModuleName:				nil,
 }
 
 var reservedSystemModuleAccountSpecs = []struct {
-	addressName       string
-	moduleName        string
-	moduleAccountName string
-	permissions       []string
+	addressName		string
+	moduleName		string
+	moduleAccountName	string
+	permissions		[]string
 }{
 	{"AETMint", mintauthoritytypes.ModuleName, mintauthoritytypes.DefaultMintAuthorityModuleAccount, []string{authtypes.Minter}},
 	{"AETFeeCollector", "fee-collector", feecollectortypes.CollectorModuleName, []string{authtypes.Burner}},
@@ -122,16 +122,16 @@ func ReservedSystemModuleAccounts() []ReservedSystemModuleAccount {
 			panic(fmt.Sprintf("reserved system address %s is not registered", spec.addressName))
 		}
 		out = append(out, ReservedSystemModuleAccount{
-			Name:                address.Name,
-			ModuleName:          spec.moduleName,
-			ModuleAccountName:   spec.moduleAccountName,
-			Raw:                 address.Raw,
-			UserFriendly:        address.UserFriendly,
-			Core:                address.Core,
-			CanHoldFunds:        address.CanHoldFunds,
-			CanReceiveUserFunds: address.CanReceiveUserFunds,
-			CanSendFunds:        address.CanSendFunds,
-			Permissions:         append([]string(nil), spec.permissions...),
+			Name:			address.Name,
+			ModuleName:		spec.moduleName,
+			ModuleAccountName:	spec.moduleAccountName,
+			Raw:			address.Raw,
+			UserFriendly:		address.UserFriendly,
+			Core:			address.Core,
+			CanHoldFunds:		address.CanHoldFunds,
+			CanReceiveUserFunds:	address.CanReceiveUserFunds,
+			CanSendFunds:		address.CanSendFunds,
+			Permissions:		append([]string(nil), spec.permissions...),
 		})
 	}
 	return out

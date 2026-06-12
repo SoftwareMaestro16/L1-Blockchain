@@ -21,11 +21,11 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano())) // #nosec G404 -- speedtest uses math/rand for non-secret tx distribution.
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))	// #nosec G404 -- speedtest uses math/rand for non-secret tx distribution.
 
 func NewBankSpeedTest() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "speedtest",
+		Use:	"speedtest",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			dir, err := os.MkdirTemp("", "bankspeedtest-*")
 			if err != nil {
@@ -40,8 +40,8 @@ func NewBankSpeedTest() *cobra.Command {
 			chainID := "foo"
 			app := l1app.NewL1App(log.NewNopLogger(), db, true, simtestutil.NewAppOptionsWithFlagHome(dir), baseapp.SetChainID(chainID))
 			gen := generator{
-				app:      app,
-				accounts: make([]accountInfo, 0),
+				app:		app,
+				accounts:	make([]accountInfo, 0),
 			}
 			speedCmd := speedtest.NewCmd(gen.createAccount, gen.generateTx, app, app.AppCodec(), app.DefaultGenesis(), chainID)
 			speedCmd.SetArgs(args)
@@ -53,29 +53,29 @@ func NewBankSpeedTest() *cobra.Command {
 }
 
 type generator struct {
-	app      *l1app.L1App
-	accounts []accountInfo
+	app		*l1app.L1App
+	accounts	[]accountInfo
 }
 
 type accountInfo struct {
-	privKey cryptotypes.PrivKey
-	address sdk.AccAddress
-	accNum  uint64
-	seqNum  uint64
+	privKey	cryptotypes.PrivKey
+	address	sdk.AccAddress
+	accNum	uint64
+	seqNum	uint64
 }
 
 func (g *generator) createAccount() (*authtypes.BaseAccount, sdk.Coins) {
 	privKey := secp256k1.GenPrivKey()
 	addr := sdk.AccAddress(privKey.PubKey().Address())
 	accNum := len(g.accounts)
-	accountNumber := uint64(accNum) // #nosec G115 -- speedtest account count is process-local and cannot approach uint64 overflow.
+	accountNumber := uint64(accNum)
 	baseAcc := authtypes.NewBaseAccount(addr, privKey.PubKey(), accountNumber, 0)
 
 	g.accounts = append(g.accounts, accountInfo{
-		privKey: privKey,
-		address: addr,
-		accNum:  accountNumber,
-		seqNum:  0,
+		privKey:	privKey,
+		address:	addr,
+		accNum:		accountNumber,
+		seqNum:		0,
 	})
 
 	return baseAcc, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 1_000_000_000))
@@ -89,7 +89,7 @@ func (g *generator) generateTx() []byte {
 	sendAmount := sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 1))
 	msg := banktypes.NewMsgSend(sender.address, recipient.address, sendAmount)
 	txConfig := g.app.TxConfig()
-	// Build and sign transaction
+
 	tx, err := simtestutil.GenSignedMockTx(
 		r,
 		txConfig,

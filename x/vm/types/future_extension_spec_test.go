@@ -68,24 +68,24 @@ func TestAVMFutureExtensionRegistryRejectsMissingDuplicateAndHashMismatch(t *tes
 
 func TestAVMFutureExtensionConsensusAffectingRequiresGovernedUpgrade(t *testing.T) {
 	_, err := NewAVMFutureExtensionDescriptor(AVMFutureExtensionDescriptor{
-		Area:                    AVMFutureExtensionSpeculativeExecution,
-		Name:                    "Speculative execution layer",
-		Description:             "Pre-execute eligible deterministic workloads while preserving commit-time validation.",
-		Prerequisites:           []string{"deterministic_replay_tests"},
-		ConsensusAffecting:      true,
-		RequiresGovernedUpgrade: false,
-		Status:                  AVMFutureExtensionStatusPlanned,
+		Area:				AVMFutureExtensionSpeculativeExecution,
+		Name:				"Speculative execution layer",
+		Description:			"Pre-execute eligible deterministic workloads while preserving commit-time validation.",
+		Prerequisites:			[]string{"deterministic_replay_tests"},
+		ConsensusAffecting:		true,
+		RequiresGovernedUpgrade:	false,
+		Status:				AVMFutureExtensionStatusPlanned,
 	})
 	require.ErrorContains(t, err, "governed upgrade")
 
 	descriptor, err := NewAVMFutureExtensionDescriptor(AVMFutureExtensionDescriptor{
-		Area:                    AVMFutureExtensionReplayDebugger,
-		Name:                    "Deterministic replay debugger",
-		Description:             "Inspect deterministic execution traces without changing consensus outputs.",
-		Prerequisites:           []string{"execution_receipts", "replay_export_import"},
-		ConsensusAffecting:      false,
-		RequiresGovernedUpgrade: false,
-		Status:                  AVMFutureExtensionStatusPlanned,
+		Area:				AVMFutureExtensionReplayDebugger,
+		Name:				"Deterministic replay debugger",
+		Description:			"Inspect deterministic execution traces without changing consensus outputs.",
+		Prerequisites:			[]string{"execution_receipts", "replay_export_import"},
+		ConsensusAffecting:		false,
+		RequiresGovernedUpgrade:	false,
+		Status:				AVMFutureExtensionStatusPlanned,
 	})
 	require.NoError(t, err)
 	require.NoError(t, descriptor.Validate())
@@ -93,13 +93,13 @@ func TestAVMFutureExtensionConsensusAffectingRequiresGovernedUpgrade(t *testing.
 
 func TestAVMFutureExtensionRejectsInvalidMarkdownCharacters(t *testing.T) {
 	_, err := NewAVMFutureExtensionDescriptor(AVMFutureExtensionDescriptor{
-		Area:                    AVMFutureExtensionInterfacePackageRegistry,
-		Name:                    "Interface | package registry",
-		Description:             "Publish interface descriptors as versioned packages.",
-		Prerequisites:           []string{"interface_hash_verification"},
-		ConsensusAffecting:      false,
-		RequiresGovernedUpgrade: false,
-		Status:                  AVMFutureExtensionStatusPlanned,
+		Area:				AVMFutureExtensionInterfacePackageRegistry,
+		Name:				"Interface | package registry",
+		Description:			"Publish interface descriptors as versioned packages.",
+		Prerequisites:			[]string{"interface_hash_verification"},
+		ConsensusAffecting:		false,
+		RequiresGovernedUpgrade:	false,
+		Status:				AVMFutureExtensionStatusPlanned,
 	})
 	require.ErrorContains(t, err, "invalid character")
 }

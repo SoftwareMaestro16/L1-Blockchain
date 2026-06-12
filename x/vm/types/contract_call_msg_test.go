@@ -56,33 +56,33 @@ func TestMsgContractCallRejectsMissingContractDisabledMethodEscrowAndGas(t *test
 
 func testMsgContractCall(contractAddr sdkAddr, gasLimit uint64) MsgContractCall {
 	return MsgContractCall{
-		Caller:          govAddr(),
-		ContractAddr:    contractAddr,
-		Method:          "counter.increment",
-		Args:            []byte("increment"),
-		Funds:           sdkmath.NewInt(5),
-		GasLimit:        gasLimit,
-		ReplyToOptional: govAddr(),
-		ExpiryHeight:    30,
+		Caller:			govAddr(),
+		ContractAddr:		contractAddr,
+		Method:			"counter.increment",
+		Args:			[]byte("increment"),
+		Funds:			sdkmath.NewInt(5),
+		GasLimit:		gasLimit,
+		ReplyToOptional:	govAddr(),
+		ExpiryHeight:		30,
 	}
 }
 
 func testContractCallAdmission(msg MsgContractCall, entrypoint avm.Entrypoint) ContractCallAdmission {
 	return ContractCallAdmission{
-		CreatedHeight: 20,
+		CreatedHeight:	20,
 		Methods: []ContractMethodAdmission{{
-			ContractAddr: msg.ContractAddr,
-			Method:       msg.Method,
-			Entrypoint:   entrypoint,
-			Enabled:      true,
+			ContractAddr:	msg.ContractAddr,
+			Method:		msg.Method,
+			Entrypoint:	entrypoint,
+			Enabled:	true,
 		}},
 		Escrows: []ContractFundsEscrow{{
-			Caller:       msg.Caller,
-			ContractAddr: msg.ContractAddr,
-			Amount:       msg.Funds,
-			ExpiryHeight: msg.ExpiryHeight,
-			Escrowed:     true,
+			Caller:		msg.Caller,
+			ContractAddr:	msg.ContractAddr,
+			Amount:		msg.Funds,
+			ExpiryHeight:	msg.ExpiryHeight,
+			Escrowed:	true,
 		}},
-		MaxArgsBytes: 128,
+		MaxArgsBytes:	128,
 	}
 }

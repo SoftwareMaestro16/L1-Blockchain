@@ -113,12 +113,12 @@ func TestZoneBudgetAndGasPolicyBounds(t *testing.T) {
 
 func testZoneMessage(zoneID ZoneID, messageType string, sequence uint64, gasLimit uint64) ZoneMessage {
 	return ZoneMessage{
-		ZoneID:      zoneID,
-		MessageType: messageType,
-		Source:      "source",
-		Destination: "destination",
-		GasLimit:    gasLimit,
-		PayloadHash: hash(string(zoneID) + messageType + string(rune(sequence))),
-		Sequence:    sequence,
+		ZoneID:		zoneID,
+		MessageType:	messageType,
+		Source:		"source",
+		Destination:	"destination",
+		GasLimit:	gasLimit,
+		PayloadHash:	hash(string(zoneID) + messageType + string(rune(sequence))),
+		Sequence:	sequence,
 	}
 }

@@ -7,74 +7,74 @@ import (
 )
 
 type AetherMeshZoneGraphState struct {
-	Epoch    uint64
-	Edges    []AetherMeshZoneEdge
-	RootHash string
+	Epoch		uint64
+	Edges		[]AetherMeshZoneEdge
+	RootHash	string
 }
 
 type AetherMeshServiceGraphState struct {
-	Epoch    uint64
-	Edges    []AetherMeshServiceEdge
-	RootHash string
+	Epoch		uint64
+	Edges		[]AetherMeshServiceEdge
+	RootHash	string
 }
 
 type AetherMeshMessageRouteGraphState struct {
-	Epoch        uint64
-	MessageEdges []AetherMeshMessageEdge
-	RouteEdges   []AetherMeshRouteEdge
-	RootHash     string
+	Epoch		uint64
+	MessageEdges	[]AetherMeshMessageEdge
+	RouteEdges	[]AetherMeshRouteEdge
+	RootHash	string
 }
 
 type AetherMeshCongestionSnapshot struct {
-	Epoch        uint64
-	Height       uint64
-	RoutingRoot  string
-	SnapshotRoot string
+	Epoch		uint64
+	Height		uint64
+	RoutingRoot	string
+	SnapshotRoot	string
 }
 
 type AetherMeshRoutingEpochState struct {
-	Epoch                  uint64
-	StartsHeight           uint64
-	ExpiresHeight          uint64
-	ZoneGraph              AetherMeshZoneGraphState
-	ServiceGraph           AetherMeshServiceGraphState
-	MessageRouteGraph      AetherMeshMessageRouteGraphState
-	CongestionSnapshot     AetherMeshCongestionSnapshot
-	CostParams             AetherMeshRoutingCostParams
-	CostParamsHash         string
-	RoutingTableRoot       string
-	CongestionSnapshotRoot string
-	EpochRoot              string
+	Epoch			uint64
+	StartsHeight		uint64
+	ExpiresHeight		uint64
+	ZoneGraph		AetherMeshZoneGraphState
+	ServiceGraph		AetherMeshServiceGraphState
+	MessageRouteGraph	AetherMeshMessageRouteGraphState
+	CongestionSnapshot	AetherMeshCongestionSnapshot
+	CostParams		AetherMeshRoutingCostParams
+	CostParamsHash		string
+	RoutingTableRoot	string
+	CongestionSnapshotRoot	string
+	EpochRoot		string
 }
 
 type AetherMeshRouteProofRequest struct {
-	SourceZone      string
-	DestinationZone string
-	Sender          string
-	Recipient       string
-	Opcode          string
-	MaxHops         uint32
-	CurrentHeight   uint64
+	SourceZone	string
+	DestinationZone	string
+	Sender		string
+	Recipient	string
+	Opcode		string
+	MaxHops		uint32
+	CurrentHeight	uint64
 }
 
 type AetherMeshRouteProof struct {
-	Epoch                  uint64
-	QueryHash              string
-	SelectedRoute          AetherMeshSelectedRouteMetadata
-	CandidateRoute         AetherMeshRouteCandidate
-	HopEdgeHashes          []string
-	RoutingTableRoot       string
-	CongestionSnapshotRoot string
-	EpochRoot              string
-	ProofHash              string
+	Epoch			uint64
+	QueryHash		string
+	SelectedRoute		AetherMeshSelectedRouteMetadata
+	CandidateRoute		AetherMeshRouteCandidate
+	HopEdgeHashes		[]string
+	RoutingTableRoot	string
+	CongestionSnapshotRoot	string
+	EpochRoot		string
+	ProofHash		string
 }
 
 type AetherMeshRoutingSimulation struct {
-	Epoch      uint64
-	Request    AetherMeshRouteSelectionRequest
-	Candidates []AetherMeshRouteCandidate
-	Selected   AetherMeshSelectedRouteMetadata
-	Proof      AetherMeshRouteProof
+	Epoch		uint64
+	Request		AetherMeshRouteSelectionRequest
+	Candidates	[]AetherMeshRouteCandidate
+	Selected	AetherMeshSelectedRouteMetadata
+	Proof		AetherMeshRouteProof
 }
 
 func BuildAetherMeshRoutingEpochState(epoch, startsHeight, expiresHeight uint64, zoneEdges []AetherMeshZoneEdge, serviceEdges []AetherMeshServiceEdge, messageEdges []AetherMeshMessageEdge, routeEdges []AetherMeshRouteEdge, params AetherMeshRoutingCostParams) (AetherMeshRoutingEpochState, error) {
@@ -103,17 +103,17 @@ func BuildAetherMeshRoutingEpochState(epoch, startsHeight, expiresHeight uint64,
 	routingRoot := ComputeAetherMeshCommittedRoutingTableRoot(routeEdges)
 	snapshotRoot := ComputeAetherMeshCommittedCongestionSnapshotRoot(routeEdges)
 	state := AetherMeshRoutingEpochState{
-		Epoch:                  epoch,
-		StartsHeight:           startsHeight,
-		ExpiresHeight:          expiresHeight,
-		ZoneGraph:              zoneState,
-		ServiceGraph:           serviceState,
-		MessageRouteGraph:      messageState,
-		CongestionSnapshot:     BuildAetherMeshCongestionSnapshot(epoch, startsHeight, routeEdges),
-		CostParams:             params,
-		CostParamsHash:         ComputeAetherMeshRoutingCostParamsHash(params),
-		RoutingTableRoot:       routingRoot,
-		CongestionSnapshotRoot: snapshotRoot,
+		Epoch:			epoch,
+		StartsHeight:		startsHeight,
+		ExpiresHeight:		expiresHeight,
+		ZoneGraph:		zoneState,
+		ServiceGraph:		serviceState,
+		MessageRouteGraph:	messageState,
+		CongestionSnapshot:	BuildAetherMeshCongestionSnapshot(epoch, startsHeight, routeEdges),
+		CostParams:		params,
+		CostParamsHash:		ComputeAetherMeshRoutingCostParamsHash(params),
+		RoutingTableRoot:	routingRoot,
+		CongestionSnapshotRoot:	snapshotRoot,
 	}
 	state.EpochRoot = ComputeAetherMeshRoutingEpochRoot(state)
 	return state, state.Validate()
@@ -121,38 +121,38 @@ func BuildAetherMeshRoutingEpochState(epoch, startsHeight, expiresHeight uint64,
 
 func BuildAetherMeshZoneGraphState(epoch uint64, edges []AetherMeshZoneEdge) (AetherMeshZoneGraphState, error) {
 	state := AetherMeshZoneGraphState{
-		Epoch:    epoch,
-		Edges:    normalizeAetherMeshZoneEdges(edges),
-		RootHash: ComputeAetherMeshZoneGraphRoot(epoch, edges),
+		Epoch:		epoch,
+		Edges:		normalizeAetherMeshZoneEdges(edges),
+		RootHash:	ComputeAetherMeshZoneGraphRoot(epoch, edges),
 	}
 	return state, state.Validate()
 }
 
 func BuildAetherMeshServiceGraphState(epoch uint64, edges []AetherMeshServiceEdge) (AetherMeshServiceGraphState, error) {
 	state := AetherMeshServiceGraphState{
-		Epoch:    epoch,
-		Edges:    normalizeAetherMeshServiceEdges(edges),
-		RootHash: ComputeAetherMeshServiceGraphRoot(epoch, edges),
+		Epoch:		epoch,
+		Edges:		normalizeAetherMeshServiceEdges(edges),
+		RootHash:	ComputeAetherMeshServiceGraphRoot(epoch, edges),
 	}
 	return state, state.Validate()
 }
 
 func BuildAetherMeshMessageRouteGraphState(epoch uint64, messageEdges []AetherMeshMessageEdge, routeEdges []AetherMeshRouteEdge) (AetherMeshMessageRouteGraphState, error) {
 	state := AetherMeshMessageRouteGraphState{
-		Epoch:        epoch,
-		MessageEdges: normalizeAetherMeshMessageEdges(messageEdges),
-		RouteEdges:   normalizeAetherMeshRouteEdges(routeEdges),
-		RootHash:     ComputeAetherMeshMessageRouteGraphRoot(epoch, messageEdges, routeEdges),
+		Epoch:		epoch,
+		MessageEdges:	normalizeAetherMeshMessageEdges(messageEdges),
+		RouteEdges:	normalizeAetherMeshRouteEdges(routeEdges),
+		RootHash:	ComputeAetherMeshMessageRouteGraphRoot(epoch, messageEdges, routeEdges),
 	}
 	return state, state.Validate()
 }
 
 func BuildAetherMeshCongestionSnapshot(epoch, height uint64, routeEdges []AetherMeshRouteEdge) AetherMeshCongestionSnapshot {
 	return AetherMeshCongestionSnapshot{
-		Epoch:        epoch,
-		Height:       height,
-		RoutingRoot:  ComputeAetherMeshCommittedRoutingTableRoot(routeEdges),
-		SnapshotRoot: ComputeAetherMeshCommittedCongestionSnapshotRoot(routeEdges),
+		Epoch:		epoch,
+		Height:		height,
+		RoutingRoot:	ComputeAetherMeshCommittedRoutingTableRoot(routeEdges),
+		SnapshotRoot:	ComputeAetherMeshCommittedCongestionSnapshotRoot(routeEdges),
 	}
 }
 
@@ -169,16 +169,16 @@ func QueryAetherMeshRouteProof(state AetherMeshRoutingEpochState, req AetherMesh
 		return AetherMeshRouteProof{}, errors.New("aether mesh route proof request height outside routing epoch")
 	}
 	selectionReq := AetherMeshRouteSelectionRequest{
-		SourceZone:             req.SourceZone,
-		DestinationZone:        req.DestinationZone,
-		Sender:                 req.Sender,
-		Recipient:              req.Recipient,
-		Opcode:                 req.Opcode,
-		RoutingTableRoot:       state.RoutingTableRoot,
-		CongestionSnapshotRoot: state.CongestionSnapshotRoot,
-		MaxHops:                req.MaxHops,
-		CurrentHeight:          req.CurrentHeight,
-		CostParams:             state.CostParams,
+		SourceZone:		req.SourceZone,
+		DestinationZone:	req.DestinationZone,
+		Sender:			req.Sender,
+		Recipient:		req.Recipient,
+		Opcode:			req.Opcode,
+		RoutingTableRoot:	state.RoutingTableRoot,
+		CongestionSnapshotRoot:	state.CongestionSnapshotRoot,
+		MaxHops:		req.MaxHops,
+		CurrentHeight:		req.CurrentHeight,
+		CostParams:		state.CostParams,
 	}
 	selected, err := SelectAetherMeshRoute(selectionReq, state.MessageRouteGraph.RouteEdges)
 	if err != nil {
@@ -203,14 +203,14 @@ func QueryAetherMeshRouteProof(state AetherMeshRoutingEpochState, req AetherMesh
 		hopHashes = append(hopHashes, hop.EdgeHash)
 	}
 	proof := AetherMeshRouteProof{
-		Epoch:                  state.Epoch,
-		QueryHash:              ComputeAetherMeshRouteProofQueryHash(req),
-		SelectedRoute:          selected,
-		CandidateRoute:         candidate,
-		HopEdgeHashes:          hopHashes,
-		RoutingTableRoot:       state.RoutingTableRoot,
-		CongestionSnapshotRoot: state.CongestionSnapshotRoot,
-		EpochRoot:              state.EpochRoot,
+		Epoch:			state.Epoch,
+		QueryHash:		ComputeAetherMeshRouteProofQueryHash(req),
+		SelectedRoute:		selected,
+		CandidateRoute:		candidate,
+		HopEdgeHashes:		hopHashes,
+		RoutingTableRoot:	state.RoutingTableRoot,
+		CongestionSnapshotRoot:	state.CongestionSnapshotRoot,
+		EpochRoot:		state.EpochRoot,
 	}
 	proof.ProofHash = ComputeAetherMeshRouteProofHash(proof)
 	return proof, proof.Validate()
@@ -222,27 +222,27 @@ func SimulateAetherMeshRouting(state AetherMeshRoutingEpochState, req AetherMesh
 		return AetherMeshRoutingSimulation{}, err
 	}
 	selectionReq := AetherMeshRouteSelectionRequest{
-		SourceZone:             req.SourceZone,
-		DestinationZone:        req.DestinationZone,
-		Sender:                 req.Sender,
-		Recipient:              req.Recipient,
-		Opcode:                 req.Opcode,
-		RoutingTableRoot:       state.RoutingTableRoot,
-		CongestionSnapshotRoot: state.CongestionSnapshotRoot,
-		MaxHops:                req.MaxHops,
-		CurrentHeight:          req.CurrentHeight,
-		CostParams:             state.CostParams,
+		SourceZone:		req.SourceZone,
+		DestinationZone:	req.DestinationZone,
+		Sender:			req.Sender,
+		Recipient:		req.Recipient,
+		Opcode:			req.Opcode,
+		RoutingTableRoot:	state.RoutingTableRoot,
+		CongestionSnapshotRoot:	state.CongestionSnapshotRoot,
+		MaxHops:		req.MaxHops,
+		CurrentHeight:		req.CurrentHeight,
+		CostParams:		state.CostParams,
 	}
 	candidates, err := BuildAetherMeshRouteCandidates(selectionReq, state.MessageRouteGraph.RouteEdges)
 	if err != nil {
 		return AetherMeshRoutingSimulation{}, err
 	}
 	return AetherMeshRoutingSimulation{
-		Epoch:      state.Epoch,
-		Request:    normalizeAetherMeshRouteSelectionRequest(selectionReq),
-		Candidates: candidates,
-		Selected:   proof.SelectedRoute,
-		Proof:      proof,
+		Epoch:		state.Epoch,
+		Request:	normalizeAetherMeshRouteSelectionRequest(selectionReq),
+		Candidates:	candidates,
+		Selected:	proof.SelectedRoute,
+		Proof:		proof,
 	}, nil
 }
 

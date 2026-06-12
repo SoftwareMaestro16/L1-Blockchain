@@ -13,96 +13,96 @@ import (
 )
 
 const (
-	MaxConfigEntriesV1     = uint32(128)
-	MaxConfigKeyBytesV1    = uint32(96)
-	MaxConfigValueBytesV1  = uint32(4096)
-	MaxPendingChangesV1    = uint32(128)
-	MaxChangeIDBytesV1     = uint32(96)
-	DefaultActivationDelay = uint64(10)
-	DefaultCriticalDelay   = uint64(100)
-	DefaultEpochLength     = uint64(50)
+	MaxConfigEntriesV1	= uint32(128)
+	MaxConfigKeyBytesV1	= uint32(96)
+	MaxConfigValueBytesV1	= uint32(4096)
+	MaxPendingChangesV1	= uint32(128)
+	MaxChangeIDBytesV1	= uint32(96)
+	DefaultActivationDelay	= uint64(10)
+	DefaultCriticalDelay	= uint64(100)
+	DefaultEpochLength	= uint64(50)
 
-	OperationSet    = "set"
-	OperationDelete = "delete"
+	OperationSet	= "set"
+	OperationDelete	= "delete"
 
-	ChangeStatusPending   = "pending"
-	ChangeStatusApproved  = "approved"
-	ChangeStatusRejected  = "rejected"
-	ChangeStatusExecuted  = "executed"
-	ChangeStatusCancelled = "cancelled"
+	ChangeStatusPending	= "pending"
+	ChangeStatusApproved	= "approved"
+	ChangeStatusRejected	= "rejected"
+	ChangeStatusExecuted	= "executed"
+	ChangeStatusCancelled	= "cancelled"
 
-	KeyConsensusMaxBlockGas       = "consensus/max_block_gas"
-	KeyFeeBaseDenom               = "fee/base_denom"
-	KeyStorageRentPerByteEpoch    = "storage/rent_per_byte_epoch"
-	KeyStorageContractStateActive = "storage/contract_state_non_empty"
-	KeyConstitutionZeroRentAllow  = "constitution/allow_zero_storage_rent"
+	KeyConsensusMaxBlockGas		= "consensus/max_block_gas"
+	KeyFeeBaseDenom			= "fee/base_denom"
+	KeyStorageRentPerByteEpoch	= "storage/rent_per_byte_epoch"
+	KeyStorageContractStateActive	= "storage/contract_state_non_empty"
+	KeyConstitutionZeroRentAllow	= "constitution/allow_zero_storage_rent"
 
-	MaxConsensusBlockGasV1 = uint64(1_000_000_000)
-	MaxConfigUintValueV1   = uint64(1_000_000_000_000_000)
+	MaxConsensusBlockGasV1	= uint64(1_000_000_000)
+	MaxConfigUintValueV1	= uint64(1_000_000_000_000_000)
 )
 
 type Params struct {
-	Authority                 string
-	MaxEntries                uint32
-	MaxPendingChanges         uint32
-	MaxKeyBytes               uint32
-	MaxValueBytes             uint32
-	MaxChangeIDBytes          uint32
-	MinActivationDelay        uint64
-	CriticalActivationDelay   uint64
-	ActivationEpochLength     uint64
-	BaseDenom                 string
-	RequiredSystemAccountKeys []string
+	Authority			string
+	MaxEntries			uint32
+	MaxPendingChanges		uint32
+	MaxKeyBytes			uint32
+	MaxValueBytes			uint32
+	MaxChangeIDBytes		uint32
+	MinActivationDelay		uint64
+	CriticalActivationDelay		uint64
+	ActivationEpochLength		uint64
+	BaseDenom			string
+	RequiredSystemAccountKeys	[]string
 }
 
 type ConfigEntry struct {
-	Key           string
-	Value         string
-	Owner         string
-	Version       uint64
-	UpdatedHeight int64
+	Key		string
+	Value		string
+	Owner		string
+	Version		uint64
+	UpdatedHeight	int64
 }
 
 type ConfigChange struct {
-	ID                                  string
-	Key                                 string
-	Value                               string
-	Operation                           string
-	Status                              string
-	SubmittedBy                         string
-	ApprovedBy                          string
-	RejectedBy                          string
-	CancelledBy                         string
-	ExecutedBy                          string
-	Reason                              string
-	RequiresConstitutionalException     bool
-	Critical                            bool
-	CreatedHeight                       int64
-	UpdatedHeight                       int64
-	ActivationHeight                    int64
-	ActivationEpoch                     uint64
-	ExpectedPreviousVersion             uint64
-	AllowMissingExpectedPreviousVersion bool
+	ID					string
+	Key					string
+	Value					string
+	Operation				string
+	Status					string
+	SubmittedBy				string
+	ApprovedBy				string
+	RejectedBy				string
+	CancelledBy				string
+	ExecutedBy				string
+	Reason					string
+	RequiresConstitutionalException		bool
+	Critical				bool
+	CreatedHeight				int64
+	UpdatedHeight				int64
+	ActivationHeight			int64
+	ActivationEpoch				uint64
+	ExpectedPreviousVersion			uint64
+	AllowMissingExpectedPreviousVersion	bool
 }
 
 type ConfigState struct {
-	Entries        []ConfigEntry
-	PendingChanges []ConfigChange
+	Entries		[]ConfigEntry
+	PendingChanges	[]ConfigChange
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:                 prototype.DefaultAuthority,
-		MaxEntries:                MaxConfigEntriesV1,
-		MaxPendingChanges:         MaxPendingChangesV1,
-		MaxKeyBytes:               MaxConfigKeyBytesV1,
-		MaxValueBytes:             MaxConfigValueBytesV1,
-		MaxChangeIDBytes:          MaxChangeIDBytesV1,
-		MinActivationDelay:        DefaultActivationDelay,
-		CriticalActivationDelay:   DefaultCriticalDelay,
-		ActivationEpochLength:     DefaultEpochLength,
-		BaseDenom:                 appparams.BaseDenom,
-		RequiredSystemAccountKeys: []string{"system/account/fee_collector", "system/account/treasury"},
+		Authority:			prototype.DefaultAuthority,
+		MaxEntries:			MaxConfigEntriesV1,
+		MaxPendingChanges:		MaxPendingChangesV1,
+		MaxKeyBytes:			MaxConfigKeyBytesV1,
+		MaxValueBytes:			MaxConfigValueBytesV1,
+		MaxChangeIDBytes:		MaxChangeIDBytesV1,
+		MinActivationDelay:		DefaultActivationDelay,
+		CriticalActivationDelay:	DefaultCriticalDelay,
+		ActivationEpochLength:		DefaultEpochLength,
+		BaseDenom:			appparams.BaseDenom,
+		RequiredSystemAccountKeys:	[]string{"system/account/fee_collector", "system/account/treasury"},
 	}
 }
 
@@ -214,10 +214,10 @@ func (c ConfigChange) Validate(params Params) error {
 		return err
 	}
 	for label, value := range map[string]string{
-		"config change approver":  c.ApprovedBy,
-		"config change rejector":  c.RejectedBy,
-		"config change canceller": c.CancelledBy,
-		"config change executor":  c.ExecutedBy,
+		"config change approver":	c.ApprovedBy,
+		"config change rejector":	c.RejectedBy,
+		"config change canceller":	c.CancelledBy,
+		"config change executor":	c.ExecutedBy,
 	} {
 		if strings.TrimSpace(value) != "" {
 			if err := addressing.ValidateAuthorityAddress(label, value); err != nil {
@@ -312,8 +312,8 @@ func (s ConfigState) ValidateRequiredSystemAccounts(params Params) error {
 
 func CloneState(state ConfigState) ConfigState {
 	out := ConfigState{
-		Entries:        make([]ConfigEntry, len(state.Entries)),
-		PendingChanges: make([]ConfigChange, len(state.PendingChanges)),
+		Entries:	make([]ConfigEntry, len(state.Entries)),
+		PendingChanges:	make([]ConfigChange, len(state.PendingChanges)),
 	}
 	copy(out.Entries, state.Entries)
 	copy(out.PendingChanges, state.PendingChanges)
@@ -566,28 +566,28 @@ func parseBoundedUint(key string, value string, requirePositive bool) (uint64, e
 }
 
 type MsgSubmitConfigChange struct {
-	Authority string
-	Change    ConfigChange
+	Authority	string
+	Change		ConfigChange
 }
 
 type MsgApproveConfigChange struct {
-	Authority string
-	ChangeID  string
+	Authority	string
+	ChangeID	string
 }
 
 type MsgRejectConfigChange struct {
-	Authority string
-	ChangeID  string
-	Reason    string
+	Authority	string
+	ChangeID	string
+	Reason		string
 }
 
 type MsgExecuteConfigChange struct {
-	Authority string
-	ChangeID  string
+	Authority	string
+	ChangeID	string
 }
 
 type MsgCancelConfigChange struct {
-	Authority string
-	ChangeID  string
-	Reason    string
+	Authority	string
+	ChangeID	string
+	Reason		string
 }

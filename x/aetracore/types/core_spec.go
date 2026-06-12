@@ -7,43 +7,43 @@ import (
 )
 
 type ZoneDescriptorSpec struct {
-	ZoneID                ZoneID
-	ZoneType              ZoneType
-	ModuleName            string
-	Enabled               bool
-	StateMachineVersion   uint64
-	MempoolPolicyID       string
-	FeePolicyID           string
-	ShardLayoutEpoch      uint64
-	MaxShards             uint32
-	MessageCapabilities   []string
-	ProofCapabilities     []string
-	UpgradeHeightOptional uint64
+	ZoneID			ZoneID
+	ZoneType		ZoneType
+	ModuleName		string
+	Enabled			bool
+	StateMachineVersion	uint64
+	MempoolPolicyID		string
+	FeePolicyID		string
+	ShardLayoutEpoch	uint64
+	MaxShards		uint32
+	MessageCapabilities	[]string
+	ProofCapabilities	[]string
+	UpgradeHeightOptional	uint64
 }
 
 type ZoneCommitmentSpec struct {
-	Height                uint64
-	ZoneID                ZoneID
-	ZoneStateRoot         string
-	ZoneMessageOutboxRoot string
-	ZoneMessageInboxRoot  string
-	ZoneReceiptRoot       string
-	ZoneEventRoot         string
-	ShardRootsRoot        string
-	ExecutionSummaryHash  string
+	Height			uint64
+	ZoneID			ZoneID
+	ZoneStateRoot		string
+	ZoneMessageOutboxRoot	string
+	ZoneMessageInboxRoot	string
+	ZoneReceiptRoot		string
+	ZoneEventRoot		string
+	ShardRootsRoot		string
+	ExecutionSummaryHash	string
 }
 
 type CoreExecutionPhaseSpec struct {
-	Phase             KernelABCIPhase
-	DeterministicWork []string
-	RejectionChecks   []string
-	CommittedOutput   []string
-	PhaseSpecHash     string
+	Phase			KernelABCIPhase
+	DeterministicWork	[]string
+	RejectionChecks		[]string
+	CommittedOutput		[]string
+	PhaseSpecHash		string
 }
 
 type CoreExecutionPipelineSpec struct {
-	Phases       []CoreExecutionPhaseSpec
-	PipelineHash string
+	Phases		[]CoreExecutionPhaseSpec
+	PipelineHash	string
 }
 
 func NewZoneDescriptorSpec(descriptor ZoneDescriptor) (ZoneDescriptorSpec, error) {
@@ -56,18 +56,18 @@ func NewZoneDescriptorSpecWithParams(descriptor ZoneDescriptor, params AetraCore
 		return ZoneDescriptorSpec{}, err
 	}
 	return ZoneDescriptorSpec{
-		ZoneID:                descriptor.ZoneID,
-		ZoneType:              descriptor.ZoneType,
-		ModuleName:            descriptor.ModuleName,
-		Enabled:               descriptor.Enabled,
-		StateMachineVersion:   descriptor.StateMachineVersion,
-		MempoolPolicyID:       descriptor.MempoolPolicyID,
-		FeePolicyID:           descriptor.FeePolicyID,
-		ShardLayoutEpoch:      descriptor.ShardLayoutEpoch,
-		MaxShards:             descriptor.MaxShards,
-		MessageCapabilities:   append([]string(nil), descriptor.MessageCapabilities...),
-		ProofCapabilities:     append([]string(nil), descriptor.ProofCapabilities...),
-		UpgradeHeightOptional: descriptor.UpgradeHeightOptional,
+		ZoneID:			descriptor.ZoneID,
+		ZoneType:		descriptor.ZoneType,
+		ModuleName:		descriptor.ModuleName,
+		Enabled:		descriptor.Enabled,
+		StateMachineVersion:	descriptor.StateMachineVersion,
+		MempoolPolicyID:	descriptor.MempoolPolicyID,
+		FeePolicyID:		descriptor.FeePolicyID,
+		ShardLayoutEpoch:	descriptor.ShardLayoutEpoch,
+		MaxShards:		descriptor.MaxShards,
+		MessageCapabilities:	append([]string(nil), descriptor.MessageCapabilities...),
+		ProofCapabilities:	append([]string(nil), descriptor.ProofCapabilities...),
+		UpgradeHeightOptional:	descriptor.UpgradeHeightOptional,
 	}, nil
 }
 
@@ -76,22 +76,22 @@ func NewZoneCommitmentSpec(commitment ZoneCommitment) (ZoneCommitmentSpec, error
 		return ZoneCommitmentSpec{}, err
 	}
 	return ZoneCommitmentSpec{
-		Height:                commitment.Height,
-		ZoneID:                commitment.ZoneID,
-		ZoneStateRoot:         commitment.StateRoot,
-		ZoneMessageOutboxRoot: commitment.OutboxRoot,
-		ZoneMessageInboxRoot:  commitment.InboxRoot,
-		ZoneReceiptRoot:       commitment.ReceiptsRoot,
-		ZoneEventRoot:         commitment.EventsRoot,
-		ShardRootsRoot:        commitment.ShardRootsRoot,
-		ExecutionSummaryHash:  commitment.ExecutionSummaryHash,
+		Height:			commitment.Height,
+		ZoneID:			commitment.ZoneID,
+		ZoneStateRoot:		commitment.StateRoot,
+		ZoneMessageOutboxRoot:	commitment.OutboxRoot,
+		ZoneMessageInboxRoot:	commitment.InboxRoot,
+		ZoneReceiptRoot:	commitment.ReceiptsRoot,
+		ZoneEventRoot:		commitment.EventsRoot,
+		ShardRootsRoot:		commitment.ShardRootsRoot,
+		ExecutionSummaryHash:	commitment.ExecutionSummaryHash,
 	}, nil
 }
 
 func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 	phases := []CoreExecutionPhaseSpec{
 		{
-			Phase: KernelPhasePrepareProposal,
+			Phase:	KernelPhasePrepareProposal,
 			DeterministicWork: []string{
 				"group-transactions-by-zone-and-shard",
 				"apply-size-and-gas-bounds",
@@ -104,10 +104,10 @@ func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 				"invalid-shard-targets",
 				"proposal-limit-exceeded",
 			},
-			CommittedOutput: []string{"proposal-schedule", "local-transaction-batches", "inbound-message-batches"},
+			CommittedOutput:	[]string{"proposal-schedule", "local-transaction-batches", "inbound-message-batches"},
 		},
 		{
-			Phase: KernelPhaseProcessProposal,
+			Phase:	KernelPhaseProcessProposal,
 			DeterministicWork: []string{
 				"rebuild-schedule-from-proposal",
 				"verify-committed-routing-state",
@@ -119,10 +119,10 @@ func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 				"wrong-message-delivery-order",
 				"malformed-execution-batches",
 			},
-			CommittedOutput: []string{"accepted-proposal-schedule", "deterministic-rejection"},
+			CommittedOutput:	[]string{"accepted-proposal-schedule", "deterministic-rejection"},
 		},
 		{
-			Phase: KernelPhaseFinalizeBlock,
+			Phase:	KernelPhaseFinalizeBlock,
 			DeterministicWork: []string{
 				"execute-zone-batches",
 				"execute-inbound-messages",
@@ -137,10 +137,10 @@ func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 				"duplicate-receipts",
 				"invalid-proof-roots",
 			},
-			CommittedOutput: []string{"zone-commitments", "global-message-root", "receipt-roots", "proof-roots", "global-state-root"},
+			CommittedOutput:	[]string{"zone-commitments", "global-message-root", "receipt-roots", "proof-roots", "global-state-root"},
 		},
 		{
-			Phase: KernelPhaseCommit,
+			Phase:	KernelPhaseCommit,
 			DeterministicWork: []string{
 				"persist-final-app-hash",
 				"persist-root-snapshots",
@@ -150,7 +150,7 @@ func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 				"missing-finality-metadata",
 				"app-hash-commitment-mismatch",
 			},
-			CommittedOutput: []string{"committed-app-hash", "historical-proof-roots", "delivery-eligibility"},
+			CommittedOutput:	[]string{"committed-app-hash", "historical-proof-roots", "delivery-eligibility"},
 		},
 	}
 	for i := range phases {
@@ -167,34 +167,34 @@ func DefaultCoreExecutionPipelineSpec() (CoreExecutionPipelineSpec, error) {
 
 func (s ZoneDescriptorSpec) Validate() error {
 	return ZoneDescriptor{
-		ZoneID:                s.ZoneID,
-		ZoneType:              s.ZoneType,
-		ModuleName:            s.ModuleName,
-		Enabled:               s.Enabled,
-		StateMachineVersion:   s.StateMachineVersion,
-		MempoolPolicyID:       s.MempoolPolicyID,
-		FeePolicyID:           s.FeePolicyID,
-		ShardLayoutEpoch:      s.ShardLayoutEpoch,
-		MaxShards:             s.MaxShards,
-		MessageCapabilities:   append([]string(nil), s.MessageCapabilities...),
-		ProofCapabilities:     append([]string(nil), s.ProofCapabilities...),
-		UpgradeHeightOptional: s.UpgradeHeightOptional,
+		ZoneID:			s.ZoneID,
+		ZoneType:		s.ZoneType,
+		ModuleName:		s.ModuleName,
+		Enabled:		s.Enabled,
+		StateMachineVersion:	s.StateMachineVersion,
+		MempoolPolicyID:	s.MempoolPolicyID,
+		FeePolicyID:		s.FeePolicyID,
+		ShardLayoutEpoch:	s.ShardLayoutEpoch,
+		MaxShards:		s.MaxShards,
+		MessageCapabilities:	append([]string(nil), s.MessageCapabilities...),
+		ProofCapabilities:	append([]string(nil), s.ProofCapabilities...),
+		UpgradeHeightOptional:	s.UpgradeHeightOptional,
 	}.Validate(DefaultParams())
 }
 
 func (s ZoneCommitmentSpec) Validate() error {
 	return ZoneCommitment{
-		Height:               s.Height,
-		ZoneID:               s.ZoneID,
-		StateRoot:            s.ZoneStateRoot,
-		InboxRoot:            s.ZoneMessageInboxRoot,
-		OutboxRoot:           s.ZoneMessageOutboxRoot,
-		ReceiptsRoot:         s.ZoneReceiptRoot,
-		EventsRoot:           s.ZoneEventRoot,
-		ShardRootsRoot:       s.ShardRootsRoot,
-		ParamsHash:           EmptyRootHash,
-		ExecutionSummaryHash: s.ExecutionSummaryHash,
-		CommitmentHash:       EmptyRootHash,
+		Height:			s.Height,
+		ZoneID:			s.ZoneID,
+		StateRoot:		s.ZoneStateRoot,
+		InboxRoot:		s.ZoneMessageInboxRoot,
+		OutboxRoot:		s.ZoneMessageOutboxRoot,
+		ReceiptsRoot:		s.ZoneReceiptRoot,
+		EventsRoot:		s.ZoneEventRoot,
+		ShardRootsRoot:		s.ShardRootsRoot,
+		ParamsHash:		EmptyRootHash,
+		ExecutionSummaryHash:	s.ExecutionSummaryHash,
+		CommitmentHash:		EmptyRootHash,
 	}.ValidateFormat()
 }
 

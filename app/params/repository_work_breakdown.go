@@ -6,127 +6,127 @@ import (
 )
 
 const (
-	AetraRepoAreaProto = "proto/"
-	AetraRepoAreaX     = "x/"
-	AetraRepoAreaApp   = "app/"
-	AetraRepoAreaTests = "tests/"
+	AetraRepoAreaProto	= "proto/"
+	AetraRepoAreaX		= "x/"
+	AetraRepoAreaApp	= "app/"
+	AetraRepoAreaTests	= "tests/"
 )
 
 const (
-	AetraRepoProtoTaskDefineMessages       = "define_protobuf_messages_for_new_modules"
-	AetraRepoProtoTaskDefineQueryServices  = "define_query_services"
-	AetraRepoProtoTaskDefineTxServices     = "define_tx_services"
-	AetraRepoProtoTaskDefineGenesis        = "define_genesis_messages"
-	AetraRepoProtoTaskDefineParams         = "define_params_messages"
-	AetraRepoProtoTaskRunCodeGeneration    = "run_code_generation"
-	AetraRepoProtoTaskBreakingChangeChecks = "add_proto_breaking_change_checks_if_available"
+	AetraRepoProtoTaskDefineMessages	= "define_protobuf_messages_for_new_modules"
+	AetraRepoProtoTaskDefineQueryServices	= "define_query_services"
+	AetraRepoProtoTaskDefineTxServices	= "define_tx_services"
+	AetraRepoProtoTaskDefineGenesis		= "define_genesis_messages"
+	AetraRepoProtoTaskDefineParams		= "define_params_messages"
+	AetraRepoProtoTaskRunCodeGeneration	= "run_code_generation"
+	AetraRepoProtoTaskBreakingChangeChecks	= "add_proto_breaking_change_checks_if_available"
 )
 
 const (
-	AetraRepoProtoTestGeneratedCodeCompiles = "generated_code_compiles"
-	AetraRepoProtoTestLintPasses            = "proto_lint_passes_if_configured"
-	AetraRepoProtoTestServiceRegistration   = "query_tx_service_registration_tested"
+	AetraRepoProtoTestGeneratedCodeCompiles	= "generated_code_compiles"
+	AetraRepoProtoTestLintPasses		= "proto_lint_passes_if_configured"
+	AetraRepoProtoTestServiceRegistration	= "query_tx_service_registration_tested"
 )
 
 const (
-	AetraRepoXTaskImplementKeepers          = "implement_keepers"
-	AetraRepoXTaskImplementMsgServers       = "implement_message_servers"
-	AetraRepoXTaskImplementQueryServers     = "implement_query_servers"
-	AetraRepoXTaskImplementGenesis          = "implement_genesis"
-	AetraRepoXTaskImplementParamsValidation = "implement_params_validation"
-	AetraRepoXTaskImplementInvariants       = "implement_invariants"
-	AetraRepoXTaskImplementHooks            = "implement_hooks_where_needed"
-	AetraRepoXTaskImplementEvents           = "implement_events"
-	AetraRepoXTaskImplementModuleInterfaces = "implement_module_interfaces"
+	AetraRepoXTaskImplementKeepers		= "implement_keepers"
+	AetraRepoXTaskImplementMsgServers	= "implement_message_servers"
+	AetraRepoXTaskImplementQueryServers	= "implement_query_servers"
+	AetraRepoXTaskImplementGenesis		= "implement_genesis"
+	AetraRepoXTaskImplementParamsValidation	= "implement_params_validation"
+	AetraRepoXTaskImplementInvariants	= "implement_invariants"
+	AetraRepoXTaskImplementHooks		= "implement_hooks_where_needed"
+	AetraRepoXTaskImplementEvents		= "implement_events"
+	AetraRepoXTaskImplementModuleInterfaces	= "implement_module_interfaces"
 )
 
 const (
-	AetraRepoXTestKeeperUnit       = "keeper_unit_tests"
-	AetraRepoXTestMsgServer        = "msg_server_tests"
-	AetraRepoXTestQueryServer      = "query_server_tests"
-	AetraRepoXTestGenesis          = "genesis_tests"
-	AetraRepoXTestInvariant        = "invariant_tests"
-	AetraRepoXTestFuzzPropertyMath = "fuzz_property_tests_for_math"
+	AetraRepoXTestKeeperUnit	= "keeper_unit_tests"
+	AetraRepoXTestMsgServer		= "msg_server_tests"
+	AetraRepoXTestQueryServer	= "query_server_tests"
+	AetraRepoXTestGenesis		= "genesis_tests"
+	AetraRepoXTestInvariant		= "invariant_tests"
+	AetraRepoXTestFuzzPropertyMath	= "fuzz_property_tests_for_math"
 )
 
 const (
-	AetraRepoAppTaskWireKeepers                  = "wire_keepers"
-	AetraRepoAppTaskWireModules                  = "wire_modules"
-	AetraRepoAppTaskWireModuleAccountPermissions = "wire_module_account_permissions"
-	AetraRepoAppTaskWireBeginEndPreblockOrder    = "wire_begin_end_preblock_order"
-	AetraRepoAppTaskWireSimulationManager        = "wire_simulation_manager_if_used"
-	AetraRepoAppTaskWireAPIRoutes                = "wire_api_routes"
-	AetraRepoAppTaskWireAutoCLI                  = "wire_autocli_if_used"
-	AetraRepoAppTaskValidateStartup              = "validate_startup"
+	AetraRepoAppTaskWireKeepers			= "wire_keepers"
+	AetraRepoAppTaskWireModules			= "wire_modules"
+	AetraRepoAppTaskWireModuleAccountPermissions	= "wire_module_account_permissions"
+	AetraRepoAppTaskWireBeginEndPreblockOrder	= "wire_begin_end_preblock_order"
+	AetraRepoAppTaskWireSimulationManager		= "wire_simulation_manager_if_used"
+	AetraRepoAppTaskWireAPIRoutes			= "wire_api_routes"
+	AetraRepoAppTaskWireAutoCLI			= "wire_autocli_if_used"
+	AetraRepoAppTaskValidateStartup			= "validate_startup"
 )
 
 const (
-	AetraRepoAppTestStartup                  = "app_startup"
-	AetraRepoAppTestModuleAccountPermissions = "module_account_permissions"
-	AetraRepoAppTestBeginEndOrder            = "begin_end_order"
-	AetraRepoAppTestExportImport             = "export_import"
-	AetraRepoAppTestDeterministicRestart     = "deterministic_restart"
-	AetraRepoAppTestAPIServiceRegistration   = "api_service_registration"
+	AetraRepoAppTestStartup				= "app_startup"
+	AetraRepoAppTestModuleAccountPermissions	= "module_account_permissions"
+	AetraRepoAppTestBeginEndOrder			= "begin_end_order"
+	AetraRepoAppTestExportImport			= "export_import"
+	AetraRepoAppTestDeterministicRestart		= "deterministic_restart"
+	AetraRepoAppTestAPIServiceRegistration		= "api_service_registration"
 )
 
 const (
-	AetraRepoTestsTaskIntegrationSuites = "integration_test_suites"
-	AetraRepoTestsTaskE2ELocalnetSmoke  = "e2e_localnet_smoke_tests"
-	AetraRepoTestsTaskAdversarial       = "adversarial_tests"
-	AetraRepoTestsTaskLoadProfiles      = "load_profile_tests"
-	AetraRepoTestsTaskDocumentationPath = "documentation_path_tests"
-	AetraRepoTestsTaskCIScripts         = "ci_scripts"
+	AetraRepoTestsTaskIntegrationSuites	= "integration_test_suites"
+	AetraRepoTestsTaskE2ELocalnetSmoke	= "e2e_localnet_smoke_tests"
+	AetraRepoTestsTaskAdversarial		= "adversarial_tests"
+	AetraRepoTestsTaskLoadProfiles		= "load_profile_tests"
+	AetraRepoTestsTaskDocumentationPath	= "documentation_path_tests"
+	AetraRepoTestsTaskCIScripts		= "ci_scripts"
 )
 
 const (
-	AetraRepoTestsRequirementDocumentedCommands = "tests_runnable_from_documented_commands"
-	AetraRepoTestsRequirementWindowsPowerShell  = "windows_powershell_local_scripts_remain_usable_if_supported"
-	AetraRepoTestsRequirementLinuxCIPrimary     = "linux_ci_path_primary_for_production_confidence"
+	AetraRepoTestsRequirementDocumentedCommands	= "tests_runnable_from_documented_commands"
+	AetraRepoTestsRequirementWindowsPowerShell	= "windows_powershell_local_scripts_remain_usable_if_supported"
+	AetraRepoTestsRequirementLinuxCIPrimary		= "linux_ci_path_primary_for_production_confidence"
 )
 
 type AetraRepoWorkAreaEvidence struct {
-	Area  string
-	Tasks []string
-	Tests []string
+	Area	string
+	Tasks	[]string
+	Tests	[]string
 }
 
 type AetraRepoWorkAreaReport struct {
-	Area     string
-	Required int
-	Passed   int
-	Failed   []string
-	Ready    bool
+	Area		string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraRepoProtoWorkEvidence() AetraRepoWorkAreaEvidence {
 	return AetraRepoWorkAreaEvidence{
-		Area:  AetraRepoAreaProto,
-		Tasks: RequiredAetraRepoProtoTasks(),
-		Tests: RequiredAetraRepoProtoTests(),
+		Area:	AetraRepoAreaProto,
+		Tasks:	RequiredAetraRepoProtoTasks(),
+		Tests:	RequiredAetraRepoProtoTests(),
 	}
 }
 
 func DefaultAetraRepoXWorkEvidence() AetraRepoWorkAreaEvidence {
 	return AetraRepoWorkAreaEvidence{
-		Area:  AetraRepoAreaX,
-		Tasks: RequiredAetraRepoXTasks(),
-		Tests: RequiredAetraRepoXTests(),
+		Area:	AetraRepoAreaX,
+		Tasks:	RequiredAetraRepoXTasks(),
+		Tests:	RequiredAetraRepoXTests(),
 	}
 }
 
 func DefaultAetraRepoAppWorkEvidence() AetraRepoWorkAreaEvidence {
 	return AetraRepoWorkAreaEvidence{
-		Area:  AetraRepoAreaApp,
-		Tasks: RequiredAetraRepoAppTasks(),
-		Tests: RequiredAetraRepoAppTests(),
+		Area:	AetraRepoAreaApp,
+		Tasks:	RequiredAetraRepoAppTasks(),
+		Tests:	RequiredAetraRepoAppTests(),
 	}
 }
 
 func DefaultAetraRepoTestsWorkEvidence() AetraRepoWorkAreaEvidence {
 	return AetraRepoWorkAreaEvidence{
-		Area:  AetraRepoAreaTests,
-		Tasks: RequiredAetraRepoTestsTasks(),
-		Tests: RequiredAetraRepoTestsRequirements(),
+		Area:	AetraRepoAreaTests,
+		Tasks:	RequiredAetraRepoTestsTasks(),
+		Tests:	RequiredAetraRepoTestsRequirements(),
 	}
 }
 
@@ -174,11 +174,11 @@ func BuildAetraRepoProtoWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepo
 
 	sort.Strings(failed)
 	return AetraRepoWorkAreaReport{
-		Area:     evidence.Area,
-		Required: len(RequiredAetraRepoProtoTasks()) + len(RequiredAetraRepoProtoTests()),
-		Passed:   passedTasks + passedTests,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Area:		evidence.Area,
+		Required:	len(RequiredAetraRepoProtoTasks()) + len(RequiredAetraRepoProtoTests()),
+		Passed:		passedTasks + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -194,11 +194,11 @@ func BuildAetraRepoXWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWork
 
 	sort.Strings(failed)
 	return AetraRepoWorkAreaReport{
-		Area:     evidence.Area,
-		Required: len(RequiredAetraRepoXTasks()) + len(RequiredAetraRepoXTests()),
-		Passed:   passedTasks + passedTests,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Area:		evidence.Area,
+		Required:	len(RequiredAetraRepoXTasks()) + len(RequiredAetraRepoXTests()),
+		Passed:		passedTasks + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -214,11 +214,11 @@ func BuildAetraRepoAppWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepoWo
 
 	sort.Strings(failed)
 	return AetraRepoWorkAreaReport{
-		Area:     evidence.Area,
-		Required: len(RequiredAetraRepoAppTasks()) + len(RequiredAetraRepoAppTests()),
-		Passed:   passedTasks + passedTests,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Area:		evidence.Area,
+		Required:	len(RequiredAetraRepoAppTasks()) + len(RequiredAetraRepoAppTests()),
+		Passed:		passedTasks + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -234,11 +234,11 @@ func BuildAetraRepoTestsWorkReport(evidence AetraRepoWorkAreaEvidence) AetraRepo
 
 	sort.Strings(failed)
 	return AetraRepoWorkAreaReport{
-		Area:     evidence.Area,
-		Required: len(RequiredAetraRepoTestsTasks()) + len(RequiredAetraRepoTestsRequirements()),
-		Passed:   passedTasks + passedTests,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Area:		evidence.Area,
+		Required:	len(RequiredAetraRepoTestsTasks()) + len(RequiredAetraRepoTestsRequirements()),
+		Passed:		passedTasks + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

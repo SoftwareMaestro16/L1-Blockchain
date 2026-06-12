@@ -40,7 +40,7 @@ func TestResolverKeeperV2AuthorizationReverseAndTTL(t *testing.T) {
 	require.ErrorContains(t, err, "requires owner")
 
 	state, unified, err := keeper.UpdateUnifiedRecord(state, "alice.aet", addr(1), ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(3),
 		},
@@ -114,12 +114,12 @@ func TestProofAndRoutingIntegrationKeepersV2(t *testing.T) {
 	})
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
+		Primary:	addr(2),
+		Contract:	addr(3),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(4),
 		},
-		Metadata: metadata,
+		Metadata:	metadata,
 	}, 12)
 	require.NoError(t, err)
 
@@ -149,25 +149,25 @@ func TestKeeperInvariantRejectsStaleResolutionCache(t *testing.T) {
 	require.NoError(t, err)
 	state := EmptyIdentityState(DefaultIdentityParams())
 	require.NoError(t, ValidateIdentityKeeperInvariantsV2(IdentityKeeperInvariantInputV2{
-		State:        state,
-		Height:       10,
-		CacheRecords: []ResolutionCacheRecordV2{record},
+		State:		state,
+		Height:		10,
+		CacheRecords:	[]ResolutionCacheRecordV2{record},
 		CacheContexts: []ResolutionCacheUseContextV2{{
-			Height:        10,
-			SourceVersion: 7,
-			ParentEpoch:   2,
-			ChildEpoch:    3,
+			Height:		10,
+			SourceVersion:	7,
+			ParentEpoch:	2,
+			ChildEpoch:	3,
 		}},
 	}))
 	require.ErrorContains(t, ValidateIdentityKeeperInvariantsV2(IdentityKeeperInvariantInputV2{
-		State:        state,
-		Height:       10,
-		CacheRecords: []ResolutionCacheRecordV2{record},
+		State:		state,
+		Height:		10,
+		CacheRecords:	[]ResolutionCacheRecordV2{record},
 		CacheContexts: []ResolutionCacheUseContextV2{{
-			Height:        10,
-			SourceVersion: 8,
-			ParentEpoch:   2,
-			ChildEpoch:    3,
+			Height:		10,
+			SourceVersion:	8,
+			ParentEpoch:	2,
+			ChildEpoch:	3,
 		}},
 	}), "cached resolution invalid")
 }

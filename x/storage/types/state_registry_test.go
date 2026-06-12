@@ -76,32 +76,32 @@ func TestStorageStateV2MessagesMutateState(t *testing.T) {
 	require.NoError(t, err)
 
 	state, err = RegisterStorageObjectInStateV2(state, MsgRegisterStorageObject{
-		Authority:   "alice",
-		Object:      object,
-		Chunks:      chunks,
-		Replication: replication,
-		Height:      10,
+		Authority:	"alice",
+		Object:		object,
+		Chunks:		chunks,
+		Replication:	replication,
+		Height:		10,
 	}, DefaultStorageChunkParams())
 	require.NoError(t, err)
 	require.Len(t, state.Objects, 1)
 
 	updatedReplication, err := NewReplicationStatusCommitment(ReplicationStatusCommitment{
-		ObjectID:           object.ObjectID,
-		ReplicationPolicy:  ReplicationPolicyRegional,
-		StorageClass:       StorageClassHot,
-		ReplicaCount:       2,
-		AvailabilityBps:    9900,
-		LastVerifiedHeight: 11,
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	ReplicationPolicyRegional,
+		StorageClass:		StorageClassHot,
+		ReplicaCount:		2,
+		AvailabilityBps:	9900,
+		LastVerifiedHeight:	11,
 	})
 	require.NoError(t, err)
 	state, err = UpdateStoragePolicyInStateV2(state, MsgUpdateStoragePolicy{
-		Authority:         "alice",
-		ObjectID:          object.ObjectID,
-		ReplicationPolicy: ReplicationPolicyRegional,
-		AccessPolicy:      AccessPolicyPublicRead,
-		StorageClass:      StorageClassHot,
-		Replication:       updatedReplication,
-		Height:            11,
+		Authority:		"alice",
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	ReplicationPolicyRegional,
+		AccessPolicy:		AccessPolicyPublicRead,
+		StorageClass:		StorageClassHot,
+		Replication:		updatedReplication,
+		Height:			11,
 	})
 	require.NoError(t, err)
 	updated, found := QueryStorageObject(state, object.ObjectID)
@@ -109,10 +109,10 @@ func TestStorageStateV2MessagesMutateState(t *testing.T) {
 	require.Equal(t, AccessPolicyPublicRead, updated.AccessPolicy)
 
 	state, err = RenewStorageObjectInStateV2(state, MsgRenewStorageObject{
-		Authority:     "alice",
-		ObjectID:      object.ObjectID,
-		ExpiresHeight: 500,
-		Height:        12,
+		Authority:	"alice",
+		ObjectID:	object.ObjectID,
+		ExpiresHeight:	500,
+		Height:		12,
 	})
 	require.NoError(t, err)
 	updated, found = QueryStorageObject(state, object.ObjectID)
@@ -121,35 +121,35 @@ func TestStorageStateV2MessagesMutateState(t *testing.T) {
 
 	receipt := testStorageStateReceipt(t, updated, 13)
 	state, err = SubmitStorageReceiptInStateV2(state, MsgSubmitStorageReceipt{
-		Authority: "alice",
-		Receipt:   receipt,
-		Height:    13,
+		Authority:	"alice",
+		Receipt:	receipt,
+		Height:		13,
 	})
 	require.NoError(t, err)
 
 	proof, err := NewStorageChunkInclusionProof(StorageChunkInclusionProof{
-		ObjectID:       updated.ObjectID,
-		ContentHash:    updated.ContentHash,
-		ObjectRoot:     updated.ObjectHash,
-		ChunkIndex:     chunks[0].ChunkIndex,
-		ChunkHash:      chunks[0].ChunkHash,
-		ChunkProofRoot: chunks[0].ChunkProofRoot,
-		ProofPath:      []string{chunks[1].ChunkProofRoot},
+		ObjectID:	updated.ObjectID,
+		ContentHash:	updated.ContentHash,
+		ObjectRoot:	updated.ObjectHash,
+		ChunkIndex:	chunks[0].ChunkIndex,
+		ChunkHash:	chunks[0].ChunkHash,
+		ChunkProofRoot:	chunks[0].ChunkProofRoot,
+		ProofPath:	[]string{chunks[1].ChunkProofRoot},
 	})
 	require.NoError(t, err)
 	stateProof, err := VerifyStorageProofInStateV2(state, MsgVerifyStorageProof{
-		Authority: "alice",
-		ObjectID:  updated.ObjectID,
-		Proof:     proof,
-		Height:    14,
+		Authority:	"alice",
+		ObjectID:	updated.ObjectID,
+		Proof:		proof,
+		Height:		14,
 	})
 	require.NoError(t, err)
 	require.Equal(t, state.Root.StateRoot, stateProof.Root)
 
 	state, err = DeleteStorageObjectInStateV2(state, MsgDeleteStorageObject{
-		Authority: "alice",
-		ObjectID:  object.ObjectID,
-		Height:    15,
+		Authority:	"alice",
+		ObjectID:	object.ObjectID,
+		Height:		15,
 	})
 	require.NoError(t, err)
 	require.Empty(t, state.Objects)
@@ -212,23 +212,23 @@ func TestStorageStateV2RejectsUnauthorizedPolicyUpdate(t *testing.T) {
 	)
 	require.NoError(t, err)
 	replication, err := NewReplicationStatusCommitment(ReplicationStatusCommitment{
-		ObjectID:           object.ObjectID,
-		ReplicationPolicy:  ReplicationPolicySingle,
-		StorageClass:       StorageClassCold,
-		ReplicaCount:       1,
-		AvailabilityBps:    9000,
-		LastVerifiedHeight: 21,
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	ReplicationPolicySingle,
+		StorageClass:		StorageClassCold,
+		ReplicaCount:		1,
+		AvailabilityBps:	9000,
+		LastVerifiedHeight:	21,
 	})
 	require.NoError(t, err)
 
 	_, err = UpdateStoragePolicyInStateV2(state, MsgUpdateStoragePolicy{
-		Authority:         "mallory",
-		ObjectID:          object.ObjectID,
-		ReplicationPolicy: ReplicationPolicySingle,
-		AccessPolicy:      AccessPolicyPrivate,
-		StorageClass:      StorageClassCold,
-		Replication:       replication,
-		Height:            21,
+		Authority:		"mallory",
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	ReplicationPolicySingle,
+		AccessPolicy:		AccessPolicyPrivate,
+		StorageClass:		StorageClassCold,
+		Replication:		replication,
+		Height:			21,
 	})
 	require.ErrorContains(t, err, "authority")
 }
@@ -250,15 +250,15 @@ func testStorageStateObjectWithChunks(t *testing.T, owner, suffix string) (Stora
 	)
 	require.NoError(t, err)
 	object, err := BuildStorageObjectFromChunkDescriptors(StorageObject{
-		Size:                   768,
-		ReplicationPolicy:      ReplicationPolicyMultiZone,
-		AccessPolicy:           AccessPolicyPermissioned,
-		Owner:                  owner,
-		StorageClass:           StorageClassWarm,
-		CreatedHeight:          10,
-		ExpiresHeightOptional:  100,
-		MetadataHashOptional:   storageTestHash(owner + "/" + suffix + "/metadata"),
-		AvailabilityCommitment: storageTestHash(owner + "/" + suffix + "/availability"),
+		Size:			768,
+		ReplicationPolicy:	ReplicationPolicyMultiZone,
+		AccessPolicy:		AccessPolicyPermissioned,
+		Owner:			owner,
+		StorageClass:		StorageClassWarm,
+		CreatedHeight:		10,
+		ExpiresHeightOptional:	100,
+		MetadataHashOptional:	storageTestHash(owner + "/" + suffix + "/metadata"),
+		AvailabilityCommitment:	storageTestHash(owner + "/" + suffix + "/availability"),
 	}, chunks, params)
 	require.NoError(t, err)
 	return object, chunks
@@ -277,12 +277,12 @@ func testStorageChunkRecords(object StorageObject, chunks []StorageChunkDescript
 func testStorageReplication(t *testing.T, object StorageObject, height uint64) ReplicationStatusCommitment {
 	t.Helper()
 	replication, err := NewReplicationStatusCommitment(ReplicationStatusCommitment{
-		ObjectID:           object.ObjectID,
-		ReplicationPolicy:  object.ReplicationPolicy,
-		StorageClass:       object.StorageClass,
-		ReplicaCount:       3,
-		AvailabilityBps:    9950,
-		LastVerifiedHeight: height,
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	object.ReplicationPolicy,
+		StorageClass:		object.StorageClass,
+		ReplicaCount:		3,
+		AvailabilityBps:	9950,
+		LastVerifiedHeight:	height,
 	})
 	require.NoError(t, err)
 	return replication
@@ -291,13 +291,13 @@ func testStorageReplication(t *testing.T, object StorageObject, height uint64) R
 func testStorageStateReceipt(t *testing.T, object StorageObject, height uint64) StorageAccessReceipt {
 	t.Helper()
 	receipt, err := NewStorageAccessReceipt(StorageAccessReceipt{
-		ObjectID:     object.ObjectID,
-		Accessor:     object.Owner,
-		AccessType:   "read",
-		AccessHeight: height,
-		ContentHash:  object.ContentHash,
-		ChunkRoot:    ComputeStorageChunkRoot(object.ChunkRoots),
-		PolicyHash:   ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
+		ObjectID:	object.ObjectID,
+		Accessor:	object.Owner,
+		AccessType:	"read",
+		AccessHeight:	height,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	ComputeStorageChunkRoot(object.ChunkRoots),
+		PolicyHash:	ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
 	})
 	require.NoError(t, err)
 	return receipt

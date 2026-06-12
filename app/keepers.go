@@ -233,12 +233,12 @@ func (app *L1App) initKeepers(
 	app.ShardingCoordinatorKeeper = persistentKeepers.ShardingCoordinatorKeeper
 
 	nativeKeepers := keeperwiring.NewNativeKeepers(keeperwiring.NativeKeeperDeps{
-		AppCodec:      appCodec,
-		Keys:          keys,
-		AccountKeeper: app.AccountKeeper,
-		BankKeeper:    app.BankKeeper,
-		DistrKeeper:   app.DistrKeeper,
-		GovAuthority:  govAuthority,
+		AppCodec:	appCodec,
+		Keys:		keys,
+		AccountKeeper:	app.AccountKeeper,
+		BankKeeper:	app.BankKeeper,
+		DistrKeeper:	app.DistrKeeper,
+		GovAuthority:	govAuthority,
 	})
 	app.BurnKeeper = nativeKeepers.BurnKeeper
 	app.TreasuryKeeper = nativeKeepers.TreasuryKeeper

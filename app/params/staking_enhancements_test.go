@@ -13,15 +13,15 @@ func TestScoreValidatorEconomicsDeterministicAndBounded(t *testing.T) {
 	totalStake := sdkmath.NewInt(10_000)
 
 	score, err := ScoreValidatorEconomics(ValidatorEconomicRecord{
-		ValidatorID:            "val-a",
-		BondedStakeNaet:        sdkmath.NewInt(4_000),
-		SelfDelegationNaet:     sdkmath.NewInt(400),
-		CommissionBps:          500,
-		UptimeBps:              9_900,
-		MissedBlockRateBps:     20,
-		SlashEvents:            1,
-		RecentSlashSeverityBps: 100,
-		MetadataComplete:       true,
+		ValidatorID:		"val-a",
+		BondedStakeNaet:	sdkmath.NewInt(4_000),
+		SelfDelegationNaet:	sdkmath.NewInt(400),
+		CommissionBps:		500,
+		UptimeBps:		9_900,
+		MissedBlockRateBps:	20,
+		SlashEvents:		1,
+		RecentSlashSeverityBps:	100,
+		MetadataComplete:	true,
 	}, totalStake, params)
 	require.NoError(t, err)
 	require.True(t, score.Eligible)
@@ -32,15 +32,15 @@ func TestScoreValidatorEconomicsDeterministicAndBounded(t *testing.T) {
 	require.LessOrEqual(t, score.RewardAdjustmentFactorBps, params.MaxRewardAdjustmentBps)
 
 	again, err := ScoreValidatorEconomics(ValidatorEconomicRecord{
-		ValidatorID:            "val-a",
-		BondedStakeNaet:        sdkmath.NewInt(4_000),
-		SelfDelegationNaet:     sdkmath.NewInt(400),
-		CommissionBps:          500,
-		UptimeBps:              9_900,
-		MissedBlockRateBps:     20,
-		SlashEvents:            1,
-		RecentSlashSeverityBps: 100,
-		MetadataComplete:       true,
+		ValidatorID:		"val-a",
+		BondedStakeNaet:	sdkmath.NewInt(4_000),
+		SelfDelegationNaet:	sdkmath.NewInt(400),
+		CommissionBps:		500,
+		UptimeBps:		9_900,
+		MissedBlockRateBps:	20,
+		SlashEvents:		1,
+		RecentSlashSeverityBps:	100,
+		MetadataComplete:	true,
 	}, totalStake, params)
 	require.NoError(t, err)
 	require.Equal(t, score, again)
@@ -60,10 +60,10 @@ func TestRecommendActiveSetBoundsEpochChurnDeterministically(t *testing.T) {
 	}
 
 	first, err := RecommendActiveSetForEpoch(ActiveSetRecommendationInput{
-		EpochID:                   11,
-		CurrentActiveValidatorIDs: current,
-		Candidates:                candidates,
-		Params:                    params,
+		EpochID:			11,
+		CurrentActiveValidatorIDs:	current,
+		Candidates:			candidates,
+		Params:				params,
 	})
 	require.NoError(t, err)
 	require.Empty(t, first.Failed)
@@ -79,10 +79,10 @@ func TestRecommendActiveSetBoundsEpochChurnDeterministically(t *testing.T) {
 		reversed[i], reversed[j] = reversed[j], reversed[i]
 	}
 	second, err := RecommendActiveSetForEpoch(ActiveSetRecommendationInput{
-		EpochID:                   11,
-		CurrentActiveValidatorIDs: current,
-		Candidates:                reversed,
-		Params:                    params,
+		EpochID:			11,
+		CurrentActiveValidatorIDs:	current,
+		Candidates:			reversed,
+		Params:				params,
 	})
 	require.NoError(t, err)
 	require.Equal(t, selectedValidatorIDs(first.Selected), selectedValidatorIDs(second.Selected))
@@ -95,11 +95,11 @@ func TestValidatorDistributionSimulationCoversNormalAdversarialAndLowParticipati
 	params := DefaultStakingEnhancementParams()
 	params.MaxActiveSet = 3
 	report, err := RunValidatorDistributionSimulation(ValidatorDistributionSimulationInput{
-		EpochID: 20,
-		Params:  params,
+		EpochID:	20,
+		Params:		params,
 		Scenarios: []ValidatorDistributionScenario{
 			{
-				Name: "normal",
+				Name:	"normal",
 				Candidates: []ValidatorEconomicRecord{
 					stakingCandidate("val-a", 3_000, 300, 9_950),
 					stakingCandidate("val-b", 2_800, 280, 9_930),
@@ -108,7 +108,7 @@ func TestValidatorDistributionSimulationCoversNormalAdversarialAndLowParticipati
 				},
 			},
 			{
-				Name: "adversarial_concentration",
+				Name:	"adversarial_concentration",
 				Candidates: []ValidatorEconomicRecord{
 					stakingCandidate("val-whale", 8_000, 800, 9_990),
 					stakingCandidate("val-b", 800, 80, 9_950),
@@ -117,15 +117,15 @@ func TestValidatorDistributionSimulationCoversNormalAdversarialAndLowParticipati
 				},
 			},
 			{
-				Name: "low_participation",
+				Name:	"low_participation",
 				Candidates: []ValidatorEconomicRecord{
 					stakingCandidate("val-a", 4_000, 400, 9_950),
 					{
-						ValidatorID:        "val-no-metadata",
-						BondedStakeNaet:    sdkmath.NewInt(3_000),
-						SelfDelegationNaet: sdkmath.NewInt(300),
-						CommissionBps:      500,
-						UptimeBps:          9_900,
+						ValidatorID:		"val-no-metadata",
+						BondedStakeNaet:	sdkmath.NewInt(3_000),
+						SelfDelegationNaet:	sdkmath.NewInt(300),
+						CommissionBps:		500,
+						UptimeBps:		9_900,
 					},
 				},
 			},
@@ -142,18 +142,18 @@ func TestValidatorDistributionSimulationCoversNormalAdversarialAndLowParticipati
 func TestStakingEnhancementInvariantRejectsRewardAdjustmentOutOfBounds(t *testing.T) {
 	params := DefaultStakingEnhancementParams()
 	recommendation := ActiveSetRecommendation{
-		EpochID:      3,
-		AllowedChurn: 1,
+		EpochID:	3,
+		AllowedChurn:	1,
 		Selected: []ValidatorEconomicScore{
 			{
-				ValidatorID:               "val-a",
-				Eligible:                  true,
-				BondedStakeNaet:           sdkmath.NewInt(1_000),
-				ScoreBps:                  9_000,
-				RewardAdjustmentFactorBps: params.MaxRewardAdjustmentBps + 1,
+				ValidatorID:			"val-a",
+				Eligible:			true,
+				BondedStakeNaet:		sdkmath.NewInt(1_000),
+				ScoreBps:			9_000,
+				RewardAdjustmentFactorBps:	params.MaxRewardAdjustmentBps + 1,
 			},
 		},
-		Events: []ValidatorEconomicEvent{{Type: ValidatorEconomicEventSelected, EpochID: 3, ValidatorID: "val-a"}},
+		Events:	[]ValidatorEconomicEvent{{Type: ValidatorEconomicEventSelected, EpochID: 3, ValidatorID: "val-a"}},
 	}
 
 	invariants := ValidateStakingEnhancementInvariants(recommendation, params)
@@ -163,12 +163,12 @@ func TestStakingEnhancementInvariantRejectsRewardAdjustmentOutOfBounds(t *testin
 
 func stakingCandidate(id string, stake, self, uptime int64) ValidatorEconomicRecord {
 	return ValidatorEconomicRecord{
-		ValidatorID:        id,
-		BondedStakeNaet:    sdkmath.NewInt(stake),
-		SelfDelegationNaet: sdkmath.NewInt(self),
-		CommissionBps:      500,
-		UptimeBps:          uptime,
-		MetadataComplete:   true,
+		ValidatorID:		id,
+		BondedStakeNaet:	sdkmath.NewInt(stake),
+		SelfDelegationNaet:	sdkmath.NewInt(self),
+		CommissionBps:		500,
+		UptimeBps:		uptime,
+		MetadataComplete:	true,
 	}
 }
 

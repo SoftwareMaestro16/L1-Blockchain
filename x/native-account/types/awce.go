@@ -11,34 +11,26 @@ import (
 	"github.com/sovereign-l1/l1/app/addressing"
 )
 
-// ---------------
-// Blocker 6: AWCE-1 Wallet Compatibility Extension
-// ---------------
-// Aetra Wallet Compatibility Extension = Cosmos wallet signing compatibility
-// + Aetra native account identity/runtime metadata
-// + AE <-> 4: dual-address abstraction
-// + policy-controlled account lifecycle
-
 const (
-	AWCE1Version = uint32(1)
+	AWCE1Version	= uint32(1)
 
-	BIP44Purpose      = uint32(44)
-	BIP44CoinType     = uint32(118)
-	BIP44Account      = uint32(0)
-	BIP44Change       = uint32(0)
-	BIP44AddressIndex = uint32(0)
+	BIP44Purpose		= uint32(44)
+	BIP44CoinType		= uint32(118)
+	BIP44Account		= uint32(0)
+	BIP44Change		= uint32(0)
+	BIP44AddressIndex	= uint32(0)
 
-	BIP44FullPath = "m/44'/118'/0'/0/0"
+	BIP44FullPath	= "m/44'/118'/0'/0/0"
 
-	SignDocTypeURL = "/cosmos.tx.v1beta1.Tx"
+	SignDocTypeURL	= "/cosmos.tx.v1beta1.Tx"
 
-	AWCE1FeatureKeyRotationV2    = "key_rotation_v2"
-	AWCE1FeatureStorageRentV2    = "storage_rent_v2"
-	AWCE1FeatureRecoveryPolicyV2 = "recovery_policy_v2"
-	AWCE1FeatureAuthPolicyV2     = "auth_policy_v2"
+	AWCE1FeatureKeyRotationV2	= "key_rotation_v2"
+	AWCE1FeatureStorageRentV2	= "storage_rent_v2"
+	AWCE1FeatureRecoveryPolicyV2	= "recovery_policy_v2"
+	AWCE1FeatureAuthPolicyV2	= "auth_policy_v2"
 
-	MaxAWCE1FeatureFlags       = 16
-	MaxAWCE1SecretPatternBytes = 256
+	MaxAWCE1FeatureFlags		= 16
+	MaxAWCE1SecretPatternBytes	= 256
 )
 
 var (
@@ -54,32 +46,28 @@ var (
 	}
 )
 
-// ---------------
-// AWCE-1 Wallet Compatibility Profile
-// ---------------
-
 type AWCE1WalletProfile struct {
-	Version          uint32
-	SpecVersion      uint32
-	AddressPair      addressing.AddressPair
-	BIP44Path        string
-	KeyType          string
-	Features         []string
-	AccountStatus    string
-	ActivationHeight uint64
+	Version			uint32
+	SpecVersion		uint32
+	AddressPair		addressing.AddressPair
+	BIP44Path		string
+	KeyType			string
+	Features		[]string
+	AccountStatus		string
+	ActivationHeight	uint64
 }
 
 func NewAWCE1WalletProfile(pair addressing.AddressPair) *AWCE1WalletProfile {
 	features, _ := DefaultFeatureFlags(AccountVersionV2)
 	return &AWCE1WalletProfile{
-		Version:          AWCE1Version,
-		SpecVersion:      AWCE1Version,
-		AddressPair:      pair,
-		BIP44Path:        BIP44FullPath,
-		KeyType:          "secp256k1",
-		Features:         features,
-		AccountStatus:    AccountStatusInactive,
-		ActivationHeight: 0,
+		Version:		AWCE1Version,
+		SpecVersion:		AWCE1Version,
+		AddressPair:		pair,
+		BIP44Path:		BIP44FullPath,
+		KeyType:		"secp256k1",
+		Features:		features,
+		AccountStatus:		AccountStatusInactive,
+		ActivationHeight:	0,
 	}
 }
 
@@ -104,10 +92,6 @@ func (p *AWCE1WalletProfile) Validate() error {
 	}
 	return nil
 }
-
-// ---------------
-// AE <-> 4: Dual-Address Verification
-// ---------------
 
 func ValidateAddressPairConsistency(pair addressing.AddressPair) error {
 	if pair.User == "" {
@@ -162,36 +146,32 @@ func DeriveAWCE1AddressPairFromPublicKey(pubKeyHex string, keyType string) (addr
 		return addressing.AddressPair{}, fmt.Errorf("AWCE1: format user address: %w", err)
 	}
 	return addressing.AddressPair{
-		Role: addressing.AddressRoleAccount,
-		User: userAddr,
-		Raw:  rawAddr,
+		Role:	addressing.AddressRoleAccount,
+		User:	userAddr,
+		Raw:	rawAddr,
 	}, nil
 }
 
-// ---------------
-// Key Rotation
-// ---------------
-
 type KeyRotationRequest struct {
-	AccountAddress string
-	NewAuthPolicy  AuthPolicy
-	RotationHeight uint64
-	Justification  string
+	AccountAddress	string
+	NewAuthPolicy	AuthPolicy
+	RotationHeight	uint64
+	Justification	string
 }
 
 type KeyRotationResult struct {
-	AccountAddress   string
-	PreviousKeyCount int
-	NewKeyCount      int
-	AddressPreserved bool
-	RotationHeight   uint64
+	AccountAddress		string
+	PreviousKeyCount	int
+	NewKeyCount		int
+	AddressPreserved	bool
+	RotationHeight		uint64
 }
 
 func ValidateKeyRotation(account Account, request KeyRotationRequest) (*KeyRotationResult, error) {
 	if err := ValidateAddressPairConsistency(addressing.AddressPair{
-		Role: addressing.AddressRoleAccount,
-		User: account.AddressUser,
-		Raw:  account.AddressRaw,
+		Role:	addressing.AddressRoleAccount,
+		User:	account.AddressUser,
+		Raw:	account.AddressRaw,
 	}); err != nil {
 		return nil, fmt.Errorf("AWCE1 key rotation: address pair invalid: %w", err)
 	}
@@ -203,21 +183,17 @@ func ValidateKeyRotation(account Account, request KeyRotationRequest) (*KeyRotat
 			request.RotationHeight, account.CreatedHeight)
 	}
 	return &KeyRotationResult{
-		AccountAddress:   account.AddressUser,
-		PreviousKeyCount: len(account.AuthPolicy.Keys),
-		NewKeyCount:      len(request.NewAuthPolicy.Keys),
-		AddressPreserved: true,
-		RotationHeight:   request.RotationHeight,
+		AccountAddress:		account.AddressUser,
+		PreviousKeyCount:	len(account.AuthPolicy.Keys),
+		NewKeyCount:		len(request.NewAuthPolicy.Keys),
+		AddressPreserved:	true,
+		RotationHeight:		request.RotationHeight,
 	}, nil
 }
 
-// ---------------
-// Account Lifecycle State Machine
-// ---------------
-
 type AccountLifecycleTransition struct {
-	From string
-	To   string
+	From	string
+	To	string
 }
 
 var ValidLifecycleTransitions = []AccountLifecycleTransition{
@@ -256,19 +232,15 @@ func IsTerminalStatus(status string) bool {
 	return status == AccountStatusClosed
 }
 
-// ---------------
-// Activation
-// ---------------
-
 var (
-	ErrAccountAlreadyActive  = errors.New("AWCE1: account already active — duplicate activation rejected")
-	ErrAccountNotFound       = errors.New("AWCE1: account not found")
-	ErrAccountInactive       = errors.New("AWCE1: account is inactive")
-	ErrAccountFrozen         = errors.New("AWCE1: account is frozen")
-	ErrAccountClosed         = errors.New("AWCE1: account is closed")
-	ErrInvalidLifecycleState = errors.New("AWCE1: invalid account lifecycle state")
-	ErrAddressMismatch       = errors.New("AWCE1: address pair mismatch")
-	ErrSecretInAccount       = errors.New("AWCE1: secret-like text found in account")
+	ErrAccountAlreadyActive		= errors.New("AWCE1: account already active — duplicate activation rejected")
+	ErrAccountNotFound		= errors.New("AWCE1: account not found")
+	ErrAccountInactive		= errors.New("AWCE1: account is inactive")
+	ErrAccountFrozen		= errors.New("AWCE1: account is frozen")
+	ErrAccountClosed		= errors.New("AWCE1: account is closed")
+	ErrInvalidLifecycleState	= errors.New("AWCE1: invalid account lifecycle state")
+	ErrAddressMismatch		= errors.New("AWCE1: address pair mismatch")
+	ErrSecretInAccount		= errors.New("AWCE1: secret-like text found in account")
 )
 
 func ValidateActivation(account Account, pair addressing.AddressPair) error {
@@ -296,64 +268,60 @@ func ActivateAccount(pair addressing.AddressPair, height uint64) (*Account, erro
 	}
 	features, _ := DefaultFeatureFlags(CurrentAccountVersion)
 	account := &Account{
-		Version:          CurrentAccountVersion,
-		AddressUser:      pair.User,
-		AddressRaw:       pair.Raw,
-		Sequence:         ActivationInitialSequence,
-		Status:           AccountStatusActive,
-		AuthPolicy:       DefaultAuthPolicy(),
-		FeatureFlags:     features,
-		CreatedHeight:    height,
-		LastActiveHeight: height,
-		StorageRentDebt:  0,
+		Version:		CurrentAccountVersion,
+		AddressUser:		pair.User,
+		AddressRaw:		pair.Raw,
+		Sequence:		ActivationInitialSequence,
+		Status:			AccountStatusActive,
+		AuthPolicy:		DefaultAuthPolicy(),
+		FeatureFlags:		features,
+		CreatedHeight:		height,
+		LastActiveHeight:	height,
+		StorageRentDebt:	0,
 	}
 	return account, nil
 }
 
 func DefaultAuthPolicy() AuthPolicy {
 	return AuthPolicy{
-		Version:   1,
-		Mode:      "single_key",
-		Threshold: 1,
+		Version:	1,
+		Mode:		"single_key",
+		Threshold:	1,
 	}
 }
 
-// ---------------
-// Cosmos SignDoc
-// ---------------
-
 type CosmosSignDoc struct {
-	AccountNumber uint64      `json:"account_number"`
-	ChainID       string      `json:"chain_id"`
-	Fee           CosmosFee   `json:"fee"`
-	Memo          string      `json:"memo"`
-	Msgs          []CosmosMsg `json:"msgs"`
-	Sequence      uint64      `json:"sequence"`
+	AccountNumber	uint64		`json:"account_number"`
+	ChainID		string		`json:"chain_id"`
+	Fee		CosmosFee	`json:"fee"`
+	Memo		string		`json:"memo"`
+	Msgs		[]CosmosMsg	`json:"msgs"`
+	Sequence	uint64		`json:"sequence"`
 }
 
 type CosmosFee struct {
-	Amount []CosmosCoin `json:"amount"`
-	Gas    string       `json:"gas"`
+	Amount	[]CosmosCoin	`json:"amount"`
+	Gas	string		`json:"gas"`
 }
 
 type CosmosCoin struct {
-	Denom  string `json:"denom"`
-	Amount string `json:"amount"`
+	Denom	string	`json:"denom"`
+	Amount	string	`json:"amount"`
 }
 
 type CosmosMsg struct {
-	TypeURL string `json:"type_url"`
-	Value   string `json:"value"`
+	TypeURL	string	`json:"type_url"`
+	Value	string	`json:"value"`
 }
 
 func NewCosmosSignDoc(accountNumber, sequence uint64, chainID string, fee CosmosFee, msgs []CosmosMsg, memo string) *CosmosSignDoc {
 	return &CosmosSignDoc{
-		AccountNumber: accountNumber,
-		ChainID:       chainID,
-		Fee:           fee,
-		Memo:          memo,
-		Msgs:          msgs,
-		Sequence:      sequence,
+		AccountNumber:	accountNumber,
+		ChainID:	chainID,
+		Fee:		fee,
+		Memo:		memo,
+		Msgs:		msgs,
+		Sequence:	sequence,
 	}
 }
 
@@ -377,17 +345,13 @@ func ValidateCosmosSignDoc(doc *CosmosSignDoc) error {
 	return nil
 }
 
-// ---------------
-// Storage Rent Debt
-// ---------------
-
 type StorageRentDebt struct {
-	Account          string
-	CurrentDebt      uint64
-	LastChargeHeight uint64
-	AccumulatedRent  uint64
-	GenesisFrozen    bool
-	GenesisDebt      uint64
+	Account			string
+	CurrentDebt		uint64
+	LastChargeHeight	uint64
+	AccumulatedRent		uint64
+	GenesisFrozen		bool
+	GenesisDebt		uint64
 }
 
 func (d StorageRentDebt) IsActiveDebt() bool {
@@ -400,18 +364,14 @@ func (d StorageRentDebt) IsFrozen() bool {
 
 func NewStorageRentDebt(account string) StorageRentDebt {
 	return StorageRentDebt{
-		Account:          account,
-		CurrentDebt:      0,
-		LastChargeHeight: 0,
-		AccumulatedRent:  0,
-		GenesisFrozen:    false,
-		GenesisDebt:      0,
+		Account:		account,
+		CurrentDebt:		0,
+		LastChargeHeight:	0,
+		AccumulatedRent:	0,
+		GenesisFrozen:		false,
+		GenesisDebt:		0,
 	}
 }
-
-// ---------------
-// Secret-Like Text Detection
-// ---------------
 
 func ValidateNoSecretLikeText(text string) error {
 	for _, pattern := range secretPatterns {

@@ -84,11 +84,11 @@ func TestAetherRoutingRejectsHopLimitAndMissingCommittedZone(t *testing.T) {
 func lifecycleRecord(t *testing.T, msg AetherMessage, stage MessageLifecycleStage, height uint64, receiptHash string) AetherMessageLifecycleRecord {
 	t.Helper()
 	record, err := NewAetherMessageLifecycleRecord(AetherMessageLifecycleRecord{
-		MsgID:           msg.MsgID,
-		Stage:           stage,
-		Height:          height,
-		RouteCommitment: msg.RouteCommitment,
-		ReceiptHash:     receiptHash,
+		MsgID:			msg.MsgID,
+		Stage:			stage,
+		Height:			height,
+		RouteCommitment:	msg.RouteCommitment,
+		ReceiptHash:		receiptHash,
 	})
 	require.NoError(t, err)
 	return record
@@ -103,25 +103,25 @@ func testAetherMessageDraft(route UnifiedMessageRoute) AetherMessage {
 
 func testAetherMessageNoT(t *testing.T, route UnifiedMessageRoute) AetherMessage {
 	msg := AetherMessage{
-		Sender:          "account/alice",
-		SenderZoneID:    zonestypes.ZoneIDFinancial,
-		SenderShardID:   "financial-1",
-		Receiver:        "contract/vault",
-		ReceiverZoneID:  zonestypes.ZoneIDContract,
-		ReceiverShardID: "contract-7",
-		ValueNAET:       sdkmath.NewInt(10),
-		Payload:         []byte("execute"),
-		PayloadType:     "contract.execute",
-		GasLimit:        100,
-		GasPrice:        sdkmath.NewInt(2),
-		ForwardingFee:   sdkmath.NewInt(3),
-		ExpiryHeight:    180,
-		Bounce:          true,
-		ExecutionMode:   ExecutionModeAsync,
-		OrderingClass:   OrderingClassSenderOrdered,
-		RouteCommitment: route.RouteCommitment,
-		CreatedAtHeight: 150,
-		Nonce:           9,
+		Sender:			"account/alice",
+		SenderZoneID:		zonestypes.ZoneIDFinancial,
+		SenderShardID:		"financial-1",
+		Receiver:		"contract/vault",
+		ReceiverZoneID:		zonestypes.ZoneIDContract,
+		ReceiverShardID:	"contract-7",
+		ValueNAET:		sdkmath.NewInt(10),
+		Payload:		[]byte("execute"),
+		PayloadType:		"contract.execute",
+		GasLimit:		100,
+		GasPrice:		sdkmath.NewInt(2),
+		ForwardingFee:		sdkmath.NewInt(3),
+		ExpiryHeight:		180,
+		Bounce:			true,
+		ExecutionMode:		ExecutionModeAsync,
+		OrderingClass:		OrderingClassSenderOrdered,
+		RouteCommitment:	route.RouteCommitment,
+		CreatedAtHeight:	150,
+		Nonce:			9,
 	}
 	if t == nil {
 		msg = normalizeAetherMessage(msg)
@@ -155,14 +155,14 @@ func routingMetric(t *testing.T, zoneID zonestypes.ZoneID, shardID string, heigh
 
 func testRoutingParams() AetherRoutingParams {
 	return AetherRoutingParams{
-		MaxHopCount:      3,
-		BaseHopCost:      10,
-		CongestionWeight: 2,
-		QueueWeight:      1,
-		LatencyWeight:    1,
-		CapacityPenalty:  100,
-		RequiredCapacity: 10,
-		GovernanceHash:   EmptyHash(),
+		MaxHopCount:		3,
+		BaseHopCost:		10,
+		CongestionWeight:	2,
+		QueueWeight:		1,
+		LatencyWeight:		1,
+		CapacityPenalty:	100,
+		RequiredCapacity:	10,
+		GovernanceHash:		EmptyHash(),
 	}
 }
 

@@ -231,10 +231,10 @@ func TestMigrationPhase7ReadinessFailsMissingBenchmarksAndNondeterministicRoutin
 func validMigrationPhase0Input() MigrationPhase0Input {
 	appHash := hashStrings("single-chain-app-hash")
 	return MigrationPhase0Input{
-		ModuleBoundaryDocHash:     hashStrings("module-boundaries"),
-		StateExportValidationHash: hashStrings("state-export-validation"),
-		ExportedAppHash:           appHash,
-		ReplayedAppHash:           appHash,
+		ModuleBoundaryDocHash:		hashStrings("module-boundaries"),
+		StateExportValidationHash:	hashStrings("state-export-validation"),
+		ExportedAppHash:		appHash,
+		ReplayedAppHash:		appHash,
 		GenesisImports: []GenesisImportCheck{
 			genesisImport("bank"),
 			genesisImport("staking"),
@@ -242,14 +242,14 @@ func validMigrationPhase0Input() MigrationPhase0Input {
 			genesisImport("distribution"),
 			genesisImport("aetracore"),
 		},
-		DynamicFeeBoundsTestHash: hashStrings("dynamic-fee-bounds"),
+		DynamicFeeBoundsTestHash:	hashStrings("dynamic-fee-bounds"),
 		InvariantChecks: []ModuleInvariantCheck{
 			invariantCheck("bank", "supply"),
 			invariantCheck("staking", "delegations"),
 			invariantCheck("slashing", "tombstones"),
 			invariantCheck("distribution", "outstanding_rewards"),
 		},
-		StoreV2CompatibilityHash: hashStrings("storev2-compatibility"),
+		StoreV2CompatibilityHash:	hashStrings("storev2-compatibility"),
 		PrefixMigrations: []StatePrefixMigrationCheck{
 			prefixMigration("bank", "bank/v1", "bank/v2"),
 			prefixMigration("staking", "staking/v1", "staking/v2"),
@@ -260,16 +260,16 @@ func validMigrationPhase0Input() MigrationPhase0Input {
 func validMigrationPhase1Input() MigrationPhase1Input {
 	emptyQueueRoot := hashStrings("empty-message-queues")
 	return MigrationPhase1Input{
-		AetraCoreModuleHash:     hashStrings("x-aetracore"),
-		ZoneRegistryRoot:        hashStrings("default-zone-registry"),
-		ZoneCount:               1,
-		DefaultZoneID:           "default",
-		DefaultZoneStateRoot:    hashStrings("default-zone-state-root"),
-		MessageRoot:             emptyQueueRoot,
-		EmptyQueueRoot:          emptyQueueRoot,
-		ProofRegistryRoot:       hashStrings("proof-registry-root"),
-		AppHashIncludesCoreRoot: true,
-		CoreRootHash:            hashStrings("core-root"),
+		AetraCoreModuleHash:		hashStrings("x-aetracore"),
+		ZoneRegistryRoot:		hashStrings("default-zone-registry"),
+		ZoneCount:			1,
+		DefaultZoneID:			"default",
+		DefaultZoneStateRoot:		hashStrings("default-zone-state-root"),
+		MessageRoot:			emptyQueueRoot,
+		EmptyQueueRoot:			emptyQueueRoot,
+		ProofRegistryRoot:		hashStrings("proof-registry-root"),
+		AppHashIncludesCoreRoot:	true,
+		CoreRootHash:			hashStrings("core-root"),
 		RootQueryAPIs: []RootQueryAPICheck{
 			rootQueryAPI("QueryZoneRoot", ProofRootZone),
 			rootQueryAPI("QueryMessageRoot", ProofRootMessage),
@@ -285,11 +285,11 @@ func validMigrationPhase1Input() MigrationPhase1Input {
 
 func validMigrationPhase2Input() MigrationPhase2Input {
 	return MigrationPhase2Input{
-		MsgBusModuleHash: hashStrings("x-msgbus"),
+		MsgBusModuleHash:	hashStrings("x-msgbus"),
 		Encoding: MsgBusEncodingCheck{
-			CodecHash:        hashStrings("msgbus-codec"),
-			MessageIDRoot:    hashStrings("msgbus-message-ids"),
-			DeterministicIDs: true,
+			CodecHash:		hashStrings("msgbus-codec"),
+			MessageIDRoot:		hashStrings("msgbus-message-ids"),
+			DeterministicIDs:	true,
 		},
 		Stores: []MsgBusStoreCheck{
 			msgBusStore("inbox"),
@@ -297,70 +297,70 @@ func validMigrationPhase2Input() MigrationPhase2Input {
 			msgBusStore("receipt"),
 		},
 		LocalExecution: MsgBusExecutionCheck{
-			ExecutionRoot:   hashStrings("msgbus-local-execution"),
-			Deterministic:   true,
-			ExecutedLocally: true,
+			ExecutionRoot:		hashStrings("msgbus-local-execution"),
+			Deterministic:		true,
+			ExecutedLocally:	true,
 		},
 		Safety: MsgBusSafetyCheck{
-			ExpiryRoot:         hashStrings("msgbus-expiry"),
-			BounceRoot:         hashStrings("msgbus-bounce"),
-			InclusionProofRoot: hashStrings("msgbus-inclusion-proofs"),
-			ReceiptsProofRoot:  hashStrings("msgbus-receipt-proofs"),
+			ExpiryRoot:		hashStrings("msgbus-expiry"),
+			BounceRoot:		hashStrings("msgbus-bounce"),
+			InclusionProofRoot:	hashStrings("msgbus-inclusion-proofs"),
+			ReceiptsProofRoot:	hashStrings("msgbus-receipt-proofs"),
 		},
-		FirstClassObjectRoot: hashStrings("first-class-message-objects"),
+		FirstClassObjectRoot:	hashStrings("first-class-message-objects"),
 	}
 }
 
 func validMigrationPhase3Input() MigrationPhase3Input {
 	return MigrationPhase3Input{
-		FinancialZone:                           zoneExtraction("financial", []string{"bank", "fees", "contract-assets", "avm-dex-contract"}),
-		IdentityZone:                            zoneExtraction("identity", []string{"identity"}),
-		ApplicationZone:                         zoneExtraction("application", []string{"scheduler", "workflow"}),
-		BankFeesContractAssetsAVMAMMInFinancial: true,
-		IdentityIsolatedActivation:              true,
-		ZoneRootsCommittedPerBlock:              true,
-		ZoneCommitmentRoot:                      hashStrings("zone-commitments-per-block"),
+		FinancialZone:					zoneExtraction("financial", []string{"bank", "fees", "contract-assets", "avm-dex-contract"}),
+		IdentityZone:					zoneExtraction("identity", []string{"identity"}),
+		ApplicationZone:				zoneExtraction("application", []string{"scheduler", "workflow"}),
+		BankFeesContractAssetsAVMAMMInFinancial:	true,
+		IdentityIsolatedActivation:			true,
+		ZoneRootsCommittedPerBlock:			true,
+		ZoneCommitmentRoot:				hashStrings("zone-commitments-per-block"),
 	}
 }
 
 func validMigrationPhase4Input() MigrationPhase4Input {
 	return MigrationPhase4Input{
-		ShardsModuleHash:          hashStrings("x-shards"),
-		ZoneID:                    "financial",
-		ShardLayoutDescriptorRoot: hashStrings("shard-layout-descriptors"),
-		RouteKeyCalculationHash:   hashStrings("route-key-calculation"),
+		ShardsModuleHash:		hashStrings("x-shards"),
+		ZoneID:				"financial",
+		ShardLayoutDescriptorRoot:	hashStrings("shard-layout-descriptors"),
+		RouteKeyCalculationHash:	hashStrings("route-key-calculation"),
 		ShardDescriptors: []ShardRuntimeDescriptorCheck{
 			shardRuntimeDescriptor("shard-0001"),
 			shardRuntimeDescriptor("shard-0002"),
 		},
-		RootAggregationHash: hashStrings("shard-root-aggregation"),
+		RootAggregationHash:	hashStrings("shard-root-aggregation"),
 		SplitMergeScheduler: ShardSplitMergeSchedulerCheck{
-			SchedulerRoot:     hashStrings("shard-scheduler"),
-			SplitDecisionRoot: hashStrings("shard-split-decisions"),
-			MergeDecisionRoot: hashStrings("shard-merge-decisions"),
-			Deterministic:     true,
+			SchedulerRoot:		hashStrings("shard-scheduler"),
+			SplitDecisionRoot:	hashStrings("shard-split-decisions"),
+			MergeDecisionRoot:	hashStrings("shard-merge-decisions"),
+			Deterministic:		true,
 		},
 		Migration: ShardMigrationCheck{
-			MigrationRoot:          hashStrings("shard-migration"),
-			OldLayoutHash:          hashStrings("old-shard-layout"),
-			NewLayoutHash:          hashStrings("new-shard-layout"),
-			InFlightMessageRoot:    hashStrings("in-flight-message-root"),
-			SurvivesLayoutChange:   true,
-			DeterministicMigration: true,
+			MigrationRoot:		hashStrings("shard-migration"),
+			OldLayoutHash:		hashStrings("old-shard-layout"),
+			NewLayoutHash:		hashStrings("new-shard-layout"),
+			InFlightMessageRoot:	hashStrings("in-flight-message-root"),
+			SurvivesLayoutChange:	true,
+			DeterministicMigration:	true,
 		},
-		ZonesSupportMultipleShards:    true,
-		IndependentWorkloadsParallel:  true,
-		InFlightMessagesSurviveChange: true,
+		ZonesSupportMultipleShards:	true,
+		IndependentWorkloadsParallel:	true,
+		InFlightMessagesSurviveChange:	true,
 	}
 }
 
 func validMigrationPhase5Input() MigrationPhase5Input {
 	return MigrationPhase5Input{
-		BytecodeFormat:         avm20Component("bytecode_format"),
-		Interpreter:            avm20Component("interpreter"),
-		GasTable:               avm20Component("gas_table"),
-		ContractStorageAdapter: avm20Component("contract_storage_adapter"),
-		ABIRegistry:            avm20Component("abi_registry"),
+		BytecodeFormat:		avm20Component("bytecode_format"),
+		Interpreter:		avm20Component("interpreter"),
+		GasTable:		avm20Component("gas_table"),
+		ContractStorageAdapter:	avm20Component("contract_storage_adapter"),
+		ABIRegistry:		avm20Component("abi_registry"),
 		MessageSyscalls: []AVM20SyscallCheck{
 			avm20Syscall("emit_message"),
 			avm20Syscall("resolve_promise"),
@@ -369,20 +369,20 @@ func validMigrationPhase5Input() MigrationPhase5Input {
 			avm20Syscall("verify_account_proof"),
 			avm20Syscall("verify_contract_storage_proof"),
 		},
-		ContractZoneDeterministic: true,
-		AsyncMessageEmissionRoot:  hashStrings("avm-async-message-emission"),
-		ContractStateProofRoot:    hashStrings("avm-contract-state-proofs"),
-		ContractZoneExecutionRoot: hashStrings("avm-contract-zone-execution"),
+		ContractZoneDeterministic:	true,
+		AsyncMessageEmissionRoot:	hashStrings("avm-async-message-emission"),
+		ContractStateProofRoot:		hashStrings("avm-contract-state-proofs"),
+		ContractZoneExecutionRoot:	hashStrings("avm-contract-zone-execution"),
 	}
 }
 
 func validMigrationPhase6Input() MigrationPhase6Input {
 	return MigrationPhase6Input{
-		AETIdentityProofRoot:          hashStrings("aet-identity-proofs"),
-		CrossZoneIdentityLookupRoot:   hashStrings("cross-zone-identity-lookups"),
-		PaymentChannelSettlementRoot:  hashStrings("payment-channel-settlement"),
-		ConditionalPaymentRoutingRoot: hashStrings("conditional-payment-routing"),
-		PaymentProofAPIRoot:           hashStrings("payment-proof-apis"),
+		AETIdentityProofRoot:		hashStrings("aet-identity-proofs"),
+		CrossZoneIdentityLookupRoot:	hashStrings("cross-zone-identity-lookups"),
+		PaymentChannelSettlementRoot:	hashStrings("payment-channel-settlement"),
+		ConditionalPaymentRoutingRoot:	hashStrings("conditional-payment-routing"),
+		PaymentProofAPIRoot:		hashStrings("payment-proof-apis"),
 		IdentityFlows: []IdentityPaymentFlowCheck{
 			identityPaymentFlow("aet_resolve", "identity"),
 			identityPaymentFlow("cross_zone_identity_lookup", "identity"),
@@ -395,20 +395,20 @@ func validMigrationPhase6Input() MigrationPhase6Input {
 			walletSDKHelper("identity_lookup"),
 			walletSDKHelper("payment_route"),
 		},
-		NamesResolveThroughIdentityZone:    true,
-		PaymentsSettleThroughFinancialZone: true,
-		ContractsUseAsyncIdentityPayments:  true,
+		NamesResolveThroughIdentityZone:	true,
+		PaymentsSettleThroughFinancialZone:	true,
+		ContractsUseAsyncIdentityPayments:	true,
 	}
 }
 
 func validMigrationPhase7Input() MigrationPhase7Input {
 	return MigrationPhase7Input{
-		BlockSTMWorkloadRoot:        hashStrings("blockstm-zone-shard-workloads"),
-		ConflictProfilingRoot:       hashStrings("conflict-profiling"),
-		MempoolLaneRoot:             hashStrings("mempool-lanes"),
-		CongestionRoutingRoot:       hashStrings("congestion-aware-routing"),
-		AdaptiveSyncRecoveryRoot:    hashStrings("adaptive-sync-recovery-tests"),
-		MultiZoneLoadSimulationRoot: hashStrings("multi-zone-load-simulation"),
+		BlockSTMWorkloadRoot:		hashStrings("blockstm-zone-shard-workloads"),
+		ConflictProfilingRoot:		hashStrings("conflict-profiling"),
+		MempoolLaneRoot:		hashStrings("mempool-lanes"),
+		CongestionRoutingRoot:		hashStrings("congestion-aware-routing"),
+		AdaptiveSyncRecoveryRoot:	hashStrings("adaptive-sync-recovery-tests"),
+		MultiZoneLoadSimulationRoot:	hashStrings("multi-zone-load-simulation"),
 		HardeningChecks: []PerformanceHardeningCheck{
 			performanceHardeningCheck("blockstm_zone_shard_batches"),
 			performanceHardeningCheck("conflict_profiling"),
@@ -426,9 +426,9 @@ func validMigrationPhase7Input() MigrationPhase7Input {
 			storeV2Benchmark("payment_channel_settle"),
 			storeV2Benchmark("proof_generation"),
 		},
-		IndependentExecutionScalesParallel:  true,
-		StateSyncRecoversCommitments:        true,
-		RoutingDeterministicUnderCongestion: true,
+		IndependentExecutionScalesParallel:	true,
+		StateSyncRecoversCommitments:		true,
+		RoutingDeterministicUnderCongestion:	true,
 	}
 }
 
@@ -443,12 +443,12 @@ func invariantCheck(module, name string) ModuleInvariantCheck {
 
 func prefixMigration(module, oldPrefix, newPrefix string) StatePrefixMigrationCheck {
 	return StatePrefixMigrationCheck{
-		ModuleName:      module,
-		OldPrefix:       oldPrefix,
-		NewPrefix:       newPrefix,
-		MigrationHash:   hashStrings("migration", module, oldPrefix, newPrefix),
-		ReversibleProof: hashStrings("migration-proof", module),
-		Safe:            true,
+		ModuleName:		module,
+		OldPrefix:		oldPrefix,
+		NewPrefix:		newPrefix,
+		MigrationHash:		hashStrings("migration", module, oldPrefix, newPrefix),
+		ReversibleProof:	hashStrings("migration-proof", module),
+		Safe:			true,
 	}
 }
 
@@ -466,83 +466,83 @@ func msgBusStore(name string) MsgBusStoreCheck {
 
 func zoneExtraction(zoneID string, modules []string) ZoneExtractionCheck {
 	return ZoneExtractionCheck{
-		ZoneID:               zoneID,
-		Extracted:            true,
-		KeeperHash:           hashStrings("zone-keeper", zoneID),
-		StatePrefixRoot:      hashStrings("zone-prefix", zoneID),
-		FeePolicyHash:        hashStrings("zone-fee-policy", zoneID),
-		ExecutionSummaryHash: hashStrings("zone-summary", zoneID),
-		CommittedRoot:        hashStrings("zone-root", zoneID),
-		Modules:              modules,
+		ZoneID:			zoneID,
+		Extracted:		true,
+		KeeperHash:		hashStrings("zone-keeper", zoneID),
+		StatePrefixRoot:	hashStrings("zone-prefix", zoneID),
+		FeePolicyHash:		hashStrings("zone-fee-policy", zoneID),
+		ExecutionSummaryHash:	hashStrings("zone-summary", zoneID),
+		CommittedRoot:		hashStrings("zone-root", zoneID),
+		Modules:		modules,
 	}
 }
 
 func shardRuntimeDescriptor(shardID string) ShardRuntimeDescriptorCheck {
 	return ShardRuntimeDescriptorCheck{
-		ShardID:           shardID,
-		LayoutHash:        hashStrings("shard-layout", shardID),
-		RouteKeyRoot:      hashStrings("shard-route-key", shardID),
-		InboxRoot:         hashStrings("shard-inbox", shardID),
-		OutboxRoot:        hashStrings("shard-outbox", shardID),
-		ShardRoot:         hashStrings("shard-state-root", shardID),
-		ParallelGroupHash: hashStrings("shard-parallel-group", shardID),
-		Active:            true,
+		ShardID:		shardID,
+		LayoutHash:		hashStrings("shard-layout", shardID),
+		RouteKeyRoot:		hashStrings("shard-route-key", shardID),
+		InboxRoot:		hashStrings("shard-inbox", shardID),
+		OutboxRoot:		hashStrings("shard-outbox", shardID),
+		ShardRoot:		hashStrings("shard-state-root", shardID),
+		ParallelGroupHash:	hashStrings("shard-parallel-group", shardID),
+		Active:			true,
 	}
 }
 
 func avm20Component(name string) AVM20ComponentCheck {
 	return AVM20ComponentCheck{
-		ComponentName: name,
-		ComponentHash: hashStrings("avm20-component", name),
-		Implemented:   true,
-		Deterministic: true,
+		ComponentName:	name,
+		ComponentHash:	hashStrings("avm20-component", name),
+		Implemented:	true,
+		Deterministic:	true,
 	}
 }
 
 func avm20Syscall(name string) AVM20SyscallCheck {
 	return AVM20SyscallCheck{
-		SyscallName: name,
-		SyscallHash: hashStrings("avm20-syscall", name),
-		Metered:     true,
-		Enabled:     true,
+		SyscallName:	name,
+		SyscallHash:	hashStrings("avm20-syscall", name),
+		Metered:	true,
+		Enabled:	true,
 	}
 }
 
 func identityPaymentFlow(name, zoneID string) IdentityPaymentFlowCheck {
 	return IdentityPaymentFlowCheck{
-		FlowName:        name,
-		FlowRoot:        hashStrings("identity-payment-flow", name),
-		ProofBacked:     true,
-		Asynchronous:    true,
-		Deterministic:   true,
-		ZoneID:          zoneID,
-		MessageTypeHash: hashStrings("identity-payment-message", name),
+		FlowName:		name,
+		FlowRoot:		hashStrings("identity-payment-flow", name),
+		ProofBacked:		true,
+		Asynchronous:		true,
+		Deterministic:		true,
+		ZoneID:			zoneID,
+		MessageTypeHash:	hashStrings("identity-payment-message", name),
 	}
 }
 
 func walletSDKHelper(name string) WalletSDKHelperCheck {
 	return WalletSDKHelperCheck{
-		HelperName:    name,
-		HelperHash:    hashStrings("wallet-sdk-helper", name),
-		Available:     true,
-		Deterministic: true,
+		HelperName:	name,
+		HelperHash:	hashStrings("wallet-sdk-helper", name),
+		Available:	true,
+		Deterministic:	true,
 	}
 }
 
 func performanceHardeningCheck(name string) PerformanceHardeningCheck {
 	return PerformanceHardeningCheck{
-		CheckName:     name,
-		EvidenceHash:  hashStrings("performance-hardening", name),
-		Enabled:       true,
-		Deterministic: true,
+		CheckName:	name,
+		EvidenceHash:	hashStrings("performance-hardening", name),
+		Enabled:	true,
+		Deterministic:	true,
 	}
 }
 
 func storeV2Benchmark(name string) StoreV2BenchmarkCheck {
 	return StoreV2BenchmarkCheck{
-		BenchmarkName: name,
-		ResultHash:    hashStrings("store-v2-benchmark", name),
-		Covered:       true,
-		Bounded:       true,
+		BenchmarkName:	name,
+		ResultHash:	hashStrings("store-v2-benchmark", name),
+		Covered:	true,
+		Bounded:	true,
 	}
 }

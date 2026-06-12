@@ -16,8 +16,8 @@ func TestConsensusCriticalSourceRejectsNondeterminismAndExternalNetworkCalls(t *
 	require.NoError(t, err)
 
 	forbidden := []struct {
-		token string
-		risk  string
+		token	string
+		risk	string
 	}{
 		{token: "time.Now(", risk: "wall-clock time is non-deterministic in consensus paths"},
 		{token: "rand.", risk: "randomness is non-deterministic in consensus paths"},
@@ -69,14 +69,14 @@ func TestFinalizeBlockMalformedTxAttackDoesNotPanicOrSucceed(t *testing.T) {
 	malformedTx := bytes.Repeat([]byte{0xff, 0x00, 0x13, 0x37}, 256)
 
 	var (
-		res *abci.ResponseFinalizeBlock
-		err error
+		res	*abci.ResponseFinalizeBlock
+		err	error
 	)
 	require.NotPanics(t, func() {
 		res, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-			Height: height,
-			Hash:   app.LastCommitID().Hash,
-			Txs:    [][]byte{malformedTx},
+			Height:	height,
+			Hash:	app.LastCommitID().Hash,
+			Txs:	[][]byte{malformedTx},
 		})
 	})
 	if err != nil {
@@ -90,8 +90,8 @@ func TestFinalizeBlockMalformedTxAttackDoesNotPanicOrSucceed(t *testing.T) {
 func TestFinalizeBlockHeightRegressionAttackIsRejected(t *testing.T) {
 	app := Setup(t, false)
 	_, err := app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   app.LastCommitID().Hash,
+		Height:	1,
+		Hash:	app.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = app.Commit()
@@ -102,8 +102,8 @@ func TestFinalizeBlockHeightRegressionAttackIsRejected(t *testing.T) {
 
 	require.NotPanics(t, func() {
 		_, err := app.FinalizeBlock(&abci.RequestFinalizeBlock{
-			Height: currentHeight,
-			Hash:   app.LastCommitID().Hash,
+			Height:	currentHeight,
+			Hash:	app.LastCommitID().Hash,
 		})
 		require.Error(t, err)
 	})

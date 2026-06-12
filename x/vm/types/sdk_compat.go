@@ -10,64 +10,64 @@ import (
 )
 
 const (
-	LifecyclePrepareProposal = "prepare_proposal"
-	LifecycleProcessProposal = "process_proposal"
-	LifecycleFinalizeBlock   = "finalize_block"
-	LifecycleCommit          = "commit"
+	LifecyclePrepareProposal	= "prepare_proposal"
+	LifecycleProcessProposal	= "process_proposal"
+	LifecycleFinalizeBlock		= "finalize_block"
+	LifecycleCommit			= "commit"
 
-	StateAccessStoreV2 = "store_v2"
-	StateAccessKVStore = "kvstore"
+	StateAccessStoreV2	= "store_v2"
+	StateAccessKVStore	= "kvstore"
 
-	DefaultAVMModuleName    = "vm"
-	DefaultAVMKeeperName    = "VMKeeper"
-	DefaultAVMMsgServerName = "MsgServer"
-	DefaultAVMStoreKey      = "vm"
+	DefaultAVMModuleName	= "vm"
+	DefaultAVMKeeperName	= "VMKeeper"
+	DefaultAVMMsgServerName	= "MsgServer"
+	DefaultAVMStoreKey	= "vm"
 )
 
 type LifecycleStage string
 type StateAccessKind string
 
 type KVLayoutEntry struct {
-	StoreKey string
-	Prefix   string
-	Purpose  string
+	StoreKey	string
+	Prefix		string
+	Purpose		string
 }
 
 type SDKIntegrationBinding struct {
-	ModuleName               string
-	KeeperName               string
-	MsgServerName            string
-	StoreKey                 string
-	Lifecycle                []LifecycleStage
-	StateAccess              []StateAccessKind
-	KVLayout                 []KVLayoutEntry
-	BlockSTMConflictPrefixes []string
-	StakingFinalityRequired  bool
-	CometBFTFinalityRequired bool
+	ModuleName			string
+	KeeperName			string
+	MsgServerName			string
+	StoreKey			string
+	Lifecycle			[]LifecycleStage
+	StateAccess			[]StateAccessKind
+	KVLayout			[]KVLayoutEntry
+	BlockSTMConflictPrefixes	[]string
+	StakingFinalityRequired		bool
+	CometBFTFinalityRequired	bool
 }
 
 type SDKDispatch struct {
-	ZoneID          zonestypes.ZoneID
-	MsgType         string
-	Call            VMCall
-	KVPrefix        string
-	BlockSTMKey     string
-	StakingPower    uint64
-	ExecutionHeight uint64
+	ZoneID		zonestypes.ZoneID
+	MsgType		string
+	Call		VMCall
+	KVPrefix	string
+	BlockSTMKey	string
+	StakingPower	uint64
+	ExecutionHeight	uint64
 }
 
 type FinalizeBlockPlan struct {
-	Height     uint64
-	Binding    SDKIntegrationBinding
-	Dispatches []SDKDispatch
+	Height		uint64
+	Binding		SDKIntegrationBinding
+	Dispatches	[]SDKDispatch
 }
 
 func DefaultAVMSDKBinding(zoneID zonestypes.ZoneID) SDKIntegrationBinding {
 	return SDKIntegrationBinding{
-		ModuleName:    DefaultAVMModuleName,
-		KeeperName:    DefaultAVMKeeperName,
-		MsgServerName: DefaultAVMMsgServerName,
-		StoreKey:      DefaultAVMStoreKey,
+		ModuleName:	DefaultAVMModuleName,
+		KeeperName:	DefaultAVMKeeperName,
+		MsgServerName:	DefaultAVMMsgServerName,
+		StoreKey:	DefaultAVMStoreKey,
 		Lifecycle: []LifecycleStage{
 			LifecycleCommit,
 			LifecycleFinalizeBlock,
@@ -78,10 +78,10 @@ func DefaultAVMSDKBinding(zoneID zonestypes.ZoneID) SDKIntegrationBinding {
 			StateAccessKVStore,
 			StateAccessStoreV2,
 		},
-		KVLayout:                 AVMKVStoreLayout(zoneID),
-		BlockSTMConflictPrefixes: []string{ContractZoneKVPrefix(zoneID)},
-		StakingFinalityRequired:  true,
-		CometBFTFinalityRequired: true,
+		KVLayout:			AVMKVStoreLayout(zoneID),
+		BlockSTMConflictPrefixes:	[]string{ContractZoneKVPrefix(zoneID)},
+		StakingFinalityRequired:	true,
+		CometBFTFinalityRequired:	true,
 	}
 }
 
@@ -130,8 +130,8 @@ func BuildFinalizeBlockPlan(height uint64, binding SDKIntegrationBinding, dispat
 
 func (b SDKIntegrationBinding) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "SDK module name", value: b.ModuleName},
 		{name: "SDK keeper name", value: b.KeeperName},

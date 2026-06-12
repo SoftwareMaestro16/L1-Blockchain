@@ -16,93 +16,93 @@ type XServicePaymentsFailureMode string
 type XServicePaymentsIntegrationPoint string
 
 const (
-	XServicePaymentsStatePaymentModel      XServicePaymentsStateObject = "PaymentModel"
-	XServicePaymentsStatePaymentEnvelope   XServicePaymentsStateObject = "PaymentEnvelope"
-	XServicePaymentsStateServiceEscrow     XServicePaymentsStateObject = "ServiceEscrow"
-	XServicePaymentsStatePaymentStream     XServicePaymentsStateObject = "PaymentStream"
-	XServicePaymentsStateMeteredUsage      XServicePaymentsStateObject = "MeteredUsage"
-	XServicePaymentsStatePaymentSettlement XServicePaymentsStateObject = "PaymentSettlement"
+	XServicePaymentsStatePaymentModel	XServicePaymentsStateObject	= "PaymentModel"
+	XServicePaymentsStatePaymentEnvelope	XServicePaymentsStateObject	= "PaymentEnvelope"
+	XServicePaymentsStateServiceEscrow	XServicePaymentsStateObject	= "ServiceEscrow"
+	XServicePaymentsStatePaymentStream	XServicePaymentsStateObject	= "PaymentStream"
+	XServicePaymentsStateMeteredUsage	XServicePaymentsStateObject	= "MeteredUsage"
+	XServicePaymentsStatePaymentSettlement	XServicePaymentsStateObject	= "PaymentSettlement"
 
-	XServicePaymentsMsgSetServicePaymentModel XServicePaymentsMessageName = "MsgSetServicePaymentModel"
-	XServicePaymentsMsgCreateServiceEscrow    XServicePaymentsMessageName = "MsgCreateServiceEscrow"
-	XServicePaymentsMsgSettleServiceEscrow    XServicePaymentsMessageName = "MsgSettleServiceEscrow"
-	XServicePaymentsMsgOpenPaymentStream      XServicePaymentsMessageName = "MsgOpenPaymentStream"
-	XServicePaymentsMsgClosePaymentStream     XServicePaymentsMessageName = "MsgClosePaymentStream"
-	XServicePaymentsMsgSubmitMeteredUsage     XServicePaymentsMessageName = "MsgSubmitMeteredUsage"
+	XServicePaymentsMsgSetServicePaymentModel	XServicePaymentsMessageName	= "MsgSetServicePaymentModel"
+	XServicePaymentsMsgCreateServiceEscrow		XServicePaymentsMessageName	= "MsgCreateServiceEscrow"
+	XServicePaymentsMsgSettleServiceEscrow		XServicePaymentsMessageName	= "MsgSettleServiceEscrow"
+	XServicePaymentsMsgOpenPaymentStream		XServicePaymentsMessageName	= "MsgOpenPaymentStream"
+	XServicePaymentsMsgClosePaymentStream		XServicePaymentsMessageName	= "MsgClosePaymentStream"
+	XServicePaymentsMsgSubmitMeteredUsage		XServicePaymentsMessageName	= "MsgSubmitMeteredUsage"
 
-	XServicePaymentsQueryPaymentModel      XServicePaymentsQueryName = "QueryPaymentModel"
-	XServicePaymentsQueryServiceEscrow     XServicePaymentsQueryName = "QueryServiceEscrow"
-	XServicePaymentsQueryPaymentStream     XServicePaymentsQueryName = "QueryPaymentStream"
-	XServicePaymentsQueryMeteredUsage      XServicePaymentsQueryName = "QueryMeteredUsage"
-	XServicePaymentsQueryPaymentSettlement XServicePaymentsQueryName = "QueryPaymentSettlement"
+	XServicePaymentsQueryPaymentModel	XServicePaymentsQueryName	= "QueryPaymentModel"
+	XServicePaymentsQueryServiceEscrow	XServicePaymentsQueryName	= "QueryServiceEscrow"
+	XServicePaymentsQueryPaymentStream	XServicePaymentsQueryName	= "QueryPaymentStream"
+	XServicePaymentsQueryMeteredUsage	XServicePaymentsQueryName	= "QueryMeteredUsage"
+	XServicePaymentsQueryPaymentSettlement	XServicePaymentsQueryName	= "QueryPaymentSettlement"
 
-	XServicePaymentsFailureEscrowUnderfunded          XServicePaymentsFailureMode = "escrow_underfunded"
-	XServicePaymentsFailureUsageReceiptInvalid        XServicePaymentsFailureMode = "usage_receipt_invalid"
-	XServicePaymentsFailureStreamSettlementExceedsMax XServicePaymentsFailureMode = "stream_settlement_exceeds_maximum"
-	XServicePaymentsFailureModelChangedAfterSigning   XServicePaymentsFailureMode = "payment_model_changed_after_call_signing"
+	XServicePaymentsFailureEscrowUnderfunded		XServicePaymentsFailureMode	= "escrow_underfunded"
+	XServicePaymentsFailureUsageReceiptInvalid		XServicePaymentsFailureMode	= "usage_receipt_invalid"
+	XServicePaymentsFailureStreamSettlementExceedsMax	XServicePaymentsFailureMode	= "stream_settlement_exceeds_maximum"
+	XServicePaymentsFailureModelChangedAfterSigning		XServicePaymentsFailureMode	= "payment_model_changed_after_call_signing"
 
-	XServicePaymentsIntegrationBankOrFinancialZone XServicePaymentsIntegrationPoint = "bank_or_financial_zone"
-	XServicePaymentsIntegrationServices            XServicePaymentsIntegrationPoint = "x/services"
-	XServicePaymentsIntegrationServiceCalls        XServicePaymentsIntegrationPoint = "x/servicecalls"
-	XServicePaymentsIntegrationPayments            XServicePaymentsIntegrationPoint = "x/payments"
+	XServicePaymentsIntegrationBankOrFinancialZone	XServicePaymentsIntegrationPoint	= "bank_or_financial_zone"
+	XServicePaymentsIntegrationServices		XServicePaymentsIntegrationPoint	= "x/services"
+	XServicePaymentsIntegrationServiceCalls		XServicePaymentsIntegrationPoint	= "x/servicecalls"
+	XServicePaymentsIntegrationPayments		XServicePaymentsIntegrationPoint	= "x/payments"
 )
 
 type XServicePaymentsFailureCoverage struct {
-	Mode  XServicePaymentsFailureMode
-	Guard string
-	Scope string
+	Mode	XServicePaymentsFailureMode
+	Guard	string
+	Scope	string
 }
 
 type XServicePaymentsModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServicePaymentsStateObject
-	Messages          []XServicePaymentsMessageName
-	Queries           []XServicePaymentsQueryName
-	FailureModes      []XServicePaymentsFailureCoverage
-	IntegrationPoints []XServicePaymentsIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServicePaymentsStateObject
+	Messages		[]XServicePaymentsMessageName
+	Queries			[]XServicePaymentsQueryName
+	FailureModes		[]XServicePaymentsFailureCoverage
+	IntegrationPoints	[]XServicePaymentsIntegrationPoint
+	BreakdownHash		string
 }
 
 type MsgSetServicePaymentModel struct {
-	Authority   string
-	Model       ServicePaymentModel
-	MessageHash string
+	Authority	string
+	Model		ServicePaymentModel
+	MessageHash	string
 }
 
 type MsgCreateServiceEscrow struct {
-	Authority   string
-	Envelope    PaymentEnvelope
-	Escrow      ServiceEscrow
-	MessageHash string
+	Authority	string
+	Envelope	PaymentEnvelope
+	Escrow		ServiceEscrow
+	MessageHash	string
 }
 
 type MsgSettleServiceEscrow struct {
-	Authority   string
-	EscrowID    string
-	Settlement  PaymentSettlement
-	MessageHash string
+	Authority	string
+	EscrowID	string
+	Settlement	PaymentSettlement
+	MessageHash	string
 }
 
 type MsgOpenPaymentStream struct {
-	Authority   string
-	Envelope    PaymentEnvelope
-	Stream      PaymentStream
-	MessageHash string
+	Authority	string
+	Envelope	PaymentEnvelope
+	Stream		PaymentStream
+	MessageHash	string
 }
 
 type MsgClosePaymentStream struct {
-	Authority     string
-	StreamID      string
-	CloseHeight   uint64
-	AmountSettled string
-	MessageHash   string
+	Authority	string
+	StreamID	string
+	CloseHeight	uint64
+	AmountSettled	string
+	MessageHash	string
 }
 
 type MsgSubmitMeteredUsage struct {
-	Authority   string
-	Usage       MeteredUsage
-	MessageHash string
+	Authority	string
+	Usage		MeteredUsage
+	MessageHash	string
 }
 
 type QueryServiceEscrow struct {
@@ -110,8 +110,8 @@ type QueryServiceEscrow struct {
 }
 
 type QueryServiceEscrowResponse struct {
-	Escrow ServiceEscrow
-	Found  bool
+	Escrow	ServiceEscrow
+	Found	bool
 }
 
 type QueryPaymentStream struct {
@@ -119,8 +119,8 @@ type QueryPaymentStream struct {
 }
 
 type QueryPaymentStreamResponse struct {
-	Stream PaymentStream
-	Found  bool
+	Stream	PaymentStream
+	Found	bool
 }
 
 type QueryMeteredUsage struct {
@@ -128,8 +128,8 @@ type QueryMeteredUsage struct {
 }
 
 type QueryMeteredUsageResponse struct {
-	Usage MeteredUsage
-	Found bool
+	Usage	MeteredUsage
+	Found	bool
 }
 
 type QueryPaymentSettlement struct {
@@ -137,21 +137,21 @@ type QueryPaymentSettlement struct {
 }
 
 type QueryPaymentSettlementResponse struct {
-	Settlement PaymentSettlement
-	Found      bool
+	Settlement	PaymentSettlement
+	Found		bool
 }
 
 type ServicePaymentSignedModelSnapshot struct {
-	ServiceID    string
-	CallID       string
-	ModelHash    string
-	SignedHeight uint64
-	SnapshotHash string
+	ServiceID	string
+	CallID		string
+	ModelHash	string
+	SignedHeight	uint64
+	SnapshotHash	string
 }
 
 func DefaultXServicePaymentsModuleBreakdown() (XServicePaymentsModuleBreakdown, error) {
 	breakdown := XServicePaymentsModuleBreakdown{
-		ModulePath: ServiceModulePayments,
+		ModulePath:	ServiceModulePayments,
 		Purpose: []string{
 			"define_payment_models",
 			"escrow_settlement",

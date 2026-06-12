@@ -10,43 +10,43 @@ import (
 )
 
 const (
-	ServiceStateDependencyCommitted    = "committed"
-	ServiceStateDependencyZoneRoot     = "zone_root"
-	ServiceStateDependencyModuleRoot   = "module_root"
-	ServiceStateDependencyGlobalRoot   = "global_root"
-	ServiceStateDependencyServiceRoot  = "service_root"
-	ServiceStateDependencyIdentityRoot = "identity_root"
-	ServiceStateDependencyStorageRoot  = "storage_root"
-	ServiceStateDependencyMessageRoot  = "message_root"
-	ServiceStateDependencyReceiptsRoot = "receipts_root"
+	ServiceStateDependencyCommitted		= "committed"
+	ServiceStateDependencyZoneRoot		= "zone_root"
+	ServiceStateDependencyModuleRoot	= "module_root"
+	ServiceStateDependencyGlobalRoot	= "global_root"
+	ServiceStateDependencyServiceRoot	= "service_root"
+	ServiceStateDependencyIdentityRoot	= "identity_root"
+	ServiceStateDependencyStorageRoot	= "storage_root"
+	ServiceStateDependencyMessageRoot	= "message_root"
+	ServiceStateDependencyReceiptsRoot	= "receipts_root"
 )
 
 type ServiceRegistryParamsV2 struct {
-	MaxTTLDelta                 uint64
-	AllowedEndpointTypes        []CanonicalServiceEndpointType
-	AllowedStateDependencyRoots []string
-	ProofHorizon                uint64
-	ParamsHash                  string
+	MaxTTLDelta			uint64
+	AllowedEndpointTypes		[]CanonicalServiceEndpointType
+	AllowedStateDependencyRoots	[]string
+	ProofHorizon			uint64
+	ParamsHash			string
 }
 
 type ServiceVersionedInterfaceEntryV2 struct {
-	InterfaceHash  string
-	Version        uint64
-	Key            string
-	DescriptorHash string
-	EntryHash      string
+	InterfaceHash	string
+	Version		uint64
+	Key		string
+	DescriptorHash	string
+	EntryHash	string
 }
 
 type ServiceRegistryExportV2 struct {
-	State      ServiceRegistryStateV2
-	Params     ServiceRegistryParamsV2
-	Roots      ServiceRegistryRootsV2
-	ExportHash string
+	State		ServiceRegistryStateV2
+	Params		ServiceRegistryParamsV2
+	Roots		ServiceRegistryRootsV2
+	ExportHash	string
 }
 
 func DefaultServiceRegistryParamsV2() ServiceRegistryParamsV2 {
 	params, _ := NewServiceRegistryParamsV2(ServiceRegistryParamsV2{
-		MaxTTLDelta: 100000,
+		MaxTTLDelta:	100000,
 		AllowedEndpointTypes: []CanonicalServiceEndpointType{
 			CanonicalEndpointAPI,
 			CanonicalEndpointApplication,
@@ -65,7 +65,7 @@ func DefaultServiceRegistryParamsV2() ServiceRegistryParamsV2 {
 			ServiceStateDependencyStorageRoot,
 			ServiceStateDependencyZoneRoot,
 		},
-		ProofHorizon: 10000,
+		ProofHorizon:	10000,
 	})
 	return params
 }
@@ -152,8 +152,8 @@ func NewVersionedServiceInterfaceDescriptorV2(descriptor DistributedInterfaceDes
 		return DistributedInterfaceDescriptor{}, errors.New("versioned service interface version must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "versioned service interface schema hash", value: descriptor.SchemaHash},
 		{name: "versioned service interface method root", value: descriptor.MethodRoot},
@@ -191,10 +191,10 @@ func BuildServiceVersionedInterfaceEntriesV2(interfaces []DistributedInterfaceDe
 			return nil, err
 		}
 		entry := ServiceVersionedInterfaceEntryV2{
-			InterfaceHash:  iface.InterfaceHash,
-			Version:        iface.Version,
-			Key:            key,
-			DescriptorHash: iface.DescriptorHash,
+			InterfaceHash:	iface.InterfaceHash,
+			Version:	iface.Version,
+			Key:		key,
+			DescriptorHash:	iface.DescriptorHash,
 		}
 		entry.EntryHash = ComputeServiceVersionedInterfaceEntryV2Hash(entry)
 		entries = append(entries, entry)
@@ -346,9 +346,9 @@ func ExportServiceRegistryV2(state ServiceRegistryStateV2, params ServiceRegistr
 		return ServiceRegistryExportV2{}, err
 	}
 	export := ServiceRegistryExportV2{
-		State:  state,
-		Params: params,
-		Roots:  ComputeServiceRegistryRootsV2(state),
+		State:	state,
+		Params:	params,
+		Roots:	ComputeServiceRegistryRootsV2(state),
 	}
 	export.ExportHash = ComputeServiceRegistryExportV2Hash(export)
 	return export, export.Validate()

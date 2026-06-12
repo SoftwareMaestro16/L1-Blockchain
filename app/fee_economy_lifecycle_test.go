@@ -75,7 +75,7 @@ func TestGoldenNativeEconomyLoopCoversFeesEmissionsPoolRewardsAndStorageRent(t *
 	storageReserveBefore := app.BankKeeper.GetBalance(ctx, app.AccountKeeper.GetModuleAddress(feecollectortypes.StorageRentReserveModuleName), appparams.BaseDenom)
 
 	require.NoError(t, app.FeesKeeper.RecordCollectedFees(ctx, fees))
-	// validatorsBefore captured after RecordCollectedFees (20M moved from fee_collector to feecollector)
+
 	validatorsBefore := app.BankKeeper.GetBalance(ctx, app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName), appparams.BaseDenom)
 	_, err := app.EndBlocker(ctx)
 	require.NoError(t, err)
@@ -95,24 +95,24 @@ func TestGoldenNativeEconomyLoopCoversFeesEmissionsPoolRewardsAndStorageRent(t *
 	require.True(t, emission.RoundingRemainder.Amount.IsZero())
 
 	nextPool, rewardSummary, err := nominatorpooltypes.SyncPoolRewards(nominatorpooltypes.DefaultParams(), nominatorpooltypes.NominatorPool{
-		PoolID:            "golden-pool",
-		TotalBondedStake:  1_000,
-		TotalShares:       1_000,
-		PoolCommissionBps: 100,
+		PoolID:			"golden-pool",
+		TotalBondedStake:	1_000,
+		TotalShares:		1_000,
+		PoolCommissionBps:	100,
 	}, nominatorpooltypes.MsgSyncPoolRewards{
-		Authority:          nominatorpooltypes.DefaultParams().Authority,
-		PoolID:             "golden-pool",
-		Epoch:              7,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: uint64(emission.ValidatorReward.Amount.Uint64()),
-		FeesAllocated:      7_000_000,
-		Height:             43,
+		Authority:		nominatorpooltypes.DefaultParams().Authority,
+		PoolID:			"golden-pool",
+		Epoch:			7,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	uint64(emission.ValidatorReward.Amount.Uint64()),
+		FeesAllocated:		7_000_000,
+		Height:			43,
 		Allocations: []nominatorpooltypes.ValidatorRewardAllocation{{
-			Validator:          testAEAddress(0x51),
-			PoolAllocatedStake: 1_000,
-			ValidatorSelfStake: 500,
-			PerformanceBps:     10_000,
-			CommissionBps:      500,
+			Validator:		testAEAddress(0x51),
+			PoolAllocatedStake:	1_000,
+			ValidatorSelfStake:	500,
+			PerformanceBps:		10_000,
+			CommissionBps:		500,
 		}},
 	})
 	require.NoError(t, err)
@@ -203,8 +203,8 @@ func configureGoldenBurnParams(t *testing.T, app *L1App, ctx sdk.Context) {
 	t.Helper()
 	params := burntypes.DefaultParams()
 	params.ProtocolBurnPermissions = append(params.ProtocolBurnPermissions, burntypes.BurnPermission{
-		ModuleName:    authtypes.FeeCollectorName,
-		AllowedDenoms: []string{appparams.BaseDenom},
+		ModuleName:	authtypes.FeeCollectorName,
+		AllowedDenoms:	[]string{appparams.BaseDenom},
 	})
 	require.NoError(t, app.BurnKeeper.SetParams(ctx, params))
 }
@@ -271,25 +271,25 @@ func TestJailedValidatorProducesZeroPoolRewards(t *testing.T) {
 	require.NoError(t, err)
 
 	_, rewardSummary, err := nominatorpooltypes.SyncPoolRewards(nominatorpooltypes.DefaultParams(), nominatorpooltypes.NominatorPool{
-		PoolID:            "jail-test-pool",
-		TotalBondedStake:  1_000,
-		TotalShares:       1_000,
-		PoolCommissionBps: 100,
+		PoolID:			"jail-test-pool",
+		TotalBondedStake:	1_000,
+		TotalShares:		1_000,
+		PoolCommissionBps:	100,
 	}, nominatorpooltypes.MsgSyncPoolRewards{
-		Authority:          nominatorpooltypes.DefaultParams().Authority,
-		PoolID:             "jail-test-pool",
-		Epoch:              7,
-		RewardRateBps:      1_000,
-		EmissionsAllocated: uint64(emission.ValidatorReward.Amount.Uint64()),
-		FeesAllocated:      0,
-		Height:             42,
+		Authority:		nominatorpooltypes.DefaultParams().Authority,
+		PoolID:			"jail-test-pool",
+		Epoch:			7,
+		RewardRateBps:		1_000,
+		EmissionsAllocated:	uint64(emission.ValidatorReward.Amount.Uint64()),
+		FeesAllocated:		0,
+		Height:			42,
 		Allocations: []nominatorpooltypes.ValidatorRewardAllocation{{
-			Validator:          testAEAddress(0x51),
-			PoolAllocatedStake: 1_000,
-			ValidatorSelfStake: 500,
-			PerformanceBps:     10_000,
-			CommissionBps:      500,
-			Jailed:             true,
+			Validator:		testAEAddress(0x51),
+			PoolAllocatedStake:	1_000,
+			ValidatorSelfStake:	500,
+			PerformanceBps:		10_000,
+			CommissionBps:		500,
+			Jailed:			true,
 		}},
 	})
 	require.NoError(t, err)

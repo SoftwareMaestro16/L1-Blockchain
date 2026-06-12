@@ -30,13 +30,12 @@ import (
 func NewRootCmd() *cobra.Command {
 	extraVersionInfo := initVersionInfo()
 
-	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
 	tempApp := l1app.NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, simtestutil.NewAppOptionsWithFlagHome(l1app.DefaultNodeHome))
 	encodingConfig := params.EncodingConfig{
-		InterfaceRegistry: tempApp.InterfaceRegistry(),
-		Codec:             tempApp.AppCodec(),
-		TxConfig:          tempApp.TxConfig(),
-		Amino:             tempApp.LegacyAmino(),
+		InterfaceRegistry:	tempApp.InterfaceRegistry(),
+		Codec:			tempApp.AppCodec(),
+		TxConfig:		tempApp.TxConfig(),
+		Amino:			tempApp.LegacyAmino(),
 	}
 
 	initClientCtx := client.Context{}.
@@ -47,14 +46,14 @@ func NewRootCmd() *cobra.Command {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithHomeDir(l1app.DefaultNodeHome).
-		WithViper("") // uses by default the binary name as prefix
+		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:           "aetrad",
-		Short:         "Aetra sovereign L1 app",
-		SilenceErrors: true,
+		Use:		"aetrad",
+		Short:		"Aetra sovereign L1 app",
+		SilenceErrors:	true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			// set the default command outputs
+
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
 
@@ -69,15 +68,12 @@ func NewRootCmd() *cobra.Command {
 				return err
 			}
 
-			// This needs to go after ReadFromClientConfig, as that function
-			// sets the RPC client needed for SIGN_MODE_TEXTUAL. This sign mode
-			// is only available if the client is online.
 			if !initClientCtx.Offline {
 				enabledSignModes := append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL)
 				txConfigOpts := tx.ConfigOptions{
-					EnabledSignModes:           enabledSignModes,
-					SigningOptions:             &txsigning.Options{AddressCodec: aetraaddress.Codec{}, ValidatorAddressCodec: aetraaddress.Codec{}},
-					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
+					EnabledSignModes:		enabledSignModes,
+					SigningOptions:			&txsigning.Options{AddressCodec: aetraaddress.Codec{}, ValidatorAddressCodec: aetraaddress.Codec{}},
+					TextualCoinMetadataQueryFn:	authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
 				}
 				txConfig, err := tx.NewTxConfigWithOptions(
 					initClientCtx.Codec,
@@ -112,7 +108,6 @@ func NewRootCmd() *cobra.Command {
 		versionCmd.SetContext(context.WithValue(context.Background(), version.ContextKey{}, extraVersionInfo))
 	}
 
-	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()
 	autoCliOpts.ClientCtx = initClientCtx
 

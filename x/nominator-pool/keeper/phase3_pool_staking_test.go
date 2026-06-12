@@ -15,10 +15,10 @@ func TestPhase31UserDepositToPoolWithoutValidatorAtTenAET(t *testing.T) {
 	pool := createOfficialLiquidStakingPool(t, &k, "phase31-official")
 
 	receipt, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        10 * types.DefaultAETBaseUnits,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		10 * types.DefaultAETBaseUnits,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, pool.PoolID, receipt.PoolID)
@@ -41,37 +41,37 @@ func TestPhase31DepositCanTargetOfficialContractAndRejectsHiddenValidatorTargets
 	pool := createOfficialLiquidStakingPool(t, &k, "phase31-contract")
 
 	receipt, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		OfficialContract: pool.ContractAddressUser,
-		WalletAddress:    user,
-		Amount:           types.DefaultMinPoolDeposit,
-		Height:           2,
+		OfficialContract:	pool.ContractAddressUser,
+		WalletAddress:		user,
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, pool.PoolID, receipt.PoolID)
 	require.Equal(t, pool.ContractAddressUser, receipt.PoolContractAddressUser)
 
 	_, err = k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        validator,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        3,
+		PoolID:		validator,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "pool id must not be an address")
 
 	_, err = k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:           "wrong-pool",
-		OfficialContract: pool.ContractAddressUser,
-		WalletAddress:    user,
-		Amount:           types.DefaultMinPoolDeposit,
-		Height:           3,
+		PoolID:			"wrong-pool",
+		OfficialContract:	pool.ContractAddressUser,
+		WalletAddress:		user,
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			3,
 	})
 	require.ErrorContains(t, err, "pool id does not match official contract")
 
 	_, err = k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit - 1,
-		Height:        3,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit - 1,
+		Height:		3,
 	})
 	require.ErrorContains(t, err, "below configured minimum")
 }
@@ -100,11 +100,11 @@ func TestPhase31DirectUserDelegationRejectedBeforeNominatorPoolMutation(t *testi
 	before := k.ExportGenesis()
 
 	err := k.DelegateUserToValidator(types.MsgDelegateToValidator{
-		Authority:        prototype.DefaultAuthority,
-		UserAddress:      user,
-		ValidatorAddress: validator,
-		Amount:           types.DefaultMinPoolDeposit,
-		Height:           2,
+		Authority:		prototype.DefaultAuthority,
+		UserAddress:		user,
+		ValidatorAddress:	validator,
+		Amount:			types.DefaultMinPoolDeposit,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "direct user delegation to validators is disabled")
 	require.Equal(t, before, k.ExportGenesis())
@@ -116,10 +116,10 @@ func phase31DepositRun(t *testing.T) (types.StakingPoolDepositReceipt, GenesisSt
 	k := NewKeeperWithAccountStatus(accountStatusFixture{user: accountStatusActive})
 	pool := createOfficialLiquidStakingPool(t, &k, "phase31-deterministic")
 	receipt, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        10 * types.DefaultAETBaseUnits,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		10 * types.DefaultAETBaseUnits,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	exported := k.ExportGenesis()

@@ -12,60 +12,60 @@ import (
 )
 
 const (
-	ClassElite      = uint8(0)
-	ClassTrusted    = uint8(1)
-	ClassNormal     = uint8(2)
-	ClassNew        = uint8(3)
-	ClassRestricted = uint8(4)
+	ClassElite	= uint8(0)
+	ClassTrusted	= uint8(1)
+	ClassNormal	= uint8(2)
+	ClassNew	= uint8(3)
+	ClassRestricted	= uint8(4)
 )
 
 type QueueParams struct {
-	MaxPerBlock             uint32
-	MaxPerAccountQueued     uint32
-	MaxPerContractQueued    uint32
-	StarvationWindowHeights uint64
+	MaxPerBlock		uint32
+	MaxPerAccountQueued	uint32
+	MaxPerContractQueued	uint32
+	StarvationWindowHeights	uint64
 }
 
 type QueueItem struct {
-	ScheduledHeight   uint64
-	ReputationClass   uint8
-	TxHeight          uint64
-	TxIndex           uint32
-	MessageIndex      uint32
-	SourceLogicalTime uint64
-	Sequence          uint64
-	Account           sdk.AccAddress
-	Contract          sdk.AccAddress
-	Payload           []byte
-	Attempts          uint32
-	LastError         string
+	ScheduledHeight		uint64
+	ReputationClass		uint8
+	TxHeight		uint64
+	TxIndex			uint32
+	MessageIndex		uint32
+	SourceLogicalTime	uint64
+	Sequence		uint64
+	Account			sdk.AccAddress
+	Contract		sdk.AccAddress
+	Payload			[]byte
+	Attempts		uint32
+	LastError		string
 }
 
 type Queue struct {
-	params         QueueParams
-	items          []QueueItem
-	nextSequence   uint64
-	accountCounts  map[string]uint32
-	contractCounts map[string]uint32
-	processed      uint64
-	failed         uint64
+	params		QueueParams
+	items		[]QueueItem
+	nextSequence	uint64
+	accountCounts	map[string]uint32
+	contractCounts	map[string]uint32
+	processed	uint64
+	failed		uint64
 }
 
 type Observability struct {
-	Queued           uint64
-	Processed        uint64
-	Failed           uint64
-	Lag              uint64
-	AccountsTracked  uint64
-	ContractsTracked uint64
+	Queued			uint64
+	Processed		uint64
+	Failed			uint64
+	Lag			uint64
+	AccountsTracked		uint64
+	ContractsTracked	uint64
 }
 
 func DefaultParams() QueueParams {
 	return QueueParams{
-		MaxPerBlock:             128,
-		MaxPerAccountQueued:     64,
-		MaxPerContractQueued:    128,
-		StarvationWindowHeights: 100,
+		MaxPerBlock:			128,
+		MaxPerAccountQueued:		64,
+		MaxPerContractQueued:		128,
+		StarvationWindowHeights:	100,
 	}
 }
 
@@ -74,9 +74,9 @@ func NewQueue(params QueueParams) (*Queue, error) {
 		return nil, err
 	}
 	return &Queue{
-		params:         params,
-		accountCounts:  make(map[string]uint32),
-		contractCounts: make(map[string]uint32),
+		params:		params,
+		accountCounts:	make(map[string]uint32),
+		contractCounts:	make(map[string]uint32),
 	}, nil
 }
 
@@ -165,12 +165,12 @@ func (q *Queue) Metrics(height uint64) Observability {
 		}
 	}
 	return Observability{
-		Queued:           uint64(len(q.items)),
-		Processed:        q.processed,
-		Failed:           q.failed,
-		Lag:              lag,
-		AccountsTracked:  uint64(len(q.accountCounts)),
-		ContractsTracked: uint64(len(q.contractCounts)),
+		Queued:			uint64(len(q.items)),
+		Processed:		q.processed,
+		Failed:			q.failed,
+		Lag:			lag,
+		AccountsTracked:	uint64(len(q.accountCounts)),
+		ContractsTracked:	uint64(len(q.contractCounts)),
 	}
 }
 
@@ -196,24 +196,24 @@ func Less(left, right QueueItem, height uint64, params QueueParams) bool {
 }
 
 type PriorityKeyValue struct {
-	ScheduledHeight   uint64
-	ReputationClass   uint8
-	TxHeight          uint64
-	TxIndex           uint32
-	MessageIndex      uint32
-	SourceLogicalTime uint64
-	Sequence          uint64
+	ScheduledHeight		uint64
+	ReputationClass		uint8
+	TxHeight		uint64
+	TxIndex			uint32
+	MessageIndex		uint32
+	SourceLogicalTime	uint64
+	Sequence		uint64
 }
 
 func PriorityKey(item QueueItem, height uint64, params QueueParams) PriorityKeyValue {
 	return PriorityKeyValue{
-		ScheduledHeight:   item.ScheduledHeight,
-		ReputationClass:   EffectiveReputationClass(item, height, params),
-		TxHeight:          item.TxHeight,
-		TxIndex:           item.TxIndex,
-		MessageIndex:      item.MessageIndex,
-		SourceLogicalTime: item.SourceLogicalTime,
-		Sequence:          item.Sequence,
+		ScheduledHeight:	item.ScheduledHeight,
+		ReputationClass:	EffectiveReputationClass(item, height, params),
+		TxHeight:		item.TxHeight,
+		TxIndex:		item.TxIndex,
+		MessageIndex:		item.MessageIndex,
+		SourceLogicalTime:	item.SourceLogicalTime,
+		Sequence:		item.Sequence,
 	}
 }
 

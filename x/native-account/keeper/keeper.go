@@ -17,8 +17,8 @@ import (
 var nextAccountNumberKey = []byte("account/meta/next_account_number")
 
 type Keeper struct {
-	storeService corestore.KVStoreService
-	feePolicy    nativeaccount.ActivationFeePolicy
+	storeService	corestore.KVStoreService
+	feePolicy	nativeaccount.ActivationFeePolicy
 }
 
 func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
@@ -222,8 +222,8 @@ func (k Keeper) SetAccount(ctx context.Context, account nativeaccount.Account) e
 type frozenMutationPolicy bool
 
 const (
-	frozenMutationBlocked frozenMutationPolicy = false
-	frozenMutationAllowed frozenMutationPolicy = true
+	frozenMutationBlocked	frozenMutationPolicy	= false
+	frozenMutationAllowed	frozenMutationPolicy	= true
 )
 
 func (k Keeper) applyAccountMutation(ctx context.Context, userAddress string, frozenPolicy frozenMutationPolicy, apply func(nativeaccount.Account) (nativeaccount.Account, error)) (nativeaccount.Account, error) {
@@ -358,8 +358,8 @@ func (k Keeper) userAddressByIndexKey(ctx context.Context, key []byte) (string, 
 }
 
 type accountStore struct {
-	ctx    context.Context
-	keeper Keeper
+	ctx	context.Context
+	keeper	Keeper
 }
 
 func newActivationStore(ctx context.Context, keeper Keeper) (accountStore, error) {

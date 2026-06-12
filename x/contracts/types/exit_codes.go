@@ -2,81 +2,75 @@ package types
 
 // ExitCodeSpec represents an exit code with its name
 type ExitCodeSpec struct {
-	Code uint32
-	Name string
+	Code	uint32
+	Name	string
 }
-
-// Exit code domains:
-// 0-31   = VM execution errors
-// 32-63  = action/message errors
-// 64-95  = state/storage errors
-// 96-127 = system/host errors
 
 const (
 	// VM Execution Errors (0-31)
-	ExitCodeOK                     uint32 = 0
-	ExitCodeValidationFailed       uint32 = 1
-	ExitCodeUnauthorized           uint32 = 2
-	ExitCodeAccountInactive        uint32 = 3
-	ExitCodeAccountFrozen          uint32 = 4
-	ExitCodeContractFrozen         uint32 = 5
-	ExitCodeCodeRejected           uint32 = 6
-	ExitCodeTypeCheckFailed        uint32 = 7
-	ExitCodeOutOfGas               uint32 = 8
-	ExitCodeStackOverflow          uint32 = 9
-	ExitCodeStackUnderflow         uint32 = 10
-	ExitCodeTypeCheckError         uint32 = 11 // Alias for TypeCheckFailed
-	ExitCodeInvalidJump            uint32 = 14
-	ExitCodeCallStackOverflow      uint32 = 15
-	ExitCodeContinuationMissing    uint32 = 16
-	ExitCodeContinuationNotFound   uint32 = 16 // Alias for ContinuationMissing
-	ExitCodeRecursionLimitExceeded uint32 = 17
+	ExitCodeOK			uint32	= 0
+	ExitCodeValidationFailed	uint32	= 1
+	ExitCodeUnauthorized		uint32	= 2
+	ExitCodeAccountInactive		uint32	= 3
+	ExitCodeAccountFrozen		uint32	= 4
+	ExitCodeContractFrozen		uint32	= 5
+	ExitCodeCodeRejected		uint32	= 6
+	ExitCodeTypeCheckFailed		uint32	= 7
+	ExitCodeOutOfGas		uint32	= 8
+	ExitCodeStackOverflow		uint32	= 9
+	ExitCodeStackUnderflow		uint32	= 10
+	ExitCodeTypeCheckError		uint32	= 11	// Alias for TypeCheckFailed
+	ExitCodeInvalidJump		uint32	= 14
+	ExitCodeCallStackOverflow	uint32	= 15
+	ExitCodeContinuationMissing	uint32	= 16
+	ExitCodeContinuationNotFound	uint32	= 16	// Alias for ContinuationMissing
+	ExitCodeRecursionLimitExceeded	uint32	= 17
 
 	// Memory / Type Safety Errors (18-21)
-	ExitCodeInvalidMemoryAccess   uint32 = 18
-	ExitCodeNullReference         uint32 = 19
-	ExitCodeInvalidChunkRef       uint32 = 20
-	ExitCodeInvalidChunkReference uint32 = 20 // Alias for InactiveFrozen
-	ExitCodeCorruptedStateObject  uint32 = 21
+	ExitCodeInvalidMemoryAccess	uint32	= 18
+	ExitCodeNullReference		uint32	= 19
+	ExitCodeInvalidChunkRef		uint32	= 20
+	ExitCodeInvalidChunkReference	uint32	= 20	// Alias for InactiveFrozen
+	ExitCodeCorruptedStateObject	uint32	= 21
 
 	// Arithmetic Edge Cases (22-24)
-	ExitCodeDivisionByZero      uint32 = 22
-	ExitCodeInvalidShift        uint32 = 23
-	ExitCodeArithmeticUnderflow uint32 = 24
+	ExitCodeDivisionByZero		uint32	= 22
+	ExitCodeInvalidShift		uint32	= 23
+	ExitCodeArithmeticUnderflow	uint32	= 24
 
 	// Execution Safety / Gas Edge Cases (25-27)
-	ExitCodeGasLimitExceeded     uint32 = 25
-	ExitCodeGasReservationFailed uint32 = 26
-	ExitCodeExecutionTimeout     uint32 = 27
+	ExitCodeGasLimitExceeded	uint32	= 25
+	ExitCodeGasReservationFailed	uint32	= 26
+	ExitCodeExecutionTimeout	uint32	= 27
 
 	// Action / Message Errors (32-63)
-	ExitCodeMessageExpired       uint32 = 32
-	ExitCodeQueueLimit           uint32 = 33
-	ExitCodeMessageTooLarge      uint32 = 34
-	ExitCodeActionBudgetExceeded  uint32 = 35
-	ExitCodeRoutingFailed        uint32 = 38
-	ExitCodeMessageRoutingFailed uint32 = 38 // Alias for RoutingFailed
-	ExitCodeQueueOverflow        uint32 = 39
-	ExitCodeShardUnavailable     uint32 = 40
+	ExitCodeMessageExpired		uint32	= 32
+	ExitCodeQueueLimit		uint32	= 33
+	ExitCodeMessageTooLarge		uint32	= 34
+	ExitCodeActionBudgetExceeded	uint32	= 35
+	ExitCodeRoutingFailed		uint32	= 38
+	ExitCodeMessageRoutingFailed	uint32	= 38	// Alias for RoutingFailed
+	ExitCodeQueueOverflow		uint32	= 39
+	ExitCodeShardUnavailable	uint32	= 40
 
 	// State / Storage Errors (64-95)
-	ExitCodeStorageLimit         uint32 = 64
-	ExitCodeStorageRentDebt      uint32 = 65
-	ExitCodeAccountStateTooBig   uint32 = 66
-	ExitCodeStateCorruption      uint32 = 67
-	ExitCodeStateVersionMismatch uint32 = 68
-	ExitCodeSnapshotFailure      uint32 = 69
+	ExitCodeStorageLimit		uint32	= 64
+	ExitCodeStorageRentDebt		uint32	= 65
+	ExitCodeAccountStateTooBig	uint32	= 66
+	ExitCodeStateCorruption		uint32	= 67
+	ExitCodeStateVersionMismatch	uint32	= 68
+	ExitCodeSnapshotFailure		uint32	= 69
 
 	// System / Host Errors (96-127)
-	ExitCodeExecutionFailed     uint32 = 96
-	ExitCodeInternalBounce      uint32 = 97
-	ExitCodeForbiddenHostCall   uint32 = 98
-	ExitCodeContractAbort       uint32 = 99
-	ExitCodeAssertionFailed     uint32 = 100
-	ExitCodeInsufficientBalance uint32 = 101
-	ExitCodeInsufficientGas     uint32 = 102
-	ExitCodeExplicitAbort       uint32 = 103
-	ExitCodeInactiveFrozen      uint32 = 104
+	ExitCodeExecutionFailed		uint32	= 96
+	ExitCodeInternalBounce		uint32	= 97
+	ExitCodeForbiddenHostCall	uint32	= 98
+	ExitCodeContractAbort		uint32	= 99
+	ExitCodeAssertionFailed		uint32	= 100
+	ExitCodeInsufficientBalance	uint32	= 101
+	ExitCodeInsufficientGas		uint32	= 102
+	ExitCodeExplicitAbort		uint32	= 103
+	ExitCodeInactiveFrozen		uint32	= 104
 )
 
 // IsVMExecutionError returns true if code is in VM execution domain (0-31)

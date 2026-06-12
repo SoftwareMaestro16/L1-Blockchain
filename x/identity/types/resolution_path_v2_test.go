@@ -29,10 +29,10 @@ func TestDeterministicResolutionPathV2VerifiesPrimaryFreshnessAndExpiry(t *testi
 	require.NoError(t, err)
 
 	result, err := VerifyDeterministicResolutionPathV2(state, "alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType:   IdentityResolutionTargetPrimary,
-		Height:       14,
-		RecordTTL:    30,
-		MaxRecordAge: 3,
+		TargetType:	IdentityResolutionTargetPrimary,
+		Height:		14,
+		RecordTTL:	30,
+		MaxRecordAge:	3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []string{"alice.aet"}, result.Path.Path)
@@ -40,17 +40,17 @@ func TestDeterministicResolutionPathV2VerifiesPrimaryFreshnessAndExpiry(t *testi
 	require.Equal(t, addr(2), result.Resolution.Record.Primary)
 
 	_, err = VerifyDeterministicResolutionPathV2(state, "alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType:   IdentityResolutionTargetPrimary,
-		Height:       14,
-		RecordTTL:    30,
-		MaxRecordAge: 1,
+		TargetType:	IdentityResolutionTargetPrimary,
+		Height:		14,
+		RecordTTL:	30,
+		MaxRecordAge:	1,
 	})
 	require.ErrorContains(t, err, "stale")
 
 	_, err = VerifyDeterministicResolutionPathV2(state, "alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType: IdentityResolutionTargetPrimary,
-		Height:     state.Domains[0].ExpiryHeight,
-		RecordTTL:  30,
+		TargetType:	IdentityResolutionTargetPrimary,
+		Height:		state.Domains[0].ExpiryHeight,
+		RecordTTL:	30,
 	})
 	require.ErrorContains(t, err, "expired")
 }
@@ -61,19 +61,19 @@ func TestDeterministicResolutionPathV2RequiresParentOrDelegation(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = VerifyDeterministicResolutionPathV2(state, "service.api.alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType: IdentityResolutionTargetPrimary,
-		Height:     14,
-		RecordTTL:  30,
+		TargetType:	IdentityResolutionTargetPrimary,
+		Height:		14,
+		RecordTTL:	30,
 	})
 	require.ErrorContains(t, err, "requires parent domain or delegation")
 
 	delegation, err := NewDelegationRecordV2("alice.aet", addr(7), DelegationScopeSubdomainCreate, []string{"create"}, 100, 2, "", 10)
 	require.NoError(t, err)
 	result, err := VerifyDeterministicResolutionPathV2(state, "service.api.alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType:  IdentityResolutionTargetPrimary,
-		Height:      14,
-		RecordTTL:   30,
-		Delegations: []DelegationRecordV2{delegation},
+		TargetType:	IdentityResolutionTargetPrimary,
+		Height:		14,
+		RecordTTL:	30,
+		Delegations:	[]DelegationRecordV2{delegation},
 	})
 	require.NoError(t, err)
 	require.Equal(t, []string{"alice.aet", "api.alice.aet", "service.api.alice.aet"}, result.Path.Path)
@@ -92,18 +92,18 @@ func TestDeterministicResolutionPathV2VerifiesServiceTarget(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = VerifyDeterministicResolutionPathV2(state, "alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType: IdentityResolutionTargetService,
-		TargetKey:  "rpc",
-		Height:     14,
-		RecordTTL:  30,
+		TargetType:	IdentityResolutionTargetService,
+		TargetKey:	"rpc",
+		Height:		14,
+		RecordTTL:	30,
 	})
 	require.NoError(t, err)
 
 	_, err = VerifyDeterministicResolutionPathV2(state, "alice.aet", DeterministicResolutionPathValidationV2{
-		TargetType: IdentityResolutionTargetService,
-		TargetKey:  "grpc",
-		Height:     14,
-		RecordTTL:  30,
+		TargetType:	IdentityResolutionTargetService,
+		TargetKey:	"grpc",
+		Height:		14,
+		RecordTTL:	30,
 	})
 	require.ErrorContains(t, err, "service target")
 }

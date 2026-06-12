@@ -14,25 +14,25 @@ func TestStakeTimeReputationIncreasesWithPoolShareExposure(t *testing.T) {
 	account := aeAddr(0x33)
 
 	state, claim, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      100,
-		PoolTotalShares: 1_000,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   10,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		100,
+		PoolTotalShares:	1_000,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		10,
 	})
 	require.NoError(t, err)
 	require.Zero(t, claim.ReputationDelta)
 
 	state, claim, err = ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      100,
-		PoolTotalShares: 1_000,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   13,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		100,
+		PoolTotalShares:	1_000,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		13,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(3_000), claim.StakeWeightedSeconds)
@@ -50,25 +50,25 @@ func TestStakeReputationNoStakeTimeNoReputation(t *testing.T) {
 	account := aeAddr(0x34)
 
 	state, claim, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      0,
-		PoolTotalShares: 1_000,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   10,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		0,
+		PoolTotalShares:	1_000,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		10,
 	})
 	require.NoError(t, err)
 	require.Zero(t, claim.ReputationDelta)
 
 	state, claim, err = ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      0,
-		PoolTotalShares: 1_000,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   20,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		0,
+		PoolTotalShares:	1_000,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		20,
 	})
 	require.NoError(t, err)
 	require.Zero(t, claim.ReputationDelta)
@@ -80,23 +80,23 @@ func TestStakeReputationClaimDeterministicGolden(t *testing.T) {
 	state := reputationStateForStakeTest(t)
 	account := aeAddr(0x35)
 	state, _, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-golden",
-		PoolShares:      25,
-		PoolTotalShares: 100,
-		PoolActiveStake: 4_000,
-		TimestampUnix:   100,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-golden",
+		PoolShares:		25,
+		PoolTotalShares:	100,
+		PoolActiveStake:	4_000,
+		TimestampUnix:		100,
 	})
 	require.NoError(t, err)
 	state, claim, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-golden",
-		PoolShares:      25,
-		PoolTotalShares: 100,
-		PoolActiveStake: 4_000,
-		TimestampUnix:   107,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-golden",
+		PoolShares:		25,
+		PoolTotalShares:	100,
+		PoolActiveStake:	4_000,
+		TimestampUnix:		107,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(7_000), claim.StakeWeightedSeconds)
@@ -107,13 +107,13 @@ func TestStakeReputationClaimDeterministicGolden(t *testing.T) {
 func TestSlashedOrJailedValidatorCannotReceivePositiveValidatorBonus(t *testing.T) {
 	params := DefaultReputationParams()
 	operatorExposure := StakePoolExposure{
-		PoolID:            "validator-self",
-		Shares:            100,
-		TotalPoolShares:   100,
-		PoolActiveStake:   1_000,
-		LastUpdatedUnix:   1,
-		ValidatorOperator: true,
-		ValidatorBonusBps: params.ValidatorStakeBonusBps,
+		PoolID:			"validator-self",
+		Shares:			100,
+		TotalPoolShares:	100,
+		PoolActiveStake:	1_000,
+		LastUpdatedUnix:	1,
+		ValidatorOperator:	true,
+		ValidatorBonusBps:	params.ValidatorStakeBonusBps,
 	}
 	require.Equal(t, uint64(1_200), EffectivePoolStakeExposure(params, operatorExposure))
 
@@ -131,25 +131,25 @@ func TestDelegatorOnJailedValidatorUsesConfiguredAllowedExposure(t *testing.T) {
 	state.Params.JailedPoolExposureBps = 2_500
 	account := aeAddr(0x37)
 	state, _, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-jailed",
-		PoolShares:      50,
-		PoolTotalShares: 100,
-		PoolActiveStake: 8_000,
-		TimestampUnix:   1,
-		ValidatorJailed: true,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-jailed",
+		PoolShares:		50,
+		PoolTotalShares:	100,
+		PoolActiveStake:	8_000,
+		TimestampUnix:		1,
+		ValidatorJailed:	true,
 	})
 	require.NoError(t, err)
 	state, claim, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-jailed",
-		PoolShares:      50,
-		PoolTotalShares: 100,
-		PoolActiveStake: 8_000,
-		TimestampUnix:   2,
-		ValidatorJailed: true,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-jailed",
+		PoolShares:		50,
+		PoolTotalShares:	100,
+		PoolActiveStake:	8_000,
+		TimestampUnix:		2,
+		ValidatorJailed:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1_000), claim.StakeWeightedSeconds)
@@ -160,13 +160,13 @@ func TestPoolUserReputationIsNotTiedToConcreteValidatorChoice(t *testing.T) {
 	state := reputationStateForStakeTest(t)
 	account := aeAddr(0x38)
 	msg := MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "official-liquid-pool",
-		PoolShares:      10,
-		PoolTotalShares: 100,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   5,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"official-liquid-pool",
+		PoolShares:		10,
+		PoolTotalShares:	100,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		5,
 	}
 	state, _, err := ApplyClaimStakeReputation(state, msg)
 	require.NoError(t, err)
@@ -184,23 +184,23 @@ func TestStakeReputationExportImportPreservesAccumulator(t *testing.T) {
 	state := reputationStateForStakeTest(t)
 	account := aeAddr(0x39)
 	state, _, err := ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-export",
-		PoolShares:      1,
-		PoolTotalShares: 1,
-		PoolActiveStake: 2_000,
-		TimestampUnix:   10,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-export",
+		PoolShares:		1,
+		PoolTotalShares:	1,
+		PoolActiveStake:	2_000,
+		TimestampUnix:		10,
 	})
 	require.NoError(t, err)
 	state, _, err = ApplyClaimStakeReputation(state, MsgClaimStakeReputation{
-		Authority:       state.Params.Authority,
-		Account:         account,
-		PoolID:          "pool-export",
-		PoolShares:      1,
-		PoolTotalShares: 1,
-		PoolActiveStake: 2_000,
-		TimestampUnix:   12,
+		Authority:		state.Params.Authority,
+		Account:		account,
+		PoolID:			"pool-export",
+		PoolShares:		1,
+		PoolTotalShares:	1,
+		PoolActiveStake:	2_000,
+		TimestampUnix:		12,
 	})
 	require.NoError(t, err)
 
@@ -217,8 +217,8 @@ func TestStakeReputationCannotBeMintedByMetadataOrTransferredAsset(t *testing.T)
 
 	state := reputationStateForStakeTest(t)
 	metadataOnly := ApplyComputedScore(ReputationRecord{
-		Account:     mustParseAE(t, aeAddr(0x41)),
-		DomainScore: MaxDomainScore,
+		Account:	mustParseAE(t, aeAddr(0x41)),
+		DomainScore:	MaxDomainScore,
 	})
 	state.Accounts = append(state.Accounts, metadataOnly)
 	state = NormalizeReputationState(state)

@@ -6,48 +6,48 @@ import (
 )
 
 const (
-	AetraDoDRequirementCodeImplemented        = "code_is_implemented"
-	AetraDoDRequirementParamsValidated        = "params_are_validated"
-	AetraDoDRequirementGenesisImportExport    = "genesis_import_export_works"
-	AetraDoDRequirementQuerySurface           = "query_surface_exists"
-	AetraDoDRequirementOperationalEvents      = "events_exist_where_operationally_relevant"
-	AetraDoDRequirementUnitTests              = "unit_tests_pass"
-	AetraDoDRequirementIntegrationTests       = "integration_tests_pass"
-	AetraDoDRequirementE2ELocalnetUserFlow    = "e2e_localnet_test_exists_for_user_facing_flow"
-	AetraDoDRequirementOperatorUserDocs       = "docs_describe_operator_user_impact"
-	AetraDoDRequirementFailureModesDocumented = "failure_modes_are_documented"
-	AetraDoDRequirementSecurityReviewed       = "security_implications_are_reviewed"
+	AetraDoDRequirementCodeImplemented		= "code_is_implemented"
+	AetraDoDRequirementParamsValidated		= "params_are_validated"
+	AetraDoDRequirementGenesisImportExport		= "genesis_import_export_works"
+	AetraDoDRequirementQuerySurface			= "query_surface_exists"
+	AetraDoDRequirementOperationalEvents		= "events_exist_where_operationally_relevant"
+	AetraDoDRequirementUnitTests			= "unit_tests_pass"
+	AetraDoDRequirementIntegrationTests		= "integration_tests_pass"
+	AetraDoDRequirementE2ELocalnetUserFlow		= "e2e_localnet_test_exists_for_user_facing_flow"
+	AetraDoDRequirementOperatorUserDocs		= "docs_describe_operator_user_impact"
+	AetraDoDRequirementFailureModesDocumented	= "failure_modes_are_documented"
+	AetraDoDRequirementSecurityReviewed		= "security_implications_are_reviewed"
 )
 
 const (
-	AetraDoDCriticalRequirementAdversarialTests     = "adversarial_tests"
-	AetraDoDCriticalRequirementInvariantTests       = "invariant_tests"
-	AetraDoDCriticalRequirementExportImportTest     = "export_import_test"
-	AetraDoDCriticalRequirementDeterministicRestart = "deterministic_restart_test"
-	AetraDoDCriticalRequirementMigrationIfState     = "migration_test_if_state_changed"
+	AetraDoDCriticalRequirementAdversarialTests	= "adversarial_tests"
+	AetraDoDCriticalRequirementInvariantTests	= "invariant_tests"
+	AetraDoDCriticalRequirementExportImportTest	= "export_import_test"
+	AetraDoDCriticalRequirementDeterministicRestart	= "deterministic_restart_test"
+	AetraDoDCriticalRequirementMigrationIfState	= "migration_test_if_state_changed"
 )
 
 type AetraDefinitionOfDoneEvidence struct {
-	TaskName                          string
-	ConsensusEconomicsOrStakingChange bool
-	Requirements                      []string
-	CriticalRequirements              []string
+	TaskName				string
+	ConsensusEconomicsOrStakingChange	bool
+	Requirements				[]string
+	CriticalRequirements			[]string
 }
 
 type AetraDefinitionOfDoneReport struct {
-	TaskName       string
-	CriticalChange bool
-	Required       int
-	Passed         int
-	Failed         []string
-	Ready          bool
+	TaskName	string
+	CriticalChange	bool
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraDefinitionOfDoneEvidence(taskName string, criticalChange bool) AetraDefinitionOfDoneEvidence {
 	evidence := AetraDefinitionOfDoneEvidence{
-		TaskName:                          taskName,
-		ConsensusEconomicsOrStakingChange: criticalChange,
-		Requirements:                      RequiredAetraDoDRequirements(),
+		TaskName:				taskName,
+		ConsensusEconomicsOrStakingChange:	criticalChange,
+		Requirements:				RequiredAetraDoDRequirements(),
 	}
 	if criticalChange {
 		evidence.CriticalRequirements = RequiredAetraDoDCriticalRequirements()
@@ -84,12 +84,12 @@ func BuildAetraDefinitionOfDoneReport(evidence AetraDefinitionOfDoneEvidence) Ae
 
 	sort.Strings(failed)
 	return AetraDefinitionOfDoneReport{
-		TaskName:       evidence.TaskName,
-		CriticalChange: evidence.ConsensusEconomicsOrStakingChange,
-		Required:       required,
-		Passed:         passed,
-		Failed:         failed,
-		Ready:          len(failed) == 0,
+		TaskName:	evidence.TaskName,
+		CriticalChange:	evidence.ConsensusEconomicsOrStakingChange,
+		Required:	required,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

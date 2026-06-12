@@ -12,54 +12,54 @@ import (
 )
 
 const (
-	AVMQueueStatePrefixPriority = "queue/priority"
-	AVMQueueStatePrefixDelayed  = "queue/delayed"
-	AVMQueueStatePrefixRetry    = "queue/retry"
-	AVMQueueStatePrefixFailed   = "queue/failed"
+	AVMQueueStatePrefixPriority	= "queue/priority"
+	AVMQueueStatePrefixDelayed	= "queue/delayed"
+	AVMQueueStatePrefixRetry	= "queue/retry"
+	AVMQueueStatePrefixFailed	= "queue/failed"
 
-	AVMQueueLanePriority AVMQueueLane = "priority"
-	AVMQueueLaneDelayed  AVMQueueLane = "delayed"
-	AVMQueueLaneRetry    AVMQueueLane = "retry"
-	AVMQueueLaneFailed   AVMQueueLane = "failed"
+	AVMQueueLanePriority	AVMQueueLane	= "priority"
+	AVMQueueLaneDelayed	AVMQueueLane	= "delayed"
+	AVMQueueLaneRetry	AVMQueueLane	= "retry"
+	AVMQueueLaneFailed	AVMQueueLane	= "failed"
 )
 
 type AVMQueueLane string
 
 type AVMZoneQueueEntry struct {
-	ZoneID          zonestypes.ZoneID
-	Lane            AVMQueueLane
-	MessageID       string
-	SortKey         string
-	Priority        uint8
-	ScheduledHeight uint64
-	SenderHash      string
-	Nonce           uint64
-	GasLimit        uint64
+	ZoneID		zonestypes.ZoneID
+	Lane		AVMQueueLane
+	MessageID	string
+	SortKey		string
+	Priority	uint8
+	ScheduledHeight	uint64
+	SenderHash	string
+	Nonce		uint64
+	GasLimit	uint64
 }
 
 type AVMZoneQueue struct {
-	ZoneID        zonestypes.ZoneID
-	PriorityQueue []AVMZoneQueueEntry
-	DelayedQueue  []AVMZoneQueueEntry
-	RetryQueue    []AVMZoneQueueEntry
-	FailedQueue   []AVMZoneQueueEntry
-	QueueRoot     string
+	ZoneID		zonestypes.ZoneID
+	PriorityQueue	[]AVMZoneQueueEntry
+	DelayedQueue	[]AVMZoneQueueEntry
+	RetryQueue	[]AVMZoneQueueEntry
+	FailedQueue	[]AVMZoneQueueEntry
+	QueueRoot	string
 }
 
 type AVMZoneQueueSelection struct {
-	Ready     []AVMAsyncMessage
-	Expired   []AVMAsyncMessage
-	Remaining AVMZoneQueue
-	Budget    zonestypes.ZoneExecutionBudget
+	Ready		[]AVMAsyncMessage
+	Expired		[]AVMAsyncMessage
+	Remaining	AVMZoneQueue
+	Budget		zonestypes.ZoneExecutionBudget
 }
 
 type AVMZoneQueueProof struct {
-	ZoneID    zonestypes.ZoneID
-	Lane      AVMQueueLane
-	MessageID string
-	SortKey   string
-	StateKey  string
-	QueueRoot string
+	ZoneID		zonestypes.ZoneID
+	Lane		AVMQueueLane
+	MessageID	string
+	SortKey		string
+	StateKey	string
+	QueueRoot	string
 }
 
 func NewAVMZoneQueue(queue AVMZoneQueue) (AVMZoneQueue, error) {
@@ -74,14 +74,14 @@ func NewAVMZoneQueueEntry(lane AVMQueueLane, msg AVMAsyncMessage, scheduledHeigh
 		scheduledHeight = AVMMessageScheduledHeight(msg)
 	}
 	entry := AVMZoneQueueEntry{
-		ZoneID:          msg.DestinationZone,
-		Lane:            lane,
-		MessageID:       msg.ID,
-		Priority:        msg.Priority,
-		ScheduledHeight: scheduledHeight,
-		SenderHash:      AVMQueueSenderHash(msg.SourceZone, msg.Source),
-		Nonce:           msg.SenderNonce,
-		GasLimit:        msg.GasLimit,
+		ZoneID:			msg.DestinationZone,
+		Lane:			lane,
+		MessageID:		msg.ID,
+		Priority:		msg.Priority,
+		ScheduledHeight:	scheduledHeight,
+		SenderHash:		AVMQueueSenderHash(msg.SourceZone, msg.Source),
+		Nonce:			msg.SenderNonce,
+		GasLimit:		msg.GasLimit,
 	}
 	entry.SortKey = AVMQueueSortKey(entry.Priority, entry.ScheduledHeight, entry.SenderHash, entry.Nonce, entry.MessageID)
 	return entry, entry.Validate()
@@ -396,14 +396,14 @@ func DeadLetterAVMZoneQueueMessage(queue AVMZoneQueue, msg AVMAsyncMessage, rece
 		return AVMZoneQueue{}, AVMDeadLetterRecord{}, errors.New("AVM dead letter queue zone mismatch")
 	}
 	record, err := NewAVMDeadLetterRecord(AVMDeadLetterRecord{
-		MessageID:            msg.ID,
-		ZoneID:               queue.ZoneID,
-		Reason:               reason,
-		FailedAttempts:       failedAttempts,
-		LastErrorCode:        receipt.ErrorCodeOptional,
-		FinalHeight:          receipt.CreatedHeight,
-		RefundAmountOptional: refundAmountOptional,
-		ReceiptID:            receipt.ReceiptID,
+		MessageID:		msg.ID,
+		ZoneID:			queue.ZoneID,
+		Reason:			reason,
+		FailedAttempts:		failedAttempts,
+		LastErrorCode:		receipt.ErrorCodeOptional,
+		FinalHeight:		receipt.CreatedHeight,
+		RefundAmountOptional:	refundAmountOptional,
+		ReceiptID:		receipt.ReceiptID,
 	})
 	if err != nil {
 		return AVMZoneQueue{}, AVMDeadLetterRecord{}, err
@@ -438,12 +438,12 @@ func QueryAVMZoneQueueProof(queue AVMZoneQueue, lane AVMQueueLane, messageID str
 			continue
 		}
 		proof := AVMZoneQueueProof{
-			ZoneID:    queue.ZoneID,
-			Lane:      lane,
-			MessageID: entry.MessageID,
-			SortKey:   entry.SortKey,
-			StateKey:  entry.StateKey(),
-			QueueRoot: queue.QueueRoot,
+			ZoneID:		queue.ZoneID,
+			Lane:		lane,
+			MessageID:	entry.MessageID,
+			SortKey:	entry.SortKey,
+			StateKey:	entry.StateKey(),
+			QueueRoot:	queue.QueueRoot,
 		}
 		return proof, proof.Validate()
 	}

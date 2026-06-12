@@ -27,16 +27,16 @@ func deployTestContract(t *testing.T, executor *Executor, deployer sdk.AccAddres
 
 func testMessage(source, dest sdk.AccAddress, queryID uint64) MessageEnvelope {
 	return MessageEnvelope{
-		Source:             source,
-		Destination:        dest,
-		Value:              naetCoin(1),
-		Opcode:             1,
-		QueryID:            queryID,
-		Body:               []byte("body"),
-		Bounce:             true,
-		CreatedLogicalTime: queryID,
-		GasLimit:           100_000,
-		ForwardFee:         forwardFee(),
+		Source:			source,
+		Destination:		dest,
+		Value:			naetCoin(1),
+		Opcode:			1,
+		QueryID:		queryID,
+		Body:			[]byte("body"),
+		Bounce:			true,
+		CreatedLogicalTime:	queryID,
+		GasLimit:		100_000,
+		ForwardFee:		forwardFee(),
 	}
 }
 

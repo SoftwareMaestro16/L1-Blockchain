@@ -18,9 +18,9 @@ func (k Keeper) MintAuthority(ctx context.Context, _ *mintauthoritypb.QueryMintA
 	}
 	params, registration, callers := types.QueryMintAuthority(state)
 	out, err := mustJSON(struct {
-		Params       types.MintAuthorityParams
-		Registration types.SystemAccountRegistration
-		Callers      []types.AllowedCaller
+		Params		types.MintAuthorityParams
+		Registration	types.SystemAccountRegistration
+		Callers		[]types.AllowedCaller
 	}{params, registration, callers})
 	return &mintauthoritypb.QueryMintAuthorityResponse{AuthorityJson: out}, err
 }

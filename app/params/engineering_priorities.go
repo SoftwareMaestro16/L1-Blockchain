@@ -6,58 +6,58 @@ import (
 )
 
 const (
-	AetraEngineeringPriorityP0 = "P0"
-	AetraEngineeringPriorityP1 = "P1"
-	AetraEngineeringPriorityP2 = "P2"
-	AetraEngineeringPriorityP3 = "P3"
+	AetraEngineeringPriorityP0	= "P0"
+	AetraEngineeringPriorityP1	= "P1"
+	AetraEngineeringPriorityP2	= "P2"
+	AetraEngineeringPriorityP3	= "P3"
 )
 
 const (
-	AetraEngineeringP0ConsensusSafety     = "consensus_safety"
-	AetraEngineeringP0DeterministicState  = "deterministic_state"
-	AetraEngineeringP0StakingCorrectness  = "staking_correctness"
-	AetraEngineeringP0SlashingCorrectness = "slashing_correctness"
-	AetraEngineeringP0SupplyInvariants    = "supply_invariants"
-	AetraEngineeringP0ExportImport        = "export_import"
+	AetraEngineeringP0ConsensusSafety	= "consensus_safety"
+	AetraEngineeringP0DeterministicState	= "deterministic_state"
+	AetraEngineeringP0StakingCorrectness	= "staking_correctness"
+	AetraEngineeringP0SlashingCorrectness	= "slashing_correctness"
+	AetraEngineeringP0SupplyInvariants	= "supply_invariants"
+	AetraEngineeringP0ExportImport		= "export_import"
 )
 
 const (
-	AetraEngineeringP1ValidatorPowerCap    = "validator_power_cap"
-	AetraEngineeringP1FeeBurnEconomics     = "fee_burn_economics"
-	AetraEngineeringP1ValidatorScore       = "validator_score"
-	AetraEngineeringP1NominationPoolSafety = "nomination_pool_safety"
-	AetraEngineeringP1GovernanceBounds     = "governance_bounds"
+	AetraEngineeringP1ValidatorPowerCap	= "validator_power_cap"
+	AetraEngineeringP1FeeBurnEconomics	= "fee_burn_economics"
+	AetraEngineeringP1ValidatorScore	= "validator_score"
+	AetraEngineeringP1NominationPoolSafety	= "nomination_pool_safety"
+	AetraEngineeringP1GovernanceBounds	= "governance_bounds"
 )
 
 const (
-	AetraEngineeringP2AVMHardening      = "avm_production_hardening"
-	AetraEngineeringP2Observability     = "observability"
-	AetraEngineeringP2Dashboards        = "dashboards"
-	AetraEngineeringP2LoadTests         = "load_tests"
-	AetraEngineeringP2PublicTestnetDocs = "public_testnet_docs"
+	AetraEngineeringP2AVMHardening		= "avm_production_hardening"
+	AetraEngineeringP2Observability		= "observability"
+	AetraEngineeringP2Dashboards		= "dashboards"
+	AetraEngineeringP2LoadTests		= "load_tests"
+	AetraEngineeringP2PublicTestnetDocs	= "public_testnet_docs"
 )
 
 const (
-	AetraEngineeringP3AntiCartelAnalytics           = "advanced_anti_cartel_analytics"
-	AetraEngineeringP3AVMLanguageResearch           = "avm_language_research"
-	AetraEngineeringP3MEVPolicy                     = "mev_policy"
-	AetraEngineeringP3EncryptedMempoolResearch      = "encrypted_mempool_research"
-	AetraEngineeringP3HigherValidatorCapExperiments = "higher_validator_cap_experiments"
+	AetraEngineeringP3AntiCartelAnalytics		= "advanced_anti_cartel_analytics"
+	AetraEngineeringP3AVMLanguageResearch		= "avm_language_research"
+	AetraEngineeringP3MEVPolicy			= "mev_policy"
+	AetraEngineeringP3EncryptedMempoolResearch	= "encrypted_mempool_research"
+	AetraEngineeringP3HigherValidatorCapExperiments	= "higher_validator_cap_experiments"
 )
 
 type AetraEngineeringPriorityEvidence struct {
-	Priority string
-	Items    []string
-	Stable   bool
+	Priority	string
+	Items		[]string
+	Stable		bool
 }
 
 type AetraEngineeringPrioritiesReport struct {
-	Priorities []AetraEngineeringPriorityEvidence
-	Required   int
-	Passed     int
-	Failed     []string
-	P3Allowed  bool
-	Ready      bool
+	Priorities	[]AetraEngineeringPriorityEvidence
+	Required	int
+	Passed		int
+	Failed		[]string
+	P3Allowed	bool
+	Ready		bool
 }
 
 func DefaultAetraEngineeringPrioritiesEvidence() []AetraEngineeringPriorityEvidence {
@@ -132,12 +132,12 @@ func BuildAetraEngineeringPrioritiesReport(evidence []AetraEngineeringPriorityEv
 
 	sort.Strings(failed)
 	return AetraEngineeringPrioritiesReport{
-		Priorities: evidence,
-		Required:   required,
-		Passed:     passed,
-		Failed:     failed,
-		P3Allowed:  p3Allowed,
-		Ready:      len(failed) == 0,
+		Priorities:	evidence,
+		Required:	required,
+		Passed:		passed,
+		Failed:		failed,
+		P3Allowed:	p3Allowed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -184,10 +184,10 @@ func RequiredAetraEngineeringP3Items() []string {
 
 func requiredEngineeringPriorities() map[string][]string {
 	return map[string][]string{
-		AetraEngineeringPriorityP0: RequiredAetraEngineeringP0Items(),
-		AetraEngineeringPriorityP1: RequiredAetraEngineeringP1Items(),
-		AetraEngineeringPriorityP2: RequiredAetraEngineeringP2Items(),
-		AetraEngineeringPriorityP3: RequiredAetraEngineeringP3Items(),
+		AetraEngineeringPriorityP0:	RequiredAetraEngineeringP0Items(),
+		AetraEngineeringPriorityP1:	RequiredAetraEngineeringP1Items(),
+		AetraEngineeringPriorityP2:	RequiredAetraEngineeringP2Items(),
+		AetraEngineeringPriorityP3:	RequiredAetraEngineeringP3Items(),
 	}
 }
 

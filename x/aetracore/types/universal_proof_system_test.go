@@ -14,11 +14,11 @@ func TestUniversalProofObjectivesBindToExpectedRoots(t *testing.T) {
 	for _, objective := range objectives {
 		seen[objective.Objective] = struct{}{}
 		root := ProofRoot{
-			Height:   9,
-			ZoneID:   objective.ZoneID,
-			RootType: objective.RootType,
-			RootHash: testHash(string(objective.Objective)),
-			Source:   "aetracore.universal_proofs",
+			Height:		9,
+			ZoneID:		objective.ZoneID,
+			RootType:	objective.RootType,
+			RootHash:	testHash(string(objective.Objective)),
+			Source:		"aetracore.universal_proofs",
 		}
 		require.NoError(t, ValidateProofRootForObjective(objective.Objective, root))
 
@@ -49,11 +49,11 @@ func TestUniversalProofObjectivesBindToExpectedRoots(t *testing.T) {
 
 func TestUniversalProofObjectiveRejectsWrongZone(t *testing.T) {
 	root := ProofRoot{
-		Height:   9,
-		ZoneID:   ZoneIDApplication,
-		RootType: BalanceProofRootType,
-		RootHash: testHash("balance"),
-		Source:   "aetracore.universal_proofs",
+		Height:		9,
+		ZoneID:		ZoneIDApplication,
+		RootType:	BalanceProofRootType,
+		RootHash:	testHash("balance"),
+		Source:		"aetracore.universal_proofs",
 	}
 
 	require.ErrorContains(t, ValidateProofRootForObjective(ProofObjectiveBalanceState, root), "requires zone FINANCIAL_ZONE")
@@ -137,9 +137,9 @@ func testUniversalZoneBranch(t *testing.T, height uint64, zoneID ZoneID, label s
 	shards := make([]UniversalShardRootBranch, 0, len(shardIDs))
 	for _, shardID := range shardIDs {
 		shards = append(shards, UniversalShardRootBranch{
-			ZoneID:    zoneID,
-			ShardID:   shardID,
-			ShardRoot: testHash(label + "-shard-" + string(shardID)),
+			ZoneID:		zoneID,
+			ShardID:	shardID,
+			ShardRoot:	testHash(label + "-shard-" + string(shardID)),
 		})
 	}
 	branch, err := NewUniversalZoneRootBranch(height, zoneID, testHash(label+"-zone"), shards)

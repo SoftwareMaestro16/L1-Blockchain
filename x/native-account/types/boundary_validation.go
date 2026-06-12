@@ -12,20 +12,20 @@ func ValidateBoundaries(boundaries []Boundary) error {
 	}
 	seen := make(map[string]struct{}, len(boundaries))
 	required := map[string]bool{
-		"app/addressing":                 false,
-		ModulePath:                       false,
-		"x/identity":                     false,
-		"x/reputation":                   false,
-		"x/storage-rent":                 false,
-		"x/pos":                          false,
-		"x/nominator-pool":               false,
-		"x/single-nominator-pool":        false,
-		"x/validator-*":                  false,
-		"x/stake-concentration":          false,
-		"x/fees":                         false,
-		"x/burn":                         false,
-		"x/treasury":                     false,
-		"x/contracts, x/vm, x/aetravm/*": false,
+		"app/addressing":			false,
+		ModulePath:				false,
+		"x/identity":				false,
+		"x/reputation":				false,
+		"x/storage-rent":			false,
+		"x/pos":				false,
+		"x/nominator-pool":			false,
+		"x/single-nominator-pool":		false,
+		"x/validator-*":			false,
+		"x/stake-concentration":		false,
+		"x/fees":				false,
+		"x/burn":				false,
+		"x/treasury":				false,
+		"x/contracts, x/vm, x/aetravm/*":	false,
 	}
 	for _, boundary := range boundaries {
 		if strings.TrimSpace(boundary.Path) == "" {

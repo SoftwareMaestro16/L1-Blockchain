@@ -15,14 +15,14 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  prototype.Params
-	State   networkingtypes.NetworkingState
+	Version	uint64
+	Params	prototype.Params
+	State	networkingtypes.NetworkingState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -35,9 +35,9 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  prototype.DefaultParams(),
-		State:   networkingtypes.EmptyState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		State:		networkingtypes.EmptyState(),
 	}
 }
 

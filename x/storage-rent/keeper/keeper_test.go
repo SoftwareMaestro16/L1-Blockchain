@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	authority = prototype.DefaultAuthority
-	contract  = "contract-1"
-	actor     = "actor-1"
+	authority	= prototype.DefaultAuthority
+	contract	= "contract-1"
+	actor		= "actor-1"
 )
 
 func setupKeeper(t *testing.T) Keeper {

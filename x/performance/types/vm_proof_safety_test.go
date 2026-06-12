@@ -90,29 +90,29 @@ func TestProofSafetyRequiresExplicitNonExistenceAndSupportedVersions(t *testing.
 
 func validVMSafetyEnvelope() VMSafetyEnvelope {
 	timeout := VMPromiseTimeoutPolicy{
-		CreatedHeight: 100,
-		TimeoutHeight: 110,
-		DelayBlocks:   10,
+		CreatedHeight:	100,
+		TimeoutHeight:	110,
+		DelayBlocks:	10,
 	}
 	timeout.PolicyHash = ComputeVMPromiseTimeoutPolicyHash(timeout)
 	envelope := VMSafetyEnvelope{
-		ExecutionID:                  "exec-1",
-		ZoneID:                       "contract",
-		ShardID:                      "shard-a",
-		ContractAddress:              "contract/escrow",
-		GasMeteringEnabled:           true,
-		GasLimit:                     10_000,
-		GasConsumed:                  9_000,
-		StorageIterationLimit:        128,
-		StorageIterations:            64,
-		ProofVerificationCount:       2,
-		ProofVerificationGasReserved: 1_000,
-		ProofVerificationGasConsumed: 900,
-		MessageCreationCount:         1,
-		ReservedForwardingFee:        "5",
-		ForwardingFeeRequired:        "3",
-		RemoteMutationMode:           VMRemoteMutationAsyncMessage,
-		PromiseTimeout:               timeout,
+		ExecutionID:			"exec-1",
+		ZoneID:				"contract",
+		ShardID:			"shard-a",
+		ContractAddress:		"contract/escrow",
+		GasMeteringEnabled:		true,
+		GasLimit:			10_000,
+		GasConsumed:			9_000,
+		StorageIterationLimit:		128,
+		StorageIterations:		64,
+		ProofVerificationCount:		2,
+		ProofVerificationGasReserved:	1_000,
+		ProofVerificationGasConsumed:	900,
+		MessageCreationCount:		1,
+		ReservedForwardingFee:		"5",
+		ForwardingFeeRequired:		"3",
+		RemoteMutationMode:		VMRemoteMutationAsyncMessage,
+		PromiseTimeout:			timeout,
 	}
 	envelope.SafetyHash = ComputeVMSafetyEnvelopeHash(envelope)
 	return envelope
@@ -120,21 +120,21 @@ func validVMSafetyEnvelope() VMSafetyEnvelope {
 
 func validProofSafetyEnvelope(nonExistence bool) UniversalProofSafetyEnvelope {
 	proof := UniversalProofSafetyEnvelope{
-		ProofID:           "proof-1",
-		ProofVersion:      ProofSafetyVersionV1,
-		SupportedVersions: []uint32{ProofSafetyVersionV1},
+		ProofID:		"proof-1",
+		ProofVersion:		ProofSafetyVersionV1,
+		SupportedVersions:	[]uint32{ProofSafetyVersionV1},
 		TrustedHeader: TrustedHeaderBinding{
-			Height:     200,
-			HeaderHash: hashStrings("trusted-header"),
-			AppHash:    hashStrings("trusted-app"),
+			Height:		200,
+			HeaderHash:	hashStrings("trusted-header"),
+			AppHash:	hashStrings("trusted-app"),
 		},
-		ProofHeight:  200,
-		ZoneID:       "identity",
-		ShardID:      "shard-a",
-		ObjectKey:    "domains/alice.aet",
-		RootType:     ProofRootIdentity,
-		RootHash:     hashStrings("identity-root"),
-		NonExistence: nonExistence,
+		ProofHeight:	200,
+		ZoneID:		"identity",
+		ShardID:	"shard-a",
+		ObjectKey:	"domains/alice.aet",
+		RootType:	ProofRootIdentity,
+		RootHash:	hashStrings("identity-root"),
+		NonExistence:	nonExistence,
 	}
 	if nonExistence {
 		proof.AbsenceProofHash = hashStrings("absence-proof")

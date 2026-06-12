@@ -48,13 +48,13 @@ func TestReservedSystemRegistryGenesisRejectsDuplicateRaw(t *testing.T) {
 	mint, found := addressing.SystemAddressByName("AETMint")
 	require.True(t, found)
 	state.Entities = append(state.Entities, SystemEntity{
-		Name:                 "AETDuplicate",
-		ModuleName:           "duplicate-system-address",
-		ModuleAccountAddress: "4:0000000000000000000000001111111111111111111111111111111111111111",
-		RawAddress:           mint.Raw,
-		AuthorityAddress:     params.Authority,
-		Status:               StatusActive,
-		Version:              1,
+		Name:			"AETDuplicate",
+		ModuleName:		"duplicate-system-address",
+		ModuleAccountAddress:	"4:0000000000000000000000001111111111111111111111111111111111111111",
+		RawAddress:		mint.Raw,
+		AuthorityAddress:	params.Authority,
+		Status:			StatusActive,
+		Version:		1,
 	})
 
 	require.ErrorContains(t, state.Validate(params), "duplicate reserved address bytes")

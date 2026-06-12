@@ -23,28 +23,28 @@ import (
 const ConsensusVersion = prototype.NextMigrationVersion
 
 var (
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasGenesis     = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ appmodule.AppModule   = AppModule{}
+	_	module.AppModuleBasic	= AppModule{}
+	_	module.HasGenesis	= AppModule{}
+	_	module.HasServices	= AppModule{}
+	_	appmodule.AppModule	= AppModule{}
 )
 
 type AppModule struct {
 	keeper *keeper.Keeper
 }
 
-func NewAppModule(k *keeper.Keeper) AppModule { return AppModule{keeper: k} }
+func NewAppModule(k *keeper.Keeper) AppModule	{ return AppModule{keeper: k} }
 
-func (AppModule) IsOnePerModuleType() {}
-func (AppModule) IsAppModule()        {}
-func (AppModule) Name() string        { return types.ModuleName }
+func (AppModule) IsOnePerModuleType()	{}
+func (AppModule) IsAppModule()		{}
+func (AppModule) Name() string		{ return types.ModuleName }
 func (AppModule) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	types.RegisterLegacyAminoCodec(cdc)
 }
 func (AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
 }
-func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
+func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux)	{}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewGRPCMsgServer(am.keeper))
@@ -66,27 +66,27 @@ func (AppModule) ValidateGenesis(_ codec.JSONCodec, _ client.TxEncodingConfig, b
 	return gs.Validate()
 }
 
-func (am AppModule) InitGenesis(_ sdk.Context, _ codec.JSONCodec, bz json.RawMessage) {
+func (am AppModule) InitGenesis(ctx sdk.Context, _ codec.JSONCodec, bz json.RawMessage) {
 	var gs types.GenesisState
 	if err := unmarshalGenesis(types.ModuleName, bz, &gs); err != nil {
 		panic(err)
 	}
-	if err := am.keeper.InitGenesis(gs); err != nil {
+	if err := am.keeper.InitGenesisState(ctx, gs); err != nil {
 		panic(fmt.Errorf("failed to initialize %s genesis: %w", types.ModuleName, err))
 	}
 }
 
-func (am AppModule) ExportGenesis(sdk.Context, codec.JSONCodec) json.RawMessage {
-	gs, err := am.keeper.ExportGenesis()
+func (am AppModule) ExportGenesis(ctx sdk.Context, _ codec.JSONCodec) json.RawMessage {
+	gs, err := am.keeper.ExportGenesisState(ctx)
 	if err != nil {
 		panic(fmt.Errorf("failed to export %s genesis: %w", types.ModuleName, err))
 	}
 	return mustMarshalGenesis(types.ModuleName, gs)
 }
 
-func (AppModule) ConsensusVersion() uint64    { return ConsensusVersion }
-func (AppModule) GetTxCmd() *cobra.Command    { return types.NewTxCmd() }
-func (AppModule) GetQueryCmd() *cobra.Command { return types.NewQueryCmd() }
+func (AppModule) ConsensusVersion() uint64	{ return ConsensusVersion }
+func (AppModule) GetTxCmd() *cobra.Command	{ return types.NewTxCmd() }
+func (AppModule) GetQueryCmd() *cobra.Command	{ return types.NewQueryCmd() }
 
 func mustMarshalGenesis(moduleName string, value any) json.RawMessage {
 	bz, err := json.Marshal(value)

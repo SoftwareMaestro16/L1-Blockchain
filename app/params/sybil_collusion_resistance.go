@@ -8,152 +8,152 @@ import (
 )
 
 const (
-	CorrelationSignalCommission = "synchronized_commission_change"
-	CorrelationSignalDowntime   = "correlated_downtime"
-	CorrelationSignalOperator   = "deterministic_operator_group"
+	CorrelationSignalCommission	= "synchronized_commission_change"
+	CorrelationSignalDowntime	= "correlated_downtime"
+	CorrelationSignalOperator	= "deterministic_operator_group"
 
-	EvidenceRouteEquivocation = "equivocation_evidence_route"
-	EvidenceRouteDowntime     = "downtime_evidence_route"
-	EvidenceRouteDuplicate    = "duplicate_evidence_rejected"
+	EvidenceRouteEquivocation	= "equivocation_evidence_route"
+	EvidenceRouteDowntime		= "downtime_evidence_route"
+	EvidenceRouteDuplicate		= "duplicate_evidence_rejected"
 
-	DefaultSybilGroupSoftCapBps               = int64(2_500)
-	DefaultSybilGroupMaxRewardDampeningBps    = int64(3_000)
-	DefaultSybilDeterministicCorrelationBps   = int64(9_000)
-	DefaultSybilAdvisoryCorrelationBps        = int64(6_000)
-	DefaultBootstrapEligibilityWindowEpochs   = uint64(12)
-	DefaultTopNConcentrationLimitBps          = int64(6_700)
-	DefaultSynchronizedCommissionThresholdBps = int64(300)
-	DefaultCorrelatedDowntimeThresholdBps     = int64(7_500)
-	DefaultEvidenceRoutingRewardCapNaet       = int64(1_000)
+	DefaultSybilGroupSoftCapBps			= int64(2_500)
+	DefaultSybilGroupMaxRewardDampeningBps		= int64(3_000)
+	DefaultSybilDeterministicCorrelationBps		= int64(9_000)
+	DefaultSybilAdvisoryCorrelationBps		= int64(6_000)
+	DefaultBootstrapEligibilityWindowEpochs		= uint64(12)
+	DefaultTopNConcentrationLimitBps		= int64(6_700)
+	DefaultSynchronizedCommissionThresholdBps	= int64(300)
+	DefaultCorrelatedDowntimeThresholdBps		= int64(7_500)
+	DefaultEvidenceRoutingRewardCapNaet		= int64(1_000)
 )
 
 type SybilCollusionResistanceParams struct {
-	GroupConcentrationSoftCapBps         int64
-	GroupMaxRewardDampeningBps           int64
-	DeterministicCorrelationThresholdBps int64
-	AdvisoryCorrelationThresholdBps      int64
-	MinSelfDelegationNaet                sdkmath.Int
-	MinSelfDelegationRatioBps            int64
-	MinPerformanceBps                    int64
-	BootstrapEligibilityWindowEpochs     uint64
-	BootstrapMaxStakeBps                 int64
-	BootstrapBonusBps                    int64
-	TopNConcentrationLimitBps            int64
-	SynchronizedCommissionThresholdBps   int64
-	CorrelatedDowntimeThresholdBps       int64
-	EvidenceRoutingRewardCapNaet         sdkmath.Int
+	GroupConcentrationSoftCapBps		int64
+	GroupMaxRewardDampeningBps		int64
+	DeterministicCorrelationThresholdBps	int64
+	AdvisoryCorrelationThresholdBps		int64
+	MinSelfDelegationNaet			sdkmath.Int
+	MinSelfDelegationRatioBps		int64
+	MinPerformanceBps			int64
+	BootstrapEligibilityWindowEpochs	uint64
+	BootstrapMaxStakeBps			int64
+	BootstrapBonusBps			int64
+	TopNConcentrationLimitBps		int64
+	SynchronizedCommissionThresholdBps	int64
+	CorrelatedDowntimeThresholdBps		int64
+	EvidenceRoutingRewardCapNaet		sdkmath.Int
 }
 
 type ValidatorSybilRecord struct {
-	ValidatorID                   string
-	EconomicGroupID               string
-	StakeNaet                     sdkmath.Int
-	VotingPowerBps                int64
-	SelfDelegationNaet            sdkmath.Int
-	SelfDelegationRatioBps        int64
-	PerformanceBps                int64
-	CommissionBps                 int64
-	CommissionChangeBps           int64
-	DowntimeObserved              bool
-	BootstrapWindowID             uint64
-	BootstrapRewardAlreadyUsed    bool
-	CorrelationScoreBps           int64
-	CorrelationProofDeterministic bool
+	ValidatorID			string
+	EconomicGroupID			string
+	StakeNaet			sdkmath.Int
+	VotingPowerBps			int64
+	SelfDelegationNaet		sdkmath.Int
+	SelfDelegationRatioBps		int64
+	PerformanceBps			int64
+	CommissionBps			int64
+	CommissionChangeBps		int64
+	DowntimeObserved		bool
+	BootstrapWindowID		uint64
+	BootstrapRewardAlreadyUsed	bool
+	CorrelationScoreBps		int64
+	CorrelationProofDeterministic	bool
 }
 
 type StakeSplitSimulationInput struct {
-	RewardPoolNaet sdkmath.Int
-	Original       ValidatorSybilRecord
-	Split          []ValidatorSybilRecord
-	Params         SybilCollusionResistanceParams
+	RewardPoolNaet	sdkmath.Int
+	Original	ValidatorSybilRecord
+	Split		[]ValidatorSybilRecord
+	Params		SybilCollusionResistanceParams
 }
 
 type StakeSplitSimulationReport struct {
-	OriginalGroupPowerBps     int64
-	SplitGroupPowerBps        int64
-	OriginalRewardNaet        sdkmath.Int
-	SplitRewardNaet           sdkmath.Int
-	OriginalDampeningBps      int64
-	SplitDampeningBps         int64
-	BypassPrevented           bool
-	ConsensusDampeningApplied bool
-	AdvisoryOnly              bool
+	OriginalGroupPowerBps		int64
+	SplitGroupPowerBps		int64
+	OriginalRewardNaet		sdkmath.Int
+	SplitRewardNaet			sdkmath.Int
+	OriginalDampeningBps		int64
+	SplitDampeningBps		int64
+	BypassPrevented			bool
+	ConsensusDampeningApplied	bool
+	AdvisoryOnly			bool
 }
 
 type ValidatorEligibilityReport struct {
-	ValidatorID           string
-	Eligible              bool
-	BootstrapEligible     bool
-	BootstrapBonusBps     int64
-	RejectReasons         []string
-	AdvisoryCorrelation   bool
-	ConsensusDampeningBps int64
+	ValidatorID		string
+	Eligible		bool
+	BootstrapEligible	bool
+	BootstrapBonusBps	int64
+	RejectReasons		[]string
+	AdvisoryCorrelation	bool
+	ConsensusDampeningBps	int64
 }
 
 type CorrelationTelemetryReport struct {
-	GroupID             string
-	Validators          []string
-	CorrelationScoreBps int64
-	DeterministicProof  bool
-	AdvisoryOnly        bool
-	ConsensusAffecting  bool
-	RewardDampeningBps  int64
-	Signals             []string
+	GroupID			string
+	Validators		[]string
+	CorrelationScoreBps	int64
+	DeterministicProof	bool
+	AdvisoryOnly		bool
+	ConsensusAffecting	bool
+	RewardDampeningBps	int64
+	Signals			[]string
 }
 
 type CollusionScenarioInput struct {
-	Validators     []ValidatorSybilRecord
-	TopN           int
-	RewardPoolNaet sdkmath.Int
-	Params         SybilCollusionResistanceParams
+	Validators	[]ValidatorSybilRecord
+	TopN		int
+	RewardPoolNaet	sdkmath.Int
+	Params		SybilCollusionResistanceParams
 }
 
 type CollusionScenarioReport struct {
-	TopNVotingPowerBps        int64
-	TopNLimitBps              int64
-	ConcentrationExceeded     bool
-	ConcentrationDampeningBps int64
-	RewardBeforeDampeningNaet sdkmath.Int
-	RewardAfterDampeningNaet  sdkmath.Int
-	CommissionAlerts          []string
-	DowntimeAlerts            []string
-	CorrelationReports        []CorrelationTelemetryReport
-	GovernanceSummary         string
+	TopNVotingPowerBps		int64
+	TopNLimitBps			int64
+	ConcentrationExceeded		bool
+	ConcentrationDampeningBps	int64
+	RewardBeforeDampeningNaet	sdkmath.Int
+	RewardAfterDampeningNaet	sdkmath.Int
+	CommissionAlerts		[]string
+	DowntimeAlerts			[]string
+	CorrelationReports		[]CorrelationTelemetryReport
+	GovernanceSummary		string
 }
 
 type EvidenceRoutingInput struct {
-	ValidatorID                 string
-	EvidenceType                string
-	Duplicate                   bool
-	Accepted                    bool
-	RequestedReporterRewardNaet sdkmath.Int
-	Params                      SybilCollusionResistanceParams
+	ValidatorID			string
+	EvidenceType			string
+	Duplicate			bool
+	Accepted			bool
+	RequestedReporterRewardNaet	sdkmath.Int
+	Params				SybilCollusionResistanceParams
 }
 
 type EvidenceRoutingReport struct {
-	Route              string
-	Accepted           bool
-	ReporterRewardNaet sdkmath.Int
-	RejectedReason     string
-	Auditable          bool
+	Route			string
+	Accepted		bool
+	ReporterRewardNaet	sdkmath.Int
+	RejectedReason		string
+	Auditable		bool
 }
 
 func DefaultSybilCollusionResistanceParams() SybilCollusionResistanceParams {
 	return SybilCollusionResistanceParams{
-		GroupConcentrationSoftCapBps:         DefaultSybilGroupSoftCapBps,
-		GroupMaxRewardDampeningBps:           DefaultSybilGroupMaxRewardDampeningBps,
-		DeterministicCorrelationThresholdBps: DefaultSybilDeterministicCorrelationBps,
-		AdvisoryCorrelationThresholdBps:      DefaultSybilAdvisoryCorrelationBps,
-		MinSelfDelegationNaet:                sdkmath.NewInt(1_000),
-		MinSelfDelegationRatioBps:            DefaultMinSelfDelegationBps,
-		MinPerformanceBps:                    DefaultValidatorReliabilityTargetBps,
-		BootstrapEligibilityWindowEpochs:     DefaultBootstrapEligibilityWindowEpochs,
-		BootstrapMaxStakeBps:                 DefaultMaxBootstrapStakeBps,
-		BootstrapBonusBps:                    DefaultValidatorBootstrapBonusBps,
-		TopNConcentrationLimitBps:            DefaultTopNConcentrationLimitBps,
-		SynchronizedCommissionThresholdBps:   DefaultSynchronizedCommissionThresholdBps,
-		CorrelatedDowntimeThresholdBps:       DefaultCorrelatedDowntimeThresholdBps,
-		EvidenceRoutingRewardCapNaet:         sdkmath.NewInt(DefaultEvidenceRoutingRewardCapNaet),
+		GroupConcentrationSoftCapBps:		DefaultSybilGroupSoftCapBps,
+		GroupMaxRewardDampeningBps:		DefaultSybilGroupMaxRewardDampeningBps,
+		DeterministicCorrelationThresholdBps:	DefaultSybilDeterministicCorrelationBps,
+		AdvisoryCorrelationThresholdBps:	DefaultSybilAdvisoryCorrelationBps,
+		MinSelfDelegationNaet:			sdkmath.NewInt(1_000),
+		MinSelfDelegationRatioBps:		DefaultMinSelfDelegationBps,
+		MinPerformanceBps:			DefaultValidatorReliabilityTargetBps,
+		BootstrapEligibilityWindowEpochs:	DefaultBootstrapEligibilityWindowEpochs,
+		BootstrapMaxStakeBps:			DefaultMaxBootstrapStakeBps,
+		BootstrapBonusBps:			DefaultValidatorBootstrapBonusBps,
+		TopNConcentrationLimitBps:		DefaultTopNConcentrationLimitBps,
+		SynchronizedCommissionThresholdBps:	DefaultSynchronizedCommissionThresholdBps,
+		CorrelatedDowntimeThresholdBps:		DefaultCorrelatedDowntimeThresholdBps,
+		EvidenceRoutingRewardCapNaet:		sdkmath.NewInt(DefaultEvidenceRoutingRewardCapNaet),
 	}
 }
 
@@ -194,15 +194,15 @@ func SimulateStakeSplitting(input StakeSplitSimulationInput) (StakeSplitSimulati
 	splitDampening, splitConsensus, splitAdvisory := groupDampening(splitPower, maxCorrelation, deterministic, params)
 	splitReward := ApplyBps(ApplyBps(rewardPool, splitPower), BasisPoints-splitDampening)
 	return StakeSplitSimulationReport{
-		OriginalGroupPowerBps:     originalPower,
-		SplitGroupPowerBps:        splitPower,
-		OriginalRewardNaet:        originalReward,
-		SplitRewardNaet:           splitReward,
-		OriginalDampeningBps:      originalDampening,
-		SplitDampeningBps:         splitDampening,
-		BypassPrevented:           splitPower == originalPower && splitReward.LTE(originalReward),
-		ConsensusDampeningApplied: originalConsensus || splitConsensus,
-		AdvisoryOnly:              (originalAdvisory || splitAdvisory || advisory) && !(originalConsensus || splitConsensus),
+		OriginalGroupPowerBps:		originalPower,
+		SplitGroupPowerBps:		splitPower,
+		OriginalRewardNaet:		originalReward,
+		SplitRewardNaet:		splitReward,
+		OriginalDampeningBps:		originalDampening,
+		SplitDampeningBps:		splitDampening,
+		BypassPrevented:		splitPower == originalPower && splitReward.LTE(originalReward),
+		ConsensusDampeningApplied:	originalConsensus || splitConsensus,
+		AdvisoryOnly:			(originalAdvisory || splitAdvisory || advisory) && !(originalConsensus || splitConsensus),
 	}, nil
 }
 
@@ -230,13 +230,13 @@ func EvaluateValidatorActiveSetEligibility(validator ValidatorSybilRecord, param
 		validator.VotingPowerBps <= params.BootstrapMaxStakeBps
 	dampening, consensus, advisory := groupDampening(validator.VotingPowerBps, validator.CorrelationScoreBps, validator.CorrelationProofDeterministic, params)
 	return ValidatorEligibilityReport{
-		ValidatorID:           validator.ValidatorID,
-		Eligible:              len(reasons) == 0,
-		BootstrapEligible:     bootstrap,
-		BootstrapBonusBps:     bootstrapBps(bootstrap, params),
-		RejectReasons:         reasons,
-		AdvisoryCorrelation:   advisory && !consensus,
-		ConsensusDampeningBps: dampening,
+		ValidatorID:		validator.ValidatorID,
+		Eligible:		len(reasons) == 0,
+		BootstrapEligible:	bootstrap,
+		BootstrapBonusBps:	bootstrapBps(bootstrap, params),
+		RejectReasons:		reasons,
+		AdvisoryCorrelation:	advisory && !consensus,
+		ConsensusDampeningBps:	dampening,
 	}, nil
 }
 
@@ -284,14 +284,14 @@ func EvaluateCorrelationTelemetry(groupID string, validators []ValidatorSybilRec
 	dampening, consensus, advisory := groupDampening(groupPower, maxScore, deterministic, params)
 	sort.Strings(ids)
 	return CorrelationTelemetryReport{
-		GroupID:             groupID,
-		Validators:          ids,
-		CorrelationScoreBps: maxScore,
-		DeterministicProof:  deterministic,
-		AdvisoryOnly:        advisory && !consensus,
-		ConsensusAffecting:  consensus,
-		RewardDampeningBps:  dampening,
-		Signals:             signals,
+		GroupID:		groupID,
+		Validators:		ids,
+		CorrelationScoreBps:	maxScore,
+		DeterministicProof:	deterministic,
+		AdvisoryOnly:		advisory && !consensus,
+		ConsensusAffecting:	consensus,
+		RewardDampeningBps:	dampening,
+		Signals:		signals,
 	}, nil
 }
 
@@ -349,16 +349,16 @@ func SimulateValidatorCollusion(input CollusionScenarioInput) (CollusionScenario
 		return correlationReports[i].GroupID < correlationReports[j].GroupID
 	})
 	return CollusionScenarioReport{
-		TopNVotingPowerBps:        topPower,
-		TopNLimitBps:              params.TopNConcentrationLimitBps,
-		ConcentrationExceeded:     topPower > params.TopNConcentrationLimitBps,
-		ConcentrationDampeningBps: dampening,
-		RewardBeforeDampeningNaet: rewardBefore,
-		RewardAfterDampeningNaet:  rewardAfter,
-		CommissionAlerts:          commissionAlerts,
-		DowntimeAlerts:            downtimeAlerts,
-		CorrelationReports:        correlationReports,
-		GovernanceSummary:         fmt.Sprintf("top_n_power_bps=%d limit_bps=%d dampening_bps=%d", topPower, params.TopNConcentrationLimitBps, dampening),
+		TopNVotingPowerBps:		topPower,
+		TopNLimitBps:			params.TopNConcentrationLimitBps,
+		ConcentrationExceeded:		topPower > params.TopNConcentrationLimitBps,
+		ConcentrationDampeningBps:	dampening,
+		RewardBeforeDampeningNaet:	rewardBefore,
+		RewardAfterDampeningNaet:	rewardAfter,
+		CommissionAlerts:		commissionAlerts,
+		DowntimeAlerts:			downtimeAlerts,
+		CorrelationReports:		correlationReports,
+		GovernanceSummary:		fmt.Sprintf("top_n_power_bps=%d limit_bps=%d dampening_bps=%d", topPower, params.TopNConcentrationLimitBps, dampening),
 	}, nil
 }
 
@@ -382,8 +382,8 @@ func RouteConsensusFaultEvidence(input EvidenceRoutingInput) (EvidenceRoutingRep
 
 func (p SybilCollusionResistanceParams) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "group_concentration_soft_cap_bps", value: p.GroupConcentrationSoftCapBps},
 		{name: "group_max_reward_dampening_bps", value: p.GroupMaxRewardDampeningBps},
@@ -471,8 +471,8 @@ func (v ValidatorSybilRecord) Validate() error {
 		return fmt.Errorf("self_delegation_naet must not be negative")
 	}
 	for _, item := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "voting_power_bps", value: v.VotingPowerBps},
 		{name: "self_delegation_ratio_bps", value: v.SelfDelegationRatioBps},

@@ -14,42 +14,42 @@ import (
 )
 
 const (
-	DefaultContractChainID    = "aetra"
-	DefaultContractNamespace  = "contracts"
-	DefaultInitialStorageRoot = "0000000000000000000000000000000000000000000000000000000000000000"
-	MaxContractSaltBytes      = 256
-	MaxContractDependencies   = 32
+	DefaultContractChainID		= "aetra"
+	DefaultContractNamespace	= "contracts"
+	DefaultInitialStorageRoot	= "0000000000000000000000000000000000000000000000000000000000000000"
+	MaxContractSaltBytes		= 256
+	MaxContractDependencies		= 32
 )
 
 type StateInit struct {
-	ABIVersion         uint32
-	CodeID             string
-	CodeHash           string
-	InitData           []byte
-	Salt               string
-	SaltBytes          []byte
-	Owner              string
-	Libraries          []CodeDependency
-	InitialStorageRoot string
-	InitialBalanceNAET uint64
-	Capabilities       []string
+	ABIVersion		uint32
+	CodeID			string
+	CodeHash		string
+	InitData		[]byte
+	Salt			string
+	SaltBytes		[]byte
+	Owner			string
+	Libraries		[]CodeDependency
+	InitialStorageRoot	string
+	InitialBalanceNAET	uint64
+	Capabilities		[]string
 }
 
 type CodeDependency struct {
-	CodeID   string
-	CodeHash string
+	CodeID		string
+	CodeHash	string
 }
 
 func NewStateInit(owner, codeHash string, initData []byte, salt string, initialBalance uint64) StateInit {
 	return StateInit{
-		ABIVersion:         1,
-		CodeID:             codeHash,
-		CodeHash:           codeHash,
-		InitData:           append([]byte(nil), initData...),
-		Salt:               salt,
-		Owner:              owner,
-		InitialStorageRoot: DefaultInitialStorageRoot,
-		InitialBalanceNAET: initialBalance,
+		ABIVersion:		1,
+		CodeID:			codeHash,
+		CodeHash:		codeHash,
+		InitData:		append([]byte(nil), initData...),
+		Salt:			salt,
+		Owner:			owner,
+		InitialStorageRoot:	DefaultInitialStorageRoot,
+		InitialBalanceNAET:	initialBalance,
 	}
 }
 

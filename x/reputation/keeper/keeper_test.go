@@ -20,21 +20,20 @@ func TestNativeReputationRewardPenaltyAndExport(t *testing.T) {
 	subject := addr(0x11)
 
 	_, err := msgServer.ApplyReputationReward(ctx, &reputationpb.MsgApplyReputationReward{
-		Authority:   app.ReputationKeeper.Authority(),
-		SubjectType: types.SubjectAccount,
-		Subject:     subject,
-		Component:   types.ComponentUptime,
-		Epoch:       1,
+		Authority:	app.ReputationKeeper.Authority(),
+		SubjectType:	types.SubjectAccount,
+		Subject:	subject,
+		Component:	types.ComponentUptime,
+		Epoch:		1,
 	})
 	require.NoError(t, err)
 
-	// Penalty from wrong authority should fail.
 	_, err = msgServer.ApplyReputationPenalty(ctx, &reputationpb.MsgApplyReputationPenalty{
-		Authority:   addr(0x22),
-		SubjectType: types.SubjectAccount,
-		Subject:     subject,
-		Component:   types.ComponentSlashing,
-		Epoch:       2,
+		Authority:	addr(0x22),
+		SubjectType:	types.SubjectAccount,
+		Subject:	subject,
+		Component:	types.ComponentSlashing,
+		Epoch:		2,
 	})
 	require.Error(t, err)
 
@@ -53,32 +52,29 @@ func TestStakeReputationClaimQueryAndExport(t *testing.T) {
 	ctx := app.NewContext(false)
 	account := addr(0x33)
 
-	// Claim with one-second duration (no stake-time).
 	_, err := app.ReputationKeeper.ClaimStakeReputation(ctx, types.MsgClaimStakeReputation{
-		Authority:       app.ReputationKeeper.Authority(),
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      100,
-		PoolTotalShares: 100,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   1,
+		Authority:		app.ReputationKeeper.Authority(),
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		100,
+		PoolTotalShares:	100,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		1,
 	})
 	require.NoError(t, err)
 
-	// Claim with longer duration should accrue stake-time.
 	claim, err := app.ReputationKeeper.ClaimStakeReputation(ctx, types.MsgClaimStakeReputation{
-		Authority:       app.ReputationKeeper.Authority(),
-		Account:         account,
-		PoolID:          "pool-a",
-		PoolShares:      100,
-		PoolTotalShares: 100,
-		PoolActiveStake: 10_000,
-		TimestampUnix:   3_601,
+		Authority:		app.ReputationKeeper.Authority(),
+		Account:		account,
+		PoolID:			"pool-a",
+		PoolShares:		100,
+		PoolTotalShares:	100,
+		PoolActiveStake:	10_000,
+		TimestampUnix:		3_601,
 	})
 	require.NoError(t, err)
 	require.Greater(t, uint64(claim.Score), uint64(0))
 
-	// Query identity reputation (stake-time visible via identity record).
 	id, err := app.ReputationKeeper.GetIdentityReputation(ctx, account)
 	require.NoError(t, err)
 	require.Contains(t, id.Account, "AE")

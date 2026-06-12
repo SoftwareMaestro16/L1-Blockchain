@@ -70,9 +70,9 @@ func TestConsensusDeterminismEvidenceRejectsAllForbiddenInputs(t *testing.T) {
 	require.NoError(t, ValidateConsensusDeterminismEvidence(evidence))
 
 	cases := []struct {
-		name   string
-		mutate func(*ConsensusDeterminismEvidence)
-		err    string
+		name	string
+		mutate	func(*ConsensusDeterminismEvidence)
+		err	string
 	}{
 		{"external API calls", func(e *ConsensusDeterminismEvidence) { e.ExternalAPICalls = true }, "external API"},
 		{"local clock", func(e *ConsensusDeterminismEvidence) { e.LocalClockUsage = true }, "local clock"},
@@ -97,15 +97,15 @@ func TestConsensusDeterminismEvidenceRejectsAllForbiddenInputs(t *testing.T) {
 
 func TestRoutingSafetyEvidenceRequiresCommittedRootsReceiptsAndBounceCap(t *testing.T) {
 	evidence := RoutingSafetyEvidence{
-		RoutingTableHash:          hashParts("routing-table"),
-		RoutingMetricsRoot:        hashParts("routing-metrics"),
-		DeterministicTieBreakHash: hashParts("tie-break"),
-		FailureReceiptRoot:        hashParts("failure-receipt"),
-		BounceValueCapHash:        hashParts("bounce-cap"),
-		FailedRouteValueNAET:      100,
-		ReceiptedValueNAET:        100,
-		OriginalBounceValueNAET:   25,
-		BounceValueNAET:           25,
+		RoutingTableHash:		hashParts("routing-table"),
+		RoutingMetricsRoot:		hashParts("routing-metrics"),
+		DeterministicTieBreakHash:	hashParts("tie-break"),
+		FailureReceiptRoot:		hashParts("failure-receipt"),
+		BounceValueCapHash:		hashParts("bounce-cap"),
+		FailedRouteValueNAET:		100,
+		ReceiptedValueNAET:		100,
+		OriginalBounceValueNAET:	25,
+		BounceValueNAET:		25,
 	}
 	evidence.EvidenceHash = ComputeRoutingSafetyEvidenceHash(evidence)
 	require.NoError(t, ValidateRoutingSafetyEvidence(evidence))

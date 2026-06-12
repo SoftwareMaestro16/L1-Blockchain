@@ -18,16 +18,16 @@ func TestServiceSecurityImplementationBundleLinksCollateralChallengeFaultPenalty
 	require.NoError(t, err)
 
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusChallenged,
-		ResponseHash:   testInterfaceHash("security-impl/response"),
-		ProofHash:      testInterfaceHash("security-impl/invalid-proof"),
-		PaymentStatus:  coretypes.ServicePaymentStatusEscrowed,
-		GasUsed:        9,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: 31,
-		AnchoredHeight: 32,
-		ErrorCode:      "invalid-proof",
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusChallenged,
+		ResponseHash:	testInterfaceHash("security-impl/response"),
+		ProofHash:	testInterfaceHash("security-impl/invalid-proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusEscrowed,
+		GasUsed:	9,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	31,
+		AnchoredHeight:	32,
+		ErrorCode:	"invalid-proof",
 	})
 	require.NoError(t, err)
 	index, tombstone, err := TombstoneServiceReceipt(ctx, index, call, receipt)
@@ -39,16 +39,16 @@ func TestServiceSecurityImplementationBundleLinksCollateralChallengeFaultPenalty
 	require.False(t, freshness.Stale)
 
 	report, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             descriptor.ServiceID,
-		ProviderID:            "provider.storage",
-		CallID:                call.CallID,
-		FaultClass:            ProviderFaultInvalidProof,
-		EvidenceHash:          testInterfaceHash("security-impl/evidence"),
-		ProofHash:             testInterfaceHash("security-impl/invalid-proof"),
-		ObservedHeight:        33,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral, ProviderPenaltyReputationScore},
-		CollateralSlashAmount: "25",
-		ReputationDelta:       -20,
+		ServiceID:		descriptor.ServiceID,
+		ProviderID:		"provider.storage",
+		CallID:			call.CallID,
+		FaultClass:		ProviderFaultInvalidProof,
+		EvidenceHash:		testInterfaceHash("security-impl/evidence"),
+		ProofHash:		testInterfaceHash("security-impl/invalid-proof"),
+		ObservedHeight:		33,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral, ProviderPenaltyReputationScore},
+		CollateralSlashAmount:	"25",
+		ReputationDelta:	-20,
 	})
 	require.NoError(t, err)
 	faultProof, err := NewServiceFaultProof(report, receipt, tombstone, 34)
@@ -76,14 +76,14 @@ func TestServiceSecurityImplementationBundleLinksCollateralChallengeFaultPenalty
 
 func TestServiceFaultProofRejectsInvalidProofWithoutProofHash(t *testing.T) {
 	_, err := NewProviderMisbehaviorReport(ProviderMisbehaviorReport{
-		ServiceID:             "portable-service",
-		ProviderID:            "provider.storage",
-		CallID:                testInterfaceHash("security-impl/invalid-proof/call"),
-		FaultClass:            ProviderFaultInvalidProof,
-		EvidenceHash:          testInterfaceHash("security-impl/invalid-proof/evidence"),
-		ObservedHeight:        44,
-		PenaltySources:        []ProviderPenaltySource{ProviderPenaltyCollateral},
-		CollateralSlashAmount: "10",
+		ServiceID:		"portable-service",
+		ProviderID:		"provider.storage",
+		CallID:			testInterfaceHash("security-impl/invalid-proof/call"),
+		FaultClass:		ProviderFaultInvalidProof,
+		EvidenceHash:		testInterfaceHash("security-impl/invalid-proof/evidence"),
+		ObservedHeight:		44,
+		PenaltySources:		[]ProviderPenaltySource{ProviderPenaltyCollateral},
+		CollateralSlashAmount:	"10",
 	})
 	require.ErrorContains(t, err, "proof hash")
 }
@@ -111,14 +111,14 @@ func TestServiceReceiptFreshnessProofRejectsStaleReceipts(t *testing.T) {
 	index, err = AcceptUnifiedServiceCall(ctx, descriptor, index, call)
 	require.NoError(t, err)
 	receipt, err := coretypes.NewServiceCallReceipt(call.ToServiceCallEnvelope(), coretypes.ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         coretypes.ServiceCallStatusExecuted,
-		ResponseHash:   testInterfaceHash("security-impl/stale-response"),
-		PaymentStatus:  coretypes.ServicePaymentStatusSettled,
-		GasUsed:        1,
-		ProviderID:     "provider.storage",
-		ExecutedHeight: 31,
-		AnchoredHeight: 32,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("security-impl/stale-response"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	1,
+		ProviderID:	"provider.storage",
+		ExecutedHeight:	31,
+		AnchoredHeight:	32,
 	})
 	require.NoError(t, err)
 	_, tombstone, err := TombstoneServiceReceipt(ctx, index, call, receipt)

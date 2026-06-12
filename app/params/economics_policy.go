@@ -3,18 +3,18 @@ package params
 import "fmt"
 
 type FeeSplitPolicy struct {
-	BurnBps                int64
-	ValidatorDelegatorBps  int64
-	TreasuryBps            int64
-	GovernanceConfigurable bool
+	BurnBps			int64
+	ValidatorDelegatorBps	int64
+	TreasuryBps		int64
+	GovernanceConfigurable	bool
 }
 
 func DefaultFeeSplitPolicy() FeeSplitPolicy {
 	return FeeSplitPolicy{
-		BurnBps:                5_000,
-		ValidatorDelegatorBps:  3_500,
-		TreasuryBps:            1_500,
-		GovernanceConfigurable: true,
+		BurnBps:		5_000,
+		ValidatorDelegatorBps:	3_500,
+		TreasuryBps:		1_500,
+		GovernanceConfigurable:	true,
 	}
 }
 

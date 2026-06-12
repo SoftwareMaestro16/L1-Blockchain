@@ -10,16 +10,16 @@ import (
 )
 
 const (
-	ServiceRegistryDescriptorsPrefix      = "services/descriptors"
-	ServiceRegistryAnchorsPrefix          = "services/anchors"
-	ServiceRegistryInterfacesPrefix       = "services/interfaces"
-	ServiceRegistryOwnersPrefix           = "services/owners"
-	ServiceRegistryNamesPrefix            = "services/names"
-	ServiceRegistryIdentityBindingsPrefix = "services/identity_bindings"
-	ServiceRegistryProvidersPrefix        = "services/providers"
-	ServiceRegistryExpiryPrefix           = "services/expiry"
-	ServiceRegistryReputationPrefix       = "services/reputation"
-	ServiceRegistryReceiptsPrefix         = "services/receipts"
+	ServiceRegistryDescriptorsPrefix	= "services/descriptors"
+	ServiceRegistryAnchorsPrefix		= "services/anchors"
+	ServiceRegistryInterfacesPrefix		= "services/interfaces"
+	ServiceRegistryOwnersPrefix		= "services/owners"
+	ServiceRegistryNamesPrefix		= "services/names"
+	ServiceRegistryIdentityBindingsPrefix	= "services/identity_bindings"
+	ServiceRegistryProvidersPrefix		= "services/providers"
+	ServiceRegistryExpiryPrefix		= "services/expiry"
+	ServiceRegistryReputationPrefix		= "services/reputation"
+	ServiceRegistryReceiptsPrefix		= "services/receipts"
 )
 
 type ServiceInterface = ServiceInterfaceDescriptor
@@ -28,74 +28,74 @@ type ServiceReceipt = ServiceCallReceipt
 type ServiceRegistryStateEntryType string
 
 const (
-	ServiceRegistryStateDescriptor      ServiceRegistryStateEntryType = "SERVICE_DESCRIPTOR"
-	ServiceRegistryStateAnchor          ServiceRegistryStateEntryType = "SERVICE_ANCHOR"
-	ServiceRegistryStateInterface       ServiceRegistryStateEntryType = "SERVICE_INTERFACE"
-	ServiceRegistryStateOwnerIndex      ServiceRegistryStateEntryType = "SERVICE_OWNER_INDEX"
-	ServiceRegistryStateNameIndex       ServiceRegistryStateEntryType = "SERVICE_NAME_INDEX"
-	ServiceRegistryStateIdentityBinding ServiceRegistryStateEntryType = "IDENTITY_SERVICE_BINDING"
-	ServiceRegistryStateProvider        ServiceRegistryStateEntryType = "PROVIDER_RECORD"
-	ServiceRegistryStateExpiryIndex     ServiceRegistryStateEntryType = "SERVICE_EXPIRY_INDEX"
-	ServiceRegistryStateReputation      ServiceRegistryStateEntryType = "REPUTATION_RECORD"
-	ServiceRegistryStateReceipt         ServiceRegistryStateEntryType = "SERVICE_RECEIPT"
+	ServiceRegistryStateDescriptor		ServiceRegistryStateEntryType	= "SERVICE_DESCRIPTOR"
+	ServiceRegistryStateAnchor		ServiceRegistryStateEntryType	= "SERVICE_ANCHOR"
+	ServiceRegistryStateInterface		ServiceRegistryStateEntryType	= "SERVICE_INTERFACE"
+	ServiceRegistryStateOwnerIndex		ServiceRegistryStateEntryType	= "SERVICE_OWNER_INDEX"
+	ServiceRegistryStateNameIndex		ServiceRegistryStateEntryType	= "SERVICE_NAME_INDEX"
+	ServiceRegistryStateIdentityBinding	ServiceRegistryStateEntryType	= "IDENTITY_SERVICE_BINDING"
+	ServiceRegistryStateProvider		ServiceRegistryStateEntryType	= "PROVIDER_RECORD"
+	ServiceRegistryStateExpiryIndex		ServiceRegistryStateEntryType	= "SERVICE_EXPIRY_INDEX"
+	ServiceRegistryStateReputation		ServiceRegistryStateEntryType	= "REPUTATION_RECORD"
+	ServiceRegistryStateReceipt		ServiceRegistryStateEntryType	= "SERVICE_RECEIPT"
 )
 
 type ServiceAnchor struct {
-	ServiceID         string
-	DescriptorHash    string
-	InterfaceHash     string
-	ProviderRoot      string
-	VerificationModel ServiceVerificationModel
-	ExpiryHeight      uint64
-	AnchorHash        string
+	ServiceID		string
+	DescriptorHash		string
+	InterfaceHash		string
+	ProviderRoot		string
+	VerificationModel	ServiceVerificationModel
+	ExpiryHeight		uint64
+	AnchorHash		string
 }
 
 type IdentityServiceBinding struct {
-	IdentityName   string
-	ServiceID      string
-	Owner          string
-	DescriptorHash string
-	CreatedHeight  uint64
-	ExpiryHeight   uint64
-	BindingHash    string
+	IdentityName	string
+	ServiceID	string
+	Owner		string
+	DescriptorHash	string
+	CreatedHeight	uint64
+	ExpiryHeight	uint64
+	BindingHash	string
 }
 
 type ProviderRecord struct {
-	ServiceID  string
-	Provider   FogProviderRecord
-	RecordHash string
+	ServiceID	string
+	Provider	FogProviderRecord
+	RecordHash	string
 }
 
 type ReputationRecord struct {
-	ProviderID    string
-	Score         uint64
-	Successes     uint64
-	Failures      uint64
-	UpdatedHeight uint64
-	RecordHash    string
+	ProviderID	string
+	Score		uint64
+	Successes	uint64
+	Failures	uint64
+	UpdatedHeight	uint64
+	RecordHash	string
 }
 
 type ServiceRegistryStateEntry struct {
-	Key       string
-	Value     string
-	EntryType ServiceRegistryStateEntryType
-	EntryHash string
+	Key		string
+	Value		string
+	EntryType	ServiceRegistryStateEntryType
+	EntryHash	string
 }
 
 type ServiceRegistryState struct {
-	Descriptors      []ServiceDescriptor
-	Anchors          []ServiceAnchor
-	Interfaces       []ServiceInterface
-	OwnerIndex       []ServiceRegistryStateEntry
-	NameIndex        []ServiceRegistryStateEntry
-	IdentityBindings []IdentityServiceBinding
-	Providers        []ProviderRecord
-	ExpiryIndex      []ServiceRegistryStateEntry
-	Reputations      []ReputationRecord
-	Receipts         []ServiceReceipt
-	Entries          []ServiceRegistryStateEntry
-	StateRoot        string
-	UpdatedHeight    uint64
+	Descriptors		[]ServiceDescriptor
+	Anchors			[]ServiceAnchor
+	Interfaces		[]ServiceInterface
+	OwnerIndex		[]ServiceRegistryStateEntry
+	NameIndex		[]ServiceRegistryStateEntry
+	IdentityBindings	[]IdentityServiceBinding
+	Providers		[]ProviderRecord
+	ExpiryIndex		[]ServiceRegistryStateEntry
+	Reputations		[]ReputationRecord
+	Receipts		[]ServiceReceipt
+	Entries			[]ServiceRegistryStateEntry
+	StateRoot		string
+	UpdatedHeight		uint64
 }
 
 func ServiceDescriptorStateKey(serviceID string) (string, error) {
@@ -189,12 +189,12 @@ func NewServiceAnchorFromDescriptor(descriptor ServiceDescriptor) (ServiceAnchor
 		return ServiceAnchor{}, err
 	}
 	anchor := ServiceAnchor{
-		ServiceID:         descriptor.ServiceID,
-		DescriptorHash:    ComputeServiceDescriptorHash(descriptor),
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		ProviderRoot:      registryProviderSet(descriptor),
-		VerificationModel: descriptor.Verification.Model,
-		ExpiryHeight:      descriptor.ExpiryHeight,
+		ServiceID:		descriptor.ServiceID,
+		DescriptorHash:		ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		ProviderRoot:		registryProviderSet(descriptor),
+		VerificationModel:	descriptor.Verification.Model,
+		ExpiryHeight:		descriptor.ExpiryHeight,
 	}
 	anchor.AnchorHash = ComputeServiceAnchorHash(anchor)
 	return anchor, anchor.Validate()
@@ -206,12 +206,12 @@ func NewServiceAnchorFromHybridAnchor(anchor HybridServiceRegistryAnchor) (Servi
 		return ServiceAnchor{}, err
 	}
 	serviceAnchor := ServiceAnchor{
-		ServiceID:         anchor.ServiceID,
-		DescriptorHash:    anchor.DescriptorHash,
-		InterfaceHash:     anchor.InterfaceHash,
-		ProviderRoot:      anchor.ProviderRoot,
-		VerificationModel: anchor.VerificationModel,
-		ExpiryHeight:      anchor.ExpiryHeight,
+		ServiceID:		anchor.ServiceID,
+		DescriptorHash:		anchor.DescriptorHash,
+		InterfaceHash:		anchor.InterfaceHash,
+		ProviderRoot:		anchor.ProviderRoot,
+		VerificationModel:	anchor.VerificationModel,
+		ExpiryHeight:		anchor.ExpiryHeight,
 	}
 	serviceAnchor.AnchorHash = ComputeServiceAnchorHash(serviceAnchor)
 	return serviceAnchor, serviceAnchor.Validate()
@@ -226,12 +226,12 @@ func NewIdentityServiceBindingFromDescriptor(descriptor ServiceDescriptor) (Iden
 		return IdentityServiceBinding{}, errors.New("aetracore identity service binding requires identity name")
 	}
 	binding := IdentityServiceBinding{
-		IdentityName:   descriptor.Discovery.IdentityName,
-		ServiceID:      descriptor.ServiceID,
-		Owner:          descriptor.Owner,
-		DescriptorHash: ComputeServiceDescriptorHash(descriptor),
-		CreatedHeight:  descriptor.CreatedHeight,
-		ExpiryHeight:   descriptor.ExpiryHeight,
+		IdentityName:	descriptor.Discovery.IdentityName,
+		ServiceID:	descriptor.ServiceID,
+		Owner:		descriptor.Owner,
+		DescriptorHash:	ComputeServiceDescriptorHash(descriptor),
+		CreatedHeight:	descriptor.CreatedHeight,
+		ExpiryHeight:	descriptor.ExpiryHeight,
 	}
 	binding.BindingHash = ComputeIdentityServiceBindingHash(binding)
 	return binding, binding.Validate()
@@ -243,8 +243,8 @@ func NewProviderRecord(serviceID string, provider FogProviderRecord) (ProviderRe
 		return ProviderRecord{}, err
 	}
 	record := ProviderRecord{
-		ServiceID: serviceID,
-		Provider:  provider,
+		ServiceID:	serviceID,
+		Provider:	provider,
 	}
 	record.RecordHash = ComputeProviderRecordHash(record)
 	return record, record.Validate()
@@ -252,11 +252,11 @@ func NewProviderRecord(serviceID string, provider FogProviderRecord) (ProviderRe
 
 func NewReputationRecord(providerID string, score, successes, failures, updatedHeight uint64) (ReputationRecord, error) {
 	record := ReputationRecord{
-		ProviderID:    strings.TrimSpace(providerID),
-		Score:         score,
-		Successes:     successes,
-		Failures:      failures,
-		UpdatedHeight: updatedHeight,
+		ProviderID:	strings.TrimSpace(providerID),
+		Score:		score,
+		Successes:	successes,
+		Failures:	failures,
+		UpdatedHeight:	updatedHeight,
 	}
 	record.RecordHash = ComputeReputationRecordHash(record)
 	return record, record.Validate()
@@ -267,18 +267,18 @@ func NewServiceRegistryState(descriptors []ServiceDescriptor, anchors []ServiceA
 		return ServiceRegistryState{}, errors.New("aetracore service registry state height must be positive")
 	}
 	state := ServiceRegistryState{
-		Descriptors:      make([]ServiceDescriptor, 0, len(descriptors)),
-		Anchors:          make([]ServiceAnchor, 0, len(anchors)),
-		Interfaces:       []ServiceInterface{},
-		OwnerIndex:       []ServiceRegistryStateEntry{},
-		NameIndex:        []ServiceRegistryStateEntry{},
-		IdentityBindings: make([]IdentityServiceBinding, 0, len(identityBindings)),
-		Providers:        make([]ProviderRecord, 0, len(providers)),
-		ExpiryIndex:      []ServiceRegistryStateEntry{},
-		Reputations:      make([]ReputationRecord, 0, len(reputations)),
-		Receipts:         make([]ServiceReceipt, 0, len(receipts)),
-		Entries:          []ServiceRegistryStateEntry{},
-		UpdatedHeight:    height,
+		Descriptors:		make([]ServiceDescriptor, 0, len(descriptors)),
+		Anchors:		make([]ServiceAnchor, 0, len(anchors)),
+		Interfaces:		[]ServiceInterface{},
+		OwnerIndex:		[]ServiceRegistryStateEntry{},
+		NameIndex:		[]ServiceRegistryStateEntry{},
+		IdentityBindings:	make([]IdentityServiceBinding, 0, len(identityBindings)),
+		Providers:		make([]ProviderRecord, 0, len(providers)),
+		ExpiryIndex:		[]ServiceRegistryStateEntry{},
+		Reputations:		make([]ReputationRecord, 0, len(reputations)),
+		Receipts:		make([]ServiceReceipt, 0, len(receipts)),
+		Entries:		[]ServiceRegistryStateEntry{},
+		UpdatedHeight:		height,
 	}
 	entries := map[string]ServiceRegistryStateEntry{}
 	for _, descriptor := range descriptors {
@@ -712,9 +712,9 @@ func IsServiceRegistryStateEntryType(entryType ServiceRegistryStateEntryType) bo
 
 func addServiceRegistryStateEntry(entries map[string]ServiceRegistryStateEntry, entryType ServiceRegistryStateEntryType, key, value string) error {
 	entry := ServiceRegistryStateEntry{
-		Key:       key,
-		Value:     value,
-		EntryType: entryType,
+		Key:		key,
+		Value:		value,
+		EntryType:	entryType,
 	}
 	entry.EntryHash = ComputeServiceRegistryStateEntryHash(entry)
 	if err := entry.Validate(); err != nil {

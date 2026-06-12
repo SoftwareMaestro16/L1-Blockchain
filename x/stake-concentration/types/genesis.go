@@ -9,30 +9,30 @@ import (
 )
 
 const (
-	ConcentrationSignalLowerRewardMultiplier = "lower_reward_multiplier"
-	ConcentrationSignalDelegationWarning     = "delegation_warning"
-	ConcentrationSignalProtocolMetric        = "protocol_metric"
-	ConcentrationSignalGovernanceAlert       = "governance_alert"
-	ConcentrationSignalParameterProposal     = "optional_parameter_adjustment_proposal"
+	ConcentrationSignalLowerRewardMultiplier	= "lower_reward_multiplier"
+	ConcentrationSignalDelegationWarning		= "delegation_warning"
+	ConcentrationSignalProtocolMetric		= "protocol_metric"
+	ConcentrationSignalGovernanceAlert		= "governance_alert"
+	ConcentrationSignalParameterProposal		= "optional_parameter_adjustment_proposal"
 )
 
 type ConcentrationTargetAssessment struct {
-	Top10VotingPowerBps uint32
-	Top20VotingPowerBps uint32
-	Top33VotingPowerBps uint32
-	Top10Exceeded       bool
-	Top20Exceeded       bool
-	Top33Exceeded       bool
-	Signals             []string
+	Top10VotingPowerBps	uint32
+	Top20VotingPowerBps	uint32
+	Top33VotingPowerBps	uint32
+	Top10Exceeded		bool
+	Top20Exceeded		bool
+	Top33Exceeded		bool
+	Signals			[]string
 }
 
 func DefaultParams() Params {
 	return Params{
-		MaxVotingPowerBps:          AetraPhaseOnePowerCapBps,
-		SoftVotingPowerBps:         AetraPhaseTwoPowerCapBps,
-		MaxRewardReductionBps:      3_000,
-		WarningThresholdBps:        AetraPhaseTwoPowerCapBps,
-		DelegationRejectionEnabled: true,
+		MaxVotingPowerBps:		AetraPhaseOnePowerCapBps,
+		SoftVotingPowerBps:		AetraPhaseTwoPowerCapBps,
+		MaxRewardReductionBps:		3_000,
+		WarningThresholdBps:		AetraPhaseTwoPowerCapBps,
+		DelegationRejectionEnabled:	true,
 	}
 }
 
@@ -166,11 +166,11 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 	}
 	effectiveCap := EffectiveMaxVotingPowerBps(params, len(canonical))
 	out := NetworkConcentration{
-		Epoch:            epoch,
-		TotalVotingPower: total,
-		Validators:       []ValidatorConcentration{},
-		Warnings:         []string{},
-		RecomputedHeight: height,
+		Epoch:			epoch,
+		TotalVotingPower:	total,
+		Validators:		[]ValidatorConcentration{},
+		Warnings:		[]string{},
+		RecomputedHeight:	height,
 	}
 	rawBps := make([]uint32, 0, len(canonical))
 	for _, validator := range canonical {
@@ -189,15 +189,15 @@ func ComputeNetworkConcentration(params Params, epoch uint64, validatorSet []Val
 			warning = "hard_cap_exceeded"
 		}
 		metric := ValidatorConcentration{
-			OperatorAddress:         validator.OperatorAddress,
-			VotingPower:             validator.VotingPower,
-			RawVotingPowerBps:       raw,
-			EffectiveVotingPowerBps: effective,
-			AboveSoftCap:            raw > params.SoftVotingPowerBps,
-			AboveHardCap:            raw > effectiveCap,
-			DelegationAllowed:       !params.DelegationRejectionEnabled || raw < effectiveCap,
-			RewardModifierBps:       modifier,
-			Warning:                 warning,
+			OperatorAddress:		validator.OperatorAddress,
+			VotingPower:			validator.VotingPower,
+			RawVotingPowerBps:		raw,
+			EffectiveVotingPowerBps:	effective,
+			AboveSoftCap:			raw > params.SoftVotingPowerBps,
+			AboveHardCap:			raw > effectiveCap,
+			DelegationAllowed:		!params.DelegationRejectionEnabled || raw < effectiveCap,
+			RewardModifierBps:		modifier,
+			Warning:			warning,
 		}
 		if warning != "" {
 			out.Warnings = append(out.Warnings, validator.OperatorAddress+":"+warning)
@@ -265,9 +265,9 @@ func (n NetworkConcentration) AssessConcentrationTargets() ConcentrationTargetAs
 		rawBps = append(rawBps, validator.RawVotingPowerBps)
 	}
 	assessment := ConcentrationTargetAssessment{
-		Top10VotingPowerBps: topNBps(rawBps, 10),
-		Top20VotingPowerBps: topNBps(rawBps, 20),
-		Top33VotingPowerBps: topNBps(rawBps, 33),
+		Top10VotingPowerBps:	topNBps(rawBps, 10),
+		Top20VotingPowerBps:	topNBps(rawBps, 20),
+		Top33VotingPowerBps:	topNBps(rawBps, 33),
 	}
 	assessment.Top10Exceeded = assessment.Top10VotingPowerBps >= AetraTop10VotingPowerTargetBps
 	assessment.Top20Exceeded = assessment.Top20VotingPowerBps >= AetraTop20VotingPowerTargetBps

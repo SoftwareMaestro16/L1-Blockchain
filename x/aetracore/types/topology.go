@@ -7,55 +7,55 @@ import (
 )
 
 const (
-	AetraNextTopologyVersion = uint64(1)
+	AetraNextTopologyVersion	= uint64(1)
 
-	topologyNodeCore              = "core/aether"
-	topologyNodeFinancial         = "zone/financial"
-	topologyNodeIdentity          = "zone/identity"
-	topologyNodeApplication       = "zone/application"
-	topologyNodeContract          = "zone/contract"
-	topologyNodeFinancialShards   = "shards/financial"
-	topologyNodeIdentityShards    = "shards/identity"
-	topologyNodeApplicationShards = "shards/application"
-	topologyNodeContractShards    = "shards/contract"
+	topologyNodeCore		= "core/aether"
+	topologyNodeFinancial		= "zone/financial"
+	topologyNodeIdentity		= "zone/identity"
+	topologyNodeApplication		= "zone/application"
+	topologyNodeContract		= "zone/contract"
+	topologyNodeFinancialShards	= "shards/financial"
+	topologyNodeIdentityShards	= "shards/identity"
+	topologyNodeApplicationShards	= "shards/application"
+	topologyNodeContractShards	= "shards/contract"
 
-	topologyRelationSchedules = "schedules"
-	topologyRelationOwns      = "owns"
-	topologyRelationAsyncCall = "async_call"
+	topologyRelationSchedules	= "schedules"
+	topologyRelationOwns		= "owns"
+	topologyRelationAsyncCall	= "async_call"
 )
 
 type TopologyNodeKind string
 
 const (
-	TopologyNodeCore       TopologyNodeKind = "CORE"
-	TopologyNodeZone       TopologyNodeKind = "ZONE"
-	TopologyNodeShardGroup TopologyNodeKind = "SHARD_GROUP"
+	TopologyNodeCore	TopologyNodeKind	= "CORE"
+	TopologyNodeZone	TopologyNodeKind	= "ZONE"
+	TopologyNodeShardGroup	TopologyNodeKind	= "SHARD_GROUP"
 )
 
 type AetraNextTopologyNode struct {
-	NodeID       string
-	Kind         TopologyNodeKind
-	ZoneID       ZoneID
-	Label        string
-	Capabilities []string
+	NodeID		string
+	Kind		TopologyNodeKind
+	ZoneID		ZoneID
+	Label		string
+	Capabilities	[]string
 }
 
 type AetraNextTopologyEdge struct {
-	FromNodeID string
-	ToNodeID   string
-	Relation   string
+	FromNodeID	string
+	ToNodeID	string
+	Relation	string
 }
 
 type AetraNextTopologyPlan struct {
-	Version      uint64
-	Nodes        []AetraNextTopologyNode
-	Edges        []AetraNextTopologyEdge
-	TopologyHash string
+	Version		uint64
+	Nodes		[]AetraNextTopologyNode
+	Edges		[]AetraNextTopologyEdge
+	TopologyHash	string
 }
 
 func DefaultAetraNextTopology() (AetraNextTopologyPlan, error) {
 	plan := AetraNextTopologyPlan{
-		Version: AetraNextTopologyVersion,
+		Version:	AetraNextTopologyVersion,
 		Nodes: []AetraNextTopologyNode{
 			{NodeID: topologyNodeCore, Kind: TopologyNodeCore, Label: "Aether Core", Capabilities: []string{"consensus", "finality", "global-root", "message-root", "proof-registry", "scheduler", "validator-set", "zone-commitments"}},
 			{NodeID: topologyNodeFinancial, Kind: TopologyNodeZone, ZoneID: ZoneIDFinancial, Label: "Financial Zone", Capabilities: []string{"bank-fees", "dex-factory", "payment-settlement"}},
@@ -85,9 +85,9 @@ func DefaultAetraNextTopology() (AetraNextTopologyPlan, error) {
 
 func NewAetraNextTopologyPlan(nodes []AetraNextTopologyNode, edges []AetraNextTopologyEdge) (AetraNextTopologyPlan, error) {
 	plan := AetraNextTopologyPlan{
-		Version: AetraNextTopologyVersion,
-		Nodes:   cloneTopologyNodes(nodes),
-		Edges:   append([]AetraNextTopologyEdge(nil), edges...),
+		Version:	AetraNextTopologyVersion,
+		Nodes:		cloneTopologyNodes(nodes),
+		Edges:		append([]AetraNextTopologyEdge(nil), edges...),
 	}
 	sortTopologyNodes(plan.Nodes)
 	sortTopologyEdges(plan.Edges)
@@ -112,8 +112,8 @@ func DefaultAetraNextShardLayouts(activationHeight uint64) ([]ShardLayout, error
 		return nil, errors.New("aetracore next topology activation height must be positive")
 	}
 	specs := []struct {
-		zoneID ZoneID
-		count  uint32
+		zoneID	ZoneID
+		count	uint32
 	}{
 		{ZoneIDFinancial, 4},
 		{ZoneIDIdentity, 2},
@@ -126,11 +126,11 @@ func DefaultAetraNextShardLayouts(activationHeight uint64) ([]ShardLayout, error
 		for i := uint32(0); i < spec.count; i++ {
 			shardID := ShardID(fmt.Sprintf("%d", i))
 			shards = append(shards, ShardDescriptor{
-				ShardID:          shardID,
-				StatePrefix:      fmt.Sprintf("zone/%s/shard/%s", spec.zoneID, shardID),
-				ActivationHeight: activationHeight,
-				ValidatorSetHash: hashParts("aetra-next-validator-set", string(spec.zoneID), string(shardID)),
-				Available:        true,
+				ShardID:		shardID,
+				StatePrefix:		fmt.Sprintf("zone/%s/shard/%s", spec.zoneID, shardID),
+				ActivationHeight:	activationHeight,
+				ValidatorSetHash:	hashParts("aetra-next-validator-set", string(spec.zoneID), string(shardID)),
+				Available:		true,
 			})
 		}
 		layout, err := NewShardLayout(spec.zoneID, 1, activationHeight, hashParts("aetra-next-routing-seed", string(spec.zoneID), "1"), shards)
@@ -149,77 +149,77 @@ func DefaultAetraNextIdentityResolverService(createdHeight uint64) (ServiceDescr
 	}
 	interfaceID := "l1.identity.v2.Resolver"
 	method := ServiceMethodDescriptor{
-		MethodID:             "resolve",
-		Name:                 "resolve",
-		InputSchemaHash:      hashParts("aetra-next-identity-resolver", "resolve", "input"),
-		OutputSchemaHash:     hashParts("aetra-next-identity-resolver", "resolve", "output"),
-		ExecutionType:        ServiceMethodSync,
-		RequiredPaymentModel: "naet-fixed",
-		GasModel:             DefaultGasPolicy,
-		VerificationModel:    ServiceVerificationConsensusReceipt,
-		TimeoutHeightDelta:   10,
-		IdempotencyRequired:  true,
-		FailureBehavior:      ServiceFailureRevert,
+		MethodID:		"resolve",
+		Name:			"resolve",
+		InputSchemaHash:	hashParts("aetra-next-identity-resolver", "resolve", "input"),
+		OutputSchemaHash:	hashParts("aetra-next-identity-resolver", "resolve", "output"),
+		ExecutionType:		ServiceMethodSync,
+		RequiredPaymentModel:	"naet-fixed",
+		GasModel:		DefaultGasPolicy,
+		VerificationModel:	ServiceVerificationConsensusReceipt,
+		TimeoutHeightDelta:	10,
+		IdempotencyRequired:	true,
+		FailureBehavior:	ServiceFailureRevert,
 	}
 	iface := ServiceInterfaceDescriptor{
-		InterfaceID:    interfaceID,
-		InterfaceName:  interfaceID,
-		Version:        2,
-		SchemaEncoding: "json-schema-v1",
-		Methods:        []ServiceMethodDescriptor{method},
-		Events:         []string{"identity.resolved"},
-		Errors:         []string{"identity.not_found"},
-		AuthModel:      "aetra-account",
-		PaymentModel:   "naet-fixed",
-		MetadataHash:   hashParts("aetra-next-identity-resolver", "metadata"),
-		CreatedHeight:  createdHeight,
+		InterfaceID:	interfaceID,
+		InterfaceName:	interfaceID,
+		Version:	2,
+		SchemaEncoding:	"json-schema-v1",
+		Methods:	[]ServiceMethodDescriptor{method},
+		Events:		[]string{"identity.resolved"},
+		Errors:		[]string{"identity.not_found"},
+		AuthModel:	"aetra-account",
+		PaymentModel:	"naet-fixed",
+		MetadataHash:	hashParts("aetra-next-identity-resolver", "metadata"),
+		CreatedHeight:	createdHeight,
 	}
 	iface = CanonicalServiceInterfaceDescriptor(iface)
 	iface.InterfaceHash = ComputeServiceInterfaceHash(iface)
 	service := ServiceDescriptor{
-		ServiceID:        "identity-resolver",
-		Owner:            DefaultAuthority,
-		ServiceType:      ServiceTypeOnChain,
-		ZoneID:           ZoneIDIdentity,
-		InterfaceID:      interfaceID,
-		EndpointKey:      "identity.query",
-		Version:          2,
-		AvailabilityHash: hashParts("aetra-next-identity-resolver", "availability"),
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     createdHeight + DefaultRootHistory,
-		CreatedHeight:    createdHeight,
-		UpdatedHeight:    createdHeight,
-		Interface:        iface,
+		ServiceID:		"identity-resolver",
+		Owner:			DefaultAuthority,
+		ServiceType:		ServiceTypeOnChain,
+		ZoneID:			ZoneIDIdentity,
+		InterfaceID:		interfaceID,
+		EndpointKey:		"identity.query",
+		Version:		2,
+		AvailabilityHash:	hashParts("aetra-next-identity-resolver", "availability"),
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		createdHeight + DefaultRootHistory,
+		CreatedHeight:		createdHeight,
+		UpdatedHeight:		createdHeight,
+		Interface:		iface,
 		Execution: ServiceExecutionDescriptor{
-			Location:        ServiceLocationModule,
-			Target:          "identity.query",
-			ModuleRoute:     "identity",
-			Mode:            ExecutionModeSync,
-			Deterministic:   true,
-			FailureBehavior: ServiceFailureRevert,
+			Location:		ServiceLocationModule,
+			Target:			"identity.query",
+			ModuleRoute:		"identity",
+			Mode:			ExecutionModeSync,
+			Deterministic:		true,
+			FailureBehavior:	ServiceFailureRevert,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:       "identity-resolver",
-			IdentityName:      "identity.aet",
-			MetadataHash:      hashParts("aetra-next-identity-resolver", "discovery"),
-			CacheExpiryHeight: createdHeight + DefaultRootHistory - 1,
-			SignaturePolicy:   "owner-signature-v1",
+			ServiceName:		"identity-resolver",
+			IdentityName:		"identity.aet",
+			MetadataHash:		hashParts("aetra-next-identity-resolver", "discovery"),
+			CacheExpiryHeight:	createdHeight + DefaultRootHistory - 1,
+			SignaturePolicy:	"owner-signature-v1",
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentOnChain,
-			Denom:          NativeFeePolicyID,
-			Amount:         "0",
-			PricingUnit:    ServicePricingPerCall,
+			SettlementMode:	ServicePaymentOnChain,
+			Denom:		NativeFeePolicyID,
+			Amount:		"0",
+			PricingUnit:	ServicePricingPerCall,
 		},
 		Storage: ServiceStorageDescriptor{
-			Model:         ServiceStorageOnChain,
-			StateRootType: ResolverProofRootType,
-			ProofRequired: true,
+			Model:		ServiceStorageOnChain,
+			StateRootType:	ResolverProofRootType,
+			ProofRequired:	true,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel: ServiceTrustConsensusExecuted,
-			Model:      ServiceVerificationConsensusReceipt,
+			TrustModel:	ServiceTrustConsensusExecuted,
+			Model:		ServiceVerificationConsensusReceipt,
 		},
 	}
 	service = CanonicalServiceDescriptor(service)
@@ -438,19 +438,19 @@ func ComputeAetraNextTopologyHash(plan AetraNextTopologyPlan) string {
 
 func nextZoneDescriptor(id ZoneID, zoneType ZoneType, moduleName string, maxShards uint32, messageCapabilities []string, proofCapabilities []string) ZoneDescriptor {
 	return CanonicalZoneDescriptor(ZoneDescriptor{
-		ZoneID:              id,
-		ZoneType:            zoneType,
-		ModuleName:          moduleName,
-		Enabled:             true,
-		StateMachineVersion: 2,
-		MempoolPolicyID:     DefaultMempoolPolicy,
-		FeePolicyID:         NativeFeePolicyID,
-		GasPolicyID:         DefaultGasPolicy,
-		MessagePolicyID:     DefaultMessagePolicy,
-		ShardLayoutEpoch:    1,
-		MaxShards:           maxShards,
-		MessageCapabilities: messageCapabilities,
-		ProofCapabilities:   proofCapabilities,
+		ZoneID:			id,
+		ZoneType:		zoneType,
+		ModuleName:		moduleName,
+		Enabled:		true,
+		StateMachineVersion:	2,
+		MempoolPolicyID:	DefaultMempoolPolicy,
+		FeePolicyID:		NativeFeePolicyID,
+		GasPolicyID:		DefaultGasPolicy,
+		MessagePolicyID:	DefaultMessagePolicy,
+		ShardLayoutEpoch:	1,
+		MaxShards:		maxShards,
+		MessageCapabilities:	messageCapabilities,
+		ProofCapabilities:	proofCapabilities,
 	})
 }
 

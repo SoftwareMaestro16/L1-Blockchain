@@ -12,86 +12,86 @@ import (
 type RoutingEngineMessageType string
 
 const (
-	RoutingEngineMsgNodeAnnouncement    RoutingEngineMessageType = "GossipNodeAnnouncement"
-	RoutingEngineMsgChannelAnnouncement RoutingEngineMessageType = "GossipChannelAnnouncement"
-	RoutingEngineMsgChannelUpdate       RoutingEngineMessageType = "GossipChannelUpdate"
-	RoutingEngineMsgLiquidityHint       RoutingEngineMessageType = "GossipLiquidityHint"
-	RoutingEngineMsgFeePolicyUpdate     RoutingEngineMessageType = "GossipFeePolicyUpdate"
-	RoutingEngineMsgRouteFailure        RoutingEngineMessageType = "GossipRouteFailure"
-	RoutingEngineMsgCapacityProbeReq    RoutingEngineMessageType = "CapacityProbeRequest"
-	RoutingEngineMsgCapacityProbeResp   RoutingEngineMessageType = "CapacityProbeResponse"
+	RoutingEngineMsgNodeAnnouncement	RoutingEngineMessageType	= "GossipNodeAnnouncement"
+	RoutingEngineMsgChannelAnnouncement	RoutingEngineMessageType	= "GossipChannelAnnouncement"
+	RoutingEngineMsgChannelUpdate		RoutingEngineMessageType	= "GossipChannelUpdate"
+	RoutingEngineMsgLiquidityHint		RoutingEngineMessageType	= "GossipLiquidityHint"
+	RoutingEngineMsgFeePolicyUpdate		RoutingEngineMessageType	= "GossipFeePolicyUpdate"
+	RoutingEngineMsgRouteFailure		RoutingEngineMessageType	= "GossipRouteFailure"
+	RoutingEngineMsgCapacityProbeReq	RoutingEngineMessageType	= "CapacityProbeRequest"
+	RoutingEngineMsgCapacityProbeResp	RoutingEngineMessageType	= "CapacityProbeResponse"
 )
 
 type RoutingNode struct {
-	NodeID         string
-	AdvertisedAt   uint64
-	LastSeenHeight uint64
-	Active         bool
-	LocalScore     int64
-	AnnouncementID string
+	NodeID		string
+	AdvertisedAt	uint64
+	LastSeenHeight	uint64
+	Active		bool
+	LocalScore	int64
+	AnnouncementID	string
 }
 
 type LiquidityHint struct {
-	HintID      string
-	ChannelID   string
-	From        string
-	To          string
-	Liquidity   string
-	ObservedAt  uint64
-	ExpiresAt   uint64
-	Advisory    bool
-	MessageHash string
+	HintID		string
+	ChannelID	string
+	From		string
+	To		string
+	Liquidity	string
+	ObservedAt	uint64
+	ExpiresAt	uint64
+	Advisory	bool
+	MessageHash	string
 }
 
 type FeePolicy struct {
-	PolicyID    string
-	ChannelID   string
-	From        string
-	To          string
-	BaseFee     string
-	MaxFee      string
-	ValidAfter  uint64
-	ValidUntil  uint64
-	MessageHash string
+	PolicyID	string
+	ChannelID	string
+	From		string
+	To		string
+	BaseFee		string
+	MaxFee		string
+	ValidAfter	uint64
+	ValidUntil	uint64
+	MessageHash	string
 }
 
 type RouteAttempt struct {
-	AttemptID     string
-	From          string
-	To            string
-	Amount        string
-	CurrentHeight uint64
-	Route         ScoredRoute
-	RetryCount    uint32
-	Success       bool
-	FailureClass  RouteFailureClass
+	AttemptID	string
+	From		string
+	To		string
+	Amount		string
+	CurrentHeight	uint64
+	Route		ScoredRoute
+	RetryCount	uint32
+	Success		bool
+	FailureClass	RouteFailureClass
 }
 
 type RouteFailure struct {
-	FailureID string
-	Report    RouteFailureReport
-	Score     RouteFailureScore
+	FailureID	string
+	Report		RouteFailureReport
+	Score		RouteFailureScore
 }
 
 type LocalPeerScore struct {
-	NodeID           string
-	Score            int64
-	InvalidGossip    uint64
-	LastUpdateHeight uint64
+	NodeID			string
+	Score			int64
+	InvalidGossip		uint64
+	LastUpdateHeight	uint64
 }
 
 type RoutingEngineState struct {
-	Topology        TopologyStore
-	Nodes           []RoutingNode
-	ChannelEdges    []ChannelEdge
-	LiquidityHints  []LiquidityHint
-	FeePolicies     []FeePolicy
-	RouteAttempts   []RouteAttempt
-	RouteFailures   []RouteFailure
-	LocalPeerScores []LocalPeerScore
-	Policy          RoutePolicy
-	RateLimit       GossipRateLimitPolicy
-	FailureScoring  RouteFailureScoringPolicy
+	Topology	TopologyStore
+	Nodes		[]RoutingNode
+	ChannelEdges	[]ChannelEdge
+	LiquidityHints	[]LiquidityHint
+	FeePolicies	[]FeePolicy
+	RouteAttempts	[]RouteAttempt
+	RouteFailures	[]RouteFailure
+	LocalPeerScores	[]LocalPeerScore
+	Policy		RoutePolicy
+	RateLimit	GossipRateLimitPolicy
+	FailureScoring	RouteFailureScoringPolicy
 }
 
 type RoutingEngineMessage interface {
@@ -108,25 +108,25 @@ type MsgGossipFeePolicyUpdate struct{ Gossip SignedGossipEnvelope }
 type MsgGossipRouteFailure struct{ Gossip SignedGossipEnvelope }
 
 type CapacityProbeRequest struct {
-	ProbeID          string
-	From             string
-	To               string
-	Amount           string
-	CurrentHeight    uint64
-	MaxHops          int
-	Policy           RoutePolicy
-	BlindedRouteHint string
-	RequestHash      string
+	ProbeID			string
+	From			string
+	To			string
+	Amount			string
+	CurrentHeight		uint64
+	MaxHops			int
+	Policy			RoutePolicy
+	BlindedRouteHint	string
+	RequestHash		string
 }
 
 type CapacityProbeResponse struct {
-	ProbeID       string
-	Responder     string
-	Available     bool
-	MinCapacity   string
-	FailureReason string
-	RouteHash     string
-	ResponseHash  string
+	ProbeID		string
+	Responder	string
+	Available	bool
+	MinCapacity	string
+	FailureReason	string
+	RouteHash	string
+	ResponseHash	string
 }
 
 func BuildRoutingGossipEnvelope(message GossipMessage, signer string, receivedAt uint64) (SignedGossipEnvelope, error) {
@@ -142,11 +142,11 @@ func BuildRoutingGossipEnvelope(message GossipMessage, signer string, receivedAt
 		return SignedGossipEnvelope{}, err
 	}
 	envelope := SignedGossipEnvelope{
-		Message:      built,
-		MessageHash:  built.MessageID,
-		Signature:    sig,
-		ReceivedFrom: signer,
-		ReceivedAt:   receivedAt,
+		Message:	built,
+		MessageHash:	built.MessageID,
+		Signature:	sig,
+		ReceivedFrom:	signer,
+		ReceivedAt:	receivedAt,
 	}.Normalize()
 	return envelope, nil
 }
@@ -157,22 +157,22 @@ func SnapshotRoutingEngineState(store TopologyStore, policy RoutePolicy, rateLim
 		return RoutingEngineState{}, err
 	}
 	state := RoutingEngineState{
-		Topology:       store,
-		ChannelEdges:   append([]ChannelEdge(nil), store.Edges...),
-		Policy:         policy.Normalize(),
-		RateLimit:      rateLimit.Normalize(),
-		FailureScoring: failurePolicy.Normalize(),
+		Topology:	store,
+		ChannelEdges:	append([]ChannelEdge(nil), store.Edges...),
+		Policy:		policy.Normalize(),
+		RateLimit:	rateLimit.Normalize(),
+		FailureScoring:	failurePolicy.Normalize(),
 	}
 	for _, envelope := range store.Messages {
 		message := envelope.Normalize().Message
 		switch message.MessageType {
 		case GossipNodeAnnouncement:
 			state.Nodes = upsertRoutingNode(state.Nodes, RoutingNode{
-				NodeID:         message.NodeID,
-				AdvertisedAt:   message.ValidAfterHeight,
-				LastSeenHeight: envelope.ReceivedAt,
-				Active:         envelope.ReceivedAt <= message.ValidUntilHeight,
-				AnnouncementID: message.MessageID,
+				NodeID:		message.NodeID,
+				AdvertisedAt:	message.ValidAfterHeight,
+				LastSeenHeight:	envelope.ReceivedAt,
+				Active:		envelope.ReceivedAt <= message.ValidUntilHeight,
+				AnnouncementID:	message.MessageID,
 			})
 		case GossipLiquidityHint:
 			state.LiquidityHints = append(state.LiquidityHints, LiquidityHintFromGossip(message))
@@ -183,10 +183,10 @@ func SnapshotRoutingEngineState(store TopologyStore, policy RoutePolicy, rateLim
 	for _, reputation := range store.Reputation {
 		reputation = reputation.Normalize()
 		state.LocalPeerScores = append(state.LocalPeerScores, LocalPeerScore{
-			NodeID:           reputation.NodeID,
-			Score:            reputation.Score,
-			InvalidGossip:    reputation.InvalidGossip,
-			LastUpdateHeight: reputation.LastUpdateHeight,
+			NodeID:			reputation.NodeID,
+			Score:			reputation.Score,
+			InvalidGossip:		reputation.InvalidGossip,
+			LastUpdateHeight:	reputation.LastUpdateHeight,
 		}.Normalize())
 	}
 	return state.Normalize(), state.Validate()
@@ -234,13 +234,13 @@ func SelectRoutingEnginePath(engine RoutingEngineState, chain PaymentsState, req
 		return RoutingEngineState{}, ScoredRoute{}, err
 	}
 	attempt := RouteAttempt{
-		AttemptID:     HashParts("route-attempt", req.From, req.To, req.Amount, route.ScoreHash, fmt.Sprintf("%020d", req.CurrentHeight)),
-		From:          req.From,
-		To:            req.To,
-		Amount:        req.Amount,
-		CurrentHeight: req.CurrentHeight,
-		Route:         route,
-		Success:       true,
+		AttemptID:	HashParts("route-attempt", req.From, req.To, req.Amount, route.ScoreHash, fmt.Sprintf("%020d", req.CurrentHeight)),
+		From:		req.From,
+		To:		req.To,
+		Amount:		req.Amount,
+		CurrentHeight:	req.CurrentHeight,
+		Route:		route,
+		Success:	true,
 	}.Normalize()
 	engine.RouteAttempts = append(engine.RouteAttempts, attempt)
 	return engine.Normalize(), route, nil
@@ -258,28 +258,28 @@ func RetryRoutingEnginePath(engine RoutingEngineState, chain PaymentsState, req 
 	result, err := RetryPaymentRoute(chain, engine.Topology, req)
 	for _, report := range req.Failures {
 		engine.RouteAttempts = append(engine.RouteAttempts, RouteAttempt{
-			AttemptID:     HashParts("route-attempt-failure", report.ChannelID, report.From, report.To, string(report.FailureClass), fmt.Sprintf("%020d", report.ObservedHeight)),
-			From:          report.From,
-			To:            report.To,
-			Amount:        req.Selection.Amount,
-			CurrentHeight: report.ObservedHeight,
-			RetryCount:    uint32(len(req.Failures)),
-			Success:       false,
-			FailureClass:  report.FailureClass,
+			AttemptID:	HashParts("route-attempt-failure", report.ChannelID, report.From, report.To, string(report.FailureClass), fmt.Sprintf("%020d", report.ObservedHeight)),
+			From:		report.From,
+			To:		report.To,
+			Amount:		req.Selection.Amount,
+			CurrentHeight:	report.ObservedHeight,
+			RetryCount:	uint32(len(req.Failures)),
+			Success:	false,
+			FailureClass:	report.FailureClass,
 		}.Normalize())
 	}
 	if err != nil {
 		return engine.Normalize(), result, err
 	}
 	engine.RouteAttempts = append(engine.RouteAttempts, RouteAttempt{
-		AttemptID:     HashParts("route-attempt-retry", req.Selection.From, req.Selection.To, req.Selection.Amount, result.Route.ScoreHash, fmt.Sprintf("%020d", req.Selection.CurrentHeight)),
-		From:          req.Selection.From,
-		To:            req.Selection.To,
-		Amount:        req.Selection.Amount,
-		CurrentHeight: req.Selection.CurrentHeight,
-		Route:         result.Route,
-		RetryCount:    result.Attempts,
-		Success:       true,
+		AttemptID:	HashParts("route-attempt-retry", req.Selection.From, req.Selection.To, req.Selection.Amount, result.Route.ScoreHash, fmt.Sprintf("%020d", req.Selection.CurrentHeight)),
+		From:		req.Selection.From,
+		To:		req.Selection.To,
+		Amount:		req.Selection.Amount,
+		CurrentHeight:	req.Selection.CurrentHeight,
+		Route:		result.Route,
+		RetryCount:	result.Attempts,
+		Success:	true,
 	}.Normalize())
 	return engine.Normalize(), result, nil
 }
@@ -293,16 +293,16 @@ func ApplyRoutingEngineFailures(engine RoutingEngineState, reports []RouteFailur
 	engine.Topology = store
 	for _, score := range scores {
 		engine.RouteFailures = append(engine.RouteFailures, RouteFailure{
-			FailureID: HashParts("route-failure", score.ChannelID, score.NodeID, string(score.FailureClass), fmt.Sprintf("%020d", score.ObservedHeight)),
+			FailureID:	HashParts("route-failure", score.ChannelID, score.NodeID, string(score.FailureClass), fmt.Sprintf("%020d", score.ObservedHeight)),
 			Report: RouteFailureReport{
-				ChannelID:      score.ChannelID,
-				From:           score.NodeID,
-				To:             score.NodeID,
-				FailureClass:   score.FailureClass,
-				Retryable:      true,
-				ObservedHeight: score.ObservedHeight,
+				ChannelID:	score.ChannelID,
+				From:		score.NodeID,
+				To:		score.NodeID,
+				FailureClass:	score.FailureClass,
+				Retryable:	true,
+				ObservedHeight:	score.ObservedHeight,
 			},
-			Score: score,
+			Score:	score,
 		}.Normalize())
 	}
 	next, err := SnapshotRoutingEngineState(engine.Topology, engine.Policy, engine.RateLimit, engine.FailureScoring)
@@ -324,11 +324,11 @@ func HandleCapacityProbe(engine RoutingEngineState, chain PaymentsState, req Cap
 		return CapacityProbeResponse{}, err
 	}
 	selection := RouteSelectionRequest{
-		From:          req.From,
-		To:            req.To,
-		Amount:        req.Amount,
-		CurrentHeight: req.CurrentHeight,
-		Policy:        req.Policy,
+		From:		req.From,
+		To:		req.To,
+		Amount:		req.Amount,
+		CurrentHeight:	req.CurrentHeight,
+		Policy:		req.Policy,
 	}.Normalize()
 	if selection.Policy.MaxHops == 0 {
 		selection.Policy = engine.Policy
@@ -353,11 +353,11 @@ func BuildCapacityProbeResponse(req CapacityProbeRequest, responder string, rout
 		return CapacityProbeResponse{}, err
 	}
 	response := CapacityProbeResponse{
-		ProbeID:       req.ProbeID,
-		Responder:     responder,
-		Available:     available,
-		MinCapacity:   strings.TrimSpace(minCapacity),
-		FailureReason: strings.TrimSpace(failureReason),
+		ProbeID:	req.ProbeID,
+		Responder:	responder,
+		Available:	available,
+		MinCapacity:	strings.TrimSpace(minCapacity),
+		FailureReason:	strings.TrimSpace(failureReason),
 	}.Normalize()
 	if route.ScoreHash != "" {
 		response.RouteHash = route.Normalize().ScoreHash
@@ -373,37 +373,37 @@ func LiquidityHintFromGossip(message GossipMessage) LiquidityHint {
 		liquidity = message.Capacity
 	}
 	return LiquidityHint{
-		HintID:      HashParts("liquidity-hint", message.MessageID),
-		ChannelID:   message.ChannelID,
-		From:        message.From,
-		To:          message.To,
-		Liquidity:   liquidity,
-		ObservedAt:  message.ValidAfterHeight,
-		ExpiresAt:   message.ValidUntilHeight,
-		Advisory:    true,
-		MessageHash: message.MessageID,
+		HintID:		HashParts("liquidity-hint", message.MessageID),
+		ChannelID:	message.ChannelID,
+		From:		message.From,
+		To:		message.To,
+		Liquidity:	liquidity,
+		ObservedAt:	message.ValidAfterHeight,
+		ExpiresAt:	message.ValidUntilHeight,
+		Advisory:	true,
+		MessageHash:	message.MessageID,
 	}.Normalize()
 }
 
 func FeePolicyFromGossip(message GossipMessage) FeePolicy {
 	message = message.Normalize()
 	return FeePolicy{
-		PolicyID:    HashParts("fee-policy-gossip", message.MessageID),
-		ChannelID:   message.ChannelID,
-		From:        message.From,
-		To:          message.To,
-		BaseFee:     message.FeeAmount,
-		MaxFee:      message.MaxFee,
-		ValidAfter:  message.ValidAfterHeight,
-		ValidUntil:  message.ValidUntilHeight,
-		MessageHash: message.MessageID,
+		PolicyID:	HashParts("fee-policy-gossip", message.MessageID),
+		ChannelID:	message.ChannelID,
+		From:		message.From,
+		To:		message.To,
+		BaseFee:	message.FeeAmount,
+		MaxFee:		message.MaxFee,
+		ValidAfter:	message.ValidAfterHeight,
+		ValidUntil:	message.ValidUntilHeight,
+		MessageHash:	message.MessageID,
 	}.Normalize()
 }
 
 func (m MsgGossipNodeAnnouncement) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgNodeAnnouncement
 }
-func (m MsgGossipNodeAnnouncement) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipNodeAnnouncement) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipNodeAnnouncement) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipNodeAnnouncement)
 }
@@ -411,7 +411,7 @@ func (m MsgGossipNodeAnnouncement) ValidateBasic() error {
 func (m MsgGossipChannelAnnouncement) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgChannelAnnouncement
 }
-func (m MsgGossipChannelAnnouncement) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipChannelAnnouncement) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipChannelAnnouncement) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipChannelAnnouncement)
 }
@@ -419,7 +419,7 @@ func (m MsgGossipChannelAnnouncement) ValidateBasic() error {
 func (m MsgGossipChannelUpdate) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgChannelUpdate
 }
-func (m MsgGossipChannelUpdate) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipChannelUpdate) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipChannelUpdate) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipChannelUpdate)
 }
@@ -427,7 +427,7 @@ func (m MsgGossipChannelUpdate) ValidateBasic() error {
 func (m MsgGossipLiquidityHint) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgLiquidityHint
 }
-func (m MsgGossipLiquidityHint) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipLiquidityHint) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipLiquidityHint) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipLiquidityHint)
 }
@@ -435,7 +435,7 @@ func (m MsgGossipLiquidityHint) ValidateBasic() error {
 func (m MsgGossipFeePolicyUpdate) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgFeePolicyUpdate
 }
-func (m MsgGossipFeePolicyUpdate) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipFeePolicyUpdate) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipFeePolicyUpdate) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipFeePolicyUpdate)
 }
@@ -443,7 +443,7 @@ func (m MsgGossipFeePolicyUpdate) ValidateBasic() error {
 func (m MsgGossipRouteFailure) RoutingEngineType() RoutingEngineMessageType {
 	return RoutingEngineMsgRouteFailure
 }
-func (m MsgGossipRouteFailure) Envelope() SignedGossipEnvelope { return m.Gossip.Normalize() }
+func (m MsgGossipRouteFailure) Envelope() SignedGossipEnvelope	{ return m.Gossip.Normalize() }
 func (m MsgGossipRouteFailure) ValidateBasic() error {
 	return validateRoutingGossipMessage(m.Gossip, GossipRouteFailure)
 }

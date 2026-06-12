@@ -10,21 +10,21 @@ import (
 
 func DefaultParams() Params {
 	return Params{
-		AllowedDenoms: []string{BaseDenom},
+		AllowedDenoms:	[]string{BaseDenom},
 		ProtocolBurnPermissions: []BurnPermission{{
-			ModuleName:    ModuleName,
-			AllowedDenoms: []string{BaseDenom},
+			ModuleName:	ModuleName,
+			AllowedDenoms:	[]string{BaseDenom},
 		}},
-		MaxReasonBytes: DefaultMaxReasonBytes,
+		MaxReasonBytes:	DefaultMaxReasonBytes,
 	}
 }
 
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Params:        DefaultParams(),
-		BurnedByDenom: []BurnedByDenomEntry{},
-		BurnedByEpoch: []BurnedByEpochEntry{},
-		BurnReasons:   []BurnReason{},
+		Params:		DefaultParams(),
+		BurnedByDenom:	[]BurnedByDenomEntry{},
+		BurnedByEpoch:	[]BurnedByEpochEntry{},
+		BurnReasons:	[]BurnReason{},
 	}
 }
 

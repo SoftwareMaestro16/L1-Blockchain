@@ -8,55 +8,55 @@ import (
 )
 
 const (
-	OperationContractDeployment = "contract_deployment"
-	OperationDomainAuctionBid   = "domain_auction_bid"
+	OperationContractDeployment	= "contract_deployment"
+	OperationDomainAuctionBid	= "domain_auction_bid"
 
-	DefaultMemoByteCost    = uint64(1)
-	DefaultStorageByteCost = uint64(10)
+	DefaultMemoByteCost	= uint64(1)
+	DefaultStorageByteCost	= uint64(10)
 
-	RestrictedCostMultiplierBps = uint32(40_000)
-	NewCostMultiplierBps        = uint32(20_000)
-	NormalCostMultiplierBps     = uint32(10_000)
-	TrustedCostMultiplierBps    = uint32(8_000)
-	EliteCostMultiplierBps      = uint32(7_000)
+	RestrictedCostMultiplierBps	= uint32(40_000)
+	NewCostMultiplierBps		= uint32(20_000)
+	NormalCostMultiplierBps		= uint32(10_000)
+	TrustedCostMultiplierBps	= uint32(8_000)
+	EliteCostMultiplierBps		= uint32(7_000)
 
-	RestrictedPriorityWeight = uint32(10)
-	NewPriorityWeight        = uint32(25)
-	NormalPriorityWeight     = uint32(50)
-	TrustedPriorityWeight    = uint32(80)
-	ElitePriorityWeight      = uint32(100)
+	RestrictedPriorityWeight	= uint32(10)
+	NewPriorityWeight		= uint32(25)
+	NormalPriorityWeight		= uint32(50)
+	TrustedPriorityWeight		= uint32(80)
+	ElitePriorityWeight		= uint32(100)
 )
 
 type UsagePolicy struct {
-	ContractDeployMinScore     uint8
-	ContractDeployDeposit      sdkmath.Int
-	DomainAuctionMaxBidsByUser uint32
-	BaseMemoByteCost           uint64
-	BaseStorageByteCost        uint64
+	ContractDeployMinScore		uint8
+	ContractDeployDeposit		sdkmath.Int
+	DomainAuctionMaxBidsByUser	uint32
+	BaseMemoByteCost		uint64
+	BaseStorageByteCost		uint64
 }
 
 type UsageLimits struct {
-	TxRateLimit               uint32
-	AsyncQueueQuota           uint32
-	MaxTxGas                  uint64
-	MemoByteCost              uint64
-	StorageByteCost           uint64
-	ContractDeploysPerEpoch   uint32
-	DomainAuctionBidsPerBlock uint32
+	TxRateLimit			uint32
+	AsyncQueueQuota			uint32
+	MaxTxGas			uint64
+	MemoByteCost			uint64
+	StorageByteCost			uint64
+	ContractDeploysPerEpoch		uint32
+	DomainAuctionBidsPerBlock	uint32
 }
 
 type PriorityKey struct {
-	Weight  uint32
-	TxIndex uint32
+	Weight	uint32
+	TxIndex	uint32
 }
 
 func DefaultUsagePolicy() UsagePolicy {
 	return UsagePolicy{
-		ContractDeployMinScore:     50,
-		ContractDeployDeposit:      sdkmath.NewInt(10_000_000_000),
-		DomainAuctionMaxBidsByUser: 5,
-		BaseMemoByteCost:           DefaultMemoByteCost,
-		BaseStorageByteCost:        DefaultStorageByteCost,
+		ContractDeployMinScore:		50,
+		ContractDeployDeposit:		sdkmath.NewInt(10_000_000_000),
+		DomainAuctionMaxBidsByUser:	5,
+		BaseMemoByteCost:		DefaultMemoByteCost,
+		BaseStorageByteCost:		DefaultStorageByteCost,
 	}
 }
 
@@ -64,13 +64,13 @@ func LimitsForReputation(score uint8, policy UsagePolicy) UsageLimits {
 	limits := LimitsForScore(score)
 	multiplier := CostMultiplierBps(score)
 	return UsageLimits{
-		TxRateLimit:               limits.MaxTxsPerBlock,
-		AsyncQueueQuota:           limits.MaxQueueMsgs,
-		MaxTxGas:                  limits.MaxTxGas,
-		MemoByteCost:              applyBps(policy.BaseMemoByteCost, multiplier),
-		StorageByteCost:           applyBps(policy.BaseStorageByteCost, multiplier),
-		ContractDeploysPerEpoch:   contractDeployLimit(score),
-		DomainAuctionBidsPerBlock: minU32(policy.DomainAuctionMaxBidsByUser, limits.MaxTxsPerBlock),
+		TxRateLimit:			limits.MaxTxsPerBlock,
+		AsyncQueueQuota:		limits.MaxQueueMsgs,
+		MaxTxGas:			limits.MaxTxGas,
+		MemoByteCost:			applyBps(policy.BaseMemoByteCost, multiplier),
+		StorageByteCost:		applyBps(policy.BaseStorageByteCost, multiplier),
+		ContractDeploysPerEpoch:	contractDeployLimit(score),
+		DomainAuctionBidsPerBlock:	minU32(policy.DomainAuctionMaxBidsByUser, limits.MaxTxsPerBlock),
 	}
 }
 
@@ -203,10 +203,6 @@ func minU32(a, b uint32) uint32 {
 	}
 	return b
 }
-
-// ---------------
-// uint32 score variants (consolidated identity model)
-// ---------------
 
 func LimitsForIdentityScore(score uint32) IdentityProgressiveLimits {
 	return GetIdentityProgressiveLimits(ClassifyReputationLevel(score))

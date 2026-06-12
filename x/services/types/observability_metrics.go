@@ -11,53 +11,53 @@ type ServiceObservabilityMetricCategory string
 type ServiceObservabilityMetricUnit string
 
 const (
-	ServiceMetricActiveServices                   ServiceObservabilityMetricID = "active_services"
-	ServiceMetricServicesByType                   ServiceObservabilityMetricID = "services_by_type"
-	ServiceMetricServicesByTrustModel             ServiceObservabilityMetricID = "services_by_trust_model"
-	ServiceMetricRegisteredInterfaces             ServiceObservabilityMetricID = "registered_interfaces"
-	ServiceMetricActiveProviders                  ServiceObservabilityMetricID = "active_providers"
-	ServiceMetricProviderCollateralTotal          ServiceObservabilityMetricID = "provider_collateral_total"
-	ServiceMetricCallsSubmitted                   ServiceObservabilityMetricID = "calls_submitted"
-	ServiceMetricCallsExecuted                    ServiceObservabilityMetricID = "calls_executed"
-	ServiceMetricCallsFailed                      ServiceObservabilityMetricID = "calls_failed"
-	ServiceMetricCallsExpired                     ServiceObservabilityMetricID = "calls_expired"
-	ServiceMetricReceiptsAnchored                 ServiceObservabilityMetricID = "receipts_anchored"
-	ServiceMetricPaymentEscrowTotal               ServiceObservabilityMetricID = "payment_escrow_total"
-	ServiceMetricDisputesOpened                   ServiceObservabilityMetricID = "disputes_opened"
-	ServiceMetricDisputesResolved                 ServiceObservabilityMetricID = "disputes_resolved"
-	ServiceMetricAverageServiceLookupLatency      ServiceObservabilityMetricID = "average_service_lookup_latency"
-	ServiceMetricAverageInterfaceLookupLatency    ServiceObservabilityMetricID = "average_interface_lookup_latency"
-	ServiceMetricReceiptProofGenerationLatency    ServiceObservabilityMetricID = "receipt_proof_generation_latency"
-	ServiceMetricBlockSTMConflictRateServiceCalls ServiceObservabilityMetricID = "blockstm_conflict_rate_for_service_calls"
+	ServiceMetricActiveServices			ServiceObservabilityMetricID	= "active_services"
+	ServiceMetricServicesByType			ServiceObservabilityMetricID	= "services_by_type"
+	ServiceMetricServicesByTrustModel		ServiceObservabilityMetricID	= "services_by_trust_model"
+	ServiceMetricRegisteredInterfaces		ServiceObservabilityMetricID	= "registered_interfaces"
+	ServiceMetricActiveProviders			ServiceObservabilityMetricID	= "active_providers"
+	ServiceMetricProviderCollateralTotal		ServiceObservabilityMetricID	= "provider_collateral_total"
+	ServiceMetricCallsSubmitted			ServiceObservabilityMetricID	= "calls_submitted"
+	ServiceMetricCallsExecuted			ServiceObservabilityMetricID	= "calls_executed"
+	ServiceMetricCallsFailed			ServiceObservabilityMetricID	= "calls_failed"
+	ServiceMetricCallsExpired			ServiceObservabilityMetricID	= "calls_expired"
+	ServiceMetricReceiptsAnchored			ServiceObservabilityMetricID	= "receipts_anchored"
+	ServiceMetricPaymentEscrowTotal			ServiceObservabilityMetricID	= "payment_escrow_total"
+	ServiceMetricDisputesOpened			ServiceObservabilityMetricID	= "disputes_opened"
+	ServiceMetricDisputesResolved			ServiceObservabilityMetricID	= "disputes_resolved"
+	ServiceMetricAverageServiceLookupLatency	ServiceObservabilityMetricID	= "average_service_lookup_latency"
+	ServiceMetricAverageInterfaceLookupLatency	ServiceObservabilityMetricID	= "average_interface_lookup_latency"
+	ServiceMetricReceiptProofGenerationLatency	ServiceObservabilityMetricID	= "receipt_proof_generation_latency"
+	ServiceMetricBlockSTMConflictRateServiceCalls	ServiceObservabilityMetricID	= "blockstm_conflict_rate_for_service_calls"
 
-	ServiceMetricCategoryRegistry    ServiceObservabilityMetricCategory = "registry"
-	ServiceMetricCategoryInterface   ServiceObservabilityMetricCategory = "interface"
-	ServiceMetricCategoryProvider    ServiceObservabilityMetricCategory = "provider"
-	ServiceMetricCategoryCall        ServiceObservabilityMetricCategory = "call"
-	ServiceMetricCategoryReceipt     ServiceObservabilityMetricCategory = "receipt"
-	ServiceMetricCategoryPayment     ServiceObservabilityMetricCategory = "payment"
-	ServiceMetricCategoryDispute     ServiceObservabilityMetricCategory = "dispute"
-	ServiceMetricCategoryLatency     ServiceObservabilityMetricCategory = "latency"
-	ServiceMetricCategoryPerformance ServiceObservabilityMetricCategory = "performance"
+	ServiceMetricCategoryRegistry		ServiceObservabilityMetricCategory	= "registry"
+	ServiceMetricCategoryInterface		ServiceObservabilityMetricCategory	= "interface"
+	ServiceMetricCategoryProvider		ServiceObservabilityMetricCategory	= "provider"
+	ServiceMetricCategoryCall		ServiceObservabilityMetricCategory	= "call"
+	ServiceMetricCategoryReceipt		ServiceObservabilityMetricCategory	= "receipt"
+	ServiceMetricCategoryPayment		ServiceObservabilityMetricCategory	= "payment"
+	ServiceMetricCategoryDispute		ServiceObservabilityMetricCategory	= "dispute"
+	ServiceMetricCategoryLatency		ServiceObservabilityMetricCategory	= "latency"
+	ServiceMetricCategoryPerformance	ServiceObservabilityMetricCategory	= "performance"
 
-	ServiceMetricUnitCount       ServiceObservabilityMetricUnit = "count"
-	ServiceMetricUnitAmount      ServiceObservabilityMetricUnit = "amount"
-	ServiceMetricUnitNanoseconds ServiceObservabilityMetricUnit = "nanoseconds"
-	ServiceMetricUnitRatioPPM    ServiceObservabilityMetricUnit = "ratio_ppm"
+	ServiceMetricUnitCount		ServiceObservabilityMetricUnit	= "count"
+	ServiceMetricUnitAmount		ServiceObservabilityMetricUnit	= "amount"
+	ServiceMetricUnitNanoseconds	ServiceObservabilityMetricUnit	= "nanoseconds"
+	ServiceMetricUnitRatioPPM	ServiceObservabilityMetricUnit	= "ratio_ppm"
 )
 
 type ServiceObservabilityMetric struct {
-	MetricID   ServiceObservabilityMetricID
-	Category   ServiceObservabilityMetricCategory
-	Unit       ServiceObservabilityMetricUnit
-	Source     string
-	Bounded    bool
-	MetricHash string
+	MetricID	ServiceObservabilityMetricID
+	Category	ServiceObservabilityMetricCategory
+	Unit		ServiceObservabilityMetricUnit
+	Source		string
+	Bounded		bool
+	MetricHash	string
 }
 
 type ServiceObservabilityMetricsManifest struct {
-	Metrics      []ServiceObservabilityMetric
-	ManifestHash string
+	Metrics		[]ServiceObservabilityMetric
+	ManifestHash	string
 }
 
 func DefaultServiceObservabilityMetricsManifest() (ServiceObservabilityMetricsManifest, error) {
@@ -212,11 +212,11 @@ func IsServiceObservabilityMetricUnit(unit ServiceObservabilityMetricUnit) bool 
 
 func newServiceObservabilityMetric(metricID ServiceObservabilityMetricID, category ServiceObservabilityMetricCategory, unit ServiceObservabilityMetricUnit, source string, bounded bool) ServiceObservabilityMetric {
 	return ServiceObservabilityMetric{
-		MetricID: metricID,
-		Category: category,
-		Unit:     unit,
-		Source:   source,
-		Bounded:  bounded,
+		MetricID:	metricID,
+		Category:	category,
+		Unit:		unit,
+		Source:		source,
+		Bounded:	bounded,
 	}
 }
 

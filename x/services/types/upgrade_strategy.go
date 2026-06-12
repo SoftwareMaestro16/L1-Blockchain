@@ -15,108 +15,108 @@ type ServiceInterfaceLifecycleStatus string
 type ServiceProviderReregistrationMode string
 
 const (
-	ServiceDescriptorObjectCanonicalDescriptor ServiceDescriptorObjectKind = "canonical_descriptor"
-	ServiceDescriptorObjectDistributedRecord   ServiceDescriptorObjectKind = "distributed_record"
-	ServiceDescriptorObjectDistributedEndpoint ServiceDescriptorObjectKind = "distributed_endpoint"
-	ServiceDescriptorObjectInterfaceDescriptor ServiceDescriptorObjectKind = "interface_descriptor"
+	ServiceDescriptorObjectCanonicalDescriptor	ServiceDescriptorObjectKind	= "canonical_descriptor"
+	ServiceDescriptorObjectDistributedRecord	ServiceDescriptorObjectKind	= "distributed_record"
+	ServiceDescriptorObjectDistributedEndpoint	ServiceDescriptorObjectKind	= "distributed_endpoint"
+	ServiceDescriptorObjectInterfaceDescriptor	ServiceDescriptorObjectKind	= "interface_descriptor"
 
-	ServiceSchemaCompatibilityBackward ServiceSchemaCompatibilityMode = "backward_compatible"
-	ServiceSchemaCompatibilityAdditive ServiceSchemaCompatibilityMode = "additive"
-	ServiceSchemaCompatibilityBreaking ServiceSchemaCompatibilityMode = "breaking"
+	ServiceSchemaCompatibilityBackward	ServiceSchemaCompatibilityMode	= "backward_compatible"
+	ServiceSchemaCompatibilityAdditive	ServiceSchemaCompatibilityMode	= "additive"
+	ServiceSchemaCompatibilityBreaking	ServiceSchemaCompatibilityMode	= "breaking"
 
-	ServiceInterfaceLifecycleActive     ServiceInterfaceLifecycleStatus = "active"
-	ServiceInterfaceLifecycleDeprecated ServiceInterfaceLifecycleStatus = "deprecated"
-	ServiceInterfaceLifecycleRetired    ServiceInterfaceLifecycleStatus = "retired"
+	ServiceInterfaceLifecycleActive		ServiceInterfaceLifecycleStatus	= "active"
+	ServiceInterfaceLifecycleDeprecated	ServiceInterfaceLifecycleStatus	= "deprecated"
+	ServiceInterfaceLifecycleRetired	ServiceInterfaceLifecycleStatus	= "retired"
 
-	ServiceProviderReregistrationUnchanged          ServiceProviderReregistrationMode = "unchanged"
-	ServiceProviderReregistrationOwnerAuthorized    ServiceProviderReregistrationMode = "owner_authorized"
-	ServiceProviderReregistrationCollateralRefresh  ServiceProviderReregistrationMode = "collateral_refresh"
-	ServiceProviderReregistrationCapabilityRefresh  ServiceProviderReregistrationMode = "capability_refresh"
-	ServiceProviderReregistrationFullReregistration ServiceProviderReregistrationMode = "full_reregistration"
-	ServiceUpgradeGovernanceProposalPrefix                                            = "gov/services/upgrade/"
+	ServiceProviderReregistrationUnchanged		ServiceProviderReregistrationMode	= "unchanged"
+	ServiceProviderReregistrationOwnerAuthorized	ServiceProviderReregistrationMode	= "owner_authorized"
+	ServiceProviderReregistrationCollateralRefresh	ServiceProviderReregistrationMode	= "collateral_refresh"
+	ServiceProviderReregistrationCapabilityRefresh	ServiceProviderReregistrationMode	= "capability_refresh"
+	ServiceProviderReregistrationFullReregistration	ServiceProviderReregistrationMode	= "full_reregistration"
+	ServiceUpgradeGovernanceProposalPrefix							= "gov/services/upgrade/"
 )
 
 type ServiceDescriptorVersionRecord struct {
-	ObjectKind              ServiceDescriptorObjectKind
-	ObjectID                string
-	Version                 uint64
-	DescriptorHash          string
-	InterfaceHash           string
-	SchemaCompatibilityHash string
-	VersionHash             string
+	ObjectKind		ServiceDescriptorObjectKind
+	ObjectID		string
+	Version			uint64
+	DescriptorHash		string
+	InterfaceHash		string
+	SchemaCompatibilityHash	string
+	VersionHash		string
 }
 
 type ServiceSchemaCompatibilityMetadata struct {
-	SchemaID          string
-	PreviousHash      string
-	NextHash          string
-	Mode              ServiceSchemaCompatibilityMode
-	AddedFields       []string
-	DeprecatedFields  []string
-	RemovedFields     []string
-	RequiredFields    []string
-	CompatibilityHash string
+	SchemaID		string
+	PreviousHash		string
+	NextHash		string
+	Mode			ServiceSchemaCompatibilityMode
+	AddedFields		[]string
+	DeprecatedFields	[]string
+	RemovedFields		[]string
+	RequiredFields		[]string
+	CompatibilityHash	string
 }
 
 type ServiceRegistryMigrationHandler struct {
-	FromRegistryVersion        uint64
-	ToRegistryVersion          uint64
-	HandlerName                string
-	GovernanceProposalID       string
-	DescriptorMigrationHandler string
-	InterfaceMigrationHandler  string
-	ProviderMigrationHandler   string
-	HandlerHash                string
+	FromRegistryVersion		uint64
+	ToRegistryVersion		uint64
+	HandlerName			string
+	GovernanceProposalID		string
+	DescriptorMigrationHandler	string
+	InterfaceMigrationHandler	string
+	ProviderMigrationHandler	string
+	HandlerHash			string
 }
 
 type ServiceInterfaceDeprecationMarker struct {
-	InterfaceHash            string
-	Version                  uint64
-	DeprecatedHeight         uint64
-	RetirementHeight         uint64
-	ReplacementInterfaceHash string
-	Reason                   string
-	MarkerHash               string
+	InterfaceHash			string
+	Version				uint64
+	DeprecatedHeight		uint64
+	RetirementHeight		uint64
+	ReplacementInterfaceHash	string
+	Reason				string
+	MarkerHash			string
 }
 
 type ServiceProviderReregistrationRule struct {
-	ProviderID                 string
-	ServiceID                  string
-	PreviousInterfaceHash      string
-	NextInterfaceHash          string
-	Mode                       ServiceProviderReregistrationMode
-	RequiresOwnerAuthorization bool
-	RequiresCollateralRefresh  bool
-	RequiresCapabilityRefresh  bool
-	EarliestHeight             uint64
-	RuleHash                   string
+	ProviderID			string
+	ServiceID			string
+	PreviousInterfaceHash		string
+	NextInterfaceHash		string
+	Mode				ServiceProviderReregistrationMode
+	RequiresOwnerAuthorization	bool
+	RequiresCollateralRefresh	bool
+	RequiresCapabilityRefresh	bool
+	EarliestHeight			uint64
+	RuleHash			string
 }
 
 type ServiceRegistryUpgradePlan struct {
-	FromRegistryVersion    uint64
-	ToRegistryVersion      uint64
-	GovernanceProposalID   string
-	DescriptorVersions     []ServiceDescriptorVersionRecord
-	SchemaCompatibility    []ServiceSchemaCompatibilityMetadata
-	MigrationHandlers      []ServiceRegistryMigrationHandler
-	InterfaceDeprecations  []ServiceInterfaceDeprecationMarker
-	ProviderReregistration []ServiceProviderReregistrationRule
-	PlanHash               string
+	FromRegistryVersion	uint64
+	ToRegistryVersion	uint64
+	GovernanceProposalID	string
+	DescriptorVersions	[]ServiceDescriptorVersionRecord
+	SchemaCompatibility	[]ServiceSchemaCompatibilityMetadata
+	MigrationHandlers	[]ServiceRegistryMigrationHandler
+	InterfaceDeprecations	[]ServiceInterfaceDeprecationMarker
+	ProviderReregistration	[]ServiceProviderReregistrationRule
+	PlanHash		string
 }
 
 type ServiceRegistryUpgradeSimulationResult struct {
-	PlanHash                         string
-	FromRegistryVersion              uint64
-	ToRegistryVersion                uint64
-	DescriptorVersionsMigrated       uint32
-	BackwardCompatibleSchemas        uint32
-	BreakingSchemas                  uint32
-	MigrationHandlersApplied         uint32
-	InterfaceDeprecationsApplied     uint32
-	ProvidersRequiringReregistration uint32
-	GovernanceControlled             bool
-	BackwardCompatible               bool
-	SimulationHash                   string
+	PlanHash				string
+	FromRegistryVersion			uint64
+	ToRegistryVersion			uint64
+	DescriptorVersionsMigrated		uint32
+	BackwardCompatibleSchemas		uint32
+	BreakingSchemas				uint32
+	MigrationHandlersApplied		uint32
+	InterfaceDeprecationsApplied		uint32
+	ProvidersRequiringReregistration	uint32
+	GovernanceControlled			bool
+	BackwardCompatible			bool
+	SimulationHash				string
 }
 
 func NewServiceDescriptorVersionRecord(record ServiceDescriptorVersionRecord) (ServiceDescriptorVersionRecord, error) {
@@ -197,15 +197,15 @@ func SimulateServiceRegistryUpgrade(plan ServiceRegistryUpgradePlan) (ServiceReg
 		return ServiceRegistryUpgradeSimulationResult{}, err
 	}
 	result := ServiceRegistryUpgradeSimulationResult{
-		PlanHash:                         plan.PlanHash,
-		FromRegistryVersion:              plan.FromRegistryVersion,
-		ToRegistryVersion:                plan.ToRegistryVersion,
-		DescriptorVersionsMigrated:       uint32(len(plan.DescriptorVersions)),
-		MigrationHandlersApplied:         uint32(len(plan.MigrationHandlers)),
-		InterfaceDeprecationsApplied:     uint32(len(plan.InterfaceDeprecations)),
-		ProvidersRequiringReregistration: uint32(countProviderReregistrations(plan.ProviderReregistration)),
-		GovernanceControlled:             strings.HasPrefix(plan.GovernanceProposalID, ServiceUpgradeGovernanceProposalPrefix),
-		BackwardCompatible:               true,
+		PlanHash:				plan.PlanHash,
+		FromRegistryVersion:			plan.FromRegistryVersion,
+		ToRegistryVersion:			plan.ToRegistryVersion,
+		DescriptorVersionsMigrated:		uint32(len(plan.DescriptorVersions)),
+		MigrationHandlersApplied:		uint32(len(plan.MigrationHandlers)),
+		InterfaceDeprecationsApplied:		uint32(len(plan.InterfaceDeprecations)),
+		ProvidersRequiringReregistration:	uint32(countProviderReregistrations(plan.ProviderReregistration)),
+		GovernanceControlled:			strings.HasPrefix(plan.GovernanceProposalID, ServiceUpgradeGovernanceProposalPrefix),
+		BackwardCompatible:			true,
 	}
 	for _, metadata := range plan.SchemaCompatibility {
 		if metadata.Mode == ServiceSchemaCompatibilityBreaking {

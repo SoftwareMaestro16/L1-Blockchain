@@ -115,10 +115,10 @@ func TestMsgServiceDepositAndQuerySurface(t *testing.T) {
 	handler := msgRouter.Handler(&types.MsgDepositToStakingPool{})
 	require.NotNil(t, handler)
 	_, err := handler(sdk.Context{}, &types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 
@@ -151,10 +151,10 @@ func TestMsgServiceDirectDelegationRejected(t *testing.T) {
 	require.NotNil(t, handler)
 
 	_, err := handler(sdk.Context{}, &types.MsgDelegateToValidator{
-		UserAddress:      aeFromRawForServiceTest(t, serviceRawAddress("22")),
-		ValidatorAddress: aeFromRawForServiceTest(t, serviceRawAddress("33")),
-		Amount:           1,
-		Height:           2,
+		UserAddress:		aeFromRawForServiceTest(t, serviceRawAddress("22")),
+		ValidatorAddress:	aeFromRawForServiceTest(t, serviceRawAddress("33")),
+		Amount:			1,
+		Height:			2,
 	})
 	require.ErrorContains(t, err, "direct user delegation to validators is disabled")
 }
@@ -169,10 +169,10 @@ func TestMsgAndQueryCodecRoundTripPreservesSurfaceFields(t *testing.T) {
 	validator := aeFromRawForServiceTest(t, serviceRawAddress("33"))
 
 	deposit := &types.MsgDepositToStakingPool{
-		PoolID:        "pool-codec",
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        9,
+		PoolID:		"pool-codec",
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		9,
 	}
 	depositBz, err := appCodec.Marshal(deposit)
 	require.NoError(t, err)
@@ -181,11 +181,11 @@ func TestMsgAndQueryCodecRoundTripPreservesSurfaceFields(t *testing.T) {
 	require.Equal(t, *deposit, depositOut)
 
 	directDelegation := &types.MsgDelegateToValidator{
-		Authority:        prototype.DefaultAuthority,
-		UserAddress:      user,
-		ValidatorAddress: validator,
-		Amount:           1,
-		Height:           10,
+		Authority:		prototype.DefaultAuthority,
+		UserAddress:		user,
+		ValidatorAddress:	validator,
+		Amount:			1,
+		Height:			10,
 	}
 	delegationBz, err := appCodec.Marshal(directDelegation)
 	require.NoError(t, err)
@@ -230,13 +230,13 @@ func createServiceOfficialPool(t *testing.T, k *keeper.Keeper) types.NominatorPo
 	t.Helper()
 	contractRaw := serviceRawAddress("66")
 	pool, err := k.CreateOfficialLiquidStakingPool(types.MsgCreateOfficialLiquidStakingPool{
-		Authority:           prototype.DefaultAuthority,
-		PoolID:              "service-pool",
-		ContractAddressUser: aeFromRawForServiceTest(t, contractRaw),
-		ContractAddressRaw:  contractRaw,
-		PoolOperator:        serviceRawAddress("11"),
-		PoolCommissionBps:   100,
-		Height:              1,
+		Authority:		prototype.DefaultAuthority,
+		PoolID:			"service-pool",
+		ContractAddressUser:	aeFromRawForServiceTest(t, contractRaw),
+		ContractAddressRaw:	contractRaw,
+		PoolOperator:		serviceRawAddress("11"),
+		PoolCommissionBps:	100,
+		Height:			1,
 	})
 	require.NoError(t, err)
 	return pool

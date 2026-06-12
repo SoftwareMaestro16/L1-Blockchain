@@ -10,11 +10,11 @@ func TestShardLocalMessageStoresSortAndBuildProofableEntries(t *testing.T) {
 	msgA := shardMessage(t, "msg-a", ZoneIDApplication, "1", ZoneIDContract, "2", "contract/instance/a", 2, 20, 2, 3)
 	msgB := shardMessage(t, "msg-b", ZoneIDApplication, "1", ZoneIDContract, "2", "contract/instance/b", 1, 19, 1, 3)
 	store, err := NewShardMessageStore(ShardMessageStore{
-		ZoneID:    ZoneIDApplication,
-		ShardID:   "1",
-		Height:    88,
-		QueueKind: ShardQueueOutbox,
-		Messages:  []ShardMessageEnvelope{msgA, msgB},
+		ZoneID:		ZoneIDApplication,
+		ShardID:	"1",
+		Height:		88,
+		QueueKind:	ShardQueueOutbox,
+		Messages:	[]ShardMessageEnvelope{msgA, msgB},
 	})
 	require.NoError(t, err)
 	require.Equal(t, "msg-b", store.Messages[0].MsgID)
@@ -27,11 +27,11 @@ func TestShardLocalMessageStoresSortAndBuildProofableEntries(t *testing.T) {
 	require.Equal(t, msgB.MessageHash, entries[0].MessageHash)
 
 	reordered, err := NewShardMessageStore(ShardMessageStore{
-		ZoneID:    ZoneIDApplication,
-		ShardID:   "1",
-		Height:    88,
-		QueueKind: ShardQueueOutbox,
-		Messages:  []ShardMessageEnvelope{msgB, msgA},
+		ZoneID:		ZoneIDApplication,
+		ShardID:	"1",
+		Height:		88,
+		QueueKind:	ShardQueueOutbox,
+		Messages:	[]ShardMessageEnvelope{msgB, msgA},
 	})
 	require.NoError(t, err)
 	require.Equal(t, store.StoreRoot, reordered.StoreRoot)
@@ -62,23 +62,23 @@ func TestShardRootsBindIntoZoneCommitment(t *testing.T) {
 
 func TestShardMigrationExecutorIsReplayable(t *testing.T) {
 	taskA, err := NewShardMigrationTask(ShardMigrationTask{
-		ZoneID:             ZoneIDContract,
-		SourceShardID:      "1",
-		DestinationShardID: "3",
-		SourceLayoutEpoch:  4,
-		TargetLayoutEpoch:  5,
-		KeyPrefix:          "contract/storage/a",
-		DeliveryEpoch:      5,
+		ZoneID:			ZoneIDContract,
+		SourceShardID:		"1",
+		DestinationShardID:	"3",
+		SourceLayoutEpoch:	4,
+		TargetLayoutEpoch:	5,
+		KeyPrefix:		"contract/storage/a",
+		DeliveryEpoch:		5,
 	})
 	require.NoError(t, err)
 	taskB, err := NewShardMigrationTask(ShardMigrationTask{
-		ZoneID:             ZoneIDContract,
-		SourceShardID:      "2",
-		DestinationShardID: "3",
-		SourceLayoutEpoch:  4,
-		TargetLayoutEpoch:  5,
-		KeyPrefix:          "contract/storage/b",
-		DeliveryEpoch:      5,
+		ZoneID:			ZoneIDContract,
+		SourceShardID:		"2",
+		DestinationShardID:	"3",
+		SourceLayoutEpoch:	4,
+		TargetLayoutEpoch:	5,
+		KeyPrefix:		"contract/storage/b",
+		DeliveryEpoch:		5,
 	})
 	require.NoError(t, err)
 
@@ -142,24 +142,24 @@ func shardMessage(
 ) ShardMessageEnvelope {
 	t.Helper()
 	msg, err := NewShardMessageEnvelope(ShardMessageEnvelope{
-		MsgID:               msgID,
-		TraceID:             "trace-" + msgID,
-		Sender:              "acct/source-" + msgID,
-		Receiver:            "acct/receiver-" + msgID,
-		SenderZoneID:        senderZone,
-		SenderShardID:       senderShard,
-		ReceiverZoneID:      receiverZone,
-		ReceiverShardID:     receiverShard,
-		DestinationStateKey: stateKey,
-		PayloadType:         "test.payload",
-		PayloadHash:         testHash(msgID + "/payload"),
-		Priority:            priority,
-		AdmissionHeight:     admissionHeight,
-		CreatedAtHeight:     admissionHeight,
-		ExpiryHeight:        admissionHeight + 100,
-		MessageIndex:        priority,
-		SourceLayoutEpoch:   sourceEpoch,
-		DeliveryLayoutEpoch: deliveryEpoch,
+		MsgID:			msgID,
+		TraceID:		"trace-" + msgID,
+		Sender:			"acct/source-" + msgID,
+		Receiver:		"acct/receiver-" + msgID,
+		SenderZoneID:		senderZone,
+		SenderShardID:		senderShard,
+		ReceiverZoneID:		receiverZone,
+		ReceiverShardID:	receiverShard,
+		DestinationStateKey:	stateKey,
+		PayloadType:		"test.payload",
+		PayloadHash:		testHash(msgID + "/payload"),
+		Priority:		priority,
+		AdmissionHeight:	admissionHeight,
+		CreatedAtHeight:	admissionHeight,
+		ExpiryHeight:		admissionHeight + 100,
+		MessageIndex:		priority,
+		SourceLayoutEpoch:	sourceEpoch,
+		DeliveryLayoutEpoch:	deliveryEpoch,
 	})
 	require.NoError(t, err)
 	return msg

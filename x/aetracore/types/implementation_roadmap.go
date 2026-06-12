@@ -10,131 +10,131 @@ import (
 type ImplementationRoadmapPhaseID string
 
 const (
-	RoadmapPhaseBaselineAudit              ImplementationRoadmapPhaseID = "phase-0-baseline-audit"
-	RoadmapPhaseKernelRootModel            ImplementationRoadmapPhaseID = "phase-1-kernel-root-model"
-	RoadmapPhaseCrossZoneMessages          ImplementationRoadmapPhaseID = "phase-2-cross-zone-messages"
-	RoadmapPhaseCanonicalZones             ImplementationRoadmapPhaseID = "phase-3-canonical-zones"
-	RoadmapPhaseServiceStorageRouting      ImplementationRoadmapPhaseID = "phase-4-services-storage-routing"
-	RoadmapPhaseIdentityPaymentIntegration ImplementationRoadmapPhaseID = "phase-5-identity-payment-integration"
-	RoadmapPhaseVMRuntime                  ImplementationRoadmapPhaseID = "phase-6-vm-runtime"
-	RoadmapPhasePerformanceHardening       ImplementationRoadmapPhaseID = "phase-7-performance-hardening"
+	RoadmapPhaseBaselineAudit		ImplementationRoadmapPhaseID	= "phase-0-baseline-audit"
+	RoadmapPhaseKernelRootModel		ImplementationRoadmapPhaseID	= "phase-1-kernel-root-model"
+	RoadmapPhaseCrossZoneMessages		ImplementationRoadmapPhaseID	= "phase-2-cross-zone-messages"
+	RoadmapPhaseCanonicalZones		ImplementationRoadmapPhaseID	= "phase-3-canonical-zones"
+	RoadmapPhaseServiceStorageRouting	ImplementationRoadmapPhaseID	= "phase-4-services-storage-routing"
+	RoadmapPhaseIdentityPaymentIntegration	ImplementationRoadmapPhaseID	= "phase-5-identity-payment-integration"
+	RoadmapPhaseVMRuntime			ImplementationRoadmapPhaseID	= "phase-6-vm-runtime"
+	RoadmapPhasePerformanceHardening	ImplementationRoadmapPhaseID	= "phase-7-performance-hardening"
 )
 
 type ImplementationRoadmap struct {
-	Phases      []ImplementationRoadmapPhase
-	RoadmapHash string
+	Phases		[]ImplementationRoadmapPhase
+	RoadmapHash	string
 }
 
 type ImplementationRoadmapPhase struct {
-	PhaseID      ImplementationRoadmapPhaseID
-	PhaseNumber  uint32
-	Name         string
-	Tasks        []RoadmapChecklistItem
-	ExitCriteria []RoadmapChecklistItem
-	Evidence     RoadmapEvidence
-	PhaseHash    string
+	PhaseID		ImplementationRoadmapPhaseID
+	PhaseNumber	uint32
+	Name		string
+	Tasks		[]RoadmapChecklistItem
+	ExitCriteria	[]RoadmapChecklistItem
+	Evidence	RoadmapEvidence
+	PhaseHash	string
 }
 
 type RoadmapChecklistItem struct {
-	ID          string
-	Description string
-	Complete    bool
+	ID		string
+	Description	string
+	Complete	bool
 }
 
 type RoadmapEvidence struct {
-	ModuleInventory                        []RoadmapModuleInventoryEntry
-	CanonicalZones                         []RoadmapCanonicalZoneEntry
-	IdentityResolverOutputs                []string
-	CrossModuleDirectWritesAudited         bool
-	ExportImportTestsAdded                 bool
-	ModuleInvariantHarnessAdded            bool
-	RootContributionInterfaceDesign        bool
-	CurrentStateReproducible               bool
-	ModuleBoundariesDocumented             bool
-	MigrationRiskListComplete              bool
-	AetraCoreModuleImplemented             bool
-	ZonesModuleImplemented                 bool
-	ZoneRegistryImplemented                bool
-	GlobalStateRootImplemented             bool
-	BlockCommitmentMetadataQueries         bool
-	DefaultZoneRunnable                    bool
-	DefaultZoneRootIncluded                bool
-	ExportImportPreservesRootMeta          bool
-	MessagesModuleImplemented              bool
-	MessageEnvelopeAdded                   bool
-	FIFOPerSenderQueuesAdded               bool
-	NonceReplayProtectionAdded             bool
-	MessageReceiptsAdded                   bool
-	BounceAndExpiryAdded                   bool
-	MessageReceiptRootsAdded               bool
-	SameChainAsyncDeterministic            bool
-	MessageReceiptProofsAvailable          bool
-	ReplayAttemptsRejected                 bool
-	FinancialZoneBoundaryMoved             bool
-	IdentityZoneActivated                  bool
-	ApplicationZoneSchedulerBoundary       bool
-	ContractZoneSkeletonAdded              bool
-	ZoneSpecificQueriesRoots               bool
-	FourCanonicalZonesExist                bool
-	CanonicalZoneSurfacesComplete          bool
-	CrossZoneMutationMessagesOnly          bool
-	ServicesModuleImplemented              bool
-	StorageModuleImplemented               bool
-	RoutingModuleImplemented               bool
-	ServiceDescriptorsAdded                bool
-	StorageObjectCommitmentsAdded          bool
-	NodeRecordsRoutingEpochsAdded          bool
-	ProofAttachedLookupQueriesAdded        bool
-	ServiceDiscoveryDeterministic          bool
-	StorageCommitmentsProofVerifiable      bool
-	RoutingTableCommittedQueryable         bool
-	AETResolverOutputsUpgraded             bool
-	IdentityGraphAdded                     bool
-	CrossZoneIdentityBindingAdded          bool
-	PaymentsModuleImplemented              bool
-	PaymentEnvelopeAdded                   bool
-	ConditionalTransfersAdded              bool
-	FinancialZoneSettlementAdded           bool
-	IdentityResolvesAllOutputTypes         bool
-	PaymentsSettleThroughFinancialZone     bool
-	PaymentDisputesDeterministicReplay     bool
-	ContractsModuleImplemented             bool
-	AVMBytecodeInterfaceAdded              bool
-	CosmWasmAdapterBoundaryAdded           bool
-	VMStorageAdapterAdded                  bool
-	VMOutboundMessageSupportAdded          bool
-	ContractReceiptsProofsAdded            bool
-	ContractExecutionMessageDriven         bool
-	ContractsNoDirectZoneMutation          bool
-	ContractStateRootProofVerifiable       bool
-	BlockSTMAwareGroupingAdded             bool
-	StoreV2RootReadOptimizationAdded       bool
-	QueueDrainingBenchmarksAdded           bool
-	ServiceLookupBenchmarksAdded           bool
-	StorageProofBenchmarksAdded            bool
-	RoutingSimulationTestsAdded            bool
-	AdaptiveSyncRecoveryTestsAdded         bool
-	IndependentZoneWorkloadsParallelize    bool
-	RootGenerationBounded                  bool
-	NodesRecoverServeProofQueriesAfterSync bool
+	ModuleInventory				[]RoadmapModuleInventoryEntry
+	CanonicalZones				[]RoadmapCanonicalZoneEntry
+	IdentityResolverOutputs			[]string
+	CrossModuleDirectWritesAudited		bool
+	ExportImportTestsAdded			bool
+	ModuleInvariantHarnessAdded		bool
+	RootContributionInterfaceDesign		bool
+	CurrentStateReproducible		bool
+	ModuleBoundariesDocumented		bool
+	MigrationRiskListComplete		bool
+	AetraCoreModuleImplemented		bool
+	ZonesModuleImplemented			bool
+	ZoneRegistryImplemented			bool
+	GlobalStateRootImplemented		bool
+	BlockCommitmentMetadataQueries		bool
+	DefaultZoneRunnable			bool
+	DefaultZoneRootIncluded			bool
+	ExportImportPreservesRootMeta		bool
+	MessagesModuleImplemented		bool
+	MessageEnvelopeAdded			bool
+	FIFOPerSenderQueuesAdded		bool
+	NonceReplayProtectionAdded		bool
+	MessageReceiptsAdded			bool
+	BounceAndExpiryAdded			bool
+	MessageReceiptRootsAdded		bool
+	SameChainAsyncDeterministic		bool
+	MessageReceiptProofsAvailable		bool
+	ReplayAttemptsRejected			bool
+	FinancialZoneBoundaryMoved		bool
+	IdentityZoneActivated			bool
+	ApplicationZoneSchedulerBoundary	bool
+	ContractZoneSkeletonAdded		bool
+	ZoneSpecificQueriesRoots		bool
+	FourCanonicalZonesExist			bool
+	CanonicalZoneSurfacesComplete		bool
+	CrossZoneMutationMessagesOnly		bool
+	ServicesModuleImplemented		bool
+	StorageModuleImplemented		bool
+	RoutingModuleImplemented		bool
+	ServiceDescriptorsAdded			bool
+	StorageObjectCommitmentsAdded		bool
+	NodeRecordsRoutingEpochsAdded		bool
+	ProofAttachedLookupQueriesAdded		bool
+	ServiceDiscoveryDeterministic		bool
+	StorageCommitmentsProofVerifiable	bool
+	RoutingTableCommittedQueryable		bool
+	AETResolverOutputsUpgraded		bool
+	IdentityGraphAdded			bool
+	CrossZoneIdentityBindingAdded		bool
+	PaymentsModuleImplemented		bool
+	PaymentEnvelopeAdded			bool
+	ConditionalTransfersAdded		bool
+	FinancialZoneSettlementAdded		bool
+	IdentityResolvesAllOutputTypes		bool
+	PaymentsSettleThroughFinancialZone	bool
+	PaymentDisputesDeterministicReplay	bool
+	ContractsModuleImplemented		bool
+	AVMBytecodeInterfaceAdded		bool
+	CosmWasmAdapterBoundaryAdded		bool
+	VMStorageAdapterAdded			bool
+	VMOutboundMessageSupportAdded		bool
+	ContractReceiptsProofsAdded		bool
+	ContractExecutionMessageDriven		bool
+	ContractsNoDirectZoneMutation		bool
+	ContractStateRootProofVerifiable	bool
+	BlockSTMAwareGroupingAdded		bool
+	StoreV2RootReadOptimizationAdded	bool
+	QueueDrainingBenchmarksAdded		bool
+	ServiceLookupBenchmarksAdded		bool
+	StorageProofBenchmarksAdded		bool
+	RoutingSimulationTestsAdded		bool
+	AdaptiveSyncRecoveryTestsAdded		bool
+	IndependentZoneWorkloadsParallelize	bool
+	RootGenerationBounded			bool
+	NodesRecoverServeProofQueriesAfterSync	bool
 }
 
 type RoadmapModuleInventoryEntry struct {
-	ModuleName CosmosSDKModuleName
-	ModulePath string
-	StoreKey   string
-	StateKeys  []string
-	RootType   RootType
+	ModuleName	CosmosSDKModuleName
+	ModulePath	string
+	StoreKey	string
+	StateKeys	[]string
+	RootType	RootType
 }
 
 type RoadmapCanonicalZoneEntry struct {
-	ZoneID         ZoneID
-	StateNamespace string
-	RootType       RootType
-	MessageQueue   bool
-	MsgServer      bool
-	QueryServer    bool
-	Keeper         bool
+	ZoneID		ZoneID
+	StateNamespace	string
+	RootType	RootType
+	MessageQueue	bool
+	MsgServer	bool
+	QueryServer	bool
+	Keeper		bool
 }
 
 func DefaultImplementationRoadmap() (ImplementationRoadmap, error) {
@@ -174,11 +174,11 @@ func BuildRoadmapModuleInventory(manifest CosmosModuleRequirementManifest) []Roa
 	for _, surface := range manifest.Modules {
 		storeKey := surface.KeeperIsolation.StoreKey
 		inventory = append(inventory, RoadmapModuleInventoryEntry{
-			ModuleName: surface.ModuleName,
-			ModulePath: surface.ModulePath,
-			StoreKey:   storeKey,
-			StateKeys:  []string{storeKey + "/params", storeKey + "/genesis", storeKey + "/root"},
-			RootType:   surface.RootContribution.RootType,
+			ModuleName:	surface.ModuleName,
+			ModulePath:	surface.ModulePath,
+			StoreKey:	storeKey,
+			StateKeys:	[]string{storeKey + "/params", storeKey + "/genesis", storeKey + "/root"},
+			RootType:	surface.RootContribution.RootType,
 		})
 	}
 	return normalizeRoadmapModuleInventory(inventory)
@@ -592,9 +592,9 @@ func ComputeImplementationRoadmapHash(roadmap ImplementationRoadmap) string {
 
 func roadmapPhaseZero(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseBaselineAudit,
-		PhaseNumber: 0,
-		Name:        "Baseline Audit",
+		PhaseID:	RoadmapPhaseBaselineAudit,
+		PhaseNumber:	0,
+		Name:		"Baseline Audit",
 		Tasks: roadmapChecklist(
 			"inventory-current-modules-state-keys",
 			"identify-cross-module-direct-writes",
@@ -608,23 +608,23 @@ func roadmapPhaseZero(inventory []RoadmapModuleInventoryEntry) ImplementationRoa
 			"migration-risk-list-complete",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                 inventory,
-			CrossModuleDirectWritesAudited:  true,
-			ExportImportTestsAdded:          true,
-			ModuleInvariantHarnessAdded:     true,
-			RootContributionInterfaceDesign: true,
-			CurrentStateReproducible:        true,
-			ModuleBoundariesDocumented:      true,
-			MigrationRiskListComplete:       true,
+			ModuleInventory:			inventory,
+			CrossModuleDirectWritesAudited:		true,
+			ExportImportTestsAdded:			true,
+			ModuleInvariantHarnessAdded:		true,
+			RootContributionInterfaceDesign:	true,
+			CurrentStateReproducible:		true,
+			ModuleBoundariesDocumented:		true,
+			MigrationRiskListComplete:		true,
 		},
 	}
 }
 
 func roadmapPhaseOne(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseKernelRootModel,
-		PhaseNumber: 1,
-		Name:        "Kernel and Root Model",
+		PhaseID:	RoadmapPhaseKernelRootModel,
+		PhaseNumber:	1,
+		Name:		"Kernel and Root Model",
 		Tasks: roadmapChecklist(
 			"implement-x-aetracore",
 			"implement-x-zones",
@@ -639,25 +639,25 @@ func roadmapPhaseOne(inventory []RoadmapModuleInventoryEntry) ImplementationRoad
 			"export-import-preserves-root-metadata",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                 inventory,
-			RootContributionInterfaceDesign: true,
-			AetraCoreModuleImplemented:      true,
-			ZonesModuleImplemented:          true,
-			ZoneRegistryImplemented:         true,
-			GlobalStateRootImplemented:      true,
-			BlockCommitmentMetadataQueries:  true,
-			DefaultZoneRunnable:             true,
-			DefaultZoneRootIncluded:         true,
-			ExportImportPreservesRootMeta:   true,
+			ModuleInventory:			inventory,
+			RootContributionInterfaceDesign:	true,
+			AetraCoreModuleImplemented:		true,
+			ZonesModuleImplemented:			true,
+			ZoneRegistryImplemented:		true,
+			GlobalStateRootImplemented:		true,
+			BlockCommitmentMetadataQueries:		true,
+			DefaultZoneRunnable:			true,
+			DefaultZoneRootIncluded:		true,
+			ExportImportPreservesRootMeta:		true,
 		},
 	}
 }
 
 func roadmapPhaseTwo(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseCrossZoneMessages,
-		PhaseNumber: 2,
-		Name:        "Cross-Zone Messages",
+		PhaseID:	RoadmapPhaseCrossZoneMessages,
+		PhaseNumber:	2,
+		Name:		"Cross-Zone Messages",
 		Tasks: roadmapChecklist(
 			"implement-x-messages",
 			"add-message-envelope",
@@ -673,26 +673,26 @@ func roadmapPhaseTwo(inventory []RoadmapModuleInventoryEntry) ImplementationRoad
 			"replay-attempts-rejected",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:               inventory,
-			MessagesModuleImplemented:     true,
-			MessageEnvelopeAdded:          true,
-			FIFOPerSenderQueuesAdded:      true,
-			NonceReplayProtectionAdded:    true,
-			MessageReceiptsAdded:          true,
-			BounceAndExpiryAdded:          true,
-			MessageReceiptRootsAdded:      true,
-			SameChainAsyncDeterministic:   true,
-			MessageReceiptProofsAvailable: true,
-			ReplayAttemptsRejected:        true,
+			ModuleInventory:		inventory,
+			MessagesModuleImplemented:	true,
+			MessageEnvelopeAdded:		true,
+			FIFOPerSenderQueuesAdded:	true,
+			NonceReplayProtectionAdded:	true,
+			MessageReceiptsAdded:		true,
+			BounceAndExpiryAdded:		true,
+			MessageReceiptRootsAdded:	true,
+			SameChainAsyncDeterministic:	true,
+			MessageReceiptProofsAvailable:	true,
+			ReplayAttemptsRejected:		true,
 		},
 	}
 }
 
 func roadmapPhaseThree(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseCanonicalZones,
-		PhaseNumber: 3,
-		Name:        "Canonical Zones",
+		PhaseID:	RoadmapPhaseCanonicalZones,
+		PhaseNumber:	3,
+		Name:		"Canonical Zones",
 		Tasks: roadmapChecklist(
 			"move-bank-fees-contract-assets-dex-into-financial-zone-boundary",
 			"activate-identity-zone",
@@ -706,25 +706,25 @@ func roadmapPhaseThree(inventory []RoadmapModuleInventoryEntry) ImplementationRo
 			"cross-zone-state-mutation-only-through-messages",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                  inventory,
-			CanonicalZones:                   DefaultRoadmapCanonicalZones(),
-			FinancialZoneBoundaryMoved:       true,
-			IdentityZoneActivated:            true,
-			ApplicationZoneSchedulerBoundary: true,
-			ContractZoneSkeletonAdded:        true,
-			ZoneSpecificQueriesRoots:         true,
-			FourCanonicalZonesExist:          true,
-			CanonicalZoneSurfacesComplete:    true,
-			CrossZoneMutationMessagesOnly:    true,
+			ModuleInventory:			inventory,
+			CanonicalZones:				DefaultRoadmapCanonicalZones(),
+			FinancialZoneBoundaryMoved:		true,
+			IdentityZoneActivated:			true,
+			ApplicationZoneSchedulerBoundary:	true,
+			ContractZoneSkeletonAdded:		true,
+			ZoneSpecificQueriesRoots:		true,
+			FourCanonicalZonesExist:		true,
+			CanonicalZoneSurfacesComplete:		true,
+			CrossZoneMutationMessagesOnly:		true,
 		},
 	}
 }
 
 func roadmapPhaseFour(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseServiceStorageRouting,
-		PhaseNumber: 4,
-		Name:        "Services, Storage, and Routing",
+		PhaseID:	RoadmapPhaseServiceStorageRouting,
+		PhaseNumber:	4,
+		Name:		"Services, Storage, and Routing",
 		Tasks: roadmapChecklist(
 			"implement-x-services",
 			"implement-x-storage",
@@ -740,26 +740,26 @@ func roadmapPhaseFour(inventory []RoadmapModuleInventoryEntry) ImplementationRoa
 			"routing-table-committed-and-queryable",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                   inventory,
-			ServicesModuleImplemented:         true,
-			StorageModuleImplemented:          true,
-			RoutingModuleImplemented:          true,
-			ServiceDescriptorsAdded:           true,
-			StorageObjectCommitmentsAdded:     true,
-			NodeRecordsRoutingEpochsAdded:     true,
-			ProofAttachedLookupQueriesAdded:   true,
-			ServiceDiscoveryDeterministic:     true,
-			StorageCommitmentsProofVerifiable: true,
-			RoutingTableCommittedQueryable:    true,
+			ModuleInventory:			inventory,
+			ServicesModuleImplemented:		true,
+			StorageModuleImplemented:		true,
+			RoutingModuleImplemented:		true,
+			ServiceDescriptorsAdded:		true,
+			StorageObjectCommitmentsAdded:		true,
+			NodeRecordsRoutingEpochsAdded:		true,
+			ProofAttachedLookupQueriesAdded:	true,
+			ServiceDiscoveryDeterministic:		true,
+			StorageCommitmentsProofVerifiable:	true,
+			RoutingTableCommittedQueryable:		true,
 		},
 	}
 }
 
 func roadmapPhaseFive(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseIdentityPaymentIntegration,
-		PhaseNumber: 5,
-		Name:        "Identity and Payment Integration",
+		PhaseID:	RoadmapPhaseIdentityPaymentIntegration,
+		PhaseNumber:	5,
+		Name:		"Identity and Payment Integration",
 		Tasks: roadmapChecklist(
 			"upgrade-aet-resolver-outputs",
 			"add-identity-graph",
@@ -775,27 +775,27 @@ func roadmapPhaseFive(inventory []RoadmapModuleInventoryEntry) ImplementationRoa
 			"payment-disputes-resolve-by-deterministic-replay",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                    inventory,
-			IdentityResolverOutputs:            DefaultRoadmapIdentityResolverOutputs(),
-			AETResolverOutputsUpgraded:         true,
-			IdentityGraphAdded:                 true,
-			CrossZoneIdentityBindingAdded:      true,
-			PaymentsModuleImplemented:          true,
-			PaymentEnvelopeAdded:               true,
-			ConditionalTransfersAdded:          true,
-			FinancialZoneSettlementAdded:       true,
-			IdentityResolvesAllOutputTypes:     true,
-			PaymentsSettleThroughFinancialZone: true,
-			PaymentDisputesDeterministicReplay: true,
+			ModuleInventory:			inventory,
+			IdentityResolverOutputs:		DefaultRoadmapIdentityResolverOutputs(),
+			AETResolverOutputsUpgraded:		true,
+			IdentityGraphAdded:			true,
+			CrossZoneIdentityBindingAdded:		true,
+			PaymentsModuleImplemented:		true,
+			PaymentEnvelopeAdded:			true,
+			ConditionalTransfersAdded:		true,
+			FinancialZoneSettlementAdded:		true,
+			IdentityResolvesAllOutputTypes:		true,
+			PaymentsSettleThroughFinancialZone:	true,
+			PaymentDisputesDeterministicReplay:	true,
 		},
 	}
 }
 
 func roadmapPhaseSix(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhaseVMRuntime,
-		PhaseNumber: 6,
-		Name:        "VM Runtime",
+		PhaseID:	RoadmapPhaseVMRuntime,
+		PhaseNumber:	6,
+		Name:		"VM Runtime",
 		Tasks: roadmapChecklist(
 			"implement-x-contracts",
 			"add-avm-ready-bytecode-interface",
@@ -810,25 +810,25 @@ func roadmapPhaseSix(inventory []RoadmapModuleInventoryEntry) ImplementationRoad
 			"contract-state-root-proof-verifiable",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                  inventory,
-			ContractsModuleImplemented:       true,
-			AVMBytecodeInterfaceAdded:        true,
-			CosmWasmAdapterBoundaryAdded:     true,
-			VMStorageAdapterAdded:            true,
-			VMOutboundMessageSupportAdded:    true,
-			ContractReceiptsProofsAdded:      true,
-			ContractExecutionMessageDriven:   true,
-			ContractsNoDirectZoneMutation:    true,
-			ContractStateRootProofVerifiable: true,
+			ModuleInventory:			inventory,
+			ContractsModuleImplemented:		true,
+			AVMBytecodeInterfaceAdded:		true,
+			CosmWasmAdapterBoundaryAdded:		true,
+			VMStorageAdapterAdded:			true,
+			VMOutboundMessageSupportAdded:		true,
+			ContractReceiptsProofsAdded:		true,
+			ContractExecutionMessageDriven:		true,
+			ContractsNoDirectZoneMutation:		true,
+			ContractStateRootProofVerifiable:	true,
 		},
 	}
 }
 
 func roadmapPhaseSeven(inventory []RoadmapModuleInventoryEntry) ImplementationRoadmapPhase {
 	return ImplementationRoadmapPhase{
-		PhaseID:     RoadmapPhasePerformanceHardening,
-		PhaseNumber: 7,
-		Name:        "Performance and Hardening",
+		PhaseID:	RoadmapPhasePerformanceHardening,
+		PhaseNumber:	7,
+		Name:		"Performance and Hardening",
 		Tasks: roadmapChecklist(
 			"add-blockstm-aware-workload-grouping",
 			"add-store-v2-optimization-for-root-heavy-reads",
@@ -844,17 +844,17 @@ func roadmapPhaseSeven(inventory []RoadmapModuleInventoryEntry) ImplementationRo
 			"nodes-recover-and-serve-proof-queries-after-sync",
 		),
 		Evidence: RoadmapEvidence{
-			ModuleInventory:                        inventory,
-			BlockSTMAwareGroupingAdded:             true,
-			StoreV2RootReadOptimizationAdded:       true,
-			QueueDrainingBenchmarksAdded:           true,
-			ServiceLookupBenchmarksAdded:           true,
-			StorageProofBenchmarksAdded:            true,
-			RoutingSimulationTestsAdded:            true,
-			AdaptiveSyncRecoveryTestsAdded:         true,
-			IndependentZoneWorkloadsParallelize:    true,
-			RootGenerationBounded:                  true,
-			NodesRecoverServeProofQueriesAfterSync: true,
+			ModuleInventory:			inventory,
+			BlockSTMAwareGroupingAdded:		true,
+			StoreV2RootReadOptimizationAdded:	true,
+			QueueDrainingBenchmarksAdded:		true,
+			ServiceLookupBenchmarksAdded:		true,
+			StorageProofBenchmarksAdded:		true,
+			RoutingSimulationTestsAdded:		true,
+			AdaptiveSyncRecoveryTestsAdded:		true,
+			IndependentZoneWorkloadsParallelize:	true,
+			RootGenerationBounded:			true,
+			NodesRecoverServeProofQueriesAfterSync:	true,
 		},
 	}
 }
@@ -874,13 +874,13 @@ func DefaultRoadmapCanonicalZones() []RoadmapCanonicalZoneEntry {
 
 func roadmapCanonicalZone(zoneID ZoneID, namespace string, rootType RootType) RoadmapCanonicalZoneEntry {
 	return RoadmapCanonicalZoneEntry{
-		ZoneID:         zoneID,
-		StateNamespace: namespace,
-		RootType:       rootType,
-		MessageQueue:   true,
-		MsgServer:      true,
-		QueryServer:    true,
-		Keeper:         true,
+		ZoneID:		zoneID,
+		StateNamespace:	namespace,
+		RootType:	rootType,
+		MessageQueue:	true,
+		MsgServer:	true,
+		QueryServer:	true,
+		Keeper:		true,
 	}
 }
 

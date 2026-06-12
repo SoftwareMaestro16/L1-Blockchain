@@ -119,14 +119,14 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	require.ErrorContains(t, ValidateProofModuleResolutionProofV2(badVersion), string(ProofModuleFailureInconsistentRecordVersions))
 
 	target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetra-local-1",
-		RequestedName:        "alice.aet",
-		TrustedHeader:        IdentityTrustedHeaderV2{ChainID: "aetra-local-1", Height: 14, AppHash: appHash, Trusted: true},
-		Proof:                proof,
-		TargetType:           IdentityResolutionTargetPrimary,
-		CurrentHeight:        14,
-		AllowRenewalWindow:   true,
-		NormalizationVersion: NameNormalizationVersionV2,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		IdentityTrustedHeaderV2{ChainID: "aetra-local-1", Height: 14, AppHash: appHash, Trusted: true},
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		14,
+		AllowRenewalWindow:	true,
+		NormalizationVersion:	NameNormalizationVersionV2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, addr(2), target.Address)
@@ -140,21 +140,21 @@ func TestProofVerificationModuleV2AssemblyCacheHeightAndLightClientFailures(t *t
 	cache, err := NewResolutionCacheRecordV2("alice.aet", identityHash("path"), identityHash("record"), 100, proof.RecordVersion, 1, 1)
 	require.NoError(t, err)
 	require.NoError(t, ValidateProofModuleCacheUseV2(cache, ResolutionCacheUseContextV2{
-		Height:        14,
-		SourceVersion: proof.RecordVersion,
-		ParentEpoch:   1,
-		ChildEpoch:    1,
-		LightClient:   true,
-		ProofVerified: true,
+		Height:		14,
+		SourceVersion:	proof.RecordVersion,
+		ParentEpoch:	1,
+		ChildEpoch:	1,
+		LightClient:	true,
+		ProofVerified:	true,
 	}))
 	invalidated := InvalidateResolutionCacheRecordV2ForDomainMutation(cache, proof.RecordVersion+1, 2, 2)
 	require.ErrorContains(t, ValidateProofModuleCacheUseV2(invalidated, ResolutionCacheUseContextV2{
-		Height:        14,
-		SourceVersion: proof.RecordVersion + 1,
-		ParentEpoch:   2,
-		ChildEpoch:    2,
-		LightClient:   true,
-		ProofVerified: true,
+		Height:		14,
+		SourceVersion:	proof.RecordVersion + 1,
+		ParentEpoch:	2,
+		ChildEpoch:	2,
+		LightClient:	true,
+		ProofVerified:	true,
 	}), string(ProofModuleFailureStaleCacheAfterInvalidation))
 
 	require.NoError(t, ValidateProofModuleHeightAvailableV2(14, 10, 20))

@@ -14,79 +14,79 @@ import (
 )
 
 const (
-	Magic                      = "AVMM"
-	Version             uint16 = 1
-	MaxAddressTextBytes        = 128
-	DefaultMaxBodyBytes        = 64 * 1024
-	DefaultMaxMetadata         = 1024
-	DefaultMaxStateInit        = 64 * 1024
-	DefaultMaxSignature        = 4096
+	Magic				= "AVMM"
+	Version			uint16	= 1
+	MaxAddressTextBytes		= 128
+	DefaultMaxBodyBytes		= 64 * 1024
+	DefaultMaxMetadata		= 1024
+	DefaultMaxStateInit		= 64 * 1024
+	DefaultMaxSignature		= 4096
 )
 
 type Kind uint8
 
 const (
-	KindExternal Kind = 1
-	KindInternal Kind = 2
-	KindBounced  Kind = 3
-	KindSystem   Kind = 4
+	KindExternal	Kind	= 1
+	KindInternal	Kind	= 2
+	KindBounced	Kind	= 3
+	KindSystem	Kind	= 4
 )
 
 type Params struct {
-	MaxBodyBytes      uint32
-	MaxMetadataBytes  uint32
-	MaxStateInitBytes uint32
-	MaxSignatureBytes uint32
+	MaxBodyBytes		uint32
+	MaxMetadataBytes	uint32
+	MaxStateInitBytes	uint32
+	MaxSignatureBytes	uint32
 }
 
 type AddressPair struct {
-	User string `json:"user"`
-	Raw  string `json:"raw"`
+	User	string	`json:"user"`
+	Raw	string	`json:"raw"`
 }
 
 type Message struct {
-	Kind          Kind        `json:"kind"`
-	Opcode        uint64      `json:"opcode"`
-	QueryID       uint64      `json:"query_id"`
-	Sender        AddressPair `json:"sender"`
-	Destination   AddressPair `json:"destination"`
-	ValueNAET     uint64      `json:"value_naet"`
-	Bounce        bool        `json:"bounce"`
-	Bounced       bool        `json:"bounced"`
-	DeadlineBlock uint64      `json:"deadline_block"`
-	GasLimit      uint64      `json:"gas_limit"`
-	Body          []byte      `json:"body"`
-	StateInit     []byte      `json:"state_init,omitempty"`
-	Metadata      []byte      `json:"metadata,omitempty"`
-	Signature     []byte      `json:"signature,omitempty"`
+	Kind		Kind		`json:"kind"`
+	Opcode		uint64		`json:"opcode"`
+	QueryID		uint64		`json:"query_id"`
+	Sender		AddressPair	`json:"sender"`
+	Destination	AddressPair	`json:"destination"`
+	ValueNAET	uint64		`json:"value_naet"`
+	Bounce		bool		`json:"bounce"`
+	Bounced		bool		`json:"bounced"`
+	DeadlineBlock	uint64		`json:"deadline_block"`
+	GasLimit	uint64		`json:"gas_limit"`
+	Body		[]byte		`json:"body"`
+	StateInit	[]byte		`json:"state_init,omitempty"`
+	Metadata	[]byte		`json:"metadata,omitempty"`
+	Signature	[]byte		`json:"signature,omitempty"`
 }
 
 type DebugMessage struct {
-	Magic         string      `json:"magic"`
-	Version       uint16      `json:"version"`
-	MessageID     string      `json:"message_id"`
-	Kind          string      `json:"kind"`
-	Opcode        uint64      `json:"opcode"`
-	QueryID       uint64      `json:"query_id"`
-	Sender        AddressPair `json:"sender"`
-	Destination   AddressPair `json:"destination"`
-	ValueNAET     uint64      `json:"value_naet"`
-	Bounce        bool        `json:"bounce"`
-	Bounced       bool        `json:"bounced"`
-	DeadlineBlock uint64      `json:"deadline_block"`
-	GasLimit      uint64      `json:"gas_limit"`
-	BodyHex       string      `json:"body_hex"`
-	StateInitHex  string      `json:"state_init_hex,omitempty"`
-	MetadataHex   string      `json:"metadata_hex,omitempty"`
-	SignatureHex  string      `json:"signature_hex,omitempty"`
+	Magic		string		`json:"magic"`
+	Version		uint16		`json:"version"`
+	MessageID	string		`json:"message_id"`
+	Kind		string		`json:"kind"`
+	Opcode		uint64		`json:"opcode"`
+	QueryID		uint64		`json:"query_id"`
+	Sender		AddressPair	`json:"sender"`
+	Destination	AddressPair	`json:"destination"`
+	ValueNAET	uint64		`json:"value_naet"`
+	Bounce		bool		`json:"bounce"`
+	Bounced		bool		`json:"bounced"`
+	DeadlineBlock	uint64		`json:"deadline_block"`
+	GasLimit	uint64		`json:"gas_limit"`
+	BodyHex		string		`json:"body_hex"`
+	StateInitHex	string		`json:"state_init_hex,omitempty"`
+	MetadataHex	string		`json:"metadata_hex,omitempty"`
+	SignatureHex	string		`json:"signature_hex,omitempty"`
 }
 
 func DefaultParams() Params {
 	return Params{
-		MaxBodyBytes:      DefaultMaxBodyBytes,
-		MaxMetadataBytes:  DefaultMaxMetadata,
-		MaxStateInitBytes: DefaultMaxStateInit,
-		MaxSignatureBytes: DefaultMaxSignature,
+		MaxBodyBytes:		DefaultMaxBodyBytes,
+		MaxMetadataBytes:	DefaultMaxMetadata,
+		MaxStateInitBytes:	DefaultMaxStateInit,
+		MaxSignatureBytes:	DefaultMaxSignature,
 	}
 }
 
@@ -141,20 +141,20 @@ func Decode(encoded []byte, params Params, currentHeight uint64) (Message, error
 		return Message{}, fmt.Errorf("AVM message ABI unsupported version %d", version)
 	}
 	msg := Message{
-		Kind:          Kind(decoder.readU8()),
-		Opcode:        decoder.readU64(),
-		QueryID:       decoder.readU64(),
-		Sender:        AddressPair{User: decoder.readString(MaxAddressTextBytes), Raw: decoder.readString(MaxAddressTextBytes)},
-		Destination:   AddressPair{User: decoder.readString(MaxAddressTextBytes), Raw: decoder.readString(MaxAddressTextBytes)},
-		ValueNAET:     decoder.readU64(),
-		Bounce:        decoder.readBool(),
-		Bounced:       decoder.readBool(),
-		DeadlineBlock: decoder.readU64(),
-		GasLimit:      decoder.readU64(),
-		Body:          decoder.readBytes(params.MaxBodyBytes),
-		StateInit:     decoder.readBytes(params.MaxStateInitBytes),
-		Metadata:      decoder.readBytes(params.MaxMetadataBytes),
-		Signature:     decoder.readBytes(params.MaxSignatureBytes),
+		Kind:		Kind(decoder.readU8()),
+		Opcode:		decoder.readU64(),
+		QueryID:	decoder.readU64(),
+		Sender:		AddressPair{User: decoder.readString(MaxAddressTextBytes), Raw: decoder.readString(MaxAddressTextBytes)},
+		Destination:	AddressPair{User: decoder.readString(MaxAddressTextBytes), Raw: decoder.readString(MaxAddressTextBytes)},
+		ValueNAET:	decoder.readU64(),
+		Bounce:		decoder.readBool(),
+		Bounced:	decoder.readBool(),
+		DeadlineBlock:	decoder.readU64(),
+		GasLimit:	decoder.readU64(),
+		Body:		decoder.readBytes(params.MaxBodyBytes),
+		StateInit:	decoder.readBytes(params.MaxStateInitBytes),
+		Metadata:	decoder.readBytes(params.MaxMetadataBytes),
+		Signature:	decoder.readBytes(params.MaxSignatureBytes),
 	}
 	if decoder.err != nil {
 		return Message{}, decoder.err
@@ -225,23 +225,23 @@ func DebugJSON(msg Message, params Params) ([]byte, error) {
 		return nil, err
 	}
 	debug := DebugMessage{
-		Magic:         Magic,
-		Version:       Version,
-		MessageID:     id,
-		Kind:          msg.Kind.String(),
-		Opcode:        msg.Opcode,
-		QueryID:       msg.QueryID,
-		Sender:        msg.Sender,
-		Destination:   msg.Destination,
-		ValueNAET:     msg.ValueNAET,
-		Bounce:        msg.Bounce,
-		Bounced:       msg.Bounced,
-		DeadlineBlock: msg.DeadlineBlock,
-		GasLimit:      msg.GasLimit,
-		BodyHex:       hex.EncodeToString(msg.Body),
-		StateInitHex:  hex.EncodeToString(msg.StateInit),
-		MetadataHex:   hex.EncodeToString(msg.Metadata),
-		SignatureHex:  hex.EncodeToString(msg.Signature),
+		Magic:		Magic,
+		Version:	Version,
+		MessageID:	id,
+		Kind:		msg.Kind.String(),
+		Opcode:		msg.Opcode,
+		QueryID:	msg.QueryID,
+		Sender:		msg.Sender,
+		Destination:	msg.Destination,
+		ValueNAET:	msg.ValueNAET,
+		Bounce:		msg.Bounce,
+		Bounced:	msg.Bounced,
+		DeadlineBlock:	msg.DeadlineBlock,
+		GasLimit:	msg.GasLimit,
+		BodyHex:	hex.EncodeToString(msg.Body),
+		StateInitHex:	hex.EncodeToString(msg.StateInit),
+		MetadataHex:	hex.EncodeToString(msg.Metadata),
+		SignatureHex:	hex.EncodeToString(msg.Signature),
 	}
 	return json.Marshal(debug)
 }
@@ -389,9 +389,9 @@ func mustRawPayload(bz []byte) []byte {
 }
 
 type byteDecoder struct {
-	data []byte
-	pos  int
-	err  error
+	data	[]byte
+	pos	int
+	err	error
 }
 
 func (d *byteDecoder) readFixed(n int) []byte {

@@ -11,22 +11,22 @@ import (
 func TestAVMUpgradeStateRegistryTracksScheduledStateAndRuntimeVersions(t *testing.T) {
 	runtimeVersions := testAVMRuntimeVersionSet(t, "v1")
 	state, err := NewAVMScheduledUpgradeState(AVMScheduledUpgradeState{
-		UpgradeID:         "upgrade-153",
-		Component:         AVMUpgradeComponentSchedulerRules,
-		FromVersion:       "scheduler-v1",
-		ToVersion:         "scheduler-v2",
-		ActivationHeight:  150,
-		MigrationRequired: true,
-		CompatibilityMode: AVMUpgradeCompatibilityVersionedPolicy,
-		Status:            AVMUpgradeStatusScheduled,
+		UpgradeID:		"upgrade-153",
+		Component:		AVMUpgradeComponentSchedulerRules,
+		FromVersion:		"scheduler-v1",
+		ToVersion:		"scheduler-v2",
+		ActivationHeight:	150,
+		MigrationRequired:	true,
+		CompatibilityMode:	AVMUpgradeCompatibilityVersionedPolicy,
+		Status:			AVMUpgradeStatusScheduled,
 	})
 	require.NoError(t, err)
 	gasTable := testAVMVersionedGasTable(t)
 
 	registry, err := NewAVMUpgradeStateRegistry(AVMUpgradeStateRegistry{
-		RuntimeVersions: runtimeVersions,
-		States:          []AVMScheduledUpgradeState{state},
-		GasTable:        gasTable,
+		RuntimeVersions:	runtimeVersions,
+		States:			[]AVMScheduledUpgradeState{state},
+		GasTable:		gasTable,
 	})
 	require.NoError(t, err)
 	require.NoError(t, registry.Validate())
@@ -47,16 +47,16 @@ func TestAVMUpgradeMigrationHandlersForQueuesAndContinuations(t *testing.T) {
 	require.True(t, queueMigration.Bounded)
 
 	continuations := []ContinuationRecord{{
-		ContinuationID:    "continuation-153",
-		ActorID:           "actor-153",
-		StepIndex:         1,
-		PartialStateHash:  engineHash("partial-153"),
-		PartialStateBytes: 64,
-		ResumeHeight:      160,
-		ExpiryHeight:      200,
-		GasReserved:       1000,
-		Status:            ContinuationStatusScheduled,
-		ResumeBy:          ContinuationResumeByScheduler,
+		ContinuationID:		"continuation-153",
+		ActorID:		"actor-153",
+		StepIndex:		1,
+		PartialStateHash:	engineHash("partial-153"),
+		PartialStateBytes:	64,
+		ResumeHeight:		160,
+		ExpiryHeight:		200,
+		GasReserved:		1000,
+		Status:			ContinuationStatusScheduled,
+		ResumeBy:		ContinuationResumeByScheduler,
 	}}
 	continuationMigration, err := BuildAVMContinuationUpgradeMigration("upgrade-153", "runtime-v1", "runtime-v2", continuations)
 	require.NoError(t, err)
@@ -111,33 +111,33 @@ func TestAVMPendingMessagesKeepCompatibilityAcrossUpgrade(t *testing.T) {
 
 func TestAVMActivatedUpgradePreventsRollback(t *testing.T) {
 	active, err := NewAVMScheduledUpgradeState(AVMScheduledUpgradeState{
-		UpgradeID:         "upgrade-forward",
-		Component:         AVMUpgradeComponentVMInterpreter,
-		FromVersion:       "vm-v1",
-		ToVersion:         "vm-v2",
-		ActivationHeight:  100,
-		MigrationRequired: false,
-		CompatibilityMode: AVMUpgradeCompatibilityNone,
-		Status:            AVMUpgradeStatusCompleted,
+		UpgradeID:		"upgrade-forward",
+		Component:		AVMUpgradeComponentVMInterpreter,
+		FromVersion:		"vm-v1",
+		ToVersion:		"vm-v2",
+		ActivationHeight:	100,
+		MigrationRequired:	false,
+		CompatibilityMode:	AVMUpgradeCompatibilityNone,
+		Status:			AVMUpgradeStatusCompleted,
 	})
 	require.NoError(t, err)
 	rollback, err := NewAVMScheduledUpgradeState(AVMScheduledUpgradeState{
-		UpgradeID:         "upgrade-rollback",
-		Component:         AVMUpgradeComponentVMInterpreter,
-		FromVersion:       "vm-v2",
-		ToVersion:         "vm-v1",
-		ActivationHeight:  200,
-		MigrationRequired: false,
-		CompatibilityMode: AVMUpgradeCompatibilityNone,
-		Status:            AVMUpgradeStatusActive,
+		UpgradeID:		"upgrade-rollback",
+		Component:		AVMUpgradeComponentVMInterpreter,
+		FromVersion:		"vm-v2",
+		ToVersion:		"vm-v1",
+		ActivationHeight:	200,
+		MigrationRequired:	false,
+		CompatibilityMode:	AVMUpgradeCompatibilityNone,
+		Status:			AVMUpgradeStatusActive,
 	})
 	require.NoError(t, err)
 	require.ErrorContains(t, ValidateAVMUpgradeRollbackPrevention([]AVMScheduledUpgradeState{active, rollback}), "cannot roll back")
 
 	registry, err := NewAVMUpgradeStateRegistry(AVMUpgradeStateRegistry{
-		RuntimeVersions: testAVMRuntimeVersionSet(t, "v2"),
-		States:          []AVMScheduledUpgradeState{active, rollback},
-		GasTable:        testAVMVersionedGasTable(t),
+		RuntimeVersions:	testAVMRuntimeVersionSet(t, "v2"),
+		States:			[]AVMScheduledUpgradeState{active, rollback},
+		GasTable:		testAVMVersionedGasTable(t),
 	})
 	require.ErrorContains(t, err, "cannot roll back")
 	require.NotEmpty(t, registry.RegistryHash)
@@ -146,14 +146,14 @@ func TestAVMActivatedUpgradePreventsRollback(t *testing.T) {
 func testAVMRuntimeVersionSet(t *testing.T, suffix string) AVMRuntimeVersionSet {
 	t.Helper()
 	versions, err := NewAVMRuntimeVersionSet(AVMRuntimeVersionSet{
-		VMInterpreterVersion:   "vm-" + suffix,
-		SchedulerVersion:       "scheduler-" + suffix,
-		GasPolicyVersion:       "gas-" + suffix,
-		ZoneConfigVersion:      "zone-" + suffix,
-		BackendAdapterVersion:  "backend-" + suffix,
-		InterfaceSchemaVersion: "interface-" + suffix,
-		RetryPolicyVersion:     "retry-" + suffix,
-		QueueLimitVersion:      "queue-" + suffix,
+		VMInterpreterVersion:	"vm-" + suffix,
+		SchedulerVersion:	"scheduler-" + suffix,
+		GasPolicyVersion:	"gas-" + suffix,
+		ZoneConfigVersion:	"zone-" + suffix,
+		BackendAdapterVersion:	"backend-" + suffix,
+		InterfaceSchemaVersion:	"interface-" + suffix,
+		RetryPolicyVersion:	"retry-" + suffix,
+		QueueLimitVersion:	"queue-" + suffix,
 	})
 	require.NoError(t, err)
 	return versions
@@ -166,10 +166,10 @@ func testAVMVersionedGasTable(t *testing.T) AVMVersionedGasTable {
 	scheduleV1, err := AVMGasScheduleFromPolicy(policyV1, true, 1_000_000)
 	require.NoError(t, err)
 	tableV1, err := NewAVMGasTableActivation(AVMGasTableActivation{
-		ActivationHeight: 1,
-		PolicyVersion:    "gas-v1",
-		Policy:           policyV1,
-		Schedule:         scheduleV1,
+		ActivationHeight:	1,
+		PolicyVersion:		"gas-v1",
+		Policy:			policyV1,
+		Schedule:		scheduleV1,
 	})
 	require.NoError(t, err)
 
@@ -179,10 +179,10 @@ func testAVMVersionedGasTable(t *testing.T) AVMVersionedGasTable {
 	scheduleV2, err := AVMGasScheduleFromPolicy(policyV2, true, 1_000_000)
 	require.NoError(t, err)
 	tableV2, err := NewAVMGasTableActivation(AVMGasTableActivation{
-		ActivationHeight: 100,
-		PolicyVersion:    "gas-v2",
-		Policy:           policyV2,
-		Schedule:         scheduleV2,
+		ActivationHeight:	100,
+		PolicyVersion:		"gas-v2",
+		Policy:			policyV2,
+		Schedule:		scheduleV2,
 	})
 	require.NoError(t, err)
 

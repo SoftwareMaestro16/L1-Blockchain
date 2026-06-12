@@ -17,12 +17,12 @@ func TestZoneStateMachineInterfaceExecutesExportsImportsAndQueriesProofs(t *test
 
 	batch, err := NewZoneBatch(ZoneIDContract, 22, []ZoneTransaction{
 		{
-			ZoneID:      ZoneIDContract,
-			TxHash:      hash("tx-1"),
-			MessageType: "contract.execute",
-			GasLimit:    10_000,
-			PayloadHash: hash("payload-1"),
-			Sequence:    1,
+			ZoneID:		ZoneIDContract,
+			TxHash:		hash("tx-1"),
+			MessageType:	"contract.execute",
+			GasLimit:	10_000,
+			PayloadHash:	hash("payload-1"),
+			Sequence:	1,
 		},
 	}, []ZoneMessage{testZoneMessage(ZoneIDContract, "contract.inbound", 1, 5_000)})
 	require.NoError(t, err)
@@ -64,12 +64,12 @@ func TestZoneExecutionMachineLifecycleMatchesZoneInterfaceSpec(t *testing.T) {
 	require.NoError(t, BeginZoneBlock(context.Background(), machine))
 
 	tx := ZoneTransaction{
-		ZoneID:      ZoneIDApplication,
-		TxHash:      hash("application-tx"),
-		MessageType: "application.execute",
-		GasLimit:    8_000,
-		PayloadHash: hash("application-payload"),
-		Sequence:    7,
+		ZoneID:		ZoneIDApplication,
+		TxHash:		hash("application-tx"),
+		MessageType:	"application.execute",
+		GasLimit:	8_000,
+		PayloadHash:	hash("application-payload"),
+		Sequence:	7,
 	}
 	result, err := ExecuteTx(context.Background(), machine, tx)
 	require.NoError(t, err)
@@ -162,15 +162,15 @@ func TestZoneExportManifestRejectsNonReproducibleImport(t *testing.T) {
 }
 
 type testZoneMachine struct {
-	zoneID   ZoneID
-	height   uint64
-	runtime  ZoneRuntimeState
-	queues   ZoneMessageQueues
-	receipts []ZoneReceipt
-	began    bool
-	txs      uint32
-	messages uint32
-	gas      uint64
+	zoneID		ZoneID
+	height		uint64
+	runtime		ZoneRuntimeState
+	queues		ZoneMessageQueues
+	receipts	[]ZoneReceipt
+	began		bool
+	txs		uint32
+	messages	uint32
+	gas		uint64
 }
 
 func (m *testZoneMachine) ZoneID() ZoneID {
@@ -198,13 +198,13 @@ func (m *testZoneMachine) ExecuteZoneBatch(_ context.Context, batch ZoneBatch) (
 		}
 	}
 	receipt, err := NewZoneReceipt(ZoneReceipt{
-		ZoneID:     m.zoneID,
-		Height:     batch.Height,
-		ItemHash:   batch.Transactions[0].TxHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    gas,
-		ResultHash: hash("zone-result"),
-		Sequence:   1,
+		ZoneID:		m.zoneID,
+		Height:		batch.Height,
+		ItemHash:	batch.Transactions[0].TxHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	gas,
+		ResultHash:	hash("zone-result"),
+		Sequence:	1,
 	})
 	if err != nil {
 		return ZoneBatchResult{}, err
@@ -218,13 +218,13 @@ func (m *testZoneMachine) ExecuteZoneBatch(_ context.Context, batch ZoneBatch) (
 		return ZoneBatchResult{}, err
 	}
 	return ZoneBatchResult{
-		ZoneID:                 m.zoneID,
-		Height:                 batch.Height,
-		TransactionsExecuted:   uint32(len(batch.Transactions)),
-		InboundMessagesApplied: uint32(len(batch.InboundMessages)),
-		GasConsumed:            gas,
-		Receipts:               []ZoneReceipt{receipt},
-		ZoneRoot:               root,
+		ZoneID:			m.zoneID,
+		Height:			batch.Height,
+		TransactionsExecuted:	uint32(len(batch.Transactions)),
+		InboundMessagesApplied:	uint32(len(batch.InboundMessages)),
+		GasConsumed:		gas,
+		Receipts:		[]ZoneReceipt{receipt},
+		ZoneRoot:		root,
 	}, nil
 }
 
@@ -247,13 +247,13 @@ func (m *testZoneMachine) ExecuteTx(_ context.Context, tx ZoneTransaction) (Exec
 	}
 	m.runtime.Budget = meter.Budget()
 	receipt, err := NewZoneReceipt(ZoneReceipt{
-		ZoneID:     m.zoneID,
-		Height:     m.height,
-		ItemHash:   tx.TxHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    tx.GasLimit,
-		ResultHash: hash("tx-result"),
-		Sequence:   tx.Sequence,
+		ZoneID:		m.zoneID,
+		Height:		m.height,
+		ItemHash:	tx.TxHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	tx.GasLimit,
+		ResultHash:	hash("tx-result"),
+		Sequence:	tx.Sequence,
 	})
 	if err != nil {
 		return ExecutionResult{}, err
@@ -292,13 +292,13 @@ func (m *testZoneMachine) ApplyInboundMessage(_ context.Context, msg ZoneMessage
 		return ZoneReceipt{}, err
 	}
 	return NewZoneReceipt(ZoneReceipt{
-		ZoneID:     m.zoneID,
-		Height:     m.height,
-		ItemHash:   msg.PayloadHash,
-		Status:     ZoneReceiptStatusSuccess,
-		GasUsed:    msg.GasLimit,
-		ResultHash: hash("inbound-result"),
-		Sequence:   msg.Sequence,
+		ZoneID:		m.zoneID,
+		Height:		m.height,
+		ItemHash:	msg.PayloadHash,
+		Status:		ZoneReceiptStatusSuccess,
+		GasUsed:	msg.GasLimit,
+		ResultHash:	hash("inbound-result"),
+		Sequence:	msg.Sequence,
 	})
 }
 

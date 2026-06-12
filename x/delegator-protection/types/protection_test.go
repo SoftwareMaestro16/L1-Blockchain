@@ -24,20 +24,20 @@ func TestValidClaimApprovedAndPaid(t *testing.T) {
 	require.Equal(t, ClaimStatusSubmitted, claim.Status)
 
 	next, err = ApplyApproveDelegatorProtectionClaim(next, MsgApproveDelegatorProtectionClaim{
-		Authority:      next.Params.Authority,
-		ClaimID:        claim.ClaimID,
-		ApprovedPayout: sdkmath.NewInt(800),
-		Height:         101,
+		Authority:	next.Params.Authority,
+		ClaimID:	claim.ClaimID,
+		ApprovedPayout:	sdkmath.NewInt(800),
+		Height:		101,
 	})
 	require.NoError(t, err)
 	approved := QueryProtectionClaims(next, QueryProtectionClaimsRequest{Delegator: "del-a", Status: ClaimStatusApproved})
 	require.Len(t, approved, 1)
 
 	next, payout, err := ApplyClaimDelegatorCompensation(next, MsgClaimDelegatorCompensation{
-		Delegator: "del-a",
-		ClaimID:   claim.ClaimID,
-		Epoch:     7,
-		Height:    102,
+		Delegator:	"del-a",
+		ClaimID:	claim.ClaimID,
+		Epoch:		7,
+		Height:		102,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(800), payout.Amount)
@@ -81,17 +81,17 @@ func TestInsufficientFundHandledCleanly(t *testing.T) {
 	next, claim, err := ApplySubmitDelegatorProtectionClaim(state, validClaimMsg("del-a", "val-a", 1_000, 800, 9, 100))
 	require.NoError(t, err)
 	next, err = ApplyApproveDelegatorProtectionClaim(next, MsgApproveDelegatorProtectionClaim{
-		Authority:      next.Params.Authority,
-		ClaimID:        claim.ClaimID,
-		ApprovedPayout: sdkmath.NewInt(800),
-		Height:         101,
+		Authority:	next.Params.Authority,
+		ClaimID:	claim.ClaimID,
+		ApprovedPayout:	sdkmath.NewInt(800),
+		Height:		101,
 	})
 	require.NoError(t, err)
 	_, _, err = ApplyClaimDelegatorCompensation(next, MsgClaimDelegatorCompensation{
-		Delegator: "del-a",
-		ClaimID:   claim.ClaimID,
-		Epoch:     9,
-		Height:    102,
+		Delegator:	"del-a",
+		ClaimID:	claim.ClaimID,
+		Epoch:		9,
+		Height:		102,
 	})
 	require.ErrorContains(t, err, "reserve floor")
 	require.Equal(t, sdkmath.NewInt(1_500), next.Fund.Balance)
@@ -104,10 +104,10 @@ func TestExportImportPreservesClaimQueue(t *testing.T) {
 	next, _, err = ApplySubmitDelegatorProtectionClaim(next, validClaimMsg("del-a", "val-a", 2_000, 700, 10, 101))
 	require.NoError(t, err)
 	next, err = ApplyApproveDelegatorProtectionClaim(next, MsgApproveDelegatorProtectionClaim{
-		Authority:      next.Params.Authority,
-		ClaimID:        claimA.ClaimID,
-		ApprovedPayout: sdkmath.NewInt(500),
-		Height:         102,
+		Authority:	next.Params.Authority,
+		ClaimID:	claimA.ClaimID,
+		ApprovedPayout:	sdkmath.NewInt(500),
+		Height:		102,
 	})
 	require.NoError(t, err)
 
@@ -165,13 +165,13 @@ func fundedProtectionState(t *testing.T, balance int64) DelegatorProtectionState
 
 func validClaimMsg(delegator string, validator string, loss int64, requested int64, epoch uint64, height uint64) MsgSubmitDelegatorProtectionClaim {
 	return MsgSubmitDelegatorProtectionClaim{
-		Delegator:       delegator,
-		Validator:       validator,
-		LossAmount:      sdkmath.NewInt(loss),
-		RequestedPayout: sdkmath.NewInt(requested),
-		EligibilityHash: protectionHashParts("eligibility", delegator, validator),
-		Reason:          "delegator loss",
-		Epoch:           epoch,
-		Height:          height,
+		Delegator:		delegator,
+		Validator:		validator,
+		LossAmount:		sdkmath.NewInt(loss),
+		RequestedPayout:	sdkmath.NewInt(requested),
+		EligibilityHash:	protectionHashParts("eligibility", delegator, validator),
+		Reason:			"delegator loss",
+		Epoch:			epoch,
+		Height:			height,
 	}
 }

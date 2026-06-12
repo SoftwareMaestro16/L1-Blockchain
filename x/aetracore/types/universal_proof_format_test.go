@@ -64,11 +64,11 @@ func TestVerifyUniversalProofRequiresZoneAndShardCommitments(t *testing.T) {
 	zoneCommitment.ShardRootsRoot = shardAggregate
 	zoneCommitment.CommitmentHash = ComputeZoneCommitmentHash(zoneCommitment)
 	shardCommitment, err := NewUniversalShardCommitment(UniversalShardCommitment{
-		Height:         height,
-		ZoneID:         ZoneIDFinancial,
-		ShardID:        "0",
-		ShardRoot:      shardRoot,
-		ShardRootsRoot: shardAggregate,
+		Height:		height,
+		ZoneID:		ZoneIDFinancial,
+		ShardID:	"0",
+		ShardRoot:	shardRoot,
+		ShardRootsRoot:	shardAggregate,
 	})
 	require.NoError(t, err)
 
@@ -105,13 +105,13 @@ func TestVerifyUniversalProofMessageInclusionAndReceipt(t *testing.T) {
 	messageRoot := testHash("global-message-root")
 	receiptRoot := testHash("receipt-root")
 	messageCommit, err := NewUniversalMessageCommitment(UniversalMessageCommitment{
-		Height:               height,
-		MessageID:            testHash("msg-id"),
-		MessageRoot:          messageRoot,
-		SourceOutboxRoot:     testHash("outbox"),
-		DestinationInboxRoot: testHash("inbox"),
-		ReceiptRoot:          receiptRoot,
-		ReceiptHash:          testHash("receipt"),
+		Height:			height,
+		MessageID:		testHash("msg-id"),
+		MessageRoot:		messageRoot,
+		SourceOutboxRoot:	testHash("outbox"),
+		DestinationInboxRoot:	testHash("inbox"),
+		ReceiptRoot:		receiptRoot,
+		ReceiptHash:		testHash("receipt"),
 	})
 	require.NoError(t, err)
 
@@ -176,28 +176,28 @@ func testUniversalProofEnvelope(
 	height := uint64(9)
 	appHash := testHash("app-hash-" + string(proofType))
 	storeProof, err := NewUniversalStoreProof(UniversalStoreProof{
-		ProofVersion:       UniversalProofVersionV1,
-		Key:                key,
-		Value:              value,
-		NonExistenceMarker: absence,
-		StoreRoot:          storeRoot,
-		ProofOps:           []string{testHash("store-proof-op-" + string(proofType))},
+		ProofVersion:		UniversalProofVersionV1,
+		Key:			key,
+		Value:			value,
+		NonExistenceMarker:	absence,
+		StoreRoot:		storeRoot,
+		ProofOps:		[]string{testHash("store-proof-op-" + string(proofType))},
 	})
 	require.NoError(t, err)
 	proof, err := NewUniversalProofEnvelope(UniversalProofEnvelope{
-		ProofType:        proofType,
-		ProofVersion:     UniversalProofVersionV1,
-		ChainID:          "aetra-test",
-		Height:           height,
-		AppHash:          appHash,
-		RootType:         rootType,
-		ZoneID:           zoneID,
-		ShardID:          shardID,
-		Key:              key,
-		Value:            value,
-		AbsenceMarker:    absence,
-		StoreProof:       storeProof,
-		VerificationPath: testUniversalProofPath(t, appHash, rootType, storeRoot),
+		ProofType:		proofType,
+		ProofVersion:		UniversalProofVersionV1,
+		ChainID:		"aetra-test",
+		Height:			height,
+		AppHash:		appHash,
+		RootType:		rootType,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		Key:			key,
+		Value:			value,
+		AbsenceMarker:		absence,
+		StoreProof:		storeProof,
+		VerificationPath:	testUniversalProofPath(t, appHash, rootType, storeRoot),
 	})
 	require.NoError(t, err)
 	return proof
@@ -206,12 +206,12 @@ func testUniversalProofEnvelope(
 func testUniversalProofPath(t *testing.T, appHash string, rootType RootType, storeRoot string) []UniversalRootStep {
 	t.Helper()
 	step, err := NewUniversalRootStep(UniversalRootStep{
-		Index:        0,
-		FromRootType: DefaultProofRootType,
-		FromRoot:     appHash,
-		ToRootType:   rootType,
-		ToRoot:       storeRoot,
-		Scope:        "store",
+		Index:		0,
+		FromRootType:	DefaultProofRootType,
+		FromRoot:	appHash,
+		ToRootType:	rootType,
+		ToRoot:		storeRoot,
+		Scope:		"store",
 	})
 	require.NoError(t, err)
 	return []UniversalRootStep{step}
@@ -219,10 +219,10 @@ func testUniversalProofPath(t *testing.T, appHash string, rootType RootType, sto
 
 func testTrustedHeader(proof UniversalProofEnvelope) UniversalTrustedHeader {
 	return UniversalTrustedHeader{
-		ChainID:    proof.ChainID,
-		Height:     proof.Height,
-		AppHash:    proof.AppHash,
-		HeaderHash: testHash("header-" + proof.AppHash),
-		Trusted:    true,
+		ChainID:	proof.ChainID,
+		Height:		proof.Height,
+		AppHash:	proof.AppHash,
+		HeaderHash:	testHash("header-" + proof.AppHash),
+		Trusted:	true,
 	}
 }

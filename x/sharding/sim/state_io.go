@@ -163,13 +163,13 @@ func (s *Simulator) validateMessage(msg CrossShardMessage) error {
 
 func (s *Simulator) commitHeader(shard ShardState) {
 	header := ShardHeader{
-		ShardID:          shard.ID,
-		Height:           shard.Height,
-		StateRoot:        shard.StateRoot,
-		MessageQueueRoot: shard.MessageQueueRoot,
-		ReceiptRoot:      shard.ReceiptRoot,
-		ValidatorSubset:  append([]string(nil), shard.ValidatorSubset...),
-		Available:        shard.Available,
+		ShardID:		shard.ID,
+		Height:			shard.Height,
+		StateRoot:		shard.StateRoot,
+		MessageQueueRoot:	shard.MessageQueueRoot,
+		ReceiptRoot:		shard.ReceiptRoot,
+		ValidatorSubset:	append([]string(nil), shard.ValidatorSubset...),
+		Available:		shard.Available,
 	}
 	header.Commitment = headerCommitment(shard)
 	s.state.Headers[shard.ID.Key()] = header

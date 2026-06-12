@@ -12,224 +12,224 @@ import (
 )
 
 const (
-	StatusPending  = "pending"
-	StatusAccepted = "accepted"
-	StatusRejected = "rejected"
-	StatusExpired  = "expired"
+	StatusPending	= "pending"
+	StatusAccepted	= "accepted"
+	StatusRejected	= "rejected"
+	StatusExpired	= "expired"
 
-	EvidenceTypeConsensus   = "consensus"
-	EvidenceTypeDoubleSign  = "double-sign"
-	EvidenceTypeDowntime    = "downtime"
-	EvidenceTypeMissedBlock = "missed-block"
-	EvidenceTypePerformance = "performance"
-	EvidenceTypeFraud       = "fraud"
+	EvidenceTypeConsensus	= "consensus"
+	EvidenceTypeDoubleSign	= "double-sign"
+	EvidenceTypeDowntime	= "downtime"
+	EvidenceTypeMissedBlock	= "missed-block"
+	EvidenceTypePerformance	= "performance"
+	EvidenceTypeFraud	= "fraud"
 
-	VoteSupportAccept = "accept"
-	VoteSupportReject = "reject"
+	VoteSupportAccept	= "accept"
+	VoteSupportReject	= "reject"
 
-	RegistryStatusCandidate  = validatorregistrytypes.StatusCandidate
-	RegistryStatusJailed     = validatorregistrytypes.StatusJailed
-	RegistryStatusTombstoned = validatorregistrytypes.StatusTombstoned
+	RegistryStatusCandidate		= validatorregistrytypes.StatusCandidate
+	RegistryStatusJailed		= validatorregistrytypes.StatusJailed
+	RegistryStatusTombstoned	= validatorregistrytypes.StatusTombstoned
 
-	SlashingReasonDoubleSign = "double_sign"
-	SlashingReasonDowntime   = "downtime"
+	SlashingReasonDoubleSign	= "double_sign"
+	SlashingReasonDowntime		= "downtime"
 
-	MaxEvidenceV1          = uint32(100_000)
-	MaxPendingEvidenceV1   = uint32(10_000)
-	MaxProofHashBytesV1    = uint32(64)
-	MaxPayloadBytesV1      = uint32(16_384)
-	MaxVotesV1             = uint32(512)
-	MaxSideEffectHistoryV1 = uint32(100_000)
-	MaxBasisPoints         = uint32(10_000)
+	MaxEvidenceV1		= uint32(100_000)
+	MaxPendingEvidenceV1	= uint32(10_000)
+	MaxProofHashBytesV1	= uint32(64)
+	MaxPayloadBytesV1	= uint32(16_384)
+	MaxVotesV1		= uint32(512)
+	MaxSideEffectHistoryV1	= uint32(100_000)
+	MaxBasisPoints		= uint32(10_000)
 
-	DefaultEvidenceTTLBlocks         = uint64(10_000)
-	DefaultReviewQuorumBps           = uint32(6_700)
-	DefaultMinSlashFractionBps       = uint32(1)
-	DefaultMaxSlashFractionBps       = uint32(2_000)
-	DefaultCriticalSlashFractionBps  = uint32(500)
-	DefaultReporterRewardNaet        = uint64(1_000_000)
-	DefaultDoubleSignJailBlocks      = uint64(0)
-	DefaultDowntimeFirstJailBlocks   = uint64(3 * 60 * 60 / 6)
-	DefaultDowntimeRepeatJailBlocks  = uint64(24 * 60 * 60 / 6)
-	DefaultFrozenStakeBlocks         = uint64(18 * 24 * 60 * 60 / 6)
-	DefaultDowntimeRepeatMultiplier  = uint32(5)
-	DefaultDowntimeChronicMultiplier = uint32(20)
+	DefaultEvidenceTTLBlocks		= uint64(10_000)
+	DefaultReviewQuorumBps			= uint32(6_700)
+	DefaultMinSlashFractionBps		= uint32(1)
+	DefaultMaxSlashFractionBps		= uint32(2_000)
+	DefaultCriticalSlashFractionBps		= uint32(500)
+	DefaultReporterRewardNaet		= uint64(1_000_000)
+	DefaultDoubleSignJailBlocks		= uint64(0)
+	DefaultDowntimeFirstJailBlocks		= uint64(3 * 60 * 60 / 6)
+	DefaultDowntimeRepeatJailBlocks		= uint64(24 * 60 * 60 / 6)
+	DefaultFrozenStakeBlocks		= uint64(18 * 24 * 60 * 60 / 6)
+	DefaultDowntimeRepeatMultiplier		= uint32(5)
+	DefaultDowntimeChronicMultiplier	= uint32(20)
 )
 
 type State struct {
-	Evidence             []EvidenceRecord
-	SlashEvents          []SlashEvent
-	ReporterRewards      []ReporterReward
-	RegistryUpdates      []RegistryUpdate
-	TombstonedValidators []string
-	JailRecords          []JailRecord
-	FrozenStakes         []FrozenStake
-	OffenseCounters      []OffenseCounter
-	IntegrationEvents    []IntegrationEvent
+	Evidence		[]EvidenceRecord
+	SlashEvents		[]SlashEvent
+	ReporterRewards		[]ReporterReward
+	RegistryUpdates		[]RegistryUpdate
+	TombstonedValidators	[]string
+	JailRecords		[]JailRecord
+	FrozenStakes		[]FrozenStake
+	OffenseCounters		[]OffenseCounter
+	IntegrationEvents	[]IntegrationEvent
 }
 
 type EvidenceRecord struct {
-	EvidenceID       string
-	Status           string
-	EvidenceType     string
-	AccusedValidator string
-	Reporter         string
-	ProofPayloadHash string
-	PayloadSizeBytes uint32
-	Votes            []EvidenceVote
-	SlashDecision    SlashDecision
-	RewardDecision   RewardDecision
-	SubmittedHeight  uint64
-	UpdatedHeight    uint64
-	ExpirationHeight uint64
-	FinalizedHeight  uint64
-	RequiresReview   bool
-	RejectionReason  string
+	EvidenceID		string
+	Status			string
+	EvidenceType		string
+	AccusedValidator	string
+	Reporter		string
+	ProofPayloadHash	string
+	PayloadSizeBytes	uint32
+	Votes			[]EvidenceVote
+	SlashDecision		SlashDecision
+	RewardDecision		RewardDecision
+	SubmittedHeight		uint64
+	UpdatedHeight		uint64
+	ExpirationHeight	uint64
+	FinalizedHeight		uint64
+	RequiresReview		bool
+	RejectionReason		string
 }
 
 type EvidenceVote struct {
-	Voter          string
-	Support        string
-	VotingPowerBps uint32
-	Height         uint64
+	Voter		string
+	Support		string
+	VotingPowerBps	uint32
+	Height		uint64
 }
 
 type SlashDecision struct {
-	FractionBps uint32
-	Tombstone   bool
-	Applied     bool
+	FractionBps	uint32
+	Tombstone	bool
+	Applied		bool
 }
 
 type RewardDecision struct {
-	Reporter   string
-	AmountNaet uint64
-	Paid       bool
+	Reporter	string
+	AmountNaet	uint64
+	Paid		bool
 }
 
 type SlashEvent struct {
-	EvidenceID       string
-	ValidatorAddress string
-	FractionBps      uint32
-	Tombstone        bool
-	Height           uint64
-	Reason           string
-	OffenseCount     uint64
-	FrozenStake      uint64
-	JailUntilHeight  uint64
+	EvidenceID		string
+	ValidatorAddress	string
+	FractionBps		uint32
+	Tombstone		bool
+	Height			uint64
+	Reason			string
+	OffenseCount		uint64
+	FrozenStake		uint64
+	JailUntilHeight		uint64
 }
 
 type ReporterReward struct {
-	EvidenceID string
-	Reporter   string
-	AmountNaet uint64
-	Paid       bool
-	Height     uint64
+	EvidenceID	string
+	Reporter	string
+	AmountNaet	uint64
+	Paid		bool
+	Height		uint64
 }
 
 type RegistryUpdate struct {
-	EvidenceID       string
-	ValidatorAddress string
-	Status           string
-	Height           uint64
+	EvidenceID		string
+	ValidatorAddress	string
+	Status			string
+	Height			uint64
 }
 
 type JailRecord struct {
-	EvidenceID        string
-	ValidatorAddress  string
-	Reason            string
-	JailedAtHeight    uint64
-	JailedUntilHeight uint64
-	Tombstone         bool
-	Active            bool
+	EvidenceID		string
+	ValidatorAddress	string
+	Reason			string
+	JailedAtHeight		uint64
+	JailedUntilHeight	uint64
+	Tombstone		bool
+	Active			bool
 }
 
 type FrozenStake struct {
-	EvidenceID       string
-	ValidatorAddress string
-	Amount           uint64
-	FrozenAtHeight   uint64
-	ReleaseHeight    uint64
-	Reason           string
+	EvidenceID		string
+	ValidatorAddress	string
+	Amount			uint64
+	FrozenAtHeight		uint64
+	ReleaseHeight		uint64
+	Reason			string
 }
 
 type OffenseCounter struct {
-	ValidatorAddress string
-	EvidenceType     string
-	Count            uint64
-	LastHeight       uint64
+	ValidatorAddress	string
+	EvidenceType		string
+	Count			uint64
+	LastHeight		uint64
 }
 
 type IntegrationEvent struct {
-	EvidenceID       string
-	ValidatorAddress string
-	Target           string
-	Action           string
-	Height           uint64
+	EvidenceID		string
+	ValidatorAddress	string
+	Target			string
+	Action			string
+	Height			uint64
 }
 
 type MsgSubmitEvidence struct {
-	Authority        string
-	EvidenceID       string
-	EvidenceType     string
-	AccusedValidator string
-	Reporter         string
-	ProofPayloadHash string
-	PayloadSizeBytes uint32
-	RequiresReview   bool
-	SlashFractionBps uint32
-	RewardNaet       uint64
-	Height           uint64
+	Authority		string
+	EvidenceID		string
+	EvidenceType		string
+	AccusedValidator	string
+	Reporter		string
+	ProofPayloadHash	string
+	PayloadSizeBytes	uint32
+	RequiresReview		bool
+	SlashFractionBps	uint32
+	RewardNaet		uint64
+	Height			uint64
 }
 
 type MsgVoteEvidence struct {
-	Authority      string
-	EvidenceID     string
-	Voter          string
-	Accept         bool
-	VotingPowerBps uint32
-	Height         uint64
+	Authority	string
+	EvidenceID	string
+	Voter		string
+	Accept		bool
+	VotingPowerBps	uint32
+	Height		uint64
 }
 
 type MsgFinalizeEvidence struct {
-	Authority  string
-	EvidenceID string
-	Height     uint64
+	Authority	string
+	EvidenceID	string
+	Height		uint64
 }
 
 type MsgCancelExpiredEvidence struct {
-	Authority  string
-	EvidenceID string
-	Height     uint64
+	Authority	string
+	EvidenceID	string
+	Height		uint64
 }
 
 type MsgSubmitDoubleSignEvidence struct {
-	Authority        string
-	EvidenceID       string
-	AccusedValidator string
-	Reporter         string
-	VoteAHash        string
-	VoteBHash        string
-	InfractionHeight uint64
-	Height           uint64
-	ValidatorStake   uint64
+	Authority		string
+	EvidenceID		string
+	AccusedValidator	string
+	Reporter		string
+	VoteAHash		string
+	VoteBHash		string
+	InfractionHeight	uint64
+	Height			uint64
+	ValidatorStake		uint64
 }
 
 type MsgSubmitDowntimeEvidence struct {
-	Authority        string
-	EvidenceID       string
-	AccusedValidator string
-	Reporter         string
-	MissedBlocks     uint64
-	WindowBlocks     uint64
-	InfractionHeight uint64
-	Height           uint64
-	ValidatorStake   uint64
+	Authority		string
+	EvidenceID		string
+	AccusedValidator	string
+	Reporter		string
+	MissedBlocks		uint64
+	WindowBlocks		uint64
+	InfractionHeight	uint64
+	Height			uint64
+	ValidatorStake		uint64
 }
 
 type MsgUnjailValidator struct {
-	Authority        string
-	ValidatorAddress string
-	Height           uint64
+	Authority		string
+	ValidatorAddress	string
+	Height			uint64
 }
 
 func (p Params) Authorize(authority string) error {

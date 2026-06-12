@@ -3,9 +3,9 @@ package types
 import "strings"
 
 const (
-	ModuleName         = "services"
-	StoreKey           = ModuleName
-	ServiceStorePrefix = "services/"
+	ModuleName		= "services"
+	StoreKey		= ModuleName
+	ServiceStorePrefix	= "services/"
 )
 
 func IsServiceStoreKey(key string) bool {

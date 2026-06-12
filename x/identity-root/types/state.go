@@ -11,180 +11,180 @@ import (
 )
 
 const (
-	SubdomainPolicyOwnerOnly = "owner_only"
-	SubdomainPolicyPublic    = "public"
-	SubdomainPolicyDisabled  = "disabled"
+	SubdomainPolicyOwnerOnly	= "owner_only"
+	SubdomainPolicyPublic		= "public"
+	SubdomainPolicyDisabled		= "disabled"
 
-	DefaultResolverRoot  = "0000000000000000000000000000000000000000000000000000000000000000"
-	DefaultRootNamespace = "aet"
+	DefaultResolverRoot	= "0000000000000000000000000000000000000000000000000000000000000000"
+	DefaultRootNamespace	= "aet"
 
-	DomainRentPayerOwner    = "owner"
-	DomainRentPayerProtocol = "protocol"
+	DomainRentPayerOwner	= "owner"
+	DomainRentPayerProtocol	= "protocol"
 )
 
 type IdentityRootParams struct {
-	RootNamespace                string
-	RegistrationPeriod           uint64
-	RenewalPeriod                uint64
-	MaxNameBytes                 uint32
-	MaxRecords                   uint32
-	MaxReservedNames             uint32
-	DomainRentRatePerByteBlock   uint64
-	DefaultDomainRentPayerPolicy string
-	NFTBindingEnabled            bool
-	AllowPublicSubdomains        bool
-	Auction                      AuctionParams
+	RootNamespace			string
+	RegistrationPeriod		uint64
+	RenewalPeriod			uint64
+	MaxNameBytes			uint32
+	MaxRecords			uint32
+	MaxReservedNames		uint32
+	DomainRentRatePerByteBlock	uint64
+	DefaultDomainRentPayerPolicy	string
+	NFTBindingEnabled		bool
+	AllowPublicSubdomains		bool
+	Auction				AuctionParams
 }
 
 type AuctionParams struct {
-	Enabled          bool
-	CommitBlocks     uint64
-	RevealBlocks     uint64
-	MinimumBidAmount uint64
+	Enabled			bool
+	CommitBlocks		uint64
+	RevealBlocks		uint64
+	MinimumBidAmount	uint64
 }
 
 type IdentityRootState struct {
-	Records         []NameRecord
-	Resolvers       []ResolverRecord
-	ReverseRecords  []ReverseRecord
-	NFTBindings     []IdentityNFTBindingReference
-	RootAuthorities []RootAuthority
-	ReservedNames   []ReservedName
+	Records		[]NameRecord
+	Resolvers	[]ResolverRecord
+	ReverseRecords	[]ReverseRecord
+	NFTBindings	[]IdentityNFTBindingReference
+	RootAuthorities	[]RootAuthority
+	ReservedNames	[]ReservedName
 }
 
 type NameRecord struct {
-	Name                    string
-	ParentName              string
-	Owner                   string
-	ResolverRoot            string
-	ExpiryHeight            uint64
-	RenewalHeight           uint64
-	SubdomainPolicy         string
-	NFTBinding              IdentityNFTBindingReference
-	StorageRentDebt         uint64
-	LastStorageChargeHeight uint64
-	RentPayerPolicy         string
-	CreatedHeight           uint64
-	UpdatedHeight           uint64
+	Name			string
+	ParentName		string
+	Owner			string
+	ResolverRoot		string
+	ExpiryHeight		uint64
+	RenewalHeight		uint64
+	SubdomainPolicy		string
+	NFTBinding		IdentityNFTBindingReference
+	StorageRentDebt		uint64
+	LastStorageChargeHeight	uint64
+	RentPayerPolicy		string
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
 }
 
 type ResolverRecord struct {
-	Name          string
-	ResolverRoot  string
-	UpdatedHeight uint64
+	Name		string
+	ResolverRoot	string
+	UpdatedHeight	uint64
 }
 
 type ReverseRecord struct {
-	Address       string
-	Name          string
-	Owner         string
-	UpdatedHeight uint64
+	Address		string
+	Name		string
+	Owner		string
+	UpdatedHeight	uint64
 }
 
 type IdentityNFTBindingReference struct {
-	Name    string
-	Enabled bool
-	ClassID string
-	NFTID   string
-	Owner   string
+	Name	string
+	Enabled	bool
+	ClassID	string
+	NFTID	string
+	Owner	string
 }
 
 type RootAuthority struct {
-	Authority string
-	Role      string
+	Authority	string
+	Role		string
 }
 
 type ReservedName struct {
-	Name      string
-	Authority string
-	Reason    string
+	Name		string
+	Authority	string
+	Reason		string
 }
 
 type MsgRegisterName struct {
-	Owner           string
-	Name            string
-	Height          uint64
-	ResolverRoot    string
-	SubdomainPolicy string
-	NFTBinding      IdentityNFTBindingReference
+	Owner		string
+	Name		string
+	Height		uint64
+	ResolverRoot	string
+	SubdomainPolicy	string
+	NFTBinding	IdentityNFTBindingReference
 }
 
 type MsgRenewName struct {
-	Owner  string
-	Name   string
-	Height uint64
+	Owner	string
+	Name	string
+	Height	uint64
 }
 
 type MsgTransferName struct {
-	Owner         string
-	Name          string
-	NewOwner      string
-	Height        uint64
-	NewNFTBinding IdentityNFTBindingReference
+	Owner		string
+	Name		string
+	NewOwner	string
+	Height		uint64
+	NewNFTBinding	IdentityNFTBindingReference
 }
 
 type MsgSetResolver struct {
-	Owner        string
-	Name         string
-	ResolverRoot string
-	Height       uint64
+	Owner		string
+	Name		string
+	ResolverRoot	string
+	Height		uint64
 }
 
 type MsgSetReverseRecord struct {
-	Owner   string
-	Address string
-	Name    string
-	Height  uint64
+	Owner	string
+	Address	string
+	Name	string
+	Height	uint64
 }
 
 type MsgCreateSubdomain struct {
-	Owner           string
-	ParentName      string
-	Label           string
-	SubdomainOwner  string
-	Height          uint64
-	ResolverRoot    string
-	SubdomainPolicy string
-	NFTBinding      IdentityNFTBindingReference
+	Owner		string
+	ParentName	string
+	Label		string
+	SubdomainOwner	string
+	Height		uint64
+	ResolverRoot	string
+	SubdomainPolicy	string
+	NFTBinding	IdentityNFTBindingReference
 }
 
 type MsgReserveName struct {
-	Authority string
-	Name      string
-	Reason    string
+	Authority	string
+	Name		string
+	Reason		string
 }
 
 type MsgReleaseReservedName struct {
-	Authority string
-	Name      string
+	Authority	string
+	Name		string
 }
 
 func DefaultIdentityRootParams() IdentityRootParams {
 	return IdentityRootParams{
-		RootNamespace:                DefaultRootNamespace,
-		RegistrationPeriod:           1_000_000,
-		RenewalPeriod:                1_000_000,
-		MaxNameBytes:                 253,
-		MaxRecords:                   100_000,
-		MaxReservedNames:             10_000,
-		DomainRentRatePerByteBlock:   1,
-		DefaultDomainRentPayerPolicy: DomainRentPayerOwner,
+		RootNamespace:			DefaultRootNamespace,
+		RegistrationPeriod:		1_000_000,
+		RenewalPeriod:			1_000_000,
+		MaxNameBytes:			253,
+		MaxRecords:			100_000,
+		MaxReservedNames:		10_000,
+		DomainRentRatePerByteBlock:	1,
+		DefaultDomainRentPayerPolicy:	DomainRentPayerOwner,
 		Auction: AuctionParams{
-			CommitBlocks:     100,
-			RevealBlocks:     100,
-			MinimumBidAmount: 1,
+			CommitBlocks:		100,
+			RevealBlocks:		100,
+			MinimumBidAmount:	1,
 		},
 	}
 }
 
 func EmptyIdentityRootState() IdentityRootState {
 	return IdentityRootState{
-		Records:         []NameRecord{},
-		Resolvers:       []ResolverRecord{},
-		ReverseRecords:  []ReverseRecord{},
-		NFTBindings:     []IdentityNFTBindingReference{},
-		RootAuthorities: []RootAuthority{},
-		ReservedNames:   []ReservedName{},
+		Records:		[]NameRecord{},
+		Resolvers:		[]ResolverRecord{},
+		ReverseRecords:		[]ReverseRecord{},
+		NFTBindings:		[]IdentityNFTBindingReference{},
+		RootAuthorities:	[]RootAuthority{},
+		ReservedNames:		[]ReservedName{},
 	}
 }
 
@@ -216,12 +216,12 @@ func (p IdentityRootParams) Validate() error {
 
 func (s IdentityRootState) Export() IdentityRootState {
 	out := IdentityRootState{
-		Records:         cloneRecords(s.Records),
-		Resolvers:       cloneResolvers(s.Resolvers),
-		ReverseRecords:  cloneReverseRecords(s.ReverseRecords),
-		NFTBindings:     cloneBindings(s.NFTBindings),
-		RootAuthorities: cloneAuthorities(s.RootAuthorities),
-		ReservedNames:   cloneReserved(s.ReservedNames),
+		Records:		cloneRecords(s.Records),
+		Resolvers:		cloneResolvers(s.Resolvers),
+		ReverseRecords:		cloneReverseRecords(s.ReverseRecords),
+		NFTBindings:		cloneBindings(s.NFTBindings),
+		RootAuthorities:	cloneAuthorities(s.RootAuthorities),
+		ReservedNames:		cloneReserved(s.ReservedNames),
 	}
 	SortRecords(out.Records)
 	SortResolvers(out.Resolvers)

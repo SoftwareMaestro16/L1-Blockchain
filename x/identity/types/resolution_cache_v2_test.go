@@ -16,43 +16,43 @@ func TestResolutionCacheRecordV2ValidatesFreshnessEpochsAndLightClientProof(t *t
 	record, err := NewResolutionCacheRecordV2("api.alice.aet", pathHash, recordHash, 100, 7, 2, 3)
 	require.NoError(t, err)
 	require.NoError(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        50,
-		SourceVersion: 7,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
+		Height:		50,
+		SourceVersion:	7,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
 	}))
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        50,
-		SourceVersion: 7,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
-		LightClient:   true,
+		Height:		50,
+		SourceVersion:	7,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
+		LightClient:	true,
 	}), "proof verification")
 	require.NoError(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        50,
-		SourceVersion: 7,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
-		LightClient:   true,
-		ProofVerified: true,
+		Height:		50,
+		SourceVersion:	7,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
+		LightClient:	true,
+		ProofVerified:	true,
 	}))
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        101,
-		SourceVersion: 7,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
+		Height:		101,
+		SourceVersion:	7,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
 	}), "expired")
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        50,
-		SourceVersion: 8,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
+		Height:		50,
+		SourceVersion:	8,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
 	}), "source version changed")
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2Use(record, ResolutionCacheUseContextV2{
-		Height:        50,
-		SourceVersion: 7,
-		ParentEpoch:   9,
-		ChildEpoch:    3,
+		Height:		50,
+		SourceVersion:	7,
+		ParentEpoch:	9,
+		ChildEpoch:	3,
 	}), "parent epoch changed")
 }
 
@@ -75,15 +75,15 @@ func validUnifiedResolutionRecordV2(t *testing.T, name string) UnifiedResolution
 	nameHash, err := DomainRecordV2NameHash(name)
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:        nameHash,
-		Owner:           addr(1),
-		PrimaryAddress:  addr(2),
-		RecordVersion:   1,
-		RecordTTL:       30,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
-		ContractTargets: []ContractTargetV2{NewContractTargetV2(ResolverKeyContract, addr(3), 12)},
+		NameHash:		nameHash,
+		Owner:			addr(1),
+		PrimaryAddress:		addr(2),
+		RecordVersion:		1,
+		RecordTTL:		30,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
+		ContractTargets:	[]ContractTargetV2{NewContractTargetV2(ResolverKeyContract, addr(3), 12)},
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 	return record

@@ -15,8 +15,8 @@ var _ types.QueryServer = grpcQueryServer{}
 type grpcMsgServer struct{ keeper *Keeper }
 type grpcQueryServer struct{ keeper *Keeper }
 
-func NewGRPCMsgServer(k *Keeper) types.MsgServer     { return grpcMsgServer{keeper: k} }
-func NewGRPCQueryServer(k *Keeper) types.QueryServer { return grpcQueryServer{keeper: k} }
+func NewGRPCMsgServer(k *Keeper) types.MsgServer	{ return grpcMsgServer{keeper: k} }
+func NewGRPCQueryServer(k *Keeper) types.QueryServer	{ return grpcQueryServer{keeper: k} }
 
 func (s grpcMsgServer) ProposeConstitutionAmendment(ctx context.Context, msg *types.MsgProposeConstitutionAmendment) (*types.MsgProposeConstitutionAmendmentResponse, error) {
 	if msg == nil {

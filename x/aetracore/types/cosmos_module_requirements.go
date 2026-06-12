@@ -10,73 +10,73 @@ import (
 type CosmosSDKModuleName string
 
 const (
-	CosmosModuleAetraCore CosmosSDKModuleName = "aetracore"
-	CosmosModuleZones     CosmosSDKModuleName = "zones"
-	CosmosModuleMessages  CosmosSDKModuleName = "messages"
-	CosmosModuleServices  CosmosSDKModuleName = "services"
-	CosmosModuleStorage   CosmosSDKModuleName = "storage"
-	CosmosModuleIdentity  CosmosSDKModuleName = "identity"
-	CosmosModuleRouting   CosmosSDKModuleName = "routing"
-	CosmosModulePayments  CosmosSDKModuleName = "payments"
-	CosmosModuleContracts CosmosSDKModuleName = "contracts"
+	CosmosModuleAetraCore	CosmosSDKModuleName	= "aetracore"
+	CosmosModuleZones	CosmosSDKModuleName	= "zones"
+	CosmosModuleMessages	CosmosSDKModuleName	= "messages"
+	CosmosModuleServices	CosmosSDKModuleName	= "services"
+	CosmosModuleStorage	CosmosSDKModuleName	= "storage"
+	CosmosModuleIdentity	CosmosSDKModuleName	= "identity"
+	CosmosModuleRouting	CosmosSDKModuleName	= "routing"
+	CosmosModulePayments	CosmosSDKModuleName	= "payments"
+	CosmosModuleContracts	CosmosSDKModuleName	= "contracts"
 )
 
 type CosmosModuleSurface struct {
-	ModuleName        CosmosSDKModuleName
-	ModulePath        string
-	MsgServer         bool
-	QueryServer       bool
-	Keeper            bool
-	Params            bool
-	GenesisExport     bool
-	GenesisImport     bool
-	Invariants        bool
-	KeeperIsolation   KeeperIsolationPolicy
-	IBCBoundary       IBCReadyBoundary
-	ABCICompatibility ABCICompatibilityPolicy
-	Events            []string
-	TypedErrors       []string
-	RootContribution  RootContribution
-	SurfaceHash       string
+	ModuleName		CosmosSDKModuleName
+	ModulePath		string
+	MsgServer		bool
+	QueryServer		bool
+	Keeper			bool
+	Params			bool
+	GenesisExport		bool
+	GenesisImport		bool
+	Invariants		bool
+	KeeperIsolation		KeeperIsolationPolicy
+	IBCBoundary		IBCReadyBoundary
+	ABCICompatibility	ABCICompatibilityPolicy
+	Events			[]string
+	TypedErrors		[]string
+	RootContribution	RootContribution
+	SurfaceHash		string
 }
 
 type KeeperIsolationPolicy struct {
-	StoreKey                         string
-	ReadableStoreKeys                []string
-	WritableStoreKeys                []string
-	GrantedCapabilities              []string
-	CrossZoneWritesProhibited        bool
-	CrossZoneMessagesModule          CosmosSDKModuleName
-	DirectCallsLimitedToLocalHelpers bool
-	SharedStateReadOnlyOrProofBacked bool
+	StoreKey				string
+	ReadableStoreKeys			[]string
+	WritableStoreKeys			[]string
+	GrantedCapabilities			[]string
+	CrossZoneWritesProhibited		bool
+	CrossZoneMessagesModule			CosmosSDKModuleName
+	DirectCallsLimitedToLocalHelpers	bool
+	SharedStateReadOnlyOrProofBacked	bool
 }
 
 type IBCReadyBoundary struct {
-	StateExportable             bool
-	ReceiptsProofVerifiable     bool
-	CanonicalBoundaryMessages   bool
-	TimeoutRulesExplicit        bool
-	ReplayRulesExplicit         bool
-	DeterministicChannelRouting bool
-	BoundaryMessageEncoding     string
-	TimeoutPolicyID             string
-	ReplayPolicyID              string
+	StateExportable			bool
+	ReceiptsProofVerifiable		bool
+	CanonicalBoundaryMessages	bool
+	TimeoutRulesExplicit		bool
+	ReplayRulesExplicit		bool
+	DeterministicChannelRouting	bool
+	BoundaryMessageEncoding		string
+	TimeoutPolicyID			string
+	ReplayPolicyID			string
 }
 
 type ABCICompatibilityPolicy struct {
-	ProposalOptimizationValidityNeutral bool
-	PrecheckDeterministic               bool
-	FinalizeBlockAuthoritative          bool
-	EndBlockCleanupBounded              bool
-	RootAggregationAfterExecution       bool
-	CleanupLimitPolicyID                string
-	RootAggregationPhase                KernelABCIPhase
-	PrecheckInputPolicyID               string
+	ProposalOptimizationValidityNeutral	bool
+	PrecheckDeterministic			bool
+	FinalizeBlockAuthoritative		bool
+	EndBlockCleanupBounded			bool
+	RootAggregationAfterExecution		bool
+	CleanupLimitPolicyID			string
+	RootAggregationPhase			KernelABCIPhase
+	PrecheckInputPolicyID			string
 }
 
 type CosmosModuleRequirementManifest struct {
-	Modules      []CosmosModuleSurface
-	ManifestHash string
+	Modules		[]CosmosModuleSurface
+	ManifestHash	string
 }
 
 func DefaultCosmosModuleRequirementManifest() (CosmosModuleRequirementManifest, error) {
@@ -296,21 +296,21 @@ func ComputeCosmosModuleRequirementManifestHash(manifest CosmosModuleRequirement
 func cosmosModuleSurface(moduleName CosmosSDKModuleName, path string, rootType RootType, events []string, typedErrors []string) CosmosModuleSurface {
 	root, _ := NewRootContribution(rootType, string(moduleName), DeterministicEmptyRootCommitment(rootType, string(moduleName)))
 	return CosmosModuleSurface{
-		ModuleName:        moduleName,
-		ModulePath:        path,
-		MsgServer:         true,
-		QueryServer:       true,
-		Keeper:            true,
-		Params:            true,
-		GenesisExport:     true,
-		GenesisImport:     true,
-		Invariants:        true,
-		KeeperIsolation:   DefaultKeeperIsolationPolicy(moduleName, string(moduleName)),
-		IBCBoundary:       DefaultIBCReadyBoundary(),
-		ABCICompatibility: DefaultABCICompatibilityPolicy(),
-		Events:            events,
-		TypedErrors:       typedErrors,
-		RootContribution:  root,
+		ModuleName:		moduleName,
+		ModulePath:		path,
+		MsgServer:		true,
+		QueryServer:		true,
+		Keeper:			true,
+		Params:			true,
+		GenesisExport:		true,
+		GenesisImport:		true,
+		Invariants:		true,
+		KeeperIsolation:	DefaultKeeperIsolationPolicy(moduleName, string(moduleName)),
+		IBCBoundary:		DefaultIBCReadyBoundary(),
+		ABCICompatibility:	DefaultABCICompatibilityPolicy(),
+		Events:			events,
+		TypedErrors:		typedErrors,
+		RootContribution:	root,
 	}
 }
 
@@ -350,13 +350,13 @@ func normalizeCosmosModuleSurfaces(surfaces []CosmosModuleSurface) []CosmosModul
 func DefaultKeeperIsolationPolicy(moduleName CosmosSDKModuleName, storeKey string) KeeperIsolationPolicy {
 	storeKey = strings.TrimSpace(storeKey)
 	return KeeperIsolationPolicy{
-		StoreKey:                         storeKey,
-		ReadableStoreKeys:                []string{storeKey},
-		WritableStoreKeys:                []string{storeKey},
-		CrossZoneWritesProhibited:        true,
-		CrossZoneMessagesModule:          CosmosModuleMessages,
-		DirectCallsLimitedToLocalHelpers: true,
-		SharedStateReadOnlyOrProofBacked: true,
+		StoreKey:				storeKey,
+		ReadableStoreKeys:			[]string{storeKey},
+		WritableStoreKeys:			[]string{storeKey},
+		CrossZoneWritesProhibited:		true,
+		CrossZoneMessagesModule:		CosmosModuleMessages,
+		DirectCallsLimitedToLocalHelpers:	true,
+		SharedStateReadOnlyOrProofBacked:	true,
 	}
 }
 
@@ -407,15 +407,15 @@ func (policy KeeperIsolationPolicy) Validate(moduleName CosmosSDKModuleName) err
 
 func DefaultIBCReadyBoundary() IBCReadyBoundary {
 	return IBCReadyBoundary{
-		StateExportable:             true,
-		ReceiptsProofVerifiable:     true,
-		CanonicalBoundaryMessages:   true,
-		TimeoutRulesExplicit:        true,
-		ReplayRulesExplicit:         true,
-		DeterministicChannelRouting: true,
-		BoundaryMessageEncoding:     "aetra.canonical.binary.v1",
-		TimeoutPolicyID:             "explicit-height-deadline-v1",
-		ReplayPolicyID:              "nonce-and-tombstone-v1",
+		StateExportable:		true,
+		ReceiptsProofVerifiable:	true,
+		CanonicalBoundaryMessages:	true,
+		TimeoutRulesExplicit:		true,
+		ReplayRulesExplicit:		true,
+		DeterministicChannelRouting:	true,
+		BoundaryMessageEncoding:	"aetra.canonical.binary.v1",
+		TimeoutPolicyID:		"explicit-height-deadline-v1",
+		ReplayPolicyID:			"nonce-and-tombstone-v1",
 	}
 }
 
@@ -453,14 +453,14 @@ func (boundary IBCReadyBoundary) Validate(moduleName CosmosSDKModuleName) error 
 
 func DefaultABCICompatibilityPolicy() ABCICompatibilityPolicy {
 	return ABCICompatibilityPolicy{
-		ProposalOptimizationValidityNeutral: true,
-		PrecheckDeterministic:               true,
-		FinalizeBlockAuthoritative:          true,
-		EndBlockCleanupBounded:              true,
-		RootAggregationAfterExecution:       true,
-		CleanupLimitPolicyID:                "bounded-endblock-cleanup-v1",
-		RootAggregationPhase:                KernelPhaseFinalizeBlock,
-		PrecheckInputPolicyID:               "consensus-context-only-v1",
+		ProposalOptimizationValidityNeutral:	true,
+		PrecheckDeterministic:			true,
+		FinalizeBlockAuthoritative:		true,
+		EndBlockCleanupBounded:			true,
+		RootAggregationAfterExecution:		true,
+		CleanupLimitPolicyID:			"bounded-endblock-cleanup-v1",
+		RootAggregationPhase:			KernelPhaseFinalizeBlock,
+		PrecheckInputPolicyID:			"consensus-context-only-v1",
 	}
 }
 

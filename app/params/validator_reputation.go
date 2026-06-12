@@ -6,116 +6,116 @@ import (
 )
 
 const (
-	ValidatorReputationScoringVersionV1 = "validator-reputation/v1"
+	ValidatorReputationScoringVersionV1	= "validator-reputation/v1"
 
-	ReputationComponentConsensusSafe = "consensus_safe"
-	ReputationComponentAdvisoryOnly  = "advisory_only"
+	ReputationComponentConsensusSafe	= "consensus_safe"
+	ReputationComponentAdvisoryOnly		= "advisory_only"
 
-	DefaultReputationMissingDataPenaltyBps       = int64(250)
-	DefaultCaptureDelegationFlowThresholdBps     = int64(2_000)
-	DefaultCaptureCommissionChangeThresholdBps   = int64(500)
-	DefaultCaptureSelfDelegationExitThresholdBps = int64(1_000)
-	DefaultRewardPerformanceTargetBps            = int64(10_000)
+	DefaultReputationMissingDataPenaltyBps		= int64(250)
+	DefaultCaptureDelegationFlowThresholdBps	= int64(2_000)
+	DefaultCaptureCommissionChangeThresholdBps	= int64(500)
+	DefaultCaptureSelfDelegationExitThresholdBps	= int64(1_000)
+	DefaultRewardPerformanceTargetBps		= int64(10_000)
 )
 
 type ValidatorReputationWeights struct {
-	ReliabilityBps         int64
-	SlashHistoryBps        int64
-	CommissionStabilityBps int64
-	SelfDelegationBps      int64
-	MetadataBps            int64
-	DelegationFlowBps      int64
-	RewardPerformanceBps   int64
-	ConcentrationBps       int64
+	ReliabilityBps		int64
+	SlashHistoryBps		int64
+	CommissionStabilityBps	int64
+	SelfDelegationBps	int64
+	MetadataBps		int64
+	DelegationFlowBps	int64
+	RewardPerformanceBps	int64
+	ConcentrationBps	int64
 }
 
 type ValidatorReputationParams struct {
-	ScoringVersion                        string
-	ConcentrationSoftCapBps               int64
-	MissingDataPenaltyBps                 int64
-	CaptureDelegationFlowThresholdBps     int64
-	CaptureCommissionChangeThresholdBps   int64
-	CaptureSelfDelegationExitThresholdBps int64
-	RewardPerformanceTargetBps            int64
-	AllowAdvisoryInputsInConsensus        bool
-	Weights                               ValidatorReputationWeights
+	ScoringVersion				string
+	ConcentrationSoftCapBps			int64
+	MissingDataPenaltyBps			int64
+	CaptureDelegationFlowThresholdBps	int64
+	CaptureCommissionChangeThresholdBps	int64
+	CaptureSelfDelegationExitThresholdBps	int64
+	RewardPerformanceTargetBps		int64
+	AllowAdvisoryInputsInConsensus		bool
+	Weights					ValidatorReputationWeights
 }
 
 type ValidatorReputationInput struct {
-	ValidatorID                    string
-	UptimeHistoryBps               []int64
-	MissedBlockRateHistoryBps      []int64
-	SlashEvents                    uint64
-	SlashSeverityBps               int64
-	CommissionChangeHistoryBps     []int64
-	SelfDelegationChangeHistoryBps []int64
-	MetadataChangeCount            uint64
-	MetadataComplete               bool
-	DelegationInflowBps            int64
-	DelegationOutflowBps           int64
-	HistoricalRewardPerformanceBps []int64
-	VotingPowerBps                 int64
-	UseInConsensus                 bool
-	AdvisoryInputsDeterministic    bool
+	ValidatorID			string
+	UptimeHistoryBps		[]int64
+	MissedBlockRateHistoryBps	[]int64
+	SlashEvents			uint64
+	SlashSeverityBps		int64
+	CommissionChangeHistoryBps	[]int64
+	SelfDelegationChangeHistoryBps	[]int64
+	MetadataChangeCount		uint64
+	MetadataComplete		bool
+	DelegationInflowBps		int64
+	DelegationOutflowBps		int64
+	HistoricalRewardPerformanceBps	[]int64
+	VotingPowerBps			int64
+	UseInConsensus			bool
+	AdvisoryInputsDeterministic	bool
 }
 
 type ValidatorReputationComponent struct {
-	Name        string
-	Source      string
-	ScoreBps    int64
-	WeightBps   int64
-	Explanation string
-	Missing     bool
+	Name		string
+	Source		string
+	ScoreBps	int64
+	WeightBps	int64
+	Explanation	string
+	Missing		bool
 }
 
 type ValidatorDelegatorMetadata struct {
-	ValidatorID                 string
-	ScoringVersion              string
-	RiskScoreBps                int64
-	ReliabilityScoreBps         int64
-	CommissionStabilityScoreBps int64
-	ConcentrationWarning        bool
-	CaptureRiskWarning          bool
-	AdvisoryOnly                bool
-	Explanation                 []string
+	ValidatorID			string
+	ScoringVersion			string
+	RiskScoreBps			int64
+	ReliabilityScoreBps		int64
+	CommissionStabilityScoreBps	int64
+	ConcentrationWarning		bool
+	CaptureRiskWarning		bool
+	AdvisoryOnly			bool
+	Explanation			[]string
 }
 
 type ValidatorReputationReport struct {
-	ValidatorID                 string
-	ScoringVersion              string
-	RiskScoreBps                int64
-	ReliabilityScoreBps         int64
-	CommissionStabilityScoreBps int64
-	ConsensusSafeScoreBps       int64
-	AdvisoryScoreBps            int64
-	ConcentrationWarning        bool
-	CaptureRiskWarning          bool
-	ConsensusSafeForSelection   bool
-	ConsensusComponents         []ValidatorReputationComponent
-	AdvisoryComponents          []ValidatorReputationComponent
-	DelegatorMetadata           ValidatorDelegatorMetadata
-	ScoreExplanation            []string
-	Failed                      []string
+	ValidatorID			string
+	ScoringVersion			string
+	RiskScoreBps			int64
+	ReliabilityScoreBps		int64
+	CommissionStabilityScoreBps	int64
+	ConsensusSafeScoreBps		int64
+	AdvisoryScoreBps		int64
+	ConcentrationWarning		bool
+	CaptureRiskWarning		bool
+	ConsensusSafeForSelection	bool
+	ConsensusComponents		[]ValidatorReputationComponent
+	AdvisoryComponents		[]ValidatorReputationComponent
+	DelegatorMetadata		ValidatorDelegatorMetadata
+	ScoreExplanation		[]string
+	Failed				[]string
 }
 
 func DefaultValidatorReputationParams() ValidatorReputationParams {
 	return ValidatorReputationParams{
-		ScoringVersion:                        ValidatorReputationScoringVersionV1,
-		ConcentrationSoftCapBps:               MaxTopValidatorConcentrationBps,
-		MissingDataPenaltyBps:                 DefaultReputationMissingDataPenaltyBps,
-		CaptureDelegationFlowThresholdBps:     DefaultCaptureDelegationFlowThresholdBps,
-		CaptureCommissionChangeThresholdBps:   DefaultCaptureCommissionChangeThresholdBps,
-		CaptureSelfDelegationExitThresholdBps: DefaultCaptureSelfDelegationExitThresholdBps,
-		RewardPerformanceTargetBps:            DefaultRewardPerformanceTargetBps,
+		ScoringVersion:				ValidatorReputationScoringVersionV1,
+		ConcentrationSoftCapBps:		MaxTopValidatorConcentrationBps,
+		MissingDataPenaltyBps:			DefaultReputationMissingDataPenaltyBps,
+		CaptureDelegationFlowThresholdBps:	DefaultCaptureDelegationFlowThresholdBps,
+		CaptureCommissionChangeThresholdBps:	DefaultCaptureCommissionChangeThresholdBps,
+		CaptureSelfDelegationExitThresholdBps:	DefaultCaptureSelfDelegationExitThresholdBps,
+		RewardPerformanceTargetBps:		DefaultRewardPerformanceTargetBps,
 		Weights: ValidatorReputationWeights{
-			ReliabilityBps:         2_500,
-			SlashHistoryBps:        1_500,
-			CommissionStabilityBps: 1_500,
-			SelfDelegationBps:      1_000,
-			MetadataBps:            750,
-			DelegationFlowBps:      1_000,
-			RewardPerformanceBps:   1_000,
-			ConcentrationBps:       750,
+			ReliabilityBps:		2_500,
+			SlashHistoryBps:	1_500,
+			CommissionStabilityBps:	1_500,
+			SelfDelegationBps:	1_000,
+			MetadataBps:		750,
+			DelegationFlowBps:	1_000,
+			RewardPerformanceBps:	1_000,
+			ConcentrationBps:	750,
 		},
 	}
 }
@@ -137,8 +137,8 @@ func EvaluateValidatorReputation(input ValidatorReputationInput, params Validato
 	delegationFlowScore := BasisPoints - clampInt64(maxInt64(input.DelegationInflowBps, input.DelegationOutflowBps), 0, BasisPoints)
 	rewardPerformanceScore, rewardMissing := rewardPerformanceScore(input.HistoricalRewardPerformanceBps, params)
 	concentrationScore := BasisPoints - concentrationDampeningBps(input.VotingPowerBps, StakingEnhancementParams{
-		ConcentrationSoftCapBps:      params.ConcentrationSoftCapBps,
-		MaxConcentrationDampeningBps: MaxValidatorRewardDampeningBps,
+		ConcentrationSoftCapBps:	params.ConcentrationSoftCapBps,
+		MaxConcentrationDampeningBps:	MaxValidatorRewardDampeningBps,
 	})
 
 	consensusComponents := []ValidatorReputationComponent{
@@ -172,33 +172,33 @@ func EvaluateValidatorReputation(input ValidatorReputationInput, params Validato
 
 	explanations := reputationExplanations(consensusComponents, advisoryComponents, concentrationWarning, captureWarning, input.UseInConsensus)
 	metadata := ValidatorDelegatorMetadata{
-		ValidatorID:                 input.ValidatorID,
-		ScoringVersion:              params.ScoringVersion,
-		RiskScoreBps:                riskScore,
-		ReliabilityScoreBps:         reliabilityScore,
-		CommissionStabilityScoreBps: commissionScore,
-		ConcentrationWarning:        concentrationWarning,
-		CaptureRiskWarning:          captureWarning,
-		AdvisoryOnly:                !consensusSafeForSelection || !input.UseInConsensus,
-		Explanation:                 explanations,
+		ValidatorID:			input.ValidatorID,
+		ScoringVersion:			params.ScoringVersion,
+		RiskScoreBps:			riskScore,
+		ReliabilityScoreBps:		reliabilityScore,
+		CommissionStabilityScoreBps:	commissionScore,
+		ConcentrationWarning:		concentrationWarning,
+		CaptureRiskWarning:		captureWarning,
+		AdvisoryOnly:			!consensusSafeForSelection || !input.UseInConsensus,
+		Explanation:			explanations,
 	}
 
 	return ValidatorReputationReport{
-		ValidatorID:                 input.ValidatorID,
-		ScoringVersion:              params.ScoringVersion,
-		RiskScoreBps:                riskScore,
-		ReliabilityScoreBps:         reliabilityScore,
-		CommissionStabilityScoreBps: commissionScore,
-		ConsensusSafeScoreBps:       consensusScore,
-		AdvisoryScoreBps:            advisoryScore,
-		ConcentrationWarning:        concentrationWarning,
-		CaptureRiskWarning:          captureWarning,
-		ConsensusSafeForSelection:   consensusSafeForSelection,
-		ConsensusComponents:         consensusComponents,
-		AdvisoryComponents:          advisoryComponents,
-		DelegatorMetadata:           metadata,
-		ScoreExplanation:            explanations,
-		Failed:                      failed,
+		ValidatorID:			input.ValidatorID,
+		ScoringVersion:			params.ScoringVersion,
+		RiskScoreBps:			riskScore,
+		ReliabilityScoreBps:		reliabilityScore,
+		CommissionStabilityScoreBps:	commissionScore,
+		ConsensusSafeScoreBps:		consensusScore,
+		AdvisoryScoreBps:		advisoryScore,
+		ConcentrationWarning:		concentrationWarning,
+		CaptureRiskWarning:		captureWarning,
+		ConsensusSafeForSelection:	consensusSafeForSelection,
+		ConsensusComponents:		consensusComponents,
+		AdvisoryComponents:		advisoryComponents,
+		DelegatorMetadata:		metadata,
+		ScoreExplanation:		explanations,
+		Failed:				failed,
 	}, nil
 }
 
@@ -258,8 +258,8 @@ func (p ValidatorReputationParams) withDefaults() ValidatorReputationParams {
 
 func (w ValidatorReputationWeights) Validate() error {
 	for _, field := range []struct {
-		name  string
-		value int64
+		name	string
+		value	int64
 	}{
 		{name: "reliability_weight_bps", value: w.ReliabilityBps},
 		{name: "slash_history_weight_bps", value: w.SlashHistoryBps},
@@ -299,10 +299,10 @@ func (input ValidatorReputationInput) Validate() error {
 		return fmt.Errorf("validator_id is required")
 	}
 	for name, values := range map[string][]int64{
-		"uptime_history_bps":                input.UptimeHistoryBps,
-		"missed_block_rate_history_bps":     input.MissedBlockRateHistoryBps,
-		"commission_change_history_bps":     input.CommissionChangeHistoryBps,
-		"historical_reward_performance_bps": input.HistoricalRewardPerformanceBps,
+		"uptime_history_bps":			input.UptimeHistoryBps,
+		"missed_block_rate_history_bps":	input.MissedBlockRateHistoryBps,
+		"commission_change_history_bps":	input.CommissionChangeHistoryBps,
+		"historical_reward_performance_bps":	input.HistoricalRewardPerformanceBps,
 	} {
 		for i, value := range values {
 			if err := validateBps(fmt.Sprintf("%s[%d]", name, i), value, 0, DefaultMaxLoadMultiplierBps); err != nil {
@@ -376,12 +376,12 @@ func reputationMetadataScore(complete bool, changes uint64, params ValidatorRepu
 
 func reputationComponent(name, source string, score, weight int64, explanation string, missing bool) ValidatorReputationComponent {
 	return ValidatorReputationComponent{
-		Name:        name,
-		Source:      source,
-		ScoreBps:    clampInt64(score, 0, BasisPoints),
-		WeightBps:   weight,
-		Explanation: explanation,
-		Missing:     missing,
+		Name:		name,
+		Source:		source,
+		ScoreBps:	clampInt64(score, 0, BasisPoints),
+		WeightBps:	weight,
+		Explanation:	explanation,
+		Missing:	missing,
 	}
 }
 

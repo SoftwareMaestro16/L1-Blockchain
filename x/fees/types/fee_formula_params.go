@@ -22,45 +22,45 @@ import (
 type FeeFormulaParams struct {
 	// TargetTransferFeeNaet is the anchor fee for a normal transfer (Requirement 1.2).
 	// Default: 10_000_000 naet == 0.01 AET.
-	TargetTransferFeeNaet string `json:"target_transfer_fee_naet"`
+	TargetTransferFeeNaet	string	`json:"target_transfer_fee_naet"`
 
 	// BaseFeePerGasNaet is the cost per gas unit in naet.
-	BaseFeePerGasNaet string `json:"base_fee_per_gas_naet"`
+	BaseFeePerGasNaet	string	`json:"base_fee_per_gas_naet"`
 
 	// ByteFeeNaet is the cost per transaction byte in naet.
-	ByteFeeNaet string `json:"byte_fee_naet"`
+	ByteFeeNaet	string	`json:"byte_fee_naet"`
 
 	// MessageFeeNaet is the cost per message in naet.
-	MessageFeeNaet string `json:"message_fee_naet"`
+	MessageFeeNaet	string	`json:"message_fee_naet"`
 
 	// MaxCongestionSurchargeNaet is the upper bound of the congestion surcharge.
 	// The actual surcharge is proportional to block utilization above the threshold.
-	MaxCongestionSurchargeNaet string `json:"max_congestion_surcharge_naet"`
+	MaxCongestionSurchargeNaet	string	`json:"max_congestion_surcharge_naet"`
 
 	// LowReputationPremiumCapNaet is the maximum bounded premium added for low-reputation
 	// senders (Requirement 1.4). Never blocks a transaction.
-	LowReputationPremiumCapNaet string `json:"low_reputation_premium_cap_naet"`
+	LowReputationPremiumCapNaet	string	`json:"low_reputation_premium_cap_naet"`
 
 	// HighReputationDiscountCapNaet is the maximum bounded discount applied for
 	// high-reputation senders (Requirement 1.5). Never zeroes the protocol fee.
-	HighReputationDiscountCapNaet string `json:"high_reputation_discount_cap_naet"`
+	HighReputationDiscountCapNaet	string	`json:"high_reputation_discount_cap_naet"`
 
 	// StorageRentSideEffectsNaet is the default fee budget for transactions that create
 	// or increase persistent state (Requirement 6.6). May be overridden per-tx.
-	StorageRentSideEffectsNaet string `json:"storage_rent_side_effects_naet"`
+	StorageRentSideEffectsNaet	string	`json:"storage_rent_side_effects_naet"`
 }
 
 // DefaultFeeFormulaParams returns safe governance defaults for the extended fee formula.
 func DefaultFeeFormulaParams() FeeFormulaParams {
 	return FeeFormulaParams{
-		TargetTransferFeeNaet:         DefaultTargetTransferFeeAmount, // 10_000_000 naet
-		BaseFeePerGasNaet:             DefaultBaseGasFeePerGas,
-		ByteFeeNaet:                   DefaultByteFeeNaet,
-		MessageFeeNaet:                DefaultMessageFeeNaet,
-		MaxCongestionSurchargeNaet:    "2000000", // 20% of target transfer fee
-		LowReputationPremiumCapNaet:   DefaultLowReputationPremiumCap,
-		HighReputationDiscountCapNaet: DefaultHighReputationDiscountCap,
-		StorageRentSideEffectsNaet:    DefaultStorageRentSideEffectsNaet,
+		TargetTransferFeeNaet:		DefaultTargetTransferFeeAmount,
+		BaseFeePerGasNaet:		DefaultBaseGasFeePerGas,
+		ByteFeeNaet:			DefaultByteFeeNaet,
+		MessageFeeNaet:			DefaultMessageFeeNaet,
+		MaxCongestionSurchargeNaet:	"2000000",
+		LowReputationPremiumCapNaet:	DefaultLowReputationPremiumCap,
+		HighReputationDiscountCapNaet:	DefaultHighReputationDiscountCap,
+		StorageRentSideEffectsNaet:	DefaultStorageRentSideEffectsNaet,
 	}
 }
 
@@ -199,7 +199,6 @@ func ComputeFullTransferFee(
 		return sdkmath.Int{}, err
 	}
 
-	// max(min_tx_fee_naet, base_transfer_fee_naet)
 	minFee, err := baseParams.MinFeeInt()
 	if err != nil {
 		return sdkmath.Int{}, err
@@ -213,35 +212,30 @@ func ComputeFullTransferFee(
 		base = baseFee
 	}
 
-	// gas_used * current_base_fee_per_gas_naet
 	gasFeePerGas, err := formulaParams.BaseFeePerGasInt()
 	if err != nil {
 		return sdkmath.Int{}, err
 	}
-	gasComponent := gasFeePerGas.MulRaw(int64(gasUsed)) // #nosec G115 -- gasUsed bounded by MaxTxGas
+	gasComponent := gasFeePerGas.MulRaw(int64(gasUsed))
 
-	// tx_size_bytes * byte_fee_naet
 	byteFee, err := formulaParams.ByteFeeInt()
 	if err != nil {
 		return sdkmath.Int{}, err
 	}
-	byteComponent := byteFee.MulRaw(int64(txSizeBytes)) // #nosec G115 -- txSizeBytes bounded by MaxTxBytes
+	byteComponent := byteFee.MulRaw(int64(txSizeBytes))
 
-	// message_count * message_fee_naet
 	msgFee, err := formulaParams.MessageFeeInt()
 	if err != nil {
 		return sdkmath.Int{}, err
 	}
-	msgComponent := msgFee.MulRaw(int64(messageCount)) // #nosec G115 -- bounded by MaxMessagesPerTx
+	msgComponent := msgFee.MulRaw(int64(messageCount))
 
-	// bounded_congestion_surcharge_naet — deterministic from KV-state block utilization bps
 	maxSurcharge, err := formulaParams.MaxCongestionSurchargeInt()
 	if err != nil {
 		return sdkmath.Int{}, err
 	}
 	congestionSurcharge := computeBoundedCongestionSurcharge(maxSurcharge, blockUtilizationBps, baseParams.CongestionThresholdBps)
 
-	// low_reputation_premium_naet and bounded_reputation_discount_naet
 	lowPremiumCap, err := formulaParams.LowReputationPremiumCapInt()
 	if err != nil {
 		return sdkmath.Int{}, err
@@ -252,7 +246,6 @@ func ComputeFullTransferFee(
 	}
 	premium, discount := computeReputationAdjustments(reputationScore, reputationFound, lowPremiumCap, discountCap)
 
-	// storage_rent_side_effects_naet
 	storageRent := storageRentSideEffectsNaet
 	if storageRent.IsNil() || storageRent.IsNegative() {
 		storageRent = sdkmath.ZeroInt()
@@ -267,7 +260,6 @@ func ComputeFullTransferFee(
 		Add(storageRent).
 		Sub(discount)
 
-	// Enforce min_tx_fee_naet as floor — discount can never zero the fee (Requirement 1.5)
 	if total.LT(minFee) {
 		total = minFee
 	}
@@ -287,8 +279,8 @@ func computeBoundedCongestionSurcharge(maxSurcharge sdkmath.Int, utilizationBps,
 		return maxSurcharge
 	}
 	overBps := uint64(utilizationBps - thresholdBps)
-	// linear interpolation: surcharge = maxSurcharge * overBps / remainingBps
-	surcharge := maxSurcharge.MulRaw(int64(overBps)).QuoRaw(int64(remainingBps)) // #nosec G115 -- bps values ≤ 10000
+
+	surcharge := maxSurcharge.MulRaw(int64(overBps)).QuoRaw(int64(remainingBps))
 	if surcharge.GT(maxSurcharge) {
 		return maxSurcharge
 	}
@@ -302,17 +294,16 @@ func computeBoundedCongestionSurcharge(maxSurcharge sdkmath.Int, utilizationBps,
 // Score is in [0..10000] bps where ReputationNeutralScore (5000) == neutral.
 func computeReputationAdjustments(score uint32, found bool, premiumCap, discountCap sdkmath.Int) (premium, discount sdkmath.Int) {
 	if !found {
-		// No reputation record → neutral behavior
+
 		return sdkmath.ZeroInt(), sdkmath.ZeroInt()
 	}
 
-	neutral := ReputationNeutralScore // 5000
+	neutral := ReputationNeutralScore
 
 	if score < neutral {
-		// Low reputation: proportional premium up to cap
-		// premium = cap * (neutral - score) / neutral
+
 		deficit := uint64(neutral - score)
-		p := premiumCap.MulRaw(int64(deficit)).QuoRaw(int64(neutral)) // #nosec G115 -- values ≤ 10000
+		p := premiumCap.MulRaw(int64(deficit)).QuoRaw(int64(neutral))
 		if p.GT(premiumCap) {
 			p = premiumCap
 		}
@@ -320,14 +311,13 @@ func computeReputationAdjustments(score uint32, found bool, premiumCap, discount
 	}
 
 	if score > neutral {
-		// High reputation: proportional discount up to cap
-		// discount = cap * (score - neutral) / (10000 - neutral)
+
 		excess := uint64(score - neutral)
 		remaining := uint64(BasisPoints) - uint64(neutral)
 		if remaining == 0 {
 			return sdkmath.ZeroInt(), discountCap
 		}
-		d := discountCap.MulRaw(int64(excess)).QuoRaw(int64(remaining)) // #nosec G115 -- values ≤ 10000
+		d := discountCap.MulRaw(int64(excess)).QuoRaw(int64(remaining))
 		if d.GT(discountCap) {
 			d = discountCap
 		}

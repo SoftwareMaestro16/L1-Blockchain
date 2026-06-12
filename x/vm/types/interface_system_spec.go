@@ -12,36 +12,36 @@ import (
 )
 
 const (
-	AVMInterfaceExecutionSync      AVMInterfaceExecutionMode = "sync"
-	AVMInterfaceExecutionAsync     AVMInterfaceExecutionMode = "async"
-	AVMInterfaceExecutionScheduled AVMInterfaceExecutionMode = "scheduled"
-	AVMInterfaceExecutionGet       AVMInterfaceExecutionMode = "get"
+	AVMInterfaceExecutionSync	AVMInterfaceExecutionMode	= "sync"
+	AVMInterfaceExecutionAsync	AVMInterfaceExecutionMode	= "async"
+	AVMInterfaceExecutionScheduled	AVMInterfaceExecutionMode	= "scheduled"
+	AVMInterfaceExecutionGet	AVMInterfaceExecutionMode	= "get"
 
-	AVMInterfaceTargetContract     AVMInterfaceTargetType = "contract"
-	AVMInterfaceTargetService      AVMInterfaceTargetType = "service"
-	AVMInterfaceTargetNativeModule AVMInterfaceTargetType = "native_module"
-	AVMInterfaceTargetWASM         AVMInterfaceTargetType = "wasm_contract"
-	AVMInterfaceTargetActor        AVMInterfaceTargetType = "actor_contract"
+	AVMInterfaceTargetContract	AVMInterfaceTargetType	= "contract"
+	AVMInterfaceTargetService	AVMInterfaceTargetType	= "service"
+	AVMInterfaceTargetNativeModule	AVMInterfaceTargetType	= "native_module"
+	AVMInterfaceTargetWASM		AVMInterfaceTargetType	= "wasm_contract"
+	AVMInterfaceTargetActor		AVMInterfaceTargetType	= "actor_contract"
 
-	AVMInterfaceSchemaJSONSchema AVMInterfaceSchemaEncoding = "json_schema"
-	AVMInterfaceSchemaProtobuf   AVMInterfaceSchemaEncoding = "protobuf"
-	AVMInterfaceSchemaTLB        AVMInterfaceSchemaEncoding = "tlb"
-	AVMInterfaceSchemaBinary     AVMInterfaceSchemaEncoding = "binary"
+	AVMInterfaceSchemaJSONSchema	AVMInterfaceSchemaEncoding	= "json_schema"
+	AVMInterfaceSchemaProtobuf	AVMInterfaceSchemaEncoding	= "protobuf"
+	AVMInterfaceSchemaTLB		AVMInterfaceSchemaEncoding	= "tlb"
+	AVMInterfaceSchemaBinary	AVMInterfaceSchemaEncoding	= "binary"
 
-	AVMInterfaceUseUIGeneration        AVMInterfaceUseCase = "ui_generation"
-	AVMInterfaceUseWalletForms         AVMInterfaceUseCase = "wallet_forms"
-	AVMInterfaceUseCLIAutoBinding      AVMInterfaceUseCase = "cli_auto_binding"
-	AVMInterfaceUseRPCIntrospection    AVMInterfaceUseCase = "rpc_introspection"
-	AVMInterfaceUseSDKCallBuilders     AVMInterfaceUseCase = "sdk_call_builders"
-	AVMInterfaceUseCapabilityDiscovery AVMInterfaceUseCase = "capability_discovery"
+	AVMInterfaceUseUIGeneration		AVMInterfaceUseCase	= "ui_generation"
+	AVMInterfaceUseWalletForms		AVMInterfaceUseCase	= "wallet_forms"
+	AVMInterfaceUseCLIAutoBinding		AVMInterfaceUseCase	= "cli_auto_binding"
+	AVMInterfaceUseRPCIntrospection		AVMInterfaceUseCase	= "rpc_introspection"
+	AVMInterfaceUseSDKCallBuilders		AVMInterfaceUseCase	= "sdk_call_builders"
+	AVMInterfaceUseCapabilityDiscovery	AVMInterfaceUseCase	= "capability_discovery"
 
-	AVMInterfaceSDKGo         AVMInterfaceSDKCodegenFormat = "go"
-	AVMInterfaceSDKTypeScript AVMInterfaceSDKCodegenFormat = "typescript"
-	AVMInterfaceSDKJSON       AVMInterfaceSDKCodegenFormat = "json"
+	AVMInterfaceSDKGo		AVMInterfaceSDKCodegenFormat	= "go"
+	AVMInterfaceSDKTypeScript	AVMInterfaceSDKCodegenFormat	= "typescript"
+	AVMInterfaceSDKJSON		AVMInterfaceSDKCodegenFormat	= "json"
 
-	MaxAVMInterfaceTokenLength   = 128
-	MaxAVMInterfaceVersionLength = 32
-	MaxAVMInterfaceDescriptors   = 512
+	MaxAVMInterfaceTokenLength	= 128
+	MaxAVMInterfaceVersionLength	= 32
+	MaxAVMInterfaceDescriptors	= 512
 )
 
 type AVMInterfaceExecutionMode string
@@ -51,85 +51,85 @@ type AVMInterfaceUseCase string
 type AVMInterfaceSDKCodegenFormat string
 
 type AVMMethodDescriptor struct {
-	MethodID                   string
-	Name                       string
-	InputSchemaHash            string
-	OutputSchemaHash           string
-	ExecutionMode              AVMInterfaceExecutionMode
-	GasHint                    uint64
-	PaymentRequirementOptional string
-	ProofRequirementOptional   string
+	MethodID			string
+	Name				string
+	InputSchemaHash			string
+	OutputSchemaHash		string
+	ExecutionMode			AVMInterfaceExecutionMode
+	GasHint				uint64
+	PaymentRequirementOptional	string
+	ProofRequirementOptional	string
 }
 
 type AVMEventDescriptor struct {
-	EventID    string
-	Name       string
-	SchemaHash string
+	EventID		string
+	Name		string
+	SchemaHash	string
 }
 
 type AVMAsyncHandlerDescriptor struct {
-	HandlerID           string
-	Name                string
-	InputSchemaHash     string
-	OutputSchemaHash    string
-	GasHint             uint64
-	RetryPolicyOptional string
-	CallbackBehavior    string
-	TimeoutHeight       uint64
+	HandlerID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	GasHint			uint64
+	RetryPolicyOptional	string
+	CallbackBehavior	string
+	TimeoutHeight		uint64
 }
 
 type AVMGetMethodDescriptor struct {
-	MethodID         string
-	Name             string
-	InputSchemaHash  string
-	OutputSchemaHash string
-	GasHint          uint64
-	ReadOnly         bool
+	MethodID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	GasHint			uint64
+	ReadOnly		bool
 }
 
 type AVMInterfaceDescriptor struct {
-	InterfaceHash           string
-	InterfaceVersion        string
-	Owner                   string
-	TargetType              AVMInterfaceTargetType
-	MethodDescriptors       []AVMMethodDescriptor
-	EventDescriptors        []AVMEventDescriptor
-	AsyncHandlerDescriptors []AVMAsyncHandlerDescriptor
-	GetMethodDescriptors    []AVMGetMethodDescriptor
-	SchemaEncoding          AVMInterfaceSchemaEncoding
-	MetadataHashOptional    string
-	MetadataGrantsAuth      bool
+	InterfaceHash		string
+	InterfaceVersion	string
+	Owner			string
+	TargetType		AVMInterfaceTargetType
+	MethodDescriptors	[]AVMMethodDescriptor
+	EventDescriptors	[]AVMEventDescriptor
+	AsyncHandlerDescriptors	[]AVMAsyncHandlerDescriptor
+	GetMethodDescriptors	[]AVMGetMethodDescriptor
+	SchemaEncoding		AVMInterfaceSchemaEncoding
+	MetadataHashOptional	string
+	MetadataGrantsAuth	bool
 }
 
 type AVMInterfaceSchema struct {
-	InterfaceHash  string
-	SchemaEncoding AVMInterfaceSchemaEncoding
-	DescriptorRoot string
-	UseCases       []AVMInterfaceUseCase
-	SchemaHash     string
+	InterfaceHash	string
+	SchemaEncoding	AVMInterfaceSchemaEncoding
+	DescriptorRoot	string
+	UseCases	[]AVMInterfaceUseCase
+	SchemaHash	string
 }
 
 type AVMInterfaceBinding struct {
-	TargetID      string
-	TargetType    AVMInterfaceTargetType
-	InterfaceHash string
-	BindingHash   string
+	TargetID	string
+	TargetType	AVMInterfaceTargetType
+	InterfaceHash	string
+	BindingHash	string
 }
 
 type AVMSDKCodeGenerationFormat struct {
-	InterfaceHash     string
-	Format            AVMInterfaceSDKCodegenFormat
-	PackageName       string
-	MethodBindings    []string
-	GetMethodBindings []string
-	GenerationHash    string
+	InterfaceHash		string
+	Format			AVMInterfaceSDKCodegenFormat
+	PackageName		string
+	MethodBindings		[]string
+	GetMethodBindings	[]string
+	GenerationHash		string
 }
 
 type AVMInterfaceRegistry struct {
-	Interfaces []AVMInterfaceDescriptor
-	Schemas    []AVMInterfaceSchema
-	Bindings   []AVMInterfaceBinding
-	Root       string
+	Interfaces	[]AVMInterfaceDescriptor
+	Schemas		[]AVMInterfaceSchema
+	Bindings	[]AVMInterfaceBinding
+	Root		string
 }
 
 func NewAVMInterfaceDescriptor(descriptor AVMInterfaceDescriptor) (AVMInterfaceDescriptor, error) {

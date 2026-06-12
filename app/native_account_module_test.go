@@ -102,7 +102,7 @@ func TestNativeAccountGenesisImportRejectsMalformedBeforePartialWrite(t *testing
 	duplicate := account
 
 	err := app.NativeAccountKeeper.InitGenesis(ctx, nativeaccounttypes.GenesisState{
-		Version: nativeaccounttypes.DefaultGenesis().Version,
+		Version:	nativeaccounttypes.DefaultGenesis().Version,
 		Accounts: []nativeaccounttypes.Account{
 			account,
 			duplicate,
@@ -143,10 +143,10 @@ func TestNativeAccountInactiveCannotSendNormalMessages(t *testing.T) {
 	route := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgUpdateAccountMetadata{})
 
 	_, err = route(ctx, &nativeaccounttypes.MsgUpdateAccountMetadata{
-		AccountUser:   pair.User,
-		Metadata:      nativeaccounttypes.AccountMetadata{MetadataHash: "hash"},
-		Signers:       []string{nativeaccounttypes.PublicKeyText(pubKey)},
-		CurrentHeight: 32,
+		AccountUser:	pair.User,
+		Metadata:	nativeaccounttypes.AccountMetadata{MetadataHash: "hash"},
+		Signers:	[]string{nativeaccounttypes.PublicKeyText(pubKey)},
+		CurrentHeight:	32,
 	})
 	require.ErrorContains(t, err, "inactive account cannot send normal messages")
 
@@ -164,9 +164,9 @@ func TestNativeAccountFrozenWhitelistAllowsRecoveryDebtAndUnfreezeOnly(t *testin
 
 	freezeRoute := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgFreezeAccount{})
 	_, err := freezeRoute(ctx, &nativeaccounttypes.MsgFreezeAccount{
-		AccountUser:   account.AddressUser,
-		Signers:       []string{signer},
-		CurrentHeight: 33,
+		AccountUser:	account.AddressUser,
+		Signers:	[]string{signer},
+		CurrentHeight:	33,
 	})
 	require.NoError(t, err)
 
@@ -180,18 +180,18 @@ func TestNativeAccountFrozenWhitelistAllowsRecoveryDebtAndUnfreezeOnly(t *testin
 
 	metadataRoute := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgUpdateAccountMetadata{})
 	_, err = metadataRoute(ctx, &nativeaccounttypes.MsgUpdateAccountMetadata{
-		AccountUser:   account.AddressUser,
-		Metadata:      nativeaccounttypes.AccountMetadata{MetadataHash: "normal-update"},
-		Signers:       []string{signer},
-		CurrentHeight: 34,
+		AccountUser:	account.AddressUser,
+		Metadata:	nativeaccounttypes.AccountMetadata{MetadataHash: "normal-update"},
+		Signers:	[]string{signer},
+		CurrentHeight:	34,
 	})
 	require.ErrorContains(t, err, "frozen account allows only")
 
 	recoverRoute := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgRecoverAccount{})
 	_, err = recoverRoute(ctx, &nativeaccounttypes.MsgRecoverAccount{
-		AccountUser:   account.AddressUser,
-		Signers:       []string{"recovery-key"},
-		CurrentHeight: 35,
+		AccountUser:	account.AddressUser,
+		Signers:	[]string{"recovery-key"},
+		CurrentHeight:	35,
 	})
 	require.NoError(t, err)
 
@@ -205,19 +205,19 @@ func TestNativeAccountFrozenWhitelistAllowsRecoveryDebtAndUnfreezeOnly(t *testin
 
 	payDebtRoute := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgPayStorageDebt{})
 	_, err = payDebtRoute(ctx, &nativeaccounttypes.MsgPayStorageDebt{
-		AccountUser:   account.AddressUser,
-		Amount:        5,
-		Signers:       []string{signer},
-		CurrentHeight: 36,
+		AccountUser:	account.AddressUser,
+		Amount:		5,
+		Signers:	[]string{signer},
+		CurrentHeight:	36,
 	})
 	require.NoError(t, err)
 
 	unfreezeRoute := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgUnfreezeAccount{})
 	_, err = unfreezeRoute(ctx, &nativeaccounttypes.MsgUnfreezeAccount{
-		AccountUser:     account.AddressUser,
-		Signers:         []string{signer},
-		CurrentHeight:   37,
-		StorageDebtPaid: true,
+		AccountUser:		account.AddressUser,
+		Signers:		[]string{signer},
+		CurrentHeight:		37,
+		StorageDebtPaid:	true,
 	})
 	require.NoError(t, err)
 
@@ -236,16 +236,16 @@ func TestNativeAccountAuthPolicyRejectsSecretsAndExportIsClean(t *testing.T) {
 	route := app.MsgServiceRouter().Handler(&nativeaccounttypes.MsgUpdateAuthPolicy{})
 
 	_, err := route(ctx, &nativeaccounttypes.MsgUpdateAuthPolicy{
-		AccountUser: account.AddressUser,
+		AccountUser:	account.AddressUser,
 		NewAuthPolicy: nativeaccounttypes.AuthPolicy{
-			Version: 1,
-			Mode:    nativeaccounttypes.AuthModeSingleKey,
+			Version:	1,
+			Mode:		nativeaccounttypes.AuthModeSingleKey,
 			Keys: []nativeaccounttypes.AuthKey{
 				{ID: "primary", PublicKey: "seed_phrase: never store this"},
 			},
 		},
-		Signers:       []string{account.PubKeys[0]},
-		CurrentHeight: 37,
+		Signers:	[]string{account.PubKeys[0]},
+		CurrentHeight:	37,
 	})
 	require.ErrorContains(t, err, "must not contain private keys or seed phrases")
 
@@ -297,11 +297,11 @@ func TestNativeAccountExportImportRoundTripStable(t *testing.T) {
 
 func nativeAccountActivationMsg(pubKey *secp256k1.PubKey, userAddress, rawAddress string) nativeaccounttypes.MsgActivateAccount {
 	return nativeaccounttypes.MsgActivateAccount{
-		AddressUser:   userAddress,
-		AddressRaw:    rawAddress,
-		PublicKeyType: "secp256k1",
-		PublicKeyHex:  hex.EncodeToString(pubKey.Bytes()),
-		FeePaid:       0,
+		AddressUser:	userAddress,
+		AddressRaw:	rawAddress,
+		PublicKeyType:	"secp256k1",
+		PublicKeyHex:	hex.EncodeToString(pubKey.Bytes()),
+		FeePaid:	0,
 	}
 }
 
@@ -317,7 +317,7 @@ func nativeAccountActivateViaRoute(t *testing.T, app *L1App, ctx sdk.Context, pu
 	account, found, err := app.NativeAccountKeeper.AccountByUser(ctx, pair.User)
 	require.NoError(t, err)
 	require.True(t, found)
-	// Ensure the activated account has spendable native tokens for tests that charge storage rent.
+
 	addr, err := addressing.ParseAccAddress(account.AddressUser)
 	require.NoError(t, err)
 	FundTestAddr(t, app, ctx, addr, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 1000000)))
@@ -332,21 +332,21 @@ func nativeAccountGenesisFixture(t *testing.T) nativeaccounttypes.Account {
 	features, err := nativeaccounttypes.DefaultFeatureFlags(nativeaccounttypes.CurrentAccountVersion)
 	require.NoError(t, err)
 	return nativeaccounttypes.Account{
-		Version:       nativeaccounttypes.CurrentAccountVersion,
-		AddressUser:   pair.User,
-		AddressRaw:    pair.Raw,
-		PubKeys:       []string{nativeaccounttypes.PublicKeyText(pubKey)},
-		AccountNumber: 1,
-		Sequence:      nativeaccounttypes.ActivationInitialSequence,
-		Status:        nativeaccounttypes.AccountStatusActive,
+		Version:	nativeaccounttypes.CurrentAccountVersion,
+		AddressUser:	pair.User,
+		AddressRaw:	pair.Raw,
+		PubKeys:	[]string{nativeaccounttypes.PublicKeyText(pubKey)},
+		AccountNumber:	1,
+		Sequence:	nativeaccounttypes.ActivationInitialSequence,
+		Status:		nativeaccounttypes.AccountStatusActive,
 		AuthPolicy: nativeaccounttypes.AuthPolicy{
-			Version: 1,
-			Mode:    nativeaccounttypes.AuthModeSingleKey,
+			Version:	1,
+			Mode:		nativeaccounttypes.AuthModeSingleKey,
 		},
-		FeatureFlags:            features,
-		CreatedHeight:           1,
-		LastActiveHeight:        1,
-		LastStorageChargeHeight: 1,
+		FeatureFlags:			features,
+		CreatedHeight:			1,
+		LastActiveHeight:		1,
+		LastStorageChargeHeight:	1,
 	}
 }
 

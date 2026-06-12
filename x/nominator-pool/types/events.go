@@ -10,46 +10,46 @@ import (
 type StakingEventType string
 
 const (
-	EventAccountActivated         StakingEventType = "AccountActivated"
-	EventPoolStakeDeposited       StakingEventType = "PoolStakeDeposited"
-	EventPoolSharesMinted         StakingEventType = "PoolSharesMinted"
-	EventPoolAllocationUpdated    StakingEventType = "PoolAllocationUpdated"
-	EventPoolUnbondingRequested   StakingEventType = "PoolUnbondingRequested"
-	EventPoolUnbondingCompleted   StakingEventType = "PoolUnbondingCompleted"
-	EventPoolRewardsClaimed       StakingEventType = "PoolRewardsClaimed"
-	EventStakeReputationClaimed   StakingEventType = "StakeReputationClaimed"
-	EventValidatorRegistered      StakingEventType = "ValidatorRegistered"
-	EventValidatorUpdated         StakingEventType = "ValidatorUpdated"
-	EventAdvancedStakeDelegated   StakingEventType = "AdvancedStakeDelegated"
-	EventAdvancedStakeUndelegated StakingEventType = "AdvancedStakeUndelegated"
-	EventAdvancedStakeRedelegated StakingEventType = "AdvancedStakeRedelegated"
+	EventAccountActivated		StakingEventType	= "AccountActivated"
+	EventPoolStakeDeposited		StakingEventType	= "PoolStakeDeposited"
+	EventPoolSharesMinted		StakingEventType	= "PoolSharesMinted"
+	EventPoolAllocationUpdated	StakingEventType	= "PoolAllocationUpdated"
+	EventPoolUnbondingRequested	StakingEventType	= "PoolUnbondingRequested"
+	EventPoolUnbondingCompleted	StakingEventType	= "PoolUnbondingCompleted"
+	EventPoolRewardsClaimed		StakingEventType	= "PoolRewardsClaimed"
+	EventStakeReputationClaimed	StakingEventType	= "StakeReputationClaimed"
+	EventValidatorRegistered	StakingEventType	= "ValidatorRegistered"
+	EventValidatorUpdated		StakingEventType	= "ValidatorUpdated"
+	EventAdvancedStakeDelegated	StakingEventType	= "AdvancedStakeDelegated"
+	EventAdvancedStakeUndelegated	StakingEventType	= "AdvancedStakeUndelegated"
+	EventAdvancedStakeRedelegated	StakingEventType	= "AdvancedStakeRedelegated"
 )
 
 type StakingEvent struct {
-	Type              StakingEventType
-	Actor             string
-	PoolContract      string
-	Validator         string
-	Amount            uint64
-	Shares            uint64
-	Height            uint64
-	Epoch             uint64
-	Sequence          uint64
-	StateKey          string
-	ProofMetadataHash string
-	EventHash         string
+	Type			StakingEventType
+	Actor			string
+	PoolContract		string
+	Validator		string
+	Amount			uint64
+	Shares			uint64
+	Height			uint64
+	Epoch			uint64
+	Sequence		uint64
+	StateKey		string
+	ProofMetadataHash	string
+	EventHash		string
 }
 
 type StakingReceipt struct {
-	TxID        string
-	Height      uint64
-	Events      []StakingEvent
-	ReceiptHash string
+	TxID		string
+	Height		uint64
+	Events		[]StakingEvent
+	ReceiptHash	string
 }
 
 type StakingEventAttribute struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 func NewStakingEvent(event StakingEvent) (StakingEvent, error) {
@@ -64,8 +64,8 @@ func NewStakingEvent(event StakingEvent) (StakingEvent, error) {
 
 func NewStakingReceipt(txID string, height uint64, events []StakingEvent) (StakingReceipt, error) {
 	receipt := StakingReceipt{
-		TxID:   strings.ToLower(strings.TrimSpace(txID)),
-		Height: height,
+		TxID:	strings.ToLower(strings.TrimSpace(txID)),
+		Height:	height,
 	}
 	if receipt.TxID == "" {
 		return StakingReceipt{}, errors.New("staking receipt tx id is required")

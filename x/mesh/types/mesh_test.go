@@ -170,43 +170,43 @@ func validMeshFixture(t *testing.T) (MeshState, MeshMessage) {
 	state := EmptyState(DefaultParams())
 	var err error
 	state, err = RegisterDestination(state, MeshDestination{
-		ZoneID:  ZoneID("FINANCIAL_ZONE"),
-		ShardID: ShardID("0:0"),
-		Active:  true,
+		ZoneID:		ZoneID("FINANCIAL_ZONE"),
+		ShardID:	ShardID("0:0"),
+		Active:		true,
 	})
 	require.NoError(t, err)
 	state, err = RegisterDestination(state, MeshDestination{
-		ZoneID:  ZoneID("CONTRACT_ZONE"),
-		ShardID: ShardID("0:1"),
-		Active:  true,
+		ZoneID:		ZoneID("CONTRACT_ZONE"),
+		ShardID:	ShardID("0:1"),
+		Active:		true,
 	})
 	require.NoError(t, err)
 
 	commitment := FinalizedCommitment{
-		ZoneID:         ZoneID("FINANCIAL_ZONE"),
-		ShardID:        ShardID("0:0"),
-		Height:         90,
-		CommitmentHash: HashParts("source-commitment", "financial", "0:0", "90"),
-		MessageRoot:    HashParts("message-root", "financial", "90"),
-		ReceiptRoot:    HashParts("receipt-root", "financial", "90"),
+		ZoneID:		ZoneID("FINANCIAL_ZONE"),
+		ShardID:	ShardID("0:0"),
+		Height:		90,
+		CommitmentHash:	HashParts("source-commitment", "financial", "0:0", "90"),
+		MessageRoot:	HashParts("message-root", "financial", "90"),
+		ReceiptRoot:	HashParts("receipt-root", "financial", "90"),
 	}
 	state, err = AddFinalizedCommitment(state, commitment)
 	require.NoError(t, err)
 
 	msg := mustMessage(t, MeshMessage{
-		SourceZone:        ZoneID("FINANCIAL_ZONE"),
-		SourceShard:       ShardID("0:0"),
-		DestinationZone:   ZoneID("CONTRACT_ZONE"),
-		DestinationShard:  ShardID("0:1"),
-		Nonce:             7,
-		Sender:            []byte("orb1sender"),
-		Recipient:         []byte("contract1recipient"),
-		AssetCommitment:   HashParts("asset", "100norb"),
-		PayloadHash:       HashParts("payload", "execute"),
-		TimeoutHeight:     150,
-		Finality:          FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
-		Sequence:          3,
-		SourceLogicalTime: 88,
+		SourceZone:		ZoneID("FINANCIAL_ZONE"),
+		SourceShard:		ShardID("0:0"),
+		DestinationZone:	ZoneID("CONTRACT_ZONE"),
+		DestinationShard:	ShardID("0:1"),
+		Nonce:			7,
+		Sender:			[]byte("orb1sender"),
+		Recipient:		[]byte("contract1recipient"),
+		AssetCommitment:	HashParts("asset", "100norb"),
+		PayloadHash:		HashParts("payload", "execute"),
+		TimeoutHeight:		150,
+		Finality:		FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
+		Sequence:		3,
+		SourceLogicalTime:	88,
 	})
 	msg.Proof = BuildProof(msg, commitment)
 	return state, msg
@@ -221,16 +221,16 @@ func mustMessage(t *testing.T, msg MeshMessage) MeshMessage {
 
 func successResult() ExecutionResult {
 	return ExecutionResult{
-		Success:    true,
-		Code:       0,
-		ResultHash: HashParts("execution", "success"),
+		Success:	true,
+		Code:		0,
+		ResultHash:	HashParts("execution", "success"),
 	}
 }
 
 func failedResult() ExecutionResult {
 	return ExecutionResult{
-		Success:    false,
-		Code:       42,
-		ResultHash: HashParts("execution", "failed"),
+		Success:	false,
+		Code:		42,
+		ResultHash:	HashParts("execution", "failed"),
 	}
 }

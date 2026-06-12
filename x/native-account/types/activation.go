@@ -13,12 +13,12 @@ import (
 )
 
 type MsgActivateAccount struct {
-	AddressUser   string             `protobuf:"bytes,1,opt,name=address_user,json=addressUser,proto3" json:"address_user,omitempty"`
-	AddressRaw    string             `protobuf:"bytes,2,opt,name=address_raw,json=addressRaw,proto3" json:"address_raw,omitempty"`
-	PublicKeyType string             `protobuf:"bytes,3,opt,name=public_key_type,json=publicKeyType,proto3" json:"public_key_type,omitempty"`
-	PublicKeyHex  string             `protobuf:"bytes,4,opt,name=public_key_hex,json=publicKeyHex,proto3" json:"public_key_hex,omitempty"`
-	FeePaid       uint64             `protobuf:"varint,5,opt,name=fee_paid,json=feePaid,proto3" json:"fee_paid,omitempty"`
-	PublicKey     cryptotypes.PubKey `json:"-"`
+	AddressUser	string			`protobuf:"bytes,1,opt,name=address_user,json=addressUser,proto3" json:"address_user,omitempty"`
+	AddressRaw	string			`protobuf:"bytes,2,opt,name=address_raw,json=addressRaw,proto3" json:"address_raw,omitempty"`
+	PublicKeyType	string			`protobuf:"bytes,3,opt,name=public_key_type,json=publicKeyType,proto3" json:"public_key_type,omitempty"`
+	PublicKeyHex	string			`protobuf:"bytes,4,opt,name=public_key_hex,json=publicKeyHex,proto3" json:"public_key_hex,omitempty"`
+	FeePaid		uint64			`protobuf:"varint,5,opt,name=fee_paid,json=feePaid,proto3" json:"fee_paid,omitempty"`
+	PublicKey	cryptotypes.PubKey	`json:"-"`
 }
 
 func (m MsgActivateAccount) ValidateBasic() error {
@@ -73,8 +73,8 @@ func ActivationAddressPair(pubKey cryptotypes.PubKey) (addressing.AddressPair, e
 }
 
 const (
-	ActivationInitialSequence = uint64(0)
-	EventTypeAccountActivated = "AccountActivated"
+	ActivationInitialSequence	= uint64(0)
+	EventTypeAccountActivated	= "AccountActivated"
 )
 
 type ActivationFeePolicy struct {
@@ -89,19 +89,19 @@ func (p ActivationFeePolicy) ValidateActivationFee(feePaid uint64) error {
 }
 
 type AccountActivatedEvent struct {
-	Type          string `json:"type"`
-	AddressUser   string `json:"address_user"`
-	AddressRaw    string `json:"address_raw"`
-	AccountNumber uint64 `json:"account_number"`
-	Sequence      uint64 `json:"sequence"`
-	PubKeyHash    string `json:"pubkey_hash"`
-	Height        uint64 `json:"height"`
-	FeePaid       uint64 `json:"fee_paid"`
+	Type		string	`json:"type"`
+	AddressUser	string	`json:"address_user"`
+	AddressRaw	string	`json:"address_raw"`
+	AccountNumber	uint64	`json:"account_number"`
+	Sequence	uint64	`json:"sequence"`
+	PubKeyHash	string	`json:"pubkey_hash"`
+	Height		uint64	`json:"height"`
+	FeePaid		uint64	`json:"fee_paid"`
 }
 
 type AccountActivationResult struct {
-	Account Account
-	Event   AccountActivatedEvent
+	Account	Account
+	Event	AccountActivatedEvent
 }
 
 type AccountActivationStore interface {
@@ -111,8 +111,8 @@ type AccountActivationStore interface {
 }
 
 type AccountActivationService struct {
-	store     AccountActivationStore
-	feePolicy ActivationFeePolicy
+	store		AccountActivationStore
+	feePolicy	ActivationFeePolicy
 }
 
 func NewAccountActivationService(store AccountActivationStore, feePolicy ActivationFeePolicy) (AccountActivationService, error) {
@@ -150,18 +150,18 @@ func (s AccountActivationService) ActivateAccount(msg MsgActivateAccount, create
 		return AccountActivationResult{}, err
 	}
 	account := Account{
-		Version:                 CurrentAccountVersion,
-		AddressUser:             pair.User,
-		AddressRaw:              pair.Raw,
-		PubKeys:                 []string{PublicKeyText(pubKey)},
-		AccountNumber:           s.store.NextAccountNumber(),
-		Sequence:                ActivationInitialSequence,
-		Status:                  AccountStatusActive,
-		AuthPolicy:              AuthPolicy{Version: 1, Mode: AuthModeSingleKey},
-		FeatureFlags:            features,
-		CreatedHeight:           createdHeight,
-		LastActiveHeight:        createdHeight,
-		LastStorageChargeHeight: createdHeight,
+		Version:			CurrentAccountVersion,
+		AddressUser:			pair.User,
+		AddressRaw:			pair.Raw,
+		PubKeys:			[]string{PublicKeyText(pubKey)},
+		AccountNumber:			s.store.NextAccountNumber(),
+		Sequence:			ActivationInitialSequence,
+		Status:				AccountStatusActive,
+		AuthPolicy:			AuthPolicy{Version: 1, Mode: AuthModeSingleKey},
+		FeatureFlags:			features,
+		CreatedHeight:			createdHeight,
+		LastActiveHeight:		createdHeight,
+		LastStorageChargeHeight:	createdHeight,
 	}
 	if err := ValidateAccountInvariant(account); err != nil {
 		return AccountActivationResult{}, err
@@ -170,16 +170,16 @@ func (s AccountActivationService) ActivateAccount(msg MsgActivateAccount, create
 		return AccountActivationResult{}, err
 	}
 	return AccountActivationResult{
-		Account: account,
+		Account:	account,
 		Event: AccountActivatedEvent{
-			Type:          EventTypeAccountActivated,
-			AddressUser:   account.AddressUser,
-			AddressRaw:    account.AddressRaw,
-			AccountNumber: account.AccountNumber,
-			Sequence:      account.Sequence,
-			PubKeyHash:    PublicKeyHash(pubKey),
-			Height:        createdHeight,
-			FeePaid:       msg.FeePaid,
+			Type:		EventTypeAccountActivated,
+			AddressUser:	account.AddressUser,
+			AddressRaw:	account.AddressRaw,
+			AccountNumber:	account.AccountNumber,
+			Sequence:	account.Sequence,
+			PubKeyHash:	PublicKeyHash(pubKey),
+			Height:		createdHeight,
+			FeePaid:	msg.FeePaid,
 		},
 	}, nil
 }

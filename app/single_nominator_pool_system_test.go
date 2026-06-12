@@ -38,18 +38,18 @@ func TestSingleNominatorPoolPendingWithdrawalSurvivesFinalizeBlockRestart(t *tes
 	genesis := GenesisStateWithSingleValidator(t, source)
 	poolGenesis := singlenominatorpoolkeeper.DefaultGenesis()
 	poolGenesis.State.Pools = []singlenominatorpooltypes.SingleNominatorPool{{
-		PoolAddress: singlenominatorPoolRawAddress("10"),
-		Owner:       singlenominatorPoolRawAddress("11"),
-		Validator:   singlenominatorPoolRawAddress("12"),
-		BondedStake: 700,
+		PoolAddress:	singlenominatorPoolRawAddress("10"),
+		Owner:		singlenominatorPoolRawAddress("11"),
+		Validator:	singlenominatorPoolRawAddress("12"),
+		BondedStake:	700,
 		PendingWithdrawal: singlenominatorpooltypes.PendingWithdrawal{
-			Amount:         300,
-			RequestHeight:  1,
-			CompleteHeight: 1 + poolGenesis.Params.UnbondingBlocks,
-			Status:         singlenominatorpooltypes.WithdrawalStatusPending,
+			Amount:		300,
+			RequestHeight:	1,
+			CompleteHeight:	1 + poolGenesis.Params.UnbondingBlocks,
+			Status:		singlenominatorpooltypes.WithdrawalStatusPending,
 		},
-		RewardBalance: 55,
-		Status:        singlenominatorpooltypes.StatusActive,
+		RewardBalance:	55,
+		Status:		singlenominatorpooltypes.StatusActive,
 	}}
 	poolGenesis.State = poolGenesis.State.Normalize(poolGenesis.Params)
 	require.NoError(t, poolGenesis.Validate())
@@ -60,15 +60,15 @@ func TestSingleNominatorPoolPendingWithdrawalSurvivesFinalizeBlockRestart(t *tes
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

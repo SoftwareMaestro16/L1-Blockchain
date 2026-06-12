@@ -24,10 +24,10 @@ func TestCrossZoneIdentityBindingV2BindUpdateRevokeEmitsInvalidations(t *testing
 	require.NoError(t, err)
 
 	msg := MsgBindCrossZoneIdentityV2{
-		Authority:    addr(1),
-		Binding:      binding,
-		Confirmation: confirmation,
-		Height:       12,
+		Authority:	addr(1),
+		Binding:	binding,
+		Confirmation:	confirmation,
+		Height:		12,
 	}
 	msg.MessageHash = ComputeMsgBindCrossZoneIdentityV2Hash(msg)
 	state, event, err := ApplyCrossZoneIdentityBindV2(state, graph, msg)
@@ -41,10 +41,10 @@ func TestCrossZoneIdentityBindingV2BindUpdateRevokeEmitsInvalidations(t *testing
 	updated := testCrossZoneIdentityBinding(t, graph, 120, 2, false)
 	messageConfirmation := testCrossZoneMessageConfirmation(t, 13)
 	update := MsgUpdateCrossZoneIdentityBindingV2{
-		Authority:    addr(1),
-		Binding:      updated,
-		Confirmation: messageConfirmation,
-		Height:       13,
+		Authority:	addr(1),
+		Binding:	updated,
+		Confirmation:	messageConfirmation,
+		Height:		13,
 	}
 	update.MessageHash = ComputeMsgUpdateCrossZoneIdentityBindingV2Hash(update)
 	state, event, err = ApplyCrossZoneIdentityBindingUpdateV2(state, graph, update)
@@ -54,12 +54,12 @@ func TestCrossZoneIdentityBindingV2BindUpdateRevokeEmitsInvalidations(t *testing
 	require.Len(t, state.Invalidations, 2)
 
 	revoke := MsgRevokeCrossZoneIdentityBindingV2{
-		Authority:  addr(1),
-		IdentityID: updated.IdentityID,
-		TargetZone: updated.TargetZone,
-		TargetType: updated.TargetType,
-		TargetKey:  updated.TargetKey,
-		Height:     14,
+		Authority:	addr(1),
+		IdentityID:	updated.IdentityID,
+		TargetZone:	updated.TargetZone,
+		TargetType:	updated.TargetType,
+		TargetKey:	updated.TargetKey,
+		Height:		14,
 	}
 	revoke.MessageHash = ComputeMsgRevokeCrossZoneIdentityBindingV2Hash(revoke)
 	state, event, err = ApplyCrossZoneIdentityBindingRevokeV2(state, graph, revoke)
@@ -74,10 +74,10 @@ func TestCrossZoneIdentityBindingV2RejectsUnauthorizedOwner(t *testing.T) {
 	graph := testCrossZoneBindingGraph(t)
 	binding := testCrossZoneIdentityBinding(t, graph, 100, 1, true)
 	msg := MsgBindCrossZoneIdentityV2{
-		Authority:    addr(9),
-		Binding:      binding,
-		Confirmation: testCrossZoneProofConfirmation(t, 12),
-		Height:       12,
+		Authority:	addr(9),
+		Binding:	binding,
+		Confirmation:	testCrossZoneProofConfirmation(t, 12),
+		Height:		12,
 	}
 	_, _, err := ApplyCrossZoneIdentityBindV2(testEmptyCrossZoneBindingState(t), graph, msg)
 	require.ErrorContains(t, err, "identity owner")
@@ -87,10 +87,10 @@ func TestCrossZoneIdentityBindingV2RequiresProofOrMessageConfirmation(t *testing
 	graph := testCrossZoneBindingGraph(t)
 	binding := testCrossZoneIdentityBinding(t, graph, 100, 1, true)
 	msg := MsgBindCrossZoneIdentityV2{
-		Authority:    addr(1),
-		Binding:      binding,
-		Confirmation: testCrossZoneMessageConfirmation(t, 12),
-		Height:       12,
+		Authority:	addr(1),
+		Binding:	binding,
+		Confirmation:	testCrossZoneMessageConfirmation(t, 12),
+		Height:		12,
 	}
 	_, _, err := ApplyCrossZoneIdentityBindV2(testEmptyCrossZoneBindingState(t), graph, msg)
 	require.ErrorContains(t, err, "proof-verifiable")
@@ -118,23 +118,23 @@ func TestCrossZoneIdentityBindingV2StateRootDeterministic(t *testing.T) {
 	firstConfirmation := testCrossZoneMessageConfirmation(t, 12)
 	secondConfirmation := testCrossZoneProofConfirmation(t, 12)
 	firstEvent, err := NewCrossZoneBindingInvalidationEventV2(CrossZoneBindingInvalidationEventV2{
-		BindingHash: first.BindingHash,
-		IdentityID:  first.IdentityID,
-		TargetZone:  first.TargetZone,
-		TargetType:  first.TargetType,
-		TargetKey:   first.TargetKey,
-		Reason:      IdentityBindingInvalidatedCreated,
-		Height:      12,
+		BindingHash:	first.BindingHash,
+		IdentityID:	first.IdentityID,
+		TargetZone:	first.TargetZone,
+		TargetType:	first.TargetType,
+		TargetKey:	first.TargetKey,
+		Reason:		IdentityBindingInvalidatedCreated,
+		Height:		12,
 	})
 	require.NoError(t, err)
 	secondEvent, err := NewCrossZoneBindingInvalidationEventV2(CrossZoneBindingInvalidationEventV2{
-		BindingHash: second.BindingHash,
-		IdentityID:  second.IdentityID,
-		TargetZone:  second.TargetZone,
-		TargetType:  second.TargetType,
-		TargetKey:   second.TargetKey,
-		Reason:      IdentityBindingInvalidatedCreated,
-		Height:      12,
+		BindingHash:	second.BindingHash,
+		IdentityID:	second.IdentityID,
+		TargetZone:	second.TargetZone,
+		TargetType:	second.TargetType,
+		TargetKey:	second.TargetKey,
+		Reason:		IdentityBindingInvalidatedCreated,
+		Height:		12,
 	})
 	require.NoError(t, err)
 
@@ -181,13 +181,13 @@ func testCrossZoneIdentityBindingWithTarget(t *testing.T, graph IdentityGraphSta
 	}
 	require.NotEmpty(t, identityID)
 	binding, err := NewCrossZoneIdentityBindingV2(CrossZoneIdentityBindingV2{
-		IdentityID:     identityID,
-		TargetZone:     "APPLICATION_ZONE",
-		TargetType:     targetType,
-		TargetKey:      targetKey,
-		ProofRequired:  proofRequired,
-		ExpiresHeight:  expiresHeight,
-		BindingVersion: version,
+		IdentityID:	identityID,
+		TargetZone:	"APPLICATION_ZONE",
+		TargetType:	targetType,
+		TargetKey:	targetKey,
+		ProofRequired:	proofRequired,
+		ExpiresHeight:	expiresHeight,
+		BindingVersion:	version,
 	})
 	require.NoError(t, err)
 	return binding
@@ -196,10 +196,10 @@ func testCrossZoneIdentityBindingWithTarget(t *testing.T, graph IdentityGraphSta
 func testCrossZoneProofConfirmation(t *testing.T, height uint64) CrossZoneBindingConfirmationV2 {
 	t.Helper()
 	confirmation, err := NewCrossZoneBindingConfirmationV2(CrossZoneBindingConfirmationV2{
-		ConfirmationType: IdentityBindingConfirmationProof,
-		ProofRoot:        identityHash("proof-root"),
-		ProofHash:        identityHash("proof-hash"),
-		ConfirmedHeight:  height,
+		ConfirmationType:	IdentityBindingConfirmationProof,
+		ProofRoot:		identityHash("proof-root"),
+		ProofHash:		identityHash("proof-hash"),
+		ConfirmedHeight:	height,
 	})
 	require.NoError(t, err)
 	return confirmation
@@ -208,10 +208,10 @@ func testCrossZoneProofConfirmation(t *testing.T, height uint64) CrossZoneBindin
 func testCrossZoneMessageConfirmation(t *testing.T, height uint64) CrossZoneBindingConfirmationV2 {
 	t.Helper()
 	confirmation, err := NewCrossZoneBindingConfirmationV2(CrossZoneBindingConfirmationV2{
-		ConfirmationType: IdentityBindingConfirmationMessage,
-		MessageID:        identityHash("message-id"),
-		ReceiptHash:      identityHash("receipt-hash"),
-		ConfirmedHeight:  height,
+		ConfirmationType:	IdentityBindingConfirmationMessage,
+		MessageID:		identityHash("message-id"),
+		ReceiptHash:		identityHash("receipt-hash"),
+		ConfirmedHeight:	height,
 	})
 	require.NoError(t, err)
 	return confirmation

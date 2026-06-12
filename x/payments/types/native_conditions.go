@@ -12,68 +12,68 @@ import (
 type NativeConditionalPaymentStatus string
 
 const (
-	NativeConditionalPaymentPending  NativeConditionalPaymentStatus = "pending"
-	NativeConditionalPaymentResolved NativeConditionalPaymentStatus = "resolved"
-	NativeConditionalPaymentTimedOut NativeConditionalPaymentStatus = "timed_out"
-	NativeConditionalPaymentRefunded NativeConditionalPaymentStatus = "refunded"
-	NativeConditionalPaymentFailed   NativeConditionalPaymentStatus = "failed"
-	NativeConditionalPaymentSettled  NativeConditionalPaymentStatus = "settled"
+	NativeConditionalPaymentPending		NativeConditionalPaymentStatus	= "pending"
+	NativeConditionalPaymentResolved	NativeConditionalPaymentStatus	= "resolved"
+	NativeConditionalPaymentTimedOut	NativeConditionalPaymentStatus	= "timed_out"
+	NativeConditionalPaymentRefunded	NativeConditionalPaymentStatus	= "refunded"
+	NativeConditionalPaymentFailed		NativeConditionalPaymentStatus	= "failed"
+	NativeConditionalPaymentSettled		NativeConditionalPaymentStatus	= "settled"
 )
 
 type NativeConditionalPayment struct {
-	ConditionID                 string
-	Payer                       string
-	Payee                       string
-	Amount                      string
-	HashLock                    string
-	TimeoutHeight               uint64
-	RouteID                     string
-	NextConditionIDOptional     string
-	PreviousConditionIDOptional string
-	Status                      NativeConditionalPaymentStatus
-	ConditionRoot               string
+	ConditionID			string
+	Payer				string
+	Payee				string
+	Amount				string
+	HashLock			string
+	TimeoutHeight			uint64
+	RouteID				string
+	NextConditionIDOptional		string
+	PreviousConditionIDOptional	string
+	Status				NativeConditionalPaymentStatus
+	ConditionRoot			string
 }
 
 type NativeConditionalPaymentOutcome struct {
-	ConditionID      string
-	Status           NativeConditionalPaymentStatus
-	Recipient        string
-	Amount           string
-	PreimageHash     string
-	ResolvedHeight   uint64
-	PaymentStateRoot string
-	OutcomeRoot      string
+	ConditionID		string
+	Status			NativeConditionalPaymentStatus
+	Recipient		string
+	Amount			string
+	PreimageHash		string
+	ResolvedHeight		uint64
+	PaymentStateRoot	string
+	OutcomeRoot		string
 }
 
 type CrossZonePaymentRoutingInput struct {
-	SourceAccount         string
-	TargetAccount         string
-	TargetIdentity        string
-	Amount                string
-	MaxFee                string
-	ExpiryHeight          uint64
-	RoutePolicy           RoutePolicy
-	LiquidityHints        []PaymentRouteBalance
-	RouteCommitment       PaymentRouteCommitment
-	ReservationRoot       string
-	UnifiedMessageRoot    string
-	FinancialFallbackRoot string
-	RoutingRoot           string
+	SourceAccount		string
+	TargetAccount		string
+	TargetIdentity		string
+	Amount			string
+	MaxFee			string
+	ExpiryHeight		uint64
+	RoutePolicy		RoutePolicy
+	LiquidityHints		[]PaymentRouteBalance
+	RouteCommitment		PaymentRouteCommitment
+	ReservationRoot		string
+	UnifiedMessageRoot	string
+	FinancialFallbackRoot	string
+	RoutingRoot		string
 }
 
 type CrossZonePaymentMessage struct {
-	MessageID           string
-	SourceZoneID        string
-	DestinationZoneID   string
-	SourceShardID       uint32
-	DestinationShardID  uint32
-	PayloadType         string
-	RouteID             string
-	RouteCommitmentHash string
-	PaymentStateRoot    string
-	UnifiedMessageRoot  string
-	ExpiryHeight        uint64
-	MessageHash         string
+	MessageID		string
+	SourceZoneID		string
+	DestinationZoneID	string
+	SourceShardID		uint32
+	DestinationShardID	uint32
+	PayloadType		string
+	RouteID			string
+	RouteCommitmentHash	string
+	PaymentStateRoot	string
+	UnifiedMessageRoot	string
+	ExpiryHeight		uint64
+	MessageHash		string
 }
 
 func NewNativeConditionalPaymentFromPromise(promise ConditionalPromise) (NativeConditionalPayment, error) {
@@ -82,16 +82,16 @@ func NewNativeConditionalPaymentFromPromise(promise ConditionalPromise) (NativeC
 		return NativeConditionalPayment{}, err
 	}
 	return BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:                 promise.PromiseID,
-		Payer:                       promise.Source,
-		Payee:                       promise.Destination,
-		Amount:                      promise.Amount,
-		HashLock:                    promise.HashLock,
-		TimeoutHeight:               promise.TimeoutHeight,
-		RouteID:                     promise.RouteIDOptional,
-		NextConditionIDOptional:     promise.NextPromiseIDOptional,
-		PreviousConditionIDOptional: promise.PreviousPromiseIDOptional,
-		Status:                      NativeConditionalPaymentPending,
+		ConditionID:			promise.PromiseID,
+		Payer:				promise.Source,
+		Payee:				promise.Destination,
+		Amount:				promise.Amount,
+		HashLock:			promise.HashLock,
+		TimeoutHeight:			promise.TimeoutHeight,
+		RouteID:			promise.RouteIDOptional,
+		NextConditionIDOptional:	promise.NextPromiseIDOptional,
+		PreviousConditionIDOptional:	promise.PreviousPromiseIDOptional,
+		Status:				NativeConditionalPaymentPending,
 	})
 }
 
@@ -224,13 +224,13 @@ func ResolveNativeConditionalPaymentChain(conditions []NativeConditionalPayment,
 			return nil, nil, err
 		}
 		outcome, err := BuildNativeConditionalPaymentOutcome(NativeConditionalPaymentOutcome{
-			ConditionID:      condition.ConditionID,
-			Status:           NativeConditionalPaymentResolved,
-			Recipient:        condition.Payee,
-			Amount:           condition.Amount,
-			PreimageHash:     preimageHash,
-			ResolvedHeight:   currentHeight,
-			PaymentStateRoot: paymentStateRoot,
+			ConditionID:		condition.ConditionID,
+			Status:			NativeConditionalPaymentResolved,
+			Recipient:		condition.Payee,
+			Amount:			condition.Amount,
+			PreimageHash:		preimageHash,
+			ResolvedHeight:		currentHeight,
+			PaymentStateRoot:	paymentStateRoot,
 		})
 		if err != nil {
 			return nil, nil, err
@@ -267,12 +267,12 @@ func ExpireNativeConditionalPayment(condition NativeConditionalPayment, resolver
 		return NativeConditionalPayment{}, NativeConditionalPaymentOutcome{}, err
 	}
 	outcome, err := BuildNativeConditionalPaymentOutcome(NativeConditionalPaymentOutcome{
-		ConditionID:      condition.ConditionID,
-		Status:           NativeConditionalPaymentRefunded,
-		Recipient:        condition.Payer,
-		Amount:           condition.Amount,
-		ResolvedHeight:   currentHeight,
-		PaymentStateRoot: paymentStateRoot,
+		ConditionID:		condition.ConditionID,
+		Status:			NativeConditionalPaymentRefunded,
+		Recipient:		condition.Payer,
+		Amount:			condition.Amount,
+		ResolvedHeight:		currentHeight,
+		PaymentStateRoot:	paymentStateRoot,
 	})
 	if err != nil {
 		return NativeConditionalPayment{}, NativeConditionalPaymentOutcome{}, err

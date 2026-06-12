@@ -12,14 +12,14 @@ func TestAdaptiveInflationRaisesUnderLowStakeLowFeesWithinWindowLimit(t *testing
 	params.PerWindowAdjustmentLimitBps = 20
 	params.GovernanceAllowsBelowRewardFloor = true
 	report, err := ComputeAdaptiveInflationEpoch(baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-		EpochID:                   31,
-		BondedStakeRatioBps:       5_800,
-		FeeRevenueNaet:            sdkmath.NewInt(100_000_000),
-		ValidatorCount:            55,
-		ValidatorRewardFloorNaet:  sdkmath.NewInt(40_000),
-		NetworkActivitySamplesBps: []int64{2_000, 2_200, 2_100},
-		TreasuryReserveHealthBps:  7_000,
-		SecurityReserveHealthBps:  7_500,
+		EpochID:			31,
+		BondedStakeRatioBps:		5_800,
+		FeeRevenueNaet:			sdkmath.NewInt(100_000_000),
+		ValidatorCount:			55,
+		ValidatorRewardFloorNaet:	sdkmath.NewInt(40_000),
+		NetworkActivitySamplesBps:	[]int64{2_000, 2_200, 2_100},
+		TreasuryReserveHealthBps:	7_000,
+		SecurityReserveHealthBps:	7_500,
 	}))
 	require.NoError(t, err)
 	require.True(t, report.Reconciled, report.Failed)
@@ -35,15 +35,15 @@ func TestAdaptiveInflationFallsAfterSecurityNeedDeclines(t *testing.T) {
 	params := DefaultAdaptiveInflationParams()
 	params.PerWindowAdjustmentLimitBps = 25
 	report, err := ComputeAdaptiveInflationEpoch(baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-		EpochID:                   32,
-		BondedStakeRatioBps:       7_500,
-		FeeRevenueNaet:            sdkmath.NewInt(3_000_000_000),
-		ValidatorCount:            90,
-		ValidatorRewardFloorNaet:  sdkmath.NewInt(5_000),
-		NetworkActivitySamplesBps: []int64{8_900, 9_100, 9_200},
-		TreasuryReserveHealthBps:  12_000,
-		SecurityReserveHealthBps:  11_500,
-		RecentInflationBps:        []int64{300, 295, 290},
+		EpochID:			32,
+		BondedStakeRatioBps:		7_500,
+		FeeRevenueNaet:			sdkmath.NewInt(3_000_000_000),
+		ValidatorCount:			90,
+		ValidatorRewardFloorNaet:	sdkmath.NewInt(5_000),
+		NetworkActivitySamplesBps:	[]int64{8_900, 9_100, 9_200},
+		TreasuryReserveHealthBps:	12_000,
+		SecurityReserveHealthBps:	11_500,
+		RecentInflationBps:		[]int64{300, 295, 290},
 	}))
 	require.NoError(t, err)
 	require.True(t, report.Reconciled, report.Failed)
@@ -56,14 +56,14 @@ func TestAdaptiveInflationUsesManipulationResistantActivityScore(t *testing.T) {
 	params := DefaultAdaptiveInflationParams()
 	params.ActivityClampDeltaBps = 500
 	report, err := ComputeAdaptiveInflationEpoch(baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-		EpochID:                   33,
-		BondedStakeRatioBps:       DefaultTargetStakeBps,
-		FeeRevenueNaet:            sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-		ValidatorCount:            DefaultActiveValidatorTarget,
-		ValidatorRewardFloorNaet:  sdkmath.NewInt(1_000),
-		NetworkActivitySamplesBps: []int64{8_800, 8_900, 9_000, 100},
-		TreasuryReserveHealthBps:  BasisPoints,
-		SecurityReserveHealthBps:  BasisPoints,
+		EpochID:			33,
+		BondedStakeRatioBps:		DefaultTargetStakeBps,
+		FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+		ValidatorCount:			DefaultActiveValidatorTarget,
+		ValidatorRewardFloorNaet:	sdkmath.NewInt(1_000),
+		NetworkActivitySamplesBps:	[]int64{8_800, 8_900, 9_000, 100},
+		TreasuryReserveHealthBps:	BasisPoints,
+		SecurityReserveHealthBps:	BasisPoints,
 	}))
 	require.NoError(t, err)
 	require.True(t, report.ControllerState.ActivityManipulationClamped)
@@ -74,14 +74,14 @@ func TestAdaptiveInflationUsesManipulationResistantActivityScore(t *testing.T) {
 func TestAdaptiveInflationDetectsEpochAccountingMismatch(t *testing.T) {
 	params := DefaultAdaptiveInflationParams()
 	input := baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-		EpochID:                   34,
-		BondedStakeRatioBps:       DefaultTargetStakeBps,
-		FeeRevenueNaet:            sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-		ValidatorCount:            DefaultActiveValidatorTarget,
-		ValidatorRewardFloorNaet:  sdkmath.NewInt(1_000),
-		NetworkActivitySamplesBps: []int64{DefaultTargetLoadBps},
-		TreasuryReserveHealthBps:  BasisPoints,
-		SecurityReserveHealthBps:  BasisPoints,
+		EpochID:			34,
+		BondedStakeRatioBps:		DefaultTargetStakeBps,
+		FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+		ValidatorCount:			DefaultActiveValidatorTarget,
+		ValidatorRewardFloorNaet:	sdkmath.NewInt(1_000),
+		NetworkActivitySamplesBps:	[]int64{DefaultTargetLoadBps},
+		TreasuryReserveHealthBps:	BasisPoints,
+		SecurityReserveHealthBps:	BasisPoints,
 	})
 	input.EndingSupplyNaet = sdkmath.NewInt(1)
 
@@ -98,55 +98,55 @@ func TestAdaptiveInflationStressSupplyAndSecurityBudget(t *testing.T) {
 	params.GovernanceAllowsBelowRewardFloor = true
 	report, err := RunAdaptiveInflationStressTest([]AdaptiveInflationStressScenario{
 		{
-			Name: "low_activity_security_budget",
+			Name:	"low_activity_security_budget",
 			Input: baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-				EpochID:                   40,
-				BondedStakeRatioBps:       5_500,
-				FeeRevenueNaet:            sdkmath.NewInt(100_000_000),
-				ValidatorCount:            50,
-				ValidatorRewardFloorNaet:  sdkmath.NewInt(45_000),
-				NetworkActivitySamplesBps: []int64{2_000, 2_100, 2_200},
-				TreasuryReserveHealthBps:  6_000,
-				SecurityReserveHealthBps:  6_500,
+				EpochID:			40,
+				BondedStakeRatioBps:		5_500,
+				FeeRevenueNaet:			sdkmath.NewInt(100_000_000),
+				ValidatorCount:			50,
+				ValidatorRewardFloorNaet:	sdkmath.NewInt(45_000),
+				NetworkActivitySamplesBps:	[]int64{2_000, 2_100, 2_200},
+				TreasuryReserveHealthBps:	6_000,
+				SecurityReserveHealthBps:	6_500,
 			}),
 		},
 		{
-			Name: "normal",
+			Name:	"normal",
 			Input: baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-				EpochID:                   41,
-				BondedStakeRatioBps:       DefaultTargetStakeBps,
-				FeeRevenueNaet:            sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-				ValidatorCount:            DefaultActiveValidatorTarget,
-				ValidatorRewardFloorNaet:  sdkmath.NewInt(20_000),
-				NetworkActivitySamplesBps: []int64{DefaultTargetLoadBps, DefaultTargetLoadBps + 100},
-				TreasuryReserveHealthBps:  BasisPoints,
-				SecurityReserveHealthBps:  BasisPoints,
+				EpochID:			41,
+				BondedStakeRatioBps:		DefaultTargetStakeBps,
+				FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+				ValidatorCount:			DefaultActiveValidatorTarget,
+				ValidatorRewardFloorNaet:	sdkmath.NewInt(20_000),
+				NetworkActivitySamplesBps:	[]int64{DefaultTargetLoadBps, DefaultTargetLoadBps + 100},
+				TreasuryReserveHealthBps:	BasisPoints,
+				SecurityReserveHealthBps:	BasisPoints,
 			}),
 		},
 		{
-			Name: "high_activity_fee_rich",
+			Name:	"high_activity_fee_rich",
 			Input: baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-				EpochID:                   42,
-				BondedStakeRatioBps:       7_600,
-				FeeRevenueNaet:            sdkmath.NewInt(3_000_000_000),
-				ValidatorCount:            95,
-				ValidatorRewardFloorNaet:  sdkmath.NewInt(5_000),
-				NetworkActivitySamplesBps: []int64{9_000, 9_100, 9_200},
-				TreasuryReserveHealthBps:  13_000,
-				SecurityReserveHealthBps:  12_000,
+				EpochID:			42,
+				BondedStakeRatioBps:		7_600,
+				FeeRevenueNaet:			sdkmath.NewInt(3_000_000_000),
+				ValidatorCount:			95,
+				ValidatorRewardFloorNaet:	sdkmath.NewInt(5_000),
+				NetworkActivitySamplesBps:	[]int64{9_000, 9_100, 9_200},
+				TreasuryReserveHealthBps:	13_000,
+				SecurityReserveHealthBps:	12_000,
 			}),
 		},
 		{
-			Name: "adversarial_activity_spike",
+			Name:	"adversarial_activity_spike",
 			Input: baseAdaptiveInflationInput(params, AdaptiveInflationInput{
-				EpochID:                   43,
-				BondedStakeRatioBps:       6_500,
-				FeeRevenueNaet:            sdkmath.NewInt(800_000_000),
-				ValidatorCount:            70,
-				ValidatorRewardFloorNaet:  sdkmath.NewInt(20_000),
-				NetworkActivitySamplesBps: []int64{7_000, 7_100, 10_000, 0},
-				TreasuryReserveHealthBps:  9_000,
-				SecurityReserveHealthBps:  9_500,
+				EpochID:			43,
+				BondedStakeRatioBps:		6_500,
+				FeeRevenueNaet:			sdkmath.NewInt(800_000_000),
+				ValidatorCount:			70,
+				ValidatorRewardFloorNaet:	sdkmath.NewInt(20_000),
+				NetworkActivitySamplesBps:	[]int64{7_000, 7_100, 10_000, 0},
+				TreasuryReserveHealthBps:	9_000,
+				SecurityReserveHealthBps:	9_500,
 			}),
 		},
 	}, params)
@@ -164,22 +164,22 @@ func TestAdaptiveInflationStressSupplyAndSecurityBudget(t *testing.T) {
 
 func baseAdaptiveInflationInput(params AdaptiveInflationParams, override AdaptiveInflationInput) AdaptiveInflationInput {
 	input := AdaptiveInflationInput{
-		EpochID:                   1,
-		AccountingPeriod:          "epoch",
-		BlocksInEpoch:             100,
-		CurrentSupplyNaet:         sdkmath.NewInt(1_000_000),
-		CurrentInflationBps:       DefaultTargetInflationBps,
-		BondedStakeRatioBps:       DefaultTargetStakeBps,
-		TargetStakeRatioBps:       params.TargetStakeRatioBps,
-		FeeRevenueNaet:            sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-		BurnAmountNaet:            sdkmath.NewInt(5_000),
-		ValidatorCount:            DefaultActiveValidatorTarget,
-		ValidatorRewardFloorNaet:  sdkmath.NewInt(10_000),
-		NetworkActivitySamplesBps: []int64{DefaultTargetLoadBps},
-		TreasuryReserveHealthBps:  BasisPoints,
-		SecurityReserveHealthBps:  BasisPoints,
-		RecentInflationBps:        []int64{DefaultTargetInflationBps},
-		Params:                    params,
+		EpochID:			1,
+		AccountingPeriod:		"epoch",
+		BlocksInEpoch:			100,
+		CurrentSupplyNaet:		sdkmath.NewInt(1_000_000),
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		BondedStakeRatioBps:		DefaultTargetStakeBps,
+		TargetStakeRatioBps:		params.TargetStakeRatioBps,
+		FeeRevenueNaet:			sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+		BurnAmountNaet:			sdkmath.NewInt(5_000),
+		ValidatorCount:			DefaultActiveValidatorTarget,
+		ValidatorRewardFloorNaet:	sdkmath.NewInt(10_000),
+		NetworkActivitySamplesBps:	[]int64{DefaultTargetLoadBps},
+		TreasuryReserveHealthBps:	BasisPoints,
+		SecurityReserveHealthBps:	BasisPoints,
+		RecentInflationBps:		[]int64{DefaultTargetInflationBps},
+		Params:				params,
 	}
 	if override.EpochID != 0 {
 		input.EpochID = override.EpochID

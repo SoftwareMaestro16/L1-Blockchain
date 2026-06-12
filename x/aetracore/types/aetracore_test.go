@@ -97,8 +97,8 @@ func TestServiceDescriptorRejectsUnsafeOffChainService(t *testing.T) {
 
 	service := testOffChainService("unsafe-indexer", ZoneIDApplication)
 	service.Verification = ServiceVerificationDescriptor{
-		TrustModel: ServiceTrustFullyTrusted,
-		Model:      ServiceVerificationAdvisory,
+		TrustModel:	ServiceTrustFullyTrusted,
+		Model:		ServiceVerificationAdvisory,
 	}
 	_, err = RegisterServiceDescriptor(state, service)
 	require.ErrorContains(t, err, "signed, proof-backed, or economically constrained")
@@ -137,22 +137,22 @@ func TestServiceByIDReturnsIsolatedDescriptor(t *testing.T) {
 
 func TestZoneDescriptorCoversKernelSpecificationFields(t *testing.T) {
 	descriptor := ZoneDescriptor{
-		ZoneID:                ZoneIDApplication,
-		ZoneName:              "application",
-		ZoneType:              ZoneTypeApplication,
-		Enabled:               true,
-		StateVersion:          2,
-		KeeperScope:           "application.keeper",
-		MsgServerScope:        "application.msg",
-		QueryServerScope:      "application.query",
-		GasPolicyID:           DefaultGasPolicy,
-		MessagePolicyID:       DefaultMessagePolicy,
-		RootPrefix:            "zone/APPLICATION_ZONE",
-		ShardLayoutEpoch:      3,
-		UpgradeHeightOptional: 100,
-		MessageCapabilities:   []string{"async-outbox", "async-inbox"},
-		ProofCapabilities:     []string{"state", "receipt"},
-		MaxShards:             4,
+		ZoneID:			ZoneIDApplication,
+		ZoneName:		"application",
+		ZoneType:		ZoneTypeApplication,
+		Enabled:		true,
+		StateVersion:		2,
+		KeeperScope:		"application.keeper",
+		MsgServerScope:		"application.msg",
+		QueryServerScope:	"application.query",
+		GasPolicyID:		DefaultGasPolicy,
+		MessagePolicyID:	DefaultMessagePolicy,
+		RootPrefix:		"zone/APPLICATION_ZONE",
+		ShardLayoutEpoch:	3,
+		UpgradeHeightOptional:	100,
+		MessageCapabilities:	[]string{"async-outbox", "async-inbox"},
+		ProofCapabilities:	[]string{"state", "receipt"},
+		MaxShards:		4,
 	}
 	descriptor = CanonicalZoneDescriptor(descriptor)
 	require.Equal(t, "application", descriptor.ModuleName)
@@ -346,18 +346,18 @@ func TestProposalScheduleGroupsByZoneAndShardDeterministically(t *testing.T) {
 	require.NoError(t, schedule.Validate())
 	require.Equal(t, []ProposalGroup{
 		{
-			ZoneID:  ZoneIDContract,
-			ShardID: "1",
-			Items:   []ProposalItem{testProposalItem(ZoneIDContract, "1", "a", 4, 13, 0)},
+			ZoneID:		ZoneIDContract,
+			ShardID:	"1",
+			Items:		[]ProposalItem{testProposalItem(ZoneIDContract, "1", "a", 4, 13, 0)},
 		},
 		{
-			ZoneID:  ZoneIDContract,
-			ShardID: "2",
-			Items:   []ProposalItem{testProposalItem(ZoneIDContract, "2", "c", 4, 15, 2)},
+			ZoneID:		ZoneIDContract,
+			ShardID:	"2",
+			Items:		[]ProposalItem{testProposalItem(ZoneIDContract, "2", "c", 4, 15, 2)},
 		},
 		{
-			ZoneID:  ZoneIDFinancial,
-			ShardID: "0",
+			ZoneID:		ZoneIDFinancial,
+			ShardID:	"0",
 			Items: []ProposalItem{
 				testProposalItem(ZoneIDFinancial, "0", "a", 1, 16, 3),
 				testProposalItem(ZoneIDFinancial, "0", "b", 2, 14, 1),
@@ -425,10 +425,10 @@ func TestRoutingTableRejectsLayoutMismatch(t *testing.T) {
 	require.NoError(t, err)
 
 	table, err := NewRoutingTableCommitment(2, 5, []RoutingZoneEntry{{
-		ZoneID:       ZoneIDFinancial,
-		LayoutEpoch:  layout.LayoutEpoch,
-		ActiveShards: 2,
-		LayoutHash:   layout.LayoutHash,
+		ZoneID:		ZoneIDFinancial,
+		LayoutEpoch:	layout.LayoutEpoch,
+		ActiveShards:	2,
+		LayoutHash:	layout.LayoutHash,
 	}})
 	require.NoError(t, err)
 	_, err = CommitRoutingTable(state, table)
@@ -678,10 +678,10 @@ func nextReadyState(t *testing.T, zoneOrder []ZoneID, layoutOrder []ZoneID) Aetr
 	require.NoError(t, err)
 
 	layoutsByZone := map[ZoneID]ShardLayout{
-		ZoneIDFinancial:   testShardLayout(t, ZoneIDFinancial, 1, []ShardID{"1", "0"}),
-		ZoneIDIdentity:    testShardLayout(t, ZoneIDIdentity, 1, []ShardID{"0"}),
-		ZoneIDApplication: testShardLayout(t, ZoneIDApplication, 1, []ShardID{"0"}),
-		ZoneIDContract:    testShardLayout(t, ZoneIDContract, 1, []ShardID{"1", "0"}),
+		ZoneIDFinancial:	testShardLayout(t, ZoneIDFinancial, 1, []ShardID{"1", "0"}),
+		ZoneIDIdentity:		testShardLayout(t, ZoneIDIdentity, 1, []ShardID{"0"}),
+		ZoneIDApplication:	testShardLayout(t, ZoneIDApplication, 1, []ShardID{"0"}),
+		ZoneIDContract:		testShardLayout(t, ZoneIDContract, 1, []ShardID{"1", "0"}),
 	}
 	layouts := make([]ShardLayout, 0, len(layoutOrder))
 	for _, zoneID := range layoutOrder {
@@ -703,68 +703,68 @@ func nextReadyState(t *testing.T, zoneOrder []ZoneID, layoutOrder []ZoneID) Aetr
 
 func testDescriptor(id ZoneID, zoneType ZoneType, moduleName string) ZoneDescriptor {
 	return ZoneDescriptor{
-		ZoneID:              id,
-		ZoneType:            zoneType,
-		ModuleName:          moduleName,
-		Enabled:             true,
-		StateMachineVersion: 1,
-		MempoolPolicyID:     DefaultMempoolPolicy,
-		FeePolicyID:         NativeFeePolicyID,
-		ShardLayoutEpoch:    1,
-		MaxShards:           4,
-		MessageCapabilities: []string{"async-inbox", "async-outbox"},
-		ProofCapabilities:   []string{"account", "message", "receipt"},
+		ZoneID:			id,
+		ZoneType:		zoneType,
+		ModuleName:		moduleName,
+		Enabled:		true,
+		StateMachineVersion:	1,
+		MempoolPolicyID:	DefaultMempoolPolicy,
+		FeePolicyID:		NativeFeePolicyID,
+		ShardLayoutEpoch:	1,
+		MaxShards:		4,
+		MessageCapabilities:	[]string{"async-inbox", "async-outbox"},
+		ProofCapabilities:	[]string{"account", "message", "receipt"},
 	}
 }
 
 func testService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 	interfaceID := "l1.identity.v1.Query"
 	return ServiceDescriptor{
-		ServiceID:        serviceID,
-		Owner:            DefaultAuthority,
-		ServiceType:      ServiceTypeOnChain,
-		ZoneID:           zoneID,
-		InterfaceID:      interfaceID,
-		EndpointKey:      "identity.query",
-		Version:          1,
-		AvailabilityHash: testHash(serviceID + "/availability"),
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     100,
-		CreatedHeight:    1,
-		UpdatedHeight:    1,
+		ServiceID:		serviceID,
+		Owner:			DefaultAuthority,
+		ServiceType:		ServiceTypeOnChain,
+		ZoneID:			zoneID,
+		InterfaceID:		interfaceID,
+		EndpointKey:		"identity.query",
+		Version:		1,
+		AvailabilityHash:	testHash(serviceID + "/availability"),
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		100,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
 			testServiceMethod("resolve", ServiceMethodSync, ServiceVerificationConsensusReceipt, DefaultGasPolicy, ServiceFailureRevert),
 		}),
 		Execution: ServiceExecutionDescriptor{
-			Location:        ServiceLocationModule,
-			Target:          "identity.query",
-			ModuleRoute:     "identity",
-			Mode:            ExecutionModeSync,
-			Deterministic:   true,
-			FailureBehavior: ServiceFailureRevert,
+			Location:		ServiceLocationModule,
+			Target:			"identity.query",
+			ModuleRoute:		"identity",
+			Mode:			ExecutionModeSync,
+			Deterministic:		true,
+			FailureBehavior:	ServiceFailureRevert,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:       serviceID,
-			IdentityName:      "identity.aet",
-			MetadataHash:      testHash(serviceID + "/metadata"),
-			CacheExpiryHeight: 90,
-			SignaturePolicy:   "owner-signature-v1",
+			ServiceName:		serviceID,
+			IdentityName:		"identity.aet",
+			MetadataHash:		testHash(serviceID + "/metadata"),
+			CacheExpiryHeight:	90,
+			SignaturePolicy:	"owner-signature-v1",
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentOnChain,
-			Denom:          NativeFeePolicyID,
-			Amount:         "0",
-			PricingUnit:    ServicePricingPerCall,
+			SettlementMode:	ServicePaymentOnChain,
+			Denom:		NativeFeePolicyID,
+			Amount:		"0",
+			PricingUnit:	ServicePricingPerCall,
 		},
 		Storage: ServiceStorageDescriptor{
-			Model:         ServiceStorageOnChain,
-			StateRootType: StateProofRootType,
-			ProofRequired: true,
+			Model:		ServiceStorageOnChain,
+			StateRootType:	StateProofRootType,
+			ProofRequired:	true,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel: ServiceTrustConsensusExecuted,
-			Model:      ServiceVerificationConsensusReceipt,
+			TrustModel:	ServiceTrustConsensusExecuted,
+			Model:		ServiceVerificationConsensusReceipt,
 		},
 	}
 }
@@ -772,50 +772,50 @@ func testService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 func testOffChainService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 	interfaceID := "l1.indexer.v1.Query"
 	return ServiceDescriptor{
-		ServiceID:        serviceID,
-		Owner:            DefaultAuthority,
-		ServiceType:      ServiceTypeOffChain,
-		ZoneID:           zoneID,
-		InterfaceID:      interfaceID,
-		EndpointKey:      "indexer.query",
-		Version:          1,
-		AvailabilityHash: testHash(serviceID + "/availability"),
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     120,
-		CreatedHeight:    1,
-		UpdatedHeight:    1,
+		ServiceID:		serviceID,
+		Owner:			DefaultAuthority,
+		ServiceType:		ServiceTypeOffChain,
+		ZoneID:			zoneID,
+		InterfaceID:		interfaceID,
+		EndpointKey:		"indexer.query",
+		Version:		1,
+		AvailabilityHash:	testHash(serviceID + "/availability"),
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		120,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
 			testServiceMethod("query", ServiceMethodAsync, ServiceVerificationSignedResult, "", ServiceFailureRetry),
 		}),
 		Execution: ServiceExecutionDescriptor{
-			Location:        ServiceLocationExternal,
-			Target:          "indexer.query",
-			Endpoint:        "https://indexer.aetra.local/v1",
-			Mode:            ExecutionModeAsync,
-			FailureBehavior: ServiceFailureRetry,
-			ResultExpiry:    30,
+			Location:		ServiceLocationExternal,
+			Target:			"indexer.query",
+			Endpoint:		"https://indexer.aetra.local/v1",
+			Mode:			ExecutionModeAsync,
+			FailureBehavior:	ServiceFailureRetry,
+			ResultExpiry:		30,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:       serviceID,
-			MetadataHash:      testHash(serviceID + "/metadata"),
-			CacheExpiryHeight: 100,
-			SignaturePolicy:   "provider-signature-v1",
+			ServiceName:		serviceID,
+			MetadataHash:		testHash(serviceID + "/metadata"),
+			CacheExpiryHeight:	100,
+			SignaturePolicy:	"provider-signature-v1",
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentPrepaid,
-			Denom:          NativeFeePolicyID,
-			Amount:         "1",
-			PricingUnit:    ServicePricingPerCall,
+			SettlementMode:	ServicePaymentPrepaid,
+			Denom:		NativeFeePolicyID,
+			Amount:		"1",
+			PricingUnit:	ServicePricingPerCall,
 		},
 		Storage: ServiceStorageDescriptor{
 			Model: ServiceStorageDistributedOffChain,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel:              ServiceTrustFullyTrusted,
-			Model:                   ServiceVerificationSignedResult,
-			RequestSigningRequired:  true,
-			ResponseSigningRequired: true,
+			TrustModel:			ServiceTrustFullyTrusted,
+			Model:				ServiceVerificationSignedResult,
+			RequestSigningRequired:		true,
+			ResponseSigningRequired:	true,
 		},
 	}
 }
@@ -823,55 +823,55 @@ func testOffChainService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 func testMixedService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 	interfaceID := "l1.storage.v1.Mixed"
 	return ServiceDescriptor{
-		ServiceID:        serviceID,
-		Owner:            DefaultAuthority,
-		ServiceType:      ServiceTypeMixed,
-		ZoneID:           zoneID,
-		InterfaceID:      interfaceID,
-		EndpointKey:      "storage.hybrid",
-		Version:          1,
-		AvailabilityHash: testHash(serviceID + "/availability"),
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     180,
-		CreatedHeight:    1,
-		UpdatedHeight:    1,
+		ServiceID:		serviceID,
+		Owner:			DefaultAuthority,
+		ServiceType:		ServiceTypeMixed,
+		ZoneID:			zoneID,
+		InterfaceID:		interfaceID,
+		EndpointKey:		"storage.hybrid",
+		Version:		1,
+		AvailabilityHash:	testHash(serviceID + "/availability"),
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		180,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
 			testServiceMethod("put", ServiceMethodAsync, ServiceVerificationChallengeWindow, "", ServiceFailureChallenge),
 		}),
 		Execution: ServiceExecutionDescriptor{
-			Location:        ServiceLocationHybrid,
-			Target:          "storage.hybrid",
-			Endpoint:        "https://storage.aetra.local/v1",
-			Mode:            ExecutionModeAsync,
-			FailureBehavior: ServiceFailureChallenge,
-			ResultExpiry:    40,
-			ChallengeWindow: 20,
+			Location:		ServiceLocationHybrid,
+			Target:			"storage.hybrid",
+			Endpoint:		"https://storage.aetra.local/v1",
+			Mode:			ExecutionModeAsync,
+			FailureBehavior:	ServiceFailureChallenge,
+			ResultExpiry:		40,
+			ChallengeWindow:	20,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:       serviceID,
-			MetadataHash:      testHash(serviceID + "/metadata"),
-			CacheExpiryHeight: 150,
-			SignaturePolicy:   "owner-and-provider-signature-v1",
+			ServiceName:		serviceID,
+			MetadataHash:		testHash(serviceID + "/metadata"),
+			CacheExpiryHeight:	150,
+			SignaturePolicy:	"owner-and-provider-signature-v1",
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentEscrow,
-			Denom:          NativeFeePolicyID,
-			Amount:         "5",
-			PricingUnit:    ServicePricingPerByte,
-			EscrowRequired: true,
-			EscrowID:       "storage-escrow",
+			SettlementMode:	ServicePaymentEscrow,
+			Denom:		NativeFeePolicyID,
+			Amount:		"5",
+			PricingUnit:	ServicePricingPerByte,
+			EscrowRequired:	true,
+			EscrowID:	"storage-escrow",
 		},
 		Storage: ServiceStorageDescriptor{
-			Model:          ServiceStorageHybridCommitment,
-			CommitmentHash: testHash(serviceID + "/storage-commitment"),
-			ProofRequired:  true,
+			Model:		ServiceStorageHybridCommitment,
+			CommitmentHash:	testHash(serviceID + "/storage-commitment"),
+			ProofRequired:	true,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel:      ServiceTrustHybridChallengeable,
-			Model:           ServiceVerificationChallengeWindow,
-			ChallengeWindow: 20,
-			FaultPolicy:     ServiceFailureChallenge,
+			TrustModel:		ServiceTrustHybridChallengeable,
+			Model:			ServiceVerificationChallengeWindow,
+			ChallengeWindow:	20,
+			FaultPolicy:		ServiceFailureChallenge,
 		},
 	}
 }
@@ -879,70 +879,70 @@ func testMixedService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 func testFogMarketService(serviceID string, zoneID ZoneID) ServiceDescriptor {
 	interfaceID := "l1.fog.v1.Compute"
 	return ServiceDescriptor{
-		ServiceID:        serviceID,
-		Owner:            DefaultAuthority,
-		ServiceType:      ServiceTypeFogMarket,
-		ZoneID:           zoneID,
-		InterfaceID:      interfaceID,
-		EndpointKey:      "fog.compute",
-		Version:          1,
-		AvailabilityHash: testHash(serviceID + "/availability"),
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     200,
-		CreatedHeight:    1,
-		UpdatedHeight:    1,
+		ServiceID:		serviceID,
+		Owner:			DefaultAuthority,
+		ServiceType:		ServiceTypeFogMarket,
+		ZoneID:			zoneID,
+		InterfaceID:		interfaceID,
+		EndpointKey:		"fog.compute",
+		Version:		1,
+		AvailabilityHash:	testHash(serviceID + "/availability"),
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		200,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 		Interface: testServiceInterface(interfaceID, []ServiceMethodDescriptor{
 			testServiceMethod("run", ServiceMethodAsync, ServiceVerificationEconomicCollateral, "", ServiceFailureSlashProvider),
 		}),
 		Execution: ServiceExecutionDescriptor{
-			Location:        ServiceLocationProviderPool,
-			Target:          "fog.compute",
-			ProviderPoolID:  "compute-pool",
-			Mode:            ExecutionModeAsync,
-			FailureBehavior: ServiceFailureSlashProvider,
-			ResultExpiry:    25,
+			Location:		ServiceLocationProviderPool,
+			Target:			"fog.compute",
+			ProviderPoolID:		"compute-pool",
+			Mode:			ExecutionModeAsync,
+			FailureBehavior:	ServiceFailureSlashProvider,
+			ResultExpiry:		25,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:       serviceID,
-			ProviderRoot:      testHash(serviceID + "/providers"),
-			MetadataHash:      testHash(serviceID + "/metadata"),
-			CacheExpiryHeight: 180,
-			SignaturePolicy:   "provider-set-signature-v1",
+			ServiceName:		serviceID,
+			ProviderRoot:		testHash(serviceID + "/providers"),
+			MetadataHash:		testHash(serviceID + "/metadata"),
+			CacheExpiryHeight:	180,
+			SignaturePolicy:	"provider-set-signature-v1",
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentMetered,
-			Denom:          NativeFeePolicyID,
-			Amount:         "2",
-			PricingUnit:    ServicePricingPerComputeUnit,
-			MeterID:        "compute-meter",
+			SettlementMode:	ServicePaymentMetered,
+			Denom:		NativeFeePolicyID,
+			Amount:		"2",
+			PricingUnit:	ServicePricingPerComputeUnit,
+			MeterID:	"compute-meter",
 		},
 		Storage: ServiceStorageDescriptor{
 			Model: ServiceStorageEphemeral,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel:               ServiceTrustEconomicallySecured,
-			Model:                    ServiceVerificationEconomicCollateral,
-			ProviderCollateralDenom:  NativeFeePolicyID,
-			ProviderCollateralAmount: "100",
-			FaultPolicy:              ServiceFailureSlashProvider,
+			TrustModel:			ServiceTrustEconomicallySecured,
+			Model:				ServiceVerificationEconomicCollateral,
+			ProviderCollateralDenom:	NativeFeePolicyID,
+			ProviderCollateralAmount:	"100",
+			FaultPolicy:			ServiceFailureSlashProvider,
 		},
 	}
 }
 
 func testServiceInterface(interfaceID string, methods []ServiceMethodDescriptor) ServiceInterfaceDescriptor {
 	descriptor := ServiceInterfaceDescriptor{
-		InterfaceID:    interfaceID,
-		InterfaceName:  interfaceID,
-		Version:        1,
-		SchemaEncoding: "json-schema-v1",
-		Methods:        methods,
-		Events:         []string{"service.receipt"},
-		Errors:         []string{"service.error"},
-		AuthModel:      "aetra-account",
-		PaymentModel:   "naet-fixed",
-		MetadataHash:   testHash(interfaceID + "/metadata"),
-		CreatedHeight:  1,
+		InterfaceID:	interfaceID,
+		InterfaceName:	interfaceID,
+		Version:	1,
+		SchemaEncoding:	"json-schema-v1",
+		Methods:	methods,
+		Events:		[]string{"service.receipt"},
+		Errors:		[]string{"service.error"},
+		AuthModel:	"aetra-account",
+		PaymentModel:	"naet-fixed",
+		MetadataHash:	testHash(interfaceID + "/metadata"),
+		CreatedHeight:	1,
 	}
 	descriptor = CanonicalServiceInterfaceDescriptor(descriptor)
 	descriptor.InterfaceHash = ComputeServiceInterfaceHash(descriptor)
@@ -951,17 +951,17 @@ func testServiceInterface(interfaceID string, methods []ServiceMethodDescriptor)
 
 func testServiceMethod(methodID string, executionType ServiceMethodExecutionType, verificationModel ServiceVerificationModel, gasModel string, failureBehavior ServiceFailureBehavior) ServiceMethodDescriptor {
 	return ServiceMethodDescriptor{
-		MethodID:             methodID,
-		Name:                 methodID,
-		InputSchemaHash:      testHash(methodID + "/input"),
-		OutputSchemaHash:     testHash(methodID + "/output"),
-		ExecutionType:        executionType,
-		RequiredPaymentModel: "naet-fixed",
-		GasModel:             gasModel,
-		VerificationModel:    verificationModel,
-		TimeoutHeightDelta:   10,
-		IdempotencyRequired:  true,
-		FailureBehavior:      failureBehavior,
+		MethodID:		methodID,
+		Name:			methodID,
+		InputSchemaHash:	testHash(methodID + "/input"),
+		OutputSchemaHash:	testHash(methodID + "/output"),
+		ExecutionType:		executionType,
+		RequiredPaymentModel:	"naet-fixed",
+		GasModel:		gasModel,
+		VerificationModel:	verificationModel,
+		TimeoutHeightDelta:	10,
+		IdempotencyRequired:	true,
+		FailureBehavior:	failureBehavior,
 	}
 }
 
@@ -988,11 +988,11 @@ func testShardLayout(t *testing.T, zoneID ZoneID, epoch uint64, shardIDs []Shard
 	shards := make([]ShardDescriptor, len(shardIDs))
 	for i, shardID := range shardIDs {
 		shards[i] = ShardDescriptor{
-			ShardID:          shardID,
-			StatePrefix:      fmt.Sprintf("zone/%s/shard/%s", zoneID, shardID),
-			ActivationHeight: 1,
-			ValidatorSetHash: testHash(fmt.Sprintf("%s/%s/validators", zoneID, shardID)),
-			Available:        true,
+			ShardID:		shardID,
+			StatePrefix:		fmt.Sprintf("zone/%s/shard/%s", zoneID, shardID),
+			ActivationHeight:	1,
+			ValidatorSetHash:	testHash(fmt.Sprintf("%s/%s/validators", zoneID, shardID)),
+			Available:		true,
 		}
 	}
 	layout, err := NewShardLayout(zoneID, epoch, 1, testHash(fmt.Sprintf("%s/%d/routing-seed", zoneID, epoch)), shards)
@@ -1002,26 +1002,26 @@ func testShardLayout(t *testing.T, zoneID ZoneID, epoch uint64, shardIDs []Shard
 
 func testContributions(height uint64) RootContributions {
 	return RootContributions{
-		IdentityRoot:  testHash(fmt.Sprintf("%d/identity", height)),
-		StorageRoot:   testHash(fmt.Sprintf("%d/storage", height)),
-		MessageRoot:   testHash(fmt.Sprintf("%d/messages", height)),
-		ReceiptsRoot:  testHash(fmt.Sprintf("%d/receipts", height)),
-		RoutingRoot:   testHash(fmt.Sprintf("%d/routing", height)),
-		PaymentsRoot:  testHash(fmt.Sprintf("%d/payments", height)),
-		ContractsRoot: testHash(fmt.Sprintf("%d/contracts", height)),
-		VMRoot:        testHash(fmt.Sprintf("%d/vm", height)),
-		ParamsHash:    testHash(fmt.Sprintf("%d/params", height)),
+		IdentityRoot:	testHash(fmt.Sprintf("%d/identity", height)),
+		StorageRoot:	testHash(fmt.Sprintf("%d/storage", height)),
+		MessageRoot:	testHash(fmt.Sprintf("%d/messages", height)),
+		ReceiptsRoot:	testHash(fmt.Sprintf("%d/receipts", height)),
+		RoutingRoot:	testHash(fmt.Sprintf("%d/routing", height)),
+		PaymentsRoot:	testHash(fmt.Sprintf("%d/payments", height)),
+		ContractsRoot:	testHash(fmt.Sprintf("%d/contracts", height)),
+		VMRoot:		testHash(fmt.Sprintf("%d/vm", height)),
+		ParamsHash:	testHash(fmt.Sprintf("%d/params", height)),
 	}
 }
 
 func testProposalItem(zoneID ZoneID, shardID ShardID, seed string, priority uint32, height uint64, txIndex uint32) ProposalItem {
 	return ProposalItem{
-		ZoneID:          zoneID,
-		ShardID:         shardID,
-		TxHash:          testHash(seed),
-		PriorityClass:   priority,
-		AdmissionHeight: height,
-		TxIndex:         txIndex,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		TxHash:			testHash(seed),
+		PriorityClass:		priority,
+		AdmissionHeight:	height,
+		TxIndex:		txIndex,
 	}
 }
 

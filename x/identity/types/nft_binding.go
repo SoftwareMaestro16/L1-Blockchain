@@ -10,18 +10,18 @@ import (
 const DomainRecordV2FlagRestricted = uint64(1 << 0)
 
 type DomainNFTBinding struct {
-	NameHash           string
-	NFTClassID         string
-	NFTItemID          string
-	Owner              sdk.AccAddress
-	LastVerifiedHeight uint64
-	BindingVersion     uint64
+	NameHash		string
+	NFTClassID		string
+	NFTItemID		string
+	Owner			sdk.AccAddress
+	LastVerifiedHeight	uint64
+	BindingVersion		uint64
 }
 
 type DomainNFTBindingContext struct {
-	RegistryOwner  sdk.AccAddress
-	NFTModuleOwner sdk.AccAddress
-	CurrentHeight  uint64
+	RegistryOwner	sdk.AccAddress
+	NFTModuleOwner	sdk.AccAddress
+	CurrentHeight	uint64
 }
 
 func NewDomainNFTBinding(name string, nftItemID string, owner sdk.AccAddress, lastVerifiedHeight uint64) (DomainNFTBinding, error) {
@@ -30,17 +30,17 @@ func NewDomainNFTBinding(name string, nftItemID string, owner sdk.AccAddress, la
 		return DomainNFTBinding{}, err
 	}
 	binding := DomainNFTBinding{
-		NameHash:           nameHash,
-		NFTClassID:         DomainNFTClassID,
-		NFTItemID:          nftItemID,
-		Owner:              cloneSpecAddress(owner),
-		LastVerifiedHeight: lastVerifiedHeight,
-		BindingVersion:     1,
+		NameHash:		nameHash,
+		NFTClassID:		DomainNFTClassID,
+		NFTItemID:		nftItemID,
+		Owner:			cloneSpecAddress(owner),
+		LastVerifiedHeight:	lastVerifiedHeight,
+		BindingVersion:		1,
 	}
 	return binding, ValidateDomainNFTBinding(binding, DomainNFTBindingContext{
-		RegistryOwner:  owner,
-		NFTModuleOwner: owner,
-		CurrentHeight:  lastVerifiedHeight,
+		RegistryOwner:	owner,
+		NFTModuleOwner:	owner,
+		CurrentHeight:	lastVerifiedHeight,
 	})
 }
 

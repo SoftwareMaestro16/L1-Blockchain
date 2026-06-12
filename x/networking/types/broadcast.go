@@ -10,43 +10,43 @@ import (
 )
 
 const (
-	DefaultBroadcastTreeFanout   = uint32(4)
-	DefaultBroadcastGossipFanout = uint32(8)
-	MaxBroadcastFanout           = uint32(256)
-	MaxBroadcastTTL              = uint32(128)
-	DefaultBroadcastDedupHorizon = uint64(128)
+	DefaultBroadcastTreeFanout	= uint32(4)
+	DefaultBroadcastGossipFanout	= uint32(8)
+	MaxBroadcastFanout		= uint32(256)
+	MaxBroadcastTTL			= uint32(128)
+	DefaultBroadcastDedupHorizon	= uint64(128)
 )
 
 type BroadcastPayloadType string
 
 const (
-	BroadcastPayloadConsensus BroadcastPayloadType = "consensus"
-	BroadcastPayloadBlock     BroadcastPayloadType = "block"
-	BroadcastPayloadExecution BroadcastPayloadType = "execution"
-	BroadcastPayloadService   BroadcastPayloadType = "service"
-	BroadcastPayloadDiscovery BroadcastPayloadType = "discovery"
-	BroadcastPayloadData      BroadcastPayloadType = "data"
-	BroadcastPayloadRouting   BroadcastPayloadType = "routing"
-	BroadcastPayloadStateSync BroadcastPayloadType = "state_sync"
+	BroadcastPayloadConsensus	BroadcastPayloadType	= "consensus"
+	BroadcastPayloadBlock		BroadcastPayloadType	= "block"
+	BroadcastPayloadExecution	BroadcastPayloadType	= "execution"
+	BroadcastPayloadService		BroadcastPayloadType	= "service"
+	BroadcastPayloadDiscovery	BroadcastPayloadType	= "discovery"
+	BroadcastPayloadData		BroadcastPayloadType	= "data"
+	BroadcastPayloadRouting		BroadcastPayloadType	= "routing"
+	BroadcastPayloadStateSync	BroadcastPayloadType	= "state_sync"
 )
 
 type BroadcastFanoutPolicy struct {
-	TreeFanout   uint32
-	GossipFanout uint32
-	OverlayBound bool
+	TreeFanout	uint32
+	GossipFanout	uint32
+	OverlayBound	bool
 }
 
 type BroadcastMessage struct {
-	BroadcastID  string
-	OriginNode   string
-	OverlayID    string
-	PayloadHash  string
-	PayloadType  BroadcastPayloadType
-	Height       uint64
-	TTL          uint32
-	Priority     uint32
-	FanoutPolicy BroadcastFanoutPolicy
-	Signature    []byte
+	BroadcastID	string
+	OriginNode	string
+	OverlayID	string
+	PayloadHash	string
+	PayloadType	BroadcastPayloadType
+	Height		uint64
+	TTL		uint32
+	Priority	uint32
+	FanoutPolicy	BroadcastFanoutPolicy
+	Signature	[]byte
 }
 
 type BroadcastDeduper struct {
@@ -54,67 +54,67 @@ type BroadcastDeduper struct {
 }
 
 type BroadcastDedupEntry struct {
-	BroadcastID string
-	PayloadHash string
-	SeenHeight  uint64
+	BroadcastID	string
+	PayloadHash	string
+	SeenHeight	uint64
 }
 
 type BroadcastFaultEvidence struct {
-	BroadcastID            string
-	ExpectedPayloadHash    string
-	ConflictingPayloadHash string
-	PeerNodeID             string
-	DetectedHeight         uint64
-	EvidenceHash           string
+	BroadcastID		string
+	ExpectedPayloadHash	string
+	ConflictingPayloadHash	string
+	PeerNodeID		string
+	DetectedHeight		uint64
+	EvidenceHash		string
 }
 
 type BroadcastDedupCache struct {
-	Horizon uint64
-	Entries []BroadcastDedupEntry
-	Faults  []BroadcastFaultEvidence
+	Horizon	uint64
+	Entries	[]BroadcastDedupEntry
+	Faults	[]BroadcastFaultEvidence
 }
 
 type BroadcastPlan struct {
-	BroadcastID   string
-	OverlayID     string
-	DedupKey      string
-	TreeTargets   []string
-	GossipTargets []string
-	FallbackUsed  bool
-	Priority      uint32
-	TTLRemaining  uint32
+	BroadcastID	string
+	OverlayID	string
+	DedupKey	string
+	TreeTargets	[]string
+	GossipTargets	[]string
+	FallbackUsed	bool
+	Priority	uint32
+	TTLRemaining	uint32
 }
 
 type BlockBroadcastHeader struct {
-	BlockID                  string
-	Height                   uint64
-	ProposerNodeID           string
-	HeaderHash               string
-	ChunkSetRoot             string
-	ProofSetRoot             string
-	BlockRoot                string
-	ChunkCount               uint32
-	AvailabilityMetadataHash string
+	BlockID				string
+	Height				uint64
+	ProposerNodeID			string
+	HeaderHash			string
+	ChunkSetRoot			string
+	ProofSetRoot			string
+	BlockRoot			string
+	ChunkCount			uint32
+	AvailabilityMetadataHash	string
 }
 
 type BlockChunkMetadata struct {
-	BlockID    string
-	ChunkIndex uint32
-	ChunkHash  string
-	ChunkSize  uint64
+	BlockID		string
+	ChunkIndex	uint32
+	ChunkHash	string
+	ChunkSize	uint64
 }
 
 type BlockProofSet struct {
-	BlockID     string
-	ProofRoot   string
-	ProofHashes []string
+	BlockID		string
+	ProofRoot	string
+	ProofHashes	[]string
 }
 
 type BlockPropagationSession struct {
-	Header         BlockBroadcastHeader
-	ProofSet       BlockProofSet
-	ReceivedChunks []PayloadChunk
-	VerifiedBitmap []bool
+	Header		BlockBroadcastHeader
+	ProofSet	BlockProofSet
+	ReceivedChunks	[]PayloadChunk
+	VerifiedBitmap	[]bool
 }
 
 func NewBroadcastMessage(msg BroadcastMessage) (BroadcastMessage, error) {
@@ -332,14 +332,14 @@ func PlanBroadcastForwarding(msg BroadcastMessage, desc OverlayDescriptor, graph
 	fallbackUsed := len(treeTargets) < int(treeFanout)
 	gossipTargets := selectBroadcastGossipTargets(msg, remaining, gossipFanout)
 	return nextDeduper, BroadcastPlan{
-		BroadcastID:   msg.BroadcastID,
-		OverlayID:     msg.OverlayID,
-		DedupKey:      ComputeBroadcastDedupKey(msg),
-		TreeTargets:   treeTargets,
-		GossipTargets: gossipTargets,
-		FallbackUsed:  fallbackUsed || len(graph.Edges) == 0,
-		Priority:      msg.Priority,
-		TTLRemaining:  msg.TTL - 1,
+		BroadcastID:	msg.BroadcastID,
+		OverlayID:	msg.OverlayID,
+		DedupKey:	ComputeBroadcastDedupKey(msg),
+		TreeTargets:	treeTargets,
+		GossipTargets:	gossipTargets,
+		FallbackUsed:	fallbackUsed || len(graph.Edges) == 0,
+		Priority:	msg.Priority,
+		TTLRemaining:	msg.TTL - 1,
 	}, nil
 }
 
@@ -384,9 +384,9 @@ func NewBroadcastDedupCache(horizon uint64) BroadcastDedupCache {
 }
 
 type BroadcastDedupDecision struct {
-	Accepted         bool
-	DroppedDuplicate bool
-	FaultEvidence    BroadcastFaultEvidence
+	Accepted		bool
+	DroppedDuplicate	bool
+	FaultEvidence		BroadcastFaultEvidence
 }
 
 func (c BroadcastDedupCache) Accept(msg BroadcastMessage, peerNodeID string, currentHeight uint64) (BroadcastDedupCache, BroadcastDedupDecision, error) {
@@ -417,9 +417,9 @@ func (c BroadcastDedupCache) Accept(msg BroadcastMessage, peerNodeID string, cur
 		return next, BroadcastDedupDecision{FaultEvidence: evidence}, nil
 	}
 	next.Entries = append(next.Entries, BroadcastDedupEntry{
-		BroadcastID: msg.BroadcastID,
-		PayloadHash: msg.PayloadHash,
-		SeenHeight:  currentHeight,
+		BroadcastID:	msg.BroadcastID,
+		PayloadHash:	msg.PayloadHash,
+		SeenHeight:	currentHeight,
 	})
 	sortBroadcastDedupEntries(next.Entries)
 	return next, BroadcastDedupDecision{Accepted: true}, nil
@@ -427,8 +427,8 @@ func (c BroadcastDedupCache) Accept(msg BroadcastMessage, peerNodeID string, cur
 
 func (c BroadcastDedupCache) Prune(currentHeight uint64) BroadcastDedupCache {
 	next := BroadcastDedupCache{
-		Horizon: c.Horizon,
-		Faults:  append([]BroadcastFaultEvidence(nil), c.Faults...),
+		Horizon:	c.Horizon,
+		Faults:		append([]BroadcastFaultEvidence(nil), c.Faults...),
 	}
 	if next.Horizon == 0 {
 		next.Horizon = DefaultBroadcastDedupHorizon
@@ -448,11 +448,11 @@ func (c BroadcastDedupCache) Prune(currentHeight uint64) BroadcastDedupCache {
 
 func NewBroadcastFaultEvidence(broadcastID, expectedPayloadHash, conflictingPayloadHash, peerNodeID string, detectedHeight uint64) BroadcastFaultEvidence {
 	evidence := BroadcastFaultEvidence{
-		BroadcastID:            normalizeHashText(broadcastID),
-		ExpectedPayloadHash:    normalizeHashText(expectedPayloadHash),
-		ConflictingPayloadHash: normalizeHashText(conflictingPayloadHash),
-		PeerNodeID:             normalizeHashText(peerNodeID),
-		DetectedHeight:         detectedHeight,
+		BroadcastID:		normalizeHashText(broadcastID),
+		ExpectedPayloadHash:	normalizeHashText(expectedPayloadHash),
+		ConflictingPayloadHash:	normalizeHashText(conflictingPayloadHash),
+		PeerNodeID:		normalizeHashText(peerNodeID),
+		DetectedHeight:		detectedHeight,
 	}
 	evidence.EvidenceHash = HashParts(
 		"broadcast-fault",
@@ -559,10 +559,10 @@ func NewBlockChunkMetadata(blockID string, chunks []PayloadChunk) ([]BlockChunkM
 	hashes := make([]string, len(ordered))
 	for i, chunk := range ordered {
 		metadata[i] = BlockChunkMetadata{
-			BlockID:    normalizeHashText(blockID),
-			ChunkIndex: chunk.Index,
-			ChunkHash:  chunk.ChunkHash,
-			ChunkSize:  uint64(len(chunk.Bytes)),
+			BlockID:	normalizeHashText(blockID),
+			ChunkIndex:	chunk.Index,
+			ChunkHash:	chunk.ChunkHash,
+			ChunkSize:	uint64(len(chunk.Bytes)),
 		}
 		hashes[i] = chunk.ChunkHash
 	}
@@ -611,9 +611,9 @@ func NewBlockProofSet(blockID string, proofHashes []string) (BlockProofSet, erro
 		}
 	}
 	return BlockProofSet{
-		BlockID:     blockID,
-		ProofRoot:   HashParts(append([]string{"block-proof-set"}, proofs...)...),
-		ProofHashes: proofs,
+		BlockID:	blockID,
+		ProofRoot:	HashParts(append([]string{"block-proof-set"}, proofs...)...),
+		ProofHashes:	proofs,
 	}, nil
 }
 
@@ -652,9 +652,9 @@ func StartBlockPropagation(header BlockBroadcastHeader, proofSet BlockProofSet, 
 		return BlockPropagationSession{}, err
 	}
 	return BlockPropagationSession{
-		Header:         header,
-		ProofSet:       proofSet,
-		VerifiedBitmap: make([]bool, header.ChunkCount),
+		Header:		header,
+		ProofSet:	proofSet,
+		VerifiedBitmap:	make([]bool, header.ChunkCount),
 	}, nil
 }
 

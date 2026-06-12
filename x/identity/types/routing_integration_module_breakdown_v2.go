@@ -16,178 +16,178 @@ type RoutingIntegrationFailureModeV2 string
 type RoutingIntegrationIntegrationPointV2 string
 
 const (
-	RoutingIntegrationModulePathV2 = "routing-integration-module"
+	RoutingIntegrationModulePathV2	= "routing-integration-module"
 
-	RoutingIntegrationStateRoutingPolicy              RoutingIntegrationStateObjectV2 = "RoutingPolicy"
-	RoutingIntegrationStateIdentityTransactionMapping RoutingIntegrationStateObjectV2 = "IdentityTransactionMapping"
-	RoutingIntegrationStateContractInvocationMapping  RoutingIntegrationStateObjectV2 = "ContractInvocationMapping"
-	RoutingIntegrationStateServiceMapping             RoutingIntegrationStateObjectV2 = "ServiceMapping"
-	RoutingIntegrationStateInterfaceMapping           RoutingIntegrationStateObjectV2 = "InterfaceMapping"
-	RoutingIntegrationStateExecutionHintPolicy        RoutingIntegrationStateObjectV2 = "ExecutionHintPolicy"
+	RoutingIntegrationStateRoutingPolicy			RoutingIntegrationStateObjectV2	= "RoutingPolicy"
+	RoutingIntegrationStateIdentityTransactionMapping	RoutingIntegrationStateObjectV2	= "IdentityTransactionMapping"
+	RoutingIntegrationStateContractInvocationMapping	RoutingIntegrationStateObjectV2	= "ContractInvocationMapping"
+	RoutingIntegrationStateServiceMapping			RoutingIntegrationStateObjectV2	= "ServiceMapping"
+	RoutingIntegrationStateInterfaceMapping			RoutingIntegrationStateObjectV2	= "InterfaceMapping"
+	RoutingIntegrationStateExecutionHintPolicy		RoutingIntegrationStateObjectV2	= "ExecutionHintPolicy"
 
-	RoutingIntegrationMsgSetRoutingPolicy            RoutingIntegrationMessageNameV2 = "MsgSetRoutingPolicy"
-	RoutingIntegrationMsgUpdateExecutionHints        RoutingIntegrationMessageNameV2 = "MsgUpdateExecutionHints"
-	RoutingIntegrationMsgRegisterInterfaceDescriptor RoutingIntegrationMessageNameV2 = "MsgRegisterInterfaceDescriptor"
-	RoutingIntegrationMsgRegisterServiceEndpoint     RoutingIntegrationMessageNameV2 = "MsgRegisterServiceEndpoint"
-	RoutingIntegrationMsgClearRoutingMetadata        RoutingIntegrationMessageNameV2 = "MsgClearRoutingMetadata"
+	RoutingIntegrationMsgSetRoutingPolicy			RoutingIntegrationMessageNameV2	= "MsgSetRoutingPolicy"
+	RoutingIntegrationMsgUpdateExecutionHints		RoutingIntegrationMessageNameV2	= "MsgUpdateExecutionHints"
+	RoutingIntegrationMsgRegisterInterfaceDescriptor	RoutingIntegrationMessageNameV2	= "MsgRegisterInterfaceDescriptor"
+	RoutingIntegrationMsgRegisterServiceEndpoint		RoutingIntegrationMessageNameV2	= "MsgRegisterServiceEndpoint"
+	RoutingIntegrationMsgClearRoutingMetadata		RoutingIntegrationMessageNameV2	= "MsgClearRoutingMetadata"
 
-	RoutingIntegrationQueryTransactionMapping        RoutingIntegrationQueryNameV2 = "QueryTransactionMapping"
-	RoutingIntegrationQueryContractInvocationMapping RoutingIntegrationQueryNameV2 = "QueryContractInvocationMapping"
-	RoutingIntegrationQueryServiceMapping            RoutingIntegrationQueryNameV2 = "QueryServiceMapping"
-	RoutingIntegrationQueryInterfaceMapping          RoutingIntegrationQueryNameV2 = "QueryInterfaceMapping"
-	RoutingIntegrationQueryExecutionHints            RoutingIntegrationQueryNameV2 = "QueryExecutionHints"
-	RoutingIntegrationQueryResolvedExecutionTarget   RoutingIntegrationQueryNameV2 = "QueryResolvedExecutionTarget"
+	RoutingIntegrationQueryTransactionMapping		RoutingIntegrationQueryNameV2	= "QueryTransactionMapping"
+	RoutingIntegrationQueryContractInvocationMapping	RoutingIntegrationQueryNameV2	= "QueryContractInvocationMapping"
+	RoutingIntegrationQueryServiceMapping			RoutingIntegrationQueryNameV2	= "QueryServiceMapping"
+	RoutingIntegrationQueryInterfaceMapping			RoutingIntegrationQueryNameV2	= "QueryInterfaceMapping"
+	RoutingIntegrationQueryExecutionHints			RoutingIntegrationQueryNameV2	= "QueryExecutionHints"
+	RoutingIntegrationQueryResolvedExecutionTarget		RoutingIntegrationQueryNameV2	= "QueryResolvedExecutionTarget"
 
-	RoutingIntegrationFailureStaleMetadata              RoutingIntegrationFailureModeV2 = "stale_routing_metadata_after_resolver_update"
-	RoutingIntegrationFailureWrongInterfaceTarget       RoutingIntegrationFailureModeV2 = "interface_descriptor_points_to_wrong_target"
-	RoutingIntegrationFailureServiceEndpointUnavailable RoutingIntegrationFailureModeV2 = "service_endpoint_proof_succeeds_but_endpoint_unavailable"
-	RoutingIntegrationFailureExecutionHintConflict      RoutingIntegrationFailureModeV2 = "execution_hint_conflicts_with_target_module_rules"
-	RoutingIntegrationFailureAdvisoryAsAuthorization    RoutingIntegrationFailureModeV2 = "client_treats_advisory_metadata_as_authorization"
+	RoutingIntegrationFailureStaleMetadata			RoutingIntegrationFailureModeV2	= "stale_routing_metadata_after_resolver_update"
+	RoutingIntegrationFailureWrongInterfaceTarget		RoutingIntegrationFailureModeV2	= "interface_descriptor_points_to_wrong_target"
+	RoutingIntegrationFailureServiceEndpointUnavailable	RoutingIntegrationFailureModeV2	= "service_endpoint_proof_succeeds_but_endpoint_unavailable"
+	RoutingIntegrationFailureExecutionHintConflict		RoutingIntegrationFailureModeV2	= "execution_hint_conflicts_with_target_module_rules"
+	RoutingIntegrationFailureAdvisoryAsAuthorization	RoutingIntegrationFailureModeV2	= "client_treats_advisory_metadata_as_authorization"
 
-	RoutingIntegrationIntegrationResolverModule    RoutingIntegrationIntegrationPointV2 = "resolver_module"
-	RoutingIntegrationIntegrationFeeModule         RoutingIntegrationIntegrationPointV2 = "fee_module"
-	RoutingIntegrationIntegrationContractExecution RoutingIntegrationIntegrationPointV2 = "contract_execution_layer"
-	RoutingIntegrationIntegrationWalletSDK         RoutingIntegrationIntegrationPointV2 = "wallet_sdk"
-	RoutingIntegrationIntegrationServiceClients    RoutingIntegrationIntegrationPointV2 = "service_clients"
+	RoutingIntegrationIntegrationResolverModule	RoutingIntegrationIntegrationPointV2	= "resolver_module"
+	RoutingIntegrationIntegrationFeeModule		RoutingIntegrationIntegrationPointV2	= "fee_module"
+	RoutingIntegrationIntegrationContractExecution	RoutingIntegrationIntegrationPointV2	= "contract_execution_layer"
+	RoutingIntegrationIntegrationWalletSDK		RoutingIntegrationIntegrationPointV2	= "wallet_sdk"
+	RoutingIntegrationIntegrationServiceClients	RoutingIntegrationIntegrationPointV2	= "service_clients"
 )
 
 type RoutingIntegrationFailureCoverageV2 struct {
-	Mode       RoutingIntegrationFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		RoutingIntegrationFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type RoutingIntegrationModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []RoutingIntegrationStateObjectV2
-	Messages          []RoutingIntegrationMessageNameV2
-	Queries           []RoutingIntegrationQueryNameV2
-	FailureModes      []RoutingIntegrationFailureCoverageV2
-	IntegrationPoints []RoutingIntegrationIntegrationPointV2
-	BackingPrimitives []string
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]RoutingIntegrationStateObjectV2
+	Messages		[]RoutingIntegrationMessageNameV2
+	Queries			[]RoutingIntegrationQueryNameV2
+	FailureModes		[]RoutingIntegrationFailureCoverageV2
+	IntegrationPoints	[]RoutingIntegrationIntegrationPointV2
+	BackingPrimitives	[]string
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type RoutingIntegrationPolicyV2 struct {
-	PolicyID                       string
-	AllowAdvisoryRoutingMetadata   bool
-	RequireProofForWalletSDK       bool
-	RequireInterfaceHash           bool
-	RequireSimulationWhenHinted    bool
-	EndpointAvailabilityIsAdvisory bool
-	PolicyHash                     string
+	PolicyID			string
+	AllowAdvisoryRoutingMetadata	bool
+	RequireProofForWalletSDK	bool
+	RequireInterfaceHash		bool
+	RequireSimulationWhenHinted	bool
+	EndpointAvailabilityIsAdvisory	bool
+	PolicyHash			string
 }
 
 type IdentityTransactionMappingV2 struct {
-	Name             string
-	Address          sdk.AccAddress
-	ProofVerified    bool
-	ProofHeight      uint64
-	RecordVersion    uint64
-	FreshUntilHeight uint64
-	AuditMemo        string
-	MappingHash      string
+	Name			string
+	Address			sdk.AccAddress
+	ProofVerified		bool
+	ProofHeight		uint64
+	RecordVersion		uint64
+	FreshUntilHeight	uint64
+	AuditMemo		string
+	MappingHash		string
 }
 
 type ContractInvocationMappingV2 struct {
-	Name             string
-	TargetID         string
-	InterfaceID      string
-	InterfaceHash    string
-	ContractAddress  sdk.AccAddress
-	Entrypoint       string
-	ProofVerified    bool
-	ProofHeight      uint64
-	RecordVersion    uint64
-	RequiresConfirm  bool
-	SimulationNeeded bool
-	MappingHash      string
+	Name			string
+	TargetID		string
+	InterfaceID		string
+	InterfaceHash		string
+	ContractAddress		sdk.AccAddress
+	Entrypoint		string
+	ProofVerified		bool
+	ProofHeight		uint64
+	RecordVersion		uint64
+	RequiresConfirm		bool
+	SimulationNeeded	bool
+	MappingHash		string
 }
 
 type ServiceMappingV2 struct {
-	Name                                    string
-	ServiceID                               string
-	Endpoint                                ServiceEndpointV2
-	FallbackEndpoints                       []ServiceEndpointV2
-	ProofVerified                           bool
-	ProofHeight                             uint64
-	RecordVersion                           uint64
-	EndpointAvailabilityConsensusGuaranteed bool
-	MappingHash                             string
+	Name					string
+	ServiceID				string
+	Endpoint				ServiceEndpointV2
+	FallbackEndpoints			[]ServiceEndpointV2
+	ProofVerified				bool
+	ProofHeight				uint64
+	RecordVersion				uint64
+	EndpointAvailabilityConsensusGuaranteed	bool
+	MappingHash				string
 }
 
 type InterfaceMappingV2 struct {
-	Name                     string
-	InterfaceID              string
-	SchemaHash               string
-	SchemaHashVerified       bool
-	RenderPolicySupported    bool
-	UserConfirmationRequired bool
-	ExecutionTargetImmutable bool
-	ProofVerified            bool
-	ProofHeight              uint64
-	RecordVersion            uint64
-	MappingHash              string
+	Name				string
+	InterfaceID			string
+	SchemaHash			string
+	SchemaHashVerified		bool
+	RenderPolicySupported		bool
+	UserConfirmationRequired	bool
+	ExecutionTargetImmutable	bool
+	ProofVerified			bool
+	ProofHeight			uint64
+	RecordVersion			uint64
+	MappingHash			string
 }
 
 type ExecutionHintPolicyV2 struct {
-	MaxGasLimitHint     uint64
-	AllowedFeeModes     []string
-	RequiresMemo        bool
-	SimulationRequired  bool
-	AllowAsyncExecution bool
-	PolicyHash          string
+	MaxGasLimitHint		uint64
+	AllowedFeeModes		[]string
+	RequiresMemo		bool
+	SimulationRequired	bool
+	AllowAsyncExecution	bool
+	PolicyHash		string
 }
 
 type RoutingIntegrationResolvedExecutionTargetV2 struct {
-	Name             string
-	TargetType       IdentityResolutionTargetTypeV2
-	TargetKey        string
-	Address          sdk.AccAddress
-	Endpoint         string
-	Descriptor       string
-	Route            RoutingMetadataV2
-	RecordVersion    uint64
-	ProofHeight      uint64
-	ProofVerified    bool
-	FreshUntilHeight uint64
-	ResultHash       string
+	Name			string
+	TargetType		IdentityResolutionTargetTypeV2
+	TargetKey		string
+	Address			sdk.AccAddress
+	Endpoint		string
+	Descriptor		string
+	Route			RoutingMetadataV2
+	RecordVersion		uint64
+	ProofHeight		uint64
+	ProofVerified		bool
+	FreshUntilHeight	uint64
+	ResultHash		string
 }
 
 type RoutingIntegrationResolvedExecutionTargetRequestV2 struct {
-	Name               string
-	TargetType         IdentityResolutionTargetTypeV2
-	TargetKey          string
-	InterfaceID        string
-	ExpectedHash       string
-	Method             string
-	PayloadHash        string
-	State              IdentityState
-	Height             uint64
-	RecordTTL          uint64
-	CurrentHeight      uint64
-	FreshnessThreshold uint64
-	ExpectedChainID    string
-	TrustedHeader      IdentityTrustedHeaderV2
-	Proof              *IdentityResolutionProofFormatV2
+	Name			string
+	TargetType		IdentityResolutionTargetTypeV2
+	TargetKey		string
+	InterfaceID		string
+	ExpectedHash		string
+	Method			string
+	PayloadHash		string
+	State			IdentityState
+	Height			uint64
+	RecordTTL		uint64
+	CurrentHeight		uint64
+	FreshnessThreshold	uint64
+	ExpectedChainID		string
+	TrustedHeader		IdentityTrustedHeaderV2
+	Proof			*IdentityResolutionProofFormatV2
 }
 
 type RoutingIntegrationWalletSDKHelperV2 struct {
-	TransactionMapping *IdentityTransactionMappingV2
-	ContractMapping    *ContractInvocationMappingV2
-	ServiceMapping     *ServiceMappingV2
-	InterfaceMapping   *InterfaceMappingV2
-	ProofRequired      bool
-	UserConfirmation   bool
-	AdvisoryOnly       bool
-	HelperHash         string
+	TransactionMapping	*IdentityTransactionMappingV2
+	ContractMapping		*ContractInvocationMappingV2
+	ServiceMapping		*ServiceMappingV2
+	InterfaceMapping	*InterfaceMappingV2
+	ProofRequired		bool
+	UserConfirmation	bool
+	AdvisoryOnly		bool
+	HelperHash		string
 }
 
 func DefaultRoutingIntegrationModuleBreakdownV2() (RoutingIntegrationModuleBreakdownV2, error) {
 	breakdown := RoutingIntegrationModuleBreakdownV2{
-		ModulePath: RoutingIntegrationModulePathV2,
+		ModulePath:	RoutingIntegrationModulePathV2,
 		Purpose: []string{
 			"contract_invocation_mapping",
 			"execution_hint_mapping",
@@ -196,9 +196,9 @@ func DefaultRoutingIntegrationModuleBreakdownV2() (RoutingIntegrationModuleBreak
 			"service_mapping",
 			"transaction_mapping",
 		},
-		StateObjects: requiredRoutingIntegrationStateObjectsV2(),
-		Messages:     requiredRoutingIntegrationMessagesV2(),
-		Queries:      requiredRoutingIntegrationQueriesV2(),
+		StateObjects:	requiredRoutingIntegrationStateObjectsV2(),
+		Messages:	requiredRoutingIntegrationMessagesV2(),
+		Queries:	requiredRoutingIntegrationQueriesV2(),
 		FailureModes: []RoutingIntegrationFailureCoverageV2{
 			{Mode: RoutingIntegrationFailureAdvisoryAsAuthorization, Guard: "ValidateRoutingIntegrationAdvisoryAuthorizationV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
 			{Mode: RoutingIntegrationFailureExecutionHintConflict, Guard: "ValidateRoutingIntegrationExecutionHintsV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
@@ -206,7 +206,7 @@ func DefaultRoutingIntegrationModuleBreakdownV2() (RoutingIntegrationModuleBreak
 			{Mode: RoutingIntegrationFailureStaleMetadata, Guard: "ValidateRoutingIntegrationMetadataFreshnessV2", StoreScope: IdentityStoreV2SpecResolversPrefix},
 			{Mode: RoutingIntegrationFailureWrongInterfaceTarget, Guard: "ValidateRoutingIntegrationInterfaceTargetV2", StoreScope: IdentityStoreV2SpecInterfaceMetadataPrefix},
 		},
-		IntegrationPoints: requiredRoutingIntegrationIntegrationPointsV2(),
+		IntegrationPoints:	requiredRoutingIntegrationIntegrationPointsV2(),
 		BackingPrimitives: []string{
 			"BuildIdentityInterfaceSchemaMappingV2",
 			"BuildIdentityInvokeByNameV2",
@@ -286,13 +286,13 @@ func BuildRoutingIntegrationTransactionMappingV2(request IdentitySendByNameReque
 		return IdentityTransactionMappingV2{}, err
 	}
 	mapping := IdentityTransactionMappingV2{
-		Name:             result.NormalizedName,
-		Address:          cloneSpecAddress(result.Address),
-		ProofVerified:    result.ProofVerified,
-		ProofHeight:      result.ProofHeight,
-		RecordVersion:    result.RecordVersion,
-		FreshUntilHeight: result.FreshUntilHeight,
-		AuditMemo:        result.AuditMemo,
+		Name:			result.NormalizedName,
+		Address:		cloneSpecAddress(result.Address),
+		ProofVerified:		result.ProofVerified,
+		ProofHeight:		result.ProofHeight,
+		RecordVersion:		result.RecordVersion,
+		FreshUntilHeight:	result.FreshUntilHeight,
+		AuditMemo:		result.AuditMemo,
 	}
 	mapping.MappingHash = ComputeIdentityTransactionMappingHashV2(mapping)
 	return mapping, ValidateIdentityTransactionMappingV2(mapping)
@@ -304,17 +304,17 @@ func BuildRoutingIntegrationContractInvocationMappingV2(request IdentityInvokeBy
 		return ContractInvocationMappingV2{}, err
 	}
 	mapping := ContractInvocationMappingV2{
-		Name:             result.NormalizedName,
-		TargetID:         result.TargetID,
-		InterfaceID:      result.InterfaceID,
-		InterfaceHash:    result.InterfaceHash,
-		ContractAddress:  cloneSpecAddress(result.ContractAddress),
-		Entrypoint:       result.Entrypoint,
-		ProofVerified:    result.ProofVerified,
-		ProofHeight:      result.ProofHeight,
-		RecordVersion:    result.RecordVersion,
-		RequiresConfirm:  result.RequiresInterfaceConfirmation,
-		SimulationNeeded: result.SimulationRequiredBeforeSigning,
+		Name:			result.NormalizedName,
+		TargetID:		result.TargetID,
+		InterfaceID:		result.InterfaceID,
+		InterfaceHash:		result.InterfaceHash,
+		ContractAddress:	cloneSpecAddress(result.ContractAddress),
+		Entrypoint:		result.Entrypoint,
+		ProofVerified:		result.ProofVerified,
+		ProofHeight:		result.ProofHeight,
+		RecordVersion:		result.RecordVersion,
+		RequiresConfirm:	result.RequiresInterfaceConfirmation,
+		SimulationNeeded:	result.SimulationRequiredBeforeSigning,
 	}
 	if result.VerifiedInterfaceDescriptor != nil {
 		if err := ValidateRoutingIntegrationInterfaceTargetV2(result.TargetID, *result.VerifiedInterfaceDescriptor); err != nil {
@@ -331,14 +331,14 @@ func BuildRoutingIntegrationServiceMappingV2(request IdentityServiceDiscoveryReq
 		return ServiceMappingV2{}, err
 	}
 	mapping := ServiceMappingV2{
-		Name:                                    request.Name,
-		ServiceID:                               result.Endpoint.ServiceID,
-		Endpoint:                                result.Endpoint,
-		FallbackEndpoints:                       append([]ServiceEndpointV2(nil), result.FallbackEndpoints...),
-		ProofVerified:                           result.ProofVerified,
-		ProofHeight:                             result.ProofHeight,
-		RecordVersion:                           result.RecordVersion,
-		EndpointAvailabilityConsensusGuaranteed: result.EndpointAvailabilityConsensusGuaranteed,
+		Name:						request.Name,
+		ServiceID:					result.Endpoint.ServiceID,
+		Endpoint:					result.Endpoint,
+		FallbackEndpoints:				append([]ServiceEndpointV2(nil), result.FallbackEndpoints...),
+		ProofVerified:					result.ProofVerified,
+		ProofHeight:					result.ProofHeight,
+		RecordVersion:					result.RecordVersion,
+		EndpointAvailabilityConsensusGuaranteed:	result.EndpointAvailabilityConsensusGuaranteed,
 	}
 	mapping.MappingHash = ComputeServiceMappingHashV2(mapping)
 	return mapping, ValidateServiceMappingV2(mapping)
@@ -350,16 +350,16 @@ func BuildRoutingIntegrationInterfaceMappingV2(request IdentityInterfaceSchemaRe
 		return InterfaceMappingV2{}, err
 	}
 	mapping := InterfaceMappingV2{
-		Name:                     request.Name,
-		InterfaceID:              result.Descriptor.InterfaceID,
-		SchemaHash:               result.SchemaHash,
-		SchemaHashVerified:       result.SchemaHashVerified,
-		RenderPolicySupported:    result.RenderPolicySupported,
-		UserConfirmationRequired: result.UserConfirmationRequired,
-		ExecutionTargetImmutable: result.ExecutionTargetImmutable,
-		ProofVerified:            result.ProofVerified,
-		ProofHeight:              result.ProofHeight,
-		RecordVersion:            result.RecordVersion,
+		Name:				request.Name,
+		InterfaceID:			result.Descriptor.InterfaceID,
+		SchemaHash:			result.SchemaHash,
+		SchemaHashVerified:		result.SchemaHashVerified,
+		RenderPolicySupported:		result.RenderPolicySupported,
+		UserConfirmationRequired:	result.UserConfirmationRequired,
+		ExecutionTargetImmutable:	result.ExecutionTargetImmutable,
+		ProofVerified:			result.ProofVerified,
+		ProofHeight:			result.ProofHeight,
+		RecordVersion:			result.RecordVersion,
 	}
 	mapping.MappingHash = ComputeInterfaceMappingHashV2(mapping)
 	return mapping, ValidateInterfaceMappingV2(mapping)
@@ -373,15 +373,15 @@ func QueryRoutingIntegrationResolvedExecutionTargetV2(request RoutingIntegration
 	switch request.TargetType {
 	case IdentityResolutionTargetPrimary:
 		mapping, err := BuildRoutingIntegrationTransactionMappingV2(IdentitySendByNameRequestV2{
-			Name:               normalized,
-			State:              request.State,
-			Height:             request.Height,
-			RecordTTL:          request.RecordTTL,
-			CurrentHeight:      request.CurrentHeight,
-			FreshnessThreshold: request.FreshnessThreshold,
-			ExpectedChainID:    request.ExpectedChainID,
-			TrustedHeader:      request.TrustedHeader,
-			Proof:              request.Proof,
+			Name:			normalized,
+			State:			request.State,
+			Height:			request.Height,
+			RecordTTL:		request.RecordTTL,
+			CurrentHeight:		request.CurrentHeight,
+			FreshnessThreshold:	request.FreshnessThreshold,
+			ExpectedChainID:	request.ExpectedChainID,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			request.Proof,
 		})
 		if err != nil {
 			return RoutingIntegrationResolvedExecutionTargetV2{}, err
@@ -389,20 +389,20 @@ func QueryRoutingIntegrationResolvedExecutionTargetV2(request RoutingIntegration
 		return routingIntegrationResolvedTargetFromTransactionV2(mapping), nil
 	case IdentityResolutionTargetContract:
 		mapping, err := BuildRoutingIntegrationContractInvocationMappingV2(IdentityInvokeByNameRequestV2{
-			Name:                  normalized,
-			TargetID:              request.TargetKey,
-			InterfaceID:           request.InterfaceID,
-			ExpectedInterfaceHash: request.ExpectedHash,
-			Method:                request.Method,
-			PayloadHash:           request.PayloadHash,
-			State:                 request.State,
-			Height:                request.Height,
-			RecordTTL:             request.RecordTTL,
-			CurrentHeight:         request.CurrentHeight,
-			FreshnessThreshold:    request.FreshnessThreshold,
-			ExpectedChainID:       request.ExpectedChainID,
-			TrustedHeader:         request.TrustedHeader,
-			Proof:                 request.Proof,
+			Name:			normalized,
+			TargetID:		request.TargetKey,
+			InterfaceID:		request.InterfaceID,
+			ExpectedInterfaceHash:	request.ExpectedHash,
+			Method:			request.Method,
+			PayloadHash:		request.PayloadHash,
+			State:			request.State,
+			Height:			request.Height,
+			RecordTTL:		request.RecordTTL,
+			CurrentHeight:		request.CurrentHeight,
+			FreshnessThreshold:	request.FreshnessThreshold,
+			ExpectedChainID:	request.ExpectedChainID,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			request.Proof,
 		})
 		if err != nil {
 			return RoutingIntegrationResolvedExecutionTargetV2{}, err
@@ -410,17 +410,17 @@ func QueryRoutingIntegrationResolvedExecutionTargetV2(request RoutingIntegration
 		return routingIntegrationResolvedTargetFromContractV2(mapping), nil
 	case IdentityResolutionTargetService:
 		mapping, err := BuildRoutingIntegrationServiceMappingV2(IdentityServiceDiscoveryRequestV2{
-			Name:                normalized,
-			ServiceID:           request.TargetKey,
-			SupportedTransports: []string{"https", "grpcs", "wss", "aetra", "ipfs"},
-			AllowedAuthPolicies: []string{"none", "token"},
-			State:               request.State,
-			Height:              request.Height,
-			RecordTTL:           request.RecordTTL,
-			CurrentHeight:       request.CurrentHeight,
-			ExpectedChainID:     request.ExpectedChainID,
-			TrustedHeader:       request.TrustedHeader,
-			Proof:               request.Proof,
+			Name:			normalized,
+			ServiceID:		request.TargetKey,
+			SupportedTransports:	[]string{"https", "grpcs", "wss", "aetra", "ipfs"},
+			AllowedAuthPolicies:	[]string{"none", "token"},
+			State:			request.State,
+			Height:			request.Height,
+			RecordTTL:		request.RecordTTL,
+			CurrentHeight:		request.CurrentHeight,
+			ExpectedChainID:	request.ExpectedChainID,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			request.Proof,
 		})
 		if err != nil {
 			return RoutingIntegrationResolvedExecutionTargetV2{}, err
@@ -428,17 +428,17 @@ func QueryRoutingIntegrationResolvedExecutionTargetV2(request RoutingIntegration
 		return routingIntegrationResolvedTargetFromServiceV2(mapping), nil
 	case IdentityResolutionTargetInterface:
 		mapping, err := BuildRoutingIntegrationInterfaceMappingV2(IdentityInterfaceSchemaRequestV2{
-			Name:               normalized,
-			InterfaceID:        request.TargetKey,
-			ExpectedSchemaHash: request.ExpectedHash,
-			WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
-			State:              request.State,
-			Height:             request.Height,
-			RecordTTL:          request.RecordTTL,
-			CurrentHeight:      request.CurrentHeight,
-			ExpectedChainID:    request.ExpectedChainID,
-			TrustedHeader:      request.TrustedHeader,
-			Proof:              request.Proof,
+			Name:			normalized,
+			InterfaceID:		request.TargetKey,
+			ExpectedSchemaHash:	request.ExpectedHash,
+			WalletPolicy:		DefaultIdentityInterfaceWalletPolicyV2(),
+			State:			request.State,
+			Height:			request.Height,
+			RecordTTL:		request.RecordTTL,
+			CurrentHeight:		request.CurrentHeight,
+			ExpectedChainID:	request.ExpectedChainID,
+			TrustedHeader:		request.TrustedHeader,
+			Proof:			request.Proof,
 		})
 		if err != nil {
 			return RoutingIntegrationResolvedExecutionTargetV2{}, err
@@ -524,13 +524,13 @@ func ValidateRoutingIntegrationAdvisoryAuthorizationV2(helper RoutingIntegration
 
 func BuildRoutingIntegrationWalletSDKHelperV2(tx *IdentityTransactionMappingV2, contract *ContractInvocationMappingV2, service *ServiceMappingV2, iface *InterfaceMappingV2, requireProof bool) (RoutingIntegrationWalletSDKHelperV2, error) {
 	helper := RoutingIntegrationWalletSDKHelperV2{
-		TransactionMapping: tx,
-		ContractMapping:    contract,
-		ServiceMapping:     service,
-		InterfaceMapping:   iface,
-		ProofRequired:      requireProof,
-		UserConfirmation:   true,
-		AdvisoryOnly:       true,
+		TransactionMapping:	tx,
+		ContractMapping:	contract,
+		ServiceMapping:		service,
+		InterfaceMapping:	iface,
+		ProofRequired:		requireProof,
+		UserConfirmation:	true,
+		AdvisoryOnly:		true,
 	}
 	if tx != nil {
 		if err := ValidateIdentityTransactionMappingV2(*tx); err != nil {

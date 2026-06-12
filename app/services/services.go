@@ -33,11 +33,11 @@ func AutoCLIOptions(modules map[string]any) autocli.AppOptions {
 	disableConflictingStakingHistoricalInfoCommand(moduleOptions)
 
 	return autocli.AppOptions{
-		Modules:               appModules,
-		ModuleOptions:         moduleOptions,
-		AddressCodec:          aetraaddress.Codec{},
-		ValidatorAddressCodec: aetraaddress.Codec{},
-		ConsensusAddressCodec: aetraaddress.Codec{},
+		Modules:		appModules,
+		ModuleOptions:		moduleOptions,
+		AddressCodec:		aetraaddress.Codec{},
+		ValidatorAddressCodec:	aetraaddress.Codec{},
+		ConsensusAddressCodec:	aetraaddress.Codec{},
 	}
 }
 
@@ -54,8 +54,8 @@ func disableConflictingStakingHistoricalInfoCommand(moduleOptions map[string]*au
 		stakingOptions.Query.Service = stakingv1beta.Query_ServiceDesc.ServiceName
 	}
 	stakingOptions.Query.RpcCommandOptions = append(stakingOptions.Query.RpcCommandOptions, &autocliv1.RpcCommandOptions{
-		RpcMethod: "HistoricalInfo",
-		Skip:      true,
+		RpcMethod:	"HistoricalInfo",
+		Skip:		true,
 	})
 
 	for _, options := range moduleOptions {

@@ -6,14 +6,6 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Task 4.16: Scenario, Invariant, and CI Tests
-// ---------------
-
-// ---------------
-// ASM Module Builder Tests
-// ---------------
-
 func TestASMModuleCreation(t *testing.T) {
 	m := NewASMModule("test_counter")
 	if m.Name != "test_counter" {
@@ -91,10 +83,6 @@ func TestASMModuleAllOpcodes(t *testing.T) {
 	}
 }
 
-// ---------------
-// JSON Module Builder Tests
-// ---------------
-
 func TestJSONModuleCreation(t *testing.T) {
 	m := NewJSONModule("counter", 1, 1)
 	if m.Name != "counter" {
@@ -170,10 +158,6 @@ func TestJSONModuleRoundTrip(t *testing.T) {
 	}
 }
 
-// ---------------
-// Invariant Tests
-// ---------------
-
 func TestDeterminismInvariantPasses(t *testing.T) {
 	result := &ScenarioResult{
 		Receipts: []*AVMLedgerReceipt{},
@@ -186,12 +170,12 @@ func TestDeterminismInvariantPasses(t *testing.T) {
 
 func TestValueConservationInvariantPasses(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ExitCode:     ExitSuccess,
-		GasUsed:      1000,
-		ValueIn:      5000,
-		ValueOut:     3000,
-		GasBreakdown: GasBreakdown{ComputeGas: 1000},
-		StorageFee:   2000,
+		ExitCode:	ExitSuccess,
+		GasUsed:	1000,
+		ValueIn:	5000,
+		ValueOut:	3000,
+		GasBreakdown:	GasBreakdown{ComputeGas: 1000},
+		StorageFee:	2000,
 	}
 	result := &ScenarioResult{
 		Receipts: []*AVMLedgerReceipt{receipt},
@@ -204,12 +188,12 @@ func TestValueConservationInvariantPasses(t *testing.T) {
 
 func TestValueConservationInvariantFailsOnImbalance(t *testing.T) {
 	receipt := &AVMLedgerReceipt{
-		ExitCode:     ExitSuccess,
-		GasUsed:      1000,
-		ValueIn:      5000,
-		ValueOut:     1000,
-		GasBreakdown: GasBreakdown{ComputeGas: 1000},
-		StorageFee:   500,
+		ExitCode:	ExitSuccess,
+		GasUsed:	1000,
+		ValueIn:	5000,
+		ValueOut:	1000,
+		GasBreakdown:	GasBreakdown{ComputeGas: 1000},
+		StorageFee:	500,
 	}
 	result := &ScenarioResult{
 		Receipts: []*AVMLedgerReceipt{receipt},
@@ -298,14 +282,14 @@ func TestRunInvariantsAllPass(t *testing.T) {
 	result := &ScenarioResult{
 		Receipts: []*AVMLedgerReceipt{
 			{
-				ExitCode:       ExitSuccess,
-				GasUsed:        1000,
-				ValueIn:        5000,
-				ValueOut:       4000,
-				GasBreakdown:   GasBreakdown{ComputeGas: 1000},
-				GasRefunded:    0,
-				StorageFee:     1000,
-				MessageFlags:   MessageFlags{Consumed: true},
+				ExitCode:	ExitSuccess,
+				GasUsed:	1000,
+				ValueIn:	5000,
+				ValueOut:	4000,
+				GasBreakdown:	GasBreakdown{ComputeGas: 1000},
+				GasRefunded:	0,
+				StorageFee:	1000,
+				MessageFlags:	MessageFlags{Consumed: true},
 			},
 		},
 	}
@@ -316,10 +300,6 @@ func TestRunInvariantsAllPass(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Negative Test Cases
-// ---------------
 
 func TestNegativeTestCasesDefined(t *testing.T) {
 	if len(NegativeTestCases) == 0 {
@@ -342,20 +322,20 @@ func TestNegativeTestCasesDefined(t *testing.T) {
 
 func TestNegativeTestCaseExitCodesCategorized(t *testing.T) {
 	categories := map[string]string{
-		"invalid_opcode":         "validation",
-		"stack_underflow":        "execution",
-		"stack_overflow":         "execution",
-		"gas_exhaustion":         "gas",
-		"type_mismatch":          "type",
-		"division_by_zero":       "execution",
-		"chunk_reference_invalid": "chunk",
-		"invalid_migration":      "upgrade",
-		"unauthorized_upgrade":   "upgrade",
-		"forbidden_host_call":   "query",
-		"double_refund_attempt":  "receipt",
-		"infinite_bounce_attempt": "receipt",
-		"malformed_abi_query":   "query",
-		"action_budget_exceeded": "execution",
+		"invalid_opcode":		"validation",
+		"stack_underflow":		"execution",
+		"stack_overflow":		"execution",
+		"gas_exhaustion":		"gas",
+		"type_mismatch":		"type",
+		"division_by_zero":		"execution",
+		"chunk_reference_invalid":	"chunk",
+		"invalid_migration":		"upgrade",
+		"unauthorized_upgrade":		"upgrade",
+		"forbidden_host_call":		"query",
+		"double_refund_attempt":	"receipt",
+		"infinite_bounce_attempt":	"receipt",
+		"malformed_abi_query":		"query",
+		"action_budget_exceeded":	"execution",
 	}
 	for _, tc := range NegativeTestCases {
 		cat, ok := categories[tc.Name]
@@ -366,10 +346,6 @@ func TestNegativeTestCaseExitCodesCategorized(t *testing.T) {
 		_ = cat
 	}
 }
-
-// ---------------
-// CI Pipeline Model Tests
-// ---------------
 
 func TestCIPipelineCreation(t *testing.T) {
 	pipeline := NewCIPipeline()
@@ -389,14 +365,14 @@ func TestCIPipelineCreation(t *testing.T) {
 
 func TestCIPipelineStageStrings(t *testing.T) {
 	stages := map[CIPipelineStage]string{
-		CIStageBuild:   "build",
-		CIStageVerify:  "verify",
-		CIStageDeploy:  "deploy",
-		CIStageExecute: "execute",
-		CIStageQuery:   "query",
-		CIStageExport:  "export",
-		CIStageImport:  "import",
-		CIStageReplay:  "replay",
+		CIStageBuild:	"build",
+		CIStageVerify:	"verify",
+		CIStageDeploy:	"deploy",
+		CIStageExecute:	"execute",
+		CIStageQuery:	"query",
+		CIStageExport:	"export",
+		CIStageImport:	"import",
+		CIStageReplay:	"replay",
 	}
 	for stage, exp := range stages {
 		if string(stage) != exp {
@@ -405,20 +381,16 @@ func TestCIPipelineStageStrings(t *testing.T) {
 	}
 }
 
-// ---------------
-// Scenario Runner Tests
-// ---------------
-
 func TestRunScenarioBasicExecution(t *testing.T) {
 	scenario := &Scenario{
-		Name: "basic_execution",
+		Name:	"basic_execution",
 		Messages: []ScenarioMessage{
 			{
-				Name:     "simple_transfer",
-				Sender:   "AE:sender1",
-				Target:   "4:contract1",
-				Value:    1000,
-				GasLimit: 10000,
+				Name:		"simple_transfer",
+				Sender:		"AE:sender1",
+				Target:		"4:contract1",
+				Value:		1000,
+				GasLimit:	10000,
 			},
 		},
 	}
@@ -440,7 +412,7 @@ func TestRunScenarioBasicExecution(t *testing.T) {
 
 func TestRunScenarioMultipleMessages(t *testing.T) {
 	scenario := &Scenario{
-		Name: "multi_message",
+		Name:	"multi_message",
 		Messages: []ScenarioMessage{
 			{Name: "msg1", Sender: "AE:alice", Target: "4:contract1", Value: 500, GasLimit: 5000},
 			{Name: "msg2", Sender: "AE:bob", Target: "4:contract1", Value: 1000, GasLimit: 5000},
@@ -459,7 +431,7 @@ func TestRunScenarioMultipleMessages(t *testing.T) {
 
 func TestRunScenarioInvariantChecks(t *testing.T) {
 	scenario := &Scenario{
-		Name: "invariant_check",
+		Name:	"invariant_check",
 		Messages: []ScenarioMessage{
 			{Name: "msg", Sender: "AE:sender", Target: "4:target", Value: 500, GasLimit: 5000},
 		},
@@ -478,10 +450,6 @@ func TestRunScenarioInvariantChecks(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Canonical Examples Tests
-// ---------------
 
 func TestCanonicalExamplesDefined(t *testing.T) {
 	if len(CanonicalExamples) == 0 {
@@ -517,26 +485,18 @@ func TestCanonicalExamplesCoversAllScenarios(t *testing.T) {
 	}
 }
 
-// ---------------
-// Scenario Message Properties Tests
-// ---------------
-
 func TestScenarioMessageBounceFlag(t *testing.T) {
 	msg := ScenarioMessage{
-		Name:    "bounce_test",
-		Sender:  "AE:sender",
-		Target:  "4:target",
-		Value:   1000,
-		Bounce:  true,
+		Name:	"bounce_test",
+		Sender:	"AE:sender",
+		Target:	"4:target",
+		Value:	1000,
+		Bounce:	true,
 	}
 	if !msg.Bounce {
 		t.Error("expected Bounce=true")
 	}
 }
-
-// ---------------
-// Full Pipeline: Build → Verify → Deploy → Execute → Query
-// ---------------
 
 func TestPipelineBuildAndVerify(t *testing.T) {
 	m := NewJSONModule("pipeline_test", 1, 1)
@@ -567,7 +527,7 @@ func TestPipelineBuildAndVerify(t *testing.T) {
 
 func TestPipelineScenarioWithScenarioResult(t *testing.T) {
 	scenario := &Scenario{
-		Name: "pipeline_integration",
+		Name:	"pipeline_integration",
 		Messages: []ScenarioMessage{
 			{Name: "deploy", Sender: "AE:deployer", Target: "4:new_contract", Value: 0, GasLimit: 50000},
 			{Name: "interact", Sender: "AE:user", Target: "4:new_contract", Value: 100, GasLimit: 10000},
@@ -588,10 +548,6 @@ func TestPipelineScenarioWithScenarioResult(t *testing.T) {
 	}
 }
 
-// ---------------
-// Query Scenario (QueryVM Domain)
-// ---------------
-
 func TestQueryScenarioBuildsSnapshot(t *testing.T) {
 	emptyMap := chunk.NewEmptyMap()
 	b, _ := chunk.NewBuilder().SetTypeTag(chunk.TypeNormal).SetData([]byte("value"), 40).Build()
@@ -599,9 +555,9 @@ func TestQueryScenarioBuildsSnapshot(t *testing.T) {
 	root := m.Root()
 
 	snapshot := &QuerySnapshot{
-		StateRootChunk: root,
-		Code:           []byte{0x01, 0x02},
-		BlockCtx:       BlockContext{Height: 100},
+		StateRootChunk:	root,
+		Code:		[]byte{0x01, 0x02},
+		BlockCtx:	BlockContext{Height: 100},
 	}
 	if snapshot.BlockCtx.Height != 100 {
 		t.Errorf("expected block height 100, got %d", snapshot.BlockCtx.Height)
@@ -610,10 +566,6 @@ func TestQueryScenarioBuildsSnapshot(t *testing.T) {
 		t.Error("expected non-nil state root chunk")
 	}
 }
-
-// ---------------
-// Upgrade + Migration Scenario
-// ---------------
 
 func TestUpgradeScenarioWithMigration(t *testing.T) {
 	registry := NewMigrationRegistry()
@@ -638,20 +590,20 @@ func TestUpgradeScenarioWithMigration(t *testing.T) {
 	originalRoot := m.Root()
 
 	state := &ContractState{
-		Address:      "4:upgradable",
-		Version:      ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
-		CodeHash:      oldCodeHash,
-		Capabilities:  UpgradeFlagAllowed,
-		Admin:         "AE:admin",
-		StateRoot:      originalRoot,
+		Address:	"4:upgradable",
+		Version:	ContractVersion{SchemaVersion: 1, CodeVersion: 1, StateVersion: 1},
+		CodeHash:	oldCodeHash,
+		Capabilities:	UpgradeFlagAllowed,
+		Admin:		"AE:admin",
+		StateRoot:	originalRoot,
 	}
 
 	msg := UpgradeMessage{
-		Type:           MsgUpgradeContractCode,
-		NewCodeHash:    newCodeHash,
-		TargetSchema:  ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 1},
-		Caller:         "AE:admin",
-		Authority:      AuthorityAdmin,
+		Type:		MsgUpgradeContractCode,
+		NewCodeHash:	newCodeHash,
+		TargetSchema:	ContractVersion{SchemaVersion: 2, CodeVersion: 2, StateVersion: 1},
+		Caller:		"AE:admin",
+		Authority:	AuthorityAdmin,
 	}
 
 	engine := NewUpgradeEngine(registry)
@@ -670,21 +622,17 @@ func TestUpgradeScenarioWithMigration(t *testing.T) {
 	}
 }
 
-// ---------------
-// Bounce + Refund Scenario
-// ---------------
-
 func TestBounceScenarioSingleBounceOnly(t *testing.T) {
 	bounceMsg := NewBounceMessage([]byte("msg_hash"), ExitChunkError)
 
 	msg := AVMLedgerReceipt{
-		ExitCode:      ExitChunkError,
-		GasUsed:       500,
-		GasRefunded:   200,
-		ValueIn:       1000,
-		ValueOut:      800,
-		MessageFlags:  MessageFlags{Bounced: true, RefundIssued: true},
-		BounceMessage: bounceMsg,
+		ExitCode:	ExitChunkError,
+		GasUsed:	500,
+		GasRefunded:	200,
+		ValueIn:	1000,
+		ValueOut:	800,
+		MessageFlags:	MessageFlags{Bounced: true, RefundIssued: true},
+		BounceMessage:	bounceMsg,
 	}
 
 	if !msg.MessageFlags.Bounced {
@@ -716,10 +664,6 @@ func TestRefundDoubleRefundPrevention(t *testing.T) {
 	}
 }
 
-// ---------------
-// StateInit + Deploy Scenario
-// ---------------
-
 func TestStateInitDeployScenario(t *testing.T) {
 	var codeHash [32]byte
 	codeHash[0] = 0x01
@@ -729,13 +673,13 @@ func TestStateInitDeployScenario(t *testing.T) {
 
 	salt := []byte{0xAA, 0xBB}
 	si := &StateInit{
-		ABIVersion:      1,
-		CodeHash:        codeHash,
-		InitData:        []byte{0x00},
-		Salt:            salt,
-		DeployerAddress: "AE:deployer1",
-		ChainID:         "test",
-		Namespace:       "namespace",
+		ABIVersion:		1,
+		CodeHash:		codeHash,
+		InitData:		[]byte{0x00},
+		Salt:			salt,
+		DeployerAddress:	"AE:deployer1",
+		ChainID:		"test",
+		Namespace:		"namespace",
 	}
 
 	addr, err := DeriveContractAddress(si)
@@ -760,10 +704,6 @@ func TestStateInitDeployScenario(t *testing.T) {
 	}
 }
 
-// ---------------
-// Get Method Query Scenario
-// ---------------
-
 func TestGetMethodQueryScenario(t *testing.T) {
 	selector := ComputeMethodSelector("get_balance(address)")
 	if selector == [4]byte{} {
@@ -772,15 +712,15 @@ func TestGetMethodQueryScenario(t *testing.T) {
 
 	resolver := NewABIMethodResolver()
 	balanceMethod := GetMethodABI{
-		Name:             "get_balance(address)",
-		Selector:         selector,
-		InputCodec:       "abi",
-		OutputCodec:      "abi",
-		GasEstimate:      500,
-		Mutability:       MethodRead,
-		Cacheable:        true,
-		MaxResponseBytes: 1024,
-		Description:      "get balance for address",
+		Name:			"get_balance(address)",
+		Selector:		selector,
+		InputCodec:		"abi",
+		OutputCodec:		"abi",
+		GasEstimate:		500,
+		Mutability:		MethodRead,
+		Cacheable:		true,
+		MaxResponseBytes:	1024,
+		Description:		"get balance for address",
 	}
 	if err := resolver.Register(balanceMethod); err != nil {
 		t.Fatalf("failed to register get_balance: %v", err)
@@ -788,15 +728,15 @@ func TestGetMethodQueryScenario(t *testing.T) {
 
 	ownerSelector := ComputeMethodSelector("get_owner()")
 	ownerMethod := GetMethodABI{
-		Name:             "get_owner()",
-		Selector:         ownerSelector,
-		InputCodec:       "abi",
-		OutputCodec:      "abi",
-		GasEstimate:      300,
-		Mutability:       MethodRead,
-		Cacheable:        true,
-		MaxResponseBytes: 256,
-		Description:      "get contract owner",
+		Name:			"get_owner()",
+		Selector:		ownerSelector,
+		InputCodec:		"abi",
+		OutputCodec:		"abi",
+		GasEstimate:		300,
+		Mutability:		MethodRead,
+		Cacheable:		true,
+		MaxResponseBytes:	256,
+		Description:		"get contract owner",
 	}
 	if err := resolver.Register(ownerMethod); err != nil {
 		t.Fatalf("failed to register get_owner: %v", err)

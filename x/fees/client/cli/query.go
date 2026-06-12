@@ -13,11 +13,11 @@ import (
 
 func GetQueryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      "Fee policy queries",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
+		Use:				types.ModuleName,
+		Short:				"Fee policy queries",
+		DisableFlagParsing:		true,
+		SuggestionsMinimumDistance:	2,
+		RunE:				client.ValidateCmd,
 	}
 	cmd.AddCommand(NewParamsCmd(), NewNetworkLoadCmd(), NewEstimateFeeCmd(), NewAccountingCmd(), NewModuleBalancesCmd())
 	return cmd
@@ -25,9 +25,9 @@ func GetQueryCmd() *cobra.Command {
 
 func NewParamsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "params",
-		Short: "Query fee policy params",
-		Args:  cobra.NoArgs,
+		Use:	"params",
+		Short:	"Query fee policy params",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -46,9 +46,9 @@ func NewParamsCmd() *cobra.Command {
 
 func NewNetworkLoadCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "network-load",
-		Short: "Query current fee network load",
-		Args:  cobra.NoArgs,
+		Use:	"network-load",
+		Short:	"Query current fee network load",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -67,9 +67,9 @@ func NewNetworkLoadCmd() *cobra.Command {
 
 func NewEstimateFeeCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "estimate-fee [gas-limit]",
-		Short: "Estimate required native fee for a gas limit",
-		Args:  cobra.ExactArgs(1),
+		Use:	"estimate-fee [gas-limit]",
+		Short:	"Estimate required native fee for a gas limit",
+		Args:	cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gasLimit, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
@@ -92,9 +92,9 @@ func NewEstimateFeeCmd() *cobra.Command {
 
 func NewAccountingCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "accounting",
-		Short: "Query protocol fee accounting",
-		Args:  cobra.NoArgs,
+		Use:	"accounting",
+		Short:	"Query protocol fee accounting",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -113,9 +113,9 @@ func NewAccountingCmd() *cobra.Command {
 
 func NewModuleBalancesCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "module-balances",
-		Short: "Query protocol fee module account balances",
-		Args:  cobra.NoArgs,
+		Use:	"module-balances",
+		Short:	"Query protocol fee module account balances",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {

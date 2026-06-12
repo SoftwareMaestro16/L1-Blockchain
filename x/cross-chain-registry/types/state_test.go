@@ -40,53 +40,53 @@ func validState() CrossChainRegistryState {
 	state.Chains = append(state.Chains, chain("aetra", ChainStatusActive), chain("ethereum", ChainStatusActive))
 	state.RiskPolicies = append(state.RiskPolicies, policy("aetra"), policy("ethereum"))
 	state.Channels = append(state.Channels, ChannelRecord{
-		ChannelID:           "channel-0",
-		ChainID:             "ethereum",
-		CounterpartyChainID: "aetra",
-		ClientID:            "client-eth",
-		Active:              true,
-		RegisteredHeight:    2,
+		ChannelID:		"channel-0",
+		ChainID:		"ethereum",
+		CounterpartyChainID:	"aetra",
+		ClientID:		"client-eth",
+		Active:			true,
+		RegisteredHeight:	2,
 	})
 	state.BridgeRoutes = append(state.BridgeRoutes, BridgeRoute{
-		RouteID:       "eth-aet",
-		SourceChainID: "ethereum",
-		TargetChainID: "aetra",
-		ChannelID:     "channel-0",
-		BridgeID:      "bridge-eth",
-		Enabled:       true,
+		RouteID:	"eth-aet",
+		SourceChainID:	"ethereum",
+		TargetChainID:	"aetra",
+		ChannelID:	"channel-0",
+		BridgeID:	"bridge-eth",
+		Enabled:	true,
 	})
 	return state
 }
 
 func chain(chainID, status string) RegisteredChain {
 	return RegisteredChain{
-		ChainID:        chainID,
-		Status:         status,
-		ClientType:     ClientTypeLightClient,
-		TrustLevel:     TrustLevelHigh,
-		LightClientRef: "lc-" + chainID,
-		RiskScore:      10,
+		ChainID:	chainID,
+		Status:		status,
+		ClientType:	ClientTypeLightClient,
+		TrustLevel:	TrustLevelHigh,
+		LightClientRef:	"lc-" + chainID,
+		RiskScore:	10,
 		Finality: FinalityAssumptions{
-			ConfirmationBlocks: 12,
-			FinalitySeconds:    180,
+			ConfirmationBlocks:	12,
+			FinalitySeconds:	180,
 		},
 		Timeout: TimeoutParameters{
-			TimeoutBlocks:  1_000,
-			TimeoutSeconds: 3_600,
+			TimeoutBlocks:	1_000,
+			TimeoutSeconds:	3_600,
 		},
-		RiskPolicyID:     chainID + "-risk",
-		RegisteredHeight: 1,
-		UpdatedHeight:    1,
+		RiskPolicyID:		chainID + "-risk",
+		RegisteredHeight:	1,
+		UpdatedHeight:		1,
 	}
 }
 
 func policy(chainID string) RiskPolicy {
 	return RiskPolicy{
-		PolicyID:           chainID + "-risk",
-		ChainID:            chainID,
-		MaxRiskScore:       50,
-		AllowedClientTypes: []string{ClientTypeLightClient},
-		MinTrustLevel:      TrustLevelMedium,
-		RequireLightClient: true,
+		PolicyID:		chainID + "-risk",
+		ChainID:		chainID,
+		MaxRiskScore:		50,
+		AllowedClientTypes:	[]string{ClientTypeLightClient},
+		MinTrustLevel:		TrustLevelMedium,
+		RequireLightClient:	true,
 	}
 }

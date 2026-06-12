@@ -38,14 +38,14 @@ func TestValidatorRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) 
 	genesis := GenesisStateWithSingleValidator(t, source)
 	registryGenesis := validatorregistrykeeper.DefaultGenesis()
 	registryGenesis.State.Validators = append(registryGenesis.State.Validators, validatorregistrytypes.ValidatorRecord{
-		OperatorAddress:    rawAddress("11"),
-		ConsensusPublicKey: "ed25519:app-validator",
-		TreasuryAddress:    rawAddress("12"),
-		WithdrawalAddress:  rawAddress("13"),
-		EmergencyAddress:   rawAddress("14"),
-		CommissionPolicy:   validatorregistrytypes.DefaultCommissionPolicy(),
-		Status:             validatorregistrytypes.StatusCandidate,
-		SelfBond:           validatorregistrytypes.DefaultMinValidatorStake,
+		OperatorAddress:	rawAddress("11"),
+		ConsensusPublicKey:	"ed25519:app-validator",
+		TreasuryAddress:	rawAddress("12"),
+		WithdrawalAddress:	rawAddress("13"),
+		EmergencyAddress:	rawAddress("14"),
+		CommissionPolicy:	validatorregistrytypes.DefaultCommissionPolicy(),
+		Status:			validatorregistrytypes.StatusCandidate,
+		SelfBond:		validatorregistrytypes.DefaultMinValidatorStake,
 		History: []validatorregistrytypes.ValidatorHistoryEvent{
 			{Height: 1, Type: validatorregistrytypes.HistoryRegistered, Detail: "genesis"},
 		},
@@ -59,15 +59,15 @@ func TestValidatorRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) 
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

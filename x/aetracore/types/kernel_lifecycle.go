@@ -9,63 +9,63 @@ import (
 type KernelABCIPhase string
 
 const (
-	KernelPhasePrepareProposal KernelABCIPhase = "PREPARE_PROPOSAL"
-	KernelPhaseProcessProposal KernelABCIPhase = "PROCESS_PROPOSAL"
-	KernelPhaseFinalizeBlock   KernelABCIPhase = "FINALIZE_BLOCK"
-	KernelPhaseCommit          KernelABCIPhase = "COMMIT"
+	KernelPhasePrepareProposal	KernelABCIPhase	= "PREPARE_PROPOSAL"
+	KernelPhaseProcessProposal	KernelABCIPhase	= "PROCESS_PROPOSAL"
+	KernelPhaseFinalizeBlock	KernelABCIPhase	= "FINALIZE_BLOCK"
+	KernelPhaseCommit		KernelABCIPhase	= "COMMIT"
 )
 
 type KernelConsensusContext struct {
-	ChainID       string
-	Height        uint64
-	BlockTimeUnix int64
+	ChainID		string
+	Height		uint64
+	BlockTimeUnix	int64
 }
 
 type KernelTimestampBounds struct {
-	PreviousBlockTimeUnix  int64
-	MaxForwardDriftSeconds int64
+	PreviousBlockTimeUnix	int64
+	MaxForwardDriftSeconds	int64
 }
 
 type KernelBlockPlan struct {
-	Height             uint64
-	ChainID            string
-	Phase              KernelABCIPhase
-	Schedule           ProposalSchedule
-	ProposalRoot       string
-	RoutingRoot        string
-	PreviousGlobalRoot string
-	ParamsHash         string
-	PlanHash           string
+	Height			uint64
+	ChainID			string
+	Phase			KernelABCIPhase
+	Schedule		ProposalSchedule
+	ProposalRoot		string
+	RoutingRoot		string
+	PreviousGlobalRoot	string
+	ParamsHash		string
+	PlanHash		string
 }
 
 type KernelBlockHeaderCommitment struct {
-	Height          uint64
-	TimeUnix        int64
-	PreviousAppHash string
-	ZonesRoot       string
-	MessagesRoot    string
-	ReceiptsRoot    string
-	HeaderHash      string
+	Height		uint64
+	TimeUnix	int64
+	PreviousAppHash	string
+	ZonesRoot	string
+	MessagesRoot	string
+	ReceiptsRoot	string
+	HeaderHash	string
 }
 
 type KernelFinalizationInput struct {
-	ZoneCommitments []ZoneCommitment
-	Receipts        []ExecutionReceipt
-	Contributions   RootContributions
+	ZoneCommitments	[]ZoneCommitment
+	Receipts	[]ExecutionReceipt
+	Contributions	RootContributions
 }
 
 type KernelFinalization struct {
-	Height          uint64
-	ChainID         string
-	Phase           KernelABCIPhase
-	PlanHash        string
-	Header          KernelBlockHeaderCommitment
-	GlobalRoot      GlobalStateRoot
-	RootSnapshot    RootSnapshot
-	ReceiptsRoot    string
-	ReceiptCount    uint64
-	CommitmentCount uint64
-	FinalityHash    string
+	Height		uint64
+	ChainID		string
+	Phase		KernelABCIPhase
+	PlanHash	string
+	Header		KernelBlockHeaderCommitment
+	GlobalRoot	GlobalStateRoot
+	RootSnapshot	RootSnapshot
+	ReceiptsRoot	string
+	ReceiptCount	uint64
+	CommitmentCount	uint64
+	FinalityHash	string
 }
 
 func PrepareKernelProposal(ctx KernelConsensusContext, state CoreState, items []ProposalItem) (KernelBlockPlan, error) {
@@ -87,13 +87,13 @@ func PrepareKernelProposal(ctx KernelConsensusContext, state CoreState, items []
 		return KernelBlockPlan{}, err
 	}
 	plan := KernelBlockPlan{
-		Height:       ctx.Height,
-		ChainID:      ctx.ChainID,
-		Phase:        KernelPhasePrepareProposal,
-		Schedule:     schedule,
-		ProposalRoot: proposalRoot,
-		RoutingRoot:  EmptyRootHash,
-		ParamsHash:   ComputeAetraCoreParamsHash(state.Params),
+		Height:		ctx.Height,
+		ChainID:	ctx.ChainID,
+		Phase:		KernelPhasePrepareProposal,
+		Schedule:	schedule,
+		ProposalRoot:	proposalRoot,
+		RoutingRoot:	EmptyRootHash,
+		ParamsHash:	ComputeAetraCoreParamsHash(state.Params),
 	}
 	if table, found := state.LatestRoutingTableAtHeight(ctx.Height); found {
 		plan.RoutingRoot = table.TableHash
@@ -163,16 +163,16 @@ func FinalizeKernelBlock(ctx KernelConsensusContext, state CoreState, plan Kerne
 		return CoreState{}, KernelFinalization{}, err
 	}
 	finalization := KernelFinalization{
-		Height:          ctx.Height,
-		ChainID:         ctx.ChainID,
-		Phase:           KernelPhaseFinalizeBlock,
-		PlanHash:        plan.PlanHash,
-		Header:          header,
-		GlobalRoot:      globalRoot,
-		RootSnapshot:    snapshot,
-		ReceiptsRoot:    receiptsRoot,
-		ReceiptCount:    uint64(len(input.Receipts)),
-		CommitmentCount: uint64(len(commitments)),
+		Height:			ctx.Height,
+		ChainID:		ctx.ChainID,
+		Phase:			KernelPhaseFinalizeBlock,
+		PlanHash:		plan.PlanHash,
+		Header:			header,
+		GlobalRoot:		globalRoot,
+		RootSnapshot:		snapshot,
+		ReceiptsRoot:		receiptsRoot,
+		ReceiptCount:		uint64(len(input.Receipts)),
+		CommitmentCount:	uint64(len(commitments)),
 	}
 	finalization.FinalityHash = ComputeKernelFinalizationHash(finalization)
 	return next.Export(), finalization, finalization.Validate()
@@ -295,12 +295,12 @@ func NewKernelBlockHeaderCommitment(ctx KernelConsensusContext, previousAppHash 
 		return KernelBlockHeaderCommitment{}, errors.New("aetracore kernel header height mismatch")
 	}
 	header := KernelBlockHeaderCommitment{
-		Height:          ctx.Height,
-		TimeUnix:        ctx.BlockTimeUnix,
-		PreviousAppHash: previousAppHash,
-		ZonesRoot:       root.ZonesRoot,
-		MessagesRoot:    snapshot.Finality.GlobalMessageRoot,
-		ReceiptsRoot:    snapshot.Finality.ExecutionReceiptRoot,
+		Height:			ctx.Height,
+		TimeUnix:		ctx.BlockTimeUnix,
+		PreviousAppHash:	previousAppHash,
+		ZonesRoot:		root.ZonesRoot,
+		MessagesRoot:		snapshot.Finality.GlobalMessageRoot,
+		ReceiptsRoot:		snapshot.Finality.ExecutionReceiptRoot,
 	}
 	header.HeaderHash = ComputeKernelBlockHeaderHash(header)
 	return header, header.Validate()

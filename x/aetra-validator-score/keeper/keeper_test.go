@@ -54,14 +54,14 @@ func TestGovernanceAuthorityRequiredForMessages(t *testing.T) {
 	params.MinRewardMultiplierBps = 8_000
 
 	err := msgServer.UpdateValidatorScoreParams(types.MsgUpdateValidatorScoreParams{
-		Authority: "ae1notgov",
-		Params:    params,
+		Authority:	"ae1notgov",
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 
 	require.NoError(t, msgServer.UpdateValidatorScoreParams(types.MsgUpdateValidatorScoreParams{
-		Authority: authority,
-		Params:    params,
+		Authority:	authority,
+		Params:		params,
 	}))
 	res, err := k.QueryParams(types.QueryParamsRequest{})
 	require.NoError(t, err)
@@ -71,8 +71,8 @@ func TestGovernanceAuthorityRequiredForMessages(t *testing.T) {
 func TestPublicValidatorMetricsQuery(t *testing.T) {
 	k := scorekeeper.NewKeeper(authority)
 	require.NoError(t, scorekeeper.NewMsgServerImpl(&k).UpdateValidatorScores(types.MsgUpdateValidatorScores{
-		Authority: authority,
-		Epoch:     20,
+		Authority:	authority,
+		Epoch:		20,
 		Metrics: []types.ValidatorMetricInput{
 			validatorMetrics("val-a", 9_950, 50),
 		},
@@ -106,17 +106,17 @@ func TestAllScoresQueryIsDeterministic(t *testing.T) {
 
 func validatorMetrics(operator string, signed, missed uint64) types.ValidatorMetricInput {
 	return types.ValidatorMetricInput{
-		OperatorAddress:          operator,
-		SignedBlocks:             signed,
-		MissedBlocks:             missed,
-		UptimeWindow:             10_000,
-		SelfBond:                 100,
-		TotalBond:                1_000,
-		CommissionHistory:        []types.CommissionPoint{{Epoch: 1, CommissionBps: 500}, {Epoch: 2, CommissionBps: 500}},
-		GovernanceVotes:          4,
-		GovernanceProposals:      4,
-		ConcentrationBps:         250,
-		ConcentrationStatus:      types.ConcentrationStatusNormal,
-		IdentityMetadataComplete: true,
+		OperatorAddress:		operator,
+		SignedBlocks:			signed,
+		MissedBlocks:			missed,
+		UptimeWindow:			10_000,
+		SelfBond:			100,
+		TotalBond:			1_000,
+		CommissionHistory:		[]types.CommissionPoint{{Epoch: 1, CommissionBps: 500}, {Epoch: 2, CommissionBps: 500}},
+		GovernanceVotes:		4,
+		GovernanceProposals:		4,
+		ConcentrationBps:		250,
+		ConcentrationStatus:		types.ConcentrationStatusNormal,
+		IdentityMetadataComplete:	true,
 	}
 }

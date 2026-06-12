@@ -64,13 +64,13 @@ func TestAVMBlockSTMRejectsConflictProneWorkloads(t *testing.T) {
 
 func TestAVMBlockSTMRequiresExpectedVersionsAndRejectsGlobalCounters(t *testing.T) {
 	noVersion := AVMBlockSTMWorkload{
-		WorkloadID:      "write-no-version",
-		ZoneID:          zonestypes.ZoneIDContract,
-		QueueIDOptional: "queue-a",
-		ExpectedVersion: 0,
-		GasEstimate:     10,
-		WritesState:     true,
-		ConflictKeyKind: AVMBlockSTMConflictZoneQueueHead,
+		WorkloadID:		"write-no-version",
+		ZoneID:			zonestypes.ZoneIDContract,
+		QueueIDOptional:	"queue-a",
+		ExpectedVersion:	0,
+		GasEstimate:		10,
+		WritesState:		true,
+		ConflictKeyKind:	AVMBlockSTMConflictZoneQueueHead,
 	}
 	_, err := NewAVMBlockSTMWorkload(noVersion)
 	require.ErrorContains(t, err, "expected versions")
@@ -108,15 +108,15 @@ func TestAVMBlockSTMPerZoneAccumulatorBoundsReceiptsAndWrites(t *testing.T) {
 func testAVMBlockSTMWorkload(t *testing.T, id string, zoneID zonestypes.ZoneID, actorID, contractAddress, queueID string, kind AVMBlockSTMConflictKeyKind, key string, expectedVersion uint64) AVMBlockSTMWorkload {
 	t.Helper()
 	workload := AVMBlockSTMWorkload{
-		WorkloadID:              id,
-		ZoneID:                  zoneID,
-		ActorIDOptional:         actorID,
-		ContractAddressOptional: contractAddress,
-		QueueIDOptional:         queueID,
-		ExpectedVersion:         expectedVersion,
-		GasEstimate:             expectedVersion,
-		WritesState:             true,
-		ConflictKeyKind:         kind,
+		WorkloadID:			id,
+		ZoneID:				zoneID,
+		ActorIDOptional:		actorID,
+		ContractAddressOptional:	contractAddress,
+		QueueIDOptional:		queueID,
+		ExpectedVersion:		expectedVersion,
+		GasEstimate:			expectedVersion,
+		WritesState:			true,
+		ConflictKeyKind:		kind,
 	}
 	switch kind {
 	case AVMBlockSTMConflictContractStorage:

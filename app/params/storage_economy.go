@@ -7,161 +7,161 @@ import (
 )
 
 const (
-	StorageOperationWrite  = "write"
-	StorageOperationUpdate = "update"
-	StorageOperationDelete = "delete"
+	StorageOperationWrite	= "write"
+	StorageOperationUpdate	= "update"
+	StorageOperationDelete	= "delete"
 
-	StorageClassAccount          = "account"
-	StorageClassContract         = "contract"
-	StorageClassProtocolCritical = "protocol_critical"
-	StorageClassExempt           = "exempt"
+	StorageClassAccount		= "account"
+	StorageClassContract		= "contract"
+	StorageClassProtocolCritical	= "protocol_critical"
+	StorageClassExempt		= "exempt"
 
-	StorageRentStatusActive          = "active"
-	StorageRentStatusWarning         = "warning"
-	StorageRentStatusFrozen          = "frozen"
-	StorageRentStatusLimitedExec     = "limited_execution"
-	StorageRentStatusCleanupEligible = "cleanup_eligible"
-	StorageRentStatusExempt          = "exempt"
+	StorageRentStatusActive			= "active"
+	StorageRentStatusWarning		= "warning"
+	StorageRentStatusFrozen			= "frozen"
+	StorageRentStatusLimitedExec		= "limited_execution"
+	StorageRentStatusCleanupEligible	= "cleanup_eligible"
+	StorageRentStatusExempt			= "exempt"
 
-	StorageFeeEventWrite  = "storage_write_fee"
-	StorageFeeEventUpdate = "storage_update_fee"
-	StorageFeeEventDelete = "storage_delete_fee"
-	StorageFeeEventRefund = "storage_delete_refund"
+	StorageFeeEventWrite	= "storage_write_fee"
+	StorageFeeEventUpdate	= "storage_update_fee"
+	StorageFeeEventDelete	= "storage_delete_fee"
+	StorageFeeEventRefund	= "storage_delete_refund"
 
-	DefaultStateWriteFeePerByteNaet       = int64(4)
-	DefaultStateUpdateFeePerByteNaet      = int64(1)
-	DefaultDeleteRefundRatioBps           = int64(5_000)
-	DefaultDeleteRefundCapBps             = int64(5_000)
-	DefaultDeleteRefundDecayBpsPerPeriod  = int64(500)
-	DefaultStorageRentRatePerBytePeriod   = int64(1)
-	DefaultStorageRentPeriodBlocks        = uint64(43_200)
-	DefaultStorageRentWarningPeriods      = uint64(2)
-	DefaultStorageRentFreezeGracePeriods  = uint64(1)
-	DefaultStorageRentCleanupGracePeriods = uint64(2)
+	DefaultStateWriteFeePerByteNaet		= int64(4)
+	DefaultStateUpdateFeePerByteNaet	= int64(1)
+	DefaultDeleteRefundRatioBps		= int64(5_000)
+	DefaultDeleteRefundCapBps		= int64(5_000)
+	DefaultDeleteRefundDecayBpsPerPeriod	= int64(500)
+	DefaultStorageRentRatePerBytePeriod	= int64(1)
+	DefaultStorageRentPeriodBlocks		= uint64(43_200)
+	DefaultStorageRentWarningPeriods	= uint64(2)
+	DefaultStorageRentFreezeGracePeriods	= uint64(1)
+	DefaultStorageRentCleanupGracePeriods	= uint64(2)
 )
 
 type StorageEconomyParams struct {
-	StateWriteFeePerByteNaet       sdkmath.Int
-	StateUpdateFeePerByteNaet      sdkmath.Int
-	DeleteRefundRatioBps           int64
-	DeleteRefundCapBps             int64
-	DeleteRefundDecayBpsPerPeriod  int64
-	RentRatePerBytePeriodNaet      sdkmath.Int
-	RentPeriodBlocks               uint64
-	WarningPeriodsBeforeExhaustion uint64
-	FreezeGracePeriods             uint64
-	CleanupGracePeriods            uint64
-	AccountClassMultiplierBps      int64
-	ContractClassMultiplierBps     int64
-	ProtocolCriticalExempt         bool
+	StateWriteFeePerByteNaet	sdkmath.Int
+	StateUpdateFeePerByteNaet	sdkmath.Int
+	DeleteRefundRatioBps		int64
+	DeleteRefundCapBps		int64
+	DeleteRefundDecayBpsPerPeriod	int64
+	RentRatePerBytePeriodNaet	sdkmath.Int
+	RentPeriodBlocks		uint64
+	WarningPeriodsBeforeExhaustion	uint64
+	FreezeGracePeriods		uint64
+	CleanupGracePeriods		uint64
+	AccountClassMultiplierBps	int64
+	ContractClassMultiplierBps	int64
+	ProtocolCriticalExempt		bool
 }
 
 type StorageFootprintRecord struct {
-	OwnerID            string
-	ContractID         string
-	Class              string
-	Bytes              int64
-	OriginalCostNaet   sdkmath.Int
-	PrepaidBalanceNaet sdkmath.Int
-	LastRentHeight     uint64
-	ConsensusCritical  bool
+	OwnerID			string
+	ContractID		string
+	Class			string
+	Bytes			int64
+	OriginalCostNaet	sdkmath.Int
+	PrepaidBalanceNaet	sdkmath.Int
+	LastRentHeight		uint64
+	ConsensusCritical	bool
 }
 
 type StorageFeeInput struct {
-	OwnerID           string
-	ContractID        string
-	Class             string
-	Operation         string
-	CurrentBytes      int64
-	DeltaBytes        int64
-	DeletedBytes      int64
-	OriginalCostNaet  sdkmath.Int
-	StorageAgePeriods uint64
-	Params            StorageEconomyParams
+	OwnerID			string
+	ContractID		string
+	Class			string
+	Operation		string
+	CurrentBytes		int64
+	DeltaBytes		int64
+	DeletedBytes		int64
+	OriginalCostNaet	sdkmath.Int
+	StorageAgePeriods	uint64
+	Params			StorageEconomyParams
 }
 
 type StorageFeeEvent struct {
-	Type           string
-	OwnerID        string
-	ContractID     string
-	Class          string
-	Operation      string
-	Bytes          int64
-	FeeNaet        sdkmath.Int
-	RefundNaet     sdkmath.Int
-	FootprintBytes int64
+	Type		string
+	OwnerID		string
+	ContractID	string
+	Class		string
+	Operation	string
+	Bytes		int64
+	FeeNaet		sdkmath.Int
+	RefundNaet	sdkmath.Int
+	FootprintBytes	int64
 }
 
 type StorageFeeOutput struct {
-	OwnerID           string
-	ContractID        string
-	Class             string
-	Operation         string
-	FeeNaet           sdkmath.Int
-	RefundNaet        sdkmath.Int
-	NetChargeNaet     sdkmath.Int
-	RefundCapNaet     sdkmath.Int
-	RefundDecayBps    int64
-	NewFootprintBytes int64
-	Events            []StorageFeeEvent
+	OwnerID			string
+	ContractID		string
+	Class			string
+	Operation		string
+	FeeNaet			sdkmath.Int
+	RefundNaet		sdkmath.Int
+	NetChargeNaet		sdkmath.Int
+	RefundCapNaet		sdkmath.Int
+	RefundDecayBps		int64
+	NewFootprintBytes	int64
+	Events			[]StorageFeeEvent
 }
 
 type StorageFootprintQueryInput struct {
-	Records    []StorageFootprintRecord
-	OwnerID    string
-	ContractID string
+	Records		[]StorageFootprintRecord
+	OwnerID		string
+	ContractID	string
 }
 
 type StorageFootprintQueryOutput struct {
-	Records                []StorageFootprintRecord
-	TotalBytes             int64
-	TotalPrepaidNaet       sdkmath.Int
-	AccountBytes           int64
-	ContractBytes          int64
-	ConsensusCriticalBytes int64
+	Records			[]StorageFootprintRecord
+	TotalBytes		int64
+	TotalPrepaidNaet	sdkmath.Int
+	AccountBytes		int64
+	ContractBytes		int64
+	ConsensusCriticalBytes	int64
 }
 
 type StorageRentInput struct {
-	Record        StorageFootprintRecord
-	CurrentHeight uint64
-	Params        StorageEconomyParams
+	Record		StorageFootprintRecord
+	CurrentHeight	uint64
+	Params		StorageEconomyParams
 }
 
 type StorageRentStatus struct {
-	OwnerID                    string
-	ContractID                 string
-	Class                      string
-	Status                     string
-	Bytes                      int64
-	RentDueNaet                sdkmath.Int
-	PrepaidBalanceNaet         sdkmath.Int
-	PeriodsElapsed             uint64
-	PeriodsCovered             uint64
-	PeriodsUntilExhaustion     uint64
-	RecoveryRequiredNaet       sdkmath.Int
-	CanExecute                 bool
-	LimitedExecution           bool
-	Frozen                     bool
-	CleanupEligible            bool
-	ConsensusCriticalProtected bool
-	Events                     []StorageFeeEvent
+	OwnerID				string
+	ContractID			string
+	Class				string
+	Status				string
+	Bytes				int64
+	RentDueNaet			sdkmath.Int
+	PrepaidBalanceNaet		sdkmath.Int
+	PeriodsElapsed			uint64
+	PeriodsCovered			uint64
+	PeriodsUntilExhaustion		uint64
+	RecoveryRequiredNaet		sdkmath.Int
+	CanExecute			bool
+	LimitedExecution		bool
+	Frozen				bool
+	CleanupEligible			bool
+	ConsensusCriticalProtected	bool
+	Events				[]StorageFeeEvent
 }
 
 func DefaultStorageEconomyParams() StorageEconomyParams {
 	return StorageEconomyParams{
-		StateWriteFeePerByteNaet:       sdkmath.NewInt(DefaultStateWriteFeePerByteNaet),
-		StateUpdateFeePerByteNaet:      sdkmath.NewInt(DefaultStateUpdateFeePerByteNaet),
-		DeleteRefundRatioBps:           DefaultDeleteRefundRatioBps,
-		DeleteRefundCapBps:             DefaultDeleteRefundCapBps,
-		DeleteRefundDecayBpsPerPeriod:  DefaultDeleteRefundDecayBpsPerPeriod,
-		RentRatePerBytePeriodNaet:      sdkmath.NewInt(DefaultStorageRentRatePerBytePeriod),
-		RentPeriodBlocks:               DefaultStorageRentPeriodBlocks,
-		WarningPeriodsBeforeExhaustion: DefaultStorageRentWarningPeriods,
-		FreezeGracePeriods:             DefaultStorageRentFreezeGracePeriods,
-		CleanupGracePeriods:            DefaultStorageRentCleanupGracePeriods,
-		AccountClassMultiplierBps:      BasisPoints,
-		ContractClassMultiplierBps:     BasisPoints,
-		ProtocolCriticalExempt:         true,
+		StateWriteFeePerByteNaet:	sdkmath.NewInt(DefaultStateWriteFeePerByteNaet),
+		StateUpdateFeePerByteNaet:	sdkmath.NewInt(DefaultStateUpdateFeePerByteNaet),
+		DeleteRefundRatioBps:		DefaultDeleteRefundRatioBps,
+		DeleteRefundCapBps:		DefaultDeleteRefundCapBps,
+		DeleteRefundDecayBpsPerPeriod:	DefaultDeleteRefundDecayBpsPerPeriod,
+		RentRatePerBytePeriodNaet:	sdkmath.NewInt(DefaultStorageRentRatePerBytePeriod),
+		RentPeriodBlocks:		DefaultStorageRentPeriodBlocks,
+		WarningPeriodsBeforeExhaustion:	DefaultStorageRentWarningPeriods,
+		FreezeGracePeriods:		DefaultStorageRentFreezeGracePeriods,
+		CleanupGracePeriods:		DefaultStorageRentCleanupGracePeriods,
+		AccountClassMultiplierBps:	BasisPoints,
+		ContractClassMultiplierBps:	BasisPoints,
+		ProtocolCriticalExempt:		true,
 	}
 }
 
@@ -175,15 +175,15 @@ func ComputeStorageFee(input StorageFeeInput) (StorageFeeOutput, error) {
 	}
 	if isStorageClassExempt(input.Class, params) {
 		return StorageFeeOutput{
-			OwnerID:           input.OwnerID,
-			ContractID:        input.ContractID,
-			Class:             input.Class,
-			Operation:         input.Operation,
-			FeeNaet:           sdkmath.ZeroInt(),
-			RefundNaet:        sdkmath.ZeroInt(),
-			NetChargeNaet:     sdkmath.ZeroInt(),
-			RefundCapNaet:     sdkmath.ZeroInt(),
-			NewFootprintBytes: input.CurrentBytes,
+			OwnerID:		input.OwnerID,
+			ContractID:		input.ContractID,
+			Class:			input.Class,
+			Operation:		input.Operation,
+			FeeNaet:		sdkmath.ZeroInt(),
+			RefundNaet:		sdkmath.ZeroInt(),
+			NetChargeNaet:		sdkmath.ZeroInt(),
+			RefundCapNaet:		sdkmath.ZeroInt(),
+			NewFootprintBytes:	input.CurrentBytes,
 		}, nil
 	}
 
@@ -231,17 +231,17 @@ func ComputeStorageFee(input StorageFeeInput) (StorageFeeOutput, error) {
 	}
 
 	return StorageFeeOutput{
-		OwnerID:           input.OwnerID,
-		ContractID:        input.ContractID,
-		Class:             input.Class,
-		Operation:         input.Operation,
-		FeeNaet:           fee,
-		RefundNaet:        refund,
-		NetChargeNaet:     fee.Sub(refund),
-		RefundCapNaet:     refundCap,
-		RefundDecayBps:    refundDecayBps,
-		NewFootprintBytes: newFootprint,
-		Events:            events,
+		OwnerID:		input.OwnerID,
+		ContractID:		input.ContractID,
+		Class:			input.Class,
+		Operation:		input.Operation,
+		FeeNaet:		fee,
+		RefundNaet:		refund,
+		NetChargeNaet:		fee.Sub(refund),
+		RefundCapNaet:		refundCap,
+		RefundDecayBps:		refundDecayBps,
+		NewFootprintBytes:	newFootprint,
+		Events:			events,
 	}, nil
 }
 
@@ -275,12 +275,12 @@ func QueryStorageFootprint(input StorageFootprintQueryInput) (StorageFootprintQu
 		}
 	}
 	return StorageFootprintQueryOutput{
-		Records:                records,
-		TotalBytes:             totalBytes,
-		TotalPrepaidNaet:       totalPrepaid,
-		AccountBytes:           accountBytes,
-		ContractBytes:          contractBytes,
-		ConsensusCriticalBytes: criticalBytes,
+		Records:		records,
+		TotalBytes:		totalBytes,
+		TotalPrepaidNaet:	totalPrepaid,
+		AccountBytes:		accountBytes,
+		ContractBytes:		contractBytes,
+		ConsensusCriticalBytes:	criticalBytes,
 	}, nil
 }
 
@@ -298,14 +298,14 @@ func ComputeStorageRentStatus(input StorageRentInput) (StorageRentStatus, error)
 	record := input.Record
 	if isStorageClassExempt(record.Class, params) || record.ConsensusCritical {
 		return StorageRentStatus{
-			OwnerID:                    record.OwnerID,
-			ContractID:                 record.ContractID,
-			Class:                      record.Class,
-			Status:                     StorageRentStatusExempt,
-			Bytes:                      record.Bytes,
-			PrepaidBalanceNaet:         normalizeInt(record.PrepaidBalanceNaet),
-			CanExecute:                 true,
-			ConsensusCriticalProtected: record.ConsensusCritical || record.Class == StorageClassProtocolCritical,
+			OwnerID:			record.OwnerID,
+			ContractID:			record.ContractID,
+			Class:				record.Class,
+			Status:				StorageRentStatusExempt,
+			Bytes:				record.Bytes,
+			PrepaidBalanceNaet:		normalizeInt(record.PrepaidBalanceNaet),
+			CanExecute:			true,
+			ConsensusCriticalProtected:	record.ConsensusCritical || record.Class == StorageClassProtocolCritical,
 		}, nil
 	}
 
@@ -351,21 +351,21 @@ func ComputeStorageRentStatus(input StorageRentInput) (StorageRentStatus, error)
 		}
 	}
 	return StorageRentStatus{
-		OwnerID:                record.OwnerID,
-		ContractID:             record.ContractID,
-		Class:                  record.Class,
-		Status:                 status,
-		Bytes:                  record.Bytes,
-		RentDueNaet:            rentDue,
-		PrepaidBalanceNaet:     prepaid,
-		PeriodsElapsed:         periodsElapsed,
-		PeriodsCovered:         coveredPeriods,
-		PeriodsUntilExhaustion: periodsUntilExhaustion,
-		RecoveryRequiredNaet:   recovery,
-		CanExecute:             canExecute,
-		LimitedExecution:       limited,
-		Frozen:                 frozen,
-		CleanupEligible:        cleanup,
+		OwnerID:		record.OwnerID,
+		ContractID:		record.ContractID,
+		Class:			record.Class,
+		Status:			status,
+		Bytes:			record.Bytes,
+		RentDueNaet:		rentDue,
+		PrepaidBalanceNaet:	prepaid,
+		PeriodsElapsed:		periodsElapsed,
+		PeriodsCovered:		coveredPeriods,
+		PeriodsUntilExhaustion:	periodsUntilExhaustion,
+		RecoveryRequiredNaet:	recovery,
+		CanExecute:		canExecute,
+		LimitedExecution:	limited,
+		Frozen:			frozen,
+		CleanupEligible:	cleanup,
 	}, nil
 }
 
@@ -502,15 +502,15 @@ func classAdjustedAmount(amount sdkmath.Int, class string, params StorageEconomy
 
 func storageEvent(eventType string, input StorageFeeInput, bytes int64, fee, refund sdkmath.Int, footprint int64) StorageFeeEvent {
 	return StorageFeeEvent{
-		Type:           eventType,
-		OwnerID:        input.OwnerID,
-		ContractID:     input.ContractID,
-		Class:          input.Class,
-		Operation:      input.Operation,
-		Bytes:          bytes,
-		FeeNaet:        fee,
-		RefundNaet:     refund,
-		FootprintBytes: footprint,
+		Type:		eventType,
+		OwnerID:	input.OwnerID,
+		ContractID:	input.ContractID,
+		Class:		input.Class,
+		Operation:	input.Operation,
+		Bytes:		bytes,
+		FeeNaet:	fee,
+		RefundNaet:	refund,
+		FootprintBytes:	footprint,
 	}
 }
 

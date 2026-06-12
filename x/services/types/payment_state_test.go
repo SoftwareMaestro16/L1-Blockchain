@@ -42,14 +42,14 @@ func TestServicePaymentModelQueryAndEnvelopeRules(t *testing.T) {
 	require.Contains(t, model.SupportedDenoms, coretypes.NativeFeePolicyID)
 
 	envelope, err := NewPaymentEnvelope(PaymentEnvelope{
-		Asset:          "uatom",
-		Payer:          testPaymentPayer(),
-		PayeeService:   descriptor.ServiceID,
-		Denom:          "uatom",
-		Amount:         "1",
-		PricingUnit:    coretypes.ServicePricingPerCall,
-		SettlementMode: coretypes.ServicePaymentPrepaid,
-		ExpiryHeight:   90,
+		Asset:		"uatom",
+		Payer:		testPaymentPayer(),
+		PayeeService:	descriptor.ServiceID,
+		Denom:		"uatom",
+		Amount:		"1",
+		PricingUnit:	coretypes.ServicePricingPerCall,
+		SettlementMode:	coretypes.ServicePaymentPrepaid,
+		ExpiryHeight:	90,
 	})
 	require.NoError(t, err)
 	require.NoError(t, EnsureEnvelopeMatchesPaymentModel(envelope, model))
@@ -74,11 +74,11 @@ func TestServicePaymentEscrowSettlementAndProof(t *testing.T) {
 	require.NoError(t, err)
 
 	escrowPlan, err := NewPaymentEscrowSettlement(PaymentEscrowSettlement{
-		EscrowID:        envelope.EscrowIDOptional,
-		ServiceID:       envelope.PayeeService,
-		ReceiptHeight:   15,
-		ProofHeight:     16,
-		ChallengeWindow: 4,
+		EscrowID:		envelope.EscrowIDOptional,
+		ServiceID:		envelope.PayeeService,
+		ReceiptHeight:		15,
+		ProofHeight:		16,
+		ChallengeWindow:	4,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(20), escrowPlan.SettleAfterHeight)
@@ -116,13 +116,13 @@ func TestServicePaymentStreamingState(t *testing.T) {
 func TestServicePaymentMeteredUsageRequiresReceiptSignatureOrProof(t *testing.T) {
 	envelope := testPaymentStateEnvelope(t, coretypes.ServicePricingPerComputeUnit, coretypes.ServicePaymentMetered, "3")
 	receipt, err := NewPaymentUsageReceipt(PaymentUsageReceipt{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("call/metered"),
-		ProviderID:    "provider-1",
-		ComputeUnits:  5,
-		ReceiptHeight: 30,
-		SignedBy:      "provider-1",
-		SignatureHash: testInterfaceHash("usage/signature"),
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("call/metered"),
+		ProviderID:	"provider-1",
+		ComputeUnits:	5,
+		ReceiptHeight:	30,
+		SignedBy:	"provider-1",
+		SignatureHash:	testInterfaceHash("usage/signature"),
 	})
 	require.NoError(t, err)
 
@@ -158,14 +158,14 @@ func TestServicePaymentFailurePolicyAndFinancialRoute(t *testing.T) {
 func testPaymentStateEnvelope(t *testing.T, unit coretypes.ServicePricingUnit, mode coretypes.ServicePaymentSettlementMode, amount string) PaymentEnvelope {
 	t.Helper()
 	envelope := PaymentEnvelope{
-		Asset:          coretypes.NativeFeePolicyID,
-		Payer:          testPaymentPayer(),
-		PayeeService:   "portable-service",
-		Denom:          coretypes.NativeFeePolicyID,
-		Amount:         amount,
-		PricingUnit:    unit,
-		SettlementMode: mode,
-		ExpiryHeight:   100,
+		Asset:		coretypes.NativeFeePolicyID,
+		Payer:		testPaymentPayer(),
+		PayeeService:	"portable-service",
+		Denom:		coretypes.NativeFeePolicyID,
+		Amount:		amount,
+		PricingUnit:	unit,
+		SettlementMode:	mode,
+		ExpiryHeight:	100,
 	}
 	switch mode {
 	case coretypes.ServicePaymentEscrow:

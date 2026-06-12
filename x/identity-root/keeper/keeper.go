@@ -16,15 +16,15 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version        uint64
-	Params         prototype.Params
-	IdentityParams types.IdentityRootParams
-	State          types.IdentityRootState
+	Version		uint64
+	Params		prototype.Params
+	IdentityParams	types.IdentityRootParams
+	State		types.IdentityRootState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -39,10 +39,10 @@ func DefaultGenesis() GenesisState {
 	state := types.EmptyIdentityRootState()
 	state.RootAuthorities = append(state.RootAuthorities, types.RootAuthority{Authority: prototype.DefaultAuthority, Role: "root"})
 	return GenesisState{
-		Version:        prototype.CurrentGenesisVersion,
-		Params:         prototype.DefaultParams(),
-		IdentityParams: types.DefaultIdentityRootParams(),
-		State:          state,
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		IdentityParams:	types.DefaultIdentityRootParams(),
+		State:		state,
 	}
 }
 
@@ -141,18 +141,18 @@ func (k *Keeper) RegisterName(msg types.MsgRegisterName) (types.NameRecord, erro
 	}
 	binding := prepareBinding(name, msg.Owner, msg.NFTBinding, k.genesis.IdentityParams)
 	record := types.NameRecord{
-		Name:                    name,
-		ParentName:              parent,
-		Owner:                   msg.Owner,
-		ResolverRoot:            msg.ResolverRoot,
-		ExpiryHeight:            expiry,
-		RenewalHeight:           msg.Height,
-		SubdomainPolicy:         msg.SubdomainPolicy,
-		NFTBinding:              binding,
-		LastStorageChargeHeight: msg.Height,
-		RentPayerPolicy:         nextDefaultRentPayerPolicy(k.genesis.IdentityParams),
-		CreatedHeight:           msg.Height,
-		UpdatedHeight:           msg.Height,
+		Name:				name,
+		ParentName:			parent,
+		Owner:				msg.Owner,
+		ResolverRoot:			msg.ResolverRoot,
+		ExpiryHeight:			expiry,
+		RenewalHeight:			msg.Height,
+		SubdomainPolicy:		msg.SubdomainPolicy,
+		NFTBinding:			binding,
+		LastStorageChargeHeight:	msg.Height,
+		RentPayerPolicy:		nextDefaultRentPayerPolicy(k.genesis.IdentityParams),
+		CreatedHeight:			msg.Height,
+		UpdatedHeight:			msg.Height,
 	}.Normalize(k.genesis.IdentityParams)
 	next := cloneGenesis(k.genesis)
 	next.State.Records = append(next.State.Records, record)
@@ -317,18 +317,18 @@ func (k *Keeper) CreateSubdomain(msg types.MsgCreateSubdomain) (types.NameRecord
 	}
 	binding := prepareBinding(name, subOwner, msg.NFTBinding, k.genesis.IdentityParams)
 	record := types.NameRecord{
-		Name:                    name,
-		ParentName:              parent.Name,
-		Owner:                   subOwner,
-		ResolverRoot:            msg.ResolverRoot,
-		ExpiryHeight:            parent.ExpiryHeight,
-		RenewalHeight:           msg.Height,
-		SubdomainPolicy:         msg.SubdomainPolicy,
-		NFTBinding:              binding,
-		LastStorageChargeHeight: msg.Height,
-		RentPayerPolicy:         nextDefaultRentPayerPolicy(k.genesis.IdentityParams),
-		CreatedHeight:           msg.Height,
-		UpdatedHeight:           msg.Height,
+		Name:				name,
+		ParentName:			parent.Name,
+		Owner:				subOwner,
+		ResolverRoot:			msg.ResolverRoot,
+		ExpiryHeight:			parent.ExpiryHeight,
+		RenewalHeight:			msg.Height,
+		SubdomainPolicy:		msg.SubdomainPolicy,
+		NFTBinding:			binding,
+		LastStorageChargeHeight:	msg.Height,
+		RentPayerPolicy:		nextDefaultRentPayerPolicy(k.genesis.IdentityParams),
+		CreatedHeight:			msg.Height,
+		UpdatedHeight:			msg.Height,
 	}.Normalize(k.genesis.IdentityParams)
 	next := cloneGenesis(k.genesis)
 	next.State.Records = append(next.State.Records, record)

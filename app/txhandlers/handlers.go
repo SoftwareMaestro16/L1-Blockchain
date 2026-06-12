@@ -18,11 +18,11 @@ func NewAnteHandler(
 ) sdk.AnteHandler {
 	anteHandler, err := ante.NewAnteHandler(
 		ante.HandlerOptions{
-			AccountKeeper:   accountKeeper,
-			BankKeeper:      bankKeeper,
-			SignModeHandler: txConfig.SignModeHandler(),
-			FeegrantKeeper:  feeGrantKeeper,
-			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			AccountKeeper:		accountKeeper,
+			BankKeeper:		bankKeeper,
+			SignModeHandler:	txConfig.SignModeHandler(),
+			FeegrantKeeper:		feeGrantKeeper,
+			SigGasConsumer:		ante.DefaultSigVerificationGasConsumer,
 			SigVerifyOptions: []ante.SigVerificationDecoratorOption{
 				ante.WithUnorderedTxGasCost(ante.DefaultUnorderedTxGasCost),
 				ante.WithMaxUnorderedTxTimeoutDuration(ante.DefaultMaxTimeoutDuration),

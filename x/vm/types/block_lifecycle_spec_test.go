@@ -15,11 +15,11 @@ func TestAVMBlockLifecycleModelsABCIOrderAndCommittedRoots(t *testing.T) {
 	cleanup := testAVMEndBlockCleanup(t, height, nil)
 
 	plan, err := NewAVMBlockLifecyclePlan(AVMBlockLifecyclePlan{
-		Height:          height,
-		PrepareProposal: withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
-		ProcessProposal: withAVMProposalPhase(proposal, AVMABCIProcessProposal),
-		FinalizeBlock:   finalize,
-		EndBlock:        cleanup,
+		Height:			height,
+		PrepareProposal:	withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
+		ProcessProposal:	withAVMProposalPhase(proposal, AVMABCIProcessProposal),
+		FinalizeBlock:		finalize,
+		EndBlock:		cleanup,
 	})
 	require.NoError(t, err)
 	require.NoError(t, plan.Validate())
@@ -47,12 +47,12 @@ func TestAVMProcessProposalRejectsExpiredIneligibleAndBudgetOverflow(t *testing.
 	expired.SenderHash = AVMQueueSenderHash(zonestypes.ZoneIDApplication, "expired")
 	expired.Nonce = 2
 	expiredPlan, err := NewAVMABCIProposalPlan(AVMABCIProposalPlan{
-		Height:   height,
-		Phase:    AVMABCIProcessProposal,
-		Messages: []AVMBlockProposalMessage{expired},
+		Height:		height,
+		Phase:		AVMABCIProcessProposal,
+		Messages:	[]AVMBlockProposalMessage{expired},
 		ZoneBudgets: []AVMBlockZoneBudget{{
-			ZoneID: zonestypes.ZoneIDContract,
-			Budget: zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
+			ZoneID:	zonestypes.ZoneIDContract,
+			Budget:	zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
 		}},
 	})
 	require.ErrorContains(t, err, "expired")
@@ -65,23 +65,23 @@ func TestAVMProcessProposalRejectsExpiredIneligibleAndBudgetOverflow(t *testing.
 	ineligible.SenderHash = AVMQueueSenderHash(zonestypes.ZoneIDApplication, "ineligible")
 	ineligible.Nonce = 3
 	_, err = NewAVMABCIProposalPlan(AVMABCIProposalPlan{
-		Height:   height,
-		Phase:    AVMABCIProcessProposal,
-		Messages: []AVMBlockProposalMessage{ineligible},
+		Height:		height,
+		Phase:		AVMABCIProcessProposal,
+		Messages:	[]AVMBlockProposalMessage{ineligible},
 		ZoneBudgets: []AVMBlockZoneBudget{{
-			ZoneID: zonestypes.ZoneIDContract,
-			Budget: zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
+			ZoneID:	zonestypes.ZoneIDContract,
+			Budget:	zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
 		}},
 	})
 	require.ErrorContains(t, err, "below scheduled height")
 
 	_, err = NewAVMABCIProposalPlan(AVMABCIProposalPlan{
-		Height:   height,
-		Phase:    AVMABCIProcessProposal,
-		Messages: []AVMBlockProposalMessage{eligible},
+		Height:		height,
+		Phase:		AVMABCIProcessProposal,
+		Messages:	[]AVMBlockProposalMessage{eligible},
 		ZoneBudgets: []AVMBlockZoneBudget{{
-			ZoneID: zonestypes.ZoneIDContract,
-			Budget: zonestypes.ZoneExecutionBudget{MaxGas: 10, MaxMessages: 10},
+			ZoneID:	zonestypes.ZoneIDContract,
+			Budget:	zonestypes.ZoneExecutionBudget{MaxGas: 10, MaxMessages: 10},
 		}},
 	})
 	require.ErrorContains(t, err, "gas used exceeds")
@@ -118,8 +118,8 @@ func TestAVMEndBlockCleanupBoundsProofHorizonAndSummaries(t *testing.T) {
 
 	insideHorizon := cleanup
 	insideHorizon.PrunedTombstones = []AVMAsyncReplayTombstone{{
-		MessageID:      engineHash("recent-tombstone"),
-		ConsumedHeight: 16,
+		MessageID:	engineHash("recent-tombstone"),
+		ConsumedHeight:	16,
 	}}
 	insideHorizon.CleanupRoot = ComputeAVMEndBlockCleanupRoot(insideHorizon)
 	require.ErrorContains(t, insideHorizon.Validate(), "proof horizon")
@@ -143,12 +143,12 @@ func testAVMProposalPlan(t *testing.T, height uint64) AVMABCIProposalPlan {
 	high, err := NewAVMBlockProposalMessage(highMsg, AVMQueueLanePriority, "actor-a")
 	require.NoError(t, err)
 	proposal, err := NewAVMABCIProposalPlan(AVMABCIProposalPlan{
-		Height:   height,
-		Phase:    AVMABCIProcessProposal,
-		Messages: []AVMBlockProposalMessage{low, high},
+		Height:		height,
+		Phase:		AVMABCIProcessProposal,
+		Messages:	[]AVMBlockProposalMessage{low, high},
 		ZoneBudgets: []AVMBlockZoneBudget{{
-			ZoneID: zonestypes.ZoneIDContract,
-			Budget: zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
+			ZoneID:	zonestypes.ZoneIDContract,
+			Budget:	zonestypes.ZoneExecutionBudget{MaxGas: 100, MaxMessages: 10},
 		}},
 	})
 	require.NoError(t, err)
@@ -160,49 +160,49 @@ func testAVMFinalizePlan(t *testing.T, height uint64) AVMFinalizeBlockPlan {
 	receiptMsg, err := NewAVMAsyncMessage(testAVMQueueMessage("receipt-msg", 1, 10, 5, 0, 50, 10))
 	require.NoError(t, err)
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          receiptMsg.ID,
-		ZoneID:             zonestypes.ZoneIDContract,
-		Executor:           "finalize-executor",
-		Status:             AVMReceiptStatusExecuted,
-		GasUsed:            10,
-		StorageWritten:     1,
-		EventsHash:         engineHash("events"),
-		OutputMessagesRoot: engineHash("output"),
-		CreatedHeight:      height,
+		MessageID:		receiptMsg.ID,
+		ZoneID:			zonestypes.ZoneIDContract,
+		Executor:		"finalize-executor",
+		Status:			AVMReceiptStatusExecuted,
+		GasUsed:		10,
+		StorageWritten:		1,
+		EventsHash:		engineHash("events"),
+		OutputMessagesRoot:	engineHash("output"),
+		CreatedHeight:		height,
 	})
 	require.NoError(t, err)
 	zoneRoot, err := NewAVMZoneStateRoot(AVMZoneStateRoot{
-		ZoneID:           zonestypes.ZoneIDContract,
-		Height:           height,
-		StateRoot:        engineHash("zone-state"),
-		MessageRoot:      engineHash("zone-message"),
-		ExecutionRoot:    engineHash("zone-execution"),
-		ContinuationRoot: engineHash("zone-continuation"),
+		ZoneID:			zonestypes.ZoneIDContract,
+		Height:			height,
+		StateRoot:		engineHash("zone-state"),
+		MessageRoot:		engineHash("zone-message"),
+		ExecutionRoot:		engineHash("zone-execution"),
+		ContinuationRoot:	engineHash("zone-continuation"),
 	})
 	require.NoError(t, err)
 	avmRoot, err := NewAVMRoot(AVMRoot{
-		Height:           height,
-		RouterRoot:       engineHash("router"),
-		AsyncMessageRoot: engineHash("async"),
-		ActorRoot:        engineHash("actor"),
-		ContractRoot:     engineHash("contract"),
-		ContinuationRoot: engineHash("continuation"),
-		InterfaceRoot:    engineHash("interface"),
-		ReceiptRoot:      engineHash("receipt"),
+		Height:			height,
+		RouterRoot:		engineHash("router"),
+		AsyncMessageRoot:	engineHash("async"),
+		ActorRoot:		engineHash("actor"),
+		ContractRoot:		engineHash("contract"),
+		ContinuationRoot:	engineHash("continuation"),
+		InterfaceRoot:		engineHash("interface"),
+		ReceiptRoot:		engineHash("receipt"),
 	})
 	require.NoError(t, err)
 	finalize, err := NewAVMFinalizeBlockPlan(AVMFinalizeBlockPlan{
-		Height:           height,
-		RouterRoot:       avmRoot.RouterRoot,
-		SyncRoot:         engineHash("sync"),
-		AsyncRoot:        avmRoot.AsyncMessageRoot,
-		ScheduledRoot:    engineHash("scheduled"),
-		ActorRoot:        avmRoot.ActorRoot,
-		ContinuationRoot: avmRoot.ContinuationRoot,
-		ReceiptRoot:      avmRoot.ReceiptRoot,
-		AVMRoot:          avmRoot,
-		ZoneRoots:        []AVMZoneStateRoot{zoneRoot},
-		Receipts:         []AVMExecutionReceipt{receipt},
+		Height:			height,
+		RouterRoot:		avmRoot.RouterRoot,
+		SyncRoot:		engineHash("sync"),
+		AsyncRoot:		avmRoot.AsyncMessageRoot,
+		ScheduledRoot:		engineHash("scheduled"),
+		ActorRoot:		avmRoot.ActorRoot,
+		ContinuationRoot:	avmRoot.ContinuationRoot,
+		ReceiptRoot:		avmRoot.ReceiptRoot,
+		AVMRoot:		avmRoot,
+		ZoneRoots:		[]AVMZoneStateRoot{zoneRoot},
+		Receipts:		[]AVMExecutionReceipt{receipt},
 	})
 	require.NoError(t, err)
 	return finalize
@@ -211,28 +211,28 @@ func testAVMFinalizePlan(t *testing.T, height uint64) AVMFinalizeBlockPlan {
 func testAVMEndBlockCleanup(t *testing.T, height uint64, expired []AVMBlockProposalMessage) AVMEndBlockCleanupPlan {
 	t.Helper()
 	summary, err := zonestypes.NewZoneExecutionSummary(zonestypes.ZoneExecutionSummary{
-		ZoneID:                 zonestypes.ZoneIDContract,
-		Height:                 height,
-		TransactionsExecuted:   1,
-		InboundMessagesApplied: 1,
-		ReceiptsProduced:       1,
-		GasConsumed:            10,
-		StateRoot:              engineHash("summary-state"),
-		InboxRoot:              engineHash("summary-inbox"),
-		OutboxRoot:             engineHash("summary-outbox"),
-		ReceiptRoot:            engineHash("summary-receipt"),
-		ExecutionResultRoot:    engineHash("summary-execution"),
+		ZoneID:			zonestypes.ZoneIDContract,
+		Height:			height,
+		TransactionsExecuted:	1,
+		InboundMessagesApplied:	1,
+		ReceiptsProduced:	1,
+		GasConsumed:		10,
+		StateRoot:		engineHash("summary-state"),
+		InboxRoot:		engineHash("summary-inbox"),
+		OutboxRoot:		engineHash("summary-outbox"),
+		ReceiptRoot:		engineHash("summary-receipt"),
+		ExecutionResultRoot:	engineHash("summary-execution"),
 	})
 	require.NoError(t, err)
 	cleanup, err := NewAVMEndBlockCleanupPlan(AVMEndBlockCleanupPlan{
-		Height:          height,
-		ExpiredMessages: expired,
+		Height:			height,
+		ExpiredMessages:	expired,
 		PrunedTombstones: []AVMAsyncReplayTombstone{{
-			MessageID:      engineHash("old-tombstone"),
-			ConsumedHeight: 1,
+			MessageID:	engineHash("old-tombstone"),
+			ConsumedHeight:	1,
 		}},
-		ProofHorizon:  10,
-		ZoneSummaries: []zonestypes.ZoneExecutionSummary{summary},
+		ProofHorizon:	10,
+		ZoneSummaries:	[]zonestypes.ZoneExecutionSummary{summary},
 	})
 	require.NoError(t, err)
 	return cleanup

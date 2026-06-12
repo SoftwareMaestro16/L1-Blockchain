@@ -35,10 +35,10 @@ func TestSpamTxReducesScoreDeterministically(t *testing.T) {
 
 	effectParams := DefaultReputationEffectParams()
 	signal := ReputationSignal{
-		ProviderType: SignalProviderUser,
-		ProviderID:   rep.Account,
-		SignalType:   SignalTypeTxSpam,
-		Height:       100,
+		ProviderType:	SignalProviderUser,
+		ProviderID:	rep.Account,
+		SignalType:	SignalTypeTxSpam,
+		Height:		100,
 	}
 	updated, err := ApplyIdentitySignal(rep, signal, effectParams)
 	require.NoError(t, err)
@@ -157,8 +157,8 @@ func TestGoldenDeterministicFeePriorityAllocation(t *testing.T) {
 	effParams := DefaultReputationEffectParams()
 
 	type state struct {
-		score  uint32
-		found  bool
+		score	uint32
+		found	bool
 	}
 
 	states := []state{
@@ -169,9 +169,9 @@ func TestGoldenDeterministicFeePriorityAllocation(t *testing.T) {
 	}
 
 	type result struct {
-		FeeAdjusted uint64
-		QueueBoost  uint32
-		QueuePenalty uint32
+		FeeAdjusted	uint64
+		QueueBoost	uint32
+		QueuePenalty	uint32
 	}
 
 	baseFee := uint64(10_000_000)
@@ -262,12 +262,12 @@ func TestMigrationWithReceiptDeterministic(t *testing.T) {
 	}
 	old.StakeRecords = []StakeReputationRecord{
 		{
-			Account:                    addr(5),
-			AccountUser:                aeAddr(0x05),
-			StakeWeightedSeconds:       86400,
-			ClaimedStakeWeightedSeconds: 86400,
-			ClaimedStakeReputation:      24,
-			LastUpdatedUnix:             100,
+			Account:			addr(5),
+			AccountUser:			aeAddr(0x05),
+			StakeWeightedSeconds:		86400,
+			ClaimedStakeWeightedSeconds:	86400,
+			ClaimedStakeReputation:		24,
+			LastUpdatedUnix:		100,
 		},
 	}
 

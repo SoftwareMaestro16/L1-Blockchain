@@ -7,40 +7,40 @@ import (
 )
 
 const (
-	OpenDesignDecisionRewardDampeningScope = "validator_reward_dampening_scope"
-	OpenDesignDecisionStateRentActivation  = "state_rent_activation_scope"
-	OpenDesignDecisionDeleteRefundPayment  = "storage_delete_refund_payment"
-	OpenDesignDecisionBootstrapFunding     = "validator_bootstrap_funding_source"
-	OpenDesignDecisionRiskYieldLocation    = "risk_adjusted_yield_query_location"
-	OpenDesignDecisionFeeBucketWeights     = "fee_bucket_weight_control"
-	OpenDesignDecisionSecurityReserveSpend = "security_reserve_spending_authority"
+	OpenDesignDecisionRewardDampeningScope	= "validator_reward_dampening_scope"
+	OpenDesignDecisionStateRentActivation	= "state_rent_activation_scope"
+	OpenDesignDecisionDeleteRefundPayment	= "storage_delete_refund_payment"
+	OpenDesignDecisionBootstrapFunding	= "validator_bootstrap_funding_source"
+	OpenDesignDecisionRiskYieldLocation	= "risk_adjusted_yield_query_location"
+	OpenDesignDecisionFeeBucketWeights	= "fee_bucket_weight_control"
+	OpenDesignDecisionSecurityReserveSpend	= "security_reserve_spending_authority"
 
-	OpenDesignDecisionStatusOpen = "open"
+	OpenDesignDecisionStatusOpen	= "open"
 )
 
 type EconomicOpenDesignDecision struct {
-	ID                        string
-	Question                  string
-	Status                    string
-	Options                   []string
-	LinkedGovernanceParams    []string
-	RequiredBeforeActivation  string
-	Queryable                 bool
-	GovernanceRequired        bool
-	ConsensusImpact           bool
-	SimulationRequired        bool
-	ImplementationMustNotPick bool
-	Resolution                string
+	ID				string
+	Question			string
+	Status				string
+	Options				[]string
+	LinkedGovernanceParams		[]string
+	RequiredBeforeActivation	string
+	Queryable			bool
+	GovernanceRequired		bool
+	ConsensusImpact			bool
+	SimulationRequired		bool
+	ImplementationMustNotPick	bool
+	Resolution			string
 }
 
 type EconomicOpenDesignDecisionReport struct {
-	Decisions   []EconomicOpenDesignDecision
-	Required    int
-	Covered     int
-	CoverageBps int64
-	Passed      bool
-	Failed      []string
-	Summary     string
+	Decisions	[]EconomicOpenDesignDecision
+	Required	int
+	Covered		int
+	CoverageBps	int64
+	Passed		bool
+	Failed		[]string
+	Summary		string
 }
 
 func DefaultEconomicOpenDesignDecisions() []EconomicOpenDesignDecision {
@@ -112,29 +112,29 @@ func BuildEconomicOpenDesignDecisionReport(decisions []EconomicOpenDesignDecisio
 	sort.Strings(failed)
 	coverage := coverageBps(covered, required)
 	return EconomicOpenDesignDecisionReport{
-		Decisions:   out,
-		Required:    required,
-		Covered:     covered,
-		CoverageBps: coverage,
-		Passed:      len(failed) == 0 && coverage == BasisPoints,
-		Failed:      failed,
-		Summary:     fmt.Sprintf("open_design_decisions=%d/%d coverage_bps=%d", covered, required, coverage),
+		Decisions:	out,
+		Required:	required,
+		Covered:	covered,
+		CoverageBps:	coverage,
+		Passed:		len(failed) == 0 && coverage == BasisPoints,
+		Failed:		failed,
+		Summary:	fmt.Sprintf("open_design_decisions=%d/%d coverage_bps=%d", covered, required, coverage),
 	}
 }
 
 func openDesignDecision(id, question string, options []string, requiredBefore string, linkedParams []string, consensusImpact bool) EconomicOpenDesignDecision {
 	return EconomicOpenDesignDecision{
-		ID:                        id,
-		Question:                  question,
-		Status:                    OpenDesignDecisionStatusOpen,
-		Options:                   append([]string{}, options...),
-		LinkedGovernanceParams:    append([]string{}, linkedParams...),
-		RequiredBeforeActivation:  requiredBefore,
-		Queryable:                 true,
-		GovernanceRequired:        true,
-		ConsensusImpact:           consensusImpact,
-		SimulationRequired:        true,
-		ImplementationMustNotPick: true,
+		ID:				id,
+		Question:			question,
+		Status:				OpenDesignDecisionStatusOpen,
+		Options:			append([]string{}, options...),
+		LinkedGovernanceParams:		append([]string{}, linkedParams...),
+		RequiredBeforeActivation:	requiredBefore,
+		Queryable:			true,
+		GovernanceRequired:		true,
+		ConsensusImpact:		consensusImpact,
+		SimulationRequired:		true,
+		ImplementationMustNotPick:	true,
 	}
 }
 
@@ -226,13 +226,13 @@ func economicOpenDesignDecisionCovered(decision EconomicOpenDesignDecision, gove
 
 func requiredEconomicOpenDesignDecisionIDs() map[string]struct{} {
 	return map[string]struct{}{
-		OpenDesignDecisionRewardDampeningScope: {},
-		OpenDesignDecisionStateRentActivation:  {},
-		OpenDesignDecisionDeleteRefundPayment:  {},
-		OpenDesignDecisionBootstrapFunding:     {},
-		OpenDesignDecisionRiskYieldLocation:    {},
-		OpenDesignDecisionFeeBucketWeights:     {},
-		OpenDesignDecisionSecurityReserveSpend: {},
+		OpenDesignDecisionRewardDampeningScope:	{},
+		OpenDesignDecisionStateRentActivation:	{},
+		OpenDesignDecisionDeleteRefundPayment:	{},
+		OpenDesignDecisionBootstrapFunding:	{},
+		OpenDesignDecisionRiskYieldLocation:	{},
+		OpenDesignDecisionFeeBucketWeights:	{},
+		OpenDesignDecisionSecurityReserveSpend:	{},
 	}
 }
 

@@ -11,38 +11,38 @@ import (
 )
 
 const (
-	ModuleName = "performance"
-	StoreKey   = ModuleName
+	ModuleName	= "performance"
+	StoreKey	= ModuleName
 
-	QueryEndpointPerformanceRecord  = "QueryPerformanceRecord"
-	QueryEndpointOperatorHistory    = "QueryOperatorPerformanceHistory"
-	QueryEndpointRolePerformance    = "QueryRolePerformance"
-	QueryEndpointRewardMultiplier   = "QueryRewardMultiplier"
-	QueryEndpointDistributionReward = "QueryPerformanceDistributionReward"
+	QueryEndpointPerformanceRecord	= "QueryPerformanceRecord"
+	QueryEndpointOperatorHistory	= "QueryOperatorPerformanceHistory"
+	QueryEndpointRolePerformance	= "QueryRolePerformance"
+	QueryEndpointRewardMultiplier	= "QueryRewardMultiplier"
+	QueryEndpointDistributionReward	= "QueryPerformanceDistributionReward"
 )
 
 type RoleMetricCollectionInput struct {
-	EpochID                  uint64
-	OperatorAddress          string
-	Role                     postypes.ValidatorRole
-	AssignedTasks            uint64
-	CompletedTasks           uint64
-	MissedTasks              uint64
-	InvalidTasks             uint64
-	SignedBlocks             uint64
-	TotalBlocks              uint64
-	TaskParticipations       uint64
-	MissedTaskParticipations uint64
-	CommittedLatencyWindow   bool
-	LatencyAdvisoryOnly      bool
-	LatencyTargetMillis      uint64
-	LatencyP95Millis         uint64
-	ValidSignatures          uint64
-	InvalidSignatures        uint64
-	ValidTaskOutputs         uint64
-	InvalidTaskOutputs       uint64
-	AcceptedEvidence         uint64
-	EvidencePenaltyWeight    uint64
+	EpochID				uint64
+	OperatorAddress			string
+	Role				postypes.ValidatorRole
+	AssignedTasks			uint64
+	CompletedTasks			uint64
+	MissedTasks			uint64
+	InvalidTasks			uint64
+	SignedBlocks			uint64
+	TotalBlocks			uint64
+	TaskParticipations		uint64
+	MissedTaskParticipations	uint64
+	CommittedLatencyWindow		bool
+	LatencyAdvisoryOnly		bool
+	LatencyTargetMillis		uint64
+	LatencyP95Millis		uint64
+	ValidSignatures			uint64
+	InvalidSignatures		uint64
+	ValidTaskOutputs		uint64
+	InvalidTaskOutputs		uint64
+	AcceptedEvidence		uint64
+	EvidencePenaltyWeight		uint64
 }
 
 type PerformanceSnapshot struct {
@@ -50,9 +50,9 @@ type PerformanceSnapshot struct {
 }
 
 type QueryPerformanceRecordRequest struct {
-	EpochID         uint64
-	OperatorAddress string
-	Role            postypes.ValidatorRole
+	EpochID		uint64
+	OperatorAddress	string
+	Role		postypes.ValidatorRole
 }
 
 type QueryPerformanceRecordResponse struct {
@@ -60,8 +60,8 @@ type QueryPerformanceRecordResponse struct {
 }
 
 type QueryOperatorPerformanceHistoryRequest struct {
-	OperatorAddress string
-	Limit           uint32
+	OperatorAddress	string
+	Limit		uint32
 }
 
 type QueryOperatorPerformanceHistoryResponse struct {
@@ -69,8 +69,8 @@ type QueryOperatorPerformanceHistoryResponse struct {
 }
 
 type QueryRolePerformanceRequest struct {
-	EpochID uint64
-	Role    postypes.ValidatorRole
+	EpochID	uint64
+	Role	postypes.ValidatorRole
 }
 
 type QueryRolePerformanceResponse struct {
@@ -78,9 +78,9 @@ type QueryRolePerformanceResponse struct {
 }
 
 type QueryRewardMultiplierRequest struct {
-	EpochID         uint64
-	OperatorAddress string
-	Role            postypes.ValidatorRole
+	EpochID		uint64
+	OperatorAddress	string
+	Role		postypes.ValidatorRole
 }
 
 type QueryRewardMultiplierResponse struct {
@@ -88,15 +88,15 @@ type QueryRewardMultiplierResponse struct {
 }
 
 type PerformanceDistributionInput struct {
-	Performance postypes.PerformanceRecord
-	Reward      postypes.RewardInput
+	Performance	postypes.PerformanceRecord
+	Reward		postypes.RewardInput
 }
 
 type PerformanceDistributionResult struct {
-	Performance        postypes.PerformanceRecord
-	OriginalRewardNaet sdkmath.Int
-	DampenedRewardNaet sdkmath.Int
-	Distribution       postypes.RewardDistribution
+	Performance		postypes.PerformanceRecord
+	OriginalRewardNaet	sdkmath.Int
+	DampenedRewardNaet	sdkmath.Int
+	Distribution		postypes.RewardDistribution
 }
 
 func CollectRolePerformanceMetrics(input RoleMetricCollectionInput) (postypes.PerformanceRecord, error) {
@@ -105,45 +105,45 @@ func CollectRolePerformanceMetrics(input RoleMetricCollectionInput) (postypes.Pe
 		return postypes.PerformanceRecord{}, err
 	}
 	uptime, err := postypes.ComputeUptimeFactor(postypes.UptimeFactorInput{
-		SignedBlocks:             input.SignedBlocks,
-		TotalBlocks:              input.TotalBlocks,
-		TaskParticipations:       input.TaskParticipations,
-		MissedTaskParticipations: input.MissedTaskParticipations,
+		SignedBlocks:			input.SignedBlocks,
+		TotalBlocks:			input.TotalBlocks,
+		TaskParticipations:		input.TaskParticipations,
+		MissedTaskParticipations:	input.MissedTaskParticipations,
 	})
 	if err != nil {
 		return postypes.PerformanceRecord{}, err
 	}
 	latency, err := postypes.ComputeLatencyFactor(postypes.LatencyFactorInput{
-		CommittedWindow: input.CommittedLatencyWindow,
-		AdvisoryOnly:    input.LatencyAdvisoryOnly,
-		TargetMillis:    input.LatencyTargetMillis,
-		P95Millis:       input.LatencyP95Millis,
+		CommittedWindow:	input.CommittedLatencyWindow,
+		AdvisoryOnly:		input.LatencyAdvisoryOnly,
+		TargetMillis:		input.LatencyTargetMillis,
+		P95Millis:		input.LatencyP95Millis,
 	})
 	if err != nil {
 		return postypes.PerformanceRecord{}, err
 	}
 	correctness, err := postypes.ComputeCorrectnessScore(postypes.CorrectnessScoreInput{
-		ValidSignatures:       input.ValidSignatures,
-		InvalidSignatures:     input.InvalidSignatures,
-		ValidTaskOutputs:      input.ValidTaskOutputs,
-		InvalidTaskOutputs:    input.InvalidTaskOutputs,
-		AcceptedEvidence:      input.AcceptedEvidence,
-		EvidencePenaltyWeight: input.EvidencePenaltyWeight,
+		ValidSignatures:	input.ValidSignatures,
+		InvalidSignatures:	input.InvalidSignatures,
+		ValidTaskOutputs:	input.ValidTaskOutputs,
+		InvalidTaskOutputs:	input.InvalidTaskOutputs,
+		AcceptedEvidence:	input.AcceptedEvidence,
+		EvidencePenaltyWeight:	input.EvidencePenaltyWeight,
 	})
 	if err != nil {
 		return postypes.PerformanceRecord{}, err
 	}
 	return postypes.BuildPerformanceRecord(postypes.PerformanceRecordInput{
-		EpochID:             input.EpochID,
-		OperatorAddress:     input.OperatorAddress,
-		Role:                input.Role,
-		AssignedTasks:       input.AssignedTasks,
-		CompletedTasks:      input.CompletedTasks,
-		MissedTasks:         input.MissedTasks,
-		InvalidTasks:        input.InvalidTasks,
-		UptimeScoreBps:      uptime,
-		LatencyScoreBps:     latency,
-		CorrectnessScoreBps: correctness,
+		EpochID:		input.EpochID,
+		OperatorAddress:	input.OperatorAddress,
+		Role:			input.Role,
+		AssignedTasks:		input.AssignedTasks,
+		CompletedTasks:		input.CompletedTasks,
+		MissedTasks:		input.MissedTasks,
+		InvalidTasks:		input.InvalidTasks,
+		UptimeScoreBps:		uptime,
+		LatencyScoreBps:	latency,
+		CorrectnessScoreBps:	correctness,
 	})
 }
 
@@ -168,10 +168,10 @@ func SettlePerformanceDistribution(input PerformanceDistributionInput) (Performa
 		return PerformanceDistributionResult{}, err
 	}
 	return PerformanceDistributionResult{
-		Performance:        input.Performance,
-		OriginalRewardNaet: input.Reward.TotalRewardsNaet,
-		DampenedRewardNaet: dampened,
-		Distribution:       distribution,
+		Performance:		input.Performance,
+		OriginalRewardNaet:	input.Reward.TotalRewardsNaet,
+		DampenedRewardNaet:	dampened,
+		Distribution:		distribution,
 	}, nil
 }
 
@@ -249,9 +249,9 @@ func QueryRolePerformance(snapshot PerformanceSnapshot, req QueryRolePerformance
 
 func QueryRewardMultiplier(snapshot PerformanceSnapshot, req QueryRewardMultiplierRequest) (QueryRewardMultiplierResponse, error) {
 	res, err := QueryPerformanceRecord(snapshot, QueryPerformanceRecordRequest{
-		EpochID:         req.EpochID,
-		OperatorAddress: req.OperatorAddress,
-		Role:            req.Role,
+		EpochID:		req.EpochID,
+		OperatorAddress:	req.OperatorAddress,
+		Role:			req.Role,
 	})
 	if err != nil {
 		return QueryRewardMultiplierResponse{}, err

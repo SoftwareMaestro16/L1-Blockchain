@@ -30,24 +30,24 @@ func TestExecutionOSSmokeCommandOutputsOperatorReport(t *testing.T) {
 	require.NoError(t, svrcmd.Execute(rootCmd, "", homeDir))
 
 	var report struct {
-		Profile string `json:"profile"`
-		Load    struct {
-			ScoreBps uint32 `json:"score_bps"`
-			Band     string `json:"band"`
-		} `json:"load"`
-		Routing struct {
+		Profile	string	`json:"profile"`
+		Load	struct {
+			ScoreBps	uint32	`json:"score_bps"`
+			Band		string	`json:"band"`
+		}	`json:"load"`
+		Routing	struct {
 			ZoneID string `json:"zone_id"`
-		} `json:"routing"`
-		Sharding struct {
+		}	`json:"routing"`
+		Sharding	struct {
 			ActiveShardCount uint32 `json:"active_shard_count"`
-		} `json:"sharding"`
-		Mesh struct {
+		}	`json:"sharding"`
+		Mesh	struct {
 			ReceiptStatus string `json:"receipt_status"`
-		} `json:"mesh"`
-		Identity struct {
+		}	`json:"mesh"`
+		Identity	struct {
 			Domain string `json:"domain"`
-		} `json:"identity"`
-		ProductionLive bool `json:"production_live"`
+		}	`json:"identity"`
+		ProductionLive	bool	`json:"production_live"`
 	}
 	require.NoError(t, json.Unmarshal(out.Bytes(), &report), out.String())
 	require.Equal(t, "execution-os-sim", report.Profile)
@@ -106,16 +106,16 @@ func TestExecutionOSDiagnosticsCommandReadsGenesis(t *testing.T) {
 	require.NoError(t, svrcmd.Execute(rootCmd, "", homeDir))
 
 	var diagnostics struct {
-		CurrentLoadScoreBps uint32 `json:"current_load_score_bps"`
-		ActiveShards        []struct {
-			ZoneID       string `json:"zone_id"`
-			ActiveShards uint32 `json:"active_shards"`
-		} `json:"active_shards"`
-		FeatureGates map[string]struct {
-			Enabled        bool `json:"enabled"`
-			TestnetProfile bool `json:"testnet_profile"`
-		} `json:"feature_gates"`
-		ProductionLive bool `json:"production_live"`
+		CurrentLoadScoreBps	uint32	`json:"current_load_score_bps"`
+		ActiveShards		[]struct {
+			ZoneID		string	`json:"zone_id"`
+			ActiveShards	uint32	`json:"active_shards"`
+		}	`json:"active_shards"`
+		FeatureGates	map[string]struct {
+			Enabled		bool	`json:"enabled"`
+			TestnetProfile	bool	`json:"testnet_profile"`
+		}	`json:"feature_gates"`
+		ProductionLive	bool	`json:"production_live"`
 	}
 	require.NoError(t, json.Unmarshal(out.Bytes(), &diagnostics), out.String())
 	require.Equal(t, uint32(500), diagnostics.CurrentLoadScoreBps)

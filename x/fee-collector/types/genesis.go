@@ -9,55 +9,55 @@ import (
 )
 
 const (
-	FeeSplitBurnMinBps       uint32 = 3_000
-	FeeSplitBurnMaxBps       uint32 = 6_000
-	FeeSplitValidatorsMinBps uint32 = 2_000
-	FeeSplitValidatorsMaxBps uint32 = 4_000
-	FeeSplitTreasuryMinBps   uint32 = 1_000
-	FeeSplitTreasuryMaxBps   uint32 = 2_000
-	FeeSplitProtectionBps    uint32 = 0
+	FeeSplitBurnMinBps		uint32	= 3_000
+	FeeSplitBurnMaxBps		uint32	= 6_000
+	FeeSplitValidatorsMinBps	uint32	= 2_000
+	FeeSplitValidatorsMaxBps	uint32	= 4_000
+	FeeSplitTreasuryMinBps		uint32	= 1_000
+	FeeSplitTreasuryMaxBps		uint32	= 2_000
+	FeeSplitProtectionBps		uint32	= 0
 )
 
 func DefaultParams() Params {
 	return Params{
-		BaseDenom:        BaseDenom,
-		TreasuryBps:      1_500,
-		ProtectionBps:    FeeSplitProtectionBps,
-		ValidatorsBps:    3_500,
-		BurnBps:          5_000,
-		CollectorModule:  CollectorModuleName,
-		TreasuryModule:   TreasuryModuleName,
-		ProtectionModule: ProtectionModuleName,
-		ValidatorsModule: authtypes.FeeCollectorName,
+		BaseDenom:		BaseDenom,
+		TreasuryBps:		1_500,
+		ProtectionBps:		FeeSplitProtectionBps,
+		ValidatorsBps:		3_500,
+		BurnBps:		5_000,
+		CollectorModule:	CollectorModuleName,
+		TreasuryModule:		TreasuryModuleName,
+		ProtectionModule:	ProtectionModuleName,
+		ValidatorsModule:	authtypes.FeeCollectorName,
 	}
 }
 
 func DefaultFeeBalances() FeeBalances {
 	return FeeBalances{
-		GasFees:          sdk.NewCoins(),
-		ForwardingFees:   sdk.NewCoins(),
-		ProtocolFees:     sdk.NewCoins(),
-		TotalCollected:   sdk.NewCoins(),
-		TotalDistributed: sdk.NewCoins(),
-		TotalBurned:      sdk.NewCoins(),
+		GasFees:		sdk.NewCoins(),
+		ForwardingFees:		sdk.NewCoins(),
+		ProtocolFees:		sdk.NewCoins(),
+		TotalCollected:		sdk.NewCoins(),
+		TotalDistributed:	sdk.NewCoins(),
+		TotalBurned:		sdk.NewCoins(),
 	}
 }
 
 func DefaultPendingDistribution() PendingDistribution {
 	return PendingDistribution{
-		Treasury:   sdk.NewCoins(),
-		Protection: sdk.NewCoins(),
-		Validators: sdk.NewCoins(),
-		Burn:       sdk.NewCoins(),
+		Treasury:	sdk.NewCoins(),
+		Protection:	sdk.NewCoins(),
+		Validators:	sdk.NewCoins(),
+		Burn:		sdk.NewCoins(),
 	}
 }
 
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Params:              DefaultParams(),
-		Balances:            DefaultFeeBalances(),
-		PendingDistribution: DefaultPendingDistribution(),
-		FeeHistory:          []FeeHistoryEntry{},
+		Params:			DefaultParams(),
+		Balances:		DefaultFeeBalances(),
+		PendingDistribution:	DefaultPendingDistribution(),
+		FeeHistory:		[]FeeHistoryEntry{},
 	}
 }
 
@@ -144,12 +144,12 @@ func (gs GenesisState) Validate() error {
 
 func (b FeeBalances) Validate(baseDenom string) error {
 	for name, coins := range map[string]sdk.Coins{
-		"gas_fees":          b.GasFees,
-		"forwarding_fees":   b.ForwardingFees,
-		"protocol_fees":     b.ProtocolFees,
-		"total_collected":   b.TotalCollected,
-		"total_distributed": b.TotalDistributed,
-		"total_burned":      b.TotalBurned,
+		"gas_fees":		b.GasFees,
+		"forwarding_fees":	b.ForwardingFees,
+		"protocol_fees":	b.ProtocolFees,
+		"total_collected":	b.TotalCollected,
+		"total_distributed":	b.TotalDistributed,
+		"total_burned":		b.TotalBurned,
 	} {
 		if err := validateBaseCoins(name, baseDenom, coins); err != nil {
 			return err
@@ -167,10 +167,10 @@ func (b FeeBalances) AccountingBalance() sdk.Coins {
 
 func (p PendingDistribution) Validate(baseDenom string) error {
 	for name, coins := range map[string]sdk.Coins{
-		"treasury":   p.Treasury,
-		"protection": p.Protection,
-		"validators": p.Validators,
-		"burn":       p.Burn,
+		"treasury":	p.Treasury,
+		"protection":	p.Protection,
+		"validators":	p.Validators,
+		"burn":		p.Burn,
 	} {
 		if err := validateBaseCoins(name, baseDenom, coins); err != nil {
 			return err
@@ -185,12 +185,12 @@ func (p PendingDistribution) Total() sdk.Coins {
 
 func (e FeeHistoryEntry) Validate(baseDenom string) error {
 	for name, coins := range map[string]sdk.Coins{
-		"collected":          e.Collected,
-		"treasury":           e.Treasury,
-		"protection":         e.Protection,
-		"validators":         e.Validators,
-		"burn":               e.Burn,
-		"rounding_remainder": e.RoundingRemainder,
+		"collected":		e.Collected,
+		"treasury":		e.Treasury,
+		"protection":		e.Protection,
+		"validators":		e.Validators,
+		"burn":			e.Burn,
+		"rounding_remainder":	e.RoundingRemainder,
 	} {
 		if err := validateBaseCoins(name, baseDenom, coins); err != nil {
 			return err
@@ -274,7 +274,7 @@ func validateUint32Bps(name string, value, min, max uint32) error {
 }
 
 func bpsAmount(amount sdkmath.Int, bps uint32) sdkmath.Int {
-	return amount.MulRaw(int64(bps)).QuoRaw(int64(BasisPoints)) // #nosec G115 -- bps bounds are validated against BasisPoints.
+	return amount.MulRaw(int64(bps)).QuoRaw(int64(BasisPoints))
 }
 
 func addPositive(coins sdk.Coins, denom string, amount sdkmath.Int) sdk.Coins {

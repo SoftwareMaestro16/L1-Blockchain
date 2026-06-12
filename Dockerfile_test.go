@@ -119,10 +119,10 @@ func TestDockerfileHasExposedPorts(t *testing.T) {
 	text := string(content)
 
 	requiredPorts := []string{
-		"26656", // P2P
-		"26657", // RPC
-		"1317",  // REST
-		"9090",  // gRPC
+		"26656",
+		"26657",
+		"1317",
+		"9090",
 	}
 
 	for _, port := range requiredPorts {
@@ -182,7 +182,6 @@ func TestDockerComposeLocalnetDoesNotReplaceScripts(t *testing.T) {
 		t.Log("warning: docker-compose should reference PowerShell scripts as alternative")
 	}
 
-	// Should mention it's a sample/configuration
 	if !strings.Contains(text, "sample") && !strings.Contains(text, "testing") && !strings.Contains(text, "not replace") {
 		t.Error("docker-compose should indicate it's a sample for testing, not replacement for PS scripts")
 	}

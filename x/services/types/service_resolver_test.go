@@ -13,10 +13,10 @@ func TestResolveServiceFromOnChainRegistryReturnsDiscoveryOutput(t *testing.T) {
 	state := testResolverRegistryState(t, descriptor, nil, 20)
 
 	out, err := ResolveService(ServiceResolverInput{
-		ServiceName:       descriptor.Discovery.ServiceName,
-		Registry:          state,
-		ResolutionHeight:  25,
-		RequireFreshProof: true,
+		ServiceName:		descriptor.Discovery.ServiceName,
+		Registry:		state,
+		ResolutionHeight:	25,
+		RequireFreshProof:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ServiceResolutionOnChainRegistry, out.Source)
@@ -42,9 +42,9 @@ func TestResolveServiceFromIdentityBinding(t *testing.T) {
 	state := testResolverRegistryState(t, descriptor, []coretypes.IdentityServiceBinding{binding}, 20)
 
 	out, err := ResolveService(ServiceResolverInput{
-		ServiceName:      "portable.aet",
-		Registry:         state,
-		ResolutionHeight: 25,
+		ServiceName:		"portable.aet",
+		Registry:		state,
+		ResolutionHeight:	25,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ServiceResolutionIdentityRecord, out.Source)
@@ -62,29 +62,29 @@ func TestResolveServiceFromSignedCacheRequiresSignatureChain(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = ResolveService(ServiceResolverInput{
-		ServiceName:      "cached-service",
-		Registry:         state,
-		ResolutionHeight: 25,
+		ServiceName:		"cached-service",
+		Registry:		state,
+		ResolutionHeight:	25,
 		CachedSigned: []ServiceResolverSourceRecord{{
-			ServiceName: "cached-service",
-			Descriptor:  descriptor,
+			ServiceName:	"cached-service",
+			Descriptor:	descriptor,
 		}},
 	})
 	require.ErrorContains(t, err, "signature hash")
 
 	out, err := ResolveService(ServiceResolverInput{
-		ServiceName:       "cached-service",
-		Registry:          state,
-		ResolutionHeight:  25,
-		RequireFreshProof: true,
+		ServiceName:		"cached-service",
+		Registry:		state,
+		ResolutionHeight:	25,
+		RequireFreshProof:	true,
 		CachedSigned: []ServiceResolverSourceRecord{{
-			ServiceName:       "cached-service",
-			Descriptor:        descriptor,
-			SignatureHash:     testInterfaceHash("cached/owner-signature"),
-			TrustMetadata:     "owner-signed-cache-record",
-			ExpiryHeight:      80,
-			PaymentModel:      registryPaymentModelFromDescriptor(descriptor),
-			VerificationModel: descriptor.Verification.Model,
+			ServiceName:		"cached-service",
+			Descriptor:		descriptor,
+			SignatureHash:		testInterfaceHash("cached/owner-signature"),
+			TrustMetadata:		"owner-signed-cache-record",
+			ExpiryHeight:		80,
+			PaymentModel:		registryPaymentModelFromDescriptor(descriptor),
+			VerificationModel:	descriptor.Verification.Model,
 		}},
 	})
 	require.NoError(t, err)
@@ -99,50 +99,50 @@ func TestResolveServiceFromDistributedMeshIncludesCommitmentChain(t *testing.T) 
 	state := testResolverRegistryState(t, descriptor, nil, 20)
 
 	iface, err := NewDistributedInterfaceDescriptor(DistributedInterfaceDescriptor{
-		InterfaceHash: descriptor.Interface.InterfaceHash,
-		InterfaceName: descriptor.Interface.InterfaceName,
-		Version:       descriptor.Interface.Version,
-		SchemaHash:    testInterfaceHash("mesh/schema"),
-		MethodRoot:    testInterfaceHash("mesh/methods"),
-		EventRoot:     testInterfaceHash("mesh/events"),
-		ErrorRoot:     testInterfaceHash("mesh/errors"),
+		InterfaceHash:	descriptor.Interface.InterfaceHash,
+		InterfaceName:	descriptor.Interface.InterfaceName,
+		Version:	descriptor.Interface.Version,
+		SchemaHash:	testInterfaceHash("mesh/schema"),
+		MethodRoot:	testInterfaceHash("mesh/methods"),
+		EventRoot:	testInterfaceHash("mesh/events"),
+		ErrorRoot:	testInterfaceHash("mesh/errors"),
 	})
 	require.NoError(t, err)
 	endpoint, err := NewDistributedServiceEndpoint(DistributedServiceEndpoint{
-		ServiceID:     descriptor.ServiceID,
-		EndpointID:    "mesh-primary",
-		Kind:          DistributedEndpointHybrid,
-		ZoneID:        string(descriptor.ZoneID),
-		Target:        "https://mesh.aetra.local/portable",
-		InterfaceHash: descriptor.Interface.InterfaceHash,
-		Priority:      1,
-		Weight:        10,
-		MetadataHash:  testInterfaceHash("mesh/endpoint"),
+		ServiceID:	descriptor.ServiceID,
+		EndpointID:	"mesh-primary",
+		Kind:		DistributedEndpointHybrid,
+		ZoneID:		string(descriptor.ZoneID),
+		Target:		"https://mesh.aetra.local/portable",
+		InterfaceHash:	descriptor.Interface.InterfaceHash,
+		Priority:	1,
+		Weight:		10,
+		MetadataHash:	testInterfaceHash("mesh/endpoint"),
 	})
 	require.NoError(t, err)
 	record, err := NewDistributedServiceRecord(DistributedServiceRecord{
-		ServiceID:      descriptor.ServiceID,
-		ServiceName:    "portable-mesh",
-		Kind:           DistributedServiceHybrid,
-		Owner:          coretypes.DefaultAuthority,
-		ZoneID:         string(descriptor.ZoneID),
-		InterfaceHash:  descriptor.Interface.InterfaceHash,
-		EndpointRoot:   ComputeDistributedEndpointRoot([]DistributedServiceEndpoint{endpoint}),
-		DescriptorHash: coretypes.ComputeServiceDescriptorHash(descriptor),
-		MetadataHash:   testInterfaceHash("mesh/metadata"),
-		CreatedHeight:  20,
-		UpdatedHeight:  20,
-		ExpiryHeight:   90,
-		Discoverable:   true,
+		ServiceID:	descriptor.ServiceID,
+		ServiceName:	"portable-mesh",
+		Kind:		DistributedServiceHybrid,
+		Owner:		coretypes.DefaultAuthority,
+		ZoneID:		string(descriptor.ZoneID),
+		InterfaceHash:	descriptor.Interface.InterfaceHash,
+		EndpointRoot:	ComputeDistributedEndpointRoot([]DistributedServiceEndpoint{endpoint}),
+		DescriptorHash:	coretypes.ComputeServiceDescriptorHash(descriptor),
+		MetadataHash:	testInterfaceHash("mesh/metadata"),
+		CreatedHeight:	20,
+		UpdatedHeight:	20,
+		ExpiryHeight:	90,
+		Discoverable:	true,
 	})
 	require.NoError(t, err)
 	commitment, err := NewDistributedExecutionCommitment(DistributedExecutionCommitment{
-		ServiceID:       descriptor.ServiceID,
-		EndpointID:      endpoint.EndpointID,
-		Kind:            DistributedCommitmentProof,
-		ProofHash:       testInterfaceHash("mesh/proof"),
-		ResultHash:      testInterfaceHash("mesh/result"),
-		CommittedHeight: 30,
+		ServiceID:		descriptor.ServiceID,
+		EndpointID:		endpoint.EndpointID,
+		Kind:			DistributedCommitmentProof,
+		ProofHash:		testInterfaceHash("mesh/proof"),
+		ResultHash:		testInterfaceHash("mesh/result"),
+		CommittedHeight:	30,
 	})
 	require.NoError(t, err)
 	distributed, err := BuildDistributedDiscoveryState(
@@ -155,10 +155,10 @@ func TestResolveServiceFromDistributedMeshIncludesCommitmentChain(t *testing.T) 
 	require.NoError(t, err)
 
 	out, err := ResolveService(ServiceResolverInput{
-		ServiceName:      "portable-mesh",
-		Registry:         state,
-		Distributed:      distributed,
-		ResolutionHeight: 31,
+		ServiceName:		"portable-mesh",
+		Registry:		state,
+		Distributed:		distributed,
+		ResolutionHeight:	31,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ServiceResolutionDistributedMesh, out.Source)

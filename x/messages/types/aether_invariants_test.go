@@ -91,25 +91,25 @@ func TestAetherMsgBusLoadRootsAreDeterministic(t *testing.T) {
 	for i := 0; i < 64; i++ {
 		route := testAetherRoute(t, uint64(240+i), 1)
 		msg, err := NewAetherMessage(AetherMessage{
-			Sender:          "account/alice",
-			SenderZoneID:    route.SourceZoneID,
-			SenderShardID:   route.SourceShardID,
-			Receiver:        "contract/vault",
-			ReceiverZoneID:  route.DestinationZoneID,
-			ReceiverShardID: route.DestinationShardID,
-			ValueNAET:       sdkmath.NewInt(1),
-			Payload:         []byte(fmt.Sprintf("payload-%d", i)),
-			PayloadType:     "contract.execute",
-			GasLimit:        100,
-			GasPrice:        sdkmath.OneInt(),
-			ForwardingFee:   sdkmath.OneInt(),
-			ExpiryHeight:    uint64(400 + i),
-			Bounce:          true,
-			ExecutionMode:   ExecutionModeAsync,
-			OrderingClass:   OrderingClassSenderOrdered,
-			RouteCommitment: route.RouteCommitment,
-			CreatedAtHeight: uint64(240 + i),
-			Nonce:           uint64(i + 1),
+			Sender:			"account/alice",
+			SenderZoneID:		route.SourceZoneID,
+			SenderShardID:		route.SourceShardID,
+			Receiver:		"contract/vault",
+			ReceiverZoneID:		route.DestinationZoneID,
+			ReceiverShardID:	route.DestinationShardID,
+			ValueNAET:		sdkmath.NewInt(1),
+			Payload:		[]byte(fmt.Sprintf("payload-%d", i)),
+			PayloadType:		"contract.execute",
+			GasLimit:		100,
+			GasPrice:		sdkmath.OneInt(),
+			ForwardingFee:		sdkmath.OneInt(),
+			ExpiryHeight:		uint64(400 + i),
+			Bounce:			true,
+			ExecutionMode:		ExecutionModeAsync,
+			OrderingClass:		OrderingClassSenderOrdered,
+			RouteCommitment:	route.RouteCommitment,
+			CreatedAtHeight:	uint64(240 + i),
+			Nonce:			uint64(i + 1),
 		})
 		require.NoError(t, err)
 		outbox = append(outbox, msg)
@@ -132,10 +132,10 @@ func TestAetherMsgBusLoadRootsAreDeterministic(t *testing.T) {
 func lockedEscrow(t *testing.T, msg AetherMessage) AetherValueEscrow {
 	t.Helper()
 	escrow, err := NewAetherValueEscrow(AetherValueEscrow{
-		MsgID:       msg.MsgID,
-		ValueLocked: msg.ValueNAET,
-		FeeLocked:   msg.ForwardingFee,
-		Status:      AetherEscrowLocked,
+		MsgID:		msg.MsgID,
+		ValueLocked:	msg.ValueNAET,
+		FeeLocked:	msg.ForwardingFee,
+		Status:		AetherEscrowLocked,
 	})
 	require.NoError(t, err)
 	return escrow

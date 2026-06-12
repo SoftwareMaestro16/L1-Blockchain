@@ -12,134 +12,134 @@ type PaymentRoadmapTaskID string
 type PaymentRoadmapExitCriterionID string
 
 const (
-	PaymentRoadmapPhase0 PaymentRoadmapPhaseID = "phase_0_specification_and_test_vectors"
-	PaymentRoadmapPhase1 PaymentRoadmapPhaseID = "phase_1_base_channel_settlement"
-	PaymentRoadmapPhase2 PaymentRoadmapPhaseID = "phase_2_fraud_proofs_and_penalties"
-	PaymentRoadmapPhase3 PaymentRoadmapPhaseID = "phase_3_conditional_payments"
-	PaymentRoadmapPhase4 PaymentRoadmapPhaseID = "phase_4_routing_engine"
-	PaymentRoadmapPhase5 PaymentRoadmapPhaseID = "phase_5_virtual_channels"
-	PaymentRoadmapPhase6 PaymentRoadmapPhaseID = "phase_6_performance_and_operations"
+	PaymentRoadmapPhase0	PaymentRoadmapPhaseID	= "phase_0_specification_and_test_vectors"
+	PaymentRoadmapPhase1	PaymentRoadmapPhaseID	= "phase_1_base_channel_settlement"
+	PaymentRoadmapPhase2	PaymentRoadmapPhaseID	= "phase_2_fraud_proofs_and_penalties"
+	PaymentRoadmapPhase3	PaymentRoadmapPhaseID	= "phase_3_conditional_payments"
+	PaymentRoadmapPhase4	PaymentRoadmapPhaseID	= "phase_4_routing_engine"
+	PaymentRoadmapPhase5	PaymentRoadmapPhaseID	= "phase_5_virtual_channels"
+	PaymentRoadmapPhase6	PaymentRoadmapPhaseID	= "phase_6_performance_and_operations"
 )
 
 type PaymentRoadmapTask struct {
-	TaskID      PaymentRoadmapTaskID
-	Description string
-	Implemented bool
-	Evidence    []string
+	TaskID		PaymentRoadmapTaskID
+	Description	string
+	Implemented	bool
+	Evidence	[]string
 }
 
 type PaymentRoadmapExitCriterion struct {
-	CriterionID PaymentRoadmapExitCriterionID
-	Description string
-	Satisfied   bool
-	Evidence    []string
+	CriterionID	PaymentRoadmapExitCriterionID
+	Description	string
+	Satisfied	bool
+	Evidence	[]string
 }
 
 type PaymentRoadmapPhase struct {
-	PhaseID      PaymentRoadmapPhaseID
-	Title        string
-	Tasks        []PaymentRoadmapTask
-	ExitCriteria []PaymentRoadmapExitCriterion
+	PhaseID		PaymentRoadmapPhaseID
+	Title		string
+	Tasks		[]PaymentRoadmapTask
+	ExitCriteria	[]PaymentRoadmapExitCriterion
 }
 
 type PaymentRoadmapReport struct {
-	Phases             []PaymentRoadmapPhase
-	CompletedTaskCount uint64
-	TotalTaskCount     uint64
-	ExitCriteriaCount  uint64
-	ReportHash         string
+	Phases			[]PaymentRoadmapPhase
+	CompletedTaskCount	uint64
+	TotalTaskCount		uint64
+	ExitCriteriaCount	uint64
+	ReportHash		string
 }
 
 type PaymentRoadmapTestVector struct {
-	VectorID        string
-	ObjectType      string
-	ObjectID        string
-	CanonicalHash   string
-	SignatureDomain string
-	EvidenceHash    string
+	VectorID	string
+	ObjectType	string
+	ObjectID	string
+	CanonicalHash	string
+	SignatureDomain	string
+	EvidenceHash	string
 }
 
 type PaymentRoadmapFraudVector struct {
-	VectorID      string
-	ProofType     FraudProofType
-	ProofID       string
-	EvidenceHash  string
-	CanonicalHash string
-	PenaltyClass  PaymentPenaltyClass
+	VectorID	string
+	ProofType	FraudProofType
+	ProofID		string
+	EvidenceHash	string
+	CanonicalHash	string
+	PenaltyClass	PaymentPenaltyClass
 }
 
 type PaymentRoadmapTimeoutVector struct {
-	VectorID          string
-	ChannelID         string
-	UpstreamPromiseID string
-	DownstreamID      string
-	Margin            uint64
-	Valid             bool
-	EvidenceHash      string
+	VectorID		string
+	ChannelID		string
+	UpstreamPromiseID	string
+	DownstreamID		string
+	Margin			uint64
+	Valid			bool
+	EvidenceHash		string
 }
 
 type PaymentRoadmapBlockSTMPlan struct {
-	PlanID             string
-	IndependentGroups  [][]string
-	ConflictCount      uint64
-	DeferredAccounting bool
-	PlanHash           string
+	PlanID			string
+	IndependentGroups	[][]string
+	ConflictCount		uint64
+	DeferredAccounting	bool
+	PlanHash		string
 }
 
 type PaymentRoadmapConditionalVector struct {
-	VectorID          string
-	RouteID           string
-	PromiseIDs        []string
-	Mode              ConditionSettlementMode
-	Atomic            bool
-	ReserveReleased   bool
-	PreimageReplayKey string
-	EvidenceHash      string
+	VectorID		string
+	RouteID			string
+	PromiseIDs		[]string
+	Mode			ConditionSettlementMode
+	Atomic			bool
+	ReserveReleased		bool
+	PreimageReplayKey	string
+	EvidenceHash		string
 }
 
 type PaymentRoadmapRoutingVector struct {
-	VectorID           string
-	RouteHash          string
-	AttemptID          string
-	FailureClass       RouteFailureClass
-	CapacityAware      bool
-	FeeAware           bool
-	TimeoutAware       bool
-	FailureAware       bool
-	StructuredFailures bool
-	EvidenceHash       string
+	VectorID		string
+	RouteHash		string
+	AttemptID		string
+	FailureClass		RouteFailureClass
+	CapacityAware		bool
+	FeeAware		bool
+	TimeoutAware		bool
+	FailureAware		bool
+	StructuredFailures	bool
+	EvidenceHash		string
 }
 
 type PaymentRoadmapVirtualVector struct {
-	VectorID             string
-	VirtualChannelID     string
-	ParentChannelIDs     []string
-	ActivationProofHash  string
-	CloseProofHash       string
-	DisputeEvidenceHash  string
-	ReserveReleaseHashes []string
-	EndpointUpdateHash   string
-	Capacity             string
-	EvidenceHash         string
+	VectorID		string
+	VirtualChannelID	string
+	ParentChannelIDs	[]string
+	ActivationProofHash	string
+	CloseProofHash		string
+	DisputeEvidenceHash	string
+	ReserveReleaseHashes	[]string
+	EndpointUpdateHash	string
+	Capacity		string
+	EvidenceHash		string
 }
 
 type PaymentRoadmapOperationsVector struct {
-	VectorID             string
-	StoreV2LayoutHash    string
-	BlockSTMPlanHash     string
-	AdaptiveSnapshotHash string
-	RecoveryHash         string
-	WatcherReplayCount   uint64
-	CleanupCompletionIDs []string
-	MetricsHash          string
-	EvidenceHash         string
+	VectorID		string
+	StoreV2LayoutHash	string
+	BlockSTMPlanHash	string
+	AdaptiveSnapshotHash	string
+	RecoveryHash		string
+	WatcherReplayCount	uint64
+	CleanupCompletionIDs	[]string
+	MetricsHash		string
+	EvidenceHash		string
 }
 
 func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 	phases := []PaymentRoadmapPhase{
 		{
-			PhaseID: PaymentRoadmapPhase0,
-			Title:   "Specification and Test Vectors",
+			PhaseID:	PaymentRoadmapPhase0,
+			Title:		"Specification and Test Vectors",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase0_canonical_encoding", "Define canonical encoding for channel states, promises, deltas, and virtual channels.", "ComputeStateHash", "ComputeConditionalTransferPromiseHash", "ComputeAsyncDeltaHash", "ComputeVirtualChannelStateHash"),
 				roadmapTask("phase0_signature_domains", "Define signature domains.", "SignatureForState", "SignatureForPromise", "SignatureForAsyncDelta", "SignatureForVirtualChannel"),
@@ -156,8 +156,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase1,
-			Title:   "Base Channel Settlement",
+			PhaseID:	PaymentRoadmapPhase1,
+			Title:		"Base Channel Settlement",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase1_channel_state", "Implement payment channel state.", "ChannelRecord", "ChannelState", "PaymentsState"),
 				roadmapTask("phase1_open", "Implement channel open.", "OpenChannel", "OpenChannelFromRequest", "MsgOpenChannel"),
@@ -176,8 +176,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase2,
-			Title:   "Fraud Proofs and Penalties",
+			PhaseID:	PaymentRoadmapPhase2,
+			Title:		"Fraud Proofs and Penalties",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase2_double_sign", "Implement same-nonce double-sign proof.", "FraudProofTypeDoubleSign", "MsgSubmitDoubleSignProof"),
 				roadmapTask("phase2_stale_close", "Implement stale close proof.", "FraudProofTypeStaleClose", "MsgSubmitStaleCloseProof"),
@@ -194,8 +194,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase3,
-			Title:   "Conditional Payments",
+			PhaseID:	PaymentRoadmapPhase3,
+			Title:		"Conditional Payments",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase3_promise_object", "Implement promise object.", "ConditionalPromise", "BuildConditionalPromise", "SignatureForPromise"),
 				roadmapTask("phase3_hash_lock_resolution", "Implement hash-lock resolution.", "RevealPromisePreimage", "VerifyPromisePreimage", "MsgResolvePromise"),
@@ -212,8 +212,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase4,
-			Title:   "Routing Engine",
+			PhaseID:	PaymentRoadmapPhase4,
+			Title:		"Routing Engine",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase4_signed_gossip", "Implement signed gossip envelope.", "BuildRoutingGossipEnvelope", "SignedGossipEnvelope.ValidateAtHeight"),
 				roadmapTask("phase4_topology_database", "Implement topology database.", "TopologyStore", "ApplyGossipEnvelope", "PruneTopologyStore"),
@@ -230,8 +230,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase5,
-			Title:   "Virtual Channels",
+			PhaseID:	PaymentRoadmapPhase5,
+			Title:		"Virtual Channels",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase5_virtual_channel_state", "Implement virtual channel state.", "VirtualChannel", "BuildVirtualChannel", "ComputeVirtualChannelStateHash"),
 				roadmapTask("phase5_parent_reservation_accounting", "Implement parent-channel reservation accounting.", "VirtualParentReserve", "BuildVirtualParentReserve", "validateVirtualParentAccounting"),
@@ -248,8 +248,8 @@ func BuildPaymentImplementationRoadmap() PaymentRoadmapReport {
 			},
 		},
 		{
-			PhaseID: PaymentRoadmapPhase6,
-			Title:   "Performance and Operations",
+			PhaseID:	PaymentRoadmapPhase6,
+			Title:		"Performance and Operations",
 			Tasks: []PaymentRoadmapTask{
 				roadmapTask("phase6_store_v2_layout_benchmarks", "Add Store v2 layout benchmarks.", "BuildStoreV2Layout", "StoreV2Layout.Validate"),
 				roadmapTask("phase6_blockstm_batch_benchmarks", "Add BlockSTM settlement batch benchmarks.", "BuildPaymentRoadmapBlockSTMPlan", "ProfileBlockSTMConflicts"),
@@ -442,10 +442,10 @@ func ValidatePaymentRoadmapCanonicalTestVectors(vectors []PaymentRoadmapTestVect
 		return errors.New("payments roadmap requires four canonical vectors")
 	}
 	required := map[string]struct{}{
-		SignatureObjectState:   {},
-		SignatureObjectPromise: {},
-		SignatureObjectDelta:   {},
-		SignatureObjectVirtual: {},
+		SignatureObjectState:	{},
+		SignatureObjectPromise:	{},
+		SignatureObjectDelta:	{},
+		SignatureObjectVirtual:	{},
 	}
 	seen := map[string]struct{}{}
 	for _, vector := range vectors {
@@ -496,12 +496,12 @@ func BuildPaymentRoadmapFraudProofVectors(channel ChannelRecord, proofs []FraudP
 		}
 		canonical := ComputeCanonicalFraudEvidenceHash(channel, proof)
 		out = append(out, PaymentRoadmapFraudVector{
-			VectorID:      HashParts("payments-roadmap-fraud-vector", channel.ChannelID, proof.ProofID, string(proof.ProofType)),
-			ProofType:     proof.ProofType,
-			ProofID:       proof.ProofID,
-			EvidenceHash:  proof.EvidenceHash,
-			CanonicalHash: canonical,
-			PenaltyClass:  class,
+			VectorID:	HashParts("payments-roadmap-fraud-vector", channel.ChannelID, proof.ProofID, string(proof.ProofType)),
+			ProofType:	proof.ProofType,
+			ProofID:	proof.ProofID,
+			EvidenceHash:	proof.EvidenceHash,
+			CanonicalHash:	canonical,
+			PenaltyClass:	class,
 		}.Normalize())
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].VectorID < out[j].VectorID })
@@ -555,13 +555,13 @@ func BuildPaymentRoadmapTimeoutOrderingVector(channel ChannelRecord, upstream, d
 	downstream = downstream.Normalize()
 	err := ValidatePromiseTimeoutOrdering(channel, upstream, downstream, margin)
 	vector := PaymentRoadmapTimeoutVector{
-		VectorID:          HashParts("payments-roadmap-timeout-vector", channel.ChannelID, upstream.PromiseID, downstream.PromiseID, fmt.Sprintf("%020d", margin)),
-		ChannelID:         channel.ChannelID,
-		UpstreamPromiseID: upstream.PromiseID,
-		DownstreamID:      downstream.PromiseID,
-		Margin:            margin,
-		Valid:             err == nil,
-		EvidenceHash:      HashParts("payments-roadmap-timeout-evidence", upstream.PromiseHash, downstream.PromiseHash, fmt.Sprintf("%020d", margin), fmt.Sprintf("%t", err == nil)),
+		VectorID:		HashParts("payments-roadmap-timeout-vector", channel.ChannelID, upstream.PromiseID, downstream.PromiseID, fmt.Sprintf("%020d", margin)),
+		ChannelID:		channel.ChannelID,
+		UpstreamPromiseID:	upstream.PromiseID,
+		DownstreamID:		downstream.PromiseID,
+		Margin:			margin,
+		Valid:			err == nil,
+		EvidenceHash:		HashParts("payments-roadmap-timeout-evidence", upstream.PromiseHash, downstream.PromiseHash, fmt.Sprintf("%020d", margin), fmt.Sprintf("%t", err == nil)),
 	}
 	return vector.Normalize()
 }
@@ -597,10 +597,10 @@ func BuildPaymentRoadmapBlockSTMPlan(plans []BlockSTMAccessPlan) (PaymentRoadmap
 	}
 	profile := ProfileBlockSTMConflicts(plans)
 	out := PaymentRoadmapBlockSTMPlan{
-		PlanID:             HashParts("payments-roadmap-blockstm-plan", fmt.Sprintf("%020d", len(plans)), fmt.Sprintf("%020d", len(profile.Conflicts))),
-		IndependentGroups:  profile.ParallelizableGroups,
-		ConflictCount:      uint64(len(profile.Conflicts)),
-		DeferredAccounting: profile.GlobalAccountingDeferred,
+		PlanID:			HashParts("payments-roadmap-blockstm-plan", fmt.Sprintf("%020d", len(plans)), fmt.Sprintf("%020d", len(profile.Conflicts))),
+		IndependentGroups:	profile.ParallelizableGroups,
+		ConflictCount:		uint64(len(profile.Conflicts)),
+		DeferredAccounting:	profile.GlobalAccountingDeferred,
 	}
 	parts := []string{"payments-roadmap-blockstm-plan", out.PlanID, fmt.Sprintf("%020d", out.ConflictCount), fmt.Sprintf("%t", out.DeferredAccounting)}
 	for _, group := range out.IndependentGroups {
@@ -622,14 +622,14 @@ func BuildPaymentRoadmapConditionalVector(result BatchConditionSettlementResult,
 	}
 	sort.Strings(ids)
 	vector := PaymentRoadmapConditionalVector{
-		VectorID:          HashParts("payments-roadmap-conditional-vector", result.RouteID, string(mode), result.EvidenceHash),
-		RouteID:           result.RouteID,
-		PromiseIDs:        ids,
-		Mode:              mode,
-		Atomic:            len(result.ConditionRootUpdates) > 0 && len(result.Resolutions) == len(ids),
-		ReserveReleased:   reserveReleased,
-		PreimageReplayKey: replay.Normalize().EvidenceHash,
-		EvidenceHash:      HashParts("payments-roadmap-conditional-evidence", result.EvidenceHash, strings.Join(ids, "|"), fmt.Sprintf("%t", reserveReleased), replay.Normalize().EvidenceHash),
+		VectorID:		HashParts("payments-roadmap-conditional-vector", result.RouteID, string(mode), result.EvidenceHash),
+		RouteID:		result.RouteID,
+		PromiseIDs:		ids,
+		Mode:			mode,
+		Atomic:			len(result.ConditionRootUpdates) > 0 && len(result.Resolutions) == len(ids),
+		ReserveReleased:	reserveReleased,
+		PreimageReplayKey:	replay.Normalize().EvidenceHash,
+		EvidenceHash:		HashParts("payments-roadmap-conditional-evidence", result.EvidenceHash, strings.Join(ids, "|"), fmt.Sprintf("%t", reserveReleased), replay.Normalize().EvidenceHash),
 	}
 	vector = vector.Normalize()
 	return vector, vector.Validate()
@@ -689,16 +689,16 @@ func BuildPaymentRoadmapRoutingVector(route ScoredRoute, attempt RouteAttempt, f
 		return PaymentRoadmapRoutingVector{}, err
 	}
 	vector := PaymentRoadmapRoutingVector{
-		VectorID:           HashParts("payments-roadmap-routing-vector", route.ScoreHash, attempt.AttemptID, route.Amount, string(failure.FailureClass)),
-		RouteHash:          route.ScoreHash,
-		AttemptID:          attempt.AttemptID,
-		FailureClass:       failure.FailureClass,
-		CapacityAware:      route.MinCapacity != "" && route.MinCapacity != "0",
-		FeeAware:           route.TotalFee != "",
-		TimeoutAware:       failure.FailureClass == RouteFailureTimeout || failure.ObservedHeight > 0,
-		FailureAware:       IsRouteFailureClass(failure.FailureClass),
-		StructuredFailures: failure.ChannelID != "" && failure.From != "" && failure.To != "",
-		EvidenceHash:       HashParts("payments-roadmap-routing-evidence", route.ScoreHash, attempt.AttemptID, failure.ChannelID, string(failure.FailureClass), fmt.Sprintf("%020d", failure.ObservedHeight)),
+		VectorID:		HashParts("payments-roadmap-routing-vector", route.ScoreHash, attempt.AttemptID, route.Amount, string(failure.FailureClass)),
+		RouteHash:		route.ScoreHash,
+		AttemptID:		attempt.AttemptID,
+		FailureClass:		failure.FailureClass,
+		CapacityAware:		route.MinCapacity != "" && route.MinCapacity != "0",
+		FeeAware:		route.TotalFee != "",
+		TimeoutAware:		failure.FailureClass == RouteFailureTimeout || failure.ObservedHeight > 0,
+		FailureAware:		IsRouteFailureClass(failure.FailureClass),
+		StructuredFailures:	failure.ChannelID != "" && failure.From != "" && failure.To != "",
+		EvidenceHash:		HashParts("payments-roadmap-routing-evidence", route.ScoreHash, attempt.AttemptID, failure.ChannelID, string(failure.FailureClass), fmt.Sprintf("%020d", failure.ObservedHeight)),
 	}
 	vector = vector.Normalize()
 	return vector, vector.Validate()
@@ -774,16 +774,16 @@ func BuildPaymentRoadmapVirtualVector(vc VirtualChannel, activation VirtualActiv
 	}
 	sort.Strings(releaseHashes)
 	vector := PaymentRoadmapVirtualVector{
-		VectorID:             HashParts("payments-roadmap-virtual-vector", vc.VirtualChannelID, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash),
-		VirtualChannelID:     vc.VirtualChannelID,
-		ParentChannelIDs:     normalizeHashSlice(vc.ParentChannelIDs),
-		ActivationProofHash:  activation.ProofHash,
-		CloseProofHash:       closeProof.ProofHash,
-		DisputeEvidenceHash:  dispute.EvidenceHash,
-		ReserveReleaseHashes: releaseHashes,
-		EndpointUpdateHash:   endpointUpdate.StateHash,
-		Capacity:             vc.Capacity,
-		EvidenceHash:         HashParts("payments-roadmap-virtual-evidence", vc.StateHash, endpointUpdate.StateHash, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash, strings.Join(releaseHashes, "|")),
+		VectorID:		HashParts("payments-roadmap-virtual-vector", vc.VirtualChannelID, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash),
+		VirtualChannelID:	vc.VirtualChannelID,
+		ParentChannelIDs:	normalizeHashSlice(vc.ParentChannelIDs),
+		ActivationProofHash:	activation.ProofHash,
+		CloseProofHash:		closeProof.ProofHash,
+		DisputeEvidenceHash:	dispute.EvidenceHash,
+		ReserveReleaseHashes:	releaseHashes,
+		EndpointUpdateHash:	endpointUpdate.StateHash,
+		Capacity:		vc.Capacity,
+		EvidenceHash:		HashParts("payments-roadmap-virtual-evidence", vc.StateHash, endpointUpdate.StateHash, activation.ProofHash, closeProof.ProofHash, dispute.EvidenceHash, strings.Join(releaseHashes, "|")),
 	}
 	vector = vector.Normalize()
 	return vector, vector.Validate()
@@ -831,11 +831,11 @@ func (v PaymentRoadmapVirtualVector) Validate() error {
 		}
 	}
 	for name, value := range map[string]string{
-		"activation proof": vector.ActivationProofHash,
-		"close proof":      vector.CloseProofHash,
-		"dispute evidence": vector.DisputeEvidenceHash,
-		"endpoint update":  vector.EndpointUpdateHash,
-		"virtual evidence": vector.EvidenceHash,
+		"activation proof":	vector.ActivationProofHash,
+		"close proof":		vector.CloseProofHash,
+		"dispute evidence":	vector.DisputeEvidenceHash,
+		"endpoint update":	vector.EndpointUpdateHash,
+		"virtual evidence":	vector.EvidenceHash,
 	} {
 		if err := ValidateHash("payments roadmap virtual "+name, value); err != nil {
 			return err
@@ -863,15 +863,15 @@ func BuildPaymentRoadmapOperationsVector(layout StoreV2Layout, blockPlan Payment
 	layoutHash := computePaymentRoadmapStoreV2LayoutHash(layout)
 	recoveryHash := computePaymentRoadmapRecoveryHash(recovery)
 	vector := PaymentRoadmapOperationsVector{
-		VectorID:             HashParts("payments-roadmap-operations-vector", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash),
-		StoreV2LayoutHash:    layoutHash,
-		BlockSTMPlanHash:     blockPlan.PlanHash,
-		AdaptiveSnapshotHash: snapshot.SnapshotHash,
-		RecoveryHash:         recoveryHash,
-		WatcherReplayCount:   uint64(len(snapshot.WatcherReplayEvents)),
-		CleanupCompletionIDs: cleanupIDs,
-		MetricsHash:          HashParts("payments-roadmap-ops-metrics", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, fmt.Sprintf("%020d", len(snapshot.WatcherReplayEvents)), fmt.Sprintf("%020d", cleanup.ProcessedFinalizations), fmt.Sprintf("%020d", cleanup.ProcessedPromiseExpiries)),
-		EvidenceHash:         HashParts("payments-roadmap-operations-evidence", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash, strings.Join(cleanupIDs, "|")),
+		VectorID:		HashParts("payments-roadmap-operations-vector", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash),
+		StoreV2LayoutHash:	layoutHash,
+		BlockSTMPlanHash:	blockPlan.PlanHash,
+		AdaptiveSnapshotHash:	snapshot.SnapshotHash,
+		RecoveryHash:		recoveryHash,
+		WatcherReplayCount:	uint64(len(snapshot.WatcherReplayEvents)),
+		CleanupCompletionIDs:	cleanupIDs,
+		MetricsHash:		HashParts("payments-roadmap-ops-metrics", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, fmt.Sprintf("%020d", len(snapshot.WatcherReplayEvents)), fmt.Sprintf("%020d", cleanup.ProcessedFinalizations), fmt.Sprintf("%020d", cleanup.ProcessedPromiseExpiries)),
+		EvidenceHash:		HashParts("payments-roadmap-operations-evidence", layoutHash, blockPlan.PlanHash, snapshot.SnapshotHash, recoveryHash, strings.Join(cleanupIDs, "|")),
 	}
 	vector = vector.Normalize()
 	return vector, vector.Validate()
@@ -892,13 +892,13 @@ func (v PaymentRoadmapOperationsVector) Normalize() PaymentRoadmapOperationsVect
 func (v PaymentRoadmapOperationsVector) Validate() error {
 	vector := v.Normalize()
 	for name, value := range map[string]string{
-		"vector id":         vector.VectorID,
-		"store v2 layout":   vector.StoreV2LayoutHash,
-		"blockstm plan":     vector.BlockSTMPlanHash,
-		"adaptive snapshot": vector.AdaptiveSnapshotHash,
-		"recovery":          vector.RecoveryHash,
-		"metrics":           vector.MetricsHash,
-		"evidence":          vector.EvidenceHash,
+		"vector id":		vector.VectorID,
+		"store v2 layout":	vector.StoreV2LayoutHash,
+		"blockstm plan":	vector.BlockSTMPlanHash,
+		"adaptive snapshot":	vector.AdaptiveSnapshotHash,
+		"recovery":		vector.RecoveryHash,
+		"metrics":		vector.MetricsHash,
+		"evidence":		vector.EvidenceHash,
 	} {
 		if err := ValidateHash("payments roadmap operations "+name, value); err != nil {
 			return err
@@ -976,10 +976,10 @@ func roadmapCriterion(id PaymentRoadmapExitCriterionID, description string, evid
 
 func roadmapTestVector(objectType, objectID, canonicalHash, signatureDomain string) PaymentRoadmapTestVector {
 	vector := PaymentRoadmapTestVector{
-		ObjectType:      objectType,
-		ObjectID:        objectID,
-		CanonicalHash:   canonicalHash,
-		SignatureDomain: signatureDomain,
+		ObjectType:		objectType,
+		ObjectID:		objectID,
+		CanonicalHash:		canonicalHash,
+		SignatureDomain:	signatureDomain,
 	}
 	vector.EvidenceHash = HashParts("payments-roadmap-canonical-vector", objectType, objectID, canonicalHash, signatureDomain)
 	vector.VectorID = HashParts("payments-roadmap-canonical-vector-id", vector.EvidenceHash)

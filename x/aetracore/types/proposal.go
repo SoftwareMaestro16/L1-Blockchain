@@ -7,24 +7,24 @@ import (
 )
 
 type ProposalItem struct {
-	ZoneID          ZoneID
-	ShardID         ShardID
-	TxHash          string
-	PriorityClass   uint32
-	AdmissionHeight uint64
-	TxIndex         uint32
-	MessageIndex    uint32
+	ZoneID		ZoneID
+	ShardID		ShardID
+	TxHash		string
+	PriorityClass	uint32
+	AdmissionHeight	uint64
+	TxIndex		uint32
+	MessageIndex	uint32
 }
 
 type ProposalGroup struct {
-	ZoneID  ZoneID
-	ShardID ShardID
-	Items   []ProposalItem
+	ZoneID	ZoneID
+	ShardID	ShardID
+	Items	[]ProposalItem
 }
 
 type ProposalSchedule struct {
-	Height uint64
-	Groups []ProposalGroup
+	Height	uint64
+	Groups	[]ProposalGroup
 }
 
 func BuildProposalSchedule(height uint64, items []ProposalItem, params AetraCoreParams) (ProposalSchedule, error) {

@@ -24,13 +24,13 @@ func TestAVMAsyncFailureRecordCoversSection12FailureClasses(t *testing.T) {
 
 	for i, class := range classes {
 		record, err := NewAVMAsyncFailureRecord(AVMAsyncFailureRecord{
-			MessageID:      msg.ID,
-			ZoneID:         msg.DestinationZone,
-			FailureClass:   class,
-			FailedHeight:   14,
-			Attempt:        uint32(i + 1),
-			GasUsed:        uint64(i),
-			RetryExhausted: class == AVMAsyncFailureRetryExhausted,
+			MessageID:	msg.ID,
+			ZoneID:		msg.DestinationZone,
+			FailureClass:	class,
+			FailedHeight:	14,
+			Attempt:	uint32(i + 1),
+			GasUsed:	uint64(i),
+			RetryExhausted:	class == AVMAsyncFailureRetryExhausted,
 		})
 		require.NoError(t, err)
 		require.NoError(t, record.Validate())
@@ -41,12 +41,12 @@ func TestAVMAsyncFailureRecordCoversSection12FailureClasses(t *testing.T) {
 	}
 
 	badClass := AVMAsyncFailureRecord{
-		MessageID:    msg.ID,
-		ZoneID:       msg.DestinationZone,
-		FailureClass: "network_timeout",
-		ErrorCode:    string(AVMAsyncErrorHandlerFailure),
-		FailedHeight: 14,
-		Attempt:      1,
+		MessageID:	msg.ID,
+		ZoneID:		msg.DestinationZone,
+		FailureClass:	"network_timeout",
+		ErrorCode:	string(AVMAsyncErrorHandlerFailure),
+		FailedHeight:	14,
+		Attempt:	1,
 	}
 	_, err := NewAVMAsyncFailureRecord(badClass)
 	require.ErrorContains(t, err, "invalid AVM async failure class")
@@ -195,13 +195,13 @@ func TestAVMAsyncFailureDeadLetterTriggerRejectsMismatches(t *testing.T) {
 	require.ErrorContains(t, err, "not a dead letter trigger")
 
 	bounceFailed, err := NewAVMAsyncFailureRecord(AVMAsyncFailureRecord{
-		MessageID:    msg.ID,
-		ZoneID:       msg.DestinationZone,
-		FailureClass: AVMAsyncFailureHandlerFailure,
-		ErrorCode:    string(AVMAsyncErrorBounceFailed),
-		FailedHeight: 15,
-		Attempt:      2,
-		GasUsed:      3,
+		MessageID:	msg.ID,
+		ZoneID:		msg.DestinationZone,
+		FailureClass:	AVMAsyncFailureHandlerFailure,
+		ErrorCode:	string(AVMAsyncErrorBounceFailed),
+		FailedHeight:	15,
+		Attempt:	2,
+		GasUsed:	3,
 	})
 	require.NoError(t, err)
 	queue, record, receipt, err := DeadLetterAVMAsyncFailure(queue, bounceFailed, AVMDeadLetterTriggerBounceFailed, "", 0, 3, 15)
@@ -251,13 +251,13 @@ func FuzzAVMAsyncFailureRecordValidation(f *testing.F) {
 			failedHeight = 1
 		}
 		record, err := NewAVMAsyncFailureRecord(AVMAsyncFailureRecord{
-			MessageID:      msg.ID,
-			ZoneID:         msg.DestinationZone,
-			FailureClass:   class,
-			FailedHeight:   failedHeight,
-			Attempt:        attempt,
-			GasUsed:        gasUsed,
-			RetryExhausted: class == AVMAsyncFailureRetryExhausted,
+			MessageID:	msg.ID,
+			ZoneID:		msg.DestinationZone,
+			FailureClass:	class,
+			FailedHeight:	failedHeight,
+			Attempt:	attempt,
+			GasUsed:	gasUsed,
+			RetryExhausted:	class == AVMAsyncFailureRetryExhausted,
 		})
 		require.NoError(t, err)
 		require.NoError(t, record.Validate())
@@ -279,13 +279,13 @@ func testAVMFailureMessage(t *testing.T, valueNAET uint64) AVMAsyncMessage {
 func testAVMFailureRecord(t *testing.T, msg AVMAsyncMessage, class AVMAsyncFailureClass) AVMAsyncFailureRecord {
 	t.Helper()
 	record, err := NewAVMAsyncFailureRecord(AVMAsyncFailureRecord{
-		MessageID:      msg.ID,
-		ZoneID:         msg.DestinationZone,
-		FailureClass:   class,
-		FailedHeight:   14,
-		Attempt:        1,
-		GasUsed:        11,
-		RetryExhausted: class == AVMAsyncFailureRetryExhausted,
+		MessageID:	msg.ID,
+		ZoneID:		msg.DestinationZone,
+		FailureClass:	class,
+		FailedHeight:	14,
+		Attempt:	1,
+		GasUsed:	11,
+		RetryExhausted:	class == AVMAsyncFailureRetryExhausted,
 	})
 	require.NoError(t, err)
 	return record

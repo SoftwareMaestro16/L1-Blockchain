@@ -17,32 +17,32 @@ func TestNativePerformanceOracleSubmitFinalizeAndExport(t *testing.T) {
 	ctx := app.NewContext(false)
 	msgServer := performancekeeper.NewMsgServerImpl(app.PerformanceKeeper)
 	report, err := types.NewPerformanceReport(types.PerformanceReport{
-		Epoch:              1,
-		ValidatorAddress:   "validator-a",
-		ReporterAddress:    "reporter-a",
-		Source:             types.ReportSourceObserver,
-		UptimeSignedBlocks: 90,
-		UptimeTotalBlocks:  100,
-		LatencyMillis:      100,
-		ResponseTimeMillis: 200,
-		MissedBlocks:       1,
-		MissedWindowBlocks: 100,
-		PeerScoreBps:       9_000,
-		SubmittedHeight:    10,
-		Slashable:          true,
+		Epoch:			1,
+		ValidatorAddress:	"validator-a",
+		ReporterAddress:	"reporter-a",
+		Source:			types.ReportSourceObserver,
+		UptimeSignedBlocks:	90,
+		UptimeTotalBlocks:	100,
+		LatencyMillis:		100,
+		ResponseTimeMillis:	200,
+		MissedBlocks:		1,
+		MissedWindowBlocks:	100,
+		PeerScoreBps:		9_000,
+		SubmittedHeight:	10,
+		Slashable:		true,
 	})
 	require.NoError(t, err)
 	reportJSON, err := json.Marshal(report)
 	require.NoError(t, err)
 
 	_, err = msgServer.SubmitPerformanceReport(ctx, &performancepb.MsgSubmitPerformanceReport{
-		Authority:  app.PerformanceKeeper.Authority(),
-		ReportJson: string(reportJSON),
+		Authority:	app.PerformanceKeeper.Authority(),
+		ReportJson:	string(reportJSON),
 	})
 	require.NoError(t, err)
 	finalized, err := msgServer.FinalizePerformanceEpoch(ctx, &performancepb.MsgFinalizePerformanceEpoch{
-		Authority: app.PerformanceKeeper.Authority(),
-		Epoch:     1,
+		Authority:	app.PerformanceKeeper.Authority(),
+		Epoch:		1,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, finalized.EpochJson)

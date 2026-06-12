@@ -14,157 +14,157 @@ type ServiceRoadmapTaskID string
 type ServiceRoadmapExitCriterionID string
 
 const (
-	ServiceRoadmapPhaseSpecificationCompatibility ServiceRoadmapPhaseID = "phase_0_specification_and_compatibility"
-	ServiceRoadmapPhaseCoreRegistry               ServiceRoadmapPhaseID = "phase_1_core_registry"
-	ServiceRoadmapPhaseInterfaceSystem            ServiceRoadmapPhaseID = "phase_2_interface_system"
-	ServiceRoadmapPhaseUnifiedCallsReceipts       ServiceRoadmapPhaseID = "phase_3_unified_calls_and_receipts"
-	ServiceRoadmapPhasePayments                   ServiceRoadmapPhaseID = "phase_4_payments"
-	ServiceRoadmapPhaseOffChainMixedServices      ServiceRoadmapPhaseID = "phase_5_off_chain_and_mixed_services"
-	ServiceRoadmapPhaseFogMarketProviders         ServiceRoadmapPhaseID = "phase_6_fog_market_providers"
-	ServiceRoadmapPhaseSDKUXTooling               ServiceRoadmapPhaseID = "phase_7_sdk_and_ux_tooling"
-	ServiceRoadmapPhasePerformanceHardening       ServiceRoadmapPhaseID = "phase_8_performance_hardening"
+	ServiceRoadmapPhaseSpecificationCompatibility	ServiceRoadmapPhaseID	= "phase_0_specification_and_compatibility"
+	ServiceRoadmapPhaseCoreRegistry			ServiceRoadmapPhaseID	= "phase_1_core_registry"
+	ServiceRoadmapPhaseInterfaceSystem		ServiceRoadmapPhaseID	= "phase_2_interface_system"
+	ServiceRoadmapPhaseUnifiedCallsReceipts		ServiceRoadmapPhaseID	= "phase_3_unified_calls_and_receipts"
+	ServiceRoadmapPhasePayments			ServiceRoadmapPhaseID	= "phase_4_payments"
+	ServiceRoadmapPhaseOffChainMixedServices	ServiceRoadmapPhaseID	= "phase_5_off_chain_and_mixed_services"
+	ServiceRoadmapPhaseFogMarketProviders		ServiceRoadmapPhaseID	= "phase_6_fog_market_providers"
+	ServiceRoadmapPhaseSDKUXTooling			ServiceRoadmapPhaseID	= "phase_7_sdk_and_ux_tooling"
+	ServiceRoadmapPhasePerformanceHardening		ServiceRoadmapPhaseID	= "phase_8_performance_hardening"
 
-	ServiceRoadmapTaskAddAvailabilityCommitments      ServiceRoadmapTaskID = "add_availability_commitments"
-	ServiceRoadmapTaskAddCallbacksRetries             ServiceRoadmapTaskID = "add_callbacks_and_retries"
-	ServiceRoadmapTaskAddCallEnvelopeValidation       ServiceRoadmapTaskID = "add_call_envelope_validation"
-	ServiceRoadmapTaskAddCLICommandGeneration         ServiceRoadmapTaskID = "add_cli_command_generation_from_interface_schema"
-	ServiceRoadmapTaskAddCollateralStaking            ServiceRoadmapTaskID = "add_collateral_staking"
-	ServiceRoadmapTaskAddDeterministicReceipts        ServiceRoadmapTaskID = "add_deterministic_receipts"
-	ServiceRoadmapTaskAddEscrowSettlement             ServiceRoadmapTaskID = "add_escrow_settlement"
-	ServiceRoadmapTaskAddFallbackExecutionHooks       ServiceRoadmapTaskID = "add_fallback_execution_hooks"
-	ServiceRoadmapTaskAddExportImport                 ServiceRoadmapTaskID = "add_export_and_import"
-	ServiceRoadmapTaskAddIdentityBindingPlaceholder   ServiceRoadmapTaskID = "add_identity_binding_placeholder"
-	ServiceRoadmapTaskAddInterfaceCallBuilder         ServiceRoadmapTaskID = "add_interface_driven_call_builder"
-	ServiceRoadmapTaskAddInterfaceHashValidation      ServiceRoadmapTaskID = "add_interface_hash_validation"
-	ServiceRoadmapTaskAddInterfaceProofQuery          ServiceRoadmapTaskID = "add_interface_proof_query"
-	ServiceRoadmapTaskAddInterfaceRegistration        ServiceRoadmapTaskID = "add_interface_registration"
-	ServiceRoadmapTaskAddMeteredUsageReceipt          ServiceRoadmapTaskID = "add_metered_usage_receipt"
-	ServiceRoadmapTaskAddMethodSchema                 ServiceRoadmapTaskID = "add_method_schema"
-	ServiceRoadmapTaskAddNameOwnerIndexes             ServiceRoadmapTaskID = "add_service_name_and_owner_indexes"
-	ServiceRoadmapTaskAddNoncesIdempotency            ServiceRoadmapTaskID = "add_nonces_and_idempotency"
-	ServiceRoadmapTaskAddPaymentModelQuery            ServiceRoadmapTaskID = "add_payment_model_query"
-	ServiceRoadmapTaskAddPerCallPayment               ServiceRoadmapTaskID = "add_per_call_payment"
-	ServiceRoadmapTaskAddProviderCollateralPenalties  ServiceRoadmapTaskID = "add_provider_collateral_penalties"
-	ServiceRoadmapTaskAddProviderRegistry             ServiceRoadmapTaskID = "add_provider_registry"
-	ServiceRoadmapTaskAddProviderSelectionQuery       ServiceRoadmapTaskID = "add_provider_selection_query"
-	ServiceRoadmapTaskAddProofVerificationHelpers     ServiceRoadmapTaskID = "add_proof_verification_helpers"
-	ServiceRoadmapTaskAddProofQuery                   ServiceRoadmapTaskID = "add_service_proof_query"
-	ServiceRoadmapTaskAddReputationCommitments        ServiceRoadmapTaskID = "add_reputation_commitments"
-	ServiceRoadmapTaskAddResultAnchoring              ServiceRoadmapTaskID = "add_result_anchoring"
-	ServiceRoadmapTaskAddReceiptProofBenchmarks       ServiceRoadmapTaskID = "add_receipt_proof_generation_benchmarks"
-	ServiceRoadmapTaskAddRegistryLookupBenchmarks     ServiceRoadmapTaskID = "add_registry_lookup_benchmarks"
-	ServiceRoadmapTaskAddServiceCallThroughputTests   ServiceRoadmapTaskID = "add_service_call_throughput_tests"
-	ServiceRoadmapTaskAddServiceResolverSDK           ServiceRoadmapTaskID = "add_service_resolver_sdk"
-	ServiceRoadmapTaskAddSDKInterfaceVerifier         ServiceRoadmapTaskID = "add_sdk_interface_verifier"
-	ServiceRoadmapTaskAddServiceRegistrationUpdate    ServiceRoadmapTaskID = "add_service_registration_and_update"
-	ServiceRoadmapTaskAddSignedRequestResponseFormat  ServiceRoadmapTaskID = "add_signed_request_and_response_format"
-	ServiceRoadmapTaskAddStoreV2Benchmarks            ServiceRoadmapTaskID = "add_store_v2_read_write_benchmarks"
-	ServiceRoadmapTaskAddBlockSTMConflictBenchmarks   ServiceRoadmapTaskID = "add_blockstm_conflict_benchmarks"
-	ServiceRoadmapTaskAddMixedDisputeLoadTests        ServiceRoadmapTaskID = "add_mixed_service_dispute_load_tests"
-	ServiceRoadmapTaskAddMixedServiceChallengeFlow    ServiceRoadmapTaskID = "add_mixed_service_challenge_flow"
-	ServiceRoadmapTaskAddWalletMetadataFormat         ServiceRoadmapTaskID = "add_wallet_metadata_format"
-	ServiceRoadmapTaskDefineCallEnvelope              ServiceRoadmapTaskID = "define_call_envelope"
-	ServiceRoadmapTaskDefinePaymentModelEnum          ServiceRoadmapTaskID = "define_payment_model_enum"
-	ServiceRoadmapTaskDefineReceiptFormat             ServiceRoadmapTaskID = "define_receipt_format"
-	ServiceRoadmapTaskDefineTrustVerificationEnums    ServiceRoadmapTaskID = "define_trust_and_verification_model_enums"
-	ServiceRoadmapTaskFinalizeDescriptorSchema        ServiceRoadmapTaskID = "finalize_service_descriptor_schema"
-	ServiceRoadmapTaskFinalizeInterfaceSchema         ServiceRoadmapTaskID = "finalize_interface_schema_format"
-	ServiceRoadmapTaskImplementServiceCallsModule     ServiceRoadmapTaskID = "implement_x_servicecalls"
-	ServiceRoadmapTaskImplementServiceInterfaceModule ServiceRoadmapTaskID = "implement_x_serviceinterface"
-	ServiceRoadmapTaskImplementServicePaymentsModule  ServiceRoadmapTaskID = "implement_x_servicepayments"
-	ServiceRoadmapTaskImplementServiceProvidersModule ServiceRoadmapTaskID = "implement_x_serviceproviders"
-	ServiceRoadmapTaskImplementServiceReceiptsModule  ServiceRoadmapTaskID = "implement_x_servicereceipts"
-	ServiceRoadmapTaskImplementServicesModule         ServiceRoadmapTaskID = "implement_x_services"
-	ServiceRoadmapTaskIntegrateBankFinancialZone      ServiceRoadmapTaskID = "integrate_with_bank_or_financial_zone"
-	ServiceRoadmapTaskMapExistingModules              ServiceRoadmapTaskID = "map_existing_aetra_modules_to_on_chain_services"
+	ServiceRoadmapTaskAddAvailabilityCommitments		ServiceRoadmapTaskID	= "add_availability_commitments"
+	ServiceRoadmapTaskAddCallbacksRetries			ServiceRoadmapTaskID	= "add_callbacks_and_retries"
+	ServiceRoadmapTaskAddCallEnvelopeValidation		ServiceRoadmapTaskID	= "add_call_envelope_validation"
+	ServiceRoadmapTaskAddCLICommandGeneration		ServiceRoadmapTaskID	= "add_cli_command_generation_from_interface_schema"
+	ServiceRoadmapTaskAddCollateralStaking			ServiceRoadmapTaskID	= "add_collateral_staking"
+	ServiceRoadmapTaskAddDeterministicReceipts		ServiceRoadmapTaskID	= "add_deterministic_receipts"
+	ServiceRoadmapTaskAddEscrowSettlement			ServiceRoadmapTaskID	= "add_escrow_settlement"
+	ServiceRoadmapTaskAddFallbackExecutionHooks		ServiceRoadmapTaskID	= "add_fallback_execution_hooks"
+	ServiceRoadmapTaskAddExportImport			ServiceRoadmapTaskID	= "add_export_and_import"
+	ServiceRoadmapTaskAddIdentityBindingPlaceholder		ServiceRoadmapTaskID	= "add_identity_binding_placeholder"
+	ServiceRoadmapTaskAddInterfaceCallBuilder		ServiceRoadmapTaskID	= "add_interface_driven_call_builder"
+	ServiceRoadmapTaskAddInterfaceHashValidation		ServiceRoadmapTaskID	= "add_interface_hash_validation"
+	ServiceRoadmapTaskAddInterfaceProofQuery		ServiceRoadmapTaskID	= "add_interface_proof_query"
+	ServiceRoadmapTaskAddInterfaceRegistration		ServiceRoadmapTaskID	= "add_interface_registration"
+	ServiceRoadmapTaskAddMeteredUsageReceipt		ServiceRoadmapTaskID	= "add_metered_usage_receipt"
+	ServiceRoadmapTaskAddMethodSchema			ServiceRoadmapTaskID	= "add_method_schema"
+	ServiceRoadmapTaskAddNameOwnerIndexes			ServiceRoadmapTaskID	= "add_service_name_and_owner_indexes"
+	ServiceRoadmapTaskAddNoncesIdempotency			ServiceRoadmapTaskID	= "add_nonces_and_idempotency"
+	ServiceRoadmapTaskAddPaymentModelQuery			ServiceRoadmapTaskID	= "add_payment_model_query"
+	ServiceRoadmapTaskAddPerCallPayment			ServiceRoadmapTaskID	= "add_per_call_payment"
+	ServiceRoadmapTaskAddProviderCollateralPenalties	ServiceRoadmapTaskID	= "add_provider_collateral_penalties"
+	ServiceRoadmapTaskAddProviderRegistry			ServiceRoadmapTaskID	= "add_provider_registry"
+	ServiceRoadmapTaskAddProviderSelectionQuery		ServiceRoadmapTaskID	= "add_provider_selection_query"
+	ServiceRoadmapTaskAddProofVerificationHelpers		ServiceRoadmapTaskID	= "add_proof_verification_helpers"
+	ServiceRoadmapTaskAddProofQuery				ServiceRoadmapTaskID	= "add_service_proof_query"
+	ServiceRoadmapTaskAddReputationCommitments		ServiceRoadmapTaskID	= "add_reputation_commitments"
+	ServiceRoadmapTaskAddResultAnchoring			ServiceRoadmapTaskID	= "add_result_anchoring"
+	ServiceRoadmapTaskAddReceiptProofBenchmarks		ServiceRoadmapTaskID	= "add_receipt_proof_generation_benchmarks"
+	ServiceRoadmapTaskAddRegistryLookupBenchmarks		ServiceRoadmapTaskID	= "add_registry_lookup_benchmarks"
+	ServiceRoadmapTaskAddServiceCallThroughputTests		ServiceRoadmapTaskID	= "add_service_call_throughput_tests"
+	ServiceRoadmapTaskAddServiceResolverSDK			ServiceRoadmapTaskID	= "add_service_resolver_sdk"
+	ServiceRoadmapTaskAddSDKInterfaceVerifier		ServiceRoadmapTaskID	= "add_sdk_interface_verifier"
+	ServiceRoadmapTaskAddServiceRegistrationUpdate		ServiceRoadmapTaskID	= "add_service_registration_and_update"
+	ServiceRoadmapTaskAddSignedRequestResponseFormat	ServiceRoadmapTaskID	= "add_signed_request_and_response_format"
+	ServiceRoadmapTaskAddStoreV2Benchmarks			ServiceRoadmapTaskID	= "add_store_v2_read_write_benchmarks"
+	ServiceRoadmapTaskAddBlockSTMConflictBenchmarks		ServiceRoadmapTaskID	= "add_blockstm_conflict_benchmarks"
+	ServiceRoadmapTaskAddMixedDisputeLoadTests		ServiceRoadmapTaskID	= "add_mixed_service_dispute_load_tests"
+	ServiceRoadmapTaskAddMixedServiceChallengeFlow		ServiceRoadmapTaskID	= "add_mixed_service_challenge_flow"
+	ServiceRoadmapTaskAddWalletMetadataFormat		ServiceRoadmapTaskID	= "add_wallet_metadata_format"
+	ServiceRoadmapTaskDefineCallEnvelope			ServiceRoadmapTaskID	= "define_call_envelope"
+	ServiceRoadmapTaskDefinePaymentModelEnum		ServiceRoadmapTaskID	= "define_payment_model_enum"
+	ServiceRoadmapTaskDefineReceiptFormat			ServiceRoadmapTaskID	= "define_receipt_format"
+	ServiceRoadmapTaskDefineTrustVerificationEnums		ServiceRoadmapTaskID	= "define_trust_and_verification_model_enums"
+	ServiceRoadmapTaskFinalizeDescriptorSchema		ServiceRoadmapTaskID	= "finalize_service_descriptor_schema"
+	ServiceRoadmapTaskFinalizeInterfaceSchema		ServiceRoadmapTaskID	= "finalize_interface_schema_format"
+	ServiceRoadmapTaskImplementServiceCallsModule		ServiceRoadmapTaskID	= "implement_x_servicecalls"
+	ServiceRoadmapTaskImplementServiceInterfaceModule	ServiceRoadmapTaskID	= "implement_x_serviceinterface"
+	ServiceRoadmapTaskImplementServicePaymentsModule	ServiceRoadmapTaskID	= "implement_x_servicepayments"
+	ServiceRoadmapTaskImplementServiceProvidersModule	ServiceRoadmapTaskID	= "implement_x_serviceproviders"
+	ServiceRoadmapTaskImplementServiceReceiptsModule	ServiceRoadmapTaskID	= "implement_x_servicereceipts"
+	ServiceRoadmapTaskImplementServicesModule		ServiceRoadmapTaskID	= "implement_x_services"
+	ServiceRoadmapTaskIntegrateBankFinancialZone		ServiceRoadmapTaskID	= "integrate_with_bank_or_financial_zone"
+	ServiceRoadmapTaskMapExistingModules			ServiceRoadmapTaskID	= "map_existing_aetra_modules_to_on_chain_services"
 
-	ServiceRoadmapExitClientsFetchVerifyInterfaces ServiceRoadmapExitCriterionID = "clients_can_fetch_and_verify_formal_service_interfaces"
-	ServiceRoadmapExitCallsRequireSettlePayments   ServiceRoadmapExitCriterionID = "calls_can_require_and_settle_service_payments"
-	ServiceRoadmapExitClientEndToEndFlow           ServiceRoadmapExitCriterionID = "client_can_resolve_service_fetch_interface_build_call_attach_payment_execute_and_verify_receipt"
-	ServiceRoadmapExitClientsQueryProviderSet      ServiceRoadmapExitCriterionID = "clients_can_query_provider_set_by_service"
-	ServiceRoadmapExitCoreObjectsProto             ServiceRoadmapExitCriterionID = "all_core_objects_have_protobuf_definitions"
-	ServiceRoadmapExitDescriptorProofQueryable     ServiceRoadmapExitCriterionID = "descriptors_are_proof_queryable"
-	ServiceRoadmapExitExistingDescriptors          ServiceRoadmapExitCriterionID = "existing_modules_can_expose_service_descriptors"
-	ServiceRoadmapExitInterfaceVersioning          ServiceRoadmapExitCriterionID = "interface_versioning_is_enforced"
-	ServiceRoadmapExitLookupsLowLatency            ServiceRoadmapExitCriterionID = "registry_and_interface_lookups_remain_low_latency"
-	ServiceRoadmapExitManualABINotRequired         ServiceRoadmapExitCriterionID = "manual_abi_coding_is_not_required_for_registered_services"
-	ServiceRoadmapExitMethodSchemasPublished       ServiceRoadmapExitCriterionID = "existing_modules_can_publish_method_schemas"
-	ServiceRoadmapExitMixedResultsChallenged       ServiceRoadmapExitCriterionID = "mixed_service_results_can_be_challenged"
-	ServiceRoadmapExitOffChainResultsAnchored      ServiceRoadmapExitCriterionID = "off_chain_service_results_can_be_anchored"
-	ServiceRoadmapExitOnChainUnifiedEnvelope       ServiceRoadmapExitCriterionID = "on_chain_services_can_be_called_through_unified_call_envelope"
-	ServiceRoadmapExitPaymentModelKnownBeforeSign  ServiceRoadmapExitCriterionID = "payment_model_is_known_before_signing"
-	ServiceRoadmapExitPaymentTestCoverage          ServiceRoadmapExitCriterionID = "escrow_and_metered_usage_are_test_covered"
-	ServiceRoadmapExitProviderFaultsPenalized      ServiceRoadmapExitCriterionID = "provider_faults_can_be_penalized_deterministically"
-	ServiceRoadmapExitProviderFaultCollateralFlows ServiceRoadmapExitCriterionID = "fault_and_collateral_flows_are_deterministic"
-	ServiceRoadmapExitProvidersAdvertiseStake      ServiceRoadmapExitCriterionID = "providers_can_advertise_services_with_stake_and_interface_support"
-	ServiceRoadmapExitProofReceiptBounded          ServiceRoadmapExitCriterionID = "proof_and_receipt_generation_remain_bounded"
-	ServiceRoadmapExitReceiptsCommittedProof       ServiceRoadmapExitCriterionID = "receipts_are_committed_and_proof_queryable"
-	ServiceRoadmapExitServicesParallelizeSafely    ServiceRoadmapExitCriterionID = "independent_services_and_calls_parallelize_safely"
-	ServiceRoadmapExitRegistryReproducible         ServiceRoadmapExitCriterionID = "registry_state_is_reproducible"
-	ServiceRoadmapExitReplayAttemptsRejected       ServiceRoadmapExitCriterionID = "replay_attempts_are_rejected"
-	ServiceRoadmapExitServiceDiscovery             ServiceRoadmapExitCriterionID = "services_are_discoverable_by_id_owner_and_name"
-	ServiceRoadmapExitSignableVectors              ServiceRoadmapExitCriterionID = "all_signable_objects_have_canonical_encoding_test_vectors"
+	ServiceRoadmapExitClientsFetchVerifyInterfaces	ServiceRoadmapExitCriterionID	= "clients_can_fetch_and_verify_formal_service_interfaces"
+	ServiceRoadmapExitCallsRequireSettlePayments	ServiceRoadmapExitCriterionID	= "calls_can_require_and_settle_service_payments"
+	ServiceRoadmapExitClientEndToEndFlow		ServiceRoadmapExitCriterionID	= "client_can_resolve_service_fetch_interface_build_call_attach_payment_execute_and_verify_receipt"
+	ServiceRoadmapExitClientsQueryProviderSet	ServiceRoadmapExitCriterionID	= "clients_can_query_provider_set_by_service"
+	ServiceRoadmapExitCoreObjectsProto		ServiceRoadmapExitCriterionID	= "all_core_objects_have_protobuf_definitions"
+	ServiceRoadmapExitDescriptorProofQueryable	ServiceRoadmapExitCriterionID	= "descriptors_are_proof_queryable"
+	ServiceRoadmapExitExistingDescriptors		ServiceRoadmapExitCriterionID	= "existing_modules_can_expose_service_descriptors"
+	ServiceRoadmapExitInterfaceVersioning		ServiceRoadmapExitCriterionID	= "interface_versioning_is_enforced"
+	ServiceRoadmapExitLookupsLowLatency		ServiceRoadmapExitCriterionID	= "registry_and_interface_lookups_remain_low_latency"
+	ServiceRoadmapExitManualABINotRequired		ServiceRoadmapExitCriterionID	= "manual_abi_coding_is_not_required_for_registered_services"
+	ServiceRoadmapExitMethodSchemasPublished	ServiceRoadmapExitCriterionID	= "existing_modules_can_publish_method_schemas"
+	ServiceRoadmapExitMixedResultsChallenged	ServiceRoadmapExitCriterionID	= "mixed_service_results_can_be_challenged"
+	ServiceRoadmapExitOffChainResultsAnchored	ServiceRoadmapExitCriterionID	= "off_chain_service_results_can_be_anchored"
+	ServiceRoadmapExitOnChainUnifiedEnvelope	ServiceRoadmapExitCriterionID	= "on_chain_services_can_be_called_through_unified_call_envelope"
+	ServiceRoadmapExitPaymentModelKnownBeforeSign	ServiceRoadmapExitCriterionID	= "payment_model_is_known_before_signing"
+	ServiceRoadmapExitPaymentTestCoverage		ServiceRoadmapExitCriterionID	= "escrow_and_metered_usage_are_test_covered"
+	ServiceRoadmapExitProviderFaultsPenalized	ServiceRoadmapExitCriterionID	= "provider_faults_can_be_penalized_deterministically"
+	ServiceRoadmapExitProviderFaultCollateralFlows	ServiceRoadmapExitCriterionID	= "fault_and_collateral_flows_are_deterministic"
+	ServiceRoadmapExitProvidersAdvertiseStake	ServiceRoadmapExitCriterionID	= "providers_can_advertise_services_with_stake_and_interface_support"
+	ServiceRoadmapExitProofReceiptBounded		ServiceRoadmapExitCriterionID	= "proof_and_receipt_generation_remain_bounded"
+	ServiceRoadmapExitReceiptsCommittedProof	ServiceRoadmapExitCriterionID	= "receipts_are_committed_and_proof_queryable"
+	ServiceRoadmapExitServicesParallelizeSafely	ServiceRoadmapExitCriterionID	= "independent_services_and_calls_parallelize_safely"
+	ServiceRoadmapExitRegistryReproducible		ServiceRoadmapExitCriterionID	= "registry_state_is_reproducible"
+	ServiceRoadmapExitReplayAttemptsRejected	ServiceRoadmapExitCriterionID	= "replay_attempts_are_rejected"
+	ServiceRoadmapExitServiceDiscovery		ServiceRoadmapExitCriterionID	= "services_are_discoverable_by_id_owner_and_name"
+	ServiceRoadmapExitSignableVectors		ServiceRoadmapExitCriterionID	= "all_signable_objects_have_canonical_encoding_test_vectors"
 )
 
 type ServiceRoadmapTask struct {
-	TaskID   ServiceRoadmapTaskID
-	Module   string
-	Artifact string
-	TaskHash string
+	TaskID		ServiceRoadmapTaskID
+	Module		string
+	Artifact	string
+	TaskHash	string
 }
 
 type ServiceRoadmapExitCriterion struct {
-	CriterionID ServiceRoadmapExitCriterionID
-	Evidence    string
-	Met         bool
-	ExitHash    string
+	CriterionID	ServiceRoadmapExitCriterionID
+	Evidence	string
+	Met		bool
+	ExitHash	string
 }
 
 type ServiceCoreObjectDefinition struct {
-	ObjectName     string
-	ProtobufType   string
-	CanonicalHash  string
-	DefinitionHash string
+	ObjectName	string
+	ProtobufType	string
+	CanonicalHash	string
+	DefinitionHash	string
 }
 
 type ServiceSignableObjectVector struct {
-	ObjectName        string
-	CanonicalEncoding string
-	TestVectorHash    string
-	VectorHash        string
+	ObjectName		string
+	CanonicalEncoding	string
+	TestVectorHash		string
+	VectorHash		string
 }
 
 type AetraModuleServiceMapping struct {
-	ModuleName     string
-	ModulePath     string
-	ServiceID      string
-	InterfaceHash  string
-	DescriptorHash string
-	OnChain        bool
-	MappingHash    string
+	ModuleName	string
+	ModulePath	string
+	ServiceID	string
+	InterfaceHash	string
+	DescriptorHash	string
+	OnChain		bool
+	MappingHash	string
 }
 
 type ServiceRoadmapPhase struct {
-	PhaseID         ServiceRoadmapPhaseID
-	Title           string
-	Tasks           []ServiceRoadmapTask
-	ExitCriteria    []ServiceRoadmapExitCriterion
-	CoreObjects     []ServiceCoreObjectDefinition
-	SignableVectors []ServiceSignableObjectVector
-	ModuleMappings  []AetraModuleServiceMapping
-	DependsOn       []ServiceRoadmapPhaseID
-	PhaseHash       string
+	PhaseID		ServiceRoadmapPhaseID
+	Title		string
+	Tasks		[]ServiceRoadmapTask
+	ExitCriteria	[]ServiceRoadmapExitCriterion
+	CoreObjects	[]ServiceCoreObjectDefinition
+	SignableVectors	[]ServiceSignableObjectVector
+	ModuleMappings	[]AetraModuleServiceMapping
+	DependsOn	[]ServiceRoadmapPhaseID
+	PhaseHash	string
 }
 
 type ServiceImplementationRoadmap struct {
-	Phases      []ServiceRoadmapPhase
-	RoadmapHash string
+	Phases		[]ServiceRoadmapPhase
+	RoadmapHash	string
 }
 
 func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error) {
 	phase0, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseSpecificationCompatibility,
-		Title:   "Specification and Compatibility",
+		PhaseID:	ServiceRoadmapPhaseSpecificationCompatibility,
+		Title:		"Specification and Compatibility",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskDefineCallEnvelope, ServiceModuleCalls, "UnifiedServiceCall"),
 			newServiceRoadmapTask(ServiceRoadmapTaskDefinePaymentModelEnum, ServiceModulePayments, "ServicePaymentSettlementMode"),
@@ -179,16 +179,16 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitExistingDescriptors, "AetraModuleServiceMapping", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitSignableVectors, "ServiceSignableObjectVector", true),
 		},
-		CoreObjects:     defaultServiceCoreObjectDefinitions(),
-		SignableVectors: defaultServiceSignableObjectVectors(),
-		ModuleMappings:  defaultAetraModuleServiceMappings(),
+		CoreObjects:		defaultServiceCoreObjectDefinitions(),
+		SignableVectors:	defaultServiceSignableObjectVectors(),
+		ModuleMappings:		defaultAetraModuleServiceMappings(),
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase1, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseCoreRegistry,
-		Title:   "Core Registry",
+		PhaseID:	ServiceRoadmapPhaseCoreRegistry,
+		Title:		"Core Registry",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddExportImport, ServiceModuleServices, "ServiceRegistryState"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddIdentityBindingPlaceholder, ServiceModuleServices, "IdentityServiceBinding"),
@@ -202,14 +202,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitRegistryReproducible, "ServiceRegistryState.StateRoot", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitServiceDiscovery, "QueryService/QueryServicesByOwner/QueryServiceByName", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseSpecificationCompatibility},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseSpecificationCompatibility},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase2, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseInterfaceSystem,
-		Title:   "Interface System",
+		PhaseID:	ServiceRoadmapPhaseInterfaceSystem,
+		Title:		"Interface System",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddInterfaceHashValidation, ServiceModuleInterface, "ComputeFormalServiceInterfaceHash"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddInterfaceProofQuery, ServiceModuleInterface, "QueryInterfaceProof"),
@@ -223,14 +223,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitInterfaceVersioning, "InterfaceVersion", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitMethodSchemasPublished, "ServiceInterfaceMethodSchema", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseCoreRegistry},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseCoreRegistry},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase3, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseUnifiedCallsReceipts,
-		Title:   "Unified Calls and Receipts",
+		PhaseID:	ServiceRoadmapPhaseUnifiedCallsReceipts,
+		Title:		"Unified Calls and Receipts",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddCallbacksRetries, ServiceModuleCalls, "UnifiedServiceCallback/ServiceRetryPolicy"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddCallEnvelopeValidation, ServiceModuleCalls, "ValidateUnifiedServiceCallForDescriptor"),
@@ -244,14 +244,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitReceiptsCommittedProof, "QueryReceiptProof", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitReplayAttemptsRejected, "ServiceCallReplayIndex", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseInterfaceSystem},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseInterfaceSystem},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase4, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhasePayments,
-		Title:   "Payments",
+		PhaseID:	ServiceRoadmapPhasePayments,
+		Title:		"Payments",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddEscrowSettlement, ServiceModulePayments, "ServiceEscrow/PaymentSettlement"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddMeteredUsageReceipt, ServiceModulePayments, "MeteredUsage"),
@@ -265,14 +265,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitPaymentModelKnownBeforeSign, "ServicePaymentSignedModelSnapshot", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitPaymentTestCoverage, "servicepayments_module_breakdown_test", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseUnifiedCallsReceipts},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseUnifiedCallsReceipts},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase5, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseOffChainMixedServices,
-		Title:   "Off Chain and Mixed Services",
+		PhaseID:	ServiceRoadmapPhaseOffChainMixedServices,
+		Title:		"Off Chain and Mixed Services",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddFallbackExecutionHooks, ServiceModuleCalls, "ServiceChallengeFlow"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddMixedServiceChallengeFlow, ServiceModuleCalls, "NewServiceChallengeFlow"),
@@ -285,14 +285,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitOffChainResultsAnchored, "MsgAnchorReceipt", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitProviderFaultsPenalized, "ProviderPenaltyRoute", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhasePayments},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhasePayments},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase6, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseFogMarketProviders,
-		Title:   "Fog Market Providers",
+		PhaseID:	ServiceRoadmapPhaseFogMarketProviders,
+		Title:		"Fog Market Providers",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddAvailabilityCommitments, ServiceModuleProviders, "AvailabilityCommitment"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddCollateralStaking, ServiceModuleProviders, "ProviderCollateral"),
@@ -306,14 +306,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitProviderFaultCollateralFlows, "ProviderCollateral/ProviderFault", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitProvidersAdvertiseStake, "ValidateProviderAdvertisesInterface", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseOffChainMixedServices},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseOffChainMixedServices},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase7, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhaseSDKUXTooling,
-		Title:   "SDK and UX Tooling",
+		PhaseID:	ServiceRoadmapPhaseSDKUXTooling,
+		Title:		"SDK and UX Tooling",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddCLICommandGeneration, ServiceModuleInterface, "CLIInterfaceCommandGenerator"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddInterfaceCallBuilder, ServiceModuleCalls, "MethodLevelCallBuilder"),
@@ -325,14 +325,14 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitClientEndToEndFlow, "ServiceResolver/MethodLevelCallBuilder/ServiceReceiptProofRecord", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitManualABINotRequired, "CLIInterfaceCommandGenerator", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseFogMarketProviders},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseFogMarketProviders},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
 	}
 	phase8, err := NewServiceRoadmapPhase(ServiceRoadmapPhase{
-		PhaseID: ServiceRoadmapPhasePerformanceHardening,
-		Title:   "Performance Hardening",
+		PhaseID:	ServiceRoadmapPhasePerformanceHardening,
+		Title:		"Performance Hardening",
 		Tasks: []ServiceRoadmapTask{
 			newServiceRoadmapTask(ServiceRoadmapTaskAddBlockSTMConflictBenchmarks, ServiceModuleCalls, "ServiceBlockSTMOperation"),
 			newServiceRoadmapTask(ServiceRoadmapTaskAddMixedDisputeLoadTests, ServiceModuleCalls, "ServiceChallengeFlow"),
@@ -346,7 +346,7 @@ func DefaultServiceImplementationRoadmap() (ServiceImplementationRoadmap, error)
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitProofReceiptBounded, "receipt_proof_generation_benchmarks", true),
 			newServiceRoadmapExitCriterion(ServiceRoadmapExitServicesParallelizeSafely, "blockstm_conflict_benchmarks", true),
 		},
-		DependsOn: []ServiceRoadmapPhaseID{ServiceRoadmapPhaseSDKUXTooling},
+		DependsOn:	[]ServiceRoadmapPhaseID{ServiceRoadmapPhaseSDKUXTooling},
 	})
 	if err != nil {
 		return ServiceImplementationRoadmap{}, err
@@ -786,12 +786,12 @@ func newServiceSignableObjectVector(objectName, encoding, testVectorHash string)
 
 func newAetraModuleServiceMapping(moduleName, modulePath, serviceID string, onChain bool) AetraModuleServiceMapping {
 	mapping := AetraModuleServiceMapping{
-		ModuleName:     moduleName,
-		ModulePath:     modulePath,
-		ServiceID:      serviceID,
-		InterfaceHash:  servicesHashParts("aetra-services-roadmap-interface-v1", moduleName, modulePath),
-		DescriptorHash: servicesHashParts("aetra-services-roadmap-descriptor-v1", moduleName, serviceID),
-		OnChain:        onChain,
+		ModuleName:	moduleName,
+		ModulePath:	modulePath,
+		ServiceID:	serviceID,
+		InterfaceHash:	servicesHashParts("aetra-services-roadmap-interface-v1", moduleName, modulePath),
+		DescriptorHash:	servicesHashParts("aetra-services-roadmap-descriptor-v1", moduleName, serviceID),
+		OnChain:	onChain,
 	}
 	mapping.MappingHash = ComputeAetraModuleServiceMappingHash(mapping)
 	return mapping

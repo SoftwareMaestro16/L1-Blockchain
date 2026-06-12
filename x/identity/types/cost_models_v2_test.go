@@ -19,11 +19,11 @@ func TestIdentityResolverUpdateCostModelV2StorageDeltaChurnAndInlineFees(t *test
 	schemaHash, err := InterfaceDescriptorHashV2(inlineSchema)
 	require.NoError(t, err)
 	after.InterfaceDescriptors = []InterfaceDescriptorV2{{
-		InterfaceID:          "wallet",
-		SchemaHash:           schemaHash,
-		SchemaInlineOptional: inlineSchema,
-		Version:              "v1",
-		RenderPolicy:         "wallet_confirm",
+		InterfaceID:		"wallet",
+		SchemaHash:		schemaHash,
+		SchemaInlineOptional:	inlineSchema,
+		Version:		"v1",
+		RenderPolicy:		"wallet_confirm",
 	}}
 	after.RecordVersion = 2
 	after.UpdatedAtHeight = 20
@@ -36,11 +36,11 @@ func TestIdentityResolverUpdateCostModelV2StorageDeltaChurnAndInlineFees(t *test
 	require.Greater(t, delta.BillableBytes, delta.NetGrowthBytes)
 
 	quote, err := QuoteIdentityResolverUpdateFeeV2(IdentityResolverUpdateCostRequestV2{
-		Before:           before,
-		After:            after,
-		UpdatedFields:    []string{"primary", "interface.wallet", "interface.wallet"},
-		UpdatesInWindow:  params.PayloadParams.FreeUpdatesPerWindow + 4,
-		ProofIndexWrites: 2,
+		Before:			before,
+		After:			after,
+		UpdatedFields:		[]string{"primary", "interface.wallet", "interface.wallet"},
+		UpdatesInWindow:	params.PayloadParams.FreeUpdatesPerWindow + 4,
+		ProofIndexWrites:	2,
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, appparams.BaseDenom, quote.Denom)
@@ -57,9 +57,9 @@ func TestIdentityResolverUpdateCostModelV2StorageDeltaChurnAndInlineFees(t *test
 	shrunk.RecordVersion = 3
 	shrunk.UpdatedAtHeight = 21
 	shrinkQuote, err := QuoteIdentityResolverUpdateFeeV2(IdentityResolverUpdateCostRequestV2{
-		Before:        after,
-		After:         shrunk,
-		UpdatedFields: []string{"interface.wallet"},
+		Before:		after,
+		After:		shrunk,
+		UpdatedFields:	[]string{"interface.wallet"},
 	}, params)
 	require.NoError(t, err)
 	require.True(t, shrinkQuote.StorageDelta.RemovedBytes > 0)
@@ -96,18 +96,18 @@ func TestIdentitySubdomainCreationCostModelV2OwnerDelegatedAndDetached(t *testin
 	params := DefaultIdentitySubdomainCostParamsV2()
 
 	ownerPolicy := SubdomainCreationPolicyV2{
-		ParentName:     parent.Name,
-		Label:          "node",
-		Actor:          addr(1),
-		ChildOwner:     addr(2),
-		Height:         12,
-		DelegationType: SubdomainDelegationOwnerControlledV2,
+		ParentName:	parent.Name,
+		Label:		"node",
+		Actor:		addr(1),
+		ChildOwner:	addr(2),
+		Height:		12,
+		DelegationType:	SubdomainDelegationOwnerControlledV2,
 	}
 	ownerQuote, err := QuoteIdentitySubdomainCreationFeeV2(IdentitySubdomainCostRequestV2{
-		State:                state,
-		Policy:               ownerPolicy,
-		ResolverPayloadBytes: 64,
-		ZonePolicyComplexity: 1,
+		State:			state,
+		Policy:			ownerPolicy,
+		ResolverPayloadBytes:	64,
+		ZonePolicyComplexity:	1,
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, "node.alice.aet", ownerQuote.ChildName)
@@ -129,9 +129,9 @@ func TestIdentitySubdomainCreationCostModelV2OwnerDelegatedAndDetached(t *testin
 	delegatePolicy.DelegationType = SubdomainDelegationDelegateControlledV2
 	delegatePolicy.Delegation = &delegation
 	delegateQuote, err := QuoteIdentitySubdomainCreationFeeV2(IdentitySubdomainCostRequestV2{
-		State:         state,
-		Policy:        delegatePolicy,
-		BillingPolicy: IdentityDelegatedBillingDelegateV2,
+		State:		state,
+		Policy:		delegatePolicy,
+		BillingPolicy:	IdentityDelegatedBillingDelegateV2,
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, IdentityDelegatedBillingDelegateV2, delegateQuote.BillingPolicy)
@@ -147,9 +147,9 @@ func TestIdentitySubdomainCreationCostModelV2OwnerDelegatedAndDetached(t *testin
 	detachedPolicy.IndependentPayment = true
 	detachedPolicy.ParentAuthorization = true
 	detachedQuote, err := QuoteIdentitySubdomainCreationFeeV2(IdentitySubdomainCostRequestV2{
-		State:                state,
-		Policy:               detachedPolicy,
-		ResolverPayloadBytes: 128,
+		State:			state,
+		Policy:			detachedPolicy,
+		ResolverPayloadBytes:	128,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, detachedQuote.Detached)
@@ -163,12 +163,12 @@ func TestIdentitySubdomainCreationCostModelV2ExpiryConstraints(t *testing.T) {
 	params := DefaultIdentitySubdomainCostParamsV2()
 
 	tooLong := SubdomainCreationPolicyV2{
-		ParentName:        parent.Name,
-		Label:             "node",
-		Actor:             addr(1),
-		ChildOwner:        addr(2),
-		Height:            12,
-		ChildExpiryHeight: parent.ExpiryHeight + 1,
+		ParentName:		parent.Name,
+		Label:			"node",
+		Actor:			addr(1),
+		ChildOwner:		addr(2),
+		Height:			12,
+		ChildExpiryHeight:	parent.ExpiryHeight + 1,
 	}
 	_, err := QuoteIdentitySubdomainCreationFeeV2(IdentitySubdomainCostRequestV2{State: state, Policy: tooLong}, params)
 	require.ErrorContains(t, err, "cannot exceed parent expiry")
@@ -180,13 +180,13 @@ func TestIdentitySubdomainCreationCostModelV2ExpiryConstraints(t *testing.T) {
 		}
 	}
 	_, err = QuoteIdentitySubdomainCreationFeeV2(IdentitySubdomainCostRequestV2{
-		State: expiredParent,
+		State:	expiredParent,
 		Policy: SubdomainCreationPolicyV2{
-			ParentName: parent.Name,
-			Label:      "node",
-			Actor:      addr(1),
-			ChildOwner: addr(2),
-			Height:     20,
+			ParentName:	parent.Name,
+			Label:		"node",
+			Actor:		addr(1),
+			ChildOwner:	addr(2),
+			Height:		20,
 		},
 	}, params)
 	require.ErrorContains(t, err, "expired")
@@ -197,24 +197,24 @@ func costModelResolverRecord(t *testing.T, name string, owner sdk.AccAddress, pr
 	nameHash, err := DomainRecordV2NameHash(name)
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:        nameHash,
-		Owner:           owner,
-		PrimaryAddress:  primary,
-		RecordVersion:   1,
-		RecordTTL:       100,
-		UpdatedAtHeight: 10,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		NameHash:		nameHash,
+		Owner:			owner,
+		PrimaryAddress:		primary,
+		RecordVersion:		1,
+		RecordTTL:		100,
+		UpdatedAtHeight:	10,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	if inline != "" {
 		schemaHash, err := InterfaceDescriptorHashV2(inline)
 		require.NoError(t, err)
 		record.InterfaceDescriptors = []InterfaceDescriptorV2{{
-			InterfaceID:          "wallet",
-			SchemaHash:           schemaHash,
-			SchemaInlineOptional: inline,
-			Version:              "v1",
-			RenderPolicy:         "wallet_confirm",
+			InterfaceID:		"wallet",
+			SchemaHash:		schemaHash,
+			SchemaInlineOptional:	inline,
+			Version:		"v1",
+			RenderPolicy:		"wallet_confirm",
 		}}
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))

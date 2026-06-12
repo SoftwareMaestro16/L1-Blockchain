@@ -53,14 +53,14 @@ func TestIdentityZoneV2ShardRoutingProofRootsAndLookupMessages(t *testing.T) {
 	require.Equal(t, IdentityRouteAuction, auctionRoute.RoutingMode)
 
 	msg, err := NewMsgResolveIdentity(MsgResolveIdentity{
-		RequestID:     "req-1",
-		Requester:     "financial/alice",
-		SourceZoneID:  "FINANCIAL_ZONE",
-		TargetName:    "alice.aet",
-		TargetType:    IdentityLookupTargetResolver,
-		ProofRequired: true,
-		ReplyTo:       "zone/financial/inbox",
-		ExpiryHeight:  100,
+		RequestID:	"req-1",
+		Requester:	"financial/alice",
+		SourceZoneID:	"FINANCIAL_ZONE",
+		TargetName:	"alice.aet",
+		TargetType:	IdentityLookupTargetResolver,
+		ProofRequired:	true,
+		ReplyTo:	"zone/financial/inbox",
+		ExpiryHeight:	100,
 	})
 	require.NoError(t, err)
 	require.NoError(t, msg.Validate())
@@ -70,14 +70,14 @@ func TestIdentityZoneV2ShardRoutingProofRootsAndLookupMessages(t *testing.T) {
 	require.NoError(t, reverseResponse.Validate())
 
 	result, err := NewMsgIdentityResolutionResult(MsgIdentityResolutionResult{
-		RequestID:             msg.RequestID,
-		Name:                  msg.TargetName,
-		TargetType:            msg.TargetType,
-		ResolvedValue:         "addr:2",
-		ResolverRecordVersion: 1,
-		ProofHashOptional:     reverseResponse.ProofIndex.ProofHash,
-		Status:                IdentityResolutionStatusResolved,
-		ExpiryHeight:          100,
+		RequestID:		msg.RequestID,
+		Name:			msg.TargetName,
+		TargetType:		msg.TargetType,
+		ResolvedValue:		"addr:2",
+		ResolverRecordVersion:	1,
+		ProofHashOptional:	reverseResponse.ProofIndex.ProofHash,
+		Status:			IdentityResolutionStatusResolved,
+		ExpiryHeight:		100,
 	})
 	require.NoError(t, err)
 	require.NoError(t, result.Validate())
@@ -150,34 +150,34 @@ func TestIdentityZoneMessagesReceiptsAndProofQueries(t *testing.T) {
 	require.NoError(t, err)
 
 	msg, err := NewIdentityLookupMessage(IdentityLookupMessage{
-		RequestID:   "req-1",
-		QueryDomain: "alice.aet",
-		RecordKey:   ResolverKeyPrimary,
-		SourceZone:  "FINANCIAL_ZONE",
-		SourceShard: "0",
-		ReplyTo:     "financial/replies",
-		Height:      13,
-		PayloadHash: identityHash("lookup-payload"),
+		RequestID:	"req-1",
+		QueryDomain:	"alice.aet",
+		RecordKey:	ResolverKeyPrimary,
+		SourceZone:	"FINANCIAL_ZONE",
+		SourceShard:	"0",
+		ReplyTo:	"financial/replies",
+		Height:		13,
+		PayloadHash:	identityHash("lookup-payload"),
 	})
 	require.NoError(t, err)
 	require.NoError(t, msg.Validate())
 
 	response, err := NewIdentityResponseReceipt(IdentityResponseReceipt{
-		RequestID:      msg.RequestID,
-		QueryDomain:    msg.QueryDomain,
-		ResolverDomain: "alice.aet",
-		ResponseHash:   identityHash("lookup-response"),
-		Height:         13,
-		Success:        true,
+		RequestID:	msg.RequestID,
+		QueryDomain:	msg.QueryDomain,
+		ResolverDomain:	"alice.aet",
+		ResponseHash:	identityHash("lookup-response"),
+		Height:		13,
+		Success:	true,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, response.ReceiptHash)
 
 	auctionReceipt, err := NewIdentityAuctionFinalizationReceipt(IdentityAuctionFinalizationReceipt{
-		Domain:      "alice.aet",
-		WinnerHash:  identityHash("winner"),
-		Height:      20,
-		AuctionHash: identityHash("auction"),
+		Domain:		"alice.aet",
+		WinnerHash:	identityHash("winner"),
+		Height:		20,
+		AuctionHash:	identityHash("auction"),
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, auctionReceipt.ReceiptHash)
@@ -203,19 +203,19 @@ func TestIdentityZoneResolverHooksGraphBindingsAndRoots(t *testing.T) {
 	require.NoError(t, err)
 
 	hook, err := NewIdentityResolverVMHook(IdentityResolverVMHook{
-		HookID:     "primary-hook",
-		NameHash:   nameHash,
-		RecordKey:  ResolverKeyPrimary,
-		InputHash:  identityHash("resolver-input"),
-		OutputHash: identityHash("resolver-output"),
-		GasLimit:   10_000,
-		Version:    1,
+		HookID:		"primary-hook",
+		NameHash:	nameHash,
+		RecordKey:	ResolverKeyPrimary,
+		InputHash:	identityHash("resolver-input"),
+		OutputHash:	identityHash("resolver-output"),
+		GasLimit:	10_000,
+		Version:	1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeIdentityResolverVMHookHash(hook), hook.HookHash)
 
 	graph, err := NewIdentityResolutionGraph(IdentityResolutionGraph{
-		Height: 12,
+		Height:	12,
 		Nodes: []IdentityResolutionGraphNode{
 			{NodeID: "resolver", NameHash: nameHash, RecordKey: ResolverKeyPrimary, TargetHash: identityHash("target")},
 			{NodeID: "domain", NameHash: nameHash, TargetHash: stateRoot},
@@ -228,11 +228,11 @@ func TestIdentityZoneResolverHooksGraphBindingsAndRoots(t *testing.T) {
 	require.Equal(t, ComputeIdentityResolutionGraphHash(graph), graph.GraphHash)
 
 	binding, err := NewIdentityCrossZoneBinding(IdentityCrossZoneBinding{
-		NameHash:    nameHash,
-		ZoneID:      "APPLICATION_ZONE",
-		BindingKey:  "application/contracts/app-1",
-		BindingRoot: identityHash("binding-root"),
-		Height:      12,
+		NameHash:	nameHash,
+		ZoneID:		"APPLICATION_ZONE",
+		BindingKey:	"application/contracts/app-1",
+		BindingRoot:	identityHash("binding-root"),
+		Height:		12,
 	})
 	require.NoError(t, err)
 

@@ -8,52 +8,52 @@ import (
 )
 
 const (
-	AcceptanceAetraCoreRoots        = "aetra_core_commits_zone_and_message_roots"
-	AcceptanceZoneAdapterExecution  = "zone_executes_through_zone_adapter"
-	AcceptanceMessageProofReceipts  = "messages_have_routing_inclusion_proofs_receipts"
-	AcceptanceStoreV2ZoneShardProof = "store_v2_layout_supports_zone_shard_proofs"
-	AcceptanceBlockSTMParallelism   = "blockstm_conflict_tests_parallel_shards"
-	AcceptanceShardSplitMergeRules  = "shard_split_merge_deterministic_committed_state"
-	AcceptanceAVM20Spec             = "avm_2_instruction_set_gas_table_specified"
-	AcceptanceIdentityProofLookup   = "identity_resolution_proof_backed_cross_zone_callable"
-	AcceptancePaymentSettlement     = "payment_settlement_trustless_proof_verifiable"
-	AcceptanceMigrationPreservation = "migration_preserves_module_state_invariants"
+	AcceptanceAetraCoreRoots	= "aetra_core_commits_zone_and_message_roots"
+	AcceptanceZoneAdapterExecution	= "zone_executes_through_zone_adapter"
+	AcceptanceMessageProofReceipts	= "messages_have_routing_inclusion_proofs_receipts"
+	AcceptanceStoreV2ZoneShardProof	= "store_v2_layout_supports_zone_shard_proofs"
+	AcceptanceBlockSTMParallelism	= "blockstm_conflict_tests_parallel_shards"
+	AcceptanceShardSplitMergeRules	= "shard_split_merge_deterministic_committed_state"
+	AcceptanceAVM20Spec		= "avm_2_instruction_set_gas_table_specified"
+	AcceptanceIdentityProofLookup	= "identity_resolution_proof_backed_cross_zone_callable"
+	AcceptancePaymentSettlement	= "payment_settlement_trustless_proof_verifiable"
+	AcceptanceMigrationPreservation	= "migration_preserves_module_state_invariants"
 )
 
 var requiredArchitectureAcceptanceCriteria = map[string]struct{}{
-	AcceptanceAetraCoreRoots:        {},
-	AcceptanceZoneAdapterExecution:  {},
-	AcceptanceMessageProofReceipts:  {},
-	AcceptanceStoreV2ZoneShardProof: {},
-	AcceptanceBlockSTMParallelism:   {},
-	AcceptanceShardSplitMergeRules:  {},
-	AcceptanceAVM20Spec:             {},
-	AcceptanceIdentityProofLookup:   {},
-	AcceptancePaymentSettlement:     {},
-	AcceptanceMigrationPreservation: {},
+	AcceptanceAetraCoreRoots:		{},
+	AcceptanceZoneAdapterExecution:		{},
+	AcceptanceMessageProofReceipts:		{},
+	AcceptanceStoreV2ZoneShardProof:	{},
+	AcceptanceBlockSTMParallelism:		{},
+	AcceptanceShardSplitMergeRules:		{},
+	AcceptanceAVM20Spec:			{},
+	AcceptanceIdentityProofLookup:		{},
+	AcceptancePaymentSettlement:		{},
+	AcceptanceMigrationPreservation:	{},
 }
 
 type ArchitectureAcceptanceCriterion struct {
-	CriterionID   string
-	Component     string
-	EvidenceHash  string
-	TestHash      string
-	Ready         bool
-	Deterministic bool
-	ProofBacked   bool
+	CriterionID	string
+	Component	string
+	EvidenceHash	string
+	TestHash	string
+	Ready		bool
+	Deterministic	bool
+	ProofBacked	bool
 }
 
 type ArchitectureAcceptanceInput struct {
-	AcceptanceVersion string
-	Criteria          []ArchitectureAcceptanceCriterion
+	AcceptanceVersion	string
+	Criteria		[]ArchitectureAcceptanceCriterion
 }
 
 type ArchitectureAcceptanceReport struct {
-	AcceptanceVersion string
-	Ready             bool
-	Failed            []string
-	Evidence          []string
-	ReportHash        string
+	AcceptanceVersion	string
+	Ready			bool
+	Failed			[]string
+	Evidence		[]string
+	ReportHash		string
 }
 
 func BuildArchitectureAcceptanceReport(input ArchitectureAcceptanceInput) ArchitectureAcceptanceReport {
@@ -71,10 +71,10 @@ func BuildArchitectureAcceptanceReport(input ArchitectureAcceptanceInput) Archit
 		evidence = append(evidence, "architecture_acceptance_criteria:"+hashArchitectureAcceptanceCriteria(input.Criteria))
 	}
 	report := ArchitectureAcceptanceReport{
-		AcceptanceVersion: input.AcceptanceVersion,
-		Ready:             len(failed) == 0,
-		Failed:            normalizeStringSet(failed),
-		Evidence:          normalizeStringSet(evidence),
+		AcceptanceVersion:	input.AcceptanceVersion,
+		Ready:			len(failed) == 0,
+		Failed:			normalizeStringSet(failed),
+		Evidence:		normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeArchitectureAcceptanceReportHash(report)
 	return report

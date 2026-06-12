@@ -79,10 +79,10 @@ func TestImplementationBacklogRejectsWrongPriorityAndMissingAcceptance(t *testin
 
 func TestImplementationBacklogAcceptanceCanonicalization(t *testing.T) {
 	item := BacklogItem{
-		Priority: BacklogPriorityHigh,
-		ItemID:   BacklogItemAetraCoreSkeleton,
-		Task:     " Implement x/aetracore skeleton. ",
-		Target:   " x/aetracore module ",
+		Priority:	BacklogPriorityHigh,
+		ItemID:		BacklogItemAetraCoreSkeleton,
+		Task:		" Implement x/aetracore skeleton. ",
+		Target:		" x/aetracore module ",
 		Acceptance: []string{
 			" keeper shell ",
 			"params",

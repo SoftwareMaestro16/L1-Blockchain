@@ -13,65 +13,65 @@ import (
 )
 
 const (
-	MaxAetherAddressLength   = 128
-	MaxAetherPayloadType     = 128
-	MaxAetherProofTypeLength = 96
-	MaxAetherSignatureLength = 512
+	MaxAetherAddressLength		= 128
+	MaxAetherPayloadType		= 128
+	MaxAetherProofTypeLength	= 96
+	MaxAetherSignatureLength	= 512
 )
 
 type ExecutionMode = UnifiedExecutionMode
 type OrderingClass = UnifiedOrderingClass
 
 const (
-	ExecutionModeSyncLocal ExecutionMode = UnifiedExecutionSyncLocal
-	ExecutionModeAsync     ExecutionMode = UnifiedExecutionAsync
-	ExecutionModeDeferred  ExecutionMode = UnifiedExecutionDeferred
-	ExecutionModePromise   ExecutionMode = UnifiedExecutionPromise
+	ExecutionModeSyncLocal	ExecutionMode	= UnifiedExecutionSyncLocal
+	ExecutionModeAsync	ExecutionMode	= UnifiedExecutionAsync
+	ExecutionModeDeferred	ExecutionMode	= UnifiedExecutionDeferred
+	ExecutionModePromise	ExecutionMode	= UnifiedExecutionPromise
 
-	OrderingClassUnordered        OrderingClass = UnifiedOrderingUnordered
-	OrderingClassSenderOrdered    OrderingClass = UnifiedOrderingSenderOrdered
-	OrderingClassReceiverOrdered  OrderingClass = UnifiedOrderingReceiverOrdered
-	OrderingClassObjectOrdered    OrderingClass = UnifiedOrderingObjectOrdered
-	OrderingClassStrictTraceOrder OrderingClass = UnifiedOrderingStrictTraceOrder
+	OrderingClassUnordered		OrderingClass	= UnifiedOrderingUnordered
+	OrderingClassSenderOrdered	OrderingClass	= UnifiedOrderingSenderOrdered
+	OrderingClassReceiverOrdered	OrderingClass	= UnifiedOrderingReceiverOrdered
+	OrderingClassObjectOrdered	OrderingClass	= UnifiedOrderingObjectOrdered
+	OrderingClassStrictTraceOrder	OrderingClass	= UnifiedOrderingStrictTraceOrder
 )
 
 type AetherProof struct {
-	ProofType string
-	RootHash  string
-	ProofHash string
+	ProofType	string
+	RootHash	string
+	ProofHash	string
 }
 
 type AetherSignature struct {
-	Signer       string
-	SignatureHex string
+	Signer		string
+	SignatureHex	string
 }
 
 type AetherMessage struct {
-	MsgID           string
-	ParentMsgID     string
-	TraceID         string
-	Sender          string
-	SenderZoneID    zonestypes.ZoneID
-	SenderShardID   string
-	Receiver        string
-	ReceiverZoneID  zonestypes.ZoneID
-	ReceiverShardID string
-	ValueNAET       sdkmath.Int
-	Payload         []byte
-	PayloadType     string
-	GasLimit        uint64
-	GasPrice        sdkmath.Int
-	ForwardingFee   sdkmath.Int
-	ExpiryHeight    uint64
-	Bounce          bool
-	ExecutionMode   ExecutionMode
-	OrderingClass   OrderingClass
-	RouteCommitment string
-	AuthProof       AetherProof
-	StateProof      AetherProof
-	CreatedAtHeight uint64
-	Nonce           uint64
-	Signature       AetherSignature
+	MsgID		string
+	ParentMsgID	string
+	TraceID		string
+	Sender		string
+	SenderZoneID	zonestypes.ZoneID
+	SenderShardID	string
+	Receiver	string
+	ReceiverZoneID	zonestypes.ZoneID
+	ReceiverShardID	string
+	ValueNAET	sdkmath.Int
+	Payload		[]byte
+	PayloadType	string
+	GasLimit	uint64
+	GasPrice	sdkmath.Int
+	ForwardingFee	sdkmath.Int
+	ExpiryHeight	uint64
+	Bounce		bool
+	ExecutionMode	ExecutionMode
+	OrderingClass	OrderingClass
+	RouteCommitment	string
+	AuthProof	AetherProof
+	StateProof	AetherProof
+	CreatedAtHeight	uint64
+	Nonce		uint64
+	Signature	AetherSignature
 }
 
 func NewAetherMessage(msg AetherMessage) (AetherMessage, error) {
@@ -228,27 +228,27 @@ func AetherMessageFromMessage(msg Message, route UnifiedMessageRoute, traceID st
 		traceID = hashParts("aetra-aether-message-trace-v1", hex.EncodeToString(msg.MessageID))
 	}
 	return NewAetherMessage(AetherMessage{
-		ParentMsgID:     parentMsgID,
-		TraceID:         traceID,
-		Sender:          hex.EncodeToString(msg.Sender),
-		SenderZoneID:    msg.SourceZone,
-		SenderShardID:   route.SourceShardID,
-		Receiver:        hex.EncodeToString(msg.Recipient),
-		ReceiverZoneID:  msg.DestinationZone,
-		ReceiverShardID: route.DestinationShardID,
-		ValueNAET:       msg.Value,
-		Payload:         msg.Payload,
-		PayloadType:     msg.Opcode,
-		GasLimit:        msg.GasLimit,
-		GasPrice:        msg.FeeLimit,
-		ForwardingFee:   msg.FeeLimit,
-		ExpiryHeight:    msg.Deadline,
-		Bounce:          msg.Bounce,
-		ExecutionMode:   route.ExecutionMode,
-		OrderingClass:   route.OrderingClass,
-		RouteCommitment: route.RouteCommitment,
-		CreatedAtHeight: msg.CreatedHeight,
-		Nonce:           msg.Nonce,
+		ParentMsgID:		parentMsgID,
+		TraceID:		traceID,
+		Sender:			hex.EncodeToString(msg.Sender),
+		SenderZoneID:		msg.SourceZone,
+		SenderShardID:		route.SourceShardID,
+		Receiver:		hex.EncodeToString(msg.Recipient),
+		ReceiverZoneID:		msg.DestinationZone,
+		ReceiverShardID:	route.DestinationShardID,
+		ValueNAET:		msg.Value,
+		Payload:		msg.Payload,
+		PayloadType:		msg.Opcode,
+		GasLimit:		msg.GasLimit,
+		GasPrice:		msg.FeeLimit,
+		ForwardingFee:		msg.FeeLimit,
+		ExpiryHeight:		msg.Deadline,
+		Bounce:			msg.Bounce,
+		ExecutionMode:		route.ExecutionMode,
+		OrderingClass:		route.OrderingClass,
+		RouteCommitment:	route.RouteCommitment,
+		CreatedAtHeight:	msg.CreatedHeight,
+		Nonce:			msg.Nonce,
 	})
 }
 

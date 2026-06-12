@@ -8,4 +8,3 @@ type VoteExtension = abcihandlers.VoteExtension
 func NewVoteExtensionHandler() *VoteExtensionHandler {
 	return abcihandlers.NewVoteExtensionHandler()
 }
-

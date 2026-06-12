@@ -39,12 +39,12 @@ func TestUpdateParamsAuthorityAndApplyMetrics(t *testing.T) {
 	require.NoError(t, keeper.UpdateParams(prototype.DefaultAuthority, prototype.TestnetParams()))
 
 	result, err := keeper.ApplyMetrics(loadtypes.Metrics{
-		CanonicalMempoolSize:        10_000,
-		UsedBlockGas:                20_000_000,
-		AverageInclusionDelayBlocks: 5,
-		FailedTxCount:               1,
-		TotalTxCount:                10,
-		ExecutionStepCount:          20_000_000,
+		CanonicalMempoolSize:		10_000,
+		UsedBlockGas:			20_000_000,
+		AverageInclusionDelayBlocks:	5,
+		FailedTxCount:			1,
+		TotalTxCount:			10,
+		ExecutionStepCount:		20_000_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), result.EMA.WindowHeight)

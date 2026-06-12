@@ -12,12 +12,12 @@ func TestReputationMissedBlockPenalty(t *testing.T) {
 	state.Validators = []ReputationRecord{validator}
 
 	next, err := ApplyReputationPenalty(state, MsgApplyReputationPenalty{
-		Authority:   state.Params.Authority,
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentMissedBlock,
-		Reason:      "missed block",
-		Epoch:       2,
+		Authority:	state.Params.Authority,
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentMissedBlock,
+		Reason:		"missed block",
+		Epoch:		2,
 	})
 	require.NoError(t, err)
 	record, found := QueryValidatorReputation(next, addr(1))
@@ -33,12 +33,12 @@ func TestReputationUptimeReward(t *testing.T) {
 	state.Validators = []ReputationRecord{ApplyComputedScore(ReputationRecord{Account: addr(1), AgeScore: 10})}
 
 	next, err := ApplyReputationReward(state, MsgApplyReputationReward{
-		Authority:   state.Params.Authority,
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentUptime,
-		Reason:      "uptime",
-		Epoch:       3,
+		Authority:	state.Params.Authority,
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentUptime,
+		Reason:		"uptime",
+		Epoch:		3,
 	})
 	require.NoError(t, err)
 	record, found := QueryValidatorReputation(next, addr(1))
@@ -55,12 +55,12 @@ func TestReputationSlashingPenaltyAlwaysReducesScore(t *testing.T) {
 	state.Validators = []ReputationRecord{validator}
 
 	next, err := ApplyReputationPenalty(state, MsgApplyReputationPenalty{
-		Authority:   state.Params.Authority,
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentSlashing,
-		Reason:      "double sign",
-		Epoch:       4,
+		Authority:	state.Params.Authority,
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentSlashing,
+		Reason:		"double sign",
+		Epoch:		4,
 	})
 	require.NoError(t, err)
 	record, found := QueryValidatorReputation(next, addr(1))
@@ -78,13 +78,13 @@ func TestReputationScoreFloorAndCeiling(t *testing.T) {
 	state := newTestReputationState(t)
 
 	next, err := ApplyReputationPenalty(state, MsgApplyReputationPenalty{
-		Authority:   state.Params.Authority,
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentSpam,
-		Amount:      500,
-		Reason:      "spam",
-		Epoch:       1,
+		Authority:	state.Params.Authority,
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentSpam,
+		Amount:		500,
+		Reason:		"spam",
+		Epoch:		1,
 	})
 	require.NoError(t, err)
 	low, found := QueryValidatorReputation(next, addr(1))
@@ -92,13 +92,13 @@ func TestReputationScoreFloorAndCeiling(t *testing.T) {
 	require.Equal(t, ScoreMin, low.Score)
 
 	next, err = ApplyReputationReward(next, MsgApplyReputationReward{
-		Authority:   next.Params.Authority,
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentUptime,
-		Amount:      1000,
-		Reason:      "long uptime",
-		Epoch:       2,
+		Authority:	next.Params.Authority,
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentUptime,
+		Amount:		1000,
+		Reason:		"long uptime",
+		Epoch:		2,
 	})
 	require.NoError(t, err)
 	high, found := QueryValidatorReputation(next, addr(1))
@@ -148,8 +148,8 @@ func TestReputationExportImportPreservesSnapshots(t *testing.T) {
 	require.Len(t, imported.Snapshots, 1)
 
 	snapshots, events, err := QueryReputationHistory(imported, ReputationHistoryQuery{
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
 	})
 	require.NoError(t, err)
 	require.Len(t, snapshots, 1)
@@ -159,28 +159,28 @@ func TestReputationExportImportPreservesSnapshots(t *testing.T) {
 func TestReputationSecurityAuthorizationAndTamperRejection(t *testing.T) {
 	state := newTestReputationState(t)
 	_, err := ApplyReputationPenalty(state, MsgApplyReputationPenalty{
-		Authority:   "4:0000000000000000000000000000000000000000000000000000000000000002",
-		SubjectType: SubjectValidator,
-		Subject:     addr(1),
-		Component:   ComponentMissedBlock,
-		Epoch:       1,
+		Authority:	"4:0000000000000000000000000000000000000000000000000000000000000002",
+		SubjectType:	SubjectValidator,
+		Subject:	addr(1),
+		Component:	ComponentMissedBlock,
+		Epoch:		1,
 	})
 	require.ErrorContains(t, err, "requires authority")
 
 	tampered := state
 	tampered.Validators = []ReputationRecord{{
-		Account:  addr(1),
-		Score:    ScoreMax,
-		AgeScore: 1,
+		Account:	addr(1),
+		Score:		ScoreMax,
+		AgeScore:	1,
 	}}
 	require.ErrorContains(t, CheckReputationInvariants(tampered), "score mismatch")
 
 	valid, err := ApplyReputationReward(state, MsgApplyReputationReward{
-		Authority:   state.Params.Authority,
-		SubjectType: SubjectReporter,
-		Subject:     addr(2),
-		Component:   ComponentRecovery,
-		Epoch:       2,
+		Authority:	state.Params.Authority,
+		SubjectType:	SubjectReporter,
+		Subject:	addr(2),
+		Component:	ComponentRecovery,
+		Epoch:		2,
 	})
 	require.NoError(t, err)
 	_, found := QueryReporterReputation(valid, addr(2))

@@ -11,61 +11,61 @@ import (
 )
 
 const (
-	EventTypeCodeStored           = "contracts.code_stored"
-	EventTypeContractInstantiated = "contracts.instantiated"
-	EventTypeContractExecuted     = "contracts.executed"
+	EventTypeCodeStored		= "contracts.code_stored"
+	EventTypeContractInstantiated	= "contracts.instantiated"
+	EventTypeContractExecuted	= "contracts.executed"
 
-	ErrInvalidParams    = "contracts_invalid_params"
-	ErrInvalidGenesis   = "contracts_invalid_genesis"
-	ErrContractNotFound = "contracts_not_found"
-	ErrInvalidBytecode  = "contracts_invalid_bytecode"
-	ErrExecutionFailed  = "contracts_execution_failed"
+	ErrInvalidParams	= "contracts_invalid_params"
+	ErrInvalidGenesis	= "contracts_invalid_genesis"
+	ErrContractNotFound	= "contracts_not_found"
+	ErrInvalidBytecode	= "contracts_invalid_bytecode"
+	ErrExecutionFailed	= "contracts_execution_failed"
 )
 
 type Params struct {
-	Authority                string
-	Enabled                  bool
-	MaxCodeBytes             uint64
-	MaxContractStorageBytes  uint64
-	MaxGasPerExecution       uint64
-	StorageRentPerByteBlock  uint64
-	MaxInitDataBytes         uint64
-	MaxStateInitSaltBytes    uint64
-	MaxStateInitDependencies uint32
+	Authority			string
+	Enabled				bool
+	MaxCodeBytes			uint64
+	MaxContractStorageBytes		uint64
+	MaxGasPerExecution		uint64
+	StorageRentPerByteBlock		uint64
+	MaxInitDataBytes		uint64
+	MaxStateInitSaltBytes		uint64
+	MaxStateInitDependencies	uint32
 }
 
 type GenesisState struct {
-	Params    Params
-	State     State
-	StateRoot string
+	Params		Params
+	State		State
+	StateRoot	string
 }
 
 type MsgStoreCode struct {
-	Authority string
-	CodeHash  string
-	CodeBytes uint64
-	Bytecode  []byte
+	Authority	string
+	CodeHash	string
+	CodeBytes	uint64
+	Bytecode	[]byte
 }
 
 type StoreCodeResponse struct {
-	CodeID    string
-	StateRoot string
+	CodeID		string
+	StateRoot	string
 }
 
 type QueryContractRequest struct {
-	ContractAddress string
-	ChainID         string
-	Namespace       string
-	Deployer        string
-	StateInit       *StateInit
+	ContractAddress	string
+	ChainID		string
+	Namespace	string
+	Deployer	string
+	StateInit	*StateInit
 }
 
 type QueryContractResponse struct {
-	ContractAddress string
-	StateRoot       string
-	Found           bool
-	Virtual         bool
-	Contract        Contract
+	ContractAddress	string
+	StateRoot	string
+	Found		bool
+	Virtual		bool
+	Contract	Contract
 }
 
 type MsgServer interface {
@@ -97,15 +97,15 @@ type QueryServer interface {
 
 func DefaultParams() Params {
 	return Params{
-		Authority:                prototype.DefaultAuthority,
-		Enabled:                  true,
-		MaxCodeBytes:             4 * 1024 * 1024,
-		MaxContractStorageBytes:  64 * 1024 * 1024,
-		MaxGasPerExecution:       100_000_000,
-		StorageRentPerByteBlock:  1,
-		MaxInitDataBytes:         MaxContractPayloadBytes,
-		MaxStateInitSaltBytes:    MaxContractSaltBytes,
-		MaxStateInitDependencies: MaxContractDependencies,
+		Authority:			prototype.DefaultAuthority,
+		Enabled:			true,
+		MaxCodeBytes:			4 * 1024 * 1024,
+		MaxContractStorageBytes:	64 * 1024 * 1024,
+		MaxGasPerExecution:		100_000_000,
+		StorageRentPerByteBlock:	1,
+		MaxInitDataBytes:		MaxContractPayloadBytes,
+		MaxStateInitSaltBytes:		MaxContractSaltBytes,
+		MaxStateInitDependencies:	MaxContractDependencies,
 	}
 }
 

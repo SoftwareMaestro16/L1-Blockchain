@@ -48,17 +48,17 @@ func TestAVMStoreV2PrefixesBucketsAndPruning(t *testing.T) {
 
 	consumed := AVMAsyncReplayTombstone{MessageID: engineHash("old-consumed"), ConsumedHeight: 10}
 	expired := AVMExpiredNonceTombstone{
-		ChainID:      "aetra-1",
-		SourceZone:   zonestypes.ZoneIDApplication,
-		Sender:       "alice",
-		SenderNonce:  9,
-		MessageID:    engineHash("old-expired"),
-		ExpiryHeight: 12,
+		ChainID:	"aetra-1",
+		SourceZone:	zonestypes.ZoneIDApplication,
+		Sender:		"alice",
+		SenderNonce:	9,
+		MessageID:	engineHash("old-expired"),
+		ExpiryHeight:	12,
 	}
 	expired.TombstoneHash = ComputeAVMExpiredNonceTombstoneHash(expired)
 	store, err := NewAVMReplayTombstoneStore(AVMReplayTombstoneStore{
-		ConsumedTombstones: []AVMAsyncReplayTombstone{consumed},
-		ExpiredNonces:      []AVMExpiredNonceTombstone{expired},
+		ConsumedTombstones:	[]AVMAsyncReplayTombstone{consumed},
+		ExpiredNonces:		[]AVMExpiredNonceTombstone{expired},
 	})
 	require.NoError(t, err)
 	pruning, err := NewAVMStoreV2TombstonePruningPlan(store, 100, 50)
@@ -84,12 +84,12 @@ func TestAVMStoreV2LayoutRootCommitsStrategy(t *testing.T) {
 	require.NoError(t, err)
 
 	layout, err := NewAVMStoreV2LayoutStrategy(AVMStoreV2LayoutStrategy{
-		MessageRecords:   []AVMStoreV2MessageRecord{record},
-		PayloadRecords:   []AVMStoreV2PayloadRecord{payload},
-		ActorPrefixes:    []AVMStoreV2ActorStatePrefix{actorPrefix},
-		ContractPrefixes: []AVMStoreV2ContractStatePrefix{contractPrefix},
-		DelayedBuckets:   []AVMStoreV2DelayedQueueBucket{bucket},
-		PruningPlan:      pruning,
+		MessageRecords:		[]AVMStoreV2MessageRecord{record},
+		PayloadRecords:		[]AVMStoreV2PayloadRecord{payload},
+		ActorPrefixes:		[]AVMStoreV2ActorStatePrefix{actorPrefix},
+		ContractPrefixes:	[]AVMStoreV2ContractStatePrefix{contractPrefix},
+		DelayedBuckets:		[]AVMStoreV2DelayedQueueBucket{bucket},
+		PruningPlan:		pruning,
 	})
 	require.NoError(t, err)
 	require.NoError(t, layout.Validate())

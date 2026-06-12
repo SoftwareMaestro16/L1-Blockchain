@@ -70,10 +70,10 @@ func TestDuplicateEvidenceIsRejectedByIDAndPayload(t *testing.T) {
 
 	group := testVerificationGroup(t, record)
 	proof := EvidenceProofPayload{
-		EvidenceID:       record.EvidenceID,
-		ObjectHash:       record.ObjectHash,
-		ProofPayloadHash: record.ProofPayloadHash,
-		PayloadSignature: testHash("proof-duplicate"),
+		EvidenceID:		record.EvidenceID,
+		ObjectHash:		record.ObjectHash,
+		ProofPayloadHash:	record.ProofPayloadHash,
+		PayloadSignature:	testHash("proof-duplicate"),
 	}
 	_, err := SubmitEvidence(params, []EvidenceSubmission{first}, record, proof, "reporter-b", SubmitterRoleReporter, params.ReporterDepositNaet, group)
 	require.ErrorContains(t, err, "duplicate evidence id")
@@ -91,18 +91,18 @@ func TestForgedEvidencePayloadIsRejected(t *testing.T) {
 	group := testVerificationGroup(t, record)
 
 	_, err := SubmitEvidence(params, nil, record, EvidenceProofPayload{
-		EvidenceID:       record.EvidenceID,
-		ObjectHash:       testHash("wrong-object"),
-		ProofPayloadHash: record.ProofPayloadHash,
-		PayloadSignature: testHash("proof-forged"),
+		EvidenceID:		record.EvidenceID,
+		ObjectHash:		testHash("wrong-object"),
+		ProofPayloadHash:	record.ProofPayloadHash,
+		PayloadSignature:	testHash("proof-forged"),
 	}, "reporter-a", SubmitterRoleReporter, params.ReporterDepositNaet, group)
 	require.ErrorContains(t, err, "object hash mismatch")
 
 	_, err = SubmitEvidence(params, nil, record, EvidenceProofPayload{
-		EvidenceID:       record.EvidenceID,
-		ObjectHash:       record.ObjectHash,
-		ProofPayloadHash: record.ProofPayloadHash,
-		PayloadSignature: "not-hex",
+		EvidenceID:		record.EvidenceID,
+		ObjectHash:		record.ObjectHash,
+		ProofPayloadHash:	record.ProofPayloadHash,
+		PayloadSignature:	"not-hex",
 	}, "reporter-a", SubmitterRoleReporter, params.ReporterDepositNaet, group)
 	require.ErrorContains(t, err, "signature")
 }
@@ -118,10 +118,10 @@ func testEvidenceSubmission(t *testing.T, params Params, role string, submitter 
 	}
 	group := testVerificationGroup(t, record)
 	proof := EvidenceProofPayload{
-		EvidenceID:       record.EvidenceID,
-		ObjectHash:       record.ObjectHash,
-		ProofPayloadHash: record.ProofPayloadHash,
-		PayloadSignature: testHash("proof-signature"),
+		EvidenceID:		record.EvidenceID,
+		ObjectHash:		record.ObjectHash,
+		ProofPayloadHash:	record.ProofPayloadHash,
+		PayloadSignature:	testHash("proof-signature"),
 	}
 	submission, err := SubmitEvidence(params, nil, record, proof, submitter, role, RequiredDeposit(params, role), group)
 	require.NoError(t, err)
@@ -143,14 +143,14 @@ func testVerificationGroup(t *testing.T, record postypes.EvidenceRecord) postype
 func testEvidenceRecord(t *testing.T, evidenceID string, reporter string) postypes.EvidenceRecord {
 	t.Helper()
 	record, err := postypes.NewEvidenceRecord(postypes.EvidenceRecord{
-		EvidenceID:       evidenceID,
-		EvidenceType:     postypes.EvidenceTypeInvalidTaskExecutionProof,
-		AccusedValidator: "val-000",
-		Reporter:         reporter,
-		EpochID:          7,
-		ObjectHash:       testHash("object"),
-		ProofPayloadHash: testHash("payload"),
-		SubmittedHeight:  70,
+		EvidenceID:		evidenceID,
+		EvidenceType:		postypes.EvidenceTypeInvalidTaskExecutionProof,
+		AccusedValidator:	"val-000",
+		Reporter:		reporter,
+		EpochID:		7,
+		ObjectHash:		testHash("object"),
+		ProofPayloadHash:	testHash("payload"),
+		SubmittedHeight:	70,
 	})
 	require.NoError(t, err)
 	return record
@@ -161,12 +161,12 @@ func testScoredValidators(t *testing.T, params postypes.Params, count int) []pos
 	out := make([]postypes.ScoredValidator, count)
 	for i := range out {
 		candidate := postypes.Candidate{
-			ValidatorID:         "val-" + threeDigits(i),
-			SelfStakeNaet:       sdkmath.NewInt(1_000_000_000),
-			DelegatedStakeNaet:  sdkmath.ZeroInt(),
-			PerformanceScoreBps: postypes.BasisPoints,
-			UptimeFactorBps:     postypes.BasisPoints,
-			CommissionBps:       500,
+			ValidatorID:		"val-" + threeDigits(i),
+			SelfStakeNaet:		sdkmath.NewInt(1_000_000_000),
+			DelegatedStakeNaet:	sdkmath.ZeroInt(),
+			PerformanceScoreBps:	postypes.BasisPoints,
+			UptimeFactorBps:	postypes.BasisPoints,
+			CommissionBps:		500,
 		}
 		scored, err := postypes.ScoreCandidate(params, candidate)
 		require.NoError(t, err)

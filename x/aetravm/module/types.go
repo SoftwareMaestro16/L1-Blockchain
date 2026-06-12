@@ -11,34 +11,26 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.9: Canonical AVM Module Format & Bytecode Verifier
-// ---------------
-
 const (
-	VerifierVersion           = 1
-	MagicNumber              = uint32(0x41564D01) // "AVM\x01"
-	MaxModuleImports         = 256
-	MaxModuleExports         = 64
-	MaxModuleInstructions    = 65536
-	MaxModuleCodeBytes       = 1 << 20 // 1 MiB
-	MaxModuleMetadataBytes   = 4096
-	MaxModuleSchemaBytes     = 1 << 16  // 64 KiB
-	MaxModuleDependencyDepth = 16
-	MaxStackDepth            = 1024
+	VerifierVersion			= 1
+	MagicNumber			= uint32(0x41564D01)	// "AVM\x01"
+	MaxModuleImports		= 256
+	MaxModuleExports		= 64
+	MaxModuleInstructions		= 65536
+	MaxModuleCodeBytes		= 1 << 20	// 1 MiB
+	MaxModuleMetadataBytes		= 4096
+	MaxModuleSchemaBytes		= 1 << 16	// 64 KiB
+	MaxModuleDependencyDepth	= 16
+	MaxStackDepth			= 1024
 
-	ModuleSectionMagic     = 0x4D53 // "MS"
-	ModuleSectionCode      = 0x01
-	ModuleSectionImports   = 0x02
-	ModuleSectionExports   = 0x03
-	ModuleSectionMetadata  = 0x04
-	ModuleSectionSchema    = 0x05
-	ModuleSectionDeps      = 0x06
+	ModuleSectionMagic	= 0x4D53	// "MS"
+	ModuleSectionCode	= 0x01
+	ModuleSectionImports	= 0x02
+	ModuleSectionExports	= 0x03
+	ModuleSectionMetadata	= 0x04
+	ModuleSectionSchema	= 0x05
+	ModuleSectionDeps	= 0x06
 )
-
-// ---------------
-// Module Trust Classification
-// ---------------
 
 // TrustLevel classifies module trust.
 //   - Untrusted: user-uploaded, needs full verification
@@ -47,7 +39,7 @@ const (
 type TrustLevel uint8
 
 const (
-	Untrusted TrustLevel = iota
+	Untrusted	TrustLevel	= iota
 	Verified
 	Canonical
 )
@@ -65,55 +57,47 @@ func (t TrustLevel) String() string {
 	}
 }
 
-// ---------------
-// Canonical Module Format
-// ---------------
-
 // AVMModule represents a canonical AVM module with all sections.
 //
 // ModuleHash = BLAKE3(canonical_encoding(all sections))
 // Any change in ANY section MUST change ModuleHash.
 type AVMModule struct {
-	Magic          uint32
-	Version        uint32
-	ABIVersion    uint32
-	ImportTable   []ImportEntry
-	ExportTable   []ExportEntry
-	MetadataHash  []byte
-	Instructions  []byte
-	DependencyHashes [][]byte
-	Schema         []byte
+	Magic			uint32
+	Version			uint32
+	ABIVersion		uint32
+	ImportTable		[]ImportEntry
+	ExportTable		[]ExportEntry
+	MetadataHash		[]byte
+	Instructions		[]byte
+	DependencyHashes	[][]byte
+	Schema			[]byte
 }
 
 // ImportEntry represents a resolved import with deterministic linking.
 type ImportEntry struct {
-	ModuleName string
-	ModuleID   []byte // Hash of the dependency module
-	FunctionIndex uint32
+	ModuleName	string
+	ModuleID	[]byte	// Hash of the dependency module
+	FunctionIndex	uint32
 }
 
 // ExportEntry represents an exported entrypoint.
 type ExportEntry struct {
-	Name   string
-	Index  Entrypoint
-	Offset uint32
+	Name	string
+	Index	Entrypoint
+	Offset	uint32
 }
 
 // Entrypoint defines the standard AVM entrypoints.
 type Entrypoint uint8
 
 const (
-	EntryDeploy          Entrypoint = 1
-	EntryReceiveExternal Entrypoint = 2
-	EntryReceiveInternal Entrypoint = 3
-	EntryReceiveBounced  Entrypoint = 4
-	EntryQuery           Entrypoint = 5
-	EntryMigrate         Entrypoint = 6
+	EntryDeploy		Entrypoint	= 1
+	EntryReceiveExternal	Entrypoint	= 2
+	EntryReceiveInternal	Entrypoint	= 3
+	EntryReceiveBounced	Entrypoint	= 4
+	EntryQuery		Entrypoint	= 5
+	EntryMigrate		Entrypoint	= 6
 )
-
-// ---------------
-// Verification Result Model
-// ---------------
 
 // VerificationResult is the canonical, deterministic output of verification.
 //
@@ -123,77 +107,61 @@ const (
 //   - No parallel nondeterministic ordering
 //   - Contains analyzed stack bounds and CFG hash
 type VerificationResult struct {
-	ModuleHash         []byte
-	VerifierVersion    uint32
-	Passed             bool
-	ErrorCode          uint32
-	ErrorMessage       string
-	AnalyzedStackBound uint32
-	CFGHash            []byte
-	TrustLevel         TrustLevel
-	DependencyHashes   [][]byte
-	ABICompatibility   bool
+	ModuleHash		[]byte
+	VerifierVersion		uint32
+	Passed			bool
+	ErrorCode		uint32
+	ErrorMessage		string
+	AnalyzedStackBound	uint32
+	CFGHash			[]byte
+	TrustLevel		TrustLevel
+	DependencyHashes	[][]byte
+	ABICompatibility	bool
 }
-
-// ---------------
-// Control Flow Graph
-// ---------------
 
 // BasicBlock represents a basic block in the control flow graph.
 type BasicBlock struct {
-	StartOffset uint32
-	EndOffset   uint32
-	Successors  []uint32
-	Predecessors []uint32
+	StartOffset	uint32
+	EndOffset	uint32
+	Successors	[]uint32
+	Predecessors	[]uint32
 }
 
 // ControlFlowGraph represents the CFG of a verified module.
 type ControlFlowGraph struct {
-	Blocks       []*BasicBlock
-	EntryBlock   uint32
-	ExitBlocks   []uint32
-	Hash         []byte
+	Blocks		[]*BasicBlock
+	EntryBlock	uint32
+	ExitBlocks	[]uint32
+	Hash		[]byte
 }
-
-// ---------------
-// Stack Safety Model
-// ---------------
 
 // StackEffect describes the stack effect per instruction.
 type StackEffect struct {
-	PushCount int
-	PopCount  int
-	NetDelta  int
+	PushCount	int
+	PopCount	int
+	NetDelta	int
 }
 
 // StackBounds describes the analyzed stack bounds for a module.
 type StackBounds struct {
-	MaxDepth int
-	MinDepth int
-	NetDelta int
+	MaxDepth	int
+	MinDepth	int
+	NetDelta	int
 }
-
-// ---------------
-// Dependency DAG
-// ---------------
 
 // DependencyEdge represents a dependency in the module DAG.
 type DependencyEdge struct {
-	FromModuleHash []byte
-	ToModuleHash   []byte
-	ToFunctionIndex uint32
+	FromModuleHash	[]byte
+	ToModuleHash	[]byte
+	ToFunctionIndex	uint32
 }
 
 // DependencyDAG represents the acyclic dependency graph of modules.
 type DependencyDAG struct {
-	Edges     []DependencyEdge
-	TopOrder  [][]byte // Topological order of module hashes
-	Verified  map[string]bool
+	Edges		[]DependencyEdge
+	TopOrder	[][]byte	// Topological order of module hashes
+	Verified	map[string]bool
 }
-
-// ---------------
-// Verifier
-// ---------------
 
 // Verifier performs deterministic verification of AVM modules.
 //
@@ -208,24 +176,24 @@ type Verifier struct {
 
 // VerifierParams configures the verifier's limits.
 type VerifierParams struct {
-	MaxCodeBytes      uint32
-	MaxInstructions   uint32
-	MaxImports        uint16
-	MaxExports        uint16
-	MaxStackDepth     uint32
-	MaxDependencies   uint16
-	MaxDependencyDepth uint8
+	MaxCodeBytes		uint32
+	MaxInstructions		uint32
+	MaxImports		uint16
+	MaxExports		uint16
+	MaxStackDepth		uint32
+	MaxDependencies		uint16
+	MaxDependencyDepth	uint8
 }
 
 func DefaultVerifierParams() VerifierParams {
 	return VerifierParams{
-		MaxCodeBytes:      MaxModuleCodeBytes,
-		MaxInstructions:   MaxModuleInstructions,
-		MaxImports:        MaxModuleImports,
-		MaxExports:        MaxModuleExports,
-		MaxStackDepth:    MaxStackDepth,
-		MaxDependencies:  256,
-		MaxDependencyDepth: MaxModuleDependencyDepth,
+		MaxCodeBytes:		MaxModuleCodeBytes,
+		MaxInstructions:	MaxModuleInstructions,
+		MaxImports:		MaxModuleImports,
+		MaxExports:		MaxModuleExports,
+		MaxStackDepth:		MaxStackDepth,
+		MaxDependencies:	256,
+		MaxDependencyDepth:	MaxModuleDependencyDepth,
 	}
 }
 
@@ -319,21 +287,17 @@ func (v *Verifier) Verify(data []byte) (VerificationResult, error) {
 	cfgHash := v.computeCFGHash(cfg)
 
 	return VerificationResult{
-		ModuleHash:         moduleHash,
-		VerifierVersion:   VerifierVersion,
-		Passed:            true,
-		ErrorCode:         0,
-		AnalyzedStackBound: uint32(bounds.MaxDepth),
-		CFGHash:           cfgHash,
-		TrustLevel:        Verified,
-		DependencyHashes:  mod.DependencyHashes,
-		ABICompatibility:  true,
+		ModuleHash:		moduleHash,
+		VerifierVersion:	VerifierVersion,
+		Passed:			true,
+		ErrorCode:		0,
+		AnalyzedStackBound:	uint32(bounds.MaxDepth),
+		CFGHash:		cfgHash,
+		TrustLevel:		Verified,
+		DependencyHashes:	mod.DependencyHashes,
+		ABICompatibility:	true,
 	}, nil
 }
-
-// ---------------
-// Canonical Module Hash
-// ---------------
 
 // ModuleHash = BLAKE3(canonical_encoding(all module sections))
 // Any change in ANY section MUST change ModuleHash.
@@ -342,10 +306,6 @@ func (v *Verifier) computeModuleHash(data []byte) []byte {
 	h.Write(data)
 	return h.Sum(nil)
 }
-
-// ---------------
-// Decode
-// ---------------
 
 func (v *Verifier) decode(data []byte) (*AVMModule, error) {
 	if len(data) < 16 {
@@ -491,7 +451,7 @@ func (v *Verifier) decode(data []byte) (*AVMModule, error) {
 
 	schemaLen, err := readU32FromReader(reader)
 	if err != nil {
-		// Schema is optional
+
 		schemaLen = 0
 	}
 
@@ -504,21 +464,17 @@ func (v *Verifier) decode(data []byte) (*AVMModule, error) {
 	}
 
 	return &AVMModule{
-		Magic:          magic,
-		Version:        version,
-		ABIVersion:     abiVersion,
-		ImportTable:    imports,
-		ExportTable:    exports,
-		MetadataHash:   metadataHash,
-		Instructions:   instructions,
-		DependencyHashes: deps,
-		Schema:         schema,
+		Magic:			magic,
+		Version:		version,
+		ABIVersion:		abiVersion,
+		ImportTable:		imports,
+		ExportTable:		exports,
+		MetadataHash:		metadataHash,
+		Instructions:		instructions,
+		DependencyHashes:	deps,
+		Schema:			schema,
 	}, nil
 }
-
-// ---------------
-// Validation Functions
-// ---------------
 
 func (v *Verifier) validateMagic(mod *AVMModule) error {
 	if mod.Magic != MagicNumber {
@@ -532,8 +488,6 @@ func (v *Verifier) validateVersion(mod *AVMModule) error {
 		return fmt.Errorf("unsupported module version %d: expected %d", mod.Version, VerifierVersion)
 	}
 
-	// ABI version compatibility check
-	// Only ABI version 1 is currently supported
 	if mod.ABIVersion != 1 {
 		return fmt.Errorf("unsupported ABI version %d: expected 1", mod.ABIVersion)
 	}
@@ -616,10 +570,6 @@ func isValidEntrypoint(entry Entrypoint) bool {
 	}
 }
 
-// ---------------
-// Control Flow Graph
-// ---------------
-
 // buildCFG builds a Control Flow Graph from bytecode.
 //
 // Invariants:
@@ -632,15 +582,9 @@ func (v *Verifier) buildCFG(code []byte) (*ControlFlowGraph, error) {
 		return nil, errors.New("empty code for CFG construction")
 	}
 
-	// Identify basic block boundaries
-	// Leaders are: entry point, jump targets, instructions after jumps
 	leaders := make(map[uint32]struct{})
-	leaders[0] = struct{}{} // First instruction is always a leader
+	leaders[0] = struct{}{}
 
-	// From exports
-	// (would need export table access — simulated)
-
-	// Scan for jump instructions and mark targets
 	for i := 0; i < len(code); {
 		opcode := code[i]
 		target := getJumpTarget(opcode, code, i)
@@ -652,7 +596,7 @@ func (v *Verifier) buildCFG(code []byte) (*ControlFlowGraph, error) {
 		}
 		next := nextInstructionOffset(opcode, i)
 		if next <= i {
-			// End of block or invalid
+
 			break
 		}
 		if next < len(code) {
@@ -674,10 +618,10 @@ func (v *Verifier) buildCFG(code []byte) (*ControlFlowGraph, error) {
 			end = sortedLeaders[i+1]
 		}
 		blocks[i] = &BasicBlock{
-			StartOffset:  start,
-			EndOffset:    end,
-			Successors:   []uint32{},
-			Predecessors: []uint32{},
+			StartOffset:	start,
+			EndOffset:	end,
+			Successors:	[]uint32{},
+			Predecessors:	[]uint32{},
 		}
 	}
 
@@ -702,16 +646,15 @@ func (v *Verifier) buildCFG(code []byte) (*ControlFlowGraph, error) {
 			}
 		}
 
-		// Check if this is an exit block (no successors after return/halt)
 		if block.EndOffset == uint32(len(code)) || isTerminalOpcode(code[int(block.EndOffset)-1]) {
 			exitBlocks = append(exitBlocks, uint32(i))
 		}
 	}
 
 	cfg := &ControlFlowGraph{
-		Blocks:     blocks,
-		EntryBlock: entryBlock,
-		ExitBlocks: exitBlocks,
+		Blocks:		blocks,
+		EntryBlock:	entryBlock,
+		ExitBlocks:	exitBlocks,
 	}
 
 	cfg.Hash = v.computeCFGHashFromBlocks(blocks)
@@ -741,62 +684,56 @@ func (v *Verifier) computeCFGHashFromBlocks(blocks []*BasicBlock) []byte {
 	return h.Sum(nil)
 }
 
-// Opcode helpers for CFG construction
-
 // AVMInstructionSize maps opcode to instruction size.
 var AVMInstructionSize = map[byte]int{
-	0x00: 1, // nop
-	0x01: 9, // push_u64 (1 byte op + 8 byte arg)
-	0x02: 1, // read_storage (variable, simplified)
-	0x03: 1, // write_storage
-	0x04: 1, // add
-	0x05: 1, // emit_internal
-	0x06: 1, // return
-	0x07: 1, // read_msg_opcode
-	0x08: 1, // read_msg_query_id
-	0x09: 1, // read_block
-	0x0a: 9, // charge_gas
-	0x0b: 1, // schedule_self
+	0x00:	1,
+	0x01:	9,
+	0x02:	1,
+	0x03:	1,
+	0x04:	1,
+	0x05:	1,
+	0x06:	1,
+	0x07:	1,
+	0x08:	1,
+	0x09:	1,
+	0x0a:	9,
+	0x0b:	1,
 }
 
 func nextInstructionOffset(opcode byte, current int) int {
 	size, ok := AVMInstructionSize[opcode]
 	if !ok {
-		return 1 // Default: skip 1 byte for unknown opcodes
+		return 1
 	}
 	return size
 }
 
 func getJumpTarget(opcode byte, code []byte, offset int) int {
-	// Return instruction jumps: no target (terminates block)
-	if opcode == 0x06 { // return
+
+	if opcode == 0x06 {
 		return -1
 	}
 	return -1
 }
 
 func isTerminalOpcode(opcode byte) bool {
-	return opcode == 0x06 // return
+	return opcode == 0x06
 }
-
-// ---------------
-// Stack Effect Analysis
-// ---------------
 
 // AVMOpcodeStackEffects maps opcodes to their stack effects.
 var AVMOpcodeStackEffects = map[byte]StackEffect{
-	0x00: {PushCount: 0, PopCount: 0, NetDelta: 0}, // nop
-	0x01: {PushCount: 1, PopCount: 0, NetDelta: 1},  // push_u64
-	0x02: {PushCount: 1, PopCount: 0, NetDelta: 1},  // read_storage (push value)
-	0x03: {PushCount: 0, PopCount: 1, NetDelta: -1},  // write_storage (pop value)
-	0x04: {PushCount: 1, PopCount: 2, NetDelta: -1}, // add (pop 2, push 1)
-	0x05: {PushCount: 0, PopCount: 0, NetDelta: 0},  // emit_internal
-	0x06: {PushCount: 0, PopCount: 0, NetDelta: 0},  // return
-	0x07: {PushCount: 1, PopCount: 0, NetDelta: 1},  // read_msg_opcode
-	0x08: {PushCount: 1, PopCount: 0, NetDelta: 1},  // read_msg_query_id
-	0x09: {PushCount: 1, PopCount: 0, NetDelta: 1},  // read_block
-	0x0a: {PushCount: 0, PopCount: 0, NetDelta: 0},  // charge_gas
-	0x0b: {PushCount: 0, PopCount: 0, NetDelta: 0},  // schedule_self
+	0x00:	{PushCount: 0, PopCount: 0, NetDelta: 0},
+	0x01:	{PushCount: 1, PopCount: 0, NetDelta: 1},
+	0x02:	{PushCount: 1, PopCount: 0, NetDelta: 1},
+	0x03:	{PushCount: 0, PopCount: 1, NetDelta: -1},
+	0x04:	{PushCount: 1, PopCount: 2, NetDelta: -1},
+	0x05:	{PushCount: 0, PopCount: 0, NetDelta: 0},
+	0x06:	{PushCount: 0, PopCount: 0, NetDelta: 0},
+	0x07:	{PushCount: 1, PopCount: 0, NetDelta: 1},
+	0x08:	{PushCount: 1, PopCount: 0, NetDelta: 1},
+	0x09:	{PushCount: 1, PopCount: 0, NetDelta: 1},
+	0x0a:	{PushCount: 0, PopCount: 0, NetDelta: 0},
+	0x0b:	{PushCount: 0, PopCount: 0, NetDelta: 0},
 }
 
 // analyzeStackBounds computes the max/min stack depth across all instruction paths.
@@ -814,7 +751,7 @@ func (v *Verifier) analyzeStackBounds(code []byte) (StackBounds, error) {
 		opcode := code[i]
 		effect, ok := AVMOpcodeStackEffects[opcode]
 		if !ok {
-			// Unknown opcode — skip with warning
+
 			i += nextInstructionOffset(opcode, i)
 			continue
 		}
@@ -837,15 +774,11 @@ func (v *Verifier) analyzeStackBounds(code []byte) (StackBounds, error) {
 	}
 
 	return StackBounds{
-		MaxDepth: maxDepth,
-		MinDepth: minDepth,
-		NetDelta: currentDepth,
+		MaxDepth:	maxDepth,
+		MinDepth:	minDepth,
+		NetDelta:	currentDepth,
 	}, nil
 }
-
-// ---------------
-// Dependency DAG Validation
-// ---------------
 
 // validateDependencyDAG ensures module dependencies form a DAG.
 //
@@ -910,9 +843,9 @@ func BuildDependencyDAG(modules []AVMModule) (*DependencyDAG, error) {
 
 		for _, dep := range mod.DependencyHashes {
 			dag.Edges = append(dag.Edges, DependencyEdge{
-				FromModuleHash:  hash,
-				ToModuleHash:    dep,
-				ToFunctionIndex: 0,
+				FromModuleHash:		hash,
+				ToModuleHash:		dep,
+				ToFunctionIndex:	0,
 			})
 			if err := topoSort(dep); err != nil {
 				return err
@@ -943,10 +876,6 @@ func BuildDependencyDAG(modules []AVMModule) (*DependencyDAG, error) {
 	return dag, nil
 }
 
-// ---------------
-// Formal Execution Guarantee
-// ---------------
-
 // ValidateExecutionGuarantee checks that a verified module guarantees runtime safety.
 //
 // Invariants (if module passes verification):
@@ -968,10 +897,6 @@ func ValidateExecutionGuarantee(result VerificationResult) error {
 
 	return nil
 }
-
-// ---------------
-// Encode / Decode Helpers
-// ---------------
 
 func encodeModule(mod *AVMModule) []byte {
 	buf := bytes.NewBuffer(nil)
@@ -1015,16 +940,12 @@ func blake3Sum32(data []byte) []byte {
 	return h.Sum(nil)
 }
 
-// ---------------
-// Helper Functions
-// ---------------
-
 func (v *Verifier) failWithCode(code uint32, msg string) VerificationResult {
 	return VerificationResult{
-		Passed:       false,
-		ErrorCode:    code,
-		ErrorMessage: msg,
-		TrustLevel:   Untrusted,
+		Passed:		false,
+		ErrorCode:	code,
+		ErrorMessage:	msg,
+		TrustLevel:	Untrusted,
 	}
 }
 

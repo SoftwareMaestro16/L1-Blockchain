@@ -16,46 +16,46 @@ func TestStakingProofMetadataStableForPoolObjects(t *testing.T) {
 	rootHash := "nominator-pool-root-ref"
 
 	cases := []struct {
-		name     string
-		req      StakingProofRequest
-		storeKey string
-		stateKey string
-		hash     string
+		name		string
+		req		StakingProofRequest
+		storeKey	string
+		stateKey	string
+		hash		string
 	}{
 		{
-			name:     "deposit",
-			req:      StakingProofRequest{Kind: StakingProofDeposit, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
-			storeKey: StoreKey,
-			stateKey: PoolDepositProofStateKey("pool-a", account),
-			hash:     "fb2b1fd776560789390b65940072a55ae1a7411e8bf7847750917c3dcb8737f7",
+			name:		"deposit",
+			req:		StakingProofRequest{Kind: StakingProofDeposit, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
+			storeKey:	StoreKey,
+			stateKey:	PoolDepositProofStateKey("pool-a", account),
+			hash:		"fb2b1fd776560789390b65940072a55ae1a7411e8bf7847750917c3dcb8737f7",
 		},
 		{
-			name:     "share",
-			req:      StakingProofRequest{Kind: StakingProofShare, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
-			storeKey: StoreKey,
-			stateKey: PoolShareProofStateKey("pool-a", account),
-			hash:     "c2077ec0a74aec831500eecb163ecafecd4401ca1ab5ff1cffc4d67c36f0df5f",
+			name:		"share",
+			req:		StakingProofRequest{Kind: StakingProofShare, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
+			storeKey:	StoreKey,
+			stateKey:	PoolShareProofStateKey("pool-a", account),
+			hash:		"c2077ec0a74aec831500eecb163ecafecd4401ca1ab5ff1cffc4d67c36f0df5f",
 		},
 		{
-			name:     "allocation",
-			req:      StakingProofRequest{Kind: StakingProofAllocation, Height: 10, PoolID: "pool-a", Epoch: 7, AppHash: appHash, RootHash: rootHash},
-			storeKey: StoreKey,
-			stateKey: PoolAllocationProofStateKey("pool-a", 7),
-			hash:     "801f5215804d3b647d3b299e97d742021b25316986e75a0a88132a663051e2f0",
+			name:		"allocation",
+			req:		StakingProofRequest{Kind: StakingProofAllocation, Height: 10, PoolID: "pool-a", Epoch: 7, AppHash: appHash, RootHash: rootHash},
+			storeKey:	StoreKey,
+			stateKey:	PoolAllocationProofStateKey("pool-a", 7),
+			hash:		"801f5215804d3b647d3b299e97d742021b25316986e75a0a88132a663051e2f0",
 		},
 		{
-			name:     "reward",
-			req:      StakingProofRequest{Kind: StakingProofReward, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
-			storeKey: StoreKey,
-			stateKey: PoolRewardProofStateKey("pool-a", account),
-			hash:     "6c43015042f5f4914ecc38eda532fdf32a07d5e9a426b85fd574c4a4ddeefce1",
+			name:		"reward",
+			req:		StakingProofRequest{Kind: StakingProofReward, Height: 10, PoolID: "pool-a", Account: account, AppHash: appHash, RootHash: rootHash},
+			storeKey:	StoreKey,
+			stateKey:	PoolRewardProofStateKey("pool-a", account),
+			hash:		"6c43015042f5f4914ecc38eda532fdf32a07d5e9a426b85fd574c4a4ddeefce1",
 		},
 		{
-			name:     "reputation",
-			req:      StakingProofRequest{Kind: StakingProofReputation, Height: 10, Account: account, AppHash: appHash, RootHash: "reputation-root-ref"},
-			storeKey: reputationtypes.StoreKey,
-			stateKey: StakeReputationProofStateKey(account),
-			hash:     "48fc1bec057d30bc2b351d7f9a82c0473aa3aea7357dd898512cfb5cb457f874",
+			name:		"reputation",
+			req:		StakingProofRequest{Kind: StakingProofReputation, Height: 10, Account: account, AppHash: appHash, RootHash: "reputation-root-ref"},
+			storeKey:	reputationtypes.StoreKey,
+			stateKey:	StakeReputationProofStateKey(account),
+			hash:		"48fc1bec057d30bc2b351d7f9a82c0473aa3aea7357dd898512cfb5cb457f874",
 		},
 	}
 	for _, tc := range cases {
@@ -79,12 +79,12 @@ func TestStakingProofRejectsMissingRootMetadataAndUnboundedFlag(t *testing.T) {
 	require.ErrorContains(t, err, "app hash and root hash")
 
 	metadata, err := BuildStakingProofMetadata(StakingProofRequest{
-		Kind:     StakingProofShare,
-		Height:   1,
-		PoolID:   "pool-a",
-		Account:  proofAEAddress(0x45),
-		AppHash:  "app",
-		RootHash: "root",
+		Kind:		StakingProofShare,
+		Height:		1,
+		PoolID:		"pool-a",
+		Account:	proofAEAddress(0x45),
+		AppHash:	"app",
+		RootHash:	"root",
 	})
 	require.NoError(t, err)
 	metadata.BoundedLookup = false

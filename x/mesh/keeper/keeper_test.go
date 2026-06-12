@@ -114,29 +114,29 @@ func keeperMeshFixture(t *testing.T) (Keeper, meshtypes.MeshMessage) {
 	require.NoError(t, keeper.RegisterDestination(keeperDestination("FINANCIAL_ZONE", "0:0")))
 
 	commitment := meshtypes.FinalizedCommitment{
-		ZoneID:         meshtypes.ZoneID("FINANCIAL_ZONE"),
-		ShardID:        meshtypes.ShardID("0:0"),
-		Height:         90,
-		CommitmentHash: meshtypes.HashParts("source-commitment", "financial", "0:0", "90"),
-		MessageRoot:    meshtypes.HashParts("message-root", "financial", "90"),
-		ReceiptRoot:    meshtypes.HashParts("receipt-root", "financial", "90"),
+		ZoneID:		meshtypes.ZoneID("FINANCIAL_ZONE"),
+		ShardID:	meshtypes.ShardID("0:0"),
+		Height:		90,
+		CommitmentHash:	meshtypes.HashParts("source-commitment", "financial", "0:0", "90"),
+		MessageRoot:	meshtypes.HashParts("message-root", "financial", "90"),
+		ReceiptRoot:	meshtypes.HashParts("receipt-root", "financial", "90"),
 	}
 	require.NoError(t, keeper.AddFinalizedCommitment(commitment))
 
 	msg, err := meshtypes.NewMessage(meshtypes.MeshMessage{
-		SourceZone:        meshtypes.ZoneID("FINANCIAL_ZONE"),
-		SourceShard:       meshtypes.ShardID("0:0"),
-		DestinationZone:   meshtypes.ZoneID("CONTRACT_ZONE"),
-		DestinationShard:  meshtypes.ShardID("0:1"),
-		Nonce:             7,
-		Sender:            []byte("orb1sender"),
-		Recipient:         []byte("contract1recipient"),
-		AssetCommitment:   meshtypes.HashParts("asset", "100naet"),
-		PayloadHash:       meshtypes.HashParts("payload", "execute"),
-		TimeoutHeight:     150,
-		Finality:          meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
-		Sequence:          3,
-		SourceLogicalTime: 88,
+		SourceZone:		meshtypes.ZoneID("FINANCIAL_ZONE"),
+		SourceShard:		meshtypes.ShardID("0:0"),
+		DestinationZone:	meshtypes.ZoneID("CONTRACT_ZONE"),
+		DestinationShard:	meshtypes.ShardID("0:1"),
+		Nonce:			7,
+		Sender:			[]byte("orb1sender"),
+		Recipient:		[]byte("contract1recipient"),
+		AssetCommitment:	meshtypes.HashParts("asset", "100naet"),
+		PayloadHash:		meshtypes.HashParts("payload", "execute"),
+		TimeoutHeight:		150,
+		Finality:		meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
+		Sequence:		3,
+		SourceLogicalTime:	88,
 	})
 	require.NoError(t, err)
 	msg.Proof = meshtypes.BuildProof(msg, commitment)
@@ -145,16 +145,16 @@ func keeperMeshFixture(t *testing.T) (Keeper, meshtypes.MeshMessage) {
 
 func keeperDestination(zone string, shard string) meshtypes.MeshDestination {
 	return meshtypes.MeshDestination{
-		ZoneID:  meshtypes.ZoneID(zone),
-		ShardID: meshtypes.ShardID(shard),
-		Active:  true,
+		ZoneID:		meshtypes.ZoneID(zone),
+		ShardID:	meshtypes.ShardID(shard),
+		Active:		true,
 	}
 }
 
 func keeperSuccessResult() meshtypes.ExecutionResult {
 	return meshtypes.ExecutionResult{
-		Success:    true,
-		Code:       0,
-		ResultHash: meshtypes.HashParts("execution", "success"),
+		Success:	true,
+		Code:		0,
+		ResultHash:	meshtypes.HashParts("execution", "success"),
 	}
 }

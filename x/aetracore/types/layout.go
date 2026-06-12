@@ -12,102 +12,102 @@ import (
 type ShardAssignmentMode string
 
 const (
-	ShardAssignmentConsistentHash ShardAssignmentMode = "consistent_hash"
-	ShardAssignmentKeyPrefix      ShardAssignmentMode = "key_prefix"
-	ShardAssignmentExplicit       ShardAssignmentMode = "explicit"
+	ShardAssignmentConsistentHash	ShardAssignmentMode	= "consistent_hash"
+	ShardAssignmentKeyPrefix	ShardAssignmentMode	= "key_prefix"
+	ShardAssignmentExplicit		ShardAssignmentMode	= "explicit"
 )
 
 type ShardPlacementOverride struct {
-	ObjectKey          string
-	ShardID            ShardID
-	ReadOnlyReplicated bool
+	ObjectKey		string
+	ShardID			ShardID
+	ReadOnlyReplicated	bool
 }
 
 type ShardRoutingInput struct {
-	ZoneID            ZoneID
-	StateKey          string
-	ShardLayoutEpoch  uint64
-	AssignmentMode    ShardAssignmentMode
-	PlacementOverride ShardID
+	ZoneID			ZoneID
+	StateKey		string
+	ShardLayoutEpoch	uint64
+	AssignmentMode		ShardAssignmentMode
+	PlacementOverride	ShardID
 }
 
 type ShardRoute struct {
-	ZoneID             ZoneID
-	StateKey           string
-	LayoutEpoch        uint64
-	AssignmentMode     ShardAssignmentMode
-	ShardID            ShardID
-	ShardCount         uint32
-	PlacementOverride  ShardID
-	ReadOnlyReplicated bool
-	RouteHash          string
+	ZoneID			ZoneID
+	StateKey		string
+	LayoutEpoch		uint64
+	AssignmentMode		ShardAssignmentMode
+	ShardID			ShardID
+	ShardCount		uint32
+	PlacementOverride	ShardID
+	ReadOnlyReplicated	bool
+	RouteHash		string
 }
 
 type ShardMetrics struct {
-	ZoneID               ZoneID
-	ShardID              ShardID
-	Height               uint64
-	GasUsed              uint64
-	FeeCollected         uint64
-	InboxBacklog         uint64
-	OutboxBacklog        uint64
-	WriteConflictCount   uint64
-	StateSizeBytes       uint64
-	ProofLatencyMicros   uint64
-	ExecutionDelayMicros uint64
-	FailedDeliveryCount  uint64
-	ExpiredMessageCount  uint64
-	MetricsHash          string
+	ZoneID			ZoneID
+	ShardID			ShardID
+	Height			uint64
+	GasUsed			uint64
+	FeeCollected		uint64
+	InboxBacklog		uint64
+	OutboxBacklog		uint64
+	WriteConflictCount	uint64
+	StateSizeBytes		uint64
+	ProofLatencyMicros	uint64
+	ExecutionDelayMicros	uint64
+	FailedDeliveryCount	uint64
+	ExpiredMessageCount	uint64
+	MetricsHash		string
 }
 
 type ShardDescriptor struct {
-	ShardID          ShardID
-	StatePrefix      string
-	ParentShardID    ShardID
-	ActivationHeight uint64
-	ValidatorSetHash string
-	Available        bool
-	KeyPrefix        string
-	HashRangeStart   uint64
-	HashRangeEnd     uint64
-	SystemShard      bool
+	ShardID			ShardID
+	StatePrefix		string
+	ParentShardID		ShardID
+	ActivationHeight	uint64
+	ValidatorSetHash	string
+	Available		bool
+	KeyPrefix		string
+	HashRangeStart		uint64
+	HashRangeEnd		uint64
+	SystemShard		bool
 }
 
 type ShardLayout struct {
-	ZoneID                 ZoneID
-	LayoutEpoch            uint64
-	ActivationHeight       uint64
-	RoutingSeedHash        string
-	AssignmentMode         ShardAssignmentMode
-	SystemShardID          ShardID
-	PlacementOverrides     []ShardPlacementOverride
-	ReadOnlyReplicatedKeys []string
-	ActiveShards           []ShardDescriptor
-	LayoutHash             string
+	ZoneID			ZoneID
+	LayoutEpoch		uint64
+	ActivationHeight	uint64
+	RoutingSeedHash		string
+	AssignmentMode		ShardAssignmentMode
+	SystemShardID		ShardID
+	PlacementOverrides	[]ShardPlacementOverride
+	ReadOnlyReplicatedKeys	[]string
+	ActiveShards		[]ShardDescriptor
+	LayoutHash		string
 }
 
 type RoutingZoneEntry struct {
-	ZoneID       ZoneID
-	LayoutEpoch  uint64
-	ActiveShards uint32
-	LayoutHash   string
+	ZoneID		ZoneID
+	LayoutEpoch	uint64
+	ActiveShards	uint32
+	LayoutHash	string
 }
 
 type RoutingTableCommitment struct {
-	RoutingEpoch uint64
-	Height       uint64
-	Entries      []RoutingZoneEntry
-	TableHash    string
+	RoutingEpoch	uint64
+	Height		uint64
+	Entries		[]RoutingZoneEntry
+	TableHash	string
 }
 
 func NewShardLayout(zoneID ZoneID, layoutEpoch uint64, activationHeight uint64, routingSeedHash string, shards []ShardDescriptor) (ShardLayout, error) {
 	layout := ShardLayout{
-		ZoneID:           zoneID,
-		LayoutEpoch:      layoutEpoch,
-		ActivationHeight: activationHeight,
-		RoutingSeedHash:  routingSeedHash,
-		AssignmentMode:   ShardAssignmentConsistentHash,
-		ActiveShards:     cloneShardDescriptors(shards),
+		ZoneID:			zoneID,
+		LayoutEpoch:		layoutEpoch,
+		ActivationHeight:	activationHeight,
+		RoutingSeedHash:	routingSeedHash,
+		AssignmentMode:		ShardAssignmentConsistentHash,
+		ActiveShards:		cloneShardDescriptors(shards),
 	}
 	sortShardDescriptors(layout.ActiveShards)
 	if err := layout.ValidateFormat(); err != nil {
@@ -119,9 +119,9 @@ func NewShardLayout(zoneID ZoneID, layoutEpoch uint64, activationHeight uint64, 
 
 func NewRoutingTableCommitment(routingEpoch uint64, height uint64, entries []RoutingZoneEntry) (RoutingTableCommitment, error) {
 	table := RoutingTableCommitment{
-		RoutingEpoch: routingEpoch,
-		Height:       height,
-		Entries:      cloneRoutingZoneEntries(entries),
+		RoutingEpoch:	routingEpoch,
+		Height:		height,
+		Entries:	cloneRoutingZoneEntries(entries),
 	}
 	sortRoutingZoneEntries(table.Entries)
 	if err := table.ValidateFormat(); err != nil {
@@ -138,10 +138,10 @@ func BuildRoutingTableCommitment(routingEpoch uint64, height uint64, layouts []S
 			return RoutingTableCommitment{}, err
 		}
 		entries[i] = RoutingZoneEntry{
-			ZoneID:       layout.ZoneID,
-			LayoutEpoch:  layout.LayoutEpoch,
-			ActiveShards: uint32(len(layout.ActiveShards)),
-			LayoutHash:   layout.LayoutHash,
+			ZoneID:		layout.ZoneID,
+			LayoutEpoch:	layout.LayoutEpoch,
+			ActiveShards:	uint32(len(layout.ActiveShards)),
+			LayoutHash:	layout.LayoutHash,
 		}
 	}
 	return NewRoutingTableCommitment(routingEpoch, height, entries)
@@ -763,14 +763,14 @@ func availableShardDescriptors(shards []ShardDescriptor) []ShardDescriptor {
 
 func newShardRoute(layout ShardLayout, input ShardRoutingInput, mode ShardAssignmentMode, shardID ShardID, placementOverride ShardID, readOnly bool) (ShardRoute, error) {
 	route := ShardRoute{
-		ZoneID:             layout.ZoneID,
-		StateKey:           input.StateKey,
-		LayoutEpoch:        layout.LayoutEpoch,
-		AssignmentMode:     mode,
-		ShardID:            shardID,
-		ShardCount:         uint32(len(availableShardDescriptors(layout.ActiveShards))),
-		PlacementOverride:  placementOverride,
-		ReadOnlyReplicated: readOnly,
+		ZoneID:			layout.ZoneID,
+		StateKey:		input.StateKey,
+		LayoutEpoch:		layout.LayoutEpoch,
+		AssignmentMode:		mode,
+		ShardID:		shardID,
+		ShardCount:		uint32(len(availableShardDescriptors(layout.ActiveShards))),
+		PlacementOverride:	placementOverride,
+		ReadOnlyReplicated:	readOnly,
 	}
 	route.RouteHash = ComputeShardRouteHash(route)
 	return route, route.ValidateHash()

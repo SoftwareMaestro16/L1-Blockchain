@@ -8,26 +8,26 @@ import (
 )
 
 const (
-	DefaultAuthority      = "4:0000000000000000000000000000000000000000000000000000000000000001"
-	DefaultQueryLimit     = uint64(50)
-	MaxQueryLimit         = uint64(200)
-	DefaultVersionGate    = "prototype-v1"
-	NextMigrationVersion  = uint64(2)
-	CurrentGenesisVersion = uint64(1)
+	DefaultAuthority	= "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultQueryLimit	= uint64(50)
+	MaxQueryLimit		= uint64(200)
+	DefaultVersionGate	= "prototype-v1"
+	NextMigrationVersion	= uint64(2)
+	CurrentGenesisVersion	= uint64(1)
 )
 
 type Params struct {
-	Enabled               bool
-	TestnetProfile        bool
-	ProductionVersionGate string
-	Authority             string
-	DefaultQueryLimit     uint64
-	MaxQueryLimit         uint64
+	Enabled			bool
+	TestnetProfile		bool
+	ProductionVersionGate	string
+	Authority		string
+	DefaultQueryLimit	uint64
+	MaxQueryLimit		uint64
 }
 
 type PageRequest struct {
-	Offset uint64
-	Limit  uint64
+	Offset	uint64
+	Limit	uint64
 }
 
 type PageResponse struct {
@@ -36,10 +36,10 @@ type PageResponse struct {
 
 func DefaultParams() Params {
 	return Params{
-		Enabled:           false,
-		Authority:         DefaultAuthority,
-		DefaultQueryLimit: DefaultQueryLimit,
-		MaxQueryLimit:     MaxQueryLimit,
+		Enabled:		false,
+		Authority:		DefaultAuthority,
+		DefaultQueryLimit:	DefaultQueryLimit,
+		MaxQueryLimit:		MaxQueryLimit,
 	}
 }
 

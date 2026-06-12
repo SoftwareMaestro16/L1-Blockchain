@@ -23,10 +23,10 @@ func TestRegisterAndBondReporter(t *testing.T) {
 	require.Zero(t, reporter.BondedAmount)
 
 	bonded, err := k.BondReporter(types.MsgBondReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		Amount:          types.DefaultMinBondAmount,
-		Height:          2,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		Amount:			types.DefaultMinBondAmount,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.DefaultMinBondAmount, bonded.BondedAmount)
@@ -71,20 +71,20 @@ func TestRewardPaidOnce(t *testing.T) {
 	require.NoError(t, err)
 
 	reward, err := k.ClaimReporterReward(types.MsgClaimReporterReward{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		ReportID:        "report-reward",
-		Height:          4,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		ReportID:		"report-reward",
+		Height:			4,
 	})
 	require.NoError(t, err)
 	require.True(t, reward.Claimed)
 	require.Equal(t, uint64(4), reward.ClaimedAt)
 
 	_, err = k.ClaimReporterReward(types.MsgClaimReporterReward{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		ReportID:        "report-reward",
-		Height:          5,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		ReportID:		"report-reward",
+		Height:			5,
 	})
 	require.ErrorContains(t, err, "already claimed")
 }
@@ -97,25 +97,25 @@ func TestUnbondingDelayEnforced(t *testing.T) {
 	reporter := registerAndBondReporter(t, &k, "11")
 
 	unbonding, err := k.UnbondReporter(types.MsgUnbondReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		Height:          7,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		Height:			7,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusUnbonding, unbonding.Status)
 	require.Equal(t, uint64(17), unbonding.UnbondingCompleteHeight)
 
 	_, err = k.UnbondReporter(types.MsgUnbondReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		Height:          16,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		Height:			16,
 	})
 	require.ErrorContains(t, err, "challenge period")
 
 	completed, err := k.UnbondReporter(types.MsgUnbondReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		Height:          17,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		Height:			17,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.StatusActive, completed.Status)
@@ -153,10 +153,10 @@ func registerAndBondReporter(t *testing.T, k *Keeper, fill string) types.Reporte
 	t.Helper()
 	reporter := registerReporter(t, k, fill, 1)
 	bonded, err := k.BondReporter(types.MsgBondReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: reporter.ReporterAddress,
-		Amount:          types.DefaultMinBondAmount,
-		Height:          2,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter.ReporterAddress,
+		Amount:			types.DefaultMinBondAmount,
+		Height:			2,
 	})
 	require.NoError(t, err)
 	return bonded
@@ -165,9 +165,9 @@ func registerAndBondReporter(t *testing.T, k *Keeper, fill string) types.Reporte
 func registerReporter(t *testing.T, k *Keeper, fill string, height uint64) types.ReporterRecord {
 	t.Helper()
 	reporter, err := k.RegisterReporter(types.MsgRegisterReporter{
-		Authority:       prototype.DefaultAuthority,
-		ReporterAddress: rawReporterAddress(fill),
-		Height:          height,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	rawReporterAddress(fill),
+		Height:			height,
 	})
 	require.NoError(t, err)
 	return reporter
@@ -175,14 +175,14 @@ func registerReporter(t *testing.T, k *Keeper, fill string, height uint64) types
 
 func validReport(reporter string, reportID string, height uint64, opts ...func(*types.MsgSubmitReport)) types.MsgSubmitReport {
 	msg := types.MsgSubmitReport{
-		Authority:        prototype.DefaultAuthority,
-		ReporterAddress:  reporter,
-		ReportID:         reportID,
-		ReportType:       types.ReportTypeFault,
-		Subject:          "validator-fault",
-		PayloadHash:      payloadHash(reportID),
-		PayloadSizeBytes: 128,
-		Height:           height,
+		Authority:		prototype.DefaultAuthority,
+		ReporterAddress:	reporter,
+		ReportID:		reportID,
+		ReportType:		types.ReportTypeFault,
+		Subject:		"validator-fault",
+		PayloadHash:		payloadHash(reportID),
+		PayloadSizeBytes:	128,
+		Height:			height,
 	}
 	for _, opt := range opts {
 		opt(&msg)

@@ -21,11 +21,9 @@ import (
 )
 
 const (
-	MsgPayStorageRentTypeURL   = "/l1.storagerent.v1.MsgPayStorageRent"
-	MsgUnfreezeContractTypeURL = "/l1.storagerent.v1.MsgUnfreezeContract"
+	MsgPayStorageRentTypeURL	= "/l1.storagerent.v1.MsgPayStorageRent"
+	MsgUnfreezeContractTypeURL	= "/l1.storagerent.v1.MsgUnfreezeContract"
 )
-
-// ---------- proto helpers ----------
 
 var ErrIntOverflowTx = fmt.Errorf("proto: integer overflow")
 var ErrInvalidLengthTx = fmt.Errorf("proto: negative length found during unmarshaling")
@@ -46,18 +44,16 @@ func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	return base
 }
 
-// ---------- MsgPayStorageRent ----------
-
 type MsgPayStorageRent struct {
-	Payer           string
-	ContractAddress string
-	Amount          uint64
-	Height          uint64
+	Payer		string
+	ContractAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
-func (m *MsgPayStorageRent) Reset()         { *m = MsgPayStorageRent{} }
-func (m *MsgPayStorageRent) String() string { return gogoproto.CompactTextString(m) }
-func (*MsgPayStorageRent) ProtoMessage()    {}
+func (m *MsgPayStorageRent) Reset()		{ *m = MsgPayStorageRent{} }
+func (m *MsgPayStorageRent) String() string	{ return gogoproto.CompactTextString(m) }
+func (*MsgPayStorageRent) ProtoMessage()	{}
 
 func (m *MsgPayStorageRent) ValidateBasic() error {
 	if m.Payer == "" {
@@ -307,7 +303,7 @@ func (m *MsgPayStorageRent) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) {
+			if skippy < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) < 0 {
@@ -398,13 +394,11 @@ func skipTx(dAtA []byte) (n int, err error) {
 	return 0, io.ErrUnexpectedEOF
 }
 
-// ---------- MsgPayStorageRentResponse ----------
-
 type MsgPayStorageRentResponse struct{}
 
-func (m *MsgPayStorageRentResponse) Reset()         { *m = MsgPayStorageRentResponse{} }
-func (m *MsgPayStorageRentResponse) String() string { return "MsgPayStorageRentResponse" }
-func (*MsgPayStorageRentResponse) ProtoMessage()    {}
+func (m *MsgPayStorageRentResponse) Reset()		{ *m = MsgPayStorageRentResponse{} }
+func (m *MsgPayStorageRentResponse) String() string	{ return "MsgPayStorageRentResponse" }
+func (*MsgPayStorageRentResponse) ProtoMessage()	{}
 
 func (m *MsgPayStorageRentResponse) Marshal() (dAtA []byte, err error) {
 	return nil, nil
@@ -425,18 +419,16 @@ func (m *MsgPayStorageRentResponse) XXX_Unmarshal(b []byte) error {
 	return nil
 }
 
-// ---------- MsgUnfreezeContract ----------
-
 type MsgUnfreezeContract struct {
-	Payer           string
-	ContractAddress string
-	Amount          uint64
-	Height          uint64
+	Payer		string
+	ContractAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
-func (m *MsgUnfreezeContract) Reset()         { *m = MsgUnfreezeContract{} }
-func (m *MsgUnfreezeContract) String() string { return gogoproto.CompactTextString(m) }
-func (*MsgUnfreezeContract) ProtoMessage()    {}
+func (m *MsgUnfreezeContract) Reset()		{ *m = MsgUnfreezeContract{} }
+func (m *MsgUnfreezeContract) String() string	{ return gogoproto.CompactTextString(m) }
+func (*MsgUnfreezeContract) ProtoMessage()	{}
 
 func (m *MsgUnfreezeContract) ValidateBasic() error {
 	if m.Payer == "" {
@@ -686,7 +678,7 @@ func (m *MsgUnfreezeContract) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) {
+			if skippy < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) < 0 {
@@ -701,13 +693,11 @@ func (m *MsgUnfreezeContract) Unmarshal(dAtA []byte) error {
 	return nil
 }
 
-// ---------- MsgUnfreezeContractResponse ----------
-
 type MsgUnfreezeContractResponse struct{}
 
-func (m *MsgUnfreezeContractResponse) Reset()         { *m = MsgUnfreezeContractResponse{} }
-func (m *MsgUnfreezeContractResponse) String() string { return "MsgUnfreezeContractResponse" }
-func (*MsgUnfreezeContractResponse) ProtoMessage()    {}
+func (m *MsgUnfreezeContractResponse) Reset()		{ *m = MsgUnfreezeContractResponse{} }
+func (m *MsgUnfreezeContractResponse) String() string	{ return "MsgUnfreezeContractResponse" }
+func (*MsgUnfreezeContractResponse) ProtoMessage()	{}
 
 func (m *MsgUnfreezeContractResponse) Marshal() (dAtA []byte, err error) {
 	return nil, nil
@@ -736,13 +726,11 @@ func init() {
 	gogoproto.RegisterFile("l1/storagerent/v1/tx.proto", buildStorageRentTxFileDescriptor())
 }
 
-// ---------- gRPC service ----------
-
 var (
-	_ gogoproto.Message = &MsgPayStorageRent{}
-	_ gogoproto.Message = &MsgPayStorageRentResponse{}
-	_ gogoproto.Message = &MsgUnfreezeContract{}
-	_ gogoproto.Message = &MsgUnfreezeContractResponse{}
+	_	gogoproto.Message	= &MsgPayStorageRent{}
+	_	gogoproto.Message	= &MsgPayStorageRentResponse{}
+	_	gogoproto.Message	= &MsgUnfreezeContract{}
+	_	gogoproto.Message	= &MsgUnfreezeContractResponse{}
 )
 
 type MsgServer interface {
@@ -766,20 +754,20 @@ func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 
 var Msg_serviceDesc = Msg_serviceDescVal
 var Msg_serviceDescVal = grpc.ServiceDesc{
-	ServiceName: "l1.storagerent.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.storagerent.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PayStorageRent",
-			Handler:    _Msg_PayStorageRent_Handler,
+			MethodName:	"PayStorageRent",
+			Handler:	_Msg_PayStorageRent_Handler,
 		},
 		{
-			MethodName: "UnfreezeContract",
-			Handler:    _Msg_UnfreezeContract_Handler,
+			MethodName:	"UnfreezeContract",
+			Handler:	_Msg_UnfreezeContract_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "l1/storagerent/v1/tx.proto",
+	Streams:	[]grpc.StreamDesc{},
+	Metadata:	"l1/storagerent/v1/tx.proto",
 }
 
 func _Msg_PayStorageRent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -791,8 +779,8 @@ func _Msg_PayStorageRent_Handler(srv interface{}, ctx context.Context, dec func(
 		return srv.(MsgServer).PayStorageRent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/l1.storagerent.v1.Msg/PayStorageRent",
+		Server:		srv,
+		FullMethod:	"/l1.storagerent.v1.Msg/PayStorageRent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).PayStorageRent(ctx, req.(*MsgPayStorageRent))
@@ -809,8 +797,8 @@ func _Msg_UnfreezeContract_Handler(srv interface{}, ctx context.Context, dec fun
 		return srv.(MsgServer).UnfreezeContract(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/l1.storagerent.v1.Msg/UnfreezeContract",
+		Server:		srv,
+		FullMethod:	"/l1.storagerent.v1.Msg/UnfreezeContract",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).UnfreezeContract(ctx, req.(*MsgUnfreezeContract))
@@ -827,9 +815,9 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 
 func buildStorageRentTxFileDescriptor() []byte {
 	fd := &descriptorpb.FileDescriptorProto{
-		Name:    descriptorString("l1/storagerent/v1/tx.proto"),
-		Package: descriptorString("l1.storagerent.v1"),
-		Syntax:  descriptorString("proto3"),
+		Name:		descriptorString("l1/storagerent/v1/tx.proto"),
+		Package:	descriptorString("l1.storagerent.v1"),
+		Syntax:		descriptorString("proto3"),
 		Options: &descriptorpb.FileOptions{
 			GoPackage: descriptorString("github.com/sovereign-l1/l1/x/storage-rent/types"),
 		},
@@ -841,7 +829,7 @@ func buildStorageRentTxFileDescriptor() []byte {
 		},
 		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
-				Name: descriptorString("Msg"),
+				Name:	descriptorString("Msg"),
 				Method: []*descriptorpb.MethodDescriptorProto{
 					serviceMethodDescriptor("PayStorageRent", "MsgPayStorageRent", "MsgPayStorageRentResponse"),
 					serviceMethodDescriptor("UnfreezeContract", "MsgUnfreezeContract", "MsgUnfreezeContractResponse"),
@@ -870,9 +858,9 @@ func messageDescriptor(name string) *descriptorpb.DescriptorProto {
 
 func serviceMethodDescriptor(name, input, output string) *descriptorpb.MethodDescriptorProto {
 	return &descriptorpb.MethodDescriptorProto{
-		Name:       descriptorString(name),
-		InputType:  descriptorString(".l1.storagerent.v1." + input),
-		OutputType: descriptorString(".l1.storagerent.v1." + output),
+		Name:		descriptorString(name),
+		InputType:	descriptorString(".l1.storagerent.v1." + input),
+		OutputType:	descriptorString(".l1.storagerent.v1." + output),
 	}
 }
 

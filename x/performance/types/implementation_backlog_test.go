@@ -63,7 +63,7 @@ func TestImplementationBacklogReportRejectsUnexpectedTask(t *testing.T) {
 
 func validImplementationBacklogInput() ImplementationBacklogInput {
 	return ImplementationBacklogInput{
-		BacklogVersion: "backlog_16",
+		BacklogVersion:	"backlog_16",
 		HighPriority: []ImplementationBacklogTaskCheck{
 			backlogTask(BacklogTaskZoneDescriptors, ImplementationBacklogHigh, "x_aetracore_types"),
 			backlogTask(BacklogTaskAetraCoreSkeleton, ImplementationBacklogHigh, "x_aetracore_module"),
@@ -98,12 +98,12 @@ func validImplementationBacklogInput() ImplementationBacklogInput {
 
 func backlogTask(taskID string, priority ImplementationBacklogPriority, component string) ImplementationBacklogTaskCheck {
 	return ImplementationBacklogTaskCheck{
-		TaskID:        taskID,
-		Priority:      priority,
-		Component:     component,
-		EvidenceHash:  hashStrings("implementation-backlog-evidence", taskID),
-		TestHash:      hashStrings("implementation-backlog-test", taskID),
-		Implemented:   true,
-		Deterministic: true,
+		TaskID:		taskID,
+		Priority:	priority,
+		Component:	component,
+		EvidenceHash:	hashStrings("implementation-backlog-evidence", taskID),
+		TestHash:	hashStrings("implementation-backlog-test", taskID),
+		Implemented:	true,
+		Deterministic:	true,
 	}
 }

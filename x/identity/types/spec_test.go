@@ -61,9 +61,9 @@ func TestIdentitySpecResolverUpdateRequiresOwner(t *testing.T) {
 	require.ErrorContains(t, err, "requires owner")
 
 	next, record, err := SetIdentityResolver(state, "alice.aet", addr(1), ResolverUpdate{
-		Primary:      addr(3),
-		Contract:     addr(4),
-		ZoneEndpoint: "contract-zone/0:1",
+		Primary:	addr(3),
+		Contract:	addr(4),
+		ZoneEndpoint:	"contract-zone/0:1",
 	}, 11)
 	require.NoError(t, err)
 	require.Equal(t, addr(3), record.Primary)

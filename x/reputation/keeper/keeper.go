@@ -13,15 +13,15 @@ import (
 )
 
 type Keeper struct {
-	storeService corestore.KVStoreService
-	authority    string
+	storeService	corestore.KVStoreService
+	authority	string
 }
 
 func NewKeeper(storeService corestore.KVStoreService, authority string) Keeper {
 	return Keeper{storeService: storeService, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 // StateKeyV2 is the store key for the consolidated reputation state.
 var stateKeyV2 = []byte{0x02}
@@ -38,7 +38,6 @@ func (k Keeper) DefaultGenesis() types.ConsolidatedReputationState {
 func (k Keeper) GetState(ctx context.Context) (types.ConsolidatedReputationState, error) {
 	store := k.storeService.OpenKVStore(ctx)
 
-	// Try v2 first.
 	bz, err := store.Get(stateKeyV2)
 	if err != nil {
 		return k.DefaultGenesis(), err
@@ -55,7 +54,6 @@ func (k Keeper) GetState(ctx context.Context) (types.ConsolidatedReputationState
 		return state, nil
 	}
 
-	// Try v1 (old ReputationState) and migrate.
 	v1Key := []byte{0x01}
 	v1bz, err := store.Get(v1Key)
 	if err != nil {
@@ -71,7 +69,7 @@ func (k Keeper) GetState(ctx context.Context) (types.ConsolidatedReputationState
 		if err := k.SetState(ctx, consolidated); err != nil {
 			return types.ConsolidatedReputationState{}, fmt.Errorf("failed to persist migrated state: %w", err)
 		}
-		// Remove old v1 key.
+
 		_ = store.Delete(v1Key)
 		return consolidated, nil
 	}
@@ -180,10 +178,6 @@ func (k Keeper) SetServiceTrustScore(ctx context.Context, sts types.ServiceTrust
 	return k.SetState(ctx, state)
 }
 
-// ---------------
-// Legacy Queries (serve from consolidated state)
-// ---------------
-
 // StakeReputation is disabled in the public API; use IdentityReputation instead.
 func (k Keeper) StakeReputation(ctx context.Context, req types.QueryStakeReputationRequest) (types.QueryStakeReputationResponse, error) {
 	return types.QueryStakeReputationResponse{}, fmt.Errorf("stake reputation query disabled; use QueryIdentityReputation or GetIdentityReputation")
@@ -196,12 +190,12 @@ func (k Keeper) AccountReputation(ctx context.Context, req types.QueryAccountRep
 
 // GetIdentityReputationScore returns the uint32 score for fee module integration.
 func (k Keeper) GetIdentityReputationScore(ctx context.Context, addr sdk.AccAddress) (uint32, bool, error) {
-	// Defensive: ensure addr is a valid AE address byte length before formatting.
+
 	if len(addr) == 0 {
 		return types.IdentityScoreDefault, false, nil
 	}
 	if !(len(addr) == 20 || len(addr) == 32) {
-		// Unknown/invalid address length; return default score rather than panicking in address formatting.
+
 		return types.IdentityScoreDefault, false, nil
 	}
 	state, err := k.GetState(ctx)

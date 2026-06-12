@@ -16,15 +16,15 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.ConfigState
+	Version	uint64
+	Params	types.Params
+	State	types.ConfigState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	runtimeCtx   context.Context
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	runtimeCtx	context.Context
 }
 
 func NewKeeper() Keeper {
@@ -37,9 +37,9 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  types.DefaultParams(),
-		State:   types.ConfigState{},
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		types.DefaultParams(),
+		State:		types.ConfigState{},
 	}
 }
 
@@ -154,11 +154,11 @@ func (k *Keeper) UpsertEntry(authority string, key string, value string, height 
 		return types.ConfigEntry{}, errors.New("config entries limit reached")
 	}
 	entry := types.ConfigEntry{
-		Key:           key,
-		Value:         value,
-		Owner:         authority,
-		Version:       version,
-		UpdatedHeight: height,
+		Key:		key,
+		Value:		value,
+		Owner:		authority,
+		Version:	version,
+		UpdatedHeight:	height,
 	}
 	if err := entry.Validate(k.genesis.Params); err != nil {
 		return types.ConfigEntry{}, err
@@ -475,11 +475,11 @@ func applyConfigChange(params types.Params, state *types.ConfigState, change typ
 			return types.ConfigEntry{}, errors.New("config entries limit reached")
 		}
 		entry := types.ConfigEntry{
-			Key:           change.Key,
-			Value:         change.Value,
-			Owner:         authority,
-			Version:       version,
-			UpdatedHeight: height,
+			Key:		change.Key,
+			Value:		change.Value,
+			Owner:		authority,
+			Version:	version,
+			UpdatedHeight:	height,
 		}
 		if err := entry.Validate(params); err != nil {
 			return types.ConfigEntry{}, err

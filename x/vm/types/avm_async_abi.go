@@ -14,134 +14,134 @@ import (
 )
 
 const (
-	AVM2PayloadTypePromiseResolution = "promise.resolution"
-	AVM2PayloadTypePromiseTimeout    = "promise.timeout"
-	MaxAVM2ABIEncodingLength         = 64
+	AVMPayloadTypePromiseResolution	= "promise.resolution"
+	AVMPayloadTypePromiseTimeout	= "promise.timeout"
+	MaxAVMABIEncodingLength		= 64
 )
 
-type AVM2AsyncCallPlan struct {
-	Height             uint64
-	CallerContract     string
-	Message            AVMAsyncMessage
-	Promise            AVM2PromiseState
-	AwaitNonBlocking   bool
-	PersistedPromiseID string
-	OutboxRoot         string
-	PromiseRoot        string
-	PlanHash           string
+type AVMAsyncCallPlan struct {
+	Height			uint64
+	CallerContract		string
+	Message			AVMAsyncMessage
+	Promise			AVMPromiseState
+	AwaitNonBlocking	bool
+	PersistedPromiseID	string
+	OutboxRoot		string
+	PromiseRoot		string
+	PlanHash		string
 }
 
-type AVM2PromiseResolution struct {
-	PromiseID         string
-	OriginalMessageID string
-	ResolutionMessage AVMAsyncMessage
-	Status            AVM2PromiseStatus
-	ReceiptHash       string
-	ReturnHash        string
-	DeliveryHeight    uint64
-	ResolutionHash    string
+type AVMPromiseResolution struct {
+	PromiseID		string
+	OriginalMessageID	string
+	ResolutionMessage	AVMAsyncMessage
+	Status			AVMPromiseStatus
+	ReceiptHash		string
+	ReturnHash		string
+	DeliveryHeight		uint64
+	ResolutionHash		string
 }
 
-type AVM2PromiseTimeoutTask struct {
-	PromiseID          string
-	Contract           string
-	DueHeight          uint64
-	HandlerPayloadHash string
-	TimeoutMessage     AVMAsyncMessage
-	TaskHash           string
+type AVMPromiseTimeoutTask struct {
+	PromiseID		string
+	Contract		string
+	DueHeight		uint64
+	HandlerPayloadHash	string
+	TimeoutMessage		AVMAsyncMessage
+	TaskHash		string
 }
 
 type AVM2MethodDescriptor struct {
-	Selector           string
-	Name               string
-	ArgumentSchemaHash string
-	ReturnSchemaHash   string
-	ArgumentEncoding   string
-	GasHint            uint64
-	MethodHash         string
+	Selector		string
+	Name			string
+	ArgumentSchemaHash	string
+	ReturnSchemaHash	string
+	ArgumentEncoding	string
+	GasHint			uint64
+	MethodHash		string
 }
 
 type AVM2EventDescriptor struct {
-	Name       string
-	SchemaHash string
-	EventHash  string
+	Name		string
+	SchemaHash	string
+	EventHash	string
 }
 
-type AVM2ErrorDescriptor struct {
-	Code       string
-	SchemaHash string
-	ErrorHash  string
+type AVMErrorDescriptor struct {
+	Code		string
+	SchemaHash	string
+	ErrorHash	string
 }
 
-type AVM2FundRequirement struct {
-	Selector        string
-	Denom           string
-	Minimum         sdkmath.Int
-	RequirementHash string
+type AVMFundRequirement struct {
+	Selector	string
+	Denom		string
+	Minimum		sdkmath.Int
+	RequirementHash	string
 }
 
-type AVM2GasHint struct {
-	Selector string
-	Estimate uint64
-	HintHash string
+type AVMGasHint struct {
+	Selector	string
+	Estimate	uint64
+	HintHash	string
 }
 
-type AVM2ABIIntrospectionDescriptor struct {
-	ABIVersion           uint64
-	CodeID               uint64
-	CodeHash             string
-	Methods              []AVM2MethodDescriptor
-	Events               []AVM2EventDescriptor
-	Errors               []AVM2ErrorDescriptor
-	RequiredFunds        []AVM2FundRequirement
-	GasHints             []AVM2GasHint
-	IdentityNameOptional string
-	InterfaceHash        string
+type AVMABIIntrospectionDescriptor struct {
+	ABIVersion		uint64
+	CodeID			uint64
+	CodeHash		string
+	Methods			[]AVM2MethodDescriptor
+	Events			[]AVM2EventDescriptor
+	Errors			[]AVMErrorDescriptor
+	RequiredFunds		[]AVMFundRequirement
+	GasHints		[]AVMGasHint
+	IdentityNameOptional	string
+	InterfaceHash		string
 }
 
-type AVM2CallFund struct {
-	Denom  string
-	Amount sdkmath.Int
+type AVMCallFund struct {
+	Denom	string
+	Amount	sdkmath.Int
 }
 
-type AVM2ABIMethodCall struct {
-	InterfaceHash    string
-	MethodSelector   string
-	ArgumentEncoding string
-	ArgumentHash     string
-	Funds            []AVM2CallFund
-	CallHash         string
+type AVMABIMethodCall struct {
+	InterfaceHash		string
+	MethodSelector		string
+	ArgumentEncoding	string
+	ArgumentHash		string
+	Funds			[]AVMCallFund
+	CallHash		string
 }
 
-type AVM2ABIIdentityBinding struct {
-	Name               string
-	InterfaceHash      string
-	ResolverRecordHash string
-	BindingHash        string
+type AVMABIIdentityBinding struct {
+	Name			string
+	InterfaceHash		string
+	ResolverRecordHash	string
+	BindingHash		string
 }
 
-func NewAVM2AsyncCallPlan(plan AVM2AsyncCallPlan) (AVM2AsyncCallPlan, error) {
-	plan = canonicalAVM2AsyncCallPlan(plan)
-	plan.OutboxRoot = ComputeAVM2MessageRoot([]AVMAsyncMessage{plan.Message})
-	plan.PromiseRoot = ComputeAVM2PromiseRoot([]AVM2PromiseState{plan.Promise})
-	plan.PlanHash = ComputeAVM2AsyncCallPlanHash(plan)
+func NewAVMAsyncCallPlan(plan AVMAsyncCallPlan) (AVMAsyncCallPlan, error) {
+	plan = canonicalAVMAsyncCallPlan(plan)
+	plan.OutboxRoot = ComputeAVMMessageRoot([]AVMAsyncMessage{plan.Message})
+	plan.PromiseRoot = ComputeAVMPromiseRoot([]AVMPromiseState{plan.Promise})
+	plan.PlanHash = ComputeAVMAsyncCallPlanHash(plan)
 	return plan, plan.Validate()
 }
 
-func NewAVM2PromiseResolution(resolution AVM2PromiseResolution) (AVM2PromiseResolution, error) {
-	resolution = canonicalAVM2PromiseResolution(resolution)
-	resolution.ResolutionHash = ComputeAVM2PromiseResolutionHash(resolution)
+func NewAVMPromiseResolution(resolution AVMPromiseResolution) (AVMPromiseResolution, error) {
+	resolution = canonicalAVMPromiseResolution(resolution)
+	resolution.ResolutionHash = ComputeAVMPromiseResolutionHash(resolution)
 	return resolution, resolution.Validate()
 }
 
-func NewAVM2PromiseTimeoutTask(task AVM2PromiseTimeoutTask) (AVM2PromiseTimeoutTask, error) {
-	task = canonicalAVM2PromiseTimeoutTask(task)
-	task.TaskHash = ComputeAVM2PromiseTimeoutTaskHash(task)
+func NewAVMPromiseTimeoutTask(task AVMPromiseTimeoutTask) (AVMPromiseTimeoutTask, error) {
+	task = canonicalAVMPromiseTimeoutTask(task)
+	task.TaskHash = ComputeAVMPromiseTimeoutTaskHash(task)
 	return task, task.Validate()
 }
 
-func NewAVM2ABIIntrospectionDescriptor(descriptor AVM2ABIIntrospectionDescriptor) (AVM2ABIIntrospectionDescriptor, error) {
-	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
+func NewAVMABIIntrospectionDescriptor(descriptor AVMABIIntrospectionDescriptor) (AVMABIIntrospectionDescriptor, error) {
+	descriptor = canonicalAVMABIIntrospectionDescriptor(descriptor)
 	for i := range descriptor.Methods {
 		descriptor.Methods[i].MethodHash = ComputeAVM2MethodDescriptorHash(descriptor.Methods[i])
 	}
@@ -149,79 +149,79 @@ func NewAVM2ABIIntrospectionDescriptor(descriptor AVM2ABIIntrospectionDescriptor
 		descriptor.Events[i].EventHash = ComputeAVM2EventDescriptorHash(descriptor.Events[i])
 	}
 	for i := range descriptor.Errors {
-		descriptor.Errors[i].ErrorHash = ComputeAVM2ErrorDescriptorHash(descriptor.Errors[i])
+		descriptor.Errors[i].ErrorHash = ComputeAVMErrorDescriptorHash(descriptor.Errors[i])
 	}
 	for i := range descriptor.RequiredFunds {
-		descriptor.RequiredFunds[i].RequirementHash = ComputeAVM2FundRequirementHash(descriptor.RequiredFunds[i])
+		descriptor.RequiredFunds[i].RequirementHash = ComputeAVMFundRequirementHash(descriptor.RequiredFunds[i])
 	}
 	for i := range descriptor.GasHints {
-		descriptor.GasHints[i].HintHash = ComputeAVM2GasHintHash(descriptor.GasHints[i])
+		descriptor.GasHints[i].HintHash = ComputeAVMGasHintHash(descriptor.GasHints[i])
 	}
-	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
-	descriptor.InterfaceHash = ComputeAVM2ABIIntrospectionHash(descriptor)
+	descriptor = canonicalAVMABIIntrospectionDescriptor(descriptor)
+	descriptor.InterfaceHash = ComputeAVMABIIntrospectionHash(descriptor)
 	return descriptor, descriptor.Validate()
 }
 
-func NewAVM2ABIMethodCall(call AVM2ABIMethodCall) (AVM2ABIMethodCall, error) {
-	call = canonicalAVM2ABIMethodCall(call)
-	call.CallHash = ComputeAVM2ABIMethodCallHash(call)
+func NewAVMABIMethodCall(call AVMABIMethodCall) (AVMABIMethodCall, error) {
+	call = canonicalAVMABIMethodCall(call)
+	call.CallHash = ComputeAVMABIMethodCallHash(call)
 	return call, call.Validate()
 }
 
-func NewAVM2ABIIdentityBinding(binding AVM2ABIIdentityBinding) (AVM2ABIIdentityBinding, error) {
-	binding = canonicalAVM2ABIIdentityBinding(binding)
-	binding.BindingHash = ComputeAVM2ABIIdentityBindingHash(binding)
+func NewAVMABIIdentityBinding(binding AVMABIIdentityBinding) (AVMABIIdentityBinding, error) {
+	binding = canonicalAVMABIIdentityBinding(binding)
+	binding.BindingHash = ComputeAVMABIIdentityBindingHash(binding)
 	return binding, binding.Validate()
 }
 
-func ApplyAVM2PromiseResolution(promise AVM2PromiseState, resolution AVM2PromiseResolution) (AVM2PromiseState, error) {
-	promise = canonicalAVM2PromiseState(promise)
-	resolution = canonicalAVM2PromiseResolution(resolution)
+func ApplyAVMPromiseResolution(promise AVMPromiseState, resolution AVMPromiseResolution) (AVMPromiseState, error) {
+	promise = canonicalAVMPromiseState(promise)
+	resolution = canonicalAVMPromiseResolution(resolution)
 	if err := promise.Validate(); err != nil {
-		return AVM2PromiseState{}, err
+		return AVMPromiseState{}, err
 	}
 	if err := resolution.Validate(); err != nil {
-		return AVM2PromiseState{}, err
+		return AVMPromiseState{}, err
 	}
 	if promise.PromiseID != resolution.PromiseID {
-		return AVM2PromiseState{}, errors.New("AVM 2.0 promise resolution id mismatch")
+		return AVMPromiseState{}, errors.New("AVM 2.0 promise resolution id mismatch")
 	}
 	if promise.MessageID != resolution.OriginalMessageID {
-		return AVM2PromiseState{}, errors.New("AVM 2.0 promise resolution message mismatch")
+		return AVMPromiseState{}, errors.New("AVM 2.0 promise resolution message mismatch")
 	}
 	if resolution.DeliveryHeight <= promise.CreatedHeight {
-		return AVM2PromiseState{}, errors.New("AVM 2.0 promise resolution must be delivered in future height")
+		return AVMPromiseState{}, errors.New("AVM 2.0 promise resolution must be delivered in future height")
 	}
 	updated := promise
 	updated.Status = resolution.Status
 	updated.ReceiptHash = resolution.ReceiptHash
 	updated.ReturnHash = resolution.ReturnHash
-	updated.PromiseHash = ComputeAVM2PromiseHash(updated)
+	updated.PromiseHash = ComputeAVMPromiseHash(updated)
 	return updated, updated.Validate()
 }
 
-func ScheduleAVM2PromiseTimeout(promise AVM2PromiseState, timeoutMessage AVMAsyncMessage) (AVM2PromiseTimeoutTask, error) {
-	promise = canonicalAVM2PromiseState(promise)
+func ScheduleAVMPromiseTimeout(promise AVMPromiseState, timeoutMessage AVMAsyncMessage) (AVMPromiseTimeoutTask, error) {
+	promise = canonicalAVMPromiseState(promise)
 	timeoutMessage = canonicalAVMAsyncMessage(timeoutMessage)
 	if err := promise.Validate(); err != nil {
-		return AVM2PromiseTimeoutTask{}, err
+		return AVMPromiseTimeoutTask{}, err
 	}
-	if promise.Status != AVM2PromisePending {
-		return AVM2PromiseTimeoutTask{}, errors.New("AVM 2.0 only pending promises can schedule timeout")
+	if promise.Status != AVMPromisePending {
+		return AVMPromiseTimeoutTask{}, errors.New("AVM 2.0 only pending promises can schedule timeout")
 	}
-	task := AVM2PromiseTimeoutTask{
-		PromiseID:          promise.PromiseID,
-		Contract:           promise.Contract,
-		DueHeight:          promise.ExpiryHeight,
-		HandlerPayloadHash: ComputeAVM2BytesHash([]byte(promise.PromiseID + ":timeout")),
-		TimeoutMessage:     timeoutMessage,
+	task := AVMPromiseTimeoutTask{
+		PromiseID:		promise.PromiseID,
+		Contract:		promise.Contract,
+		DueHeight:		promise.ExpiryHeight,
+		HandlerPayloadHash:	ComputeAVMBytesHash([]byte(promise.PromiseID + ":timeout")),
+		TimeoutMessage:		timeoutMessage,
 	}
-	return NewAVM2PromiseTimeoutTask(task)
+	return NewAVMPromiseTimeoutTask(task)
 }
 
-func BindAVM2ABIToCode(code AVM2CodeRecord, descriptor AVM2ABIIntrospectionDescriptor) error {
-	code = canonicalAVM2CodeRecord(code)
-	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
+func BindAVMABIToCode(code AVMCodeRecord, descriptor AVMABIIntrospectionDescriptor) error {
+	code = canonicalAVMCodeRecord(code)
+	descriptor = canonicalAVMABIIntrospectionDescriptor(descriptor)
 	if err := code.Validate(); err != nil {
 		return err
 	}
@@ -240,9 +240,9 @@ func BindAVM2ABIToCode(code AVM2CodeRecord, descriptor AVM2ABIIntrospectionDescr
 	return nil
 }
 
-func ValidateAVM2ABIMethodCall(descriptor AVM2ABIIntrospectionDescriptor, call AVM2ABIMethodCall) error {
-	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
-	call = canonicalAVM2ABIMethodCall(call)
+func ValidateAVMABIMethodCall(descriptor AVMABIIntrospectionDescriptor, call AVMABIMethodCall) error {
+	descriptor = canonicalAVMABIIntrospectionDescriptor(descriptor)
+	call = canonicalAVMABIMethodCall(call)
 	if err := descriptor.Validate(); err != nil {
 		return err
 	}
@@ -259,11 +259,11 @@ func ValidateAVM2ABIMethodCall(descriptor AVM2ABIIntrospectionDescriptor, call A
 	if method.ArgumentEncoding != call.ArgumentEncoding {
 		return errors.New("AVM 2.0 method argument encoding mismatch")
 	}
-	return validateAVM2CallFunds(descriptor.RequiredFundsForSelector(call.MethodSelector), call.Funds)
+	return validateAVMCallFunds(descriptor.RequiredFundsForSelector(call.MethodSelector), call.Funds)
 }
 
-func (p AVM2AsyncCallPlan) Validate() error {
-	p = canonicalAVM2AsyncCallPlan(p)
+func (p AVMAsyncCallPlan) Validate() error {
+	p = canonicalAVMAsyncCallPlan(p)
 	if p.Height == 0 {
 		return errors.New("AVM 2.0 async call height must be positive")
 	}
@@ -279,7 +279,7 @@ func (p AVM2AsyncCallPlan) Validate() error {
 	if !p.AwaitNonBlocking {
 		return errors.New("AVM 2.0 async await must be non-blocking")
 	}
-	if p.Promise.Status != AVM2PromisePending {
+	if p.Promise.Status != AVMPromisePending {
 		return errors.New("AVM 2.0 async call must persist pending promise")
 	}
 	if p.Promise.Contract != p.CallerContract {
@@ -303,23 +303,23 @@ func (p AVM2AsyncCallPlan) Validate() error {
 	if p.Promise.ExpiryHeight != p.Message.ExpiryHeight {
 		return errors.New("AVM 2.0 async promise expiry must match message expiry")
 	}
-	if p.OutboxRoot != ComputeAVM2MessageRoot([]AVMAsyncMessage{p.Message}) {
+	if p.OutboxRoot != ComputeAVMMessageRoot([]AVMAsyncMessage{p.Message}) {
 		return errors.New("AVM 2.0 async outbox root mismatch")
 	}
-	if p.PromiseRoot != ComputeAVM2PromiseRoot([]AVM2PromiseState{p.Promise}) {
+	if p.PromiseRoot != ComputeAVMPromiseRoot([]AVMPromiseState{p.Promise}) {
 		return errors.New("AVM 2.0 async promise root mismatch")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 async call plan hash", p.PlanHash); err != nil {
 		return err
 	}
-	if p.PlanHash != ComputeAVM2AsyncCallPlanHash(p) {
+	if p.PlanHash != ComputeAVMAsyncCallPlanHash(p) {
 		return errors.New("AVM 2.0 async call plan hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2PromiseResolution) Validate() error {
-	r = canonicalAVM2PromiseResolution(r)
+func (r AVMPromiseResolution) Validate() error {
+	r = canonicalAVMPromiseResolution(r)
 	if err := zonestypes.ValidateHash("AVM 2.0 promise resolution promise id", r.PromiseID); err != nil {
 		return err
 	}
@@ -329,7 +329,7 @@ func (r AVM2PromiseResolution) Validate() error {
 	if err := r.ResolutionMessage.Validate(); err != nil {
 		return err
 	}
-	if !IsAVM2PromiseStatus(r.Status) || r.Status == AVM2PromisePending {
+	if !IsAVMPromiseStatus(r.Status) || r.Status == AVMPromisePending {
 		return errors.New("AVM 2.0 promise resolution status must be terminal")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 promise resolution receipt hash", r.ReceiptHash); err != nil {
@@ -343,20 +343,20 @@ func (r AVM2PromiseResolution) Validate() error {
 	if r.DeliveryHeight == 0 {
 		return errors.New("AVM 2.0 promise resolution delivery height must be positive")
 	}
-	if r.ResolutionMessage.PayloadType != AVM2PayloadTypePromiseResolution {
+	if r.ResolutionMessage.PayloadType != AVMPayloadTypePromiseResolution {
 		return errors.New("AVM 2.0 promise resolution must use resolution payload type")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 promise resolution hash", r.ResolutionHash); err != nil {
 		return err
 	}
-	if r.ResolutionHash != ComputeAVM2PromiseResolutionHash(r) {
+	if r.ResolutionHash != ComputeAVMPromiseResolutionHash(r) {
 		return errors.New("AVM 2.0 promise resolution hash mismatch")
 	}
 	return nil
 }
 
-func (t AVM2PromiseTimeoutTask) Validate() error {
-	t = canonicalAVM2PromiseTimeoutTask(t)
+func (t AVMPromiseTimeoutTask) Validate() error {
+	t = canonicalAVMPromiseTimeoutTask(t)
 	if err := zonestypes.ValidateHash("AVM 2.0 timeout promise id", t.PromiseID); err != nil {
 		return err
 	}
@@ -372,7 +372,7 @@ func (t AVM2PromiseTimeoutTask) Validate() error {
 	if err := t.TimeoutMessage.Validate(); err != nil {
 		return err
 	}
-	if t.TimeoutMessage.PayloadType != AVM2PayloadTypePromiseTimeout {
+	if t.TimeoutMessage.PayloadType != AVMPayloadTypePromiseTimeout {
 		return errors.New("AVM 2.0 timeout message must use timeout payload type")
 	}
 	if t.TimeoutMessage.CreatedHeight < t.DueHeight {
@@ -381,7 +381,7 @@ func (t AVM2PromiseTimeoutTask) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 timeout task hash", t.TaskHash); err != nil {
 		return err
 	}
-	if t.TaskHash != ComputeAVM2PromiseTimeoutTaskHash(t) {
+	if t.TaskHash != ComputeAVMPromiseTimeoutTaskHash(t) {
 		return errors.New("AVM 2.0 timeout task hash mismatch")
 	}
 	return nil
@@ -389,10 +389,10 @@ func (t AVM2PromiseTimeoutTask) Validate() error {
 
 func (d AVM2MethodDescriptor) Validate() error {
 	d = canonicalAVM2MethodDescriptor(d)
-	if err := validateEngineToken("AVM 2.0 method selector", d.Selector, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 method selector", d.Selector, MaxAVMTokenLength); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 method name", d.Name, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 method name", d.Name, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 method argument schema hash", d.ArgumentSchemaHash); err != nil {
@@ -401,7 +401,7 @@ func (d AVM2MethodDescriptor) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 method return schema hash", d.ReturnSchemaHash); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 method argument encoding", d.ArgumentEncoding, MaxAVM2ABIEncodingLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 method argument encoding", d.ArgumentEncoding, MaxAVMABIEncodingLength); err != nil {
 		return err
 	}
 	if d.GasHint == 0 {
@@ -418,7 +418,7 @@ func (d AVM2MethodDescriptor) Validate() error {
 
 func (d AVM2EventDescriptor) Validate() error {
 	d = canonicalAVM2EventDescriptor(d)
-	if err := validateEngineToken("AVM 2.0 ABI event name", d.Name, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 ABI event name", d.Name, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI event schema hash", d.SchemaHash); err != nil {
@@ -433,9 +433,9 @@ func (d AVM2EventDescriptor) Validate() error {
 	return nil
 }
 
-func (d AVM2ErrorDescriptor) Validate() error {
-	d = canonicalAVM2ErrorDescriptor(d)
-	if err := validateEngineToken("AVM 2.0 ABI error code", d.Code, MaxAVM2TokenLength); err != nil {
+func (d AVMErrorDescriptor) Validate() error {
+	d = canonicalAVMErrorDescriptor(d)
+	if err := validateEngineToken("AVM 2.0 ABI error code", d.Code, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI error schema hash", d.SchemaHash); err != nil {
@@ -444,18 +444,18 @@ func (d AVM2ErrorDescriptor) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI error hash", d.ErrorHash); err != nil {
 		return err
 	}
-	if d.ErrorHash != ComputeAVM2ErrorDescriptorHash(d) {
+	if d.ErrorHash != ComputeAVMErrorDescriptorHash(d) {
 		return errors.New("AVM 2.0 ABI error hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2FundRequirement) Validate() error {
-	r = canonicalAVM2FundRequirement(r)
-	if err := validateEngineToken("AVM 2.0 fund selector", r.Selector, MaxAVM2TokenLength); err != nil {
+func (r AVMFundRequirement) Validate() error {
+	r = canonicalAVMFundRequirement(r)
+	if err := validateEngineToken("AVM 2.0 fund selector", r.Selector, MaxAVMTokenLength); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 fund denom", r.Denom, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 fund denom", r.Denom, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if r.Minimum.IsNil() || r.Minimum.IsNegative() {
@@ -464,15 +464,15 @@ func (r AVM2FundRequirement) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 fund requirement hash", r.RequirementHash); err != nil {
 		return err
 	}
-	if r.RequirementHash != ComputeAVM2FundRequirementHash(r) {
+	if r.RequirementHash != ComputeAVMFundRequirementHash(r) {
 		return errors.New("AVM 2.0 fund requirement hash mismatch")
 	}
 	return nil
 }
 
-func (h AVM2GasHint) Validate() error {
-	h = canonicalAVM2GasHint(h)
-	if err := validateEngineToken("AVM 2.0 gas hint selector", h.Selector, MaxAVM2TokenLength); err != nil {
+func (h AVMGasHint) Validate() error {
+	h = canonicalAVMGasHint(h)
+	if err := validateEngineToken("AVM 2.0 gas hint selector", h.Selector, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if h.Estimate == 0 {
@@ -481,14 +481,14 @@ func (h AVM2GasHint) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 gas hint hash", h.HintHash); err != nil {
 		return err
 	}
-	if h.HintHash != ComputeAVM2GasHintHash(h) {
+	if h.HintHash != ComputeAVMGasHintHash(h) {
 		return errors.New("AVM 2.0 gas hint hash mismatch")
 	}
 	return nil
 }
 
-func (d AVM2ABIIntrospectionDescriptor) Validate() error {
-	d = canonicalAVM2ABIIntrospectionDescriptor(d)
+func (d AVMABIIntrospectionDescriptor) Validate() error {
+	d = canonicalAVMABIIntrospectionDescriptor(d)
 	if d.ABIVersion == 0 || d.CodeID == 0 {
 		return errors.New("AVM 2.0 ABI introspection version and code id must be positive")
 	}
@@ -504,58 +504,58 @@ func (d AVM2ABIIntrospectionDescriptor) Validate() error {
 	if err := validateAVM2Events(d.Events); err != nil {
 		return err
 	}
-	if err := validateAVM2Errors(d.Errors); err != nil {
+	if err := validateAVMErrors(d.Errors); err != nil {
 		return err
 	}
-	if err := validateAVM2FundRequirements(d.RequiredFunds, d.Methods); err != nil {
+	if err := validateAVMFundRequirements(d.RequiredFunds, d.Methods); err != nil {
 		return err
 	}
-	if err := validateAVM2GasHints(d.GasHints, d.Methods); err != nil {
+	if err := validateAVMGasHints(d.GasHints, d.Methods); err != nil {
 		return err
 	}
 	if d.IdentityNameOptional != "" {
-		if err := validateEngineToken("AVM 2.0 ABI identity name", d.IdentityNameOptional, MaxAVM2TokenLength); err != nil {
+		if err := validateEngineToken("AVM 2.0 ABI identity name", d.IdentityNameOptional, MaxAVMTokenLength); err != nil {
 			return err
 		}
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI introspection interface hash", d.InterfaceHash); err != nil {
 		return err
 	}
-	if d.InterfaceHash != ComputeAVM2ABIIntrospectionHash(d) {
+	if d.InterfaceHash != ComputeAVMABIIntrospectionHash(d) {
 		return errors.New("AVM 2.0 ABI introspection hash mismatch")
 	}
 	return nil
 }
 
-func (c AVM2ABIMethodCall) Validate() error {
-	c = canonicalAVM2ABIMethodCall(c)
+func (c AVMABIMethodCall) Validate() error {
+	c = canonicalAVMABIMethodCall(c)
 	if err := zonestypes.ValidateHash("AVM 2.0 call interface hash", c.InterfaceHash); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 call method selector", c.MethodSelector, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 call method selector", c.MethodSelector, MaxAVMTokenLength); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 call argument encoding", c.ArgumentEncoding, MaxAVM2ABIEncodingLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 call argument encoding", c.ArgumentEncoding, MaxAVMABIEncodingLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 call argument hash", c.ArgumentHash); err != nil {
 		return err
 	}
-	if err := validateAVM2CallFundRecords(c.Funds); err != nil {
+	if err := validateAVMCallFundRecords(c.Funds); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 method call hash", c.CallHash); err != nil {
 		return err
 	}
-	if c.CallHash != ComputeAVM2ABIMethodCallHash(c) {
+	if c.CallHash != ComputeAVMABIMethodCallHash(c) {
 		return errors.New("AVM 2.0 method call hash mismatch")
 	}
 	return nil
 }
 
-func (b AVM2ABIIdentityBinding) Validate() error {
-	b = canonicalAVM2ABIIdentityBinding(b)
-	if err := validateEngineToken("AVM 2.0 ABI identity name", b.Name, MaxAVM2TokenLength); err != nil {
+func (b AVMABIIdentityBinding) Validate() error {
+	b = canonicalAVMABIIdentityBinding(b)
+	if err := validateEngineToken("AVM 2.0 ABI identity name", b.Name, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if !strings.HasSuffix(b.Name, ".aet") {
@@ -570,14 +570,14 @@ func (b AVM2ABIIdentityBinding) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI identity binding hash", b.BindingHash); err != nil {
 		return err
 	}
-	if b.BindingHash != ComputeAVM2ABIIdentityBindingHash(b) {
+	if b.BindingHash != ComputeAVMABIIdentityBindingHash(b) {
 		return errors.New("AVM 2.0 ABI identity binding hash mismatch")
 	}
 	return nil
 }
 
-func (d AVM2ABIIntrospectionDescriptor) FindMethod(selector string) (AVM2MethodDescriptor, bool) {
-	d = canonicalAVM2ABIIntrospectionDescriptor(d)
+func (d AVMABIIntrospectionDescriptor) FindMethod(selector string) (AVM2MethodDescriptor, bool) {
+	d = canonicalAVMABIIntrospectionDescriptor(d)
 	selector = strings.TrimSpace(selector)
 	for _, method := range d.Methods {
 		if method.Selector == selector {
@@ -587,10 +587,10 @@ func (d AVM2ABIIntrospectionDescriptor) FindMethod(selector string) (AVM2MethodD
 	return AVM2MethodDescriptor{}, false
 }
 
-func (d AVM2ABIIntrospectionDescriptor) RequiredFundsForSelector(selector string) []AVM2FundRequirement {
-	d = canonicalAVM2ABIIntrospectionDescriptor(d)
+func (d AVMABIIntrospectionDescriptor) RequiredFundsForSelector(selector string) []AVMFundRequirement {
+	d = canonicalAVMABIIntrospectionDescriptor(d)
 	selector = strings.TrimSpace(selector)
-	var out []AVM2FundRequirement
+	var out []AVMFundRequirement
 	for _, requirement := range d.RequiredFunds {
 		if requirement.Selector == selector {
 			out = append(out, requirement)
@@ -599,10 +599,10 @@ func (d AVM2ABIIntrospectionDescriptor) RequiredFundsForSelector(selector string
 	return out
 }
 
-func ComputeAVM2AsyncCallPlanHash(plan AVM2AsyncCallPlan) string {
-	plan = canonicalAVM2AsyncCallPlan(plan)
+func ComputeAVMAsyncCallPlanHash(plan AVMAsyncCallPlan) string {
+	plan = canonicalAVMAsyncCallPlan(plan)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-async-call-plan-v1")
+	writeEnginePart(h, "aetra-AVM-async-call-plan-v1")
 	writeEngineUint64(h, plan.Height)
 	writeEnginePart(h, plan.CallerContract)
 	writeEnginePart(h, plan.Message.ID)
@@ -614,10 +614,10 @@ func ComputeAVM2AsyncCallPlanHash(plan AVM2AsyncCallPlan) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2PromiseResolutionHash(resolution AVM2PromiseResolution) string {
-	resolution = canonicalAVM2PromiseResolution(resolution)
+func ComputeAVMPromiseResolutionHash(resolution AVMPromiseResolution) string {
+	resolution = canonicalAVMPromiseResolution(resolution)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-promise-resolution-v1")
+	writeEnginePart(h, "aetra-AVM-promise-resolution-v1")
 	writeEnginePart(h, resolution.PromiseID)
 	writeEnginePart(h, resolution.OriginalMessageID)
 	writeEnginePart(h, resolution.ResolutionMessage.ID)
@@ -628,10 +628,10 @@ func ComputeAVM2PromiseResolutionHash(resolution AVM2PromiseResolution) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2PromiseTimeoutTaskHash(task AVM2PromiseTimeoutTask) string {
-	task = canonicalAVM2PromiseTimeoutTask(task)
+func ComputeAVMPromiseTimeoutTaskHash(task AVMPromiseTimeoutTask) string {
+	task = canonicalAVMPromiseTimeoutTask(task)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-promise-timeout-task-v1")
+	writeEnginePart(h, "aetra-AVM-promise-timeout-task-v1")
 	writeEnginePart(h, task.PromiseID)
 	writeEnginePart(h, task.Contract)
 	writeEngineUint64(h, task.DueHeight)
@@ -643,7 +643,7 @@ func ComputeAVM2PromiseTimeoutTaskHash(task AVM2PromiseTimeoutTask) string {
 func ComputeAVM2MethodDescriptorHash(method AVM2MethodDescriptor) string {
 	method = canonicalAVM2MethodDescriptor(method)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-method-descriptor-v1")
+	writeEnginePart(h, "aetra-AVM-method-descriptor-v1")
 	writeEnginePart(h, method.Selector)
 	writeEnginePart(h, method.Name)
 	writeEnginePart(h, method.ArgumentSchemaHash)
@@ -656,44 +656,44 @@ func ComputeAVM2MethodDescriptorHash(method AVM2MethodDescriptor) string {
 func ComputeAVM2EventDescriptorHash(event AVM2EventDescriptor) string {
 	event = canonicalAVM2EventDescriptor(event)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-abi-event-descriptor-v1")
+	writeEnginePart(h, "aetra-AVM-abi-event-descriptor-v1")
 	writeEnginePart(h, event.Name)
 	writeEnginePart(h, event.SchemaHash)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ErrorDescriptorHash(errDesc AVM2ErrorDescriptor) string {
-	errDesc = canonicalAVM2ErrorDescriptor(errDesc)
+func ComputeAVMErrorDescriptorHash(errDesc AVMErrorDescriptor) string {
+	errDesc = canonicalAVMErrorDescriptor(errDesc)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-error-descriptor-v1")
+	writeEnginePart(h, "aetra-AVM-error-descriptor-v1")
 	writeEnginePart(h, errDesc.Code)
 	writeEnginePart(h, errDesc.SchemaHash)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2FundRequirementHash(requirement AVM2FundRequirement) string {
-	requirement = canonicalAVM2FundRequirement(requirement)
+func ComputeAVMFundRequirementHash(requirement AVMFundRequirement) string {
+	requirement = canonicalAVMFundRequirement(requirement)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-fund-requirement-v1")
+	writeEnginePart(h, "aetra-AVM-fund-requirement-v1")
 	writeEnginePart(h, requirement.Selector)
 	writeEnginePart(h, requirement.Denom)
 	writeEnginePart(h, requirement.Minimum.String())
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2GasHintHash(hint AVM2GasHint) string {
-	hint = canonicalAVM2GasHint(hint)
+func ComputeAVMGasHintHash(hint AVMGasHint) string {
+	hint = canonicalAVMGasHint(hint)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-gas-hint-v1")
+	writeEnginePart(h, "aetra-AVM-gas-hint-v1")
 	writeEnginePart(h, hint.Selector)
 	writeEngineUint64(h, hint.Estimate)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ABIIntrospectionHash(descriptor AVM2ABIIntrospectionDescriptor) string {
-	descriptor = canonicalAVM2ABIIntrospectionDescriptor(descriptor)
+func ComputeAVMABIIntrospectionHash(descriptor AVMABIIntrospectionDescriptor) string {
+	descriptor = canonicalAVMABIIntrospectionDescriptor(descriptor)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-abi-introspection-v1")
+	writeEnginePart(h, "aetra-AVM-abi-introspection-v1")
 	writeEngineUint64(h, descriptor.ABIVersion)
 	writeEngineUint64(h, descriptor.CodeID)
 	writeEnginePart(h, descriptor.CodeHash)
@@ -721,11 +721,11 @@ func ComputeAVM2ABIIntrospectionHash(descriptor AVM2ABIIntrospectionDescriptor) 
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ABIMethodCallHash(call AVM2ABIMethodCall) string {
-	call = canonicalAVM2ABIMethodCall(call)
+func ComputeAVMABIMethodCallHash(call AVMABIMethodCall) string {
+	call = canonicalAVMABIMethodCall(call)
 	call.CallHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-method-call-v1")
+	writeEnginePart(h, "aetra-AVM-method-call-v1")
 	writeEnginePart(h, call.InterfaceHash)
 	writeEnginePart(h, call.MethodSelector)
 	writeEnginePart(h, call.ArgumentEncoding)
@@ -738,21 +738,21 @@ func ComputeAVM2ABIMethodCallHash(call AVM2ABIMethodCall) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ABIIdentityBindingHash(binding AVM2ABIIdentityBinding) string {
-	binding = canonicalAVM2ABIIdentityBinding(binding)
+func ComputeAVMABIIdentityBindingHash(binding AVMABIIdentityBinding) string {
+	binding = canonicalAVMABIIdentityBinding(binding)
 	binding.BindingHash = ""
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-abi-identity-binding-v1")
+	writeEnginePart(h, "aetra-AVM-abi-identity-binding-v1")
 	writeEnginePart(h, binding.Name)
 	writeEnginePart(h, binding.InterfaceHash)
 	writeEnginePart(h, binding.ResolverRecordHash)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func canonicalAVM2AsyncCallPlan(plan AVM2AsyncCallPlan) AVM2AsyncCallPlan {
+func canonicalAVMAsyncCallPlan(plan AVMAsyncCallPlan) AVMAsyncCallPlan {
 	plan.CallerContract = strings.TrimSpace(plan.CallerContract)
 	plan.Message = canonicalAVMAsyncMessage(plan.Message)
-	plan.Promise = canonicalAVM2PromiseState(plan.Promise)
+	plan.Promise = canonicalAVMPromiseState(plan.Promise)
 	plan.PersistedPromiseID = strings.TrimSpace(plan.PersistedPromiseID)
 	plan.OutboxRoot = strings.TrimSpace(plan.OutboxRoot)
 	plan.PromiseRoot = strings.TrimSpace(plan.PromiseRoot)
@@ -760,7 +760,7 @@ func canonicalAVM2AsyncCallPlan(plan AVM2AsyncCallPlan) AVM2AsyncCallPlan {
 	return plan
 }
 
-func canonicalAVM2PromiseResolution(resolution AVM2PromiseResolution) AVM2PromiseResolution {
+func canonicalAVMPromiseResolution(resolution AVMPromiseResolution) AVMPromiseResolution {
 	resolution.PromiseID = strings.TrimSpace(resolution.PromiseID)
 	resolution.OriginalMessageID = strings.TrimSpace(resolution.OriginalMessageID)
 	resolution.ResolutionMessage = canonicalAVMAsyncMessage(resolution.ResolutionMessage)
@@ -770,7 +770,7 @@ func canonicalAVM2PromiseResolution(resolution AVM2PromiseResolution) AVM2Promis
 	return resolution
 }
 
-func canonicalAVM2PromiseTimeoutTask(task AVM2PromiseTimeoutTask) AVM2PromiseTimeoutTask {
+func canonicalAVMPromiseTimeoutTask(task AVMPromiseTimeoutTask) AVMPromiseTimeoutTask {
 	task.PromiseID = strings.TrimSpace(task.PromiseID)
 	task.Contract = strings.TrimSpace(task.Contract)
 	task.HandlerPayloadHash = strings.TrimSpace(task.HandlerPayloadHash)
@@ -796,27 +796,27 @@ func canonicalAVM2EventDescriptor(event AVM2EventDescriptor) AVM2EventDescriptor
 	return event
 }
 
-func canonicalAVM2ErrorDescriptor(errDesc AVM2ErrorDescriptor) AVM2ErrorDescriptor {
+func canonicalAVMErrorDescriptor(errDesc AVMErrorDescriptor) AVMErrorDescriptor {
 	errDesc.Code = strings.TrimSpace(errDesc.Code)
 	errDesc.SchemaHash = strings.TrimSpace(errDesc.SchemaHash)
 	errDesc.ErrorHash = strings.TrimSpace(errDesc.ErrorHash)
 	return errDesc
 }
 
-func canonicalAVM2FundRequirement(requirement AVM2FundRequirement) AVM2FundRequirement {
+func canonicalAVMFundRequirement(requirement AVMFundRequirement) AVMFundRequirement {
 	requirement.Selector = strings.TrimSpace(requirement.Selector)
 	requirement.Denom = strings.TrimSpace(requirement.Denom)
 	requirement.RequirementHash = strings.TrimSpace(requirement.RequirementHash)
 	return requirement
 }
 
-func canonicalAVM2GasHint(hint AVM2GasHint) AVM2GasHint {
+func canonicalAVMGasHint(hint AVMGasHint) AVMGasHint {
 	hint.Selector = strings.TrimSpace(hint.Selector)
 	hint.HintHash = strings.TrimSpace(hint.HintHash)
 	return hint
 }
 
-func canonicalAVM2ABIIntrospectionDescriptor(descriptor AVM2ABIIntrospectionDescriptor) AVM2ABIIntrospectionDescriptor {
+func canonicalAVMABIIntrospectionDescriptor(descriptor AVMABIIntrospectionDescriptor) AVMABIIntrospectionDescriptor {
 	descriptor.CodeHash = strings.TrimSpace(descriptor.CodeHash)
 	descriptor.IdentityNameOptional = strings.TrimSpace(descriptor.IdentityNameOptional)
 	descriptor.InterfaceHash = strings.TrimSpace(descriptor.InterfaceHash)
@@ -830,14 +830,14 @@ func canonicalAVM2ABIIntrospectionDescriptor(descriptor AVM2ABIIntrospectionDesc
 		descriptor.Events[i] = canonicalAVM2EventDescriptor(descriptor.Events[i])
 	}
 	sort.SliceStable(descriptor.Events, func(i, j int) bool { return descriptor.Events[i].Name < descriptor.Events[j].Name })
-	descriptor.Errors = append([]AVM2ErrorDescriptor(nil), descriptor.Errors...)
+	descriptor.Errors = append([]AVMErrorDescriptor(nil), descriptor.Errors...)
 	for i := range descriptor.Errors {
-		descriptor.Errors[i] = canonicalAVM2ErrorDescriptor(descriptor.Errors[i])
+		descriptor.Errors[i] = canonicalAVMErrorDescriptor(descriptor.Errors[i])
 	}
 	sort.SliceStable(descriptor.Errors, func(i, j int) bool { return descriptor.Errors[i].Code < descriptor.Errors[j].Code })
-	descriptor.RequiredFunds = append([]AVM2FundRequirement(nil), descriptor.RequiredFunds...)
+	descriptor.RequiredFunds = append([]AVMFundRequirement(nil), descriptor.RequiredFunds...)
 	for i := range descriptor.RequiredFunds {
-		descriptor.RequiredFunds[i] = canonicalAVM2FundRequirement(descriptor.RequiredFunds[i])
+		descriptor.RequiredFunds[i] = canonicalAVMFundRequirement(descriptor.RequiredFunds[i])
 	}
 	sort.SliceStable(descriptor.RequiredFunds, func(i, j int) bool {
 		if descriptor.RequiredFunds[i].Selector == descriptor.RequiredFunds[j].Selector {
@@ -845,34 +845,34 @@ func canonicalAVM2ABIIntrospectionDescriptor(descriptor AVM2ABIIntrospectionDesc
 		}
 		return descriptor.RequiredFunds[i].Selector < descriptor.RequiredFunds[j].Selector
 	})
-	descriptor.GasHints = append([]AVM2GasHint(nil), descriptor.GasHints...)
+	descriptor.GasHints = append([]AVMGasHint(nil), descriptor.GasHints...)
 	for i := range descriptor.GasHints {
-		descriptor.GasHints[i] = canonicalAVM2GasHint(descriptor.GasHints[i])
+		descriptor.GasHints[i] = canonicalAVMGasHint(descriptor.GasHints[i])
 	}
 	sort.SliceStable(descriptor.GasHints, func(i, j int) bool { return descriptor.GasHints[i].Selector < descriptor.GasHints[j].Selector })
 	return descriptor
 }
 
-func canonicalAVM2CallFund(fund AVM2CallFund) AVM2CallFund {
+func canonicalAVMCallFund(fund AVMCallFund) AVMCallFund {
 	fund.Denom = strings.TrimSpace(fund.Denom)
 	return fund
 }
 
-func canonicalAVM2ABIMethodCall(call AVM2ABIMethodCall) AVM2ABIMethodCall {
+func canonicalAVMABIMethodCall(call AVMABIMethodCall) AVMABIMethodCall {
 	call.InterfaceHash = strings.TrimSpace(call.InterfaceHash)
 	call.MethodSelector = strings.TrimSpace(call.MethodSelector)
 	call.ArgumentEncoding = strings.TrimSpace(call.ArgumentEncoding)
 	call.ArgumentHash = strings.TrimSpace(call.ArgumentHash)
 	call.CallHash = strings.TrimSpace(call.CallHash)
-	call.Funds = append([]AVM2CallFund(nil), call.Funds...)
+	call.Funds = append([]AVMCallFund(nil), call.Funds...)
 	for i := range call.Funds {
-		call.Funds[i] = canonicalAVM2CallFund(call.Funds[i])
+		call.Funds[i] = canonicalAVMCallFund(call.Funds[i])
 	}
 	sort.SliceStable(call.Funds, func(i, j int) bool { return call.Funds[i].Denom < call.Funds[j].Denom })
 	return call
 }
 
-func canonicalAVM2ABIIdentityBinding(binding AVM2ABIIdentityBinding) AVM2ABIIdentityBinding {
+func canonicalAVMABIIdentityBinding(binding AVMABIIdentityBinding) AVMABIIdentityBinding {
 	binding.Name = strings.TrimSpace(binding.Name)
 	binding.InterfaceHash = strings.TrimSpace(binding.InterfaceHash)
 	binding.ResolverRecordHash = strings.TrimSpace(binding.ResolverRecordHash)
@@ -914,7 +914,7 @@ func validateAVM2Events(events []AVM2EventDescriptor) error {
 	return nil
 }
 
-func validateAVM2Errors(errorsList []AVM2ErrorDescriptor) error {
+func validateAVMErrors(errorsList []AVMErrorDescriptor) error {
 	seen := make(map[string]struct{}, len(errorsList))
 	for i, errDesc := range errorsList {
 		if err := errDesc.Validate(); err != nil {
@@ -931,7 +931,7 @@ func validateAVM2Errors(errorsList []AVM2ErrorDescriptor) error {
 	return nil
 }
 
-func validateAVM2FundRequirements(requirements []AVM2FundRequirement, methods []AVM2MethodDescriptor) error {
+func validateAVMFundRequirements(requirements []AVMFundRequirement, methods []AVM2MethodDescriptor) error {
 	selectors := make(map[string]struct{}, len(methods))
 	for _, method := range methods {
 		selectors[method.Selector] = struct{}{}
@@ -953,7 +953,7 @@ func validateAVM2FundRequirements(requirements []AVM2FundRequirement, methods []
 	return nil
 }
 
-func validateAVM2GasHints(hints []AVM2GasHint, methods []AVM2MethodDescriptor) error {
+func validateAVMGasHints(hints []AVMGasHint, methods []AVM2MethodDescriptor) error {
 	selectors := make(map[string]struct{}, len(methods))
 	for _, method := range methods {
 		selectors[method.Selector] = struct{}{}
@@ -974,11 +974,11 @@ func validateAVM2GasHints(hints []AVM2GasHint, methods []AVM2MethodDescriptor) e
 	return nil
 }
 
-func validateAVM2CallFundRecords(funds []AVM2CallFund) error {
+func validateAVMCallFundRecords(funds []AVMCallFund) error {
 	seen := make(map[string]struct{}, len(funds))
 	for i, fund := range funds {
-		fund = canonicalAVM2CallFund(fund)
-		if err := validateEngineToken("AVM 2.0 call fund denom", fund.Denom, MaxAVM2TokenLength); err != nil {
+		fund = canonicalAVMCallFund(fund)
+		if err := validateEngineToken("AVM 2.0 call fund denom", fund.Denom, MaxAVMTokenLength); err != nil {
 			return err
 		}
 		if fund.Amount.IsNil() || fund.Amount.IsNegative() {
@@ -995,10 +995,10 @@ func validateAVM2CallFundRecords(funds []AVM2CallFund) error {
 	return nil
 }
 
-func validateAVM2CallFunds(requirements []AVM2FundRequirement, funds []AVM2CallFund) error {
+func validateAVMCallFunds(requirements []AVMFundRequirement, funds []AVMCallFund) error {
 	available := make(map[string]sdkmath.Int, len(funds))
 	for _, fund := range funds {
-		fund = canonicalAVM2CallFund(fund)
+		fund = canonicalAVMCallFund(fund)
 		available[fund.Denom] = fund.Amount
 	}
 	for _, requirement := range requirements {

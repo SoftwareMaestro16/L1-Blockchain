@@ -9,22 +9,22 @@ import (
 
 func TestComputeSlashingPenaltyScalesStakeExposureBySeverityRoleAndImpact(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:                     "penalty-1",
-		ValidatorID:                   "val-a",
-		SeverityLevel:                 SlashSeverityHigh,
-		StakeExposureNaet:             sdkmath.NewInt(10_000),
-		RoleWeightBps:                 5_000,
-		RepeatOffenseMultiplierBps:    10_000,
-		TaskImpactBps:                 8_000,
-		SafetyImpactBps:               10_000,
-		LivenessImpactBps:             10_000,
-		SelfStakeNaet:                 sdkmath.NewInt(4_000),
-		Nominations:                   []Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(6_000)}},
-		RewardConfiscationNaet:        sdkmath.NewInt(250),
-		TemporaryJailEpochs:           2,
-		RoleSuspensions:               []ValidatorRole{ValidatorRoleVerifier},
-		FutureElectionScorePenaltyBps: 1_000,
-		EvidenceHeight:                50,
+		PenaltyID:			"penalty-1",
+		ValidatorID:			"val-a",
+		SeverityLevel:			SlashSeverityHigh,
+		StakeExposureNaet:		sdkmath.NewInt(10_000),
+		RoleWeightBps:			5_000,
+		RepeatOffenseMultiplierBps:	10_000,
+		TaskImpactBps:			8_000,
+		SafetyImpactBps:		10_000,
+		LivenessImpactBps:		10_000,
+		SelfStakeNaet:			sdkmath.NewInt(4_000),
+		Nominations:			[]Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(6_000)}},
+		RewardConfiscationNaet:		sdkmath.NewInt(250),
+		TemporaryJailEpochs:		2,
+		RoleSuspensions:		[]ValidatorRole{ValidatorRoleVerifier},
+		FutureElectionScorePenaltyBps:	1_000,
+		EvidenceHeight:			50,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(1_200), penalty.ScaledPenaltyBps)
@@ -54,16 +54,16 @@ func TestSlashSeverityClassesUseProtocolNames(t *testing.T) {
 	}, SlashSeverityClasses())
 
 	expected := map[string]uint32{
-		SlashSeverityMinorLivenessFault:         5,
-		SlashSeverityMajorLivenessFault:         25,
-		SlashSeverityRepeatedLivenessFault:      100,
-		SlashSeverityInvalidTaskExecution:       750,
-		SlashSeverityInvalidStateTransition:     1_500,
-		SlashSeverityRepeatedInvalidProposal:    25,
-		SlashSeverityRepeatedTimestampViolation: 25,
-		SlashSeverityEquivocation:               2_000,
-		SlashSeverityDoubleSign:                 500,
-		SlashSeverityEvidenceFraud:              7_500,
+		SlashSeverityMinorLivenessFault:		5,
+		SlashSeverityMajorLivenessFault:		25,
+		SlashSeverityRepeatedLivenessFault:		100,
+		SlashSeverityInvalidTaskExecution:		750,
+		SlashSeverityInvalidStateTransition:		1_500,
+		SlashSeverityRepeatedInvalidProposal:		25,
+		SlashSeverityRepeatedTimestampViolation:	25,
+		SlashSeverityEquivocation:			2_000,
+		SlashSeverityDoubleSign:			500,
+		SlashSeverityEvidenceFraud:			7_500,
 	}
 	for severity, bps := range expected {
 		actual, err := DefaultSeverityBps(severity)
@@ -74,8 +74,8 @@ func TestSlashSeverityClassesUseProtocolNames(t *testing.T) {
 
 func TestRepeatedObjectiveProposalAndTimestampViolationsCanJailSlashWithoutTombstone(t *testing.T) {
 	for _, tc := range []struct {
-		name     string
-		severity string
+		name		string
+		severity	string
 	}{
 		{name: "invalid-proposal", severity: SlashSeverityRepeatedInvalidProposal},
 		{name: "timestamp-violation", severity: SlashSeverityRepeatedTimestampViolation},
@@ -83,17 +83,17 @@ func TestRepeatedObjectiveProposalAndTimestampViolationsCanJailSlashWithoutTombs
 		t.Run(tc.name, func(t *testing.T) {
 			candidate := candidate("val-a", 100_000, 0)
 			result, err := ExecuteSlashing(SlashingExecutionInput{
-				EvidenceID:     tc.name + "-evidence-1",
-				ExecutedHeight: 100,
-				CurrentEpoch:   10,
-				Candidate:      candidate,
+				EvidenceID:	tc.name + "-evidence-1",
+				ExecutedHeight:	100,
+				CurrentEpoch:	10,
+				Candidate:	candidate,
 				PenaltyInput: SlashingPenaltyInput{
-					PenaltyID:           tc.name + "-penalty-1",
-					SeverityLevel:       tc.severity,
-					StakeExposureNaet:   sdkmath.NewInt(100_000),
-					SelfStakeNaet:       candidate.SelfStakeNaet,
-					TemporaryJailEpochs: 24,
-					EvidenceHeight:      90,
+					PenaltyID:		tc.name + "-penalty-1",
+					SeverityLevel:		tc.severity,
+					StakeExposureNaet:	sdkmath.NewInt(100_000),
+					SelfStakeNaet:		candidate.SelfStakeNaet,
+					TemporaryJailEpochs:	24,
+					EvidenceHeight:		90,
 				},
 				RoutingInput: SlashingPenaltyRoutingInput{
 					BurnBps: BasisPoints,
@@ -111,13 +111,13 @@ func TestRepeatedObjectiveProposalAndTimestampViolationsCanJailSlashWithoutTombs
 
 func TestSlashingEvidenceTimingCoversHeightManipulationEdges(t *testing.T) {
 	valid := SlashingEvidenceTimingInput{
-		FaultHeight:                   100,
-		EvidenceHeight:                110,
-		CurrentHeight:                 120,
-		MaxEvidenceAgeBlocks:          100,
-		ValidatorBondedHeight:         90,
-		ValidatorUnbondingHeight:      115,
-		UnbondingEvidenceWindowBlocks: 30,
+		FaultHeight:			100,
+		EvidenceHeight:			110,
+		CurrentHeight:			120,
+		MaxEvidenceAgeBlocks:		100,
+		ValidatorBondedHeight:		90,
+		ValidatorUnbondingHeight:	115,
+		UnbondingEvidenceWindowBlocks:	30,
 	}
 	require.NoError(t, ValidateSlashingEvidenceTiming(valid))
 
@@ -147,13 +147,13 @@ func TestSlashingEvidenceTimingCoversHeightManipulationEdges(t *testing.T) {
 
 func TestProgressiveDowntimeSlashingDefaultsStayWithinAetraRanges(t *testing.T) {
 	first, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:           "downtime-first",
-		ValidatorID:         "val-a",
-		SeverityLevel:       SlashSeverityMinorLivenessFault,
-		StakeExposureNaet:   sdkmath.NewInt(100_000),
-		SelfStakeNaet:       sdkmath.NewInt(100_000),
-		TemporaryJailEpochs: 1,
-		EvidenceHeight:      10,
+		PenaltyID:		"downtime-first",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityMinorLivenessFault,
+		StakeExposureNaet:	sdkmath.NewInt(100_000),
+		SelfStakeNaet:		sdkmath.NewInt(100_000),
+		TemporaryJailEpochs:	1,
+		EvidenceHeight:		10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(5), first.SeverityBps)
@@ -161,13 +161,13 @@ func TestProgressiveDowntimeSlashingDefaultsStayWithinAetraRanges(t *testing.T) 
 	require.Equal(t, uint64(1), first.TemporaryJailEpochs)
 
 	repeat, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:           "downtime-repeat",
-		ValidatorID:         "val-a",
-		SeverityLevel:       SlashSeverityMajorLivenessFault,
-		StakeExposureNaet:   sdkmath.NewInt(100_000),
-		SelfStakeNaet:       sdkmath.NewInt(100_000),
-		TemporaryJailEpochs: 24,
-		EvidenceHeight:      20,
+		PenaltyID:		"downtime-repeat",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityMajorLivenessFault,
+		StakeExposureNaet:	sdkmath.NewInt(100_000),
+		SelfStakeNaet:		sdkmath.NewInt(100_000),
+		TemporaryJailEpochs:	24,
+		EvidenceHeight:		20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(25), repeat.SeverityBps)
@@ -175,14 +175,14 @@ func TestProgressiveDowntimeSlashingDefaultsStayWithinAetraRanges(t *testing.T) 
 	require.Equal(t, uint64(24), repeat.TemporaryJailEpochs)
 
 	chronic, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:                     "downtime-chronic",
-		ValidatorID:                   "val-a",
-		SeverityLevel:                 SlashSeverityRepeatedLivenessFault,
-		StakeExposureNaet:             sdkmath.NewInt(100_000),
-		SelfStakeNaet:                 sdkmath.NewInt(100_000),
-		TemporaryJailEpochs:           72,
-		FutureElectionScorePenaltyBps: 500,
-		EvidenceHeight:                30,
+		PenaltyID:			"downtime-chronic",
+		ValidatorID:			"val-a",
+		SeverityLevel:			SlashSeverityRepeatedLivenessFault,
+		StakeExposureNaet:		sdkmath.NewInt(100_000),
+		SelfStakeNaet:			sdkmath.NewInt(100_000),
+		TemporaryJailEpochs:		72,
+		FutureElectionScorePenaltyBps:	500,
+		EvidenceHeight:			30,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(100), chronic.SeverityBps)
@@ -193,21 +193,21 @@ func TestProgressiveDowntimeSlashingDefaultsStayWithinAetraRanges(t *testing.T) 
 
 func TestComputeSlashingPenaltyCapsAtStakeExposureAndAppliesTombstoneIdentityInvalidation(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:                     "penalty-critical",
-		ValidatorID:                   "val-a",
-		SeverityLevel:                 SlashSeverityCritical,
-		SeverityBps:                   9_000,
-		StakeExposureNaet:             sdkmath.NewInt(1_000),
-		RoleWeightBps:                 10_000,
-		RepeatOffenseMultiplierBps:    10_000,
-		TaskImpactBps:                 10_000,
-		SafetyImpactBps:               10_000,
-		LivenessImpactBps:             10_000,
-		SelfStakeNaet:                 sdkmath.NewInt(1_000),
-		PermanentTombstone:            true,
-		IdentityInvalidation:          true,
-		FutureElectionScorePenaltyBps: 10_000,
-		EvidenceHeight:                60,
+		PenaltyID:			"penalty-critical",
+		ValidatorID:			"val-a",
+		SeverityLevel:			SlashSeverityCritical,
+		SeverityBps:			9_000,
+		StakeExposureNaet:		sdkmath.NewInt(1_000),
+		RoleWeightBps:			10_000,
+		RepeatOffenseMultiplierBps:	10_000,
+		TaskImpactBps:			10_000,
+		SafetyImpactBps:		10_000,
+		LivenessImpactBps:		10_000,
+		SelfStakeNaet:			sdkmath.NewInt(1_000),
+		PermanentTombstone:		true,
+		IdentityInvalidation:		true,
+		FutureElectionScorePenaltyBps:	10_000,
+		EvidenceHeight:			60,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(900), penalty.StakeSlashNaet)
@@ -226,24 +226,24 @@ func TestComputeSlashingPenaltyCapsAtStakeExposureAndAppliesTombstoneIdentityInv
 
 func TestRouteSlashingPenaltySplitsBurnReporterTreasuryAndCompensation(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:              "penalty-routing",
-		ValidatorID:            "val-a",
-		SeverityLevel:          SlashSeverityDoubleSign,
-		StakeExposureNaet:      sdkmath.NewInt(10_000),
-		SelfStakeNaet:          sdkmath.NewInt(10_000),
-		RewardConfiscationNaet: sdkmath.NewInt(1_000),
-		EvidenceHeight:         70,
+		PenaltyID:		"penalty-routing",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityDoubleSign,
+		StakeExposureNaet:	sdkmath.NewInt(10_000),
+		SelfStakeNaet:		sdkmath.NewInt(10_000),
+		RewardConfiscationNaet:	sdkmath.NewInt(1_000),
+		EvidenceHeight:		70,
 	})
 	require.NoError(t, err)
 	routing, err := RouteSlashingPenalty(SlashingPenaltyRoutingInput{
-		Penalty:                penalty,
-		ReporterID:             "reporter-a",
-		AffectedPoolIDOptional: "pool-a",
-		BurnBps:                3_000,
-		ReporterRewardBps:      2_000,
-		ProtocolTreasuryBps:    4_000,
-		CompensationBps:        1_000,
-		ReporterRewardCapBps:   1_000,
+		Penalty:		penalty,
+		ReporterID:		"reporter-a",
+		AffectedPoolIDOptional:	"pool-a",
+		BurnBps:		3_000,
+		ReporterRewardBps:	2_000,
+		ProtocolTreasuryBps:	4_000,
+		CompensationBps:	1_000,
+		ReporterRewardCapBps:	1_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_500), routing.TotalPenaltyNaet)
@@ -259,18 +259,18 @@ func TestRouteSlashingPenaltySplitsBurnReporterTreasuryAndCompensation(t *testin
 func TestDoubleSignSlashingDefaultsToFivePercentJailAndTombstone(t *testing.T) {
 	candidate := candidate("val-a", 10_000, 0)
 	result, err := ExecuteSlashing(SlashingExecutionInput{
-		EvidenceID:     "double-sign-evidence-1",
-		ExecutedHeight: 100,
-		CurrentEpoch:   10,
-		Candidate:      candidate,
+		EvidenceID:	"double-sign-evidence-1",
+		ExecutedHeight:	100,
+		CurrentEpoch:	10,
+		Candidate:	candidate,
 		PenaltyInput: SlashingPenaltyInput{
-			PenaltyID:           "double-sign-penalty-1",
-			SeverityLevel:       SlashSeverityDoubleSign,
-			StakeExposureNaet:   sdkmath.NewInt(10_000),
-			SelfStakeNaet:       candidate.SelfStakeNaet,
-			TemporaryJailEpochs: 1,
-			PermanentTombstone:  true,
-			EvidenceHeight:      90,
+			PenaltyID:		"double-sign-penalty-1",
+			SeverityLevel:		SlashSeverityDoubleSign,
+			StakeExposureNaet:	sdkmath.NewInt(10_000),
+			SelfStakeNaet:		candidate.SelfStakeNaet,
+			TemporaryJailEpochs:	1,
+			PermanentTombstone:	true,
+			EvidenceHeight:		90,
 		},
 		RoutingInput: SlashingPenaltyRoutingInput{
 			BurnBps: BasisPoints,
@@ -311,31 +311,31 @@ func TestSlashingRecordMatchesDesignFieldsAndExecutesInvariants(t *testing.T) {
 	candidate.ReliabilityIndexBps = BasisPoints
 	candidate.Roles = []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleBlockProducer}
 	result, err := ExecuteSlashing(SlashingExecutionInput{
-		EvidenceID:             "evidence-1",
-		ReporterID:             "reporter-a",
-		AffectedPoolIDOptional: "pool-a",
-		ExecutedHeight:         100,
-		CurrentEpoch:           10,
-		Candidate:              candidate,
+		EvidenceID:		"evidence-1",
+		ReporterID:		"reporter-a",
+		AffectedPoolIDOptional:	"pool-a",
+		ExecutedHeight:		100,
+		CurrentEpoch:		10,
+		Candidate:		candidate,
 		PenaltyInput: SlashingPenaltyInput{
-			PenaltyID:                     "penalty-record-1",
-			SeverityLevel:                 SlashSeverityInvalidTaskExecution,
-			StakeExposureNaet:             sdkmath.NewInt(15_000),
-			RoleWeightBps:                 10_000,
-			SelfStakeNaet:                 candidate.SelfStakeNaet,
-			Nominations:                   candidate.Nominations,
-			RewardConfiscationNaet:        sdkmath.NewInt(100),
-			TemporaryJailEpochs:           2,
-			RoleSuspensions:               []ValidatorRole{ValidatorRoleVerifier},
-			FutureElectionScorePenaltyBps: 1_000,
-			EvidenceHeight:                90,
+			PenaltyID:			"penalty-record-1",
+			SeverityLevel:			SlashSeverityInvalidTaskExecution,
+			StakeExposureNaet:		sdkmath.NewInt(15_000),
+			RoleWeightBps:			10_000,
+			SelfStakeNaet:			candidate.SelfStakeNaet,
+			Nominations:			candidate.Nominations,
+			RewardConfiscationNaet:		sdkmath.NewInt(100),
+			TemporaryJailEpochs:		2,
+			RoleSuspensions:		[]ValidatorRole{ValidatorRoleVerifier},
+			FutureElectionScorePenaltyBps:	1_000,
+			EvidenceHeight:			90,
 		},
 		RoutingInput: SlashingPenaltyRoutingInput{
-			BurnBps:              3_000,
-			ReporterRewardBps:    1_000,
-			ProtocolTreasuryBps:  4_000,
-			CompensationBps:      2_000,
-			ReporterRewardCapBps: 1_000,
+			BurnBps:		3_000,
+			ReporterRewardBps:	1_000,
+			ProtocolTreasuryBps:	4_000,
+			CompensationBps:	2_000,
+			ReporterRewardCapBps:	1_000,
 		},
 	})
 	require.NoError(t, err)
@@ -364,19 +364,19 @@ func TestSlashingRecordMatchesDesignFieldsAndExecutesInvariants(t *testing.T) {
 
 func TestSlashingRecordRejectsRoutingMismatchAndNegativeExecution(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:              "penalty-record-bad",
-		ValidatorID:            "val-a",
-		SeverityLevel:          SlashSeverityDoubleSign,
-		StakeExposureNaet:      sdkmath.NewInt(1_000),
-		SelfStakeNaet:          sdkmath.NewInt(1_000),
-		RewardConfiscationNaet: sdkmath.NewInt(100),
-		EvidenceHeight:         90,
+		PenaltyID:		"penalty-record-bad",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityDoubleSign,
+		StakeExposureNaet:	sdkmath.NewInt(1_000),
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
+		RewardConfiscationNaet:	sdkmath.NewInt(100),
+		EvidenceHeight:		90,
 	})
 	require.NoError(t, err)
 	routing, err := RouteSlashingPenalty(SlashingPenaltyRoutingInput{
-		Penalty:                penalty,
-		ReporterID:             "reporter-a",
-		AffectedPoolIDOptional: "pool-a",
+		Penalty:		penalty,
+		ReporterID:		"reporter-a",
+		AffectedPoolIDOptional:	"pool-a",
 	})
 	require.NoError(t, err)
 	record := NewSlashingRecord("evidence-bad", penalty, routing, 10, 100)
@@ -385,15 +385,15 @@ func TestSlashingRecordRejectsRoutingMismatchAndNegativeExecution(t *testing.T) 
 	require.ErrorContains(t, record.Validate(), "routing total")
 
 	_, err = ExecuteSlashing(SlashingExecutionInput{
-		EvidenceID:     "evidence-bad",
-		ExecutedHeight: -1,
-		CurrentEpoch:   10,
-		Candidate:      candidate("val-a", 1_000, 0),
+		EvidenceID:	"evidence-bad",
+		ExecutedHeight:	-1,
+		CurrentEpoch:	10,
+		Candidate:	candidate("val-a", 1_000, 0),
 		PenaltyInput: SlashingPenaltyInput{
-			PenaltyID:         "penalty-record-bad-2",
-			SeverityLevel:     SlashSeverityDoubleSign,
-			StakeExposureNaet: sdkmath.NewInt(1_000),
-			SelfStakeNaet:     sdkmath.NewInt(1_000),
+			PenaltyID:		"penalty-record-bad-2",
+			SeverityLevel:		SlashSeverityDoubleSign,
+			StakeExposureNaet:	sdkmath.NewInt(1_000),
+			SelfStakeNaet:		sdkmath.NewInt(1_000),
 		},
 	})
 	require.ErrorContains(t, err, "executed height")
@@ -401,44 +401,44 @@ func TestSlashingRecordRejectsRoutingMismatchAndNegativeExecution(t *testing.T) 
 
 func TestRouteSlashingPenaltyRejectsMissingPoolsAndInvalidBps(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:         "penalty-routing-bad",
-		ValidatorID:       "val-a",
-		SeverityLevel:     SlashSeverityMinorLivenessFault,
-		StakeExposureNaet: sdkmath.NewInt(10_000),
-		SelfStakeNaet:     sdkmath.NewInt(10_000),
-		EvidenceHeight:    70,
+		PenaltyID:		"penalty-routing-bad",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityMinorLivenessFault,
+		StakeExposureNaet:	sdkmath.NewInt(10_000),
+		SelfStakeNaet:		sdkmath.NewInt(10_000),
+		EvidenceHeight:		70,
 	})
 	require.NoError(t, err)
 	_, err = RouteSlashingPenalty(SlashingPenaltyRoutingInput{
-		Penalty:         penalty,
-		ReporterID:      "reporter-a",
-		CompensationBps: 1_000,
+		Penalty:		penalty,
+		ReporterID:		"reporter-a",
+		CompensationBps:	1_000,
 	})
 	require.ErrorContains(t, err, "affected pool")
 
 	_, err = RouteSlashingPenalty(SlashingPenaltyRoutingInput{
-		Penalty:                penalty,
-		ReporterID:             "reporter-a",
-		AffectedPoolIDOptional: "pool-a",
-		BurnBps:                9_000,
-		ReporterRewardBps:      2_000,
+		Penalty:		penalty,
+		ReporterID:		"reporter-a",
+		AffectedPoolIDOptional:	"pool-a",
+		BurnBps:		9_000,
+		ReporterRewardBps:	2_000,
 	})
 	require.ErrorContains(t, err, "routing bps")
 }
 
 func TestApplySlashingPenaltyJailsSuspendsRolesAndReducesElectionReliability(t *testing.T) {
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:                     "penalty-roles",
-		ValidatorID:                   "val-a",
-		SeverityLevel:                 SlashSeverityMedium,
-		StakeExposureNaet:             sdkmath.NewInt(1_000),
-		RoleWeightBps:                 10_000,
-		SelfStakeNaet:                 sdkmath.NewInt(500),
-		Nominations:                   []Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(500)}},
-		TemporaryJailEpochs:           3,
-		RoleSuspensions:               []ValidatorRole{ValidatorRoleVerifier},
-		FutureElectionScorePenaltyBps: 2_000,
-		EvidenceHeight:                61,
+		PenaltyID:			"penalty-roles",
+		ValidatorID:			"val-a",
+		SeverityLevel:			SlashSeverityMedium,
+		StakeExposureNaet:		sdkmath.NewInt(1_000),
+		RoleWeightBps:			10_000,
+		SelfStakeNaet:			sdkmath.NewInt(500),
+		Nominations:			[]Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(500)}},
+		TemporaryJailEpochs:		3,
+		RoleSuspensions:		[]ValidatorRole{ValidatorRoleVerifier},
+		FutureElectionScorePenaltyBps:	2_000,
+		EvidenceHeight:			61,
 	})
 	require.NoError(t, err)
 	candidate := candidate("val-a", 2_000_000_000, 2_000)
@@ -457,30 +457,30 @@ func TestApplySlashingPenaltyJailsSuspendsRolesAndReducesElectionReliability(t *
 
 func TestSlashingPenaltyRejectsUnsafeInputsAndHashTampering(t *testing.T) {
 	_, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:         "penalty-bad",
-		ValidatorID:       "val-a",
-		SeverityLevel:     "unknown",
-		StakeExposureNaet: sdkmath.NewInt(1_000),
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
+		PenaltyID:		"penalty-bad",
+		ValidatorID:		"val-a",
+		SeverityLevel:		"unknown",
+		StakeExposureNaet:	sdkmath.NewInt(1_000),
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
 	})
 	require.ErrorContains(t, err, "unsupported slash severity")
 
 	_, err = ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:         "penalty-bad",
-		ValidatorID:       "val-a",
-		SeverityLevel:     SlashSeverityLow,
-		StakeExposureNaet: sdkmath.NewInt(1_000),
-		RoleWeightBps:     BasisPoints + 1,
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
+		PenaltyID:		"penalty-bad",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityLow,
+		StakeExposureNaet:	sdkmath.NewInt(1_000),
+		RoleWeightBps:		BasisPoints + 1,
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
 	})
 	require.ErrorContains(t, err, "role weight")
 
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:         "penalty-good",
-		ValidatorID:       "val-a",
-		SeverityLevel:     SlashSeverityLow,
-		StakeExposureNaet: sdkmath.NewInt(1_000),
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
+		PenaltyID:		"penalty-good",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityLow,
+		StakeExposureNaet:	sdkmath.NewInt(1_000),
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
 	})
 	require.NoError(t, err)
 	penalty.StakeSlashNaet = penalty.StakeSlashNaet.AddRaw(1)

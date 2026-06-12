@@ -13,69 +13,69 @@ import (
 type PaymentSettlementTiming string
 
 const (
-	PaymentSettlementBeforeExecution PaymentSettlementTiming = "before_execution"
-	PaymentSettlementAfterExecution  PaymentSettlementTiming = "after_execution"
-	PaymentSettlementAfterChallenge  PaymentSettlementTiming = "after_challenge_window"
+	PaymentSettlementBeforeExecution	PaymentSettlementTiming	= "before_execution"
+	PaymentSettlementAfterExecution		PaymentSettlementTiming	= "after_execution"
+	PaymentSettlementAfterChallenge		PaymentSettlementTiming	= "after_challenge_window"
 )
 
 type PaymentMeteringRecord struct {
-	ServiceID     string
-	CallID        string
-	RequestBytes  uint64
-	ResponseBytes uint64
-	StorageBytes  uint64
-	MeterID       string
-	MeterHeight   uint64
-	RecordHash    string
+	ServiceID	string
+	CallID		string
+	RequestBytes	uint64
+	ResponseBytes	uint64
+	StorageBytes	uint64
+	MeterID		string
+	MeterHeight	uint64
+	RecordHash	string
 }
 
 type PaymentUsageReceipt struct {
-	ServiceID     string
-	CallID        string
-	ProviderID    string
-	ComputeUnits  uint64
-	ReceiptHeight uint64
-	SignedBy      string
-	SignatureHash string
-	ProofHash     string
-	ReceiptHash   string
+	ServiceID	string
+	CallID		string
+	ProviderID	string
+	ComputeUnits	uint64
+	ReceiptHeight	uint64
+	SignedBy	string
+	SignatureHash	string
+	ProofHash	string
+	ReceiptHash	string
 }
 
 type PaymentSubscriptionEntitlement struct {
-	SubscriptionID  string
-	Payer           string
-	ServiceID       string
-	StartHeight     uint64
-	EndHeight       uint64
-	StartUnix       int64
-	EndUnix         int64
-	StateBacked     bool
-	ProofHash       string
-	EntitlementHash string
+	SubscriptionID	string
+	Payer		string
+	ServiceID	string
+	StartHeight	uint64
+	EndHeight	uint64
+	StartUnix	int64
+	EndUnix		int64
+	StateBacked	bool
+	ProofHash	string
+	EntitlementHash	string
 }
 
 type PaymentEscrowSettlement struct {
-	EscrowID          string
-	ServiceID         string
-	ReceiptHeight     uint64
-	ProofHeight       uint64
-	ChallengeWindow   uint64
-	SettleAfterHeight uint64
-	SettlementHash    string
+	EscrowID		string
+	ServiceID		string
+	ReceiptHeight		uint64
+	ProofHeight		uint64
+	ChallengeWindow		uint64
+	SettleAfterHeight	uint64
+	SettlementHash		string
 }
 
 type PaymentModelQuote struct {
-	Envelope                         PaymentEnvelope
-	Units                            uint64
-	UnitAmount                       string
-	AmountDue                        string
-	SettlementTiming                 PaymentSettlementTiming
-	RequiresDeterministicMeterRecord bool
-	RequiresUsageReceipt             bool
-	RequiresSubscriptionEntitlement  bool
-	RequiresEscrowLock               bool
-	SettleAfterHeight                uint64
-	QuoteHash                        string
+	Envelope				PaymentEnvelope
+	Units					uint64
+	UnitAmount				string
+	AmountDue				string
+	SettlementTiming			PaymentSettlementTiming
+	RequiresDeterministicMeterRecord	bool
+	RequiresUsageReceipt			bool
+	RequiresSubscriptionEntitlement		bool
+	RequiresEscrowLock			bool
+	SettleAfterHeight			uint64
+	QuoteHash				string
 }
 
 func NewPaymentMeteringRecord(record PaymentMeteringRecord) (PaymentMeteringRecord, error) {
@@ -323,11 +323,11 @@ func QuotePerCallPayment(envelope PaymentEnvelope, trust coretypes.ServiceTrustM
 		return PaymentModelQuote{}, errors.New("services per-call payment requires CALL pricing unit")
 	}
 	quote := PaymentModelQuote{
-		Envelope:         envelope,
-		Units:            1,
-		UnitAmount:       envelope.Amount,
-		AmountDue:        envelope.Amount,
-		SettlementTiming: paymentTimingForTrust(envelope.SettlementMode, trust),
+		Envelope:		envelope,
+		Units:			1,
+		UnitAmount:		envelope.Amount,
+		AmountDue:		envelope.Amount,
+		SettlementTiming:	paymentTimingForTrust(envelope.SettlementMode, trust),
 	}
 	quote.QuoteHash = ComputePaymentModelQuoteHash(quote)
 	return quote, quote.Validate()
@@ -351,12 +351,12 @@ func QuotePerBytePayment(envelope PaymentEnvelope, meter PaymentMeteringRecord) 
 		return PaymentModelQuote{}, err
 	}
 	quote := PaymentModelQuote{
-		Envelope:                         envelope,
-		Units:                            meter.TotalBytes(),
-		UnitAmount:                       envelope.Amount,
-		AmountDue:                        due,
-		SettlementTiming:                 PaymentSettlementAfterExecution,
-		RequiresDeterministicMeterRecord: true,
+		Envelope:				envelope,
+		Units:					meter.TotalBytes(),
+		UnitAmount:				envelope.Amount,
+		AmountDue:				due,
+		SettlementTiming:			PaymentSettlementAfterExecution,
+		RequiresDeterministicMeterRecord:	true,
 	}
 	quote.QuoteHash = ComputePaymentModelQuoteHash(quote)
 	return quote, quote.Validate()
@@ -380,12 +380,12 @@ func QuotePerComputeUnitPayment(envelope PaymentEnvelope, receipt PaymentUsageRe
 		return PaymentModelQuote{}, err
 	}
 	quote := PaymentModelQuote{
-		Envelope:             envelope,
-		Units:                receipt.ComputeUnits,
-		UnitAmount:           envelope.Amount,
-		AmountDue:            due,
-		SettlementTiming:     PaymentSettlementAfterExecution,
-		RequiresUsageReceipt: true,
+		Envelope:		envelope,
+		Units:			receipt.ComputeUnits,
+		UnitAmount:		envelope.Amount,
+		AmountDue:		due,
+		SettlementTiming:	PaymentSettlementAfterExecution,
+		RequiresUsageReceipt:	true,
 	}
 	quote.QuoteHash = ComputePaymentModelQuoteHash(quote)
 	return quote, quote.Validate()
@@ -408,12 +408,12 @@ func QuoteSubscriptionPayment(envelope PaymentEnvelope, entitlement PaymentSubsc
 		return PaymentModelQuote{}, errors.New("services subscription entitlement is not active")
 	}
 	quote := PaymentModelQuote{
-		Envelope:                        envelope,
-		Units:                           entitlement.EndHeight - entitlement.StartHeight + 1,
-		UnitAmount:                      envelope.Amount,
-		AmountDue:                       envelope.Amount,
-		SettlementTiming:                PaymentSettlementBeforeExecution,
-		RequiresSubscriptionEntitlement: true,
+		Envelope:				envelope,
+		Units:					entitlement.EndHeight - entitlement.StartHeight + 1,
+		UnitAmount:				envelope.Amount,
+		AmountDue:				envelope.Amount,
+		SettlementTiming:			PaymentSettlementBeforeExecution,
+		RequiresSubscriptionEntitlement:	true,
 	}
 	quote.QuoteHash = ComputePaymentModelQuoteHash(quote)
 	return quote, quote.Validate()
@@ -433,13 +433,13 @@ func PlanEscrowPaymentSettlement(envelope PaymentEnvelope, settlement PaymentEsc
 		return PaymentModelQuote{}, err
 	}
 	quote := PaymentModelQuote{
-		Envelope:           envelope,
-		Units:              1,
-		UnitAmount:         envelope.Amount,
-		AmountDue:          envelope.Amount,
-		SettlementTiming:   PaymentSettlementAfterChallenge,
-		RequiresEscrowLock: true,
-		SettleAfterHeight:  settlement.SettleAfterHeight,
+		Envelope:		envelope,
+		Units:			1,
+		UnitAmount:		envelope.Amount,
+		AmountDue:		envelope.Amount,
+		SettlementTiming:	PaymentSettlementAfterChallenge,
+		RequiresEscrowLock:	true,
+		SettleAfterHeight:	settlement.SettleAfterHeight,
 	}
 	quote.QuoteHash = ComputePaymentModelQuoteHash(quote)
 	return quote, quote.Validate()

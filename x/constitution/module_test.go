@@ -36,25 +36,25 @@ func TestConstitutionServiceDelayAndBounds(t *testing.T) {
 	proposed.MaxBlockGas = 2_000_000
 
 	_, err := msgRouter.Handler(&types.MsgProposeConstitutionAmendment{})(ctx, &types.MsgProposeConstitutionAmendment{
-		Authority: prototype.DefaultAuthority,
+		Authority:	prototype.DefaultAuthority,
 		Amendment: types.Amendment{
-			ID:       "raise-gas-bound",
-			Proposed: proposed,
+			ID:		"raise-gas-bound",
+			Proposed:	proposed,
 		},
 	})
 	require.NoError(t, err)
 
 	_, err = msgRouter.Handler(&types.MsgVoteConstitutionAmendment{})(ctx.WithBlockHeight(11), &types.MsgVoteConstitutionAmendment{
-		Authority:      prototype.DefaultAuthority,
-		AmendmentID:    "raise-gas-bound",
-		Support:        types.VoteSupportYes,
-		VotingPowerBps: 7_000,
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-gas-bound",
+		Support:	types.VoteSupportYes,
+		VotingPowerBps:	7_000,
 	})
 	require.NoError(t, err)
 
 	_, err = msgRouter.Handler(&types.MsgExecuteConstitutionAmendment{})(ctx.WithBlockHeight(99), &types.MsgExecuteConstitutionAmendment{
-		Authority:   prototype.DefaultAuthority,
-		AmendmentID: "raise-gas-bound",
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-gas-bound",
 	})
 	require.ErrorContains(t, err, "delay")
 

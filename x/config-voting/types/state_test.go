@@ -41,21 +41,21 @@ func TestDeleteProposalCannotCarryValue(t *testing.T) {
 func proposalFixture(id string) ConfigProposal {
 	params := DefaultConfigVotingParams()
 	return ConfigProposal{
-		ProposalID:              id,
-		Title:                   "raise block gas",
-		ConfigKey:               configtypes.KeyConsensusMaxBlockGas,
-		ConfigValue:             "1000000",
-		Operation:               configtypes.OperationSet,
-		SubmittedBy:             "authority",
-		Status:                  ProposalStatusVoting,
-		SnapshotHeight:          1,
-		SubmitHeight:            2,
-		VotingEndHeight:         2 + params.VotingPeriod,
-		EarliestExecutionHeight: 2 + params.VotingPeriod + params.ExecutionDelay,
+		ProposalID:			id,
+		Title:				"raise block gas",
+		ConfigKey:			configtypes.KeyConsensusMaxBlockGas,
+		ConfigValue:			"1000000",
+		Operation:			configtypes.OperationSet,
+		SubmittedBy:			"authority",
+		Status:				ProposalStatusVoting,
+		SnapshotHeight:			1,
+		SubmitHeight:			2,
+		VotingEndHeight:		2 + params.VotingPeriod,
+		EarliestExecutionHeight:	2 + params.VotingPeriod + params.ExecutionDelay,
 		VotingPowerSnapshot: []VotingPowerSnapshotEntry{
 			{Voter: "val1", Power: 60},
 			{Voter: "val2", Power: 40},
 		},
-		TotalVotingPower: 100,
+		TotalVotingPower:	100,
 	}
 }

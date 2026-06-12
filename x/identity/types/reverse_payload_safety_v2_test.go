@@ -55,12 +55,12 @@ func TestVerifiedReverseProofFormatAndWalletDisplayV2(t *testing.T) {
 	require.True(t, proof.Record.Verified)
 	require.NotEmpty(t, proof.ProofHash)
 	require.NoError(t, ValidateVerifiedReverseResolutionProofV2(proof, IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:      "aetra-local-1",
-		RequestedName:        domain.Name,
-		TrustedHeader:        trustedHeaderForProofV2(proof.Proof),
-		CurrentHeight:        14,
-		AllowRenewalWindow:   true,
-		NormalizationVersion: NameNormalizationVersionV2,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		domain.Name,
+		TrustedHeader:		trustedHeaderForProofV2(proof.Proof),
+		CurrentHeight:		14,
+		AllowRenewalWindow:	true,
+		NormalizationVersion:	NameNormalizationVersionV2,
 	}))
 
 	display := BuildIdentityReverseWalletDisplayStateV2(state, addr(2), 14, nil)
@@ -96,14 +96,14 @@ func TestResolverPayloadSafetyFeesLimitsAndMalformedMetadataV2(t *testing.T) {
 	spam := record
 	for i := 0; i <= MaxUnifiedServiceEndpoints; i++ {
 		spam.ServiceEndpoints = append(spam.ServiceEndpoints, ServiceEndpointV2{
-			ServiceID:   "svc" + string(rune('a'+i)),
-			Endpoint:    "https://svc" + string(rune('a'+i)) + ".aet",
-			ServiceType: "service.v1",
-			Transport:   "https",
-			AuthPolicy:  "none",
-			Priority:    uint32(i),
-			Weight:      1,
-			TTL:         10,
+			ServiceID:	"svc" + string(rune('a'+i)),
+			Endpoint:	"https://svc" + string(rune('a'+i)) + ".aet",
+			ServiceType:	"service.v1",
+			Transport:	"https",
+			AuthPolicy:	"none",
+			Priority:	uint32(i),
+			Weight:		1,
+			TTL:		10,
 		})
 	}
 	require.ErrorContains(t, ValidateUnifiedResolutionRecordV2(spam), "service endpoints")
@@ -147,31 +147,31 @@ func safePayloadRecordV2(t *testing.T) UnifiedResolutionRecordV2 {
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		ServiceEndpoints: []ServiceEndpointV2{{
-			ServiceID:   "rpc",
-			Endpoint:    "https://rpc.aet",
-			ServiceType: "service.v1",
-			Transport:   "https",
-			AuthPolicy:  "none",
-			Priority:    1,
-			Weight:      1,
-			TTL:         10,
+			ServiceID:	"rpc",
+			Endpoint:	"https://rpc.aet",
+			ServiceType:	"service.v1",
+			Transport:	"https",
+			AuthPolicy:	"none",
+			Priority:	1,
+			Weight:		1,
+			TTL:		10,
 		}},
 		InterfaceDescriptors: []InterfaceDescriptorV2{{
-			InterfaceID:          "wallet",
-			SchemaHash:           hash,
-			SchemaInlineOptional: inline,
-			Version:              "v1",
-			RenderPolicy:         IdentityRenderPolicyConfirmV2,
+			InterfaceID:		"wallet",
+			SchemaHash:		hash,
+			SchemaInlineOptional:	inline,
+			Version:		"v1",
+			RenderPolicy:		IdentityRenderPolicyConfirmV2,
 		}},
-		RecordVersion:   1,
-		RecordTTL:       10,
-		UpdatedAtHeight: 10,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		1,
+		RecordTTL:		10,
+		UpdatedAtHeight:	10,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	sortUnifiedResolutionRecordV2(&record)
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))

@@ -152,8 +152,8 @@ func TestAPRBreakdownLabelsEstimateAndCommissionImpact(t *testing.T) {
 	require.NoError(t, err)
 
 	apr, err := types.EstimateAPRBreakdown(params, state, types.QueryEstimatedAPRRequest{
-		ValidatorCommissionBps:    1_000,
-		ValidatorOperatingCostBps: 50,
+		ValidatorCommissionBps:		1_000,
+		ValidatorOperatingCostBps:	50,
 	})
 	require.NoError(t, err)
 	require.True(t, apr.IsEstimate)
@@ -249,9 +249,9 @@ func fastEpochParams() types.Params {
 
 func epochInput(epoch, supply, bonded, fees uint64) types.EpochEconomicsInput {
 	return types.EpochEconomicsInput{
-		Epoch:         epoch,
-		TotalSupply:   supply,
-		BondedTokens:  bonded,
-		FeesCollected: fees,
+		Epoch:		epoch,
+		TotalSupply:	supply,
+		BondedTokens:	bonded,
+		FeesCollected:	fees,
 	}
 }

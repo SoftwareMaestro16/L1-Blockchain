@@ -13,251 +13,251 @@ type MigrationTaskID string
 type MigrationExitCriterionID string
 
 const (
-	MigrationPhaseBaselineHardening    MigrationPhaseID = "phase-0-baseline-hardening"
-	MigrationPhaseCoreCommitments      MigrationPhaseID = "phase-1-core-commitments"
-	MigrationPhaseMessageBus           MigrationPhaseID = "phase-2-message-bus"
-	MigrationPhaseZoneExtraction       MigrationPhaseID = "phase-3-zone-extraction"
-	MigrationPhaseShardingRuntime      MigrationPhaseID = "phase-4-sharding-runtime"
-	MigrationPhaseAVM20                MigrationPhaseID = "phase-5-avm-2.0"
-	MigrationPhaseIdentityPayments     MigrationPhaseID = "phase-6-identity-payment-integration"
-	MigrationPhasePerformanceHardening MigrationPhaseID = "phase-7-performance-hardening"
+	MigrationPhaseBaselineHardening		MigrationPhaseID	= "phase-0-baseline-hardening"
+	MigrationPhaseCoreCommitments		MigrationPhaseID	= "phase-1-core-commitments"
+	MigrationPhaseMessageBus		MigrationPhaseID	= "phase-2-message-bus"
+	MigrationPhaseZoneExtraction		MigrationPhaseID	= "phase-3-zone-extraction"
+	MigrationPhaseShardingRuntime		MigrationPhaseID	= "phase-4-sharding-runtime"
+	MigrationPhaseAVM20			MigrationPhaseID	= "phase-5-avm-2.0"
+	MigrationPhaseIdentityPayments		MigrationPhaseID	= "phase-6-identity-payment-integration"
+	MigrationPhasePerformanceHardening	MigrationPhaseID	= "phase-7-performance-hardening"
 
-	MigrationTaskModuleBoundaryDocs        MigrationTaskID = "module-boundary-documentation"
-	MigrationTaskStateExportValidation     MigrationTaskID = "state-export-validation"
-	MigrationTaskDeterministicGenesis      MigrationTaskID = "deterministic-genesis-import"
-	MigrationTaskDynamicFeeBoundsTests     MigrationTaskID = "dynamic-fee-bounds-tests"
-	MigrationTaskLegacyModuleInvariants    MigrationTaskID = "staking-slashing-bank-distribution-invariants"
-	MigrationTaskStoreV2CompatibilityAudit MigrationTaskID = "store-v2-compatibility-audit"
+	MigrationTaskModuleBoundaryDocs		MigrationTaskID	= "module-boundary-documentation"
+	MigrationTaskStateExportValidation	MigrationTaskID	= "state-export-validation"
+	MigrationTaskDeterministicGenesis	MigrationTaskID	= "deterministic-genesis-import"
+	MigrationTaskDynamicFeeBoundsTests	MigrationTaskID	= "dynamic-fee-bounds-tests"
+	MigrationTaskLegacyModuleInvariants	MigrationTaskID	= "staking-slashing-bank-distribution-invariants"
+	MigrationTaskStoreV2CompatibilityAudit	MigrationTaskID	= "store-v2-compatibility-audit"
 
-	MigrationTaskAetraCoreModule      MigrationTaskID = "aetracore-module"
-	MigrationTaskDefaultZoneRegistry  MigrationTaskID = "default-zone-registry"
-	MigrationTaskDefaultZoneStateRoot MigrationTaskID = "default-zone-state-root"
-	MigrationTaskEmptyMessageRoot     MigrationTaskID = "empty-message-root"
-	MigrationTaskProofRootRegistry    MigrationTaskID = "proof-root-registry"
-	MigrationTaskRootQueryAPIs        MigrationTaskID = "root-query-apis"
+	MigrationTaskAetraCoreModule		MigrationTaskID	= "aetracore-module"
+	MigrationTaskDefaultZoneRegistry	MigrationTaskID	= "default-zone-registry"
+	MigrationTaskDefaultZoneStateRoot	MigrationTaskID	= "default-zone-state-root"
+	MigrationTaskEmptyMessageRoot		MigrationTaskID	= "empty-message-root"
+	MigrationTaskProofRootRegistry		MigrationTaskID	= "proof-root-registry"
+	MigrationTaskRootQueryAPIs		MigrationTaskID	= "root-query-apis"
 
-	MigrationTaskMsgbusModule           MigrationTaskID = "msgbus-module"
-	MigrationTaskMessageEncodingAndIDs  MigrationTaskID = "message-encoding-and-ids"
-	MigrationTaskMessageStores          MigrationTaskID = "inbox-outbox-receipt-stores"
-	MigrationTaskLocalZoneExecution     MigrationTaskID = "local-zone-message-execution"
-	MigrationTaskExpiryBounceLogic      MigrationTaskID = "expiry-and-bounce-logic"
-	MigrationTaskMessageInclusionProofs MigrationTaskID = "message-inclusion-proofs"
+	MigrationTaskMsgbusModule		MigrationTaskID	= "msgbus-module"
+	MigrationTaskMessageEncodingAndIDs	MigrationTaskID	= "message-encoding-and-ids"
+	MigrationTaskMessageStores		MigrationTaskID	= "inbox-outbox-receipt-stores"
+	MigrationTaskLocalZoneExecution		MigrationTaskID	= "local-zone-message-execution"
+	MigrationTaskExpiryBounceLogic		MigrationTaskID	= "expiry-and-bounce-logic"
+	MigrationTaskMessageInclusionProofs	MigrationTaskID	= "message-inclusion-proofs"
 
-	MigrationTaskExtractFinancialZone   MigrationTaskID = "extract-financial-zone"
-	MigrationTaskExtractIdentityZone    MigrationTaskID = "extract-identity-zone"
-	MigrationTaskExtractApplicationZone MigrationTaskID = "extract-application-zone"
-	MigrationTaskZoneSpecificKeepers    MigrationTaskID = "zone-specific-keepers-state-prefixes"
-	MigrationTaskZoneLocalFeePolicies   MigrationTaskID = "zone-local-fee-policies"
-	MigrationTaskZoneExecutionSummaries MigrationTaskID = "zone-execution-summaries"
+	MigrationTaskExtractFinancialZone	MigrationTaskID	= "extract-financial-zone"
+	MigrationTaskExtractIdentityZone	MigrationTaskID	= "extract-identity-zone"
+	MigrationTaskExtractApplicationZone	MigrationTaskID	= "extract-application-zone"
+	MigrationTaskZoneSpecificKeepers	MigrationTaskID	= "zone-specific-keepers-state-prefixes"
+	MigrationTaskZoneLocalFeePolicies	MigrationTaskID	= "zone-local-fee-policies"
+	MigrationTaskZoneExecutionSummaries	MigrationTaskID	= "zone-execution-summaries"
 
-	MigrationTaskShardsModule                MigrationTaskID = "shards-module"
-	MigrationTaskShardLayoutDescriptors      MigrationTaskID = "shard-layout-descriptors"
-	MigrationTaskRouteKeyCalculation         MigrationTaskID = "route-key-calculation"
-	MigrationTaskPerShardMessageStores       MigrationTaskID = "per-shard-inbox-outbox"
-	MigrationTaskShardRootAggregation        MigrationTaskID = "shard-root-aggregation"
-	MigrationTaskSplitMergeScheduler         MigrationTaskID = "split-merge-scheduler"
-	MigrationTaskDeterministicShardMigration MigrationTaskID = "deterministic-shard-migration"
+	MigrationTaskShardsModule			MigrationTaskID	= "shards-module"
+	MigrationTaskShardLayoutDescriptors		MigrationTaskID	= "shard-layout-descriptors"
+	MigrationTaskRouteKeyCalculation		MigrationTaskID	= "route-key-calculation"
+	MigrationTaskPerShardMessageStores		MigrationTaskID	= "per-shard-inbox-outbox"
+	MigrationTaskShardRootAggregation		MigrationTaskID	= "shard-root-aggregation"
+	MigrationTaskSplitMergeScheduler		MigrationTaskID	= "split-merge-scheduler"
+	MigrationTaskDeterministicShardMigration	MigrationTaskID	= "deterministic-shard-migration"
 
-	MigrationTaskAVMBytecodeFormat         MigrationTaskID = "avm-bytecode-format"
-	MigrationTaskAVMInterpreter            MigrationTaskID = "avm-interpreter"
-	MigrationTaskAVMGasTable               MigrationTaskID = "avm-gas-table"
-	MigrationTaskContractStorageAdapter    MigrationTaskID = "contract-storage-adapter"
-	MigrationTaskContractMessageSyscalls   MigrationTaskID = "contract-message-syscalls"
-	MigrationTaskProofVerificationSyscalls MigrationTaskID = "proof-verification-syscalls"
-	MigrationTaskABIRegistry               MigrationTaskID = "abi-registry"
+	MigrationTaskAVMBytecodeFormat		MigrationTaskID	= "avm-bytecode-format"
+	MigrationTaskAVMInterpreter		MigrationTaskID	= "avm-interpreter"
+	MigrationTaskAVMGasTable		MigrationTaskID	= "avm-gas-table"
+	MigrationTaskContractStorageAdapter	MigrationTaskID	= "contract-storage-adapter"
+	MigrationTaskContractMessageSyscalls	MigrationTaskID	= "contract-message-syscalls"
+	MigrationTaskProofVerificationSyscalls	MigrationTaskID	= "proof-verification-syscalls"
+	MigrationTaskABIRegistry		MigrationTaskID	= "abi-registry"
 
-	MigrationTaskIdentityProofActivation   MigrationTaskID = "identity-proof-activation"
-	MigrationTaskCrossZoneIdentityLookup   MigrationTaskID = "cross-zone-identity-lookup-messages"
-	MigrationTaskPaymentChannelSettlement  MigrationTaskID = "payment-channel-settlement"
-	MigrationTaskConditionalPaymentRouting MigrationTaskID = "conditional-payment-routing"
-	MigrationTaskPaymentProofAPIs          MigrationTaskID = "payment-proof-apis"
-	MigrationTaskWalletSDKIdentityPayment  MigrationTaskID = "wallet-sdk-identity-payment-helpers"
+	MigrationTaskIdentityProofActivation	MigrationTaskID	= "identity-proof-activation"
+	MigrationTaskCrossZoneIdentityLookup	MigrationTaskID	= "cross-zone-identity-lookup-messages"
+	MigrationTaskPaymentChannelSettlement	MigrationTaskID	= "payment-channel-settlement"
+	MigrationTaskConditionalPaymentRouting	MigrationTaskID	= "conditional-payment-routing"
+	MigrationTaskPaymentProofAPIs		MigrationTaskID	= "payment-proof-apis"
+	MigrationTaskWalletSDKIdentityPayment	MigrationTaskID	= "wallet-sdk-identity-payment-helpers"
 
-	MigrationTaskBlockSTMZoneShardWorkloads MigrationTaskID = "blockstm-zone-shard-workloads"
-	MigrationTaskConflictProfiling          MigrationTaskID = "conflict-profiling"
-	MigrationTaskStoreV2Benchmarks          MigrationTaskID = "store-v2-benchmarks"
-	MigrationTaskMempoolLanes               MigrationTaskID = "mempool-lanes"
-	MigrationTaskCongestionAwareRouting     MigrationTaskID = "congestion-aware-routing"
-	MigrationTaskAdaptiveSyncRecoveryTests  MigrationTaskID = "adaptivesync-recovery-tests"
-	MigrationTaskMultiZoneLoadSimulation    MigrationTaskID = "multi-zone-traffic-load-simulation"
+	MigrationTaskBlockSTMZoneShardWorkloads	MigrationTaskID	= "blockstm-zone-shard-workloads"
+	MigrationTaskConflictProfiling		MigrationTaskID	= "conflict-profiling"
+	MigrationTaskStoreV2Benchmarks		MigrationTaskID	= "store-v2-benchmarks"
+	MigrationTaskMempoolLanes		MigrationTaskID	= "mempool-lanes"
+	MigrationTaskCongestionAwareRouting	MigrationTaskID	= "congestion-aware-routing"
+	MigrationTaskAdaptiveSyncRecoveryTests	MigrationTaskID	= "adaptivesync-recovery-tests"
+	MigrationTaskMultiZoneLoadSimulation	MigrationTaskID	= "multi-zone-traffic-load-simulation"
 
-	MigrationExitSingleChainReproducibleExport MigrationExitCriterionID = "single-chain-state-reproducible-exportable"
-	MigrationExitLegacyInvariantCoverage       MigrationExitCriterionID = "legacy-module-invariant-coverage"
-	MigrationExitSafePrefixMigration           MigrationExitCriterionID = "safe-prefix-migration-upgrade-handlers"
+	MigrationExitSingleChainReproducibleExport	MigrationExitCriterionID	= "single-chain-state-reproducible-exportable"
+	MigrationExitLegacyInvariantCoverage		MigrationExitCriterionID	= "legacy-module-invariant-coverage"
+	MigrationExitSafePrefixMigration		MigrationExitCriterionID	= "safe-prefix-migration-upgrade-handlers"
 
-	MigrationExitSingleZoneOperation       MigrationExitCriterionID = "current-chain-operates-as-one-zone"
-	MigrationExitAppHashCoreRoot           MigrationExitCriterionID = "app-hash-includes-core-root-structure"
-	MigrationExitProofRegistryRootMetadata MigrationExitCriterionID = "proof-registry-serves-root-metadata"
+	MigrationExitSingleZoneOperation	MigrationExitCriterionID	= "current-chain-operates-as-one-zone"
+	MigrationExitAppHashCoreRoot		MigrationExitCriterionID	= "app-hash-includes-core-root-structure"
+	MigrationExitProofRegistryRootMetadata	MigrationExitCriterionID	= "proof-registry-serves-root-metadata"
 
-	MigrationExitMessagesFirstClassCommitted   MigrationExitCriterionID = "messages-first-class-committed-objects"
-	MigrationExitLocalAsyncDeterministic       MigrationExitCriterionID = "local-async-messages-deterministic"
-	MigrationExitMessageReceiptsProofQueryable MigrationExitCriterionID = "message-receipts-proof-queryable"
+	MigrationExitMessagesFirstClassCommitted	MigrationExitCriterionID	= "messages-first-class-committed-objects"
+	MigrationExitLocalAsyncDeterministic		MigrationExitCriterionID	= "local-async-messages-deterministic"
+	MigrationExitMessageReceiptsProofQueryable	MigrationExitCriterionID	= "message-receipts-proof-queryable"
 
-	MigrationExitFinancialZoneExecution MigrationExitCriterionID = "financial-modules-execute-in-financial-zone"
-	MigrationExitIdentityZoneIsolated   MigrationExitCriterionID = "identity-module-isolated-zone"
-	MigrationExitZoneRootsPerBlock      MigrationExitCriterionID = "zone-roots-committed-per-block"
+	MigrationExitFinancialZoneExecution	MigrationExitCriterionID	= "financial-modules-execute-in-financial-zone"
+	MigrationExitIdentityZoneIsolated	MigrationExitCriterionID	= "identity-module-isolated-zone"
+	MigrationExitZoneRootsPerBlock		MigrationExitCriterionID	= "zone-roots-committed-per-block"
 
-	MigrationExitMultiShardZones                      MigrationExitCriterionID = "zones-run-with-multiple-shards"
-	MigrationExitParallelShardWorkloads               MigrationExitCriterionID = "independent-shard-workloads-parallel"
-	MigrationExitInflightMessagesSurviveLayoutChanges MigrationExitCriterionID = "in-flight-messages-survive-layout-changes"
+	MigrationExitMultiShardZones				MigrationExitCriterionID	= "zones-run-with-multiple-shards"
+	MigrationExitParallelShardWorkloads			MigrationExitCriterionID	= "independent-shard-workloads-parallel"
+	MigrationExitInflightMessagesSurviveLayoutChanges	MigrationExitCriterionID	= "in-flight-messages-survive-layout-changes"
 
-	MigrationExitContractZoneDeterministic    MigrationExitCriterionID = "contract-zone-runs-deterministic-contracts"
-	MigrationExitContractsEmitAsyncMessages   MigrationExitCriterionID = "contracts-emit-async-messages"
-	MigrationExitContractStateProofsAvailable MigrationExitCriterionID = "contract-state-proofs-available"
+	MigrationExitContractZoneDeterministic		MigrationExitCriterionID	= "contract-zone-runs-deterministic-contracts"
+	MigrationExitContractsEmitAsyncMessages		MigrationExitCriterionID	= "contracts-emit-async-messages"
+	MigrationExitContractStateProofsAvailable	MigrationExitCriterionID	= "contract-state-proofs-available"
 
-	MigrationExitNamesResolveProofBacked           MigrationExitCriterionID = "names-resolve-proof-backed-identity-zone"
-	MigrationExitPaymentsSettleTrustlessly         MigrationExitCriterionID = "payments-settle-trustlessly-financial-zone"
-	MigrationExitContractsUseIdentityPaymentsAsync MigrationExitCriterionID = "contracts-use-identity-payment-messages-async"
+	MigrationExitNamesResolveProofBacked		MigrationExitCriterionID	= "names-resolve-proof-backed-identity-zone"
+	MigrationExitPaymentsSettleTrustlessly		MigrationExitCriterionID	= "payments-settle-trustlessly-financial-zone"
+	MigrationExitContractsUseIdentityPaymentsAsync	MigrationExitCriterionID	= "contracts-use-identity-payment-messages-async"
 
-	MigrationExitParallelismScales              MigrationExitCriterionID = "zone-shard-execution-scales-with-parallelism"
-	MigrationExitStateSyncRecoversCommitments   MigrationExitCriterionID = "state-sync-recovers-zone-shard-commitments"
-	MigrationExitRoutingDeterministicCongestion MigrationExitCriterionID = "routing-deterministic-under-congestion"
+	MigrationExitParallelismScales			MigrationExitCriterionID	= "zone-shard-execution-scales-with-parallelism"
+	MigrationExitStateSyncRecoversCommitments	MigrationExitCriterionID	= "state-sync-recovers-zone-shard-commitments"
+	MigrationExitRoutingDeterministicCongestion	MigrationExitCriterionID	= "routing-deterministic-under-congestion"
 )
 
 type MigrationTaskDescriptor struct {
-	PhaseID        MigrationPhaseID
-	TaskID         MigrationTaskID
-	Task           string
-	Target         string
-	Evidence       string
-	DescriptorHash string
+	PhaseID		MigrationPhaseID
+	TaskID		MigrationTaskID
+	Task		string
+	Target		string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type MigrationExitCriterion struct {
-	PhaseID        MigrationPhaseID
-	CriterionID    MigrationExitCriterionID
-	Criterion      string
-	Evidence       string
-	DescriptorHash string
+	PhaseID		MigrationPhaseID
+	CriterionID	MigrationExitCriterionID
+	Criterion	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type MigrationPhase struct {
-	PhaseID      MigrationPhaseID
-	Title        string
-	Tasks        []MigrationTaskDescriptor
-	ExitCriteria []MigrationExitCriterion
-	PhaseHash    string
+	PhaseID		MigrationPhaseID
+	Title		string
+	Tasks		[]MigrationTaskDescriptor
+	ExitCriteria	[]MigrationExitCriterion
+	PhaseHash	string
 }
 
 type MigrationPathSpec struct {
-	Version uint64
-	Phases  []MigrationPhase
-	Root    string
+	Version	uint64
+	Phases	[]MigrationPhase
+	Root	string
 }
 
 type BaselineHardeningEvidence struct {
-	ModuleBoundaryDocsRoot   string
-	StateExportManifestHash  string
-	GenesisImportHash        string
-	DynamicFeeBoundsTestHash string
-	LegacyInvariantRoot      string
-	StoreV2AuditHash         string
-	UpgradeHandlerPrefixHash string
-	StateReproducible        bool
-	StateExportable          bool
-	InvariantCoverage        bool
-	PrefixMigrationSafe      bool
-	EvidenceHash             string
+	ModuleBoundaryDocsRoot		string
+	StateExportManifestHash		string
+	GenesisImportHash		string
+	DynamicFeeBoundsTestHash	string
+	LegacyInvariantRoot		string
+	StoreV2AuditHash		string
+	UpgradeHandlerPrefixHash	string
+	StateReproducible		bool
+	StateExportable			bool
+	InvariantCoverage		bool
+	PrefixMigrationSafe		bool
+	EvidenceHash			string
 }
 
 type CoreCommitmentMigrationEvidence struct {
-	AetraCoreModuleHash       string
-	DefaultZoneDescriptorHash string
-	DefaultZoneStateRoot      string
-	EmptyMessageRoot          string
-	ProofRegistryRoot         string
-	RootQueryAPIHash          string
-	AppHashCoreRoot           string
-	DefaultZoneID             ZoneID
-	SingleZoneMode            bool
-	ProofRegistryMetadata     bool
-	EvidenceHash              string
+	AetraCoreModuleHash		string
+	DefaultZoneDescriptorHash	string
+	DefaultZoneStateRoot		string
+	EmptyMessageRoot		string
+	ProofRegistryRoot		string
+	RootQueryAPIHash		string
+	AppHashCoreRoot			string
+	DefaultZoneID			ZoneID
+	SingleZoneMode			bool
+	ProofRegistryMetadata		bool
+	EvidenceHash			string
 }
 
 type MessageBusMigrationEvidence struct {
-	MsgbusModuleHash        string
-	MessageCodecHash        string
-	MessageIDDerivationHash string
-	InboxStoreRoot          string
-	OutboxStoreRoot         string
-	ReceiptStoreRoot        string
-	LocalExecutionRoot      string
-	ExpiryBounceRoot        string
-	InclusionProofRoot      string
-	MessagesCommitted       bool
-	LocalAsyncDeterministic bool
-	ReceiptProofQueryable   bool
-	EvidenceHash            string
+	MsgbusModuleHash	string
+	MessageCodecHash	string
+	MessageIDDerivationHash	string
+	InboxStoreRoot		string
+	OutboxStoreRoot		string
+	ReceiptStoreRoot	string
+	LocalExecutionRoot	string
+	ExpiryBounceRoot	string
+	InclusionProofRoot	string
+	MessagesCommitted	bool
+	LocalAsyncDeterministic	bool
+	ReceiptProofQueryable	bool
+	EvidenceHash		string
 }
 
 type ZoneExtractionMigrationEvidence struct {
-	FinancialZoneRoot          string
-	IdentityZoneRoot           string
-	ApplicationZoneRoot        string
-	ZoneKeeperRoot             string
-	ZonePrefixRoot             string
-	ZoneFeePolicyRoot          string
-	ZoneExecutionSummaryRoot   string
-	FinancialModulesRouted     bool
-	IdentityIsolated           bool
-	ZoneRootsCommittedPerBlock bool
-	EvidenceHash               string
+	FinancialZoneRoot		string
+	IdentityZoneRoot		string
+	ApplicationZoneRoot		string
+	ZoneKeeperRoot			string
+	ZonePrefixRoot			string
+	ZoneFeePolicyRoot		string
+	ZoneExecutionSummaryRoot	string
+	FinancialModulesRouted		bool
+	IdentityIsolated		bool
+	ZoneRootsCommittedPerBlock	bool
+	EvidenceHash			string
 }
 
 type ShardingRuntimeMigrationEvidence struct {
-	ShardsModuleHash        string
-	ShardLayoutRoot         string
-	RouteKeyCalculationRoot string
-	PerShardInboxRoot       string
-	PerShardOutboxRoot      string
-	ShardRootAggregate      string
-	SplitMergeScheduleRoot  string
-	ShardMigrationRoot      string
-	MultiShardZones         bool
-	ParallelShardWorkloads  bool
-	InflightMessagesSafe    bool
-	EvidenceHash            string
+	ShardsModuleHash	string
+	ShardLayoutRoot		string
+	RouteKeyCalculationRoot	string
+	PerShardInboxRoot	string
+	PerShardOutboxRoot	string
+	ShardRootAggregate	string
+	SplitMergeScheduleRoot	string
+	ShardMigrationRoot	string
+	MultiShardZones		bool
+	ParallelShardWorkloads	bool
+	InflightMessagesSafe	bool
+	EvidenceHash		string
 }
 
 type AVM20MigrationEvidence struct {
-	BytecodeFormatHash      string
-	InterpreterRoot         string
-	GasTableRoot            string
-	ContractStorageRoot     string
-	MessageSyscallRoot      string
-	ProofSyscallRoot        string
-	ABIRegistryRoot         string
-	DeterministicContracts  bool
-	AsyncMessages           bool
-	ContractProofsAvailable bool
-	EvidenceHash            string
+	BytecodeFormatHash	string
+	InterpreterRoot		string
+	GasTableRoot		string
+	ContractStorageRoot	string
+	MessageSyscallRoot	string
+	ProofSyscallRoot	string
+	ABIRegistryRoot		string
+	DeterministicContracts	bool
+	AsyncMessages		bool
+	ContractProofsAvailable	bool
+	EvidenceHash		string
 }
 
 type IdentityPaymentIntegrationEvidence struct {
-	IdentityProofRoot            string
-	IdentityLookupMessageRoot    string
-	PaymentChannelSettlementRoot string
-	ConditionalPaymentRouteRoot  string
-	PaymentProofAPIRoot          string
-	WalletSDKHelperRoot          string
-	ProofBackedNames             bool
-	TrustlessPayments            bool
-	AsyncContractMessages        bool
-	EvidenceHash                 string
+	IdentityProofRoot		string
+	IdentityLookupMessageRoot	string
+	PaymentChannelSettlementRoot	string
+	ConditionalPaymentRouteRoot	string
+	PaymentProofAPIRoot		string
+	WalletSDKHelperRoot		string
+	ProofBackedNames		bool
+	TrustlessPayments		bool
+	AsyncContractMessages		bool
+	EvidenceHash			string
 }
 
 type PerformanceHardeningMigrationEvidence struct {
-	BlockSTMWorkloadRoot     string
-	ConflictProfileRoot      string
-	StoreV2BenchmarkRoot     string
-	MempoolLaneRoot          string
-	CongestionRoutingRoot    string
-	AdaptiveSyncRecoveryRoot string
-	LoadSimulationRoot       string
-	ParallelismScales        bool
-	StateSyncRecoversRoots   bool
-	CongestionDeterministic  bool
-	EvidenceHash             string
+	BlockSTMWorkloadRoot		string
+	ConflictProfileRoot		string
+	StoreV2BenchmarkRoot		string
+	MempoolLaneRoot			string
+	CongestionRoutingRoot		string
+	AdaptiveSyncRecoveryRoot	string
+	LoadSimulationRoot		string
+	ParallelismScales		bool
+	StateSyncRecoversRoots		bool
+	CongestionDeterministic		bool
+	EvidenceHash			string
 }
 
 func DefaultMigrationPathSpec() (MigrationPathSpec, error) {
@@ -275,8 +275,8 @@ func DefaultMigrationPathSpec() (MigrationPathSpec, error) {
 
 func BuildMigrationPathSpec(phases []MigrationPhase) (MigrationPathSpec, error) {
 	spec := MigrationPathSpec{
-		Version: MigrationPathSpecVersion,
-		Phases:  normalizeMigrationPhases(phases),
+		Version:	MigrationPathSpecVersion,
+		Phases:		normalizeMigrationPhases(phases),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return MigrationPathSpec{}, err
@@ -695,8 +695,8 @@ func (e BaselineHardeningEvidence) Normalize() BaselineHardeningEvidence {
 func (e BaselineHardeningEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration module boundary docs root", e.ModuleBoundaryDocsRoot},
 		{"aetracore migration state export manifest hash", e.StateExportManifestHash},
@@ -758,8 +758,8 @@ func (e CoreCommitmentMigrationEvidence) Normalize() CoreCommitmentMigrationEvid
 func (e CoreCommitmentMigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration module hash", e.AetraCoreModuleHash},
 		{"aetracore migration default zone descriptor hash", e.DefaultZoneDescriptorHash},
@@ -826,8 +826,8 @@ func (e MessageBusMigrationEvidence) Normalize() MessageBusMigrationEvidence {
 func (e MessageBusMigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration msgbus module hash", e.MsgbusModuleHash},
 		{"aetracore migration message codec hash", e.MessageCodecHash},
@@ -891,8 +891,8 @@ func (e ZoneExtractionMigrationEvidence) Normalize() ZoneExtractionMigrationEvid
 func (e ZoneExtractionMigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration financial zone root", e.FinancialZoneRoot},
 		{"aetracore migration identity zone root", e.IdentityZoneRoot},
@@ -955,8 +955,8 @@ func (e ShardingRuntimeMigrationEvidence) Normalize() ShardingRuntimeMigrationEv
 func (e ShardingRuntimeMigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration shards module hash", e.ShardsModuleHash},
 		{"aetracore migration shard layout root", e.ShardLayoutRoot},
@@ -1019,8 +1019,8 @@ func (e AVM20MigrationEvidence) Normalize() AVM20MigrationEvidence {
 func (e AVM20MigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration AVM bytecode format hash", e.BytecodeFormatHash},
 		{"aetracore migration AVM interpreter root", e.InterpreterRoot},
@@ -1081,8 +1081,8 @@ func (e IdentityPaymentIntegrationEvidence) Normalize() IdentityPaymentIntegrati
 func (e IdentityPaymentIntegrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration identity proof root", e.IdentityProofRoot},
 		{"aetracore migration identity lookup message root", e.IdentityLookupMessageRoot},
@@ -1143,8 +1143,8 @@ func (e PerformanceHardeningMigrationEvidence) Normalize() PerformanceHardeningM
 func (e PerformanceHardeningMigrationEvidence) ValidateFormat() error {
 	e = e.Normalize()
 	hashes := []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore migration BlockSTM workload root", e.BlockSTMWorkloadRoot},
 		{"aetracore migration conflict profile root", e.ConflictProfileRoot},
@@ -1547,10 +1547,10 @@ func ComputePerformanceHardeningMigrationEvidenceHash(e PerformanceHardeningMigr
 
 func migrationPhase(phaseID MigrationPhaseID, title string, tasks []MigrationTaskDescriptor, criteria []MigrationExitCriterion) MigrationPhase {
 	phase := MigrationPhase{
-		PhaseID:      phaseID,
-		Title:        title,
-		Tasks:        normalizeMigrationTasks(tasks),
-		ExitCriteria: normalizeMigrationExitCriteria(criteria),
+		PhaseID:	phaseID,
+		Title:		title,
+		Tasks:		normalizeMigrationTasks(tasks),
+		ExitCriteria:	normalizeMigrationExitCriteria(criteria),
 	}
 	phase.PhaseHash = ComputeMigrationPhaseHash(phase)
 	return phase
@@ -1558,11 +1558,11 @@ func migrationPhase(phaseID MigrationPhaseID, title string, tasks []MigrationTas
 
 func migrationTask(phaseID MigrationPhaseID, taskID MigrationTaskID, task, target, evidence string) MigrationTaskDescriptor {
 	descriptor := MigrationTaskDescriptor{
-		PhaseID:  phaseID,
-		TaskID:   taskID,
-		Task:     task,
-		Target:   target,
-		Evidence: evidence,
+		PhaseID:	phaseID,
+		TaskID:		taskID,
+		Task:		task,
+		Target:		target,
+		Evidence:	evidence,
 	}
 	descriptor.DescriptorHash = ComputeMigrationTaskHash(descriptor)
 	return descriptor
@@ -1570,10 +1570,10 @@ func migrationTask(phaseID MigrationPhaseID, taskID MigrationTaskID, task, targe
 
 func migrationExitCriterion(phaseID MigrationPhaseID, criterionID MigrationExitCriterionID, criterion, evidence string) MigrationExitCriterion {
 	descriptor := MigrationExitCriterion{
-		PhaseID:     phaseID,
-		CriterionID: criterionID,
-		Criterion:   criterion,
-		Evidence:    evidence,
+		PhaseID:	phaseID,
+		CriterionID:	criterionID,
+		Criterion:	criterion,
+		Evidence:	evidence,
 	}
 	descriptor.DescriptorHash = ComputeMigrationExitCriterionHash(descriptor)
 	return descriptor

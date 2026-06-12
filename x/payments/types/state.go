@@ -12,50 +12,50 @@ import (
 )
 
 type PaymentsState struct {
-	Channels                 []ChannelRecord
-	Edges                    []ChannelEdge
-	VirtualChannels          []VirtualChannel
-	Settlements              []SettlementRecord
-	Batches                  []SettlementBatch
-	CustodyLocks             []CustodyLock
-	ClosedChannels           []ClosedChannelTombstone
-	ConditionClaims          []ConditionClaimRecord
-	ValidatorPaymentServices []ValidatorPaymentServiceMetadata
-	ValidatorWatchRegistries []ValidatorWatchRegistration
-	FeeSchedule              PaymentFeeSchedule
-	FeeMultipliers           []PaymentFeeMultiplier
-	FeeCharges               []PaymentFeeCharge
-	FeeRefunds               []PaymentFeeRefund
-	SecurityReserveHooks     []SecurityReserveAllocationHook
-	InclusionLatencies       []SettlementInclusionLatency
-	AsyncFinalizationQueue   []AsyncFinalizationJob
-	AsyncPromiseExpiryQueue  []AsyncPromiseExpiryJob
-	AsyncCompletions         []AsyncSettlementCompletion
-	Events                   []PaymentEvent
+	Channels			[]ChannelRecord
+	Edges				[]ChannelEdge
+	VirtualChannels			[]VirtualChannel
+	Settlements			[]SettlementRecord
+	Batches				[]SettlementBatch
+	CustodyLocks			[]CustodyLock
+	ClosedChannels			[]ClosedChannelTombstone
+	ConditionClaims			[]ConditionClaimRecord
+	ValidatorPaymentServices	[]ValidatorPaymentServiceMetadata
+	ValidatorWatchRegistries	[]ValidatorWatchRegistration
+	FeeSchedule			PaymentFeeSchedule
+	FeeMultipliers			[]PaymentFeeMultiplier
+	FeeCharges			[]PaymentFeeCharge
+	FeeRefunds			[]PaymentFeeRefund
+	SecurityReserveHooks		[]SecurityReserveAllocationHook
+	InclusionLatencies		[]SettlementInclusionLatency
+	AsyncFinalizationQueue		[]AsyncFinalizationJob
+	AsyncPromiseExpiryQueue		[]AsyncPromiseExpiryJob
+	AsyncCompletions		[]AsyncSettlementCompletion
+	Events				[]PaymentEvent
 }
 
 func EmptyState() PaymentsState {
 	return PaymentsState{
-		Channels:                 []ChannelRecord{},
-		Edges:                    []ChannelEdge{},
-		VirtualChannels:          []VirtualChannel{},
-		Settlements:              []SettlementRecord{},
-		Batches:                  []SettlementBatch{},
-		CustodyLocks:             []CustodyLock{},
-		ClosedChannels:           []ClosedChannelTombstone{},
-		ConditionClaims:          []ConditionClaimRecord{},
-		ValidatorPaymentServices: []ValidatorPaymentServiceMetadata{},
-		ValidatorWatchRegistries: []ValidatorWatchRegistration{},
-		FeeSchedule:              DefaultPaymentFeeSchedule(),
-		FeeMultipliers:           []PaymentFeeMultiplier{},
-		FeeCharges:               []PaymentFeeCharge{},
-		FeeRefunds:               []PaymentFeeRefund{},
-		SecurityReserveHooks:     []SecurityReserveAllocationHook{},
-		InclusionLatencies:       []SettlementInclusionLatency{},
-		AsyncFinalizationQueue:   []AsyncFinalizationJob{},
-		AsyncPromiseExpiryQueue:  []AsyncPromiseExpiryJob{},
-		AsyncCompletions:         []AsyncSettlementCompletion{},
-		Events:                   []PaymentEvent{},
+		Channels:			[]ChannelRecord{},
+		Edges:				[]ChannelEdge{},
+		VirtualChannels:		[]VirtualChannel{},
+		Settlements:			[]SettlementRecord{},
+		Batches:			[]SettlementBatch{},
+		CustodyLocks:			[]CustodyLock{},
+		ClosedChannels:			[]ClosedChannelTombstone{},
+		ConditionClaims:		[]ConditionClaimRecord{},
+		ValidatorPaymentServices:	[]ValidatorPaymentServiceMetadata{},
+		ValidatorWatchRegistries:	[]ValidatorWatchRegistration{},
+		FeeSchedule:			DefaultPaymentFeeSchedule(),
+		FeeMultipliers:			[]PaymentFeeMultiplier{},
+		FeeCharges:			[]PaymentFeeCharge{},
+		FeeRefunds:			[]PaymentFeeRefund{},
+		SecurityReserveHooks:		[]SecurityReserveAllocationHook{},
+		InclusionLatencies:		[]SettlementInclusionLatency{},
+		AsyncFinalizationQueue:		[]AsyncFinalizationJob{},
+		AsyncPromiseExpiryQueue:	[]AsyncPromiseExpiryJob{},
+		AsyncCompletions:		[]AsyncSettlementCompletion{},
+		Events:				[]PaymentEvent{},
 	}
 }
 
@@ -244,21 +244,21 @@ func ComputeChannelOpenFeeFormula(state PaymentsState, channel ChannelRecord) (C
 		total = total.Add(denom.Sub(sdkmath.OneInt())).Quo(denom)
 	}
 	return ChannelOpenFeeFormula{
-		Denom:                  NativeDenom,
-		BaseFee:                base.String(),
-		ParticipantFee:         participantFee.String(),
-		ParticipantCount:       participantCount,
-		StorageByteFee:         byteFee.String(),
-		StorageBytes:           storageBytes,
-		StorageFee:             storageFee.String(),
-		ConditionalSurcharge:   conditionalSurcharge.String(),
-		VirtualAnchorSurcharge: virtualSurcharge.String(),
-		RoutingDeposit:         routingDeposit.String(),
-		RentReserve:            rentReserve.String(),
-		MultiplierBps:          multiplier,
-		MinFee:                 schedule.OpenFeeMin,
-		MaxFee:                 schedule.OpenFeeMax,
-		TotalFee:               total.String(),
+		Denom:			NativeDenom,
+		BaseFee:		base.String(),
+		ParticipantFee:		participantFee.String(),
+		ParticipantCount:	participantCount,
+		StorageByteFee:		byteFee.String(),
+		StorageBytes:		storageBytes,
+		StorageFee:		storageFee.String(),
+		ConditionalSurcharge:	conditionalSurcharge.String(),
+		VirtualAnchorSurcharge:	virtualSurcharge.String(),
+		RoutingDeposit:		routingDeposit.String(),
+		RentReserve:		rentReserve.String(),
+		MultiplierBps:		multiplier,
+		MinFee:			schedule.OpenFeeMin,
+		MaxFee:			schedule.OpenFeeMax,
+		TotalFee:		total.String(),
 	}, nil
 }
 
@@ -295,17 +295,17 @@ func ChargePaymentFee(state PaymentsState, feeClass PaymentFeeClass, channel Cha
 	channelID := normalizeOptionalHash(channel.ChannelID)
 	objectID = strings.TrimSpace(objectID)
 	charge := PaymentFeeCharge{
-		FeeID:          HashParts("payment-fee", string(feeClass), channelID, objectID, payer, amountPaid, fmt.Sprintf("%020d", height)),
-		FeeClass:       feeClass,
-		ChannelID:      channelID,
-		ObjectID:       objectID,
-		Payer:          strings.TrimSpace(payer),
-		Denom:          NativeDenom,
-		Amount:         amountPaid,
-		RequiredAmount: required,
-		StorageBytes:   storageBytes,
-		MultiplierBps:  multiplier,
-		Height:         height,
+		FeeID:		HashParts("payment-fee", string(feeClass), channelID, objectID, payer, amountPaid, fmt.Sprintf("%020d", height)),
+		FeeClass:	feeClass,
+		ChannelID:	channelID,
+		ObjectID:	objectID,
+		Payer:		strings.TrimSpace(payer),
+		Denom:		NativeDenom,
+		Amount:		amountPaid,
+		RequiredAmount:	required,
+		StorageBytes:	storageBytes,
+		MultiplierBps:	multiplier,
+		Height:		height,
 	}.Normalize()
 	if err := charge.Validate(); err != nil {
 		return PaymentsState{}, PaymentFeeCharge{}, err
@@ -339,13 +339,13 @@ func RefundPaymentFee(state PaymentsState, feeID, recipient, reason string, heig
 		return state, PaymentFeeRefund{}, nil
 	}
 	refund := PaymentFeeRefund{
-		RefundID:  HashParts("payment-fee-refund", feeID, recipient, reason, fmt.Sprintf("%020d", height)),
-		FeeID:     feeID,
-		Recipient: recipient,
-		Denom:     NativeDenom,
-		Amount:    charge.Amount,
-		Reason:    reason,
-		Height:    height,
+		RefundID:	HashParts("payment-fee-refund", feeID, recipient, reason, fmt.Sprintf("%020d", height)),
+		FeeID:		feeID,
+		Recipient:	recipient,
+		Denom:		NativeDenom,
+		Amount:		charge.Amount,
+		Reason:		reason,
+		Height:		height,
 	}.Normalize()
 	if err := refund.Validate(); err != nil {
 		return PaymentsState{}, PaymentFeeRefund{}, err
@@ -389,13 +389,13 @@ func EstimateSettlementMessageGas(input SettlementArbitrationInput, schedule Set
 	}
 	stateBytes := estimateSettlementStateBytes(input)
 	estimate := SettlementGasEstimate{
-		Operation:            input.Operation,
-		BaseGas:              base,
-		SignatureGas:         signatureCount * schedule.PerSignatureGas,
-		ConditionGas:         conditionCount * schedule.PerConditionGas,
-		FraudProofGas:        fraudProofCount * schedule.PerFraudProofGas,
-		PenaltyAllocationGas: penaltyAllocationCount * schedule.PerPenaltyAllocationGas,
-		StateByteGas:         stateBytes * schedule.PerStateByteGas,
+		Operation:		input.Operation,
+		BaseGas:		base,
+		SignatureGas:		signatureCount * schedule.PerSignatureGas,
+		ConditionGas:		conditionCount * schedule.PerConditionGas,
+		FraudProofGas:		fraudProofCount * schedule.PerFraudProofGas,
+		PenaltyAllocationGas:	penaltyAllocationCount * schedule.PerPenaltyAllocationGas,
+		StateByteGas:		stateBytes * schedule.PerStateByteGas,
 	}
 	estimate.TotalGas = estimate.BaseGas + estimate.SignatureGas + estimate.ConditionGas + estimate.FraudProofGas + estimate.PenaltyAllocationGas + estimate.StateByteGas
 	return estimate, nil
@@ -436,15 +436,15 @@ func BuildSecurityReserveAllocationHooks(channel ChannelRecord, proof FraudProof
 		}
 		commitment := HashParts("security-reserve-allocation", channel.ChannelID, proof.ProofID, allocation.Offender, allocation.Amount, fmt.Sprintf("%020d", height))
 		hook := SecurityReserveAllocationHook{
-			HookID:     HashParts("security-reserve-hook", commitment),
-			ChannelID:  channel.ChannelID,
-			ProofID:    proof.ProofID,
-			Offender:   allocation.Offender,
-			Denom:      NativeDenom,
-			Amount:     allocation.Amount,
-			Height:     height,
-			Route:      PenaltyRouteSecurityReserve,
-			Allocation: commitment,
+			HookID:		HashParts("security-reserve-hook", commitment),
+			ChannelID:	channel.ChannelID,
+			ProofID:	proof.ProofID,
+			Offender:	allocation.Offender,
+			Denom:		NativeDenom,
+			Amount:		allocation.Amount,
+			Height:		height,
+			Route:		PenaltyRouteSecurityReserve,
+			Allocation:	commitment,
 		}.Normalize()
 		if err := hook.ValidateForChannel(channel); err != nil {
 			return nil, err
@@ -462,13 +462,13 @@ func RecordSettlementInclusionLatency(state PaymentsState, operationID, channelI
 		return PaymentsState{}, SettlementInclusionLatency{}, errors.New("payments inclusion latency channel not found")
 	}
 	record := SettlementInclusionLatency{
-		RecordID:        HashParts("settlement-inclusion-latency", operationID, channelID, string(operation), fmt.Sprintf("%020d", submittedHeight), fmt.Sprintf("%020d", includedHeight)),
-		OperationID:     operationID,
-		ChannelID:       channelID,
-		Operation:       operation,
-		SubmittedHeight: submittedHeight,
-		IncludedHeight:  includedHeight,
-		SLOThreshold:    sloThreshold,
+		RecordID:		HashParts("settlement-inclusion-latency", operationID, channelID, string(operation), fmt.Sprintf("%020d", submittedHeight), fmt.Sprintf("%020d", includedHeight)),
+		OperationID:		operationID,
+		ChannelID:		channelID,
+		Operation:		operation,
+		SubmittedHeight:	submittedHeight,
+		IncludedHeight:		includedHeight,
+		SLOThreshold:		sloThreshold,
 	}.Normalize()
 	if err := record.Validate(state.Channels); err != nil {
 		return PaymentsState{}, SettlementInclusionLatency{}, err
@@ -542,10 +542,10 @@ func RefreshAsyncExecutionQueues(state PaymentsState, currentHeight uint64) (Pay
 			continue
 		}
 		next.AsyncFinalizationQueue = append(next.AsyncFinalizationQueue, AsyncFinalizationJob{
-			JobID:          jobID,
-			ChannelID:      channel.ChannelID,
-			FinalizeHeight: finalizeHeight,
-			EnqueuedHeight: currentHeight,
+			JobID:		jobID,
+			ChannelID:	channel.ChannelID,
+			FinalizeHeight:	finalizeHeight,
+			EnqueuedHeight:	currentHeight,
 		}.Normalize())
 	}
 	sortAsyncFinalizationJobs(next.AsyncFinalizationQueue)
@@ -578,13 +578,13 @@ func EnqueueExpiredPromise(state PaymentsState, promise ConditionalPromise, reso
 		return state, existing, nil
 	}
 	job := AsyncPromiseExpiryJob{
-		JobID:             jobID,
-		ChannelID:         channel.ChannelID,
-		PromiseID:         promise.PromiseID,
-		Promise:           promise,
-		Resolver:          resolver,
-		ExpireAfterHeight: expireAfterHeight,
-		EnqueuedHeight:    currentHeight,
+		JobID:			jobID,
+		ChannelID:		channel.ChannelID,
+		PromiseID:		promise.PromiseID,
+		Promise:		promise,
+		Resolver:		resolver,
+		ExpireAfterHeight:	expireAfterHeight,
+		EnqueuedHeight:		currentHeight,
 	}.Normalize()
 	if err := job.Validate(); err != nil {
 		return PaymentsState{}, AsyncPromiseExpiryJob{}, err
@@ -664,10 +664,10 @@ func ProcessAsyncExecutionQueues(state PaymentsState, currentHeight, maxFinaliza
 		}
 		var resolutions []ConditionResolution
 		next, resolutions, _, err = ExpireConditionalPromises(next, PromiseExpiryRequest{
-			ChannelID:     job.ChannelID,
-			Promises:      []ConditionalPromise{job.Promise},
-			Resolver:      job.Resolver,
-			CurrentHeight: currentHeight,
+			ChannelID:	job.ChannelID,
+			Promises:	[]ConditionalPromise{job.Promise},
+			Resolver:	job.Resolver,
+			CurrentHeight:	currentHeight,
 		})
 		if err != nil {
 			next = markAsyncPromiseExpiryFailed(next, job.JobID, currentHeight, err.Error())
@@ -712,8 +712,8 @@ func openChannelRecord(state PaymentsState, channel ChannelRecord) (PaymentsStat
 		return PaymentsState{}, PaymentEvent{}, errors.New("payments channel already exists")
 	}
 	if err := (SettlementArbitrationInput{
-		Operation: SettlementArbitrationOpen,
-		ChannelID: channel.ChannelID,
+		Operation:	SettlementArbitrationOpen,
+		ChannelID:	channel.ChannelID,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, PaymentEvent{}, err
 	}
@@ -823,10 +823,10 @@ func PruneTopologyStore(store TopologyStore, currentHeight uint64) (TopologyStor
 	}
 	store = store.Normalize()
 	next := TopologyStore{
-		Messages:     make([]SignedGossipEnvelope, 0, len(store.Messages)),
-		Edges:        make([]ChannelEdge, 0, len(store.Edges)),
-		Reputation:   append([]GossipReputation(nil), store.Reputation...),
-		LastPrunedAt: currentHeight,
+		Messages:	make([]SignedGossipEnvelope, 0, len(store.Messages)),
+		Edges:		make([]ChannelEdge, 0, len(store.Edges)),
+		Reputation:	append([]GossipReputation(nil), store.Reputation...),
+		LastPrunedAt:	currentHeight,
 	}
 	for _, envelope := range store.Messages {
 		envelope = envelope.Normalize()
@@ -913,11 +913,11 @@ func AcceptAsyncCheckpoint(state PaymentsState, channelID string, checkpoint Cha
 		return PaymentsState{}, errors.New("payments async checkpoint nonce must increase")
 	}
 	proof := AsyncDeltaDisputeProof{
-		ProofID:         HashParts("async-checkpoint-proof", checkpoint.StateHash),
-		ChannelID:       channel.ChannelID,
-		CheckpointState: checkpoint,
-		Deltas:          deltas,
-		EvidenceHash:    HashParts("async-dispute", checkpoint.StateHash, ComputeAsyncDeltaRootForChannel(channel, deltas)),
+		ProofID:		HashParts("async-checkpoint-proof", checkpoint.StateHash),
+		ChannelID:		channel.ChannelID,
+		CheckpointState:	checkpoint,
+		Deltas:			deltas,
+		EvidenceHash:		HashParts("async-dispute", checkpoint.StateHash, ComputeAsyncDeltaRootForChannel(channel, deltas)),
 	}
 	if err := proof.ValidateForChannel(channel, currentHeight); err != nil {
 		return PaymentsState{}, err
@@ -976,22 +976,22 @@ func RevealPromisePreimage(state PaymentsState, req PreimageRevealRequest) (Paym
 	for _, promise := range normalizeConditionalPromises(req.Promises) {
 		evidenceHash := HashParts("promise-preimage", promise.PromiseID, preimageHash)
 		resolution := ConditionResolution{
-			ConditionID:  promise.PromiseID,
-			Resolver:     req.Revealer,
-			Recipient:    promise.Destination,
-			Amount:       promise.Amount,
-			Expired:      false,
-			EvidenceHash: evidenceHash,
+			ConditionID:	promise.PromiseID,
+			Resolver:	req.Revealer,
+			Recipient:	promise.Destination,
+			Amount:		promise.Amount,
+			Expired:	false,
+			EvidenceHash:	evidenceHash,
 		}.Normalize()
 		resolutions = append(resolutions, resolution)
 		next.ConditionClaims = append(next.ConditionClaims, ConditionClaimRecord{
-			ChainID:        channel.ChainID,
-			ChannelID:      channel.ChannelID,
-			ConditionID:    promise.PromiseID,
-			EvidenceHash:   evidenceHash,
-			PreimageHash:   preimageHash,
-			ResolvedHeight: req.CurrentHeight,
-			ExpiresHeight:  req.CurrentHeight + DefaultReplayHorizon,
+			ChainID:	channel.ChainID,
+			ChannelID:	channel.ChannelID,
+			ConditionID:	promise.PromiseID,
+			EvidenceHash:	evidenceHash,
+			PreimageHash:	preimageHash,
+			ResolvedHeight:	req.CurrentHeight,
+			ExpiresHeight:	req.CurrentHeight + DefaultReplayHorizon,
 		}.Normalize())
 	}
 	sortConditionClaimRecords(next.ConditionClaims)
@@ -1017,21 +1017,21 @@ func ExpireConditionalPromises(state PaymentsState, req PromiseExpiryRequest) (P
 	for _, promise := range normalizeConditionalPromises(req.Promises) {
 		evidenceHash := HashParts("promise-expiry", promise.PromiseID, fmt.Sprintf("%020d", req.CurrentHeight))
 		resolution := ConditionResolution{
-			ConditionID:  promise.PromiseID,
-			Resolver:     req.Resolver,
-			Recipient:    promise.Source,
-			Amount:       promise.Amount,
-			Expired:      true,
-			EvidenceHash: evidenceHash,
+			ConditionID:	promise.PromiseID,
+			Resolver:	req.Resolver,
+			Recipient:	promise.Source,
+			Amount:		promise.Amount,
+			Expired:	true,
+			EvidenceHash:	evidenceHash,
 		}.Normalize()
 		resolutions = append(resolutions, resolution)
 		next.ConditionClaims = append(next.ConditionClaims, ConditionClaimRecord{
-			ChainID:        channel.ChainID,
-			ChannelID:      channel.ChannelID,
-			ConditionID:    promise.PromiseID,
-			EvidenceHash:   evidenceHash,
-			ResolvedHeight: req.CurrentHeight,
-			ExpiresHeight:  req.CurrentHeight + DefaultReplayHorizon,
+			ChainID:	channel.ChainID,
+			ChannelID:	channel.ChannelID,
+			ConditionID:	promise.PromiseID,
+			EvidenceHash:	evidenceHash,
+			ResolvedHeight:	req.CurrentHeight,
+			ExpiresHeight:	req.CurrentHeight + DefaultReplayHorizon,
 		}.Normalize())
 	}
 	sortConditionClaimRecords(next.ConditionClaims)
@@ -1071,12 +1071,12 @@ func BatchSettleLinkedPromises(state PaymentsState, req BatchConditionSettlement
 	for i, promise := range proof.Promises {
 		channel, _ := state.ChannelByID(promise.ChannelID)
 		resolution := ConditionResolution{
-			ConditionID:  promise.PromiseID,
-			Resolver:     req.Resolver,
-			Recipient:    promise.Destination,
-			Amount:       promise.Amount,
-			Expired:      false,
-			EvidenceHash: HashParts("batch-condition-resolution", evidenceHash, promise.PromiseID),
+			ConditionID:	promise.PromiseID,
+			Resolver:	req.Resolver,
+			Recipient:	promise.Destination,
+			Amount:		promise.Amount,
+			Expired:	false,
+			EvidenceHash:	HashParts("batch-condition-resolution", evidenceHash, promise.PromiseID),
 		}
 		if req.Mode == ConditionSettlementModeExpiry {
 			resolution.Recipient = promise.Source
@@ -1085,13 +1085,13 @@ func BatchSettleLinkedPromises(state PaymentsState, req BatchConditionSettlement
 		resolution = resolution.Normalize()
 		resolutions = append(resolutions, resolution)
 		next.ConditionClaims = append(next.ConditionClaims, ConditionClaimRecord{
-			ChainID:        channel.ChainID,
-			ChannelID:      channel.ChannelID,
-			ConditionID:    promise.PromiseID,
-			EvidenceHash:   resolution.EvidenceHash,
-			PreimageHash:   preimageHash,
-			ResolvedHeight: req.CurrentHeight,
-			ExpiresHeight:  req.CurrentHeight + DefaultReplayHorizon,
+			ChainID:	channel.ChainID,
+			ChannelID:	channel.ChannelID,
+			ConditionID:	promise.PromiseID,
+			EvidenceHash:	resolution.EvidenceHash,
+			PreimageHash:	preimageHash,
+			ResolvedHeight:	req.CurrentHeight,
+			ExpiresHeight:	req.CurrentHeight + DefaultReplayHorizon,
 		}.Normalize())
 		if req.Mode != ConditionSettlementModePreimage || i == 0 {
 			continue
@@ -1104,20 +1104,20 @@ func BatchSettleLinkedPromises(state PaymentsState, req BatchConditionSettlement
 			continue
 		}
 		feeClaims = append(feeClaims, RouteFeeClaim{
-			ChannelID:    promise.ChannelID,
-			PromiseID:    promise.PromiseID,
-			Recipient:    promise.Source,
-			Amount:       promise.Fee,
-			EvidenceHash: HashParts("route-fee-claim", evidenceHash, promise.PromiseID, promise.Source),
+			ChannelID:	promise.ChannelID,
+			PromiseID:	promise.PromiseID,
+			Recipient:	promise.Source,
+			Amount:		promise.Fee,
+			EvidenceHash:	HashParts("route-fee-claim", evidenceHash, promise.PromiseID, promise.Source),
 		}.Normalize())
 	}
 	sortConditionClaimRecords(next.ConditionClaims)
 	result := BatchConditionSettlementResult{
-		RouteID:              proof.RouteID,
-		Resolutions:          resolutions,
-		FeeClaims:            feeClaims,
-		ConditionRootUpdates: updates,
-		EvidenceHash:         evidenceHash,
+		RouteID:		proof.RouteID,
+		Resolutions:		resolutions,
+		FeeClaims:		feeClaims,
+		ConditionRootUpdates:	updates,
+		EvidenceHash:		evidenceHash,
 	}.Normalize()
 	if err := result.Validate(); err != nil {
 		return PaymentsState{}, BatchConditionSettlementResult{}, err
@@ -1127,12 +1127,12 @@ func BatchSettleLinkedPromises(state PaymentsState, req BatchConditionSettlement
 
 func SubmitClose(state PaymentsState, channelID string, closingState ChannelState, submitter string, currentHeight uint64, settlementFee string) (PaymentsState, error) {
 	return SubmitCloseWithRequest(state, ChannelCloseRequest{
-		ChannelID:     channelID,
-		ClosingState:  closingState,
-		CloseReason:   CloseReasonUnilateral,
-		Submitter:     submitter,
-		CurrentHeight: currentHeight,
-		SettlementFee: settlementFee,
+		ChannelID:	channelID,
+		ClosingState:	closingState,
+		CloseReason:	CloseReasonUnilateral,
+		Submitter:	submitter,
+		CurrentHeight:	currentHeight,
+		SettlementFee:	settlementFee,
 	})
 }
 
@@ -1154,19 +1154,19 @@ func SubmitCloseWithRequest(state PaymentsState, req ChannelCloseRequest) (Payme
 		return PaymentsState{}, err
 	}
 	pending := PendingClose{
-		Submitter:          req.Submitter,
-		SubmittedHeight:    req.CurrentHeight,
-		SettleAfterHeight:  req.CurrentHeight + channel.DisputePeriod,
-		CloseReason:        req.CloseReason,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      req.SettlementFee,
-		State:              closingState,
+		Submitter:		req.Submitter,
+		SubmittedHeight:	req.CurrentHeight,
+		SettleAfterHeight:	req.CurrentHeight + channel.DisputePeriod,
+		CloseReason:		req.CloseReason,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		req.SettlementFee,
+		State:			closingState,
 	}
 	if err := (SettlementArbitrationInput{
-		Operation:     SettlementArbitrationUnilateralClose,
-		ChannelID:     channel.ChannelID,
-		SignedState:   pending.State,
-		CurrentHeight: req.CurrentHeight,
+		Operation:	SettlementArbitrationUnilateralClose,
+		ChannelID:	channel.ChannelID,
+		SignedState:	pending.State,
+		CurrentHeight:	req.CurrentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
 	}
@@ -1231,13 +1231,13 @@ func ForcedClose(state PaymentsState, channelID string, submitter string, curren
 		return PaymentsState{}, errors.New("payments forced close timeout has not expired")
 	}
 	pending := PendingClose{
-		Submitter:          submitter,
-		SubmittedHeight:    currentHeight,
-		SettleAfterHeight:  currentHeight + channel.DisputePeriod,
-		CloseReason:        CloseReasonTimeout,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      settlementFee,
-		State:              channel.LatestState.Normalize(),
+		Submitter:		submitter,
+		SubmittedHeight:	currentHeight,
+		SettleAfterHeight:	currentHeight + channel.DisputePeriod,
+		CloseReason:		CloseReasonTimeout,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		settlementFee,
+		State:			channel.LatestState.Normalize(),
 	}
 	if err := pending.ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
@@ -1280,10 +1280,10 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 	}
 	closingState = closingState.Normalize()
 	if err := (SettlementArbitrationInput{
-		Operation:     SettlementArbitrationCooperativeClose,
-		ChannelID:     channel.ChannelID,
-		SignedState:   closingState,
-		CurrentHeight: currentHeight,
+		Operation:	SettlementArbitrationCooperativeClose,
+		ChannelID:	channel.ChannelID,
+		SignedState:	closingState,
+		CurrentHeight:	currentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -1298,14 +1298,14 @@ func CooperativeClose(state PaymentsState, channelID string, closingState Channe
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          closingState.StateHash,
-		Nonce:              closingState.Nonce,
-		FinalBalances:      finalBalances,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      settlementFee,
-		SettledHeight:      currentHeight,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		closingState.StateHash,
+		Nonce:			closingState.Nonce,
+		FinalBalances:		finalBalances,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		settlementFee,
+		SettledHeight:		currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -1355,10 +1355,10 @@ func ReceiverClose(state PaymentsState, channelID string, claim UnidirectionalCl
 	}
 	claim = claim.Normalize()
 	if err := (SettlementArbitrationInput{
-		Operation:     SettlementArbitrationUnilateralClose,
-		ChannelID:     channel.ChannelID,
-		Claim:         claim,
-		CurrentHeight: currentHeight,
+		Operation:	SettlementArbitrationUnilateralClose,
+		ChannelID:	channel.ChannelID,
+		Claim:		claim,
+		CurrentHeight:	currentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -1376,14 +1376,14 @@ func ReceiverClose(state PaymentsState, channelID string, claim UnidirectionalCl
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          claim.StateHash,
-		Nonce:              claim.Nonce,
-		FinalBalances:      finalBalances,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      settlementFee,
-		SettledHeight:      currentHeight,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		claim.StateHash,
+		Nonce:			claim.Nonce,
+		FinalBalances:		finalBalances,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		settlementFee,
+		SettledHeight:		currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -1457,14 +1457,14 @@ func PayerReclaim(state PaymentsState, channelID string, payer string, currentHe
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          stateHash,
-		Nonce:              nonce,
-		FinalBalances:      finalBalances,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      settlementFee,
-		SettledHeight:      currentHeight,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		stateHash,
+		Nonce:			nonce,
+		FinalBalances:		finalBalances,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		settlementFee,
+		SettledHeight:		currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -1503,11 +1503,11 @@ func DisputeClose(state PaymentsState, channelID string, newerState ChannelState
 		return PaymentsState{}, errors.New("payments channel not found")
 	}
 	return DisputeChannel(state, ChannelDisputeRequest{
-		ChannelID:             channelID,
-		ClosingStateReference: channel.PendingClose.State.StateHash,
-		NewerState:            newerState,
-		Submitter:             submitter,
-		CurrentHeight:         currentHeight,
+		ChannelID:		channelID,
+		ClosingStateReference:	channel.PendingClose.State.StateHash,
+		NewerState:		newerState,
+		Submitter:		submitter,
+		CurrentHeight:		currentHeight,
 	})
 }
 
@@ -1531,11 +1531,11 @@ func DisputeChannel(state PaymentsState, req ChannelDisputeRequest) (PaymentsSta
 		return PaymentsState{}, errors.New("payments dispute window has closed")
 	}
 	if err := (SettlementArbitrationInput{
-		Operation:       SettlementArbitrationDispute,
-		ChannelID:       channel.ChannelID,
-		SignedState:     req.NewerState,
-		ConditionProofs: req.ConditionProofs,
-		CurrentHeight:   req.CurrentHeight,
+		Operation:		SettlementArbitrationDispute,
+		ChannelID:		channel.ChannelID,
+		SignedState:		req.NewerState,
+		ConditionProofs:	req.ConditionProofs,
+		CurrentHeight:		req.CurrentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
 	}
@@ -1604,11 +1604,11 @@ func SubmitWatchDispute(state PaymentsState, submission WatchDisputeSubmission) 
 		return PaymentsState{}, err
 	}
 	return DisputeChannel(state, ChannelDisputeRequest{
-		ChannelID:             submission.ChannelID,
-		ClosingStateReference: submission.ClosingStateReference,
-		NewerState:            submission.NewerState,
-		Submitter:             submission.Delegator,
-		CurrentHeight:         submission.CurrentHeight,
+		ChannelID:		submission.ChannelID,
+		ClosingStateReference:	submission.ClosingStateReference,
+		NewerState:		submission.NewerState,
+		Submitter:		submission.Delegator,
+		CurrentHeight:		submission.CurrentHeight,
 	})
 }
 
@@ -1685,13 +1685,13 @@ func SubmitValidatorAssistedDispute(state PaymentsState, submission ValidatorAss
 		return PaymentsState{}, errors.New("payments validator watch registration not found")
 	}
 	next, err := SubmitWatchDispute(state, WatchDisputeSubmission{
-		WatchService:          metadata.ServiceAddress,
-		Delegator:             submission.Delegator,
-		ChannelID:             submission.ChannelID,
-		ClosingStateReference: submission.ClosingStateReference,
-		NewerState:            submission.NewerState,
-		CurrentHeight:         submission.CurrentHeight,
-		EvidenceHash:          submission.EvidenceHash,
+		WatchService:		metadata.ServiceAddress,
+		Delegator:		submission.Delegator,
+		ChannelID:		submission.ChannelID,
+		ClosingStateReference:	submission.ClosingStateReference,
+		NewerState:		submission.NewerState,
+		CurrentHeight:		submission.CurrentHeight,
+		EvidenceHash:		submission.EvidenceHash,
 	})
 	if err != nil {
 		return PaymentsState{}, err
@@ -1721,10 +1721,10 @@ func SubmitFraudProofWithPolicy(state PaymentsState, channelID string, proof Fra
 	}
 	proof = proof.Normalize()
 	if err := (SettlementArbitrationInput{
-		Operation:     SettlementArbitrationFraudProof,
-		ChannelID:     channel.ChannelID,
-		FraudProof:    proof,
-		CurrentHeight: currentHeight,
+		Operation:	SettlementArbitrationFraudProof,
+		ChannelID:	channel.ChannelID,
+		FraudProof:	proof,
+		CurrentHeight:	currentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, err
 	}
@@ -1785,11 +1785,11 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 		return PaymentsState{}, SettlementRecord{}, errors.New("payments fraud close requires accepted proof")
 	}
 	if err := (SettlementArbitrationInput{
-		Operation:       SettlementArbitrationFinalSettlement,
-		ChannelID:       channel.ChannelID,
-		SignedState:     channel.PendingClose.State,
-		ConditionProofs: channel.PendingClose.ConditionProofs,
-		CurrentHeight:   currentHeight,
+		Operation:		SettlementArbitrationFinalSettlement,
+		ChannelID:		channel.ChannelID,
+		SignedState:		channel.PendingClose.State,
+		ConditionProofs:	channel.PendingClose.ConditionProofs,
+		CurrentHeight:		currentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -1801,16 +1801,16 @@ func FraudClose(state PaymentsState, channelID string, currentHeight uint64) (Pa
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          channel.PendingClose.State.StateHash,
-		Nonce:              channel.PendingClose.State.Nonce,
-		FinalBalances:      finalBalances,
-		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
-		SettlementFee:      channel.PendingClose.SettlementFee,
-		Penalties:          channel.PendingClose.Penalties,
-		PenaltyAllocations: channel.PendingClose.PenaltyAllocations,
-		SettledHeight:      currentHeight,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		channel.PendingClose.State.StateHash,
+		Nonce:			channel.PendingClose.State.Nonce,
+		FinalBalances:		finalBalances,
+		SettlementFeeDenom:	channel.PendingClose.SettlementFeeDenom,
+		SettlementFee:		channel.PendingClose.SettlementFee,
+		Penalties:		channel.PendingClose.Penalties,
+		PenaltyAllocations:	channel.PendingClose.PenaltyAllocations,
+		SettledHeight:		currentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -1862,11 +1862,11 @@ func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementReque
 	}
 	resolutions := mergeConditionResolutions(channel.PendingClose.ConditionProofs, req.ResolvedConditions)
 	if err := (SettlementArbitrationInput{
-		Operation:       SettlementArbitrationFinalSettlement,
-		ChannelID:       channel.ChannelID,
-		SignedState:     channel.PendingClose.State,
-		ConditionProofs: resolutions,
-		CurrentHeight:   req.CurrentHeight,
+		Operation:		SettlementArbitrationFinalSettlement,
+		ChannelID:		channel.ChannelID,
+		SignedState:		channel.PendingClose.State,
+		ConditionProofs:	resolutions,
+		CurrentHeight:		req.CurrentHeight,
 	}).ValidateForChannel(channel); err != nil {
 		return PaymentsState{}, SettlementRecord{}, err
 	}
@@ -1885,16 +1885,16 @@ func FinalizeSettlementWithRequest(state PaymentsState, req FinalSettlementReque
 		return PaymentsState{}, SettlementRecord{}, err
 	}
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          channel.PendingClose.State.StateHash,
-		Nonce:              channel.PendingClose.State.Nonce,
-		FinalBalances:      finalBalances,
-		SettlementFeeDenom: channel.PendingClose.SettlementFeeDenom,
-		SettlementFee:      channel.PendingClose.SettlementFee,
-		Penalties:          channel.PendingClose.Penalties,
-		PenaltyAllocations: channel.PendingClose.PenaltyAllocations,
-		SettledHeight:      req.CurrentHeight,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		channel.PendingClose.State.StateHash,
+		Nonce:			channel.PendingClose.State.Nonce,
+		FinalBalances:		finalBalances,
+		SettlementFeeDenom:	channel.PendingClose.SettlementFeeDenom,
+		SettlementFee:		channel.PendingClose.SettlementFee,
+		Penalties:		channel.PendingClose.Penalties,
+		PenaltyAllocations:	channel.PendingClose.PenaltyAllocations,
+		SettledHeight:		req.CurrentHeight,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	if err := settlement.ValidateForChannel(channel); err != nil {
@@ -2229,8 +2229,8 @@ func RoutePayment(state PaymentsState, from, to, amountText string, currentHeigh
 	candidates := activeEdgesForAmount(state.Edges, amount, currentHeight)
 	sortEdges(candidates)
 	type path struct {
-		node  string
-		edges []ChannelEdge
+		node	string
+		edges	[]ChannelEdge
 	}
 	queue := []path{{node: from}}
 	visitedDepth := map[string]int{from: 0}
@@ -2297,20 +2297,20 @@ func ApplyCongestionSnapshot(policy RoutePolicy, snapshot CongestionSnapshot) (R
 		return RoutePolicy{}, err
 	}
 	stats := EdgeRoutingStats{
-		ChannelID:              snapshot.ChannelID,
-		From:                   snapshot.From,
-		To:                     snapshot.To,
-		SuccessRateBps:         10_000 - snapshot.ChannelUpdateFailureRateBps,
-		LiquidityUpdatedHeight: snapshot.LiquidityUpdatedHeight,
-		CongestionBps:          snapshot.ChannelUpdateFailureRateBps,
-		NodeAvailabilityBps:    10_000,
-		FailureCount:           uint32(snapshot.ChannelUpdateFailureRateBps / 1_000),
-		PendingConditionCount:  snapshot.PendingConditionCount,
-		AvgResolutionLatency:   snapshot.AvgResolutionLatency,
-		RetryCount:             snapshot.RouteRetryCount,
-		ReservePressureBps:     snapshot.ReservePressureBps,
-		NodeQueueDelay:         snapshot.NodeQueueDelay,
-		LastUpdatedHeight:      snapshot.ObservedHeight,
+		ChannelID:		snapshot.ChannelID,
+		From:			snapshot.From,
+		To:			snapshot.To,
+		SuccessRateBps:		10_000 - snapshot.ChannelUpdateFailureRateBps,
+		LiquidityUpdatedHeight:	snapshot.LiquidityUpdatedHeight,
+		CongestionBps:		snapshot.ChannelUpdateFailureRateBps,
+		NodeAvailabilityBps:	10_000,
+		FailureCount:		uint32(snapshot.ChannelUpdateFailureRateBps / 1_000),
+		PendingConditionCount:	snapshot.PendingConditionCount,
+		AvgResolutionLatency:	snapshot.AvgResolutionLatency,
+		RetryCount:		snapshot.RouteRetryCount,
+		ReservePressureBps:	snapshot.ReservePressureBps,
+		NodeQueueDelay:		snapshot.NodeQueueDelay,
+		LastUpdatedHeight:	snapshot.ObservedHeight,
 	}
 	if snapshot.NodeQueueDelay > 0 {
 		stats.NodeAvailabilityBps = 10_000 - uint32Min(10_000, uint32(snapshot.NodeQueueDelay))
@@ -2328,12 +2328,12 @@ func ApplyRouteFailureReport(policy RoutePolicy, report RouteFailureReport) (Rou
 	stats, found := routeStatsForEdge(policy, ChannelEdge{ChannelID: report.ChannelID, From: report.From, To: report.To})
 	if !found {
 		stats = EdgeRoutingStats{
-			ChannelID:              report.ChannelID,
-			From:                   report.From,
-			To:                     report.To,
-			SuccessRateBps:         10_000,
-			NodeAvailabilityBps:    10_000,
-			LiquidityUpdatedHeight: report.ObservedHeight,
+			ChannelID:		report.ChannelID,
+			From:			report.From,
+			To:			report.To,
+			SuccessRateBps:		10_000,
+			NodeAvailabilityBps:	10_000,
+			LiquidityUpdatedHeight:	report.ObservedHeight,
 		}
 	}
 	stats.FailureCount++
@@ -2397,10 +2397,10 @@ func RetryPaymentRoute(state PaymentsState, store TopologyStore, req RouteRetryR
 		return RouteRetryResult{Attempts: uint32(len(req.Failures)) + 1, Retryable: false, Reason: err.Error()}, err
 	}
 	return RouteRetryResult{
-		Route:      route,
-		Attempts:   uint32(len(req.Failures)) + 1,
-		Retryable:  true,
-		PolicyHash: routePolicyHash(selection.Policy),
+		Route:		route,
+		Attempts:	uint32(len(req.Failures)) + 1,
+		Retryable:	true,
+		PolicyHash:	routePolicyHash(selection.Policy),
 	}, nil
 }
 
@@ -2472,16 +2472,16 @@ func CalculateHopRoutingFee(req HopFeeCalculationRequest) (RoutingHopFee, error)
 		return RoutingHopFee{}, errors.New("payments routing hop fee exceeds policy maximum")
 	}
 	return RoutingHopFee{
-		Denom:                   NativeDenom,
-		BaseHopFee:              base.String(),
-		ProportionalFee:         proportional.String(),
-		LiquidityReservationFee: reservation.String(),
-		VirtualChannelSetupFee:  virtualSetup.String(),
-		CongestionSurcharge:     congestion.String(),
-		FailurePenalty:          failurePenalty.String(),
-		RepeatedInvalidAttempts: req.RepeatedInvalidAttempts,
-		TotalFee:                total.String(),
-		PolicyHash:              policy.PolicyHash,
+		Denom:				NativeDenom,
+		BaseHopFee:			base.String(),
+		ProportionalFee:		proportional.String(),
+		LiquidityReservationFee:	reservation.String(),
+		VirtualChannelSetupFee:		virtualSetup.String(),
+		CongestionSurcharge:		congestion.String(),
+		FailurePenalty:			failurePenalty.String(),
+		RepeatedInvalidAttempts:	req.RepeatedInvalidAttempts,
+		TotalFee:			total.String(),
+		PolicyHash:			policy.PolicyHash,
 	}, nil
 }
 
@@ -2659,15 +2659,15 @@ func BuildForwardingPackets(route ScoredRoute, routeSeed string, routeNonce uint
 			return nil, err
 		}
 		packet := ForwardingPacket{
-			RouteID:        hopRouteID,
-			HopPaymentID:   hopPaymentID,
-			ChannelID:      edge.ChannelID,
-			ForwardingNode: edge.From,
-			NextNode:       edge.To,
-			Amount:         route.Amount,
-			FeeAmount:      edge.FeeAmount,
-			TimeoutHeight:  timeoutHeight,
-			NextPacketHash: nextHash,
+			RouteID:	hopRouteID,
+			HopPaymentID:	hopPaymentID,
+			ChannelID:	edge.ChannelID,
+			ForwardingNode:	edge.From,
+			NextNode:	edge.To,
+			Amount:		route.Amount,
+			FeeAmount:	edge.FeeAmount,
+			TimeoutHeight:	timeoutHeight,
+			NextPacketHash:	nextHash,
 		}.Normalize()
 		packet.PacketHash = ComputeForwardingPacketHash(packet)
 		packet.PacketID = HashParts("forwarding-packet-id", packet.PacketHash)
@@ -2718,11 +2718,11 @@ func RecordForwardingPacket(replayRecords []ForwardingPacketReplayRecord, packet
 		return nil, err
 	}
 	records := append(normalizeForwardingReplayRecords(replayRecords), ForwardingPacketReplayRecord{
-		PacketID:       packet.PacketID,
-		RouteID:        packet.RouteID,
-		HopPaymentID:   packet.HopPaymentID,
-		RecordedHeight: currentHeight,
-		ExpiresHeight:  currentHeight + DefaultReplayHorizon,
+		PacketID:	packet.PacketID,
+		RouteID:	packet.RouteID,
+		HopPaymentID:	packet.HopPaymentID,
+		RecordedHeight:	currentHeight,
+		ExpiresHeight:	currentHeight + DefaultReplayHorizon,
 	}.Normalize())
 	sortForwardingReplayRecords(records)
 	return records, nil
@@ -2748,14 +2748,14 @@ func PrivacySafeForwardingLog(packet ForwardingPacket, currentHeight uint64) (Fo
 		return ForwardingLogRecord{}, errors.New("payments forwarding log height must be positive")
 	}
 	record := ForwardingLogRecord{
-		PacketID:       packet.PacketID,
-		RouteID:        packet.RouteID,
-		HopPaymentID:   packet.HopPaymentID,
-		ChannelID:      packet.ChannelID,
-		ForwardingNode: packet.ForwardingNode,
-		NextNodeHash:   HashParts("forwarding-next-node", packet.NextNode),
-		AmountHash:     HashParts("forwarding-amount", packet.Amount, packet.FeeAmount),
-		RecordedHeight: currentHeight,
+		PacketID:	packet.PacketID,
+		RouteID:	packet.RouteID,
+		HopPaymentID:	packet.HopPaymentID,
+		ChannelID:	packet.ChannelID,
+		ForwardingNode:	packet.ForwardingNode,
+		NextNodeHash:	HashParts("forwarding-next-node", packet.NextNode),
+		AmountHash:	HashParts("forwarding-amount", packet.Amount, packet.FeeAmount),
+		RecordedHeight:	currentHeight,
 	}.Normalize()
 	return record, record.Validate()
 }
@@ -2789,24 +2789,24 @@ func BuildStoreV2Layout(state PaymentsState) (StoreV2Layout, error) {
 		participantKeys := make([]string, 0, len(channel.Participants))
 		for _, participant := range channel.Participants {
 			index := StoreV2ParticipantChannelRecord{
-				Key:         StoreV2ParticipantChannelKey(participant, channel.ChannelID),
-				Version:     StoreV2MigrationVersion,
-				Participant: participant,
-				ChannelID:   channel.ChannelID,
+				Key:		StoreV2ParticipantChannelKey(participant, channel.ChannelID),
+				Version:	StoreV2MigrationVersion,
+				Participant:	participant,
+				ChannelID:	channel.ChannelID,
 			}.Normalize()
 			layout.ParticipantChannels = append(layout.ParticipantChannels, index)
 			participantKeys = append(participantKeys, index.Key)
 		}
 		sortStrings(participantKeys)
 		record := StoreV2ChannelRecord{
-			Key:                     StoreV2ChannelKey(channel.ChannelID),
-			Version:                 StoreV2MigrationVersion,
-			ChannelID:               channel.ChannelID,
-			Channel:                 compact,
-			LatestStateHash:         channel.LatestState.StateHash,
-			LatestStateNonce:        channel.LatestState.Nonce,
-			ParticipantIndexKeys:    participantKeys,
-			RoutingAdvertisementKey: StoreV2RoutingKeyForChannel(channel),
+			Key:				StoreV2ChannelKey(channel.ChannelID),
+			Version:			StoreV2MigrationVersion,
+			ChannelID:			channel.ChannelID,
+			Channel:			compact,
+			LatestStateHash:		channel.LatestState.StateHash,
+			LatestStateNonce:		channel.LatestState.Nonce,
+			ParticipantIndexKeys:		participantKeys,
+			RoutingAdvertisementKey:	StoreV2RoutingKeyForChannel(channel),
 		}
 		layout.Channels = append(layout.Channels, record.Normalize())
 		addLatestHashCheckpoint := true
@@ -2818,67 +2818,67 @@ func BuildStoreV2Layout(state PaymentsState) (StoreV2Layout, error) {
 				addLatestHashCheckpoint = false
 			}
 			pending := StoreV2PendingCloseRecord{
-				Key:       StoreV2PendingCloseKey(channel.ChannelID),
-				Version:   StoreV2MigrationVersion,
-				ChannelID: channel.ChannelID,
-				Close:     channel.PendingClose,
+				Key:		StoreV2PendingCloseKey(channel.ChannelID),
+				Version:	StoreV2MigrationVersion,
+				ChannelID:	channel.ChannelID,
+				Close:		channel.PendingClose,
 			}.Normalize()
 			layout.PendingCloses = append(layout.PendingCloses, pending)
 			layout.Channels[len(layout.Channels)-1].PendingCloseKey = pending.Key
 			layout.ChannelStates = append(layout.ChannelStates, StoreV2ChannelStateRecord{
-				Key:              StoreV2ChannelStateKey(channel.ChannelID, channel.PendingClose.State.Nonce),
-				Version:          StoreV2MigrationVersion,
-				ChannelID:        channel.ChannelID,
-				Nonce:            channel.PendingClose.State.Nonce,
-				StateHash:        channel.PendingClose.State.StateHash,
-				FullState:        channel.PendingClose.State,
-				SubmittedOnChain: true,
-				CheckpointHeight: channel.PendingClose.SubmittedHeight,
+				Key:			StoreV2ChannelStateKey(channel.ChannelID, channel.PendingClose.State.Nonce),
+				Version:		StoreV2MigrationVersion,
+				ChannelID:		channel.ChannelID,
+				Nonce:			channel.PendingClose.State.Nonce,
+				StateHash:		channel.PendingClose.State.StateHash,
+				FullState:		channel.PendingClose.State,
+				SubmittedOnChain:	true,
+				CheckpointHeight:	channel.PendingClose.SubmittedHeight,
 			}.Normalize())
 			for _, condition := range channel.PendingClose.State.Conditions {
 				appendCondition(storeV2ConditionFromPayment(channel, condition, false))
 			}
 			for _, proof := range channel.PendingClose.FraudProofs {
 				layout.FraudProofs = append(layout.FraudProofs, StoreV2FraudProofRecord{
-					Key:       StoreV2FraudProofKey(proof.ProofID),
-					Version:   StoreV2MigrationVersion,
-					ProofID:   proof.ProofID,
-					ChannelID: channel.ChannelID,
-					Proof:     proof,
+					Key:		StoreV2FraudProofKey(proof.ProofID),
+					Version:	StoreV2MigrationVersion,
+					ProofID:	proof.ProofID,
+					ChannelID:	channel.ChannelID,
+					Proof:		proof,
 				}.Normalize())
 			}
 		}
 		if addLatestHashCheckpoint {
 			layout.ChannelStates = append(layout.ChannelStates, StoreV2ChannelStateRecord{
-				Key:              StoreV2ChannelStateKey(channel.ChannelID, channel.LatestState.Nonce),
-				Version:          StoreV2MigrationVersion,
-				ChannelID:        channel.ChannelID,
-				Nonce:            channel.LatestState.Nonce,
-				StateHash:        channel.LatestState.StateHash,
-				FullState:        compactStoreV2State(channel.LatestState),
-				SubmittedOnChain: false,
-				CheckpointHeight: channel.OpenHeight,
+				Key:			StoreV2ChannelStateKey(channel.ChannelID, channel.LatestState.Nonce),
+				Version:		StoreV2MigrationVersion,
+				ChannelID:		channel.ChannelID,
+				Nonce:			channel.LatestState.Nonce,
+				StateHash:		channel.LatestState.StateHash,
+				FullState:		compactStoreV2State(channel.LatestState),
+				SubmittedOnChain:	false,
+				CheckpointHeight:	channel.OpenHeight,
 			}.Normalize())
 		}
 	}
 	for _, vc := range state.VirtualChannels {
 		vc = vc.Normalize()
 		layout.VirtualChannels = append(layout.VirtualChannels, StoreV2VirtualChannelRecord{
-			Key:              StoreV2VirtualChannelKey(vc.VirtualChannelID),
-			Version:          StoreV2MigrationVersion,
-			VirtualChannelID: vc.VirtualChannelID,
-			Channel:          vc,
-			AnchorHash:       vc.AnchorCommitment,
+			Key:			StoreV2VirtualChannelKey(vc.VirtualChannelID),
+			Version:		StoreV2MigrationVersion,
+			VirtualChannelID:	vc.VirtualChannelID,
+			Channel:		vc,
+			AnchorHash:		vc.AnchorCommitment,
 		}.Normalize())
 	}
 	for _, tombstone := range state.ClosedChannels {
 		tombstone = tombstone.Normalize()
 		layout.SettlementTombstones = append(layout.SettlementTombstones, StoreV2SettlementTombstoneRecord{
-			Key:              StoreV2SettlementTombstoneKey(tombstone.ChannelID),
-			Version:          StoreV2MigrationVersion,
-			ChannelID:        tombstone.ChannelID,
-			Tombstone:        tombstone,
-			PruneAfterHeight: tombstone.ExpiresHeight,
+			Key:			StoreV2SettlementTombstoneKey(tombstone.ChannelID),
+			Version:		StoreV2MigrationVersion,
+			ChannelID:		tombstone.ChannelID,
+			Tombstone:		tombstone,
+			PruneAfterHeight:	tombstone.ExpiresHeight,
 		}.Normalize())
 	}
 	layout = layout.Normalize()
@@ -2942,9 +2942,9 @@ func QueryStoreV2ParticipantChannels(layout StoreV2Layout, req ParticipantChanne
 		next = end
 	}
 	return ParticipantChannelPageResponse{
-		Entries:    append([]StoreV2ParticipantChannelRecord(nil), matches[req.Offset:end]...),
-		NextOffset: next,
-		Total:      total,
+		Entries:	append([]StoreV2ParticipantChannelRecord(nil), matches[req.Offset:end]...),
+		NextOffset:	next,
+		Total:		total,
 	}, nil
 }
 
@@ -2961,36 +2961,36 @@ func BuildAdaptiveSyncSnapshot(state PaymentsState, height uint64) (AdaptiveSync
 		return AdaptiveSyncSnapshot{}, err
 	}
 	snapshot := AdaptiveSyncSnapshot{
-		Key:                     StoreV2AdaptiveSnapshotKey(height),
-		Version:                 StoreV2MigrationVersion,
-		Height:                  height,
-		Layout:                  layout,
-		ConsensusOnly:           true,
-		RoutingTopologyExcluded: true,
+		Key:				StoreV2AdaptiveSnapshotKey(height),
+		Version:			StoreV2MigrationVersion,
+		Height:				height,
+		Layout:				layout,
+		ConsensusOnly:			true,
+		RoutingTopologyExcluded:	true,
 	}
 	for _, channel := range state.Channels {
 		channel = channel.Normalize()
 		if channel.Status == ChannelStatusPendingClose && channel.PendingClose.State.StateHash != "" {
 			if channel.PendingClose.DisputeCount > 0 || channel.Finality == ChannelFinalityInDispute {
 				snapshot.ActiveDisputes = append(snapshot.ActiveDisputes, AdaptiveSyncActiveDisputeIndex{
-					Key:               StoreV2ActiveDisputeKey(channel.ChannelID),
-					ChannelID:         channel.ChannelID,
-					PendingStateHash:  channel.PendingClose.State.StateHash,
-					PendingNonce:      channel.PendingClose.State.Nonce,
-					SubmittedHeight:   channel.PendingClose.SubmittedHeight,
-					SettleAfterHeight: channel.PendingClose.SettleAfterHeight,
-					DisputeCount:      channel.PendingClose.DisputeCount,
-					Submitter:         channel.PendingClose.Submitter,
+					Key:			StoreV2ActiveDisputeKey(channel.ChannelID),
+					ChannelID:		channel.ChannelID,
+					PendingStateHash:	channel.PendingClose.State.StateHash,
+					PendingNonce:		channel.PendingClose.State.Nonce,
+					SubmittedHeight:	channel.PendingClose.SubmittedHeight,
+					SettleAfterHeight:	channel.PendingClose.SettleAfterHeight,
+					DisputeCount:		channel.PendingClose.DisputeCount,
+					Submitter:		channel.PendingClose.Submitter,
 				}.Normalize())
 			}
 			if pendingHeight, ok := PendingFinalizationHeightForChannel(channel); ok {
 				snapshot.PendingFinalizations = append(snapshot.PendingFinalizations, AdaptiveSyncPendingFinalizationIndex{
-					Key:              StoreV2PendingFinalizationKey(channel.ChannelID),
-					ChannelID:        channel.ChannelID,
-					PendingHeight:    pendingHeight,
-					Finality:         channel.Finality,
-					PendingStateHash: channel.PendingClose.State.StateHash,
-					PendingNonce:     channel.PendingClose.State.Nonce,
+					Key:			StoreV2PendingFinalizationKey(channel.ChannelID),
+					ChannelID:		channel.ChannelID,
+					PendingHeight:		pendingHeight,
+					Finality:		channel.Finality,
+					PendingStateHash:	channel.PendingClose.State.StateHash,
+					PendingNonce:		channel.PendingClose.State.Nonce,
 				}.Normalize())
 			}
 		}
@@ -2998,9 +2998,9 @@ func BuildAdaptiveSyncSnapshot(state PaymentsState, height uint64) (AdaptiveSync
 	for _, event := range state.Events {
 		event = event.Normalize()
 		snapshot.WatcherReplayEvents = append(snapshot.WatcherReplayEvents, AdaptiveSyncWatcherReplayEvent{
-			Key:       StoreV2WatcherReplayEventKey(event.Height, event.EventID),
-			Event:     event,
-			EventHash: AdaptiveSyncEventHash(event),
+			Key:		StoreV2WatcherReplayEventKey(event.Height, event.EventID),
+			Event:		event,
+			EventHash:	AdaptiveSyncEventHash(event),
 		}.Normalize())
 	}
 	snapshot = snapshot.Normalize()
@@ -3079,26 +3079,26 @@ func (s PaymentsState) Export() PaymentsState {
 
 func (s PaymentsState) Clone() PaymentsState {
 	out := PaymentsState{
-		Channels:                 make([]ChannelRecord, len(s.Channels)),
-		Edges:                    make([]ChannelEdge, len(s.Edges)),
-		VirtualChannels:          make([]VirtualChannel, len(s.VirtualChannels)),
-		Settlements:              make([]SettlementRecord, len(s.Settlements)),
-		Batches:                  make([]SettlementBatch, len(s.Batches)),
-		CustodyLocks:             make([]CustodyLock, len(s.CustodyLocks)),
-		ClosedChannels:           make([]ClosedChannelTombstone, len(s.ClosedChannels)),
-		ConditionClaims:          make([]ConditionClaimRecord, len(s.ConditionClaims)),
-		ValidatorPaymentServices: make([]ValidatorPaymentServiceMetadata, len(s.ValidatorPaymentServices)),
-		ValidatorWatchRegistries: make([]ValidatorWatchRegistration, len(s.ValidatorWatchRegistries)),
-		FeeSchedule:              s.FeeSchedule.Normalize(),
-		FeeMultipliers:           make([]PaymentFeeMultiplier, len(s.FeeMultipliers)),
-		FeeCharges:               make([]PaymentFeeCharge, len(s.FeeCharges)),
-		FeeRefunds:               make([]PaymentFeeRefund, len(s.FeeRefunds)),
-		SecurityReserveHooks:     make([]SecurityReserveAllocationHook, len(s.SecurityReserveHooks)),
-		InclusionLatencies:       make([]SettlementInclusionLatency, len(s.InclusionLatencies)),
-		AsyncFinalizationQueue:   make([]AsyncFinalizationJob, len(s.AsyncFinalizationQueue)),
-		AsyncPromiseExpiryQueue:  make([]AsyncPromiseExpiryJob, len(s.AsyncPromiseExpiryQueue)),
-		AsyncCompletions:         make([]AsyncSettlementCompletion, len(s.AsyncCompletions)),
-		Events:                   make([]PaymentEvent, len(s.Events)),
+		Channels:			make([]ChannelRecord, len(s.Channels)),
+		Edges:				make([]ChannelEdge, len(s.Edges)),
+		VirtualChannels:		make([]VirtualChannel, len(s.VirtualChannels)),
+		Settlements:			make([]SettlementRecord, len(s.Settlements)),
+		Batches:			make([]SettlementBatch, len(s.Batches)),
+		CustodyLocks:			make([]CustodyLock, len(s.CustodyLocks)),
+		ClosedChannels:			make([]ClosedChannelTombstone, len(s.ClosedChannels)),
+		ConditionClaims:		make([]ConditionClaimRecord, len(s.ConditionClaims)),
+		ValidatorPaymentServices:	make([]ValidatorPaymentServiceMetadata, len(s.ValidatorPaymentServices)),
+		ValidatorWatchRegistries:	make([]ValidatorWatchRegistration, len(s.ValidatorWatchRegistries)),
+		FeeSchedule:			s.FeeSchedule.Normalize(),
+		FeeMultipliers:			make([]PaymentFeeMultiplier, len(s.FeeMultipliers)),
+		FeeCharges:			make([]PaymentFeeCharge, len(s.FeeCharges)),
+		FeeRefunds:			make([]PaymentFeeRefund, len(s.FeeRefunds)),
+		SecurityReserveHooks:		make([]SecurityReserveAllocationHook, len(s.SecurityReserveHooks)),
+		InclusionLatencies:		make([]SettlementInclusionLatency, len(s.InclusionLatencies)),
+		AsyncFinalizationQueue:		make([]AsyncFinalizationJob, len(s.AsyncFinalizationQueue)),
+		AsyncPromiseExpiryQueue:	make([]AsyncPromiseExpiryJob, len(s.AsyncPromiseExpiryQueue)),
+		AsyncCompletions:		make([]AsyncSettlementCompletion, len(s.AsyncCompletions)),
+		Events:				make([]PaymentEvent, len(s.Events)),
 	}
 	for i, channel := range s.Channels {
 		out.Channels[i] = channel.Normalize()
@@ -3296,13 +3296,13 @@ func (s PaymentsState) StateHashDebug(channelID string) (StateHashDebug, error) 
 		return StateHashDebug{}, errors.New("payments channel not found")
 	}
 	debug := StateHashDebug{
-		ChannelID:               channel.ChannelID,
-		Status:                  channel.Status,
-		LatestNonce:             channel.LatestState.Nonce,
-		LatestStateHash:         channel.LatestState.StateHash,
-		ComputedLatestStateHash: ComputeStateHash(channel.LatestState),
-		FinalizedNonce:          channel.FinalizedNonce,
-		DisputedNonce:           channel.DisputedNonce,
+		ChannelID:			channel.ChannelID,
+		Status:				channel.Status,
+		LatestNonce:			channel.LatestState.Nonce,
+		LatestStateHash:		channel.LatestState.StateHash,
+		ComputedLatestStateHash:	ComputeStateHash(channel.LatestState),
+		FinalizedNonce:			channel.FinalizedNonce,
+		DisputedNonce:			channel.DisputedNonce,
 	}
 	if channel.PendingClose.State.StateHash != "" {
 		debug.PendingNonce = channel.PendingClose.State.Nonce
@@ -4052,22 +4052,22 @@ func appendSettlementReplayRecords(state *PaymentsState, channel ChannelRecord, 
 	channel = channel.Normalize()
 	settlement = settlement.Normalize()
 	tombstone := ClosedChannelTombstone{
-		ChainID:        channel.ChainID,
-		ChannelID:      channel.ChannelID,
-		FinalizedNonce: settlement.Nonce,
-		StateHash:      settlement.StateHash,
-		ClosedHeight:   height,
-		ExpiresHeight:  height + DefaultReplayHorizon,
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		FinalizedNonce:	settlement.Nonce,
+		StateHash:	settlement.StateHash,
+		ClosedHeight:	height,
+		ExpiresHeight:	height + DefaultReplayHorizon,
 	}.Normalize()
 	state.ClosedChannels = upsertClosedChannelTombstone(state.ClosedChannels, tombstone)
 	for _, resolution := range normalizeConditionResolutions(resolutions) {
 		state.ConditionClaims = append(state.ConditionClaims, ConditionClaimRecord{
-			ChainID:        channel.ChainID,
-			ChannelID:      channel.ChannelID,
-			ConditionID:    resolution.ConditionID,
-			EvidenceHash:   resolution.EvidenceHash,
-			ResolvedHeight: height,
-			ExpiresHeight:  height + DefaultReplayHorizon,
+			ChainID:	channel.ChainID,
+			ChannelID:	channel.ChannelID,
+			ConditionID:	resolution.ConditionID,
+			EvidenceHash:	resolution.EvidenceHash,
+			ResolvedHeight:	height,
+			ExpiresHeight:	height + DefaultReplayHorizon,
 		}.Normalize())
 	}
 }
@@ -4368,15 +4368,15 @@ func virtualReserveReleasesFromClose(proof VirtualCloseProof, current VirtualCha
 			amount = share.String()
 		}
 		release := VirtualReserveRelease{
-			SegmentID:         HashParts("virtual-release-segment", current.VirtualChannelID, commitment),
-			VirtualChannelID:  current.VirtualChannelID,
-			ParentChannelID:   parentID,
-			ReserveCommitment: commitment,
-			Capacity:          amount,
-			BalanceA:          proof.FinalState.BalanceA,
-			BalanceB:          proof.FinalState.BalanceB,
-			FeeAmount:         current.RoutingFeeAmount,
-			ReleaseHeight:     proof.ReleaseHeight,
+			SegmentID:		HashParts("virtual-release-segment", current.VirtualChannelID, commitment),
+			VirtualChannelID:	current.VirtualChannelID,
+			ParentChannelID:	parentID,
+			ReserveCommitment:	commitment,
+			Capacity:		amount,
+			BalanceA:		proof.FinalState.BalanceA,
+			BalanceB:		proof.FinalState.BalanceB,
+			FeeAmount:		current.RoutingFeeAmount,
+			ReleaseHeight:		proof.ReleaseHeight,
 		}
 		release.ReleaseHash = HashParts("virtual-reserve-release", release.SegmentID, release.VirtualChannelID, release.ParentChannelID, release.ReserveCommitment, release.Capacity, release.BalanceA, release.BalanceB, fmt.Sprintf("%020d", release.ReleaseHeight))
 		releases = append(releases, release.Normalize())
@@ -4406,10 +4406,10 @@ func virtualActivationReserveCommitments(proof VirtualActivationProof) []string 
 }
 
 type routeSearchPath struct {
-	node  string
-	edges []ChannelEdge
-	cost  sdkmath.Int
-	fee   sdkmath.Int
+	node	string
+	edges	[]ChannelEdge
+	cost	sdkmath.Int
+	fee	sdkmath.Int
 }
 
 func selectPaymentRouteWithPolicy(state PaymentsState, store TopologyStore, req RouteSelectionRequest, amount sdkmath.Int) (ScoredRoute, error) {
@@ -4785,11 +4785,11 @@ func buildScoredRoute(edges []ChannelEdge, amount, totalFee, totalCost sdkmath.I
 		parts = append(parts, edgeKey(edge), edge.Capacity, edge.FeeAmount, fmt.Sprintf("%020d", edge.ExpiresHeight))
 	}
 	route := ScoredRoute{
-		Edges:       append([]ChannelEdge(nil), edges...),
-		Amount:      amount.String(),
-		TotalFee:    totalFee.String(),
-		TotalCost:   totalCost.String(),
-		MinCapacity: minCapacity.String(),
+		Edges:		append([]ChannelEdge(nil), edges...),
+		Amount:		amount.String(),
+		TotalFee:	totalFee.String(),
+		TotalCost:	totalCost.String(),
+		MinCapacity:	minCapacity.String(),
 	}
 	route.ScoreHash = HashParts(parts...)
 	route = route.Normalize()
@@ -4821,10 +4821,10 @@ func buildMultiPathRoute(parts []ScoredRoute) (MultiPathRoute, error) {
 		hashParts = append(hashParts, part.ScoreHash)
 	}
 	out := MultiPathRoute{
-		Parts:       append([]ScoredRoute(nil), parts...),
-		TotalAmount: totalAmount.String(),
-		TotalFee:    totalFee.String(),
-		ScoreHash:   HashParts(hashParts...),
+		Parts:		append([]ScoredRoute(nil), parts...),
+		TotalAmount:	totalAmount.String(),
+		TotalFee:	totalFee.String(),
+		ScoreHash:	HashParts(hashParts...),
 	}
 	return out, nil
 }
@@ -5215,10 +5215,10 @@ func feeMultiplierForClass(state PaymentsState, feeClass PaymentFeeClass, schedu
 func feeChannelForVirtual(vc VirtualChannel) ChannelRecord {
 	vc = vc.Normalize()
 	return ChannelRecord{
-		ChainID:      vc.ChainID,
-		ChannelID:    vc.VirtualChannelID,
-		Participants: vc.Endpoints,
-		LatestState:  ChannelState{StateHash: vc.StateHash},
+		ChainID:	vc.ChainID,
+		ChannelID:	vc.VirtualChannelID,
+		Participants:	vc.Endpoints,
+		LatestState:	ChannelState{StateHash: vc.StateHash},
 	}
 }
 
@@ -5324,13 +5324,13 @@ func appendAsyncCompletion(state PaymentsState, jobID, jobType, channelID, objec
 		}
 	}
 	completion := AsyncSettlementCompletion{
-		CompletionID: HashParts("async-settlement-completion", jobID, resultHash, fmt.Sprintf("%020d", height)),
-		JobID:        jobID,
-		JobType:      jobType,
-		ChannelID:    channelID,
-		ObjectID:     objectID,
-		ResultHash:   resultHash,
-		Height:       height,
+		CompletionID:	HashParts("async-settlement-completion", jobID, resultHash, fmt.Sprintf("%020d", height)),
+		JobID:		jobID,
+		JobType:	jobType,
+		ChannelID:	channelID,
+		ObjectID:	objectID,
+		ResultHash:	resultHash,
+		Height:		height,
 	}.Normalize()
 	state.AsyncCompletions = append(state.AsyncCompletions, completion)
 	state.Events = append(state.Events, AsyncSettlementCompletionEvent(completion))

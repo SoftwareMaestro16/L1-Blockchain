@@ -12,65 +12,65 @@ import (
 )
 
 const (
-	AVMStateAccessRead  AVMStateAccessMode = "read"
-	AVMStateAccessWrite AVMStateAccessMode = "write"
+	AVMStateAccessRead	AVMStateAccessMode	= "read"
+	AVMStateAccessWrite	AVMStateAccessMode	= "write"
 
-	AVMStateAccessTargetZone     AVMStateAccessTarget = "zone"
-	AVMStateAccessTargetActor    AVMStateAccessTarget = "actor"
-	AVMStateAccessTargetContract AVMStateAccessTarget = "contract"
+	AVMStateAccessTargetZone	AVMStateAccessTarget	= "zone"
+	AVMStateAccessTargetActor	AVMStateAccessTarget	= "actor"
+	AVMStateAccessTargetContract	AVMStateAccessTarget	= "contract"
 )
 
 type AVMStateAccessMode string
 type AVMStateAccessTarget string
 
 type AVMNonceKeeper struct {
-	States     []AVMReplayNonceState
-	KeeperRoot string
+	States		[]AVMReplayNonceState
+	KeeperRoot	string
 }
 
 type AVMReplayTombstoneStore struct {
-	ConsumedTombstones []AVMAsyncReplayTombstone
-	ExpiredNonces      []AVMExpiredNonceTombstone
-	StoreRoot          string
+	ConsumedTombstones	[]AVMAsyncReplayTombstone
+	ExpiredNonces		[]AVMExpiredNonceTombstone
+	StoreRoot		string
 }
 
 type AVMZoneAccessCapability struct {
-	SourceZone      zonestypes.ZoneID
-	ActorIDOptional string
-	ContractAddress string
-	CapabilityHash  string
+	SourceZone	zonestypes.ZoneID
+	ActorIDOptional	string
+	ContractAddress	string
+	CapabilityHash	string
 }
 
 type AVMStateAccessRequest struct {
-	SourceZone      zonestypes.ZoneID
-	TargetZone      zonestypes.ZoneID
-	Mode            AVMStateAccessMode
-	Target          AVMStateAccessTarget
-	ActorIDOptional string
-	ContractAddress string
-	StateKey        string
-	ProofHash       string
-	ReadOnlyProof   bool
-	RequestHash     string
+	SourceZone	zonestypes.ZoneID
+	TargetZone	zonestypes.ZoneID
+	Mode		AVMStateAccessMode
+	Target		AVMStateAccessTarget
+	ActorIDOptional	string
+	ContractAddress	string
+	StateKey	string
+	ProofHash	string
+	ReadOnlyProof	bool
+	RequestHash	string
 }
 
 type AVMSchedulerRetryBound struct {
-	MessageID   string
-	Attempt     uint32
-	MaxAttempts uint32
+	MessageID	string
+	Attempt		uint32
+	MaxAttempts	uint32
 }
 
 type AVMSchedulerSafetyCheck struct {
-	ZoneID                      zonestypes.ZoneID
-	Height                      uint64
-	ReadyMessages               []AVMAsyncMessage
-	ExpiredMessages             []AVMAsyncMessage
-	Budget                      zonestypes.ZoneExecutionBudget
-	RetryBounds                 []AVMSchedulerRetryBound
-	RequireSenderNonceOrdering  bool
-	RejectedEarlyMessageIDs     []string
-	RejectedExpiredExecutionIDs []string
-	SchedulerCheckHash          string
+	ZoneID				zonestypes.ZoneID
+	Height				uint64
+	ReadyMessages			[]AVMAsyncMessage
+	ExpiredMessages			[]AVMAsyncMessage
+	Budget				zonestypes.ZoneExecutionBudget
+	RetryBounds			[]AVMSchedulerRetryBound
+	RequireSenderNonceOrdering	bool
+	RejectedEarlyMessageIDs		[]string
+	RejectedExpiredExecutionIDs	[]string
+	SchedulerCheckHash		string
 }
 
 func NewAVMNonceKeeper(keeper AVMNonceKeeper) (AVMNonceKeeper, error) {
@@ -323,13 +323,13 @@ func NewAVMSchedulerSafetyCheck(queue AVMZoneQueue, messages []AVMAsyncMessage, 
 		return AVMSchedulerSafetyCheck{}, err
 	}
 	check := AVMSchedulerSafetyCheck{
-		ZoneID:                     queue.ZoneID,
-		Height:                     height,
-		ReadyMessages:              selection.Ready,
-		ExpiredMessages:            selection.Expired,
-		Budget:                     selection.Budget,
-		RetryBounds:                append([]AVMSchedulerRetryBound(nil), retryBounds...),
-		RequireSenderNonceOrdering: requireSenderNonceOrdering,
+		ZoneID:				queue.ZoneID,
+		Height:				height,
+		ReadyMessages:			selection.Ready,
+		ExpiredMessages:		selection.Expired,
+		Budget:				selection.Budget,
+		RetryBounds:			append([]AVMSchedulerRetryBound(nil), retryBounds...),
+		RequireSenderNonceOrdering:	requireSenderNonceOrdering,
 	}
 	for _, msg := range messages {
 		msg = canonicalAVMAsyncMessage(msg)

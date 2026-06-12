@@ -8,22 +8,22 @@ import (
 )
 
 type ExportManifest struct {
-	Height                 uint64
-	AppHash                string
-	GlobalRoot             string
-	ZonesRoot              string
-	ServicesRoot           string
-	IdentityRoot           string
-	StorageRoot            string
-	MessageRoot            string
-	ReceiptsRoot           string
-	RoutingRoot            string
-	PaymentsRoot           string
-	ContractsRoot          string
-	VMRoot                 string
-	ZoneCommitmentCount    uint64
-	ServiceDescriptorCount uint64
-	ManifestHash           string
+	Height			uint64
+	AppHash			string
+	GlobalRoot		string
+	ZonesRoot		string
+	ServicesRoot		string
+	IdentityRoot		string
+	StorageRoot		string
+	MessageRoot		string
+	ReceiptsRoot		string
+	RoutingRoot		string
+	PaymentsRoot		string
+	ContractsRoot		string
+	VMRoot			string
+	ZoneCommitmentCount	uint64
+	ServiceDescriptorCount	uint64
+	ManifestHash		string
 }
 
 func NewExportManifest(root GlobalStateRoot, appHash string, state AetraCoreState) (ExportManifest, error) {
@@ -37,21 +37,21 @@ func NewExportManifest(root GlobalStateRoot, appHash string, state AetraCoreStat
 		return ExportManifest{}, err
 	}
 	manifest := ExportManifest{
-		Height:                 root.Height,
-		AppHash:                appHash,
-		GlobalRoot:             root.GlobalRoot,
-		ZonesRoot:              root.ZonesRoot,
-		ServicesRoot:           root.ServicesRoot,
-		IdentityRoot:           root.IdentityRoot,
-		StorageRoot:            root.StorageRoot,
-		MessageRoot:            root.MessageRoot,
-		ReceiptsRoot:           root.ReceiptsRoot,
-		RoutingRoot:            root.RoutingRoot,
-		PaymentsRoot:           root.PaymentsRoot,
-		ContractsRoot:          root.ContractsRoot,
-		VMRoot:                 root.VMRoot,
-		ZoneCommitmentCount:    uint64(len(state.CommitmentsAtHeight(root.Height))),
-		ServiceDescriptorCount: uint64(len(state.ServiceDescriptors)),
+		Height:			root.Height,
+		AppHash:		appHash,
+		GlobalRoot:		root.GlobalRoot,
+		ZonesRoot:		root.ZonesRoot,
+		ServicesRoot:		root.ServicesRoot,
+		IdentityRoot:		root.IdentityRoot,
+		StorageRoot:		root.StorageRoot,
+		MessageRoot:		root.MessageRoot,
+		ReceiptsRoot:		root.ReceiptsRoot,
+		RoutingRoot:		root.RoutingRoot,
+		PaymentsRoot:		root.PaymentsRoot,
+		ContractsRoot:		root.ContractsRoot,
+		VMRoot:			root.VMRoot,
+		ZoneCommitmentCount:	uint64(len(state.CommitmentsAtHeight(root.Height))),
+		ServiceDescriptorCount:	uint64(len(state.ServiceDescriptors)),
 	}
 	manifest.ManifestHash = ComputeExportManifestHash(manifest)
 	return manifest, nil

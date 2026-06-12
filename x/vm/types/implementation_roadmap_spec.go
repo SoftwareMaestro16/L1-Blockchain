@@ -10,124 +10,124 @@ import (
 )
 
 const (
-	AVMRoadmapPhase0 AVMImplementationRoadmapPhaseID = "phase_0_specification_and_test_vectors"
-	AVMRoadmapPhase1 AVMImplementationRoadmapPhaseID = "phase_1_sync_router"
-	AVMRoadmapPhase2 AVMImplementationRoadmapPhaseID = "phase_2_async_engine"
-	AVMRoadmapPhase3 AVMImplementationRoadmapPhaseID = "phase_3_cross_zone_routing"
-	AVMRoadmapPhase4 AVMImplementationRoadmapPhaseID = "phase_4_actor_runtime"
-	AVMRoadmapPhase5 AVMImplementationRoadmapPhaseID = "phase_5_continuations"
-	AVMRoadmapPhase6 AVMImplementationRoadmapPhaseID = "phase_6_contract_backends"
-	AVMRoadmapPhase7 AVMImplementationRoadmapPhaseID = "phase_7_interface_system"
-	AVMRoadmapPhase8 AVMImplementationRoadmapPhaseID = "phase_8_performance_and_hardening"
+	AVMRoadmapPhase0	AVMImplementationRoadmapPhaseID	= "phase_0_specification_and_test_vectors"
+	AVMRoadmapPhase1	AVMImplementationRoadmapPhaseID	= "phase_1_sync_router"
+	AVMRoadmapPhase2	AVMImplementationRoadmapPhaseID	= "phase_2_async_engine"
+	AVMRoadmapPhase3	AVMImplementationRoadmapPhaseID	= "phase_3_cross_zone_routing"
+	AVMRoadmapPhase4	AVMImplementationRoadmapPhaseID	= "phase_4_actor_runtime"
+	AVMRoadmapPhase5	AVMImplementationRoadmapPhaseID	= "phase_5_continuations"
+	AVMRoadmapPhase6	AVMImplementationRoadmapPhaseID	= "phase_6_contract_backends"
+	AVMRoadmapPhase7	AVMImplementationRoadmapPhaseID	= "phase_7_interface_system"
+	AVMRoadmapPhase8	AVMImplementationRoadmapPhaseID	= "phase_8_performance_and_hardening"
 
-	AVMRoadmapTaskCanonicalAsyncMessageEncoding AVMImplementationRoadmapTask = "define_canonical_async_message_encoding"
-	AVMRoadmapTaskMessageIDDerivation           AVMImplementationRoadmapTask = "define_message_id_derivation"
-	AVMRoadmapTaskDeterministicQueueSortKey     AVMImplementationRoadmapTask = "define_deterministic_queue_sort_key"
-	AVMRoadmapTaskExecutionReceiptSchema        AVMImplementationRoadmapTask = "define_execution_receipt_schema"
-	AVMRoadmapTaskAVMRootSchema                 AVMImplementationRoadmapTask = "define_avm_root_schema"
-	AVMRoadmapTaskGasPolicySchema               AVMImplementationRoadmapTask = "define_gas_policy_schema"
-	AVMRoadmapTaskInterfaceDescriptorSchema     AVMImplementationRoadmapTask = "define_interface_descriptor_schema"
+	AVMRoadmapTaskCanonicalAsyncMessageEncoding	AVMImplementationRoadmapTask	= "define_canonical_async_message_encoding"
+	AVMRoadmapTaskMessageIDDerivation		AVMImplementationRoadmapTask	= "define_message_id_derivation"
+	AVMRoadmapTaskDeterministicQueueSortKey		AVMImplementationRoadmapTask	= "define_deterministic_queue_sort_key"
+	AVMRoadmapTaskExecutionReceiptSchema		AVMImplementationRoadmapTask	= "define_execution_receipt_schema"
+	AVMRoadmapTaskAVMRootSchema			AVMImplementationRoadmapTask	= "define_avm_root_schema"
+	AVMRoadmapTaskGasPolicySchema			AVMImplementationRoadmapTask	= "define_gas_policy_schema"
+	AVMRoadmapTaskInterfaceDescriptorSchema		AVMImplementationRoadmapTask	= "define_interface_descriptor_schema"
 
-	AVMRoadmapTaskRouterSkeleton       AVMImplementationRoadmapTask = "implement_avm_router_skeleton"
-	AVMRoadmapTaskSyncEngineWrapper    AVMImplementationRoadmapTask = "route_msgserver_calls_through_sync_engine_wrapper"
-	AVMRoadmapTaskSyncReceipts         AVMImplementationRoadmapTask = "add_execution_receipts_for_routed_sync_messages"
-	AVMRoadmapTaskZoneRouteDescriptors AVMImplementationRoadmapTask = "add_zone_route_descriptors"
-	AVMRoadmapTaskAVMRootPlaceholder   AVMImplementationRoadmapTask = "add_avm_root_placeholder"
+	AVMRoadmapTaskRouterSkeleton		AVMImplementationRoadmapTask	= "implement_avm_router_skeleton"
+	AVMRoadmapTaskSyncEngineWrapper		AVMImplementationRoadmapTask	= "route_msgserver_calls_through_sync_engine_wrapper"
+	AVMRoadmapTaskSyncReceipts		AVMImplementationRoadmapTask	= "add_execution_receipts_for_routed_sync_messages"
+	AVMRoadmapTaskZoneRouteDescriptors	AVMImplementationRoadmapTask	= "add_zone_route_descriptors"
+	AVMRoadmapTaskAVMRootPlaceholder	AVMImplementationRoadmapTask	= "add_avm_root_placeholder"
 
-	AVMRoadmapTaskAsyncMessageStore AVMImplementationRoadmapTask = "implement_async_message_store"
-	AVMRoadmapTaskZoneQueues        AVMImplementationRoadmapTask = "implement_zone_queues"
-	AVMRoadmapTaskDelayedQueue      AVMImplementationRoadmapTask = "implement_delayed_queue"
-	AVMRoadmapTaskRetryQueue        AVMImplementationRoadmapTask = "implement_retry_queue"
-	AVMRoadmapTaskDeadLetterQueue   AVMImplementationRoadmapTask = "implement_dead_letter_queue"
-	AVMRoadmapTaskReplayTombstones  AVMImplementationRoadmapTask = "implement_replay_tombstones"
-	AVMRoadmapTaskQueueRoots        AVMImplementationRoadmapTask = "add_queue_roots"
+	AVMRoadmapTaskAsyncMessageStore	AVMImplementationRoadmapTask	= "implement_async_message_store"
+	AVMRoadmapTaskZoneQueues	AVMImplementationRoadmapTask	= "implement_zone_queues"
+	AVMRoadmapTaskDelayedQueue	AVMImplementationRoadmapTask	= "implement_delayed_queue"
+	AVMRoadmapTaskRetryQueue	AVMImplementationRoadmapTask	= "implement_retry_queue"
+	AVMRoadmapTaskDeadLetterQueue	AVMImplementationRoadmapTask	= "implement_dead_letter_queue"
+	AVMRoadmapTaskReplayTombstones	AVMImplementationRoadmapTask	= "implement_replay_tombstones"
+	AVMRoadmapTaskQueueRoots	AVMImplementationRoadmapTask	= "add_queue_roots"
 
-	AVMRoadmapTaskZoneMetadata             AVMImplementationRoadmapTask = "add_source_and_destination_zone_metadata"
-	AVMRoadmapTaskZoneMessageFilters       AVMImplementationRoadmapTask = "add_zone_message_filters"
-	AVMRoadmapTaskCrossZoneInboxOutboxRoot AVMImplementationRoadmapTask = "add_cross_zone_inbox_and_outbox_roots"
-	AVMRoadmapTaskBounceSystem             AVMImplementationRoadmapTask = "add_bounce_system"
-	AVMRoadmapTaskCrossZoneValueAccounting AVMImplementationRoadmapTask = "add_cross_zone_value_accounting"
-	AVMRoadmapTaskCrossZoneProofQueries    AVMImplementationRoadmapTask = "add_cross_zone_proof_queries"
+	AVMRoadmapTaskZoneMetadata		AVMImplementationRoadmapTask	= "add_source_and_destination_zone_metadata"
+	AVMRoadmapTaskZoneMessageFilters	AVMImplementationRoadmapTask	= "add_zone_message_filters"
+	AVMRoadmapTaskCrossZoneInboxOutboxRoot	AVMImplementationRoadmapTask	= "add_cross_zone_inbox_and_outbox_roots"
+	AVMRoadmapTaskBounceSystem		AVMImplementationRoadmapTask	= "add_bounce_system"
+	AVMRoadmapTaskCrossZoneValueAccounting	AVMImplementationRoadmapTask	= "add_cross_zone_value_accounting"
+	AVMRoadmapTaskCrossZoneProofQueries	AVMImplementationRoadmapTask	= "add_cross_zone_proof_queries"
 
-	AVMRoadmapTaskActorRecords         AVMImplementationRoadmapTask = "implement_actor_records"
-	AVMRoadmapTaskActorMailboxes       AVMImplementationRoadmapTask = "implement_actor_mailboxes"
-	AVMRoadmapTaskActorHandlerDispatch AVMImplementationRoadmapTask = "implement_actor_handler_dispatch"
-	AVMRoadmapTaskActorStateIsolation  AVMImplementationRoadmapTask = "implement_actor_state_isolation"
-	AVMRoadmapTaskActorReceiptEmission AVMImplementationRoadmapTask = "add_actor_receipt_emission"
-	AVMRoadmapTaskActorStateProofQuery AVMImplementationRoadmapTask = "add_actor_state_proof_query"
+	AVMRoadmapTaskActorRecords		AVMImplementationRoadmapTask	= "implement_actor_records"
+	AVMRoadmapTaskActorMailboxes		AVMImplementationRoadmapTask	= "implement_actor_mailboxes"
+	AVMRoadmapTaskActorHandlerDispatch	AVMImplementationRoadmapTask	= "implement_actor_handler_dispatch"
+	AVMRoadmapTaskActorStateIsolation	AVMImplementationRoadmapTask	= "implement_actor_state_isolation"
+	AVMRoadmapTaskActorReceiptEmission	AVMImplementationRoadmapTask	= "add_actor_receipt_emission"
+	AVMRoadmapTaskActorStateProofQuery	AVMImplementationRoadmapTask	= "add_actor_state_proof_query"
 
-	AVMRoadmapTaskContinuationState         AVMImplementationRoadmapTask = "implement_continuation_state"
-	AVMRoadmapTaskResumeQueue               AVMImplementationRoadmapTask = "implement_resume_queue"
-	AVMRoadmapTaskContinuationExpiry        AVMImplementationRoadmapTask = "implement_expiry_handling"
-	AVMRoadmapTaskContinuationGasAccounting AVMImplementationRoadmapTask = "implement_continuation_gas_accounting"
-	AVMRoadmapTaskContinuationProofQuery    AVMImplementationRoadmapTask = "add_continuation_proof_query"
+	AVMRoadmapTaskContinuationState		AVMImplementationRoadmapTask	= "implement_continuation_state"
+	AVMRoadmapTaskResumeQueue		AVMImplementationRoadmapTask	= "implement_resume_queue"
+	AVMRoadmapTaskContinuationExpiry	AVMImplementationRoadmapTask	= "implement_expiry_handling"
+	AVMRoadmapTaskContinuationGasAccounting	AVMImplementationRoadmapTask	= "implement_continuation_gas_accounting"
+	AVMRoadmapTaskContinuationProofQuery	AVMImplementationRoadmapTask	= "add_continuation_proof_query"
 
-	AVMRoadmapTaskAVMNativeContractBackend AVMImplementationRoadmapTask = "implement_avm_native_contract_backend"
-	AVMRoadmapTaskWASMAdapterBoundary      AVMImplementationRoadmapTask = "define_optional_wasm_adapter_boundary"
-	AVMRoadmapTaskCodeRegistry             AVMImplementationRoadmapTask = "add_code_registry"
-	AVMRoadmapTaskContractInstanceRegistry AVMImplementationRoadmapTask = "add_contract_instance_registry"
-	AVMRoadmapTaskStoreV2StorageAdapter    AVMImplementationRoadmapTask = "add_store_v2_storage_adapter"
-	AVMRoadmapTaskContractGasMetering      AVMImplementationRoadmapTask = "add_gas_metering_for_contract_execution"
+	AVMRoadmapTaskAVMNativeContractBackend	AVMImplementationRoadmapTask	= "implement_avm_native_contract_backend"
+	AVMRoadmapTaskWASMAdapterBoundary	AVMImplementationRoadmapTask	= "define_optional_wasm_adapter_boundary"
+	AVMRoadmapTaskCodeRegistry		AVMImplementationRoadmapTask	= "add_code_registry"
+	AVMRoadmapTaskContractInstanceRegistry	AVMImplementationRoadmapTask	= "add_contract_instance_registry"
+	AVMRoadmapTaskStoreV2StorageAdapter	AVMImplementationRoadmapTask	= "add_store_v2_storage_adapter"
+	AVMRoadmapTaskContractGasMetering	AVMImplementationRoadmapTask	= "add_gas_metering_for_contract_execution"
 
-	AVMRoadmapTaskInterfaceRegistry    AVMImplementationRoadmapTask = "implement_interface_registry"
-	AVMRoadmapTaskInterfaceDescriptors AVMImplementationRoadmapTask = "add_methods_events_async_handlers_and_get_method_descriptors"
-	AVMRoadmapTaskInterfaceHashVerify  AVMImplementationRoadmapTask = "add_interface_hash_verification"
-	AVMRoadmapTaskSDKCLIBindingMeta    AVMImplementationRoadmapTask = "add_sdk_and_cli_binding_metadata"
-	AVMRoadmapTaskWalletUIMetadata     AVMImplementationRoadmapTask = "add_wallet_ui_generation_metadata"
+	AVMRoadmapTaskInterfaceRegistry		AVMImplementationRoadmapTask	= "implement_interface_registry"
+	AVMRoadmapTaskInterfaceDescriptors	AVMImplementationRoadmapTask	= "add_methods_events_async_handlers_and_get_method_descriptors"
+	AVMRoadmapTaskInterfaceHashVerify	AVMImplementationRoadmapTask	= "add_interface_hash_verification"
+	AVMRoadmapTaskSDKCLIBindingMeta		AVMImplementationRoadmapTask	= "add_sdk_and_cli_binding_metadata"
+	AVMRoadmapTaskWalletUIMetadata		AVMImplementationRoadmapTask	= "add_wallet_ui_generation_metadata"
 
-	AVMRoadmapTaskBlockSTMConflictBenchmarks AVMImplementationRoadmapTask = "add_blockstm_conflict_benchmarks"
-	AVMRoadmapTaskQueueThroughputBenchmarks  AVMImplementationRoadmapTask = "add_queue_throughput_benchmarks"
-	AVMRoadmapTaskActorExecutionBenchmarks   AVMImplementationRoadmapTask = "add_actor_execution_benchmarks"
-	AVMRoadmapTaskRootGenerationBenchmarks   AVMImplementationRoadmapTask = "add_root_generation_benchmarks"
-	AVMRoadmapTaskReplayDeterminismSuite     AVMImplementationRoadmapTask = "add_replay_and_determinism_test_suite"
-	AVMRoadmapTaskUpgradeCompatibilityTests  AVMImplementationRoadmapTask = "add_upgrade_compatibility_tests"
+	AVMRoadmapTaskBlockSTMConflictBenchmarks	AVMImplementationRoadmapTask	= "add_blockstm_conflict_benchmarks"
+	AVMRoadmapTaskQueueThroughputBenchmarks		AVMImplementationRoadmapTask	= "add_queue_throughput_benchmarks"
+	AVMRoadmapTaskActorExecutionBenchmarks		AVMImplementationRoadmapTask	= "add_actor_execution_benchmarks"
+	AVMRoadmapTaskRootGenerationBenchmarks		AVMImplementationRoadmapTask	= "add_root_generation_benchmarks"
+	AVMRoadmapTaskReplayDeterminismSuite		AVMImplementationRoadmapTask	= "add_replay_and_determinism_test_suite"
+	AVMRoadmapTaskUpgradeCompatibilityTests		AVMImplementationRoadmapTask	= "add_upgrade_compatibility_tests"
 
-	AVMRoadmapExitSignableHashableObjectsHaveTestVectors AVMImplementationExitCriterion = "signable_hashable_objects_have_test_vectors"
-	AVMRoadmapExitQueueOrderingTestCovered               AVMImplementationExitCriterion = "queue_ordering_test_covered"
-	AVMRoadmapExitRootEncodingFixed                      AVMImplementationExitCriterion = "root_encoding_fixed"
+	AVMRoadmapExitSignableHashableObjectsHaveTestVectors	AVMImplementationExitCriterion	= "signable_hashable_objects_have_test_vectors"
+	AVMRoadmapExitQueueOrderingTestCovered			AVMImplementationExitCriterion	= "queue_ordering_test_covered"
+	AVMRoadmapExitRootEncodingFixed				AVMImplementationExitCriterion	= "root_encoding_fixed"
 
-	AVMRoadmapExitExistingCallsRepresentedAsRoutedSync AVMImplementationExitCriterion = "existing_module_calls_represented_as_avm_routed_sync_execution"
-	AVMRoadmapExitDeterministicSyncReceipts            AVMImplementationExitCriterion = "sync_receipts_emitted_deterministically"
+	AVMRoadmapExitExistingCallsRepresentedAsRoutedSync	AVMImplementationExitCriterion	= "existing_module_calls_represented_as_avm_routed_sync_execution"
+	AVMRoadmapExitDeterministicSyncReceipts			AVMImplementationExitCriterion	= "sync_receipts_emitted_deterministically"
 
-	AVMRoadmapExitAsyncScheduledLaterBlocks  AVMImplementationExitCriterion = "async_messages_scheduled_and_executed_in_later_blocks"
-	AVMRoadmapExitExpiredMessagesDoNotRun    AVMImplementationExitCriterion = "expired_messages_do_not_execute"
-	AVMRoadmapExitRetryDeadLetterDeterminism AVMImplementationExitCriterion = "retry_and_dead_letter_flows_are_deterministic"
+	AVMRoadmapExitAsyncScheduledLaterBlocks		AVMImplementationExitCriterion	= "async_messages_scheduled_and_executed_in_later_blocks"
+	AVMRoadmapExitExpiredMessagesDoNotRun		AVMImplementationExitCriterion	= "expired_messages_do_not_execute"
+	AVMRoadmapExitRetryDeadLetterDeterminism	AVMImplementationExitCriterion	= "retry_and_dead_letter_flows_are_deterministic"
 
-	AVMRoadmapExitZoneAToZoneBAsync          AVMImplementationExitCriterion = "zone_a_can_send_async_message_to_zone_b"
-	AVMRoadmapExitFailedCrossZoneTerminal    AVMImplementationExitCriterion = "failed_cross_zone_messages_bounce_or_dead_letter"
-	AVMRoadmapExitCrossZoneReceiptsProofable AVMImplementationExitCriterion = "cross_zone_receipts_are_proof_queryable"
+	AVMRoadmapExitZoneAToZoneBAsync			AVMImplementationExitCriterion	= "zone_a_can_send_async_message_to_zone_b"
+	AVMRoadmapExitFailedCrossZoneTerminal		AVMImplementationExitCriterion	= "failed_cross_zone_messages_bounce_or_dead_letter"
+	AVMRoadmapExitCrossZoneReceiptsProofable	AVMImplementationExitCriterion	= "cross_zone_receipts_are_proof_queryable"
 
-	AVMRoadmapExitActorMailboxSerialExecution AVMImplementationExitCriterion = "actors_execute_mailbox_messages_one_at_a_time"
-	AVMRoadmapExitActorStateIsolation         AVMImplementationExitCriterion = "actors_cannot_mutate_other_actor_state"
-	AVMRoadmapExitActorDeterministicReceipts  AVMImplementationExitCriterion = "actor_messages_are_deterministic_and_receipt_backed"
+	AVMRoadmapExitActorMailboxSerialExecution	AVMImplementationExitCriterion	= "actors_execute_mailbox_messages_one_at_a_time"
+	AVMRoadmapExitActorStateIsolation		AVMImplementationExitCriterion	= "actors_cannot_mutate_other_actor_state"
+	AVMRoadmapExitActorDeterministicReceipts	AVMImplementationExitCriterion	= "actor_messages_are_deterministic_and_receipt_backed"
 
-	AVMRoadmapExitWorkflowsPauseResume       AVMImplementationExitCriterion = "long_running_workflows_can_pause_and_resume"
-	AVMRoadmapExitContinuationExpiryReceipts AVMImplementationExitCriterion = "expired_continuations_produce_deterministic_receipts"
+	AVMRoadmapExitWorkflowsPauseResume		AVMImplementationExitCriterion	= "long_running_workflows_can_pause_and_resume"
+	AVMRoadmapExitContinuationExpiryReceipts	AVMImplementationExitCriterion	= "expired_continuations_produce_deterministic_receipts"
 
-	AVMRoadmapExitContractsSyncAsyncHandlers AVMImplementationExitCriterion = "contracts_can_execute_sync_and_async_handlers"
-	AVMRoadmapExitContractsEmitAsyncMessages AVMImplementationExitCriterion = "contracts_can_emit_async_messages"
-	AVMRoadmapExitContractStateProofable     AVMImplementationExitCriterion = "contract_state_is_proof_queryable"
+	AVMRoadmapExitContractsSyncAsyncHandlers	AVMImplementationExitCriterion	= "contracts_can_execute_sync_and_async_handlers"
+	AVMRoadmapExitContractsEmitAsyncMessages	AVMImplementationExitCriterion	= "contracts_can_emit_async_messages"
+	AVMRoadmapExitContractStateProofable		AVMImplementationExitCriterion	= "contract_state_is_proof_queryable"
 
-	AVMRoadmapExitVerifiableInterfaces AVMImplementationExitCriterion = "contracts_and_services_expose_verifiable_interfaces"
-	AVMRoadmapExitClientsBuildCalls    AVMImplementationExitCriterion = "clients_can_build_calls_from_interface_descriptors"
+	AVMRoadmapExitVerifiableInterfaces	AVMImplementationExitCriterion	= "contracts_and_services_expose_verifiable_interfaces"
+	AVMRoadmapExitClientsBuildCalls		AVMImplementationExitCriterion	= "clients_can_build_calls_from_interface_descriptors"
 
-	AVMRoadmapExitReplayDeterministic       AVMImplementationExitCriterion = "avm_execution_is_deterministic_under_replay"
-	AVMRoadmapExitParallelIndependentActors AVMImplementationExitCriterion = "independent_zones_and_actors_execute_in_parallel_where_supported"
-	AVMRoadmapExitBoundedQueueRootCosts     AVMImplementationExitCriterion = "queue_and_root_generation_costs_remain_bounded"
+	AVMRoadmapExitReplayDeterministic	AVMImplementationExitCriterion	= "avm_execution_is_deterministic_under_replay"
+	AVMRoadmapExitParallelIndependentActors	AVMImplementationExitCriterion	= "independent_zones_and_actors_execute_in_parallel_where_supported"
+	AVMRoadmapExitBoundedQueueRootCosts	AVMImplementationExitCriterion	= "queue_and_root_generation_costs_remain_bounded"
 
-	AVMRoadmapVectorAsyncMessageEncoding      AVMTestVectorTarget = "async_message_encoding"
-	AVMRoadmapVectorMessageIDDerivation       AVMTestVectorTarget = "message_id_derivation"
-	AVMRoadmapVectorDeterministicQueueSort    AVMTestVectorTarget = "deterministic_queue_sort_key"
-	AVMRoadmapVectorExecutionReceiptSchema    AVMTestVectorTarget = "execution_receipt_schema"
-	AVMRoadmapVectorAVMRootSchema             AVMTestVectorTarget = "avm_root_schema"
-	AVMRoadmapVectorGasPolicySchema           AVMTestVectorTarget = "gas_policy_schema"
-	AVMRoadmapVectorInterfaceDescriptorSchema AVMTestVectorTarget = "interface_descriptor_schema"
+	AVMRoadmapVectorAsyncMessageEncoding		AVMTestVectorTarget	= "async_message_encoding"
+	AVMRoadmapVectorMessageIDDerivation		AVMTestVectorTarget	= "message_id_derivation"
+	AVMRoadmapVectorDeterministicQueueSort		AVMTestVectorTarget	= "deterministic_queue_sort_key"
+	AVMRoadmapVectorExecutionReceiptSchema		AVMTestVectorTarget	= "execution_receipt_schema"
+	AVMRoadmapVectorAVMRootSchema			AVMTestVectorTarget	= "avm_root_schema"
+	AVMRoadmapVectorGasPolicySchema			AVMTestVectorTarget	= "gas_policy_schema"
+	AVMRoadmapVectorInterfaceDescriptorSchema	AVMTestVectorTarget	= "interface_descriptor_schema"
 
-	MaxAVMRoadmapPhases       = 16
-	MaxAVMRoadmapTasks        = 32
-	MaxAVMRoadmapExitCriteria = 16
-	MaxAVMTestVectorTargets   = 32
-	MaxAVMRoadmapTextBytes    = 128
+	MaxAVMRoadmapPhases		= 16
+	MaxAVMRoadmapTasks		= 32
+	MaxAVMRoadmapExitCriteria	= 16
+	MaxAVMTestVectorTargets		= 32
+	MaxAVMRoadmapTextBytes		= 128
 )
 
 type AVMImplementationRoadmapPhaseID string
@@ -136,26 +136,26 @@ type AVMImplementationExitCriterion string
 type AVMTestVectorTarget string
 
 type AVMImplementationRoadmapPhase struct {
-	PhaseID           AVMImplementationRoadmapPhaseID
-	Name              string
-	Tasks             []AVMImplementationRoadmapTask
-	ExitCriteria      []AVMImplementationExitCriterion
-	TestVectorTargets []AVMTestVectorTarget
-	ConsensusCritical bool
-	PhaseHash         string
+	PhaseID			AVMImplementationRoadmapPhaseID
+	Name			string
+	Tasks			[]AVMImplementationRoadmapTask
+	ExitCriteria		[]AVMImplementationExitCriterion
+	TestVectorTargets	[]AVMTestVectorTarget
+	ConsensusCritical	bool
+	PhaseHash		string
 }
 
 type AVMImplementationRoadmap struct {
-	RoadmapName string
-	Phases      []AVMImplementationRoadmapPhase
-	RoadmapHash string
+	RoadmapName	string
+	Phases		[]AVMImplementationRoadmapPhase
+	RoadmapHash	string
 }
 
 func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 	phases := []AVMImplementationRoadmapPhase{
 		{
-			PhaseID: AVMRoadmapPhase0,
-			Name:    "Specification and Test Vectors",
+			PhaseID:	AVMRoadmapPhase0,
+			Name:		"Specification and Test Vectors",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskCanonicalAsyncMessageEncoding,
 				AVMRoadmapTaskMessageIDDerivation,
@@ -179,11 +179,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapVectorGasPolicySchema,
 				AVMRoadmapVectorInterfaceDescriptorSchema,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase1,
-			Name:    "Sync Router",
+			PhaseID:	AVMRoadmapPhase1,
+			Name:		"Sync Router",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskRouterSkeleton,
 				AVMRoadmapTaskSyncEngineWrapper,
@@ -195,11 +195,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitExistingCallsRepresentedAsRoutedSync,
 				AVMRoadmapExitDeterministicSyncReceipts,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase2,
-			Name:    "Async Engine",
+			PhaseID:	AVMRoadmapPhase2,
+			Name:		"Async Engine",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskAsyncMessageStore,
 				AVMRoadmapTaskZoneQueues,
@@ -214,11 +214,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitExpiredMessagesDoNotRun,
 				AVMRoadmapExitRetryDeadLetterDeterminism,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase3,
-			Name:    "Cross-Zone Routing",
+			PhaseID:	AVMRoadmapPhase3,
+			Name:		"Cross-Zone Routing",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskZoneMetadata,
 				AVMRoadmapTaskZoneMessageFilters,
@@ -232,11 +232,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitFailedCrossZoneTerminal,
 				AVMRoadmapExitCrossZoneReceiptsProofable,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase4,
-			Name:    "Actor Runtime",
+			PhaseID:	AVMRoadmapPhase4,
+			Name:		"Actor Runtime",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskActorRecords,
 				AVMRoadmapTaskActorMailboxes,
@@ -250,11 +250,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitActorStateIsolation,
 				AVMRoadmapExitActorDeterministicReceipts,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase5,
-			Name:    "Continuations",
+			PhaseID:	AVMRoadmapPhase5,
+			Name:		"Continuations",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskContinuationState,
 				AVMRoadmapTaskResumeQueue,
@@ -266,11 +266,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitWorkflowsPauseResume,
 				AVMRoadmapExitContinuationExpiryReceipts,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase6,
-			Name:    "Contract Backends",
+			PhaseID:	AVMRoadmapPhase6,
+			Name:		"Contract Backends",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskAVMNativeContractBackend,
 				AVMRoadmapTaskWASMAdapterBoundary,
@@ -284,11 +284,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitContractsEmitAsyncMessages,
 				AVMRoadmapExitContractStateProofable,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase7,
-			Name:    "Interface System",
+			PhaseID:	AVMRoadmapPhase7,
+			Name:		"Interface System",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskInterfaceRegistry,
 				AVMRoadmapTaskInterfaceDescriptors,
@@ -300,11 +300,11 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitVerifiableInterfaces,
 				AVMRoadmapExitClientsBuildCalls,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 		{
-			PhaseID: AVMRoadmapPhase8,
-			Name:    "Performance and Hardening",
+			PhaseID:	AVMRoadmapPhase8,
+			Name:		"Performance and Hardening",
 			Tasks: []AVMImplementationRoadmapTask{
 				AVMRoadmapTaskBlockSTMConflictBenchmarks,
 				AVMRoadmapTaskQueueThroughputBenchmarks,
@@ -318,7 +318,7 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 				AVMRoadmapExitParallelIndependentActors,
 				AVMRoadmapExitBoundedQueueRootCosts,
 			},
-			ConsensusCritical: true,
+			ConsensusCritical:	true,
 		},
 	}
 	for i := range phases {
@@ -329,8 +329,8 @@ func DefaultAVMImplementationRoadmap() (AVMImplementationRoadmap, error) {
 		phases[i] = phase
 	}
 	return NewAVMImplementationRoadmap(AVMImplementationRoadmap{
-		RoadmapName: "AVM implementation roadmap",
-		Phases:      phases,
+		RoadmapName:	"AVM implementation roadmap",
+		Phases:		phases,
 	})
 }
 

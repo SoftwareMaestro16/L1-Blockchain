@@ -15,16 +15,16 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version     uint64
-	Params      prototype.Params
-	State       paymentstypes.PaymentsState
-	Liquidity   paymentstypes.LiquidityOptimizationState
-	FraudProofs paymentstypes.FraudProofVerificationState
+	Version		uint64
+	Params		prototype.Params
+	State		paymentstypes.PaymentsState
+	Liquidity	paymentstypes.LiquidityOptimizationState
+	FraudProofs	paymentstypes.FraudProofVerificationState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -37,11 +37,11 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:     prototype.CurrentGenesisVersion,
-		Params:      prototype.DefaultParams(),
-		State:       paymentstypes.EmptyState(),
-		Liquidity:   paymentstypes.EmptyLiquidityOptimizationState(),
-		FraudProofs: paymentstypes.EmptyFraudProofVerificationState(),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		prototype.DefaultParams(),
+		State:		paymentstypes.EmptyState(),
+		Liquidity:	paymentstypes.EmptyLiquidityOptimizationState(),
+		FraudProofs:	paymentstypes.EmptyFraudProofVerificationState(),
 	}
 }
 

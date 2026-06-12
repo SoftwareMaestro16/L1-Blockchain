@@ -10,17 +10,17 @@ import (
 const DefaultOverlayQueueLimit = uint32(1024)
 
 type OverlayMessageQueue struct {
-	OverlayID      string
-	MaxMessages    uint32
-	Messages       []AetherMeshMessage
-	SeenMessageIDs []string
+	OverlayID	string
+	MaxMessages	uint32
+	Messages	[]AetherMeshMessage
+	SeenMessageIDs	[]string
 }
 
 type CrossZoneSequenceState struct {
-	SourceZone      string
-	DestinationZone string
-	NextSequence    uint64
-	LastAccepted    uint64
+	SourceZone	string
+	DestinationZone	string
+	NextSequence	uint64
+	LastAccepted	uint64
 }
 
 type CrossZoneSequenceTracker struct {
@@ -30,37 +30,37 @@ type CrossZoneSequenceTracker struct {
 type ReceiptDeliveryState string
 
 const (
-	ReceiptDeliveryPending      ReceiptDeliveryState = "pending"
-	ReceiptDeliveryAcknowledged ReceiptDeliveryState = "acknowledged"
+	ReceiptDeliveryPending		ReceiptDeliveryState	= "pending"
+	ReceiptDeliveryAcknowledged	ReceiptDeliveryState	= "acknowledged"
 )
 
 type ReceiptDelivery struct {
-	DeliveryID      string
-	Receipt         CrossZoneReceipt
-	DestinationNode string
-	DeliveredHeight uint64
-	AckHash         string
-	State           ReceiptDeliveryState
+	DeliveryID	string
+	Receipt		CrossZoneReceipt
+	DestinationNode	string
+	DeliveredHeight	uint64
+	AckHash		string
+	State		ReceiptDeliveryState
 }
 
 type QueryResponseProof struct {
-	ResponseID     string
-	RequestID      string
-	Responder      string
-	PayloadHash    string
-	Proof          AetherMeshProof
-	ResponseHeight uint64
-	Signature      []byte
+	ResponseID	string
+	RequestID	string
+	Responder	string
+	PayloadHash	string
+	Proof		AetherMeshProof
+	ResponseHeight	uint64
+	Signature	[]byte
 }
 
 type L3OverlayMetrics struct {
-	OverlayID       string
-	QueuedCount     uint64
-	DeliveredCount  uint64
-	ReplayDropCount uint64
-	ExpiredCount    uint64
-	ReceiptCount    uint64
-	QueryProofCount uint64
+	OverlayID	string
+	QueuedCount	uint64
+	DeliveredCount	uint64
+	ReplayDropCount	uint64
+	ExpiredCount	uint64
+	ReceiptCount	uint64
+	QueryProofCount	uint64
 }
 
 func NewOverlayMessageQueue(overlayID string, maxMessages uint32) (OverlayMessageQueue, error) {
@@ -178,9 +178,9 @@ func NextCrossZoneSequence(tracker CrossZoneSequenceTracker, sourceZone, destina
 		}
 	}
 	next.States = append(next.States, CrossZoneSequenceState{
-		SourceZone:      sourceZone,
-		DestinationZone: destinationZone,
-		NextSequence:    2,
+		SourceZone:		sourceZone,
+		DestinationZone:	destinationZone,
+		NextSequence:		2,
 	})
 	sortCrossZoneSequenceStates(next.States)
 	return next, 1, nil
@@ -212,10 +212,10 @@ func AcceptCrossZoneSequence(tracker CrossZoneSequenceTracker, msg CrossZoneMess
 		return CrossZoneSequenceTracker{}, errors.New("networking cross-zone sequence gap")
 	}
 	next.States = append(next.States, CrossZoneSequenceState{
-		SourceZone:      msg.SourceZone,
-		DestinationZone: msg.DestinationZone,
-		NextSequence:    msg.SourceSequence + 1,
-		LastAccepted:    msg.SourceSequence,
+		SourceZone:		msg.SourceZone,
+		DestinationZone:	msg.DestinationZone,
+		NextSequence:		msg.SourceSequence + 1,
+		LastAccepted:		msg.SourceSequence,
 	})
 	sortCrossZoneSequenceStates(next.States)
 	return next, nil
@@ -241,10 +241,10 @@ func NewReceiptDelivery(receipt CrossZoneReceipt, destinationNode string, delive
 		return ReceiptDelivery{}, err
 	}
 	delivery := ReceiptDelivery{
-		Receipt:         receipt,
-		DestinationNode: destinationNode,
-		DeliveredHeight: deliveredHeight,
-		State:           ReceiptDeliveryPending,
+		Receipt:		receipt,
+		DestinationNode:	destinationNode,
+		DeliveredHeight:	deliveredHeight,
+		State:			ReceiptDeliveryPending,
 	}
 	delivery.DeliveryID = ComputeReceiptDeliveryID(delivery)
 	if err := delivery.Validate(); err != nil {

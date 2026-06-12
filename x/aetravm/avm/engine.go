@@ -12,7 +12,6 @@ import (
 
 // Engine is the core AVM execution coordinator.
 type Engine struct {
-	// ... potentially some global state or config ...
 }
 
 func NewEngine() *Engine {
@@ -22,36 +21,38 @@ func NewEngine() *Engine {
 // Execute performs a deterministic state transition.
 // (StateChunk, Message, BlockContext) -> (NewStateChunk, Actions, Receipt, error)
 func (e *Engine) Execute(state *chunk.Chunk, msg Message, blockCtx BlockContext, gasLimit uint64, maxActions uint32) (*chunk.Chunk, []Action, AVMReceipt, error) {
-	msg.GasLimit = gasLimit // Override if provided explicitly
+	msg.GasLimit = gasLimit
 	frame := NewExecutionFrame(state, msg, maxActions)
 
-	// Set sandbox boundaries
 	frame.BlockCtx = blockCtx
 	frame.Capabilities = CapabilityMask{
-		Crypto:    true,
-		Chain:     true,
-		Messaging: true,
-		Storage:   true,
+		Crypto:		true,
+		Chain:		true,
+		Messaging:	true,
+		Storage:	true,
 	}
 
-	// Phase 1: Storage Phase - Load state Chunks (READ ONLY snapshot)
 	frame.Phase = PhaseStorage
-	// In a real implementation, this would track which chunks are touched.
+
 	if !frame.ChargeGas(500) {
 		return frame.finalize(contractstypes.ExitCodeOutOfGas)
 	}
 
-	// Phase 2: Credit Phase - Apply attached value
 	frame.Phase = PhaseCredit
 	if !frame.ChargeGas(100) {
 		return frame.finalize(contractstypes.ExitCodeOutOfGas)
 	}
-	// TODO: Update working state balance based on message value
+	if frame.Message.Value > 0 {
+		credited, err := applyAttachedValueToWorkingState(frame.WorkingState, frame.Message.Value)
+		if err != nil {
+			frame.Aborted = true
+			return frame.finalize(contractstypes.ExitCodeContractAbort)
+		}
+		frame.WorkingState = credited
+	}
 
-	// Phase 3: Compute Phase - Execute instructions
 	frame.Phase = PhaseCompute
-	// Simulation of VM execution:
-	// We use the payload to simulate different execution paths.
+
 	payloadData := frame.Message.Payload.Data()
 
 	if string(payloadData) == "trigger_abort" {
@@ -65,45 +66,42 @@ func (e *Engine) Execute(state *chunk.Chunk, msg Message, blockCtx BlockContext,
 
 	if string(payloadData) == "emit_actions" || string(payloadData) == "emit_with_bounce" {
 		frame.PendingActions = append(frame.PendingActions, Action{
-			Type:    ActionInternal,
-			Target:  "contract_b",
-			Payload: frame.Message.Payload, // Reuse payload for simplicity
+			Type:		ActionInternal,
+			Target:		"contract_b",
+			Payload:	frame.Message.Payload,
 		})
 
 		if string(payloadData) == "emit_with_bounce" {
 			frame.PendingActions = append(frame.PendingActions, Action{
-				Type:         ActionSystem,
-				Target:       "system_notifier",
-				Payload:      frame.Message.Payload,
-				SystemBounce: true,
+				Type:		ActionSystem,
+				Target:		"system_notifier",
+				Payload:	frame.Message.Payload,
+				SystemBounce:	true,
 			})
 		} else {
 			frame.PendingActions = append(frame.PendingActions, Action{
-				Type:    ActionExternal,
-				Target:  "user_a",
-				Payload: frame.Message.Payload,
+				Type:		ActionExternal,
+				Target:		"user_a",
+				Payload:	frame.Message.Payload,
 			})
 		}
 	}
 
-	// We record a trace step for demonstration.
 	frame.Trace.Steps = append(frame.Trace.Steps, TraceStep{
-		Instruction: "LOAD_BAL",
-		StackDelta:  1,
-		GasConsumed: 10,
-		Phase:       PhaseCompute,
+		Instruction:	"LOAD_BAL",
+		StackDelta:	1,
+		GasConsumed:	10,
+		Phase:		PhaseCompute,
 	})
 
 	if !frame.ChargeGas(1000) {
 		return frame.finalize(contractstypes.ExitCodeOutOfGas)
 	}
 
-	// Phase 4: Action Phase - Emit outgoing messages/events
 	frame.Phase = PhaseAction
 	if !frame.ChargeGas(200) {
 		return frame.finalize(contractstypes.ExitCodeOutOfGas)
 	}
-	// Actions are collected in f.PendingActions during PhaseCompute.
 
 	if uint32(len(frame.PendingActions)) > frame.ActionBudget {
 		frame.Aborted = true
@@ -111,7 +109,6 @@ func (e *Engine) Execute(state *chunk.Chunk, msg Message, blockCtx BlockContext,
 	}
 	frame.ActionsUsed = uint32(len(frame.PendingActions))
 
-	// Phase 5: Finalization Phase - Commit new Chunk roots
 	frame.Phase = PhaseFinalization
 	if !frame.ChargeGas(300) {
 		return frame.finalize(contractstypes.ExitCodeOutOfGas)
@@ -124,14 +121,13 @@ func (f *ExecutionFrame) finalize(exitCode uint32) (*chunk.Chunk, []Action, AVMR
 	f.ExitCode = exitCode
 
 	receipt := AVMReceipt{
-		ExitCode:        f.ExitCode,
-		GasUsed:         f.GasUsed,
-		GasLimit:        f.GasLimit,
-		PhaseGas:        f.PhaseGas,
-		StateRootBefore: hex.EncodeToString(f.StateSnapshot.Hash()),
+		ExitCode:		f.ExitCode,
+		GasUsed:		f.GasUsed,
+		GasLimit:		f.GasLimit,
+		PhaseGas:		f.PhaseGas,
+		StateRootBefore:	hex.EncodeToString(f.StateSnapshot.Hash()),
 	}
 
-	// Action Determinism: Sort actions canonically
 	sort.SliceStable(f.PendingActions, func(i, j int) bool {
 		if f.PendingActions[i].Type != f.PendingActions[j].Type {
 			return f.PendingActions[i].Type < f.PendingActions[j].Type
@@ -139,9 +135,8 @@ func (f *ExecutionFrame) finalize(exitCode uint32) (*chunk.Chunk, []Action, AVMR
 		return f.PendingActions[i].Target < f.PendingActions[j].Target
 	})
 
-	// Revert Model
 	if f.Aborted || f.ExitCode != contractstypes.ExitCodeOK {
-		// Revert: return original state, discard non-system actions
+
 		receipt.StateRootAfter = receipt.StateRootBefore
 
 		var finalActions []Action
@@ -156,7 +151,6 @@ func (f *ExecutionFrame) finalize(exitCode uint32) (*chunk.Chunk, []Action, AVMR
 		return f.StateSnapshot, finalActions, receipt, nil
 	}
 
-	// Success: return working state and actions
 	receipt.StateRootAfter = hex.EncodeToString(f.WorkingState.Hash())
 	receipt.EmittedActionsHash = f.computeActionsHash(f.PendingActions)
 	receipt.ExecutionTraceHash = f.computeTraceHash()

@@ -6,44 +6,44 @@ import (
 )
 
 const (
-	AetraUpgradeRequirementStoreKeyDecision     = "store_key_decision"
-	AetraUpgradeRequirementGenesisImportExport  = "genesis_import_export"
-	AetraUpgradeRequirementMigrationHandler     = "migration_handler"
-	AetraUpgradeRequirementVersionMapUpdate     = "version_map_update"
-	AetraUpgradeRequirementUpgradeTest          = "upgrade_test"
-	AetraUpgradeRequirementRollbackNotes        = "rollback_notes_where_possible"
-	AetraUpgradeRequirementOperatorInstructions = "operator_instructions"
+	AetraUpgradeRequirementStoreKeyDecision		= "store_key_decision"
+	AetraUpgradeRequirementGenesisImportExport	= "genesis_import_export"
+	AetraUpgradeRequirementMigrationHandler		= "migration_handler"
+	AetraUpgradeRequirementVersionMapUpdate		= "version_map_update"
+	AetraUpgradeRequirementUpgradeTest		= "upgrade_test"
+	AetraUpgradeRequirementRollbackNotes		= "rollback_notes_where_possible"
+	AetraUpgradeRequirementOperatorInstructions	= "operator_instructions"
 )
 
 const (
-	AetraMigrationTestOldGenesisImports      = "old_genesis_imports_into_new_binary"
-	AetraMigrationTestInitializesParams      = "migration_initializes_params"
-	AetraMigrationTestPreservesBalances      = "migration_preserves_balances"
-	AetraMigrationTestPreservesStakingState  = "migration_preserves_staking_state"
-	AetraMigrationTestPreservesSlashingState = "migration_preserves_slashing_state"
-	AetraMigrationTestPreservesContractState = "migration_preserves_contract_state_if_applicable"
-	AetraMigrationTestDeterministicAppHash   = "app_hash_after_migration_is_deterministic"
+	AetraMigrationTestOldGenesisImports		= "old_genesis_imports_into_new_binary"
+	AetraMigrationTestInitializesParams		= "migration_initializes_params"
+	AetraMigrationTestPreservesBalances		= "migration_preserves_balances"
+	AetraMigrationTestPreservesStakingState		= "migration_preserves_staking_state"
+	AetraMigrationTestPreservesSlashingState	= "migration_preserves_slashing_state"
+	AetraMigrationTestPreservesContractState	= "migration_preserves_contract_state_if_applicable"
+	AetraMigrationTestDeterministicAppHash		= "app_hash_after_migration_is_deterministic"
 )
 
 type AetraUpgradeStrategyEvidence struct {
-	ModuleName   string
-	Requirements []string
-	Tests        []string
+	ModuleName	string
+	Requirements	[]string
+	Tests		[]string
 }
 
 type AetraUpgradeStrategyReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraUpgradeStrategyEvidence(moduleName string) AetraUpgradeStrategyEvidence {
 	return AetraUpgradeStrategyEvidence{
-		ModuleName:   moduleName,
-		Requirements: RequiredAetraUpgradeRequirements(),
-		Tests:        RequiredAetraMigrationTests(),
+		ModuleName:	moduleName,
+		Requirements:	RequiredAetraUpgradeRequirements(),
+		Tests:		RequiredAetraMigrationTests(),
 	}
 }
 
@@ -67,11 +67,11 @@ func BuildAetraUpgradeStrategyReport(evidence AetraUpgradeStrategyEvidence) Aetr
 
 	sort.Strings(failed)
 	return AetraUpgradeStrategyReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(RequiredAetraUpgradeRequirements()) + len(RequiredAetraMigrationTests()),
-		Passed:     passedRequirements + passedTests,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(RequiredAetraUpgradeRequirements()) + len(RequiredAetraMigrationTests()),
+		Passed:		passedRequirements + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

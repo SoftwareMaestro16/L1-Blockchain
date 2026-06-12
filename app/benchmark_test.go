@@ -28,9 +28,9 @@ func BenchmarkEmptyBlockFinalizeCommit(b *testing.B) {
 	app := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: simtestutil.DefaultConsensusParams,
-		AppStateBytes:   genesisBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	simtestutil.DefaultConsensusParams,
+		AppStateBytes:		genesisBytes,
 	})
 	require.NoError(b, err)
 
@@ -38,9 +38,9 @@ func BenchmarkEmptyBlockFinalizeCommit(b *testing.B) {
 	b.ResetTimer()
 	for height := int64(1); height <= int64(b.N); height++ {
 		_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-			Height:             height,
-			Hash:               app.LastCommitID().Hash,
-			NextValidatorsHash: nextValidatorsHash,
+			Height:			height,
+			Hash:			app.LastCommitID().Hash,
+			NextValidatorsHash:	nextValidatorsHash,
 		})
 		require.NoError(b, err)
 		_, err = app.Commit()
@@ -60,9 +60,9 @@ func BenchmarkTPS(b *testing.B) {
 	app := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: simtestutil.DefaultConsensusParams,
-		AppStateBytes:   genesisBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	simtestutil.DefaultConsensusParams,
+		AppStateBytes:		genesisBytes,
 	})
 	require.NoError(b, err)
 
@@ -106,10 +106,10 @@ func BenchmarkTPS(b *testing.B) {
 		b.StartTimer()
 
 		_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-			Height:             height,
-			Hash:               app.LastCommitID().Hash,
-			NextValidatorsHash: nextValidatorsHash,
-			Txs:                txs,
+			Height:			height,
+			Hash:			app.LastCommitID().Hash,
+			NextValidatorsHash:	nextValidatorsHash,
+			Txs:			txs,
 		})
 		require.NoError(b, err)
 		_, err = app.Commit()

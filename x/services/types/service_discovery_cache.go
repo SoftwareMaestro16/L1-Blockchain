@@ -12,77 +12,77 @@ import (
 type ServiceDiscoveryCacheTrust string
 
 const (
-	ServiceDiscoveryCacheVerified ServiceDiscoveryCacheTrust = "verified"
-	ServiceDiscoveryCacheAdvisory ServiceDiscoveryCacheTrust = "advisory"
+	ServiceDiscoveryCacheVerified	ServiceDiscoveryCacheTrust	= "verified"
+	ServiceDiscoveryCacheAdvisory	ServiceDiscoveryCacheTrust	= "advisory"
 )
 
 type ServiceDiscoveryCacheRecord struct {
-	ServiceID           string
-	DescriptorHash      string
-	InterfaceHash       string
-	Source              ServiceResolutionSource
-	ProofHeightOptional uint64
-	SignatureOptional   string
-	ExpiresHeight       uint64
-	FetchedAtHeight     uint64
-	Trust               ServiceDiscoveryCacheTrust
-	CacheHash           string
+	ServiceID		string
+	DescriptorHash		string
+	InterfaceHash		string
+	Source			ServiceResolutionSource
+	ProofHeightOptional	uint64
+	SignatureOptional	string
+	ExpiresHeight		uint64
+	FetchedAtHeight		uint64
+	Trust			ServiceDiscoveryCacheTrust
+	CacheHash		string
 }
 
 type ServiceDiscoveryCacheConstraints struct {
-	RegistryExpiryHeight     uint64
-	InterfaceCompatibleUntil uint64
-	CurrentHeight            uint64
+	RegistryExpiryHeight		uint64
+	InterfaceCompatibleUntil	uint64
+	CurrentHeight			uint64
 }
 
 type ServiceDiscoveryUpdateEvent struct {
-	ServiceID      string
-	DescriptorHash string
-	InterfaceHash  string
-	Height         uint64
-	EventHash      string
+	ServiceID	string
+	DescriptorHash	string
+	InterfaceHash	string
+	Height		uint64
+	EventHash	string
 }
 
 type SignedServiceAdvertisement struct {
-	ServiceName       string
-	Descriptor        ServiceDiscoveryDescriptorV1
-	Endpoint          string
-	InterfaceHash     string
-	Signer            string
-	ProviderOptional  string
-	ExpiresHeight     uint64
-	IssuedAtHeight    uint64
-	Nonce             uint64
-	AdvertisementHash string
-	SignatureHash     string
+	ServiceName		string
+	Descriptor		ServiceDiscoveryDescriptorV1
+	Endpoint		string
+	InterfaceHash		string
+	Signer			string
+	ProviderOptional	string
+	ExpiresHeight		uint64
+	IssuedAtHeight		uint64
+	Nonce			uint64
+	AdvertisementHash	string
+	SignatureHash		string
 }
 
 type QueryServiceDiscovery struct {
-	ServiceName  string
-	IncludeProof bool
+	ServiceName	string
+	IncludeProof	bool
 }
 
 type QueryServiceDiscoveriesByIdentity struct {
-	IdentityName  string
-	IncludeProof  bool
-	CurrentHeight uint64
+	IdentityName	string
+	IncludeProof	bool
+	CurrentHeight	uint64
 }
 
 type QueryServiceDiscoveryResponse struct {
-	Descriptor         ServiceDiscoveryDescriptorV1
-	RegistryDescriptor ServiceDescriptor
-	Proof              ServiceRegistryProof
-	Found              bool
+	Descriptor		ServiceDiscoveryDescriptorV1
+	RegistryDescriptor	ServiceDescriptor
+	Proof			ServiceRegistryProof
+	Found			bool
 }
 
 type QueryServiceDiscoveriesResponse struct {
-	Services []QueryServiceDiscoveryResponse
-	Total    uint64
+	Services	[]QueryServiceDiscoveryResponse
+	Total		uint64
 }
 
 type ServiceResolverFallbackPolicy struct {
-	Order      []ServiceResolutionSource
-	PolicyHash string
+	Order		[]ServiceResolutionSource
+	PolicyHash	string
 }
 
 func NewServiceDiscoveryCacheRecord(record ServiceDiscoveryCacheRecord, constraints ServiceDiscoveryCacheConstraints) (ServiceDiscoveryCacheRecord, error) {
@@ -169,10 +169,10 @@ func ValidateServiceDiscoveryCacheConstraints(record ServiceDiscoveryCacheRecord
 
 func NewServiceDiscoveryUpdateEvent(serviceID, descriptorHash, interfaceHash string, height uint64) (ServiceDiscoveryUpdateEvent, error) {
 	event := ServiceDiscoveryUpdateEvent{
-		ServiceID:      strings.TrimSpace(serviceID),
-		DescriptorHash: strings.ToLower(strings.TrimSpace(descriptorHash)),
-		InterfaceHash:  strings.ToLower(strings.TrimSpace(interfaceHash)),
-		Height:         height,
+		ServiceID:	strings.TrimSpace(serviceID),
+		DescriptorHash:	strings.ToLower(strings.TrimSpace(descriptorHash)),
+		InterfaceHash:	strings.ToLower(strings.TrimSpace(interfaceHash)),
+		Height:		height,
 	}
 	if err := event.ValidateFormat(); err != nil {
 		return ServiceDiscoveryUpdateEvent{}, err
@@ -326,16 +326,16 @@ func ServiceResolverSourceRecordFromAdvertisement(ad SignedServiceAdvertisement,
 		return ServiceResolverSourceRecord{}, errors.New("signed service advertisement registry descriptor mismatch")
 	}
 	record := ServiceResolverSourceRecord{
-		Source:            ServiceResolutionSignedCache,
-		ServiceName:       ad.ServiceName,
-		ServiceID:         descriptor.ServiceID,
-		Descriptor:        descriptor,
-		Endpoint:          ad.Endpoint,
-		TrustMetadata:     string(ad.Descriptor.TrustModel),
-		PaymentModel:      ad.Descriptor.PaymentModel,
-		VerificationModel: ad.Descriptor.VerificationModel,
-		ExpiryHeight:      ad.ExpiresHeight,
-		SignatureHash:     ad.SignatureHash,
+		Source:			ServiceResolutionSignedCache,
+		ServiceName:		ad.ServiceName,
+		ServiceID:		descriptor.ServiceID,
+		Descriptor:		descriptor,
+		Endpoint:		ad.Endpoint,
+		TrustMetadata:		string(ad.Descriptor.TrustModel),
+		PaymentModel:		ad.Descriptor.PaymentModel,
+		VerificationModel:	ad.Descriptor.VerificationModel,
+		ExpiryHeight:		ad.ExpiresHeight,
+		SignatureHash:		ad.SignatureHash,
 	}
 	return NewServiceResolverSourceRecord(record)
 }
@@ -367,10 +367,10 @@ func QueryServiceDiscoveryFromState(state ServiceRegistryState, q QueryServiceDi
 		return QueryServiceDiscoveryResponse{}, err
 	}
 	return QueryServiceDiscoveryResponse{
-		Descriptor:         descriptor,
-		RegistryDescriptor: response.Descriptor,
-		Proof:              response.Proof,
-		Found:              true,
+		Descriptor:		descriptor,
+		RegistryDescriptor:	response.Descriptor,
+		Proof:			response.Proof,
+		Found:			true,
 	}, nil
 }
 
@@ -414,10 +414,10 @@ func QueryServiceDiscoveriesByIdentityFromState(state ServiceRegistryState, q Qu
 			return QueryServiceDiscoveriesResponse{}, err
 		}
 		out = append(out, QueryServiceDiscoveryResponse{
-			Descriptor:         projected,
-			RegistryDescriptor: descriptor,
-			Proof:              proof,
-			Found:              true,
+			Descriptor:		projected,
+			RegistryDescriptor:	descriptor,
+			Proof:			proof,
+			Found:			true,
 		})
 	}
 	sort.SliceStable(out, func(i, j int) bool {

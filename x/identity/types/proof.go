@@ -11,53 +11,53 @@ import (
 const identityParamsStoreKey = IdentityStoreV2Prefix + "/params"
 
 type IdentityProofLeaf struct {
-	Key       string
-	ValueHash string
-	LeafHash  string
+	Key		string
+	ValueHash	string
+	LeafHash	string
 }
 
 type IdentityProofStep struct {
-	Hash          string
-	SiblingOnLeft bool
+	Hash		string
+	SiblingOnLeft	bool
 }
 
 type IdentityInclusionProof struct {
-	RootHash  string
-	Key       string
-	ValueHash string
-	LeafHash  string
-	Index     int
-	LeafCount int
-	Steps     []IdentityProofStep
+	RootHash	string
+	Key		string
+	ValueHash	string
+	LeafHash	string
+	Index		int
+	LeafCount	int
+	Steps		[]IdentityProofStep
 }
 
 type IdentityAbsenceProof struct {
-	RootHash  string
-	Key       string
-	LeafCount int
-	Previous  *IdentityInclusionProof
-	Next      *IdentityInclusionProof
+	RootHash	string
+	Key		string
+	LeafCount	int
+	Previous	*IdentityInclusionProof
+	Next		*IdentityInclusionProof
 }
 
 type IdentityResolutionCandidateProof struct {
-	Domain          string
-	DomainProof     *IdentityInclusionProof
-	DomainAbsence   *IdentityAbsenceProof
-	ResolverProof   *IdentityInclusionProof
-	ResolverAbsence *IdentityAbsenceProof
+	Domain		string
+	DomainProof	*IdentityInclusionProof
+	DomainAbsence	*IdentityAbsenceProof
+	ResolverProof	*IdentityInclusionProof
+	ResolverAbsence	*IdentityAbsenceProof
 }
 
 type IdentityResolutionProof struct {
-	StateRoot       string
-	QueryDomain     string
-	ResolverDomain  string
-	AuthorityDomain Domain
-	AuthorityNFT    DomainNFT
-	Resolver        ResolverRecord
-	Candidates      []IdentityResolutionCandidateProof
-	DomainProof     IdentityInclusionProof
-	NFTProof        IdentityInclusionProof
-	ResolverProof   IdentityInclusionProof
+	StateRoot	string
+	QueryDomain	string
+	ResolverDomain	string
+	AuthorityDomain	Domain
+	AuthorityNFT	DomainNFT
+	Resolver	ResolverRecord
+	Candidates	[]IdentityResolutionCandidateProof
+	DomainProof	IdentityInclusionProof
+	NFTProof	IdentityInclusionProof
+	ResolverProof	IdentityInclusionProof
 }
 
 func IdentityStateRoot(state IdentityState) (string, error) {
@@ -307,15 +307,15 @@ func BuildIdentityResolutionProof(state IdentityState, name string, height uint6
 		return IdentityResolutionProof{}, err
 	}
 	proof := IdentityResolutionProof{
-		StateRoot:       stateRoot,
-		QueryDomain:     resolution.QueryDomain,
-		ResolverDomain:  resolution.ResolverDomain,
-		AuthorityDomain: resolution.AuthorityDomain,
-		AuthorityNFT:    nft,
-		Resolver:        resolution.Record,
-		DomainProof:     domainProof,
-		NFTProof:        nftProof,
-		ResolverProof:   resolverProof,
+		StateRoot:		stateRoot,
+		QueryDomain:		resolution.QueryDomain,
+		ResolverDomain:		resolution.ResolverDomain,
+		AuthorityDomain:	resolution.AuthorityDomain,
+		AuthorityNFT:		nft,
+		Resolver:		resolution.Record,
+		DomainProof:		domainProof,
+		NFTProof:		nftProof,
+		ResolverProof:		resolverProof,
 	}
 	for _, candidate := range candidates {
 		candidateProof, err := buildResolutionCandidateProof(state, candidate)
@@ -380,11 +380,11 @@ func VerifyIdentityResolutionProof(proof IdentityResolutionProof, height uint64)
 		return IdentityResolution{}, err
 	}
 	return IdentityResolution{
-		QueryDomain:     proof.QueryDomain,
-		ResolverDomain:  proof.ResolverDomain,
-		AuthorityDomain: cloneDomain(proof.AuthorityDomain),
-		Record:          cloneResolver(proof.Resolver),
-		Depth:           depth,
+		QueryDomain:		proof.QueryDomain,
+		ResolverDomain:		proof.ResolverDomain,
+		AuthorityDomain:	cloneDomain(proof.AuthorityDomain),
+		Record:			cloneResolver(proof.Resolver),
+		Depth:			depth,
 	}, nil
 }
 
@@ -497,12 +497,12 @@ func verifyResolutionCandidateProofs(proof IdentityResolutionProof) error {
 
 func buildIdentityProofFromLeaves(leaves []IdentityProofLeaf, index int) IdentityInclusionProof {
 	proof := IdentityInclusionProof{
-		RootHash:  identityMerkleRoot(leaves),
-		Key:       leaves[index].Key,
-		ValueHash: leaves[index].ValueHash,
-		LeafHash:  leaves[index].LeafHash,
-		Index:     index,
-		LeafCount: len(leaves),
+		RootHash:	identityMerkleRoot(leaves),
+		Key:		leaves[index].Key,
+		ValueHash:	leaves[index].ValueHash,
+		LeafHash:	leaves[index].LeafHash,
+		Index:		index,
+		LeafCount:	len(leaves),
 	}
 	hashes := make([]string, len(leaves))
 	for i, leaf := range leaves {

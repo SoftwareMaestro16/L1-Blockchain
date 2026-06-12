@@ -14,42 +14,42 @@ import (
 type StakingProofKind string
 
 const (
-	StakingProofDeposit    StakingProofKind = "deposit"
-	StakingProofShare      StakingProofKind = "share"
-	StakingProofAllocation StakingProofKind = "allocation"
-	StakingProofReward     StakingProofKind = "reward"
-	StakingProofReputation StakingProofKind = "reputation"
+	StakingProofDeposit	StakingProofKind	= "deposit"
+	StakingProofShare	StakingProofKind	= "share"
+	StakingProofAllocation	StakingProofKind	= "allocation"
+	StakingProofReward	StakingProofKind	= "reward"
+	StakingProofReputation	StakingProofKind	= "reputation"
 )
 
 type StakingProofRequest struct {
-	Kind     StakingProofKind
-	Height   uint64
-	PoolID   string
-	Account  string
-	Epoch    uint64
-	AppHash  string
-	RootHash string
+	Kind		StakingProofKind
+	Height		uint64
+	PoolID		string
+	Account		string
+	Epoch		uint64
+	AppHash		string
+	RootHash	string
 }
 
 type StakingProofMetadata struct {
-	Kind          StakingProofKind
-	Height        uint64
-	StoreKey      string
-	StateKey      string
-	AppHash       string
-	RootHash      string
-	ProofPath     []ProofPathMetadata
-	MetadataHash  string
-	BoundedLookup bool
+	Kind		StakingProofKind
+	Height		uint64
+	StoreKey	string
+	StateKey	string
+	AppHash		string
+	RootHash	string
+	ProofPath	[]ProofPathMetadata
+	MetadataHash	string
+	BoundedLookup	bool
 }
 
 type ProofPathMetadata struct {
-	Step      uint32
-	FromRoot  string
-	ToRoot    string
-	StoreKey  string
-	StateKey  string
-	ProofKind string
+	Step		uint32
+	FromRoot	string
+	ToRoot		string
+	StoreKey	string
+	StateKey	string
+	ProofKind	string
 }
 
 func BuildStakingProofMetadata(req StakingProofRequest) (StakingProofMetadata, error) {
@@ -112,29 +112,29 @@ func BuildStakingProofMetadata(req StakingProofRequest) (StakingProofMetadata, e
 		return StakingProofMetadata{}, fmt.Errorf("unsupported staking proof kind %q", req.Kind)
 	}
 	out := StakingProofMetadata{
-		Kind:          req.Kind,
-		Height:        req.Height,
-		StoreKey:      storeKey,
-		StateKey:      stateKey,
-		AppHash:       req.AppHash,
-		RootHash:      req.RootHash,
-		BoundedLookup: true,
+		Kind:		req.Kind,
+		Height:		req.Height,
+		StoreKey:	storeKey,
+		StateKey:	stateKey,
+		AppHash:	req.AppHash,
+		RootHash:	req.RootHash,
+		BoundedLookup:	true,
 		ProofPath: []ProofPathMetadata{
 			{
-				Step:      0,
-				FromRoot:  req.AppHash,
-				ToRoot:    req.RootHash,
-				StoreKey:  storeKey,
-				StateKey:  "",
-				ProofKind: "app-to-store-root",
+				Step:		0,
+				FromRoot:	req.AppHash,
+				ToRoot:		req.RootHash,
+				StoreKey:	storeKey,
+				StateKey:	"",
+				ProofKind:	"app-to-store-root",
 			},
 			{
-				Step:      1,
-				FromRoot:  req.RootHash,
-				ToRoot:    req.RootHash,
-				StoreKey:  storeKey,
-				StateKey:  stateKey,
-				ProofKind: "store-key-membership",
+				Step:		1,
+				FromRoot:	req.RootHash,
+				ToRoot:		req.RootHash,
+				StoreKey:	storeKey,
+				StateKey:	stateKey,
+				ProofKind:	"store-key-membership",
 			},
 		},
 	}

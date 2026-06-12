@@ -10,94 +10,94 @@ import (
 type ImplementationBacklogPriority string
 
 const (
-	ImplementationBacklogHigh   ImplementationBacklogPriority = "HIGH"
-	ImplementationBacklogMedium ImplementationBacklogPriority = "MEDIUM"
-	ImplementationBacklogLower  ImplementationBacklogPriority = "LOWER"
+	ImplementationBacklogHigh	ImplementationBacklogPriority	= "HIGH"
+	ImplementationBacklogMedium	ImplementationBacklogPriority	= "MEDIUM"
+	ImplementationBacklogLower	ImplementationBacklogPriority	= "LOWER"
 )
 
 const (
-	BacklogTaskZoneDescriptors                = "zone_descriptors"
-	BacklogTaskAetraCoreSkeleton              = "aetracore_skeleton"
-	BacklogTaskGlobalRootHierarchy            = "global_root_hierarchy"
-	BacklogTaskMsgBusMessageEncoding          = "msgbus_message_encoding"
-	BacklogTaskLocalMessageStores             = "local_message_stores"
-	BacklogTaskStoreV2KeyPrefixPlan           = "store_v2_key_prefix_plan"
-	BacklogTaskBlockSTMZoneBatchConflictTests = "blockstm_zone_batch_conflict_tests"
-	BacklogTaskDeterministicRoutingTable      = "deterministic_routing_table_format"
-	BacklogTaskProofRegistrySchema            = "proof_registry_schema"
+	BacklogTaskZoneDescriptors			= "zone_descriptors"
+	BacklogTaskAetraCoreSkeleton			= "aetracore_skeleton"
+	BacklogTaskGlobalRootHierarchy			= "global_root_hierarchy"
+	BacklogTaskMsgBusMessageEncoding		= "msgbus_message_encoding"
+	BacklogTaskLocalMessageStores			= "local_message_stores"
+	BacklogTaskStoreV2KeyPrefixPlan			= "store_v2_key_prefix_plan"
+	BacklogTaskBlockSTMZoneBatchConflictTests	= "blockstm_zone_batch_conflict_tests"
+	BacklogTaskDeterministicRoutingTable		= "deterministic_routing_table_format"
+	BacklogTaskProofRegistrySchema			= "proof_registry_schema"
 
-	BacklogTaskFinancialZoneExtraction  = "financial_zone_extraction"
-	BacklogTaskIdentityZoneActivation   = "identity_zone_activation"
-	BacklogTaskPerZoneMempoolLanes      = "per_zone_mempool_lanes"
-	BacklogTaskPerShardFeeAccumulators  = "per_shard_fee_accumulators"
-	BacklogTaskShardSplitMergeScheduler = "shard_split_merge_scheduler"
-	BacklogTaskAVMBytecodeGasTable      = "avm_bytecode_gas_table"
-	BacklogTaskPaymentSettlementState   = "payment_settlement_state"
-	BacklogTaskCrossZoneIdentityLookup  = "cross_zone_identity_lookup"
+	BacklogTaskFinancialZoneExtraction	= "financial_zone_extraction"
+	BacklogTaskIdentityZoneActivation	= "identity_zone_activation"
+	BacklogTaskPerZoneMempoolLanes		= "per_zone_mempool_lanes"
+	BacklogTaskPerShardFeeAccumulators	= "per_shard_fee_accumulators"
+	BacklogTaskShardSplitMergeScheduler	= "shard_split_merge_scheduler"
+	BacklogTaskAVMBytecodeGasTable		= "avm_bytecode_gas_table"
+	BacklogTaskPaymentSettlementState	= "payment_settlement_state"
+	BacklogTaskCrossZoneIdentityLookup	= "cross_zone_identity_lookup"
 
-	BacklogTaskDynamicRouteCapacityScoring = "dynamic_route_capacity_scoring"
-	BacklogTaskVirtualPaymentChannels      = "virtual_payment_channels"
-	BacklogTaskAdvancedABIIntrospection    = "advanced_abi_introspection"
-	BacklogTaskVMNativeResolverContracts   = "vm_native_resolver_contracts"
-	BacklogTaskValidatorServiceMetadata    = "validator_service_metadata"
-	BacklogTaskZoneStateRentPolicies       = "zone_state_rent_policies"
+	BacklogTaskDynamicRouteCapacityScoring	= "dynamic_route_capacity_scoring"
+	BacklogTaskVirtualPaymentChannels	= "virtual_payment_channels"
+	BacklogTaskAdvancedABIIntrospection	= "advanced_abi_introspection"
+	BacklogTaskVMNativeResolverContracts	= "vm_native_resolver_contracts"
+	BacklogTaskValidatorServiceMetadata	= "validator_service_metadata"
+	BacklogTaskZoneStateRentPolicies	= "zone_state_rent_policies"
 )
 
 var requiredHighPriorityBacklogTasks = map[string]struct{}{
-	BacklogTaskZoneDescriptors:                {},
-	BacklogTaskAetraCoreSkeleton:              {},
-	BacklogTaskGlobalRootHierarchy:            {},
-	BacklogTaskMsgBusMessageEncoding:          {},
-	BacklogTaskLocalMessageStores:             {},
-	BacklogTaskStoreV2KeyPrefixPlan:           {},
-	BacklogTaskBlockSTMZoneBatchConflictTests: {},
-	BacklogTaskDeterministicRoutingTable:      {},
-	BacklogTaskProofRegistrySchema:            {},
+	BacklogTaskZoneDescriptors:			{},
+	BacklogTaskAetraCoreSkeleton:			{},
+	BacklogTaskGlobalRootHierarchy:			{},
+	BacklogTaskMsgBusMessageEncoding:		{},
+	BacklogTaskLocalMessageStores:			{},
+	BacklogTaskStoreV2KeyPrefixPlan:		{},
+	BacklogTaskBlockSTMZoneBatchConflictTests:	{},
+	BacklogTaskDeterministicRoutingTable:		{},
+	BacklogTaskProofRegistrySchema:			{},
 }
 
 var requiredMediumPriorityBacklogTasks = map[string]struct{}{
-	BacklogTaskFinancialZoneExtraction:  {},
-	BacklogTaskIdentityZoneActivation:   {},
-	BacklogTaskPerZoneMempoolLanes:      {},
-	BacklogTaskPerShardFeeAccumulators:  {},
-	BacklogTaskShardSplitMergeScheduler: {},
-	BacklogTaskAVMBytecodeGasTable:      {},
-	BacklogTaskPaymentSettlementState:   {},
-	BacklogTaskCrossZoneIdentityLookup:  {},
+	BacklogTaskFinancialZoneExtraction:	{},
+	BacklogTaskIdentityZoneActivation:	{},
+	BacklogTaskPerZoneMempoolLanes:		{},
+	BacklogTaskPerShardFeeAccumulators:	{},
+	BacklogTaskShardSplitMergeScheduler:	{},
+	BacklogTaskAVMBytecodeGasTable:		{},
+	BacklogTaskPaymentSettlementState:	{},
+	BacklogTaskCrossZoneIdentityLookup:	{},
 }
 
 var requiredLowerPriorityBacklogTasks = map[string]struct{}{
-	BacklogTaskDynamicRouteCapacityScoring: {},
-	BacklogTaskVirtualPaymentChannels:      {},
-	BacklogTaskAdvancedABIIntrospection:    {},
-	BacklogTaskVMNativeResolverContracts:   {},
-	BacklogTaskValidatorServiceMetadata:    {},
-	BacklogTaskZoneStateRentPolicies:       {},
+	BacklogTaskDynamicRouteCapacityScoring:	{},
+	BacklogTaskVirtualPaymentChannels:	{},
+	BacklogTaskAdvancedABIIntrospection:	{},
+	BacklogTaskVMNativeResolverContracts:	{},
+	BacklogTaskValidatorServiceMetadata:	{},
+	BacklogTaskZoneStateRentPolicies:	{},
 }
 
 type ImplementationBacklogTaskCheck struct {
-	TaskID        string
-	Priority      ImplementationBacklogPriority
-	Component     string
-	EvidenceHash  string
-	TestHash      string
-	Implemented   bool
-	Deterministic bool
+	TaskID		string
+	Priority	ImplementationBacklogPriority
+	Component	string
+	EvidenceHash	string
+	TestHash	string
+	Implemented	bool
+	Deterministic	bool
 }
 
 type ImplementationBacklogInput struct {
-	BacklogVersion string
-	HighPriority   []ImplementationBacklogTaskCheck
-	MediumPriority []ImplementationBacklogTaskCheck
-	LowerPriority  []ImplementationBacklogTaskCheck
+	BacklogVersion	string
+	HighPriority	[]ImplementationBacklogTaskCheck
+	MediumPriority	[]ImplementationBacklogTaskCheck
+	LowerPriority	[]ImplementationBacklogTaskCheck
 }
 
 type ImplementationBacklogReport struct {
-	BacklogVersion string
-	Passed         bool
-	Failed         []string
-	Evidence       []string
-	ReportHash     string
+	BacklogVersion	string
+	Passed		bool
+	Failed		[]string
+	Evidence	[]string
+	ReportHash	string
 }
 
 func BuildImplementationBacklogReport(input ImplementationBacklogInput) ImplementationBacklogReport {
@@ -125,10 +125,10 @@ func BuildImplementationBacklogReport(input ImplementationBacklogInput) Implemen
 		evidence = append(evidence, "lower_priority_backlog:"+hashBacklogTaskChecks(ImplementationBacklogLower, input.LowerPriority))
 	}
 	report := ImplementationBacklogReport{
-		BacklogVersion: input.BacklogVersion,
-		Passed:         len(failed) == 0,
-		Failed:         normalizeStringSet(failed),
-		Evidence:       normalizeStringSet(evidence),
+		BacklogVersion:	input.BacklogVersion,
+		Passed:		len(failed) == 0,
+		Failed:		normalizeStringSet(failed),
+		Evidence:	normalizeStringSet(evidence),
 	}
 	report.ReportHash = ComputeImplementationBacklogReportHash(report)
 	return report

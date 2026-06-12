@@ -77,8 +77,8 @@ func TestServiceRegistryModeStateBuildsDeterministicRoots(t *testing.T) {
 	first := testService("identity-resolver", ZoneIDIdentity)
 	second := testService("payments-settlement", ZoneIDPayment)
 	auth := map[string]string{
-		first.ServiceID:  ComputeServiceOwnerAuthorizationHash(first.ServiceID, first.Owner, 20),
-		second.ServiceID: ComputeServiceOwnerAuthorizationHash(second.ServiceID, second.Owner, 20),
+		first.ServiceID:	ComputeServiceOwnerAuthorizationHash(first.ServiceID, first.Owner, 20),
+		second.ServiceID:	ComputeServiceOwnerAuthorizationHash(second.ServiceID, second.Owner, 20),
 	}
 
 	onChain, err := BuildServiceRegistryModeState(ServiceRegistryOnChain, []ServiceDescriptor{second, first}, auth, 20)

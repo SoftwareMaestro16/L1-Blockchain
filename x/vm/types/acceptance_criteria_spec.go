@@ -10,29 +10,29 @@ import (
 )
 
 const (
-	AVMAcceptanceSyncExecutionWrapsMsgServer         AVMAcceptanceCriterion = "sync_execution_wraps_existing_cosmos_sdk_msgserver_calls"
-	AVMAcceptanceAsyncLifecycleComplete              AVMAcceptanceCriterion = "async_messages_can_be_scheduled_executed_retried_bounced_expired_and_dead_lettered"
-	AVMAcceptanceQueueOrderingDeterministicTested    AVMAcceptanceCriterion = "queue_ordering_is_deterministic_and_test_covered"
-	AVMAcceptanceCrossZoneQueueReceiptRoots          AVMAcceptanceCriterion = "cross_zone_messages_use_queue_and_receipt_roots"
-	AVMAcceptanceActorMailboxIsolation               AVMAcceptanceCriterion = "actor_runtime_supports_isolated_mailbox_execution"
-	AVMAcceptanceContinuationsPauseResume            AVMAcceptanceCriterion = "continuations_support_pause_and_resume_across_blocks"
-	AVMAcceptanceContractBackendsExplicitInterface   AVMAcceptanceCriterion = "contract_backends_are_isolated_behind_explicit_runtime_interface"
-	AVMAcceptanceGasModelComplete                    AVMAcceptanceCriterion = "gas_model_covers_execution_storage_scheduling_routing_proof_verification_and_continuation_storage"
-	AVMAcceptanceInterfaceRegistryComplete           AVMAcceptanceCriterion = "interface_registry_supports_methods_events_async_handlers_and_get_methods"
-	AVMAcceptanceRootCommitmentsComplete             AVMAcceptanceCriterion = "root_commitments_include_router_message_actor_contract_continuation_interface_and_receipt_roots"
-	AVMAcceptanceReplayProtection                    AVMAcceptanceCriterion = "replay_protection_prevents_duplicate_message_execution"
-	AVMAcceptanceStoreV2PrefixProofQueryable         AVMAcceptanceCriterion = "store_v2_layout_is_prefix_isolated_and_proof_queryable"
-	AVMAcceptanceBlockSTMConflictStrategyBenchmarked AVMAcceptanceCriterion = "blockstm_conflict_strategy_is_defined_and_benchmarked"
+	AVMAcceptanceSyncExecutionWrapsMsgServer		AVMAcceptanceCriterion	= "sync_execution_wraps_existing_cosmos_sdk_msgserver_calls"
+	AVMAcceptanceAsyncLifecycleComplete			AVMAcceptanceCriterion	= "async_messages_can_be_scheduled_executed_retried_bounced_expired_and_dead_lettered"
+	AVMAcceptanceQueueOrderingDeterministicTested		AVMAcceptanceCriterion	= "queue_ordering_is_deterministic_and_test_covered"
+	AVMAcceptanceCrossZoneQueueReceiptRoots			AVMAcceptanceCriterion	= "cross_zone_messages_use_queue_and_receipt_roots"
+	AVMAcceptanceActorMailboxIsolation			AVMAcceptanceCriterion	= "actor_runtime_supports_isolated_mailbox_execution"
+	AVMAcceptanceContinuationsPauseResume			AVMAcceptanceCriterion	= "continuations_support_pause_and_resume_across_blocks"
+	AVMAcceptanceContractBackendsExplicitInterface		AVMAcceptanceCriterion	= "contract_backends_are_isolated_behind_explicit_runtime_interface"
+	AVMAcceptanceGasModelComplete				AVMAcceptanceCriterion	= "gas_model_covers_execution_storage_scheduling_routing_proof_verification_and_continuation_storage"
+	AVMAcceptanceInterfaceRegistryComplete			AVMAcceptanceCriterion	= "interface_registry_supports_methods_events_async_handlers_and_get_methods"
+	AVMAcceptanceRootCommitmentsComplete			AVMAcceptanceCriterion	= "root_commitments_include_router_message_actor_contract_continuation_interface_and_receipt_roots"
+	AVMAcceptanceReplayProtection				AVMAcceptanceCriterion	= "replay_protection_prevents_duplicate_message_execution"
+	AVMAcceptanceStoreV2PrefixProofQueryable		AVMAcceptanceCriterion	= "store_v2_layout_is_prefix_isolated_and_proof_queryable"
+	AVMAcceptanceBlockSTMConflictStrategyBenchmarked	AVMAcceptanceCriterion	= "blockstm_conflict_strategy_is_defined_and_benchmarked"
 
-	MaxAVMAcceptanceCriteria  = 64
-	MaxAVMAcceptanceNameBytes = 192
+	MaxAVMAcceptanceCriteria	= 64
+	MaxAVMAcceptanceNameBytes	= 192
 )
 
 type AVMAcceptanceCriterion string
 
 type AVMAcceptanceCriteriaSpec struct {
-	Criteria []AVMAcceptanceCriterion
-	SpecHash string
+	Criteria	[]AVMAcceptanceCriterion
+	SpecHash	string
 }
 
 func DefaultAVMAcceptanceCriteriaSpec() (AVMAcceptanceCriteriaSpec, error) {

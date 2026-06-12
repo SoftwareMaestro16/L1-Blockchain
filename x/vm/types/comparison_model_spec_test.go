@@ -66,18 +66,18 @@ func TestAVMExecutionModelComparisonRejectsMissingFeatureAndHashMismatch(t *test
 
 func TestAVMExecutionComparisonRejectsUndifferentiatedRows(t *testing.T) {
 	_, err := NewAVMExecutionComparisonRow(AVMExecutionComparisonRow{
-		Feature:              AVMComparisonFeatureExecution,
-		ClassicCosmosSDK:     "synchronous",
-		AVM:                  "synchronous",
-		RequiresAVMExtension: false,
+		Feature:		AVMComparisonFeatureExecution,
+		ClassicCosmosSDK:	"synchronous",
+		AVM:			"synchronous",
+		RequiresAVMExtension:	false,
 	})
 	require.ErrorContains(t, err, "distinguish AVM")
 
 	row, err := NewAVMExecutionComparisonRow(AVMExecutionComparisonRow{
-		Feature:              AVMComparisonFeatureExecution,
-		ClassicCosmosSDK:     "synchronous",
-		AVM:                  "sync + async",
-		RequiresAVMExtension: true,
+		Feature:		AVMComparisonFeatureExecution,
+		ClassicCosmosSDK:	"synchronous",
+		AVM:			"sync + async",
+		RequiresAVMExtension:	true,
 	})
 	require.NoError(t, err)
 	row.AVM = "sync | async"

@@ -14,8 +14,8 @@ func TestInvariantListCommandReturnsCriticalRoutes(t *testing.T) {
 	require.NoError(t, err)
 
 	var res struct {
-		Command string   `json:"command"`
-		Routes  []string `json:"routes"`
+		Command	string		`json:"command"`
+		Routes	[]string	`json:"routes"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(out), &res), out)
 	require.Equal(t, "invariants list", res.Command)

@@ -21,7 +21,6 @@ func (app *L1App) validateAetraAuthGenesis(genesisState GenesisState) error {
 	return genesisvalidation.ValidateAuthGenesis(app.appCodec, genesisvalidation.State(genesisState))
 }
 
-
 func (app *L1App) ensureCoreGenesisCollections(ctx sdk.Context) error {
 	if err := ensureCollectionItem(ctx, app.MintKeeper.Params, appparams.AetraMintParams()); err != nil {
 		return err

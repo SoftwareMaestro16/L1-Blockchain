@@ -16,154 +16,154 @@ type OffChainProofAnchorPolicy string
 type OffChainAvailabilityPolicy string
 
 const (
-	OffChainEndpointRPC            OffChainEndpointType = "RPC_ENDPOINT"
-	OffChainEndpointOverlay        OffChainEndpointType = "OVERLAY"
-	OffChainEndpointProviderMesh   OffChainEndpointType = "PROVIDER_MESH"
-	OffChainEndpointServiceNetwork OffChainEndpointType = "SERVICE_NETWORK"
+	OffChainEndpointRPC		OffChainEndpointType	= "RPC_ENDPOINT"
+	OffChainEndpointOverlay		OffChainEndpointType	= "OVERLAY"
+	OffChainEndpointProviderMesh	OffChainEndpointType	= "PROVIDER_MESH"
+	OffChainEndpointServiceNetwork	OffChainEndpointType	= "SERVICE_NETWORK"
 
-	OffChainRequestCallerSigned OffChainRequestSigningPolicy = "CALLER_SIGNED"
+	OffChainRequestCallerSigned	OffChainRequestSigningPolicy	= "CALLER_SIGNED"
 
-	OffChainResponseProviderSigned OffChainResponseSigningPolicy = "PROVIDER_SIGNED"
+	OffChainResponseProviderSigned	OffChainResponseSigningPolicy	= "PROVIDER_SIGNED"
 
-	OffChainProofAnchorNone     OffChainProofAnchorPolicy = "NONE"
-	OffChainProofAnchorOptional OffChainProofAnchorPolicy = "OPTIONAL"
-	OffChainProofAnchorRequired OffChainProofAnchorPolicy = "REQUIRED"
+	OffChainProofAnchorNone		OffChainProofAnchorPolicy	= "NONE"
+	OffChainProofAnchorOptional	OffChainProofAnchorPolicy	= "OPTIONAL"
+	OffChainProofAnchorRequired	OffChainProofAnchorPolicy	= "REQUIRED"
 
-	OffChainAvailabilitySignedAdvertisement OffChainAvailabilityPolicy = "SIGNED_ADVERTISEMENT"
-	OffChainAvailabilityRenewableEndpoint   OffChainAvailabilityPolicy = "RENEWABLE_ENDPOINT"
+	OffChainAvailabilitySignedAdvertisement	OffChainAvailabilityPolicy	= "SIGNED_ADVERTISEMENT"
+	OffChainAvailabilityRenewableEndpoint	OffChainAvailabilityPolicy	= "RENEWABLE_ENDPOINT"
 )
 
 type OffChainServiceDefinition struct {
-	ServiceID             string
-	Owner                 string
-	ZoneID                ZoneID
-	Endpoint              string
-	EndpointType          OffChainEndpointType
-	ProviderKey           string
-	RequestSigningPolicy  OffChainRequestSigningPolicy
-	ResponseSigningPolicy OffChainResponseSigningPolicy
-	ProofAnchorPolicy     OffChainProofAnchorPolicy
-	AvailabilityPolicy    OffChainAvailabilityPolicy
-	ResultExpiry          uint64
-	InterfaceID           string
-	InterfaceName         string
-	EndpointKey           string
-	Version               uint64
-	AvailabilityHash      string
-	ProviderRoot          string
-	PaymentDenom          string
-	PaymentAmount         string
-	Methods               []OffChainServiceMethod
-	MetadataHash          string
-	CreatedHeight         uint64
-	UpdatedHeight         uint64
-	ExpiryHeight          uint64
+	ServiceID		string
+	Owner			string
+	ZoneID			ZoneID
+	Endpoint		string
+	EndpointType		OffChainEndpointType
+	ProviderKey		string
+	RequestSigningPolicy	OffChainRequestSigningPolicy
+	ResponseSigningPolicy	OffChainResponseSigningPolicy
+	ProofAnchorPolicy	OffChainProofAnchorPolicy
+	AvailabilityPolicy	OffChainAvailabilityPolicy
+	ResultExpiry		uint64
+	InterfaceID		string
+	InterfaceName		string
+	EndpointKey		string
+	Version			uint64
+	AvailabilityHash	string
+	ProviderRoot		string
+	PaymentDenom		string
+	PaymentAmount		string
+	Methods			[]OffChainServiceMethod
+	MetadataHash		string
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	ExpiryHeight		uint64
 }
 
 type OffChainServiceMethod struct {
-	MethodID             string
-	Name                 string
-	InputSchemaHash      string
-	OutputSchemaHash     string
-	RequiredPaymentModel string
-	VerificationModel    ServiceVerificationModel
-	TimeoutHeightDelta   uint64
-	IdempotencyRequired  bool
-	CallbackSupported    bool
-	FailurePolicy        ServiceFailureBehavior
+	MethodID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	RequiredPaymentModel	string
+	VerificationModel	ServiceVerificationModel
+	TimeoutHeightDelta	uint64
+	IdempotencyRequired	bool
+	CallbackSupported	bool
+	FailurePolicy		ServiceFailureBehavior
 }
 
 type OffChainEndpointMetadata struct {
-	Endpoint     string
-	EndpointType OffChainEndpointType
-	ProviderKey  string
-	ExpiryHeight uint64
-	MetadataHash string
+	Endpoint	string
+	EndpointType	OffChainEndpointType
+	ProviderKey	string
+	ExpiryHeight	uint64
+	MetadataHash	string
 }
 
 type OffChainServiceDescriptorSchema struct {
-	Descriptor            ServiceDescriptor
-	Endpoint              OffChainEndpointMetadata
-	RequestSigningPolicy  OffChainRequestSigningPolicy
-	ResponseSigningPolicy OffChainResponseSigningPolicy
-	ProofAnchorPolicy     OffChainProofAnchorPolicy
-	AvailabilityPolicy    OffChainAvailabilityPolicy
-	ResultExpiry          uint64
-	SchemaHash            string
+	Descriptor		ServiceDescriptor
+	Endpoint		OffChainEndpointMetadata
+	RequestSigningPolicy	OffChainRequestSigningPolicy
+	ResponseSigningPolicy	OffChainResponseSigningPolicy
+	ProofAnchorPolicy	OffChainProofAnchorPolicy
+	AvailabilityPolicy	OffChainAvailabilityPolicy
+	ResultExpiry		uint64
+	SchemaHash		string
 }
 
 type OffChainSignedAdvertisement struct {
-	ServiceID         string
-	Owner             string
-	InterfaceHash     string
-	Endpoint          string
-	EndpointType      OffChainEndpointType
-	ProviderKey       string
-	ExpiryHeight      uint64
-	AdvertisementHash string
-	Signer            string
-	SignatureHash     string
+	ServiceID		string
+	Owner			string
+	InterfaceHash		string
+	Endpoint		string
+	EndpointType		OffChainEndpointType
+	ProviderKey		string
+	ExpiryHeight		uint64
+	AdvertisementHash	string
+	Signer			string
+	SignatureHash		string
 }
 
 type OffChainServiceRequest struct {
-	CallID         string
-	ServiceID      string
-	MethodID       string
-	Caller         string
-	Nonce          uint64
-	IdempotencyKey string
-	PayloadHash    string
-	ProviderKey    string
-	DeadlineHeight uint64
-	RequestHash    string
+	CallID		string
+	ServiceID	string
+	MethodID	string
+	Caller		string
+	Nonce		uint64
+	IdempotencyKey	string
+	PayloadHash	string
+	ProviderKey	string
+	DeadlineHeight	uint64
+	RequestHash	string
 }
 
 type OffChainSignedRequest struct {
-	Request       OffChainServiceRequest
-	Signer        string
-	SignatureHash string
+	Request		OffChainServiceRequest
+	Signer		string
+	SignatureHash	string
 }
 
 type OffChainServiceResponse struct {
-	CallID             string
-	ServiceID          string
-	MethodID           string
-	RequestHash        string
-	ResponseHash       string
-	ProviderKey        string
-	Height             uint64
-	ResultExpiryHeight uint64
-	SettlementUse      bool
-	ChallengeUse       bool
+	CallID			string
+	ServiceID		string
+	MethodID		string
+	RequestHash		string
+	ResponseHash		string
+	ProviderKey		string
+	Height			uint64
+	ResultExpiryHeight	uint64
+	SettlementUse		bool
+	ChallengeUse		bool
 }
 
 type OffChainSignedResponse struct {
-	Response      OffChainServiceResponse
-	Signer        string
-	SignatureHash string
+	Response	OffChainServiceResponse
+	Signer		string
+	SignatureHash	string
 }
 
 type OffChainReceiptAnchorMessage struct {
-	ServiceID    string
-	CallID       string
-	RequestHash  string
-	ResponseHash string
-	ProviderKey  string
-	Height       uint64
-	ProofHash    string
-	AnchorHash   string
+	ServiceID	string
+	CallID		string
+	RequestHash	string
+	ResponseHash	string
+	ProviderKey	string
+	Height		uint64
+	ProofHash	string
+	AnchorHash	string
 }
 
 type OffChainEndpointRenewal struct {
-	ServiceID         string
-	Endpoint          string
-	EndpointType      OffChainEndpointType
-	ProviderKey       string
-	RenewedAtHeight   uint64
-	ExpiryHeight      uint64
-	AdvertisementHash string
-	Signer            string
-	SignatureHash     string
+	ServiceID		string
+	Endpoint		string
+	EndpointType		OffChainEndpointType
+	ProviderKey		string
+	RenewedAtHeight		uint64
+	ExpiryHeight		uint64
+	AdvertisementHash	string
+	Signer			string
+	SignatureHash		string
 }
 
 func BuildOffChainServiceDescriptor(definition OffChainServiceDefinition) (OffChainServiceDescriptorSchema, error) {
@@ -176,17 +176,17 @@ func BuildOffChainServiceDescriptor(definition OffChainServiceDefinition) (OffCh
 		methods[i] = method.ServiceMethodDescriptor()
 	}
 	interfaceDescriptor := ServiceInterfaceDescriptor{
-		InterfaceID:    definition.InterfaceID,
-		InterfaceName:  definition.InterfaceName,
-		Version:        definition.Version,
-		SchemaEncoding: DefaultOnChainSchemaEncoding,
-		Methods:        methods,
-		Events:         []string{"offchain.receipt_anchored"},
-		Errors:         []string{"offchain.response_rejected"},
-		AuthModel:      DefaultOnChainAuthModel,
-		PaymentModel:   definition.Methods[0].RequiredPaymentModel,
-		MetadataHash:   definition.MetadataHash,
-		CreatedHeight:  definition.CreatedHeight,
+		InterfaceID:	definition.InterfaceID,
+		InterfaceName:	definition.InterfaceName,
+		Version:	definition.Version,
+		SchemaEncoding:	DefaultOnChainSchemaEncoding,
+		Methods:	methods,
+		Events:		[]string{"offchain.receipt_anchored"},
+		Errors:		[]string{"offchain.response_rejected"},
+		AuthModel:	DefaultOnChainAuthModel,
+		PaymentModel:	definition.Methods[0].RequiredPaymentModel,
+		MetadataHash:	definition.MetadataHash,
+		CreatedHeight:	definition.CreatedHeight,
 	}
 	interfaceDescriptor = CanonicalServiceInterfaceDescriptor(interfaceDescriptor)
 	interfaceDescriptor.InterfaceHash = ComputeServiceInterfaceHash(interfaceDescriptor)
@@ -198,54 +198,54 @@ func BuildOffChainServiceDescriptor(definition OffChainServiceDefinition) (OffCh
 		providerPoolID = definition.ProviderKey
 	}
 	descriptor := ServiceDescriptor{
-		ServiceID:        definition.ServiceID,
-		Owner:            definition.Owner,
-		ServiceType:      ServiceTypeOffChain,
-		ZoneID:           definition.ZoneID,
-		InterfaceID:      definition.InterfaceID,
-		EndpointKey:      definition.EndpointKey,
-		Version:          definition.Version,
-		AvailabilityHash: definition.AvailabilityHash,
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     definition.ExpiryHeight,
-		CreatedHeight:    definition.CreatedHeight,
-		UpdatedHeight:    definition.UpdatedHeight,
-		Interface:        interfaceDescriptor,
+		ServiceID:		definition.ServiceID,
+		Owner:			definition.Owner,
+		ServiceType:		ServiceTypeOffChain,
+		ZoneID:			definition.ZoneID,
+		InterfaceID:		definition.InterfaceID,
+		EndpointKey:		definition.EndpointKey,
+		Version:		definition.Version,
+		AvailabilityHash:	definition.AvailabilityHash,
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		definition.ExpiryHeight,
+		CreatedHeight:		definition.CreatedHeight,
+		UpdatedHeight:		definition.UpdatedHeight,
+		Interface:		interfaceDescriptor,
 		Execution: ServiceExecutionDescriptor{
-			Location:        location,
-			Target:          definition.EndpointKey,
-			Endpoint:        definition.Endpoint,
-			ProviderPoolID:  providerPoolID,
-			Mode:            ExecutionModeAsync,
-			Deterministic:   false,
-			ReceiptPolicy:   ServiceReceiptCommitted,
-			FailureBehavior: aggregateOffChainFailurePolicy(definition.Methods),
-			ResultExpiry:    definition.ResultExpiry,
+			Location:		location,
+			Target:			definition.EndpointKey,
+			Endpoint:		definition.Endpoint,
+			ProviderPoolID:		providerPoolID,
+			Mode:			ExecutionModeAsync,
+			Deterministic:		false,
+			ReceiptPolicy:		ServiceReceiptCommitted,
+			FailureBehavior:	aggregateOffChainFailurePolicy(definition.Methods),
+			ResultExpiry:		definition.ResultExpiry,
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:     definition.ServiceID,
-			ProviderRoot:    definition.ProviderRoot,
-			MetadataHash:    definition.MetadataHash,
-			SignaturePolicy: string(definition.AvailabilityPolicy),
+			ServiceName:		definition.ServiceID,
+			ProviderRoot:		definition.ProviderRoot,
+			MetadataHash:		definition.MetadataHash,
+			SignaturePolicy:	string(definition.AvailabilityPolicy),
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentPrepaid,
-			Denom:          definition.PaymentDenom,
-			Amount:         definition.PaymentAmount,
-			PricingUnit:    ServicePricingPerCall,
-			ExpiryHeight:   definition.ExpiryHeight,
+			SettlementMode:	ServicePaymentPrepaid,
+			Denom:		definition.PaymentDenom,
+			Amount:		definition.PaymentAmount,
+			PricingUnit:	ServicePricingPerCall,
+			ExpiryHeight:	definition.ExpiryHeight,
 		},
 		Storage: ServiceStorageDescriptor{
-			Model:         ServiceStorageDistributedOffChain,
-			ProofRequired: definition.ProofAnchorPolicy == OffChainProofAnchorRequired,
+			Model:		ServiceStorageDistributedOffChain,
+			ProofRequired:	definition.ProofAnchorPolicy == OffChainProofAnchorRequired,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel:              ServiceTrustFullyTrusted,
-			Model:                   offChainVerificationModel(definition.ProofAnchorPolicy),
-			RequestSigningRequired:  true,
-			ResponseSigningRequired: true,
-			ProofFormat:             offChainProofFormat(definition.ProofAnchorPolicy),
+			TrustModel:			ServiceTrustFullyTrusted,
+			Model:				offChainVerificationModel(definition.ProofAnchorPolicy),
+			RequestSigningRequired:		true,
+			ResponseSigningRequired:	true,
+			ProofFormat:			offChainProofFormat(definition.ProofAnchorPolicy),
 		},
 	}
 	descriptor = CanonicalServiceDescriptor(descriptor)
@@ -253,19 +253,19 @@ func BuildOffChainServiceDescriptor(definition OffChainServiceDefinition) (OffCh
 		return OffChainServiceDescriptorSchema{}, err
 	}
 	schema := OffChainServiceDescriptorSchema{
-		Descriptor: descriptor,
+		Descriptor:	descriptor,
 		Endpoint: OffChainEndpointMetadata{
-			Endpoint:     definition.Endpoint,
-			EndpointType: definition.EndpointType,
-			ProviderKey:  definition.ProviderKey,
-			ExpiryHeight: definition.ExpiryHeight,
-			MetadataHash: definition.MetadataHash,
+			Endpoint:	definition.Endpoint,
+			EndpointType:	definition.EndpointType,
+			ProviderKey:	definition.ProviderKey,
+			ExpiryHeight:	definition.ExpiryHeight,
+			MetadataHash:	definition.MetadataHash,
 		},
-		RequestSigningPolicy:  definition.RequestSigningPolicy,
-		ResponseSigningPolicy: definition.ResponseSigningPolicy,
-		ProofAnchorPolicy:     definition.ProofAnchorPolicy,
-		AvailabilityPolicy:    definition.AvailabilityPolicy,
-		ResultExpiry:          definition.ResultExpiry,
+		RequestSigningPolicy:	definition.RequestSigningPolicy,
+		ResponseSigningPolicy:	definition.ResponseSigningPolicy,
+		ProofAnchorPolicy:	definition.ProofAnchorPolicy,
+		AvailabilityPolicy:	definition.AvailabilityPolicy,
+		ResultExpiry:		definition.ResultExpiry,
 	}
 	schema.SchemaHash = ComputeOffChainServiceDescriptorSchemaHash(schema)
 	return schema, schema.Validate()
@@ -403,17 +403,17 @@ func (method OffChainServiceMethod) Validate() error {
 
 func (method OffChainServiceMethod) ServiceMethodDescriptor() ServiceMethodDescriptor {
 	return ServiceMethodDescriptor{
-		MethodID:             method.MethodID,
-		Name:                 method.Name,
-		InputSchemaHash:      method.InputSchemaHash,
-		OutputSchemaHash:     method.OutputSchemaHash,
-		ExecutionType:        ServiceMethodAsync,
-		RequiredPaymentModel: method.RequiredPaymentModel,
-		VerificationModel:    method.VerificationModel,
-		TimeoutHeightDelta:   method.TimeoutHeightDelta,
-		IdempotencyRequired:  method.IdempotencyRequired,
-		CallbackSupported:    method.CallbackSupported,
-		FailureBehavior:      method.FailurePolicy,
+		MethodID:		method.MethodID,
+		Name:			method.Name,
+		InputSchemaHash:	method.InputSchemaHash,
+		OutputSchemaHash:	method.OutputSchemaHash,
+		ExecutionType:		ServiceMethodAsync,
+		RequiredPaymentModel:	method.RequiredPaymentModel,
+		VerificationModel:	method.VerificationModel,
+		TimeoutHeightDelta:	method.TimeoutHeightDelta,
+		IdempotencyRequired:	method.IdempotencyRequired,
+		CallbackSupported:	method.CallbackSupported,
+		FailureBehavior:	method.FailurePolicy,
 	}
 }
 
@@ -478,14 +478,14 @@ func NewOffChainSignedAdvertisement(schema OffChainServiceDescriptorSchema, sign
 		return OffChainSignedAdvertisement{}, err
 	}
 	ad := OffChainSignedAdvertisement{
-		ServiceID:     schema.Descriptor.ServiceID,
-		Owner:         schema.Descriptor.Owner,
-		InterfaceHash: schema.Descriptor.Interface.InterfaceHash,
-		Endpoint:      schema.Endpoint.Endpoint,
-		EndpointType:  schema.Endpoint.EndpointType,
-		ProviderKey:   schema.Endpoint.ProviderKey,
-		ExpiryHeight:  schema.Endpoint.ExpiryHeight,
-		Signer:        strings.TrimSpace(signer),
+		ServiceID:	schema.Descriptor.ServiceID,
+		Owner:		schema.Descriptor.Owner,
+		InterfaceHash:	schema.Descriptor.Interface.InterfaceHash,
+		Endpoint:	schema.Endpoint.Endpoint,
+		EndpointType:	schema.Endpoint.EndpointType,
+		ProviderKey:	schema.Endpoint.ProviderKey,
+		ExpiryHeight:	schema.Endpoint.ExpiryHeight,
+		Signer:		strings.TrimSpace(signer),
 	}
 	ad.AdvertisementHash = ComputeOffChainAdvertisementHash(ad)
 	ad.SignatureHash = ComputeOffChainAdvertisementSignatureHash(ad, ad.Signer)
@@ -548,8 +548,8 @@ func (ad OffChainSignedAdvertisement) Validate() error {
 func NewOffChainSignedRequest(request OffChainServiceRequest, signer string) (OffChainSignedRequest, error) {
 	request = CanonicalOffChainServiceRequest(request)
 	signed := OffChainSignedRequest{
-		Request: request,
-		Signer:  strings.TrimSpace(signer),
+		Request:	request,
+		Signer:		strings.TrimSpace(signer),
 	}
 	signed.SignatureHash = ComputeOffChainRequestSignatureHash(request, signed.Signer)
 	return signed, signed.Validate()
@@ -627,8 +627,8 @@ func (request OffChainServiceRequest) Validate() error {
 func NewOffChainSignedResponse(response OffChainServiceResponse, signer string) (OffChainSignedResponse, error) {
 	response = CanonicalOffChainServiceResponse(response)
 	signed := OffChainSignedResponse{
-		Response: response,
-		Signer:   strings.TrimSpace(signer),
+		Response:	response,
+		Signer:		strings.TrimSpace(signer),
 	}
 	signed.SignatureHash = ComputeOffChainResponseSignatureHash(response, signed.Signer)
 	return signed, signed.Validate()
@@ -697,13 +697,13 @@ func NewOffChainReceiptAnchorMessage(response OffChainServiceResponse, proofHash
 		return OffChainReceiptAnchorMessage{}, err
 	}
 	anchor := OffChainReceiptAnchorMessage{
-		ServiceID:    response.ServiceID,
-		CallID:       response.CallID,
-		RequestHash:  response.RequestHash,
-		ResponseHash: response.ResponseHash,
-		ProviderKey:  response.ProviderKey,
-		Height:       response.Height,
-		ProofHash:    strings.ToLower(strings.TrimSpace(proofHash)),
+		ServiceID:	response.ServiceID,
+		CallID:		response.CallID,
+		RequestHash:	response.RequestHash,
+		ResponseHash:	response.ResponseHash,
+		ProviderKey:	response.ProviderKey,
+		Height:		response.Height,
+		ProofHash:	strings.ToLower(strings.TrimSpace(proofHash)),
 	}
 	if anchor.ProofHash == "" {
 		anchor.ProofHash = ComputeOffChainReceiptAnchorProofHash(anchor)
@@ -751,13 +751,13 @@ func NewOffChainEndpointRenewal(schema OffChainServiceDescriptorSchema, endpoint
 		return OffChainEndpointRenewal{}, err
 	}
 	renewal := OffChainEndpointRenewal{
-		ServiceID:       schema.Descriptor.ServiceID,
-		Endpoint:        strings.TrimSpace(endpoint),
-		EndpointType:    schema.Endpoint.EndpointType,
-		ProviderKey:     schema.Endpoint.ProviderKey,
-		RenewedAtHeight: schema.Descriptor.UpdatedHeight,
-		ExpiryHeight:    expiryHeight,
-		Signer:          strings.TrimSpace(signer),
+		ServiceID:		schema.Descriptor.ServiceID,
+		Endpoint:		strings.TrimSpace(endpoint),
+		EndpointType:		schema.Endpoint.EndpointType,
+		ProviderKey:		schema.Endpoint.ProviderKey,
+		RenewedAtHeight:	schema.Descriptor.UpdatedHeight,
+		ExpiryHeight:		expiryHeight,
+		Signer:			strings.TrimSpace(signer),
 	}
 	renewal.AdvertisementHash = ComputeOffChainEndpointRenewalHash(renewal)
 	renewal.SignatureHash = ComputeOffChainEndpointRenewalSignatureHash(renewal, renewal.Signer)

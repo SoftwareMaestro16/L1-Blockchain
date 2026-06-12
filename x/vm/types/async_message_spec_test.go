@@ -87,10 +87,10 @@ func TestAVMAsyncMessageRegistryRequiresReplayTombstoneForConsumedMessages(t *te
 	require.ErrorContains(t, registry.Validate(), "must create replay tombstone")
 
 	registry = AVMAsyncMessageRegistry{
-		ConsumedMessageIDs: []string{consumed.ID},
+		ConsumedMessageIDs:	[]string{consumed.ID},
 		ReplayTombstones: []AVMAsyncReplayTombstone{{
-			MessageID:      consumed.ID,
-			ConsumedHeight: 12,
+			MessageID:	consumed.ID,
+			ConsumedHeight:	12,
 		}},
 	}
 	require.NoError(t, registry.Validate())
@@ -102,22 +102,22 @@ func TestAVMAsyncMessageRegistryRequiresReplayTombstoneForConsumedMessages(t *te
 
 func testAVMAsyncMessage(source string, sourceZone zonestypes.ZoneID, destination string, destinationZone zonestypes.ZoneID, nonce uint64, createdHeight uint64) AVMAsyncMessage {
 	return AVMAsyncMessage{
-		ChainID:         "aetra-1",
-		Source:          source,
-		Destination:     destination,
-		Payload:         []byte("payload"),
-		GasLimit:        100,
-		DelayHeight:     1,
-		ExpiryHeight:    createdHeight + 10,
-		RetryPolicy:     DefaultAVMRetryPolicy(createdHeight + 10),
-		BounceFlag:      true,
-		SourceZone:      sourceZone,
-		DestinationZone: destinationZone,
-		SenderNonce:     nonce,
-		PayloadType:     "contract.call",
-		ValueNAET:       1,
-		ForwardingFee:   1,
-		Priority:        3,
-		CreatedHeight:   createdHeight,
+		ChainID:		"aetra-1",
+		Source:			source,
+		Destination:		destination,
+		Payload:		[]byte("payload"),
+		GasLimit:		100,
+		DelayHeight:		1,
+		ExpiryHeight:		createdHeight + 10,
+		RetryPolicy:		DefaultAVMRetryPolicy(createdHeight + 10),
+		BounceFlag:		true,
+		SourceZone:		sourceZone,
+		DestinationZone:	destinationZone,
+		SenderNonce:		nonce,
+		PayloadType:		"contract.call",
+		ValueNAET:		1,
+		ForwardingFee:		1,
+		Priority:		3,
+		CreatedHeight:		createdHeight,
 	}
 }

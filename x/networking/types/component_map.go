@@ -10,159 +10,159 @@ import (
 type NodeSideComponent string
 
 const (
-	ComponentANA        NodeSideComponent = "ana"
-	ComponentSessionMgr NodeSideComponent = "sessionmgr"
-	ComponentOverlayMgr NodeSideComponent = "overlaymgr"
-	ComponentDRT        NodeSideComponent = "drt"
-	ComponentRL2        NodeSideComponent = "rl2"
-	ComponentMesh       NodeSideComponent = "mesh"
-	ComponentBroadcast  NodeSideComponent = "broadcast"
+	ComponentANA		NodeSideComponent	= "ana"
+	ComponentSessionMgr	NodeSideComponent	= "sessionmgr"
+	ComponentOverlayMgr	NodeSideComponent	= "overlaymgr"
+	ComponentDRT		NodeSideComponent	= "drt"
+	ComponentRL2		NodeSideComponent	= "rl2"
+	ComponentMesh		NodeSideComponent	= "mesh"
+	ComponentBroadcast	NodeSideComponent	= "broadcast"
 )
 
 type OnChainSupportModule string
 
 const (
-	SupportModuleNetwork  OnChainSupportModule = "x/network"
-	SupportModuleRouting  OnChainSupportModule = "x/routing"
-	SupportModuleServices OnChainSupportModule = "x/services"
-	SupportModuleStorage  OnChainSupportModule = "x/storage"
-	SupportModuleMessages OnChainSupportModule = "x/messages"
+	SupportModuleNetwork	OnChainSupportModule	= "x/network"
+	SupportModuleRouting	OnChainSupportModule	= "x/routing"
+	SupportModuleServices	OnChainSupportModule	= "x/services"
+	SupportModuleStorage	OnChainSupportModule	= "x/storage"
+	SupportModuleMessages	OnChainSupportModule	= "x/messages"
 )
 
 type NodeSideComponentSpec struct {
-	Component              NodeSideComponent
-	Layer                  NetworkLayer
-	Channels               []ChannelClass
-	Responsibilities       []string
-	DependsOn              []NodeSideComponent
-	RuntimeOnly            bool
-	AdvisoryUntilCommitted bool
-	WritesCommittedState   bool
-	ExtendsCometBFT        bool
+	Component		NodeSideComponent
+	Layer			NetworkLayer
+	Channels		[]ChannelClass
+	Responsibilities	[]string
+	DependsOn		[]NodeSideComponent
+	RuntimeOnly		bool
+	AdvisoryUntilCommitted	bool
+	WritesCommittedState	bool
+	ExtendsCometBFT		bool
 }
 
 type OnChainSupportModuleSpec struct {
-	Module                    OnChainSupportModule
-	OwnsCommittedState        bool
-	StateObjects              []string
-	ConsumesNetworkProofs     bool
-	AllowsExternalNetworkCall bool
-	Optional                  bool
+	Module				OnChainSupportModule
+	OwnsCommittedState		bool
+	StateObjects			[]string
+	ConsumesNetworkProofs		bool
+	AllowsExternalNetworkCall	bool
+	Optional			bool
 }
 
 type NetworkingComponentMap struct {
-	NodeComponents []NodeSideComponentSpec
-	SupportModules []OnChainSupportModuleSpec
-	MapRoot        string
+	NodeComponents	[]NodeSideComponentSpec
+	SupportModules	[]OnChainSupportModuleSpec
+	MapRoot		string
 }
 
 func DefaultNetworkingComponentMap() NetworkingComponentMap {
 	componentMap := NetworkingComponentMap{
 		NodeComponents: []NodeSideComponentSpec{
 			{
-				Component:              ComponentANA,
-				Layer:                  LayerL0Physical,
-				Channels:               []ChannelClass{ChannelConsensus, ChannelMempool, ChannelBlock, ChannelStateSync, ChannelData, ChannelExecution, ChannelService, ChannelRouting, ChannelDiscovery},
-				Responsibilities:       []string{"Aether Networking Adapter", "peer scoring", "channel prioritization", "adaptive fanout"},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentANA,
+				Layer:			LayerL0Physical,
+				Channels:		[]ChannelClass{ChannelConsensus, ChannelMempool, ChannelBlock, ChannelStateSync, ChannelData, ChannelExecution, ChannelService, ChannelRouting, ChannelDiscovery},
+				Responsibilities:	[]string{"Aether Networking Adapter", "peer scoring", "channel prioritization", "adaptive fanout"},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentSessionMgr,
-				Layer:                  LayerL1Session,
-				Channels:               []ChannelClass{ChannelConsensus, ChannelBlock, ChannelStateSync, ChannelExecution, ChannelService, ChannelRouting, ChannelDiscovery, ChannelData},
-				Responsibilities:       []string{"node identity", "handshake", "session keys", "stream multiplexing"},
-				DependsOn:              []NodeSideComponent{ComponentANA},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentSessionMgr,
+				Layer:			LayerL1Session,
+				Channels:		[]ChannelClass{ChannelConsensus, ChannelBlock, ChannelStateSync, ChannelExecution, ChannelService, ChannelRouting, ChannelDiscovery, ChannelData},
+				Responsibilities:	[]string{"node identity", "handshake", "session keys", "stream multiplexing"},
+				DependsOn:		[]NodeSideComponent{ComponentANA},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentOverlayMgr,
-				Layer:                  LayerL2Overlay,
-				Channels:               []ChannelClass{ChannelRouting, ChannelExecution, ChannelService, ChannelData},
-				Responsibilities:       []string{"overlay membership", "peer sets", "route graph building"},
-				DependsOn:              []NodeSideComponent{ComponentSessionMgr, ComponentDRT},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentOverlayMgr,
+				Layer:			LayerL2Overlay,
+				Channels:		[]ChannelClass{ChannelRouting, ChannelExecution, ChannelService, ChannelData},
+				Responsibilities:	[]string{"overlay membership", "peer sets", "route graph building"},
+				DependsOn:		[]NodeSideComponent{ComponentSessionMgr, ComponentDRT},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentDRT,
-				Layer:                  LayerL2Overlay,
-				Channels:               []ChannelClass{ChannelDiscovery, ChannelRouting, ChannelService},
-				Responsibilities:       []string{"distributed routing table", "lease advertisements", "proof-attached responses"},
-				DependsOn:              []NodeSideComponent{ComponentSessionMgr},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentDRT,
+				Layer:			LayerL2Overlay,
+				Channels:		[]ChannelClass{ChannelDiscovery, ChannelRouting, ChannelService},
+				Responsibilities:	[]string{"distributed routing table", "lease advertisements", "proof-attached responses"},
+				DependsOn:		[]NodeSideComponent{ComponentSessionMgr},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentRL2,
-				Layer:                  LayerL2Overlay,
-				Channels:               []ChannelClass{ChannelBlock, ChannelStateSync, ChannelData, ChannelExecution},
-				Responsibilities:       []string{"reliable chunked transport", "resumable transfers", "Merkle verification"},
-				DependsOn:              []NodeSideComponent{ComponentSessionMgr},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentRL2,
+				Layer:			LayerL2Overlay,
+				Channels:		[]ChannelClass{ChannelBlock, ChannelStateSync, ChannelData, ChannelExecution},
+				Responsibilities:	[]string{"reliable chunked transport", "resumable transfers", "Merkle verification"},
+				DependsOn:		[]NodeSideComponent{ComponentSessionMgr},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentMesh,
-				Layer:                  LayerL3Application,
-				Channels:               []ChannelClass{ChannelExecution, ChannelService, ChannelData, ChannelDiscovery},
-				Responsibilities:       []string{"application networking", "service flow", "cross-zone messages", "receipts"},
-				DependsOn:              []NodeSideComponent{ComponentOverlayMgr, ComponentRL2},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentMesh,
+				Layer:			LayerL3Application,
+				Channels:		[]ChannelClass{ChannelExecution, ChannelService, ChannelData, ChannelDiscovery},
+				Responsibilities:	[]string{"application networking", "service flow", "cross-zone messages", "receipts"},
+				DependsOn:		[]NodeSideComponent{ComponentOverlayMgr, ComponentRL2},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 			{
-				Component:              ComponentBroadcast,
-				Layer:                  LayerL0Physical,
-				Channels:               []ChannelClass{ChannelBlock, ChannelData, ChannelService, ChannelRouting},
-				Responsibilities:       []string{"hybrid gossip tree", "deduplication", "header-first block propagation"},
-				DependsOn:              []NodeSideComponent{ComponentANA, ComponentOverlayMgr, ComponentRL2},
-				RuntimeOnly:            true,
-				AdvisoryUntilCommitted: true,
-				ExtendsCometBFT:        true,
+				Component:		ComponentBroadcast,
+				Layer:			LayerL0Physical,
+				Channels:		[]ChannelClass{ChannelBlock, ChannelData, ChannelService, ChannelRouting},
+				Responsibilities:	[]string{"hybrid gossip tree", "deduplication", "header-first block propagation"},
+				DependsOn:		[]NodeSideComponent{ComponentANA, ComponentOverlayMgr, ComponentRL2},
+				RuntimeOnly:		true,
+				AdvisoryUntilCommitted:	true,
+				ExtendsCometBFT:	true,
 			},
 		},
 		SupportModules: []OnChainSupportModuleSpec{
 			{
-				Module:             SupportModuleNetwork,
-				OwnsCommittedState: true,
-				StateObjects:       []string{"committed network parameters", "node records"},
-				Optional:           true,
+				Module:			SupportModuleNetwork,
+				OwnsCommittedState:	true,
+				StateObjects:		[]string{"committed network parameters", "node records"},
+				Optional:		true,
 			},
 			{
-				Module:                SupportModuleRouting,
-				OwnsCommittedState:    true,
-				StateObjects:          []string{"routing table commitments", "overlay descriptors"},
-				ConsumesNetworkProofs: true,
-				Optional:              true,
+				Module:			SupportModuleRouting,
+				OwnsCommittedState:	true,
+				StateObjects:		[]string{"routing table commitments", "overlay descriptors"},
+				ConsumesNetworkProofs:	true,
+				Optional:		true,
 			},
 			{
-				Module:                SupportModuleServices,
-				OwnsCommittedState:    true,
-				StateObjects:          []string{"service endpoint records", "provider records"},
-				ConsumesNetworkProofs: true,
-				Optional:              true,
+				Module:			SupportModuleServices,
+				OwnsCommittedState:	true,
+				StateObjects:		[]string{"service endpoint records", "provider records"},
+				ConsumesNetworkProofs:	true,
+				Optional:		true,
 			},
 			{
-				Module:                SupportModuleStorage,
-				OwnsCommittedState:    true,
-				StateObjects:          []string{"storage provider commitments"},
-				ConsumesNetworkProofs: true,
-				Optional:              true,
+				Module:			SupportModuleStorage,
+				OwnsCommittedState:	true,
+				StateObjects:		[]string{"storage provider commitments"},
+				ConsumesNetworkProofs:	true,
+				Optional:		true,
 			},
 			{
-				Module:                SupportModuleMessages,
-				OwnsCommittedState:    true,
-				StateObjects:          []string{"cross-zone message receipts", "replay protection"},
-				ConsumesNetworkProofs: true,
-				Optional:              true,
+				Module:			SupportModuleMessages,
+				OwnsCommittedState:	true,
+				StateObjects:		[]string{"cross-zone message receipts", "replay protection"},
+				ConsumesNetworkProofs:	true,
+				Optional:		true,
 			},
 		},
 	}

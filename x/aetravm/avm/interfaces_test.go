@@ -43,108 +43,108 @@ func TestDeveloperUXManifestBuildsHashCommittedClientMetadata(t *testing.T) {
 
 func TestDeveloperUXManifestRejectsInvalidDescriptors(t *testing.T) {
 	base := InterfaceManifest{
-		Name:    "counter",
-		Version: 1,
+		Name:		"counter",
+		Version:	1,
 		Methods: []InterfaceMethod{{
-			Name:       "increment",
-			Entrypoint: EntryReceiveInternal,
-			Opcode:     1,
+			Name:		"increment",
+			Entrypoint:	EntryReceiveInternal,
+			Opcode:		1,
 			Params: []InterfaceParamDescriptor{{
-				Name:     "amount",
-				Kind:     InterfaceValueU64,
-				Required: true,
+				Name:		"amount",
+				Kind:		InterfaceValueU64,
+				Required:	true,
 			}},
 			Results: []InterfaceResultDescriptor{{
-				Name: "counter",
-				Kind: InterfaceValueU64,
+				Name:	"counter",
+				Kind:	InterfaceValueU64,
 			}},
 		}},
 	}
 
 	tests := []struct {
-		name   string
-		mutate func(*InterfaceManifest)
-		want   string
+		name	string
+		mutate	func(*InterfaceManifest)
+		want	string
 	}{
 		{
-			name: "get method must be query",
+			name:	"get method must be query",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.GetMethods = []InterfaceGetMethod{{
-					Name:       "get_counter",
-					Entrypoint: EntryReceiveInternal,
-					Selector:   1,
+					Name:		"get_counter",
+					Entrypoint:	EntryReceiveInternal,
+					Selector:	1,
 				}}
 			},
-			want: "query entrypoint",
+			want:	"query entrypoint",
 		},
 		{
-			name: "duplicate callable names are rejected",
+			name:	"duplicate callable names are rejected",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.GetMethods = []InterfaceGetMethod{{
-					Name:       "increment",
-					Entrypoint: EntryQuery,
-					Selector:   1,
+					Name:		"increment",
+					Entrypoint:	EntryQuery,
+					Selector:	1,
 				}}
 			},
-			want: "duplicate",
+			want:	"duplicate",
 		},
 		{
-			name: "async bounced flag must match entrypoint",
+			name:	"async bounced flag must match entrypoint",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.AsyncHandlers = []InterfaceAsyncHandler{{
-					Name:       "bounce",
-					Entrypoint: EntryReceiveInternal,
-					Opcode:     2,
-					Bounced:    true,
+					Name:		"bounce",
+					Entrypoint:	EntryReceiveInternal,
+					Opcode:		2,
+					Bounced:	true,
 				}}
 			},
-			want: "bounced flag",
+			want:	"bounced flag",
 		},
 		{
-			name: "unknown SDK binding method is rejected",
+			name:	"unknown SDK binding method is rejected",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.SDKBindings = []InterfaceSDKBinding{{
-					Method:       "missing",
-					Package:      "github.com/sovereign-l1/l1/sdk/avm",
-					Service:      "Counter",
-					MethodName:   "Increment",
-					RequestType:  "IncrementRequest",
-					ResponseType: "IncrementResponse",
+					Method:		"missing",
+					Package:	"github.com/sovereign-l1/l1/sdk/avm",
+					Service:	"Counter",
+					MethodName:	"Increment",
+					RequestType:	"IncrementRequest",
+					ResponseType:	"IncrementResponse",
 				}}
 			},
-			want: "not declared",
+			want:	"not declared",
 		},
 		{
-			name: "wallet input kind is validated",
+			name:	"wallet input kind is validated",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.WalletActions = []InterfaceWalletAction{{
-					Method:       "increment",
-					Title:        "Increment counter",
-					Risk:         InterfaceWalletRiskLow,
-					ConfirmLabel: "Increment",
+					Method:		"increment",
+					Title:		"Increment counter",
+					Risk:		InterfaceWalletRiskLow,
+					ConfirmLabel:	"Increment",
 					Inputs: []InterfaceParamDescriptor{{
-						Name: "amount",
-						Kind: InterfaceValueKind("map"),
+						Name:	"amount",
+						Kind:	InterfaceValueKind("map"),
 					}},
 				}}
 			},
-			want: "invalid kind",
+			want:	"invalid kind",
 		},
 		{
-			name: "wallet inputs must match declared parameters",
+			name:	"wallet inputs must match declared parameters",
 			mutate: func(manifest *InterfaceManifest) {
 				manifest.WalletActions = []InterfaceWalletAction{{
-					Method:       "increment",
-					Title:        "Increment counter",
-					Risk:         InterfaceWalletRiskLow,
-					ConfirmLabel: "Increment",
+					Method:		"increment",
+					Title:		"Increment counter",
+					Risk:		InterfaceWalletRiskLow,
+					ConfirmLabel:	"Increment",
 					Inputs: []InterfaceParamDescriptor{{
-						Name: "missing",
-						Kind: InterfaceValueU64,
+						Name:	"missing",
+						Kind:	InterfaceValueU64,
 					}},
 				}}
 			},
-			want: "not declared",
+			want:	"not declared",
 		},
 	}
 
@@ -160,91 +160,91 @@ func TestDeveloperUXManifestRejectsInvalidDescriptors(t *testing.T) {
 
 func developerUXManifest() InterfaceManifest {
 	return InterfaceManifest{
-		Name:    " counter ",
-		Version: 1,
+		Name:		" counter ",
+		Version:	1,
 		Methods: []InterfaceMethod{{
-			Name:        "increment",
-			Entrypoint:  EntryReceiveInternal,
-			Opcode:      1,
-			Async:       true,
-			Description: "Increment the counter by a bounded amount.",
+			Name:		"increment",
+			Entrypoint:	EntryReceiveInternal,
+			Opcode:		1,
+			Async:		true,
+			Description:	"Increment the counter by a bounded amount.",
 			Params: []InterfaceParamDescriptor{{
-				Name:        "amount",
-				Kind:        InterfaceValueU64,
-				Required:    true,
-				Description: "Amount to add.",
+				Name:		"amount",
+				Kind:		InterfaceValueU64,
+				Required:	true,
+				Description:	"Amount to add.",
 			}},
 			Results: []InterfaceResultDescriptor{{
-				Name: "counter",
-				Kind: InterfaceValueU64,
+				Name:	"counter",
+				Kind:	InterfaceValueU64,
 			}},
 		}},
 		Events: []InterfaceEvent{{
-			Name:   "incremented",
-			Opcode: 10,
+			Name:	"incremented",
+			Opcode:	10,
 			Fields: []InterfaceParamDescriptor{{
-				Name:     "counter",
-				Kind:     InterfaceValueU64,
-				Required: true,
+				Name:		"counter",
+				Kind:		InterfaceValueU64,
+				Required:	true,
 			}},
 		}},
 		AsyncHandlers: []InterfaceAsyncHandler{{
-			Name:        "resume",
-			Entrypoint:  EntryReceiveInternal,
-			Opcode:      2,
-			MessageType: "counter.resume",
-			Idempotent:  true,
+			Name:		"resume",
+			Entrypoint:	EntryReceiveInternal,
+			Opcode:		2,
+			MessageType:	"counter.resume",
+			Idempotent:	true,
 			Params: []InterfaceParamDescriptor{{
-				Name:     "query_id",
-				Kind:     InterfaceValueU64,
-				Required: true,
+				Name:		"query_id",
+				Kind:		InterfaceValueU64,
+				Required:	true,
 			}},
 		}},
 		GetMethods: []InterfaceGetMethod{{
-			Name:             "get_counter",
-			Entrypoint:       EntryQuery,
-			Selector:         1,
-			Cacheable:        true,
-			MaxResponseBytes: 64,
+			Name:			"get_counter",
+			Entrypoint:		EntryQuery,
+			Selector:		1,
+			Cacheable:		true,
+			MaxResponseBytes:	64,
 			Results: []InterfaceResultDescriptor{{
-				Name: "counter",
-				Kind: InterfaceValueU64,
+				Name:	"counter",
+				Kind:	InterfaceValueU64,
 			}},
 		}},
 		CLIBindings: []InterfaceCLIBinding{{
-			Method:       "increment",
-			Command:      "counter increment",
-			Use:          "counter increment --amount <u64>",
-			Aliases:      []string{"inc", "counter-inc"},
-			Examples:     []string{"aether avm counter increment --amount 1"},
-			InputFormat:  "flags",
-			OutputFormat: "json",
+			Method:		"increment",
+			Command:	"counter increment",
+			Use:		"counter increment --amount <u64>",
+			Aliases:	[]string{"inc", "counter-inc"},
+			Examples:	[]string{"aether avm counter increment --amount 1"},
+			InputFormat:	"flags",
+			OutputFormat:	"json",
 		}},
 		SDKBindings: []InterfaceSDKBinding{{
-			Method:       "increment",
-			Package:      "github.com/sovereign-l1/l1/sdk/avm",
-			Service:      "Counter",
-			MethodName:   "Increment",
-			RequestType:  "IncrementRequest",
-			ResponseType: "IncrementResponse",
-			Async:        true,
+			Method:		"increment",
+			Package:	"github.com/sovereign-l1/l1/sdk/avm",
+			Service:	"Counter",
+			MethodName:	"Increment",
+			RequestType:	"IncrementRequest",
+			ResponseType:	"IncrementResponse",
+			Async:		true,
 		}},
 		WalletActions: []InterfaceWalletAction{{
-			Method:       "increment",
-			Title:        "Increment counter",
-			Description:  "Adds the provided amount to the AVM counter state.",
-			Category:     "counter",
-			Icon:         "counter",
-			Risk:         InterfaceWalletRiskLow,
-			ConfirmLabel: "Increment",
+			Method:		"increment",
+			Title:		"Increment counter",
+			Description:	"Adds the provided amount to the AVM counter state.",
+			Category:	"counter",
+			Icon:		"counter",
+			Risk:		InterfaceWalletRiskLow,
+			ConfirmLabel:	"Increment",
 			Inputs: []InterfaceParamDescriptor{{
-				Name:     "amount",
-				Kind:     InterfaceValueU64,
-				Required: true,
+				Name:		"amount",
+				Kind:		InterfaceValueU64,
+				Required:	true,
 			}},
 			Outputs: []InterfaceResultDescriptor{{
-				Name: "counter",
-				Kind: InterfaceValueU64,
+				Name:	"counter",
+				Kind:	InterfaceValueU64,
 			}},
 		}},
 	}

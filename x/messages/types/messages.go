@@ -18,135 +18,135 @@ import (
 )
 
 const (
-	CanonicalMessageEncodingVersion = uint16(1)
-	MessageIDBytes                  = 32
-	MaxChainIDLength                = 96
-	MaxOpcodeLength                 = 96
-	MaxAuthScopeLength              = 96
-	MaxRouteIDLength                = 128
-	MaxProofPathItems               = 256
+	CanonicalMessageEncodingVersion	= uint16(1)
+	MessageIDBytes			= 32
+	MaxChainIDLength		= 96
+	MaxOpcodeLength			= 96
+	MaxAuthScopeLength		= 96
+	MaxRouteIDLength		= 128
+	MaxProofPathItems		= 256
 
-	MessagesPrefix        = "messages"
-	MessagesOutboxPrefix  = MessagesPrefix + "/outbox"
-	MessagesInboxPrefix   = MessagesPrefix + "/inbox"
-	MessagesReceiptPrefix = MessagesPrefix + "/receipts"
-	MessagesNoncePrefix   = MessagesPrefix + "/nonces"
-	MessagesReplayPrefix  = MessagesPrefix + "/replay"
-	MessagesExpiryPrefix  = MessagesPrefix + "/expiry"
+	MessagesPrefix		= "messages"
+	MessagesOutboxPrefix	= MessagesPrefix + "/outbox"
+	MessagesInboxPrefix	= MessagesPrefix + "/inbox"
+	MessagesReceiptPrefix	= MessagesPrefix + "/receipts"
+	MessagesNoncePrefix	= MessagesPrefix + "/nonces"
+	MessagesReplayPrefix	= MessagesPrefix + "/replay"
+	MessagesExpiryPrefix	= MessagesPrefix + "/expiry"
 )
 
 type MessageStatus string
 type MessageProofKind string
 
 const (
-	MessageStatusQueued   MessageStatus = "queued"
-	MessageStatusExecuted MessageStatus = "executed"
-	MessageStatusFailed   MessageStatus = "failed"
-	MessageStatusExpired  MessageStatus = "expired"
-	MessageStatusBounced  MessageStatus = "bounced"
-	MessageStatusRejected MessageStatus = "rejected"
+	MessageStatusQueued	MessageStatus	= "queued"
+	MessageStatusExecuted	MessageStatus	= "executed"
+	MessageStatusFailed	MessageStatus	= "failed"
+	MessageStatusExpired	MessageStatus	= "expired"
+	MessageStatusBounced	MessageStatus	= "bounced"
+	MessageStatusRejected	MessageStatus	= "rejected"
 
-	MessageProofInclusion MessageProofKind = "message_inclusion"
-	MessageProofReceipt   MessageProofKind = "execution_receipt"
+	MessageProofInclusion	MessageProofKind	= "message_inclusion"
+	MessageProofReceipt	MessageProofKind	= "execution_receipt"
 )
 
 type MessageParams struct {
-	ChainID          string
-	MaxPayloadSize   uint32
-	MinGasLimit      uint64
-	MaxGasLimit      uint64
-	MinFeeLimit      sdkmath.Int
-	ProofHorizon     uint64
-	MaxDrainPerBlock uint32
-	BounceGasReserve uint64
-	ParamsHash       string
+	ChainID			string
+	MaxPayloadSize		uint32
+	MinGasLimit		uint64
+	MaxGasLimit		uint64
+	MinFeeLimit		sdkmath.Int
+	ProofHorizon		uint64
+	MaxDrainPerBlock	uint32
+	BounceGasReserve	uint64
+	ParamsHash		string
 }
 
 type Message struct {
-	MessageID       []byte
-	ChainID         string
-	SourceZone      zonestypes.ZoneID
-	DestinationZone zonestypes.ZoneID
-	Sender          sdk.AccAddress
-	Recipient       sdk.AccAddress
-	Value           sdkmath.Int
-	Opcode          string
-	Payload         []byte
-	GasLimit        uint64
-	Deadline        uint64
-	Nonce           uint64
-	SourceSequence  uint64
-	RouteID         string
-	Bounce          bool
-	FeeLimit        sdkmath.Int
-	CreatedHeight   uint64
-	PayloadHash     []byte
-	AuthScope       string
+	MessageID	[]byte
+	ChainID		string
+	SourceZone	zonestypes.ZoneID
+	DestinationZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Recipient	sdk.AccAddress
+	Value		sdkmath.Int
+	Opcode		string
+	Payload		[]byte
+	GasLimit	uint64
+	Deadline	uint64
+	Nonce		uint64
+	SourceSequence	uint64
+	RouteID		string
+	Bounce		bool
+	FeeLimit	sdkmath.Int
+	CreatedHeight	uint64
+	PayloadHash	[]byte
+	AuthScope	string
 }
 
 type MessageReceipt struct {
-	MessageID         []byte
-	SourceZone        zonestypes.ZoneID
-	DestinationZone   zonestypes.ZoneID
-	Status            MessageStatus
-	GasUsed           uint64
-	FeeCharged        sdkmath.Int
-	ReturnPayloadHash []byte
-	ErrorCode         uint32
-	HasErrorCode      bool
-	ExecutedHeight    uint64
-	ReceiptHash       []byte
+	MessageID		[]byte
+	SourceZone		zonestypes.ZoneID
+	DestinationZone		zonestypes.ZoneID
+	Status			MessageStatus
+	GasUsed			uint64
+	FeeCharged		sdkmath.Int
+	ReturnPayloadHash	[]byte
+	ErrorCode		uint32
+	HasErrorCode		bool
+	ExecutedHeight		uint64
+	ReceiptHash		[]byte
 }
 
 type ReplayTombstone struct {
-	MessageID      []byte
-	SourceZone     zonestypes.ZoneID
-	Sender         sdk.AccAddress
-	Nonce          uint64
-	SourceSequence uint64
-	ConsumedHeight uint64
-	RetainUntil    uint64
-	TombstoneHash  []byte
+	MessageID	[]byte
+	SourceZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Nonce		uint64
+	SourceSequence	uint64
+	ConsumedHeight	uint64
+	RetainUntil	uint64
+	TombstoneHash	[]byte
 }
 
 type QueueItem struct {
-	Message        Message
-	EnqueuedHeight uint64
+	Message		Message
+	EnqueuedHeight	uint64
 }
 
 type SenderNonce struct {
-	SourceZone zonestypes.ZoneID
-	Sender     sdk.AccAddress
-	Nonce      uint64
+	SourceZone	zonestypes.ZoneID
+	Sender		sdk.AccAddress
+	Nonce		uint64
 }
 
 type ExpiryItem struct {
-	Deadline  uint64
-	MessageID []byte
+	Deadline	uint64
+	MessageID	[]byte
 }
 
 type KeeperState struct {
-	Outbox     []QueueItem
-	Inbox      []QueueItem
-	Receipts   []MessageReceipt
-	Nonces     []SenderNonce
-	Tombstones []ReplayTombstone
-	Expiry     []ExpiryItem
-	Height     uint64
-	Params     MessageParams
-	StateRoot  string
+	Outbox		[]QueueItem
+	Inbox		[]QueueItem
+	Receipts	[]MessageReceipt
+	Nonces		[]SenderNonce
+	Tombstones	[]ReplayTombstone
+	Expiry		[]ExpiryItem
+	Height		uint64
+	Params		MessageParams
+	StateRoot	string
 }
 
 type MessageRoots struct {
-	OutboxRoot    string
-	InboxRoot     string
-	MessageRoot   string
-	ReceiptRoot   string
-	NonceRoot     string
-	TombstoneRoot string
-	ExpiryRoot    string
-	StateRoot     string
-	ParamsHash    string
+	OutboxRoot	string
+	InboxRoot	string
+	MessageRoot	string
+	ReceiptRoot	string
+	NonceRoot	string
+	TombstoneRoot	string
+	ExpiryRoot	string
+	StateRoot	string
+	ParamsHash	string
 }
 
 type MsgSubmitCrossZoneMessage struct {
@@ -154,9 +154,9 @@ type MsgSubmitCrossZoneMessage struct {
 }
 
 type SubmitCrossZoneMessageResponse struct {
-	MessageID   []byte
-	MessageRoot string
-	OutboxKey   string
+	MessageID	[]byte
+	MessageRoot	string
+	OutboxKey	string
 }
 
 type QueryMessageRequest struct {
@@ -164,8 +164,8 @@ type QueryMessageRequest struct {
 }
 
 type QueryMessageResponse struct {
-	Message Message
-	Found   bool
+	Message	Message
+	Found	bool
 }
 
 type QueryReceiptRequest struct {
@@ -173,24 +173,24 @@ type QueryReceiptRequest struct {
 }
 
 type QueryReceiptResponse struct {
-	Receipt MessageReceipt
-	Found   bool
+	Receipt	MessageReceipt
+	Found	bool
 }
 
 type QueryProofRequest struct {
-	Kind      MessageProofKind
-	MessageID []byte
-	Root      string
-	Limit     uint32
+	Kind		MessageProofKind
+	MessageID	[]byte
+	Root		string
+	Limit		uint32
 }
 
 type QueryProofResponse struct {
-	Kind      MessageProofKind
-	MessageID []byte
-	Root      string
-	ValueHash string
-	Path      []string
-	ProofHash string
+	Kind		MessageProofKind
+	MessageID	[]byte
+	Root		string
+	ValueHash	string
+	Path		[]string
+	ProofHash	string
 }
 
 type MsgServer interface {
@@ -214,15 +214,15 @@ type KeeperMsgServer struct {
 
 func DefaultMessageParams(chainID string) MessageParams {
 	return MessageParams{
-		ChainID:          chainID,
-		MaxPayloadSize:   1024 * 1024,
-		MinGasLimit:      1,
-		MaxGasLimit:      100_000_000,
-		MinFeeLimit:      sdkmath.ZeroInt(),
-		ProofHorizon:     10_000,
-		MaxDrainPerBlock: 1024,
-		BounceGasReserve: 1,
-		ParamsHash:       EmptyHash(),
+		ChainID:		chainID,
+		MaxPayloadSize:		1024 * 1024,
+		MinGasLimit:		1,
+		MaxGasLimit:		100_000_000,
+		MinFeeLimit:		sdkmath.ZeroInt(),
+		ProofHorizon:		10_000,
+		MaxDrainPerBlock:	1024,
+		BounceGasReserve:	1,
+		ParamsHash:		EmptyHash(),
 	}
 }
 
@@ -283,9 +283,9 @@ func (k MessageKeeper) SubmitCrossZoneMessage(req MsgSubmitCrossZoneMessage) (Me
 		return MessageKeeper{}, SubmitCrossZoneMessageResponse{}, err
 	}
 	return MessageKeeper{state: next.Normalize()}, SubmitCrossZoneMessageResponse{
-		MessageID:   append([]byte(nil), msg.MessageID...),
-		MessageRoot: ComputeMessageRoot(next.Outbox, next.Inbox),
-		OutboxKey:   outboxKey,
+		MessageID:	append([]byte(nil), msg.MessageID...),
+		MessageRoot:	ComputeMessageRoot(next.Outbox, next.Inbox),
+		OutboxKey:	outboxKey,
 	}, nil
 }
 
@@ -423,23 +423,23 @@ func (k MessageKeeper) BuildBounce(original Message, receipt MessageReceipt, non
 		hex.EncodeToString(receipt.ReturnPayloadHash),
 	))
 	bounce := Message{
-		ChainID:         original.ChainID,
-		SourceZone:      original.DestinationZone,
-		DestinationZone: original.SourceZone,
-		Sender:          append(sdk.AccAddress(nil), original.Recipient...),
-		Recipient:       append(sdk.AccAddress(nil), original.Sender...),
-		Value:           original.Value,
-		Opcode:          "aether.bounce",
-		Payload:         payload,
-		GasLimit:        original.GasLimit + k.state.Params.BounceGasReserve,
-		Deadline:        original.Deadline,
-		Nonce:           nonce,
-		SourceSequence:  sourceSequence,
-		RouteID:         "bounce/" + hex.EncodeToString(original.MessageID),
-		Bounce:          false,
-		FeeLimit:        original.FeeLimit,
-		CreatedHeight:   height,
-		AuthScope:       "bounce",
+		ChainID:		original.ChainID,
+		SourceZone:		original.DestinationZone,
+		DestinationZone:	original.SourceZone,
+		Sender:			append(sdk.AccAddress(nil), original.Recipient...),
+		Recipient:		append(sdk.AccAddress(nil), original.Sender...),
+		Value:			original.Value,
+		Opcode:			"aether.bounce",
+		Payload:		payload,
+		GasLimit:		original.GasLimit + k.state.Params.BounceGasReserve,
+		Deadline:		original.Deadline,
+		Nonce:			nonce,
+		SourceSequence:		sourceSequence,
+		RouteID:		"bounce/" + hex.EncodeToString(original.MessageID),
+		Bounce:			false,
+		FeeLimit:		original.FeeLimit,
+		CreatedHeight:		height,
+		AuthScope:		"bounce",
 	}
 	if bounce.Deadline < height {
 		bounce.Deadline = height
@@ -506,11 +506,11 @@ func (k MessageKeeper) MessageProof(req QueryProofRequest) (QueryProofResponse, 
 		return QueryProofResponse{}, errors.New("proof path exceeds limit")
 	}
 	proof := QueryProofResponse{
-		Kind:      req.Kind,
-		MessageID: append([]byte(nil), req.MessageID...),
-		Root:      req.Root,
-		ValueHash: valueHash,
-		Path:      path,
+		Kind:		req.Kind,
+		MessageID:	append([]byte(nil), req.MessageID...),
+		Root:		req.Root,
+		ValueHash:	valueHash,
+		Path:		path,
 	}
 	proof.ProofHash = ComputeProofHash(proof)
 	return proof, proof.ValidateFor(req)
@@ -688,14 +688,14 @@ func NewMessageReceipt(receipt MessageReceipt) (MessageReceipt, error) {
 
 func ReceiptFromMessage(msg Message, status MessageStatus, gasUsed uint64, feeCharged sdkmath.Int, returnPayloadHash []byte, errorCode *uint32, executedHeight uint64) MessageReceipt {
 	receipt := MessageReceipt{
-		MessageID:         append([]byte(nil), msg.MessageID...),
-		SourceZone:        msg.SourceZone,
-		DestinationZone:   msg.DestinationZone,
-		Status:            status,
-		GasUsed:           gasUsed,
-		FeeCharged:        feeCharged,
-		ReturnPayloadHash: append([]byte(nil), returnPayloadHash...),
-		ExecutedHeight:    executedHeight,
+		MessageID:		append([]byte(nil), msg.MessageID...),
+		SourceZone:		msg.SourceZone,
+		DestinationZone:	msg.DestinationZone,
+		Status:			status,
+		GasUsed:		gasUsed,
+		FeeCharged:		feeCharged,
+		ReturnPayloadHash:	append([]byte(nil), returnPayloadHash...),
+		ExecutedHeight:		executedHeight,
 	}
 	if errorCode != nil {
 		receipt.ErrorCode = *errorCode
@@ -765,13 +765,13 @@ func NewReplayTombstone(msg Message, consumedHeight uint64, proofHorizon uint64)
 		return ReplayTombstone{}, errors.New("tombstone height and proof horizon must be positive")
 	}
 	tombstone := ReplayTombstone{
-		MessageID:      append([]byte(nil), msg.MessageID...),
-		SourceZone:     msg.SourceZone,
-		Sender:         append(sdk.AccAddress(nil), msg.Sender...),
-		Nonce:          msg.Nonce,
-		SourceSequence: msg.SourceSequence,
-		ConsumedHeight: consumedHeight,
-		RetainUntil:    consumedHeight + proofHorizon,
+		MessageID:	append([]byte(nil), msg.MessageID...),
+		SourceZone:	msg.SourceZone,
+		Sender:		append(sdk.AccAddress(nil), msg.Sender...),
+		Nonce:		msg.Nonce,
+		SourceSequence:	msg.SourceSequence,
+		ConsumedHeight:	consumedHeight,
+		RetainUntil:	consumedHeight + proofHorizon,
 	}
 	tombstone.TombstoneHash = ComputeTombstoneHash(tombstone)
 	return tombstone, tombstone.Validate()
@@ -835,13 +835,13 @@ func ComputeReceiptRoot(receipts []MessageReceipt) string {
 func ComputeKeeperRoots(state KeeperState) MessageRoots {
 	state = state.Normalize()
 	roots := MessageRoots{
-		OutboxRoot:    ComputeQueueRoot("outbox", state.Outbox),
-		InboxRoot:     ComputeQueueRoot("inbox", state.Inbox),
-		ReceiptRoot:   ComputeReceiptRoot(state.Receipts),
-		NonceRoot:     ComputeNonceRoot(state.Nonces),
-		TombstoneRoot: ComputeTombstoneRoot(state.Tombstones),
-		ExpiryRoot:    ComputeExpiryRoot(state.Expiry),
-		ParamsHash:    state.Params.ParamsHash,
+		OutboxRoot:	ComputeQueueRoot("outbox", state.Outbox),
+		InboxRoot:	ComputeQueueRoot("inbox", state.Inbox),
+		ReceiptRoot:	ComputeReceiptRoot(state.Receipts),
+		NonceRoot:	ComputeNonceRoot(state.Nonces),
+		TombstoneRoot:	ComputeTombstoneRoot(state.Tombstones),
+		ExpiryRoot:	ComputeExpiryRoot(state.Expiry),
+		ParamsHash:	state.Params.ParamsHash,
 	}
 	roots.MessageRoot = hashParts("aetra-message-queue-pair-root-v1", roots.OutboxRoot, roots.InboxRoot)
 	roots.StateRoot = hashParts("aetra-message-keeper-state-root-v1", roots.MessageRoot, roots.ReceiptRoot, roots.NonceRoot, roots.TombstoneRoot, roots.ExpiryRoot, roots.ParamsHash)

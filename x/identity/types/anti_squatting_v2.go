@@ -12,80 +12,80 @@ import (
 )
 
 const (
-	DefaultIdentityCommitmentDepositNaet      = int64(10_000_000_000)
-	DefaultIdentityResolverStorageFeePerByte  = int64(1_000_000)
-	DefaultIdentityGraceRecoveryCostNaet      = int64(25_000_000_000)
-	DefaultIdentityBulkRegistrationWindow     = uint64(720)
-	DefaultIdentityBulkRegistrationLimit      = uint32(5)
-	IdentityAntiSquattingResultAllowedV2      = "allowed"
-	IdentityAntiSquattingResultBulkLimitedV2  = "bulk_limited"
-	IdentityAntiSquattingResultInvalidInputV2 = "invalid_input"
+	DefaultIdentityCommitmentDepositNaet		= int64(10_000_000_000)
+	DefaultIdentityResolverStorageFeePerByte	= int64(1_000_000)
+	DefaultIdentityGraceRecoveryCostNaet		= int64(25_000_000_000)
+	DefaultIdentityBulkRegistrationWindow		= uint64(720)
+	DefaultIdentityBulkRegistrationLimit		= uint32(5)
+	IdentityAntiSquattingResultAllowedV2		= "allowed"
+	IdentityAntiSquattingResultBulkLimitedV2	= "bulk_limited"
+	IdentityAntiSquattingResultInvalidInputV2	= "invalid_input"
 )
 
 type IdentityAntiSquattingParamsV2 struct {
-	DomainParams                     DomainParams
-	CommitmentDeposit                sdkmath.Int
-	ResolverStorageFeePerByte        sdkmath.Int
-	GraceRecoveryCost                sdkmath.Int
-	BulkRegistrationWindowBlocks     uint64
-	MaxBulkRegistrationsPerAccount   uint32
-	BulkRegistrationLimitEnabled     bool
-	ContestedNameAuctionRequired     bool
-	ExpiredDomainGracePeriodBlocks   uint64
-	ExpiredDomainReleaseWindowBlocks uint64
+	DomainParams				DomainParams
+	CommitmentDeposit			sdkmath.Int
+	ResolverStorageFeePerByte		sdkmath.Int
+	GraceRecoveryCost			sdkmath.Int
+	BulkRegistrationWindowBlocks		uint64
+	MaxBulkRegistrationsPerAccount		uint32
+	BulkRegistrationLimitEnabled		bool
+	ContestedNameAuctionRequired		bool
+	ExpiredDomainGracePeriodBlocks		uint64
+	ExpiredDomainReleaseWindowBlocks	uint64
 }
 
 type IdentityRegistrationPriceQuoteV2 struct {
-	Name                     string
-	PricingLabel             string
-	RegistrationFee          sdkmath.Int
-	RenewalFee               sdkmath.Int
-	CommitmentDeposit        sdkmath.Int
-	ResolverStorageFee       sdkmath.Int
-	GraceRecoveryCost        sdkmath.Int
-	TotalRegistrationCost    sdkmath.Int
-	TotalRenewalCost         sdkmath.Int
-	ResolverPayloadBytes     uint64
-	ContestedAuctionRequired bool
-	DeterministicFormula     string
+	Name				string
+	PricingLabel			string
+	RegistrationFee			sdkmath.Int
+	RenewalFee			sdkmath.Int
+	CommitmentDeposit		sdkmath.Int
+	ResolverStorageFee		sdkmath.Int
+	GraceRecoveryCost		sdkmath.Int
+	TotalRegistrationCost		sdkmath.Int
+	TotalRenewalCost		sdkmath.Int
+	ResolverPayloadBytes		uint64
+	ContestedAuctionRequired	bool
+	DeterministicFormula		string
 }
 
 type IdentityBulkRegistrationAttemptV2 struct {
-	Owner                sdk.AccAddress
-	Name                 string
-	Height               uint64
-	ResolverPayloadBytes uint64
+	Owner			sdk.AccAddress
+	Name			string
+	Height			uint64
+	ResolverPayloadBytes	uint64
 }
 
 type IdentityBulkRegistrationResultV2 struct {
-	InputIndex uint32
-	Owner      sdk.AccAddress
-	Name       string
-	WindowID   uint64
-	Status     string
-	Error      string
-	Quote      *IdentityRegistrationPriceQuoteV2
+	InputIndex	uint32
+	Owner		sdk.AccAddress
+	Name		string
+	WindowID	uint64
+	Status		string
+	Error		string
+	Quote		*IdentityRegistrationPriceQuoteV2
 }
 
 type IdentityBulkRegistrationSimulationV2 struct {
-	ResultOrder string
-	Allowed     uint32
-	Rejected    uint32
-	Results     []IdentityBulkRegistrationResultV2
+	ResultOrder	string
+	Allowed		uint32
+	Rejected	uint32
+	Results		[]IdentityBulkRegistrationResultV2
 }
 
 func DefaultIdentityAntiSquattingParamsV2() IdentityAntiSquattingParamsV2 {
 	return IdentityAntiSquattingParamsV2{
-		DomainParams:                     DefaultDomainParams(),
-		CommitmentDeposit:                sdkmath.NewInt(DefaultIdentityCommitmentDepositNaet),
-		ResolverStorageFeePerByte:        sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
-		GraceRecoveryCost:                sdkmath.NewInt(DefaultIdentityGraceRecoveryCostNaet),
-		BulkRegistrationWindowBlocks:     DefaultIdentityBulkRegistrationWindow,
-		MaxBulkRegistrationsPerAccount:   DefaultIdentityBulkRegistrationLimit,
-		BulkRegistrationLimitEnabled:     true,
-		ContestedNameAuctionRequired:     true,
-		ExpiredDomainGracePeriodBlocks:   DefaultRenewalWindowBlocks,
-		ExpiredDomainReleaseWindowBlocks: DefaultRenewalWindowBlocks + 1,
+		DomainParams:				DefaultDomainParams(),
+		CommitmentDeposit:			sdkmath.NewInt(DefaultIdentityCommitmentDepositNaet),
+		ResolverStorageFeePerByte:		sdkmath.NewInt(DefaultIdentityResolverStorageFeePerByte),
+		GraceRecoveryCost:			sdkmath.NewInt(DefaultIdentityGraceRecoveryCostNaet),
+		BulkRegistrationWindowBlocks:		DefaultIdentityBulkRegistrationWindow,
+		MaxBulkRegistrationsPerAccount:		DefaultIdentityBulkRegistrationLimit,
+		BulkRegistrationLimitEnabled:		true,
+		ContestedNameAuctionRequired:		true,
+		ExpiredDomainGracePeriodBlocks:		DefaultRenewalWindowBlocks,
+		ExpiredDomainReleaseWindowBlocks:	DefaultRenewalWindowBlocks + 1,
 	}
 }
 
@@ -94,8 +94,8 @@ func ValidateIdentityAntiSquattingParamsV2(params IdentityAntiSquattingParamsV2)
 		return err
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "commitment deposit", value: params.CommitmentDeposit},
 		{label: "resolver storage fee per byte", value: params.ResolverStorageFeePerByte},
@@ -141,16 +141,16 @@ func QuoteIdentityRegistrationPriceV2(name string, resolverPayloadBytes uint64, 
 	}
 	storageFee := params.ResolverStorageFeePerByte.Mul(sdkmath.NewIntFromUint64(resolverPayloadBytes))
 	quote := IdentityRegistrationPriceQuoteV2{
-		Name:                     normalized,
-		PricingLabel:             pricingLabel,
-		RegistrationFee:          registrationFee,
-		RenewalFee:               renewalFee,
-		CommitmentDeposit:        params.CommitmentDeposit,
-		ResolverStorageFee:       storageFee,
-		GraceRecoveryCost:        params.GraceRecoveryCost,
-		ResolverPayloadBytes:     resolverPayloadBytes,
-		ContestedAuctionRequired: contested && params.ContestedNameAuctionRequired,
-		DeterministicFormula:     "length_price + commitment_deposit + resolver_payload_bytes*storage_fee_per_byte",
+		Name:				normalized,
+		PricingLabel:			pricingLabel,
+		RegistrationFee:		registrationFee,
+		RenewalFee:			renewalFee,
+		CommitmentDeposit:		params.CommitmentDeposit,
+		ResolverStorageFee:		storageFee,
+		GraceRecoveryCost:		params.GraceRecoveryCost,
+		ResolverPayloadBytes:		resolverPayloadBytes,
+		ContestedAuctionRequired:	contested && params.ContestedNameAuctionRequired,
+		DeterministicFormula:		"length_price + commitment_deposit + resolver_payload_bytes*storage_fee_per_byte",
 	}
 	quote.TotalRegistrationCost = registrationFee.Add(params.CommitmentDeposit).Add(storageFee)
 	quote.TotalRenewalCost = renewalFee
@@ -175,8 +175,8 @@ func IdentityPricingLabelV2(name string) (string, error) {
 
 func SimulateIdentityBulkRegistrationWindowV2(attempts []IdentityBulkRegistrationAttemptV2, params IdentityAntiSquattingParamsV2) IdentityBulkRegistrationSimulationV2 {
 	sim := IdentityBulkRegistrationSimulationV2{
-		ResultOrder: "input_index",
-		Results:     make([]IdentityBulkRegistrationResultV2, 0, len(attempts)),
+		ResultOrder:	"input_index",
+		Results:	make([]IdentityBulkRegistrationResultV2, 0, len(attempts)),
 	}
 	if err := ValidateIdentityAntiSquattingParamsV2(params); err != nil {
 		for i, attempt := range attempts {
@@ -188,10 +188,10 @@ func SimulateIdentityBulkRegistrationWindowV2(attempts []IdentityBulkRegistratio
 	windowCounts := map[string]uint32{}
 	for i, attempt := range attempts {
 		result := IdentityBulkRegistrationResultV2{
-			InputIndex: uint32(i),
-			Owner:      cloneSpecAddress(attempt.Owner),
-			Name:       attempt.Name,
-			Status:     IdentityAntiSquattingResultAllowedV2,
+			InputIndex:	uint32(i),
+			Owner:		cloneSpecAddress(attempt.Owner),
+			Name:		attempt.Name,
+			Status:		IdentityAntiSquattingResultAllowedV2,
 		}
 		normalized, err := NormalizeAETDomain(attempt.Name)
 		if err != nil {

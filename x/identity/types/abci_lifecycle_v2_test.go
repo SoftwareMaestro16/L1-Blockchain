@@ -109,10 +109,10 @@ func TestIdentityABCIPlusFinalizeBoundedExpiryAndCacheEventsV2(t *testing.T) {
 	require.NoError(t, err)
 
 	resp, err := FinalizeIdentityABCIPlusV2(IdentityFinalizeRequestV2{
-		State:        state,
-		Height:       20,
-		ExpiryLimit:  1,
-		CacheRecords: []ResolutionCacheRecordV2{cacheAlice, cacheBob},
+		State:		state,
+		Height:		20,
+		ExpiryLimit:	1,
+		CacheRecords:	[]ResolutionCacheRecordV2{cacheAlice, cacheBob},
 	})
 	require.NoError(t, err)
 	require.Equal(t, state, resp.State)

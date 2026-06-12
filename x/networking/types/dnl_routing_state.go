@@ -8,69 +8,69 @@ import (
 )
 
 const (
-	DefaultNodeRecordVersion = uint64(1)
+	DefaultNodeRecordVersion	= uint64(1)
 
-	RoutingNodeKeyPrefix       = "routing/nodes"
-	RoutingZoneKeyPrefix       = "routing/zones"
-	RoutingServiceKeyPrefix    = "routing/services"
-	RoutingReputationKeyPrefix = "routing/reputation"
-	RoutingCacheKeyPrefix      = "routing/cache"
-	RoutingTableKeyPrefix      = "routing/table"
+	RoutingNodeKeyPrefix		= "routing/nodes"
+	RoutingZoneKeyPrefix		= "routing/zones"
+	RoutingServiceKeyPrefix		= "routing/services"
+	RoutingReputationKeyPrefix	= "routing/reputation"
+	RoutingCacheKeyPrefix		= "routing/cache"
+	RoutingTableKeyPrefix		= "routing/table"
 )
 
 type NodeLatencyVectorEntry struct {
-	NodeID        string
-	PeerNodeID    string
-	ZoneID        string
-	LatencyMillis uint64
-	SampleHeight  uint64
-	VectorHash    string
+	NodeID		string
+	PeerNodeID	string
+	ZoneID		string
+	LatencyMillis	uint64
+	SampleHeight	uint64
+	VectorHash	string
 }
 
 type ReputationCommitment struct {
-	NodeID         string
-	Reputation     PeerScore
-	EvidenceRoot   string
-	UpdatedHeight  uint64
-	CommitmentHash string
+	NodeID		string
+	Reputation	PeerScore
+	EvidenceRoot	string
+	UpdatedHeight	uint64
+	CommitmentHash	string
 }
 
 type LookupCacheRecord struct {
-	LookupKey    string
-	QueryHash    string
-	ResponseHash string
-	ExpiryHeight uint64
-	ProofHash    string
-	CacheHash    string
+	LookupKey	string
+	QueryHash	string
+	ResponseHash	string
+	ExpiryHeight	uint64
+	ProofHash	string
+	CacheHash	string
 }
 
 type RoutingTable struct {
-	Epoch     uint64
-	Routes    []DNLRoutingTableEntry
-	TableRoot string
+	Epoch		uint64
+	Routes		[]DNLRoutingTableEntry
+	TableRoot	string
 }
 
 type RoutingIndexRecord struct {
-	Key       string
-	Value     string
-	EntryHash string
+	Key		string
+	Value		string
+	EntryHash	string
 }
 
 type DNLRoutingState struct {
-	Nodes          []NodeRecord
-	ZoneIndex      []RoutingIndexRecord
-	ServiceIndex   []RoutingIndexRecord
-	Reputation     []ReputationCommitment
-	Cache          []LookupCacheRecord
-	Tables         []RoutingTable
-	Height         uint64
-	NodesRoot      string
-	ZonesRoot      string
-	ServicesRoot   string
-	ReputationRoot string
-	CacheRoot      string
-	TablesRoot     string
-	StateRoot      string
+	Nodes		[]NodeRecord
+	ZoneIndex	[]RoutingIndexRecord
+	ServiceIndex	[]RoutingIndexRecord
+	Reputation	[]ReputationCommitment
+	Cache		[]LookupCacheRecord
+	Tables		[]RoutingTable
+	Height		uint64
+	NodesRoot	string
+	ZonesRoot	string
+	ServicesRoot	string
+	ReputationRoot	string
+	CacheRoot	string
+	TablesRoot	string
+	StateRoot	string
 }
 
 func NewReputationCommitment(commitment ReputationCommitment) (ReputationCommitment, error) {
@@ -110,11 +110,11 @@ func NewRoutingTable(table RoutingTable) (RoutingTable, error) {
 
 func BuildDNLRoutingState(nodes []NodeRecord, reputation []ReputationCommitment, cache []LookupCacheRecord, tables []RoutingTable, height uint64) (DNLRoutingState, error) {
 	state := DNLRoutingState{
-		Nodes:      normalizeRoutingNodeRecords(nodes),
-		Reputation: normalizeReputationCommitments(reputation),
-		Cache:      normalizeLookupCacheRecords(cache),
-		Tables:     normalizeRoutingTables(tables),
-		Height:     height,
+		Nodes:		normalizeRoutingNodeRecords(nodes),
+		Reputation:	normalizeReputationCommitments(reputation),
+		Cache:		normalizeLookupCacheRecords(cache),
+		Tables:		normalizeRoutingTables(tables),
+		Height:		height,
 	}
 	if err := state.populateIndexes(); err != nil {
 		return DNLRoutingState{}, err
@@ -392,8 +392,8 @@ func (state DNLRoutingState) ValidateFormat() error {
 	}
 	if state.StateRoot != "" {
 		for _, field := range []struct {
-			name  string
-			value string
+			name	string
+			value	string
 		}{
 			{"nodes root", state.NodesRoot},
 			{"zones root", state.ZonesRoot},
@@ -419,19 +419,19 @@ func (state DNLRoutingState) Validate() error {
 		return errors.New("networking DNL routing state root is required")
 	}
 	expected := DNLRoutingState{
-		Nodes:          state.Nodes,
-		ZoneIndex:      state.ZoneIndex,
-		ServiceIndex:   state.ServiceIndex,
-		Reputation:     state.Reputation,
-		Cache:          state.Cache,
-		Tables:         state.Tables,
-		Height:         state.Height,
-		NodesRoot:      ComputeRoutingNodesRoot(state.Nodes),
-		ZonesRoot:      ComputeRoutingIndexRoot(state.ZoneIndex),
-		ServicesRoot:   ComputeRoutingIndexRoot(state.ServiceIndex),
-		ReputationRoot: ComputeRoutingReputationRoot(state.Reputation),
-		CacheRoot:      ComputeLookupCacheRoot(state.Cache),
-		TablesRoot:     ComputeRoutingTablesRoot(state.Tables),
+		Nodes:		state.Nodes,
+		ZoneIndex:	state.ZoneIndex,
+		ServiceIndex:	state.ServiceIndex,
+		Reputation:	state.Reputation,
+		Cache:		state.Cache,
+		Tables:		state.Tables,
+		Height:		state.Height,
+		NodesRoot:	ComputeRoutingNodesRoot(state.Nodes),
+		ZonesRoot:	ComputeRoutingIndexRoot(state.ZoneIndex),
+		ServicesRoot:	ComputeRoutingIndexRoot(state.ServiceIndex),
+		ReputationRoot:	ComputeRoutingReputationRoot(state.Reputation),
+		CacheRoot:	ComputeLookupCacheRoot(state.Cache),
+		TablesRoot:	ComputeRoutingTablesRoot(state.Tables),
 	}
 	expected.StateRoot = ComputeDNLRoutingStateRoot(expected)
 	if state.NodesRoot != expected.NodesRoot ||

@@ -158,9 +158,9 @@ func TestServiceBlockSTMHighVolumeServiceCallsConflictOnlyOnSharedStateKeys(t *t
 	ops := make([]ServiceBlockSTMOperation, 0, 64)
 	for i := 0; i < 64; i++ {
 		op, err := NewServiceBlockSTMOperation(ServiceBlockSTMExecuteOnChainCall, map[string]string{
-			"call_id":    fmt.Sprintf("call.%02d", i),
-			"service_id": "svc.dex",
-			"state_key":  fmt.Sprintf("pool/%02d", i),
+			"call_id":	fmt.Sprintf("call.%02d", i),
+			"service_id":	"svc.dex",
+			"state_key":	fmt.Sprintf("pool/%02d", i),
 		}, 0)
 		require.NoError(t, err)
 		ops = append(ops, op)
@@ -172,9 +172,9 @@ func TestServiceBlockSTMHighVolumeServiceCallsConflictOnlyOnSharedStateKeys(t *t
 	}
 
 	shared, err := NewServiceBlockSTMOperation(ServiceBlockSTMExecuteOnChainCall, map[string]string{
-		"call_id":    "call.shared",
-		"service_id": "svc.dex",
-		"state_key":  "pool/07",
+		"call_id":	"call.shared",
+		"service_id":	"svc.dex",
+		"state_key":	"pool/07",
 	}, 0)
 	require.NoError(t, err)
 	require.True(t, ServiceBlockSTMOperationsConflict(ops[7], shared))

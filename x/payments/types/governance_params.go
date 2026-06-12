@@ -7,171 +7,171 @@ import (
 )
 
 const (
-	DefaultMinimumChannelCollateral           = "1"
-	DefaultMaximumChannelCollateral           = "1000000000000000000"
-	DefaultMaximumPromiseAmountRatioBps       = uint32(10_000)
-	DefaultMaximumPromiseLifetime             = uint64(10_000)
-	DefaultExpiredPromiseCleanupLimitPerBlock = uint64(256)
-	DefaultMaxVirtualChannelsPerParentChannel = uint64(128)
-	DefaultMaximumVirtualChannelDepth         = uint64(MaxRoutingHops)
-	DefaultMinimumParentTimeoutMargin         = uint64(DefaultTimeoutMargin)
-	DefaultVirtualChannelReservationExpiry    = uint64(256)
-	DefaultMultiSegmentVirtualMaxSegments     = uint64(MaxParentChannels)
-	DefaultStaleClosePenalty                  = "10"
-	DefaultSameNonceDoubleSignPenalty         = "20"
-	DefaultInvalidConditionPenalty            = "8"
-	DefaultReplayAttemptPenalty               = "8"
-	DefaultInvalidFraudProofDeposit           = "1"
-	DefaultReporterRewardPercentageBps        = uint32(1_000)
-	DefaultReporterRewardCap                  = "5"
-	DefaultPenaltyBurnAllocationBps           = uint32(2_500)
-	DefaultSecurityReserveAllocationBps       = uint32(2_500)
-	DefaultMaxTopologyUpdatesPerPeerWindow    = uint32(16)
-	DefaultRouteFailureScoreDecay             = uint64(DefaultGossipTTL)
-	DefaultCongestionPenaltyDecay             = uint64(DefaultGossipTTL)
-	DefaultCapacityProbeRateLimit             = uint32(16)
-	DefaultFinalizationQueueWorkLimit         = uint64(256)
-	DefaultChannelOpenCongestionMultiplierBps = uint32(20_000)
-	DefaultDisputeCongestionMultiplierBps     = uint32(25_000)
-	DefaultStorePruningHorizon                = uint64(DefaultReplayHorizon)
+	DefaultMinimumChannelCollateral			= "1"
+	DefaultMaximumChannelCollateral			= "1000000000000000000"
+	DefaultMaximumPromiseAmountRatioBps		= uint32(10_000)
+	DefaultMaximumPromiseLifetime			= uint64(10_000)
+	DefaultExpiredPromiseCleanupLimitPerBlock	= uint64(256)
+	DefaultMaxVirtualChannelsPerParentChannel	= uint64(128)
+	DefaultMaximumVirtualChannelDepth		= uint64(MaxRoutingHops)
+	DefaultMinimumParentTimeoutMargin		= uint64(DefaultTimeoutMargin)
+	DefaultVirtualChannelReservationExpiry		= uint64(256)
+	DefaultMultiSegmentVirtualMaxSegments		= uint64(MaxParentChannels)
+	DefaultStaleClosePenalty			= "10"
+	DefaultSameNonceDoubleSignPenalty		= "20"
+	DefaultInvalidConditionPenalty			= "8"
+	DefaultReplayAttemptPenalty			= "8"
+	DefaultInvalidFraudProofDeposit			= "1"
+	DefaultReporterRewardPercentageBps		= uint32(1_000)
+	DefaultReporterRewardCap			= "5"
+	DefaultPenaltyBurnAllocationBps			= uint32(2_500)
+	DefaultSecurityReserveAllocationBps		= uint32(2_500)
+	DefaultMaxTopologyUpdatesPerPeerWindow		= uint32(16)
+	DefaultRouteFailureScoreDecay			= uint64(DefaultGossipTTL)
+	DefaultCongestionPenaltyDecay			= uint64(DefaultGossipTTL)
+	DefaultCapacityProbeRateLimit			= uint32(16)
+	DefaultFinalizationQueueWorkLimit		= uint64(256)
+	DefaultChannelOpenCongestionMultiplierBps	= uint32(20_000)
+	DefaultDisputeCongestionMultiplierBps		= uint32(25_000)
+	DefaultStorePruningHorizon			= uint64(DefaultReplayHorizon)
 )
 
 type PaymentGovernanceParams struct {
-	Channel      PaymentChannelGovernanceParams
-	Conditional  PaymentConditionalGovernanceParams
-	Virtual      PaymentVirtualChannelGovernanceParams
-	FraudPenalty PaymentFraudPenaltyGovernanceParams
-	Routing      PaymentRoutingGovernanceParams
-	Execution    PaymentExecutionGovernanceParams
-	ParamsHash   string
+	Channel		PaymentChannelGovernanceParams
+	Conditional	PaymentConditionalGovernanceParams
+	Virtual		PaymentVirtualChannelGovernanceParams
+	FraudPenalty	PaymentFraudPenaltyGovernanceParams
+	Routing		PaymentRoutingGovernanceParams
+	Execution	PaymentExecutionGovernanceParams
+	ParamsHash	string
 }
 
 type PaymentChannelGovernanceParams struct {
-	MinimumChannelCollateral  string
-	MaximumChannelCollateral  string
-	MinimumChallengePeriod    uint64
-	MaximumChallengePeriod    uint64
-	DefaultChallengePeriod    uint64
-	MinimumCloseDelay         uint64
-	MaximumCloseDelay         uint64
-	ChannelOpenBaseFee        string
-	ChannelStorageFeePerByte  string
-	ChannelTombstoneRetention uint64
+	MinimumChannelCollateral	string
+	MaximumChannelCollateral	string
+	MinimumChallengePeriod		uint64
+	MaximumChallengePeriod		uint64
+	DefaultChallengePeriod		uint64
+	MinimumCloseDelay		uint64
+	MaximumCloseDelay		uint64
+	ChannelOpenBaseFee		string
+	ChannelStorageFeePerByte	string
+	ChannelTombstoneRetention	uint64
 }
 
 type PaymentConditionalGovernanceParams struct {
-	MaximumActivePromisesPerChannel    uint64
-	MaximumPromiseAmountRatioBps       uint32
-	MinimumTimeoutMargin               uint64
-	MaximumPromiseLifetime             uint64
-	BatchResolutionMaximumSize         uint64
-	PromiseStorageFee                  string
-	ExpiredPromiseCleanupLimitPerBlock uint64
+	MaximumActivePromisesPerChannel		uint64
+	MaximumPromiseAmountRatioBps		uint32
+	MinimumTimeoutMargin			uint64
+	MaximumPromiseLifetime			uint64
+	BatchResolutionMaximumSize		uint64
+	PromiseStorageFee			string
+	ExpiredPromiseCleanupLimitPerBlock	uint64
 }
 
 type PaymentVirtualChannelGovernanceParams struct {
-	MaximumVirtualChannelsPerParentChannel uint64
-	MaximumVirtualChannelDepth             uint64
-	MinimumParentTimeoutMargin             uint64
-	VirtualChannelAnchorFee                string
-	VirtualChannelReservationExpiry        uint64
-	MultiSegmentVirtualChannelMaxSegments  uint64
+	MaximumVirtualChannelsPerParentChannel	uint64
+	MaximumVirtualChannelDepth		uint64
+	MinimumParentTimeoutMargin		uint64
+	VirtualChannelAnchorFee			string
+	VirtualChannelReservationExpiry		uint64
+	MultiSegmentVirtualChannelMaxSegments	uint64
 }
 
 type PaymentFraudPenaltyGovernanceParams struct {
-	StaleClosePenalty                string
-	SameNonceDoubleSignPenalty       string
-	InvalidConditionPenalty          string
-	ReplayAttemptPenalty             string
-	InvalidFraudProofDeposit         string
-	ReporterRewardPercentageBps      uint32
-	ReporterRewardCap                string
-	PenaltyBurnAllocationBps         uint32
-	SecurityReserveAllocationBps     uint32
-	CounterpartyCompensationPriority bool
+	StaleClosePenalty			string
+	SameNonceDoubleSignPenalty		string
+	InvalidConditionPenalty			string
+	ReplayAttemptPenalty			string
+	InvalidFraudProofDeposit		string
+	ReporterRewardPercentageBps		uint32
+	ReporterRewardCap			string
+	PenaltyBurnAllocationBps		uint32
+	SecurityReserveAllocationBps		uint32
+	CounterpartyCompensationPriority	bool
 }
 
 type PaymentRoutingGovernanceParams struct {
-	RoutingAdvertisementDeposit         string
-	GossipMessageExpiry                 uint64
-	LiquidityHintExpiry                 uint64
-	MaximumTopologyUpdatesPerPeerWindow uint32
-	RouteFailureScoreDecay              uint64
-	CongestionPenaltyDecay              uint64
-	CapacityProbeRateLimit              uint32
-	CapacityProbeWindow                 uint64
+	RoutingAdvertisementDeposit		string
+	GossipMessageExpiry			uint64
+	LiquidityHintExpiry			uint64
+	MaximumTopologyUpdatesPerPeerWindow	uint32
+	RouteFailureScoreDecay			uint64
+	CongestionPenaltyDecay			uint64
+	CapacityProbeRateLimit			uint32
+	CapacityProbeWindow			uint64
 }
 
 type PaymentExecutionGovernanceParams struct {
-	SettlementBatchMaximumSize             uint64
-	FinalizationQueueWorkLimitPerBlock     uint64
-	ExpiredPromiseCleanupWorkLimitPerBlock uint64
-	ChannelOpenCongestionFeeMultiplierBps  uint32
-	DisputeCongestionFeeMultiplierBps      uint32
-	StorePruningHorizon                    uint64
+	SettlementBatchMaximumSize		uint64
+	FinalizationQueueWorkLimitPerBlock	uint64
+	ExpiredPromiseCleanupWorkLimitPerBlock	uint64
+	ChannelOpenCongestionFeeMultiplierBps	uint32
+	DisputeCongestionFeeMultiplierBps	uint32
+	StorePruningHorizon			uint64
 }
 
 func DefaultPaymentGovernanceParams() PaymentGovernanceParams {
 	feeSchedule := DefaultPaymentFeeSchedule().Normalize()
 	params := PaymentGovernanceParams{
 		Channel: PaymentChannelGovernanceParams{
-			MinimumChannelCollateral:  DefaultMinimumChannelCollateral,
-			MaximumChannelCollateral:  DefaultMaximumChannelCollateral,
-			MinimumChallengePeriod:    MinChallengePeriod,
-			MaximumChallengePeriod:    MaxChallengePeriod,
-			DefaultChallengePeriod:    DefaultDisputePeriod,
-			MinimumCloseDelay:         MinCloseDelay,
-			MaximumCloseDelay:         MaxCloseDelay,
-			ChannelOpenBaseFee:        feeSchedule.ChannelOpenFee,
-			ChannelStorageFeePerByte:  feeSchedule.StorageByteFee,
-			ChannelTombstoneRetention: DefaultReplayHorizon,
+			MinimumChannelCollateral:	DefaultMinimumChannelCollateral,
+			MaximumChannelCollateral:	DefaultMaximumChannelCollateral,
+			MinimumChallengePeriod:		MinChallengePeriod,
+			MaximumChallengePeriod:		MaxChallengePeriod,
+			DefaultChallengePeriod:		DefaultDisputePeriod,
+			MinimumCloseDelay:		MinCloseDelay,
+			MaximumCloseDelay:		MaxCloseDelay,
+			ChannelOpenBaseFee:		feeSchedule.ChannelOpenFee,
+			ChannelStorageFeePerByte:	feeSchedule.StorageByteFee,
+			ChannelTombstoneRetention:	DefaultReplayHorizon,
 		},
 		Conditional: PaymentConditionalGovernanceParams{
-			MaximumActivePromisesPerChannel:    MaxConditionsPerState,
-			MaximumPromiseAmountRatioBps:       DefaultMaximumPromiseAmountRatioBps,
-			MinimumTimeoutMargin:               DefaultTimeoutMargin,
-			MaximumPromiseLifetime:             DefaultMaximumPromiseLifetime,
-			BatchResolutionMaximumSize:         MaxSettlementBatchOps,
-			PromiseStorageFee:                  feeSchedule.ConditionalPromiseSettlementFee,
-			ExpiredPromiseCleanupLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+			MaximumActivePromisesPerChannel:	MaxConditionsPerState,
+			MaximumPromiseAmountRatioBps:		DefaultMaximumPromiseAmountRatioBps,
+			MinimumTimeoutMargin:			DefaultTimeoutMargin,
+			MaximumPromiseLifetime:			DefaultMaximumPromiseLifetime,
+			BatchResolutionMaximumSize:		MaxSettlementBatchOps,
+			PromiseStorageFee:			feeSchedule.ConditionalPromiseSettlementFee,
+			ExpiredPromiseCleanupLimitPerBlock:	DefaultExpiredPromiseCleanupLimitPerBlock,
 		},
 		Virtual: PaymentVirtualChannelGovernanceParams{
-			MaximumVirtualChannelsPerParentChannel: DefaultMaxVirtualChannelsPerParentChannel,
-			MaximumVirtualChannelDepth:             DefaultMaximumVirtualChannelDepth,
-			MinimumParentTimeoutMargin:             DefaultMinimumParentTimeoutMargin,
-			VirtualChannelAnchorFee:                feeSchedule.VirtualChannelAnchorFee,
-			VirtualChannelReservationExpiry:        DefaultVirtualChannelReservationExpiry,
-			MultiSegmentVirtualChannelMaxSegments:  DefaultMultiSegmentVirtualMaxSegments,
+			MaximumVirtualChannelsPerParentChannel:	DefaultMaxVirtualChannelsPerParentChannel,
+			MaximumVirtualChannelDepth:		DefaultMaximumVirtualChannelDepth,
+			MinimumParentTimeoutMargin:		DefaultMinimumParentTimeoutMargin,
+			VirtualChannelAnchorFee:		feeSchedule.VirtualChannelAnchorFee,
+			VirtualChannelReservationExpiry:	DefaultVirtualChannelReservationExpiry,
+			MultiSegmentVirtualChannelMaxSegments:	DefaultMultiSegmentVirtualMaxSegments,
 		},
 		FraudPenalty: PaymentFraudPenaltyGovernanceParams{
-			StaleClosePenalty:                DefaultStaleClosePenalty,
-			SameNonceDoubleSignPenalty:       DefaultSameNonceDoubleSignPenalty,
-			InvalidConditionPenalty:          DefaultInvalidConditionPenalty,
-			ReplayAttemptPenalty:             DefaultReplayAttemptPenalty,
-			InvalidFraudProofDeposit:         DefaultInvalidFraudProofDeposit,
-			ReporterRewardPercentageBps:      DefaultReporterRewardPercentageBps,
-			ReporterRewardCap:                DefaultReporterRewardCap,
-			PenaltyBurnAllocationBps:         DefaultPenaltyBurnAllocationBps,
-			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
-			CounterpartyCompensationPriority: true,
+			StaleClosePenalty:			DefaultStaleClosePenalty,
+			SameNonceDoubleSignPenalty:		DefaultSameNonceDoubleSignPenalty,
+			InvalidConditionPenalty:		DefaultInvalidConditionPenalty,
+			ReplayAttemptPenalty:			DefaultReplayAttemptPenalty,
+			InvalidFraudProofDeposit:		DefaultInvalidFraudProofDeposit,
+			ReporterRewardPercentageBps:		DefaultReporterRewardPercentageBps,
+			ReporterRewardCap:			DefaultReporterRewardCap,
+			PenaltyBurnAllocationBps:		DefaultPenaltyBurnAllocationBps,
+			SecurityReserveAllocationBps:		DefaultSecurityReserveAllocationBps,
+			CounterpartyCompensationPriority:	true,
 		},
 		Routing: PaymentRoutingGovernanceParams{
-			RoutingAdvertisementDeposit:         feeSchedule.RoutingAdvertisementDeposit,
-			GossipMessageExpiry:                 DefaultGossipTTL,
-			LiquidityHintExpiry:                 DefaultGossipTTL,
-			MaximumTopologyUpdatesPerPeerWindow: DefaultMaxTopologyUpdatesPerPeerWindow,
-			RouteFailureScoreDecay:              DefaultRouteFailureScoreDecay,
-			CongestionPenaltyDecay:              DefaultCongestionPenaltyDecay,
-			CapacityProbeRateLimit:              DefaultCapacityProbeRateLimit,
-			CapacityProbeWindow:                 DefaultGossipTTL,
+			RoutingAdvertisementDeposit:		feeSchedule.RoutingAdvertisementDeposit,
+			GossipMessageExpiry:			DefaultGossipTTL,
+			LiquidityHintExpiry:			DefaultGossipTTL,
+			MaximumTopologyUpdatesPerPeerWindow:	DefaultMaxTopologyUpdatesPerPeerWindow,
+			RouteFailureScoreDecay:			DefaultRouteFailureScoreDecay,
+			CongestionPenaltyDecay:			DefaultCongestionPenaltyDecay,
+			CapacityProbeRateLimit:			DefaultCapacityProbeRateLimit,
+			CapacityProbeWindow:			DefaultGossipTTL,
 		},
 		Execution: PaymentExecutionGovernanceParams{
-			SettlementBatchMaximumSize:             MaxSettlementBatchOps,
-			FinalizationQueueWorkLimitPerBlock:     DefaultFinalizationQueueWorkLimit,
-			ExpiredPromiseCleanupWorkLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
-			ChannelOpenCongestionFeeMultiplierBps:  DefaultChannelOpenCongestionMultiplierBps,
-			DisputeCongestionFeeMultiplierBps:      DefaultDisputeCongestionMultiplierBps,
-			StorePruningHorizon:                    DefaultStorePruningHorizon,
+			SettlementBatchMaximumSize:		MaxSettlementBatchOps,
+			FinalizationQueueWorkLimitPerBlock:	DefaultFinalizationQueueWorkLimit,
+			ExpiredPromiseCleanupWorkLimitPerBlock:	DefaultExpiredPromiseCleanupLimitPerBlock,
+			ChannelOpenCongestionFeeMultiplierBps:	DefaultChannelOpenCongestionMultiplierBps,
+			DisputeCongestionFeeMultiplierBps:	DefaultDisputeCongestionMultiplierBps,
+			StorePruningHorizon:			DefaultStorePruningHorizon,
 		},
 	}
 	params = params.Normalize()
@@ -404,63 +404,63 @@ func DefaultPaymentGovernanceParamsNoHash() PaymentGovernanceParams {
 	feeSchedule := DefaultPaymentFeeSchedule().Normalize()
 	return PaymentGovernanceParams{
 		Channel: PaymentChannelGovernanceParams{
-			MinimumChannelCollateral:  DefaultMinimumChannelCollateral,
-			MaximumChannelCollateral:  DefaultMaximumChannelCollateral,
-			MinimumChallengePeriod:    MinChallengePeriod,
-			MaximumChallengePeriod:    MaxChallengePeriod,
-			DefaultChallengePeriod:    DefaultDisputePeriod,
-			MinimumCloseDelay:         MinCloseDelay,
-			MaximumCloseDelay:         MaxCloseDelay,
-			ChannelOpenBaseFee:        feeSchedule.ChannelOpenFee,
-			ChannelStorageFeePerByte:  feeSchedule.StorageByteFee,
-			ChannelTombstoneRetention: DefaultReplayHorizon,
+			MinimumChannelCollateral:	DefaultMinimumChannelCollateral,
+			MaximumChannelCollateral:	DefaultMaximumChannelCollateral,
+			MinimumChallengePeriod:		MinChallengePeriod,
+			MaximumChallengePeriod:		MaxChallengePeriod,
+			DefaultChallengePeriod:		DefaultDisputePeriod,
+			MinimumCloseDelay:		MinCloseDelay,
+			MaximumCloseDelay:		MaxCloseDelay,
+			ChannelOpenBaseFee:		feeSchedule.ChannelOpenFee,
+			ChannelStorageFeePerByte:	feeSchedule.StorageByteFee,
+			ChannelTombstoneRetention:	DefaultReplayHorizon,
 		},
 		Conditional: PaymentConditionalGovernanceParams{
-			MaximumActivePromisesPerChannel:    MaxConditionsPerState,
-			MaximumPromiseAmountRatioBps:       DefaultMaximumPromiseAmountRatioBps,
-			MinimumTimeoutMargin:               DefaultTimeoutMargin,
-			MaximumPromiseLifetime:             DefaultMaximumPromiseLifetime,
-			BatchResolutionMaximumSize:         MaxSettlementBatchOps,
-			PromiseStorageFee:                  feeSchedule.ConditionalPromiseSettlementFee,
-			ExpiredPromiseCleanupLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
+			MaximumActivePromisesPerChannel:	MaxConditionsPerState,
+			MaximumPromiseAmountRatioBps:		DefaultMaximumPromiseAmountRatioBps,
+			MinimumTimeoutMargin:			DefaultTimeoutMargin,
+			MaximumPromiseLifetime:			DefaultMaximumPromiseLifetime,
+			BatchResolutionMaximumSize:		MaxSettlementBatchOps,
+			PromiseStorageFee:			feeSchedule.ConditionalPromiseSettlementFee,
+			ExpiredPromiseCleanupLimitPerBlock:	DefaultExpiredPromiseCleanupLimitPerBlock,
 		},
 		Virtual: PaymentVirtualChannelGovernanceParams{
-			MaximumVirtualChannelsPerParentChannel: DefaultMaxVirtualChannelsPerParentChannel,
-			MaximumVirtualChannelDepth:             DefaultMaximumVirtualChannelDepth,
-			MinimumParentTimeoutMargin:             DefaultMinimumParentTimeoutMargin,
-			VirtualChannelAnchorFee:                feeSchedule.VirtualChannelAnchorFee,
-			VirtualChannelReservationExpiry:        DefaultVirtualChannelReservationExpiry,
-			MultiSegmentVirtualChannelMaxSegments:  DefaultMultiSegmentVirtualMaxSegments,
+			MaximumVirtualChannelsPerParentChannel:	DefaultMaxVirtualChannelsPerParentChannel,
+			MaximumVirtualChannelDepth:		DefaultMaximumVirtualChannelDepth,
+			MinimumParentTimeoutMargin:		DefaultMinimumParentTimeoutMargin,
+			VirtualChannelAnchorFee:		feeSchedule.VirtualChannelAnchorFee,
+			VirtualChannelReservationExpiry:	DefaultVirtualChannelReservationExpiry,
+			MultiSegmentVirtualChannelMaxSegments:	DefaultMultiSegmentVirtualMaxSegments,
 		},
 		FraudPenalty: PaymentFraudPenaltyGovernanceParams{
-			StaleClosePenalty:                DefaultStaleClosePenalty,
-			SameNonceDoubleSignPenalty:       DefaultSameNonceDoubleSignPenalty,
-			InvalidConditionPenalty:          DefaultInvalidConditionPenalty,
-			ReplayAttemptPenalty:             DefaultReplayAttemptPenalty,
-			InvalidFraudProofDeposit:         DefaultInvalidFraudProofDeposit,
-			ReporterRewardPercentageBps:      DefaultReporterRewardPercentageBps,
-			ReporterRewardCap:                DefaultReporterRewardCap,
-			PenaltyBurnAllocationBps:         DefaultPenaltyBurnAllocationBps,
-			SecurityReserveAllocationBps:     DefaultSecurityReserveAllocationBps,
-			CounterpartyCompensationPriority: true,
+			StaleClosePenalty:			DefaultStaleClosePenalty,
+			SameNonceDoubleSignPenalty:		DefaultSameNonceDoubleSignPenalty,
+			InvalidConditionPenalty:		DefaultInvalidConditionPenalty,
+			ReplayAttemptPenalty:			DefaultReplayAttemptPenalty,
+			InvalidFraudProofDeposit:		DefaultInvalidFraudProofDeposit,
+			ReporterRewardPercentageBps:		DefaultReporterRewardPercentageBps,
+			ReporterRewardCap:			DefaultReporterRewardCap,
+			PenaltyBurnAllocationBps:		DefaultPenaltyBurnAllocationBps,
+			SecurityReserveAllocationBps:		DefaultSecurityReserveAllocationBps,
+			CounterpartyCompensationPriority:	true,
 		},
 		Routing: PaymentRoutingGovernanceParams{
-			RoutingAdvertisementDeposit:         feeSchedule.RoutingAdvertisementDeposit,
-			GossipMessageExpiry:                 DefaultGossipTTL,
-			LiquidityHintExpiry:                 DefaultGossipTTL,
-			MaximumTopologyUpdatesPerPeerWindow: DefaultMaxTopologyUpdatesPerPeerWindow,
-			RouteFailureScoreDecay:              DefaultRouteFailureScoreDecay,
-			CongestionPenaltyDecay:              DefaultCongestionPenaltyDecay,
-			CapacityProbeRateLimit:              DefaultCapacityProbeRateLimit,
-			CapacityProbeWindow:                 DefaultGossipTTL,
+			RoutingAdvertisementDeposit:		feeSchedule.RoutingAdvertisementDeposit,
+			GossipMessageExpiry:			DefaultGossipTTL,
+			LiquidityHintExpiry:			DefaultGossipTTL,
+			MaximumTopologyUpdatesPerPeerWindow:	DefaultMaxTopologyUpdatesPerPeerWindow,
+			RouteFailureScoreDecay:			DefaultRouteFailureScoreDecay,
+			CongestionPenaltyDecay:			DefaultCongestionPenaltyDecay,
+			CapacityProbeRateLimit:			DefaultCapacityProbeRateLimit,
+			CapacityProbeWindow:			DefaultGossipTTL,
 		},
 		Execution: PaymentExecutionGovernanceParams{
-			SettlementBatchMaximumSize:             MaxSettlementBatchOps,
-			FinalizationQueueWorkLimitPerBlock:     DefaultFinalizationQueueWorkLimit,
-			ExpiredPromiseCleanupWorkLimitPerBlock: DefaultExpiredPromiseCleanupLimitPerBlock,
-			ChannelOpenCongestionFeeMultiplierBps:  DefaultChannelOpenCongestionMultiplierBps,
-			DisputeCongestionFeeMultiplierBps:      DefaultDisputeCongestionMultiplierBps,
-			StorePruningHorizon:                    DefaultStorePruningHorizon,
+			SettlementBatchMaximumSize:		MaxSettlementBatchOps,
+			FinalizationQueueWorkLimitPerBlock:	DefaultFinalizationQueueWorkLimit,
+			ExpiredPromiseCleanupWorkLimitPerBlock:	DefaultExpiredPromiseCleanupLimitPerBlock,
+			ChannelOpenCongestionFeeMultiplierBps:	DefaultChannelOpenCongestionMultiplierBps,
+			DisputeCongestionFeeMultiplierBps:	DefaultDisputeCongestionMultiplierBps,
+			StorePruningHorizon:			DefaultStorePruningHorizon,
 		},
 	}
 }
@@ -725,11 +725,11 @@ func BuildGovernedPenaltyMatrix(params PaymentGovernanceParams) ([]PenaltyMatrix
 		fraud.matrixEntry(PenaltyClassReplayAttempt, FraudProofTypeReplayAttempt, PenaltySourceChannelBalance, fraud.ReplayAttemptPenalty),
 		fraud.matrixEntry(PenaltyClassAsyncOverexposure, FraudProofTypeAsyncOverexposure, PenaltySourceParticipantBond, fraud.SameNonceDoubleSignPenalty),
 		{
-			Class:                    PenaltyClassInvalidFraudProof,
-			Source:                   PenaltySourceFraudProofDeposit,
-			BasePenalty:              fraud.InvalidFraudProofDeposit,
-			InvalidProofVerifierCost: fraud.InvalidFraudProofDeposit,
-			Bounded:                  true,
+			Class:				PenaltyClassInvalidFraudProof,
+			Source:				PenaltySourceFraudProofDeposit,
+			BasePenalty:			fraud.InvalidFraudProofDeposit,
+			InvalidProofVerifierCost:	fraud.InvalidFraudProofDeposit,
+			Bounded:			true,
 		},
 	}
 	for _, entry := range matrix {
@@ -750,12 +750,12 @@ func BuildGovernedFraudPenaltyPolicy(params PaymentGovernanceParams) (FraudPenal
 		counterpartyBps = MaxPenaltyRouteBps
 	}
 	policy := FraudPenaltyPolicy{
-		ReporterRewardCap:       params.FraudPenalty.ReporterRewardCap,
-		CounterpartyRewardBps:   counterpartyBps,
-		BurnShareBps:            params.FraudPenalty.PenaltyBurnAllocationBps,
-		SecurityReserveShareBps: params.FraudPenalty.SecurityReserveAllocationBps,
-		CommunityPoolShareBps:   MaxPenaltyRouteBps - params.FraudPenalty.PenaltyBurnAllocationBps - params.FraudPenalty.SecurityReserveAllocationBps,
-		SecurityReserveHook:     params.FraudPenalty.SecurityReserveAllocationBps > 0,
+		ReporterRewardCap:		params.FraudPenalty.ReporterRewardCap,
+		CounterpartyRewardBps:		counterpartyBps,
+		BurnShareBps:			params.FraudPenalty.PenaltyBurnAllocationBps,
+		SecurityReserveShareBps:	params.FraudPenalty.SecurityReserveAllocationBps,
+		CommunityPoolShareBps:		MaxPenaltyRouteBps - params.FraudPenalty.PenaltyBurnAllocationBps - params.FraudPenalty.SecurityReserveAllocationBps,
+		SecurityReserveHook:		params.FraudPenalty.SecurityReserveAllocationBps > 0,
 	}.Normalize()
 	return policy, policy.Validate()
 }
@@ -855,8 +855,8 @@ func (p PaymentFraudPenaltyGovernanceParams) Normalize(defaults PaymentFraudPena
 func (p PaymentFraudPenaltyGovernanceParams) Validate() error {
 	params := p.Normalize(DefaultPaymentGovernanceParamsNoHash().FraudPenalty)
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments governance stale close penalty", params.StaleClosePenalty},
 		{"payments governance double sign penalty", params.SameNonceDoubleSignPenalty},
@@ -887,16 +887,16 @@ func (p PaymentFraudPenaltyGovernanceParams) matrixEntry(class PaymentPenaltyCla
 		counterpartyComp = penalty
 	}
 	return PenaltyMatrixEntry{
-		Class:                    class,
-		ProofType:                proofType,
-		Source:                   source,
-		BasePenalty:              penalty,
-		ReporterRewardCap:        reporterCap,
-		CounterpartyCompensation: counterpartyComp,
-		BurnShareBps:             p.PenaltyBurnAllocationBps,
-		SecurityReserveShareBps:  p.SecurityReserveAllocationBps,
-		CommunityPoolShareBps:    MaxPenaltyRouteBps - p.PenaltyBurnAllocationBps - p.SecurityReserveAllocationBps,
-		Bounded:                  true,
+		Class:				class,
+		ProofType:			proofType,
+		Source:				source,
+		BasePenalty:			penalty,
+		ReporterRewardCap:		reporterCap,
+		CounterpartyCompensation:	counterpartyComp,
+		BurnShareBps:			p.PenaltyBurnAllocationBps,
+		SecurityReserveShareBps:	p.SecurityReserveAllocationBps,
+		CommunityPoolShareBps:		MaxPenaltyRouteBps - p.PenaltyBurnAllocationBps - p.SecurityReserveAllocationBps,
+		Bounded:			true,
 	}
 }
 
@@ -1080,10 +1080,10 @@ func ApplyGovernedExecutionFeeMultipliers(state PaymentsState, currentHeight, ch
 	var err error
 	if channelOpenCongestionBps > 0 {
 		next, err = SetPaymentFeeMultiplier(next, PaymentFeeMultiplier{
-			FeeClass:      PaymentFeeClassChannelOpen,
-			MultiplierBps: params.Execution.ChannelOpenCongestionFeeMultiplierBps,
-			CongestionBps: uint32(channelOpenCongestionBps),
-			UpdatedHeight: currentHeight,
+			FeeClass:	PaymentFeeClassChannelOpen,
+			MultiplierBps:	params.Execution.ChannelOpenCongestionFeeMultiplierBps,
+			CongestionBps:	uint32(channelOpenCongestionBps),
+			UpdatedHeight:	currentHeight,
 		})
 		if err != nil {
 			return PaymentsState{}, err
@@ -1091,10 +1091,10 @@ func ApplyGovernedExecutionFeeMultipliers(state PaymentsState, currentHeight, ch
 	}
 	if disputeCongestionBps > 0 {
 		next, err = SetPaymentFeeMultiplier(next, PaymentFeeMultiplier{
-			FeeClass:      PaymentFeeClassDispute,
-			MultiplierBps: params.Execution.DisputeCongestionFeeMultiplierBps,
-			CongestionBps: uint32(disputeCongestionBps),
-			UpdatedHeight: currentHeight,
+			FeeClass:	PaymentFeeClassDispute,
+			MultiplierBps:	params.Execution.DisputeCongestionFeeMultiplierBps,
+			CongestionBps:	uint32(disputeCongestionBps),
+			UpdatedHeight:	currentHeight,
 		})
 		if err != nil {
 			return PaymentsState{}, err

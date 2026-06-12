@@ -56,8 +56,8 @@ func TestXServicesModuleBreakdownRejectsMissingSurface(t *testing.T) {
 func TestXServicesFailureModesUseRegistryGuards(t *testing.T) {
 	state, descriptor, _ := testXServicesRegistryState(t)
 	_, err := RegisterServiceInRegistryV2(state, MsgRegisterServiceV2{
-		Authority:  descriptor.Owner,
-		Descriptor: descriptor,
+		Authority:	descriptor.Owner,
+		Descriptor:	descriptor,
 	}, 20)
 	require.ErrorContains(t, err, "already exists")
 
@@ -67,8 +67,8 @@ func TestXServicesFailureModesUseRegistryGuards(t *testing.T) {
 	updated, err = NewCanonicalServiceDescriptor(updated)
 	require.NoError(t, err)
 	_, err = UpdateServiceInRegistryV2(state, MsgUpdateServiceV2{
-		Authority:  "attacker",
-		Descriptor: updated,
+		Authority:	"attacker",
+		Descriptor:	updated,
 	}, 21)
 	require.ErrorContains(t, err, "must own service")
 }
@@ -98,10 +98,10 @@ func TestXServicesDescriptorUsableForCallRejectsExpiredAndInterfaceMismatch(t *t
 func TestXServicesIdentityBindingFreshnessDetectsDomainTransfer(t *testing.T) {
 	_, descriptor, _ := testXServicesRegistryState(t)
 	binding, err := NewServiceIdentityBindingV2(ServiceIdentityBindingV2{
-		ServiceID:    descriptor.ServiceID,
-		IdentityName: "dex.aet",
-		Owner:        descriptor.Owner,
-		BoundHeight:  30,
+		ServiceID:	descriptor.ServiceID,
+		IdentityName:	"dex.aet",
+		Owner:		descriptor.Owner,
+		BoundHeight:	30,
 	})
 	require.NoError(t, err)
 
@@ -135,30 +135,30 @@ func TestXServicesStoreV2ProofQueryIntegration(t *testing.T) {
 func testXServicesRegistryState(t *testing.T) (ServiceRegistryStateV2, CanonicalServiceDescriptor, DistributedInterfaceDescriptor) {
 	t.Helper()
 	iface, err := NewDistributedInterfaceDescriptor(DistributedInterfaceDescriptor{
-		InterfaceHash: testInterfaceHash("x-services/iface"),
-		InterfaceName: "dex.v1",
-		Version:       1,
-		SchemaHash:    testInterfaceHash("x-services/schema"),
-		MethodRoot:    testInterfaceHash("x-services/methods"),
-		EventRoot:     testInterfaceHash("x-services/events"),
-		ErrorRoot:     testInterfaceHash("x-services/errors"),
+		InterfaceHash:	testInterfaceHash("x-services/iface"),
+		InterfaceName:	"dex.v1",
+		Version:	1,
+		SchemaHash:	testInterfaceHash("x-services/schema"),
+		MethodRoot:	testInterfaceHash("x-services/methods"),
+		EventRoot:	testInterfaceHash("x-services/events"),
+		ErrorRoot:	testInterfaceHash("x-services/errors"),
 	})
 	require.NoError(t, err)
 	descriptor, err := NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        "svc.dex",
-		EndpointType:     CanonicalEndpointApplication,
-		InterfaceHash:    iface.InterfaceHash,
-		SupportedMethods: []string{"swap"},
-		AuthModel:        "owner",
-		StateDependency:  "service_root",
-		Owner:            "owner.dex",
-		ZoneID:           "aetra",
-		Version:          1,
-		EndpointURIHash:  testInterfaceHash("x-services/endpoint"),
-		MetadataHash:     testInterfaceHash("x-services/metadata"),
-		TTLHeight:        100,
-		Status:           CanonicalServiceStatusActive,
-		Capabilities:     []string{"dex"},
+		ServiceID:		"svc.dex",
+		EndpointType:		CanonicalEndpointApplication,
+		InterfaceHash:		iface.InterfaceHash,
+		SupportedMethods:	[]string{"swap"},
+		AuthModel:		"owner",
+		StateDependency:	"service_root",
+		Owner:			"owner.dex",
+		ZoneID:			"aetra",
+		Version:		1,
+		EndpointURIHash:	testInterfaceHash("x-services/endpoint"),
+		MetadataHash:		testInterfaceHash("x-services/metadata"),
+		TTLHeight:		100,
+		Status:			CanonicalServiceStatusActive,
+		Capabilities:		[]string{"dex"},
 	})
 	require.NoError(t, err)
 	state, err := BuildServiceRegistryStateV2([]CanonicalServiceDescriptor{descriptor}, []DistributedInterfaceDescriptor{iface}, nil, nil, 10)

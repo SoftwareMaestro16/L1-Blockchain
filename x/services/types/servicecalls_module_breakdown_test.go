@@ -126,12 +126,12 @@ func TestXServiceCallsAnchorWindowAndResultHashGuards(t *testing.T) {
 	ctx := coretypes.ServiceConsensusContext{ChainID: "aetra-test-1", Height: 70}
 	call := testInteractionCall(t, ctx, testInterfaceSystemDescriptor(), "submit", 5, "servicecalls/result")
 	outcome := coretypes.ServiceExecutionOutcome{
-		CallID:        call.CallID,
-		Status:        coretypes.ServiceCallStatusExecuted,
-		ResponseHash:  testInterfaceHash("servicecalls/result/response"),
-		ProofHash:     testInterfaceHash("servicecalls/result/proof"),
-		PaymentStatus: coretypes.ServicePaymentStatusSettled,
-		GasUsed:       10,
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("servicecalls/result/response"),
+		ProofHash:	testInterfaceHash("servicecalls/result/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	10,
 	}
 
 	msg, err := NewMsgAnchorServiceResult(coretypes.DefaultAuthority, call, outcome.ResponseHash, outcome)
@@ -171,12 +171,12 @@ func TestXServiceCallsRetryAndQueries(t *testing.T) {
 	anchorIndex, err := NewServiceCallReplayIndex(25)
 	require.NoError(t, err)
 	anchor, err := AnchorUnifiedServiceReceipt(ctx, descriptor, anchorIndex, original, coretypes.ServiceExecutionOutcome{
-		CallID:        original.CallID,
-		Status:        coretypes.ServiceCallStatusExecuted,
-		ResponseHash:  testInterfaceHash("servicecalls/query/response"),
-		ProofHash:     testInterfaceHash("servicecalls/query/proof"),
-		PaymentStatus: coretypes.ServicePaymentStatusSettled,
-		GasUsed:       42,
+		CallID:		original.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("servicecalls/query/response"),
+		ProofHash:	testInterfaceHash("servicecalls/query/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	42,
 	}, coretypes.DefaultAuthority)
 	require.NoError(t, err)
 

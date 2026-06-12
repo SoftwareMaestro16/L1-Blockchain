@@ -8,138 +8,138 @@ import (
 )
 
 const (
-	AttackClassStakeConcentration   = "stake_concentration"
-	AttackClassCommissionBaitSwitch = "commission_bait_and_switch"
-	AttackClassRewardManipulation   = "reward_manipulation"
-	AttackClassFeeSpam              = "fee_spam"
-	AttackClassStateBloat           = "state_bloat"
-	AttackClassEvidenceSpam         = "evidence_spam"
-	AttackClassDelegationCapture    = "delegation_capture"
+	AttackClassStakeConcentration	= "stake_concentration"
+	AttackClassCommissionBaitSwitch	= "commission_bait_and_switch"
+	AttackClassRewardManipulation	= "reward_manipulation"
+	AttackClassFeeSpam		= "fee_spam"
+	AttackClassStateBloat		= "state_bloat"
+	AttackClassEvidenceSpam		= "evidence_spam"
+	AttackClassDelegationCapture	= "delegation_capture"
 
-	DefaultAttackMinCostToProfitBps       = int64(15_000)
-	DefaultRewardManipulationThresholdBps = int64(500)
-	DefaultDelegationInflowThresholdBps   = int64(1_000)
-	DefaultStakeMovementThresholdBps      = int64(750)
-	DefaultCartelVotingPowerThresholdBps  = int64(3_334)
-	DefaultCartelPenaltyBps               = int64(20_000)
+	DefaultAttackMinCostToProfitBps		= int64(15_000)
+	DefaultRewardManipulationThresholdBps	= int64(500)
+	DefaultDelegationInflowThresholdBps	= int64(1_000)
+	DefaultStakeMovementThresholdBps	= int64(750)
+	DefaultCartelVotingPowerThresholdBps	= int64(3_334)
+	DefaultCartelPenaltyBps			= int64(20_000)
 )
 
 type EconomicAttackHardeningParams struct {
-	MinCostToProfitBps              int64
-	StakeConcentrationThresholdBps  int64
-	CommissionJumpThresholdBps      int64
-	RewardManipulationThresholdBps  int64
-	FeeSpamFailedTxThresholdBps     int64
-	StateGrowthThresholdBytes       int64
-	EvidenceSpamSubmissionThreshold uint64
-	DelegationInflowThresholdBps    int64
-	StakeMovementThresholdBps       int64
-	CartelVotingPowerThresholdBps   int64
-	CartelPenaltyBps                int64
-	CircuitBreakerParams            EconomicCircuitBreakerParams
+	MinCostToProfitBps		int64
+	StakeConcentrationThresholdBps	int64
+	CommissionJumpThresholdBps	int64
+	RewardManipulationThresholdBps	int64
+	FeeSpamFailedTxThresholdBps	int64
+	StateGrowthThresholdBytes	int64
+	EvidenceSpamSubmissionThreshold	uint64
+	DelegationInflowThresholdBps	int64
+	StakeMovementThresholdBps	int64
+	CartelVotingPowerThresholdBps	int64
+	CartelPenaltyBps		int64
+	CircuitBreakerParams		EconomicCircuitBreakerParams
 }
 
 type EconomicAttackPreventionInput struct {
-	ExpectedAttackProfitNaet sdkmath.Int
-	TotalStakeNaet           sdkmath.Int
-	ValidatorStakeNaet       sdkmath.Int
-	ValidatorStakeBps        int64
-	CommissionChangeBps      int64
-	RewardDeviationBps       int64
-	SlashingPenaltyNaet      sdkmath.Int
-	FeeSpamTxCount           uint64
-	FeePerSpamTxNaet         sdkmath.Int
-	FailedTxRateBps          int64
-	StateGrowthBytes         int64
-	StateExpansionFeeNaet    sdkmath.Int
-	EvidenceSubmissions      uint64
-	EvidenceDepositNaet      sdkmath.Int
-	ReporterRewardCapNaet    sdkmath.Int
-	DelegationInflowBps      int64
-	ControllerInput          EconomicCircuitBreakerInput
+	ExpectedAttackProfitNaet	sdkmath.Int
+	TotalStakeNaet			sdkmath.Int
+	ValidatorStakeNaet		sdkmath.Int
+	ValidatorStakeBps		int64
+	CommissionChangeBps		int64
+	RewardDeviationBps		int64
+	SlashingPenaltyNaet		sdkmath.Int
+	FeeSpamTxCount			uint64
+	FeePerSpamTxNaet		sdkmath.Int
+	FailedTxRateBps			int64
+	StateGrowthBytes		int64
+	StateExpansionFeeNaet		sdkmath.Int
+	EvidenceSubmissions		uint64
+	EvidenceDepositNaet		sdkmath.Int
+	ReporterRewardCapNaet		sdkmath.Int
+	DelegationInflowBps		int64
+	ControllerInput			EconomicCircuitBreakerInput
 }
 
 type EconomicAttackAssessment struct {
-	Class           string
-	Triggered       bool
-	CostNaet        sdkmath.Int
-	ExpectedProfit  sdkmath.Int
-	CostToProfitBps int64
-	Profitable      bool
-	Mitigation      string
-	Signals         []string
+	Class		string
+	Triggered	bool
+	CostNaet	sdkmath.Int
+	ExpectedProfit	sdkmath.Int
+	CostToProfitBps	int64
+	Profitable	bool
+	Mitigation	string
+	Signals		[]string
 }
 
 type EconomicAttackPreventionReport struct {
-	Assessments    []EconomicAttackAssessment
-	CircuitBreaker EconomicCircuitBreakerOutput
-	Passed         bool
-	Failed         []string
+	Assessments	[]EconomicAttackAssessment
+	CircuitBreaker	EconomicCircuitBreakerOutput
+	Passed		bool
+	Failed		[]string
 }
 
 type EconomicAttackInvariantReport struct {
-	Passed bool
-	Failed []string
+	Passed	bool
+	Failed	[]string
 }
 
 type CartelSimulationInput struct {
-	ValidatorPowerBps []int64
-	ColludingIndices  []int
-	RewardPoolNaet    sdkmath.Int
-	ExpectedMEVNaet   sdkmath.Int
-	Epochs            uint64
-	Params            EconomicAttackHardeningParams
+	ValidatorPowerBps	[]int64
+	ColludingIndices	[]int
+	RewardPoolNaet		sdkmath.Int
+	ExpectedMEVNaet		sdkmath.Int
+	Epochs			uint64
+	Params			EconomicAttackHardeningParams
 }
 
 type CartelSimulationReport struct {
-	CartelVotingPowerBps int64
-	ExpectedGainNaet     sdkmath.Int
-	ExpectedPenaltyNaet  sdkmath.Int
-	Profitable           bool
-	Mitigation           string
-	Triggered            bool
+	CartelVotingPowerBps	int64
+	ExpectedGainNaet	sdkmath.Int
+	ExpectedPenaltyNaet	sdkmath.Int
+	Profitable		bool
+	Mitigation		string
+	Triggered		bool
 }
 
 type StakeMovementSnapshot struct {
-	ValidatorID string
-	StakeBps    int64
+	ValidatorID	string
+	StakeBps	int64
 }
 
 type StakeMovementAlert struct {
-	ValidatorID string
-	PreviousBps int64
-	CurrentBps  int64
-	DeltaBps    int64
-	Reason      string
+	ValidatorID	string
+	PreviousBps	int64
+	CurrentBps	int64
+	DeltaBps	int64
+	Reason		string
 }
 
 type StakeMovementMonitorInput struct {
-	Previous []StakeMovementSnapshot
-	Current  []StakeMovementSnapshot
-	Params   EconomicAttackHardeningParams
+	Previous	[]StakeMovementSnapshot
+	Current		[]StakeMovementSnapshot
+	Params		EconomicAttackHardeningParams
 }
 
 type StakeMovementMonitorReport struct {
-	Alerts          []StakeMovementAlert
-	TotalInflowBps  int64
-	TotalOutflowBps int64
-	Abnormal        bool
+	Alerts		[]StakeMovementAlert
+	TotalInflowBps	int64
+	TotalOutflowBps	int64
+	Abnormal	bool
 }
 
 func DefaultEconomicAttackHardeningParams() EconomicAttackHardeningParams {
 	return EconomicAttackHardeningParams{
-		MinCostToProfitBps:              DefaultAttackMinCostToProfitBps,
-		StakeConcentrationThresholdBps:  MaxTopValidatorConcentrationBps,
-		CommissionJumpThresholdBps:      MaxDailyCommissionChangeBps,
-		RewardManipulationThresholdBps:  DefaultRewardManipulationThresholdBps,
-		FeeSpamFailedTxThresholdBps:     DefaultCircuitBreakerFailedTxRateBps,
-		StateGrowthThresholdBytes:       DefaultStateGrowthSurchargeThresholdBytes,
-		EvidenceSpamSubmissionThreshold: 10,
-		DelegationInflowThresholdBps:    DefaultDelegationInflowThresholdBps,
-		StakeMovementThresholdBps:       DefaultStakeMovementThresholdBps,
-		CartelVotingPowerThresholdBps:   DefaultCartelVotingPowerThresholdBps,
-		CartelPenaltyBps:                DefaultCartelPenaltyBps,
-		CircuitBreakerParams:            DefaultEconomicCircuitBreakerParams(),
+		MinCostToProfitBps:			DefaultAttackMinCostToProfitBps,
+		StakeConcentrationThresholdBps:		MaxTopValidatorConcentrationBps,
+		CommissionJumpThresholdBps:		MaxDailyCommissionChangeBps,
+		RewardManipulationThresholdBps:		DefaultRewardManipulationThresholdBps,
+		FeeSpamFailedTxThresholdBps:		DefaultCircuitBreakerFailedTxRateBps,
+		StateGrowthThresholdBytes:		DefaultStateGrowthSurchargeThresholdBytes,
+		EvidenceSpamSubmissionThreshold:	10,
+		DelegationInflowThresholdBps:		DefaultDelegationInflowThresholdBps,
+		StakeMovementThresholdBps:		DefaultStakeMovementThresholdBps,
+		CartelVotingPowerThresholdBps:		DefaultCartelVotingPowerThresholdBps,
+		CartelPenaltyBps:			DefaultCartelPenaltyBps,
+		CircuitBreakerParams:			DefaultEconomicCircuitBreakerParams(),
 	}
 }
 
@@ -245,12 +245,12 @@ func SimulateValidatorCartel(input CartelSimulationInput) (CartelSimulationRepor
 	penalty := ApplyBps(gain, params.CartelPenaltyBps)
 	triggered := cartelPower >= params.CartelVotingPowerThresholdBps
 	return CartelSimulationReport{
-		CartelVotingPowerBps: cartelPower,
-		ExpectedGainNaet:     gain,
-		ExpectedPenaltyNaet:  penalty,
-		Profitable:           triggered && gain.GT(penalty),
-		Mitigation:           "cartel_power_alert_slashing_risk_and_reward_dampening",
-		Triggered:            triggered,
+		CartelVotingPowerBps:	cartelPower,
+		ExpectedGainNaet:	gain,
+		ExpectedPenaltyNaet:	penalty,
+		Profitable:		triggered && gain.GT(penalty),
+		Mitigation:		"cartel_power_alert_slashing_risk_and_reward_dampening",
+		Triggered:		triggered,
 	}, nil
 }
 
@@ -388,8 +388,8 @@ func (p EconomicAttackHardeningParams) withDefaults() EconomicAttackHardeningPar
 
 func (input EconomicAttackPreventionInput) Validate() error {
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "expected_attack_profit_naet", value: input.ExpectedAttackProfitNaet},
 		{name: "total_stake_naet", value: input.TotalStakeNaet},
@@ -436,14 +436,14 @@ func attackAssessment(class string, triggered bool, cost, profit sdkmath.Int, mi
 		signals = append(signals, signal)
 	}
 	return EconomicAttackAssessment{
-		Class:           class,
-		Triggered:       triggered,
-		CostNaet:        cost,
-		ExpectedProfit:  profit,
-		CostToProfitBps: costToProfit,
-		Profitable:      triggered && profit.IsPositive() && profit.GT(cost),
-		Mitigation:      mitigation,
-		Signals:         signals,
+		Class:			class,
+		Triggered:		triggered,
+		CostNaet:		cost,
+		ExpectedProfit:		profit,
+		CostToProfitBps:	costToProfit,
+		Profitable:		triggered && profit.IsPositive() && profit.GT(cost),
+		Mitigation:		mitigation,
+		Signals:		signals,
 	}
 }
 

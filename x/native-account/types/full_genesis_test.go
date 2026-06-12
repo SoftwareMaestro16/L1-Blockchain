@@ -154,8 +154,8 @@ func TestFullGenesisExportDoesNotContainPrivateKeyOrSeed(t *testing.T) {
 }
 
 type testFullGenesisStore struct {
-	state  FullGenesisState
-	writes int
+	state	FullGenesisState
+	writes	int
 }
 
 func newFullGenesisStore(state FullGenesisState) *testFullGenesisStore {
@@ -198,15 +198,15 @@ func validatorRecord(t *testing.T, fill byte) validatorregistrytypes.ValidatorRe
 	withdrawal, _ := testAddressPair(t, fill+2)
 	emergency, _ := testAddressPair(t, fill+3)
 	return validatorregistrytypes.ValidatorRecord{
-		OperatorAddress:    operator,
-		ConsensusPublicKey: "ed25519-consensus-key",
-		TreasuryAddress:    treasury,
-		WithdrawalAddress:  withdrawal,
-		EmergencyAddress:   emergency,
-		CommissionPolicy:   validatorregistrytypes.DefaultCommissionPolicy(),
-		Status:             validatorregistrytypes.StatusActive,
-		Capabilities:       []string{"liquid-staking"},
-		SelfBond:           validatorregistrytypes.DefaultSoloValidatorMinSelfStake,
+		OperatorAddress:	operator,
+		ConsensusPublicKey:	"ed25519-consensus-key",
+		TreasuryAddress:	treasury,
+		WithdrawalAddress:	withdrawal,
+		EmergencyAddress:	emergency,
+		CommissionPolicy:	validatorregistrytypes.DefaultCommissionPolicy(),
+		Status:			validatorregistrytypes.StatusActive,
+		Capabilities:		[]string{"liquid-staking"},
+		SelfBond:		validatorregistrytypes.DefaultSoloValidatorMinSelfStake,
 	}
 }
 
@@ -218,13 +218,13 @@ func liquidStakingPool(t *testing.T) nominatorpooltypes.NominatorPool {
 	validatorA, _ := testAddressPair(t, 0x64)
 	validatorB, _ := testAddressPair(t, 0x65)
 	return nominatorpooltypes.NominatorPool{
-		PoolID:                "pool-a",
-		ContractAddressUser:   contractUser,
-		ContractAddressRaw:    contractRaw,
-		OfficialLiquidStaking: true,
-		PoolOperator:          operator,
-		TotalShares:           2_000,
-		TotalBondedStake:      3_000,
+		PoolID:			"pool-a",
+		ContractAddressUser:	contractUser,
+		ContractAddressRaw:	contractRaw,
+		OfficialLiquidStaking:	true,
+		PoolOperator:		operator,
+		TotalShares:		2_000,
+		TotalBondedStake:	3_000,
 		Allocations: []nominatorpooltypes.PoolAllocation{
 			{ValidatorAddress: validatorA, Amount: 1_000, Height: 7},
 			{ValidatorAddress: validatorB, Amount: 1_500, Height: 8},
@@ -238,10 +238,10 @@ func liquidStakingPool(t *testing.T) nominatorpooltypes.NominatorPool {
 		PendingWithdrawals: []nominatorpooltypes.PendingWithdrawal{
 			{WithdrawalID: "withdraw-a", Delegator: delegator, Shares: 100, Amount: 150, RequestHeight: 9, CompleteHeight: 99, Status: nominatorpooltypes.WithdrawalStatusPending},
 		},
-		RewardIndex:       1_234_567,
-		SlashIndex:        3,
-		PoolCommissionBps: 100,
-		Status:            nominatorpooltypes.PoolStatusActive,
+		RewardIndex:		1_234_567,
+		SlashIndex:		3,
+		PoolCommissionBps:	100,
+		Status:			nominatorpooltypes.PoolStatusActive,
 		UnbondingQueue: []nominatorpooltypes.UnbondingEntry{
 			{WithdrawalID: "withdraw-a", Delegator: delegator, Amount: 150, CompleteHeight: 99, Status: nominatorpooltypes.WithdrawalStatusPending},
 		},
@@ -263,14 +263,14 @@ func storageRentState() storagerenttypes.StorageRentState {
 	return storagerenttypes.StorageRentState{
 		Contracts: []storagerenttypes.ContractRentRecord{
 			{
-				ContractAddress:    "contract-a",
-				ActorID:            "actor-a",
-				StorageBytes:       10_000,
-				PrepaidRentBalance: 20,
-				RentDebt:           55,
-				LastChargedHeight:  12,
-				Status:             storagerenttypes.ContractStatusActive,
-				ArchivalProofRoot:  storagerenttypes.DefaultProofRoot,
+				ContractAddress:	"contract-a",
+				ActorID:		"actor-a",
+				StorageBytes:		10_000,
+				PrepaidRentBalance:	20,
+				RentDebt:		55,
+				LastChargedHeight:	12,
+				Status:			storagerenttypes.ContractStatusActive,
+				ArchivalProofRoot:	storagerenttypes.DefaultProofRoot,
 			},
 		},
 		Distributions: []storagerenttypes.RentDistributionRecord{

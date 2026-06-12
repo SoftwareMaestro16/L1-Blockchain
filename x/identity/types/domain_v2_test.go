@@ -14,8 +14,8 @@ func TestDomainRecordV2FromDomainValidatesCanonicalState(t *testing.T) {
 	record.Resolver = addr(1)
 
 	err = ValidateDomainRecordV2(record, DomainRecordV2ValidationContext{
-		CurrentHeight: 12,
-		NFTOwner:      state.DomainNFTs[0].Owner,
+		CurrentHeight:	12,
+		NFTOwner:	state.DomainNFTs[0].Owner,
 	})
 	require.NoError(t, err)
 	require.Equal(t, record.Name, record.NormalizedName)
@@ -66,15 +66,15 @@ func TestDomainRecordV2ResolverMustBeOwnerOrDelegate(t *testing.T) {
 	record.Resolver = addr(7)
 
 	err = ValidateDomainRecordV2(record, DomainRecordV2ValidationContext{
-		CurrentHeight: 12,
-		NFTOwner:      addr(1),
+		CurrentHeight:	12,
+		NFTOwner:	addr(1),
 	})
 	require.ErrorContains(t, err, "authorized delegate")
 
 	err = ValidateDomainRecordV2(record, DomainRecordV2ValidationContext{
-		CurrentHeight:     12,
-		NFTOwner:          addr(1),
-		ResolverDelegates: []sdk.AccAddress{addr(7)},
+		CurrentHeight:		12,
+		NFTOwner:		addr(1),
+		ResolverDelegates:	[]sdk.AccAddress{addr(7)},
 	})
 	require.NoError(t, err)
 }

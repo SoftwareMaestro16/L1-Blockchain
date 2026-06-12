@@ -12,7 +12,7 @@ func TestIdentityLightClientProofV2VerifiesAllResolutionObjectives(t *testing.T)
 	state, _, err := IssueSubdomain(state, "alice.aet", "api", addr(1), addr(1), true, 11)
 	require.NoError(t, err)
 	state, _, err = PatchIdentityResolver(state, "api.alice.aet", addr(1), ResolverPatch{
-		Primary: addr(2),
+		Primary:	addr(2),
 		Records: map[string]sdk.AccAddress{
 			ResolverKeyWallet: addr(3),
 		},
@@ -22,10 +22,10 @@ func TestIdentityLightClientProofV2VerifiesAllResolutionObjectives(t *testing.T)
 	require.NoError(t, err)
 
 	proof, err := BuildIdentityLightClientResolutionProofV2(state, IdentityLightClientProofRequestV2{
-		Name:           "svc.api.alice.aet",
-		TrustedHeight:  14,
-		RecordTTL:      10,
-		ReverseAddress: addr(2),
+		Name:		"svc.api.alice.aet",
+		TrustedHeight:	14,
+		RecordTTL:	10,
+		ReverseAddress:	addr(2),
 		Objectives: []IdentityProofObjectiveV2{
 			IdentityProofObjectiveDomainNonExistence,
 			IdentityProofObjectiveDomainStatusExpiry,
@@ -59,9 +59,9 @@ func TestIdentityLightClientProofV2DomainExistenceAndFreshness(t *testing.T) {
 	require.NoError(t, err)
 
 	proof, err := BuildIdentityLightClientResolutionProofV2(state, IdentityLightClientProofRequestV2{
-		Name:          "alice.aet",
-		TrustedHeight: 13,
-		RecordTTL:     5,
+		Name:		"alice.aet",
+		TrustedHeight:	13,
+		RecordTTL:	5,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, proof.QueryDomainProof)
@@ -79,9 +79,9 @@ func TestIdentityLightClientProofV2NonExistenceOnly(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 
 	proof, err := BuildIdentityLightClientResolutionProofV2(state, IdentityLightClientProofRequestV2{
-		Name:          "missing.aet",
-		TrustedHeight: 13,
-		RecordTTL:     5,
+		Name:		"missing.aet",
+		TrustedHeight:	13,
+		RecordTTL:	5,
 		Objectives: []IdentityProofObjectiveV2{
 			IdentityProofObjectiveDomainNonExistence,
 			IdentityProofObjectiveVersionAndFreshness,
@@ -105,10 +105,10 @@ func TestIdentityLightClientProofV2RejectsReverseMismatch(t *testing.T) {
 	require.NoError(t, err)
 
 	proof, err := BuildIdentityLightClientResolutionProofV2(state, IdentityLightClientProofRequestV2{
-		Name:           "alice.aet",
-		TrustedHeight:  14,
-		RecordTTL:      10,
-		ReverseAddress: addr(2),
+		Name:		"alice.aet",
+		TrustedHeight:	14,
+		RecordTTL:	10,
+		ReverseAddress:	addr(2),
 		Objectives: []IdentityProofObjectiveV2{
 			IdentityProofObjectiveReverseConsistency,
 			IdentityProofObjectiveRecursiveResolution,

@@ -23,28 +23,28 @@ import (
 const ConsensusVersion = prototype.NextMigrationVersion
 
 var (
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasGenesis     = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ appmodule.AppModule   = AppModule{}
+	_	module.AppModuleBasic	= AppModule{}
+	_	module.HasGenesis	= AppModule{}
+	_	module.HasServices	= AppModule{}
+	_	appmodule.AppModule	= AppModule{}
 )
 
 type AppModule struct {
 	keeper *keeper.Keeper
 }
 
-func NewAppModule(k *keeper.Keeper) AppModule { return AppModule{keeper: k} }
+func NewAppModule(k *keeper.Keeper) AppModule	{ return AppModule{keeper: k} }
 
-func (AppModule) IsOnePerModuleType() {}
-func (AppModule) IsAppModule()        {}
-func (AppModule) Name() string        { return types.ModuleName }
+func (AppModule) IsOnePerModuleType()	{}
+func (AppModule) IsAppModule()		{}
+func (AppModule) Name() string		{ return types.ModuleName }
 func (AppModule) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	types.RegisterLegacyAminoCodec(cdc)
 }
 func (AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
 }
-func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
+func (AppModule) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux)	{}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
@@ -86,9 +86,9 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, _ codec.JSONCodec) json.RawMe
 	return mustMarshalGenesis(types.ModuleName, gs)
 }
 
-func (AppModule) ConsensusVersion() uint64    { return ConsensusVersion }
-func (AppModule) GetTxCmd() *cobra.Command    { return types.NewTxCmd() }
-func (AppModule) GetQueryCmd() *cobra.Command { return types.NewQueryCmd() }
+func (AppModule) ConsensusVersion() uint64	{ return ConsensusVersion }
+func (AppModule) GetTxCmd() *cobra.Command	{ return types.NewTxCmd() }
+func (AppModule) GetQueryCmd() *cobra.Command	{ return types.NewQueryCmd() }
 
 func mustMarshalGenesis(moduleName string, value any) json.RawMessage {
 	bz, err := json.Marshal(value)

@@ -8,26 +8,26 @@ import (
 )
 
 type NetworkingState struct {
-	LayerStack          []LayerSpec
-	Adapter             AetherNetworkingAdapter
-	ChannelPolicies     []ChannelPolicy
-	NodeRecords         []NodeRecord
-	RoleCommitments     []RoleCommitment
-	Sessions            []SessionChannel
-	IdentityTransitions []IdentityTransitionRecord
-	OverlayDescriptors  []OverlayDescriptor
+	LayerStack		[]LayerSpec
+	Adapter			AetherNetworkingAdapter
+	ChannelPolicies		[]ChannelPolicy
+	NodeRecords		[]NodeRecord
+	RoleCommitments		[]RoleCommitment
+	Sessions		[]SessionChannel
+	IdentityTransitions	[]IdentityTransitionRecord
+	OverlayDescriptors	[]OverlayDescriptor
 }
 
 func EmptyState() NetworkingState {
 	return NetworkingState{
-		LayerStack:          DefaultLayerStack(),
-		Adapter:             DefaultAetherNetworkingAdapter(),
-		ChannelPolicies:     DefaultChannelPolicies(),
-		NodeRecords:         []NodeRecord{},
-		RoleCommitments:     []RoleCommitment{},
-		Sessions:            []SessionChannel{},
-		IdentityTransitions: []IdentityTransitionRecord{},
-		OverlayDescriptors:  DefaultOverlayDescriptors(),
+		LayerStack:		DefaultLayerStack(),
+		Adapter:		DefaultAetherNetworkingAdapter(),
+		ChannelPolicies:	DefaultChannelPolicies(),
+		NodeRecords:		[]NodeRecord{},
+		RoleCommitments:	[]RoleCommitment{},
+		Sessions:		[]SessionChannel{},
+		IdentityTransitions:	[]IdentityTransitionRecord{},
+		OverlayDescriptors:	DefaultOverlayDescriptors(),
 	}
 }
 
@@ -141,11 +141,11 @@ func PruneExpired(state NetworkingState, currentHeight uint64) (NetworkingState,
 		return NetworkingState{}, err
 	}
 	next := NetworkingState{
-		LayerStack:          cloneLayerStack(state.LayerStack),
-		Adapter:             cloneAdapter(state.Adapter),
-		ChannelPolicies:     cloneChannelPolicies(state.ChannelPolicies),
-		IdentityTransitions: []IdentityTransitionRecord{},
-		OverlayDescriptors:  []OverlayDescriptor{},
+		LayerStack:		cloneLayerStack(state.LayerStack),
+		Adapter:		cloneAdapter(state.Adapter),
+		ChannelPolicies:	cloneChannelPolicies(state.ChannelPolicies),
+		IdentityTransitions:	[]IdentityTransitionRecord{},
+		OverlayDescriptors:	[]OverlayDescriptor{},
 	}
 	for _, record := range state.NodeRecords {
 		if currentHeight == 0 || currentHeight <= record.ExpiresHeight {
@@ -217,14 +217,14 @@ func (s NetworkingState) Export() NetworkingState {
 
 func (s NetworkingState) Clone() NetworkingState {
 	out := NetworkingState{
-		LayerStack:          cloneLayerStack(s.LayerStack),
-		Adapter:             cloneAdapter(s.Adapter),
-		ChannelPolicies:     cloneChannelPolicies(s.ChannelPolicies),
-		NodeRecords:         make([]NodeRecord, len(s.NodeRecords)),
-		RoleCommitments:     cloneRoleCommitments(s.RoleCommitments),
-		Sessions:            make([]SessionChannel, len(s.Sessions)),
-		IdentityTransitions: cloneIdentityTransitions(s.IdentityTransitions),
-		OverlayDescriptors:  cloneOverlayDescriptors(s.OverlayDescriptors),
+		LayerStack:		cloneLayerStack(s.LayerStack),
+		Adapter:		cloneAdapter(s.Adapter),
+		ChannelPolicies:	cloneChannelPolicies(s.ChannelPolicies),
+		NodeRecords:		make([]NodeRecord, len(s.NodeRecords)),
+		RoleCommitments:	cloneRoleCommitments(s.RoleCommitments),
+		Sessions:		make([]SessionChannel, len(s.Sessions)),
+		IdentityTransitions:	cloneIdentityTransitions(s.IdentityTransitions),
+		OverlayDescriptors:	cloneOverlayDescriptors(s.OverlayDescriptors),
 	}
 	for i, record := range s.NodeRecords {
 		out.NodeRecords[i] = NormalizeNodeRecord(record)

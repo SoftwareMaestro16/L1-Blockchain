@@ -18,92 +18,92 @@ type XServiceReceiptsIntegrationPoint string
 type ServiceReceiptRecordKind string
 
 const (
-	XServiceReceiptsStateReceiptParams    XServiceReceiptsStateObject = "ReceiptParams"
-	XServiceReceiptsStateReceiptRecord    XServiceReceiptsStateObject = "ReceiptRecord"
-	XServiceReceiptsStateReceiptRoot      XServiceReceiptsStateObject = "ReceiptRoot"
-	XServiceReceiptsStateReceiptTombstone XServiceReceiptsStateObject = "ReceiptTombstone"
+	XServiceReceiptsStateReceiptParams	XServiceReceiptsStateObject	= "ReceiptParams"
+	XServiceReceiptsStateReceiptRecord	XServiceReceiptsStateObject	= "ReceiptRecord"
+	XServiceReceiptsStateReceiptRoot	XServiceReceiptsStateObject	= "ReceiptRoot"
+	XServiceReceiptsStateReceiptTombstone	XServiceReceiptsStateObject	= "ReceiptTombstone"
 
-	XServiceReceiptsMsgAnchorReceipt XServiceReceiptsMessageName = "MsgAnchorReceipt"
-	XServiceReceiptsMsgPruneReceipt  XServiceReceiptsMessageName = "MsgPruneReceipt"
+	XServiceReceiptsMsgAnchorReceipt	XServiceReceiptsMessageName	= "MsgAnchorReceipt"
+	XServiceReceiptsMsgPruneReceipt		XServiceReceiptsMessageName	= "MsgPruneReceipt"
 
-	XServiceReceiptsQueryReceipt           XServiceReceiptsQueryName = "QueryReceipt"
-	XServiceReceiptsQueryReceiptProof      XServiceReceiptsQueryName = "QueryReceiptProof"
-	XServiceReceiptsQueryReceiptRoot       XServiceReceiptsQueryName = "QueryReceiptRoot"
-	XServiceReceiptsQueryReceiptsByService XServiceReceiptsQueryName = "QueryReceiptsByService"
+	XServiceReceiptsQueryReceipt		XServiceReceiptsQueryName	= "QueryReceipt"
+	XServiceReceiptsQueryReceiptProof	XServiceReceiptsQueryName	= "QueryReceiptProof"
+	XServiceReceiptsQueryReceiptRoot	XServiceReceiptsQueryName	= "QueryReceiptRoot"
+	XServiceReceiptsQueryReceiptsByService	XServiceReceiptsQueryName	= "QueryReceiptsByService"
 
-	XServiceReceiptsFailureDuplicateReceipt              XServiceReceiptsFailureMode = "duplicate_receipt"
-	XServiceReceiptsFailureMissingExecutedOnChainReceipt XServiceReceiptsFailureMode = "missing_receipt_for_executed_on_chain_call"
-	XServiceReceiptsFailureReceiptHashMismatch           XServiceReceiptsFailureMode = "receipt_hash_mismatch"
-	XServiceReceiptsFailurePrunedBeforeProofHorizon      XServiceReceiptsFailureMode = "receipt_pruned_before_proof_horizon"
+	XServiceReceiptsFailureDuplicateReceipt			XServiceReceiptsFailureMode	= "duplicate_receipt"
+	XServiceReceiptsFailureMissingExecutedOnChainReceipt	XServiceReceiptsFailureMode	= "missing_receipt_for_executed_on_chain_call"
+	XServiceReceiptsFailureReceiptHashMismatch		XServiceReceiptsFailureMode	= "receipt_hash_mismatch"
+	XServiceReceiptsFailurePrunedBeforeProofHorizon		XServiceReceiptsFailureMode	= "receipt_pruned_before_proof_horizon"
 
-	XServiceReceiptsIntegrationAllServiceModules XServiceReceiptsIntegrationPoint = "all_service_modules"
-	XServiceReceiptsIntegrationProofRegistry     XServiceReceiptsIntegrationPoint = "proof_registry"
-	XServiceReceiptsIntegrationStoreV2           XServiceReceiptsIntegrationPoint = "store_v2"
+	XServiceReceiptsIntegrationAllServiceModules	XServiceReceiptsIntegrationPoint	= "all_service_modules"
+	XServiceReceiptsIntegrationProofRegistry	XServiceReceiptsIntegrationPoint	= "proof_registry"
+	XServiceReceiptsIntegrationStoreV2		XServiceReceiptsIntegrationPoint	= "store_v2"
 
-	ServiceReceiptRecordKindCall     ServiceReceiptRecordKind = "call"
-	ServiceReceiptRecordKindPayment  ServiceReceiptRecordKind = "payment"
-	ServiceReceiptRecordKindProvider ServiceReceiptRecordKind = "provider"
-	ServiceReceiptRecordKindService  ServiceReceiptRecordKind = "service"
-	ServiceReceiptRecordKindStorage  ServiceReceiptRecordKind = "storage"
+	ServiceReceiptRecordKindCall		ServiceReceiptRecordKind	= "call"
+	ServiceReceiptRecordKindPayment		ServiceReceiptRecordKind	= "payment"
+	ServiceReceiptRecordKindProvider	ServiceReceiptRecordKind	= "provider"
+	ServiceReceiptRecordKindService		ServiceReceiptRecordKind	= "service"
+	ServiceReceiptRecordKindStorage		ServiceReceiptRecordKind	= "storage"
 )
 
 type ReceiptTombstone = ServiceReceiptTombstone
 
 type XServiceReceiptsFailureCoverage struct {
-	Mode  XServiceReceiptsFailureMode
-	Guard string
-	Scope string
+	Mode	XServiceReceiptsFailureMode
+	Guard	string
+	Scope	string
 }
 
 type XServiceReceiptsModuleBreakdown struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []XServiceReceiptsStateObject
-	Messages          []XServiceReceiptsMessageName
-	Queries           []XServiceReceiptsQueryName
-	FailureModes      []XServiceReceiptsFailureCoverage
-	IntegrationPoints []XServiceReceiptsIntegrationPoint
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]XServiceReceiptsStateObject
+	Messages		[]XServiceReceiptsMessageName
+	Queries			[]XServiceReceiptsQueryName
+	FailureModes		[]XServiceReceiptsFailureCoverage
+	IntegrationPoints	[]XServiceReceiptsIntegrationPoint
+	BreakdownHash		string
 }
 
 type ReceiptRecord struct {
-	ReceiptID         string
-	ServiceID         string
-	CallID            string
-	Kind              ServiceReceiptRecordKind
-	Status            ServiceReceiptStatusText
-	ReceiptHash       string
-	Height            uint64
-	RetainUntilHeight uint64
-	RecordHash        string
+	ReceiptID		string
+	ServiceID		string
+	CallID			string
+	Kind			ServiceReceiptRecordKind
+	Status			ServiceReceiptStatusText
+	ReceiptHash		string
+	Height			uint64
+	RetainUntilHeight	uint64
+	RecordHash		string
 }
 
 type ReceiptRoot struct {
-	RootKind       ServiceReceiptRecordKind
-	Height         uint64
-	RecordCount    uint64
-	RootHash       string
-	CommitmentHash string
+	RootKind	ServiceReceiptRecordKind
+	Height		uint64
+	RecordCount	uint64
+	RootHash	string
+	CommitmentHash	string
 }
 
 type ReceiptParams struct {
-	ProofHorizon   uint64
-	PruneBatchSize uint64
-	ParamsHash     string
+	ProofHorizon	uint64
+	PruneBatchSize	uint64
+	ParamsHash	string
 }
 
 type MsgAnchorReceipt struct {
-	Authority           string
-	Receipt             ServiceReceipt
-	ExpectedReceiptHash string
-	MessageHash         string
+	Authority		string
+	Receipt			ServiceReceipt
+	ExpectedReceiptHash	string
+	MessageHash		string
 }
 
 type MsgPruneReceipt struct {
-	Authority     string
-	ReceiptID     string
-	CurrentHeight uint64
-	MessageHash   string
+	Authority	string
+	ReceiptID	string
+	CurrentHeight	uint64
+	MessageHash	string
 }
 
 type QueryReceipt struct {
@@ -111,8 +111,8 @@ type QueryReceipt struct {
 }
 
 type QueryReceiptResponse struct {
-	Record ReceiptRecord
-	Found  bool
+	Record	ReceiptRecord
+	Found	bool
 }
 
 type QueryReceiptsByService struct {
@@ -120,18 +120,18 @@ type QueryReceiptsByService struct {
 }
 
 type QueryReceiptsByServiceResponse struct {
-	Records      []ReceiptRecord
-	ResponseHash string
+	Records		[]ReceiptRecord
+	ResponseHash	string
 }
 
 type QueryReceiptRoot struct {
-	RootKind ServiceReceiptRecordKind
-	Height   uint64
+	RootKind	ServiceReceiptRecordKind
+	Height		uint64
 }
 
 type QueryReceiptRootResponse struct {
-	Root  ReceiptRoot
-	Found bool
+	Root	ReceiptRoot
+	Found	bool
 }
 
 type QueryReceiptProof struct {
@@ -139,23 +139,23 @@ type QueryReceiptProof struct {
 }
 
 type ServiceReceiptProofRecord struct {
-	ReceiptID   string
-	ServiceID   string
-	ReceiptHash string
-	RootHash    string
-	ProofHeight uint64
-	ProofHashes []string
-	ProofHash   string
+	ReceiptID	string
+	ServiceID	string
+	ReceiptHash	string
+	RootHash	string
+	ProofHeight	uint64
+	ProofHashes	[]string
+	ProofHash	string
 }
 
 type QueryReceiptProofResponse struct {
-	Proof ServiceReceiptProofRecord
-	Found bool
+	Proof	ServiceReceiptProofRecord
+	Found	bool
 }
 
 func DefaultXServiceReceiptsModuleBreakdown() (XServiceReceiptsModuleBreakdown, error) {
 	breakdown := XServiceReceiptsModuleBreakdown{
-		ModulePath: ServiceModuleReceipts,
+		ModulePath:	ServiceModuleReceipts,
 		Purpose: []string{
 			"proof_queryable_roots",
 			"receipt_records",
@@ -220,14 +220,14 @@ func NewReceiptRecordFromServiceReceipt(receipt ServiceReceipt, kind ServiceRece
 		return ReceiptRecord{}, err
 	}
 	record := ReceiptRecord{
-		ReceiptID:         receipt.CallID,
-		ServiceID:         receipt.ServiceID,
-		CallID:            receipt.CallID,
-		Kind:              kind,
-		Status:            status,
-		ReceiptHash:       receipt.ReceiptHash,
-		Height:            receipt.AnchoredHeight,
-		RetainUntilHeight: receipt.AnchoredHeight + proofHorizon,
+		ReceiptID:		receipt.CallID,
+		ServiceID:		receipt.ServiceID,
+		CallID:			receipt.CallID,
+		Kind:			kind,
+		Status:			status,
+		ReceiptHash:		receipt.ReceiptHash,
+		Height:			receipt.AnchoredHeight,
+		RetainUntilHeight:	receipt.AnchoredHeight + proofHorizon,
 	}
 	record.RecordHash = ComputeReceiptRecordHash(record)
 	return record, record.Validate()
@@ -240,10 +240,10 @@ func BuildReceiptRoot(kind ServiceReceiptRecordKind, height uint64, records []Re
 		return ReceiptRoot{}, err
 	}
 	root := ReceiptRoot{
-		RootKind:    kind,
-		Height:      height,
-		RecordCount: uint64(len(ordered)),
-		RootHash:    ComputeReceiptRecordRootHash(kind, ordered),
+		RootKind:	kind,
+		Height:		height,
+		RecordCount:	uint64(len(ordered)),
+		RootHash:	ComputeReceiptRecordRootHash(kind, ordered),
 	}
 	root.CommitmentHash = ComputeReceiptRootCommitmentHash(root)
 	return root, root.Validate()
@@ -251,9 +251,9 @@ func BuildReceiptRoot(kind ServiceReceiptRecordKind, height uint64, records []Re
 
 func NewMsgAnchorReceipt(authority string, receipt ServiceReceipt, expectedReceiptHash string) (MsgAnchorReceipt, error) {
 	msg := MsgAnchorReceipt{
-		Authority:           strings.TrimSpace(authority),
-		Receipt:             receipt,
-		ExpectedReceiptHash: strings.ToLower(strings.TrimSpace(expectedReceiptHash)),
+		Authority:		strings.TrimSpace(authority),
+		Receipt:		receipt,
+		ExpectedReceiptHash:	strings.ToLower(strings.TrimSpace(expectedReceiptHash)),
 	}
 	msg.MessageHash = ComputeMsgAnchorReceiptHash(msg)
 	return msg, msg.ValidateBasic()
@@ -261,9 +261,9 @@ func NewMsgAnchorReceipt(authority string, receipt ServiceReceipt, expectedRecei
 
 func NewMsgPruneReceipt(authority string, record ReceiptRecord, currentHeight uint64) (MsgPruneReceipt, error) {
 	msg := MsgPruneReceipt{
-		Authority:     strings.TrimSpace(authority),
-		ReceiptID:     strings.ToLower(strings.TrimSpace(record.ReceiptID)),
-		CurrentHeight: currentHeight,
+		Authority:	strings.TrimSpace(authority),
+		ReceiptID:	strings.ToLower(strings.TrimSpace(record.ReceiptID)),
+		CurrentHeight:	currentHeight,
 	}
 	msg.MessageHash = ComputeMsgPruneReceiptHash(msg)
 	return msg, msg.ValidateForRecord(record)
@@ -397,12 +397,12 @@ func QueryReceiptProofFromRecords(records []ReceiptRecord, query QueryReceiptPro
 			continue
 		}
 		proof := ServiceReceiptProofRecord{
-			ReceiptID:   record.ReceiptID,
-			ServiceID:   record.ServiceID,
-			ReceiptHash: record.ReceiptHash,
-			RootHash:    root.RootHash,
-			ProofHeight: root.Height,
-			ProofHashes: receiptRecordSiblingHashes(records, record.ReceiptID),
+			ReceiptID:	record.ReceiptID,
+			ServiceID:	record.ServiceID,
+			ReceiptHash:	record.ReceiptHash,
+			RootHash:	root.RootHash,
+			ProofHeight:	root.Height,
+			ProofHashes:	receiptRecordSiblingHashes(records, record.ReceiptID),
 		}
 		proof.ProofHash = ComputeServiceReceiptProofRecordHash(proof)
 		return QueryReceiptProofResponse{Proof: proof, Found: true}, proof.Validate()

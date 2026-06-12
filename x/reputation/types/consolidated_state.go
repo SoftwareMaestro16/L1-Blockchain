@@ -19,23 +19,23 @@ const (
 // No fragmented Account/Validator/Reporter/StakeRecords — only identity records,
 // validator scores, and service trust scores. No events, no snapshots.
 type ConsolidatedReputationState struct {
-	Version            uint64              `json:"version"`
-	Params             ReputationParams    `json:"params"`
-	EffectParams       ReputationEffectParams `json:"effect_params"`
-	Identities         []IdentityReputation `json:"identities"`
-	ValidatorScores    []ValidatorScore    `json:"validator_scores,omitempty"`
-	ServiceTrustScores []ServiceTrustScore `json:"service_trust_scores,omitempty"`
-	MigrationReceipt   *MigrationReceipt   `json:"migration_receipt,omitempty"`
+	Version			uint64			`json:"version"`
+	Params			ReputationParams	`json:"params"`
+	EffectParams		ReputationEffectParams	`json:"effect_params"`
+	Identities		[]IdentityReputation	`json:"identities"`
+	ValidatorScores		[]ValidatorScore	`json:"validator_scores,omitempty"`
+	ServiceTrustScores	[]ServiceTrustScore	`json:"service_trust_scores,omitempty"`
+	MigrationReceipt	*MigrationReceipt	`json:"migration_receipt,omitempty"`
 }
 
 func NewConsolidatedReputationState(params ReputationParams) ConsolidatedReputationState {
 	return ConsolidatedReputationState{
-		Version:          ConsolidatedStateVersionV1,
-		Params:           params,
-		EffectParams:     DefaultReputationEffectParams(),
-		Identities:       nil,
-		ValidatorScores:  nil,
-		ServiceTrustScores: nil,
+		Version:		ConsolidatedStateVersionV1,
+		Params:			params,
+		EffectParams:		DefaultReputationEffectParams(),
+		Identities:		nil,
+		ValidatorScores:	nil,
+		ServiceTrustScores:	nil,
 	}
 }
 
@@ -138,8 +138,6 @@ func normalizeServiceTrustScores(scores []ServiceTrustScore) []ServiceTrustScore
 	return out
 }
 
-// --- ValidatorScore validation ---
-
 func validateValidatorScore(vs *ValidatorScore) error {
 	if vs.ValidatorAddress == "" {
 		return errors.New("validator score: address must not be empty")
@@ -193,10 +191,6 @@ func validateServiceTrustScore(sts *ServiceTrustScore) error {
 	}
 	return nil
 }
-
-// ---------------
-// Identity Query Helpers
-// ---------------
 
 func FindIdentity(state ConsolidatedReputationState, account string) (IdentityReputation, bool) {
 	state = NormalizeConsolidatedState(state)
@@ -282,10 +276,6 @@ func UpsertServiceTrustScore(state ConsolidatedReputationState, sts ServiceTrust
 	return NormalizeConsolidatedState(state)
 }
 
-// ---------------
-// Migration from Old ReputationState
-// ---------------
-
 func MigrateFromReputationState(old ReputationState) ConsolidatedReputationState {
 	old = NormalizeReputationState(old)
 	params := old.Params
@@ -296,8 +286,6 @@ func MigrateFromReputationState(old ReputationState) ConsolidatedReputationState
 		identities = append(identities, *id)
 	}
 
-	// Stake records feed stake-time into identity signals.
-	// Merge stake-time into existing identity or create new.
 	for _, stakeRec := range old.StakeRecords {
 		userAddr := addressing.FormatAccAddress(stakeRec.Account)
 		idx := findIdentityByIdx(identities, userAddr)
@@ -321,15 +309,12 @@ func MigrateFromReputationState(old ReputationState) ConsolidatedReputationState
 		validatorScores = append(validatorScores, *vs)
 	}
 
-	// Reporter records are dropped unless they overlap with validators.
-	// No separate reporter reputation in consolidated model.
-
 	return ConsolidatedReputationState{
-		Version:          ConsolidatedStateVersionV1,
-		Params:           params,
-		Identities:       normalizeIdentities(identities),
-		ValidatorScores:  normalizeValidatorScores(validatorScores),
-		ServiceTrustScores: nil,
+		Version:		ConsolidatedStateVersionV1,
+		Params:			params,
+		Identities:		normalizeIdentities(identities),
+		ValidatorScores:	normalizeValidatorScores(validatorScores),
+		ServiceTrustScores:	nil,
 	}
 }
 
@@ -389,10 +374,6 @@ func addressKeyStr(addr string) string {
 	return strings.TrimSpace(strings.ToLower(addr))
 }
 
-// ---------------
-// Export/Import
-// ---------------
-
 func ExportConsolidatedState(state ConsolidatedReputationState) (ConsolidatedReputationState, error) {
 	state = NormalizeConsolidatedState(state)
 	if err := state.Validate(); err != nil {
@@ -422,13 +403,13 @@ func cloneConsolidatedState(state ConsolidatedReputationState) ConsolidatedReput
 		receipt = &r
 	}
 	return ConsolidatedReputationState{
-		Version:            state.Version,
-		Params:             state.Params,
-		EffectParams:       state.EffectParams,
-		Identities:         ids,
-		ValidatorScores:    vs,
-		ServiceTrustScores: sts,
-		MigrationReceipt:   receipt,
+		Version:		state.Version,
+		Params:			state.Params,
+		EffectParams:		state.EffectParams,
+		Identities:		ids,
+		ValidatorScores:	vs,
+		ServiceTrustScores:	sts,
+		MigrationReceipt:	receipt,
 	}
 }
 
@@ -439,34 +420,34 @@ var _ json.Unmarshaler = &ConsolidatedReputationState{}
 func (state ConsolidatedReputationState) MarshalJSON() ([]byte, error) {
 	clone := NormalizeConsolidatedState(state)
 	raw := struct {
-		Version            uint64              `json:"version"`
-		Params             ReputationParams    `json:"params"`
-		EffectParams       ReputationEffectParams `json:"effect_params"`
-		Identities         []IdentityReputation `json:"identities"`
-		ValidatorScores    []ValidatorScore    `json:"validator_scores,omitempty"`
-		ServiceTrustScores []ServiceTrustScore `json:"service_trust_scores,omitempty"`
-		MigrationReceipt   *MigrationReceipt   `json:"migration_receipt,omitempty"`
+		Version			uint64			`json:"version"`
+		Params			ReputationParams	`json:"params"`
+		EffectParams		ReputationEffectParams	`json:"effect_params"`
+		Identities		[]IdentityReputation	`json:"identities"`
+		ValidatorScores		[]ValidatorScore	`json:"validator_scores,omitempty"`
+		ServiceTrustScores	[]ServiceTrustScore	`json:"service_trust_scores,omitempty"`
+		MigrationReceipt	*MigrationReceipt	`json:"migration_receipt,omitempty"`
 	}{
-		Version:            clone.Version,
-		Params:             clone.Params,
-		EffectParams:       clone.EffectParams,
-		Identities:         clone.Identities,
-		ValidatorScores:    clone.ValidatorScores,
-		ServiceTrustScores: clone.ServiceTrustScores,
-		MigrationReceipt:   clone.MigrationReceipt,
+		Version:		clone.Version,
+		Params:			clone.Params,
+		EffectParams:		clone.EffectParams,
+		Identities:		clone.Identities,
+		ValidatorScores:	clone.ValidatorScores,
+		ServiceTrustScores:	clone.ServiceTrustScores,
+		MigrationReceipt:	clone.MigrationReceipt,
 	}
 	return json.Marshal(raw)
 }
 
 func (state *ConsolidatedReputationState) UnmarshalJSON(bz []byte) error {
 	var raw struct {
-		Version           uint64              `json:"version"`
-		Params            ReputationParams    `json:"params"`
-		EffectParams      ReputationEffectParams `json:"effect_params"`
-		Identities        []IdentityReputation `json:"identities"`
-		ValidatorScores   []ValidatorScore    `json:"validator_scores,omitempty"`
-		ServiceTrustScores []ServiceTrustScore `json:"service_trust_scores,omitempty"`
-		MigrationReceipt  *MigrationReceipt   `json:"migration_receipt,omitempty"`
+		Version			uint64			`json:"version"`
+		Params			ReputationParams	`json:"params"`
+		EffectParams		ReputationEffectParams	`json:"effect_params"`
+		Identities		[]IdentityReputation	`json:"identities"`
+		ValidatorScores		[]ValidatorScore	`json:"validator_scores,omitempty"`
+		ServiceTrustScores	[]ServiceTrustScore	`json:"service_trust_scores,omitempty"`
+		MigrationReceipt	*MigrationReceipt	`json:"migration_receipt,omitempty"`
 	}
 	if err := json.Unmarshal(bz, &raw); err != nil {
 		return err

@@ -33,8 +33,8 @@ func TestAVMZoneQueueKeysAndCanonicalSort(t *testing.T) {
 	require.Less(t, high.SortKey, low.SortKey)
 
 	queue, err := NewAVMZoneQueue(AVMZoneQueue{
-		ZoneID:        zonestypes.ZoneIDContract,
-		PriorityQueue: []AVMZoneQueueEntry{low, high},
+		ZoneID:		zonestypes.ZoneIDContract,
+		PriorityQueue:	[]AVMZoneQueueEntry{low, high},
 	})
 	require.NoError(t, err)
 	require.Equal(t, msgHigh.ID, queue.PriorityQueue[0].MessageID)
@@ -64,8 +64,8 @@ func TestAVMZoneQueueSelectsBySchedulingRuleAndBudget(t *testing.T) {
 		entries = append(entries, entry)
 	}
 	queue, err := NewAVMZoneQueue(AVMZoneQueue{
-		ZoneID:        zonestypes.ZoneIDContract,
-		PriorityQueue: entries,
+		ZoneID:		zonestypes.ZoneIDContract,
+		PriorityQueue:	entries,
 	})
 	require.NoError(t, err)
 
@@ -97,16 +97,16 @@ func TestAVMZoneQueueRejectsInvalidEntriesAndIgnoresFailedLaneForExecution(t *te
 	badSort := entry
 	badSort.SortKey = "wrong"
 	_, err = NewAVMZoneQueue(AVMZoneQueue{
-		ZoneID:        zonestypes.ZoneIDContract,
-		PriorityQueue: []AVMZoneQueueEntry{badSort},
+		ZoneID:		zonestypes.ZoneIDContract,
+		PriorityQueue:	[]AVMZoneQueueEntry{badSort},
 	})
 	require.ErrorContains(t, err, "sort key")
 
 	failed, err := NewAVMZoneQueueEntry(AVMQueueLaneFailed, msg, 0)
 	require.NoError(t, err)
 	queue, err := NewAVMZoneQueue(AVMZoneQueue{
-		ZoneID:      zonestypes.ZoneIDContract,
-		FailedQueue: []AVMZoneQueueEntry{failed},
+		ZoneID:		zonestypes.ZoneIDContract,
+		FailedQueue:	[]AVMZoneQueueEntry{failed},
 	})
 	require.NoError(t, err)
 	selection, err := SelectAVMZoneQueueWork(

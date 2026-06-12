@@ -12,48 +12,48 @@ const StateInvariantModelVersion = uint64(1)
 type StateInvariantID string
 
 const (
-	StateInvariantZoneCommitmentMatchesState       StateInvariantID = "zone-commitment-matches-state"
-	StateInvariantShardRootsIncludedInZoneRoot     StateInvariantID = "shard-roots-included-in-zone-root"
-	StateInvariantOutputMessagesInOutboxRoot       StateInvariantID = "output-messages-in-outbox-root"
-	StateInvariantConsumedMessagesHaveOneReceipt   StateInvariantID = "consumed-messages-have-one-receipt"
-	StateInvariantCrossZoneValueConserved          StateInvariantID = "cross-zone-value-conserved"
-	StateInvariantPaymentCollateralMatchesBankLock StateInvariantID = "payment-collateral-matches-bank-lock"
-	StateInvariantIdentityDomainOwnershipBinding   StateInvariantID = "identity-domain-ownership-binding"
-	StateInvariantContractStorageProofZoneBinding  StateInvariantID = "contract-storage-proof-zone-binding"
+	StateInvariantZoneCommitmentMatchesState	StateInvariantID	= "zone-commitment-matches-state"
+	StateInvariantShardRootsIncludedInZoneRoot	StateInvariantID	= "shard-roots-included-in-zone-root"
+	StateInvariantOutputMessagesInOutboxRoot	StateInvariantID	= "output-messages-in-outbox-root"
+	StateInvariantConsumedMessagesHaveOneReceipt	StateInvariantID	= "consumed-messages-have-one-receipt"
+	StateInvariantCrossZoneValueConserved		StateInvariantID	= "cross-zone-value-conserved"
+	StateInvariantPaymentCollateralMatchesBankLock	StateInvariantID	= "payment-collateral-matches-bank-lock"
+	StateInvariantIdentityDomainOwnershipBinding	StateInvariantID	= "identity-domain-ownership-binding"
+	StateInvariantContractStorageProofZoneBinding	StateInvariantID	= "contract-storage-proof-zone-binding"
 )
 
 type StateInvariantDescriptor struct {
-	InvariantID    StateInvariantID
-	Invariant      string
-	Enforcement    string
-	DescriptorHash string
+	InvariantID	StateInvariantID
+	Invariant	string
+	Enforcement	string
+	DescriptorHash	string
 }
 
 type StateInvariantModel struct {
-	Version    uint64
-	Invariants []StateInvariantDescriptor
-	Root       string
+	Version		uint64
+	Invariants	[]StateInvariantDescriptor
+	Root		string
 }
 
 type StateInvariantEvidence struct {
-	Height                                uint64
-	ZoneCommitmentMatchesExecutedState    bool
-	ShardRootsIncludedInZoneRoot          bool
-	OutputMessagesIncludedInSourceOutbox  bool
-	ConsumedMessagesHaveOneReceipt        bool
-	CrossZoneValueTransferConservesNaet   bool
-	PaymentCollateralMatchesLockedBalance bool
-	IdentityDomainsHaveOwnershipBinding   bool
-	ContractStorageProofsBindToZoneRoot   bool
-	ZoneCommitmentRoot                    string
-	ShardRootsRoot                        string
-	MessageOutboxRoot                     string
-	MessageReceiptRoot                    string
-	ValueConservationRoot                 string
-	PaymentCollateralRoot                 string
-	IdentityOwnershipRoot                 string
-	ContractStorageProofRoot              string
-	EvidenceHash                          string
+	Height					uint64
+	ZoneCommitmentMatchesExecutedState	bool
+	ShardRootsIncludedInZoneRoot		bool
+	OutputMessagesIncludedInSourceOutbox	bool
+	ConsumedMessagesHaveOneReceipt		bool
+	CrossZoneValueTransferConservesNaet	bool
+	PaymentCollateralMatchesLockedBalance	bool
+	IdentityDomainsHaveOwnershipBinding	bool
+	ContractStorageProofsBindToZoneRoot	bool
+	ZoneCommitmentRoot			string
+	ShardRootsRoot				string
+	MessageOutboxRoot			string
+	MessageReceiptRoot			string
+	ValueConservationRoot			string
+	PaymentCollateralRoot			string
+	IdentityOwnershipRoot			string
+	ContractStorageProofRoot		string
+	EvidenceHash				string
 }
 
 func StateInvariantDescriptors() []StateInvariantDescriptor {
@@ -71,8 +71,8 @@ func StateInvariantDescriptors() []StateInvariantDescriptor {
 
 func BuildStateInvariantModel(invariants []StateInvariantDescriptor) (StateInvariantModel, error) {
 	model := StateInvariantModel{
-		Version:    StateInvariantModelVersion,
-		Invariants: normalizeStateInvariantDescriptors(invariants),
+		Version:	StateInvariantModelVersion,
+		Invariants:	normalizeStateInvariantDescriptors(invariants),
 	}
 	if err := model.ValidateFormat(); err != nil {
 		return StateInvariantModel{}, err
@@ -248,8 +248,8 @@ func (evidence StateInvariantEvidence) ValidateFormat() error {
 		return errors.New("aetracore state invariant failed: contract storage proof must bind to contract zone root")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore state invariant zone commitment root", evidence.ZoneCommitmentRoot},
 		{"aetracore state invariant shard roots root", evidence.ShardRootsRoot},
@@ -375,9 +375,9 @@ func ValidateStateInvariantModel() error {
 
 func stateInvariant(id StateInvariantID, invariant, enforcement string) StateInvariantDescriptor {
 	desc, err := BuildStateInvariantDescriptor(StateInvariantDescriptor{
-		InvariantID: id,
-		Invariant:   invariant,
-		Enforcement: enforcement,
+		InvariantID:	id,
+		Invariant:	invariant,
+		Enforcement:	enforcement,
 	})
 	if err != nil {
 		panic(err)

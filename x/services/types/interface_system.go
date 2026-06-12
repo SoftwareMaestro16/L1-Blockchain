@@ -10,60 +10,60 @@ import (
 )
 
 type ServiceInterfaceMethodSchema struct {
-	MethodID            string
-	Name                string
-	InputSchemaHash     string
-	OutputSchemaHash    string
-	ExecutionType       coretypes.ServiceMethodExecutionType
-	GasModel            string
-	VerificationModel   coretypes.ServiceVerificationModel
-	TimeoutPolicy       ServiceMethodTimeoutPolicy
-	IdempotencyRequired bool
-	CallbackSupported   bool
-	PaymentRequirements string
-	MethodHash          string
+	MethodID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	ExecutionType		coretypes.ServiceMethodExecutionType
+	GasModel		string
+	VerificationModel	coretypes.ServiceVerificationModel
+	TimeoutPolicy		ServiceMethodTimeoutPolicy
+	IdempotencyRequired	bool
+	CallbackSupported	bool
+	PaymentRequirements	string
+	MethodHash		string
 }
 
 type ServiceMethodTimeoutPolicy struct {
-	TimeoutHeightDelta uint64
-	FailureBehavior    coretypes.ServiceFailureBehavior
-	PolicyHash         string
+	TimeoutHeightDelta	uint64
+	FailureBehavior		coretypes.ServiceFailureBehavior
+	PolicyHash		string
 }
 
 type FormalServiceInterface struct {
-	InterfaceHash       string
-	InterfaceName       string
-	Version             uint64
-	Methods             []ServiceInterfaceMethodSchema
-	Events              []string
-	Errors              []string
-	AuthModel           string
-	PaymentRequirements string
-	SchemaEncoding      string
-	MetadataHash        string
-	CreatedHeight       uint64
-	DefinitionHash      string
+	InterfaceHash		string
+	InterfaceName		string
+	Version			uint64
+	Methods			[]ServiceInterfaceMethodSchema
+	Events			[]string
+	Errors			[]string
+	AuthModel		string
+	PaymentRequirements	string
+	SchemaEncoding		string
+	MetadataHash		string
+	CreatedHeight		uint64
+	DefinitionHash		string
 }
 
 type ServiceInterfaceCallPreparation struct {
-	ServiceID           string
-	InterfaceHash       string
-	MethodID            string
-	MethodName          string
-	InputSchemaHash     string
-	OutputSchemaHash    string
-	ExecutionType       coretypes.ServiceMethodExecutionType
-	GasModel            string
-	VerificationModel   coretypes.ServiceVerificationModel
-	AuthModel           string
-	PaymentRequirements string
-	SchemaEncoding      string
-	PayloadHash         string
-	Caller              string
-	Nonce               uint64
-	PreparedHeight      uint64
-	EventStream         bool
-	PreparationHash     string
+	ServiceID		string
+	InterfaceHash		string
+	MethodID		string
+	MethodName		string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	ExecutionType		coretypes.ServiceMethodExecutionType
+	GasModel		string
+	VerificationModel	coretypes.ServiceVerificationModel
+	AuthModel		string
+	PaymentRequirements	string
+	SchemaEncoding		string
+	PayloadHash		string
+	Caller			string
+	Nonce			uint64
+	PreparedHeight		uint64
+	EventStream		bool
+	PreparationHash		string
 }
 
 func NewFormalServiceInterface(iface ServiceInterface) (FormalServiceInterface, error) {
@@ -74,20 +74,20 @@ func NewFormalServiceInterface(iface ServiceInterface) (FormalServiceInterface, 
 	methods := make([]ServiceInterfaceMethodSchema, 0, len(iface.Methods))
 	for _, method := range iface.Methods {
 		methodSchema := ServiceInterfaceMethodSchema{
-			MethodID:          method.MethodID,
-			Name:              method.Name,
-			InputSchemaHash:   method.InputSchemaHash,
-			OutputSchemaHash:  method.OutputSchemaHash,
-			ExecutionType:     method.ExecutionType,
-			GasModel:          method.GasModel,
-			VerificationModel: method.VerificationModel,
+			MethodID:		method.MethodID,
+			Name:			method.Name,
+			InputSchemaHash:	method.InputSchemaHash,
+			OutputSchemaHash:	method.OutputSchemaHash,
+			ExecutionType:		method.ExecutionType,
+			GasModel:		method.GasModel,
+			VerificationModel:	method.VerificationModel,
 			TimeoutPolicy: ServiceMethodTimeoutPolicy{
-				TimeoutHeightDelta: method.TimeoutHeightDelta,
-				FailureBehavior:    method.FailureBehavior,
+				TimeoutHeightDelta:	method.TimeoutHeightDelta,
+				FailureBehavior:	method.FailureBehavior,
 			},
-			IdempotencyRequired: method.IdempotencyRequired,
-			CallbackSupported:   method.CallbackSupported,
-			PaymentRequirements: method.RequiredPaymentModel,
+			IdempotencyRequired:	method.IdempotencyRequired,
+			CallbackSupported:	method.CallbackSupported,
+			PaymentRequirements:	method.RequiredPaymentModel,
 		}
 		methodSchema.TimeoutPolicy.PolicyHash = ComputeServiceMethodTimeoutPolicyHash(methodSchema.TimeoutPolicy)
 		methodSchema.MethodHash = ComputeServiceInterfaceMethodSchemaHash(methodSchema)
@@ -95,17 +95,17 @@ func NewFormalServiceInterface(iface ServiceInterface) (FormalServiceInterface, 
 	}
 	sortServiceInterfaceMethodSchemas(methods)
 	definition := FormalServiceInterface{
-		InterfaceHash:       iface.InterfaceHash,
-		InterfaceName:       iface.InterfaceName,
-		Version:             iface.Version,
-		Methods:             methods,
-		Events:              append([]string(nil), iface.Events...),
-		Errors:              append([]string(nil), iface.Errors...),
-		AuthModel:           iface.AuthModel,
-		PaymentRequirements: iface.PaymentModel,
-		SchemaEncoding:      iface.SchemaEncoding,
-		MetadataHash:        iface.MetadataHash,
-		CreatedHeight:       iface.CreatedHeight,
+		InterfaceHash:		iface.InterfaceHash,
+		InterfaceName:		iface.InterfaceName,
+		Version:		iface.Version,
+		Methods:		methods,
+		Events:			append([]string(nil), iface.Events...),
+		Errors:			append([]string(nil), iface.Errors...),
+		AuthModel:		iface.AuthModel,
+		PaymentRequirements:	iface.PaymentModel,
+		SchemaEncoding:		iface.SchemaEncoding,
+		MetadataHash:		iface.MetadataHash,
+		CreatedHeight:		iface.CreatedHeight,
 	}
 	sort.Strings(definition.Events)
 	sort.Strings(definition.Errors)
@@ -297,23 +297,23 @@ func PrepareServiceInterfaceCall(descriptor ServiceDescriptor, methodName, calle
 		return ServiceInterfaceCallPreparation{}, errors.New("services interface call prepared height must be positive")
 	}
 	preparation := ServiceInterfaceCallPreparation{
-		ServiceID:           descriptor.ServiceID,
-		InterfaceHash:       definition.InterfaceHash,
-		MethodID:            method.MethodID,
-		MethodName:          method.Name,
-		InputSchemaHash:     method.InputSchemaHash,
-		OutputSchemaHash:    method.OutputSchemaHash,
-		ExecutionType:       method.ExecutionType,
-		GasModel:            method.GasModel,
-		VerificationModel:   method.VerificationModel,
-		AuthModel:           definition.AuthModel,
-		PaymentRequirements: method.PaymentRequirements,
-		SchemaEncoding:      definition.SchemaEncoding,
-		PayloadHash:         strings.ToLower(strings.TrimSpace(payloadHash)),
-		Caller:              strings.TrimSpace(caller),
-		Nonce:               nonce,
-		PreparedHeight:      preparedHeight,
-		EventStream:         method.ExecutionType == coretypes.ServiceMethodEvented,
+		ServiceID:		descriptor.ServiceID,
+		InterfaceHash:		definition.InterfaceHash,
+		MethodID:		method.MethodID,
+		MethodName:		method.Name,
+		InputSchemaHash:	method.InputSchemaHash,
+		OutputSchemaHash:	method.OutputSchemaHash,
+		ExecutionType:		method.ExecutionType,
+		GasModel:		method.GasModel,
+		VerificationModel:	method.VerificationModel,
+		AuthModel:		definition.AuthModel,
+		PaymentRequirements:	method.PaymentRequirements,
+		SchemaEncoding:		definition.SchemaEncoding,
+		PayloadHash:		strings.ToLower(strings.TrimSpace(payloadHash)),
+		Caller:			strings.TrimSpace(caller),
+		Nonce:			nonce,
+		PreparedHeight:		preparedHeight,
+		EventStream:		method.ExecutionType == coretypes.ServiceMethodEvented,
 	}
 	preparation.PreparationHash = ComputeServiceInterfaceCallPreparationHash(preparation)
 	return preparation, preparation.Validate()

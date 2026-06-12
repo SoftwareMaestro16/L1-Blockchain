@@ -12,90 +12,90 @@ import (
 )
 
 const (
-	MaxBlockSTMItems          = 100_000
-	MaxBlockSTMAccessKeys     = 256
-	MaxBlockSTMRemoteMessages = 256
+	MaxBlockSTMItems		= 100_000
+	MaxBlockSTMAccessKeys		= 256
+	MaxBlockSTMRemoteMessages	= 256
 )
 
 type BlockSTMExecutionItem struct {
-	TxID             string
-	TxIndex          uint32
-	MessageIndex     uint32
-	ZoneID           string
-	ShardID          string
-	ObjectID         string
-	ObjectVersion    uint64
-	FeeAmount        string
-	ReadKeys         []string
-	WriteKeys        []string
-	RemoteWrites     []BlockSTMRemoteWrite
-	LocalMultiStepOp bool
+	TxID			string
+	TxIndex			uint32
+	MessageIndex		uint32
+	ZoneID			string
+	ShardID			string
+	ObjectID		string
+	ObjectVersion		uint64
+	FeeAmount		string
+	ReadKeys		[]string
+	WriteKeys		[]string
+	RemoteWrites		[]BlockSTMRemoteWrite
+	LocalMultiStepOp	bool
 }
 
 type BlockSTMRemoteWrite struct {
-	DestinationZoneID  string
-	DestinationShardID string
-	ObjectID           string
-	PayloadHash        string
+	DestinationZoneID	string
+	DestinationShardID	string
+	ObjectID		string
+	PayloadHash		string
 }
 
 type BlockSTMExecutionGroup struct {
-	GroupID        string
-	ZoneID         string
-	ShardID        string
-	ParallelBatch  uint32
-	Items          []BlockSTMExecutionItem
-	ReadSetRoot    string
-	WriteSetRoot   string
-	ConflictKeySet []string
-	GroupHash      string
+	GroupID		string
+	ZoneID		string
+	ShardID		string
+	ParallelBatch	uint32
+	Items		[]BlockSTMExecutionItem
+	ReadSetRoot	string
+	WriteSetRoot	string
+	ConflictKeySet	[]string
+	GroupHash	string
 }
 
 type ShardFeeAccumulator struct {
-	ZoneID   string
-	ShardID  string
-	Amount   string
-	Count    uint64
-	RootHash string
+	ZoneID		string
+	ShardID		string
+	Amount		string
+	Count		uint64
+	RootHash	string
 }
 
 type ShardMessageQueue struct {
-	ZoneID    string
-	ShardID   string
-	Messages  []ShardOutputMessage
-	QueueHash string
+	ZoneID		string
+	ShardID		string
+	Messages	[]ShardOutputMessage
+	QueueHash	string
 }
 
 type ShardOutputMessage struct {
-	MessageID          string
-	SourceTxID         string
-	SourceZoneID       string
-	SourceShardID      string
-	DestinationZoneID  string
-	DestinationShardID string
-	ObjectID           string
-	PayloadHash        string
-	Sequence           uint64
-	MessageHash        string
+	MessageID		string
+	SourceTxID		string
+	SourceZoneID		string
+	SourceShardID		string
+	DestinationZoneID	string
+	DestinationShardID	string
+	ObjectID		string
+	PayloadHash		string
+	Sequence		uint64
+	MessageHash		string
 }
 
 type VersionedObjectUpdate struct {
-	ZoneID          string
-	ShardID         string
-	ObjectID        string
-	ExpectedVersion uint64
-	NextVersion     uint64
-	StateKey        string
-	UpdateHash      string
+	ZoneID		string
+	ShardID		string
+	ObjectID	string
+	ExpectedVersion	uint64
+	NextVersion	uint64
+	StateKey	string
+	UpdateHash	string
 }
 
 type BlockSTMStrategyPlan struct {
-	Height          uint64
-	Groups          []BlockSTMExecutionGroup
-	FeeAccumulators []ShardFeeAccumulator
-	MessageQueues   []ShardMessageQueue
-	ObjectUpdates   []VersionedObjectUpdate
-	PlanHash        string
+	Height		uint64
+	Groups		[]BlockSTMExecutionGroup
+	FeeAccumulators	[]ShardFeeAccumulator
+	MessageQueues	[]ShardMessageQueue
+	ObjectUpdates	[]VersionedObjectUpdate
+	PlanHash	string
 }
 
 func BuildBlockSTMStrategyPlan(height uint64, items []BlockSTMExecutionItem) (BlockSTMStrategyPlan, error) {
@@ -134,11 +134,11 @@ func BuildBlockSTMStrategyPlan(height uint64, items []BlockSTMExecutionItem) (Bl
 	}
 	updates := buildVersionedObjectUpdates(ordered)
 	plan := BlockSTMStrategyPlan{
-		Height:          height,
-		Groups:          groups,
-		FeeAccumulators: fees,
-		MessageQueues:   queues,
-		ObjectUpdates:   updates,
+		Height:			height,
+		Groups:			groups,
+		FeeAccumulators:	fees,
+		MessageQueues:		queues,
+		ObjectUpdates:		updates,
 	}
 	plan.PlanHash = ComputeBlockSTMStrategyPlanHash(plan)
 	return plan, plan.Validate()
@@ -599,13 +599,13 @@ func buildBlockSTMGroups(items []BlockSTMExecutionItem) ([]BlockSTMExecutionGrou
 		for _, key := range keys {
 			shardItems := normalizeBlockSTMItems(byShard[key])
 			group := BlockSTMExecutionGroup{
-				ZoneID:         shardItems[0].ZoneID,
-				ShardID:        shardItems[0].ShardID,
-				ParallelBatch:  uint32(batchIndex + 1),
-				Items:          shardItems,
-				ReadSetRoot:    computeAccessRoot(shardItems, true),
-				WriteSetRoot:   computeAccessRoot(shardItems, false),
-				ConflictKeySet: conflictKeys(shardItems),
+				ZoneID:		shardItems[0].ZoneID,
+				ShardID:	shardItems[0].ShardID,
+				ParallelBatch:	uint32(batchIndex + 1),
+				Items:		shardItems,
+				ReadSetRoot:	computeAccessRoot(shardItems, true),
+				WriteSetRoot:	computeAccessRoot(shardItems, false),
+				ConflictKeySet:	conflictKeys(shardItems),
 			}
 			group.GroupHash = ComputeBlockSTMGroupHash(group)
 			group.GroupID = hashStrings("performance-blockstm-group-id", group.GroupHash)
@@ -622,8 +622,8 @@ func buildBlockSTMGroups(items []BlockSTMExecutionItem) ([]BlockSTMExecutionGrou
 
 func buildShardFeeAccumulators(items []BlockSTMExecutionItem) ([]ShardFeeAccumulator, error) {
 	type bucket struct {
-		total sdkmath.Int
-		count uint64
+		total	sdkmath.Int
+		count	uint64
 	}
 	buckets := make(map[string]bucket)
 	keys := make([]string, 0)
@@ -665,14 +665,14 @@ func buildShardMessageQueues(items []BlockSTMExecutionItem) ([]ShardMessageQueue
 			}
 			sequence := uint64(len(queues[key]) + 1)
 			message := ShardOutputMessage{
-				SourceTxID:         item.TxID,
-				SourceZoneID:       item.ZoneID,
-				SourceShardID:      item.ShardID,
-				DestinationZoneID:  remote.DestinationZoneID,
-				DestinationShardID: remote.DestinationShardID,
-				ObjectID:           remote.ObjectID,
-				PayloadHash:        remote.PayloadHash,
-				Sequence:           sequence,
+				SourceTxID:		item.TxID,
+				SourceZoneID:		item.ZoneID,
+				SourceShardID:		item.ShardID,
+				DestinationZoneID:	remote.DestinationZoneID,
+				DestinationShardID:	remote.DestinationShardID,
+				ObjectID:		remote.ObjectID,
+				PayloadHash:		remote.PayloadHash,
+				Sequence:		sequence,
 			}
 			message.MessageHash = ComputeShardOutputMessageHash(message)
 			message.MessageID = hashStrings("performance-shard-message-id", message.MessageHash)
@@ -703,12 +703,12 @@ func buildVersionedObjectUpdates(items []BlockSTMExecutionItem) []VersionedObjec
 		}
 		seen[key] = struct{}{}
 		update := VersionedObjectUpdate{
-			ZoneID:          item.ZoneID,
-			ShardID:         item.ShardID,
-			ObjectID:        item.ObjectID,
-			ExpectedVersion: item.ObjectVersion,
-			NextVersion:     item.ObjectVersion + 1,
-			StateKey:        VersionedObjectStateKey(item.ZoneID, item.ShardID, item.ObjectID, item.ObjectVersion),
+			ZoneID:			item.ZoneID,
+			ShardID:		item.ShardID,
+			ObjectID:		item.ObjectID,
+			ExpectedVersion:	item.ObjectVersion,
+			NextVersion:		item.ObjectVersion + 1,
+			StateKey:		VersionedObjectStateKey(item.ZoneID, item.ShardID, item.ObjectID, item.ObjectVersion),
 		}
 		update.UpdateHash = ComputeVersionedObjectUpdateHash(update)
 		updates = append(updates, update.Normalize())

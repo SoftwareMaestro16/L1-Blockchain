@@ -35,15 +35,15 @@ func TestMixedServiceChallengeCanPenalizeProvider(t *testing.T) {
 	require.NoError(t, err)
 
 	state, dispute, err := OpenMixedServiceChallenge(state, MixedChallengeMessage{
-		AnchorID:            anchor.AnchorID,
-		Challenger:          "challenger.storage.1",
-		ChallengeCommitment: testHash("mixed/challenge/1"),
-		OpenedHeight:        25,
+		AnchorID:		anchor.AnchorID,
+		Challenger:		"challenger.storage.1",
+		ChallengeCommitment:	testHash("mixed/challenge/1"),
+		OpenedHeight:		25,
 		VerificationHook: MixedVerificationHook{
-			HookType:           MixedHookProofVerification,
-			ProofCommitment:    testHash("mixed/proof/1"),
-			ProofMeterGas:      25_000,
-			ExpectedResultHash: testHash("mixed/expected/1"),
+			HookType:		MixedHookProofVerification,
+			ProofCommitment:	testHash("mixed/proof/1"),
+			ProofMeterGas:		25_000,
+			ExpectedResultHash:	testHash("mixed/expected/1"),
 		},
 	})
 	require.NoError(t, err)
@@ -53,10 +53,10 @@ func TestMixedServiceChallengeCanPenalizeProvider(t *testing.T) {
 	require.NotEmpty(t, dispute.DisputeHash)
 
 	resolution := MixedDisputeResolution{
-		DisputeID:      dispute.DisputeID,
-		Resolver:       DefaultAuthority,
-		ResolvedHeight: 29,
-		ProofAccepted:  true,
+		DisputeID:	dispute.DisputeID,
+		Resolver:	DefaultAuthority,
+		ResolvedHeight:	29,
+		ProofAccepted:	true,
 	}
 	resolution.ResolutionHash = ComputeMixedDisputeResolutionHash(resolution)
 	state, settlement, err := ResolveMixedServiceChallenge(state, resolution)
@@ -75,34 +75,34 @@ func TestMixedServiceFallbackHookMustBeDeterministic(t *testing.T) {
 	require.NoError(t, err)
 
 	_, _, err = OpenMixedServiceChallenge(state, MixedChallengeMessage{
-		AnchorID:            anchor.AnchorID,
-		Challenger:          "challenger.storage.2",
-		ChallengeCommitment: testHash("mixed/challenge/fallback"),
-		OpenedHeight:        21,
+		AnchorID:		anchor.AnchorID,
+		Challenger:		"challenger.storage.2",
+		ChallengeCommitment:	testHash("mixed/challenge/fallback"),
+		OpenedHeight:		21,
 		VerificationHook: MixedVerificationHook{
-			HookType:      MixedHookFallbackExecution,
-			Deterministic: false,
+			HookType:	MixedHookFallbackExecution,
+			Deterministic:	false,
 		},
 	})
 	require.ErrorContains(t, err, "fallback verification hook must be deterministic")
 
 	state, dispute, err := OpenMixedServiceChallenge(state, MixedChallengeMessage{
-		AnchorID:            anchor.AnchorID,
-		Challenger:          "challenger.storage.2",
-		ChallengeCommitment: testHash("mixed/challenge/fallback"),
-		OpenedHeight:        21,
+		AnchorID:		anchor.AnchorID,
+		Challenger:		"challenger.storage.2",
+		ChallengeCommitment:	testHash("mixed/challenge/fallback"),
+		OpenedHeight:		21,
 		VerificationHook: MixedVerificationHook{
-			HookType:      MixedHookFallbackExecution,
-			Deterministic: true,
+			HookType:	MixedHookFallbackExecution,
+			Deterministic:	true,
 		},
 	})
 	require.NoError(t, err)
 
 	resolution := MixedDisputeResolution{
-		DisputeID:        dispute.DisputeID,
-		Resolver:         DefaultAuthority,
-		ResolvedHeight:   22,
-		FallbackExecuted: true,
+		DisputeID:		dispute.DisputeID,
+		Resolver:		DefaultAuthority,
+		ResolvedHeight:		22,
+		FallbackExecuted:	true,
 	}
 	resolution.ResolutionHash = ComputeMixedDisputeResolutionHash(resolution)
 	state, settlement, err := ResolveMixedServiceChallenge(state, resolution)
@@ -142,10 +142,10 @@ func testMixedServiceWithCollateral() ServiceDescriptor {
 
 func testMixedResultAnchor(height uint64) MixedResultAnchor {
 	return MixedResultAnchor{
-		CallID:            testHash("mixed/call/1"),
-		RequestCommitment: testHash("mixed/request/1"),
-		ResultCommitment:  testHash("mixed/result/1"),
-		ReceiptCommitment: testHash("mixed/receipt/1"),
-		Height:            height,
+		CallID:			testHash("mixed/call/1"),
+		RequestCommitment:	testHash("mixed/request/1"),
+		ResultCommitment:	testHash("mixed/result/1"),
+		ReceiptCommitment:	testHash("mixed/receipt/1"),
+		Height:			height,
 	}
 }

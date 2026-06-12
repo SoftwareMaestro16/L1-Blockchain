@@ -9,52 +9,52 @@ import (
 )
 
 const (
-	WalletActionNormalSpend     = "normal_spend"
-	WalletActionContractExecute = "contract_execute"
-	WalletActionStakingDeposit  = "staking_deposit"
-	WalletActionReadQuery       = "read_query"
-	WalletActionProofQuery      = "proof_query"
-	WalletActionTopUp           = "top_up"
-	WalletActionPayStorageDebt  = "pay_storage_debt"
-	WalletActionUnfreeze        = "unfreeze"
+	WalletActionNormalSpend		= "normal_spend"
+	WalletActionContractExecute	= "contract_execute"
+	WalletActionStakingDeposit	= "staking_deposit"
+	WalletActionReadQuery		= "read_query"
+	WalletActionProofQuery		= "proof_query"
+	WalletActionTopUp		= "top_up"
+	WalletActionPayStorageDebt	= "pay_storage_debt"
+	WalletActionUnfreeze		= "unfreeze"
 )
 
 type WalletStorageUsage struct {
-	CodeBytes  uint64
-	DataBytes  uint64
-	IndexBytes uint64
+	CodeBytes	uint64
+	DataBytes	uint64
+	IndexBytes	uint64
 }
 
 type WalletRentInput struct {
-	Account             Account
-	Balance             uint64
-	Storage             WalletStorageUsage
-	GasFee              uint64
-	CurrentHeight       uint64
-	Params              storagerenttypes.StorageRentParams
-	FreezeDebtThreshold uint64
+	Account			Account
+	Balance			uint64
+	Storage			WalletStorageUsage
+	GasFee			uint64
+	CurrentHeight		uint64
+	Params			storagerenttypes.StorageRentParams
+	FreezeDebtThreshold	uint64
 }
 
 type WalletRentResult struct {
-	Account          Account
-	Balance          uint64
-	StorageBytes     uint64
-	StorageRentDelta uint64
-	EffectiveFee     uint64
-	Frozen           bool
-	DebtPaid         bool
+	Account			Account
+	Balance			uint64
+	StorageBytes		uint64
+	StorageRentDelta	uint64
+	EffectiveFee		uint64
+	Frozen			bool
+	DebtPaid		bool
 }
 
 type AccountCloseObligations struct {
-	Balance              uint64
-	StorageDebt          uint64
-	Stake                uint64
-	PoolShares           uint64
-	Unbonding            uint64
-	PendingRewards       uint64
-	Domains              uint64
-	OwnershipObligations uint64
-	RequiredReputation   uint64
+	Balance			uint64
+	StorageDebt		uint64
+	Stake			uint64
+	PoolShares		uint64
+	Unbonding		uint64
+	PendingRewards		uint64
+	Domains			uint64
+	OwnershipObligations	uint64
+	RequiredReputation	uint64
 }
 
 func WalletPersistentStorageSize(usage WalletStorageUsage) (uint64, error) {

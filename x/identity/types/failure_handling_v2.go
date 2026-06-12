@@ -1,21 +1,21 @@
 package types
 
 type IdentityLightClientFailureHandlingV2 struct {
-	FailureCode                               IdentityLightClientFailureCodeV2
-	RejectTargetUse                           bool
-	RequestFreshProof                         bool
-	DirectAddressFallbackRequiresConfirmation bool
-	DirectAddressFallbackAllowed              bool
-	CacheInvalid                              bool
-	InvalidatedCache                          *ResolutionCacheRecordV2
+	FailureCode					IdentityLightClientFailureCodeV2
+	RejectTargetUse					bool
+	RequestFreshProof				bool
+	DirectAddressFallbackRequiresConfirmation	bool
+	DirectAddressFallbackAllowed			bool
+	CacheInvalid					bool
+	InvalidatedCache				*ResolutionCacheRecordV2
 }
 
 type IdentityWalletResolutionStatusV2 struct {
-	VerifiedStatusVisible bool
-	AutoFillTargetAllowed bool
-	FreshnessWarning      bool
-	RejectTargetUse       bool
-	FailureCode           IdentityLightClientFailureCodeV2
+	VerifiedStatusVisible	bool
+	AutoFillTargetAllowed	bool
+	FreshnessWarning	bool
+	RejectTargetUse		bool
+	FailureCode		IdentityLightClientFailureCodeV2
 }
 
 func HandleIdentityLightClientFailureV2(err error, cached *ResolutionCacheRecordV2, directAddressConfirmed bool) IdentityLightClientFailureHandlingV2 {
@@ -24,11 +24,11 @@ func HandleIdentityLightClientFailureV2(err error, cached *ResolutionCacheRecord
 		code = IdentityLightClientErrProofInvalid
 	}
 	out := IdentityLightClientFailureHandlingV2{
-		FailureCode:       code,
-		RejectTargetUse:   true,
-		RequestFreshProof: true,
-		DirectAddressFallbackRequiresConfirmation: true,
-		DirectAddressFallbackAllowed:              directAddressConfirmed,
+		FailureCode:		code,
+		RejectTargetUse:	true,
+		RequestFreshProof:	true,
+		DirectAddressFallbackRequiresConfirmation:	true,
+		DirectAddressFallbackAllowed:			directAddressConfirmed,
 	}
 	if cached != nil {
 		invalidated := InvalidateResolutionCacheRecordV2ForDomainMutation(*cached, cached.SourceVersion, cached.ParentEpoch, cached.ChildEpoch)
@@ -45,15 +45,15 @@ func EvaluateIdentityWalletResolutionStatusV2(target *IdentityLightClientVerifie
 			code = IdentityLightClientErrProofInvalid
 		}
 		return IdentityWalletResolutionStatusV2{
-			VerifiedStatusVisible: false,
-			AutoFillTargetAllowed: false,
-			RejectTargetUse:       true,
-			FailureCode:           code,
+			VerifiedStatusVisible:	false,
+			AutoFillTargetAllowed:	false,
+			RejectTargetUse:	true,
+			FailureCode:		code,
 		}
 	}
 	status := IdentityWalletResolutionStatusV2{
-		VerifiedStatusVisible: true,
-		AutoFillTargetAllowed: true,
+		VerifiedStatusVisible:	true,
+		AutoFillTargetAllowed:	true,
 	}
 	if freshnessThreshold > 0 && localHeight > target.ProofHeight && localHeight-target.ProofHeight > freshnessThreshold {
 		status.FreshnessWarning = true

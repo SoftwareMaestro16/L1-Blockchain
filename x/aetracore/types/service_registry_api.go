@@ -16,147 +16,147 @@ type ServiceRegistryMessage interface {
 }
 
 type MsgRegisterService struct {
-	Authority              string
-	Descriptor             ServiceDescriptor
-	OwnerAuthorizationHash string
-	MessageHash            string
+	Authority		string
+	Descriptor		ServiceDescriptor
+	OwnerAuthorizationHash	string
+	MessageHash		string
 }
 
 type MsgUpdateService struct {
-	Authority       string
-	Descriptor      ServiceDescriptor
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	Descriptor	ServiceDescriptor
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgRenewService struct {
-	Authority       string
-	ServiceID       string
-	ExpiryHeight    uint64
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	ServiceID	string
+	ExpiryHeight	uint64
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgDisableService struct {
-	Authority       string
-	ServiceID       string
-	Reason          string
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	ServiceID	string
+	Reason		string
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgTransferService struct {
-	Authority       string
-	ServiceID       string
-	NewOwner        string
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	ServiceID	string
+	NewOwner	string
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgBindServiceIdentity struct {
-	Authority       string
-	ServiceID       string
-	IdentityName    string
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	ServiceID	string
+	IdentityName	string
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgUnbindServiceIdentity struct {
-	Authority       string
-	ServiceID       string
-	IdentityName    string
-	ExpectedVersion uint64
-	MessageHash     string
+	Authority	string
+	ServiceID	string
+	IdentityName	string
+	ExpectedVersion	uint64
+	MessageHash	string
 }
 
 type MsgRegisterProvider struct {
-	Authority   string
-	ServiceID   string
-	Provider    FogProviderRecord
-	MessageHash string
+	Authority	string
+	ServiceID	string
+	Provider	FogProviderRecord
+	MessageHash	string
 }
 
 type MsgUpdateProvider struct {
-	Authority   string
-	ServiceID   string
-	Provider    FogProviderRecord
-	MessageHash string
+	Authority	string
+	ServiceID	string
+	Provider	FogProviderRecord
+	MessageHash	string
 }
 
 type MsgStakeProviderCollateral struct {
-	Authority   string
-	ServiceID   string
-	ProviderID  string
-	Denom       string
-	Amount      string
-	Height      uint64
-	MessageHash string
+	Authority	string
+	ServiceID	string
+	ProviderID	string
+	Denom		string
+	Amount		string
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgUnstakeProviderCollateral struct {
-	Authority   string
-	ServiceID   string
-	ProviderID  string
-	Denom       string
-	Amount      string
-	Height      uint64
-	MessageHash string
+	Authority	string
+	ServiceID	string
+	ProviderID	string
+	Denom		string
+	Amount		string
+	Height		uint64
+	MessageHash	string
 }
 
 type MsgAnchorServiceReceipt struct {
-	Authority   string
-	Receipt     ServiceReceipt
-	AnchorHash  string
-	MessageHash string
+	Authority	string
+	Receipt		ServiceReceipt
+	AnchorHash	string
+	MessageHash	string
 }
 
 type MsgSubmitServiceDispute struct {
-	Authority    string
-	ServiceID    string
-	CallID       string
-	ProviderID   string
-	EvidenceHash string
-	Reason       string
-	OpenedHeight uint64
-	MessageHash  string
+	Authority	string
+	ServiceID	string
+	CallID		string
+	ProviderID	string
+	EvidenceHash	string
+	Reason		string
+	OpenedHeight	uint64
+	MessageHash	string
 }
 
 type QueryPagination struct {
-	Offset uint64
-	Limit  uint64
+	Offset	uint64
+	Limit	uint64
 }
 
 type QueryService struct {
-	ServiceID     string
-	IncludeAnchor bool
-	IncludeProof  bool
+	ServiceID	string
+	IncludeAnchor	bool
+	IncludeProof	bool
 }
 
 type QueryServiceResponse struct {
-	Descriptor ServiceDescriptor
-	Anchor     ServiceAnchor
-	Proof      ServiceRegistryProof
-	Found      bool
+	Descriptor	ServiceDescriptor
+	Anchor		ServiceAnchor
+	Proof		ServiceRegistryProof
+	Found		bool
 }
 
 type QueryServiceByName struct {
-	ServiceName  string
-	IncludeProof bool
+	ServiceName	string
+	IncludeProof	bool
 }
 
 type QueryServicesByOwner struct {
-	Owner      string
-	Pagination QueryPagination
+	Owner		string
+	Pagination	QueryPagination
 }
 
 type QueryServicesByIdentity struct {
-	IdentityName string
-	Pagination   QueryPagination
+	IdentityName	string
+	Pagination	QueryPagination
 }
 
 type QueryProvidersByService struct {
-	ServiceID  string
-	Pagination QueryPagination
+	ServiceID	string
+	Pagination	QueryPagination
 }
 
 type QueryServiceInterface struct {
@@ -172,8 +172,8 @@ type QueryServiceVerificationModel struct {
 }
 
 type QueryServiceReceipt struct {
-	ServiceID string
-	CallID    string
+	ServiceID	string
+	CallID		string
 }
 
 type QueryServiceProof struct {
@@ -183,49 +183,49 @@ type QueryServiceProof struct {
 type QueryServiceParams struct{}
 
 type QueryServicesResponse struct {
-	Services []ServiceDescriptor
-	Total    uint64
+	Services	[]ServiceDescriptor
+	Total		uint64
 }
 
 type QueryProvidersResponse struct {
-	Providers []ProviderRecord
-	Total     uint64
+	Providers	[]ProviderRecord
+	Total		uint64
 }
 
 type QueryServiceInterfaceResponse struct {
-	Interface ServiceInterface
-	Found     bool
+	Interface	ServiceInterface
+	Found		bool
 }
 
 type QueryServicePaymentModelResponse struct {
-	ServiceID      string
-	PaymentModel   string
-	SettlementMode ServicePaymentSettlementMode
-	Denom          string
-	Amount         string
-	PricingUnit    ServicePricingUnit
-	Found          bool
+	ServiceID	string
+	PaymentModel	string
+	SettlementMode	ServicePaymentSettlementMode
+	Denom		string
+	Amount		string
+	PricingUnit	ServicePricingUnit
+	Found		bool
 }
 
 type QueryServiceVerificationModelResponse struct {
-	ServiceID          string
-	TrustModel         ServiceTrustModel
-	VerificationModel  ServiceVerificationModel
-	ProofFormat        string
-	ChallengeWindow    uint64
-	FallbackServiceID  string
-	ProviderCollateral string
-	Found              bool
+	ServiceID		string
+	TrustModel		ServiceTrustModel
+	VerificationModel	ServiceVerificationModel
+	ProofFormat		string
+	ChallengeWindow		uint64
+	FallbackServiceID	string
+	ProviderCollateral	string
+	Found			bool
 }
 
 type QueryServiceReceiptResponse struct {
-	Receipt ServiceReceipt
-	Found   bool
+	Receipt	ServiceReceipt
+	Found	bool
 }
 
 type QueryServiceProofResponse struct {
-	Proof ServiceRegistryProof
-	Found bool
+	Proof	ServiceRegistryProof
+	Found	bool
 }
 
 type QueryServiceParamsResponse struct {
@@ -313,20 +313,20 @@ func NewMsgAnchorServiceReceipt(authority string, receipt ServiceReceipt, anchor
 
 func NewMsgSubmitServiceDispute(authority, serviceID, callID, providerID, evidenceHash, reason string, openedHeight uint64) (MsgSubmitServiceDispute, error) {
 	msg := MsgSubmitServiceDispute{
-		Authority:    strings.TrimSpace(authority),
-		ServiceID:    strings.TrimSpace(serviceID),
-		CallID:       strings.ToLower(strings.TrimSpace(callID)),
-		ProviderID:   strings.TrimSpace(providerID),
-		EvidenceHash: strings.ToLower(strings.TrimSpace(evidenceHash)),
-		Reason:       strings.TrimSpace(reason),
-		OpenedHeight: openedHeight,
+		Authority:	strings.TrimSpace(authority),
+		ServiceID:	strings.TrimSpace(serviceID),
+		CallID:		strings.ToLower(strings.TrimSpace(callID)),
+		ProviderID:	strings.TrimSpace(providerID),
+		EvidenceHash:	strings.ToLower(strings.TrimSpace(evidenceHash)),
+		Reason:		strings.TrimSpace(reason),
+		OpenedHeight:	openedHeight,
 	}
 	msg.MessageHash = ComputeServiceRegistryMessageHash(msg)
 	return msg, msg.ValidateBasic()
 }
 
-func (m MsgRegisterService) ServiceRegistryMessageName() string { return "MsgRegisterService" }
-func (m MsgRegisterService) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgRegisterService) ServiceRegistryMessageName() string	{ return "MsgRegisterService" }
+func (m MsgRegisterService) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgRegisterService) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -344,8 +344,8 @@ func (m MsgRegisterService) ValidateBasic() error {
 	return validateRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgUpdateService) ServiceRegistryMessageName() string { return "MsgUpdateService" }
-func (m MsgUpdateService) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgUpdateService) ServiceRegistryMessageName() string	{ return "MsgUpdateService" }
+func (m MsgUpdateService) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgUpdateService) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -363,8 +363,8 @@ func (m MsgUpdateService) ValidateBasic() error {
 	return validateRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgRenewService) ServiceRegistryMessageName() string { return "MsgRenewService" }
-func (m MsgRenewService) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgRenewService) ServiceRegistryMessageName() string	{ return "MsgRenewService" }
+func (m MsgRenewService) ServiceRegistrySigner() string		{ return m.Authority }
 func (m MsgRenewService) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -378,8 +378,8 @@ func (m MsgRenewService) ValidateBasic() error {
 	return validateRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgDisableService) ServiceRegistryMessageName() string { return "MsgDisableService" }
-func (m MsgDisableService) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgDisableService) ServiceRegistryMessageName() string	{ return "MsgDisableService" }
+func (m MsgDisableService) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgDisableService) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -398,8 +398,8 @@ func (m MsgDisableService) ValidateBasic() error {
 	return validateRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgTransferService) ServiceRegistryMessageName() string { return "MsgTransferService" }
-func (m MsgTransferService) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgTransferService) ServiceRegistryMessageName() string	{ return "MsgTransferService" }
+func (m MsgTransferService) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgTransferService) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -419,8 +419,8 @@ func (m MsgTransferService) ValidateBasic() error {
 	return validateRegistryMessageHash(m, m.MessageHash)
 }
 
-func (m MsgBindServiceIdentity) ServiceRegistryMessageName() string { return "MsgBindServiceIdentity" }
-func (m MsgBindServiceIdentity) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgBindServiceIdentity) ServiceRegistryMessageName() string	{ return "MsgBindServiceIdentity" }
+func (m MsgBindServiceIdentity) ServiceRegistrySigner() string		{ return m.Authority }
 func (m MsgBindServiceIdentity) ValidateBasic() error {
 	return validateServiceIdentityBindingMessage(m.Authority, m.ServiceID, m.IdentityName, m.ExpectedVersion, m, m.MessageHash)
 }
@@ -428,19 +428,19 @@ func (m MsgBindServiceIdentity) ValidateBasic() error {
 func (m MsgUnbindServiceIdentity) ServiceRegistryMessageName() string {
 	return "MsgUnbindServiceIdentity"
 }
-func (m MsgUnbindServiceIdentity) ServiceRegistrySigner() string { return m.Authority }
+func (m MsgUnbindServiceIdentity) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgUnbindServiceIdentity) ValidateBasic() error {
 	return validateServiceIdentityBindingMessage(m.Authority, m.ServiceID, m.IdentityName, m.ExpectedVersion, m, m.MessageHash)
 }
 
-func (m MsgRegisterProvider) ServiceRegistryMessageName() string { return "MsgRegisterProvider" }
-func (m MsgRegisterProvider) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgRegisterProvider) ServiceRegistryMessageName() string	{ return "MsgRegisterProvider" }
+func (m MsgRegisterProvider) ServiceRegistrySigner() string		{ return m.Authority }
 func (m MsgRegisterProvider) ValidateBasic() error {
 	return validateProviderMessage(m.Authority, m.ServiceID, m.Provider, m, m.MessageHash)
 }
 
-func (m MsgUpdateProvider) ServiceRegistryMessageName() string { return "MsgUpdateProvider" }
-func (m MsgUpdateProvider) ServiceRegistrySigner() string      { return m.Authority }
+func (m MsgUpdateProvider) ServiceRegistryMessageName() string	{ return "MsgUpdateProvider" }
+func (m MsgUpdateProvider) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgUpdateProvider) ValidateBasic() error {
 	return validateProviderMessage(m.Authority, m.ServiceID, m.Provider, m, m.MessageHash)
 }
@@ -448,7 +448,7 @@ func (m MsgUpdateProvider) ValidateBasic() error {
 func (m MsgStakeProviderCollateral) ServiceRegistryMessageName() string {
 	return "MsgStakeProviderCollateral"
 }
-func (m MsgStakeProviderCollateral) ServiceRegistrySigner() string { return m.Authority }
+func (m MsgStakeProviderCollateral) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgStakeProviderCollateral) ValidateBasic() error {
 	return validateProviderCollateralMessage(m.Authority, m.ServiceID, m.ProviderID, m.Denom, m.Amount, m.Height, m, m.MessageHash)
 }
@@ -456,7 +456,7 @@ func (m MsgStakeProviderCollateral) ValidateBasic() error {
 func (m MsgUnstakeProviderCollateral) ServiceRegistryMessageName() string {
 	return "MsgUnstakeProviderCollateral"
 }
-func (m MsgUnstakeProviderCollateral) ServiceRegistrySigner() string { return m.Authority }
+func (m MsgUnstakeProviderCollateral) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgUnstakeProviderCollateral) ValidateBasic() error {
 	return validateProviderCollateralMessage(m.Authority, m.ServiceID, m.ProviderID, m.Denom, m.Amount, m.Height, m, m.MessageHash)
 }
@@ -464,7 +464,7 @@ func (m MsgUnstakeProviderCollateral) ValidateBasic() error {
 func (m MsgAnchorServiceReceipt) ServiceRegistryMessageName() string {
 	return "MsgAnchorServiceReceipt"
 }
-func (m MsgAnchorServiceReceipt) ServiceRegistrySigner() string { return m.Authority }
+func (m MsgAnchorServiceReceipt) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgAnchorServiceReceipt) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -483,7 +483,7 @@ func (m MsgAnchorServiceReceipt) ValidateBasic() error {
 func (m MsgSubmitServiceDispute) ServiceRegistryMessageName() string {
 	return "MsgSubmitServiceDispute"
 }
-func (m MsgSubmitServiceDispute) ServiceRegistrySigner() string { return m.Authority }
+func (m MsgSubmitServiceDispute) ServiceRegistrySigner() string	{ return m.Authority }
 func (m MsgSubmitServiceDispute) ValidateBasic() error {
 	if err := validateRegistryAuthority(m.Authority); err != nil {
 		return err
@@ -662,13 +662,13 @@ func (state ServiceRegistryState) QueryServicePaymentModel(q QueryServicePayment
 		return QueryServicePaymentModelResponse{ServiceID: q.ServiceID, Found: false}, nil
 	}
 	return QueryServicePaymentModelResponse{
-		ServiceID:      descriptor.ServiceID,
-		PaymentModel:   registryPaymentModel(descriptor),
-		SettlementMode: descriptor.Payment.SettlementMode,
-		Denom:          descriptor.Payment.Denom,
-		Amount:         descriptor.Payment.Amount,
-		PricingUnit:    descriptor.Payment.PricingUnit,
-		Found:          true,
+		ServiceID:	descriptor.ServiceID,
+		PaymentModel:	registryPaymentModel(descriptor),
+		SettlementMode:	descriptor.Payment.SettlementMode,
+		Denom:		descriptor.Payment.Denom,
+		Amount:		descriptor.Payment.Amount,
+		PricingUnit:	descriptor.Payment.PricingUnit,
+		Found:		true,
 	}, nil
 }
 
@@ -681,14 +681,14 @@ func (state ServiceRegistryState) QueryServiceVerificationModel(q QueryServiceVe
 		return QueryServiceVerificationModelResponse{ServiceID: q.ServiceID, Found: false}, nil
 	}
 	return QueryServiceVerificationModelResponse{
-		ServiceID:          descriptor.ServiceID,
-		TrustModel:         descriptor.Verification.TrustModel,
-		VerificationModel:  descriptor.Verification.Model,
-		ProofFormat:        descriptor.Verification.ProofFormat,
-		ChallengeWindow:    descriptor.Verification.ChallengeWindow,
-		FallbackServiceID:  descriptor.Verification.FallbackServiceID,
-		ProviderCollateral: descriptor.Verification.ProviderCollateralAmount,
-		Found:              true,
+		ServiceID:		descriptor.ServiceID,
+		TrustModel:		descriptor.Verification.TrustModel,
+		VerificationModel:	descriptor.Verification.Model,
+		ProofFormat:		descriptor.Verification.ProofFormat,
+		ChallengeWindow:	descriptor.Verification.ChallengeWindow,
+		FallbackServiceID:	descriptor.Verification.FallbackServiceID,
+		ProviderCollateral:	descriptor.Verification.ProviderCollateralAmount,
+		Found:			true,
 	}, nil
 }
 
@@ -919,13 +919,13 @@ func (state ServiceRegistryState) serviceProof(serviceID, descriptorHash, interf
 	key, _ := ServiceDescriptorStateKey(serviceID)
 	recordHash := hashParts("aetra-aek-service-registry-state-proof-record-v1", key, descriptorHash)
 	proof := ServiceRegistryProof{
-		ServiceID:      serviceID,
-		RegistryMode:   ServiceRegistryOnChain,
-		RegistryRoot:   state.StateRoot,
-		RecordHash:     recordHash,
-		DescriptorHash: descriptorHash,
-		InterfaceHash:  interfaceHash,
-		ProofHeight:    state.UpdatedHeight,
+		ServiceID:	serviceID,
+		RegistryMode:	ServiceRegistryOnChain,
+		RegistryRoot:	state.StateRoot,
+		RecordHash:	recordHash,
+		DescriptorHash:	descriptorHash,
+		InterfaceHash:	interfaceHash,
+		ProofHeight:	state.UpdatedHeight,
 	}
 	proof.ProofHash = ComputeServiceRegistryProofHash(proof)
 	return proof

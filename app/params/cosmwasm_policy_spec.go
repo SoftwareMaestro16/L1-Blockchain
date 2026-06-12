@@ -6,129 +6,129 @@ import (
 )
 
 const (
-	AetraCosmWasmPolicyModuleName = "app/wasmconfig"
+	AetraCosmWasmPolicyModuleName	= "app/wasmconfig"
 
-	AetraCosmWasmRoleOptionalCompatibility = "cosmwasm_optional_gated_compatibility_layer"
-	AetraCosmWasmRoleAVMPrimaryRuntime     = "avm_remains_primary_native_contract_runtime"
+	AetraCosmWasmRoleOptionalCompatibility	= "cosmwasm_optional_gated_compatibility_layer"
+	AetraCosmWasmRoleAVMPrimaryRuntime	= "avm_remains_primary_native_contract_runtime"
 
-	AetraCosmWasmLaunchPhaseEarlyTestnet = "early_testnet"
-	AetraCosmWasmLaunchPhaseLaterTestnet = "later_testnet"
-	AetraCosmWasmLaunchPhaseMainnet      = "mainnet"
+	AetraCosmWasmLaunchPhaseEarlyTestnet	= "early_testnet"
+	AetraCosmWasmLaunchPhaseLaterTestnet	= "later_testnet"
+	AetraCosmWasmLaunchPhaseMainnet		= "mainnet"
 
-	AetraCosmWasmUploadPermissionedOrGovernanceGated        = "permissioned_or_governance_gated_upload"
-	AetraCosmWasmUploadPermissionlessWithStrongFeesDeposits = "permissionless_upload_with_strong_fees_deposits"
-	AetraCosmWasmMainnetAfterSecurityReview                 = "mainnet_policy_decided_after_security_review"
+	AetraCosmWasmUploadPermissionedOrGovernanceGated	= "permissioned_or_governance_gated_upload"
+	AetraCosmWasmUploadPermissionlessWithStrongFeesDeposits	= "permissionless_upload_with_strong_fees_deposits"
+	AetraCosmWasmMainnetAfterSecurityReview			= "mainnet_policy_decided_after_security_review"
 
-	AetraCosmWasmGasStorageMaxWasmCodeSize           = "max_wasm_code_size"
-	AetraCosmWasmGasStorageMaxInstantiateGas         = "max_instantiate_gas"
-	AetraCosmWasmGasStorageMaxExecuteGasPerTx        = "max_execute_gas_per_tx"
-	AetraCosmWasmGasStorageMaxQueryGas               = "max_query_gas"
-	AetraCosmWasmGasStorageStorageRentOrPricing      = "storage_rent_or_storage_pricing"
-	AetraCosmWasmGasStorageContractUploadFee         = "contract_upload_fee"
-	AetraCosmWasmGasStorageMigrationAuthorityRules   = "contract_migration_authority_rules"
-	AetraCosmWasmGasStoragePinnedCodePolicyIfUsed    = "pinned_code_policy_if_used"
-	AetraCosmWasmGasStorageGovernanceConfigurable    = "gas_storage_params_governance_configurable_with_bounds"
-	AetraCosmWasmGasStorageDeterministicAccounting   = "deterministic_integer_accounting"
-	AetraCosmWasmGasStorageSecurityAndBenchmarkGates = "security_review_and_benchmark_gates_required"
+	AetraCosmWasmGasStorageMaxWasmCodeSize			= "max_wasm_code_size"
+	AetraCosmWasmGasStorageMaxInstantiateGas		= "max_instantiate_gas"
+	AetraCosmWasmGasStorageMaxExecuteGasPerTx		= "max_execute_gas_per_tx"
+	AetraCosmWasmGasStorageMaxQueryGas			= "max_query_gas"
+	AetraCosmWasmGasStorageStorageRentOrPricing		= "storage_rent_or_storage_pricing"
+	AetraCosmWasmGasStorageContractUploadFee		= "contract_upload_fee"
+	AetraCosmWasmGasStorageMigrationAuthorityRules		= "contract_migration_authority_rules"
+	AetraCosmWasmGasStoragePinnedCodePolicyIfUsed		= "pinned_code_policy_if_used"
+	AetraCosmWasmGasStorageGovernanceConfigurable		= "gas_storage_params_governance_configurable_with_bounds"
+	AetraCosmWasmGasStorageDeterministicAccounting		= "deterministic_integer_accounting"
+	AetraCosmWasmGasStorageSecurityAndBenchmarkGates	= "security_review_and_benchmark_gates_required"
 
-	AetraCosmWasmTestLaunchPolicyCovered      = "launch_policy_tests"
-	AetraCosmWasmTestGasStorageCovered        = "gas_storage_limit_tests"
-	AetraCosmWasmTestUploadFeeCovered         = "upload_fee_tests"
-	AetraCosmWasmTestStoragePricingCovered    = "storage_pricing_tests"
-	AetraCosmWasmTestMigrationAuthority       = "migration_authority_tests"
-	AetraCosmWasmTestPinnedCodePolicy         = "pinned_code_policy_tests"
-	AetraCosmWasmTestAVMCompatibilityBoundary = "avm_cosmwasm_boundary_tests"
+	AetraCosmWasmTestLaunchPolicyCovered		= "launch_policy_tests"
+	AetraCosmWasmTestGasStorageCovered		= "gas_storage_limit_tests"
+	AetraCosmWasmTestUploadFeeCovered		= "upload_fee_tests"
+	AetraCosmWasmTestStoragePricingCovered		= "storage_pricing_tests"
+	AetraCosmWasmTestMigrationAuthority		= "migration_authority_tests"
+	AetraCosmWasmTestPinnedCodePolicy		= "pinned_code_policy_tests"
+	AetraCosmWasmTestAVMCompatibilityBoundary	= "avm_cosmwasm_boundary_tests"
 
-	AetraCosmWasmSecurityTestInfiniteLoopGasLimit       = "infinite_loop_contract_hits_gas_limit"
-	AetraCosmWasmSecurityTestLargeStorageWriteBounded   = "large_storage_write_bounded"
-	AetraCosmWasmSecurityTestFailedContractStateSafe    = "failed_contract_does_not_corrupt_state"
-	AetraCosmWasmSecurityTestReservedModuleFundsDenied  = "contract_cannot_access_reserved_module_funds"
-	AetraCosmWasmSecurityTestMigrationAuthorization     = "migration_authorization_enforced"
-	AetraCosmWasmSecurityTestReplySubmessageDeterminism = "reply_submessage_behavior_deterministic"
-	AetraCosmWasmSecurityTestStableEvents               = "event_emission_stable"
-	AetraCosmWasmSecurityTestExportImportContracts      = "export_import_with_contracts"
-	AetraCosmWasmSecurityTestQueryNoStateMutation       = "contract_query_does_not_mutate_state"
+	AetraCosmWasmSecurityTestInfiniteLoopGasLimit		= "infinite_loop_contract_hits_gas_limit"
+	AetraCosmWasmSecurityTestLargeStorageWriteBounded	= "large_storage_write_bounded"
+	AetraCosmWasmSecurityTestFailedContractStateSafe	= "failed_contract_does_not_corrupt_state"
+	AetraCosmWasmSecurityTestReservedModuleFundsDenied	= "contract_cannot_access_reserved_module_funds"
+	AetraCosmWasmSecurityTestMigrationAuthorization		= "migration_authorization_enforced"
+	AetraCosmWasmSecurityTestReplySubmessageDeterminism	= "reply_submessage_behavior_deterministic"
+	AetraCosmWasmSecurityTestStableEvents			= "event_emission_stable"
+	AetraCosmWasmSecurityTestExportImportContracts		= "export_import_with_contracts"
+	AetraCosmWasmSecurityTestQueryNoStateMutation		= "contract_query_does_not_mutate_state"
 )
 
 type AetraCosmWasmLaunchPhasePolicy struct {
-	Phase        string
-	UploadPolicy string
+	Phase		string
+	UploadPolicy	string
 }
 
 type AetraCosmWasmLaunchPolicyEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	OptionalGatedCompatibilityLayer bool
-	AVMRemainsPrimaryRuntime        bool
-	PhasePolicies                   []AetraCosmWasmLaunchPhasePolicy
-	MainnetAfterSecurityReview      bool
+	OptionalGatedCompatibilityLayer	bool
+	AVMRemainsPrimaryRuntime	bool
+	PhasePolicies			[]AetraCosmWasmLaunchPhasePolicy
+	MainnetAfterSecurityReview	bool
 }
 
 type AetraCosmWasmLaunchPolicyReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraCosmWasmGasStorageEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredControls []string
+	RequiredControls	[]string
 
-	GovernanceConfigurableWithBounds bool
-	DeterministicIntegerAccounting   bool
-	SecurityReviewAndBenchmarks      bool
+	GovernanceConfigurableWithBounds	bool
+	DeterministicIntegerAccounting		bool
+	SecurityReviewAndBenchmarks		bool
 }
 
 type AetraCosmWasmGasStorageReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraCosmWasmTestEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredTests []string
+	RequiredTests	[]string
 }
 
 type AetraCosmWasmTestReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraCosmWasmContractSecurityTestEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	RequiredTests []string
+	RequiredTests	[]string
 }
 
 type AetraCosmWasmContractSecurityTestReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraCosmWasmLaunchPolicyEvidence() AetraCosmWasmLaunchPolicyEvidence {
 	return AetraCosmWasmLaunchPolicyEvidence{
-		ModuleName:                      AetraCosmWasmPolicyModuleName,
-		OptionalGatedCompatibilityLayer: true,
-		AVMRemainsPrimaryRuntime:        true,
+		ModuleName:				AetraCosmWasmPolicyModuleName,
+		OptionalGatedCompatibilityLayer:	true,
+		AVMRemainsPrimaryRuntime:		true,
 		PhasePolicies: []AetraCosmWasmLaunchPhasePolicy{
 			{Phase: AetraCosmWasmLaunchPhaseEarlyTestnet, UploadPolicy: AetraCosmWasmUploadPermissionedOrGovernanceGated},
 			{Phase: AetraCosmWasmLaunchPhaseLaterTestnet, UploadPolicy: AetraCosmWasmUploadPermissionlessWithStrongFeesDeposits},
 			{Phase: AetraCosmWasmLaunchPhaseMainnet, UploadPolicy: AetraCosmWasmMainnetAfterSecurityReview},
 		},
-		MainnetAfterSecurityReview: true,
+		MainnetAfterSecurityReview:	true,
 	}
 }
 
@@ -160,22 +160,22 @@ func BuildAetraCosmWasmLaunchPolicyReport(evidence AetraCosmWasmLaunchPolicyEvid
 
 	sort.Strings(failed)
 	return AetraCosmWasmLaunchPolicyReport{
-		ModuleName: evidence.ModuleName,
-		Required:   6,
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	6,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraCosmWasmGasStorageEvidence() AetraCosmWasmGasStorageEvidence {
 	return AetraCosmWasmGasStorageEvidence{
-		ModuleName:       AetraCosmWasmPolicyModuleName,
-		RequiredControls: requiredAetraCosmWasmGasStorageControls(),
+		ModuleName:		AetraCosmWasmPolicyModuleName,
+		RequiredControls:	requiredAetraCosmWasmGasStorageControls(),
 
-		GovernanceConfigurableWithBounds: true,
-		DeterministicIntegerAccounting:   true,
-		SecurityReviewAndBenchmarks:      true,
+		GovernanceConfigurableWithBounds:	true,
+		DeterministicIntegerAccounting:		true,
+		SecurityReviewAndBenchmarks:		true,
 	}
 }
 
@@ -208,18 +208,18 @@ func BuildAetraCosmWasmGasStorageReport(evidence AetraCosmWasmGasStorageEvidence
 
 	sort.Strings(failed)
 	return AetraCosmWasmGasStorageReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredControls) + len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredControls) + len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraCosmWasmTestEvidence() AetraCosmWasmTestEvidence {
 	return AetraCosmWasmTestEvidence{
-		ModuleName:    AetraCosmWasmPolicyModuleName,
-		RequiredTests: requiredAetraCosmWasmTests(),
+		ModuleName:	AetraCosmWasmPolicyModuleName,
+		RequiredTests:	requiredAetraCosmWasmTests(),
 	}
 }
 
@@ -239,18 +239,18 @@ func BuildAetraCosmWasmTestReport(evidence AetraCosmWasmTestEvidence) AetraCosmW
 
 	sort.Strings(failed)
 	return AetraCosmWasmTestReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredTests),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredTests),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraCosmWasmContractSecurityTestEvidence() AetraCosmWasmContractSecurityTestEvidence {
 	return AetraCosmWasmContractSecurityTestEvidence{
-		ModuleName:    AetraCosmWasmPolicyModuleName,
-		RequiredTests: requiredAetraCosmWasmContractSecurityTests(),
+		ModuleName:	AetraCosmWasmPolicyModuleName,
+		RequiredTests:	requiredAetraCosmWasmContractSecurityTests(),
 	}
 }
 
@@ -270,11 +270,11 @@ func BuildAetraCosmWasmContractSecurityTestReport(evidence AetraCosmWasmContract
 
 	sort.Strings(failed)
 	return AetraCosmWasmContractSecurityTestReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredTests),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredTests),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -329,9 +329,9 @@ func validateAetraCosmWasmModuleName(moduleName string) []string {
 
 func validateAetraCosmWasmPhasePolicies(policies []AetraCosmWasmLaunchPhasePolicy) (int, []string) {
 	required := map[string]string{
-		AetraCosmWasmLaunchPhaseEarlyTestnet: AetraCosmWasmUploadPermissionedOrGovernanceGated,
-		AetraCosmWasmLaunchPhaseLaterTestnet: AetraCosmWasmUploadPermissionlessWithStrongFeesDeposits,
-		AetraCosmWasmLaunchPhaseMainnet:      AetraCosmWasmMainnetAfterSecurityReview,
+		AetraCosmWasmLaunchPhaseEarlyTestnet:	AetraCosmWasmUploadPermissionedOrGovernanceGated,
+		AetraCosmWasmLaunchPhaseLaterTestnet:	AetraCosmWasmUploadPermissionlessWithStrongFeesDeposits,
+		AetraCosmWasmLaunchPhaseMainnet:	AetraCosmWasmMainnetAfterSecurityReview,
 	}
 	seen := map[string]string{}
 	failed := make([]string, 0)

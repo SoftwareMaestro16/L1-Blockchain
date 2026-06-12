@@ -66,15 +66,15 @@ func TestActorValidation(t *testing.T) {
 
 func testMessage(source, destination sdk.AccAddress) async.MessageEnvelope {
 	return async.MessageEnvelope{
-		Source:      source,
-		Destination: destination,
-		Value:       sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
-		Opcode:      1,
-		QueryID:     1,
-		Body:        []byte("body"),
-		Bounce:      true,
-		GasLimit:    100_000,
-		ForwardFee:  sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
+		Source:		source,
+		Destination:	destination,
+		Value:		sdk.NewCoin(appparams.BaseDenom, sdkmath.ZeroInt()),
+		Opcode:		1,
+		QueryID:	1,
+		Body:		[]byte("body"),
+		Bounce:		true,
+		GasLimit:	100_000,
+		ForwardFee:	sdk.NewCoin(appparams.BaseDenom, async.DefaultParams().ForwardingFee),
 	}
 }
 

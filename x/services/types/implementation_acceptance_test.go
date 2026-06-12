@@ -13,18 +13,18 @@ func TestDefaultServiceImplementationAcceptanceManifestCoversSection20(t *testin
 	require.Len(t, manifest.Criteria, 12)
 
 	required := map[ServiceImplementationAcceptanceID]bool{
-		ServiceAcceptanceFirstClassRegistryObjects: false,
-		ServiceAcceptanceAllServiceTypesDefined:    false,
-		ServiceAcceptanceFormalInterfaceBinding:    false,
-		ServiceAcceptanceUnifiedCallEnvelope:       false,
-		ServiceAcceptanceDiscoveryResolution:       false,
-		ServiceAcceptancePaymentSettlementModes:    false,
-		ServiceAcceptanceStorageDeclarations:       false,
-		ServiceAcceptanceMixedServiceDisputes:      false,
-		ServiceAcceptanceProviderRules:             false,
-		ServiceAcceptanceCosmosModuleSurface:       false,
-		ServiceAcceptanceStoreV2BlockSTMStrategy:   false,
-		ServiceAcceptanceSDKExecutionFlow:          false,
+		ServiceAcceptanceFirstClassRegistryObjects:	false,
+		ServiceAcceptanceAllServiceTypesDefined:	false,
+		ServiceAcceptanceFormalInterfaceBinding:	false,
+		ServiceAcceptanceUnifiedCallEnvelope:		false,
+		ServiceAcceptanceDiscoveryResolution:		false,
+		ServiceAcceptancePaymentSettlementModes:	false,
+		ServiceAcceptanceStorageDeclarations:		false,
+		ServiceAcceptanceMixedServiceDisputes:		false,
+		ServiceAcceptanceProviderRules:			false,
+		ServiceAcceptanceCosmosModuleSurface:		false,
+		ServiceAcceptanceStoreV2BlockSTMStrategy:	false,
+		ServiceAcceptanceSDKExecutionFlow:		false,
 	}
 	for _, criterion := range manifest.Criteria {
 		_, found := required[criterion.CriterionID]

@@ -9,57 +9,57 @@ import (
 )
 
 type ZoneCommitment struct {
-	Height               uint64
-	ZoneID               ZoneID
-	StateRoot            string
-	InboxRoot            string
-	OutboxRoot           string
-	ReceiptsRoot         string
-	EventsRoot           string
-	ShardRootsRoot       string
-	ParamsHash           string
-	ExecutionSummaryHash string
-	CommitmentHash       string
+	Height			uint64
+	ZoneID			ZoneID
+	StateRoot		string
+	InboxRoot		string
+	OutboxRoot		string
+	ReceiptsRoot		string
+	EventsRoot		string
+	ShardRootsRoot		string
+	ParamsHash		string
+	ExecutionSummaryHash	string
+	CommitmentHash		string
 }
 
 type GlobalStateRoot struct {
-	Height        uint64
-	ZonesRoot     string
-	ServicesRoot  string
-	IdentityRoot  string
-	StorageRoot   string
-	MessageRoot   string
-	ReceiptsRoot  string
-	RoutingRoot   string
-	PaymentsRoot  string
-	ContractsRoot string
-	VMRoot        string
-	ParamsHash    string
-	GlobalRoot    string
+	Height		uint64
+	ZonesRoot	string
+	ServicesRoot	string
+	IdentityRoot	string
+	StorageRoot	string
+	MessageRoot	string
+	ReceiptsRoot	string
+	RoutingRoot	string
+	PaymentsRoot	string
+	ContractsRoot	string
+	VMRoot		string
+	ParamsHash	string
+	GlobalRoot	string
 }
 
 type RootContributions struct {
-	IdentityRoot  string
-	StorageRoot   string
-	MessageRoot   string
-	ReceiptsRoot  string
-	RoutingRoot   string
-	PaymentsRoot  string
-	ContractsRoot string
-	VMRoot        string
-	ParamsHash    string
+	IdentityRoot	string
+	StorageRoot	string
+	MessageRoot	string
+	ReceiptsRoot	string
+	RoutingRoot	string
+	PaymentsRoot	string
+	ContractsRoot	string
+	VMRoot		string
+	ParamsHash	string
 }
 
 type UnifiedStateRootSet struct {
-	ZonesRoot     string
-	ServicesRoot  string
-	IdentityRoot  string
-	StorageRoot   string
-	MessageRoot   string
-	ReceiptsRoot  string
-	RoutingRoot   string
-	PaymentsRoot  string
-	ContractsRoot string
+	ZonesRoot	string
+	ServicesRoot	string
+	IdentityRoot	string
+	StorageRoot	string
+	MessageRoot	string
+	ReceiptsRoot	string
+	RoutingRoot	string
+	PaymentsRoot	string
+	ContractsRoot	string
 }
 
 func NewZoneCommitment(
@@ -75,16 +75,16 @@ func NewZoneCommitment(
 	executionSummaryHash string,
 ) (ZoneCommitment, error) {
 	commitment := ZoneCommitment{
-		Height:               height,
-		ZoneID:               zoneID,
-		StateRoot:            stateRoot,
-		InboxRoot:            inboxRoot,
-		OutboxRoot:           outboxRoot,
-		ReceiptsRoot:         receiptsRoot,
-		EventsRoot:           eventsRoot,
-		ShardRootsRoot:       shardRootsRoot,
-		ParamsHash:           paramsHash,
-		ExecutionSummaryHash: executionSummaryHash,
+		Height:			height,
+		ZoneID:			zoneID,
+		StateRoot:		stateRoot,
+		InboxRoot:		inboxRoot,
+		OutboxRoot:		outboxRoot,
+		ReceiptsRoot:		receiptsRoot,
+		EventsRoot:		eventsRoot,
+		ShardRootsRoot:		shardRootsRoot,
+		ParamsHash:		paramsHash,
+		ExecutionSummaryHash:	executionSummaryHash,
 	}
 	if err := commitment.ValidateFormat(); err != nil {
 		return ZoneCommitment{}, err
@@ -161,18 +161,18 @@ func ComputeZoneCommitmentHash(c ZoneCommitment) string {
 
 func NewGlobalStateRoot(height uint64, zonesRoot string, servicesRoot string, contributions RootContributions) (GlobalStateRoot, error) {
 	root := GlobalStateRoot{
-		Height:        height,
-		ZonesRoot:     zonesRoot,
-		ServicesRoot:  servicesRoot,
-		IdentityRoot:  contributions.IdentityRoot,
-		StorageRoot:   contributions.StorageRoot,
-		MessageRoot:   contributions.MessageRoot,
-		ReceiptsRoot:  contributions.ReceiptsRoot,
-		RoutingRoot:   contributions.RoutingRoot,
-		PaymentsRoot:  contributions.PaymentsRoot,
-		ContractsRoot: contributions.ContractsRoot,
-		VMRoot:        contributions.VMRoot,
-		ParamsHash:    contributions.ParamsHash,
+		Height:		height,
+		ZonesRoot:	zonesRoot,
+		ServicesRoot:	servicesRoot,
+		IdentityRoot:	contributions.IdentityRoot,
+		StorageRoot:	contributions.StorageRoot,
+		MessageRoot:	contributions.MessageRoot,
+		ReceiptsRoot:	contributions.ReceiptsRoot,
+		RoutingRoot:	contributions.RoutingRoot,
+		PaymentsRoot:	contributions.PaymentsRoot,
+		ContractsRoot:	contributions.ContractsRoot,
+		VMRoot:		contributions.VMRoot,
+		ParamsHash:	contributions.ParamsHash,
 	}
 	if err := root.ValidateFormat(); err != nil {
 		return GlobalStateRoot{}, err
@@ -285,22 +285,22 @@ func ComputeGlobalStateRootHash(r GlobalStateRoot) string {
 
 func (r GlobalStateRoot) RootSet() UnifiedStateRootSet {
 	return UnifiedStateRootSet{
-		ZonesRoot:     r.ZonesRoot,
-		ServicesRoot:  r.ServicesRoot,
-		IdentityRoot:  r.IdentityRoot,
-		StorageRoot:   r.StorageRoot,
-		MessageRoot:   r.MessageRoot,
-		ReceiptsRoot:  r.ReceiptsRoot,
-		RoutingRoot:   r.RoutingRoot,
-		PaymentsRoot:  r.PaymentsRoot,
-		ContractsRoot: r.ContractsRoot,
+		ZonesRoot:	r.ZonesRoot,
+		ServicesRoot:	r.ServicesRoot,
+		IdentityRoot:	r.IdentityRoot,
+		StorageRoot:	r.StorageRoot,
+		MessageRoot:	r.MessageRoot,
+		ReceiptsRoot:	r.ReceiptsRoot,
+		RoutingRoot:	r.RoutingRoot,
+		PaymentsRoot:	r.PaymentsRoot,
+		ContractsRoot:	r.ContractsRoot,
 	}
 }
 
 func (s UnifiedStateRootSet) Validate() error {
 	for _, item := range []struct {
-		name string
-		root string
+		name	string
+		root	string
 	}{
 		{"zones", s.ZonesRoot},
 		{"services", s.ServicesRoot},

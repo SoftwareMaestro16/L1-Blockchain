@@ -126,19 +126,19 @@ func TestLatencyStrategySpecRejectsInvalidHashesAndBounds(t *testing.T) {
 
 func mempoolTx(seed string, sender string, zoneID ZoneID, shardID ShardID, object string, class MempoolMessageClass, fee uint64, expiry uint64, admission uint64, priority uint32, known bool, preResolved bool) MempoolAdmissionTx {
 	return MempoolAdmissionTx{
-		TxHash:          hashParts("mempool-tx", seed),
-		Sender:          sender,
-		TargetZoneID:    zoneID,
-		TargetShardID:   shardID,
-		RouteKey:        object + "/route",
-		TargetObject:    object,
-		MessageClass:    class,
-		FeeNAET:         fee,
-		ExpiryHeight:    expiry,
-		AdmissionHeight: admission,
-		PriorityClass:   priority,
-		TargetKnown:     known,
-		PreResolved:     preResolved,
+		TxHash:			hashParts("mempool-tx", seed),
+		Sender:			sender,
+		TargetZoneID:		zoneID,
+		TargetShardID:		shardID,
+		RouteKey:		object + "/route",
+		TargetObject:		object,
+		MessageClass:		class,
+		FeeNAET:		fee,
+		ExpiryHeight:		expiry,
+		AdmissionHeight:	admission,
+		PriorityClass:		priority,
+		TargetKnown:		known,
+		PreResolved:		preResolved,
 	}
 }
 

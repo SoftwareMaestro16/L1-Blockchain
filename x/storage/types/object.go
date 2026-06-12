@@ -11,79 +11,79 @@ import (
 )
 
 const (
-	MaxStorageChunkRoots      = 4096
-	MaxStorageObjectSize      = uint64(1 << 40)
-	MaxStorageTokenBytes      = 128
-	MaxStorageReceiptAccesses = 1024
-	StorageObjectVersionV1    = uint64(1)
+	MaxStorageChunkRoots		= 4096
+	MaxStorageObjectSize		= uint64(1 << 40)
+	MaxStorageTokenBytes		= 128
+	MaxStorageReceiptAccesses	= 1024
+	StorageObjectVersionV1		= uint64(1)
 
-	StorageClassHot     = "hot"
-	StorageClassWarm    = "warm"
-	StorageClassCold    = "cold"
-	StorageClassArchive = "archive"
+	StorageClassHot		= "hot"
+	StorageClassWarm	= "warm"
+	StorageClassCold	= "cold"
+	StorageClassArchive	= "archive"
 
-	ReplicationPolicySingle    = "single"
-	ReplicationPolicyRegional  = "regional"
-	ReplicationPolicyMultiZone = "multi_zone"
-	ReplicationPolicyErasure   = "erasure_coded"
+	ReplicationPolicySingle		= "single"
+	ReplicationPolicyRegional	= "regional"
+	ReplicationPolicyMultiZone	= "multi_zone"
+	ReplicationPolicyErasure	= "erasure_coded"
 
-	AccessPolicyPrivate      = "private"
-	AccessPolicyPublicRead   = "public_read"
-	AccessPolicyPermissioned = "permissioned"
+	AccessPolicyPrivate		= "private"
+	AccessPolicyPublicRead		= "public_read"
+	AccessPolicyPermissioned	= "permissioned"
 )
 
 type StorageObject struct {
-	ContentHash            string
-	ChunkRoots             []string
-	Size                   uint64
-	ReplicationPolicy      string
-	AccessPolicy           string
-	ObjectID               string
-	Owner                  string
-	StorageClass           string
-	CreatedHeight          uint64
-	ExpiresHeightOptional  uint64
-	MetadataHashOptional   string
-	AvailabilityCommitment string
-	Version                uint64
-	ObjectHash             string
+	ContentHash		string
+	ChunkRoots		[]string
+	Size			uint64
+	ReplicationPolicy	string
+	AccessPolicy		string
+	ObjectID		string
+	Owner			string
+	StorageClass		string
+	CreatedHeight		uint64
+	ExpiresHeightOptional	uint64
+	MetadataHashOptional	string
+	AvailabilityCommitment	string
+	Version			uint64
+	ObjectHash		string
 }
 
 type StorageChunkSet struct {
-	ObjectID   string
-	ChunkRoots []string
-	ChunkRoot  string
-	ChunkCount uint32
+	ObjectID	string
+	ChunkRoots	[]string
+	ChunkRoot	string
+	ChunkCount	uint32
 }
 
 type StorageRetrievalProof struct {
-	ObjectID    string
-	ContentHash string
-	ChunkRoot   string
-	ChunkIndex  uint32
-	ChunkHash   string
-	ProofPath   []string
-	ProofHash   string
+	ObjectID	string
+	ContentHash	string
+	ChunkRoot	string
+	ChunkIndex	uint32
+	ChunkHash	string
+	ProofPath	[]string
+	ProofHash	string
 }
 
 type StorageAccessReceipt struct {
-	ReceiptID      string
-	ObjectID       string
-	Accessor       string
-	AccessType     string
-	AccessHeight   uint64
-	ContentHash    string
-	ChunkRoot      string
-	PolicyHash     string
-	RetrievalProof string
-	ReceiptHash    string
+	ReceiptID	string
+	ObjectID	string
+	Accessor	string
+	AccessType	string
+	AccessHeight	uint64
+	ContentHash	string
+	ChunkRoot	string
+	PolicyHash	string
+	RetrievalProof	string
+	ReceiptHash	string
 }
 
 type StorageObjectCommitmentState struct {
-	Objects  []StorageObject
-	Receipts []StorageAccessReceipt
-	Height   uint64
-	RootHash string
+	Objects		[]StorageObject
+	Receipts	[]StorageAccessReceipt
+	Height		uint64
+	RootHash	string
 }
 
 func NewStorageObject(object StorageObject) (StorageObject, error) {
@@ -116,10 +116,10 @@ func NewStorageChunkSet(objectID string, chunkRoots []string) (StorageChunkSet, 
 		return StorageChunkSet{}, fmt.Errorf("storage chunk set must not exceed %d roots", MaxStorageChunkRoots)
 	}
 	set := StorageChunkSet{
-		ObjectID:   objectID,
-		ChunkRoots: ordered,
-		ChunkRoot:  ComputeStorageChunkRoot(ordered),
-		ChunkCount: uint32(len(ordered)),
+		ObjectID:	objectID,
+		ChunkRoots:	ordered,
+		ChunkRoot:	ComputeStorageChunkRoot(ordered),
+		ChunkCount:	uint32(len(ordered)),
 	}
 	return set, set.Validate()
 }
@@ -151,9 +151,9 @@ func NewStorageAccessReceipt(receipt StorageAccessReceipt) (StorageAccessReceipt
 
 func BuildStorageObjectCommitmentState(objects []StorageObject, receipts []StorageAccessReceipt, height uint64) (StorageObjectCommitmentState, error) {
 	state := StorageObjectCommitmentState{
-		Objects:  normalizeStorageObjects(objects),
-		Receipts: normalizeStorageReceipts(receipts),
-		Height:   height,
+		Objects:	normalizeStorageObjects(objects),
+		Receipts:	normalizeStorageReceipts(receipts),
+		Height:		height,
 	}
 	if err := state.ValidateFormat(); err != nil {
 		return StorageObjectCommitmentState{}, err

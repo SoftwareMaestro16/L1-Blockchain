@@ -25,10 +25,10 @@ func TestIdentityResolverOutputTypesValidateAndHash(t *testing.T) {
 	service := testIdentityGraphServiceEndpoint()
 	contract := NewContractTargetV2(ResolverKeyContract, addr(3), 12)
 	composite, err := NewCompositeIdentityObjectV2(CompositeIdentityObjectV2{
-		ObjectID:     "composite/alice",
-		NameHash:     nameHash,
-		ComponentIDs: []string{"account/" + identityHash("account"), "service/svc-pay"},
-		MetadataHash: identityHash("composite-metadata"),
+		ObjectID:	"composite/alice",
+		NameHash:	nameHash,
+		ComponentIDs:	[]string{"account/" + identityHash("account"), "service/svc-pay"},
+		MetadataHash:	identityHash("composite-metadata"),
 	})
 	require.NoError(t, err)
 
@@ -87,10 +87,10 @@ func TestIdentityGraphRejectsTamperedEdgeTargetHash(t *testing.T) {
 
 func TestIdentityGraphRejectsUnknownOutputType(t *testing.T) {
 	_, err := NewIdentityResolverOutputV2(IdentityResolverOutputV2{
-		OutputID:   "bad/output",
-		NameHash:   identityHash("alice.aet"),
-		OutputType: "bad",
-		Height:     12,
+		OutputID:	"bad/output",
+		NameHash:	identityHash("alice.aet"),
+		OutputType:	"bad",
+		Height:		12,
 	})
 	require.ErrorContains(t, err, "unknown identity resolver output type")
 }
@@ -99,9 +99,9 @@ func testIdentityGraphUnifiedRecord(t *testing.T) UnifiedResolutionRecordV2 {
 	t.Helper()
 	nameHash := identityHash("alice.aet")
 	record := UnifiedResolutionRecordV2{
-		NameHash:       nameHash,
-		Owner:          addr(1),
-		PrimaryAddress: addr(2),
+		NameHash:	nameHash,
+		Owner:		addr(1),
+		PrimaryAddress:	addr(2),
 		ContractTargets: []ContractTargetV2{
 			NewContractTargetV2(ResolverKeyContract, addr(3), 12),
 		},
@@ -109,17 +109,17 @@ func testIdentityGraphUnifiedRecord(t *testing.T) UnifiedResolutionRecordV2 {
 			testIdentityGraphServiceEndpoint(),
 		},
 		RoutingMetadata: RoutingMetadataV2{
-			ZoneID:          "IDENTITY_ZONE",
-			ShardID:         "0001",
-			RouteID:         "resolve",
-			TargetType:      string(IdentityResolutionTargetRoute),
-			PreferredTarget: "identity/alice",
+			ZoneID:			"IDENTITY_ZONE",
+			ShardID:		"0001",
+			RouteID:		"resolve",
+			TargetType:		string(IdentityResolutionTargetRoute),
+			PreferredTarget:	"identity/alice",
 		},
-		RecordVersion:   1,
-		RecordTTL:       30,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		1,
+		RecordTTL:		30,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 	return record
@@ -127,15 +127,15 @@ func testIdentityGraphUnifiedRecord(t *testing.T) UnifiedResolutionRecordV2 {
 
 func testIdentityGraphServiceEndpoint() ServiceEndpointV2 {
 	return ServiceEndpointV2{
-		Key:         "svc-pay",
-		Endpoint:    "https://pay.alice.aet",
-		ServiceID:   "svc-pay",
-		ServiceType: "payment.v1",
-		Transport:   "https",
-		AuthPolicy:  "none",
-		Priority:    10,
-		Weight:      1,
-		TTL:         30,
+		Key:		"svc-pay",
+		Endpoint:	"https://pay.alice.aet",
+		ServiceID:	"svc-pay",
+		ServiceType:	"payment.v1",
+		Transport:	"https",
+		AuthPolicy:	"none",
+		Priority:	10,
+		Weight:		1,
+		TTL:		30,
 	}
 }
 

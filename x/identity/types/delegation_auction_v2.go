@@ -9,16 +9,16 @@ import (
 )
 
 const (
-	MaxDelegationPermissionsV2       = 16
-	MaxDelegationPermissionBytesV2   = 48
-	MaxDelegationRecordPrefixBytesV2 = 48
-	MaxAuctionFeeSplitIDBytesV2      = 64
+	MaxDelegationPermissionsV2		= 16
+	MaxDelegationPermissionBytesV2		= 48
+	MaxDelegationRecordPrefixBytesV2	= 48
+	MaxAuctionFeeSplitIDBytesV2		= 64
 
-	DelegationRecordVersionV2 uint64 = 1
+	DelegationRecordVersionV2	uint64	= 1
 
-	DelegationPermissionCreateV2         = "create"
-	DelegationPermissionRenewZoneV2      = "renew"
-	DelegationPermissionTransferParentV2 = "transfer_parent"
+	DelegationPermissionCreateV2		= "create"
+	DelegationPermissionRenewZoneV2		= "renew"
+	DelegationPermissionTransferParentV2	= "transfer_parent"
 )
 
 type DelegationScopeBitsV2 uint64
@@ -26,17 +26,17 @@ type DelegationScopeBitsV2 uint64
 type DelegationScopeV2 string
 
 const (
-	DelegationScopeResolverUpdate        DelegationScopeV2 = "resolver_update"
-	DelegationScopeSubdomainCreate       DelegationScopeV2 = "subdomain_create"
-	DelegationScopeSubdomainTransfer     DelegationScopeV2 = "subdomain_transfer"
-	DelegationScopeServiceRecordUpdate   DelegationScopeV2 = "service_record_update"
-	DelegationScopeInterfaceRecordUpdate DelegationScopeV2 = "interface_record_update"
-	DelegationScopeRoutingRecordUpdate   DelegationScopeV2 = "routing_record_update"
-	DelegationScopeZoneAdmin             DelegationScopeV2 = "zone_admin"
+	DelegationScopeResolverUpdate		DelegationScopeV2	= "resolver_update"
+	DelegationScopeSubdomainCreate		DelegationScopeV2	= "subdomain_create"
+	DelegationScopeSubdomainTransfer	DelegationScopeV2	= "subdomain_transfer"
+	DelegationScopeServiceRecordUpdate	DelegationScopeV2	= "service_record_update"
+	DelegationScopeInterfaceRecordUpdate	DelegationScopeV2	= "interface_record_update"
+	DelegationScopeRoutingRecordUpdate	DelegationScopeV2	= "routing_record_update"
+	DelegationScopeZoneAdmin		DelegationScopeV2	= "zone_admin"
 )
 
 const (
-	DelegationScopeBitResolverUpdateV2 DelegationScopeBitsV2 = 1 << iota
+	DelegationScopeBitResolverUpdateV2	DelegationScopeBitsV2	= 1 << iota
 	DelegationScopeBitSubdomainCreateV2
 	DelegationScopeBitSubdomainTransferV2
 	DelegationScopeBitServiceRecordUpdateV2
@@ -46,52 +46,52 @@ const (
 )
 
 type DelegationRecordV2 struct {
-	NameHash              string
-	Delegate              sdk.AccAddress
-	Scope                 DelegationScopeV2
-	ScopeBits             DelegationScopeBitsV2
-	Permissions           []string
-	ExpiresAtHeight       uint64
-	SubtreeLimit          uint8
-	RecordPrefixLimit     string
-	CreatedAtHeight       uint64
-	TimeLockedUntilHeight uint64
-	DelegationVersion     uint64
-	CanTransferParent     bool
+	NameHash		string
+	Delegate		sdk.AccAddress
+	Scope			DelegationScopeV2
+	ScopeBits		DelegationScopeBitsV2
+	Permissions		[]string
+	ExpiresAtHeight		uint64
+	SubtreeLimit		uint8
+	RecordPrefixLimit	string
+	CreatedAtHeight		uint64
+	TimeLockedUntilHeight	uint64
+	DelegationVersion	uint64
+	CanTransferParent	bool
 }
 
 type PartialDelegationAuthorizationV2 struct {
-	Scope                     DelegationScopeV2
-	Permission                string
-	RecordKey                 string
-	ChildLabel                string
-	SubtreeDepth              uint8
-	Height                    uint64
-	ExpectedDelegationVersion uint64
+	Scope				DelegationScopeV2
+	Permission			string
+	RecordKey			string
+	ChildLabel			string
+	SubtreeDepth			uint8
+	Height				uint64
+	ExpectedDelegationVersion	uint64
 }
 
 type AuctionRecordV2Status string
 
 const (
-	AuctionRecordV2Commit    AuctionRecordV2Status = "commit"
-	AuctionRecordV2Reveal    AuctionRecordV2Status = "reveal"
-	AuctionRecordV2Finalized AuctionRecordV2Status = "finalized"
+	AuctionRecordV2Commit		AuctionRecordV2Status	= "commit"
+	AuctionRecordV2Reveal		AuctionRecordV2Status	= "reveal"
+	AuctionRecordV2Finalized	AuctionRecordV2Status	= "finalized"
 )
 
 type AuctionRecordV2 struct {
-	AuctionID             string
-	NameHash              string
-	Status                AuctionRecordV2Status
-	CommitStartHeight     uint64
-	CommitEndHeight       uint64
-	RevealStartHeight     uint64
-	RevealEndHeight       uint64
-	MinBid                uint64
-	WinningBid            uint64
-	Winner                sdk.AccAddress
-	SealedCommitmentsRoot string
-	RevealedBidsCount     uint64
-	FeeSplitID            string
+	AuctionID		string
+	NameHash		string
+	Status			AuctionRecordV2Status
+	CommitStartHeight	uint64
+	CommitEndHeight		uint64
+	RevealStartHeight	uint64
+	RevealEndHeight		uint64
+	MinBid			uint64
+	WinningBid		uint64
+	Winner			sdk.AccAddress
+	SealedCommitmentsRoot	string
+	RevealedBidsCount	uint64
+	FeeSplitID		string
 }
 
 func NewDelegationRecordV2(name string, delegate sdk.AccAddress, scope DelegationScopeV2, permissions []string, expiresAtHeight uint64, subtreeLimit uint8, recordPrefixLimit string, createdAtHeight uint64) (DelegationRecordV2, error) {
@@ -104,16 +104,16 @@ func NewDelegationRecordV2(name string, delegate sdk.AccAddress, scope Delegatio
 		return DelegationRecordV2{}, err
 	}
 	record := DelegationRecordV2{
-		NameHash:          nameHash,
-		Delegate:          cloneSpecAddress(delegate),
-		Scope:             scope,
-		ScopeBits:         DelegationScopeBitForScopeV2(scope),
-		Permissions:       sortStringSet(permissions),
-		ExpiresAtHeight:   expiresAtHeight,
-		SubtreeLimit:      subtreeLimit,
-		RecordPrefixLimit: recordPrefixLimit,
-		CreatedAtHeight:   createdAtHeight,
-		DelegationVersion: DelegationRecordVersionV2,
+		NameHash:		nameHash,
+		Delegate:		cloneSpecAddress(delegate),
+		Scope:			scope,
+		ScopeBits:		DelegationScopeBitForScopeV2(scope),
+		Permissions:		sortStringSet(permissions),
+		ExpiresAtHeight:	expiresAtHeight,
+		SubtreeLimit:		subtreeLimit,
+		RecordPrefixLimit:	recordPrefixLimit,
+		CreatedAtHeight:	createdAtHeight,
+		DelegationVersion:	DelegationRecordVersionV2,
 	}
 	return record, ValidateDelegationRecordV2(record)
 }
@@ -277,11 +277,11 @@ func ValidateDelegationDoesNotEscalateV2(parent DelegationRecordV2, child Delega
 
 func ValidateParentTransferByDelegationV2(record DelegationRecordV2, expectedVersion uint64, height uint64) error {
 	if err := ValidatePartialDelegationAuthorizationV2(record, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainTransfer,
-		Permission:                DelegationPermissionTransferParentV2,
-		RecordKey:                 DelegationPermissionTransferParentV2,
-		Height:                    height,
-		ExpectedDelegationVersion: expectedVersion,
+		Scope:				DelegationScopeSubdomainTransfer,
+		Permission:			DelegationPermissionTransferParentV2,
+		RecordKey:			DelegationPermissionTransferParentV2,
+		Height:				height,
+		ExpectedDelegationVersion:	expectedVersion,
 	}); err != nil {
 		return err
 	}
@@ -349,19 +349,19 @@ func BuildAuctionRecordV2(auction Auction, minBid uint64, feeSplitID string) (Au
 		return AuctionRecordV2{}, err
 	}
 	record := AuctionRecordV2{
-		AuctionID:             identityHash("identity-v2-auction", auction.Name, fmt.Sprintf("%020d", auction.CommitStartHeight)),
-		NameHash:              nameHash,
-		Status:                auctionRecordStatusFromPhaseV2(auction.Phase),
-		CommitStartHeight:     auction.CommitStartHeight,
-		CommitEndHeight:       auction.RevealStartHeight,
-		RevealStartHeight:     auction.RevealStartHeight,
-		RevealEndHeight:       auction.RevealEndHeight,
-		MinBid:                minBid,
-		WinningBid:            auction.WinningBid,
-		Winner:                cloneSpecAddress(auction.Winner),
-		SealedCommitmentsRoot: ComputeAuctionSealedCommitmentsRootV2(auction.Commitments),
-		RevealedBidsCount:     uint64(len(auction.Reveals)),
-		FeeSplitID:            feeSplitID,
+		AuctionID:		identityHash("identity-v2-auction", auction.Name, fmt.Sprintf("%020d", auction.CommitStartHeight)),
+		NameHash:		nameHash,
+		Status:			auctionRecordStatusFromPhaseV2(auction.Phase),
+		CommitStartHeight:	auction.CommitStartHeight,
+		CommitEndHeight:	auction.RevealStartHeight,
+		RevealStartHeight:	auction.RevealStartHeight,
+		RevealEndHeight:	auction.RevealEndHeight,
+		MinBid:			minBid,
+		WinningBid:		auction.WinningBid,
+		Winner:			cloneSpecAddress(auction.Winner),
+		SealedCommitmentsRoot:	ComputeAuctionSealedCommitmentsRootV2(auction.Commitments),
+		RevealedBidsCount:	uint64(len(auction.Reveals)),
+		FeeSplitID:		feeSplitID,
 	}
 	return record, ValidateAuctionRecordV2(record)
 }

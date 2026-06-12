@@ -14,31 +14,31 @@ const CoreMessageSpecVersion = uint64(1)
 type CoreMessageType string
 
 const (
-	CoreMsgZoneTransfer         CoreMessageType = "MsgZoneTransfer"
-	CoreMsgCrossZoneCall        CoreMessageType = "MsgCrossZoneCall"
-	CoreMsgShardCall            CoreMessageType = "MsgShardCall"
-	CoreMsgContractCall         CoreMessageType = "MsgContractCall"
-	CoreMsgIdentityLookup       CoreMessageType = "MsgIdentityLookup"
-	CoreMsgIdentityLookupResult CoreMessageType = "MsgIdentityLookupResult"
-	CoreMsgPaymentRoute         CoreMessageType = "MsgPaymentRoute"
-	CoreMsgPaymentSettle        CoreMessageType = "MsgPaymentSettle"
-	CoreMsgPromiseResolve       CoreMessageType = "MsgPromiseResolve"
-	CoreMsgPromiseTimeout       CoreMessageType = "MsgPromiseTimeout"
-	CoreMsgProofSubmit          CoreMessageType = "MsgProofSubmit"
-	CoreMsgBounce               CoreMessageType = "MsgBounce"
+	CoreMsgZoneTransfer		CoreMessageType	= "MsgZoneTransfer"
+	CoreMsgCrossZoneCall		CoreMessageType	= "MsgCrossZoneCall"
+	CoreMsgShardCall		CoreMessageType	= "MsgShardCall"
+	CoreMsgContractCall		CoreMessageType	= "MsgContractCall"
+	CoreMsgIdentityLookup		CoreMessageType	= "MsgIdentityLookup"
+	CoreMsgIdentityLookupResult	CoreMessageType	= "MsgIdentityLookupResult"
+	CoreMsgPaymentRoute		CoreMessageType	= "MsgPaymentRoute"
+	CoreMsgPaymentSettle		CoreMessageType	= "MsgPaymentSettle"
+	CoreMsgPromiseResolve		CoreMessageType	= "MsgPromiseResolve"
+	CoreMsgPromiseTimeout		CoreMessageType	= "MsgPromiseTimeout"
+	CoreMsgProofSubmit		CoreMessageType	= "MsgProofSubmit"
+	CoreMsgBounce			CoreMessageType	= "MsgBounce"
 )
 
 type CoreMessageTypeDescriptor struct {
-	MessageType    CoreMessageType
-	Purpose        string
-	PrimaryZone    string
-	DescriptorHash string
+	MessageType	CoreMessageType
+	Purpose		string
+	PrimaryZone	string
+	DescriptorHash	string
 }
 
 type CoreMessageTypeSpec struct {
-	Version uint64
-	Types   []CoreMessageTypeDescriptor
-	Root    string
+	Version	uint64
+	Types	[]CoreMessageTypeDescriptor
+	Root	string
 }
 
 func CoreMessageTypeDescriptors() []CoreMessageTypeDescriptor {
@@ -60,8 +60,8 @@ func CoreMessageTypeDescriptors() []CoreMessageTypeDescriptor {
 
 func BuildCoreMessageTypeSpec(types []CoreMessageTypeDescriptor) (CoreMessageTypeSpec, error) {
 	spec := CoreMessageTypeSpec{
-		Version: CoreMessageSpecVersion,
-		Types:   normalizeCoreMessageTypeDescriptors(types),
+		Version:	CoreMessageSpecVersion,
+		Types:		normalizeCoreMessageTypeDescriptors(types),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return CoreMessageTypeSpec{}, err
@@ -249,9 +249,9 @@ func ValidateCoreMessageTypeSpec() error {
 
 func coreMessageType(messageType CoreMessageType, purpose string, primaryZone string) CoreMessageTypeDescriptor {
 	desc, err := BuildCoreMessageTypeDescriptor(CoreMessageTypeDescriptor{
-		MessageType: messageType,
-		Purpose:     purpose,
-		PrimaryZone: primaryZone,
+		MessageType:	messageType,
+		Purpose:	purpose,
+		PrimaryZone:	primaryZone,
 	})
 	if err != nil {
 		panic(err)

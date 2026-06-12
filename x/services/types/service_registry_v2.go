@@ -9,107 +9,107 @@ import (
 )
 
 const (
-	ServiceDescriptorRegistryPrefix = ServiceStorePrefix + "descriptors"
-	ServiceInterfaceRegistryPrefix  = ServiceStorePrefix + "interfaces"
-	ServiceOwnerIndexPrefix         = ServiceStorePrefix + "owner_index"
-	ServiceZoneIndexPrefix          = ServiceStorePrefix + "zone_index"
-	ServiceMethodIndexPrefix        = ServiceStorePrefix + "method_index"
-	ServiceReceiptRegistryPrefix    = ServiceStorePrefix + "receipts"
+	ServiceDescriptorRegistryPrefix	= ServiceStorePrefix + "descriptors"
+	ServiceInterfaceRegistryPrefix	= ServiceStorePrefix + "interfaces"
+	ServiceOwnerIndexPrefix		= ServiceStorePrefix + "owner_index"
+	ServiceZoneIndexPrefix		= ServiceStorePrefix + "zone_index"
+	ServiceMethodIndexPrefix	= ServiceStorePrefix + "method_index"
+	ServiceReceiptRegistryPrefix	= ServiceStorePrefix + "receipts"
 )
 
 type ServiceRegistryIndexEntryV2 struct {
-	Key       string
-	Value     string
-	EntryHash string
+	Key		string
+	Value		string
+	EntryHash	string
 }
 
 type ServiceReceiptV2 struct {
-	ServiceID   string
-	ReceiptID   string
-	CallID      string
-	Status      string
-	ResultHash  string
-	Height      uint64
-	ReceiptHash string
+	ServiceID	string
+	ReceiptID	string
+	CallID		string
+	Status		string
+	ResultHash	string
+	Height		uint64
+	ReceiptHash	string
 }
 
 type ServiceIdentityBindingV2 struct {
-	ServiceID    string
-	IdentityName string
-	Owner        string
-	BoundHeight  uint64
-	BindingHash  string
+	ServiceID	string
+	IdentityName	string
+	Owner		string
+	BoundHeight	uint64
+	BindingHash	string
 }
 
 type ServiceRegistryStateV2 struct {
-	Descriptors      []CanonicalServiceDescriptor
-	Interfaces       []DistributedInterfaceDescriptor
-	OwnerIndex       []ServiceRegistryIndexEntryV2
-	ZoneIndex        []ServiceRegistryIndexEntryV2
-	MethodIndex      []ServiceRegistryIndexEntryV2
-	Receipts         []ServiceReceiptV2
-	IdentityBindings []ServiceIdentityBindingV2
-	Height           uint64
-	StateRoot        string
+	Descriptors		[]CanonicalServiceDescriptor
+	Interfaces		[]DistributedInterfaceDescriptor
+	OwnerIndex		[]ServiceRegistryIndexEntryV2
+	ZoneIndex		[]ServiceRegistryIndexEntryV2
+	MethodIndex		[]ServiceRegistryIndexEntryV2
+	Receipts		[]ServiceReceiptV2
+	IdentityBindings	[]ServiceIdentityBindingV2
+	Height			uint64
+	StateRoot		string
 }
 
 type ServiceRegistryRootsV2 struct {
-	DescriptorRoot string
-	InterfaceRoot  string
-	OwnerRoot      string
-	ZoneRoot       string
-	MethodRoot     string
-	ReceiptRoot    string
-	BindingRoot    string
-	StateRoot      string
+	DescriptorRoot	string
+	InterfaceRoot	string
+	OwnerRoot	string
+	ZoneRoot	string
+	MethodRoot	string
+	ReceiptRoot	string
+	BindingRoot	string
+	StateRoot	string
 }
 
 type ServiceRegistryProofV2 struct {
-	Query       string
-	Key         string
-	ValueHash   string
-	Root        string
-	Height      uint64
-	ProofHashes []string
+	Query		string
+	Key		string
+	ValueHash	string
+	Root		string
+	Height		uint64
+	ProofHashes	[]string
 }
 
 type MsgRegisterServiceV2 struct {
-	Authority  string
-	Descriptor CanonicalServiceDescriptor
+	Authority	string
+	Descriptor	CanonicalServiceDescriptor
 }
 
 type MsgUpdateServiceV2 struct {
-	Authority  string
-	Descriptor CanonicalServiceDescriptor
+	Authority	string
+	Descriptor	CanonicalServiceDescriptor
 }
 
 type MsgDisableServiceV2 struct {
-	Authority string
-	ServiceID string
-	Height    uint64
+	Authority	string
+	ServiceID	string
+	Height		uint64
 }
 
 type MsgRegisterInterfaceV2 struct {
-	Authority  string
-	Descriptor DistributedInterfaceDescriptor
+	Authority	string
+	Descriptor	DistributedInterfaceDescriptor
 }
 
 type MsgUpdateInterfaceV2 struct {
-	Authority  string
-	Descriptor DistributedInterfaceDescriptor
+	Authority	string
+	Descriptor	DistributedInterfaceDescriptor
 }
 
 type MsgBindServiceToIdentityV2 struct {
-	Authority    string
-	ServiceID    string
-	IdentityName string
-	Height       uint64
+	Authority	string
+	ServiceID	string
+	IdentityName	string
+	Height		uint64
 }
 
 type MsgUnbindServiceFromIdentityV2 struct {
-	Authority    string
-	ServiceID    string
-	IdentityName string
+	Authority	string
+	ServiceID	string
+	IdentityName	string
 }
 
 type QueryServiceV2 struct {
@@ -216,11 +216,11 @@ func NewServiceIdentityBindingV2(binding ServiceIdentityBindingV2) (ServiceIdent
 
 func BuildServiceRegistryStateV2(descriptors []CanonicalServiceDescriptor, interfaces []DistributedInterfaceDescriptor, receipts []ServiceReceiptV2, bindings []ServiceIdentityBindingV2, height uint64) (ServiceRegistryStateV2, error) {
 	state := ServiceRegistryStateV2{
-		Descriptors:      normalizeServiceRegistryDescriptorsV2(descriptors),
-		Interfaces:       normalizeDistributedInterfaces(interfaces),
-		Receipts:         normalizeServiceReceiptsV2(receipts),
-		IdentityBindings: normalizeServiceIdentityBindingsV2(bindings),
-		Height:           height,
+		Descriptors:		normalizeServiceRegistryDescriptorsV2(descriptors),
+		Interfaces:		normalizeDistributedInterfaces(interfaces),
+		Receipts:		normalizeServiceReceiptsV2(receipts),
+		IdentityBindings:	normalizeServiceIdentityBindingsV2(bindings),
+		Height:			height,
 	}
 	if err := state.rebuildIndexes(); err != nil {
 		return ServiceRegistryStateV2{}, err
@@ -321,10 +321,10 @@ func BindServiceToIdentityInRegistryV2(state ServiceRegistryStateV2, msg MsgBind
 		return ServiceRegistryStateV2{}, errors.New("service registry bind authority must own service")
 	}
 	binding, err := NewServiceIdentityBindingV2(ServiceIdentityBindingV2{
-		ServiceID:    msg.ServiceID,
-		IdentityName: msg.IdentityName,
-		Owner:        msg.Authority,
-		BoundHeight:  firstPositiveHeight(msg.Height, height),
+		ServiceID:	msg.ServiceID,
+		IdentityName:	msg.IdentityName,
+		Owner:		msg.Authority,
+		BoundHeight:	firstPositiveHeight(msg.Height, height),
 	})
 	if err != nil {
 		return ServiceRegistryStateV2{}, err
@@ -422,12 +422,12 @@ func QueryServiceProofFromRegistryV2(state ServiceRegistryStateV2, query QuerySe
 		return ServiceRegistryProofV2{}, fmt.Errorf("service registry proof key %s not found", query.Key)
 	}
 	return ServiceRegistryProofV2{
-		Query:       "QueryServiceProof",
-		Key:         query.Key,
-		ValueHash:   entryHash,
-		Root:        state.StateRoot,
-		Height:      state.Height,
-		ProofHashes: proofHashes,
+		Query:		"QueryServiceProof",
+		Key:		query.Key,
+		ValueHash:	entryHash,
+		Root:		state.StateRoot,
+		Height:		state.Height,
+		ProofHashes:	proofHashes,
 	}, nil
 }
 
@@ -614,13 +614,13 @@ func ComputeServiceIdentityBindingRootV2(bindings []ServiceIdentityBindingV2) st
 
 func ComputeServiceRegistryRootsV2(state ServiceRegistryStateV2) ServiceRegistryRootsV2 {
 	roots := ServiceRegistryRootsV2{
-		DescriptorRoot: ComputeServiceRegistryDescriptorRootV2(state.Descriptors),
-		InterfaceRoot:  ComputeServiceRegistryInterfaceRootV2(state.Interfaces),
-		OwnerRoot:      ComputeServiceRegistryIndexRootV2("owner", state.OwnerIndex),
-		ZoneRoot:       ComputeServiceRegistryIndexRootV2("zone", state.ZoneIndex),
-		MethodRoot:     ComputeServiceRegistryIndexRootV2("method", state.MethodIndex),
-		ReceiptRoot:    ComputeServiceReceiptRootV2(state.Receipts),
-		BindingRoot:    ComputeServiceIdentityBindingRootV2(state.IdentityBindings),
+		DescriptorRoot:	ComputeServiceRegistryDescriptorRootV2(state.Descriptors),
+		InterfaceRoot:	ComputeServiceRegistryInterfaceRootV2(state.Interfaces),
+		OwnerRoot:	ComputeServiceRegistryIndexRootV2("owner", state.OwnerIndex),
+		ZoneRoot:	ComputeServiceRegistryIndexRootV2("zone", state.ZoneIndex),
+		MethodRoot:	ComputeServiceRegistryIndexRootV2("method", state.MethodIndex),
+		ReceiptRoot:	ComputeServiceReceiptRootV2(state.Receipts),
+		BindingRoot:	ComputeServiceIdentityBindingRootV2(state.IdentityBindings),
 	}
 	roots.StateRoot = servicesHashParts(
 		"aetra-services-registry-state-root-v1",
@@ -929,57 +929,57 @@ func serviceRegistryProofEntryV2(state ServiceRegistryStateV2, key string) (stri
 }
 
 func serviceRegistryProofEntriesV2(state ServiceRegistryStateV2) []struct {
-	Key       string
-	ValueHash string
+	Key		string
+	ValueHash	string
 } {
 	entries := []struct {
-		Key       string
-		ValueHash string
+		Key		string
+		ValueHash	string
 	}{}
 	for _, descriptor := range state.Descriptors {
 		key, _ := ServiceDescriptorV2Key(descriptor.ServiceID)
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: key, ValueHash: descriptor.DescriptorHash})
 	}
 	for _, iface := range state.Interfaces {
 		key, _ := ServiceInterfaceV2Key(iface.InterfaceHash)
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: key, ValueHash: iface.DescriptorHash})
 	}
 	for _, entry := range state.OwnerIndex {
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: entry.Key, ValueHash: entry.EntryHash})
 	}
 	for _, entry := range state.ZoneIndex {
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: entry.Key, ValueHash: entry.EntryHash})
 	}
 	for _, entry := range state.MethodIndex {
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: entry.Key, ValueHash: entry.EntryHash})
 	}
 	for _, receipt := range state.Receipts {
 		key, _ := ServiceReceiptV2Key(receipt.ServiceID, receipt.ReceiptID)
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: key, ValueHash: receipt.ReceiptHash})
 	}
 	for _, binding := range state.IdentityBindings {
 		key := ServiceStorePrefix + "identity_bindings/" + binding.ServiceID + "/" + binding.IdentityName
 		entries = append(entries, struct {
-			Key       string
-			ValueHash string
+			Key		string
+			ValueHash	string
 		}{Key: key, ValueHash: binding.BindingHash})
 	}
 	return entries

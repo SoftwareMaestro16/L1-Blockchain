@@ -11,57 +11,57 @@ func TestPartialDelegationV2ScopesVersionAndPrefixBoundLabels(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, DelegationRecordVersionV2, prefix.DelegationVersion)
 	require.NoError(t, ValidatePartialDelegationAuthorizationV2(prefix, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainCreate,
-		ChildLabel:                "svcapi",
-		SubtreeDepth:              1,
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeSubdomainCreate,
+		ChildLabel:			"svcapi",
+		SubtreeDepth:			1,
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}))
 	require.ErrorContains(t, ValidatePartialDelegationAuthorizationV2(prefix, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainCreate,
-		ChildLabel:                "api",
-		SubtreeDepth:              1,
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeSubdomainCreate,
+		ChildLabel:			"api",
+		SubtreeDepth:			1,
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}), "child label prefix")
 	require.ErrorContains(t, ValidatePartialDelegationAuthorizationV2(prefix, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainCreate,
-		ChildLabel:                "svcapi",
-		SubtreeDepth:              1,
-		Height:                    20,
-		ExpectedDelegationVersion: 2,
+		Scope:				DelegationScopeSubdomainCreate,
+		ChildLabel:			"svcapi",
+		SubtreeDepth:			1,
+		Height:				20,
+		ExpectedDelegationVersion:	2,
 	}), "version conflict")
 
 	specific, err := NewDelegationRecordV2("alice.aet", addr(7), DelegationScopeSubdomainCreate, []string{"label.api"}, 100, 2, "", 10)
 	require.NoError(t, err)
 	require.NoError(t, ValidatePartialDelegationAuthorizationV2(specific, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainCreate,
-		ChildLabel:                "api",
-		SubtreeDepth:              1,
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeSubdomainCreate,
+		ChildLabel:			"api",
+		SubtreeDepth:			1,
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}))
 	require.ErrorContains(t, ValidatePartialDelegationAuthorizationV2(specific, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeSubdomainCreate,
-		ChildLabel:                "www",
-		SubtreeDepth:              1,
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeSubdomainCreate,
+		ChildLabel:			"www",
+		SubtreeDepth:			1,
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}), "does not allow child label")
 
 	service, err := NewDelegationRecordV2("alice.aet", addr(8), DelegationScopeServiceRecordUpdate, []string{"service.rpc"}, 100, 1, "service.", 10)
 	require.NoError(t, err)
 	require.NoError(t, ValidatePartialDelegationAuthorizationV2(service, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeServiceRecordUpdate,
-		RecordKey:                 "service.rpc",
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeServiceRecordUpdate,
+		RecordKey:			"service.rpc",
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}))
 	require.ErrorContains(t, ValidatePartialDelegationAuthorizationV2(service, PartialDelegationAuthorizationV2{
-		Scope:                     DelegationScopeRoutingRecordUpdate,
-		RecordKey:                 "service.rpc",
-		Height:                    20,
-		ExpectedDelegationVersion: DelegationRecordVersionV2,
+		Scope:				DelegationScopeRoutingRecordUpdate,
+		RecordKey:			"service.rpc",
+		Height:				20,
+		ExpectedDelegationVersion:	DelegationRecordVersionV2,
 	}), "scope mismatch")
 }
 
@@ -91,26 +91,26 @@ func TestPartialDelegationV2RejectsEscalationAndParentTransferWithoutGrant(t *te
 func TestZonePolicyV2InheritanceLimitsCacheInvalidationAndRecursiveProof(t *testing.T) {
 	state, _ := registerSpecDomain(t, "alice", addr(1), "salt", 10)
 	state, subdomain, err := IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:     "alice.aet",
-		Label:          "api",
-		Actor:          addr(1),
-		ChildOwner:     addr(2),
-		Height:         20,
-		DelegationType: SubdomainDelegationOwnerControlledV2,
+		ParentName:	"alice.aet",
+		Label:		"api",
+		Actor:		addr(1),
+		ChildOwner:	addr(2),
+		Height:		20,
+		DelegationType:	SubdomainDelegationOwnerControlledV2,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, state.Domains)
 
 	parentPolicy, err := NewZonePolicyV2("alice.aet", ZonePolicyV2{
-		AllowedRecordTypes:      []string{"primary", "service"},
-		AllowedServiceTypes:     []string{"rpc.v1"},
-		SubdomainCreationPolicy: ZoneSubdomainCreationDelegatedV2,
-		ResolverUpdatePolicy:    ZoneResolverUpdateDelegatedV2,
-		InterfacePolicy:         ZoneInterfacePolicyHashRequiredV2,
-		RoutingPolicy:           ZoneRoutingPolicyExplicitTargetsV2,
-		MaxChildDepth:           2,
-		MaxChildRecords:         5,
-		UpdatedAtHeight:         20,
+		AllowedRecordTypes:		[]string{"primary", "service"},
+		AllowedServiceTypes:		[]string{"rpc.v1"},
+		SubdomainCreationPolicy:	ZoneSubdomainCreationDelegatedV2,
+		ResolverUpdatePolicy:		ZoneResolverUpdateDelegatedV2,
+		InterfacePolicy:		ZoneInterfacePolicyHashRequiredV2,
+		RoutingPolicy:			ZoneRoutingPolicyExplicitTargetsV2,
+		MaxChildDepth:			2,
+		MaxChildRecords:		5,
+		UpdatedAtHeight:		20,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateZonePolicyForSubdomainV2(parentPolicy, subdomain, 1, 2, "primary", "rpc.v1"))
@@ -119,17 +119,17 @@ func TestZonePolicyV2InheritanceLimitsCacheInvalidationAndRecursiveProof(t *test
 	require.ErrorContains(t, ValidateZonePolicyForSubdomainV2(parentPolicy, subdomain, 1, 2, "primary", "grpc.v1"), "disallows service")
 
 	childPolicy, err := NewZonePolicyV2("api.alice.aet", ZonePolicyV2{
-		AllowedRecordTypes:      []string{"primary"},
-		AllowedServiceTypes:     []string{"graphql.v1"},
-		SubdomainCreationPolicy: ZoneSubdomainCreationOwnerOnlyV2,
-		ResolverUpdatePolicy:    ZoneResolverUpdateOwnerOnlyV2,
-		InterfacePolicy:         ZoneInterfacePolicyWalletPolicyV2,
-		RoutingPolicy:           ZoneRoutingPolicyWalletPolicyV2,
-		MaxChildDepth:           1,
-		MaxChildRecords:         2,
-		UpdatedAtHeight:         21,
-		ParentPolicyHash:        parentPolicy.PolicyHash,
-		OverrideParent:          true,
+		AllowedRecordTypes:		[]string{"primary"},
+		AllowedServiceTypes:		[]string{"graphql.v1"},
+		SubdomainCreationPolicy:	ZoneSubdomainCreationOwnerOnlyV2,
+		ResolverUpdatePolicy:		ZoneResolverUpdateOwnerOnlyV2,
+		InterfacePolicy:		ZoneInterfacePolicyWalletPolicyV2,
+		RoutingPolicy:			ZoneRoutingPolicyWalletPolicyV2,
+		MaxChildDepth:			1,
+		MaxChildRecords:		2,
+		UpdatedAtHeight:		21,
+		ParentPolicyHash:		parentPolicy.PolicyHash,
+		OverrideParent:			true,
 	})
 	require.NoError(t, err)
 	subdomain.Detached = true

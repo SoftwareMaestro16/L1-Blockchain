@@ -43,10 +43,10 @@ func TestValidatorElectionStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	electionGenesis := validatorelectionkeeper.DefaultGenesis()
 	consensusKey := electionConsensusKeyHex(0x31)
 	electionGenesis.State.CurrentValidatorSet = []validatorelectiontypes.ValidatorPower{{
-		OperatorAddress:    rawElectionAddress("11"),
-		ConsensusPublicKey: consensusKey,
-		VotingPower:        100,
-		ValidatorStatus:    validatorregistrytypes.StatusActive,
+		OperatorAddress:	rawElectionAddress("11"),
+		ConsensusPublicKey:	consensusKey,
+		VotingPower:		100,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	}}
 	electionGenesis.State = electionGenesis.State.Normalize(electionGenesis.Params)
 	require.NoError(t, electionGenesis.Validate())
@@ -57,15 +57,15 @@ func TestValidatorElectionStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()
@@ -88,10 +88,10 @@ func TestValidatorElectionCurrentSetControlsFinalizeBlockValidatorUpdates(t *tes
 
 	electionGenesis := validatorelectionkeeper.DefaultGenesis()
 	electionGenesis.State.CurrentValidatorSet = []validatorelectiontypes.ValidatorPower{{
-		OperatorAddress:    rawElectionAddress("42"),
-		ConsensusPublicKey: electionKey,
-		VotingPower:        77,
-		ValidatorStatus:    validatorregistrytypes.StatusActive,
+		OperatorAddress:	rawElectionAddress("42"),
+		ConsensusPublicKey:	electionKey,
+		VotingPower:		77,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	}}
 	electionGenesis.State = electionGenesis.State.Normalize(electionGenesis.Params)
 	require.NoError(t, electionGenesis.Validate())
@@ -102,15 +102,15 @@ func TestValidatorElectionCurrentSetControlsFinalizeBlockValidatorUpdates(t *tes
 	require.NoError(t, err)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	res, err := app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   app.LastCommitID().Hash,
+		Height:	1,
+		Hash:	app.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.ValidatorUpdates)
@@ -139,10 +139,10 @@ func TestValidatorElectionMalformedConsensusKeyRejectsFinalizeBlock(t *testing.T
 
 	electionGenesis := validatorelectionkeeper.DefaultGenesis()
 	electionGenesis.State.CurrentValidatorSet = []validatorelectiontypes.ValidatorPower{{
-		OperatorAddress:    rawElectionAddress("55"),
-		ConsensusPublicKey: "ed25519:not-a-32-byte-key",
-		VotingPower:        1,
-		ValidatorStatus:    validatorregistrytypes.StatusActive,
+		OperatorAddress:	rawElectionAddress("55"),
+		ConsensusPublicKey:	"ed25519:not-a-32-byte-key",
+		VotingPower:		1,
+		ValidatorStatus:	validatorregistrytypes.StatusActive,
 	}}
 	electionGenesis.State = electionGenesis.State.Normalize(electionGenesis.Params)
 	require.NoError(t, electionGenesis.Validate())
@@ -153,15 +153,15 @@ func TestValidatorElectionMalformedConsensusKeyRejectsFinalizeBlock(t *testing.T
 	require.NoError(t, err)
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   app.LastCommitID().Hash,
+		Height:	1,
+		Hash:	app.LastCommitID().Hash,
 	})
 	require.ErrorContains(t, err, "ed25519 public key must be exactly 32 bytes")
 }

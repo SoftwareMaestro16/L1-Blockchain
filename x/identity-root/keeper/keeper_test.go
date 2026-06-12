@@ -14,8 +14,8 @@ import (
 const authority = prototype.DefaultAuthority
 
 var (
-	ownerA = mustAE("11")
-	ownerB = mustAE("22")
+	ownerA	= mustAE("11")
+	ownerB	= mustAE("22")
 )
 
 func setupKeeper(t *testing.T) Keeper {
@@ -178,14 +178,14 @@ func TestNFTBindingRequiredWhenEnabled(t *testing.T) {
 	_, err := k.RegisterName(types.MsgRegisterName{Owner: ownerA, Name: "alice", Height: 10})
 	require.ErrorContains(t, err, "NFT binding")
 	record, err := k.RegisterName(types.MsgRegisterName{
-		Owner:  ownerA,
-		Name:   "alice",
-		Height: 10,
+		Owner:	ownerA,
+		Name:	"alice",
+		Height:	10,
 		NFTBinding: types.IdentityNFTBindingReference{
-			Enabled: true,
-			ClassID: "identity",
-			NFTID:   "alice",
-			Owner:   ownerA,
+			Enabled:	true,
+			ClassID:	"identity",
+			NFTID:		"alice",
+			Owner:		ownerA,
 		},
 	})
 	require.NoError(t, err)

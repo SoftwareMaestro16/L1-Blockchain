@@ -30,7 +30,6 @@ func TestLaunchModuleInventoryCoversAllModules(t *testing.T) {
 		t.Fatalf("error reading launch-module-inventory.md: %v", err)
 	}
 
-	// List all x/* directories
 	entries, err := os.ReadDir("..")
 	if err != nil {
 		t.Skip("Cannot read x/ directory")
@@ -46,8 +45,7 @@ func TestLaunchModuleInventoryCoversAllModules(t *testing.T) {
 		}
 	}
 
-	// Allow some modules to be intentionally not documented
-	knownMissing := []string{"internal", "memo"} // internal packages don't need docs
+	knownMissing := []string{"internal", "memo"}
 	for _, m := range knownMissing {
 		for i, mm := range missingModules {
 			if mm == m {
@@ -60,7 +58,6 @@ func TestLaunchModuleInventoryCoversAllModules(t *testing.T) {
 		t.Errorf("launch-module-inventory.md missing many modules: %v", missingModules[:5])
 	}
 }
-
 
 // TestLaunchModuleInventoryPrototypeModulesMarked verifies prototype modules are marked
 func TestLaunchModuleInventoryPrototypeModulesMarked(t *testing.T) {
@@ -82,7 +79,7 @@ func TestLaunchModuleInventoryPrototypeModulesMarked(t *testing.T) {
 
 	for _, module := range prototypeModules {
 		if strings.Contains(text, module) {
-			// Check if it's marked as prototype_only
+
 			moduleSection := extractSectionAround(text, module, 500)
 			if !strings.Contains(strings.ToLower(moduleSection), "prototype") &&
 				!strings.Contains(strings.ToLower(moduleSection), "in-memory") {
@@ -91,7 +88,6 @@ func TestLaunchModuleInventoryPrototypeModulesMarked(t *testing.T) {
 		}
 	}
 }
-
 
 // extractSectionAround extracts text around a pattern for context analysis
 func extractSectionAround(text, pattern string, window int) string {
@@ -121,7 +117,6 @@ func TestTestnetKernelDocExists(t *testing.T) {
 		t.Fatalf("error checking TESTNET.md: %v", err)
 	}
 }
-
 
 // TestTestnetKernelPoolStakingMentioned verifies pool deposit is mentioned
 func TestTestnetKernelPoolStakingMentioned(t *testing.T) {
@@ -187,7 +182,6 @@ func TestTestnetKernelNoDirectDelegation(t *testing.T) {
 
 	text := strings.ToLower(string(content))
 
-	// Must mention that direct delegation is disabled
 	hasDirectDelegationMention := strings.Contains(text, "no direct") ||
 		strings.Contains(text, "disabled") ||
 		strings.Contains(text, "not available") ||

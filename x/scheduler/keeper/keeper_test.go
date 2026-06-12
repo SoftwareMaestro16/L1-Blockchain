@@ -23,8 +23,8 @@ func TestOnlyAuthorizedModulesCanRegisterJobs(t *testing.T) {
 	job := testJob("unauthorized", "job", schedulertypes.JobTypeDelayed, 10)
 
 	err := k.RegisterScheduledJob(schedulertypes.MsgRegisterScheduledJob{
-		Authority: prototype.DefaultAuthority,
-		Job:       job,
+		Authority:	prototype.DefaultAuthority,
+		Job:		job,
 	})
 	require.ErrorContains(t, err, "not authorized")
 }
@@ -176,12 +176,12 @@ func execute(height uint64) schedulertypes.MsgExecuteDueJobs {
 
 func testJob(owner, id, jobType string, nextHeight uint64) schedulertypes.ScheduledJob {
 	return schedulertypes.ScheduledJob{
-		ID:                  id,
-		OwnerModule:         owner,
-		Type:                jobType,
-		NextExecutionHeight: nextHeight,
-		Interval:            5,
-		MaxGas:              100,
-		RetryPolicy:         schedulertypes.RetryPolicy{MaxRetries: 1, BackoffInterval: 2},
+		ID:			id,
+		OwnerModule:		owner,
+		Type:			jobType,
+		NextExecutionHeight:	nextHeight,
+		Interval:		5,
+		MaxGas:			100,
+		RetryPolicy:		schedulertypes.RetryPolicy{MaxRetries: 1, BackoffInterval: 2},
 	}
 }

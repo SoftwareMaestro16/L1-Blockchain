@@ -18,10 +18,6 @@ import (
 	treasurytypes "github.com/sovereign-l1/l1/x/treasury/types"
 )
 
-// ---------------------------------------------------------------------------
-// Task 10: Failing fixture tests for economic invariants
-// ---------------------------------------------------------------------------
-
 func TestEmissionCapInvariantFailsOnExcessMinting(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false)
@@ -35,14 +31,14 @@ func TestEmissionCapInvariantFailsOnExcessMinting(t *testing.T) {
 	fakeGenesis.TotalMintedAccounting = excessCoin
 	fakeGenesis.EpochHistory = []emissionstypes.EmissionEpoch{
 		{
-			Epoch:             1,
-			EmissionAmount:    excessCoin,
-			ValidatorReward:   excessCoin,
-			Treasury:          sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
-			ProtectionFund:    sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
-			Burn:              sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
-			Ecosystem:         sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
-			RoundingRemainder: sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
+			Epoch:			1,
+			EmissionAmount:		excessCoin,
+			ValidatorReward:	excessCoin,
+			Treasury:		sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
+			ProtectionFund:		sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
+			Burn:			sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
+			Ecosystem:		sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
+			RoundingRemainder:	sdk.NewCoin(emParams.BaseDenom, sdkmath.ZeroInt()),
 		},
 	}
 	importedApp := Setup(t, false)
@@ -98,8 +94,8 @@ func TestFeeCollectorAccountingInvariantFailsOnMismatch(t *testing.T) {
 	gs, err := app.FeeCollectorKeeper.ExportGenesis(ctx)
 	require.NoError(t, err)
 	gs.Balances = feecollectortypes.FeeBalances{
-		GasFees:        sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 999)),
-		TotalCollected: sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 999)),
+		GasFees:	sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 999)),
+		TotalCollected:	sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 999)),
 	}
 	gs.PendingDistribution = feecollectortypes.PendingDistribution{
 		Treasury: sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 999)),
@@ -119,15 +115,15 @@ func TestRentReserveBalanceInvariantFailsOnAlertState(t *testing.T) {
 	gs, err := app.StorageRentKeeper.ExportGenesisState(ctx)
 	require.NoError(t, err)
 	gs.State.SystemReserve = storagerenttypes.SystemRentReserve{
-		AvailableFunds:                   0,
-		ProjectedRentPerBlock:            100,
-		WarningRunwayBlocks:              100,
-		CriticalRunwayBlocks:             10,
-		RequiredTopUp:                    1_000,
-		FeeCollectorBalance:              0,
-		TreasuryBalance:                  0,
-		GovernanceConfiguredPayerBalance: 0,
-		ProtocolCriticalExecutable:       false,
+		AvailableFunds:				0,
+		ProjectedRentPerBlock:			100,
+		WarningRunwayBlocks:			100,
+		CriticalRunwayBlocks:			10,
+		RequiredTopUp:				1_000,
+		FeeCollectorBalance:			0,
+		TreasuryBalance:			0,
+		GovernanceConfiguredPayerBalance:	0,
+		ProtocolCriticalExecutable:		false,
 	}
 	importedApp := Setup(t, false)
 	importedCtx := importedApp.NewContext(false)
@@ -136,10 +132,6 @@ func TestRentReserveBalanceInvariantFailsOnAlertState(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "storage rent system reserve is in invariant alert state")
 }
-
-// ---------------------------------------------------------------------------
-// Task 11: Roundtrip export/import tests for each economic module
-// ---------------------------------------------------------------------------
 
 func TestFeesModuleGenesisRoundTrip(t *testing.T) {
 	app := Setup(t, false)
@@ -247,30 +239,22 @@ func TestStorageRentModuleGenesisRoundTrip(t *testing.T) {
 	require.Equal(t, original, reexported)
 }
 
-// ---------------------------------------------------------------------------
-// Task 12: Golden end-to-end economic cycle with step-by-step invariants
-// ---------------------------------------------------------------------------
-
 func TestGoldenEconomyFullCycleWithStepByStepInvariants(t *testing.T) {
 	app := Setup(t, false)
 	ctx := app.NewContext(false).WithBlockHeight(42)
 
-	// Step 0: initial invariants pass
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 1: record fees from two fee_collector sources
 	fees := sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 20_000_000))
 	require.NoError(t, app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, fees))
 	require.NoError(t, app.BankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, authtypes.FeeCollectorName, fees))
 	require.NoError(t, app.FeesKeeper.RecordCollectedFees(ctx, fees))
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 2: EndBlocker distributes
 	_, err := app.EndBlocker(ctx)
 	require.NoError(t, err)
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 3: Wrong denom fee rejected
 	wrongDenomFee := sdk.NewCoins(sdk.NewInt64Coin("uosmo", 100))
 	require.NoError(t, app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, wrongDenomFee))
 	require.NoError(t, app.BankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, authtypes.FeeCollectorName, wrongDenomFee))
@@ -278,12 +262,10 @@ func TestGoldenEconomyFullCycleWithStepByStepInvariants(t *testing.T) {
 	require.Error(t, err)
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 4: Zero fee is silently accepted (no-op)
 	zeroFee := sdk.NewCoins()
 	require.NoError(t, app.FeesKeeper.RecordCollectedFees(ctx, zeroFee))
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 5: Unauthorized mint rejection
 	configureGoldenBurnParams(t, app, ctx)
 	configureGoldenEmissionParams(t, app, ctx)
 	ctx = ctx.WithBlockHeight(43)
@@ -292,7 +274,6 @@ func TestGoldenEconomyFullCycleWithStepByStepInvariants(t *testing.T) {
 	require.Equal(t, sdk.NewInt64Coin(params.BaseDenom, 1_000), emission.EmissionAmount)
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 6: Protocol income distribution
 	rentPayer := AddTestAddrsWithCoins(t, app, ctx, 1, sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 1_000)))[0]
 	allocations, remainder, err := app.FeeCollectorKeeper.CollectAndDistributeProtocolIncomeFromAccount(ctx, rentPayer, sdk.NewCoins(sdk.NewInt64Coin(params.BaseDenom, 100)))
 	require.NoError(t, err)
@@ -300,7 +281,6 @@ func TestGoldenEconomyFullCycleWithStepByStepInvariants(t *testing.T) {
 	require.NotEmpty(t, allocations)
 	require.Empty(t, app.RunAppInvariants(ctx))
 
-	// Step 7: Export all, re-import, verify invariants still pass
 	feeCollectorGenesis, err := app.FeeCollectorKeeper.ExportGenesis(ctx)
 	require.NoError(t, err)
 	burnGenesis, err := app.BurnKeeper.ExportGenesis(ctx)
@@ -326,10 +306,6 @@ func TestGoldenEconomyFullCycleWithStepByStepInvariants(t *testing.T) {
 	require.NoError(t, importedApp.StorageRentKeeper.InitGenesisState(importedCtx, storageRentGenesis))
 	require.Empty(t, importedApp.RunAppInvariants(importedCtx))
 }
-
-// ---------------------------------------------------------------------------
-// helpers
-// ---------------------------------------------------------------------------
 
 func initTreasuryBankBalance(ctx sdk.Context, app *L1App, gs *treasurytypes.GenesisState) error {
 	accounting := gs.Allocations.AccountingBalance()

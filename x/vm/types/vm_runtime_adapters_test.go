@@ -61,42 +61,42 @@ func TestAVMRuntimeAdapterEmitsOutboundMessageReceiptAndRootCommitment(t *testin
 	storageAdapter, err := NewVMStorageAdapter(RuntimeAVM, zoneID, manifest)
 	require.NoError(t, err)
 	outbound, err := NewVMOutboundMessageSyscall(RuntimeAVM, manifest.AVM.MessageSyscall, VMOutboundMessageRequest{
-		ChainID:         "aetra-test-1",
-		Source:          "contract-a",
-		Destination:     "app-b",
-		SourceZone:      zoneID,
-		DestinationZone: zonestypes.ZoneIDApplication,
-		Payload:         []byte("advance"),
-		PayloadType:     "application.workflow",
-		GasLimit:        100,
-		ForwardingFee:   1,
-		SenderNonce:     3,
-		CreatedHeight:   10,
-		ExpiryHeight:    50,
-		RouteHint:       "contract/app",
+		ChainID:		"aetra-test-1",
+		Source:			"contract-a",
+		Destination:		"app-b",
+		SourceZone:		zoneID,
+		DestinationZone:	zonestypes.ZoneIDApplication,
+		Payload:		[]byte("advance"),
+		PayloadType:		"application.workflow",
+		GasLimit:		100,
+		ForwardingFee:		1,
+		SenderNonce:		3,
+		CreatedHeight:		10,
+		ExpiryHeight:		50,
+		RouteHint:		"contract/app",
 	})
 	require.NoError(t, err)
 	receipt, err := NewVMReceiptEmission(RuntimeAVM, AVMExecutionReceipt{
-		MessageID:          outbound.Message.ID,
-		ZoneID:             zoneID,
-		Executor:           "avm-runtime",
-		Status:             AVMReceiptStatusExecuted,
-		GasUsed:            77,
-		StorageWritten:     1,
-		EventsHash:         engineHash("events"),
-		OutputMessagesRoot: ComputeAVMZoneOutputMessageRoot(zoneID, []AVMAsyncMessage{outbound.Message}),
-		CreatedHeight:      11,
+		MessageID:		outbound.Message.ID,
+		ZoneID:			zoneID,
+		Executor:		"avm-runtime",
+		Status:			AVMReceiptStatusExecuted,
+		GasUsed:		77,
+		StorageWritten:		1,
+		EventsHash:		engineHash("events"),
+		OutputMessagesRoot:	ComputeAVMZoneOutputMessageRoot(zoneID, []AVMAsyncMessage{outbound.Message}),
+		CreatedHeight:		11,
 	}, zoneID)
 	require.NoError(t, err)
 
 	adapter, err := NewVMRuntimeAdapter(VMRuntimeAdapter{
-		Trait:              trait,
-		BoundaryManifest:   manifest,
-		BytecodeValidation: bytecode,
-		GasTable:           gasTable,
-		StorageAdapter:     storageAdapter,
-		OutboundSyscalls:   []VMOutboundMessageSyscall{outbound},
-		ReceiptEmission:    receipt,
+		Trait:			trait,
+		BoundaryManifest:	manifest,
+		BytecodeValidation:	bytecode,
+		GasTable:		gasTable,
+		StorageAdapter:		storageAdapter,
+		OutboundSyscalls:	[]VMOutboundMessageSyscall{outbound},
+		ReceiptEmission:	receipt,
 	})
 	require.NoError(t, err)
 	require.NoError(t, adapter.Validate())
@@ -125,8 +125,8 @@ func TestCosmWasmRuntimeAdapterUsesExplicitGasAndStorageBoundary(t *testing.T) {
 	profile, err := DefaultVMDeterminismProfile(RuntimeCosmWasm)
 	require.NoError(t, err)
 	manifest, err := NewVMAdapterBoundaryManifest(VMAdapterBoundaryManifest{
-		ZoneID:             zoneID,
-		DeterminismProfile: profile,
+		ZoneID:			zoneID,
+		DeterminismProfile:	profile,
 	})
 	require.NoError(t, err)
 	trait, err := NewVMRuntimeTrait(VMRuntimeTrait{Runtime: RuntimeCosmWasm, AdapterKind: VMAdapterCosmWasm, DeterminismProfile: profile})
@@ -143,23 +143,23 @@ func TestCosmWasmRuntimeAdapterUsesExplicitGasAndStorageBoundary(t *testing.T) {
 	require.Equal(t, manifest.CosmWasm.GasConversion.StorageWriteGas, storageAdapter.WriteGas)
 
 	receipt, err := NewVMReceiptEmission(RuntimeCosmWasm, AVMExecutionReceipt{
-		MessageID:          engineHash("wasm-message"),
-		ZoneID:             zoneID,
-		Executor:           "cosmwasm-adapter",
-		Status:             AVMReceiptStatusExecuted,
-		GasUsed:            100,
-		EventsHash:         engineHash("wasm-events"),
-		OutputMessagesRoot: ComputeAVMZoneOutputMessageRoot(zoneID, nil),
-		CreatedHeight:      12,
+		MessageID:		engineHash("wasm-message"),
+		ZoneID:			zoneID,
+		Executor:		"cosmwasm-adapter",
+		Status:			AVMReceiptStatusExecuted,
+		GasUsed:		100,
+		EventsHash:		engineHash("wasm-events"),
+		OutputMessagesRoot:	ComputeAVMZoneOutputMessageRoot(zoneID, nil),
+		CreatedHeight:		12,
 	}, zoneID)
 	require.NoError(t, err)
 	adapter, err := NewVMRuntimeAdapter(VMRuntimeAdapter{
-		Trait:              trait,
-		BoundaryManifest:   manifest,
-		BytecodeValidation: bytecode,
-		GasTable:           gasTable,
-		StorageAdapter:     storageAdapter,
-		ReceiptEmission:    receipt,
+		Trait:			trait,
+		BoundaryManifest:	manifest,
+		BytecodeValidation:	bytecode,
+		GasTable:		gasTable,
+		StorageAdapter:		storageAdapter,
+		ReceiptEmission:	receipt,
 	})
 	require.NoError(t, err)
 	require.NoError(t, adapter.Validate())
@@ -169,14 +169,14 @@ func TestCosmWasmRuntimeAdapterUsesExplicitGasAndStorageBoundary(t *testing.T) {
 func testVMRuntimeAVMBytecode(t *testing.T, code ...avm.Instruction) []byte {
 	t.Helper()
 	module := avm.Module{
-		Version: avm.Version,
+		Version:	avm.Version,
 		Imports: []avm.HostFunction{
 			avm.HostReturn,
 		},
 		Exports: map[avm.Entrypoint]uint32{
 			avm.EntryReceiveExternal: 0,
 		},
-		Code: code,
+		Code:	code,
 	}
 	encoded, err := avm.EncodeModule(module)
 	require.NoError(t, err)

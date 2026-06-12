@@ -14,45 +14,45 @@ import (
 type IdentityProofObjectiveV2 string
 
 const (
-	IdentityProofObjectiveDomainExistence     IdentityProofObjectiveV2 = "domain_existence"
-	IdentityProofObjectiveDomainNonExistence  IdentityProofObjectiveV2 = "domain_non_existence"
-	IdentityProofObjectiveDomainStatusExpiry  IdentityProofObjectiveV2 = "domain_status_expiry"
-	IdentityProofObjectiveNFTBinding          IdentityProofObjectiveV2 = "nft_ownership_binding"
-	IdentityProofObjectiveResolverRecord      IdentityProofObjectiveV2 = "resolver_record_contents"
-	IdentityProofObjectiveReverseConsistency  IdentityProofObjectiveV2 = "reverse_resolution_consistency"
-	IdentityProofObjectiveSubdomainDelegation IdentityProofObjectiveV2 = "subdomain_delegation_chain"
-	IdentityProofObjectiveRecursiveResolution IdentityProofObjectiveV2 = "recursive_resolution_path"
-	IdentityProofObjectiveVersionAndFreshness IdentityProofObjectiveV2 = "record_version_freshness"
+	IdentityProofObjectiveDomainExistence		IdentityProofObjectiveV2	= "domain_existence"
+	IdentityProofObjectiveDomainNonExistence	IdentityProofObjectiveV2	= "domain_non_existence"
+	IdentityProofObjectiveDomainStatusExpiry	IdentityProofObjectiveV2	= "domain_status_expiry"
+	IdentityProofObjectiveNFTBinding		IdentityProofObjectiveV2	= "nft_ownership_binding"
+	IdentityProofObjectiveResolverRecord		IdentityProofObjectiveV2	= "resolver_record_contents"
+	IdentityProofObjectiveReverseConsistency	IdentityProofObjectiveV2	= "reverse_resolution_consistency"
+	IdentityProofObjectiveSubdomainDelegation	IdentityProofObjectiveV2	= "subdomain_delegation_chain"
+	IdentityProofObjectiveRecursiveResolution	IdentityProofObjectiveV2	= "recursive_resolution_path"
+	IdentityProofObjectiveVersionAndFreshness	IdentityProofObjectiveV2	= "record_version_freshness"
 )
 
 type IdentityLightClientProofRequestV2 struct {
-	Name                string
-	TrustedHeight       uint64
-	RecordTTL           uint64
-	ReverseAddress      sdk.AccAddress
-	AuthorizedAliasKeys []string
-	Objectives          []IdentityProofObjectiveV2
+	Name			string
+	TrustedHeight		uint64
+	RecordTTL		uint64
+	ReverseAddress		sdk.AccAddress
+	AuthorizedAliasKeys	[]string
+	Objectives		[]IdentityProofObjectiveV2
 }
 
 type IdentityLightClientResolutionProofV2 struct {
-	StateRoot           string
-	QueryDomain         string
-	TrustedHeight       uint64
-	FreshUntilHeight    uint64
-	RecordVersion       uint64
-	DomainStatus        DomainLifecycleStatus
-	DomainExpiryHeight  uint64
-	Objectives          []IdentityProofObjectiveV2
-	QueryDomainProof    *IdentityInclusionProof
-	QueryDomainAbsence  *IdentityAbsenceProof
-	ResolutionProof     *IdentityResolutionProof
-	ReverseRecord       *ReverseResolutionRecordV2
-	ReverseProof        *IdentityInclusionProof
-	ReverseAbsence      *IdentityAbsenceProof
-	SubdomainChain      []SubdomainRecord
-	SubdomainProofs     []IdentityInclusionProof
-	AuthorizedAliasKeys []string
-	ProofHash           string
+	StateRoot		string
+	QueryDomain		string
+	TrustedHeight		uint64
+	FreshUntilHeight	uint64
+	RecordVersion		uint64
+	DomainStatus		DomainLifecycleStatus
+	DomainExpiryHeight	uint64
+	Objectives		[]IdentityProofObjectiveV2
+	QueryDomainProof	*IdentityInclusionProof
+	QueryDomainAbsence	*IdentityAbsenceProof
+	ResolutionProof		*IdentityResolutionProof
+	ReverseRecord		*ReverseResolutionRecordV2
+	ReverseProof		*IdentityInclusionProof
+	ReverseAbsence		*IdentityAbsenceProof
+	SubdomainChain		[]SubdomainRecord
+	SubdomainProofs		[]IdentityInclusionProof
+	AuthorizedAliasKeys	[]string
+	ProofHash		string
 }
 
 func BuildIdentityLightClientResolutionProofV2(state IdentityState, request IdentityLightClientProofRequestV2) (IdentityLightClientResolutionProofV2, error) {
@@ -76,12 +76,12 @@ func BuildIdentityLightClientResolutionProofV2(state IdentityState, request Iden
 	}
 
 	proof := IdentityLightClientResolutionProofV2{
-		StateRoot:           stateRoot,
-		QueryDomain:         query,
-		TrustedHeight:       request.TrustedHeight,
-		FreshUntilHeight:    request.TrustedHeight + request.RecordTTL,
-		Objectives:          objectives,
-		AuthorizedAliasKeys: append([]string(nil), request.AuthorizedAliasKeys...),
+		StateRoot:		stateRoot,
+		QueryDomain:		query,
+		TrustedHeight:		request.TrustedHeight,
+		FreshUntilHeight:	request.TrustedHeight + request.RecordTTL,
+		Objectives:		objectives,
+		AuthorizedAliasKeys:	append([]string(nil), request.AuthorizedAliasKeys...),
 	}
 	sort.Strings(proof.AuthorizedAliasKeys)
 

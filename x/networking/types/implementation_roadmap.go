@@ -10,206 +10,206 @@ import (
 type NetworkingRoadmapPhase string
 
 const (
-	RoadmapPhaseBaselineInstrumentation NetworkingRoadmapPhase = "phase_0_baseline_and_instrumentation"
-	RoadmapPhaseAetherNetworkingAdapter NetworkingRoadmapPhase = "phase_1_aether_networking_adapter"
-	RoadmapPhaseNodeIdentitySessions    NetworkingRoadmapPhase = "phase_2_node_identity_and_sessions"
-	RoadmapPhaseOverlayRouting          NetworkingRoadmapPhase = "phase_3_overlay_routing"
-	RoadmapPhaseRL2Streaming            NetworkingRoadmapPhase = "phase_4_rl2_streaming"
-	RoadmapPhaseDiscoveryLayer          NetworkingRoadmapPhase = "phase_5_discovery_layer"
-	RoadmapPhaseHybridBroadcast         NetworkingRoadmapPhase = "phase_6_hybrid_broadcast"
-	RoadmapPhaseAetherMesh              NetworkingRoadmapPhase = "phase_7_aether_mesh"
-	RoadmapPhaseSecurityLoadHardening   NetworkingRoadmapPhase = "phase_8_security_and_load_hardening"
+	RoadmapPhaseBaselineInstrumentation	NetworkingRoadmapPhase	= "phase_0_baseline_and_instrumentation"
+	RoadmapPhaseAetherNetworkingAdapter	NetworkingRoadmapPhase	= "phase_1_aether_networking_adapter"
+	RoadmapPhaseNodeIdentitySessions	NetworkingRoadmapPhase	= "phase_2_node_identity_and_sessions"
+	RoadmapPhaseOverlayRouting		NetworkingRoadmapPhase	= "phase_3_overlay_routing"
+	RoadmapPhaseRL2Streaming		NetworkingRoadmapPhase	= "phase_4_rl2_streaming"
+	RoadmapPhaseDiscoveryLayer		NetworkingRoadmapPhase	= "phase_5_discovery_layer"
+	RoadmapPhaseHybridBroadcast		NetworkingRoadmapPhase	= "phase_6_hybrid_broadcast"
+	RoadmapPhaseAetherMesh			NetworkingRoadmapPhase	= "phase_7_aether_mesh"
+	RoadmapPhaseSecurityLoadHardening	NetworkingRoadmapPhase	= "phase_8_security_and_load_hardening"
 )
 
 type NetworkingRoadmapTask string
 
 const (
-	RoadmapTaskInventoryCometBFTP2P        NetworkingRoadmapTask = "inventory_current_cometbft_p2p_configuration"
-	RoadmapTaskPeerMetricsCollection       NetworkingRoadmapTask = "add_peer_metrics_collection"
-	RoadmapTaskChannelBandwidthMetrics     NetworkingRoadmapTask = "add_channel_bandwidth_metrics"
-	RoadmapTaskBlockPropagationLatency     NetworkingRoadmapTask = "add_block_propagation_latency_metrics"
-	RoadmapTaskMempoolPropagationMetrics   NetworkingRoadmapTask = "add_mempool_propagation_metrics"
-	RoadmapTaskNetworkParameterSchema      NetworkingRoadmapTask = "define_network_parameter_schema"
-	RoadmapTaskANAWrapper                  NetworkingRoadmapTask = "implement_ana_wrapper"
-	RoadmapTaskLogicalChannelClasses       NetworkingRoadmapTask = "add_logical_channel_classes"
-	RoadmapTaskPeerScoreModel              NetworkingRoadmapTask = "add_peer_score_model"
-	RoadmapTaskAdaptiveFanoutConfiguration NetworkingRoadmapTask = "add_adaptive_fanout_configuration"
-	RoadmapTaskQoSPolicy                   NetworkingRoadmapTask = "add_qos_policy"
-	RoadmapTaskServiceTrafficIsolation     NetworkingRoadmapTask = "add_service_traffic_isolation"
-	RoadmapTaskNodeIDDerivation            NetworkingRoadmapTask = "define_node_id_derivation"
-	RoadmapTaskNodeRecord                  NetworkingRoadmapTask = "define_node_record"
-	RoadmapTaskSignedNodeAdvertisements    NetworkingRoadmapTask = "implement_signed_node_advertisements"
-	RoadmapTaskSessionHandshake            NetworkingRoadmapTask = "implement_session_handshake"
-	RoadmapTaskMultiplexedStreams          NetworkingRoadmapTask = "implement_multiplexed_streams"
-	RoadmapTaskSessionKeyRotation          NetworkingRoadmapTask = "implement_session_key_rotation"
-	RoadmapTaskOverlayDescriptor           NetworkingRoadmapTask = "define_overlay_descriptor"
-	RoadmapTaskOverlayMembership           NetworkingRoadmapTask = "implement_overlay_membership"
-	RoadmapTaskOverlayPeerSets             NetworkingRoadmapTask = "implement_overlay_peer_sets"
-	RoadmapTaskRouteGraph                  NetworkingRoadmapTask = "implement_route_graph"
-	RoadmapTaskRoutingTableCommitment      NetworkingRoadmapTask = "implement_routing_table_commitment"
-	RoadmapTaskZoneServiceOverlays         NetworkingRoadmapTask = "add_zone_and_service_overlays"
-	RoadmapTaskTransferOfferProtocol       NetworkingRoadmapTask = "implement_transfer_offer_protocol"
-	RoadmapTaskChunkDescriptors            NetworkingRoadmapTask = "implement_chunk_descriptors"
-	RoadmapTaskChunkMerkleVerification     NetworkingRoadmapTask = "implement_chunk_merkle_verification"
-	RoadmapTaskResumableTransfer           NetworkingRoadmapTask = "implement_resumable_transfer"
-	RoadmapTaskAdaptiveChunkSizingRL2      NetworkingRoadmapTask = "implement_adaptive_chunk_sizing"
-	RoadmapTaskRL2Backpressure             NetworkingRoadmapTask = "implement_backpressure"
-	RoadmapTaskDRT                         NetworkingRoadmapTask = "implement_drt"
-	RoadmapTaskDiscoveryRecords            NetworkingRoadmapTask = "add_discovery_records"
-	RoadmapTaskLeaseRenewal                NetworkingRoadmapTask = "add_lease_renewal"
-	RoadmapTaskProofAttachedLookupResponse NetworkingRoadmapTask = "add_proof_attached_lookup_responses"
-	RoadmapTaskServiceZoneIndexes          NetworkingRoadmapTask = "add_service_and_zone_indexes"
-	RoadmapTaskSignedAdvertisementValid    NetworkingRoadmapTask = "add_signed_advertisement_validation"
-	RoadmapTaskTreeBroadcast               NetworkingRoadmapTask = "implement_tree_broadcast"
-	RoadmapTaskGossipFallback              NetworkingRoadmapTask = "implement_gossip_fallback"
-	RoadmapTaskHashDeduplication           NetworkingRoadmapTask = "implement_hash_deduplication"
-	RoadmapTaskHeaderFirstBlockPropagation NetworkingRoadmapTask = "implement_header_first_block_propagation"
-	RoadmapTaskParallelChunkFetch          NetworkingRoadmapTask = "implement_parallel_chunk_fetch"
-	RoadmapTaskApplicationMessageEnvelope  NetworkingRoadmapTask = "implement_application_network_message_envelope"
-	RoadmapTaskExecutionZoneMessageRouting NetworkingRoadmapTask = "add_execution_zone_message_routing"
-	RoadmapTaskCrossZoneSequenceHandling   NetworkingRoadmapTask = "add_cross_zone_sequence_handling"
-	RoadmapTaskReceiptDeliveryProtocol     NetworkingRoadmapTask = "add_receipt_delivery_protocol"
-	RoadmapTaskQueryResponseProofAttach    NetworkingRoadmapTask = "add_query_response_proof_attachment"
-	RoadmapTaskServiceTrafficPath          NetworkingRoadmapTask = "add_service_network_traffic_path"
-	RoadmapTaskPeerReputationHardening     NetworkingRoadmapTask = "add_peer_reputation_hardening"
-	RoadmapTaskEclipseResistanceTests      NetworkingRoadmapTask = "add_eclipse_resistance_tests"
-	RoadmapTaskSpamFloodSimulations        NetworkingRoadmapTask = "add_spam_flood_simulations"
-	RoadmapTaskRoutingManipulationSims     NetworkingRoadmapTask = "add_routing_manipulation_simulations"
-	RoadmapTaskBandwidthExhaustionTests    NetworkingRoadmapTask = "add_bandwidth_exhaustion_tests"
-	RoadmapTaskChunkCorruptionTests        NetworkingRoadmapTask = "add_chunk_corruption_tests"
+	RoadmapTaskInventoryCometBFTP2P		NetworkingRoadmapTask	= "inventory_current_cometbft_p2p_configuration"
+	RoadmapTaskPeerMetricsCollection	NetworkingRoadmapTask	= "add_peer_metrics_collection"
+	RoadmapTaskChannelBandwidthMetrics	NetworkingRoadmapTask	= "add_channel_bandwidth_metrics"
+	RoadmapTaskBlockPropagationLatency	NetworkingRoadmapTask	= "add_block_propagation_latency_metrics"
+	RoadmapTaskMempoolPropagationMetrics	NetworkingRoadmapTask	= "add_mempool_propagation_metrics"
+	RoadmapTaskNetworkParameterSchema	NetworkingRoadmapTask	= "define_network_parameter_schema"
+	RoadmapTaskANAWrapper			NetworkingRoadmapTask	= "implement_ana_wrapper"
+	RoadmapTaskLogicalChannelClasses	NetworkingRoadmapTask	= "add_logical_channel_classes"
+	RoadmapTaskPeerScoreModel		NetworkingRoadmapTask	= "add_peer_score_model"
+	RoadmapTaskAdaptiveFanoutConfiguration	NetworkingRoadmapTask	= "add_adaptive_fanout_configuration"
+	RoadmapTaskQoSPolicy			NetworkingRoadmapTask	= "add_qos_policy"
+	RoadmapTaskServiceTrafficIsolation	NetworkingRoadmapTask	= "add_service_traffic_isolation"
+	RoadmapTaskNodeIDDerivation		NetworkingRoadmapTask	= "define_node_id_derivation"
+	RoadmapTaskNodeRecord			NetworkingRoadmapTask	= "define_node_record"
+	RoadmapTaskSignedNodeAdvertisements	NetworkingRoadmapTask	= "implement_signed_node_advertisements"
+	RoadmapTaskSessionHandshake		NetworkingRoadmapTask	= "implement_session_handshake"
+	RoadmapTaskMultiplexedStreams		NetworkingRoadmapTask	= "implement_multiplexed_streams"
+	RoadmapTaskSessionKeyRotation		NetworkingRoadmapTask	= "implement_session_key_rotation"
+	RoadmapTaskOverlayDescriptor		NetworkingRoadmapTask	= "define_overlay_descriptor"
+	RoadmapTaskOverlayMembership		NetworkingRoadmapTask	= "implement_overlay_membership"
+	RoadmapTaskOverlayPeerSets		NetworkingRoadmapTask	= "implement_overlay_peer_sets"
+	RoadmapTaskRouteGraph			NetworkingRoadmapTask	= "implement_route_graph"
+	RoadmapTaskRoutingTableCommitment	NetworkingRoadmapTask	= "implement_routing_table_commitment"
+	RoadmapTaskZoneServiceOverlays		NetworkingRoadmapTask	= "add_zone_and_service_overlays"
+	RoadmapTaskTransferOfferProtocol	NetworkingRoadmapTask	= "implement_transfer_offer_protocol"
+	RoadmapTaskChunkDescriptors		NetworkingRoadmapTask	= "implement_chunk_descriptors"
+	RoadmapTaskChunkMerkleVerification	NetworkingRoadmapTask	= "implement_chunk_merkle_verification"
+	RoadmapTaskResumableTransfer		NetworkingRoadmapTask	= "implement_resumable_transfer"
+	RoadmapTaskAdaptiveChunkSizingRL2	NetworkingRoadmapTask	= "implement_adaptive_chunk_sizing"
+	RoadmapTaskRL2Backpressure		NetworkingRoadmapTask	= "implement_backpressure"
+	RoadmapTaskDRT				NetworkingRoadmapTask	= "implement_drt"
+	RoadmapTaskDiscoveryRecords		NetworkingRoadmapTask	= "add_discovery_records"
+	RoadmapTaskLeaseRenewal			NetworkingRoadmapTask	= "add_lease_renewal"
+	RoadmapTaskProofAttachedLookupResponse	NetworkingRoadmapTask	= "add_proof_attached_lookup_responses"
+	RoadmapTaskServiceZoneIndexes		NetworkingRoadmapTask	= "add_service_and_zone_indexes"
+	RoadmapTaskSignedAdvertisementValid	NetworkingRoadmapTask	= "add_signed_advertisement_validation"
+	RoadmapTaskTreeBroadcast		NetworkingRoadmapTask	= "implement_tree_broadcast"
+	RoadmapTaskGossipFallback		NetworkingRoadmapTask	= "implement_gossip_fallback"
+	RoadmapTaskHashDeduplication		NetworkingRoadmapTask	= "implement_hash_deduplication"
+	RoadmapTaskHeaderFirstBlockPropagation	NetworkingRoadmapTask	= "implement_header_first_block_propagation"
+	RoadmapTaskParallelChunkFetch		NetworkingRoadmapTask	= "implement_parallel_chunk_fetch"
+	RoadmapTaskApplicationMessageEnvelope	NetworkingRoadmapTask	= "implement_application_network_message_envelope"
+	RoadmapTaskExecutionZoneMessageRouting	NetworkingRoadmapTask	= "add_execution_zone_message_routing"
+	RoadmapTaskCrossZoneSequenceHandling	NetworkingRoadmapTask	= "add_cross_zone_sequence_handling"
+	RoadmapTaskReceiptDeliveryProtocol	NetworkingRoadmapTask	= "add_receipt_delivery_protocol"
+	RoadmapTaskQueryResponseProofAttach	NetworkingRoadmapTask	= "add_query_response_proof_attachment"
+	RoadmapTaskServiceTrafficPath		NetworkingRoadmapTask	= "add_service_network_traffic_path"
+	RoadmapTaskPeerReputationHardening	NetworkingRoadmapTask	= "add_peer_reputation_hardening"
+	RoadmapTaskEclipseResistanceTests	NetworkingRoadmapTask	= "add_eclipse_resistance_tests"
+	RoadmapTaskSpamFloodSimulations		NetworkingRoadmapTask	= "add_spam_flood_simulations"
+	RoadmapTaskRoutingManipulationSims	NetworkingRoadmapTask	= "add_routing_manipulation_simulations"
+	RoadmapTaskBandwidthExhaustionTests	NetworkingRoadmapTask	= "add_bandwidth_exhaustion_tests"
+	RoadmapTaskChunkCorruptionTests		NetworkingRoadmapTask	= "add_chunk_corruption_tests"
 )
 
 type NetworkingExitCriterion string
 
 const (
-	ExitCurrentBehaviorMeasurable     NetworkingExitCriterion = "current_network_behavior_is_measurable"
-	ExitBaselineMetricsExist          NetworkingExitCriterion = "baseline_propagation_and_peer_quality_metrics_exist"
-	ExitConsensusProtectedPriority    NetworkingExitCriterion = "consensus_traffic_has_protected_priority"
-	ExitPeerScoringChannelMetrics     NetworkingExitCriterion = "peer_scoring_and_channel_metrics_are_available"
-	ExitServiceCannotStarveConsensus  NetworkingExitCriterion = "service_traffic_cannot_starve_consensus"
-	ExitCryptographicNodeAuth         NetworkingExitCriterion = "nodes_authenticate_through_cryptographic_identity"
-	ExitLogicalStreamsShareSession    NetworkingExitCriterion = "logical_streams_share_one_peer_session"
-	ExitExpiredForgedRecordsRejected  NetworkingExitCriterion = "expired_or_forged_node_records_are_rejected"
-	ExitOverlayJoinSupported          NetworkingExitCriterion = "nodes_can_join_validator_zone_service_data_and_discovery_overlays"
-	ExitCommittedRoutesReproducible   NetworkingExitCriterion = "overlay_routing_decisions_are_reproducible_when_committed"
-	ExitPeerRotationConnectivity      NetworkingExitCriterion = "peer_rotation_preserves_connectivity"
-	ExitChunkedStreamingPayloads      NetworkingExitCriterion = "blocks_state_snapshots_and_proof_bundles_stream_in_chunks"
-	ExitInterruptedTransfersResume    NetworkingExitCriterion = "interrupted_transfers_can_resume"
-	ExitInvalidChunksRejected         NetworkingExitCriterion = "invalid_chunks_are_rejected"
-	ExitDiscoveryObjectsDiscoverable  NetworkingExitCriterion = "nodes_zones_services_endpoints_and_storage_providers_are_discoverable"
-	ExitDiscoveryRecordsExpireVerify  NetworkingExitCriterion = "discovery_records_expire_and_can_be_verified"
-	ExitForgedExpiredRecordsRejected  NetworkingExitCriterion = "forged_or_expired_discovery_records_are_rejected"
-	ExitBlocksHeaderChunksProofSet    NetworkingExitCriterion = "blocks_propagate_as_header_chunks_and_proof_set"
-	ExitDuplicateConflictingHandled   NetworkingExitCriterion = "duplicate_and_conflicting_broadcasts_are_handled"
-	ExitFallbackGossipResilient       NetworkingExitCriterion = "fallback_gossip_preserves_resilience"
-	ExitL3MessageClassesSupported     NetworkingExitCriterion = "l3_messages_support_execution_service_query_storage_and_cross_zone_classes"
-	ExitCrossZoneDeliverySemantics    NetworkingExitCriterion = "cross_zone_delivery_is_at_least_once_network_and_exactly_once_execution"
-	ExitReceiptsVisibleProofQueryable NetworkingExitCriterion = "receipts_are_delivery_visible_and_proof_queryable_where_committed"
-	ExitMaliciousPeersIsolated        NetworkingExitCriterion = "malicious_peers_are_isolated_locally"
-	ExitCriticalChannelsUnderFlood    NetworkingExitCriterion = "critical_channels_remain_available_under_service_flood"
-	ExitDiscoveryPoisoningDetected    NetworkingExitCriterion = "discovery_poisoning_is_detected_by_signature_and_proof_checks"
+	ExitCurrentBehaviorMeasurable		NetworkingExitCriterion	= "current_network_behavior_is_measurable"
+	ExitBaselineMetricsExist		NetworkingExitCriterion	= "baseline_propagation_and_peer_quality_metrics_exist"
+	ExitConsensusProtectedPriority		NetworkingExitCriterion	= "consensus_traffic_has_protected_priority"
+	ExitPeerScoringChannelMetrics		NetworkingExitCriterion	= "peer_scoring_and_channel_metrics_are_available"
+	ExitServiceCannotStarveConsensus	NetworkingExitCriterion	= "service_traffic_cannot_starve_consensus"
+	ExitCryptographicNodeAuth		NetworkingExitCriterion	= "nodes_authenticate_through_cryptographic_identity"
+	ExitLogicalStreamsShareSession		NetworkingExitCriterion	= "logical_streams_share_one_peer_session"
+	ExitExpiredForgedRecordsRejected	NetworkingExitCriterion	= "expired_or_forged_node_records_are_rejected"
+	ExitOverlayJoinSupported		NetworkingExitCriterion	= "nodes_can_join_validator_zone_service_data_and_discovery_overlays"
+	ExitCommittedRoutesReproducible		NetworkingExitCriterion	= "overlay_routing_decisions_are_reproducible_when_committed"
+	ExitPeerRotationConnectivity		NetworkingExitCriterion	= "peer_rotation_preserves_connectivity"
+	ExitChunkedStreamingPayloads		NetworkingExitCriterion	= "blocks_state_snapshots_and_proof_bundles_stream_in_chunks"
+	ExitInterruptedTransfersResume		NetworkingExitCriterion	= "interrupted_transfers_can_resume"
+	ExitInvalidChunksRejected		NetworkingExitCriterion	= "invalid_chunks_are_rejected"
+	ExitDiscoveryObjectsDiscoverable	NetworkingExitCriterion	= "nodes_zones_services_endpoints_and_storage_providers_are_discoverable"
+	ExitDiscoveryRecordsExpireVerify	NetworkingExitCriterion	= "discovery_records_expire_and_can_be_verified"
+	ExitForgedExpiredRecordsRejected	NetworkingExitCriterion	= "forged_or_expired_discovery_records_are_rejected"
+	ExitBlocksHeaderChunksProofSet		NetworkingExitCriterion	= "blocks_propagate_as_header_chunks_and_proof_set"
+	ExitDuplicateConflictingHandled		NetworkingExitCriterion	= "duplicate_and_conflicting_broadcasts_are_handled"
+	ExitFallbackGossipResilient		NetworkingExitCriterion	= "fallback_gossip_preserves_resilience"
+	ExitL3MessageClassesSupported		NetworkingExitCriterion	= "l3_messages_support_execution_service_query_storage_and_cross_zone_classes"
+	ExitCrossZoneDeliverySemantics		NetworkingExitCriterion	= "cross_zone_delivery_is_at_least_once_network_and_exactly_once_execution"
+	ExitReceiptsVisibleProofQueryable	NetworkingExitCriterion	= "receipts_are_delivery_visible_and_proof_queryable_where_committed"
+	ExitMaliciousPeersIsolated		NetworkingExitCriterion	= "malicious_peers_are_isolated_locally"
+	ExitCriticalChannelsUnderFlood		NetworkingExitCriterion	= "critical_channels_remain_available_under_service_flood"
+	ExitDiscoveryPoisoningDetected		NetworkingExitCriterion	= "discovery_poisoning_is_detected_by_signature_and_proof_checks"
 )
 
 type RoadmapTaskStatus string
 
 const (
-	RoadmapTaskPending  RoadmapTaskStatus = "pending"
-	RoadmapTaskComplete RoadmapTaskStatus = "complete"
+	RoadmapTaskPending	RoadmapTaskStatus	= "pending"
+	RoadmapTaskComplete	RoadmapTaskStatus	= "complete"
 )
 
 type NetworkingRoadmapPhaseSpec struct {
-	Phase        NetworkingRoadmapPhase
-	Title        string
-	Tasks        []NetworkingRoadmapTask
-	ExitCriteria []NetworkingExitCriterion
-	DependsOn    []NetworkingRoadmapPhase
+	Phase		NetworkingRoadmapPhase
+	Title		string
+	Tasks		[]NetworkingRoadmapTask
+	ExitCriteria	[]NetworkingExitCriterion
+	DependsOn	[]NetworkingRoadmapPhase
 }
 
 type NetworkingRoadmapTaskEvidence struct {
-	Task     NetworkingRoadmapTask
-	Status   RoadmapTaskStatus
-	Evidence string
+	Task		NetworkingRoadmapTask
+	Status		RoadmapTaskStatus
+	Evidence	string
 }
 
 type NetworkingRoadmapEvidence struct {
-	CometBFTInventory           AetherNetworkingAdapter
-	PerformanceSnapshot         PerformanceMetricsSnapshot
-	L0Schedule                  L0Schedule
-	XNetworkParams              XNetworkParams
-	Session                     SessionChannel
-	NodeRecords                 []NodeRecord
-	SignedDiscoveryRecords      []DiscoveryRecord
-	HandshakeReplayRejected     bool
-	KeyRotationAvailable        bool
-	OverlayDescriptors          []OverlayDescriptor
-	OverlayMemberships          []OverlayMembershipRecord
-	AdaptiveGraph               AdaptiveOverlayGraph
-	RoutingGraph                RoutingGraph
-	RoutingTableUse             RoutingTableUse
-	PeerRotationPreserved       bool
-	RL2Offer                    RL2TransferOffer
-	RL2ChunkDescriptors         []RL2ChunkDescriptor
-	RL2Session                  RL2TransferSession
-	RL2StreamingPlan            RL2StreamingPlan
-	RL2PayloadTypes             []RL2PayloadType
-	RL2BackpressureSignal       RL2BackpressureSignal
-	RL2InvalidChunkRejected     bool
-	RL2InterruptedResumed       bool
-	DiscoveryTable              DistributedRoutingTable
-	DiscoveryResponse           DiscoveryResponse
-	DiscoveryObjectTypes        []DRTObjectType
-	DiscoveryLeaseRenewed       bool
-	DiscoveryForgedRejected     bool
-	DiscoveryExpiredRejected    bool
-	BroadcastMessage            BroadcastMessage
-	BroadcastPlan               BroadcastPlan
-	BroadcastDedupCache         BroadcastDedupCache
-	BroadcastDuplicateHandled   bool
-	BroadcastConflictHandled    bool
-	BlockSession                BlockPropagationSession
-	ParallelChunkPlan           StreamParallelFetchPlan
-	GossipFallbackUsed          bool
-	MeshMessages                []AetherMeshMessage
-	MeshDeliveries              []AetherMeshDelivery
-	CrossZoneTracker            CrossZoneSequenceTracker
-	CrossZoneReceipt            CrossZoneReceipt
-	ReceiptDelivery             ReceiptDelivery
-	QueryResponseProof          QueryResponseProof
-	L3Metrics                   []L3OverlayMetrics
-	CrossZoneAtLeastOnce        bool
-	CrossZoneExactlyOnce        bool
-	SecurityPolicy              NetworkSecurityPolicy
-	SecurityDecision            NetworkSecurityDecision
-	ReputationDecision          PeerReputationDecision
-	EclipsePlan                 EclipseResistancePlan
-	EclipseThreats              []NetworkThreat
-	SpamSimulation              SpamSimulationResult
-	RoutingManipulation         RoutingManipulationSimulationResult
-	BandwidthExhaustionDetected bool
-	ChunkCorruptionDetected     bool
-	DiscoveryPoisoningDetected  bool
-	CriticalChannelsAvailable   bool
+	CometBFTInventory		AetherNetworkingAdapter
+	PerformanceSnapshot		PerformanceMetricsSnapshot
+	L0Schedule			L0Schedule
+	XNetworkParams			XNetworkParams
+	Session				SessionChannel
+	NodeRecords			[]NodeRecord
+	SignedDiscoveryRecords		[]DiscoveryRecord
+	HandshakeReplayRejected		bool
+	KeyRotationAvailable		bool
+	OverlayDescriptors		[]OverlayDescriptor
+	OverlayMemberships		[]OverlayMembershipRecord
+	AdaptiveGraph			AdaptiveOverlayGraph
+	RoutingGraph			RoutingGraph
+	RoutingTableUse			RoutingTableUse
+	PeerRotationPreserved		bool
+	RL2Offer			RL2TransferOffer
+	RL2ChunkDescriptors		[]RL2ChunkDescriptor
+	RL2Session			RL2TransferSession
+	RL2StreamingPlan		RL2StreamingPlan
+	RL2PayloadTypes			[]RL2PayloadType
+	RL2BackpressureSignal		RL2BackpressureSignal
+	RL2InvalidChunkRejected		bool
+	RL2InterruptedResumed		bool
+	DiscoveryTable			DistributedRoutingTable
+	DiscoveryResponse		DiscoveryResponse
+	DiscoveryObjectTypes		[]DRTObjectType
+	DiscoveryLeaseRenewed		bool
+	DiscoveryForgedRejected		bool
+	DiscoveryExpiredRejected	bool
+	BroadcastMessage		BroadcastMessage
+	BroadcastPlan			BroadcastPlan
+	BroadcastDedupCache		BroadcastDedupCache
+	BroadcastDuplicateHandled	bool
+	BroadcastConflictHandled	bool
+	BlockSession			BlockPropagationSession
+	ParallelChunkPlan		StreamParallelFetchPlan
+	GossipFallbackUsed		bool
+	MeshMessages			[]AetherMeshMessage
+	MeshDeliveries			[]AetherMeshDelivery
+	CrossZoneTracker		CrossZoneSequenceTracker
+	CrossZoneReceipt		CrossZoneReceipt
+	ReceiptDelivery			ReceiptDelivery
+	QueryResponseProof		QueryResponseProof
+	L3Metrics			[]L3OverlayMetrics
+	CrossZoneAtLeastOnce		bool
+	CrossZoneExactlyOnce		bool
+	SecurityPolicy			NetworkSecurityPolicy
+	SecurityDecision		NetworkSecurityDecision
+	ReputationDecision		PeerReputationDecision
+	EclipsePlan			EclipseResistancePlan
+	EclipseThreats			[]NetworkThreat
+	SpamSimulation			SpamSimulationResult
+	RoutingManipulation		RoutingManipulationSimulationResult
+	BandwidthExhaustionDetected	bool
+	ChunkCorruptionDetected		bool
+	DiscoveryPoisoningDetected	bool
+	CriticalChannelsAvailable	bool
 }
 
 type NetworkingRoadmapPhaseReport struct {
-	Phase                 NetworkingRoadmapPhase
-	Tasks                 []NetworkingRoadmapTaskEvidence
-	SatisfiedExitCriteria []NetworkingExitCriterion
-	Ready                 bool
-	ReportHash            string
+	Phase			NetworkingRoadmapPhase
+	Tasks			[]NetworkingRoadmapTaskEvidence
+	SatisfiedExitCriteria	[]NetworkingExitCriterion
+	Ready			bool
+	ReportHash		string
 }
 
 type NetworkingImplementationRoadmap struct {
-	Phases      []NetworkingRoadmapPhaseSpec
-	RoadmapRoot string
+	Phases		[]NetworkingRoadmapPhaseSpec
+	RoadmapRoot	string
 }
 
 func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 	roadmap := NetworkingImplementationRoadmap{
 		Phases: []NetworkingRoadmapPhaseSpec{
 			{
-				Phase: RoadmapPhaseBaselineInstrumentation,
-				Title: "Baseline and Instrumentation",
+				Phase:	RoadmapPhaseBaselineInstrumentation,
+				Title:	"Baseline and Instrumentation",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskInventoryCometBFTP2P,
 					RoadmapTaskPeerMetricsCollection,
@@ -224,8 +224,8 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 				},
 			},
 			{
-				Phase: RoadmapPhaseAetherNetworkingAdapter,
-				Title: "Aether Networking Adapter",
+				Phase:	RoadmapPhaseAetherNetworkingAdapter,
+				Title:	"Aether Networking Adapter",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskANAWrapper,
 					RoadmapTaskLogicalChannelClasses,
@@ -239,11 +239,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitPeerScoringChannelMetrics,
 					ExitServiceCannotStarveConsensus,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseBaselineInstrumentation},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseBaselineInstrumentation},
 			},
 			{
-				Phase: RoadmapPhaseNodeIdentitySessions,
-				Title: "Node Identity and Sessions",
+				Phase:	RoadmapPhaseNodeIdentitySessions,
+				Title:	"Node Identity and Sessions",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskNodeIDDerivation,
 					RoadmapTaskNodeRecord,
@@ -257,11 +257,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitLogicalStreamsShareSession,
 					ExitExpiredForgedRecordsRejected,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseAetherNetworkingAdapter},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseAetherNetworkingAdapter},
 			},
 			{
-				Phase: RoadmapPhaseOverlayRouting,
-				Title: "Overlay Routing",
+				Phase:	RoadmapPhaseOverlayRouting,
+				Title:	"Overlay Routing",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskOverlayDescriptor,
 					RoadmapTaskOverlayMembership,
@@ -275,11 +275,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitCommittedRoutesReproducible,
 					ExitPeerRotationConnectivity,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseNodeIdentitySessions},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseNodeIdentitySessions},
 			},
 			{
-				Phase: RoadmapPhaseRL2Streaming,
-				Title: "RL2 Streaming",
+				Phase:	RoadmapPhaseRL2Streaming,
+				Title:	"RL2 Streaming",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskTransferOfferProtocol,
 					RoadmapTaskChunkDescriptors,
@@ -293,11 +293,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitInterruptedTransfersResume,
 					ExitInvalidChunksRejected,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseOverlayRouting},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseOverlayRouting},
 			},
 			{
-				Phase: RoadmapPhaseDiscoveryLayer,
-				Title: "Discovery Layer",
+				Phase:	RoadmapPhaseDiscoveryLayer,
+				Title:	"Discovery Layer",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskDRT,
 					RoadmapTaskDiscoveryRecords,
@@ -311,11 +311,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitDiscoveryRecordsExpireVerify,
 					ExitForgedExpiredRecordsRejected,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseRL2Streaming},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseRL2Streaming},
 			},
 			{
-				Phase: RoadmapPhaseHybridBroadcast,
-				Title: "Hybrid Broadcast",
+				Phase:	RoadmapPhaseHybridBroadcast,
+				Title:	"Hybrid Broadcast",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskTreeBroadcast,
 					RoadmapTaskGossipFallback,
@@ -328,11 +328,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitDuplicateConflictingHandled,
 					ExitFallbackGossipResilient,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseDiscoveryLayer},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseDiscoveryLayer},
 			},
 			{
-				Phase: RoadmapPhaseAetherMesh,
-				Title: "Aether Mesh",
+				Phase:	RoadmapPhaseAetherMesh,
+				Title:	"Aether Mesh",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskApplicationMessageEnvelope,
 					RoadmapTaskExecutionZoneMessageRouting,
@@ -346,11 +346,11 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitCrossZoneDeliverySemantics,
 					ExitReceiptsVisibleProofQueryable,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseHybridBroadcast},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseHybridBroadcast},
 			},
 			{
-				Phase: RoadmapPhaseSecurityLoadHardening,
-				Title: "Security and Load Hardening",
+				Phase:	RoadmapPhaseSecurityLoadHardening,
+				Title:	"Security and Load Hardening",
 				Tasks: []NetworkingRoadmapTask{
 					RoadmapTaskPeerReputationHardening,
 					RoadmapTaskEclipseResistanceTests,
@@ -364,7 +364,7 @@ func DefaultNetworkingImplementationRoadmap() NetworkingImplementationRoadmap {
 					ExitCriticalChannelsUnderFlood,
 					ExitDiscoveryPoisoningDetected,
 				},
-				DependsOn: []NetworkingRoadmapPhase{RoadmapPhaseAetherMesh},
+				DependsOn:	[]NetworkingRoadmapPhase{RoadmapPhaseAetherMesh},
 			},
 		},
 	}
@@ -486,10 +486,10 @@ func EvaluateRoadmapPhaseReadiness(phase NetworkingRoadmapPhase, evidence Networ
 		return NetworkingRoadmapPhaseReport{}, err
 	}
 	report := NetworkingRoadmapPhaseReport{
-		Phase:                 phase,
-		Tasks:                 tasks,
-		SatisfiedExitCriteria: criteria,
-		Ready:                 allRoadmapTasksComplete(tasks) && allExitCriteriaSatisfied(phase, criteria),
+		Phase:			phase,
+		Tasks:			tasks,
+		SatisfiedExitCriteria:	criteria,
+		Ready:			allRoadmapTasksComplete(tasks) && allExitCriteriaSatisfied(phase, criteria),
 	}
 	report.ReportHash = ComputeRoadmapPhaseReportHash(report)
 	return report, nil
@@ -1298,9 +1298,9 @@ func normalizeTaskEvidence(values []NetworkingRoadmapTaskEvidence) []NetworkingR
 	out := make([]NetworkingRoadmapTaskEvidence, len(values))
 	for i, value := range values {
 		out[i] = NetworkingRoadmapTaskEvidence{
-			Task:     NetworkingRoadmapTask(strings.ToLower(strings.TrimSpace(string(value.Task)))),
-			Status:   RoadmapTaskStatus(strings.ToLower(strings.TrimSpace(string(value.Status)))),
-			Evidence: strings.TrimSpace(value.Evidence),
+			Task:		NetworkingRoadmapTask(strings.ToLower(strings.TrimSpace(string(value.Task)))),
+			Status:		RoadmapTaskStatus(strings.ToLower(strings.TrimSpace(string(value.Status)))),
+			Evidence:	strings.TrimSpace(value.Evidence),
 		}
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Task < out[j].Task })

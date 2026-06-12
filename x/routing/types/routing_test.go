@@ -10,8 +10,8 @@ import (
 
 func TestClassifyTxStableTypeStrings(t *testing.T) {
 	tests := []struct {
-		msgType string
-		class   TxClass
+		msgType	string
+		class	TxClass
 	}{
 		{MsgTypeSoftwareUpgrade, TxClassCriticalSystem},
 		{MsgTypeDelegate, TxClassStakingGovSecurity},
@@ -48,15 +48,15 @@ func TestRouteSameInputDeterministic(t *testing.T) {
 func TestDifferentMapInsertionOrderProducesSameRouteAndPriority(t *testing.T) {
 	leftInput := validFinancialInput()
 	leftInput.ActiveShards = map[ZoneID]uint32{
-		ZoneFinancial:   8,
-		ZoneIdentity:    4,
-		ZoneApplication: 16,
+		ZoneFinancial:		8,
+		ZoneIdentity:		4,
+		ZoneApplication:	16,
 	}
 	rightInput := validFinancialInput()
 	rightInput.ActiveShards = map[ZoneID]uint32{
-		ZoneApplication: 16,
-		ZoneIdentity:    4,
-		ZoneFinancial:   8,
+		ZoneApplication:	16,
+		ZoneIdentity:		4,
+		ZoneFinancial:		8,
 	}
 
 	left, err := Route(leftInput)
@@ -130,9 +130,9 @@ func TestRouteRejectsUnknownTxClass(t *testing.T) {
 	require.ErrorContains(t, err, "unknown routing message type")
 
 	_, err = Route(RouteInput{
-		MsgType:  "/unknown.Msg",
-		FeeDenom: NativeFeeDenom,
-		TxHash:   hashBytes("unknown"),
+		MsgType:	"/unknown.Msg",
+		FeeDenom:	NativeFeeDenom,
+		TxHash:		hashBytes("unknown"),
 	})
 	require.ErrorContains(t, err, "unknown routing message type")
 }
@@ -169,15 +169,15 @@ func TestRouteRejectsNonNativeFeeDenom(t *testing.T) {
 
 func TestIdentityDomainNormalizationAndValidation(t *testing.T) {
 	input := RouteInput{
-		MsgType:         MsgTypeIdentityRegister,
-		FeeDenom:        NativeFeeDenom,
-		FeeClass:        1,
-		ReputationClass: 1,
-		AdmissionHeight: 7,
-		TxHash:          hashBytes("identity"),
-		RoutingEpoch:    3,
-		ActiveShards:    map[ZoneID]uint32{ZoneIdentity: 4},
-		Locality:        Locality{Domain: " Alice.AET "},
+		MsgType:		MsgTypeIdentityRegister,
+		FeeDenom:		NativeFeeDenom,
+		FeeClass:		1,
+		ReputationClass:	1,
+		AdmissionHeight:	7,
+		TxHash:			hashBytes("identity"),
+		RoutingEpoch:		3,
+		ActiveShards:		map[ZoneID]uint32{ZoneIdentity: 4},
+		Locality:		Locality{Domain: " Alice.AET "},
 	}
 	decision, err := Route(input)
 	require.NoError(t, err)
@@ -190,11 +190,11 @@ func TestIdentityDomainNormalizationAndValidation(t *testing.T) {
 
 func TestContractAndAsyncLocality(t *testing.T) {
 	contractInput := RouteInput{
-		MsgType:      MsgTypeWasmExecute,
-		FeeDenom:     NativeFeeDenom,
-		TxHash:       hashBytes("contract"),
-		ActiveShards: map[ZoneID]uint32{ZoneContract: 2},
-		Locality:     Locality{ContractAddress: actor(0x44)},
+		MsgType:	MsgTypeWasmExecute,
+		FeeDenom:	NativeFeeDenom,
+		TxHash:		hashBytes("contract"),
+		ActiveShards:	map[ZoneID]uint32{ZoneContract: 2},
+		Locality:	Locality{ContractAddress: actor(0x44)},
 	}
 	contractDecision, err := Route(contractInput)
 	require.NoError(t, err)
@@ -202,11 +202,11 @@ func TestContractAndAsyncLocality(t *testing.T) {
 	require.Equal(t, actor(0x44), contractDecision.PrimaryActor)
 
 	asyncInput := RouteInput{
-		MsgType:      MsgTypeAsyncSend,
-		FeeDenom:     NativeFeeDenom,
-		TxHash:       hashBytes("async"),
-		ActiveShards: map[ZoneID]uint32{ZoneApplication: 2},
-		Locality:     Locality{AsyncDestination: actor(0x55)},
+		MsgType:	MsgTypeAsyncSend,
+		FeeDenom:	NativeFeeDenom,
+		TxHash:		hashBytes("async"),
+		ActiveShards:	map[ZoneID]uint32{ZoneApplication: 2},
+		Locality:	Locality{AsyncDestination: actor(0x55)},
 	}
 	asyncDecision, err := Route(asyncInput)
 	require.NoError(t, err)
@@ -225,27 +225,27 @@ func TestRouteRejectsMalformedLocality(t *testing.T) {
 
 func validFinancialInput() RouteInput {
 	return RouteInput{
-		MsgType:         MsgTypeBankSend,
-		FeeDenom:        NativeFeeDenom,
-		FeeClass:        2,
-		ReputationClass: 3,
-		AdmissionHeight: 42,
-		TxHash:          hashBytes("financial"),
-		RoutingEpoch:    9,
-		ActiveShards:    map[ZoneID]uint32{ZoneFinancial: 8},
-		Locality:        Locality{AccountKey: actor(0x11)},
+		MsgType:		MsgTypeBankSend,
+		FeeDenom:		NativeFeeDenom,
+		FeeClass:		2,
+		ReputationClass:	3,
+		AdmissionHeight:	42,
+		TxHash:			hashBytes("financial"),
+		RoutingEpoch:		9,
+		ActiveShards:		map[ZoneID]uint32{ZoneFinancial: 8},
+		Locality:		Locality{AccountKey: actor(0x11)},
 	}
 }
 
 func validCoreInput() RouteInput {
 	return RouteInput{
-		MsgType:         MsgTypeDelegate,
-		FeeDenom:        NativeFeeDenom,
-		FeeClass:        1,
-		ReputationClass: 1,
-		AdmissionHeight: 1,
-		TxHash:          hashBytes("core"),
-		Locality:        Locality{AccountKey: actor(0x22)},
+		MsgType:		MsgTypeDelegate,
+		FeeDenom:		NativeFeeDenom,
+		FeeClass:		1,
+		ReputationClass:	1,
+		AdmissionHeight:	1,
+		TxHash:			hashBytes("core"),
+		Locality:		Locality{AccountKey: actor(0x22)},
 	}
 }
 

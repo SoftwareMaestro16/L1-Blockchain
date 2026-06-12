@@ -62,7 +62,7 @@ func TestArchitectureAcceptanceReportRejectsUnexpectedCriterion(t *testing.T) {
 
 func validArchitectureAcceptanceInput() ArchitectureAcceptanceInput {
 	return ArchitectureAcceptanceInput{
-		AcceptanceVersion: "acceptance_18",
+		AcceptanceVersion:	"acceptance_18",
 		Criteria: []ArchitectureAcceptanceCriterion{
 			architectureAcceptance(AcceptanceAetraCoreRoots, "x_aetracore_roots"),
 			architectureAcceptance(AcceptanceZoneAdapterExecution, "x_zones_adapter"),
@@ -80,12 +80,12 @@ func validArchitectureAcceptanceInput() ArchitectureAcceptanceInput {
 
 func architectureAcceptance(criterionID, component string) ArchitectureAcceptanceCriterion {
 	return ArchitectureAcceptanceCriterion{
-		CriterionID:   criterionID,
-		Component:     component,
-		EvidenceHash:  hashStrings("architecture-acceptance-evidence", criterionID),
-		TestHash:      hashStrings("architecture-acceptance-test", criterionID),
-		Ready:         true,
-		Deterministic: true,
-		ProofBacked:   true,
+		CriterionID:	criterionID,
+		Component:	component,
+		EvidenceHash:	hashStrings("architecture-acceptance-evidence", criterionID),
+		TestHash:	hashStrings("architecture-acceptance-test", criterionID),
+		Ready:		true,
+		Deterministic:	true,
+		ProofBacked:	true,
 	}
 }

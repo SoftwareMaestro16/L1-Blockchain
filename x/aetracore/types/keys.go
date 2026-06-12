@@ -3,11 +3,11 @@ package types
 import "fmt"
 
 const (
-	ModuleName = "aetracore"
-	StoreKey   = ModuleName
+	ModuleName	= "aetracore"
+	StoreKey	= ModuleName
 
-	AetherKernelParamsKey = "aek/params"
-	CoreParamsKey         = "core/params"
+	AetherKernelParamsKey	= "aek/params"
+	CoreParamsKey		= "core/params"
 )
 
 func CoreZoneKey(zoneID ZoneID) (string, error) {

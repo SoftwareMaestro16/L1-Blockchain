@@ -89,7 +89,7 @@ the module is referenced from app code or app tests. `Proto` checks
 | x/reputation | Validator reputation types | yes | no | no | no | 2 | KEEP_NATIVE | Keep native when used for validator safety | none | reputation bounds and evidence integration |
 | x/routing | System routing | yes | yes | no | no | 3 | KEEP_NATIVE | Keep native | none | route admission and determinism tests |
 | x/scheduler | Protocol scheduler | yes | yes | yes | no | 2 | KEEP_NATIVE | Keep native | none | bounded task and genesis tests |
-| x/schedulerv2 | Scheduler specs/types | no | no | no | no | 1 | CONSOLIDATE_AVM_RUNTIME | Merge with scheduler/AVM scheduler roadmap | scheduler v2 decision | scheduler compatibility tests |
+| x/schedulerv2 | Scheduler specs/types | no | no | no | no | 1 | CONSOLIDATE_AVM_RUNTIME | Merged into x/scheduler (DAG + MailboxPlan + ReplayHash) | done | merged |
 | x/services | Service registry/app payments | yes | yes | yes | no | 20 | MOVE_TO_CONTRACT | Mark deprecated native app logic; service registry products move to contracts | contract service registry/retry/payment replacement | service contract and compatibility tests |
 | x/sharding | Sharding simulation/types | yes | no | no | no | 2 | KEEP_NATIVE | Keep native sharding coordination support | none | sharding sim/coordinator tests |
 | x/sharding-coordinator | Native sharding coordinator | yes | yes | yes | no | 2 | KEEP_NATIVE | Keep native | none | coordinator genesis and invariant tests |

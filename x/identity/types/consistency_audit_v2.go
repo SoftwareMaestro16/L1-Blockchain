@@ -7,30 +7,30 @@ import (
 type IdentityConsistencySeverityV2 string
 
 const (
-	IdentityConsistencySeverityErrorV2   IdentityConsistencySeverityV2 = "error"
-	IdentityConsistencySeverityWarningV2 IdentityConsistencySeverityV2 = "warning"
+	IdentityConsistencySeverityErrorV2	IdentityConsistencySeverityV2	= "error"
+	IdentityConsistencySeverityWarningV2	IdentityConsistencySeverityV2	= "warning"
 )
 
 type IdentityConsistencyIssueV2 struct {
-	Code     string
-	Severity IdentityConsistencySeverityV2
-	Name     string
-	NameHash string
-	Message  string
+	Code		string
+	Severity	IdentityConsistencySeverityV2
+	Name		string
+	NameHash	string
+	Message		string
 }
 
 type IdentityConsistencyAuditRequestV2 struct {
-	State                      IdentityState
-	Height                     uint64
-	Delegations                []DelegationRecordV2
-	AllowReservedResolver      bool
-	AllowRenewalAuctionForName bool
+	State				IdentityState
+	Height				uint64
+	Delegations			[]DelegationRecordV2
+	AllowReservedResolver		bool
+	AllowRenewalAuctionForName	bool
 }
 
 type IdentityConsistencyAuditResultV2 struct {
-	Height uint64
-	Valid  bool
-	Issues []IdentityConsistencyIssueV2
+	Height	uint64
+	Valid	bool
+	Issues	[]IdentityConsistencyIssueV2
 }
 
 func QueryIdentityPeriodicConsistencyAuditV2(request IdentityConsistencyAuditRequestV2) IdentityConsistencyAuditResultV2 {
@@ -44,11 +44,11 @@ func QueryIdentityPeriodicConsistencyAuditV2(request IdentityConsistencyAuditReq
 		}
 		result.Valid = false
 		result.Issues = append(result.Issues, IdentityConsistencyIssueV2{
-			Code:     code,
-			Severity: IdentityConsistencySeverityErrorV2,
-			Name:     name,
-			NameHash: nameHash,
-			Message:  message,
+			Code:		code,
+			Severity:	IdentityConsistencySeverityErrorV2,
+			Name:		name,
+			NameHash:	nameHash,
+			Message:	message,
 		})
 	}
 	if request.Height == 0 {

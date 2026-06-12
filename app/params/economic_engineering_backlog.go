@@ -7,90 +7,90 @@ import (
 )
 
 const (
-	EconomicBacklogPriorityHigh   = "high"
-	EconomicBacklogPriorityMedium = "medium"
-	EconomicBacklogPriorityLower  = "lower"
+	EconomicBacklogPriorityHigh	= "high"
+	EconomicBacklogPriorityMedium	= "medium"
+	EconomicBacklogPriorityLower	= "lower"
 
-	EconomicBacklogAddEconomicsLocalExclude       = "add_economics_md_to_local_git_exclude"
-	EconomicBacklogEpochEconomicReportDataModel   = "implement_epoch_economic_report_data_model"
-	EconomicBacklogNetIssuanceAccounting          = "add_net_issuance_accounting"
-	EconomicBacklogBurnAccountingQueries          = "add_burn_accounting_and_queries"
-	EconomicBacklogBurnFeeDistribution            = "wire_burn_allocation_into_fee_distribution"
-	EconomicBacklogDeflationGuard                 = "enforce_deflation_guard"
-	EconomicBacklogFeeAllocationInvariantTests    = "add_fee_allocation_invariant_tests"
-	EconomicBacklogSlashingRouteInvariantTests    = "add_slashing_route_invariant_tests"
-	EconomicBacklogValidatorConcentrationQueries  = "add_validator_concentration_queries"
-	EconomicBacklogStateGrowthTelemetry           = "add_state_growth_telemetry"
-	EconomicBacklogValidatorRiskScoreQuery        = "implement_validator_risk_score_query"
-	EconomicBacklogCommissionChangeWarningEvent   = "implement_commission_change_warning_event"
-	EconomicBacklogDynamicBaseFeeSimulationTests  = "add_dynamic_base_fee_simulation_tests"
-	EconomicBacklogSenderLocalSpamSurchargeDesign = "add_sender_local_spam_surcharge_design"
-	EconomicBacklogStoragePricingSpecification    = "add_storage_pricing_specification"
-	EconomicBacklogSupplyProjectionCommandOrQuery = "add_supply_projection_command_or_query"
-	EconomicBacklogGovernanceImpactReport         = "add_governance_parameter_impact_report"
-	EconomicBacklogFullStateRentLifecycle         = "implement_full_state_rent_lifecycle"
-	EconomicBacklogAdaptiveInflationController    = "implement_adaptive_inflation_controller"
-	EconomicBacklogSecurityReserveModule          = "implement_security_reserve_module"
-	EconomicBacklogFeeMarketCircuitBreaker        = "implement_fee_market_circuit_breaker"
-	EconomicBacklogDelegationSimulator            = "implement_delegation_simulator"
-	EconomicBacklogValidatorBootstrapBand         = "implement_validator_bootstrap_band"
+	EconomicBacklogAddEconomicsLocalExclude		= "add_economics_md_to_local_git_exclude"
+	EconomicBacklogEpochEconomicReportDataModel	= "implement_epoch_economic_report_data_model"
+	EconomicBacklogNetIssuanceAccounting		= "add_net_issuance_accounting"
+	EconomicBacklogBurnAccountingQueries		= "add_burn_accounting_and_queries"
+	EconomicBacklogBurnFeeDistribution		= "wire_burn_allocation_into_fee_distribution"
+	EconomicBacklogDeflationGuard			= "enforce_deflation_guard"
+	EconomicBacklogFeeAllocationInvariantTests	= "add_fee_allocation_invariant_tests"
+	EconomicBacklogSlashingRouteInvariantTests	= "add_slashing_route_invariant_tests"
+	EconomicBacklogValidatorConcentrationQueries	= "add_validator_concentration_queries"
+	EconomicBacklogStateGrowthTelemetry		= "add_state_growth_telemetry"
+	EconomicBacklogValidatorRiskScoreQuery		= "implement_validator_risk_score_query"
+	EconomicBacklogCommissionChangeWarningEvent	= "implement_commission_change_warning_event"
+	EconomicBacklogDynamicBaseFeeSimulationTests	= "add_dynamic_base_fee_simulation_tests"
+	EconomicBacklogSenderLocalSpamSurchargeDesign	= "add_sender_local_spam_surcharge_design"
+	EconomicBacklogStoragePricingSpecification	= "add_storage_pricing_specification"
+	EconomicBacklogSupplyProjectionCommandOrQuery	= "add_supply_projection_command_or_query"
+	EconomicBacklogGovernanceImpactReport		= "add_governance_parameter_impact_report"
+	EconomicBacklogFullStateRentLifecycle		= "implement_full_state_rent_lifecycle"
+	EconomicBacklogAdaptiveInflationController	= "implement_adaptive_inflation_controller"
+	EconomicBacklogSecurityReserveModule		= "implement_security_reserve_module"
+	EconomicBacklogFeeMarketCircuitBreaker		= "implement_fee_market_circuit_breaker"
+	EconomicBacklogDelegationSimulator		= "implement_delegation_simulator"
+	EconomicBacklogValidatorBootstrapBand		= "implement_validator_bootstrap_band"
 
-	EconomicNonGoalSecondStakingAsset                  = "do_not_introduce_second_staking_asset"
-	EconomicNonGoalExternalValidatorRewardAssets       = "do_not_use_external_assets_for_validator_rewards"
-	EconomicNonGoalOffChainFeeAccounting               = "do_not_use_off_chain_data_for_fee_accounting"
-	EconomicNonGoalNondeterministicConsensusReputation = "do_not_use_nondeterministic_reputation_in_consensus"
-	EconomicNonGoalUnverifiableValidatorIdentity       = "do_not_rely_on_unverifiable_validator_identity"
-	EconomicNonGoalDiscretionarySlashing               = "do_not_reduce_slashing_determinism"
-	EconomicNonGoalBurnOverSecurityBudget              = "do_not_prioritize_burn_over_security_budget"
-	EconomicNonGoalUnboundedControllers                = "do_not_allow_unbounded_untested_controllers"
+	EconomicNonGoalSecondStakingAsset			= "do_not_introduce_second_staking_asset"
+	EconomicNonGoalExternalValidatorRewardAssets		= "do_not_use_external_assets_for_validator_rewards"
+	EconomicNonGoalOffChainFeeAccounting			= "do_not_use_off_chain_data_for_fee_accounting"
+	EconomicNonGoalNondeterministicConsensusReputation	= "do_not_use_nondeterministic_reputation_in_consensus"
+	EconomicNonGoalUnverifiableValidatorIdentity		= "do_not_rely_on_unverifiable_validator_identity"
+	EconomicNonGoalDiscretionarySlashing			= "do_not_reduce_slashing_determinism"
+	EconomicNonGoalBurnOverSecurityBudget			= "do_not_prioritize_burn_over_security_budget"
+	EconomicNonGoalUnboundedControllers			= "do_not_allow_unbounded_untested_controllers"
 )
 
 type EconomicEngineeringBacklogItem struct {
-	ID                string
-	Priority          string
-	Description       string
-	Evidence          []string
-	RequiresTests     bool
-	RequiresTelemetry bool
-	RequiresQuery     bool
-	LocalOnly         bool
-	Tracked           bool
+	ID			string
+	Priority		string
+	Description		string
+	Evidence		[]string
+	RequiresTests		bool
+	RequiresTelemetry	bool
+	RequiresQuery		bool
+	LocalOnly		bool
+	Tracked			bool
 }
 
 type EconomicEngineeringBacklogReport struct {
-	Items             []EconomicEngineeringBacklogItem
-	RequiredHigh      int
-	RequiredMedium    int
-	RequiredLower     int
-	CoveredHigh       int
-	CoveredMedium     int
-	CoveredLower      int
-	HighCoverageBps   int64
-	MediumCoverageBps int64
-	LowerCoverageBps  int64
-	Passed            bool
-	Failed            []string
-	Summary           string
+	Items			[]EconomicEngineeringBacklogItem
+	RequiredHigh		int
+	RequiredMedium		int
+	RequiredLower		int
+	CoveredHigh		int
+	CoveredMedium		int
+	CoveredLower		int
+	HighCoverageBps		int64
+	MediumCoverageBps	int64
+	LowerCoverageBps	int64
+	Passed			bool
+	Failed			[]string
+	Summary			string
 }
 
 type EconomicNonGoal struct {
-	ID                  string
-	Statement           string
-	Enforcement         []string
-	ConsensusCritical   bool
-	DeterminismGuard    bool
-	SecurityBudgetGuard bool
-	Tracked             bool
+	ID			string
+	Statement		string
+	Enforcement		[]string
+	ConsensusCritical	bool
+	DeterminismGuard	bool
+	SecurityBudgetGuard	bool
+	Tracked			bool
 }
 
 type EconomicNonGoalReport struct {
-	NonGoals    []EconomicNonGoal
-	Required    int
-	Covered     int
-	CoverageBps int64
-	Passed      bool
-	Failed      []string
-	Summary     string
+	NonGoals	[]EconomicNonGoal
+	Required	int
+	Covered		int
+	CoverageBps	int64
+	Passed		bool
+	Failed		[]string
+	Summary		string
 }
 
 func DefaultEconomicEngineeringBacklog() []EconomicEngineeringBacklogItem {
@@ -144,19 +144,19 @@ func BuildEconomicEngineeringBacklogReport(items []EconomicEngineeringBacklogIte
 	mediumCoverage := coverageBps(covered[EconomicBacklogPriorityMedium], required[EconomicBacklogPriorityMedium])
 	lowerCoverage := coverageBps(covered[EconomicBacklogPriorityLower], required[EconomicBacklogPriorityLower])
 	return EconomicEngineeringBacklogReport{
-		Items:             out,
-		RequiredHigh:      required[EconomicBacklogPriorityHigh],
-		RequiredMedium:    required[EconomicBacklogPriorityMedium],
-		RequiredLower:     required[EconomicBacklogPriorityLower],
-		CoveredHigh:       covered[EconomicBacklogPriorityHigh],
-		CoveredMedium:     covered[EconomicBacklogPriorityMedium],
-		CoveredLower:      covered[EconomicBacklogPriorityLower],
-		HighCoverageBps:   highCoverage,
-		MediumCoverageBps: mediumCoverage,
-		LowerCoverageBps:  lowerCoverage,
-		Passed:            len(failed) == 0 && highCoverage == BasisPoints && mediumCoverage == BasisPoints && lowerCoverage == BasisPoints,
-		Failed:            failed,
-		Summary:           fmt.Sprintf("backlog_high=%d/%d backlog_medium=%d/%d backlog_lower=%d/%d coverage_bps=%d/%d/%d", covered[EconomicBacklogPriorityHigh], required[EconomicBacklogPriorityHigh], covered[EconomicBacklogPriorityMedium], required[EconomicBacklogPriorityMedium], covered[EconomicBacklogPriorityLower], required[EconomicBacklogPriorityLower], highCoverage, mediumCoverage, lowerCoverage),
+		Items:			out,
+		RequiredHigh:		required[EconomicBacklogPriorityHigh],
+		RequiredMedium:		required[EconomicBacklogPriorityMedium],
+		RequiredLower:		required[EconomicBacklogPriorityLower],
+		CoveredHigh:		covered[EconomicBacklogPriorityHigh],
+		CoveredMedium:		covered[EconomicBacklogPriorityMedium],
+		CoveredLower:		covered[EconomicBacklogPriorityLower],
+		HighCoverageBps:	highCoverage,
+		MediumCoverageBps:	mediumCoverage,
+		LowerCoverageBps:	lowerCoverage,
+		Passed:			len(failed) == 0 && highCoverage == BasisPoints && mediumCoverage == BasisPoints && lowerCoverage == BasisPoints,
+		Failed:			failed,
+		Summary:		fmt.Sprintf("backlog_high=%d/%d backlog_medium=%d/%d backlog_lower=%d/%d coverage_bps=%d/%d/%d", covered[EconomicBacklogPriorityHigh], required[EconomicBacklogPriorityHigh], covered[EconomicBacklogPriorityMedium], required[EconomicBacklogPriorityMedium], covered[EconomicBacklogPriorityLower], required[EconomicBacklogPriorityLower], highCoverage, mediumCoverage, lowerCoverage),
 	}
 }
 
@@ -168,39 +168,39 @@ func BuildEconomicNonGoalReport(nonGoals []EconomicNonGoal) EconomicNonGoalRepor
 	sort.Strings(failed)
 	coverage := coverageBps(covered, required)
 	return EconomicNonGoalReport{
-		NonGoals:    out,
-		Required:    required,
-		Covered:     covered,
-		CoverageBps: coverage,
-		Passed:      len(failed) == 0 && coverage == BasisPoints,
-		Failed:      failed,
-		Summary:     fmt.Sprintf("economic_non_goals=%d/%d coverage_bps=%d", covered, required, coverage),
+		NonGoals:	out,
+		Required:	required,
+		Covered:	covered,
+		CoverageBps:	coverage,
+		Passed:		len(failed) == 0 && coverage == BasisPoints,
+		Failed:		failed,
+		Summary:	fmt.Sprintf("economic_non_goals=%d/%d coverage_bps=%d", covered, required, coverage),
 	}
 }
 
 func backlogItem(priority, id, description string, evidence []string, requiresTests, requiresTelemetry, requiresQuery, localOnly bool) EconomicEngineeringBacklogItem {
 	return EconomicEngineeringBacklogItem{
-		ID:                id,
-		Priority:          priority,
-		Description:       description,
-		Evidence:          append([]string{}, evidence...),
-		RequiresTests:     requiresTests,
-		RequiresTelemetry: requiresTelemetry,
-		RequiresQuery:     requiresQuery,
-		LocalOnly:         localOnly,
-		Tracked:           true,
+		ID:			id,
+		Priority:		priority,
+		Description:		description,
+		Evidence:		append([]string{}, evidence...),
+		RequiresTests:		requiresTests,
+		RequiresTelemetry:	requiresTelemetry,
+		RequiresQuery:		requiresQuery,
+		LocalOnly:		localOnly,
+		Tracked:		true,
 	}
 }
 
 func nonGoal(id, statement string, enforcement []string, consensusCritical, determinismGuard, securityBudgetGuard bool) EconomicNonGoal {
 	return EconomicNonGoal{
-		ID:                  id,
-		Statement:           statement,
-		Enforcement:         append([]string{}, enforcement...),
-		ConsensusCritical:   consensusCritical,
-		DeterminismGuard:    determinismGuard,
-		SecurityBudgetGuard: securityBudgetGuard,
-		Tracked:             true,
+		ID:			id,
+		Statement:		statement,
+		Enforcement:		append([]string{}, enforcement...),
+		ConsensusCritical:	consensusCritical,
+		DeterminismGuard:	determinismGuard,
+		SecurityBudgetGuard:	securityBudgetGuard,
+		Tracked:		true,
 	}
 }
 
@@ -398,13 +398,13 @@ func requiredEconomicEngineeringBacklogIDs() map[string][]string {
 
 func requiredEconomicNonGoalIDs() map[string]struct{} {
 	return map[string]struct{}{
-		EconomicNonGoalSecondStakingAsset:                  {},
-		EconomicNonGoalExternalValidatorRewardAssets:       {},
-		EconomicNonGoalOffChainFeeAccounting:               {},
-		EconomicNonGoalNondeterministicConsensusReputation: {},
-		EconomicNonGoalUnverifiableValidatorIdentity:       {},
-		EconomicNonGoalDiscretionarySlashing:               {},
-		EconomicNonGoalBurnOverSecurityBudget:              {},
-		EconomicNonGoalUnboundedControllers:                {},
+		EconomicNonGoalSecondStakingAsset:			{},
+		EconomicNonGoalExternalValidatorRewardAssets:		{},
+		EconomicNonGoalOffChainFeeAccounting:			{},
+		EconomicNonGoalNondeterministicConsensusReputation:	{},
+		EconomicNonGoalUnverifiableValidatorIdentity:		{},
+		EconomicNonGoalDiscretionarySlashing:			{},
+		EconomicNonGoalBurnOverSecurityBudget:			{},
+		EconomicNonGoalUnboundedControllers:			{},
 	}
 }

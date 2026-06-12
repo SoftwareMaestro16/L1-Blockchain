@@ -13,12 +13,12 @@ func TestIdentityResolutionProofLightClientV2ReturnsVerifiedPrimary(t *testing.T
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		TargetType:      IdentityResolutionTargetPrimary,
-		CurrentHeight:   20,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "alice.aet", target.Name)
@@ -35,12 +35,12 @@ func TestIdentityResolutionProofLightClientV2FailureCodes(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolvePrimary, 14, 30, nil)
 
 	base := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		TargetType:      IdentityResolutionTargetPrimary,
-		CurrentHeight:   20,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		TargetType:		IdentityResolutionTargetPrimary,
+		CurrentHeight:		20,
 	}
 
 	invalidName := base
@@ -86,12 +86,12 @@ func TestIdentityResolutionProofLightClientV2ReverseConsistency(t *testing.T) {
 	proof := buildLightClientFormatProofV2(t, state, "alice.aet", IdentityProofQueryResolveReverse, 14, 30, addr(2))
 
 	base := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:          "aetra-local-1",
-		RequestedName:            "alice.aet",
-		TrustedHeader:            trustedHeaderForProofV2(proof),
-		Proof:                    proof,
-		TargetType:               IdentityResolutionTargetPrimary,
-		RequireReverseResolution: true,
+		ExpectedChainID:		"aetra-local-1",
+		RequestedName:			"alice.aet",
+		TrustedHeader:			trustedHeaderForProofV2(proof),
+		Proof:				proof,
+		TargetType:			IdentityResolutionTargetPrimary,
+		RequireReverseResolution:	true,
 	}
 	_, err = VerifyIdentityResolutionProofLightClientV2(base)
 	require.NoError(t, err)
@@ -110,23 +110,23 @@ func TestIdentityResolutionProofLightClientV2VerifiesRecursivePath(t *testing.T)
 	require.NoError(t, err)
 
 	_, err = VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		RecursiveProof:  &recursive,
-		TargetType:      IdentityResolutionTargetPrimary,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		RecursiveProof:		&recursive,
+		TargetType:		IdentityResolutionTargetPrimary,
 	})
 	require.NoError(t, err)
 
 	recursive.PathDomainRecords = nil
 	req := IdentityLightClientVerificationRequestV2{
-		ExpectedChainID: "aetra-local-1",
-		RequestedName:   "alice.aet",
-		TrustedHeader:   trustedHeaderForProofV2(proof),
-		Proof:           proof,
-		RecursiveProof:  &recursive,
-		TargetType:      IdentityResolutionTargetPrimary,
+		ExpectedChainID:	"aetra-local-1",
+		RequestedName:		"alice.aet",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			proof,
+		RecursiveProof:		&recursive,
+		TargetType:		IdentityResolutionTargetPrimary,
 	}
 	requireLightClientCodeV2(t, req, IdentityLightClientErrProofInvalid)
 }
@@ -135,25 +135,25 @@ func TestIdentityResolutionProofLightClientV2SkipsDisabledContractTargets(t *tes
 	nameHash, err := DomainRecordV2NameHash("alice.aet")
 	require.NoError(t, err)
 	record := UnifiedResolutionRecordV2{
-		NameHash: nameHash,
-		Owner:    addr(1),
+		NameHash:	nameHash,
+		Owner:		addr(1),
 		ContractTargets: []ContractTargetV2{{
-			TargetID:        "swap",
-			ContractAddress: addr(3),
-			Enabled:         false,
-			UpdatedAtHeight: 12,
+			TargetID:		"swap",
+			ContractAddress:	addr(3),
+			Enabled:		false,
+			UpdatedAtHeight:	12,
 		}},
-		RecordVersion:   1,
-		RecordTTL:       30,
-		UpdatedAtHeight: 12,
-		MaxPayloadBytes: MaxUnifiedPayloadBytesV2,
-		SchemaVersion:   UnifiedResolutionSchemaVersionV2,
+		RecordVersion:		1,
+		RecordTTL:		30,
+		UpdatedAtHeight:	12,
+		MaxPayloadBytes:	MaxUnifiedPayloadBytesV2,
+		SchemaVersion:		UnifiedResolutionSchemaVersionV2,
 	}
 	require.NoError(t, ValidateUnifiedResolutionRecordV2(record))
 
 	_, err = lightClientTargetFromRecordV2(record, IdentityLightClientVerificationRequestV2{
-		TargetType: IdentityResolutionTargetContract,
-		TargetKey:  "swap",
+		TargetType:	IdentityResolutionTargetContract,
+		TargetKey:	"swap",
 	})
 	code, ok := IdentityLightClientFailureCodeFromErrorV2(err)
 	require.True(t, ok)
@@ -171,10 +171,10 @@ func buildLightClientFormatProofV2(t *testing.T, state IdentityState, name strin
 
 func trustedHeaderForProofV2(proof IdentityResolutionProofFormatV2) IdentityTrustedHeaderV2 {
 	return IdentityTrustedHeaderV2{
-		ChainID: proof.ChainID,
-		Height:  proof.Height,
-		AppHash: proof.AppHash,
-		Trusted: true,
+		ChainID:	proof.ChainID,
+		Height:		proof.Height,
+		AppHash:	proof.AppHash,
+		Trusted:	true,
 	}
 }
 

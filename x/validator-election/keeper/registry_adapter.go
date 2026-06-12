@@ -23,10 +23,10 @@ type StakingSetSyncer interface {
 }
 
 type StakingValidatorUpdate struct {
-	OperatorAddress    string
-	ConsensusPublicKey string
-	VotingPower        uint64
-	Remove             bool
+	OperatorAddress		string
+	ConsensusPublicKey	string
+	VotingPower		uint64
+	Remove			bool
 }
 
 func (k *Keeper) ApplyRegisteredValidator(authority, operator string, height uint64, registry ValidatorRegistryReader, insurance ValidatorInsuranceReader) (types.CandidateApplication, error) {
@@ -44,15 +44,15 @@ func (k *Keeper) ApplyRegisteredValidator(authority, operator string, height uin
 		return types.CandidateApplication{}, err
 	}
 	return k.ApplyForValidatorSet(types.MsgApplyForValidatorSet{
-		Authority: authority,
+		Authority:	authority,
 		Application: types.CandidateApplication{
-			OperatorAddress:    record.OperatorAddress,
-			ConsensusPublicKey: record.ConsensusPublicKey,
-			RequestedPower:     registryVotingPower(record, k.genesis.Params),
-			SelfBond:           registryVotingPower(record, k.genesis.Params),
-			ValidatorStatus:    record.Status,
+			OperatorAddress:	record.OperatorAddress,
+			ConsensusPublicKey:	record.ConsensusPublicKey,
+			RequestedPower:		registryVotingPower(record, k.genesis.Params),
+			SelfBond:		registryVotingPower(record, k.genesis.Params),
+			ValidatorStatus:	record.Status,
 		},
-		Height: height,
+		Height:	height,
 	})
 }
 
@@ -89,10 +89,10 @@ func (k *Keeper) CommitElectionWithRegistryPolicy(msg types.MsgCommitElection, r
 		return types.ElectionResult{}, err
 	}
 	result := types.ElectionResult{
-		Epoch:     k.genesis.State.ElectionEpoch,
-		Height:    msg.Height,
-		NextSet:   types.SortValidatorSet(nextSet),
-		Committed: true,
+		Epoch:		k.genesis.State.ElectionEpoch,
+		Height:		msg.Height,
+		NextSet:	types.SortValidatorSet(nextSet),
+		Committed:	true,
 	}
 	next := cloneGenesis(k.genesis)
 	next.State.NextValidatorSet = result.NextSet
@@ -124,16 +124,16 @@ func (k Keeper) SyncCurrentSetToStaking(ctx context.Context, syncer StakingSetSy
 			continue
 		}
 		updates = append(updates, StakingValidatorUpdate{
-			OperatorAddress:    validator.OperatorAddress,
-			ConsensusPublicKey: validator.ConsensusPublicKey,
-			Remove:             true,
+			OperatorAddress:	validator.OperatorAddress,
+			ConsensusPublicKey:	validator.ConsensusPublicKey,
+			Remove:			true,
 		})
 	}
 	for _, validator := range current {
 		updates = append(updates, StakingValidatorUpdate{
-			OperatorAddress:    validator.OperatorAddress,
-			ConsensusPublicKey: validator.ConsensusPublicKey,
-			VotingPower:        validator.VotingPower,
+			OperatorAddress:	validator.OperatorAddress,
+			ConsensusPublicKey:	validator.ConsensusPublicKey,
+			VotingPower:		validator.VotingPower,
 		})
 	}
 	for _, update := range updates {

@@ -14,231 +14,231 @@ import (
 )
 
 const (
-	AVM2ContractStatePrefixCode         = "contract/code"
-	AVM2ContractStatePrefixInstance     = "contract/instance"
-	AVM2ContractStatePrefixStorage      = "contract/storage"
-	AVM2ContractStatePrefixABI          = "contract/abi"
-	AVM2ContractStatePrefixEvents       = "contract/events"
-	AVM2ContractStatePrefixMessageNonce = "contract/message_nonce"
+	AVMContractStatePrefixCode		= "contract/code"
+	AVMContractStatePrefixInstance		= "contract/instance"
+	AVMContractStatePrefixStorage		= "contract/storage"
+	AVMContractStatePrefixABI		= "contract/abi"
+	AVMContractStatePrefixEvents		= "contract/events"
+	AVMContractStatePrefixMessageNonce	= "contract/message_nonce"
 
-	AVM2ContractValueCodeRecord     = "CodeRecord"
-	AVM2ContractValueContractRecord = "ContractRecord"
-	AVM2ContractValueStorageValue   = "StorageValue"
-	AVM2ContractValueABIDescriptor  = "AbiDescriptor"
-	AVM2ContractValueContractEvent  = "ContractEvent"
-	AVM2ContractValueMessageNonce   = "uint64"
+	AVMContractValueCodeRecord	= "CodeRecord"
+	AVMContractValueContractRecord	= "ContractRecord"
+	AVMContractValueStorageValue	= "StorageValue"
+	AVMContractValueABIDescriptor	= "AbiDescriptor"
+	AVMContractValueContractEvent	= "ContractEvent"
+	AVMContractValueMessageNonce	= "uint64"
 
-	AVM2MeteringProfileDefault = "default-avm2"
+	AVMMeteringProfileDefault	= "default-AVM"
 )
 
-type AVM2ContractStateEntry struct {
-	Key       string
-	ValueType string
-	Purpose   string
-	ShardKey  string
-	EntryHash string
+type AVMContractStateEntry struct {
+	Key		string
+	ValueType	string
+	Purpose		string
+	ShardKey	string
+	EntryHash	string
 }
 
-type AVM2ContractStateLayout struct {
-	Entries    []AVM2ContractStateEntry
-	LayoutRoot string
+type AVMContractStateLayout struct {
+	Entries		[]AVMContractStateEntry
+	LayoutRoot	string
 }
 
-type AVM2CodeRecord struct {
-	CodeID                uint64
-	CodeHash              string
-	VMVersion             uint64
-	InstructionSetVersion uint64
-	ABIHash               string
-	Deployer              string
-	CreatedAtHeight       uint64
-	CodeBytesRef          string
-	MeteringProfile       string
-	Enabled               bool
-	RecordHash            string
+type AVMCodeRecord struct {
+	CodeID			uint64
+	CodeHash		string
+	VMVersion		uint64
+	InstructionSetVersion	uint64
+	ABIHash			string
+	Deployer		string
+	CreatedAtHeight		uint64
+	CodeBytesRef		string
+	MeteringProfile		string
+	Enabled			bool
+	RecordHash		string
 }
 
-type AVM2ContractRecord struct {
-	ContractAddr    string
-	CodeID          uint64
-	Creator         string
-	AdminOptional   string
-	StorageRoot     string
-	BalanceNAET     sdkmath.Int
-	CreatedAtHeight uint64
-	UpdatedAtHeight uint64
-	InstanceVersion uint64
-	ShardID         uint32
-	RecordHash      string
+type AVMContractRecord struct {
+	ContractAddr	string
+	CodeID		uint64
+	Creator		string
+	AdminOptional	string
+	StorageRoot	string
+	BalanceNAET	sdkmath.Int
+	CreatedAtHeight	uint64
+	UpdatedAtHeight	uint64
+	InstanceVersion	uint64
+	ShardID		uint32
+	RecordHash	string
 }
 
-type AVM2ContractStorageValue struct {
-	ContractAddr string
-	StorageKey   string
-	ValueHash    string
-	ValueBytes   uint64
-	ShardKey     string
-	RecordHash   string
+type AVMContractStorageValue struct {
+	ContractAddr	string
+	StorageKey	string
+	ValueHash	string
+	ValueBytes	uint64
+	ShardKey	string
+	RecordHash	string
 }
 
-type AVM2ContractABIDescriptorRecord struct {
-	CodeID     uint64
-	ABI        AVM2ABIDescriptor
-	Key        string
-	ShardKey   string
-	RecordHash string
+type AVMContractABIDescriptorRecord struct {
+	CodeID		uint64
+	ABI		AVMABIDescriptor
+	Key		string
+	ShardKey	string
+	RecordHash	string
 }
 
-type AVM2ContractEventRecord struct {
-	Event      AVM2Event
-	Key        string
-	ShardKey   string
-	RecordHash string
+type AVMContractEventRecord struct {
+	Event		AVMEvent
+	Key		string
+	ShardKey	string
+	RecordHash	string
 }
 
-type AVM2ContractMessageNonceRecord struct {
-	ContractAddr string
-	Nonce        uint64
-	Key          string
-	ShardKey     string
-	RecordHash   string
+type AVMContractMessageNonceRecord struct {
+	ContractAddr	string
+	Nonce		uint64
+	Key		string
+	ShardKey	string
+	RecordHash	string
 }
 
-type AVM2ContractStateIndex struct {
-	Layout        AVM2ContractStateLayout
-	Codes         []AVM2CodeRecord
-	Contracts     []AVM2ContractRecord
-	Storage       []AVM2ContractStorageValue
-	ABIs          []AVM2ContractABIDescriptorRecord
-	Events        []AVM2ContractEventRecord
-	MessageNonces []AVM2ContractMessageNonceRecord
-	StateRoot     string
+type AVMContractStateIndex struct {
+	Layout		AVMContractStateLayout
+	Codes		[]AVMCodeRecord
+	Contracts	[]AVMContractRecord
+	Storage		[]AVMContractStorageValue
+	ABIs		[]AVMContractABIDescriptorRecord
+	Events		[]AVMContractEventRecord
+	MessageNonces	[]AVMContractMessageNonceRecord
+	StateRoot	string
 }
 
-func DefaultAVM2ContractStateLayout() (AVM2ContractStateLayout, error) {
-	layout := AVM2ContractStateLayout{Entries: []AVM2ContractStateEntry{
+func DefaultAVMContractStateLayout() (AVMContractStateLayout, error) {
+	layout := AVMContractStateLayout{Entries: []AVMContractStateEntry{
 		{
-			Key:       AVM2ContractCodeStateKey(1),
-			ValueType: AVM2ContractValueCodeRecord,
-			Purpose:   "code metadata, hashes, VM version, metering profile, and enablement",
-			ShardKey:  "code_id",
+			Key:		AVMContractCodeStateKey(1),
+			ValueType:	AVMContractValueCodeRecord,
+			Purpose:	"code metadata, hashes, VM version, metering profile, and enablement",
+			ShardKey:	"code_id",
 		},
 		{
-			Key:       AVM2ContractInstanceStateKey("contract_addr"),
-			ValueType: AVM2ContractValueContractRecord,
-			Purpose:   "contract instance metadata, code binding, admin, balance, storage root, and shard assignment",
-			ShardKey:  "contract_addr",
+			Key:		AVMContractInstanceStateKey("contract_addr"),
+			ValueType:	AVMContractValueContractRecord,
+			Purpose:	"contract instance metadata, code binding, admin, balance, storage root, and shard assignment",
+			ShardKey:	"contract_addr",
 		},
 		{
-			Key:       AVM2ContractStorageStateKey("contract_addr", "storage_key"),
-			ValueType: AVM2ContractValueStorageValue,
-			Purpose:   "contract-owned persistent key-value state",
-			ShardKey:  "contract_addr/storage_key_prefix",
+			Key:		AVMContractStorageStateKey("contract_addr", "storage_key"),
+			ValueType:	AVMContractValueStorageValue,
+			Purpose:	"contract-owned persistent key-value state",
+			ShardKey:	"contract_addr/storage_key_prefix",
 		},
 		{
-			Key:       AVM2ContractABIStateKey(1, 1),
-			ValueType: AVM2ContractValueABIDescriptor,
-			Purpose:   "versioned ABI and schema metadata for calls, events, and errors",
-			ShardKey:  "code_id",
+			Key:		AVMContractABIStateKey(1, 1),
+			ValueType:	AVMContractValueABIDescriptor,
+			Purpose:	"versioned ABI and schema metadata for calls, events, and errors",
+			ShardKey:	"code_id",
 		},
 		{
-			Key:       AVM2ContractEventStateKey(1, "contract_addr", "event_id"),
-			ValueType: AVM2ContractValueContractEvent,
-			Purpose:   "deterministic contract event output included in event roots",
-			ShardKey:  "contract_addr",
+			Key:		AVMContractEventStateKey(1, "contract_addr", "event_id"),
+			ValueType:	AVMContractValueContractEvent,
+			Purpose:	"deterministic contract event output included in event roots",
+			ShardKey:	"contract_addr",
 		},
 		{
-			Key:       AVM2ContractMessageNonceStateKey("contract_addr"),
-			ValueType: AVM2ContractValueMessageNonce,
-			Purpose:   "replay-safe nonce for contract-emitted messages",
-			ShardKey:  "contract_addr",
+			Key:		AVMContractMessageNonceStateKey("contract_addr"),
+			ValueType:	AVMContractValueMessageNonce,
+			Purpose:	"replay-safe nonce for contract-emitted messages",
+			ShardKey:	"contract_addr",
 		},
 	}}
-	layout = canonicalAVM2ContractStateLayout(layout)
+	layout = canonicalAVMContractStateLayout(layout)
 	for i := range layout.Entries {
-		layout.Entries[i].EntryHash = ComputeAVM2ContractStateEntryHash(layout.Entries[i])
+		layout.Entries[i].EntryHash = ComputeAVMContractStateEntryHash(layout.Entries[i])
 	}
-	layout = canonicalAVM2ContractStateLayout(layout)
-	layout.LayoutRoot = ComputeAVM2ContractStateLayoutRoot(layout)
+	layout = canonicalAVMContractStateLayout(layout)
+	layout.LayoutRoot = ComputeAVMContractStateLayoutRoot(layout)
 	return layout, layout.Validate()
 }
 
-func NewAVM2CodeRecord(record AVM2CodeRecord) (AVM2CodeRecord, error) {
-	record = canonicalAVM2CodeRecord(record)
-	record.RecordHash = ComputeAVM2CodeRecordHash(record)
+func NewAVMCodeRecord(record AVMCodeRecord) (AVMCodeRecord, error) {
+	record = canonicalAVMCodeRecord(record)
+	record.RecordHash = ComputeAVMCodeRecordHash(record)
 	return record, record.Validate()
 }
 
-func NewAVM2ContractRecord(record AVM2ContractRecord) (AVM2ContractRecord, error) {
-	record = canonicalAVM2ContractRecord(record)
-	record.RecordHash = ComputeAVM2ContractRecordHash(record)
+func NewAVMContractRecord(record AVMContractRecord) (AVMContractRecord, error) {
+	record = canonicalAVMContractRecord(record)
+	record.RecordHash = ComputeAVMContractRecordHash(record)
 	return record, record.Validate()
 }
 
-func NewAVM2ContractStorageValue(value AVM2ContractStorageValue) (AVM2ContractStorageValue, error) {
-	value = canonicalAVM2ContractStorageValue(value)
+func NewAVMContractStorageValue(value AVMContractStorageValue) (AVMContractStorageValue, error) {
+	value = canonicalAVMContractStorageValue(value)
 	if value.ShardKey == "" {
-		value.ShardKey = AVM2ContractStorageShardKey(value.ContractAddr, value.StorageKey)
+		value.ShardKey = AVMContractStorageShardKey(value.ContractAddr, value.StorageKey)
 	}
-	value.RecordHash = ComputeAVM2ContractStorageValueHash(value)
+	value.RecordHash = ComputeAVMContractStorageValueHash(value)
 	return value, value.Validate()
 }
 
-func NewAVM2ContractABIDescriptorRecord(record AVM2ContractABIDescriptorRecord) (AVM2ContractABIDescriptorRecord, error) {
-	record = canonicalAVM2ContractABIDescriptorRecord(record)
+func NewAVMContractABIDescriptorRecord(record AVMContractABIDescriptorRecord) (AVMContractABIDescriptorRecord, error) {
+	record = canonicalAVMContractABIDescriptorRecord(record)
 	if record.CodeID == 0 {
 		record.CodeID = record.ABI.CodeID
 	}
 	if record.Key == "" {
-		record.Key = AVM2ContractABIStateKey(record.CodeID, record.ABI.ABIVersion)
+		record.Key = AVMContractABIStateKey(record.CodeID, record.ABI.ABIVersion)
 	}
 	if record.ShardKey == "" {
-		record.ShardKey = AVM2ContractCodeShardKey(record.CodeID)
+		record.ShardKey = AVMContractCodeShardKey(record.CodeID)
 	}
-	record.RecordHash = ComputeAVM2ContractABIDescriptorRecordHash(record)
+	record.RecordHash = ComputeAVMContractABIDescriptorRecordHash(record)
 	return record, record.Validate()
 }
 
-func NewAVM2ContractEventRecord(record AVM2ContractEventRecord) (AVM2ContractEventRecord, error) {
-	record = canonicalAVM2ContractEventRecord(record)
+func NewAVMContractEventRecord(record AVMContractEventRecord) (AVMContractEventRecord, error) {
+	record = canonicalAVMContractEventRecord(record)
 	if record.Key == "" {
-		record.Key = AVM2ContractEventStateKey(record.Event.Height, record.Event.ContractAddress, record.Event.EventID)
+		record.Key = AVMContractEventStateKey(record.Event.Height, record.Event.ContractAddress, record.Event.EventID)
 	}
 	if record.ShardKey == "" {
 		record.ShardKey = record.Event.ContractAddress
 	}
-	record.RecordHash = ComputeAVM2ContractEventRecordHash(record)
+	record.RecordHash = ComputeAVMContractEventRecordHash(record)
 	return record, record.Validate()
 }
 
-func NewAVM2ContractMessageNonceRecord(record AVM2ContractMessageNonceRecord) (AVM2ContractMessageNonceRecord, error) {
-	record = canonicalAVM2ContractMessageNonceRecord(record)
+func NewAVMContractMessageNonceRecord(record AVMContractMessageNonceRecord) (AVMContractMessageNonceRecord, error) {
+	record = canonicalAVMContractMessageNonceRecord(record)
 	if record.Key == "" {
-		record.Key = AVM2ContractMessageNonceStateKey(record.ContractAddr)
+		record.Key = AVMContractMessageNonceStateKey(record.ContractAddr)
 	}
 	if record.ShardKey == "" {
 		record.ShardKey = record.ContractAddr
 	}
-	record.RecordHash = ComputeAVM2ContractMessageNonceRecordHash(record)
+	record.RecordHash = ComputeAVMContractMessageNonceRecordHash(record)
 	return record, record.Validate()
 }
 
-func NewAVM2ContractStateIndex(index AVM2ContractStateIndex) (AVM2ContractStateIndex, error) {
-	index = canonicalAVM2ContractStateIndex(index)
+func NewAVMContractStateIndex(index AVMContractStateIndex) (AVMContractStateIndex, error) {
+	index = canonicalAVMContractStateIndex(index)
 	if len(index.Layout.Entries) == 0 {
-		layout, err := DefaultAVM2ContractStateLayout()
+		layout, err := DefaultAVMContractStateLayout()
 		if err != nil {
-			return AVM2ContractStateIndex{}, err
+			return AVMContractStateIndex{}, err
 		}
 		index.Layout = layout
 	}
-	index.StateRoot = ComputeAVM2ContractStateIndexRoot(index)
+	index.StateRoot = ComputeAVMContractStateIndexRoot(index)
 	return index, index.Validate()
 }
 
-func ValidateAVM2ContractInstantiation(code AVM2CodeRecord, contract AVM2ContractRecord) error {
-	code = canonicalAVM2CodeRecord(code)
-	contract = canonicalAVM2ContractRecord(contract)
+func ValidateAVMContractInstantiation(code AVMCodeRecord, contract AVMContractRecord) error {
+	code = canonicalAVMCodeRecord(code)
+	contract = canonicalAVMContractRecord(contract)
 	if err := code.Validate(); err != nil {
 		return err
 	}
@@ -251,14 +251,14 @@ func ValidateAVM2ContractInstantiation(code AVM2CodeRecord, contract AVM2Contrac
 	if contract.CodeID != code.CodeID {
 		return errors.New("AVM 2.0 contract code id does not match code record")
 	}
-	if code.VMVersion != AVM2VMVersion {
+	if code.VMVersion != AVMVMVersion {
 		return errors.New("AVM 2.0 code record has incompatible VM version")
 	}
 	return nil
 }
 
-func (l AVM2ContractStateLayout) Validate() error {
-	l = canonicalAVM2ContractStateLayout(l)
+func (l AVMContractStateLayout) Validate() error {
+	l = canonicalAVMContractStateLayout(l)
 	if len(l.Entries) != 6 {
 		return errors.New("AVM 2.0 contract state layout must declare six canonical entries")
 	}
@@ -276,12 +276,12 @@ func (l AVM2ContractStateLayout) Validate() error {
 		}
 	}
 	for _, required := range []string{
-		AVM2ContractValueCodeRecord,
-		AVM2ContractValueContractRecord,
-		AVM2ContractValueStorageValue,
-		AVM2ContractValueABIDescriptor,
-		AVM2ContractValueContractEvent,
-		AVM2ContractValueMessageNonce,
+		AVMContractValueCodeRecord,
+		AVMContractValueContractRecord,
+		AVMContractValueStorageValue,
+		AVMContractValueABIDescriptor,
+		AVMContractValueContractEvent,
+		AVMContractValueMessageNonce,
 	} {
 		if _, found := seen[required]; !found {
 			return fmt.Errorf("AVM 2.0 contract state layout missing %s", required)
@@ -290,18 +290,18 @@ func (l AVM2ContractStateLayout) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 contract state layout root", l.LayoutRoot); err != nil {
 		return err
 	}
-	if l.LayoutRoot != ComputeAVM2ContractStateLayoutRoot(l) {
+	if l.LayoutRoot != ComputeAVMContractStateLayoutRoot(l) {
 		return errors.New("AVM 2.0 contract state layout root mismatch")
 	}
 	return nil
 }
 
-func (e AVM2ContractStateEntry) Validate() error {
-	e = canonicalAVM2ContractStateEntry(e)
-	if err := validateAVM2ContractStateKey("AVM 2.0 contract state key", e.Key); err != nil {
+func (e AVMContractStateEntry) Validate() error {
+	e = canonicalAVMContractStateEntry(e)
+	if err := validateAVMContractStateKey("AVM 2.0 contract state key", e.Key); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 contract state value type", e.ValueType, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 contract state value type", e.ValueType, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if strings.TrimSpace(e.Purpose) == "" {
@@ -310,27 +310,27 @@ func (e AVM2ContractStateEntry) Validate() error {
 	if len(e.Purpose) > 256 {
 		return errors.New("AVM 2.0 contract state purpose must be <= 256 bytes")
 	}
-	if err := validateEngineToken("AVM 2.0 contract state shard key", strings.ReplaceAll(e.ShardKey, "_prefix", ""), MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 contract state shard key", strings.ReplaceAll(e.ShardKey, "_prefix", ""), MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 contract state entry hash", e.EntryHash); err != nil {
 		return err
 	}
-	if e.EntryHash != ComputeAVM2ContractStateEntryHash(e) {
+	if e.EntryHash != ComputeAVMContractStateEntryHash(e) {
 		return errors.New("AVM 2.0 contract state entry hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2CodeRecord) Validate() error {
-	r = canonicalAVM2CodeRecord(r)
+func (r AVMCodeRecord) Validate() error {
+	r = canonicalAVMCodeRecord(r)
 	if r.CodeID == 0 {
 		return errors.New("AVM 2.0 code id must be positive")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 code hash", r.CodeHash); err != nil {
 		return err
 	}
-	if r.VMVersion != AVM2VMVersion {
+	if r.VMVersion != AVMVMVersion {
 		return errors.New("AVM 2.0 code record VM version must be 2")
 	}
 	if r.InstructionSetVersion == 0 {
@@ -339,40 +339,40 @@ func (r AVM2CodeRecord) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 code ABI hash", r.ABIHash); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 code deployer", r.Deployer, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 code deployer", r.Deployer, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if r.CreatedAtHeight == 0 {
 		return errors.New("AVM 2.0 code created height must be positive")
 	}
-	if err := validateAVM2ContentRef("AVM 2.0 code bytes ref", r.CodeBytesRef); err != nil {
+	if err := validateAVMContentRef("AVM 2.0 code bytes ref", r.CodeBytesRef); err != nil {
 		return err
 	}
-	if err := validateEngineToken("AVM 2.0 metering profile", r.MeteringProfile, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 metering profile", r.MeteringProfile, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 code record hash", r.RecordHash); err != nil {
 		return err
 	}
-	if r.RecordHash != ComputeAVM2CodeRecordHash(r) {
+	if r.RecordHash != ComputeAVMCodeRecordHash(r) {
 		return errors.New("AVM 2.0 code record hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2ContractRecord) Validate() error {
-	r = canonicalAVM2ContractRecord(r)
+func (r AVMContractRecord) Validate() error {
+	r = canonicalAVMContractRecord(r)
 	if err := validateEngineToken("AVM 2.0 contract address", r.ContractAddr, MaxAVMStateKeySegmentLength); err != nil {
 		return err
 	}
 	if r.CodeID == 0 {
 		return errors.New("AVM 2.0 contract code id must be positive")
 	}
-	if err := validateEngineToken("AVM 2.0 contract creator", r.Creator, MaxAVM2TokenLength); err != nil {
+	if err := validateEngineToken("AVM 2.0 contract creator", r.Creator, MaxAVMTokenLength); err != nil {
 		return err
 	}
 	if r.AdminOptional != "" {
-		if err := validateEngineToken("AVM 2.0 contract admin", r.AdminOptional, MaxAVM2TokenLength); err != nil {
+		if err := validateEngineToken("AVM 2.0 contract admin", r.AdminOptional, MaxAVMTokenLength); err != nil {
 			return err
 		}
 	}
@@ -394,14 +394,14 @@ func (r AVM2ContractRecord) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 contract record hash", r.RecordHash); err != nil {
 		return err
 	}
-	if r.RecordHash != ComputeAVM2ContractRecordHash(r) {
+	if r.RecordHash != ComputeAVMContractRecordHash(r) {
 		return errors.New("AVM 2.0 contract record hash mismatch")
 	}
 	return nil
 }
 
-func (v AVM2ContractStorageValue) Validate() error {
-	v = canonicalAVM2ContractStorageValue(v)
+func (v AVMContractStorageValue) Validate() error {
+	v = canonicalAVMContractStorageValue(v)
 	if err := validateEngineToken("AVM 2.0 storage contract address", v.ContractAddr, MaxAVMStateKeySegmentLength); err != nil {
 		return err
 	}
@@ -411,47 +411,47 @@ func (v AVM2ContractStorageValue) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 storage value hash", v.ValueHash); err != nil {
 		return err
 	}
-	if v.ShardKey != AVM2ContractStorageShardKey(v.ContractAddr, v.StorageKey) {
+	if v.ShardKey != AVMContractStorageShardKey(v.ContractAddr, v.StorageKey) {
 		return errors.New("AVM 2.0 storage shard key mismatch")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 storage record hash", v.RecordHash); err != nil {
 		return err
 	}
-	if v.RecordHash != ComputeAVM2ContractStorageValueHash(v) {
+	if v.RecordHash != ComputeAVMContractStorageValueHash(v) {
 		return errors.New("AVM 2.0 storage record hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2ContractABIDescriptorRecord) Validate() error {
-	r = canonicalAVM2ContractABIDescriptorRecord(r)
+func (r AVMContractABIDescriptorRecord) Validate() error {
+	r = canonicalAVMContractABIDescriptorRecord(r)
 	if r.CodeID == 0 || r.CodeID != r.ABI.CodeID {
 		return errors.New("AVM 2.0 ABI record code id mismatch")
 	}
-	if err := r.ABI.Validate(DefaultAVM2Limits()); err != nil {
+	if err := r.ABI.Validate(DefaultAVMLimits()); err != nil {
 		return err
 	}
-	if r.Key != AVM2ContractABIStateKey(r.CodeID, r.ABI.ABIVersion) {
+	if r.Key != AVMContractABIStateKey(r.CodeID, r.ABI.ABIVersion) {
 		return errors.New("AVM 2.0 ABI state key mismatch")
 	}
-	if r.ShardKey != AVM2ContractCodeShardKey(r.CodeID) {
+	if r.ShardKey != AVMContractCodeShardKey(r.CodeID) {
 		return errors.New("AVM 2.0 ABI shard key mismatch")
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 ABI record hash", r.RecordHash); err != nil {
 		return err
 	}
-	if r.RecordHash != ComputeAVM2ContractABIDescriptorRecordHash(r) {
+	if r.RecordHash != ComputeAVMContractABIDescriptorRecordHash(r) {
 		return errors.New("AVM 2.0 ABI record hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2ContractEventRecord) Validate() error {
-	r = canonicalAVM2ContractEventRecord(r)
-	if err := r.Event.Validate(DefaultAVM2Limits()); err != nil {
+func (r AVMContractEventRecord) Validate() error {
+	r = canonicalAVMContractEventRecord(r)
+	if err := r.Event.Validate(DefaultAVMLimits()); err != nil {
 		return err
 	}
-	if r.Key != AVM2ContractEventStateKey(r.Event.Height, r.Event.ContractAddress, r.Event.EventID) {
+	if r.Key != AVMContractEventStateKey(r.Event.Height, r.Event.ContractAddress, r.Event.EventID) {
 		return errors.New("AVM 2.0 event state key mismatch")
 	}
 	if r.ShardKey != r.Event.ContractAddress {
@@ -460,18 +460,18 @@ func (r AVM2ContractEventRecord) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 event record hash", r.RecordHash); err != nil {
 		return err
 	}
-	if r.RecordHash != ComputeAVM2ContractEventRecordHash(r) {
+	if r.RecordHash != ComputeAVMContractEventRecordHash(r) {
 		return errors.New("AVM 2.0 event record hash mismatch")
 	}
 	return nil
 }
 
-func (r AVM2ContractMessageNonceRecord) Validate() error {
-	r = canonicalAVM2ContractMessageNonceRecord(r)
+func (r AVMContractMessageNonceRecord) Validate() error {
+	r = canonicalAVMContractMessageNonceRecord(r)
 	if err := validateEngineToken("AVM 2.0 nonce contract address", r.ContractAddr, MaxAVMStateKeySegmentLength); err != nil {
 		return err
 	}
-	if r.Key != AVM2ContractMessageNonceStateKey(r.ContractAddr) {
+	if r.Key != AVMContractMessageNonceStateKey(r.ContractAddr) {
 		return errors.New("AVM 2.0 message nonce key mismatch")
 	}
 	if r.ShardKey != r.ContractAddr {
@@ -480,73 +480,73 @@ func (r AVM2ContractMessageNonceRecord) Validate() error {
 	if err := zonestypes.ValidateHash("AVM 2.0 message nonce record hash", r.RecordHash); err != nil {
 		return err
 	}
-	if r.RecordHash != ComputeAVM2ContractMessageNonceRecordHash(r) {
+	if r.RecordHash != ComputeAVMContractMessageNonceRecordHash(r) {
 		return errors.New("AVM 2.0 message nonce record hash mismatch")
 	}
 	return nil
 }
 
-func (i AVM2ContractStateIndex) Validate() error {
-	i = canonicalAVM2ContractStateIndex(i)
+func (i AVMContractStateIndex) Validate() error {
+	i = canonicalAVMContractStateIndex(i)
 	if err := i.Layout.Validate(); err != nil {
 		return err
 	}
-	if err := validateAVM2CodeRecords(i.Codes); err != nil {
+	if err := validateAVMCodeRecords(i.Codes); err != nil {
 		return err
 	}
-	if err := validateAVM2ContractRecords(i.Contracts, i.Codes); err != nil {
+	if err := validateAVMContractRecords(i.Contracts, i.Codes); err != nil {
 		return err
 	}
-	if err := validateAVM2StorageValues(i.Storage); err != nil {
+	if err := validateAVMStorageValues(i.Storage); err != nil {
 		return err
 	}
-	if err := validateAVM2ABIRecords(i.ABIs); err != nil {
+	if err := validateAVMABIRecords(i.ABIs); err != nil {
 		return err
 	}
-	if err := validateAVM2EventRecords(i.Events); err != nil {
+	if err := validateAVMEventRecords(i.Events); err != nil {
 		return err
 	}
-	if err := validateAVM2NonceRecords(i.MessageNonces); err != nil {
+	if err := validateAVMNonceRecords(i.MessageNonces); err != nil {
 		return err
 	}
 	if err := zonestypes.ValidateHash("AVM 2.0 contract state index root", i.StateRoot); err != nil {
 		return err
 	}
-	if i.StateRoot != ComputeAVM2ContractStateIndexRoot(i) {
+	if i.StateRoot != ComputeAVMContractStateIndexRoot(i) {
 		return errors.New("AVM 2.0 contract state index root mismatch")
 	}
 	return nil
 }
 
-func AVM2ContractCodeStateKey(codeID uint64) string {
-	return fmt.Sprintf("%s/%020d", AVM2ContractStatePrefixCode, codeID)
+func AVMContractCodeStateKey(codeID uint64) string {
+	return fmt.Sprintf("%s/%020d", AVMContractStatePrefixCode, codeID)
 }
 
-func AVM2ContractInstanceStateKey(contractAddr string) string {
-	return AVM2ContractStatePrefixInstance + "/" + strings.TrimSpace(contractAddr)
+func AVMContractInstanceStateKey(contractAddr string) string {
+	return AVMContractStatePrefixInstance + "/" + strings.TrimSpace(contractAddr)
 }
 
-func AVM2ContractStorageStateKey(contractAddr, storageKey string) string {
-	return AVM2ContractStatePrefixStorage + "/" + strings.TrimSpace(contractAddr) + "/" + strings.TrimSpace(storageKey)
+func AVMContractStorageStateKey(contractAddr, storageKey string) string {
+	return AVMContractStatePrefixStorage + "/" + strings.TrimSpace(contractAddr) + "/" + strings.TrimSpace(storageKey)
 }
 
-func AVM2ContractABIStateKey(codeID, abiVersion uint64) string {
-	return fmt.Sprintf("%s/%020d/%020d", AVM2ContractStatePrefixABI, codeID, abiVersion)
+func AVMContractABIStateKey(codeID, abiVersion uint64) string {
+	return fmt.Sprintf("%s/%020d/%020d", AVMContractStatePrefixABI, codeID, abiVersion)
 }
 
-func AVM2ContractEventStateKey(height uint64, contractAddr, eventID string) string {
-	return fmt.Sprintf("%s/%020d/%s/%s", AVM2ContractStatePrefixEvents, height, strings.TrimSpace(contractAddr), strings.TrimSpace(eventID))
+func AVMContractEventStateKey(height uint64, contractAddr, eventID string) string {
+	return fmt.Sprintf("%s/%020d/%s/%s", AVMContractStatePrefixEvents, height, strings.TrimSpace(contractAddr), strings.TrimSpace(eventID))
 }
 
-func AVM2ContractMessageNonceStateKey(contractAddr string) string {
-	return AVM2ContractStatePrefixMessageNonce + "/" + strings.TrimSpace(contractAddr)
+func AVMContractMessageNonceStateKey(contractAddr string) string {
+	return AVMContractStatePrefixMessageNonce + "/" + strings.TrimSpace(contractAddr)
 }
 
-func AVM2ContractCodeShardKey(codeID uint64) string {
+func AVMContractCodeShardKey(codeID uint64) string {
 	return fmt.Sprintf("code_id/%020d", codeID)
 }
 
-func AVM2ContractStorageShardKey(contractAddr, storageKey string) string {
+func AVMContractStorageShardKey(contractAddr, storageKey string) string {
 	prefix := strings.TrimSpace(storageKey)
 	if idx := strings.Index(prefix, "/"); idx >= 0 {
 		prefix = prefix[:idx]
@@ -554,10 +554,10 @@ func AVM2ContractStorageShardKey(contractAddr, storageKey string) string {
 	return strings.TrimSpace(contractAddr) + "/" + prefix
 }
 
-func ComputeAVM2ContractStateEntryHash(entry AVM2ContractStateEntry) string {
-	entry = canonicalAVM2ContractStateEntry(entry)
+func ComputeAVMContractStateEntryHash(entry AVMContractStateEntry) string {
+	entry = canonicalAVMContractStateEntry(entry)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-state-entry-v1")
+	writeEnginePart(h, "aetra-AVM-contract-state-entry-v1")
 	writeEnginePart(h, entry.Key)
 	writeEnginePart(h, entry.ValueType)
 	writeEnginePart(h, entry.Purpose)
@@ -565,10 +565,10 @@ func ComputeAVM2ContractStateEntryHash(entry AVM2ContractStateEntry) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractStateLayoutRoot(layout AVM2ContractStateLayout) string {
-	layout = canonicalAVM2ContractStateLayout(layout)
+func ComputeAVMContractStateLayoutRoot(layout AVMContractStateLayout) string {
+	layout = canonicalAVMContractStateLayout(layout)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-state-layout-v1")
+	writeEnginePart(h, "aetra-AVM-contract-state-layout-v1")
 	writeEngineUint64(h, uint64(len(layout.Entries)))
 	for _, entry := range layout.Entries {
 		writeEnginePart(h, entry.EntryHash)
@@ -576,10 +576,10 @@ func ComputeAVM2ContractStateLayoutRoot(layout AVM2ContractStateLayout) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2CodeRecordHash(record AVM2CodeRecord) string {
-	record = canonicalAVM2CodeRecord(record)
+func ComputeAVMCodeRecordHash(record AVMCodeRecord) string {
+	record = canonicalAVMCodeRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-code-record-v1")
+	writeEnginePart(h, "aetra-AVM-code-record-v1")
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.CodeHash)
 	writeEngineUint64(h, record.VMVersion)
@@ -593,10 +593,10 @@ func ComputeAVM2CodeRecordHash(record AVM2CodeRecord) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractRecordHash(record AVM2ContractRecord) string {
-	record = canonicalAVM2ContractRecord(record)
+func ComputeAVMContractRecordHash(record AVMContractRecord) string {
+	record = canonicalAVMContractRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-record-v1")
+	writeEnginePart(h, "aetra-AVM-contract-record-v1")
 	writeEnginePart(h, record.ContractAddr)
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.Creator)
@@ -610,10 +610,10 @@ func ComputeAVM2ContractRecordHash(record AVM2ContractRecord) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractStorageValueHash(value AVM2ContractStorageValue) string {
-	value = canonicalAVM2ContractStorageValue(value)
+func ComputeAVMContractStorageValueHash(value AVMContractStorageValue) string {
+	value = canonicalAVMContractStorageValue(value)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-storage-value-v1")
+	writeEnginePart(h, "aetra-AVM-contract-storage-value-v1")
 	writeEnginePart(h, value.ContractAddr)
 	writeEnginePart(h, value.StorageKey)
 	writeEnginePart(h, value.ValueHash)
@@ -622,10 +622,10 @@ func ComputeAVM2ContractStorageValueHash(value AVM2ContractStorageValue) string 
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractABIDescriptorRecordHash(record AVM2ContractABIDescriptorRecord) string {
-	record = canonicalAVM2ContractABIDescriptorRecord(record)
+func ComputeAVMContractABIDescriptorRecordHash(record AVMContractABIDescriptorRecord) string {
+	record = canonicalAVMContractABIDescriptorRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-abi-record-v1")
+	writeEnginePart(h, "aetra-AVM-contract-abi-record-v1")
 	writeEngineUint64(h, record.CodeID)
 	writeEnginePart(h, record.ABI.InterfaceHash)
 	writeEnginePart(h, record.Key)
@@ -633,20 +633,20 @@ func ComputeAVM2ContractABIDescriptorRecordHash(record AVM2ContractABIDescriptor
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractEventRecordHash(record AVM2ContractEventRecord) string {
-	record = canonicalAVM2ContractEventRecord(record)
+func ComputeAVMContractEventRecordHash(record AVMContractEventRecord) string {
+	record = canonicalAVMContractEventRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-event-record-v1")
+	writeEnginePart(h, "aetra-AVM-contract-event-record-v1")
 	writeEnginePart(h, record.Event.EventHash)
 	writeEnginePart(h, record.Key)
 	writeEnginePart(h, record.ShardKey)
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractMessageNonceRecordHash(record AVM2ContractMessageNonceRecord) string {
-	record = canonicalAVM2ContractMessageNonceRecord(record)
+func ComputeAVMContractMessageNonceRecordHash(record AVMContractMessageNonceRecord) string {
+	record = canonicalAVMContractMessageNonceRecord(record)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-message-nonce-v1")
+	writeEnginePart(h, "aetra-AVM-contract-message-nonce-v1")
 	writeEnginePart(h, record.ContractAddr)
 	writeEngineUint64(h, record.Nonce)
 	writeEnginePart(h, record.Key)
@@ -654,10 +654,10 @@ func ComputeAVM2ContractMessageNonceRecordHash(record AVM2ContractMessageNonceRe
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func ComputeAVM2ContractStateIndexRoot(index AVM2ContractStateIndex) string {
-	index = canonicalAVM2ContractStateIndex(index)
+func ComputeAVMContractStateIndexRoot(index AVMContractStateIndex) string {
+	index = canonicalAVMContractStateIndex(index)
 	h := sha256.New()
-	writeEnginePart(h, "aetra-avm2-contract-state-index-v1")
+	writeEnginePart(h, "aetra-AVM-contract-state-index-v1")
 	writeEnginePart(h, index.Layout.LayoutRoot)
 	writeEngineUint64(h, uint64(len(index.Codes)))
 	for _, code := range index.Codes {
@@ -686,7 +686,7 @@ func ComputeAVM2ContractStateIndexRoot(index AVM2ContractStateIndex) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func canonicalAVM2ContractStateEntry(entry AVM2ContractStateEntry) AVM2ContractStateEntry {
+func canonicalAVMContractStateEntry(entry AVMContractStateEntry) AVMContractStateEntry {
 	entry.Key = strings.TrimSpace(entry.Key)
 	entry.ValueType = strings.TrimSpace(entry.ValueType)
 	entry.Purpose = strings.TrimSpace(entry.Purpose)
@@ -695,10 +695,10 @@ func canonicalAVM2ContractStateEntry(entry AVM2ContractStateEntry) AVM2ContractS
 	return entry
 }
 
-func canonicalAVM2ContractStateLayout(layout AVM2ContractStateLayout) AVM2ContractStateLayout {
-	layout.Entries = append([]AVM2ContractStateEntry(nil), layout.Entries...)
+func canonicalAVMContractStateLayout(layout AVMContractStateLayout) AVMContractStateLayout {
+	layout.Entries = append([]AVMContractStateEntry(nil), layout.Entries...)
 	for i := range layout.Entries {
-		layout.Entries[i] = canonicalAVM2ContractStateEntry(layout.Entries[i])
+		layout.Entries[i] = canonicalAVMContractStateEntry(layout.Entries[i])
 	}
 	sort.SliceStable(layout.Entries, func(i, j int) bool {
 		return layout.Entries[i].Key < layout.Entries[j].Key
@@ -707,7 +707,7 @@ func canonicalAVM2ContractStateLayout(layout AVM2ContractStateLayout) AVM2Contra
 	return layout
 }
 
-func canonicalAVM2CodeRecord(record AVM2CodeRecord) AVM2CodeRecord {
+func canonicalAVMCodeRecord(record AVMCodeRecord) AVMCodeRecord {
 	record.CodeHash = strings.TrimSpace(record.CodeHash)
 	record.ABIHash = strings.TrimSpace(record.ABIHash)
 	record.Deployer = strings.TrimSpace(record.Deployer)
@@ -717,7 +717,7 @@ func canonicalAVM2CodeRecord(record AVM2CodeRecord) AVM2CodeRecord {
 	return record
 }
 
-func canonicalAVM2ContractRecord(record AVM2ContractRecord) AVM2ContractRecord {
+func canonicalAVMContractRecord(record AVMContractRecord) AVMContractRecord {
 	record.ContractAddr = strings.TrimSpace(record.ContractAddr)
 	record.Creator = strings.TrimSpace(record.Creator)
 	record.AdminOptional = strings.TrimSpace(record.AdminOptional)
@@ -726,7 +726,7 @@ func canonicalAVM2ContractRecord(record AVM2ContractRecord) AVM2ContractRecord {
 	return record
 }
 
-func canonicalAVM2ContractStorageValue(value AVM2ContractStorageValue) AVM2ContractStorageValue {
+func canonicalAVMContractStorageValue(value AVMContractStorageValue) AVMContractStorageValue {
 	value.ContractAddr = strings.TrimSpace(value.ContractAddr)
 	value.StorageKey = strings.TrimSpace(value.StorageKey)
 	value.ValueHash = strings.TrimSpace(value.ValueHash)
@@ -735,23 +735,23 @@ func canonicalAVM2ContractStorageValue(value AVM2ContractStorageValue) AVM2Contr
 	return value
 }
 
-func canonicalAVM2ContractABIDescriptorRecord(record AVM2ContractABIDescriptorRecord) AVM2ContractABIDescriptorRecord {
-	record.ABI = canonicalAVM2ABIDescriptor(record.ABI)
+func canonicalAVMContractABIDescriptorRecord(record AVMContractABIDescriptorRecord) AVMContractABIDescriptorRecord {
+	record.ABI = canonicalAVMABIDescriptor(record.ABI)
 	record.Key = strings.TrimSpace(record.Key)
 	record.ShardKey = strings.TrimSpace(record.ShardKey)
 	record.RecordHash = strings.TrimSpace(record.RecordHash)
 	return record
 }
 
-func canonicalAVM2ContractEventRecord(record AVM2ContractEventRecord) AVM2ContractEventRecord {
-	record.Event = canonicalAVM2Event(record.Event)
+func canonicalAVMContractEventRecord(record AVMContractEventRecord) AVMContractEventRecord {
+	record.Event = canonicalAVMEvent(record.Event)
 	record.Key = strings.TrimSpace(record.Key)
 	record.ShardKey = strings.TrimSpace(record.ShardKey)
 	record.RecordHash = strings.TrimSpace(record.RecordHash)
 	return record
 }
 
-func canonicalAVM2ContractMessageNonceRecord(record AVM2ContractMessageNonceRecord) AVM2ContractMessageNonceRecord {
+func canonicalAVMContractMessageNonceRecord(record AVMContractMessageNonceRecord) AVMContractMessageNonceRecord {
 	record.ContractAddr = strings.TrimSpace(record.ContractAddr)
 	record.Key = strings.TrimSpace(record.Key)
 	record.ShardKey = strings.TrimSpace(record.ShardKey)
@@ -759,21 +759,21 @@ func canonicalAVM2ContractMessageNonceRecord(record AVM2ContractMessageNonceReco
 	return record
 }
 
-func canonicalAVM2ContractStateIndex(index AVM2ContractStateIndex) AVM2ContractStateIndex {
-	index.Layout = canonicalAVM2ContractStateLayout(index.Layout)
-	index.Codes = append([]AVM2CodeRecord(nil), index.Codes...)
+func canonicalAVMContractStateIndex(index AVMContractStateIndex) AVMContractStateIndex {
+	index.Layout = canonicalAVMContractStateLayout(index.Layout)
+	index.Codes = append([]AVMCodeRecord(nil), index.Codes...)
 	for i := range index.Codes {
-		index.Codes[i] = canonicalAVM2CodeRecord(index.Codes[i])
+		index.Codes[i] = canonicalAVMCodeRecord(index.Codes[i])
 	}
 	sort.SliceStable(index.Codes, func(i, j int) bool { return index.Codes[i].CodeID < index.Codes[j].CodeID })
-	index.Contracts = append([]AVM2ContractRecord(nil), index.Contracts...)
+	index.Contracts = append([]AVMContractRecord(nil), index.Contracts...)
 	for i := range index.Contracts {
-		index.Contracts[i] = canonicalAVM2ContractRecord(index.Contracts[i])
+		index.Contracts[i] = canonicalAVMContractRecord(index.Contracts[i])
 	}
 	sort.SliceStable(index.Contracts, func(i, j int) bool { return index.Contracts[i].ContractAddr < index.Contracts[j].ContractAddr })
-	index.Storage = append([]AVM2ContractStorageValue(nil), index.Storage...)
+	index.Storage = append([]AVMContractStorageValue(nil), index.Storage...)
 	for i := range index.Storage {
-		index.Storage[i] = canonicalAVM2ContractStorageValue(index.Storage[i])
+		index.Storage[i] = canonicalAVMContractStorageValue(index.Storage[i])
 	}
 	sort.SliceStable(index.Storage, func(i, j int) bool {
 		if index.Storage[i].ContractAddr == index.Storage[j].ContractAddr {
@@ -781,9 +781,9 @@ func canonicalAVM2ContractStateIndex(index AVM2ContractStateIndex) AVM2ContractS
 		}
 		return index.Storage[i].ContractAddr < index.Storage[j].ContractAddr
 	})
-	index.ABIs = append([]AVM2ContractABIDescriptorRecord(nil), index.ABIs...)
+	index.ABIs = append([]AVMContractABIDescriptorRecord(nil), index.ABIs...)
 	for i := range index.ABIs {
-		index.ABIs[i] = canonicalAVM2ContractABIDescriptorRecord(index.ABIs[i])
+		index.ABIs[i] = canonicalAVMContractABIDescriptorRecord(index.ABIs[i])
 	}
 	sort.SliceStable(index.ABIs, func(i, j int) bool {
 		if index.ABIs[i].CodeID == index.ABIs[j].CodeID {
@@ -791,21 +791,21 @@ func canonicalAVM2ContractStateIndex(index AVM2ContractStateIndex) AVM2ContractS
 		}
 		return index.ABIs[i].CodeID < index.ABIs[j].CodeID
 	})
-	index.Events = append([]AVM2ContractEventRecord(nil), index.Events...)
+	index.Events = append([]AVMContractEventRecord(nil), index.Events...)
 	for i := range index.Events {
-		index.Events[i] = canonicalAVM2ContractEventRecord(index.Events[i])
+		index.Events[i] = canonicalAVMContractEventRecord(index.Events[i])
 	}
 	sort.SliceStable(index.Events, func(i, j int) bool { return index.Events[i].Key < index.Events[j].Key })
-	index.MessageNonces = append([]AVM2ContractMessageNonceRecord(nil), index.MessageNonces...)
+	index.MessageNonces = append([]AVMContractMessageNonceRecord(nil), index.MessageNonces...)
 	for i := range index.MessageNonces {
-		index.MessageNonces[i] = canonicalAVM2ContractMessageNonceRecord(index.MessageNonces[i])
+		index.MessageNonces[i] = canonicalAVMContractMessageNonceRecord(index.MessageNonces[i])
 	}
 	sort.SliceStable(index.MessageNonces, func(i, j int) bool { return index.MessageNonces[i].ContractAddr < index.MessageNonces[j].ContractAddr })
 	index.StateRoot = strings.TrimSpace(index.StateRoot)
 	return index
 }
 
-func validateAVM2CodeRecords(records []AVM2CodeRecord) error {
+func validateAVMCodeRecords(records []AVMCodeRecord) error {
 	seen := make(map[uint64]struct{}, len(records))
 	for i, record := range records {
 		if err := record.Validate(); err != nil {
@@ -822,7 +822,7 @@ func validateAVM2CodeRecords(records []AVM2CodeRecord) error {
 	return nil
 }
 
-func validateAVM2ContractRecords(records []AVM2ContractRecord, codes []AVM2CodeRecord) error {
+func validateAVMContractRecords(records []AVMContractRecord, codes []AVMCodeRecord) error {
 	seen := make(map[string]struct{}, len(records))
 	codeIDs := make(map[uint64]struct{}, len(codes))
 	for _, code := range codes {
@@ -846,13 +846,13 @@ func validateAVM2ContractRecords(records []AVM2ContractRecord, codes []AVM2CodeR
 	return nil
 }
 
-func validateAVM2StorageValues(values []AVM2ContractStorageValue) error {
+func validateAVMStorageValues(values []AVMContractStorageValue) error {
 	seen := make(map[string]struct{}, len(values))
 	for _, value := range values {
 		if err := value.Validate(); err != nil {
 			return err
 		}
-		key := AVM2ContractStorageStateKey(value.ContractAddr, value.StorageKey)
+		key := AVMContractStorageStateKey(value.ContractAddr, value.StorageKey)
 		if _, found := seen[key]; found {
 			return errors.New("duplicate AVM 2.0 storage value")
 		}
@@ -861,7 +861,7 @@ func validateAVM2StorageValues(values []AVM2ContractStorageValue) error {
 	return nil
 }
 
-func validateAVM2ABIRecords(records []AVM2ContractABIDescriptorRecord) error {
+func validateAVMABIRecords(records []AVMContractABIDescriptorRecord) error {
 	seen := make(map[string]struct{}, len(records))
 	for _, record := range records {
 		if err := record.Validate(); err != nil {
@@ -875,7 +875,7 @@ func validateAVM2ABIRecords(records []AVM2ContractABIDescriptorRecord) error {
 	return nil
 }
 
-func validateAVM2EventRecords(records []AVM2ContractEventRecord) error {
+func validateAVMEventRecords(records []AVMContractEventRecord) error {
 	seen := make(map[string]struct{}, len(records))
 	for _, record := range records {
 		if err := record.Validate(); err != nil {
@@ -889,7 +889,7 @@ func validateAVM2EventRecords(records []AVM2ContractEventRecord) error {
 	return nil
 }
 
-func validateAVM2NonceRecords(records []AVM2ContractMessageNonceRecord) error {
+func validateAVMNonceRecords(records []AVMContractMessageNonceRecord) error {
 	seen := make(map[string]struct{}, len(records))
 	for _, record := range records {
 		if err := record.Validate(); err != nil {
@@ -903,7 +903,7 @@ func validateAVM2NonceRecords(records []AVM2ContractMessageNonceRecord) error {
 	return nil
 }
 
-func validateAVM2ContractStateKey(fieldName, value string) error {
+func validateAVMContractStateKey(fieldName, value string) error {
 	if strings.TrimSpace(value) != value || value == "" {
 		return fmt.Errorf("%s is required and must not have surrounding whitespace", fieldName)
 	}
@@ -924,7 +924,7 @@ func validateAVM2ContractStateKey(fieldName, value string) error {
 	return nil
 }
 
-func validateAVM2ContentRef(fieldName, value string) error {
+func validateAVMContentRef(fieldName, value string) error {
 	if strings.TrimSpace(value) != value || value == "" {
 		return fmt.Errorf("%s is required and must not have surrounding whitespace", fieldName)
 	}

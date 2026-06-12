@@ -14,20 +14,20 @@ import (
 )
 
 const (
-	IdentityProofSchemaVersionV2 uint64 = 1
+	IdentityProofSchemaVersionV2	uint64	= 1
 
-	IdentityResolutionProofCommitmentDomainV2  = "identity-v2-resolution-proof-commitment"
-	RecursiveResolutionProofCommitmentDomainV2 = "identity-v2-recursive-resolution-proof-commitment"
+	IdentityResolutionProofCommitmentDomainV2	= "identity-v2-resolution-proof-commitment"
+	RecursiveResolutionProofCommitmentDomainV2	= "identity-v2-recursive-resolution-proof-commitment"
 )
 
 type IdentityProofQueryTypeV2 string
 
 const (
-	IdentityProofQueryResolvePrimary IdentityProofQueryTypeV2 = "resolve_primary"
-	IdentityProofQueryResolveRecord  IdentityProofQueryTypeV2 = "resolve_record"
-	IdentityProofQueryResolveReverse IdentityProofQueryTypeV2 = "resolve_reverse"
-	IdentityProofQueryDomainExists   IdentityProofQueryTypeV2 = "domain_exists"
-	IdentityProofQueryDomainAbsent   IdentityProofQueryTypeV2 = "domain_absent"
+	IdentityProofQueryResolvePrimary	IdentityProofQueryTypeV2	= "resolve_primary"
+	IdentityProofQueryResolveRecord		IdentityProofQueryTypeV2	= "resolve_record"
+	IdentityProofQueryResolveReverse	IdentityProofQueryTypeV2	= "resolve_reverse"
+	IdentityProofQueryDomainExists		IdentityProofQueryTypeV2	= "domain_exists"
+	IdentityProofQueryDomainAbsent		IdentityProofQueryTypeV2	= "domain_absent"
 )
 
 var IdentityResolutionProofFormatV2FieldOrder = []string{
@@ -75,48 +75,48 @@ var RecursiveResolutionProofV2FieldOrder = []string{
 }
 
 type IdentityResolutionProofFormatV2 struct {
-	ProofVersion               uint64
-	ChainID                    string
-	Height                     uint64
-	AppHash                    string
-	Name                       string
-	NameHash                   string
-	QueryType                  IdentityProofQueryTypeV2
-	NormalizedNameProof        string
-	DomainRecord               *DomainRecordV2
-	DomainRecordProof          *IdentityInclusionProof
-	NFTBinding                 *DomainNFTBinding
-	NFTBindingProof            *IdentityInclusionProof
-	ResolverRecord             *UnifiedResolutionRecordV2
-	ResolverRecordProof        *IdentityInclusionProof
-	ReverseRecordOptional      *ReverseResolutionRecordV2
-	ReverseRecordProofOptional *IdentityInclusionProof
-	DelegationChain            []DelegationRecordV2
-	DelegationChainProofs      []IdentityInclusionProof
-	SubdomainPath              []SubdomainRecord
-	SubdomainPathProofs        []IdentityInclusionProof
-	NonExistenceProofOptional  *IdentityAbsenceProof
-	RecordVersion              uint64
-	ProofCommitmentHash        string
+	ProofVersion			uint64
+	ChainID				string
+	Height				uint64
+	AppHash				string
+	Name				string
+	NameHash			string
+	QueryType			IdentityProofQueryTypeV2
+	NormalizedNameProof		string
+	DomainRecord			*DomainRecordV2
+	DomainRecordProof		*IdentityInclusionProof
+	NFTBinding			*DomainNFTBinding
+	NFTBindingProof			*IdentityInclusionProof
+	ResolverRecord			*UnifiedResolutionRecordV2
+	ResolverRecordProof		*IdentityInclusionProof
+	ReverseRecordOptional		*ReverseResolutionRecordV2
+	ReverseRecordProofOptional	*IdentityInclusionProof
+	DelegationChain			[]DelegationRecordV2
+	DelegationChainProofs		[]IdentityInclusionProof
+	SubdomainPath			[]SubdomainRecord
+	SubdomainPathProofs		[]IdentityInclusionProof
+	NonExistenceProofOptional	*IdentityAbsenceProof
+	RecordVersion			uint64
+	ProofCommitmentHash		string
 }
 
 type RecursiveResolutionProofV2 struct {
-	ProofVersion             uint64
-	ChainID                  string
-	Height                   uint64
-	RootName                 string
-	TargetName               string
-	PathLabels               []string
-	PathHashes               []string
-	PathDomainRecords        []DomainRecordV2
-	PathResolverRecords      []UnifiedResolutionRecordV2
-	PathDelegationRecords    []DelegationRecordV2
-	PathProofs               []IdentityInclusionProof
-	FinalResolutionRecord    UnifiedResolutionRecordV2
-	FinalRecordProof         IdentityInclusionProof
-	CacheRecordOptional      *ResolutionCacheRecordV2
-	CacheRecordProofOptional *IdentityInclusionProof
-	ProofCommitmentHash      string
+	ProofVersion			uint64
+	ChainID				string
+	Height				uint64
+	RootName			string
+	TargetName			string
+	PathLabels			[]string
+	PathHashes			[]string
+	PathDomainRecords		[]DomainRecordV2
+	PathResolverRecords		[]UnifiedResolutionRecordV2
+	PathDelegationRecords		[]DelegationRecordV2
+	PathProofs			[]IdentityInclusionProof
+	FinalResolutionRecord		UnifiedResolutionRecordV2
+	FinalRecordProof		IdentityInclusionProof
+	CacheRecordOptional		*ResolutionCacheRecordV2
+	CacheRecordProofOptional	*IdentityInclusionProof
+	ProofCommitmentHash		string
 }
 
 func BuildIdentityResolutionProofFormatV2(state IdentityState, chainID string, appHash string, name string, queryType IdentityProofQueryTypeV2, height uint64, ttl uint64, reverseAddress sdk.AccAddress) (IdentityResolutionProofFormatV2, error) {
@@ -139,15 +139,15 @@ func BuildIdentityResolutionProofFormatV2(state IdentityState, chainID string, a
 	}
 
 	out := IdentityResolutionProofFormatV2{
-		ProofVersion:        IdentityProofSchemaVersionV2,
-		ChainID:             chainID,
-		Height:              height,
-		AppHash:             appHash,
-		Name:                normalized,
-		NameHash:            nameHash,
-		QueryType:           queryType,
-		NormalizedNameProof: identityHash("identity-v2-normalized-name-proof", normalized, normalized, nameHash, fmt.Sprintf("%020d", NameNormalizationVersionV2)),
-		RecordVersion:       1,
+		ProofVersion:		IdentityProofSchemaVersionV2,
+		ChainID:		chainID,
+		Height:			height,
+		AppHash:		appHash,
+		Name:			normalized,
+		NameHash:		nameHash,
+		QueryType:		queryType,
+		NormalizedNameProof:	identityHash("identity-v2-normalized-name-proof", normalized, normalized, nameHash, fmt.Sprintf("%020d", NameNormalizationVersionV2)),
+		RecordVersion:		1,
 	}
 
 	if domain, found := findDomain(state, normalized); found {
@@ -360,12 +360,12 @@ func BuildRecursiveResolutionProofV2(state IdentityState, chainID string, rootNa
 		return RecursiveResolutionProofV2{}, errors.New("identity v2 recursive proof target is not under root_name")
 	}
 	out := RecursiveResolutionProofV2{
-		ProofVersion: IdentityProofSchemaVersionV2,
-		ChainID:      chainID,
-		Height:       height,
-		RootName:     rootResult.NormalizedName,
-		TargetName:   targetResult.NormalizedName,
-		PathLabels:   append([]string(nil), path.Labels...),
+		ProofVersion:	IdentityProofSchemaVersionV2,
+		ChainID:	chainID,
+		Height:		height,
+		RootName:	rootResult.NormalizedName,
+		TargetName:	targetResult.NormalizedName,
+		PathLabels:	append([]string(nil), path.Labels...),
 	}
 	for i, candidate := range path.Path {
 		out.PathHashes = append(out.PathHashes, path.PathHashes[i])
@@ -878,12 +878,12 @@ func nftBindingForProof(domain Domain, nft DomainNFT, height uint64) (DomainNFTB
 		lastVerifiedHeight = height
 	}
 	binding := DomainNFTBinding{
-		NameHash:           nameHash,
-		NFTClassID:         DomainNFTClassID,
-		NFTItemID:          nft.ID,
-		Owner:              cloneSpecAddress(nft.Owner),
-		LastVerifiedHeight: lastVerifiedHeight,
-		BindingVersion:     1,
+		NameHash:		nameHash,
+		NFTClassID:		DomainNFTClassID,
+		NFTItemID:		nft.ID,
+		Owner:			cloneSpecAddress(nft.Owner),
+		LastVerifiedHeight:	lastVerifiedHeight,
+		BindingVersion:		1,
 	}
 	return binding, ValidateDomainNFTBinding(binding, DomainNFTBindingContext{RegistryOwner: domain.Owner, NFTModuleOwner: nft.Owner, CurrentHeight: height})
 }

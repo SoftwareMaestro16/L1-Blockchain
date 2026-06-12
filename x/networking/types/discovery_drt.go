@@ -10,94 +10,94 @@ import (
 )
 
 const (
-	MaxDRTAdvertisements = 4096
-	DefaultDRTQueryLimit = uint32(32)
-	MaxDRTQueryLimit     = uint32(256)
+	MaxDRTAdvertisements	= 4096
+	DefaultDRTQueryLimit	= uint32(32)
+	MaxDRTQueryLimit	= uint32(256)
 )
 
 type DRTObjectType string
 
 const (
-	DRTObjectNode                    DRTObjectType = "node"
-	DRTObjectExecutionZone           DRTObjectType = "execution_zone"
-	DRTObjectServiceEndpoint         DRTObjectType = "service_endpoint"
-	DRTObjectRPCEndpoint             DRTObjectType = "rpc_endpoint"
-	DRTObjectStorageProvider         DRTObjectType = "storage_provider"
-	DRTObjectRoutingEntryPoint       DRTObjectType = "routing_entry_point"
-	DRTObjectOverlayMembershipRecord DRTObjectType = "overlay_membership_record"
-	DRTObjectStreamProvider          DRTObjectType = "stream_provider"
+	DRTObjectNode				DRTObjectType	= "node"
+	DRTObjectExecutionZone			DRTObjectType	= "execution_zone"
+	DRTObjectServiceEndpoint		DRTObjectType	= "service_endpoint"
+	DRTObjectRPCEndpoint			DRTObjectType	= "rpc_endpoint"
+	DRTObjectStorageProvider		DRTObjectType	= "storage_provider"
+	DRTObjectRoutingEntryPoint		DRTObjectType	= "routing_entry_point"
+	DRTObjectOverlayMembershipRecord	DRTObjectType	= "overlay_membership_record"
+	DRTObjectStreamProvider			DRTObjectType	= "stream_provider"
 )
 
 type DRTAdvertisement struct {
-	AdvertisementID   string
-	ObjectType        DRTObjectType
-	ObjectID          string
-	Discovery         DiscoveryRecord
-	OverlayID         string
-	ZoneID            string
-	ServiceID         string
-	EndpointHash      string
-	StakeWeight       uint64
-	PeerScoreBps      uint32
-	LeaseStartHeight  uint64
-	LeaseExpireHeight uint64
+	AdvertisementID		string
+	ObjectType		DRTObjectType
+	ObjectID		string
+	Discovery		DiscoveryRecord
+	OverlayID		string
+	ZoneID			string
+	ServiceID		string
+	EndpointHash		string
+	StakeWeight		uint64
+	PeerScoreBps		uint32
+	LeaseStartHeight	uint64
+	LeaseExpireHeight	uint64
 }
 
 type DRTQuery struct {
-	ObjectType     DRTObjectType
-	ObjectID       string
-	OverlayID      string
-	ZoneID         string
-	ServiceID      string
-	MinStakeWeight uint64
-	Limit          uint32
-	CurrentHeight  uint64
+	ObjectType	DRTObjectType
+	ObjectID	string
+	OverlayID	string
+	ZoneID		string
+	ServiceID	string
+	MinStakeWeight	uint64
+	Limit		uint32
+	CurrentHeight	uint64
 }
 
 type DRTBucket struct {
-	BucketID       uint32
-	Advertisements []DRTAdvertisement
+	BucketID	uint32
+	Advertisements	[]DRTAdvertisement
 }
 
 type DistributedRoutingTable struct {
-	Advertisements []DRTAdvertisement
-	Records        []DiscoveryRecord
-	Revocations    []DiscoveryRevocation
+	Advertisements	[]DRTAdvertisement
+	Records		[]DiscoveryRecord
+	Revocations	[]DiscoveryRevocation
 }
 
 type DiscoveryRevocation struct {
-	RevocationID      string
-	RecordID          string
-	OwnerNodeID       string
-	AdvertisementHash string
-	RevokedHeight     uint64
-	Signature         []byte
+	RevocationID		string
+	RecordID		string
+	OwnerNodeID		string
+	AdvertisementHash	string
+	RevokedHeight		uint64
+	Signature		[]byte
 }
 
 type DiscoverySignatureChainEntry struct {
-	NodeID    string
-	PublicKey []byte
-	Signature []byte
+	NodeID		string
+	PublicKey	[]byte
+	Signature	[]byte
 }
 
 type DiscoveryOnChainProof struct {
-	ProofHash   string
-	ProofHeight uint64
-	StateRoot   string
+	ProofHash	string
+	ProofHeight	uint64
+	StateRoot	string
 }
 
 type DiscoveryResponse struct {
-	ResponseID      string
-	QueryHash       string
-	MatchedRecords  []DiscoveryRecord
-	SignatureChain  []DiscoverySignatureChainEntry
-	OnChainProof    DiscoveryOnChainProof
-	ExpiryHeight    uint64
-	SourceNodeID    string
-	SourceSignature []byte
-	ResultHash      string
-	AdvisoryOnly    bool
-	GeneratedHeight uint64
+	ResponseID	string
+	QueryHash	string
+	MatchedRecords	[]DiscoveryRecord
+	SignatureChain	[]DiscoverySignatureChainEntry
+	OnChainProof	DiscoveryOnChainProof
+	ExpiryHeight	uint64
+	SourceNodeID	string
+	SourceSignature	[]byte
+	ResultHash	string
+	AdvisoryOnly	bool
+	GeneratedHeight	uint64
 }
 
 func EmptyDistributedRoutingTable() DistributedRoutingTable {
@@ -328,13 +328,13 @@ func NewDiscoveryResponse(response DiscoveryResponse, sourcePrivateKey ed25519.P
 func BuildDiscoveryResponse(table DistributedRoutingTable, query DRTQuery, source NodeRecord, sourcePrivateKey ed25519.PrivateKey, networkSalt []byte, onChainProof DiscoveryOnChainProof, currentHeight uint64) (DiscoveryResponse, error) {
 	records := table.findRecordsForQuery(query, currentHeight)
 	response := DiscoveryResponse{
-		QueryHash:       ComputeDRTQueryHash(query),
-		MatchedRecords:  records,
-		SignatureChain:  DiscoverySignatureChain(records),
-		OnChainProof:    NormalizeDiscoveryOnChainProof(onChainProof),
-		SourceNodeID:    source.NodeID,
-		AdvisoryOnly:    onChainProof.ProofHash == "",
-		GeneratedHeight: currentHeight,
+		QueryHash:		ComputeDRTQueryHash(query),
+		MatchedRecords:		records,
+		SignatureChain:		DiscoverySignatureChain(records),
+		OnChainProof:		NormalizeDiscoveryOnChainProof(onChainProof),
+		SourceNodeID:		source.NodeID,
+		AdvisoryOnly:		onChainProof.ProofHash == "",
+		GeneratedHeight:	currentHeight,
 	}
 	return NewDiscoveryResponse(response, sourcePrivateKey, networkSalt)
 }
@@ -503,9 +503,9 @@ func DiscoverySignatureChain(records []DiscoveryRecord) []DiscoverySignatureChai
 	chain := make([]DiscoverySignatureChainEntry, len(records))
 	for i, record := range records {
 		chain[i] = DiscoverySignatureChainEntry{
-			NodeID:    record.OwnerNodeID,
-			PublicKey: cloneBytes(record.Record.NodePubKey),
-			Signature: cloneBytes(record.Signature),
+			NodeID:		record.OwnerNodeID,
+			PublicKey:	cloneBytes(record.Record.NodePubKey),
+			Signature:	cloneBytes(record.Signature),
 		}
 	}
 	return chain
@@ -956,9 +956,9 @@ func (table DistributedRoutingTable) Validate(networkSalt []byte, currentHeight 
 
 func (table DistributedRoutingTable) Clone() DistributedRoutingTable {
 	return DistributedRoutingTable{
-		Advertisements: cloneDRTAdvertisements(table.Advertisements),
-		Records:        cloneDiscoveryRecords(table.Records),
-		Revocations:    cloneDiscoveryRevocations(table.Revocations),
+		Advertisements:	cloneDRTAdvertisements(table.Advertisements),
+		Records:	cloneDiscoveryRecords(table.Records),
+		Revocations:	cloneDiscoveryRevocations(table.Revocations),
 	}
 }
 
@@ -1052,17 +1052,17 @@ func validateDRTObjectCompatibility(ad DRTAdvertisement) error {
 
 func validateDiscoveryRecordCompatibility(record DiscoveryRecord) error {
 	ad := DRTAdvertisement{
-		ObjectType:        record.RecordType,
-		ObjectID:          record.TargetID,
-		Discovery:         DiscoveryRecord{Record: record.Record},
-		OverlayID:         record.OverlayID,
-		ZoneID:            record.ZoneID,
-		ServiceID:         record.ServiceID,
-		EndpointHash:      record.AdvertisementHash,
-		StakeWeight:       1,
-		PeerScoreBps:      0,
-		LeaseStartHeight:  1,
-		LeaseExpireHeight: record.ExpiresHeight,
+		ObjectType:		record.RecordType,
+		ObjectID:		record.TargetID,
+		Discovery:		DiscoveryRecord{Record: record.Record},
+		OverlayID:		record.OverlayID,
+		ZoneID:			record.ZoneID,
+		ServiceID:		record.ServiceID,
+		EndpointHash:		record.AdvertisementHash,
+		StakeWeight:		1,
+		PeerScoreBps:		0,
+		LeaseStartHeight:	1,
+		LeaseExpireHeight:	record.ExpiresHeight,
 	}
 	switch record.RecordType {
 	case DRTObjectNode, DRTObjectOverlayMembershipRecord:
@@ -1082,10 +1082,10 @@ func NewDiscoveryRevocation(record DiscoveryRecord, privateKey ed25519.PrivateKe
 		return DiscoveryRevocation{}, errors.New("networking discovery revocation signer must own node record")
 	}
 	revocation := NormalizeDiscoveryRevocation(DiscoveryRevocation{
-		RecordID:          record.RecordID,
-		OwnerNodeID:       record.OwnerNodeID,
-		AdvertisementHash: record.AdvertisementHash,
-		RevokedHeight:     revokedHeight,
+		RecordID:		record.RecordID,
+		OwnerNodeID:		record.OwnerNodeID,
+		AdvertisementHash:	record.AdvertisementHash,
+		RevokedHeight:		revokedHeight,
 	})
 	revocation.RevocationID = ComputeDiscoveryRevocationID(revocation)
 	payload, err := DiscoveryRevocationSigningPayload(revocation)

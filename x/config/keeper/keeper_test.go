@@ -109,13 +109,13 @@ func TestExportImportDeterministicAndMigration(t *testing.T) {
 	_, err = source.UpsertEntry(prototype.DefaultAuthority, "runtime/a", "a", 1)
 	require.NoError(t, err)
 	_, err = source.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("change-b", "runtime/b", "b2"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("change-b", "runtime/b", "b2"),
 	}, 3)
 	require.NoError(t, err)
 	_, err = source.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("change-a", "runtime/a", "a2"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("change-a", "runtime/a", "a2"),
 	}, 4)
 	require.NoError(t, err)
 
@@ -156,14 +156,14 @@ func TestPersistentRuntimeMutationSurvivesRestartAndImport(t *testing.T) {
 func TestConfigChangeLifecycleRequiresAuthority(t *testing.T) {
 	keeper := NewKeeper()
 	_, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: "4:0000000000000000000000000000000000000000000000000000000000000002",
-		Change:    change("change-1", "runtime/max_validators", "100"),
+		Authority:	"4:0000000000000000000000000000000000000000000000000000000000000002",
+		Change:		change("change-1", "runtime/max_validators", "100"),
 	}, 1)
 	require.ErrorContains(t, err, "governance authority")
 
 	submitted, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("change-1", "runtime/max_validators", "100"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("change-1", "runtime/max_validators", "100"),
 	}, 1)
 	require.NoError(t, err)
 	require.Equal(t, types.ChangeStatusPending, submitted.Status)
@@ -193,8 +193,8 @@ func TestConfigChangeLifecycleRequiresAuthority(t *testing.T) {
 func TestCriticalConfigChangeActivatesOnDeterministicEpoch(t *testing.T) {
 	keeper := NewKeeper()
 	submitted, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("critical-gas", types.KeyConsensusMaxBlockGas, "1000000"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("critical-gas", types.KeyConsensusMaxBlockGas, "1000000"),
 	}, 7)
 	require.NoError(t, err)
 	require.True(t, submitted.Critical)
@@ -214,14 +214,14 @@ func TestInvalidConfigChangeRejectedBeforeExecution(t *testing.T) {
 	keeper := NewKeeper()
 
 	_, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("bad-gas", "avm/gas/contract_call", "0"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("bad-gas", "avm/gas/contract_call", "0"),
 	}, 1)
 	require.ErrorContains(t, err, "positive")
 
 	_, err = keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("bad-denom", types.KeyFeeBaseDenom, "uatom"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("bad-denom", types.KeyFeeBaseDenom, "uatom"),
 	}, 1)
 	require.ErrorContains(t, err, "base denom")
 }
@@ -229,8 +229,8 @@ func TestInvalidConfigChangeRejectedBeforeExecution(t *testing.T) {
 func TestConfigCannotSetUnlimitedBlockGas(t *testing.T) {
 	keeper := NewKeeper()
 	_, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("bad-block-gas", types.KeyConsensusMaxBlockGas, "1000000001"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("bad-block-gas", types.KeyConsensusMaxBlockGas, "1000000001"),
 	}, 1)
 	require.ErrorContains(t, err, "unlimited block gas")
 }
@@ -241,8 +241,8 @@ func TestConfigCannotSetZeroStorageRentForNonEmptyStateWithoutConstitutionalRule
 	require.NoError(t, err)
 
 	_, err = keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    change("zero-rent", types.KeyStorageRentPerByteEpoch, "0"),
+		Authority:	prototype.DefaultAuthority,
+		Change:		change("zero-rent", types.KeyStorageRentPerByteEpoch, "0"),
 	}, 2)
 	require.ErrorContains(t, err, "constitutional allowance")
 
@@ -251,8 +251,8 @@ func TestConfigCannotSetZeroStorageRentForNonEmptyStateWithoutConstitutionalRule
 	allowed := change("zero-rent", types.KeyStorageRentPerByteEpoch, "0")
 	allowed.RequiresConstitutionalException = true
 	_, err = keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    allowed,
+		Authority:	prototype.DefaultAuthority,
+		Change:		allowed,
 	}, 3)
 	require.NoError(t, err)
 }
@@ -265,8 +265,8 @@ func TestConfigCannotRemoveRequiredSystemAccountAddresses(t *testing.T) {
 	deleteChange := change("remove-fee-collector", "system/account/fee_collector", "")
 	deleteChange.Operation = types.OperationDelete
 	_, err = keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-		Authority: prototype.DefaultAuthority,
-		Change:    deleteChange,
+		Authority:	prototype.DefaultAuthority,
+		Change:		deleteChange,
 	}, 2)
 	require.ErrorContains(t, err, "required system account")
 }
@@ -275,8 +275,8 @@ func TestPendingConfigChangesAreDeterministicallyOrdered(t *testing.T) {
 	keeper := NewKeeper()
 	for _, id := range []string{"change-z", "change-a", "change-m"} {
 		_, err := keeper.SubmitConfigChange(types.MsgSubmitConfigChange{
-			Authority: prototype.DefaultAuthority,
-			Change:    change(id, "runtime/"+id, "1"),
+			Authority:	prototype.DefaultAuthority,
+			Change:		change(id, "runtime/"+id, "1"),
 		}, 1)
 		require.NoError(t, err)
 	}
@@ -288,24 +288,24 @@ func TestPendingConfigChangesAreDeterministicallyOrdered(t *testing.T) {
 
 func entry(key string, value string, version uint64) types.ConfigEntry {
 	return types.ConfigEntry{
-		Key:           key,
-		Value:         value,
-		Owner:         prototype.DefaultAuthority,
-		Version:       version,
-		UpdatedHeight: 1,
+		Key:		key,
+		Value:		value,
+		Owner:		prototype.DefaultAuthority,
+		Version:	version,
+		UpdatedHeight:	1,
 	}
 }
 
 func change(id string, key string, value string) types.ConfigChange {
 	return types.ConfigChange{
-		ID:                      id,
-		Key:                     key,
-		Value:                   value,
-		Operation:               types.OperationSet,
-		Status:                  types.ChangeStatusPending,
-		SubmittedBy:             prototype.DefaultAuthority,
-		CreatedHeight:           1,
-		UpdatedHeight:           1,
-		ExpectedPreviousVersion: 0,
+		ID:				id,
+		Key:				key,
+		Value:				value,
+		Operation:			types.OperationSet,
+		Status:				types.ChangeStatusPending,
+		SubmittedBy:			prototype.DefaultAuthority,
+		CreatedHeight:			1,
+		UpdatedHeight:			1,
+		ExpectedPreviousVersion:	0,
 	}
 }

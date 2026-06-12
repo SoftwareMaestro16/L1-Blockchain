@@ -14,74 +14,74 @@ import (
 type ConditionalPaymentMessageType string
 
 const (
-	ConditionalMsgRegisterPromise             ConditionalPaymentMessageType = "MsgRegisterPromise"
-	ConditionalMsgResolveWithPreimage         ConditionalPaymentMessageType = "MsgResolveWithPreimage"
-	ConditionalMsgExpirePromise               ConditionalPaymentMessageType = "MsgExpirePromise"
-	ConditionalMsgBatchResolvePromises        ConditionalPaymentMessageType = "MsgBatchResolvePromises"
-	ConditionalMsgDisputeCondition            ConditionalPaymentMessageType = "MsgDisputeCondition"
-	ConditionalMsgFinalizeConditionSettlement ConditionalPaymentMessageType = "MsgFinalizeConditionSettlement"
+	ConditionalMsgRegisterPromise			ConditionalPaymentMessageType	= "MsgRegisterPromise"
+	ConditionalMsgResolveWithPreimage		ConditionalPaymentMessageType	= "MsgResolveWithPreimage"
+	ConditionalMsgExpirePromise			ConditionalPaymentMessageType	= "MsgExpirePromise"
+	ConditionalMsgBatchResolvePromises		ConditionalPaymentMessageType	= "MsgBatchResolvePromises"
+	ConditionalMsgDisputeCondition			ConditionalPaymentMessageType	= "MsgDisputeCondition"
+	ConditionalMsgFinalizeConditionSettlement	ConditionalPaymentMessageType	= "MsgFinalizeConditionSettlement"
 )
 
 type ConditionRoot struct {
-	ChannelID      string
-	Nonce          uint64
-	RootHash       string
-	ConditionCount uint32
-	PromiseIDs     []string
-	CommitmentHash string
+	ChannelID	string
+	Nonce		uint64
+	RootHash	string
+	ConditionCount	uint32
+	PromiseIDs	[]string
+	CommitmentHash	string
 }
 
 type PreimageClaim struct {
-	ClaimID        string
-	ChannelID      string
-	PromiseID      string
-	Resolver       string
-	PreimageHash   string
-	ResolvedHeight uint64
-	ExpiresHeight  uint64
-	EvidenceHash   string
+	ClaimID		string
+	ChannelID	string
+	PromiseID	string
+	Resolver	string
+	PreimageHash	string
+	ResolvedHeight	uint64
+	ExpiresHeight	uint64
+	EvidenceHash	string
 }
 
 type PromiseLink struct {
-	LinkID        string
-	RouteID       string
-	PreviousID    string
-	PromiseID     string
-	NextID        string
-	ChannelID     string
-	TimeoutHeight uint64
-	HashLock      string
+	LinkID		string
+	RouteID		string
+	PreviousID	string
+	PromiseID	string
+	NextID		string
+	ChannelID	string
+	TimeoutHeight	uint64
+	HashLock	string
 }
 
 type PromiseTimeout struct {
-	TimeoutID     string
-	ChannelID     string
-	PromiseID     string
-	TimeoutHeight uint64
-	SafetyMargin  uint64
-	Expired       bool
+	TimeoutID	string
+	ChannelID	string
+	PromiseID	string
+	TimeoutHeight	uint64
+	SafetyMargin	uint64
+	Expired		bool
 }
 
 type ConditionSettlementRecord struct {
-	SettlementID string
-	RouteID      string
-	Mode         ConditionSettlementMode
-	Resolver     string
-	ResolvedAt   uint64
-	EvidenceHash string
-	Resolutions  []ConditionResolution
-	RootUpdates  []ConditionRootUpdate
-	FeeClaims    []RouteFeeClaim
+	SettlementID	string
+	RouteID		string
+	Mode		ConditionSettlementMode
+	Resolver	string
+	ResolvedAt	uint64
+	EvidenceHash	string
+	Resolutions	[]ConditionResolution
+	RootUpdates	[]ConditionRootUpdate
+	FeeClaims	[]RouteFeeClaim
 }
 
 type ConditionalPaymentsModuleState struct {
-	Promises        []ConditionalPromise
-	ConditionRoots  []ConditionRoot
-	PreimageClaims  []PreimageClaim
-	PromiseLinks    []PromiseLink
-	PromiseTimeouts []PromiseTimeout
-	Settlements     []ConditionSettlementRecord
-	ExpiredClaims   []ConditionClaimRecord
+	Promises	[]ConditionalPromise
+	ConditionRoots	[]ConditionRoot
+	PreimageClaims	[]PreimageClaim
+	PromiseLinks	[]PromiseLink
+	PromiseTimeouts	[]PromiseTimeout
+	Settlements	[]ConditionSettlementRecord
+	ExpiredClaims	[]ConditionClaimRecord
 }
 
 type ConditionalPaymentMessage interface {
@@ -90,11 +90,11 @@ type ConditionalPaymentMessage interface {
 }
 
 type MsgRegisterPromise struct {
-	Signer        string
-	ChannelID     string
-	BaseState     ChannelState
-	Promises      []ConditionalPromise
-	CurrentHeight uint64
+	Signer		string
+	ChannelID	string
+	BaseState	ChannelState
+	Promises	[]ConditionalPromise
+	CurrentHeight	uint64
 }
 
 type MsgResolveWithPreimage struct {
@@ -110,19 +110,19 @@ type MsgBatchResolvePromises struct {
 }
 
 type MsgDisputeCondition struct {
-	Signer              string
-	ChannelID           string
-	Promise             ConditionalPromise
-	Resolution          ConditionResolution
-	Reason              string
-	CurrentHeight       uint64
-	VerificationFeePaid string
+	Signer			string
+	ChannelID		string
+	Promise			ConditionalPromise
+	Resolution		ConditionResolution
+	Reason			string
+	CurrentHeight		uint64
+	VerificationFeePaid	string
 }
 
 type MsgFinalizeConditionSettlement struct {
-	Signer        string
-	Settlement    ConditionSettlementRecord
-	CurrentHeight uint64
+	Signer		string
+	Settlement	ConditionSettlementRecord
+	CurrentHeight	uint64
 }
 
 func SnapshotConditionalPaymentsModuleState(state PaymentsState) (ConditionalPaymentsModuleState, error) {
@@ -150,13 +150,13 @@ func SnapshotConditionalPaymentsModuleState(state PaymentsState) (ConditionalPay
 			continue
 		}
 		out.PreimageClaims = append(out.PreimageClaims, PreimageClaim{
-			ClaimID:        HashParts("preimage-claim", claim.ChannelID, claim.ConditionID, claim.EvidenceHash),
-			ChannelID:      claim.ChannelID,
-			PromiseID:      claim.ConditionID,
-			PreimageHash:   claim.PreimageHash,
-			ResolvedHeight: claim.ResolvedHeight,
-			ExpiresHeight:  claim.ExpiresHeight,
-			EvidenceHash:   claim.EvidenceHash,
+			ClaimID:	HashParts("preimage-claim", claim.ChannelID, claim.ConditionID, claim.EvidenceHash),
+			ChannelID:	claim.ChannelID,
+			PromiseID:	claim.ConditionID,
+			PreimageHash:	claim.PreimageHash,
+			ResolvedHeight:	claim.ResolvedHeight,
+			ExpiresHeight:	claim.ExpiresHeight,
+			EvidenceHash:	claim.EvidenceHash,
 		}.Normalize())
 	}
 	return out.Normalize(), out.Validate()
@@ -278,10 +278,10 @@ func DisputeConditionResolution(state PaymentsState, msg MsgDisputeCondition) (P
 	}
 	next := state.Clone()
 	next.Events = append(next.Events, PaymentEvent{
-		EventID:   HashParts("condition-dispute", msg.ChannelID, msg.Promise.PromiseID, msg.Resolution.EvidenceHash),
-		EventType: "condition_dispute",
-		ChannelID: msg.ChannelID,
-		Height:    msg.CurrentHeight,
+		EventID:	HashParts("condition-dispute", msg.ChannelID, msg.Promise.PromiseID, msg.Resolution.EvidenceHash),
+		EventType:	"condition_dispute",
+		ChannelID:	msg.ChannelID,
+		Height:		msg.CurrentHeight,
 		Attributes: []PaymentEventAttribute{
 			{Key: "promise_id", Value: msg.Promise.PromiseID},
 			{Key: "reason", Value: msg.Reason},
@@ -410,12 +410,12 @@ func ConditionRootFromState(channel ChannelRecord, state ChannelState) Condition
 	}
 	sort.Strings(ids)
 	root := ConditionRoot{
-		ChannelID:      channel.ChannelID,
-		Nonce:          state.Nonce,
-		RootHash:       state.ConditionRoot,
-		ConditionCount: state.ConditionCount,
-		PromiseIDs:     ids,
-		CommitmentHash: ComputeConditionRootCommitment(channel, state),
+		ChannelID:	channel.ChannelID,
+		Nonce:		state.Nonce,
+		RootHash:	state.ConditionRoot,
+		ConditionCount:	state.ConditionCount,
+		PromiseIDs:	ids,
+		CommitmentHash:	ComputeConditionRootCommitment(channel, state),
 	}
 	return root.Normalize()
 }
@@ -424,16 +424,16 @@ func PromiseFromCondition(channel ChannelRecord, condition ConditionalPayment) C
 	channel = channel.Normalize()
 	condition = condition.Normalize()
 	promise := ConditionalPromise{
-		PromiseID:     condition.ConditionID,
-		ChannelID:     channel.ChannelID,
-		Source:        condition.Payer,
-		Destination:   condition.Payee,
-		Amount:        condition.Amount,
-		Fee:           "0",
-		HashLock:      condition.HashLock,
-		TimeoutHeight: condition.TimeoutHeight,
-		ConditionType: condition.ConditionType,
-		Nonce:         condition.NonceStart,
+		PromiseID:	condition.ConditionID,
+		ChannelID:	channel.ChannelID,
+		Source:		condition.Payer,
+		Destination:	condition.Payee,
+		Amount:		condition.Amount,
+		Fee:		"0",
+		HashLock:	condition.HashLock,
+		TimeoutHeight:	condition.TimeoutHeight,
+		ConditionType:	condition.ConditionType,
+		Nonce:		condition.NonceStart,
 	}
 	promise.PromiseHash = ComputeConditionalTransferPromiseHash(promise)
 	return promise.Normalize()
@@ -442,26 +442,26 @@ func PromiseFromCondition(channel ChannelRecord, condition ConditionalPayment) C
 func PromiseLinkFromPromise(promise ConditionalPromise) PromiseLink {
 	promise = promise.Normalize()
 	return PromiseLink{
-		LinkID:        HashParts("promise-link", promise.RouteIDOptional, promise.PreviousPromiseIDOptional, promise.PromiseID, promise.NextPromiseIDOptional),
-		RouteID:       promise.RouteIDOptional,
-		PreviousID:    promise.PreviousPromiseIDOptional,
-		PromiseID:     promise.PromiseID,
-		NextID:        promise.NextPromiseIDOptional,
-		ChannelID:     promise.ChannelID,
-		TimeoutHeight: promise.TimeoutHeight,
-		HashLock:      promise.HashLock,
+		LinkID:		HashParts("promise-link", promise.RouteIDOptional, promise.PreviousPromiseIDOptional, promise.PromiseID, promise.NextPromiseIDOptional),
+		RouteID:	promise.RouteIDOptional,
+		PreviousID:	promise.PreviousPromiseIDOptional,
+		PromiseID:	promise.PromiseID,
+		NextID:		promise.NextPromiseIDOptional,
+		ChannelID:	promise.ChannelID,
+		TimeoutHeight:	promise.TimeoutHeight,
+		HashLock:	promise.HashLock,
 	}.Normalize()
 }
 
 func PromiseTimeoutFromPromise(promise ConditionalPromise, margin uint64, expired bool) PromiseTimeout {
 	promise = promise.Normalize()
 	return PromiseTimeout{
-		TimeoutID:     HashParts("promise-timeout", promise.ChannelID, promise.PromiseID, fmt.Sprintf("%020d", promise.TimeoutHeight)),
-		ChannelID:     promise.ChannelID,
-		PromiseID:     promise.PromiseID,
-		TimeoutHeight: promise.TimeoutHeight,
-		SafetyMargin:  margin,
-		Expired:       expired,
+		TimeoutID:	HashParts("promise-timeout", promise.ChannelID, promise.PromiseID, fmt.Sprintf("%020d", promise.TimeoutHeight)),
+		ChannelID:	promise.ChannelID,
+		PromiseID:	promise.PromiseID,
+		TimeoutHeight:	promise.TimeoutHeight,
+		SafetyMargin:	margin,
+		Expired:	expired,
 	}.Normalize()
 }
 
@@ -469,15 +469,15 @@ func ConditionSettlementRecordFromBatch(req BatchConditionSettlementRequest, res
 	req = req.Normalize()
 	result = result.Normalize()
 	record := ConditionSettlementRecord{
-		SettlementID: HashParts("condition-settlement", result.RouteID, result.EvidenceHash, fmt.Sprintf("%020d", req.CurrentHeight)),
-		RouteID:      result.RouteID,
-		Mode:         req.Mode,
-		Resolver:     req.Resolver,
-		ResolvedAt:   req.CurrentHeight,
-		EvidenceHash: result.EvidenceHash,
-		Resolutions:  result.Resolutions,
-		RootUpdates:  result.ConditionRootUpdates,
-		FeeClaims:    result.FeeClaims,
+		SettlementID:	HashParts("condition-settlement", result.RouteID, result.EvidenceHash, fmt.Sprintf("%020d", req.CurrentHeight)),
+		RouteID:	result.RouteID,
+		Mode:		req.Mode,
+		Resolver:	req.Resolver,
+		ResolvedAt:	req.CurrentHeight,
+		EvidenceHash:	result.EvidenceHash,
+		Resolutions:	result.Resolutions,
+		RootUpdates:	result.ConditionRootUpdates,
+		FeeClaims:	result.FeeClaims,
 	}
 	return record.Normalize()
 }
@@ -535,7 +535,7 @@ func (m MsgResolveWithPreimage) ValidateBasic() error {
 func (m MsgExpirePromise) ConditionalPaymentType() ConditionalPaymentMessageType {
 	return ConditionalMsgExpirePromise
 }
-func (m MsgExpirePromise) Normalize() MsgExpirePromise { m.Request = m.Request.Normalize(); return m }
+func (m MsgExpirePromise) Normalize() MsgExpirePromise	{ m.Request = m.Request.Normalize(); return m }
 func (m MsgExpirePromise) ValidateBasic() error {
 	req := m.Normalize().Request
 	if req.CurrentHeight == 0 || len(req.Promises) == 0 {
@@ -789,10 +789,10 @@ func (r ConditionSettlementRecord) Validate() error {
 func appendConditionSettlementRecord(state PaymentsState, record ConditionSettlementRecord) PaymentsState {
 	record = record.Normalize()
 	event := PaymentEvent{
-		EventID:   HashParts("condition-settlement-event", record.SettlementID),
-		EventType: "condition_settlement",
-		ChannelID: record.RootUpdates[0].ChannelID,
-		Height:    record.ResolvedAt,
+		EventID:	HashParts("condition-settlement-event", record.SettlementID),
+		EventType:	"condition_settlement",
+		ChannelID:	record.RootUpdates[0].ChannelID,
+		Height:		record.ResolvedAt,
 		Attributes: []PaymentEventAttribute{
 			{Key: "route_id", Value: record.RouteID},
 			{Key: "mode", Value: string(record.Mode)},

@@ -10,55 +10,55 @@ import (
 type SecurityThreat string
 
 const (
-	SecurityThreatStaleStateClose                SecurityThreat = "STALE_STATE_CLOSE"
-	SecurityThreatSameNonceDoubleSign            SecurityThreat = "SAME_NONCE_DOUBLE_SIGN"
-	SecurityThreatReplayAcrossDomain             SecurityThreat = "REPLAY_ACROSS_CHAIN_OR_CHANNEL_DOMAIN"
-	SecurityThreatInvalidConditionResolution     SecurityThreat = "INVALID_CONDITION_RESOLUTION"
-	SecurityThreatPreimageWithholding            SecurityThreat = "PREIMAGE_WITHHOLDING"
-	SecurityThreatTimeoutRace                    SecurityThreat = "TIMEOUT_RACE"
-	SecurityThreatRouteGriefing                  SecurityThreat = "ROUTE_GRIEFING"
-	SecurityThreatLiquidityExhaustion            SecurityThreat = "LIQUIDITY_EXHAUSTION"
-	SecurityThreatGossipSpam                     SecurityThreat = "GOSSIP_SPAM"
-	SecurityThreatChannelOpenSpam                SecurityThreat = "CHANNEL_OPEN_SPAM"
-	SecurityThreatStateBloatUnresolvedPromises   SecurityThreat = "STATE_BLOAT_UNRESOLVED_PROMISES"
-	SecurityThreatWatchServiceDowntime           SecurityThreat = "WATCH_SERVICE_DOWNTIME"
-	SecurityThreatParticipantKeyCompromise       SecurityThreat = "PARTICIPANT_KEY_COMPROMISE"
-	SecurityThreatValidatorCensorship            SecurityThreat = "VALIDATOR_CENSORSHIP_WITHIN_BOUNDED_WINDOWS"
-	SecurityThreatSettlementBatchConflictAmplify SecurityThreat = "SETTLEMENT_BATCH_CONFLICT_AMPLIFICATION"
+	SecurityThreatStaleStateClose			SecurityThreat	= "STALE_STATE_CLOSE"
+	SecurityThreatSameNonceDoubleSign		SecurityThreat	= "SAME_NONCE_DOUBLE_SIGN"
+	SecurityThreatReplayAcrossDomain		SecurityThreat	= "REPLAY_ACROSS_CHAIN_OR_CHANNEL_DOMAIN"
+	SecurityThreatInvalidConditionResolution	SecurityThreat	= "INVALID_CONDITION_RESOLUTION"
+	SecurityThreatPreimageWithholding		SecurityThreat	= "PREIMAGE_WITHHOLDING"
+	SecurityThreatTimeoutRace			SecurityThreat	= "TIMEOUT_RACE"
+	SecurityThreatRouteGriefing			SecurityThreat	= "ROUTE_GRIEFING"
+	SecurityThreatLiquidityExhaustion		SecurityThreat	= "LIQUIDITY_EXHAUSTION"
+	SecurityThreatGossipSpam			SecurityThreat	= "GOSSIP_SPAM"
+	SecurityThreatChannelOpenSpam			SecurityThreat	= "CHANNEL_OPEN_SPAM"
+	SecurityThreatStateBloatUnresolvedPromises	SecurityThreat	= "STATE_BLOAT_UNRESOLVED_PROMISES"
+	SecurityThreatWatchServiceDowntime		SecurityThreat	= "WATCH_SERVICE_DOWNTIME"
+	SecurityThreatParticipantKeyCompromise		SecurityThreat	= "PARTICIPANT_KEY_COMPROMISE"
+	SecurityThreatValidatorCensorship		SecurityThreat	= "VALIDATOR_CENSORSHIP_WITHIN_BOUNDED_WINDOWS"
+	SecurityThreatSettlementBatchConflictAmplify	SecurityThreat	= "SETTLEMENT_BATCH_CONFLICT_AMPLIFICATION"
 )
 
 type SecurityGuarantee string
 
 const (
-	SecurityGuaranteeUnilateralClose               SecurityGuarantee = "ANY_PARTICIPANT_CAN_UNILATERALLY_CLOSE"
-	SecurityGuaranteeLatestStateSupersedesStale    SecurityGuarantee = "LATEST_VALID_STATE_SUPERSEDES_STALE_CLOSE"
-	SecurityGuaranteeSameNonceConflictPunishable   SecurityGuarantee = "SAME_NONCE_CONFLICTING_SIGNATURES_PUNISHABLE"
-	SecurityGuaranteeConditionalProofBeforeTimeout SecurityGuarantee = "CONDITIONS_SETTLE_ONLY_WITH_VALID_PROOF_BEFORE_TIMEOUT"
-	SecurityGuaranteeExpiredConditionsRelease      SecurityGuarantee = "EXPIRED_CONDITIONS_RELEASE_RESERVES"
-	SecurityGuaranteeReplayRejected                SecurityGuarantee = "REPLAY_REJECTED_ACROSS_DOMAINS_EPOCHS_AND_FINALIZED_STATES"
-	SecurityGuaranteeLockedCollateral              SecurityGuarantee = "LOCKED_COLLATERAL_WITHDRAWN_ONLY_BY_SETTLEMENT_RULES"
-	SecurityGuaranteeOnchainDisputeSufficiency     SecurityGuarantee = "ONCHAIN_STATE_SUFFICIENT_TO_RESOLVE_DISPUTES"
+	SecurityGuaranteeUnilateralClose		SecurityGuarantee	= "ANY_PARTICIPANT_CAN_UNILATERALLY_CLOSE"
+	SecurityGuaranteeLatestStateSupersedesStale	SecurityGuarantee	= "LATEST_VALID_STATE_SUPERSEDES_STALE_CLOSE"
+	SecurityGuaranteeSameNonceConflictPunishable	SecurityGuarantee	= "SAME_NONCE_CONFLICTING_SIGNATURES_PUNISHABLE"
+	SecurityGuaranteeConditionalProofBeforeTimeout	SecurityGuarantee	= "CONDITIONS_SETTLE_ONLY_WITH_VALID_PROOF_BEFORE_TIMEOUT"
+	SecurityGuaranteeExpiredConditionsRelease	SecurityGuarantee	= "EXPIRED_CONDITIONS_RELEASE_RESERVES"
+	SecurityGuaranteeReplayRejected			SecurityGuarantee	= "REPLAY_REJECTED_ACROSS_DOMAINS_EPOCHS_AND_FINALIZED_STATES"
+	SecurityGuaranteeLockedCollateral		SecurityGuarantee	= "LOCKED_COLLATERAL_WITHDRAWN_ONLY_BY_SETTLEMENT_RULES"
+	SecurityGuaranteeOnchainDisputeSufficiency	SecurityGuarantee	= "ONCHAIN_STATE_SUFFICIENT_TO_RESOLVE_DISPUTES"
 )
 
 type ThreatModelEntry struct {
-	Threat            SecurityThreat
-	Controls          []SecurityGuarantee
-	ConsensusCritical bool
-	BoundedWindow     bool
-	Description       string
+	Threat			SecurityThreat
+	Controls		[]SecurityGuarantee
+	ConsensusCritical	bool
+	BoundedWindow		bool
+	Description		string
 }
 
 type SecurityGuaranteeCheck struct {
-	Guarantee    SecurityGuarantee
-	Passed       bool
-	EvidenceHash string
-	Reason       string
+	Guarantee	SecurityGuarantee
+	Passed		bool
+	EvidenceHash	string
+	Reason		string
 }
 
 type SecurityModelReport struct {
-	Threats    []ThreatModelEntry
-	Guarantees []SecurityGuaranteeCheck
-	ReportHash string
+	Threats		[]ThreatModelEntry
+	Guarantees	[]SecurityGuaranteeCheck
+	ReportHash	string
 }
 
 func DefaultThreatModel() []ThreatModelEntry {
@@ -127,8 +127,8 @@ func BuildSecurityModelReport(state PaymentsState) (SecurityModelReport, error) 
 		buildSecurityCheck(state, SecurityGuaranteeOnchainDisputeSufficiency, securityOnchainDisputeSufficiencyPasses(state)),
 	}
 	report := SecurityModelReport{
-		Threats:    normalizeThreatModelEntries(threats),
-		Guarantees: normalizeSecurityGuaranteeChecks(checks),
+		Threats:	normalizeThreatModelEntries(threats),
+		Guarantees:	normalizeSecurityGuaranteeChecks(checks),
 	}
 	report.ReportHash = ComputeSecurityModelReportHash(report)
 	if err := report.Validate(); err != nil {
@@ -223,11 +223,11 @@ func IsSecurityGuarantee(value SecurityGuarantee) bool {
 
 func securityThreat(threat SecurityThreat, consensusCritical, boundedWindow bool, description string, controls ...SecurityGuarantee) ThreatModelEntry {
 	return ThreatModelEntry{
-		Threat:            threat,
-		Controls:          normalizeSecurityGuarantees(controls),
-		ConsensusCritical: consensusCritical,
-		BoundedWindow:     boundedWindow,
-		Description:       description,
+		Threat:			threat,
+		Controls:		normalizeSecurityGuarantees(controls),
+		ConsensusCritical:	consensusCritical,
+		BoundedWindow:		boundedWindow,
+		Description:		description,
 	}
 }
 
@@ -237,10 +237,10 @@ func buildSecurityCheck(state PaymentsState, guarantee SecurityGuarantee, passed
 		reason = "state violates guarantee"
 	}
 	return SecurityGuaranteeCheck{
-		Guarantee:    guarantee,
-		Passed:       passed,
-		EvidenceHash: securityGuaranteeEvidenceHash(state, guarantee),
-		Reason:       reason,
+		Guarantee:	guarantee,
+		Passed:		passed,
+		EvidenceHash:	securityGuaranteeEvidenceHash(state, guarantee),
+		Reason:		reason,
 	}
 }
 

@@ -15,14 +15,14 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -36,9 +36,9 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 func DefaultGenesis() GenesisState {
 	params := types.DefaultParams()
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
-		Params:  params,
-		State:   types.State{}.Normalize(params),
+		Version:	prototype.CurrentGenesisVersion,
+		Params:		params,
+		State:		types.State{}.Normalize(params),
 	}
 }
 
@@ -111,9 +111,9 @@ func (k *Keeper) RegisterReporter(msg types.MsgRegisterReporter) (types.Reporter
 		return types.ReporterRecord{}, errors.New("reporter already registered")
 	}
 	reporter := types.ReporterRecord{
-		ReporterAddress: msg.ReporterAddress,
-		ReporterScore:   k.genesis.Params.InitialScore,
-		Status:          types.StatusActive,
+		ReporterAddress:	msg.ReporterAddress,
+		ReporterScore:		k.genesis.Params.InitialScore,
+		Status:			types.StatusActive,
 	}
 	if err := reporter.Validate(k.genesis.Params); err != nil {
 		return types.ReporterRecord{}, err
@@ -233,9 +233,9 @@ func (k *Keeper) SubmitReport(msg types.MsgSubmitReport) (types.ReportRecord, er
 		reporter.AcceptedReports++
 		reporter.ReporterScore += k.genesis.Params.AcceptedScoreDelta
 		reporter.RewardHistory = append(reporter.RewardHistory, types.ReporterReward{
-			ReportID:  msg.ReportID,
-			Amount:    rewardAmount,
-			CreatedAt: msg.Height,
+			ReportID:	msg.ReportID,
+			Amount:		rewardAmount,
+			CreatedAt:	msg.Height,
 		})
 	} else if msg.Malicious {
 		status = types.ReportStatusMalicious
@@ -250,17 +250,17 @@ func (k *Keeper) SubmitReport(msg types.MsgSubmitReport) (types.ReportRecord, er
 		}
 	}
 	report := types.ReportRecord{
-		ReportID:         msg.ReportID,
-		ReporterAddress:  msg.ReporterAddress,
-		ReportType:       msg.ReportType,
-		Subject:          msg.Subject,
-		PayloadHash:      msg.PayloadHash,
-		PayloadSizeBytes: msg.PayloadSizeBytes,
-		Status:           status,
-		SubmittedHeight:  msg.Height,
-		FinalizedHeight:  finalizedHeight,
-		RewardAmount:     rewardAmount,
-		SlashAmount:      slashAmount,
+		ReportID:		msg.ReportID,
+		ReporterAddress:	msg.ReporterAddress,
+		ReportType:		msg.ReportType,
+		Subject:		msg.Subject,
+		PayloadHash:		msg.PayloadHash,
+		PayloadSizeBytes:	msg.PayloadSizeBytes,
+		Status:			status,
+		SubmittedHeight:	msg.Height,
+		FinalizedHeight:	finalizedHeight,
+		RewardAmount:		rewardAmount,
+		SlashAmount:		slashAmount,
 	}
 	if err := report.Validate(k.genesis.Params); err != nil {
 		return types.ReportRecord{}, err
@@ -353,8 +353,8 @@ func (k Keeper) ReporterRewards(address string) []types.ReporterReward {
 
 type Migrator struct{ keeper *Keeper }
 
-func NewMigrator(k *Keeper) Migrator  { return Migrator{keeper: k} }
-func (m Migrator) Migrate1to2() error { return m.keeper.ExportGenesis().Validate() }
+func NewMigrator(k *Keeper) Migrator	{ return Migrator{keeper: k} }
+func (m Migrator) Migrate1to2() error	{ return m.keeper.ExportGenesis().Validate() }
 func (k Keeper) Migrate1to2State(ctx context.Context) error {
 	_, err := k.ExportGenesisState(ctx)
 	return err

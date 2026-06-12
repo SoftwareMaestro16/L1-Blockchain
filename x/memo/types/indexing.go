@@ -11,59 +11,59 @@ import (
 )
 
 const (
-	AssetTypeNative   = "native"
-	AssetTypeSBT      = "sbt"
-	AssetTypeContract = "contract"
-	AssetTypeDomain   = "domain"
+	AssetTypeNative		= "native"
+	AssetTypeSBT		= "sbt"
+	AssetTypeContract	= "contract"
+	AssetTypeDomain		= "domain"
 
-	EventTypeBankTransfer     = "bank_transfer"
-	EventTypeResolverPayment  = "resolver_payment"
-	EventTypeSBTProofRevoke   = "sbt_proof_revoke"
-	EventTypeContractCall     = "contract_call"
-	EventTypeDomainAuctionBid = "domain_auction_bid"
-	EventTypeDomainRenewal    = "domain_renewal"
-	EventTypeMemoAttached     = "memo_attached"
+	EventTypeBankTransfer		= "bank_transfer"
+	EventTypeResolverPayment	= "resolver_payment"
+	EventTypeSBTProofRevoke		= "sbt_proof_revoke"
+	EventTypeContractCall		= "contract_call"
+	EventTypeDomainAuctionBid	= "domain_auction_bid"
+	EventTypeDomainRenewal		= "domain_renewal"
+	EventTypeMemoAttached		= "memo_attached"
 
-	StoragePolicyFullMemo        = "full_memo_onchain"
-	StoragePolicyHashOnlyOnchain = "hash_only_onchain"
+	StoragePolicyFullMemo		= "full_memo_onchain"
+	StoragePolicyHashOnlyOnchain	= "hash_only_onchain"
 )
 
 type MemoStoragePolicy struct {
-	Mode            string
-	MaxOnChainBytes uint32
+	Mode		string
+	MaxOnChainBytes	uint32
 }
 
 type MemoStoreRecord struct {
-	TxHash        []byte
-	Sender        sdk.AccAddress
-	Receiver      sdk.AccAddress
-	Contract      sdk.AccAddress
-	AssetType     string
-	RelatedDomain string
-	EventType     string
-	Memo          string
-	MemoHash      []byte
-	BlockHeight   int64
-	TimestampUnix int64
+	TxHash		[]byte
+	Sender		sdk.AccAddress
+	Receiver	sdk.AccAddress
+	Contract	sdk.AccAddress
+	AssetType	string
+	RelatedDomain	string
+	EventType	string
+	Memo		string
+	MemoHash	[]byte
+	BlockHeight	int64
+	TimestampUnix	int64
 }
 
 type MemoIndex struct {
-	ByTxHash    map[string][]MemoStoreRecord
-	BySender    map[string][]MemoStoreRecord
-	ByReceiver  map[string][]MemoStoreRecord
-	ByDomain    map[string][]MemoStoreRecord
-	ByContract  map[string][]MemoStoreRecord
-	ByAsset     map[string][]MemoStoreRecord
-	ByEventType map[string][]MemoStoreRecord
+	ByTxHash	map[string][]MemoStoreRecord
+	BySender	map[string][]MemoStoreRecord
+	ByReceiver	map[string][]MemoStoreRecord
+	ByDomain	map[string][]MemoStoreRecord
+	ByContract	map[string][]MemoStoreRecord
+	ByAsset		map[string][]MemoStoreRecord
+	ByEventType	map[string][]MemoStoreRecord
 }
 
 type EventMemoAttached struct {
-	TxHash   []byte
-	From     sdk.AccAddress
-	To       sdk.AccAddress
-	Domain   string
-	MemoHash []byte
-	Memo     string
+	TxHash		[]byte
+	From		sdk.AccAddress
+	To		sdk.AccAddress
+	Domain		string
+	MemoHash	[]byte
+	Memo		string
 }
 
 func DefaultMemoStoragePolicy(params MemoParams) MemoStoragePolicy {
@@ -109,13 +109,13 @@ func ValidateMemoStoragePolicy(policy MemoStoragePolicy, params MemoParams) erro
 
 func IndexMemoRecords(records []MemoStoreRecord) (MemoIndex, error) {
 	index := MemoIndex{
-		ByTxHash:    make(map[string][]MemoStoreRecord),
-		BySender:    make(map[string][]MemoStoreRecord),
-		ByReceiver:  make(map[string][]MemoStoreRecord),
-		ByDomain:    make(map[string][]MemoStoreRecord),
-		ByContract:  make(map[string][]MemoStoreRecord),
-		ByAsset:     make(map[string][]MemoStoreRecord),
-		ByEventType: make(map[string][]MemoStoreRecord),
+		ByTxHash:	make(map[string][]MemoStoreRecord),
+		BySender:	make(map[string][]MemoStoreRecord),
+		ByReceiver:	make(map[string][]MemoStoreRecord),
+		ByDomain:	make(map[string][]MemoStoreRecord),
+		ByContract:	make(map[string][]MemoStoreRecord),
+		ByAsset:	make(map[string][]MemoStoreRecord),
+		ByEventType:	make(map[string][]MemoStoreRecord),
 	}
 	for _, record := range records {
 		if err := ValidateMemoStoreRecord(record); err != nil {
@@ -158,12 +158,12 @@ func MemoSearchIndexAffectsConsensus() bool {
 
 func DeterministicMemoEvent(record MemoStoreRecord) EventMemoAttached {
 	return EventMemoAttached{
-		TxHash:   cloneBytes(record.TxHash),
-		From:     cloneAddress(record.Sender),
-		To:       cloneAddress(record.Receiver),
-		Domain:   record.RelatedDomain,
-		MemoHash: cloneBytes(record.MemoHash),
-		Memo:     record.Memo,
+		TxHash:		cloneBytes(record.TxHash),
+		From:		cloneAddress(record.Sender),
+		To:		cloneAddress(record.Receiver),
+		Domain:		record.RelatedDomain,
+		MemoHash:	cloneBytes(record.MemoHash),
+		Memo:		record.Memo,
 	}
 }
 

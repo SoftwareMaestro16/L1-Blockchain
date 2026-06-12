@@ -8,31 +8,31 @@ import (
 )
 
 const (
-	TestnetReadinessGoTest                = "ci_go_test_all"
-	TestnetReadinessGenesisValidate       = "ci_genesis_validate"
-	TestnetReadinessLocalnetSmoke         = "ci_localnet_smoke"
-	TestnetReadinessExportImportRoundtrip = "ci_export_import_roundtrip"
-	TestnetReadinessInvariants            = "ci_invariants"
-	TestnetReadinessLinter                = "ci_linter"
-	TestnetReadinessReleaseArtifact       = "ci_release_artifact_build"
-	TestnetReadinessVersionCommand        = "node_binary_version_command"
-	TestnetReadinessChainIDValidation     = "chain_id_validation"
-	TestnetReadinessValidatorDocs         = "validator_documentation_minimum"
+	TestnetReadinessGoTest			= "ci_go_test_all"
+	TestnetReadinessGenesisValidate		= "ci_genesis_validate"
+	TestnetReadinessLocalnetSmoke		= "ci_localnet_smoke"
+	TestnetReadinessExportImportRoundtrip	= "ci_export_import_roundtrip"
+	TestnetReadinessInvariants		= "ci_invariants"
+	TestnetReadinessLinter			= "ci_linter"
+	TestnetReadinessReleaseArtifact		= "ci_release_artifact_build"
+	TestnetReadinessVersionCommand		= "node_binary_version_command"
+	TestnetReadinessChainIDValidation	= "chain_id_validation"
+	TestnetReadinessValidatorDocs		= "validator_documentation_minimum"
 )
 
 type TestnetReadinessGate struct {
-	ID          string
-	Description string
-	CIJob       string
-	Command     string
-	Required    bool
+	ID		string
+	Description	string
+	CIJob		string
+	Command		string
+	Required	bool
 }
 
 type TestnetReadinessReport struct {
-	Required int
-	Passed   int
-	Failed   []string
-	Ready    bool
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultTestnetReadinessChecklist() []TestnetReadinessGate {
@@ -104,10 +104,10 @@ func BuildTestnetReadinessReport(passed map[string]bool) TestnetReadinessReport 
 	}
 	sort.Strings(failed)
 	return TestnetReadinessReport{
-		Required: len(RequiredTestnetReadinessGateIDs()),
-		Passed:   passedCount,
-		Failed:   failed,
-		Ready:    len(failed) == 0,
+		Required:	len(RequiredTestnetReadinessGateIDs()),
+		Passed:		passedCount,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

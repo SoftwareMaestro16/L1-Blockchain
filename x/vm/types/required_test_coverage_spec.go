@@ -10,89 +10,89 @@ import (
 )
 
 const (
-	AVMTestCoverageCategoryUnit        AVMRequiredTestCoverageCategory = "unit"
-	AVMTestCoverageCategoryIntegration AVMRequiredTestCoverageCategory = "integration"
-	AVMTestCoverageCategoryInvariant   AVMRequiredTestCoverageCategory = "invariant"
-	AVMTestCoverageCategoryFuzz        AVMRequiredTestCoverageCategory = "fuzz"
-	AVMTestCoverageCategoryPerformance AVMRequiredTestCoverageCategory = "performance"
+	AVMTestCoverageCategoryUnit		AVMRequiredTestCoverageCategory	= "unit"
+	AVMTestCoverageCategoryIntegration	AVMRequiredTestCoverageCategory	= "integration"
+	AVMTestCoverageCategoryInvariant	AVMRequiredTestCoverageCategory	= "invariant"
+	AVMTestCoverageCategoryFuzz		AVMRequiredTestCoverageCategory	= "fuzz"
+	AVMTestCoverageCategoryPerformance	AVMRequiredTestCoverageCategory	= "performance"
 
-	AVMUnitCoverageMessageIDDerivation       AVMRequiredTestCoverageCase = "message_id_derivation"
-	AVMUnitCoverageSenderNonceValidation     AVMRequiredTestCoverageCase = "sender_nonce_validation"
-	AVMUnitCoverageQueueSortKeyOrdering      AVMRequiredTestCoverageCase = "queue_sort_key_ordering"
-	AVMUnitCoverageDelayHeightEligibility    AVMRequiredTestCoverageCase = "delay_height_eligibility"
-	AVMUnitCoverageExpiryHandling            AVMRequiredTestCoverageCase = "expiry_handling"
-	AVMUnitCoverageRetryPolicyHandling       AVMRequiredTestCoverageCase = "retry_policy_handling"
-	AVMUnitCoverageBounceMessageConstruction AVMRequiredTestCoverageCase = "bounce_message_construction"
-	AVMUnitCoverageDeadLetterTransition      AVMRequiredTestCoverageCase = "dead_letter_transition"
-	AVMUnitCoverageGasPolicyCalculation      AVMRequiredTestCoverageCase = "gas_policy_calculation"
-	AVMUnitCoverageInterfaceHashCalculation  AVMRequiredTestCoverageCase = "interface_hash_calculation"
-	AVMUnitCoverageReceiptHashCalculation    AVMRequiredTestCoverageCase = "receipt_hash_calculation"
+	AVMUnitCoverageMessageIDDerivation		AVMRequiredTestCoverageCase	= "message_id_derivation"
+	AVMUnitCoverageSenderNonceValidation		AVMRequiredTestCoverageCase	= "sender_nonce_validation"
+	AVMUnitCoverageQueueSortKeyOrdering		AVMRequiredTestCoverageCase	= "queue_sort_key_ordering"
+	AVMUnitCoverageDelayHeightEligibility		AVMRequiredTestCoverageCase	= "delay_height_eligibility"
+	AVMUnitCoverageExpiryHandling			AVMRequiredTestCoverageCase	= "expiry_handling"
+	AVMUnitCoverageRetryPolicyHandling		AVMRequiredTestCoverageCase	= "retry_policy_handling"
+	AVMUnitCoverageBounceMessageConstruction	AVMRequiredTestCoverageCase	= "bounce_message_construction"
+	AVMUnitCoverageDeadLetterTransition		AVMRequiredTestCoverageCase	= "dead_letter_transition"
+	AVMUnitCoverageGasPolicyCalculation		AVMRequiredTestCoverageCase	= "gas_policy_calculation"
+	AVMUnitCoverageInterfaceHashCalculation		AVMRequiredTestCoverageCase	= "interface_hash_calculation"
+	AVMUnitCoverageReceiptHashCalculation		AVMRequiredTestCoverageCase	= "receipt_hash_calculation"
 
-	AVMIntegrationCoverageSyncRouterExecution       AVMRequiredTestCoverageCase = "sync_module_execution_through_avm_router"
-	AVMIntegrationCoverageAsyncFutureBlockExecution AVMRequiredTestCoverageCase = "async_message_submitted_and_executed_in_future_block"
-	AVMIntegrationCoverageDelayedMessageExecution   AVMRequiredTestCoverageCase = "delayed_message_execution"
-	AVMIntegrationCoverageFailedMessageBounce       AVMRequiredTestCoverageCase = "failed_message_bounce"
-	AVMIntegrationCoverageRetryExhaustionDeadLetter AVMRequiredTestCoverageCase = "retry_exhaustion_to_dead_letter_queue"
-	AVMIntegrationCoverageCrossZoneExecution        AVMRequiredTestCoverageCase = "cross_zone_message_execution"
-	AVMIntegrationCoverageActorMailboxExecution     AVMRequiredTestCoverageCase = "actor_mailbox_execution"
-	AVMIntegrationCoverageContinuationResume        AVMRequiredTestCoverageCase = "continuation_resume"
-	AVMIntegrationCoverageContractEmitsAsyncMessage AVMRequiredTestCoverageCase = "contract_emits_async_message"
-	AVMIntegrationCoverageInterfaceDescriptorQuery  AVMRequiredTestCoverageCase = "interface_descriptor_queried_by_client"
+	AVMIntegrationCoverageSyncRouterExecution	AVMRequiredTestCoverageCase	= "sync_module_execution_through_avm_router"
+	AVMIntegrationCoverageAsyncFutureBlockExecution	AVMRequiredTestCoverageCase	= "async_message_submitted_and_executed_in_future_block"
+	AVMIntegrationCoverageDelayedMessageExecution	AVMRequiredTestCoverageCase	= "delayed_message_execution"
+	AVMIntegrationCoverageFailedMessageBounce	AVMRequiredTestCoverageCase	= "failed_message_bounce"
+	AVMIntegrationCoverageRetryExhaustionDeadLetter	AVMRequiredTestCoverageCase	= "retry_exhaustion_to_dead_letter_queue"
+	AVMIntegrationCoverageCrossZoneExecution	AVMRequiredTestCoverageCase	= "cross_zone_message_execution"
+	AVMIntegrationCoverageActorMailboxExecution	AVMRequiredTestCoverageCase	= "actor_mailbox_execution"
+	AVMIntegrationCoverageContinuationResume	AVMRequiredTestCoverageCase	= "continuation_resume"
+	AVMIntegrationCoverageContractEmitsAsyncMessage	AVMRequiredTestCoverageCase	= "contract_emits_async_message"
+	AVMIntegrationCoverageInterfaceDescriptorQuery	AVMRequiredTestCoverageCase	= "interface_descriptor_queried_by_client"
 
-	AVMInvariantCoverageExecutedMessageOneReceipt      AVMRequiredTestCoverageCase = "every_executed_message_has_one_receipt"
-	AVMInvariantCoverageQueuedMessageStoredRecord      AVMRequiredTestCoverageCase = "every_queued_message_has_stored_message_record"
-	AVMInvariantCoverageConsumedMessageNoReplay        AVMRequiredTestCoverageCase = "consumed_message_cannot_be_replayed"
-	AVMInvariantCoverageExpiredMessageCannotExecute    AVMRequiredTestCoverageCase = "expired_message_cannot_execute"
-	AVMInvariantCoverageBounceCannotOverRefund         AVMRequiredTestCoverageCase = "bounce_cannot_over_refund_value"
-	AVMInvariantCoverageZoneRootQueueContinuationRoots AVMRequiredTestCoverageCase = "zone_root_includes_queue_and_continuation_roots"
-	AVMInvariantCoverageActorMailboxOrderDeterministic AVMRequiredTestCoverageCase = "actor_mailbox_order_is_deterministic"
-	AVMInvariantCoverageActorStateIsolationEnforced    AVMRequiredTestCoverageCase = "actor_state_isolation_is_enforced"
-	AVMInvariantCoverageContractStoragePrefixIsolated  AVMRequiredTestCoverageCase = "contract_storage_key_prefix_is_isolated"
+	AVMInvariantCoverageExecutedMessageOneReceipt		AVMRequiredTestCoverageCase	= "every_executed_message_has_one_receipt"
+	AVMInvariantCoverageQueuedMessageStoredRecord		AVMRequiredTestCoverageCase	= "every_queued_message_has_stored_message_record"
+	AVMInvariantCoverageConsumedMessageNoReplay		AVMRequiredTestCoverageCase	= "consumed_message_cannot_be_replayed"
+	AVMInvariantCoverageExpiredMessageCannotExecute		AVMRequiredTestCoverageCase	= "expired_message_cannot_execute"
+	AVMInvariantCoverageBounceCannotOverRefund		AVMRequiredTestCoverageCase	= "bounce_cannot_over_refund_value"
+	AVMInvariantCoverageZoneRootQueueContinuationRoots	AVMRequiredTestCoverageCase	= "zone_root_includes_queue_and_continuation_roots"
+	AVMInvariantCoverageActorMailboxOrderDeterministic	AVMRequiredTestCoverageCase	= "actor_mailbox_order_is_deterministic"
+	AVMInvariantCoverageActorStateIsolationEnforced		AVMRequiredTestCoverageCase	= "actor_state_isolation_is_enforced"
+	AVMInvariantCoverageContractStoragePrefixIsolated	AVMRequiredTestCoverageCase	= "contract_storage_key_prefix_is_isolated"
 
-	AVMFuzzCoverageMalformedAsyncMessages    AVMRequiredTestCoverageCase = "malformed_async_messages"
-	AVMFuzzCoverageRandomNonceOrdering       AVMRequiredTestCoverageCase = "random_nonce_ordering"
-	AVMFuzzCoverageQueuePriorityEdgeCases    AVMRequiredTestCoverageCase = "queue_priority_edge_cases"
-	AVMFuzzCoverageRetryExpiryBoundaries     AVMRequiredTestCoverageCase = "retry_and_expiry_boundary_conditions"
-	AVMFuzzCoverageBouncePayloadLimits       AVMRequiredTestCoverageCase = "bounce_payload_limits"
-	AVMFuzzCoverageActorHandlerFailures      AVMRequiredTestCoverageCase = "actor_handler_failures"
-	AVMFuzzCoverageContinuationStatePayloads AVMRequiredTestCoverageCase = "continuation_state_payloads"
-	AVMFuzzCoverageContractStorageKeys       AVMRequiredTestCoverageCase = "contract_storage_keys"
-	AVMFuzzCoverageInterfaceSchemaPayloads   AVMRequiredTestCoverageCase = "interface_schema_payloads"
+	AVMFuzzCoverageMalformedAsyncMessages		AVMRequiredTestCoverageCase	= "malformed_async_messages"
+	AVMFuzzCoverageRandomNonceOrdering		AVMRequiredTestCoverageCase	= "random_nonce_ordering"
+	AVMFuzzCoverageQueuePriorityEdgeCases		AVMRequiredTestCoverageCase	= "queue_priority_edge_cases"
+	AVMFuzzCoverageRetryExpiryBoundaries		AVMRequiredTestCoverageCase	= "retry_and_expiry_boundary_conditions"
+	AVMFuzzCoverageBouncePayloadLimits		AVMRequiredTestCoverageCase	= "bounce_payload_limits"
+	AVMFuzzCoverageActorHandlerFailures		AVMRequiredTestCoverageCase	= "actor_handler_failures"
+	AVMFuzzCoverageContinuationStatePayloads	AVMRequiredTestCoverageCase	= "continuation_state_payloads"
+	AVMFuzzCoverageContractStorageKeys		AVMRequiredTestCoverageCase	= "contract_storage_keys"
+	AVMFuzzCoverageInterfaceSchemaPayloads		AVMRequiredTestCoverageCase	= "interface_schema_payloads"
 
-	AVMPerformanceCoverageQueueInsertThroughput          AVMRequiredTestCoverageCase = "queue_insert_throughput"
-	AVMPerformanceCoverageQueueDrainThroughput           AVMRequiredTestCoverageCase = "queue_drain_throughput"
-	AVMPerformanceCoverageAsyncExecutionThroughput       AVMRequiredTestCoverageCase = "async_message_execution_throughput"
-	AVMPerformanceCoverageActorMailboxThroughput         AVMRequiredTestCoverageCase = "actor_mailbox_throughput"
-	AVMPerformanceCoverageContinuationResumeThroughput   AVMRequiredTestCoverageCase = "continuation_resume_throughput"
-	AVMPerformanceCoverageCrossZoneThroughput            AVMRequiredTestCoverageCase = "cross_zone_message_throughput"
-	AVMPerformanceCoverageReceiptProofGenerationLatency  AVMRequiredTestCoverageCase = "receipt_proof_generation_latency"
-	AVMPerformanceCoverageAVMRootGenerationLatency       AVMRequiredTestCoverageCase = "avm_root_generation_latency"
-	AVMPerformanceCoverageBlockSTMConflictRateByWorkload AVMRequiredTestCoverageCase = "blockstm_conflict_rate_by_workload"
+	AVMPerformanceCoverageQueueInsertThroughput		AVMRequiredTestCoverageCase	= "queue_insert_throughput"
+	AVMPerformanceCoverageQueueDrainThroughput		AVMRequiredTestCoverageCase	= "queue_drain_throughput"
+	AVMPerformanceCoverageAsyncExecutionThroughput		AVMRequiredTestCoverageCase	= "async_message_execution_throughput"
+	AVMPerformanceCoverageActorMailboxThroughput		AVMRequiredTestCoverageCase	= "actor_mailbox_throughput"
+	AVMPerformanceCoverageContinuationResumeThroughput	AVMRequiredTestCoverageCase	= "continuation_resume_throughput"
+	AVMPerformanceCoverageCrossZoneThroughput		AVMRequiredTestCoverageCase	= "cross_zone_message_throughput"
+	AVMPerformanceCoverageReceiptProofGenerationLatency	AVMRequiredTestCoverageCase	= "receipt_proof_generation_latency"
+	AVMPerformanceCoverageAVMRootGenerationLatency		AVMRequiredTestCoverageCase	= "avm_root_generation_latency"
+	AVMPerformanceCoverageBlockSTMConflictRateByWorkload	AVMRequiredTestCoverageCase	= "blockstm_conflict_rate_by_workload"
 
-	MaxAVMRequiredTestCoverageCategories = 8
-	MaxAVMRequiredTestCoverageCases      = 64
-	MaxAVMRequiredTestCoverageNameBytes  = 128
+	MaxAVMRequiredTestCoverageCategories	= 8
+	MaxAVMRequiredTestCoverageCases		= 64
+	MaxAVMRequiredTestCoverageNameBytes	= 128
 )
 
 type AVMRequiredTestCoverageCategory string
 type AVMRequiredTestCoverageCase string
 
 type AVMRequiredTestCoverageGroup struct {
-	Category  AVMRequiredTestCoverageCategory
-	Cases     []AVMRequiredTestCoverageCase
-	GroupHash string
+	Category	AVMRequiredTestCoverageCategory
+	Cases		[]AVMRequiredTestCoverageCase
+	GroupHash	string
 }
 
 type AVMRequiredTestCoverageSpec struct {
-	SpecName string
-	Groups   []AVMRequiredTestCoverageGroup
-	SpecHash string
+	SpecName	string
+	Groups		[]AVMRequiredTestCoverageGroup
+	SpecHash	string
 }
 
 func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 	groups := []AVMRequiredTestCoverageGroup{
 		{
-			Category: AVMTestCoverageCategoryUnit,
+			Category:	AVMTestCoverageCategoryUnit,
 			Cases: []AVMRequiredTestCoverageCase{
 				AVMUnitCoverageMessageIDDerivation,
 				AVMUnitCoverageSenderNonceValidation,
@@ -108,7 +108,7 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 			},
 		},
 		{
-			Category: AVMTestCoverageCategoryIntegration,
+			Category:	AVMTestCoverageCategoryIntegration,
 			Cases: []AVMRequiredTestCoverageCase{
 				AVMIntegrationCoverageSyncRouterExecution,
 				AVMIntegrationCoverageAsyncFutureBlockExecution,
@@ -123,7 +123,7 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 			},
 		},
 		{
-			Category: AVMTestCoverageCategoryInvariant,
+			Category:	AVMTestCoverageCategoryInvariant,
 			Cases: []AVMRequiredTestCoverageCase{
 				AVMInvariantCoverageExecutedMessageOneReceipt,
 				AVMInvariantCoverageQueuedMessageStoredRecord,
@@ -137,7 +137,7 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 			},
 		},
 		{
-			Category: AVMTestCoverageCategoryFuzz,
+			Category:	AVMTestCoverageCategoryFuzz,
 			Cases: []AVMRequiredTestCoverageCase{
 				AVMFuzzCoverageMalformedAsyncMessages,
 				AVMFuzzCoverageRandomNonceOrdering,
@@ -151,7 +151,7 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 			},
 		},
 		{
-			Category: AVMTestCoverageCategoryPerformance,
+			Category:	AVMTestCoverageCategoryPerformance,
 			Cases: []AVMRequiredTestCoverageCase{
 				AVMPerformanceCoverageQueueInsertThroughput,
 				AVMPerformanceCoverageQueueDrainThroughput,
@@ -173,8 +173,8 @@ func DefaultAVMRequiredTestCoverageSpec() (AVMRequiredTestCoverageSpec, error) {
 		groups[i] = group
 	}
 	return NewAVMRequiredTestCoverageSpec(AVMRequiredTestCoverageSpec{
-		SpecName: "AVM required test coverage",
-		Groups:   groups,
+		SpecName:	"AVM required test coverage",
+		Groups:		groups,
 	})
 }
 

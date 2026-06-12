@@ -40,14 +40,14 @@ func TestPaymentChannelCloseDisputeFraudAndSettlement(t *testing.T) {
 		{Participant: bob, Amount: "500"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("fraud", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          newerState,
-		StateB:          conflicting,
-		PenaltyAmount:   "25",
-		EvidenceHash:    HashParts("evidence", newerState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("fraud", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			newerState,
+		StateB:			conflicting,
+		PenaltyAmount:		"25",
+		EvidenceHash:		HashParts("evidence", newerState.StateHash, conflicting.StateHash),
 	}
 	state, err = SubmitFraudProof(state, channel.ChannelID, proof, 26)
 	require.NoError(t, err)
@@ -119,18 +119,18 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	alice := testAddress(0x41)
 	bob := testAddress(0x42)
 	openReq := ChannelOpenRequest{
-		ChainID:                      "aetra-test-1",
-		Participants:                 []string{alice, bob},
-		InitialBalances:              []Balance{{Participant: alice, Amount: "1000"}, {Participant: bob, Amount: "0"}},
-		ChannelType:                  ChannelTypeBidirectional,
-		Collateral:                   "1000",
-		CloseDelay:                   8,
-		ChallengePeriod:              8,
-		FeePolicyID:                  NativeDenom,
-		OpeningFeeDenom:              NativeDenom,
-		OpeningFeePaid:               DefaultOpeningFee,
-		ConditionalPaymentsSupported: true,
-		OpenHeight:                   10,
+		ChainID:			"aetra-test-1",
+		Participants:			[]string{alice, bob},
+		InitialBalances:		[]Balance{{Participant: alice, Amount: "1000"}, {Participant: bob, Amount: "0"}},
+		ChannelType:			ChannelTypeBidirectional,
+		Collateral:			"1000",
+		CloseDelay:			8,
+		ChallengePeriod:		8,
+		FeePolicyID:			NativeDenom,
+		OpeningFeeDenom:		NativeDenom,
+		OpeningFeePaid:			DefaultOpeningFee,
+		ConditionalPaymentsSupported:	true,
+		OpenHeight:			10,
 	}
 	state, fraud, result, err := ApplyPaymentAPISurfaceMessage(EmptyState(), EmptyFraudProofVerificationState(), MsgOpenChannel{Signer: alice, Request: openReq})
 	require.NoError(t, err)
@@ -162,11 +162,11 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	preimage := "api-surface-preimage"
 	promise := signedPromiseWithHashLock(t, promiseChannel, "api-surface-promise", alice, bob, "20", "1", 2, 40, HashParts(preimage))
 	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgRegisterPromise{
-		Signer:        alice,
-		ChannelID:     channel.ChannelID,
-		BaseState:     base,
-		Promises:      []ConditionalPromise{promise},
-		CurrentHeight: 20,
+		Signer:		alice,
+		ChannelID:	channel.ChannelID,
+		BaseState:	base,
+		Promises:	[]ConditionalPromise{promise},
+		CurrentHeight:	20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgRegisterPromise, result.MsgName)
@@ -181,11 +181,11 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	require.Equal(t, "980", capacity.AvailableCapacity)
 
 	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgResolvePromise{Request: PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{promise},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 30,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{promise},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	30,
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgResolvePromise, result.MsgName)
@@ -200,10 +200,10 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 		{Participant: bob, Amount: "500"},
 	})
 	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgUnilateralClose{Signer: alice, Request: ChannelCloseRequest{
-		ChannelID:     channel.ChannelID,
-		ClosingState:  closeState,
-		CurrentHeight: 31,
-		SettlementFee: "0",
+		ChannelID:	channel.ChannelID,
+		ClosingState:	closeState,
+		CurrentHeight:	31,
+		SettlementFee:	"0",
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgUnilateralClose, result.MsgName)
@@ -225,11 +225,11 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 		{Participant: bob, Amount: "510"},
 	})
 	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgDisputeClose{Signer: bob, Request: ChannelDisputeRequest{
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: closeState.StateHash,
-		NewerState:            newerState,
-		CurrentHeight:         32,
-		DisputeFeePaid:        "0",
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	closeState.StateHash,
+		NewerState:		newerState,
+		CurrentHeight:		32,
+		DisputeFeePaid:		"0",
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgDisputeClose, result.MsgName)
@@ -244,21 +244,21 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	})
 	proofID := HashParts("api-surface-fraud", channel.ChannelID)
 	state, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgSubmitFraudProof{Signer: bob, Submission: FraudProofSubmission{
-		ChannelID: channel.ChannelID,
+		ChannelID:	channel.ChannelID,
 		Proof: FraudProof{
-			ProofID:         proofID,
-			ProofType:       FraudProofTypeDoubleSign,
-			SubmittedBy:     bob,
-			OffendingSigner: alice,
-			StateA:          newerState,
-			StateB:          conflicting,
-			PenaltyDenom:    NativeDenom,
-			PenaltyAmount:   "20",
-			EvidenceHash:    HashParts("api-surface-fraud-evidence", newerState.StateHash, conflicting.StateHash),
+			ProofID:		proofID,
+			ProofType:		FraudProofTypeDoubleSign,
+			SubmittedBy:		bob,
+			OffendingSigner:	alice,
+			StateA:			newerState,
+			StateB:			conflicting,
+			PenaltyDenom:		NativeDenom,
+			PenaltyAmount:		"20",
+			EvidenceHash:		HashParts("api-surface-fraud-evidence", newerState.StateHash, conflicting.StateHash),
 		},
-		CurrentHeight: 33,
-		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "3", BurnShareBps: MaxPenaltyRouteBps},
-		GasLimit:      100_000_000,
+		CurrentHeight:	33,
+		Policy:		FraudPenaltyPolicy{ReporterRewardCap: "3", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:	100_000_000,
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgSubmitFraudProof, result.MsgName)
@@ -271,8 +271,8 @@ func TestPaymentAPISurfaceMessagesQueriesAndSettlementViews(t *testing.T) {
 	require.Equal(t, "3", queriedProof.Reward.Amount)
 
 	state, _, result, err = ApplyPaymentAPISurfaceMessage(state, fraud, MsgFinalizeClose{Signer: alice, Request: FinalSettlementRequest{
-		ChannelID:     channel.ChannelID,
-		CurrentHeight: 50,
+		ChannelID:	channel.ChannelID,
+		CurrentHeight:	50,
 	}})
 	require.NoError(t, err)
 	require.Equal(t, PaymentAPIMsgFinalizeClose, result.MsgName)
@@ -306,9 +306,9 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 
 	next, fraud, result := PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}
 	next, fraud, result, err = ApplyPaymentAPISurfaceMessage(state, EmptyFraudProofVerificationState(), MsgCloseVirtualChannel{
-		Signer:           alice,
-		VirtualChannelID: vc.VirtualChannelID,
-		CurrentHeight:    40,
+		Signer:			alice,
+		VirtualChannelID:	vc.VirtualChannelID,
+		CurrentHeight:		40,
 	})
 	require.NoError(t, err)
 	require.Empty(t, fraud.EvidenceRecords)
@@ -320,11 +320,11 @@ func TestPaymentAPISurfaceVirtualChannelMessagesAndQueries(t *testing.T) {
 	require.False(t, found)
 
 	rejected, err := PaymentAPIFraudProofRejectedEvent(FraudProofSubmission{
-		ChannelID:     state.Channels[0].ChannelID,
-		CurrentHeight: 41,
+		ChannelID:	state.Channels[0].ChannelID,
+		CurrentHeight:	41,
 		Proof: FraudProof{
-			ProofID:   HashParts("api-surface-rejected-fraud", state.Channels[0].ChannelID),
-			ProofType: FraudProofTypeDoubleSign,
+			ProofID:	HashParts("api-surface-rejected-fraud", state.Channels[0].ChannelID),
+			ProofType:	FraudProofTypeDoubleSign,
 		},
 	}, "malformed evidence")
 	require.NoError(t, err)
@@ -372,15 +372,15 @@ func TestPaymentRoadmapPhase0ThroughPhase6VectorsAndExitCriteria(t *testing.T) {
 		{Participant: bob, Amount: "360"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("roadmap-double-sign-proof", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		PenaltyDenom:    NativeDenom,
-		PenaltyAmount:   "20",
-		EvidenceHash:    HashParts("roadmap-double-sign-evidence", closeState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("roadmap-double-sign-proof", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"20",
+		EvidenceHash:		HashParts("roadmap-double-sign-evidence", closeState.StateHash, conflicting.StateHash),
 	}
 	fraudVectors, err := BuildPaymentRoadmapFraudProofVectors(channel, []FraudProof{proof})
 	require.NoError(t, err)
@@ -396,47 +396,47 @@ func TestPaymentRoadmapPhase0ThroughPhase6VectorsAndExitCriteria(t *testing.T) {
 	require.NoError(t, ValidatePaymentRoadmapTimeoutVector(invalidTimeout, false))
 
 	conditionalVector, err := BuildPaymentRoadmapConditionalVector(BatchConditionSettlementResult{
-		RouteID:      HashParts("roadmap-conditional-route", channel.ChannelID),
-		EvidenceHash: HashParts("roadmap-conditional-result", promise.PromiseID),
+		RouteID:	HashParts("roadmap-conditional-route", channel.ChannelID),
+		EvidenceHash:	HashParts("roadmap-conditional-result", promise.PromiseID),
 		Resolutions: []ConditionResolution{{
-			ConditionID:  promise.PromiseID,
-			Resolver:     bob,
-			Recipient:    bob,
-			Amount:       promise.Amount,
-			EvidenceHash: HashParts("roadmap-conditional-resolution", promise.PromiseID),
+			ConditionID:	promise.PromiseID,
+			Resolver:	bob,
+			Recipient:	bob,
+			Amount:		promise.Amount,
+			EvidenceHash:	HashParts("roadmap-conditional-resolution", promise.PromiseID),
 		}},
 		ConditionRootUpdates: []ConditionRootUpdate{{
-			ChannelID:      channel.ChannelID,
-			Nonce:          state.Nonce + 1,
-			ConditionRoot:  ComputeConditionsRoot(nil),
-			ConditionCount: 0,
+			ChannelID:	channel.ChannelID,
+			Nonce:		state.Nonce + 1,
+			ConditionRoot:	ComputeConditionsRoot(nil),
+			ConditionCount:	0,
 		}},
 	}, ConditionSettlementModePreimage, true, ConditionClaimRecord{
-		ChainID:        channel.ChainID,
-		ChannelID:      channel.ChannelID,
-		ConditionID:    promise.PromiseID,
-		EvidenceHash:   HashParts("roadmap-preimage-replay-key", promise.PromiseID),
-		ResolvedHeight: 40,
-		ExpiresHeight:  40 + DefaultReplayHorizon,
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		ConditionID:	promise.PromiseID,
+		EvidenceHash:	HashParts("roadmap-preimage-replay-key", promise.PromiseID),
+		ResolvedHeight:	40,
+		ExpiresHeight:	40 + DefaultReplayHorizon,
 	})
 	require.NoError(t, err)
 	require.NoError(t, conditionalVector.Validate())
 
 	firstPlan, err := AccessPlanForSettlementOperation(SettlementOperation{
-		OperationID:   HashParts("roadmap-plan-first"),
-		OperationType: BatchOperationSettle,
-		ChannelID:     channel.ChannelID,
-		Nonce:         3,
-		StateHash:     closeState.StateHash,
+		OperationID:	HashParts("roadmap-plan-first"),
+		OperationType:	BatchOperationSettle,
+		ChannelID:	channel.ChannelID,
+		Nonce:		3,
+		StateHash:	closeState.StateHash,
 	}, 50)
 	require.NoError(t, err)
 	secondChannel := signedChannel(t, "roadmap-second-channel", "1000", alice, router)
 	secondPlan, err := AccessPlanForSettlementOperation(SettlementOperation{
-		OperationID:   HashParts("roadmap-plan-second"),
-		OperationType: BatchOperationSettle,
-		ChannelID:     secondChannel.ChannelID,
-		Nonce:         2,
-		StateHash:     secondChannel.LatestState.StateHash,
+		OperationID:	HashParts("roadmap-plan-second"),
+		OperationType:	BatchOperationSettle,
+		ChannelID:	secondChannel.ChannelID,
+		Nonce:		2,
+		StateHash:	secondChannel.LatestState.StateHash,
 	}, 50)
 	require.NoError(t, err)
 	blockPlan, err := BuildPaymentRoadmapBlockSTMPlan([]BlockSTMAccessPlan{firstPlan, secondPlan})
@@ -448,29 +448,29 @@ func TestPaymentRoadmapPhase0ThroughPhase6VectorsAndExitCriteria(t *testing.T) {
 
 	edge := ChannelEdge{ChannelID: channel.ChannelID, From: alice, To: bob, Capacity: "1000", FeeDenom: NativeDenom, FeeAmount: "1", Active: true}
 	route := ScoredRoute{
-		Edges:       []ChannelEdge{edge},
-		Amount:      "100",
-		TotalFee:    "1",
-		TotalCost:   "101",
-		MinCapacity: "1000",
-		ScoreHash:   HashParts("roadmap-route-score", channel.ChannelID),
+		Edges:		[]ChannelEdge{edge},
+		Amount:		"100",
+		TotalFee:	"1",
+		TotalCost:	"101",
+		MinCapacity:	"1000",
+		ScoreHash:	HashParts("roadmap-route-score", channel.ChannelID),
 	}
 	attempt := RouteAttempt{
-		AttemptID:     HashParts("roadmap-route-attempt", route.ScoreHash),
-		From:          alice,
-		To:            bob,
-		Amount:        "100",
-		CurrentHeight: 50,
-		Route:         route,
-		Success:       true,
+		AttemptID:	HashParts("roadmap-route-attempt", route.ScoreHash),
+		From:		alice,
+		To:		bob,
+		Amount:		"100",
+		CurrentHeight:	50,
+		Route:		route,
+		Success:	true,
 	}
 	failure := RouteFailureReport{
-		ChannelID:      channel.ChannelID,
-		From:           alice,
-		To:             bob,
-		FailureClass:   RouteFailureTimeout,
-		Retryable:      true,
-		ObservedHeight: 51,
+		ChannelID:	channel.ChannelID,
+		From:		alice,
+		To:		bob,
+		FailureClass:	RouteFailureTimeout,
+		Retryable:	true,
+		ObservedHeight:	51,
 	}
 	routingVector, err := BuildPaymentRoadmapRoutingVector(route, attempt, failure)
 	require.NoError(t, err)
@@ -676,19 +676,19 @@ func TestPaymentPerformanceCoverageProfilesPerBlockWorkloads(t *testing.T) {
 		opener := testAddress(byte(0xc0 + i*2))
 		counterparty := testAddress(byte(0xc1 + i*2))
 		openMessages = append(openMessages, MsgOpenChannel{
-			Signer: opener,
+			Signer:	opener,
 			Request: ChannelOpenRequest{
-				ChainID:         "aetra-test-1",
-				Participants:    []string{opener, counterparty},
-				InitialBalances: []Balance{{Participant: opener, Amount: "100"}, {Participant: counterparty, Amount: "0"}},
-				ChannelType:     ChannelTypeBidirectional,
-				Collateral:      "100",
-				CloseDelay:      8,
-				ChallengePeriod: 8,
-				FeePolicyID:     NativeDenom,
-				OpeningFeeDenom: NativeDenom,
-				OpeningFeePaid:  DefaultOpeningFee,
-				OpenHeight:      10 + uint64(i),
+				ChainID:		"aetra-test-1",
+				Participants:		[]string{opener, counterparty},
+				InitialBalances:	[]Balance{{Participant: opener, Amount: "100"}, {Participant: counterparty, Amount: "0"}},
+				ChannelType:		ChannelTypeBidirectional,
+				Collateral:		"100",
+				CloseDelay:		8,
+				ChallengePeriod:	8,
+				FeePolicyID:		NativeDenom,
+				OpeningFeeDenom:	NativeDenom,
+				OpeningFeePaid:		DefaultOpeningFee,
+				OpenHeight:		10 + uint64(i),
 			},
 		})
 	}
@@ -847,9 +847,9 @@ func TestPaymentObservabilityMetricsCoverOperationalSignals(t *testing.T) {
 		ConditionClaimRecord{ChainID: conditionChannel.ChainID, ChannelID: conditionChannel.ChannelID, ConditionID: HashParts("observability-expired"), EvidenceHash: HashParts("promise-expiry", "observability-expired"), ResolvedHeight: 26, ExpiresHeight: 26 + DefaultReplayHorizon}.Normalize(),
 	)
 	rejected, err := PaymentAPIFraudProofRejectedEvent(FraudProofSubmission{
-		ChannelID:     disputeChannel.ChannelID,
-		CurrentHeight: 27,
-		Proof:         FraudProof{ProofID: HashParts("observability-rejected-proof"), ProofType: FraudProofTypeDoubleSign},
+		ChannelID:	disputeChannel.ChannelID,
+		CurrentHeight:	27,
+		Proof:		FraudProof{ProofID: HashParts("observability-rejected-proof"), ProofType: FraudProofTypeDoubleSign},
 	}, "observability rejected")
 	require.NoError(t, err)
 	state.Events = append(state.Events, rejected)
@@ -858,17 +858,17 @@ func TestPaymentObservabilityMetricsCoverOperationalSignals(t *testing.T) {
 	state, _, err = EnqueueExpiredPromise(state, activePromise, alice, 28)
 	require.NoError(t, err)
 	state.FeeCharges = append(state.FeeCharges, PaymentFeeCharge{
-		FeeID:          HashParts("observability-routing-fee"),
-		FeeClass:       PaymentFeeClassRoutingAdvertisement,
-		ChannelID:      conditionChannel.ChannelID,
-		ObjectID:       HashParts("observability-routing-advertisement"),
-		Payer:          alice,
-		Denom:          NativeDenom,
-		Amount:         "7",
-		RequiredAmount: "7",
-		StorageBytes:   128,
-		MultiplierBps:  10_000,
-		Height:         28,
+		FeeID:		HashParts("observability-routing-fee"),
+		FeeClass:	PaymentFeeClassRoutingAdvertisement,
+		ChannelID:	conditionChannel.ChannelID,
+		ObjectID:	HashParts("observability-routing-advertisement"),
+		Payer:		alice,
+		Denom:		NativeDenom,
+		Amount:		"7",
+		RequiredAmount:	"7",
+		StorageBytes:	128,
+		MultiplierBps:	10_000,
+		Height:		28,
 	}.Normalize())
 	sortPaymentFeeCharges(state.FeeCharges)
 	require.NoError(t, state.Validate())
@@ -922,21 +922,21 @@ func TestPaymentObservabilityMetricsCoverOperationalSignals(t *testing.T) {
 	require.NoError(t, ValidateHash("observability metrics hash", metrics.MetricsHash))
 
 	alerts, err := EvaluatePaymentObservabilityAlerts(state, metrics, PaymentObservabilityAlertThresholds{
-		WindowBlocks:              100,
-		HighPendingDisputeCount:   0,
-		NearExpiryWithoutFinalize: 0,
-		FraudProofRejectionSpike:  0,
-		ChannelOpenSpamSpike:      0,
-		PromiseExpiryBacklog:      0,
-		SettlementQueueBacklog:    0,
-		BlockSTMConflictRateBps:   1,
-		StoreLatencyOps:           1,
-		WatchReplayLagBlocks:      1,
-		RoutingGossipSpamRateBps:  1,
+		WindowBlocks:			100,
+		HighPendingDisputeCount:	0,
+		NearExpiryWithoutFinalize:	0,
+		FraudProofRejectionSpike:	0,
+		ChannelOpenSpamSpike:		0,
+		PromiseExpiryBacklog:		0,
+		SettlementQueueBacklog:		0,
+		BlockSTMConflictRateBps:	1,
+		StoreLatencyOps:		1,
+		WatchReplayLagBlocks:		1,
+		RoutingGossipSpamRateBps:	1,
 	}, PaymentObservabilityExternalSignals{
-		WatcherReplayHeight:   20,
-		RoutingGossipMessages: 10,
-		RoutingGossipRejected: 5,
+		WatcherReplayHeight:	20,
+		RoutingGossipMessages:	10,
+		RoutingGossipRejected:	5,
 	})
 	require.NoError(t, err)
 	require.Len(t, alerts, 10)
@@ -1026,18 +1026,18 @@ func TestPaymentGovernanceParametersValidateChannelAndConditionalBounds(t *testi
 	require.Equal(t, "3", schedule.ConditionalPromiseSettlementFee)
 
 	openReq := ChannelOpenRequest{
-		ChainID:         "aetra-test-1",
-		ChannelID:       HashParts("governance-open", alice, bob),
-		Participants:    []string{alice, bob},
-		InitialBalances: []Balance{{Participant: alice, Amount: "250"}, {Participant: bob, Amount: "0"}},
-		ChannelType:     ChannelTypeBidirectional,
-		Collateral:      "250",
-		CloseDelay:      8,
-		ChallengePeriod: 16,
-		FeePolicyID:     NativeDenom,
-		OpeningFeeDenom: NativeDenom,
-		OpeningFeePaid:  "9",
-		OpenHeight:      10,
+		ChainID:		"aetra-test-1",
+		ChannelID:		HashParts("governance-open", alice, bob),
+		Participants:		[]string{alice, bob},
+		InitialBalances:	[]Balance{{Participant: alice, Amount: "250"}, {Participant: bob, Amount: "0"}},
+		ChannelType:		ChannelTypeBidirectional,
+		Collateral:		"250",
+		CloseDelay:		8,
+		ChallengePeriod:	16,
+		FeePolicyID:		NativeDenom,
+		OpeningFeeDenom:	NativeDenom,
+		OpeningFeePaid:		"9",
+		OpenHeight:		10,
 	}
 	require.NoError(t, ValidateChannelOpenRequestWithGovernance(openReq, params))
 
@@ -1123,14 +1123,14 @@ func TestPaymentGovernanceParametersValidateVirtualAndFraudPenaltyBounds(t *test
 	require.Equal(t, uint64(2), VirtualChannelDepth(vc))
 
 	secondVC := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("governance-virtual-second", alice, bob),
-		ParentChannelIDs: vc.ParentChannelIDs,
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("governance-virtual-second", alice, bob),
+		ParentChannelIDs:	vc.ParentChannelIDs,
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		40,
 	}, vc.ChainID)
 	perParentLimited := params
 	perParentLimited.Virtual.MaximumVirtualChannelsPerParentChannel = 1
@@ -1153,14 +1153,14 @@ func TestPaymentGovernanceParametersValidateVirtualAndFraudPenaltyBounds(t *test
 	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, vc, feeRequired), "anchor fee below")
 
 	timeoutVC := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("governance-virtual-timeout", alice, bob),
-		ParentChannelIDs: vc.ParentChannelIDs,
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    81,
+		VirtualChannelID:	HashParts("governance-virtual-timeout", alice, bob),
+		ParentChannelIDs:	vc.ParentChannelIDs,
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		81,
 	}, vc.ChainID)
 	require.ErrorContains(t, ValidateVirtualChannelWithGovernance(base, timeoutVC, params), "parent timeout margin")
 
@@ -1257,12 +1257,12 @@ func TestPaymentGovernanceParametersValidateRoutingAndExecutionBounds(t *testing
 	failurePolicy, err := BuildGovernedRouteFailureScoringPolicy(params)
 	require.NoError(t, err)
 	score, err := BuildRouteFailureScore(RouteFailureReport{
-		ChannelID:      channel.ChannelID,
-		From:           alice,
-		To:             bob,
-		FailureClass:   RouteFailureCongestion,
-		Retryable:      true,
-		ObservedHeight: 10,
+		ChannelID:	channel.ChannelID,
+		From:		alice,
+		To:		bob,
+		FailureClass:	RouteFailureCongestion,
+		Retryable:	true,
+		ObservedHeight:	10,
 	}, 1, failurePolicy)
 	require.NoError(t, err)
 	decayed, err := DecayRouteFailureScoreWithGovernance(score, 15, params)
@@ -1270,18 +1270,18 @@ func TestPaymentGovernanceParametersValidateRoutingAndExecutionBounds(t *testing
 	require.Equal(t, score.ScoreDelta/2, decayed.ScoreDelta)
 
 	gossip, err := BuildGossipMessage(GossipMessage{
-		MessageType:      GossipChannelUpdate,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "100",
-		FeeDenom:         NativeDenom,
-		FeeAmount:        "1",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 40,
-		Sequence:         1,
+		MessageType:		GossipChannelUpdate,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"100",
+		FeeDenom:		NativeDenom,
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	40,
+		Sequence:		1,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateGossipMessageExpiryWithGovernance(gossip, params))
@@ -1290,19 +1290,19 @@ func TestPaymentGovernanceParametersValidateRoutingAndExecutionBounds(t *testing
 	require.ErrorContains(t, ValidateGossipMessageExpiryWithGovernance(tooLong, params), "expiry exceeds")
 
 	liquidity, err := BuildGossipMessage(GossipMessage{
-		MessageType:      GossipLiquidityHint,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "100",
-		Liquidity:        "90",
-		FeeDenom:         NativeDenom,
-		FeeAmount:        "1",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 30,
-		Sequence:         2,
+		MessageType:		GossipLiquidityHint,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"100",
+		Liquidity:		"90",
+		FeeDenom:		NativeDenom,
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	30,
+		Sequence:		2,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateGossipMessageExpiryWithGovernance(liquidity, params))
@@ -1362,10 +1362,10 @@ func TestSettlementArbitrationBoundaryRejectsNonDeterministicInputs(t *testing.T
 	})
 
 	valid := SettlementArbitrationInput{
-		Operation:     SettlementArbitrationUnilateralClose,
-		ChannelID:     channel.ChannelID,
-		SignedState:   closeState,
-		CurrentHeight: 20,
+		Operation:	SettlementArbitrationUnilateralClose,
+		ChannelID:	channel.ChannelID,
+		SignedState:	closeState,
+		CurrentHeight:	20,
 	}
 	require.NoError(t, valid.ValidateForChannel(channel))
 
@@ -1401,10 +1401,10 @@ func TestSettlementArbitrationBoundaryRequiresSignedState(t *testing.T) {
 	closeState.Signatures = nil
 
 	err := (SettlementArbitrationInput{
-		Operation:     SettlementArbitrationUnilateralClose,
-		ChannelID:     channel.ChannelID,
-		SignedState:   closeState,
-		CurrentHeight: 20,
+		Operation:	SettlementArbitrationUnilateralClose,
+		ChannelID:	channel.ChannelID,
+		SignedState:	closeState,
+		CurrentHeight:	20,
 	}).ValidateForChannel(channel)
 	require.ErrorContains(t, err, "quorum")
 }
@@ -1426,13 +1426,13 @@ func TestUnilateralCloseRequestStoresReasonAndDetachedSignatures(t *testing.T) {
 	detached := closeState.Signatures
 	closeState.Signatures = nil
 	state, err = SubmitCloseWithRequest(state, ChannelCloseRequest{
-		ChannelID:     channel.ChannelID,
-		ClosingState:  closeState,
-		Signatures:    detached,
-		CloseReason:   CloseReasonUnilateral,
-		Submitter:     bob,
-		CurrentHeight: 20,
-		SettlementFee: "3",
+		ChannelID:	channel.ChannelID,
+		ClosingState:	closeState,
+		Signatures:	detached,
+		CloseReason:	CloseReasonUnilateral,
+		Submitter:	bob,
+		CurrentHeight:	20,
+		SettlementFee:	"3",
 	})
 	require.NoError(t, err)
 	require.Equal(t, ChannelStatusPendingClose, state.Channels[0].Status)
@@ -1473,19 +1473,19 @@ func TestFraudProofInvalidBalanceRoutesPenaltyRemainder(t *testing.T) {
 	require.ErrorContains(t, invalid.ValidateForChannel(channel, false), "conserve")
 
 	proof := FraudProof{
-		ProofID:         HashParts("invalid-balance", channel.ChannelID),
-		ProofType:       FraudProofTypeInvalidBalance,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          invalid,
-		PenaltyAmount:   "25",
-		EvidenceHash:    HashParts("evidence", invalid.StateHash),
+		ProofID:		HashParts("invalid-balance", channel.ChannelID),
+		ProofType:		FraudProofTypeInvalidBalance,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			invalid,
+		PenaltyAmount:		"25",
+		EvidenceHash:		HashParts("evidence", invalid.StateHash),
 	}
 	state, err = SubmitFraudProofWithPolicy(state, channel.ChannelID, proof, 21, FraudPenaltyPolicy{
-		ReporterRewardCap:       "10",
-		BurnShareBps:            5000,
-		SecurityReserveShareBps: 2500,
-		CommunityPoolShareBps:   2500,
+		ReporterRewardCap:		"10",
+		BurnShareBps:			5000,
+		SecurityReserveShareBps:	2500,
+		CommunityPoolShareBps:		2500,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
@@ -1577,14 +1577,14 @@ func TestDisputeAndPenaltyFinalityTransitionsRetainCollateralUntilSettlement(t *
 		{Participant: bob, Amount: "500"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("finality-proof", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          newerState,
-		StateB:          conflicting,
-		PenaltyAmount:   "20",
-		EvidenceHash:    HashParts("evidence", newerState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("finality-proof", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			newerState,
+		StateB:			conflicting,
+		PenaltyAmount:		"20",
+		EvidenceHash:		HashParts("evidence", newerState.StateHash, conflicting.StateHash),
 	}
 	state, err = SubmitFraudProof(state, channel.ChannelID, proof, 22)
 	require.NoError(t, err)
@@ -1606,10 +1606,10 @@ func TestLockedCollateralInvariantForEveryFinalityState(t *testing.T) {
 	lock := CustodyLock{ChannelID: base.ChannelID, Denom: NativeDenom, Amount: base.Collateral}
 
 	cases := []struct {
-		name     string
-		finality ChannelFinality
-		status   ChannelStatus
-		locks    []CustodyLock
+		name		string
+		finality	ChannelFinality
+		status		ChannelStatus
+		locks		[]CustodyLock
 	}{
 		{"open", ChannelFinalityOpen, ChannelStatusOpen, []CustodyLock{lock}},
 		{"pending-close", ChannelFinalityPendingClose, ChannelStatusPendingClose, []CustodyLock{lock}},
@@ -1627,8 +1627,8 @@ func TestLockedCollateralInvariantForEveryFinalityState(t *testing.T) {
 			channel.Status = tc.status
 			channel.Finality = tc.finality
 			require.NoError(t, ValidateLockedCollateralForFinality(PaymentsState{
-				Channels:     []ChannelRecord{channel},
-				CustodyLocks: tc.locks,
+				Channels:	[]ChannelRecord{channel},
+				CustodyLocks:	tc.locks,
 			}))
 		})
 	}
@@ -1662,12 +1662,12 @@ func TestConditionalPromiseObjectSignatureReserveAndReplayRules(t *testing.T) {
 	require.ErrorContains(t, ValidateConditionalPromisesForChannel(channel, []ConditionalPromise{promise, overReserve}, nil), "reserve")
 
 	settled := []ConditionClaimRecord{{
-		ChainID:        channel.ChainID,
-		ChannelID:      channel.ChannelID,
-		ConditionID:    promise.PromiseID,
-		EvidenceHash:   HashParts("promise-settled", promise.PromiseID),
-		ResolvedHeight: 50,
-		ExpiresHeight:  100,
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		ConditionID:	promise.PromiseID,
+		EvidenceHash:	HashParts("promise-settled", promise.PromiseID),
+		ResolvedHeight:	50,
+		ExpiresHeight:	100,
 	}}
 	require.ErrorContains(t, ValidateConditionalPromisesForChannel(channel, []ConditionalPromise{promise}, settled), "already been settled")
 
@@ -1705,11 +1705,11 @@ func TestHashLockedPreimageRevealResolvesLinkedPromisesAndTracksPreimage(t *test
 	freshState := state.Clone()
 
 	state, resolutions, err := RevealPromisePreimage(state, PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{first, second},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 30,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{first, second},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	30,
 	})
 	require.NoError(t, err)
 	require.Len(t, resolutions, 2)
@@ -1728,29 +1728,29 @@ func TestHashLockedPreimageRevealResolvesLinkedPromisesAndTracksPreimage(t *test
 	require.Equal(t, hashLock, claimsByID[second.PromiseID].PreimageHash)
 
 	_, _, err = RevealPromisePreimage(state, PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{first},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 31,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{first},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	31,
 	})
 	require.ErrorContains(t, err, "already been settled")
 
 	_, _, err = RevealPromisePreimage(freshState.Clone(), PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{first},
-		Preimage:      "wrong-secret",
-		Revealer:      bob,
-		CurrentHeight: 30,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{first},
+		Preimage:	"wrong-secret",
+		Revealer:	bob,
+		CurrentHeight:	30,
 	})
 	require.ErrorContains(t, err, "does not satisfy hash lock")
 
 	_, _, err = RevealPromisePreimage(freshState.Clone(), PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{first},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 41,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{first},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	41,
 	})
 	require.ErrorContains(t, err, "timed out")
 }
@@ -1790,18 +1790,18 @@ func TestTimeoutOrderingAndExpiryResolutionReleaseConditionRoot(t *testing.T) {
 	require.NoError(t, err)
 
 	_, _, _, err = ExpireConditionalPromises(state, PromiseExpiryRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{downstream},
-		Resolver:      alice,
-		CurrentHeight: downstream.TimeoutHeight,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{downstream},
+		Resolver:	alice,
+		CurrentHeight:	downstream.TimeoutHeight,
 	})
 	require.ErrorContains(t, err, "has not expired")
 
 	state, resolutions, expiryUpdate, err := ExpireConditionalPromises(state, PromiseExpiryRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{downstream},
-		Resolver:      alice,
-		CurrentHeight: downstream.TimeoutHeight + 1,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{downstream},
+		Resolver:	alice,
+		CurrentHeight:	downstream.TimeoutHeight + 1,
 	})
 	require.NoError(t, err)
 	require.Len(t, resolutions, 1)
@@ -1812,11 +1812,11 @@ func TestTimeoutOrderingAndExpiryResolutionReleaseConditionRoot(t *testing.T) {
 	require.NotEqual(t, rootUpdate.ConditionRoot, expiryUpdate.ConditionRoot)
 
 	_, _, err = RevealPromisePreimage(state, PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{downstream},
-		Preimage:      "race-preimage",
-		Revealer:      bob,
-		CurrentHeight: downstream.TimeoutHeight + 1,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{downstream},
+		Preimage:	"race-preimage",
+		Revealer:	bob,
+		CurrentHeight:	downstream.TimeoutHeight + 1,
 	})
 	require.ErrorContains(t, err, "timed out")
 }
@@ -1863,21 +1863,21 @@ func TestBatchConditionSettlementAtomicallyResolvesChainedPromises(t *testing.T)
 	require.NoError(t, err)
 
 	proof := ConditionLinkageProof{
-		RouteID:       routeID,
-		Promises:      []ConditionalPromise{first, second},
-		Sender:        alice,
-		Receiver:      bob,
-		Amount:        "30",
-		TotalFees:     "1",
-		HashLock:      hashLock,
-		TimeoutMargin: DefaultTimeoutMargin,
+		RouteID:	routeID,
+		Promises:	[]ConditionalPromise{first, second},
+		Sender:		alice,
+		Receiver:	bob,
+		Amount:		"30",
+		TotalFees:	"1",
+		HashLock:	hashLock,
+		TimeoutMargin:	DefaultTimeoutMargin,
 	}
 	state, result, err := BatchSettleLinkedPromises(state, BatchConditionSettlementRequest{
-		LinkageProof:  proof,
-		Mode:          ConditionSettlementModePreimage,
-		Preimage:      "atomic-preimage",
-		Resolver:      bob,
-		CurrentHeight: 30,
+		LinkageProof:	proof,
+		Mode:		ConditionSettlementModePreimage,
+		Preimage:	"atomic-preimage",
+		Resolver:	bob,
+		CurrentHeight:	30,
 	})
 	require.NoError(t, err)
 	require.Len(t, result.Resolutions, 2)
@@ -1891,11 +1891,11 @@ func TestBatchConditionSettlementAtomicallyResolvesChainedPromises(t *testing.T)
 	require.Equal(t, hashLock, state.ConditionClaims[1].PreimageHash)
 
 	_, _, err = BatchSettleLinkedPromises(state, BatchConditionSettlementRequest{
-		LinkageProof:  proof,
-		Mode:          ConditionSettlementModePreimage,
-		Preimage:      "atomic-preimage",
-		Resolver:      bob,
-		CurrentHeight: 31,
+		LinkageProof:	proof,
+		Mode:		ConditionSettlementModePreimage,
+		Preimage:	"atomic-preimage",
+		Resolver:	bob,
+		CurrentHeight:	31,
 	})
 	require.ErrorContains(t, err, "already been settled")
 }
@@ -1917,11 +1917,11 @@ func TestConditionalPaymentsModuleMessagesRootsClaimsAndDisputes(t *testing.T) {
 	require.NoError(t, err)
 
 	state, snapshot, err := ApplyConditionalPaymentMessage(state, MsgRegisterPromise{
-		Signer:        alice,
-		ChannelID:     channel.ChannelID,
-		BaseState:     base,
-		Promises:      []ConditionalPromise{promise},
-		CurrentHeight: 20,
+		Signer:		alice,
+		ChannelID:	channel.ChannelID,
+		BaseState:	base,
+		Promises:	[]ConditionalPromise{promise},
+		CurrentHeight:	20,
 	})
 	require.NoError(t, err)
 	require.Len(t, snapshot.Promises, 1)
@@ -1930,48 +1930,48 @@ func TestConditionalPaymentsModuleMessagesRootsClaimsAndDisputes(t *testing.T) {
 	require.NoError(t, ValidateReservedBalancesForConditions(state.Channels[0], state.Channels[0].LatestState))
 
 	_, _, err = ApplyConditionalPaymentMessage(state, MsgRegisterPromise{
-		Signer:        alice,
-		ChannelID:     channel.ChannelID,
-		BaseState:     base,
-		Promises:      []ConditionalPromise{promise, promise},
-		CurrentHeight: 21,
+		Signer:		alice,
+		ChannelID:	channel.ChannelID,
+		BaseState:	base,
+		Promises:	[]ConditionalPromise{promise, promise},
+		CurrentHeight:	21,
 	})
 	require.ErrorContains(t, err, "duplicate promise")
 
 	state, snapshot, err = ApplyConditionalPaymentMessage(state, MsgResolveWithPreimage{Request: PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{promise},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 30,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{promise},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	30,
 	}})
 	require.NoError(t, err)
 	require.Len(t, snapshot.PreimageClaims, 1)
 	require.Equal(t, HashParts(preimage), state.ConditionClaims[0].PreimageHash)
 
 	_, _, err = ApplyConditionalPaymentMessage(state, MsgResolveWithPreimage{Request: PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{promise},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 31,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{promise},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	31,
 	}})
 	require.ErrorContains(t, err, "already been settled")
 
 	invalidResolution := ConditionResolution{
-		ConditionID:  promise.PromiseID,
-		Resolver:     bob,
-		Recipient:    alice,
-		Amount:       promise.Amount,
-		EvidenceHash: HashParts("invalid-condition-resolution", promise.PromiseID),
+		ConditionID:	promise.PromiseID,
+		Resolver:	bob,
+		Recipient:	alice,
+		Amount:		promise.Amount,
+		EvidenceHash:	HashParts("invalid-condition-resolution", promise.PromiseID),
 	}
 	disputed, _, err := ApplyConditionalPaymentMessage(state, MsgDisputeCondition{
-		Signer:        alice,
-		ChannelID:     channel.ChannelID,
-		Promise:       promise,
-		Resolution:    invalidResolution,
-		Reason:        "wrong-recipient",
-		CurrentHeight: 32,
+		Signer:		alice,
+		ChannelID:	channel.ChannelID,
+		Promise:	promise,
+		Resolution:	invalidResolution,
+		Reason:		"wrong-recipient",
+		CurrentHeight:	32,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "condition_dispute", disputed.Events[len(disputed.Events)-1].EventType)
@@ -2017,21 +2017,21 @@ func TestConditionalPaymentsModuleExpiryAndBatchFinalizeRecords(t *testing.T) {
 	require.NoError(t, err)
 
 	proof := ConditionLinkageProof{
-		RouteID:       routeID,
-		Promises:      []ConditionalPromise{first, second},
-		Sender:        alice,
-		Receiver:      bob,
-		Amount:        "30",
-		TotalFees:     "1",
-		HashLock:      hashLock,
-		TimeoutMargin: DefaultTimeoutMargin,
+		RouteID:	routeID,
+		Promises:	[]ConditionalPromise{first, second},
+		Sender:		alice,
+		Receiver:	bob,
+		Amount:		"30",
+		TotalFees:	"1",
+		HashLock:	hashLock,
+		TimeoutMargin:	DefaultTimeoutMargin,
 	}
 	state, snapshot, err := ApplyConditionalPaymentMessage(state, MsgBatchResolvePromises{Request: BatchConditionSettlementRequest{
-		LinkageProof:  proof,
-		Mode:          ConditionSettlementModePreimage,
-		Preimage:      "conditional-module-batch-preimage",
-		Resolver:      bob,
-		CurrentHeight: 30,
+		LinkageProof:	proof,
+		Mode:		ConditionSettlementModePreimage,
+		Preimage:	"conditional-module-batch-preimage",
+		Resolver:	bob,
+		CurrentHeight:	30,
 	}})
 	require.NoError(t, err)
 	require.Len(t, state.ConditionClaims, 2)
@@ -2039,15 +2039,15 @@ func TestConditionalPaymentsModuleExpiryAndBatchFinalizeRecords(t *testing.T) {
 	require.Equal(t, "condition_settlement", state.Events[len(state.Events)-1].EventType)
 
 	record := ConditionSettlementRecordFromBatch(BatchConditionSettlementRequest{
-		LinkageProof:  proof,
-		Mode:          ConditionSettlementModePreimage,
-		Resolver:      bob,
-		CurrentHeight: 30,
+		LinkageProof:	proof,
+		Mode:		ConditionSettlementModePreimage,
+		Resolver:	bob,
+		CurrentHeight:	30,
 	}, BatchConditionSettlementResult{
-		RouteID:              routeID,
-		Resolutions:          []ConditionResolution{{ConditionID: first.PromiseID, Resolver: bob, Recipient: router, Amount: first.Amount, EvidenceHash: HashParts("finalize-condition", first.PromiseID)}},
-		ConditionRootUpdates: []ConditionRootUpdate{{ChannelID: first.ChannelID, Nonce: 2, ConditionRoot: state.Channels[0].LatestState.ConditionRoot, ConditionCount: 1, Conditions: state.Channels[0].LatestState.Conditions}},
-		EvidenceHash:         HashParts("finalize-condition", routeID),
+		RouteID:		routeID,
+		Resolutions:		[]ConditionResolution{{ConditionID: first.PromiseID, Resolver: bob, Recipient: router, Amount: first.Amount, EvidenceHash: HashParts("finalize-condition", first.PromiseID)}},
+		ConditionRootUpdates:	[]ConditionRootUpdate{{ChannelID: first.ChannelID, Nonce: 2, ConditionRoot: state.Channels[0].LatestState.ConditionRoot, ConditionCount: 1, Conditions: state.Channels[0].LatestState.Conditions}},
+		EvidenceHash:		HashParts("finalize-condition", routeID),
 	})
 	state, _, err = ApplyConditionalPaymentMessage(state, MsgFinalizeConditionSettlement{Signer: bob, Settlement: record, CurrentHeight: 31})
 	require.NoError(t, err)
@@ -2090,14 +2090,14 @@ func TestBatchConditionSettlementRejectsBrokenRouteInvariants(t *testing.T) {
 	state, err = AcceptSignedState(state, openSecond.ChannelID, secondBase, 20)
 	require.NoError(t, err)
 	require.ErrorContains(t, ConditionLinkageProof{
-		RouteID:       routeID,
-		Promises:      []ConditionalPromise{first, second},
-		Sender:        alice,
-		Receiver:      bob,
-		Amount:        "30",
-		TotalFees:     "1",
-		HashLock:      hashLock,
-		TimeoutMargin: DefaultTimeoutMargin,
+		RouteID:	routeID,
+		Promises:	[]ConditionalPromise{first, second},
+		Sender:		alice,
+		Receiver:	bob,
+		Amount:		"30",
+		TotalFees:	"1",
+		HashLock:	hashLock,
+		TimeoutMargin:	DefaultTimeoutMargin,
 	}.ValidateForState(state, nil), "amount conservation")
 
 	firstConservedID := HashParts("promise", routeID, "first-conserved")
@@ -2105,33 +2105,33 @@ func TestBatchConditionSettlementRejectsBrokenRouteInvariants(t *testing.T) {
 	firstConserved := signedRoutePromise(t, firstChannel, firstConservedID, routeID, alice, router, "31", "0", 12, 70, hashLock, "", badTimeoutID)
 	badTimeout := signedRoutePromise(t, secondChannel, badTimeoutID, routeID, router, bob, "30", "1", 11, 60, hashLock, firstConservedID, "")
 	require.ErrorContains(t, ConditionLinkageProof{
-		RouteID:       routeID,
-		Promises:      []ConditionalPromise{firstConserved, badTimeout},
-		Sender:        alice,
-		Receiver:      bob,
-		Amount:        "30",
-		TotalFees:     "1",
-		HashLock:      hashLock,
-		TimeoutMargin: DefaultTimeoutMargin,
+		RouteID:	routeID,
+		Promises:	[]ConditionalPromise{firstConserved, badTimeout},
+		Sender:		alice,
+		Receiver:	bob,
+		Amount:		"30",
+		TotalFees:	"1",
+		HashLock:	hashLock,
+		TimeoutMargin:	DefaultTimeoutMargin,
 	}.ValidateForState(state, nil), "downstream timeout")
 
 	partialState, partialResult, err := BatchSettleLinkedPromises(state, BatchConditionSettlementRequest{
 		LinkageProof: ConditionLinkageProof{
-			RouteID:                    routeID,
-			Promises:                   []ConditionalPromise{second},
-			Sender:                     router,
-			Receiver:                   bob,
-			Amount:                     "30",
-			TotalFees:                  "0",
-			HashLock:                   hashLock,
-			TimeoutMargin:              DefaultTimeoutMargin,
-			PartialDispute:             true,
-			OffchainResolvedPromiseIDs: []string{firstID},
+			RouteID:			routeID,
+			Promises:			[]ConditionalPromise{second},
+			Sender:				router,
+			Receiver:			bob,
+			Amount:				"30",
+			TotalFees:			"0",
+			HashLock:			hashLock,
+			TimeoutMargin:			DefaultTimeoutMargin,
+			PartialDispute:			true,
+			OffchainResolvedPromiseIDs:	[]string{firstID},
 		},
-		Mode:          ConditionSettlementModePreimage,
-		Preimage:      "bad-route-preimage",
-		Resolver:      bob,
-		CurrentHeight: 30,
+		Mode:		ConditionSettlementModePreimage,
+		Preimage:	"bad-route-preimage",
+		Resolver:	bob,
+		CurrentHeight:	30,
 	})
 	require.NoError(t, err)
 	require.Len(t, partialResult.Resolutions, 1)
@@ -2181,35 +2181,35 @@ func TestBatchConditionSettlementExpiryIsAtomicWithoutFees(t *testing.T) {
 
 	_, _, err = BatchSettleLinkedPromises(state, BatchConditionSettlementRequest{
 		LinkageProof: ConditionLinkageProof{
-			RouteID:       routeID,
-			Promises:      []ConditionalPromise{first, second},
-			Sender:        alice,
-			Receiver:      bob,
-			Amount:        "30",
-			TotalFees:     "1",
-			HashLock:      hashLock,
-			TimeoutMargin: DefaultTimeoutMargin,
+			RouteID:	routeID,
+			Promises:	[]ConditionalPromise{first, second},
+			Sender:		alice,
+			Receiver:	bob,
+			Amount:		"30",
+			TotalFees:	"1",
+			HashLock:	hashLock,
+			TimeoutMargin:	DefaultTimeoutMargin,
 		},
-		Mode:          ConditionSettlementModeExpiry,
-		Resolver:      alice,
-		CurrentHeight: 70,
+		Mode:		ConditionSettlementModeExpiry,
+		Resolver:	alice,
+		CurrentHeight:	70,
 	})
 	require.ErrorContains(t, err, "has not expired")
 
 	state, result, err := BatchSettleLinkedPromises(state, BatchConditionSettlementRequest{
 		LinkageProof: ConditionLinkageProof{
-			RouteID:       routeID,
-			Promises:      []ConditionalPromise{first, second},
-			Sender:        alice,
-			Receiver:      bob,
-			Amount:        "30",
-			TotalFees:     "1",
-			HashLock:      hashLock,
-			TimeoutMargin: DefaultTimeoutMargin,
+			RouteID:	routeID,
+			Promises:	[]ConditionalPromise{first, second},
+			Sender:		alice,
+			Receiver:	bob,
+			Amount:		"30",
+			TotalFees:	"1",
+			HashLock:	hashLock,
+			TimeoutMargin:	DefaultTimeoutMargin,
 		},
-		Mode:          ConditionSettlementModeExpiry,
-		Resolver:      alice,
-		CurrentHeight: 71,
+		Mode:		ConditionSettlementModeExpiry,
+		Resolver:	alice,
+		CurrentHeight:	71,
 	})
 	require.NoError(t, err)
 	require.Len(t, result.Resolutions, 2)
@@ -2246,21 +2246,21 @@ func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
 		{Participant: bob, Amount: "500"},
 	})
 	state, err = DisputeChannel(state, ChannelDisputeRequest{
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: closeState.StateHash,
-		NewerState:            newerState,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	closeState.StateHash,
+		NewerState:		newerState,
 		FraudProof: FraudProof{
-			ProofID:         HashParts("dispute-proof", channel.ChannelID),
-			ProofType:       FraudProofTypeDoubleSign,
-			SubmittedBy:     bob,
-			OffendingSigner: alice,
-			StateA:          newerState,
-			StateB:          conflicting,
-			PenaltyAmount:   "25",
-			EvidenceHash:    HashParts("evidence", newerState.StateHash, conflicting.StateHash),
+			ProofID:		HashParts("dispute-proof", channel.ChannelID),
+			ProofType:		FraudProofTypeDoubleSign,
+			SubmittedBy:		bob,
+			OffendingSigner:	alice,
+			StateA:			newerState,
+			StateB:			conflicting,
+			PenaltyAmount:		"25",
+			EvidenceHash:		HashParts("evidence", newerState.StateHash, conflicting.StateHash),
 		},
-		Submitter:     bob,
-		CurrentHeight: 25,
+		Submitter:	bob,
+		CurrentHeight:	25,
 	})
 	require.NoError(t, err)
 	require.Equal(t, newerState.StateHash, state.Channels[0].PendingClose.State.StateHash)
@@ -2269,11 +2269,11 @@ func TestDisputeRequestEmitsEventAndAppliesOptionalFraudProof(t *testing.T) {
 	require.Equal(t, "channel-dispute", state.Events[len(state.Events)-1].EventType)
 
 	_, err = DisputeChannel(state, ChannelDisputeRequest{
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: closeState.StateHash,
-		NewerState:            newerState,
-		Submitter:             bob,
-		CurrentHeight:         26,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	closeState.StateHash,
+		NewerState:		newerState,
+		Submitter:		bob,
+		CurrentHeight:		26,
 	})
 	require.ErrorContains(t, err, "reference")
 }
@@ -2288,17 +2288,17 @@ func TestPaymentStateRejectsNonNaetAndCollateralMismatch(t *testing.T) {
 
 	channel = signedChannel(t, "bad-collateral", "1000", alice, bob)
 	badState, err := BuildState(ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             2,
-		PreviousStateHash: channel.OpeningStateHash,
-		TimeoutHeight:     64,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			2,
+		PreviousStateHash:	channel.OpeningStateHash,
+		TimeoutHeight:		64,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 		Balances: []Balance{
 			{Participant: alice, Amount: "999"},
 			{Participant: bob, Amount: "0"},
@@ -2319,20 +2319,20 @@ func TestChannelOpenLifecycleLocksFeeAndEmitsEvent(t *testing.T) {
 	alice := testAddress(0x33)
 	bob := testAddress(0x34)
 	req := ChannelOpenRequest{
-		ChainID:                      "aetra-test-1",
-		ChannelID:                    HashParts("open-lifecycle", alice, bob),
-		Participants:                 []string{alice, bob},
-		InitialBalances:              []Balance{{Participant: alice, Amount: "700"}, {Participant: bob, Amount: "300"}},
-		ChannelType:                  ChannelTypeBidirectional,
-		Collateral:                   "1000",
-		CloseDelay:                   8,
-		ChallengePeriod:              12,
-		FeePolicyID:                  NativeDenom,
-		OpeningFeeDenom:              NativeDenom,
-		OpeningFeePaid:               DefaultOpeningFee,
-		RoutingAdvertised:            true,
-		ConditionalPaymentsSupported: true,
-		OpenHeight:                   11,
+		ChainID:			"aetra-test-1",
+		ChannelID:			HashParts("open-lifecycle", alice, bob),
+		Participants:			[]string{alice, bob},
+		InitialBalances:		[]Balance{{Participant: alice, Amount: "700"}, {Participant: bob, Amount: "300"}},
+		ChannelType:			ChannelTypeBidirectional,
+		Collateral:			"1000",
+		CloseDelay:			8,
+		ChallengePeriod:		12,
+		FeePolicyID:			NativeDenom,
+		OpeningFeeDenom:		NativeDenom,
+		OpeningFeePaid:			DefaultOpeningFee,
+		RoutingAdvertised:		true,
+		ConditionalPaymentsSupported:	true,
+		OpenHeight:			11,
 	}
 
 	state, event, err := OpenChannelFromRequest(EmptyState(), req)
@@ -2391,10 +2391,10 @@ func TestPaymentFeeScheduleChargesStorageAndDynamicMultiplier(t *testing.T) {
 	state, err := ConfigurePaymentFeeSchedule(EmptyState(), schedule)
 	require.NoError(t, err)
 	state, err = SetPaymentFeeMultiplier(state, PaymentFeeMultiplier{
-		FeeClass:      PaymentFeeClassChannelOpen,
-		MultiplierBps: 20_000,
-		CongestionBps: 5_000,
-		UpdatedHeight: channel.OpenHeight,
+		FeeClass:	PaymentFeeClassChannelOpen,
+		MultiplierBps:	20_000,
+		CongestionBps:	5_000,
+		UpdatedHeight:	channel.OpenHeight,
 	})
 	require.NoError(t, err)
 
@@ -2461,10 +2461,10 @@ func TestChannelOpenFeeFormulaComponentsAndBounds(t *testing.T) {
 	boundedState, err := ConfigurePaymentFeeSchedule(EmptyState(), boundedSchedule)
 	require.NoError(t, err)
 	boundedState, err = SetPaymentFeeMultiplier(boundedState, PaymentFeeMultiplier{
-		FeeClass:      PaymentFeeClassChannelOpen,
-		MultiplierBps: 15_000,
-		CongestionBps: 2_500,
-		UpdatedHeight: channel.OpenHeight,
+		FeeClass:	PaymentFeeClassChannelOpen,
+		MultiplierBps:	15_000,
+		CongestionBps:	2_500,
+		UpdatedHeight:	channel.OpenHeight,
 	})
 	require.NoError(t, err)
 	formula, err = ComputeChannelOpenFeeFormula(boundedState, channel)
@@ -2533,21 +2533,21 @@ func TestPaymentFeeScheduleRejectsCloseDisputeAndRoutingBypass(t *testing.T) {
 		{Participant: bob, Amount: "55"},
 	})
 	_, err = DisputeChannel(pending, ChannelDisputeRequest{
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: closeState.StateHash,
-		NewerState:            newer,
-		Submitter:             bob,
-		CurrentHeight:         21,
-		DisputeFeePaid:        "0",
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	closeState.StateHash,
+		NewerState:		newer,
+		Submitter:		bob,
+		CurrentHeight:		21,
+		DisputeFeePaid:		"0",
 	})
 	require.ErrorContains(t, err, "fee below required")
 	pending, err = DisputeChannel(pending, ChannelDisputeRequest{
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: closeState.StateHash,
-		NewerState:            newer,
-		Submitter:             bob,
-		CurrentHeight:         21,
-		DisputeFeePaid:        "4",
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	closeState.StateHash,
+		NewerState:		newer,
+		Submitter:		bob,
+		CurrentHeight:		21,
+		DisputeFeePaid:		"4",
 	})
 	require.NoError(t, err)
 	require.Equal(t, newer.StateHash, pending.Channels[0].PendingClose.State.StateHash)
@@ -2575,16 +2575,16 @@ func TestFraudProofVerificationFeeRefundsWhenAccepted(t *testing.T) {
 	})
 	proofID := HashParts("fee-fraud-proof", channel.ChannelID)
 	proof := FraudProof{
-		ProofID:             proofID,
-		ProofType:           FraudProofTypeDoubleSign,
-		SubmittedBy:         bob,
-		OffendingSigner:     alice,
-		StateA:              closeState,
-		StateB:              conflicting,
-		EvidenceHash:        ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
-		PenaltyDenom:        NativeDenom,
-		PenaltyAmount:       "10",
-		VerificationFeePaid: "0",
+		ProofID:		proofID,
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"10",
+		VerificationFeePaid:	"0",
 	}
 	_, err = SubmitFraudProof(state, channel.ChannelID, proof, 21)
 	require.ErrorContains(t, err, "fee below required")
@@ -2622,23 +2622,23 @@ func TestFraudProofVerificationModuleDedupGasPenaltyAndRewardClaim(t *testing.T)
 	})
 	proofID := HashParts("fraud-module-proof", channel.ChannelID)
 	proof := FraudProof{
-		ProofID:         proofID,
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		EvidenceHash:    HashParts("fraud-module-evidence", closeState.StateHash, conflicting.StateHash),
-		PenaltyDenom:    NativeDenom,
-		PenaltyAmount:   "20",
+		ProofID:		proofID,
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		HashParts("fraud-module-evidence", closeState.StateHash, conflicting.StateHash),
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"20",
 	}
 	module := EmptyFraudProofVerificationState()
 	state, module, err = ApplyFraudProofVerificationMessage(state, module, MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         proof,
-		CurrentHeight: 21,
-		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
-		GasLimit:      100_000_000,
+		ChannelID:	channel.ChannelID,
+		Proof:		proof,
+		CurrentHeight:	21,
+		Policy:		FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:	100_000_000,
 	}})
 	require.NoError(t, err)
 	require.Len(t, module.EvidenceRecords, 1)
@@ -2654,43 +2654,43 @@ func TestFraudProofVerificationModuleDedupGasPenaltyAndRewardClaim(t *testing.T)
 	reordered.StateB = closeState
 	reordered.EvidenceHash = HashParts("fraud-module-evidence-reordered", conflicting.StateHash, closeState.StateHash)
 	_, _, err = ApplyFraudProofVerificationMessage(state, module, MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         reordered,
-		CurrentHeight: 22,
-		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
-		GasLimit:      100_000_000,
+		ChannelID:	channel.ChannelID,
+		Proof:		reordered,
+		CurrentHeight:	22,
+		Policy:		FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:	100_000_000,
 	}})
 	require.ErrorContains(t, err, "duplicate fraud evidence")
 
 	_, _, err = ApplyFraudProofVerificationMessage(state, EmptyFraudProofVerificationState(), MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         reordered,
-		CurrentHeight: 22,
-		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
-		GasLimit:      1,
+		ChannelID:	channel.ChannelID,
+		Proof:		reordered,
+		CurrentHeight:	22,
+		Policy:		FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: MaxPenaltyRouteBps},
+		GasLimit:	1,
 	}})
 	require.ErrorContains(t, err, "gas limit")
 
 	_, _, err = ApplyFraudProofVerificationMessage(state, EmptyFraudProofVerificationState(), MsgSubmitDoubleSignProof{Input: FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         FraudProof{ProofID: HashParts("fraud-module-too-large"), ProofType: FraudProofTypeDoubleSign, SubmittedBy: bob, OffendingSigner: alice, StateA: closeState, StateB: conflicting, EvidenceHash: HashParts("fraud-module-too-large"), PenaltyDenom: NativeDenom, PenaltyAmount: "80"},
-		CurrentHeight: 22,
-		Policy:        FraudPenaltyPolicy{ReporterRewardCap: "80"},
-		GasLimit:      100_000_000,
+		ChannelID:	channel.ChannelID,
+		Proof:		FraudProof{ProofID: HashParts("fraud-module-too-large"), ProofType: FraudProofTypeDoubleSign, SubmittedBy: bob, OffendingSigner: alice, StateA: closeState, StateB: conflicting, EvidenceHash: HashParts("fraud-module-too-large"), PenaltyDenom: NativeDenom, PenaltyAmount: "80"},
+		CurrentHeight:	22,
+		Policy:		FraudPenaltyPolicy{ReporterRewardCap: "80"},
+		GasLimit:	100_000_000,
 	}})
 	require.ErrorContains(t, err, "exceeds available balance")
 
 	_, module, err = ApplyFraudProofVerificationMessage(state, module, MsgClaimReporterReward{
-		RewardID:      module.ReporterRewards[0].RewardID,
-		Reporter:      bob,
-		CurrentHeight: 23,
+		RewardID:	module.ReporterRewards[0].RewardID,
+		Reporter:	bob,
+		CurrentHeight:	23,
 	})
 	require.NoError(t, err)
 	require.True(t, module.ReporterRewards[0].Claimed)
 	_, _, err = ApplyFraudProofVerificationMessage(state, module, MsgClaimReporterReward{
-		RewardID:      module.ReporterRewards[0].RewardID,
-		Reporter:      bob,
-		CurrentHeight: 24,
+		RewardID:	module.ReporterRewards[0].RewardID,
+		Reporter:	bob,
+		CurrentHeight:	24,
 	})
 	require.ErrorContains(t, err, "already claimed")
 }
@@ -2707,15 +2707,15 @@ func FuzzCanonicalFraudEvidenceHashMalformedInputs(f *testing.F) {
 			channel.ChannelID = channelID
 		}
 		proof := FraudProof{
-			ProofID:         HashParts("fraud-fuzz-proof", channel.ChannelID),
-			ProofType:       FraudProofTypeDoubleSign,
-			SubmittedBy:     bob,
-			OffendingSigner: alice,
-			StateA:          ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("left", chainID, channel.ChannelID)},
-			StateB:          ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("right", chainID, channel.ChannelID)},
-			EvidenceHash:    HashParts("fraud-fuzz-evidence", chainID, channel.ChannelID),
-			PenaltyDenom:    NativeDenom,
-			PenaltyAmount:   "20",
+			ProofID:		HashParts("fraud-fuzz-proof", channel.ChannelID),
+			ProofType:		FraudProofTypeDoubleSign,
+			SubmittedBy:		bob,
+			OffendingSigner:	alice,
+			StateA:			ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("left", chainID, channel.ChannelID)},
+			StateB:			ChannelState{ChainID: chainID, ChannelID: channel.ChannelID, Epoch: epoch, Nonce: nonce, StateHash: HashParts("right", chainID, channel.ChannelID)},
+			EvidenceHash:		HashParts("fraud-fuzz-evidence", chainID, channel.ChannelID),
+			PenaltyDenom:		NativeDenom,
+			PenaltyAmount:		"20",
 		}
 		require.NoError(t, ValidateHash("fuzz canonical fraud evidence", ComputeCanonicalFraudEvidenceHash(channel, proof)))
 	})
@@ -2825,10 +2825,10 @@ func TestSettlementGasCostsAndInclusionLatencyMonitoring(t *testing.T) {
 
 	schedule := DefaultSettlementGasCostSchedule()
 	estimate, err := EstimateSettlementMessageGas(SettlementArbitrationInput{
-		Operation:       SettlementArbitrationDispute,
-		ChannelID:       channel.ChannelID,
-		SignedState:     closeState,
-		ConditionProofs: []ConditionResolution{{ConditionID: HashParts("settlement-gas-condition"), Resolver: bob, Recipient: bob, Amount: "1", EvidenceHash: HashParts("settlement-gas-evidence")}},
+		Operation:		SettlementArbitrationDispute,
+		ChannelID:		channel.ChannelID,
+		SignedState:		closeState,
+		ConditionProofs:	[]ConditionResolution{{ConditionID: HashParts("settlement-gas-condition"), Resolver: bob, Recipient: bob, Amount: "1", EvidenceHash: HashParts("settlement-gas-evidence")}},
 	}, schedule)
 	require.NoError(t, err)
 	require.Equal(t, SettlementArbitrationDispute, estimate.Operation)
@@ -2870,21 +2870,21 @@ func TestFraudProofRefundAccountingAndSecurityReserveHook(t *testing.T) {
 	})
 	proofID := HashParts("fraud-reserve-hook-proof", channel.ChannelID)
 	proof := FraudProof{
-		ProofID:             proofID,
-		ProofType:           FraudProofTypeDoubleSign,
-		SubmittedBy:         bob,
-		OffendingSigner:     alice,
-		StateA:              closeState,
-		StateB:              conflicting,
-		EvidenceHash:        ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
-		PenaltyDenom:        NativeDenom,
-		PenaltyAmount:       "10",
-		VerificationFeePaid: "7",
+		ProofID:		proofID,
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"10",
+		VerificationFeePaid:	"7",
 	}
 	state, err = SubmitFraudProofWithPolicy(state, channel.ChannelID, proof, 21, FraudPenaltyPolicy{
-		ReporterRewardCap:       "4",
-		SecurityReserveShareBps: MaxPenaltyRouteBps,
-		SecurityReserveHook:     true,
+		ReporterRewardCap:		"4",
+		SecurityReserveShareBps:	MaxPenaltyRouteBps,
+		SecurityReserveHook:		true,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.FeeRefunds, 1)
@@ -2912,13 +2912,13 @@ func TestPenaltyMatrixCoversFraudProofCategoriesAndBoundsBalances(t *testing.T) 
 	channel.Status = ChannelStatusPendingClose
 	channel.Finality = ChannelFinalityPendingClose
 	channel.PendingClose = PendingClose{
-		Submitter:          alice,
-		SubmittedHeight:    20,
-		SettleAfterHeight:  36,
-		CloseReason:        CloseReasonUnilateral,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      "0",
-		State:              closeState,
+		Submitter:		alice,
+		SubmittedHeight:	20,
+		SettleAfterHeight:	36,
+		CloseReason:		CloseReasonUnilateral,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		"0",
+		State:			closeState,
 	}
 	for _, proofType := range []FraudProofType{
 		FraudProofTypeInvalidClose,
@@ -2935,15 +2935,15 @@ func TestPenaltyMatrixCoversFraudProofCategoriesAndBoundsBalances(t *testing.T) 
 
 	proofID := HashParts("penalty-matrix-proof", channel.ChannelID)
 	proof := FraudProof{
-		ProofID:         proofID,
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		EvidenceHash:    ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
-		PenaltyDenom:    NativeDenom,
-		PenaltyAmount:   "25",
+		ProofID:		proofID,
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"25",
 	}
 	accounting, err := BuildPenaltyRouteAccounting(channel, proof, DefaultPenaltyMatrix(), FraudPenaltyPolicy{})
 	require.NoError(t, err)
@@ -2976,43 +2976,43 @@ func TestLiquidityAdvertisementReservationScoreAndDepositPenalty(t *testing.T) {
 	bob := testAddress(0xad)
 	channelID := HashParts("liquidity-ad-channel")
 	ad, err := BuildLiquidityAdvertisement(LiquidityAdvertisement{
-		ChannelID:           channelID,
-		Advertiser:          alice,
-		Counterparty:        bob,
-		Capacity:            "1000",
-		FeeDenom:            NativeDenom,
-		BaseFee:             "1",
-		ReservationFee:      "3",
-		VirtualSetupFee:     "5",
-		ReliabilityBps:      9_000,
-		ValidUntilHeight:    50,
-		DepositAmount:       "9",
-		BackedByReservation: true,
+		ChannelID:		channelID,
+		Advertiser:		alice,
+		Counterparty:		bob,
+		Capacity:		"1000",
+		FeeDenom:		NativeDenom,
+		BaseFee:		"1",
+		ReservationFee:		"3",
+		VirtualSetupFee:	"5",
+		ReliabilityBps:		9_000,
+		ValidUntilHeight:	50,
+		DepositAmount:		"9",
+		BackedByReservation:	true,
 	}, "5")
 	require.NoError(t, err)
 	require.NotEmpty(t, ad.AdvertisementHash)
 
 	_, err = BuildLiquidityAdvertisement(LiquidityAdvertisement{
-		ChannelID:        channelID,
-		Advertiser:       alice,
-		Counterparty:     bob,
-		Capacity:         "1000",
-		FeeDenom:         NativeDenom,
-		ValidUntilHeight: 50,
-		DepositAmount:    "4",
+		ChannelID:		channelID,
+		Advertiser:		alice,
+		Counterparty:		bob,
+		Capacity:		"1000",
+		FeeDenom:		NativeDenom,
+		ValidUntilHeight:	50,
+		DepositAmount:		"4",
 	}, "5")
 	require.ErrorContains(t, err, "deposit below required")
 
 	reservation, err := BuildSignedLiquidityReservation(SignedLiquidityReservation{
-		AdvertisementID:  ad.AdvertisementID,
-		ChainID:          "aetra-test-chain",
-		ChannelID:        channelID,
-		Reserver:         alice,
-		Counterparty:     bob,
-		Capacity:         "700",
-		FeeAmount:        "3",
-		ExpirationHeight: 45,
-		Nonce:            1,
+		AdvertisementID:	ad.AdvertisementID,
+		ChainID:		"aetra-test-chain",
+		ChannelID:		channelID,
+		Reserver:		alice,
+		Counterparty:		bob,
+		Capacity:		"700",
+		FeeAmount:		"3",
+		ExpirationHeight:	45,
+		Nonce:			1,
 	}, alice)
 	require.NoError(t, err)
 	require.NoError(t, reservation.Validate())
@@ -3036,41 +3036,41 @@ func TestLiquidityOptimizationModuleReservationsForecastsFeesAndDecay(t *testing
 	var err error
 
 	state, err = ApplyLiquidityOptimizationMessage(chain, state, MsgSetLiquidityLimits{
-		Signer: alice,
+		Signer:	alice,
 		Limits: LiquidityLimits{
-			ChannelID:            channel.ChannelID,
-			Participant:          alice,
-			MaxReservedCapacity:  "700",
-			MinAvailableCapacity: "100",
-			MaxBaseFee:           "5",
-			MaxReservationFee:    "3",
-			MaxVirtualSetupFee:   "8",
-			MaxProportionalBps:   500,
-			MaxRebalanceLoad:     10,
+			ChannelID:		channel.ChannelID,
+			Participant:		alice,
+			MaxReservedCapacity:	"700",
+			MinAvailableCapacity:	"100",
+			MaxBaseFee:		"5",
+			MaxReservationFee:	"3",
+			MaxVirtualSetupFee:	"8",
+			MaxProportionalBps:	500,
+			MaxRebalanceLoad:	10,
 		},
-		CurrentHeight: 12,
+		CurrentHeight:	12,
 	})
 	require.NoError(t, err)
 
 	ad := LiquidityAdvertisement{
-		ChannelID:           channel.ChannelID,
-		Advertiser:          alice,
-		Counterparty:        bob,
-		Capacity:            "600",
-		FeeDenom:            NativeDenom,
-		BaseFee:             "2",
-		ReservationFee:      "3",
-		VirtualSetupFee:     "5",
-		ReliabilityBps:      9_500,
-		ValidUntilHeight:    80,
-		DepositAmount:       "9",
-		BackedByReservation: true,
+		ChannelID:		channel.ChannelID,
+		Advertiser:		alice,
+		Counterparty:		bob,
+		Capacity:		"600",
+		FeeDenom:		NativeDenom,
+		BaseFee:		"2",
+		ReservationFee:		"3",
+		VirtualSetupFee:	"5",
+		ReliabilityBps:		9_500,
+		ValidUntilHeight:	80,
+		DepositAmount:		"9",
+		BackedByReservation:	true,
 	}
 	state, err = ApplyLiquidityOptimizationMessage(chain, state, MsgAdvertiseLiquidity{
-		Signer:          alice,
-		Advertisement:   ad,
-		RequiredDeposit: "5",
-		CurrentHeight:   13,
+		Signer:			alice,
+		Advertisement:		ad,
+		RequiredDeposit:	"5",
+		CurrentHeight:		13,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.Positions, 1)
@@ -3079,20 +3079,20 @@ func TestLiquidityOptimizationModuleReservationsForecastsFeesAndDecay(t *testing
 	require.Len(t, state.Scores, 1)
 
 	reservation, err := BuildSignedLiquidityReservation(SignedLiquidityReservation{
-		AdvertisementID:  state.Positions[0].FeePolicyID,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		Reserver:         alice,
-		Counterparty:     bob,
-		Capacity:         "400",
-		FeeAmount:        "3",
-		ExpirationHeight: 30,
-		Nonce:            1,
+		AdvertisementID:	state.Positions[0].FeePolicyID,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Reserver:		alice,
+		Counterparty:		bob,
+		Capacity:		"400",
+		FeeAmount:		"3",
+		ExpirationHeight:	30,
+		Nonce:			1,
 	}, alice)
 	require.NoError(t, err)
 	state, err = ApplyLiquidityOptimizationMessage(chain, state, MsgReserveLiquidity{
-		Reservation:   reservation,
-		CurrentHeight: 14,
+		Reservation:	reservation,
+		CurrentHeight:	14,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "400", state.Positions[0].ReservedCapacity)
@@ -3100,53 +3100,53 @@ func TestLiquidityOptimizationModuleReservationsForecastsFeesAndDecay(t *testing
 	require.Equal(t, "400", state.Forecasts[0].ReservedCapacity)
 
 	overReserve, err := BuildSignedLiquidityReservation(SignedLiquidityReservation{
-		AdvertisementID:  state.Positions[0].FeePolicyID,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		Reserver:         alice,
-		Counterparty:     bob,
-		Capacity:         "300",
-		FeeAmount:        "3",
-		ExpirationHeight: 30,
-		Nonce:            2,
+		AdvertisementID:	state.Positions[0].FeePolicyID,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Reserver:		alice,
+		Counterparty:		bob,
+		Capacity:		"300",
+		FeeAmount:		"3",
+		ExpirationHeight:	30,
+		Nonce:			2,
 	}, alice)
 	require.NoError(t, err)
 	_, err = ApplyLiquidityOptimizationMessage(chain, state, MsgReserveLiquidity{Reservation: overReserve, CurrentHeight: 15})
 	require.ErrorContains(t, err, "over-reservation")
 
 	policy, err := BuildRoutingFeePolicyUpdate(RoutingFeePolicyUpdate{
-		ChainID:                 channel.ChainID,
-		ChannelID:               channel.ChannelID,
-		From:                    alice,
-		To:                      bob,
-		FeeDenom:                NativeDenom,
-		BaseHopFee:              "2",
-		ProportionalFeeBps:      100,
-		LiquidityReservationFee: "3",
-		VirtualChannelSetupFee:  "5",
-		CongestionSurcharge:     "1",
-		FailurePenalty:          "1",
-		MaxHopFee:               "5",
-		ValidAfterHeight:        16,
-		ValidUntilHeight:        50,
-		Sequence:                1,
+		ChainID:			channel.ChainID,
+		ChannelID:			channel.ChannelID,
+		From:				alice,
+		To:				bob,
+		FeeDenom:			NativeDenom,
+		BaseHopFee:			"2",
+		ProportionalFeeBps:		100,
+		LiquidityReservationFee:	"3",
+		VirtualChannelSetupFee:		"5",
+		CongestionSurcharge:		"1",
+		FailurePenalty:			"1",
+		MaxHopFee:			"5",
+		ValidAfterHeight:		16,
+		ValidUntilHeight:		50,
+		Sequence:			1,
 	}, alice)
 	require.NoError(t, err)
 	state, err = ApplyLiquidityOptimizationMessage(chain, state, MsgUpdateFeePolicy{
-		Signer: alice,
-		Policy: policy,
+		Signer:	alice,
+		Policy:	policy,
 		Bounds: LiquidityFeePolicyBounds{
-			MaxBaseFee:         "5",
-			MaxReservationFee:  "3",
-			MaxVirtualSetupFee: "8",
-			MaxCongestionFee:   "2",
-			MaxFailurePenalty:  "2",
-			MaxHopFee:          "8",
-			MaxProportionalBps: 500,
-			MinValidityWindow:  8,
-			MaxValidityWindow:  80,
+			MaxBaseFee:		"5",
+			MaxReservationFee:	"3",
+			MaxVirtualSetupFee:	"8",
+			MaxCongestionFee:	"2",
+			MaxFailurePenalty:	"2",
+			MaxHopFee:		"8",
+			MaxProportionalBps:	500,
+			MinValidityWindow:	8,
+			MaxValidityWindow:	80,
 		},
-		CurrentHeight: 16,
+		CurrentHeight:	16,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.FeePolicies, 1)
@@ -3157,39 +3157,39 @@ func TestLiquidityOptimizationModuleReservationsForecastsFeesAndDecay(t *testing
 	tooHigh.Signature, err = SignatureForRoutingFeePolicy(tooHigh, alice)
 	require.NoError(t, err)
 	_, err = ApplyLiquidityOptimizationMessage(chain, state, MsgUpdateFeePolicy{
-		Signer:        alice,
-		Policy:        tooHigh,
-		Bounds:        LiquidityFeePolicyBounds{MaxBaseFee: "5"},
-		CurrentHeight: 17,
+		Signer:		alice,
+		Policy:		tooHigh,
+		Bounds:		LiquidityFeePolicyBounds{MaxBaseFee: "5"},
+		CurrentHeight:	17,
 	})
 	require.ErrorContains(t, err, "bounds")
 
 	state, err = ApplyLiquidityOptimizationMessage(chain, state, MsgSubmitRebalanceIntent{
-		Signer: alice,
+		Signer:	alice,
 		Intent: RebalanceIntent{
-			ChannelID:         channel.ChannelID,
-			Owner:             alice,
-			TargetCapacity:    "500",
-			MaxSettlementLoad: 8,
-			Priority:          1,
-			ExpiresHeight:     60,
+			ChannelID:		channel.ChannelID,
+			Owner:			alice,
+			TargetCapacity:		"500",
+			MaxSettlementLoad:	8,
+			Priority:		1,
+			ExpiresHeight:		60,
 		},
-		CurrentHeight: 18,
+		CurrentHeight:	18,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.RebalanceIntents, 1)
 
 	_, err = ApplyLiquidityOptimizationMessage(chain, state, MsgSubmitRebalanceIntent{
-		Signer: alice,
+		Signer:	alice,
 		Intent: RebalanceIntent{
-			ChannelID:         channel.ChannelID,
-			Owner:             alice,
-			TargetCapacity:    "500",
-			MaxSettlementLoad: 11,
-			Priority:          1,
-			ExpiresHeight:     60,
+			ChannelID:		channel.ChannelID,
+			Owner:			alice,
+			TargetCapacity:		"500",
+			MaxSettlementLoad:	11,
+			Priority:		1,
+			ExpiresHeight:		60,
 		},
-		CurrentHeight: 19,
+		CurrentHeight:	19,
 	})
 	require.ErrorContains(t, err, "settlement load")
 
@@ -3311,32 +3311,32 @@ func TestBidirectionalStateCommitmentIncludesDomainFields(t *testing.T) {
 	channel = channel.Normalize()
 
 	condition := ConditionalPayment{
-		ConditionID:   HashParts("condition", channel.ChannelID),
-		ConditionType: ConditionTypeHashLock,
-		Payer:         channel.Participants[0],
-		Payee:         channel.Participants[1],
-		Amount:        "40",
-		HashLock:      HashParts("preimage"),
-		TimeoutHeight: 88,
-		NonceStart:    2,
-		NonceEnd:      5,
+		ConditionID:	HashParts("condition", channel.ChannelID),
+		ConditionType:	ConditionTypeHashLock,
+		Payer:		channel.Participants[0],
+		Payee:		channel.Participants[1],
+		Amount:		"40",
+		HashLock:	HashParts("preimage"),
+		TimeoutHeight:	88,
+		NonceStart:	2,
+		NonceEnd:	5,
 	}
 	state, err := BuildState(ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             2,
-		PreviousStateHash: channel.OpeningStateHash,
-		Balances:          []Balance{{Participant: channel.Participants[0], Amount: "460"}, {Participant: channel.Participants[1], Amount: "500"}},
-		ReserveA:          "25",
-		ReserveB:          "15",
-		Conditions:        []ConditionalPayment{condition},
-		TimeoutHeight:     96,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			2,
+		PreviousStateHash:	channel.OpeningStateHash,
+		Balances:		[]Balance{{Participant: channel.Participants[0], Amount: "460"}, {Participant: channel.Participants[1], Amount: "500"}},
+		ReserveA:		"25",
+		ReserveB:		"15",
+		Conditions:		[]ConditionalPayment{condition},
+		TimeoutHeight:		96,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Participants {
@@ -3438,15 +3438,15 @@ func TestStateHashEncodingVersionAndDomainSeparation(t *testing.T) {
 	require.ErrorContains(t, err, "unsupported")
 
 	condition := ConditionalPayment{
-		ConditionID:   HashParts("promise", channel.ChannelID),
-		ConditionType: ConditionTypeHashLock,
-		Payer:         alice,
-		Payee:         bob,
-		Amount:        "10",
-		HashLock:      HashParts("promise-preimage"),
-		TimeoutHeight: 64,
-		NonceStart:    2,
-		NonceEnd:      3,
+		ConditionID:	HashParts("promise", channel.ChannelID),
+		ConditionType:	ConditionTypeHashLock,
+		Payer:		alice,
+		Payee:		bob,
+		Amount:		"10",
+		HashLock:	HashParts("promise-preimage"),
+		TimeoutHeight:	64,
+		NonceStart:	2,
+		NonceEnd:	3,
 	}
 	async := signedAsyncChannel(t, "domain-async", "1000", []Balance{
 		{Participant: alice, Amount: "1000"},
@@ -3458,23 +3458,23 @@ func TestStateHashEncodingVersionAndDomainSeparation(t *testing.T) {
 		{Participant: bob, Amount: "490"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("domain-proof", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          state,
-		StateB:          conflicting,
-		PenaltyAmount:   "10",
-		EvidenceHash:    HashParts("evidence", state.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("domain-proof", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			state,
+		StateB:			conflicting,
+		PenaltyAmount:		"10",
+		EvidenceHash:		HashParts("evidence", state.StateHash, conflicting.StateHash),
 	}
 	vc := VirtualChannel{
-		VirtualChannelID: HashParts("domain-vc", alice, bob),
-		ChainID:          channel.ChainID,
-		Nonce:            1,
-		ParentChannelIDs: []string{channel.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Capacity:         "100",
-		ExpiresHeight:    90,
+		VirtualChannelID:	HashParts("domain-vc", alice, bob),
+		ChainID:		channel.ChainID,
+		Nonce:			1,
+		ParentChannelIDs:	[]string{channel.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Capacity:		"100",
+		ExpiresHeight:		90,
 	}
 	vc.AnchorCommitment = ComputeVirtualChannelAnchor(vc)
 	vc.StateHash = ComputeVirtualChannelStateHash(vc)
@@ -3546,13 +3546,13 @@ func TestCommitmentModelBindsChannelDomainAndPayloads(t *testing.T) {
 	require.NotEqual(t, ComputeAsyncDeltaRootForChannel(asyncFirst, []AsyncPaymentDelta{delta}), ComputeAsyncDeltaRootForChannel(asyncSecond, []AsyncPaymentDelta{delta}))
 
 	vc := VirtualChannel{
-		VirtualChannelID: HashParts("commitment-vc", alice, bob),
-		ChainID:          first.ChainID,
-		Nonce:            1,
-		ParentChannelIDs: []string{first.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Capacity:         "100",
-		ExpiresHeight:    90,
+		VirtualChannelID:	HashParts("commitment-vc", alice, bob),
+		ChainID:		first.ChainID,
+		Nonce:			1,
+		ParentChannelIDs:	[]string{first.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Capacity:		"100",
+		ExpiresHeight:		90,
 	}
 	vc.AnchorCommitment = ComputeVirtualChannelAnchor(vc)
 	changedVC := vc
@@ -3563,15 +3563,15 @@ func TestCommitmentModelBindsChannelDomainAndPayloads(t *testing.T) {
 	require.NotEqual(t, vc.AnchorCommitment, ComputeVirtualChannelAnchor(changedVC))
 
 	settlement := SettlementRecord{
-		ChainID:            first.ChainID,
-		ChannelID:          first.ChannelID,
-		StateHash:          firstState.StateHash,
-		Nonce:              firstState.Nonce,
-		FinalBalances:      firstState.Balances,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      "0",
-		Penalties:          []Penalty{{Offender: alice, Recipient: bob, Denom: NativeDenom, Amount: "1"}},
-		SettledHeight:      100,
+		ChainID:		first.ChainID,
+		ChannelID:		first.ChannelID,
+		StateHash:		firstState.StateHash,
+		Nonce:			firstState.Nonce,
+		FinalBalances:		firstState.Balances,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		"0",
+		Penalties:		[]Penalty{{Offender: alice, Recipient: bob, Denom: NativeDenom, Amount: "1"}},
+		SettledHeight:		100,
 	}
 	penaltyRoute := settlement
 	penaltyRoute.Penalties = []Penalty{{Offender: bob, Recipient: alice, Denom: NativeDenom, Amount: "1"}}
@@ -3731,31 +3731,31 @@ func TestPaymentSignerAPIEnforcesLimitsPauseAndAuditLog(t *testing.T) {
 	})
 
 	api, err := NewPaymentSignerAPI(PaymentSignerConfig{
-		Signer:               alice,
-		KeyRole:              SignerKeyRoleParticipant,
-		FundsKey:             alice,
-		GossipKey:            gossipKey,
-		IsolationMode:        SignerIsolationHardware,
-		AutomatedSigning:     true,
-		MaxAutomatedAmount:   "25",
-		MaxAutomatedPerBlock: 2,
+		Signer:			alice,
+		KeyRole:		SignerKeyRoleParticipant,
+		FundsKey:		alice,
+		GossipKey:		gossipKey,
+		IsolationMode:		SignerIsolationHardware,
+		AutomatedSigning:	true,
+		MaxAutomatedAmount:	"25",
+		MaxAutomatedPerBlock:	2,
 		ChannelLimits: []ChannelSigningLimit{{
-			ChannelID:        channel.ChannelID,
-			MaxNonce:         3,
-			MaxAmount:        "25",
-			MaxSignatures:    2,
-			ValidUntilHeight: 100,
+			ChannelID:		channel.ChannelID,
+			MaxNonce:		3,
+			MaxAmount:		"25",
+			MaxSignatures:		2,
+			ValidUntilHeight:	100,
 		}},
 	}, SignerPersistence{}, nil)
 	require.NoError(t, err)
 
 	api, resp, err := api.SignState(SignStateRequest{
-		State:         stateTwo,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "10",
-		Automated:     true,
-		CurrentHeight: 20,
+		State:		stateTwo,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"10",
+		Automated:	true,
+		CurrentHeight:	20,
 	})
 	require.NoError(t, err)
 	require.True(t, resp.WALRecord.Released)
@@ -3767,12 +3767,12 @@ func TestPaymentSignerAPIEnforcesLimitsPauseAndAuditLog(t *testing.T) {
 	require.Len(t, api.AuditLogs, 1)
 
 	api, _, err = api.SignState(SignStateRequest{
-		State:         stateThree,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "20",
-		Automated:     true,
-		CurrentHeight: 20,
+		State:		stateThree,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"20",
+		Automated:	true,
+		CurrentHeight:	20,
 	})
 	require.NoError(t, err)
 
@@ -3783,46 +3783,46 @@ func TestPaymentSignerAPIEnforcesLimitsPauseAndAuditLog(t *testing.T) {
 	signatureLimited := api
 	signatureLimited.Config.ChannelLimits[0].MaxNonce = 5
 	_, _, err = signatureLimited.SignState(SignStateRequest{
-		State:         stateFour,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "10",
-		Automated:     true,
-		CurrentHeight: 21,
+		State:		stateFour,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"10",
+		Automated:	true,
+		CurrentHeight:	21,
 	})
 	require.ErrorContains(t, err, "signature limit")
 
 	nonceLimited := api
 	nonceLimited.Config.ChannelLimits = []ChannelSigningLimit{{
-		ChannelID:        channel.ChannelID,
-		MaxNonce:         3,
-		MaxAmount:        "25",
-		ValidUntilHeight: 100,
+		ChannelID:		channel.ChannelID,
+		MaxNonce:		3,
+		MaxAmount:		"25",
+		ValidUntilHeight:	100,
 	}}
 	_, _, err = nonceLimited.SignState(SignStateRequest{
-		State:         stateFour,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "10",
-		Automated:     true,
-		CurrentHeight: 21,
+		State:		stateFour,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"10",
+		Automated:	true,
+		CurrentHeight:	21,
 	})
 	require.ErrorContains(t, err, "nonce limit")
 
 	amountLimited := api
 	amountLimited.Config.ChannelLimits = []ChannelSigningLimit{{
-		ChannelID:        channel.ChannelID,
-		MaxNonce:         5,
-		MaxAmount:        "25",
-		ValidUntilHeight: 100,
+		ChannelID:		channel.ChannelID,
+		MaxNonce:		5,
+		MaxAmount:		"25",
+		ValidUntilHeight:	100,
 	}}
 	_, _, err = amountLimited.SignState(SignStateRequest{
-		State:         stateFour,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "26",
-		Automated:     true,
-		CurrentHeight: 21,
+		State:		stateFour,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"26",
+		Automated:	true,
+		CurrentHeight:	21,
 	})
 	require.ErrorContains(t, err, "amount limit")
 
@@ -3830,12 +3830,12 @@ func TestPaymentSignerAPIEnforcesLimitsPauseAndAuditLog(t *testing.T) {
 	require.NoError(t, err)
 	api.Config = pausedConfig
 	_, _, err = api.SignState(SignStateRequest{
-		State:         stateTwo,
-		Signer:        alice,
-		KeyRole:       SignerKeyRoleParticipant,
-		Amount:        "10",
-		Automated:     true,
-		CurrentHeight: 26,
+		State:		stateTwo,
+		Signer:		alice,
+		KeyRole:	SignerKeyRoleParticipant,
+		Amount:		"10",
+		Automated:	true,
+		CurrentHeight:	26,
 	})
 	require.ErrorContains(t, err, "emergency paused")
 }
@@ -3851,47 +3851,47 @@ func TestPaymentSignerAPISeparatesRoutingAndFundsKeys(t *testing.T) {
 	})
 
 	_, err := NewPaymentSignerAPI(PaymentSignerConfig{
-		Signer:    routeKey,
-		KeyRole:   SignerKeyRoleRoutingGossip,
-		FundsKey:  fundsKey,
-		GossipKey: fundsKey,
+		Signer:		routeKey,
+		KeyRole:	SignerKeyRoleRoutingGossip,
+		FundsKey:	fundsKey,
+		GossipKey:	fundsKey,
 	}, SignerPersistence{}, nil)
 	require.ErrorContains(t, err, "separate from funds key")
 
 	routingAPI, err := NewPaymentSignerAPI(PaymentSignerConfig{
-		Signer:    routeKey,
-		KeyRole:   SignerKeyRoleRoutingGossip,
-		FundsKey:  fundsKey,
-		GossipKey: routeKey,
+		Signer:		routeKey,
+		KeyRole:	SignerKeyRoleRoutingGossip,
+		FundsKey:	fundsKey,
+		GossipKey:	routeKey,
 	}, SignerPersistence{}, nil)
 	require.NoError(t, err)
 
 	_, envelope, err := routingAPI.SignGossip(GossipMessage{
-		MessageType:      GossipNodeAnnouncement,
-		ChainID:          channel.ChainID,
-		NodeID:           routeKey,
-		From:             routeKey,
-		ValidAfterHeight: 10,
-		ValidUntilHeight: 50,
+		MessageType:		GossipNodeAnnouncement,
+		ChainID:		channel.ChainID,
+		NodeID:			routeKey,
+		From:			routeKey,
+		ValidAfterHeight:	10,
+		ValidUntilHeight:	50,
 	}, routeKey, 20)
 	require.NoError(t, err)
 	require.Equal(t, routeKey, envelope.Signature.Signer)
 	require.NoError(t, envelope.ValidateForState(EmptyState(), 20))
 
 	_, _, err = routingAPI.SignState(SignStateRequest{
-		State:         state,
-		Signer:        routeKey,
-		KeyRole:       SignerKeyRoleRoutingGossip,
-		Amount:        "10",
-		CurrentHeight: 20,
+		State:		state,
+		Signer:		routeKey,
+		KeyRole:	SignerKeyRoleRoutingGossip,
+		Amount:		"10",
+		CurrentHeight:	20,
 	})
 	require.ErrorContains(t, err, "cannot sign channel state")
 
 	fundsAPI, err := NewPaymentSignerAPI(PaymentSignerConfig{
-		Signer:    fundsKey,
-		KeyRole:   SignerKeyRoleParticipant,
-		FundsKey:  fundsKey,
-		GossipKey: routeKey,
+		Signer:		fundsKey,
+		KeyRole:	SignerKeyRoleParticipant,
+		FundsKey:	fundsKey,
+		GossipKey:	routeKey,
 	}, SignerPersistence{}, nil)
 	require.NoError(t, err)
 	_, _, err = fundsAPI.SignGossip(envelope.Message, fundsKey, 20)
@@ -3913,24 +3913,24 @@ func TestKeyCompromiseCloseStartsFraudCloseWithLatestState(t *testing.T) {
 	})
 
 	bad := KeyCompromiseCloseRequest{
-		ChannelID:      channel.ChannelID,
-		CompromisedKey: testAddress(0x6d),
-		SafeSubmitter:  bob,
-		LatestState:    latest,
-		CurrentHeight:  20,
-		EvidenceHash:   HashParts("key-compromise", "bad", channel.ChannelID),
+		ChannelID:	channel.ChannelID,
+		CompromisedKey:	testAddress(0x6d),
+		SafeSubmitter:	bob,
+		LatestState:	latest,
+		CurrentHeight:	20,
+		EvidenceHash:	HashParts("key-compromise", "bad", channel.ChannelID),
 	}
 	_, err = SubmitKeyCompromiseClose(state, bad)
 	require.ErrorContains(t, err, "channel participants")
 
 	next, err := SubmitKeyCompromiseClose(state, KeyCompromiseCloseRequest{
-		ChannelID:      channel.ChannelID,
-		CompromisedKey: alice,
-		SafeSubmitter:  bob,
-		LatestState:    latest,
-		CurrentHeight:  20,
-		SettlementFee:  "0",
-		EvidenceHash:   HashParts("key-compromise", channel.ChannelID, alice),
+		ChannelID:	channel.ChannelID,
+		CompromisedKey:	alice,
+		SafeSubmitter:	bob,
+		LatestState:	latest,
+		CurrentHeight:	20,
+		SettlementFee:	"0",
+		EvidenceHash:	HashParts("key-compromise", channel.ChannelID, alice),
 	})
 	require.NoError(t, err)
 	require.Equal(t, ChannelStatusPendingClose, next.Channels[0].Status)
@@ -3995,14 +3995,14 @@ func TestDoubleSignFraudAppliesIndependentPenalties(t *testing.T) {
 	require.NoError(t, err)
 
 	aliceProof := FraudProof{
-		ProofID:         HashParts("double-sign-alice", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		PenaltyAmount:   "25",
-		EvidenceHash:    HashParts("evidence", "alice", closeState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("double-sign-alice", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		PenaltyAmount:		"25",
+		EvidenceHash:		HashParts("evidence", "alice", closeState.StateHash, conflicting.StateHash),
 	}
 	bobProof := aliceProof
 	bobProof.ProofID = HashParts("double-sign-bob", channel.ChannelID)
@@ -4076,11 +4076,11 @@ func TestChannelUpdateLifecycleValidatesOffchainAndRegistersCheckpoint(t *testin
 		{Participant: channel.Participants[1], Amount: "500"},
 	})
 	req := ChannelUpdateRequest{
-		ChannelID:            channel.ChannelID,
-		State:                update,
-		ConditionCommitments: update.Conditions,
-		Submitter:            alice,
-		CurrentHeight:        18,
+		ChannelID:		channel.ChannelID,
+		State:			update,
+		ConditionCommitments:	update.Conditions,
+		Submitter:		alice,
+		CurrentHeight:		18,
 	}
 	result, err := ValidateOffchainUpdate(channel, req)
 	require.NoError(t, err)
@@ -4103,11 +4103,11 @@ func TestChannelUpdateLifecycleValidatesOffchainAndRegistersCheckpoint(t *testin
 		{Participant: channel.Participants[1], Amount: "500"},
 	})
 	_, err = ValidateOffchainUpdate(channel, ChannelUpdateRequest{
-		ChannelID:            channel.ChannelID,
-		State:                overReserve,
-		ConditionCommitments: overReserve.Conditions,
-		Submitter:            alice,
-		CurrentHeight:        18,
+		ChannelID:		channel.ChannelID,
+		State:			overReserve,
+		ConditionCommitments:	overReserve.Conditions,
+		Submitter:		alice,
+		CurrentHeight:		18,
 	})
 	require.ErrorContains(t, err, "reserve")
 }
@@ -4130,12 +4130,12 @@ func TestAsyncUpdateBatchCanRegisterCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	checkpoint = signAsyncCheckpoint(t, channel, checkpoint)
 	state, result, err := RegisterUpdateCheckpoint(state, ChannelUpdateRequest{
-		ChannelID:          channel.ChannelID,
-		State:              checkpoint,
-		AsyncDeltas:        []AsyncPaymentDelta{delta},
-		RegisterCheckpoint: true,
-		Submitter:          bob,
-		CurrentHeight:      30,
+		ChannelID:		channel.ChannelID,
+		State:			checkpoint,
+		AsyncDeltas:		[]AsyncPaymentDelta{delta},
+		RegisterCheckpoint:	true,
+		Submitter:		bob,
+		CurrentHeight:		30,
 	})
 	require.NoError(t, err)
 	require.True(t, result.CheckpointRegistered)
@@ -4176,15 +4176,15 @@ func TestUnidirectionalAcknowledgementModeAndPayerReclaim(t *testing.T) {
 	channel := signedUnidirectionalChannel(t, "uni-ack", "1000", payer, receiver, true)
 
 	claim, err := BuildUnidirectionalClaim(UnidirectionalClaim{
-		ChainID:             channel.ChainID,
-		ChannelID:           channel.ChannelID,
-		Payer:               payer,
-		Receiver:            receiver,
-		LockedAmount:        channel.Collateral,
-		ClaimedAmount:       "125",
-		Nonce:               2,
-		ExpirationHeight:    80,
-		ExpirationTimestamp: 0,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Payer:			payer,
+		Receiver:		receiver,
+		LockedAmount:		channel.Collateral,
+		ClaimedAmount:		"125",
+		Nonce:			2,
+		ExpirationHeight:	80,
+		ExpirationTimestamp:	0,
 	})
 	require.NoError(t, err)
 	claim.PayerSignature, err = SignatureForClaim(claim, payer)
@@ -4212,17 +4212,17 @@ func TestUnidirectionalStreamingPaymentHelperFormat(t *testing.T) {
 	channel := signedUnidirectionalChannel(t, "uni-stream", "1000", payer, receiver, false)
 
 	claim, err := StreamingClaimForChannel(channel, StreamingPaymentFrame{
-		ChannelID:           channel.ChannelID,
-		StreamID:            HashParts("stream", channel.ChannelID),
-		Payer:               payer,
-		Receiver:            receiver,
-		PreviousClaimed:     "10",
-		RatePerBlock:        "5",
-		StartHeight:         20,
-		CurrentHeight:       32,
-		Nonce:               2,
-		ExpirationHeight:    90,
-		ExpirationTimestamp: 0,
+		ChannelID:		channel.ChannelID,
+		StreamID:		HashParts("stream", channel.ChannelID),
+		Payer:			payer,
+		Receiver:		receiver,
+		PreviousClaimed:	"10",
+		RatePerBlock:		"5",
+		StartHeight:		20,
+		CurrentHeight:		32,
+		Nonce:			2,
+		ExpirationHeight:	90,
+		ExpirationTimestamp:	0,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "70", claim.ClaimedAmount)
@@ -4249,11 +4249,11 @@ func TestAsyncCheckpointAggregationExposureExpiryAndProof(t *testing.T) {
 	require.NoError(t, err)
 	checkpoint = signAsyncCheckpoint(t, channel, checkpoint)
 	proof := AsyncDeltaDisputeProof{
-		ProofID:         HashParts("proof", checkpoint.StateHash),
-		ChannelID:       channel.ChannelID,
-		CheckpointState: checkpoint,
-		Deltas:          []AsyncPaymentDelta{delta},
-		EvidenceHash:    HashParts("async-dispute", checkpoint.StateHash, ComputeAsyncDeltaRootForChannel(channel, []AsyncPaymentDelta{delta})),
+		ProofID:		HashParts("proof", checkpoint.StateHash),
+		ChannelID:		channel.ChannelID,
+		CheckpointState:	checkpoint,
+		Deltas:			[]AsyncPaymentDelta{delta},
+		EvidenceHash:		HashParts("async-dispute", checkpoint.StateHash, ComputeAsyncDeltaRootForChannel(channel, []AsyncPaymentDelta{delta})),
 	}
 	require.NoError(t, proof.ValidateForChannel(channel, 30))
 
@@ -4309,39 +4309,39 @@ func TestPaymentAssetScopeRejectsNonNaetFeesAndPenalties(t *testing.T) {
 	})
 
 	edge := ChannelEdge{
-		ChannelID: channel.ChannelID,
-		From:      alice,
-		To:        bob,
-		Capacity:  "100",
-		FeeDenom:  "uatom",
-		FeeAmount: "1",
-		Active:    true,
+		ChannelID:	channel.ChannelID,
+		From:		alice,
+		To:		bob,
+		Capacity:	"100",
+		FeeDenom:	"uatom",
+		FeeAmount:	"1",
+		Active:		true,
 	}
 	require.ErrorContains(t, edge.Validate(), "naet")
 
 	pending := PendingClose{
-		Submitter:          alice,
-		SubmittedHeight:    20,
-		SettleAfterHeight:  28,
-		SettlementFeeDenom: "uatom",
-		SettlementFee:      "1",
-		State:              closeState,
+		Submitter:		alice,
+		SubmittedHeight:	20,
+		SettleAfterHeight:	28,
+		SettlementFeeDenom:	"uatom",
+		SettlementFee:		"1",
+		State:			closeState,
 	}
 	require.ErrorContains(t, pending.ValidateForChannel(channel), "naet")
 
 	proof := FraudProof{
-		ProofID:         HashParts("bad-penalty-denom"),
-		ProofType:       FraudProofTypeStaleClose,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
+		ProofID:		HashParts("bad-penalty-denom"),
+		ProofType:		FraudProofTypeStaleClose,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
 		StateB: signedState(t, channel, 3, closeState.StateHash, []Balance{
 			{Participant: alice, Amount: "450"},
 			{Participant: bob, Amount: "550"},
 		}),
-		PenaltyDenom:  "uatom",
-		PenaltyAmount: "10",
-		EvidenceHash:  HashParts("evidence", "bad-penalty-denom"),
+		PenaltyDenom:	"uatom",
+		PenaltyAmount:	"10",
+		EvidenceHash:	HashParts("evidence", "bad-penalty-denom"),
 	}
 	require.ErrorContains(t, proof.ValidateForChannel(channel), "naet")
 
@@ -4349,14 +4349,14 @@ func TestPaymentAssetScopeRejectsNonNaetFeesAndPenalties(t *testing.T) {
 	require.ErrorContains(t, penalty.ValidateForChannel(channel), "naet")
 
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          closeState.StateHash,
-		Nonce:              closeState.Nonce,
-		FinalBalances:      closeState.Balances,
-		SettlementFeeDenom: "uatom",
-		SettlementFee:      "0",
-		SettledHeight:      40,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		closeState.StateHash,
+		Nonce:			closeState.Nonce,
+		FinalBalances:		closeState.Balances,
+		SettlementFeeDenom:	"uatom",
+		SettlementFee:		"0",
+		SettledHeight:		40,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	require.ErrorContains(t, settlement.ValidateForChannel(channel), "naet")
@@ -4397,15 +4397,15 @@ func TestRoutePaymentAndVirtualChannelUseExistingLiquidity(t *testing.T) {
 	require.Equal(t, []string{first.ChannelID, second.ChannelID}, []string{path[0].ChannelID, path[1].ChannelID})
 
 	vc := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("virtual", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "250",
-		BalanceA:         "250",
-		BalanceB:         "0",
-		RoutingFeeAmount: "2",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("virtual", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"250",
+		BalanceA:		"250",
+		BalanceB:		"0",
+		RoutingFeeAmount:	"2",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	state, err = OpenVirtualChannel(state, vc)
 	require.NoError(t, err)
@@ -4432,14 +4432,14 @@ func TestVirtualChannelActivationRequiresReservesExpiryAndSignatures(t *testing.
 	require.NoError(t, err)
 
 	unsigned := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-rules", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-rules", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	_, err = OpenVirtualChannel(state, unsigned)
 	require.ErrorContains(t, err, "reserved capacity")
@@ -4458,42 +4458,42 @@ func TestVirtualChannelActivationRequiresReservesExpiryAndSignatures(t *testing.
 	require.NoError(t, err)
 
 	tooLate := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-too-late", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    firstReserve.TimeoutHeight,
+		VirtualChannelID:	HashParts("vc-too-late", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		firstReserve.TimeoutHeight,
 	}, first.ChainID)
 	_, err = OpenVirtualChannel(state, tooLate)
 	require.ErrorContains(t, err, "parent safety timeout")
 
 	missingSignature := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-missing-sig", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-missing-sig", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	missingSignature.Signatures = missingSignature.Signatures[:1]
 	_, err = OpenVirtualChannel(state, missingSignature)
 	require.ErrorContains(t, err, "missing required signature")
 
 	_, err = BuildVirtualChannel(VirtualChannel{
-		VirtualChannelID: HashParts("vc-bad-balances", alice, bob),
-		ChainID:          first.ChainID,
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "60",
-		BalanceB:         "60",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-bad-balances", alice, bob),
+		ChainID:		first.ChainID,
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"60",
+		BalanceB:		"60",
+		ExpiresHeight:		40,
 	})
 	require.ErrorContains(t, err, "balances")
 }
@@ -4522,15 +4522,15 @@ func TestVirtualChannelOpeningRequiresReservationProofAndRouteTimeout(t *testing
 	require.NoError(t, err)
 
 	vc := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-proof", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		RoutingFeeAmount: "2",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-proof", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		RoutingFeeAmount:	"2",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	proof := signedVirtualActivationProof(t, vc, router, 80)
 	state, err = OpenVirtualChannelWithProof(state, proof)
@@ -4545,14 +4545,14 @@ func TestVirtualChannelOpeningRequiresReservationProofAndRouteTimeout(t *testing
 	require.ErrorContains(t, err, "signature channel id mismatch")
 
 	tooLate := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-proof-too-late", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    70,
+		VirtualChannelID:	HashParts("vc-proof-too-late", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		70,
 	}, first.ChainID)
 	_, err = OpenVirtualChannelWithProof(state.Clone(), signedVirtualActivationProof(t, tooLate, router, 80))
 	require.ErrorContains(t, err, "route timeout")
@@ -4584,14 +4584,14 @@ func TestVirtualChannelEndpointUpdatesAndDisputeProof(t *testing.T) {
 	require.NoError(t, err)
 
 	vc := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-update", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-update", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	proof := signedVirtualActivationProof(t, vc, router, 80)
 	state, err = OpenVirtualChannelWithProof(state, proof)
@@ -4751,13 +4751,13 @@ func TestVirtualChannelLiquidityAggregationSegmentsAndPartialFailure(t *testing.
 	require.NoError(t, err)
 
 	vc := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts("vc-aggregated", alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Capacity:         "100",
-		BalanceA:         "100",
-		BalanceB:         "0",
-		ExpiresHeight:    40,
+		VirtualChannelID:	HashParts("vc-aggregated", alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Capacity:		"100",
+		BalanceA:		"100",
+		BalanceB:		"0",
+		ExpiresHeight:		40,
 	}, first.ChainID)
 	reserves := []VirtualParentReserve{
 		signedVirtualReserve(t, vc, first.ChannelID, alice, "60", "60"),
@@ -4822,11 +4822,11 @@ func TestScoredRouteSelectionPenalizesFeeStaleLiquidityAndFailures(t *testing.T)
 		{ChannelID: second.ChannelID, From: router, To: bob, SuccessRateBps: 10_000, LiquidityUpdatedHeight: 95, NodeAvailabilityBps: 10_000, TimeoutMargin: DefaultTimeoutMargin},
 	}
 	route, err := SelectPaymentRoute(state, TopologyStore{}, RouteSelectionRequest{
-		From:          alice,
-		To:            bob,
-		Amount:        "100",
-		CurrentHeight: 100,
-		Policy:        policy,
+		From:		alice,
+		To:		bob,
+		Amount:		"100",
+		CurrentHeight:	100,
+		Policy:		policy,
 	})
 	require.NoError(t, err)
 	require.Len(t, route.Edges, 2)
@@ -4878,21 +4878,21 @@ func TestRoutingFeePolicyUpdateAndHopFeeCalculation(t *testing.T) {
 	alice := testAddress(0x41)
 	router := testAddress(0x42)
 	policy, err := BuildRoutingFeePolicyUpdate(RoutingFeePolicyUpdate{
-		ChainID:                 "aetra-test-chain",
-		ChannelID:               HashParts("routing-fee-policy-channel"),
-		From:                    router,
-		To:                      alice,
-		FeeDenom:                NativeDenom,
-		BaseHopFee:              "2",
-		ProportionalFeeBps:      250,
-		LiquidityReservationFee: "3",
-		VirtualChannelSetupFee:  "5",
-		CongestionSurcharge:     "7",
-		FailurePenalty:          "11",
-		MaxHopFee:               "100",
-		ValidAfterHeight:        10,
-		ValidUntilHeight:        20,
-		Sequence:                1,
+		ChainID:			"aetra-test-chain",
+		ChannelID:			HashParts("routing-fee-policy-channel"),
+		From:				router,
+		To:				alice,
+		FeeDenom:			NativeDenom,
+		BaseHopFee:			"2",
+		ProportionalFeeBps:		250,
+		LiquidityReservationFee:	"3",
+		VirtualChannelSetupFee:		"5",
+		CongestionSurcharge:		"7",
+		FailurePenalty:			"11",
+		MaxHopFee:			"100",
+		ValidAfterHeight:		10,
+		ValidUntilHeight:		20,
+		Sequence:			1,
 	}, router)
 	require.NoError(t, err)
 	require.NotEmpty(t, policy.PolicyID)
@@ -4901,11 +4901,11 @@ func TestRoutingFeePolicyUpdateAndHopFeeCalculation(t *testing.T) {
 	require.ErrorContains(t, policy.ValidateAtHeight(21), "validity window")
 
 	fee, err := CalculateHopRoutingFee(HopFeeCalculationRequest{
-		Amount:                  "1000",
-		Policy:                  policy,
-		CurrentHeight:           12,
-		IncludeVirtualSetup:     true,
-		RepeatedInvalidAttempts: 2,
+		Amount:				"1000",
+		Policy:				policy,
+		CurrentHeight:			12,
+		IncludeVirtualSetup:		true,
+		RepeatedInvalidAttempts:	2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "2", fee.BaseHopFee)
@@ -4918,29 +4918,29 @@ func TestRoutingFeePolicyUpdateAndHopFeeCalculation(t *testing.T) {
 	require.Equal(t, policy.PolicyHash, fee.PolicyHash)
 
 	tooLowMax, err := BuildRoutingFeePolicyUpdate(RoutingFeePolicyUpdate{
-		ChainID:                 policy.ChainID,
-		ChannelID:               policy.ChannelID,
-		From:                    policy.From,
-		To:                      policy.To,
-		FeeDenom:                NativeDenom,
-		BaseHopFee:              "2",
-		ProportionalFeeBps:      250,
-		LiquidityReservationFee: "3",
-		VirtualChannelSetupFee:  "5",
-		CongestionSurcharge:     "7",
-		FailurePenalty:          "11",
-		MaxHopFee:               "50",
-		ValidAfterHeight:        10,
-		ValidUntilHeight:        20,
-		Sequence:                2,
+		ChainID:			policy.ChainID,
+		ChannelID:			policy.ChannelID,
+		From:				policy.From,
+		To:				policy.To,
+		FeeDenom:			NativeDenom,
+		BaseHopFee:			"2",
+		ProportionalFeeBps:		250,
+		LiquidityReservationFee:	"3",
+		VirtualChannelSetupFee:		"5",
+		CongestionSurcharge:		"7",
+		FailurePenalty:			"11",
+		MaxHopFee:			"50",
+		ValidAfterHeight:		10,
+		ValidUntilHeight:		20,
+		Sequence:			2,
 	}, router)
 	require.NoError(t, err)
 	_, err = CalculateHopRoutingFee(HopFeeCalculationRequest{
-		Amount:                  "1000",
-		Policy:                  tooLowMax,
-		CurrentHeight:           12,
-		IncludeVirtualSetup:     true,
-		RepeatedInvalidAttempts: 2,
+		Amount:				"1000",
+		Policy:				tooLowMax,
+		CurrentHeight:			12,
+		IncludeVirtualSetup:		true,
+		RepeatedInvalidAttempts:	2,
 	})
 	require.ErrorContains(t, err, "exceeds policy maximum")
 }
@@ -4953,18 +4953,18 @@ func TestRouteFeeCeilingRejectsMicroFeeOvercharge(t *testing.T) {
 	policy.MaxFeeAmount = "5"
 	route := ScoredRoute{
 		Edges: []ChannelEdge{{
-			ChannelID: HashParts("fee-ceiling-edge"),
-			From:      alice,
-			To:        bob,
-			Capacity:  "100",
-			FeeDenom:  NativeDenom,
-			FeeAmount: "4",
-			Active:    true,
+			ChannelID:	HashParts("fee-ceiling-edge"),
+			From:		alice,
+			To:		bob,
+			Capacity:	"100",
+			FeeDenom:	NativeDenom,
+			FeeAmount:	"4",
+			Active:		true,
 		}},
-		Amount:      "50",
-		TotalFee:    "4",
-		TotalCost:   "4",
-		MinCapacity: "100",
+		Amount:		"50",
+		TotalFee:	"4",
+		TotalCost:	"4",
+		MinCapacity:	"100",
 	}
 	require.NoError(t, ValidateRouteFeeCeiling(route, policy))
 	route.TotalFee = "6"
@@ -4981,14 +4981,14 @@ func TestRouteFeeCeilingRejectsMicroFeeOvercharge(t *testing.T) {
 	firstPromise := signedRoutePromise(t, first, firstID, routeID, alice, router, "58", "0", 9, 70, hashLock, "", secondID)
 	secondPromise := signedRoutePromise(t, second, secondID, routeID, router, bob, "50", "8", 10, 40, hashLock, firstID, "")
 	proof := ConditionLinkageProof{
-		RouteID:       routeID,
-		Sender:        alice,
-		Receiver:      bob,
-		Amount:        "50",
-		TotalFees:     "8",
-		HashLock:      hashLock,
-		Promises:      []ConditionalPromise{firstPromise, secondPromise},
-		TimeoutMargin: DefaultTimeoutMargin,
+		RouteID:	routeID,
+		Sender:		alice,
+		Receiver:	bob,
+		Amount:		"50",
+		TotalFees:	"8",
+		HashLock:	hashLock,
+		Promises:	[]ConditionalPromise{firstPromise, secondPromise},
+		TimeoutMargin:	DefaultTimeoutMargin,
 	}
 	require.ErrorContains(t, ValidateConditionLinkageFeeCeiling(proof, policy), "policy ceiling")
 	policy.MaxFeeAmount = "8"
@@ -5060,17 +5060,17 @@ func TestCongestionSignalsIncreaseWeightAndReduceMaxPaymentSize(t *testing.T) {
 
 	policy := DefaultRoutePolicy()
 	policy, err = ApplyCongestionSnapshot(policy, CongestionSnapshot{
-		ChannelID:                   direct.ChannelID,
-		From:                        alice,
-		To:                          bob,
-		ChannelUpdateFailureRateBps: 9_000,
-		PendingConditionCount:       8,
-		AvgResolutionLatency:        500,
-		RouteRetryCount:             3,
-		ReservePressureBps:          8_000,
-		NodeQueueDelay:              400,
-		LiquidityUpdatedHeight:      10,
-		ObservedHeight:              100,
+		ChannelID:			direct.ChannelID,
+		From:				alice,
+		To:				bob,
+		ChannelUpdateFailureRateBps:	9_000,
+		PendingConditionCount:		8,
+		AvgResolutionLatency:		500,
+		RouteRetryCount:		3,
+		ReservePressureBps:		8_000,
+		NodeQueueDelay:			400,
+		LiquidityUpdatedHeight:		10,
+		ObservedHeight:			100,
 	})
 	require.NoError(t, err)
 
@@ -5104,13 +5104,13 @@ func TestCongestionPenaltyDecayRestoresRoutePreference(t *testing.T) {
 	policy := DefaultRoutePolicy()
 	policy.DecayHalfLife = 10
 	policy, err = ApplyCongestionSnapshot(policy, CongestionSnapshot{
-		ChannelID:                   cheap.ChannelID,
-		From:                        alice,
-		To:                          bob,
-		ChannelUpdateFailureRateBps: 9_000,
-		PendingConditionCount:       10,
-		ReservePressureBps:          1_000,
-		ObservedHeight:              10,
+		ChannelID:			cheap.ChannelID,
+		From:				alice,
+		To:				bob,
+		ChannelUpdateFailureRateBps:	9_000,
+		PendingConditionCount:		10,
+		ReservePressureBps:		1_000,
+		ObservedHeight:			10,
 	})
 	require.NoError(t, err)
 	congested, err := SelectPaymentRoute(state, TopologyStore{}, RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 10, Policy: policy})
@@ -5144,16 +5144,16 @@ func TestCongestionAwareRetryPolicySelectsAlternateRoute(t *testing.T) {
 	require.NoError(t, err)
 
 	result, err := RetryPaymentRoute(state, TopologyStore{}, RouteRetryRequest{
-		Selection: RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 50, Policy: DefaultRoutePolicy()},
+		Selection:	RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 50, Policy: DefaultRoutePolicy()},
 		Failures: []RouteFailureReport{{
-			ChannelID:      direct.ChannelID,
-			From:           alice,
-			To:             bob,
-			FailureClass:   ClassifyRouteFailure("node queue congestion"),
-			Retryable:      true,
-			ObservedHeight: 50,
+			ChannelID:	direct.ChannelID,
+			From:		alice,
+			To:		bob,
+			FailureClass:	ClassifyRouteFailure("node queue congestion"),
+			Retryable:	true,
+			ObservedHeight:	50,
 		}},
-		Policy: RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
+		Policy:	RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
 	})
 	require.NoError(t, err)
 	require.True(t, result.Retryable)
@@ -5163,13 +5163,13 @@ func TestCongestionAwareRetryPolicySelectsAlternateRoute(t *testing.T) {
 	require.NotEmpty(t, result.PolicyHash)
 
 	exhausted, err := RetryPaymentRoute(state, TopologyStore{}, RouteRetryRequest{
-		Selection: RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 50, Policy: DefaultRoutePolicy()},
+		Selection:	RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 50, Policy: DefaultRoutePolicy()},
 		Failures: []RouteFailureReport{
 			{ChannelID: direct.ChannelID, From: alice, To: bob, FailureClass: RouteFailureCongestion, Retryable: true, ObservedHeight: 50},
 			{ChannelID: first.ChannelID, From: alice, To: router, FailureClass: RouteFailureCongestion, Retryable: true, ObservedHeight: 51},
 			{ChannelID: second.ChannelID, From: router, To: bob, FailureClass: RouteFailureCongestion, Retryable: true, ObservedHeight: 52},
 		},
-		Policy: RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
+		Policy:	RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
 	})
 	require.NoError(t, err)
 	require.False(t, exhausted.Retryable)
@@ -5194,21 +5194,21 @@ func TestRoutingEngineModuleGossipSearchRetryProbeAndSpamResistance(t *testing.T
 	policy.MaxHops = 4
 	policy.HopPenalty = "0"
 	engine, err := SnapshotRoutingEngineState(TopologyStore{}, policy, GossipRateLimitPolicy{
-		WindowBlocks:          8,
-		MaxMessagesPerNode:    8,
-		MaxMessagesPerChannel: 4,
-		MaxTopologyUpdates:    8,
-		RejectPenalty:         InvalidGossipPenalty,
+		WindowBlocks:		8,
+		MaxMessagesPerNode:	8,
+		MaxMessagesPerChannel:	4,
+		MaxTopologyUpdates:	8,
+		RejectPenalty:		InvalidGossipPenalty,
 	}, DefaultRouteFailureScoringPolicy())
 	require.NoError(t, err)
 
 	node := routingEngineEnvelope(t, GossipMessage{
-		MessageType:      GossipNodeAnnouncement,
-		ChainID:          direct.ChainID,
-		NodeID:           router,
-		From:             router,
-		ValidAfterHeight: 10,
-		ValidUntilHeight: 50,
+		MessageType:		GossipNodeAnnouncement,
+		ChainID:		direct.ChainID,
+		NodeID:			router,
+		From:			router,
+		ValidAfterHeight:	10,
+		ValidUntilHeight:	50,
 	}, router, 10)
 	engine, decision, err := ApplyRoutingEngineMessage(engine, state, MsgGossipNodeAnnouncement{Gossip: node}, 10)
 	require.NoError(t, err)
@@ -5247,9 +5247,9 @@ func TestRoutingEngineModuleGossipSearchRetryProbeAndSpamResistance(t *testing.T
 	require.NotEmpty(t, probe.RouteHash)
 
 	engine, retry, err := RetryRoutingEnginePath(engine, state, RouteRetryRequest{
-		Selection: RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 21, Policy: policy},
-		Failures:  []RouteFailureReport{{ChannelID: first.ChannelID, From: alice, To: router, FailureClass: RouteFailureCongestion, Retryable: true, ObservedHeight: 20}},
-		Policy:    RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
+		Selection:	RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 21, Policy: policy},
+		Failures:	[]RouteFailureReport{{ChannelID: first.ChannelID, From: alice, To: router, FailureClass: RouteFailureCongestion, Retryable: true, ObservedHeight: 20}},
+		Policy:		RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(2), retry.Attempts)
@@ -5287,11 +5287,11 @@ func TestForwardingPacketsExposeOnlyPerHopMetadata(t *testing.T) {
 			{ChannelID: HashParts("privacy-channel-2"), From: router1, To: router2, Capacity: "500", FeeAmount: "2", Active: true},
 			{ChannelID: HashParts("privacy-channel-3"), From: router2, To: bob, Capacity: "500", FeeAmount: "3", Active: true},
 		},
-		Amount:      "100",
-		TotalFee:    "6",
-		TotalCost:   "9",
-		MinCapacity: "500",
-		ScoreHash:   HashParts("privacy-score"),
+		Amount:		"100",
+		TotalFee:	"6",
+		TotalCost:	"9",
+		MinCapacity:	"500",
+		ScoreHash:	HashParts("privacy-score"),
 	}
 	packets, err := BuildForwardingPackets(route, "payment-seed", 7, 100)
 	require.NoError(t, err)
@@ -5319,12 +5319,12 @@ func TestForwardingPacketReplayProtectionRejectsReusedIdentifiers(t *testing.T) 
 	alice := testAddress(0x6b)
 	bob := testAddress(0x6c)
 	route := ScoredRoute{
-		Edges:       []ChannelEdge{{ChannelID: HashParts("privacy-replay-channel"), From: alice, To: bob, Capacity: "500", FeeAmount: "1", Active: true}},
-		Amount:      "50",
-		TotalFee:    "1",
-		TotalCost:   "2",
-		MinCapacity: "500",
-		ScoreHash:   HashParts("privacy-replay-score"),
+		Edges:		[]ChannelEdge{{ChannelID: HashParts("privacy-replay-channel"), From: alice, To: bob, Capacity: "500", FeeAmount: "1", Active: true}},
+		Amount:		"50",
+		TotalFee:	"1",
+		TotalCost:	"2",
+		MinCapacity:	"500",
+		ScoreHash:	HashParts("privacy-replay-score"),
 	}
 	_, err := DeriveRouteID("seed", 0)
 	require.ErrorContains(t, err, "nonce")
@@ -5360,33 +5360,33 @@ func TestUntrustedTopologyIsRejectedBeforeRouteUse(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = RegisterRoutingEdge(state, ChannelEdge{
-		ChannelID: HashParts("unknown-channel"),
-		From:      alice,
-		To:        bob,
-		Capacity:  "100",
-		FeeAmount: "1",
-		Active:    true,
+		ChannelID:	HashParts("unknown-channel"),
+		From:		alice,
+		To:		bob,
+		Capacity:	"100",
+		FeeAmount:	"1",
+		Active:		true,
 	})
 	require.ErrorContains(t, err, "open channel")
 
 	_, err = RegisterRoutingEdge(state, ChannelEdge{
-		ChannelID: channel.ChannelID,
-		From:      alice,
-		To:        bob,
-		Capacity:  "100",
-		FeeAmount: "1",
-		Active:    true,
+		ChannelID:	channel.ChannelID,
+		From:		alice,
+		To:		bob,
+		Capacity:	"100",
+		FeeAmount:	"1",
+		Active:		true,
 	})
 	require.ErrorContains(t, err, "participants")
 
 	untrusted := state
 	untrusted.Edges = append(untrusted.Edges, ChannelEdge{
-		ChannelID: HashParts("gossip-only"),
-		From:      alice,
-		To:        bob,
-		Capacity:  "100",
-		FeeAmount: "1",
-		Active:    true,
+		ChannelID:	HashParts("gossip-only"),
+		From:		alice,
+		To:		bob,
+		Capacity:	"100",
+		FeeAmount:	"1",
+		Active:		true,
 	})
 	_, err = RoutePayment(untrusted, alice, bob, "50", 10, 4)
 	require.ErrorContains(t, err, "unknown channel")
@@ -5399,18 +5399,18 @@ func TestSignedGossipEnvelopeBuildsLocalTopologyStore(t *testing.T) {
 	state := EmptyStateWithChannel(t, channel)
 
 	envelope := signedGossipEnvelope(t, GossipMessage{
-		MessageType:      GossipChannelAnnouncement,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "500",
-		FeeAmount:        "2",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 50,
-		ReputationDelta:  3,
-		Sequence:         1,
+		MessageType:		GossipChannelAnnouncement,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"500",
+		FeeAmount:		"2",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	50,
+		ReputationDelta:	3,
+		Sequence:		1,
 	}, alice, 20)
 
 	store, err := ApplyGossipEnvelope(TopologyStore{}, state, envelope, 20)
@@ -5421,17 +5421,17 @@ func TestSignedGossipEnvelopeBuildsLocalTopologyStore(t *testing.T) {
 	require.Equal(t, int64(3), RoutingScoreForEdge(store, store.Edges[0]))
 
 	commitmentOnly := signedGossipEnvelope(t, GossipMessage{
-		MessageType:       GossipChannelAnnouncement,
-		ChainID:           channel.ChainID,
-		NodeID:            bob,
-		From:              bob,
-		To:                alice,
-		Capacity:          "100",
-		FeeAmount:         "1",
-		ValidAfterHeight:  20,
-		ValidUntilHeight:  50,
-		ChannelCommitment: HashParts("verifiable-channel-commitment", bob, alice),
-		Sequence:          2,
+		MessageType:		GossipChannelAnnouncement,
+		ChainID:		channel.ChainID,
+		NodeID:			bob,
+		From:			bob,
+		To:			alice,
+		Capacity:		"100",
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	50,
+		ChannelCommitment:	HashParts("verifiable-channel-commitment", bob, alice),
+		Sequence:		2,
 	}, bob, 20)
 	store, err = ApplyGossipEnvelope(store, state, commitmentOnly, 20)
 	require.NoError(t, err)
@@ -5445,17 +5445,17 @@ func TestGossipExpiryPruningAndInvalidPenaltyAffectLocalScoreOnly(t *testing.T) 
 	channel := signedChannel(t, "gossip-prune", "1000", alice, bob)
 	state := EmptyStateWithChannel(t, channel)
 	envelope := signedGossipEnvelope(t, GossipMessage{
-		MessageType:      GossipChannelUpdate,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "400",
-		FeeAmount:        "1",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 25,
-		Sequence:         1,
+		MessageType:		GossipChannelUpdate,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"400",
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	25,
+		Sequence:		1,
 	}, alice, 20)
 
 	store, err := ApplyGossipEnvelope(TopologyStore{}, state, envelope, 20)
@@ -5470,18 +5470,18 @@ func TestGossipExpiryPruningAndInvalidPenaltyAffectLocalScoreOnly(t *testing.T) 
 	require.ErrorContains(t, err, "expired")
 
 	invalid := signedGossipEnvelope(t, GossipMessage{
-		MessageType:      GossipLiquidityHint,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Liquidity:        "250",
-		FeeAmount:        "1",
-		ValidAfterHeight: 30,
-		ValidUntilHeight: 60,
-		Sequence:         2,
-		Advisory:         true,
+		MessageType:		GossipLiquidityHint,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Liquidity:		"250",
+		FeeAmount:		"1",
+		ValidAfterHeight:	30,
+		ValidUntilHeight:	60,
+		Sequence:		2,
+		Advisory:		true,
 	}, bob, 30)
 	penalized, err := ApplyGossipEnvelope(store, state, invalid, 30)
 	require.ErrorContains(t, err, "signer must match")
@@ -5499,32 +5499,32 @@ func TestFeePolicyGossipRequiresValidityAndMaxFee(t *testing.T) {
 	state := EmptyStateWithChannel(t, channel)
 
 	invalidPolicy := GossipMessage{
-		MessageType:      GossipFeePolicyUpdate,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		FeeAmount:        "1",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 50,
+		MessageType:		GossipFeePolicyUpdate,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	50,
 	}
 	_, err := BuildGossipMessage(invalidPolicy)
 	require.ErrorContains(t, err, "max fee")
 
 	policy := signedGossipEnvelope(t, GossipMessage{
-		MessageType:      GossipFeePolicyUpdate,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "300",
-		FeeAmount:        "2",
-		MaxFee:           "5",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 50,
-		Sequence:         1,
+		MessageType:		GossipFeePolicyUpdate,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"300",
+		FeeAmount:		"2",
+		MaxFee:			"5",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	50,
+		Sequence:		1,
 	}, alice, 20)
 	store, err := ApplyGossipEnvelope(TopologyStore{}, state, policy, 20)
 	require.NoError(t, err)
@@ -5542,17 +5542,17 @@ func TestGossipRateLimitRejectsTopologySpamLocally(t *testing.T) {
 
 	for seq := uint64(1); seq <= 2; seq++ {
 		envelope := signedGossipEnvelope(t, GossipMessage{
-			MessageType:      GossipChannelUpdate,
-			ChainID:          channel.ChainID,
-			ChannelID:        channel.ChannelID,
-			NodeID:           alice,
-			From:             alice,
-			To:               bob,
-			Capacity:         "500",
-			FeeAmount:        "1",
-			ValidAfterHeight: 20,
-			ValidUntilHeight: 40,
-			Sequence:         seq,
+			MessageType:		GossipChannelUpdate,
+			ChainID:		channel.ChainID,
+			ChannelID:		channel.ChannelID,
+			NodeID:			alice,
+			From:			alice,
+			To:			bob,
+			Capacity:		"500",
+			FeeAmount:		"1",
+			ValidAfterHeight:	20,
+			ValidUntilHeight:	40,
+			Sequence:		seq,
 		}, alice, 20)
 		var decision GossipRateLimitDecision
 		var err error
@@ -5563,17 +5563,17 @@ func TestGossipRateLimitRejectsTopologySpamLocally(t *testing.T) {
 	require.Len(t, store.Messages, 2)
 
 	spam := signedGossipEnvelope(t, GossipMessage{
-		MessageType:      GossipChannelUpdate,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		NodeID:           alice,
-		From:             alice,
-		To:               bob,
-		Capacity:         "500",
-		FeeAmount:        "1",
-		ValidAfterHeight: 20,
-		ValidUntilHeight: 40,
-		Sequence:         3,
+		MessageType:		GossipChannelUpdate,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		NodeID:			alice,
+		From:			alice,
+		To:			bob,
+		Capacity:		"500",
+		FeeAmount:		"1",
+		ValidAfterHeight:	20,
+		ValidUntilHeight:	40,
+		Sequence:		3,
 	}, alice, 20)
 	next, decision, err := ApplyGossipEnvelopeWithRateLimit(store, state, spam, 20, policy)
 	require.ErrorContains(t, err, "node message rate limit")
@@ -5613,54 +5613,54 @@ func TestHighValueRouteRequiresBackedLiquidityProof(t *testing.T) {
 	state := EmptyStateWithChannel(t, channel)
 
 	ad, err := BuildLiquidityAdvertisement(LiquidityAdvertisement{
-		ChannelID:           channel.ChannelID,
-		Advertiser:          alice,
-		Counterparty:        bob,
-		Capacity:            "300",
-		FeeDenom:            NativeDenom,
-		BaseFee:             "1",
-		ReservationFee:      "2",
-		ReliabilityBps:      9_000,
-		ValidUntilHeight:    60,
-		DepositAmount:       "10",
-		BackedByReservation: true,
+		ChannelID:		channel.ChannelID,
+		Advertiser:		alice,
+		Counterparty:		bob,
+		Capacity:		"300",
+		FeeDenom:		NativeDenom,
+		BaseFee:		"1",
+		ReservationFee:		"2",
+		ReliabilityBps:		9_000,
+		ValidUntilHeight:	60,
+		DepositAmount:		"10",
+		BackedByReservation:	true,
 	}, "10")
 	require.NoError(t, err)
 	reservation, err := BuildSignedLiquidityReservation(SignedLiquidityReservation{
-		AdvertisementID:  ad.AdvertisementID,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		Reserver:         alice,
-		Counterparty:     bob,
-		Capacity:         "250",
-		FeeAmount:        "2",
-		ExpirationHeight: 55,
-		Nonce:            1,
+		AdvertisementID:	ad.AdvertisementID,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Reserver:		alice,
+		Counterparty:		bob,
+		Capacity:		"250",
+		FeeAmount:		"2",
+		ExpirationHeight:	55,
+		Nonce:			1,
 	}, alice)
 	require.NoError(t, err)
 	proof, err := BuildRouteLiquidityProof(RouteLiquidityProof{
-		ChannelID:          channel.ChannelID,
-		Amount:             "200",
-		HighValueThreshold: "100",
-		RequiredDeposit:    "10",
-		CurrentHeight:      40,
-		Advertisement:      ad,
-		Reservation:        reservation,
+		ChannelID:		channel.ChannelID,
+		Amount:			"200",
+		HighValueThreshold:	"100",
+		RequiredDeposit:	"10",
+		CurrentHeight:		40,
+		Advertisement:		ad,
+		Reservation:		reservation,
 	})
 	require.NoError(t, err)
 	require.NoError(t, VerifyRouteLiquidityProof(state, proof))
 
 	unbackedAd, err := BuildLiquidityAdvertisement(LiquidityAdvertisement{
-		ChannelID:        channel.ChannelID,
-		Advertiser:       alice,
-		Counterparty:     bob,
-		Capacity:         "300",
-		FeeDenom:         NativeDenom,
-		BaseFee:          "1",
-		ReservationFee:   "2",
-		ReliabilityBps:   9_000,
-		ValidUntilHeight: 60,
-		DepositAmount:    "10",
+		ChannelID:		channel.ChannelID,
+		Advertiser:		alice,
+		Counterparty:		bob,
+		Capacity:		"300",
+		FeeDenom:		NativeDenom,
+		BaseFee:		"1",
+		ReservationFee:		"2",
+		ReliabilityBps:		9_000,
+		ValidUntilHeight:	60,
+		DepositAmount:		"10",
 	}, "10")
 	require.NoError(t, err)
 	unbacked := proof
@@ -5683,17 +5683,17 @@ func TestTopologySpamSimulationAppliesRateLimitsAndPenalties(t *testing.T) {
 	envelopes := []SignedGossipEnvelope{}
 	for seq := uint64(1); seq <= 4; seq++ {
 		envelopes = append(envelopes, signedGossipEnvelope(t, GossipMessage{
-			MessageType:      GossipChannelUpdate,
-			ChainID:          channel.ChainID,
-			ChannelID:        channel.ChannelID,
-			NodeID:           alice,
-			From:             alice,
-			To:               bob,
-			Capacity:         "500",
-			FeeAmount:        "1",
-			ValidAfterHeight: 20,
-			ValidUntilHeight: 40,
-			Sequence:         seq,
+			MessageType:		GossipChannelUpdate,
+			ChainID:		channel.ChainID,
+			ChannelID:		channel.ChannelID,
+			NodeID:			alice,
+			From:			alice,
+			To:			bob,
+			Capacity:		"500",
+			FeeAmount:		"1",
+			ValidAfterHeight:	20,
+			ValidUntilHeight:	40,
+			Sequence:		seq,
 		}, alice, 20))
 	}
 
@@ -5755,16 +5755,16 @@ func TestFinalSettlementRequiresResolvedConditionsAndUnlocksCustody(t *testing.T
 	require.ErrorContains(t, err, "conditions")
 
 	resolution := ConditionResolution{
-		ConditionID:  closeState.Conditions[0].ConditionID,
-		Resolver:     bob,
-		Recipient:    closeState.Conditions[0].Payee,
-		Amount:       closeState.Conditions[0].Amount,
-		EvidenceHash: HashParts("condition-resolution", closeState.Conditions[0].ConditionID),
+		ConditionID:	closeState.Conditions[0].ConditionID,
+		Resolver:	bob,
+		Recipient:	closeState.Conditions[0].Payee,
+		Amount:		closeState.Conditions[0].Amount,
+		EvidenceHash:	HashParts("condition-resolution", closeState.Conditions[0].ConditionID),
 	}
 	state, settlement, err := FinalizeSettlementWithRequest(state, FinalSettlementRequest{
-		ChannelID:          channel.ChannelID,
-		ResolvedConditions: []ConditionResolution{resolution},
-		CurrentHeight:      40,
+		ChannelID:		channel.ChannelID,
+		ResolvedConditions:	[]ConditionResolution{resolution},
+		CurrentHeight:		40,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ChannelStatusSettled, state.Channels[0].Status)
@@ -5794,41 +5794,41 @@ func TestSettlementRejectsReusedConditionAndPreimageClaims(t *testing.T) {
 	require.NoError(t, err)
 
 	resolution := ConditionResolution{
-		ConditionID:  closeState.Conditions[0].ConditionID,
-		Resolver:     alice,
-		Recipient:    bob,
-		Amount:       "25",
-		EvidenceHash: HashParts("condition-preimage", "shared"),
+		ConditionID:	closeState.Conditions[0].ConditionID,
+		Resolver:	alice,
+		Recipient:	bob,
+		Amount:		"25",
+		EvidenceHash:	HashParts("condition-preimage", "shared"),
 	}
 	reusedCondition := state
 	reusedCondition.ConditionClaims = append(reusedCondition.ConditionClaims, ConditionClaimRecord{
-		ChainID:        channel.ChainID,
-		ChannelID:      channel.ChannelID,
-		ConditionID:    resolution.ConditionID,
-		EvidenceHash:   HashParts("condition-preimage", "old"),
-		ResolvedHeight: 19,
-		ExpiresHeight:  19 + DefaultReplayHorizon,
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		ConditionID:	resolution.ConditionID,
+		EvidenceHash:	HashParts("condition-preimage", "old"),
+		ResolvedHeight:	19,
+		ExpiresHeight:	19 + DefaultReplayHorizon,
 	})
 	_, _, err = FinalizeSettlementWithRequest(reusedCondition, FinalSettlementRequest{
-		ChannelID:          channel.ChannelID,
-		ResolvedConditions: []ConditionResolution{resolution},
-		CurrentHeight:      40,
+		ChannelID:		channel.ChannelID,
+		ResolvedConditions:	[]ConditionResolution{resolution},
+		CurrentHeight:		40,
 	})
 	require.ErrorContains(t, err, "condition claim")
 
 	reusedEvidence := state
 	reusedEvidence.ConditionClaims = append(reusedEvidence.ConditionClaims, ConditionClaimRecord{
-		ChainID:        channel.ChainID,
-		ChannelID:      channel.ChannelID,
-		ConditionID:    HashParts("other-condition"),
-		EvidenceHash:   resolution.EvidenceHash,
-		ResolvedHeight: 19,
-		ExpiresHeight:  19 + DefaultReplayHorizon,
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		ConditionID:	HashParts("other-condition"),
+		EvidenceHash:	resolution.EvidenceHash,
+		ResolvedHeight:	19,
+		ExpiresHeight:	19 + DefaultReplayHorizon,
 	})
 	_, _, err = FinalizeSettlementWithRequest(reusedEvidence, FinalSettlementRequest{
-		ChannelID:          channel.ChannelID,
-		ResolvedConditions: []ConditionResolution{resolution},
-		CurrentHeight:      40,
+		ChannelID:		channel.ChannelID,
+		ResolvedConditions:	[]ConditionResolution{resolution},
+		CurrentHeight:		40,
 	})
 	require.ErrorContains(t, err, "evidence claim")
 }
@@ -5883,24 +5883,24 @@ func TestWatchServiceSubmitsStaleCloseDispute(t *testing.T) {
 	require.NoError(t, err)
 
 	state, err = SubmitWatchDispute(state, WatchDisputeSubmission{
-		WatchService:          watch,
-		Delegator:             bob,
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: stale.StateHash,
-		NewerState:            newer,
-		CurrentHeight:         21,
-		EvidenceHash:          HashParts("watch-dispute", channel.ChannelID, newer.StateHash),
+		WatchService:		watch,
+		Delegator:		bob,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	stale.StateHash,
+		NewerState:		newer,
+		CurrentHeight:		21,
+		EvidenceHash:		HashParts("watch-dispute", channel.ChannelID, newer.StateHash),
 	})
 	require.NoError(t, err)
 	require.Equal(t, newer.StateHash, state.Channels[0].PendingClose.State.StateHash)
 
 	_, err = SubmitWatchDispute(state, WatchDisputeSubmission{
-		WatchService:          watch,
-		Delegator:             watch,
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: newer.StateHash,
-		NewerState:            newer,
-		CurrentHeight:         22,
+		WatchService:		watch,
+		Delegator:		watch,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	newer.StateHash,
+		NewerState:		newer,
+		CurrentHeight:		22,
 	})
 	require.ErrorContains(t, err, "delegator")
 }
@@ -5917,23 +5917,23 @@ func TestValidatorAssistedWatchServiceSubmitsDispute(t *testing.T) {
 	state, err = OpenChannel(state, channel)
 	require.NoError(t, err)
 	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
-		ValidatorAddress: validator,
-		ServiceAddress:   service,
-		WatchEndpoint:    "https://validator.example/watch",
-		RoutingEndpoint:  "https://validator.example/route",
-		PublicKey:        "validator-watch-key",
-		MinDelegation:    "100",
-		CommissionBps:    250,
-		Active:           true,
-		UpdatedHeight:    10,
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		WatchEndpoint:		"https://validator.example/watch",
+		RoutingEndpoint:	"https://validator.example/route",
+		PublicKey:		"validator-watch-key",
+		MinDelegation:		"100",
+		CommissionBps:		250,
+		Active:			true,
+		UpdatedHeight:		10,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.ValidatorPaymentServices, 1)
 	require.NotEmpty(t, state.ValidatorPaymentServices[0].MetadataHash)
 	state, err = RegisterValidatorWatchService(state, ValidatorWatchRegistration{
-		ValidatorAddress: validator,
-		Delegator:        bob,
-		RegisteredHeight: 11,
+		ValidatorAddress:	validator,
+		Delegator:		bob,
+		RegisteredHeight:	11,
 	})
 	require.NoError(t, err)
 
@@ -5948,27 +5948,27 @@ func TestValidatorAssistedWatchServiceSubmitsDispute(t *testing.T) {
 	state, err = SubmitClose(state, channel.ChannelID, stale, alice, 20, "0")
 	require.NoError(t, err)
 	state, err = SubmitValidatorAssistedDispute(state, ValidatorAssistedDisputeSubmission{
-		ValidatorAddress:      validator,
-		ServiceAddress:        service,
-		Delegator:             bob,
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: stale.StateHash,
-		NewerState:            newer,
-		CurrentHeight:         21,
-		EvidenceHash:          HashParts("validator-watch", channel.ChannelID, newer.StateHash),
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		Delegator:		bob,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	stale.StateHash,
+		NewerState:		newer,
+		CurrentHeight:		21,
+		EvidenceHash:		HashParts("validator-watch", channel.ChannelID, newer.StateHash),
 	})
 	require.NoError(t, err)
 	require.Equal(t, newer.StateHash, state.Channels[0].PendingClose.State.StateHash)
 	require.Contains(t, paymentEventTypes(state.Events), "validator-assisted-dispute")
 
 	_, err = SubmitValidatorAssistedDispute(state, ValidatorAssistedDisputeSubmission{
-		ValidatorAddress:      testAddress(0x96),
-		ServiceAddress:        service,
-		Delegator:             bob,
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: newer.StateHash,
-		NewerState:            newer,
-		CurrentHeight:         22,
+		ValidatorAddress:	testAddress(0x96),
+		ServiceAddress:		service,
+		Delegator:		bob,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	newer.StateHash,
+		NewerState:		newer,
+		CurrentHeight:		22,
 	})
 	require.ErrorContains(t, err, "validator service not found")
 }
@@ -5985,12 +5985,12 @@ func TestValidatorServicePenaltiesStaySeparateFromSlashing(t *testing.T) {
 	state, err = OpenChannel(state, channel)
 	require.NoError(t, err)
 	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
-		ValidatorAddress: validator,
-		ServiceAddress:   service,
-		WatchEndpoint:    "https://validator.example/watch",
-		MinDelegation:    "1",
-		Active:           true,
-		UpdatedHeight:    10,
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		WatchEndpoint:		"https://validator.example/watch",
+		MinDelegation:		"1",
+		Active:			true,
+		UpdatedHeight:		10,
 	})
 	require.NoError(t, err)
 	closeState := signedState(t, channel, 2, channel.OpeningStateHash, []Balance{
@@ -6004,20 +6004,20 @@ func TestValidatorServicePenaltiesStaySeparateFromSlashing(t *testing.T) {
 		{Participant: bob, Amount: "550"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("validator-channel-fraud", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: validator,
-		StateA:          closeState,
-		StateB:          conflicting,
-		EvidenceHash:    ComputeDisputeProofHash(FraudProof{ProofID: HashParts("validator-channel-fraud", channel.ChannelID), ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
-		PenaltyDenom:    NativeDenom,
-		PenaltyAmount:   "30",
+		ProofID:		HashParts("validator-channel-fraud", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	validator,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		ComputeDisputeProofHash(FraudProof{ProofID: HashParts("validator-channel-fraud", channel.ChannelID), ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyDenom:		NativeDenom,
+		PenaltyAmount:		"30",
 	}
 	state, err = SubmitFraudProofWithPolicy(state, channel.ChannelID, proof, 21, FraudPenaltyPolicy{
-		ReporterRewardCap:       "15",
-		SecurityReserveShareBps: 7000,
-		CommunityPoolShareBps:   3000,
+		ReporterRewardCap:		"15",
+		SecurityReserveShareBps:	7000,
+		CommunityPoolShareBps:		3000,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
@@ -6049,14 +6049,14 @@ func TestFraudCloseSettlesAfterAcceptedProof(t *testing.T) {
 		{Participant: bob, Amount: "500"},
 	})
 	proof := FraudProof{
-		ProofID:         HashParts("fraud-close-proof", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		PenaltyAmount:   "25",
-		EvidenceHash:    HashParts("evidence", closeState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("fraud-close-proof", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		PenaltyAmount:		"25",
+		EvidenceHash:		HashParts("evidence", closeState.StateHash, conflicting.StateHash),
 	}
 	state, err = SubmitFraudProof(state, channel.ChannelID, proof, 21)
 	require.NoError(t, err)
@@ -6082,11 +6082,11 @@ func TestSettlementBatchRequiresIndependentChannels(t *testing.T) {
 	require.Less(t, batch.Operations[0].ChannelID, batch.Operations[1].ChannelID)
 
 	batch.Operations = append(batch.Operations, SettlementOperation{
-		OperationID:   HashParts("op", "duplicate"),
-		OperationType: BatchOperationDispute,
-		ChannelID:     first.ChannelID,
-		Nonce:         2,
-		StateHash:     first.LatestState.StateHash,
+		OperationID:	HashParts("op", "duplicate"),
+		OperationType:	BatchOperationDispute,
+		ChannelID:	first.ChannelID,
+		Nonce:		2,
+		StateHash:	first.LatestState.StateHash,
 	})
 	batch.RootHash = ComputeBatchRoot(batch.Operations)
 	require.ErrorContains(t, batch.Validate(), "independent")
@@ -6163,15 +6163,15 @@ func TestPaymentBlockAccumulatorAggregatesAfterSettlementHotPath(t *testing.T) {
 	bob := testAddress(0x88)
 	channel := signedChannel(t, "block-accumulator", "100", alice, bob)
 	settlement := SettlementRecord{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		StateHash:          channel.LatestState.StateHash,
-		Nonce:              channel.LatestState.Nonce,
-		FinalBalances:      channel.LatestState.Balances,
-		SettlementFeeDenom: NativeDenom,
-		SettlementFee:      "3",
-		PenaltyAllocations: []PenaltyAllocation{{Offender: alice, Route: PenaltyRouteCommunityPool, Denom: NativeDenom, Amount: "7"}},
-		SettledHeight:      100,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		StateHash:		channel.LatestState.StateHash,
+		Nonce:			channel.LatestState.Nonce,
+		FinalBalances:		channel.LatestState.Balances,
+		SettlementFeeDenom:	NativeDenom,
+		SettlementFee:		"3",
+		PenaltyAllocations:	[]PenaltyAllocation{{Offender: alice, Route: PenaltyRouteCommunityPool, Denom: NativeDenom, Amount: "7"}},
+		SettledHeight:		100,
 	}
 	settlement.SettlementHash = ComputeSettlementHash(settlement)
 	acc := PaymentBlockAccumulator{BlockHeight: 100}
@@ -6187,17 +6187,17 @@ func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
 	alice := testAddress(0x8b)
 	bob := testAddress(0x8c)
 	openReq := ChannelOpenRequest{
-		ChainID:         "aetra-test-1",
-		Participants:    []string{alice, bob},
-		InitialBalances: []Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
-		ChannelType:     ChannelTypeBidirectional,
-		Collateral:      "100",
-		CloseDelay:      8,
-		ChallengePeriod: 8,
-		FeePolicyID:     NativeDenom,
-		OpeningFeeDenom: NativeDenom,
-		OpeningFeePaid:  DefaultOpeningFee,
-		OpenHeight:      10,
+		ChainID:		"aetra-test-1",
+		Participants:		[]string{alice, bob},
+		InitialBalances:	[]Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
+		ChannelType:		ChannelTypeBidirectional,
+		Collateral:		"100",
+		CloseDelay:		8,
+		ChallengePeriod:	8,
+		FeePolicyID:		NativeDenom,
+		OpeningFeeDenom:	NativeDenom,
+		OpeningFeePaid:		DefaultOpeningFee,
+		OpenHeight:		10,
 	}
 	openMsg := MsgOpenChannel{Signer: alice, Request: openReq}.Normalize()
 	state := EmptyState()
@@ -6217,14 +6217,14 @@ func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
 		{Participant: bob, Amount: "10"},
 	})
 	state, result, err = ApplyPaymentChannelMessage(state, MsgSubmitCheckpoint{
-		Signer: alice,
+		Signer:	alice,
 		Request: ChannelUpdateRequest{
-			ChannelID:          channel.ChannelID,
-			State:              nextState,
-			RegisterCheckpoint: true,
-			Submitter:          alice,
-			CurrentHeight:      12,
-			CheckpointFeePaid:  "0",
+			ChannelID:		channel.ChannelID,
+			State:			nextState,
+			RegisterCheckpoint:	true,
+			Submitter:		alice,
+			CurrentHeight:		12,
+			CheckpointFeePaid:	"0",
 		},
 	})
 	require.NoError(t, err)
@@ -6232,13 +6232,13 @@ func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
 	require.Equal(t, nextState.StateHash, state.Channels[0].LatestState.StateHash)
 
 	closeMsg := MsgUnilateralClose{
-		Signer: alice,
+		Signer:	alice,
 		Request: ChannelCloseRequest{
-			ChannelID:     channel.ChannelID,
-			ClosingState:  nextState,
-			Submitter:     alice,
-			CurrentHeight: 20,
-			SettlementFee: "0",
+			ChannelID:	channel.ChannelID,
+			ClosingState:	nextState,
+			Submitter:	alice,
+			CurrentHeight:	20,
+			SettlementFee:	"0",
 		},
 	}.Normalize()
 	plan, err := PaymentChannelMessageAccessPlan(closeMsg, 20)
@@ -6250,10 +6250,10 @@ func TestPaymentChannelModuleMessagesDispatchAnteAndInvariants(t *testing.T) {
 	require.NoError(t, ValidateLockedCollateralForFinality(state))
 
 	state, result, err = ApplyPaymentChannelMessage(state, MsgFinalizeClose{
-		Signer: bob,
+		Signer:	bob,
 		Request: FinalSettlementRequest{
-			ChannelID:     channel.ChannelID,
-			CurrentHeight: 28,
+			ChannelID:	channel.ChannelID,
+			CurrentHeight:	28,
 		},
 	})
 	require.NoError(t, err)
@@ -6354,7 +6354,7 @@ func TestStoreV2LayoutUsesSpecifiedPrefixesAndCompactChannelRecords(t *testing.T
 func TestStoreV2PrunesExpiredTombstonesAndConditions(t *testing.T) {
 	channelID := HashParts("store-v2-prune-channel")
 	layout := StoreV2Layout{
-		Version: StoreV2MigrationVersion,
+		Version:	StoreV2MigrationVersion,
 		Conditions: []StoreV2ConditionRecord{
 			{Key: StoreV2ConditionKey(HashParts("expired-condition")), Version: StoreV2MigrationVersion, ConditionID: HashParts("expired-condition"), ChannelID: channelID, ExpiresHeight: 10},
 			{Key: StoreV2ConditionKey(HashParts("active-condition")), Version: StoreV2MigrationVersion, ConditionID: HashParts("active-condition"), ChannelID: channelID, ExpiresHeight: 30},
@@ -6362,16 +6362,16 @@ func TestStoreV2PrunesExpiredTombstonesAndConditions(t *testing.T) {
 		},
 		SettlementTombstones: []StoreV2SettlementTombstoneRecord{
 			{
-				Key:       StoreV2SettlementTombstoneKey(HashParts("old-channel")),
-				Version:   StoreV2MigrationVersion,
-				ChannelID: HashParts("old-channel"),
-				Tombstone: ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("old-channel"), FinalizedNonce: 1, StateHash: HashParts("old-state"), ClosedHeight: 5, ExpiresHeight: 15},
+				Key:		StoreV2SettlementTombstoneKey(HashParts("old-channel")),
+				Version:	StoreV2MigrationVersion,
+				ChannelID:	HashParts("old-channel"),
+				Tombstone:	ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("old-channel"), FinalizedNonce: 1, StateHash: HashParts("old-state"), ClosedHeight: 5, ExpiresHeight: 15},
 			},
 			{
-				Key:       StoreV2SettlementTombstoneKey(HashParts("kept-channel")),
-				Version:   StoreV2MigrationVersion,
-				ChannelID: HashParts("kept-channel"),
-				Tombstone: ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("kept-channel"), FinalizedNonce: 1, StateHash: HashParts("kept-state"), ClosedHeight: 5, ExpiresHeight: 35},
+				Key:		StoreV2SettlementTombstoneKey(HashParts("kept-channel")),
+				Version:	StoreV2MigrationVersion,
+				ChannelID:	HashParts("kept-channel"),
+				Tombstone:	ClosedChannelTombstone{ChainID: "aetra-test-1", ChannelID: HashParts("kept-channel"), FinalizedNonce: 1, StateHash: HashParts("kept-state"), ClosedHeight: 5, ExpiresHeight: 35},
 			},
 		},
 	}
@@ -6528,11 +6528,11 @@ func benchmarkSettlementOperation(seed string, opType BatchOperationType, nonce 
 	channelID := HashParts(seed, "channel", fmt.Sprintf("%020d", nonce))
 	stateHash := HashParts(seed, "state", fmt.Sprintf("%020d", nonce))
 	return SettlementOperation{
-		OperationID:   HashParts(seed, "op", fmt.Sprintf("%020d", nonce), string(opType)),
-		OperationType: opType,
-		ChannelID:     channelID,
-		Nonce:         nonce,
-		StateHash:     stateHash,
+		OperationID:	HashParts(seed, "op", fmt.Sprintf("%020d", nonce), string(opType)),
+		OperationType:	opType,
+		ChannelID:	channelID,
+		Nonce:		nonce,
+		StateHash:	stateHash,
 	}
 }
 
@@ -6646,25 +6646,25 @@ func TestSecurityModelUsesPenaltyAndConditionEnforcement(t *testing.T) {
 		{Participant: bob, Amount: "500"},
 	})
 	state, err = SubmitFraudProof(state, channel.ChannelID, FraudProof{
-		ProofID:         HashParts("security-double-sign", channel.ChannelID),
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		PenaltyAmount:   "10",
-		EvidenceHash:    HashParts("security-double-sign-evidence", closeState.StateHash, conflicting.StateHash),
+		ProofID:		HashParts("security-double-sign", channel.ChannelID),
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		PenaltyAmount:		"10",
+		EvidenceHash:		HashParts("security-double-sign-evidence", closeState.StateHash, conflicting.StateHash),
 	}, 21)
 	require.NoError(t, err)
 	require.Len(t, state.Channels[0].PendingClose.Penalties, 1)
 
 	promise := signedPromiseWithHashLock(t, channel, "security-condition", alice, bob, "10", "0", 7, 11, HashParts("security-preimage"))
 	_, _, err = RevealPromisePreimage(EmptyStateWithChannel(t, channel), PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []ConditionalPromise{promise},
-		Preimage:      "wrong-preimage",
-		Revealer:      bob,
-		CurrentHeight: 10,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]ConditionalPromise{promise},
+		Preimage:	"wrong-preimage",
+		Revealer:	bob,
+		CurrentHeight:	10,
 	})
 	require.ErrorContains(t, err, "does not satisfy hash lock")
 }
@@ -6675,10 +6675,10 @@ func TestEconomicFinalityRequirementsChallengeSizingAndReport(t *testing.T) {
 	channel := signedChannel(t, "economic-finality", "1000", alice, bob)
 	state := EmptyStateWithChannel(t, channel)
 	sizing := ChallengePeriodSizing{
-		MessagePropagationDelay: 1,
-		WatchServiceReaction:    2,
-		CongestionBuffer:        1,
-		MultiHopTimeoutMargin:   1,
+		MessagePropagationDelay:	1,
+		WatchServiceReaction:		2,
+		CongestionBuffer:		1,
+		MultiHopTimeoutMargin:		1,
 	}
 
 	require.NoError(t, ValidateEconomicFinalityRequirements(DefaultEconomicFinalityRequirements()))
@@ -6711,10 +6711,10 @@ func TestEconomicFinalityReportCoversVirtualAndPenaltySettlement(t *testing.T) {
 	router := testAddress(0xfd)
 	bob := testAddress(0xfe)
 	sizing := ChallengePeriodSizing{
-		MessagePropagationDelay: 1,
-		WatchServiceReaction:    2,
-		CongestionBuffer:        1,
-		MultiHopTimeoutMargin:   1,
+		MessagePropagationDelay:	1,
+		WatchServiceReaction:		2,
+		CongestionBuffer:		1,
+		MultiHopTimeoutMargin:		1,
 	}
 
 	state, _, _ := virtualChannelFixture(t, "economic-finality-virtual", alice, router, bob, "100", 40)
@@ -6735,14 +6735,14 @@ func TestEconomicFinalityReportCoversVirtualAndPenaltySettlement(t *testing.T) {
 	})
 	proofID := HashParts("economic-finality-penalty", channel.ChannelID)
 	state, err = SubmitFraudProof(state, channel.ChannelID, FraudProof{
-		ProofID:         proofID,
-		ProofType:       FraudProofTypeDoubleSign,
-		SubmittedBy:     channel.Participants[1],
-		OffendingSigner: channel.Participants[0],
-		StateA:          closeState,
-		StateB:          conflicting,
-		EvidenceHash:    ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
-		PenaltyAmount:   "10",
+		ProofID:		proofID,
+		ProofType:		FraudProofTypeDoubleSign,
+		SubmittedBy:		channel.Participants[1],
+		OffendingSigner:	channel.Participants[0],
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		ComputeDisputeProofHash(FraudProof{ProofID: proofID, ProofType: FraudProofTypeDoubleSign, StateA: closeState, StateB: conflicting}),
+		PenaltyAmount:		"10",
 	}, 27)
 	require.NoError(t, err)
 	require.Equal(t, ChannelFinalityPenalized, state.Channels[0].Finality)
@@ -6758,27 +6758,27 @@ func TestDisputePriorityPolicyNearExpiryFraudAndStressInclusion(t *testing.T) {
 	require.NoError(t, policy.Validate())
 
 	normal, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
-		Operation:         SettlementArbitrationDispute,
-		ChannelID:         first,
-		SubmittedHeight:   20,
-		CurrentHeight:     21,
-		SettleAfterHeight: 28,
-		FeePaid:           "4",
-		RequiredFee:       "4",
-		EstimatedGas:      10,
+		Operation:		SettlementArbitrationDispute,
+		ChannelID:		first,
+		SubmittedHeight:	20,
+		CurrentHeight:		21,
+		SettleAfterHeight:	28,
+		FeePaid:		"4",
+		RequiredFee:		"4",
+		EstimatedGas:		10,
 	})
 	require.NoError(t, err)
 	critical, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
-		Operation:         SettlementArbitrationFraudProof,
-		ChannelID:         second,
-		SubmittedHeight:   20,
-		CurrentHeight:     27,
-		SettleAfterHeight: 28,
-		HasFraudProof:     true,
-		FeePaid:           "4",
-		RequiredFee:       "4",
-		EstimatedGas:      10,
-		CongestionBps:     9_000,
+		Operation:		SettlementArbitrationFraudProof,
+		ChannelID:		second,
+		SubmittedHeight:	20,
+		CurrentHeight:		27,
+		SettleAfterHeight:	28,
+		HasFraudProof:		true,
+		FeePaid:		"4",
+		RequiredFee:		"4",
+		EstimatedGas:		10,
+		CongestionBps:		9_000,
 	})
 	require.NoError(t, err)
 	require.True(t, critical.PriorityScore > normal.PriorityScore)
@@ -6786,16 +6786,16 @@ func TestDisputePriorityPolicyNearExpiryFraudAndStressInclusion(t *testing.T) {
 	require.True(t, critical.Deterministic)
 
 	repeated, err := ComputeDisputeTransactionPriority(policy, DisputePriorityRequest{
-		Operation:         SettlementArbitrationFraudProof,
-		ChannelID:         second,
-		SubmittedHeight:   20,
-		CurrentHeight:     27,
-		SettleAfterHeight: 28,
-		HasFraudProof:     true,
-		FeePaid:           "4",
-		RequiredFee:       "4",
-		EstimatedGas:      10,
-		CongestionBps:     9_000,
+		Operation:		SettlementArbitrationFraudProof,
+		ChannelID:		second,
+		SubmittedHeight:	20,
+		CurrentHeight:		27,
+		SettleAfterHeight:	28,
+		HasFraudProof:		true,
+		FeePaid:		"4",
+		RequiredFee:		"4",
+		EstimatedGas:		10,
+		CongestionBps:		9_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, critical.DecisionHash, repeated.DecisionHash)
@@ -6831,19 +6831,19 @@ func TestNearExpiryDisputeMonitoringAndValidatorWatcherFormat(t *testing.T) {
 
 	var err error
 	state, err = RegisterValidatorPaymentService(state, ValidatorPaymentServiceMetadata{
-		ValidatorAddress: validator,
-		ServiceAddress:   service,
-		WatchEndpoint:    "https://validator.example/watch",
-		PublicKey:        "validator-watch-key",
-		MinDelegation:    "10",
-		Active:           true,
-		UpdatedHeight:    12,
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		WatchEndpoint:		"https://validator.example/watch",
+		PublicKey:		"validator-watch-key",
+		MinDelegation:		"10",
+		Active:			true,
+		UpdatedHeight:		12,
 	})
 	require.NoError(t, err)
 	state, err = RegisterValidatorWatchService(state, ValidatorWatchRegistration{
-		ValidatorAddress: validator,
-		Delegator:        bob,
-		RegisteredHeight: 13,
+		ValidatorAddress:	validator,
+		Delegator:		bob,
+		RegisteredHeight:	13,
 	})
 	require.NoError(t, err)
 	require.Equal(t, service, state.ValidatorWatchRegistries[0].ServiceAddress)
@@ -6869,20 +6869,20 @@ func signedChannel(t *testing.T, salt, collateral, left, right string) ChannelRe
 
 	channelID := HashParts(salt, left, right)
 	channel := ChannelRecord{
-		ChainID:             "aetra-test-1",
-		ChannelID:           channelID,
-		ChannelType:         ChannelTypeBidirectional,
-		Participants:        []string{left, right},
-		Denom:               NativeDenom,
-		Collateral:          collateral,
-		OpenHeight:          10,
-		CloseDelay:          8,
-		DisputePeriod:       8,
-		OpeningFeePaid:      DefaultOpeningFee,
-		ConditionalPayments: true,
-		CustodyDenom:        NativeDenom,
-		CustodyAmount:       collateral,
-		Status:              ChannelStatusOpen,
+		ChainID:		"aetra-test-1",
+		ChannelID:		channelID,
+		ChannelType:		ChannelTypeBidirectional,
+		Participants:		[]string{left, right},
+		Denom:			NativeDenom,
+		Collateral:		collateral,
+		OpenHeight:		10,
+		CloseDelay:		8,
+		DisputePeriod:		8,
+		OpeningFeePaid:		DefaultOpeningFee,
+		ConditionalPayments:	true,
+		CustodyDenom:		NativeDenom,
+		CustodyAmount:		collateral,
+		Status:			ChannelStatusOpen,
 	}
 	openState := signedState(t, channel, 1, "", []Balance{
 		{Participant: left, Amount: collateral},
@@ -6906,18 +6906,18 @@ func signedState(t *testing.T, channel ChannelRecord, nonce uint64, previous str
 	t.Helper()
 
 	state, err := BuildState(ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             nonce,
-		Balances:          balances,
-		PreviousStateHash: previous,
-		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			nonce,
+		Balances:		balances,
+		PreviousStateHash:	previous,
+		TimeoutHeight:		channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -6934,20 +6934,20 @@ func signedReserveState(t *testing.T, channel ChannelRecord, nonce uint64, previ
 	t.Helper()
 
 	state, err := BuildState(ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             nonce,
-		Balances:          balances,
-		ReserveA:          reserveA,
-		ReserveB:          reserveB,
-		PreviousStateHash: previous,
-		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + 70,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			nonce,
+		Balances:		balances,
+		ReserveA:		reserveA,
+		ReserveB:		reserveB,
+		PreviousStateHash:	previous,
+		TimeoutHeight:		channel.OpenHeight + channel.DisputePeriod + 70,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -6982,20 +6982,20 @@ func signedRoutePromise(t *testing.T, channel ChannelRecord, promiseID, routeID,
 	t.Helper()
 
 	promise, err := BuildConditionalPromise(ConditionalPromise{
-		PromiseID:                 promiseID,
-		ChannelID:                 channel.ChannelID,
-		Source:                    source,
-		Destination:               destination,
-		Amount:                    amount,
-		Fee:                       fee,
-		HashLock:                  hashLock,
-		TimeoutHeight:             timeoutHeight,
-		TimeoutTimestamp:          int64(timeoutHeight * 10),
-		ConditionType:             ConditionTypeHashLock,
-		RouteIDOptional:           routeID,
-		PreviousPromiseIDOptional: previousID,
-		NextPromiseIDOptional:     nextID,
-		Nonce:                     nonce,
+		PromiseID:			promiseID,
+		ChannelID:			channel.ChannelID,
+		Source:				source,
+		Destination:			destination,
+		Amount:				amount,
+		Fee:				fee,
+		HashLock:			hashLock,
+		TimeoutHeight:			timeoutHeight,
+		TimeoutTimestamp:		int64(timeoutHeight * 10),
+		ConditionType:			ConditionTypeHashLock,
+		RouteIDOptional:		routeID,
+		PreviousPromiseIDOptional:	previousID,
+		NextPromiseIDOptional:		nextID,
+		Nonce:				nonce,
 	})
 	require.NoError(t, err)
 	promise.Signature, err = SignatureForPromise(channel, promise, source)
@@ -7012,11 +7012,11 @@ func signedGossipEnvelope(t *testing.T, message GossipMessage, signer string, re
 	sig, err := SignatureForGossip(built, signer)
 	require.NoError(t, err)
 	return SignedGossipEnvelope{
-		Message:      built,
-		MessageHash:  built.MessageID,
-		Signature:    sig,
-		ReceivedFrom: signer,
-		ReceivedAt:   receivedAt,
+		Message:	built,
+		MessageHash:	built.MessageID,
+		Signature:	sig,
+		ReceivedFrom:	signer,
+		ReceivedAt:	receivedAt,
 	}.Normalize()
 }
 
@@ -7052,9 +7052,9 @@ func signedVirtualActivationProof(t *testing.T, vc VirtualChannel, signer string
 	reserves := make([]VirtualParentReserve, 0, len(vc.ParentChannelIDs))
 	for _, parentID := range vc.ParentChannelIDs {
 		reserve, err := BuildVirtualParentReserve(vc, VirtualParentReserve{
-			ParentChannelID: parentID,
-			Capacity:        vc.Capacity,
-			FeeAmount:       "1",
+			ParentChannelID:	parentID,
+			Capacity:		vc.Capacity,
+			FeeAmount:		"1",
 		}, signer)
 		require.NoError(t, err)
 		reserves = append(reserves, reserve)
@@ -7089,14 +7089,14 @@ func virtualChannelFixture(t *testing.T, salt, alice, router, bob, capacity stri
 	state, err = AcceptSignedState(state, second.ChannelID, secondReserve, 20)
 	require.NoError(t, err)
 	vc := signedVirtualChannel(t, VirtualChannel{
-		VirtualChannelID: HashParts(salt, alice, bob),
-		ParentChannelIDs: []string{first.ChannelID, second.ChannelID},
-		Endpoints:        []string{alice, bob},
-		Intermediaries:   []string{router},
-		Capacity:         capacity,
-		BalanceA:         capacity,
-		BalanceB:         "0",
-		ExpiresHeight:    expiresHeight,
+		VirtualChannelID:	HashParts(salt, alice, bob),
+		ParentChannelIDs:	[]string{first.ChannelID, second.ChannelID},
+		Endpoints:		[]string{alice, bob},
+		Intermediaries:		[]string{router},
+		Capacity:		capacity,
+		BalanceA:		capacity,
+		BalanceB:		"0",
+		ExpiresHeight:		expiresHeight,
 	}, first.ChainID)
 	proof := signedVirtualActivationProof(t, vc, router, 80)
 	state, err = OpenVirtualChannelWithProof(state, proof)
@@ -7108,10 +7108,10 @@ func signedVirtualReserve(t *testing.T, vc VirtualChannel, parentID, signer, cap
 	t.Helper()
 
 	reserve, err := BuildVirtualParentReserve(vc, VirtualParentReserve{
-		ParentChannelID: parentID,
-		Capacity:        capacity,
-		SplitAmount:     splitAmount,
-		FeeAmount:       "0",
+		ParentChannelID:	parentID,
+		Capacity:		capacity,
+		SplitAmount:		splitAmount,
+		FeeAmount:		"0",
 	}, signer)
 	require.NoError(t, err)
 	return reserve
@@ -7174,32 +7174,32 @@ func signedConditionalState(t *testing.T, channel ChannelRecord, nonce uint64, p
 
 	channel = channel.Normalize()
 	condition := ConditionalPayment{
-		ConditionID:   HashParts("condition", channel.ChannelID, conditionAmount),
-		ConditionType: ConditionTypeHashLock,
-		Payer:         channel.Participants[0],
-		Payee:         channel.Participants[1],
-		Amount:        conditionAmount,
-		HashLock:      HashParts("condition-preimage", conditionAmount),
-		TimeoutHeight: channel.OpenHeight + channel.DisputePeriod + nonce + 2,
-		NonceStart:    nonce,
-		NonceEnd:      nonce + 2,
+		ConditionID:	HashParts("condition", channel.ChannelID, conditionAmount),
+		ConditionType:	ConditionTypeHashLock,
+		Payer:		channel.Participants[0],
+		Payee:		channel.Participants[1],
+		Amount:		conditionAmount,
+		HashLock:	HashParts("condition-preimage", conditionAmount),
+		TimeoutHeight:	channel.OpenHeight + channel.DisputePeriod + nonce + 2,
+		NonceStart:	nonce,
+		NonceEnd:	nonce + 2,
 	}
 	state, err := BuildState(ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             nonce,
-		Balances:          balances,
-		ReserveA:          "25",
-		ReserveB:          "0",
-		Conditions:        []ConditionalPayment{condition},
-		PreviousStateHash: previous,
-		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			nonce,
+		Balances:		balances,
+		ReserveA:		"25",
+		ReserveB:		"0",
+		Conditions:		[]ConditionalPayment{condition},
+		PreviousStateHash:	previous,
+		TimeoutHeight:		channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Participants {
@@ -7216,38 +7216,38 @@ func signedUnidirectionalChannel(t *testing.T, salt, collateral, payer, receiver
 	t.Helper()
 
 	channel := ChannelRecord{
-		ChainID:             "aetra-test-1",
-		ChannelID:           HashParts(salt, payer, receiver),
-		ChannelType:         ChannelTypeUnidirectional,
-		Participants:        []string{payer, receiver},
-		Payer:               payer,
-		Receiver:            receiver,
-		ReceiverAckRequired: ackRequired,
-		Denom:               NativeDenom,
-		Collateral:          collateral,
-		OpenHeight:          10,
-		CloseDelay:          8,
-		DisputePeriod:       8,
-		ExpirationHeight:    72,
-		ExpirationTimestamp: 0,
-		OpeningFeePaid:      DefaultOpeningFee,
-		CustodyDenom:        NativeDenom,
-		CustodyAmount:       collateral,
-		Status:              ChannelStatusOpen,
+		ChainID:		"aetra-test-1",
+		ChannelID:		HashParts(salt, payer, receiver),
+		ChannelType:		ChannelTypeUnidirectional,
+		Participants:		[]string{payer, receiver},
+		Payer:			payer,
+		Receiver:		receiver,
+		ReceiverAckRequired:	ackRequired,
+		Denom:			NativeDenom,
+		Collateral:		collateral,
+		OpenHeight:		10,
+		CloseDelay:		8,
+		DisputePeriod:		8,
+		ExpirationHeight:	72,
+		ExpirationTimestamp:	0,
+		OpeningFeePaid:		DefaultOpeningFee,
+		CustodyDenom:		NativeDenom,
+		CustodyAmount:		collateral,
+		Status:			ChannelStatusOpen,
 	}
 	openState, err := BuildState(ChannelState{
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		ChannelType:      channel.ChannelType,
-		Denom:            channel.Denom,
-		Version:          CurrentStateVersion,
-		Epoch:            1,
-		Nonce:            1,
-		Balances:         []Balance{{Participant: payer, Amount: collateral}, {Participant: receiver, Amount: "0"}},
-		TimeoutHeight:    channel.ExpirationHeight,
-		TimeoutTimestamp: channel.ExpirationTimestamp,
-		CloseDelay:       channel.DisputePeriod,
-		FeePolicyID:      NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			1,
+		Balances:		[]Balance{{Participant: payer, Amount: collateral}, {Participant: receiver, Amount: "0"}},
+		TimeoutHeight:		channel.ExpirationHeight,
+		TimeoutTimestamp:	channel.ExpirationTimestamp,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -7265,15 +7265,15 @@ func signedUnidirectionalClaim(t *testing.T, channel ChannelRecord, claimed stri
 	t.Helper()
 
 	claim, err := BuildUnidirectionalClaim(UnidirectionalClaim{
-		ChainID:             channel.ChainID,
-		ChannelID:           channel.ChannelID,
-		Payer:               channel.Payer,
-		Receiver:            channel.Receiver,
-		LockedAmount:        channel.Collateral,
-		ClaimedAmount:       claimed,
-		Nonce:               nonce,
-		ExpirationHeight:    expirationHeight,
-		ExpirationTimestamp: channel.ExpirationTimestamp,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Payer:			channel.Payer,
+		Receiver:		channel.Receiver,
+		LockedAmount:		channel.Collateral,
+		ClaimedAmount:		claimed,
+		Nonce:			nonce,
+		ExpirationHeight:	expirationHeight,
+		ExpirationTimestamp:	channel.ExpirationTimestamp,
 	})
 	require.NoError(t, err)
 	claim.PayerSignature, err = SignatureForClaim(claim, channel.Payer)
@@ -7293,40 +7293,40 @@ func signedAsyncChannel(t *testing.T, salt, collateral string, balances []Balanc
 	t.Helper()
 
 	channel := ChannelRecord{
-		ChainID:        "aetra-test-1",
-		ChannelID:      HashParts(append([]string{salt}, participants...)...),
-		ChannelType:    ChannelTypeAsync,
-		Participants:   participants,
-		Denom:          NativeDenom,
-		Collateral:     collateral,
-		OpenHeight:     10,
-		CloseDelay:     8,
-		DisputePeriod:  8,
-		OpeningFeePaid: DefaultOpeningFee,
-		CustodyDenom:   NativeDenom,
-		CustodyAmount:  collateral,
-		Status:         ChannelStatusOpen,
+		ChainID:	"aetra-test-1",
+		ChannelID:	HashParts(append([]string{salt}, participants...)...),
+		ChannelType:	ChannelTypeAsync,
+		Participants:	participants,
+		Denom:		NativeDenom,
+		Collateral:	collateral,
+		OpenHeight:	10,
+		CloseDelay:	8,
+		DisputePeriod:	8,
+		OpeningFeePaid:	DefaultOpeningFee,
+		CustodyDenom:	NativeDenom,
+		CustodyAmount:	collateral,
+		Status:		ChannelStatusOpen,
 	}
 	openState, err := BuildState(ChannelState{
-		ChainID:            channel.ChainID,
-		ChannelID:          channel.ChannelID,
-		ChannelType:        channel.ChannelType,
-		Denom:              channel.Denom,
-		Version:            CurrentStateVersion,
-		Epoch:              1,
-		Nonce:              1,
-		Balances:           balances,
-		CheckpointNonce:    1,
-		CheckpointBalances: balances,
-		AsyncUpdateRoot:    ComputeAsyncDeltaRootForChannel(channel, nil),
-		AcceptedUpdateRoot: ComputeAsyncDeltaRootForChannel(channel, nil),
-		SendWindow:         sendWindow,
-		ReceiveWindow:      receiveWindow,
-		MaxUnackedAmount:   maxUnacked,
-		ExpiryHeight:       expiryHeight,
-		TimeoutHeight:      expiryHeight,
-		CloseDelay:         channel.DisputePeriod,
-		FeePolicyID:        NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			1,
+		Balances:		balances,
+		CheckpointNonce:	1,
+		CheckpointBalances:	balances,
+		AsyncUpdateRoot:	ComputeAsyncDeltaRootForChannel(channel, nil),
+		AcceptedUpdateRoot:	ComputeAsyncDeltaRootForChannel(channel, nil),
+		SendWindow:		sendWindow,
+		ReceiveWindow:		receiveWindow,
+		MaxUnackedAmount:	maxUnacked,
+		ExpiryHeight:		expiryHeight,
+		TimeoutHeight:		expiryHeight,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		NativeDenom,
 	})
 	require.NoError(t, err)
 	channel.LatestState = signAsyncCheckpoint(t, channel, openState)
@@ -7339,16 +7339,16 @@ func signedAsyncDelta(t *testing.T, channel ChannelRecord, salt, from, to, amoun
 	t.Helper()
 
 	delta, err := BuildAsyncDelta(AsyncPaymentDelta{
-		UpdateID:     HashParts("async-delta", channel.ChannelID, salt),
-		ChainID:      channel.ChainID,
-		ChannelID:    channel.ChannelID,
-		From:         from,
-		To:           to,
-		Direction:    AsyncDeltaDirection(from, to),
-		Amount:       amount,
-		NonceStart:   nonceStart,
-		NonceEnd:     nonceEnd,
-		ExpiryHeight: expiryHeight,
+		UpdateID:	HashParts("async-delta", channel.ChannelID, salt),
+		ChainID:	channel.ChainID,
+		ChannelID:	channel.ChannelID,
+		From:		from,
+		To:		to,
+		Direction:	AsyncDeltaDirection(from, to),
+		Amount:		amount,
+		NonceStart:	nonceStart,
+		NonceEnd:	nonceEnd,
+		ExpiryHeight:	expiryHeight,
 	})
 	require.NoError(t, err)
 	delta.Signature, err = SignatureForAsyncDelta(delta, from)

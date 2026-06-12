@@ -85,13 +85,13 @@ func TestIdentityObservabilitySpecV2CoversSection15(t *testing.T) {
 
 func TestIdentityObservabilityEventV2CanonicalABCIEvent(t *testing.T) {
 	event, err := NewIdentityObservabilityEventV2(IdentityObservabilityEventV2{
-		Type:   IdentityEventResolverUpdated,
-		Height: 20,
-		Name:   "Alice.AET",
-		Actor:  hex.EncodeToString(addr(1)),
+		Type:	IdentityEventResolverUpdated,
+		Height:	20,
+		Name:	"Alice.AET",
+		Actor:	hex.EncodeToString(addr(1)),
 		Attributes: map[string]string{
-			"record_version": "2",
-			"scope":          string(DelegationScopeResolverUpdate),
+			"record_version":	"2",
+			"scope":		string(DelegationScopeResolverUpdate),
 		},
 	})
 	require.NoError(t, err)
@@ -118,18 +118,18 @@ func TestIdentityObservabilityMetricsSnapshotV2(t *testing.T) {
 	require.NoError(t, err)
 
 	snapshot, err := BuildIdentityObservabilityMetricsSnapshotV2(IdentityObservabilityMetricsInputV2{
-		State:                             state,
-		Height:                            50,
-		Delegations:                       []DelegationRecordV2{delegation},
-		BatchResolverUpdateSize:           3,
-		BlockSTMIdentityMessages:          10,
-		BlockSTMConflicts:                 2,
-		StoreV2DirectReadLatencyMicros:    11,
-		StoreV2RecursiveReadLatencyMicros: 22,
-		StoreV2ResolverWriteLatencyMicros: 33,
-		ProofQueryLatencyMicros:           44,
-		ProofVerificationFailureCount:     5,
-		ReverseRecordsInvalidated:         1,
+		State:					state,
+		Height:					50,
+		Delegations:				[]DelegationRecordV2{delegation},
+		BatchResolverUpdateSize:		3,
+		BlockSTMIdentityMessages:		10,
+		BlockSTMConflicts:			2,
+		StoreV2DirectReadLatencyMicros:		11,
+		StoreV2RecursiveReadLatencyMicros:	22,
+		StoreV2ResolverWriteLatencyMicros:	33,
+		ProofQueryLatencyMicros:		44,
+		ProofVerificationFailureCount:		5,
+		ReverseRecordsInvalidated:		1,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateIdentityObservabilityMetricsSnapshotV2(snapshot))
@@ -173,9 +173,9 @@ func TestIdentityObservabilityMetricsRejectMissingAndBadUnitsV2(t *testing.T) {
 	valid, err := NewIdentityMetricSampleV2(IdentityMetricProofQueryLatency, 10, 5, IdentityMetricUnitMicroseconds, nil)
 	require.NoError(t, err)
 	snapshot := IdentityObservabilityMetricsSnapshotV2{
-		Height:       10,
-		Metrics:      []IdentityMetricSampleV2{valid},
-		SnapshotHash: identityHash("wrong"),
+		Height:		10,
+		Metrics:	[]IdentityMetricSampleV2{valid},
+		SnapshotHash:	identityHash("wrong"),
 	}
 	require.ErrorContains(t, ValidateIdentityObservabilityMetricsSnapshotV2(snapshot), "missing required metrics")
 }
@@ -183,14 +183,14 @@ func TestIdentityObservabilityMetricsRejectMissingAndBadUnitsV2(t *testing.T) {
 func TestIdentityObservabilityAlertsV2EvaluateRequiredAlerts(t *testing.T) {
 	validState := observabilityState(t)
 	snapshot, err := BuildIdentityObservabilityMetricsSnapshotV2(IdentityObservabilityMetricsInputV2{
-		State:                             validState,
-		Height:                            70,
-		BlockSTMIdentityMessages:          10,
-		BlockSTMConflicts:                 5,
-		StoreV2DirectReadLatencyMicros:    200,
-		StoreV2RecursiveReadLatencyMicros: 300,
-		ProofQueryLatencyMicros:           400,
-		ProofVerificationFailureCount:     6,
+		State:					validState,
+		Height:					70,
+		BlockSTMIdentityMessages:		10,
+		BlockSTMConflicts:			5,
+		StoreV2DirectReadLatencyMicros:		200,
+		StoreV2RecursiveReadLatencyMicros:	300,
+		ProofQueryLatencyMicros:		400,
+		ProofVerificationFailureCount:		6,
 	})
 	require.NoError(t, err)
 
@@ -201,22 +201,22 @@ func TestIdentityObservabilityAlertsV2EvaluateRequiredAlerts(t *testing.T) {
 	broken.Resolvers[0].Metadata = []byte(strings.Repeat("a", MaxUnifiedPayloadBytesV2))
 
 	alerts, err := EvaluateIdentityObservabilityAlertsV2(IdentityObservabilityAlertInputV2{
-		State:                        broken,
-		Snapshot:                     snapshot,
-		Height:                       70,
-		RegistrationAttemptsInWindow: 2,
-		ResolverUpdatesInWindow:      2,
-		ReverseMismatchesInWindow:    2,
+		State:				broken,
+		Snapshot:			snapshot,
+		Height:				70,
+		RegistrationAttemptsInWindow:	2,
+		ResolverUpdatesInWindow:	2,
+		ReverseMismatchesInWindow:	2,
 		Thresholds: IdentityObservabilityAlertThresholdsV2{
-			ResolverPayloadNearMaxBps:           8_000,
-			ExpiryBacklogThreshold:              1,
-			ProofFailureSpikeThreshold:          1,
-			RegistrationSpamSpikeThreshold:      1,
-			ResolverUpdateSpamSpikeThreshold:    1,
-			AuctionFinalizationBacklogThreshold: 1,
-			BlockSTMConflictRateBpsThreshold:    1,
-			StoreV2ReadLatencyMicrosThreshold:   1,
-			ReverseMismatchSpikeThreshold:       1,
+			ResolverPayloadNearMaxBps:		8_000,
+			ExpiryBacklogThreshold:			1,
+			ProofFailureSpikeThreshold:		1,
+			RegistrationSpamSpikeThreshold:		1,
+			ResolverUpdateSpamSpikeThreshold:	1,
+			AuctionFinalizationBacklogThreshold:	1,
+			BlockSTMConflictRateBpsThreshold:	1,
+			StoreV2ReadLatencyMicrosThreshold:	1,
+			ReverseMismatchSpikeThreshold:		1,
 		},
 	})
 	require.NoError(t, err)
@@ -237,27 +237,27 @@ func TestIdentityObservabilityAlertsV2EvaluateRequiredAlerts(t *testing.T) {
 func TestIdentityObservabilityAlertsV2StayQuietBelowThresholds(t *testing.T) {
 	state := observabilityState(t)
 	snapshot, err := BuildIdentityObservabilityMetricsSnapshotV2(IdentityObservabilityMetricsInputV2{
-		State:                    state,
-		Height:                   50,
-		BlockSTMIdentityMessages: 100,
-		BlockSTMConflicts:        1,
+		State:				state,
+		Height:				50,
+		BlockSTMIdentityMessages:	100,
+		BlockSTMConflicts:		1,
 	})
 	require.NoError(t, err)
 
 	alerts, err := EvaluateIdentityObservabilityAlertsV2(IdentityObservabilityAlertInputV2{
-		State:    state,
-		Snapshot: snapshot,
-		Height:   50,
+		State:		state,
+		Snapshot:	snapshot,
+		Height:		50,
 		Thresholds: IdentityObservabilityAlertThresholdsV2{
-			ResolverPayloadNearMaxBps:           10_000,
-			ExpiryBacklogThreshold:              100,
-			ProofFailureSpikeThreshold:          100,
-			RegistrationSpamSpikeThreshold:      100,
-			ResolverUpdateSpamSpikeThreshold:    100,
-			AuctionFinalizationBacklogThreshold: 100,
-			BlockSTMConflictRateBpsThreshold:    1_000,
-			StoreV2ReadLatencyMicrosThreshold:   100,
-			ReverseMismatchSpikeThreshold:       100,
+			ResolverPayloadNearMaxBps:		10_000,
+			ExpiryBacklogThreshold:			100,
+			ProofFailureSpikeThreshold:		100,
+			RegistrationSpamSpikeThreshold:		100,
+			ResolverUpdateSpamSpikeThreshold:	100,
+			AuctionFinalizationBacklogThreshold:	100,
+			BlockSTMConflictRateBpsThreshold:	1_000,
+			StoreV2ReadLatencyMicrosThreshold:	100,
+			ReverseMismatchSpikeThreshold:		100,
 		},
 	})
 	require.NoError(t, err)
@@ -282,13 +282,13 @@ func observabilityState(t *testing.T) IdentityState {
 	state.Domains = upsertDomain(state.Domains, oldDomain)
 	state.DomainNFTs = append(state.DomainNFTs, expired.DomainNFTs...)
 	state, _, err = IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:        "alice.aet",
-		Label:             "api",
-		Actor:             addr(1),
-		ChildOwner:        addr(1),
-		Height:            20,
-		ChildExpiryHeight: 90,
-		DelegationType:    SubdomainDelegationOwnerControlledV2,
+		ParentName:		"alice.aet",
+		Label:			"api",
+		Actor:			addr(1),
+		ChildOwner:		addr(1),
+		Height:			20,
+		ChildExpiryHeight:	90,
+		DelegationType:		SubdomainDelegationOwnerControlledV2,
 	})
 	require.NoError(t, err)
 	commit, err := CommitDomainRegistration(state, "commit.aet", addr(6), identityHash("commit"), 45)

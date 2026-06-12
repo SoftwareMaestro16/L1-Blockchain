@@ -12,26 +12,26 @@ import (
 func TestBuildDelegationRecordCapturesCapitalLayerAttributes(t *testing.T) {
 	params := testParams()
 	record, err := BuildDelegationRecord(params, 20, 100, "del-a", "val-a", sdkmath.NewInt(1_000), DelegationPreferences{
-		RiskAppetite:           RiskAppetiteAggressive,
-		CommissionTolerance:    700,
-		LockDurationPreference: LockDurationLongTerm,
-		RewardStrategy:         RewardStrategyAutoRedelegate,
-		RiskTrancheOptional:    RiskTrancheFirstLoss,
+		RiskAppetite:		RiskAppetiteAggressive,
+		CommissionTolerance:	700,
+		LockDurationPreference:	LockDurationLongTerm,
+		RewardStrategy:		RewardStrategyAutoRedelegate,
+		RiskTrancheOptional:	RiskTrancheFirstLoss,
 	})
 	require.NoError(t, err)
 	require.Equal(t, DelegationRecord{
-		Delegator:              "del-a",
-		Validator:              "val-a",
-		Amount:                 sdkmath.NewInt(1_000),
-		ActivationEpoch:        21,
-		Status:                 DelegationStatusActive,
-		RiskAppetite:           RiskAppetiteAggressive,
-		CommissionTolerance:    700,
-		LockDurationPreference: LockDurationLongTerm,
-		RewardStrategy:         RewardStrategyAutoRedelegate,
-		RiskTrancheOptional:    RiskTrancheFirstLoss,
-		CreatedHeight:          100,
-		UpdatedHeight:          100,
+		Delegator:		"del-a",
+		Validator:		"val-a",
+		Amount:			sdkmath.NewInt(1_000),
+		ActivationEpoch:	21,
+		Status:			DelegationStatusActive,
+		RiskAppetite:		RiskAppetiteAggressive,
+		CommissionTolerance:	700,
+		LockDurationPreference:	LockDurationLongTerm,
+		RewardStrategy:		RewardStrategyAutoRedelegate,
+		RiskTrancheOptional:	RiskTrancheFirstLoss,
+		CreatedHeight:		100,
+		UpdatedHeight:		100,
 	}, record)
 }
 
@@ -51,18 +51,18 @@ func TestBuildDelegationRecordAppliesSafeDefaults(t *testing.T) {
 func TestBuildDelegationRecordFromIntentUsesActivationDelayAndTolerance(t *testing.T) {
 	params := testParams()
 	intent := postypes.DelegationIntent{
-		NominatorID:            "del-intent",
-		ValidatorID:            "val-intent",
-		StakeNaet:              sdkmath.NewInt(900),
-		RequestedEpoch:         30,
-		MaxCommissionBps:       600,
-		MinPerformanceScoreBps: 9_000,
+		NominatorID:		"del-intent",
+		ValidatorID:		"val-intent",
+		StakeNaet:		sdkmath.NewInt(900),
+		RequestedEpoch:		30,
+		MaxCommissionBps:	600,
+		MinPerformanceScoreBps:	9_000,
 	}
 
 	record, err := BuildDelegationRecordFromIntent(params, intent, 222, DelegationPreferences{
-		RiskAppetite:           RiskAppetiteConservative,
-		LockDurationPreference: LockDurationFlexible,
-		RewardStrategy:         RewardStrategyCompound,
+		RiskAppetite:		RiskAppetiteConservative,
+		LockDurationPreference:	LockDurationFlexible,
+		RewardStrategy:		RewardStrategyCompound,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(31), record.ActivationEpoch)
@@ -70,10 +70,10 @@ func TestBuildDelegationRecordFromIntentUsesActivationDelayAndTolerance(t *testi
 	require.Equal(t, sdkmath.NewInt(900), record.Amount)
 
 	_, err = BuildDelegationRecordFromIntent(params, intent, 222, DelegationPreferences{
-		RiskAppetite:           RiskAppetiteConservative,
-		CommissionTolerance:    500,
-		LockDurationPreference: LockDurationFlexible,
-		RewardStrategy:         RewardStrategyCompound,
+		RiskAppetite:		RiskAppetiteConservative,
+		CommissionTolerance:	500,
+		LockDurationPreference:	LockDurationFlexible,
+		RewardStrategy:		RewardStrategyCompound,
 	})
 	require.ErrorContains(t, err, "below intent tolerance")
 }
@@ -164,8 +164,8 @@ func TestCommissionToleranceMarksExceededAndEmitsAdvisoryAlert(t *testing.T) {
 func TestLockDurationPreferencePreservesUnbondingAndRequiresExtendedSlashWindow(t *testing.T) {
 	params := testParams()
 	record, err := BuildDelegationRecord(params, 5, 100, "del-long", "val-a", sdkmath.NewInt(500), DelegationPreferences{
-		CommissionTolerance:    500,
-		LockDurationPreference: LockDurationLongTerm,
+		CommissionTolerance:	500,
+		LockDurationPreference:	LockDurationLongTerm,
 	})
 	require.NoError(t, err)
 

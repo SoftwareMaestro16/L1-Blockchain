@@ -103,19 +103,19 @@ func TestAVMRootFinalizationAndReplayDeterminism(t *testing.T) {
 	proposal := testAVMProposalPlan(t, height)
 	cleanup := testAVMEndBlockCleanup(t, height, nil)
 	left, err := NewAVMBlockLifecyclePlan(AVMBlockLifecyclePlan{
-		Height:          height,
-		PrepareProposal: withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
-		ProcessProposal: withAVMProposalPhase(proposal, AVMABCIProcessProposal),
-		FinalizeBlock:   finalize,
-		EndBlock:        cleanup,
+		Height:			height,
+		PrepareProposal:	withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
+		ProcessProposal:	withAVMProposalPhase(proposal, AVMABCIProcessProposal),
+		FinalizeBlock:		finalize,
+		EndBlock:		cleanup,
 	})
 	require.NoError(t, err)
 	right, err := NewAVMBlockLifecyclePlan(AVMBlockLifecyclePlan{
-		Height:          height,
-		PrepareProposal: withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
-		ProcessProposal: withAVMProposalPhase(proposal, AVMABCIProcessProposal),
-		FinalizeBlock:   finalize,
-		EndBlock:        cleanup,
+		Height:			height,
+		PrepareProposal:	withAVMProposalPhase(proposal, AVMABCIPrepareProposal),
+		ProcessProposal:	withAVMProposalPhase(proposal, AVMABCIProcessProposal),
+		FinalizeBlock:		finalize,
+		EndBlock:		cleanup,
 	})
 	require.NoError(t, err)
 	require.NoError(t, VerifyAVMBlockReplayDeterminism(left, right))

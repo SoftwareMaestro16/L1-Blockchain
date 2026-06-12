@@ -6,255 +6,255 @@ import (
 )
 
 const (
-	AetraEconomicsModuleName = "x/aetra-economics"
+	AetraEconomicsModuleName	= "x/aetra-economics"
 
-	AetraEconomicsPurposeLowModerateInflation = "low_moderate_inflation"
-	AetraEconomicsPurposeFeeBurn              = "fee_burn"
-	AetraEconomicsPurposeTreasuryAllocation   = "treasury_allocation"
-	AetraEconomicsPurposeRewardSmoothing      = "reward_smoothing"
-	AetraEconomicsPurposeTransparentAPRModel  = "transparent_apr_model"
+	AetraEconomicsPurposeLowModerateInflation	= "low_moderate_inflation"
+	AetraEconomicsPurposeFeeBurn			= "fee_burn"
+	AetraEconomicsPurposeTreasuryAllocation		= "treasury_allocation"
+	AetraEconomicsPurposeRewardSmoothing		= "reward_smoothing"
+	AetraEconomicsPurposeTransparentAPRModel	= "transparent_apr_model"
 
-	AetraEconomicsResponsibilityDynamicInflation = "calculate_dynamic_inflation"
-	AetraEconomicsResponsibilityBondedRatio      = "track_bonded_ratio"
-	AetraEconomicsResponsibilityStakingAPR       = "estimate_staking_apr"
-	AetraEconomicsResponsibilityFeeSplit         = "split_fees"
-	AetraEconomicsResponsibilityBurnFeeShare     = "burn_configured_fee_share"
-	AetraEconomicsResponsibilityRewardsShare     = "send_configured_share_to_distribution_rewards"
-	AetraEconomicsResponsibilityTreasuryShare    = "send_configured_share_to_treasury"
-	AetraEconomicsResponsibilityRewardSmoothing  = "smooth_reward_changes"
-	AetraEconomicsResponsibilityEconomicMetrics  = "expose_economic_metrics"
-	AetraEconomicsResponsibilitySupplyInvariants = "protect_supply_invariants"
+	AetraEconomicsResponsibilityDynamicInflation	= "calculate_dynamic_inflation"
+	AetraEconomicsResponsibilityBondedRatio		= "track_bonded_ratio"
+	AetraEconomicsResponsibilityStakingAPR		= "estimate_staking_apr"
+	AetraEconomicsResponsibilityFeeSplit		= "split_fees"
+	AetraEconomicsResponsibilityBurnFeeShare	= "burn_configured_fee_share"
+	AetraEconomicsResponsibilityRewardsShare	= "send_configured_share_to_distribution_rewards"
+	AetraEconomicsResponsibilityTreasuryShare	= "send_configured_share_to_treasury"
+	AetraEconomicsResponsibilityRewardSmoothing	= "smooth_reward_changes"
+	AetraEconomicsResponsibilityEconomicMetrics	= "expose_economic_metrics"
+	AetraEconomicsResponsibilitySupplyInvariants	= "protect_supply_invariants"
 
-	AetraEconomicsStateParams         = "Params"
-	AetraEconomicsStateEpochEconomics = "EpochEconomics"
-	AetraEconomicsStateSupplyStats    = "SupplyStats"
+	AetraEconomicsStateParams		= "Params"
+	AetraEconomicsStateEpochEconomics	= "EpochEconomics"
+	AetraEconomicsStateSupplyStats		= "SupplyStats"
 
-	AetraEconomicsStateParamInflationMinBps        = "InflationMinBps"
-	AetraEconomicsStateParamInflationMaxBps        = "InflationMaxBps"
-	AetraEconomicsStateParamInflationChangeRateBps = "InflationChangeRateBps"
-	AetraEconomicsStateParamTargetBondedRatioBps   = "TargetBondedRatioBps"
-	AetraEconomicsStateParamBurnFeeShareBps        = "BurnFeeShareBps"
-	AetraEconomicsStateParamRewardFeeShareBps      = "RewardFeeShareBps"
-	AetraEconomicsStateParamTreasuryFeeShareBps    = "TreasuryFeeShareBps"
-	AetraEconomicsStateParamRewardSmoothingEpochs  = "RewardSmoothingEpochs"
-	AetraEconomicsStateParamAprTargetMinBps        = "AprTargetMinBps"
-	AetraEconomicsStateParamAprTargetMaxBps        = "AprTargetMaxBps"
+	AetraEconomicsStateParamInflationMinBps		= "InflationMinBps"
+	AetraEconomicsStateParamInflationMaxBps		= "InflationMaxBps"
+	AetraEconomicsStateParamInflationChangeRateBps	= "InflationChangeRateBps"
+	AetraEconomicsStateParamTargetBondedRatioBps	= "TargetBondedRatioBps"
+	AetraEconomicsStateParamBurnFeeShareBps		= "BurnFeeShareBps"
+	AetraEconomicsStateParamRewardFeeShareBps	= "RewardFeeShareBps"
+	AetraEconomicsStateParamTreasuryFeeShareBps	= "TreasuryFeeShareBps"
+	AetraEconomicsStateParamRewardSmoothingEpochs	= "RewardSmoothingEpochs"
+	AetraEconomicsStateParamAprTargetMinBps		= "AprTargetMinBps"
+	AetraEconomicsStateParamAprTargetMaxBps		= "AprTargetMaxBps"
 
-	AetraEconomicsStateEpochNumber          = "EpochNumber"
-	AetraEconomicsStateEpochStartHeight     = "StartHeight"
-	AetraEconomicsStateEpochEndHeight       = "EndHeight"
-	AetraEconomicsStateEpochBondedRatioBps  = "BondedRatioBps"
-	AetraEconomicsStateEpochInflationBps    = "InflationBps"
-	AetraEconomicsStateEpochEstimatedAprBps = "EstimatedAprBps"
-	AetraEconomicsStateEpochFeesCollected   = "FeesCollected"
-	AetraEconomicsStateEpochFeesBurned      = "FeesBurned"
-	AetraEconomicsStateEpochFeesToRewards   = "FeesToRewards"
-	AetraEconomicsStateEpochFeesToTreasury  = "FeesToTreasury"
-	AetraEconomicsStateEpochMintedRewards   = "MintedRewards"
+	AetraEconomicsStateEpochNumber		= "EpochNumber"
+	AetraEconomicsStateEpochStartHeight	= "StartHeight"
+	AetraEconomicsStateEpochEndHeight	= "EndHeight"
+	AetraEconomicsStateEpochBondedRatioBps	= "BondedRatioBps"
+	AetraEconomicsStateEpochInflationBps	= "InflationBps"
+	AetraEconomicsStateEpochEstimatedAprBps	= "EstimatedAprBps"
+	AetraEconomicsStateEpochFeesCollected	= "FeesCollected"
+	AetraEconomicsStateEpochFeesBurned	= "FeesBurned"
+	AetraEconomicsStateEpochFeesToRewards	= "FeesToRewards"
+	AetraEconomicsStateEpochFeesToTreasury	= "FeesToTreasury"
+	AetraEconomicsStateEpochMintedRewards	= "MintedRewards"
 
-	AetraEconomicsStateSupplyTotalMinted = "TotalMinted"
-	AetraEconomicsStateSupplyTotalBurned = "TotalBurned"
-	AetraEconomicsStateSupplyNetIssuance = "NetIssuance"
+	AetraEconomicsStateSupplyTotalMinted	= "TotalMinted"
+	AetraEconomicsStateSupplyTotalBurned	= "TotalBurned"
+	AetraEconomicsStateSupplyNetIssuance	= "NetIssuance"
 
-	AetraEconomicsInflationCurveBelowTargetIncreases  = "bonded_ratio_below_target_increases_inflation"
-	AetraEconomicsInflationCurveAboveTargetDecreases  = "bonded_ratio_above_target_decreases_inflation"
-	AetraEconomicsInflationCurveNeverBelowMin         = "inflation_never_below_min"
-	AetraEconomicsInflationCurveNeverAboveMax         = "inflation_never_above_max"
-	AetraEconomicsInflationCurveEpochChangeBounded    = "inflation_change_per_epoch_bounded"
-	AetraEconomicsInflationCurveNoFloatingPoint       = "no_floating_point"
-	AetraEconomicsInflationCurveNoPerBlockInstability = "no_per_block_instability"
-	AetraEconomicsInflationCurveDeterministic         = "all_calculations_deterministic"
+	AetraEconomicsInflationCurveBelowTargetIncreases	= "bonded_ratio_below_target_increases_inflation"
+	AetraEconomicsInflationCurveAboveTargetDecreases	= "bonded_ratio_above_target_decreases_inflation"
+	AetraEconomicsInflationCurveNeverBelowMin		= "inflation_never_below_min"
+	AetraEconomicsInflationCurveNeverAboveMax		= "inflation_never_above_max"
+	AetraEconomicsInflationCurveEpochChangeBounded		= "inflation_change_per_epoch_bounded"
+	AetraEconomicsInflationCurveNoFloatingPoint		= "no_floating_point"
+	AetraEconomicsInflationCurveNoPerBlockInstability	= "no_per_block_instability"
+	AetraEconomicsInflationCurveDeterministic		= "all_calculations_deterministic"
 
-	AetraEconomicsFeeSplitSumToBasisPoints              = "fee_split_sums_to_10000_bps"
-	AetraEconomicsFeeSplitRecommendedBurnRange          = "burn_fee_share_bps_3000_6000"
-	AetraEconomicsFeeSplitRecommendedRewardRange        = "reward_fee_share_bps_2000_4000"
-	AetraEconomicsFeeSplitRecommendedTreasuryRange      = "treasury_fee_share_bps_1000_2000"
-	AetraEconomicsFeeSplitRejectsInvalidSum             = "reject_sum_not_10000_bps"
-	AetraEconomicsFeeSplitRejectsNegativeShares         = "reject_negative_shares"
-	AetraEconomicsFeeSplitRejectsBurnAboveGovernanceMax = "reject_burn_share_above_governance_max"
-	AetraEconomicsFeeSplitRejectsTreasuryAboveMax       = "reject_treasury_share_above_governance_max"
-	AetraEconomicsFeeSplitRejectsZeroRewards            = "reject_zero_rewards_without_emergency_governance"
+	AetraEconomicsFeeSplitSumToBasisPoints			= "fee_split_sums_to_10000_bps"
+	AetraEconomicsFeeSplitRecommendedBurnRange		= "burn_fee_share_bps_3000_6000"
+	AetraEconomicsFeeSplitRecommendedRewardRange		= "reward_fee_share_bps_2000_4000"
+	AetraEconomicsFeeSplitRecommendedTreasuryRange		= "treasury_fee_share_bps_1000_2000"
+	AetraEconomicsFeeSplitRejectsInvalidSum			= "reject_sum_not_10000_bps"
+	AetraEconomicsFeeSplitRejectsNegativeShares		= "reject_negative_shares"
+	AetraEconomicsFeeSplitRejectsBurnAboveGovernanceMax	= "reject_burn_share_above_governance_max"
+	AetraEconomicsFeeSplitRejectsTreasuryAboveMax		= "reject_treasury_share_above_governance_max"
+	AetraEconomicsFeeSplitRejectsZeroRewards		= "reject_zero_rewards_without_emergency_governance"
 
-	AetraEconomicsAPRQueryInflationOnly     = "inflation_only_apr"
-	AetraEconomicsAPRQueryFeeAdjusted       = "fee_adjusted_apr"
-	AetraEconomicsAPRQueryCommissionImpact  = "validator_commission_impact"
-	AetraEconomicsAPRQueryDelegatorEstimate = "estimated_delegator_apr"
-	AetraEconomicsAPRQueryValidatorGross    = "estimated_validator_gross_apr"
-	AetraEconomicsAPRQueryValidatorNet      = "estimated_validator_net_apr"
-	AetraEconomicsAPRQueryLabeledAsEstimate = "apr_labeled_as_estimate_not_guaranteed"
+	AetraEconomicsAPRQueryInflationOnly	= "inflation_only_apr"
+	AetraEconomicsAPRQueryFeeAdjusted	= "fee_adjusted_apr"
+	AetraEconomicsAPRQueryCommissionImpact	= "validator_commission_impact"
+	AetraEconomicsAPRQueryDelegatorEstimate	= "estimated_delegator_apr"
+	AetraEconomicsAPRQueryValidatorGross	= "estimated_validator_gross_apr"
+	AetraEconomicsAPRQueryValidatorNet	= "estimated_validator_net_apr"
+	AetraEconomicsAPRQueryLabeledAsEstimate	= "apr_labeled_as_estimate_not_guaranteed"
 
-	AetraEconomicsRequiredTestInflationBelowTarget      = "inflation_increases_when_bonded_ratio_below_target"
-	AetraEconomicsRequiredTestInflationAboveTarget      = "inflation_decreases_when_bonded_ratio_above_target"
-	AetraEconomicsRequiredTestInflationMinMax           = "inflation_remains_within_min_max"
-	AetraEconomicsRequiredTestInflationChangeBounded    = "inflation_change_rate_bounded"
-	AetraEconomicsRequiredTestFeeSplitAccounting        = "fee_split_exact_accounting"
-	AetraEconomicsRequiredTestBurnAccounting            = "burn_accounting"
-	AetraEconomicsRequiredTestTreasuryAccounting        = "treasury_accounting"
-	AetraEconomicsRequiredTestRewardsAccounting         = "rewards_accounting"
-	AetraEconomicsRequiredTestAPRMath                   = "apr_estimate_math"
-	AetraEconomicsRequiredTestZeroFeeBlock              = "zero_fee_block_handling"
-	AetraEconomicsRequiredTestHighFeeBlock              = "high_fee_block_handling"
-	AetraEconomicsRequiredTestExportImportState         = "export_import_economics_state"
-	AetraEconomicsRequiredTestSupplyInvariantManyEpochs = "supply_invariant_after_many_epochs"
-	AetraEconomicsRequiredTestGovernanceInvalidParams   = "governance_invalid_params_rejected"
+	AetraEconomicsRequiredTestInflationBelowTarget		= "inflation_increases_when_bonded_ratio_below_target"
+	AetraEconomicsRequiredTestInflationAboveTarget		= "inflation_decreases_when_bonded_ratio_above_target"
+	AetraEconomicsRequiredTestInflationMinMax		= "inflation_remains_within_min_max"
+	AetraEconomicsRequiredTestInflationChangeBounded	= "inflation_change_rate_bounded"
+	AetraEconomicsRequiredTestFeeSplitAccounting		= "fee_split_exact_accounting"
+	AetraEconomicsRequiredTestBurnAccounting		= "burn_accounting"
+	AetraEconomicsRequiredTestTreasuryAccounting		= "treasury_accounting"
+	AetraEconomicsRequiredTestRewardsAccounting		= "rewards_accounting"
+	AetraEconomicsRequiredTestAPRMath			= "apr_estimate_math"
+	AetraEconomicsRequiredTestZeroFeeBlock			= "zero_fee_block_handling"
+	AetraEconomicsRequiredTestHighFeeBlock			= "high_fee_block_handling"
+	AetraEconomicsRequiredTestExportImportState		= "export_import_economics_state"
+	AetraEconomicsRequiredTestSupplyInvariantManyEpochs	= "supply_invariant_after_many_epochs"
+	AetraEconomicsRequiredTestGovernanceInvalidParams	= "governance_invalid_params_rejected"
 )
 
 type AetraEconomicsSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	LowModerateInflation bool
-	FeeBurn              bool
-	TreasuryAllocation   bool
-	RewardSmoothing      bool
-	TransparentAPRModel  bool
+	LowModerateInflation	bool
+	FeeBurn			bool
+	TreasuryAllocation	bool
+	RewardSmoothing		bool
+	TransparentAPRModel	bool
 }
 
 type AetraEconomicsSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsResponsibilitiesEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	CalculatesDynamicInflation                bool
-	TracksBondedRatio                         bool
-	EstimatesStakingAPR                       bool
-	SplitsFees                                bool
-	BurnsConfiguredFeeShare                   bool
-	SendsConfiguredShareToDistributionRewards bool
-	SendsConfiguredShareToTreasury            bool
-	SmoothsRewardChanges                      bool
-	ExposesEconomicMetrics                    bool
-	ProtectsSupplyInvariants                  bool
+	CalculatesDynamicInflation			bool
+	TracksBondedRatio				bool
+	EstimatesStakingAPR				bool
+	SplitsFees					bool
+	BurnsConfiguredFeeShare				bool
+	SendsConfiguredShareToDistributionRewards	bool
+	SendsConfiguredShareToTreasury			bool
+	SmoothsRewardChanges				bool
+	ExposesEconomicMetrics				bool
+	ProtectsSupplyInvariants			bool
 }
 
 type AetraEconomicsResponsibilitiesReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsStateSpecEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	ParamsFields         []string
-	EpochEconomicsFields []string
-	SupplyStatsFields    []string
+	ParamsFields		[]string
+	EpochEconomicsFields	[]string
+	SupplyStatsFields	[]string
 }
 
 type AetraEconomicsStateSpecReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsInflationCurveEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	BondedRatioBelowTargetIncreasesInflation bool
-	BondedRatioAboveTargetDecreasesInflation bool
-	InflationNeverBelowMin                   bool
-	InflationNeverAboveMax                   bool
-	InflationChangePerEpochBounded           bool
-	NoFloatingPoint                          bool
-	NoPerBlockInstability                    bool
-	AllCalculationsDeterministic             bool
+	BondedRatioBelowTargetIncreasesInflation	bool
+	BondedRatioAboveTargetDecreasesInflation	bool
+	InflationNeverBelowMin				bool
+	InflationNeverAboveMax				bool
+	InflationChangePerEpochBounded			bool
+	NoFloatingPoint					bool
+	NoPerBlockInstability				bool
+	AllCalculationsDeterministic			bool
 }
 
 type AetraEconomicsInflationCurveReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsFeeSplitRulesEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	FeeSplitSumsToBasisPoints          bool
-	RecommendedBurnRange               bool
-	RecommendedRewardRange             bool
-	RecommendedTreasuryRange           bool
-	RejectsInvalidSum                  bool
-	RejectsNegativeShares              bool
-	RejectsBurnAboveGovernanceMax      bool
-	RejectsTreasuryAboveGovernanceMax  bool
-	RejectsZeroRewardsWithoutEmergency bool
+	FeeSplitSumsToBasisPoints		bool
+	RecommendedBurnRange			bool
+	RecommendedRewardRange			bool
+	RecommendedTreasuryRange		bool
+	RejectsInvalidSum			bool
+	RejectsNegativeShares			bool
+	RejectsBurnAboveGovernanceMax		bool
+	RejectsTreasuryAboveGovernanceMax	bool
+	RejectsZeroRewardsWithoutEmergency	bool
 }
 
 type AetraEconomicsFeeSplitRulesReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsAPRQueryEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	InflationOnlyAPR           bool
-	FeeAdjustedAPR             bool
-	ValidatorCommissionImpact  bool
-	EstimatedDelegatorAPR      bool
-	EstimatedValidatorGrossAPR bool
-	EstimatedValidatorNetAPR   bool
-	LabeledAsEstimate          bool
+	InflationOnlyAPR		bool
+	FeeAdjustedAPR			bool
+	ValidatorCommissionImpact	bool
+	EstimatedDelegatorAPR		bool
+	EstimatedValidatorGrossAPR	bool
+	EstimatedValidatorNetAPR	bool
+	LabeledAsEstimate		bool
 }
 
 type AetraEconomicsAPRQueryReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraEconomicsTestingRequirementsEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	InflationIncreasesBelowTarget   bool
-	InflationDecreasesAboveTarget   bool
-	InflationWithinMinMax           bool
-	InflationChangeRateBounded      bool
-	FeeSplitExactAccounting         bool
-	BurnAccounting                  bool
-	TreasuryAccounting              bool
-	RewardsAccounting               bool
-	APRMath                         bool
-	ZeroFeeBlockHandling            bool
-	HighFeeBlockHandling            bool
-	ExportImportEconomicsState      bool
-	SupplyInvariantAfterManyEpochs  bool
-	GovernanceInvalidParamsRejected bool
+	InflationIncreasesBelowTarget	bool
+	InflationDecreasesAboveTarget	bool
+	InflationWithinMinMax		bool
+	InflationChangeRateBounded	bool
+	FeeSplitExactAccounting		bool
+	BurnAccounting			bool
+	TreasuryAccounting		bool
+	RewardsAccounting		bool
+	APRMath				bool
+	ZeroFeeBlockHandling		bool
+	HighFeeBlockHandling		bool
+	ExportImportEconomicsState	bool
+	SupplyInvariantAfterManyEpochs	bool
+	GovernanceInvalidParamsRejected	bool
 }
 
 type AetraEconomicsTestingRequirementsReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraEconomicsSpecEvidence() AetraEconomicsSpecEvidence {
 	return AetraEconomicsSpecEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		LowModerateInflation: true,
-		FeeBurn:              true,
-		TreasuryAllocation:   true,
-		RewardSmoothing:      true,
-		TransparentAPRModel:  true,
+		LowModerateInflation:	true,
+		FeeBurn:		true,
+		TreasuryAllocation:	true,
+		RewardSmoothing:	true,
+		TransparentAPRModel:	true,
 	}
 }
 
@@ -292,28 +292,28 @@ func BuildAetraEconomicsSpecReport(evidence AetraEconomicsSpecEvidence) AetraEco
 
 	sort.Strings(failed)
 	return AetraEconomicsSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsResponsibilitiesEvidence() AetraEconomicsResponsibilitiesEvidence {
 	return AetraEconomicsResponsibilitiesEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		CalculatesDynamicInflation:                true,
-		TracksBondedRatio:                         true,
-		EstimatesStakingAPR:                       true,
-		SplitsFees:                                true,
-		BurnsConfiguredFeeShare:                   true,
-		SendsConfiguredShareToDistributionRewards: true,
-		SendsConfiguredShareToTreasury:            true,
-		SmoothsRewardChanges:                      true,
-		ExposesEconomicMetrics:                    true,
-		ProtectsSupplyInvariants:                  true,
+		CalculatesDynamicInflation:			true,
+		TracksBondedRatio:				true,
+		EstimatesStakingAPR:				true,
+		SplitsFees:					true,
+		BurnsConfiguredFeeShare:			true,
+		SendsConfiguredShareToDistributionRewards:	true,
+		SendsConfiguredShareToTreasury:			true,
+		SmoothsRewardChanges:				true,
+		ExposesEconomicMetrics:				true,
+		ProtectsSupplyInvariants:			true,
 	}
 }
 
@@ -356,17 +356,17 @@ func BuildAetraEconomicsResponsibilitiesReport(evidence AetraEconomicsResponsibi
 
 	sort.Strings(failed)
 	return AetraEconomicsResponsibilitiesReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsStateSpecEvidence() AetraEconomicsStateSpecEvidence {
 	return AetraEconomicsStateSpecEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 		ParamsFields: []string{
 			AetraEconomicsStateParamInflationMinBps,
 			AetraEconomicsStateParamInflationMaxBps,
@@ -429,26 +429,26 @@ func BuildAetraEconomicsStateSpecReport(evidence AetraEconomicsStateSpecEvidence
 	failed = append(failed, failedSupply...)
 	sort.Strings(failed)
 	return AetraEconomicsStateSpecReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(requiredParams) + len(requiredEpoch) + len(requiredSupply),
-		Passed:     passedParams + passedEpoch + passedSupply,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(requiredParams) + len(requiredEpoch) + len(requiredSupply),
+		Passed:		passedParams + passedEpoch + passedSupply,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsInflationCurveEvidence() AetraEconomicsInflationCurveEvidence {
 	return AetraEconomicsInflationCurveEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		BondedRatioBelowTargetIncreasesInflation: true,
-		BondedRatioAboveTargetDecreasesInflation: true,
-		InflationNeverBelowMin:                   true,
-		InflationNeverAboveMax:                   true,
-		InflationChangePerEpochBounded:           true,
-		NoFloatingPoint:                          true,
-		NoPerBlockInstability:                    true,
-		AllCalculationsDeterministic:             true,
+		BondedRatioBelowTargetIncreasesInflation:	true,
+		BondedRatioAboveTargetDecreasesInflation:	true,
+		InflationNeverBelowMin:				true,
+		InflationNeverAboveMax:				true,
+		InflationChangePerEpochBounded:			true,
+		NoFloatingPoint:				true,
+		NoPerBlockInstability:				true,
+		AllCalculationsDeterministic:			true,
 	}
 }
 
@@ -489,27 +489,27 @@ func BuildAetraEconomicsInflationCurveReport(evidence AetraEconomicsInflationCur
 
 	sort.Strings(failed)
 	return AetraEconomicsInflationCurveReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsFeeSplitRulesEvidence() AetraEconomicsFeeSplitRulesEvidence {
 	return AetraEconomicsFeeSplitRulesEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		FeeSplitSumsToBasisPoints:          true,
-		RecommendedBurnRange:               true,
-		RecommendedRewardRange:             true,
-		RecommendedTreasuryRange:           true,
-		RejectsInvalidSum:                  true,
-		RejectsNegativeShares:              true,
-		RejectsBurnAboveGovernanceMax:      true,
-		RejectsTreasuryAboveGovernanceMax:  true,
-		RejectsZeroRewardsWithoutEmergency: true,
+		FeeSplitSumsToBasisPoints:		true,
+		RecommendedBurnRange:			true,
+		RecommendedRewardRange:			true,
+		RecommendedTreasuryRange:		true,
+		RejectsInvalidSum:			true,
+		RejectsNegativeShares:			true,
+		RejectsBurnAboveGovernanceMax:		true,
+		RejectsTreasuryAboveGovernanceMax:	true,
+		RejectsZeroRewardsWithoutEmergency:	true,
 	}
 }
 
@@ -551,25 +551,25 @@ func BuildAetraEconomicsFeeSplitRulesReport(evidence AetraEconomicsFeeSplitRules
 
 	sort.Strings(failed)
 	return AetraEconomicsFeeSplitRulesReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsAPRQueryEvidence() AetraEconomicsAPRQueryEvidence {
 	return AetraEconomicsAPRQueryEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		InflationOnlyAPR:           true,
-		FeeAdjustedAPR:             true,
-		ValidatorCommissionImpact:  true,
-		EstimatedDelegatorAPR:      true,
-		EstimatedValidatorGrossAPR: true,
-		EstimatedValidatorNetAPR:   true,
-		LabeledAsEstimate:          true,
+		InflationOnlyAPR:		true,
+		FeeAdjustedAPR:			true,
+		ValidatorCommissionImpact:	true,
+		EstimatedDelegatorAPR:		true,
+		EstimatedValidatorGrossAPR:	true,
+		EstimatedValidatorNetAPR:	true,
+		LabeledAsEstimate:		true,
 	}
 }
 
@@ -609,32 +609,32 @@ func BuildAetraEconomicsAPRQueryReport(evidence AetraEconomicsAPRQueryEvidence) 
 
 	sort.Strings(failed)
 	return AetraEconomicsAPRQueryReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraEconomicsTestingRequirementsEvidence() AetraEconomicsTestingRequirementsEvidence {
 	return AetraEconomicsTestingRequirementsEvidence{
-		ModuleName: AetraEconomicsModuleName,
+		ModuleName:	AetraEconomicsModuleName,
 
-		InflationIncreasesBelowTarget:   true,
-		InflationDecreasesAboveTarget:   true,
-		InflationWithinMinMax:           true,
-		InflationChangeRateBounded:      true,
-		FeeSplitExactAccounting:         true,
-		BurnAccounting:                  true,
-		TreasuryAccounting:              true,
-		RewardsAccounting:               true,
-		APRMath:                         true,
-		ZeroFeeBlockHandling:            true,
-		HighFeeBlockHandling:            true,
-		ExportImportEconomicsState:      true,
-		SupplyInvariantAfterManyEpochs:  true,
-		GovernanceInvalidParamsRejected: true,
+		InflationIncreasesBelowTarget:		true,
+		InflationDecreasesAboveTarget:		true,
+		InflationWithinMinMax:			true,
+		InflationChangeRateBounded:		true,
+		FeeSplitExactAccounting:		true,
+		BurnAccounting:				true,
+		TreasuryAccounting:			true,
+		RewardsAccounting:			true,
+		APRMath:				true,
+		ZeroFeeBlockHandling:			true,
+		HighFeeBlockHandling:			true,
+		ExportImportEconomicsState:		true,
+		SupplyInvariantAfterManyEpochs:		true,
+		GovernanceInvalidParamsRejected:	true,
 	}
 }
 
@@ -681,11 +681,11 @@ func BuildAetraEconomicsTestingRequirementsReport(evidence AetraEconomicsTesting
 
 	sort.Strings(failed)
 	return AetraEconomicsTestingRequirementsReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

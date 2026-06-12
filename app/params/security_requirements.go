@@ -6,150 +6,150 @@ import (
 )
 
 const (
-	SecurityRequirementDeterministicStateTransitions  = "deterministic_state_transitions"
-	SecurityRequirementNoExternalConsensusCalls       = "no_non_deterministic_external_calls"
-	SecurityRequirementNoWallClockStateTransitions    = "no_wall_clock_dependency_except_block_time"
-	SecurityRequirementNoFloatingPointAccounting      = "no_floating_point_accounting"
-	SecurityRequirementNoUnorderedMapStateEffects     = "no_unordered_map_iteration_affecting_state"
-	SecurityRequirementDeterministicSerialization     = "deterministic_serialization"
-	SecurityRequirementExportImportEqualityTests      = "export_import_equality_tests"
-	SecurityRequirementAppHashStabilityTests          = "app_hash_stability_tests"
-	SecurityRequirementNoUnboundedMint                = "no_unbounded_mint"
-	SecurityRequirementNoUnauthorizedModuleMintBurn   = "no_unauthorized_module_account_mint_burn"
-	SecurityRequirementSupplyInvariants               = "supply_invariants"
-	SecurityRequirementFeeSplitInvariants             = "fee_split_invariants"
-	SecurityRequirementDelegationShareInvariants      = "delegation_share_invariants"
-	SecurityRequirementRewardDistributionInvariants   = "reward_distribution_invariants"
-	SecurityRequirementSlashingNoStakeUnderflow       = "slashing_cannot_underflow_stake"
-	SecurityRequirementJailedValidatorRewardExclusion = "jailed_validators_no_active_rewards"
-	SecurityRequirementNoConsensusPanicOnInvalidInput = "no_consensus_panic_on_invalid_input"
-	SecurityRequirementInvariantTestsRequired         = "invariant_tests_required"
-	SecurityRequirementModulePermissionsStartup       = "module_account_permissions_validated_at_startup"
-	SecurityRequirementReservedCannotSignUserTxs      = "reserved_addresses_cannot_sign_user_txs"
-	SecurityRequirementBlockedCannotReceiveFunds      = "blocked_addresses_cannot_receive_normal_user_funds"
-	SecurityRequirementGovernanceAuthorityChecked     = "governance_authority_checked"
-	SecurityRequirementParamsAuthorityChecked         = "params_authority_checked"
-	SecurityRequirementKeeperWiringTests              = "keeper_wiring_tests"
+	SecurityRequirementDeterministicStateTransitions	= "deterministic_state_transitions"
+	SecurityRequirementNoExternalConsensusCalls		= "no_non_deterministic_external_calls"
+	SecurityRequirementNoWallClockStateTransitions		= "no_wall_clock_dependency_except_block_time"
+	SecurityRequirementNoFloatingPointAccounting		= "no_floating_point_accounting"
+	SecurityRequirementNoUnorderedMapStateEffects		= "no_unordered_map_iteration_affecting_state"
+	SecurityRequirementDeterministicSerialization		= "deterministic_serialization"
+	SecurityRequirementExportImportEqualityTests		= "export_import_equality_tests"
+	SecurityRequirementAppHashStabilityTests		= "app_hash_stability_tests"
+	SecurityRequirementNoUnboundedMint			= "no_unbounded_mint"
+	SecurityRequirementNoUnauthorizedModuleMintBurn		= "no_unauthorized_module_account_mint_burn"
+	SecurityRequirementSupplyInvariants			= "supply_invariants"
+	SecurityRequirementFeeSplitInvariants			= "fee_split_invariants"
+	SecurityRequirementDelegationShareInvariants		= "delegation_share_invariants"
+	SecurityRequirementRewardDistributionInvariants		= "reward_distribution_invariants"
+	SecurityRequirementSlashingNoStakeUnderflow		= "slashing_cannot_underflow_stake"
+	SecurityRequirementJailedValidatorRewardExclusion	= "jailed_validators_no_active_rewards"
+	SecurityRequirementNoConsensusPanicOnInvalidInput	= "no_consensus_panic_on_invalid_input"
+	SecurityRequirementInvariantTestsRequired		= "invariant_tests_required"
+	SecurityRequirementModulePermissionsStartup		= "module_account_permissions_validated_at_startup"
+	SecurityRequirementReservedCannotSignUserTxs		= "reserved_addresses_cannot_sign_user_txs"
+	SecurityRequirementBlockedCannotReceiveFunds		= "blocked_addresses_cannot_receive_normal_user_funds"
+	SecurityRequirementGovernanceAuthorityChecked		= "governance_authority_checked"
+	SecurityRequirementParamsAuthorityChecked		= "params_authority_checked"
+	SecurityRequirementKeeperWiringTests			= "keeper_wiring_tests"
 )
 
 type ConsensusSafetyRequirements struct {
-	DeterministicStateTransitions            bool
-	NoNonDeterministicExternalCalls          bool
-	NoWallClockDependencyExceptBlockTime     bool
-	NoFloatingPointAccounting                bool
-	NoUnorderedMapIterationAffectingState    bool
-	DeterministicSerialization               bool
-	ExportImportEqualityTests                bool
-	AppHashStabilityTests                    bool
-	NoConsensusPanicOnInvalidInput           bool
-	ConsensusProvidedBlockTimeOnly           bool
-	CrossArchitectureDeterminismReview       bool
-	DeterminismStaticGateRequired            bool
-	ConsensusPathExternalFilesystemForbidden bool
+	DeterministicStateTransitions			bool
+	NoNonDeterministicExternalCalls			bool
+	NoWallClockDependencyExceptBlockTime		bool
+	NoFloatingPointAccounting			bool
+	NoUnorderedMapIterationAffectingState		bool
+	DeterministicSerialization			bool
+	ExportImportEqualityTests			bool
+	AppHashStabilityTests				bool
+	NoConsensusPanicOnInvalidInput			bool
+	ConsensusProvidedBlockTimeOnly			bool
+	CrossArchitectureDeterminismReview		bool
+	DeterminismStaticGateRequired			bool
+	ConsensusPathExternalFilesystemForbidden	bool
 }
 
 type EconomicSafetyRequirements struct {
-	NoUnboundedMint                        bool
-	NoUnauthorizedModuleAccountMintBurn    bool
-	SupplyInvariants                       bool
-	FeeSplitInvariants                     bool
-	DelegationShareInvariants              bool
-	RewardDistributionInvariants           bool
-	SlashingCannotUnderflowStake           bool
-	JailedValidatorsCannotReceiveRewards   bool
-	ModuleAccountAuthorityChecked          bool
-	BurnAndMintEventsAfterBankSuccess      bool
-	FixedPointRewardMath                   bool
-	NegativeBalanceForbidden               bool
-	DistributionSkipsInactiveOrJailedPower bool
-	EconomicInvariantTestsRequired         bool
-	ExportImportSupplyStabilityTests       bool
+	NoUnboundedMint				bool
+	NoUnauthorizedModuleAccountMintBurn	bool
+	SupplyInvariants			bool
+	FeeSplitInvariants			bool
+	DelegationShareInvariants		bool
+	RewardDistributionInvariants		bool
+	SlashingCannotUnderflowStake		bool
+	JailedValidatorsCannotReceiveRewards	bool
+	ModuleAccountAuthorityChecked		bool
+	BurnAndMintEventsAfterBankSuccess	bool
+	FixedPointRewardMath			bool
+	NegativeBalanceForbidden		bool
+	DistributionSkipsInactiveOrJailedPower	bool
+	EconomicInvariantTestsRequired		bool
+	ExportImportSupplyStabilityTests	bool
 }
 
 type PermissionSafetyRequirements struct {
-	ModuleAccountPermissionsValidatedAtStartup bool
-	ReservedAddressesCannotSignUserTxs         bool
-	BlockedAddressesCannotReceiveUserFunds     bool
-	ExplicitReceiveAllowlistRequired           bool
-	GovernanceAuthorityChecked                 bool
-	ParamsAuthorityChecked                     bool
-	KeeperWiringTests                          bool
-	ModuleAccountPermissionsMinimumRequired    bool
-	ReservedAddressCatalogValidated            bool
-	BlockedAddressBankKeeperWiringValidated    bool
-	UserTxSignerValidationUsesReservedCatalog  bool
+	ModuleAccountPermissionsValidatedAtStartup	bool
+	ReservedAddressesCannotSignUserTxs		bool
+	BlockedAddressesCannotReceiveUserFunds		bool
+	ExplicitReceiveAllowlistRequired		bool
+	GovernanceAuthorityChecked			bool
+	ParamsAuthorityChecked				bool
+	KeeperWiringTests				bool
+	ModuleAccountPermissionsMinimumRequired		bool
+	ReservedAddressCatalogValidated			bool
+	BlockedAddressBankKeeperWiringValidated		bool
+	UserTxSignerValidationUsesReservedCatalog	bool
 }
 
 type ValidatorRewardEligibility struct {
-	ValidatorAddress string
-	ActiveSet        bool
-	Jailed           bool
-	Tombstoned       bool
-	RewardNaet       int64
+	ValidatorAddress	string
+	ActiveSet		bool
+	Jailed			bool
+	Tombstoned		bool
+	RewardNaet		int64
 }
 
 type SecurityRequirementsReport struct {
-	ConsensusRequired  int
-	ConsensusPassed    int
-	EconomicRequired   int
-	EconomicPassed     int
-	PermissionRequired int
-	PermissionPassed   int
-	Failed             []string
-	Passed             bool
+	ConsensusRequired	int
+	ConsensusPassed		int
+	EconomicRequired	int
+	EconomicPassed		int
+	PermissionRequired	int
+	PermissionPassed	int
+	Failed			[]string
+	Passed			bool
 }
 
 func DefaultConsensusSafetyRequirements() ConsensusSafetyRequirements {
 	return ConsensusSafetyRequirements{
-		DeterministicStateTransitions:            true,
-		NoNonDeterministicExternalCalls:          true,
-		NoWallClockDependencyExceptBlockTime:     true,
-		NoFloatingPointAccounting:                true,
-		NoUnorderedMapIterationAffectingState:    true,
-		DeterministicSerialization:               true,
-		ExportImportEqualityTests:                true,
-		AppHashStabilityTests:                    true,
-		NoConsensusPanicOnInvalidInput:           true,
-		ConsensusProvidedBlockTimeOnly:           true,
-		CrossArchitectureDeterminismReview:       true,
-		DeterminismStaticGateRequired:            true,
-		ConsensusPathExternalFilesystemForbidden: true,
+		DeterministicStateTransitions:			true,
+		NoNonDeterministicExternalCalls:		true,
+		NoWallClockDependencyExceptBlockTime:		true,
+		NoFloatingPointAccounting:			true,
+		NoUnorderedMapIterationAffectingState:		true,
+		DeterministicSerialization:			true,
+		ExportImportEqualityTests:			true,
+		AppHashStabilityTests:				true,
+		NoConsensusPanicOnInvalidInput:			true,
+		ConsensusProvidedBlockTimeOnly:			true,
+		CrossArchitectureDeterminismReview:		true,
+		DeterminismStaticGateRequired:			true,
+		ConsensusPathExternalFilesystemForbidden:	true,
 	}
 }
 
 func DefaultEconomicSafetyRequirements() EconomicSafetyRequirements {
 	return EconomicSafetyRequirements{
-		NoUnboundedMint:                        true,
-		NoUnauthorizedModuleAccountMintBurn:    true,
-		SupplyInvariants:                       true,
-		FeeSplitInvariants:                     true,
-		DelegationShareInvariants:              true,
-		RewardDistributionInvariants:           true,
-		SlashingCannotUnderflowStake:           true,
-		JailedValidatorsCannotReceiveRewards:   true,
-		ModuleAccountAuthorityChecked:          true,
-		BurnAndMintEventsAfterBankSuccess:      true,
-		FixedPointRewardMath:                   true,
-		NegativeBalanceForbidden:               true,
-		DistributionSkipsInactiveOrJailedPower: true,
-		EconomicInvariantTestsRequired:         true,
-		ExportImportSupplyStabilityTests:       true,
+		NoUnboundedMint:			true,
+		NoUnauthorizedModuleAccountMintBurn:	true,
+		SupplyInvariants:			true,
+		FeeSplitInvariants:			true,
+		DelegationShareInvariants:		true,
+		RewardDistributionInvariants:		true,
+		SlashingCannotUnderflowStake:		true,
+		JailedValidatorsCannotReceiveRewards:	true,
+		ModuleAccountAuthorityChecked:		true,
+		BurnAndMintEventsAfterBankSuccess:	true,
+		FixedPointRewardMath:			true,
+		NegativeBalanceForbidden:		true,
+		DistributionSkipsInactiveOrJailedPower:	true,
+		EconomicInvariantTestsRequired:		true,
+		ExportImportSupplyStabilityTests:	true,
 	}
 }
 
 func DefaultPermissionSafetyRequirements() PermissionSafetyRequirements {
 	return PermissionSafetyRequirements{
-		ModuleAccountPermissionsValidatedAtStartup: true,
-		ReservedAddressesCannotSignUserTxs:         true,
-		BlockedAddressesCannotReceiveUserFunds:     true,
-		ExplicitReceiveAllowlistRequired:           true,
-		GovernanceAuthorityChecked:                 true,
-		ParamsAuthorityChecked:                     true,
-		KeeperWiringTests:                          true,
-		ModuleAccountPermissionsMinimumRequired:    true,
-		ReservedAddressCatalogValidated:            true,
-		BlockedAddressBankKeeperWiringValidated:    true,
-		UserTxSignerValidationUsesReservedCatalog:  true,
+		ModuleAccountPermissionsValidatedAtStartup:	true,
+		ReservedAddressesCannotSignUserTxs:		true,
+		BlockedAddressesCannotReceiveUserFunds:		true,
+		ExplicitReceiveAllowlistRequired:		true,
+		GovernanceAuthorityChecked:			true,
+		ParamsAuthorityChecked:				true,
+		KeeperWiringTests:				true,
+		ModuleAccountPermissionsMinimumRequired:	true,
+		ReservedAddressCatalogValidated:		true,
+		BlockedAddressBankKeeperWiringValidated:	true,
+		UserTxSignerValidationUsesReservedCatalog:	true,
 	}
 }
 
@@ -227,14 +227,14 @@ func BuildSecurityRequirementsReport(consensus ConsensusSafetyRequirements, econ
 	}
 	sort.Strings(failed)
 	return SecurityRequirementsReport{
-		ConsensusRequired:  len(consensusChecks),
-		ConsensusPassed:    consensusPassed,
-		EconomicRequired:   len(economicChecks),
-		EconomicPassed:     economicPassed,
-		PermissionRequired: len(permissionChecks),
-		PermissionPassed:   permissionPassed,
-		Failed:             failed,
-		Passed:             len(failed) == 0,
+		ConsensusRequired:	len(consensusChecks),
+		ConsensusPassed:	consensusPassed,
+		EconomicRequired:	len(economicChecks),
+		EconomicPassed:		economicPassed,
+		PermissionRequired:	len(permissionChecks),
+		PermissionPassed:	permissionPassed,
+		Failed:			failed,
+		Passed:			len(failed) == 0,
 	}
 }
 
@@ -271,6 +271,6 @@ func ValidateActiveValidatorRewardEligibility(eligibility ValidatorRewardEligibi
 }
 
 type requirementCheck struct {
-	ID     string
-	Passed bool
+	ID	string
+	Passed	bool
 }

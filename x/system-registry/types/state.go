@@ -11,101 +11,101 @@ import (
 )
 
 const (
-	StatusActive     = "active"
-	StatusPaused     = "paused"
-	StatusDeprecated = "deprecated"
+	StatusActive		= "active"
+	StatusPaused		= "paused"
+	StatusDeprecated	= "deprecated"
 
-	EventTypeRegistered = "registered"
-	EventTypeUpdated    = "updated"
-	EventTypePaused     = "paused"
-	EventTypeResumed    = "resumed"
-	EventTypeDeprecated = "deprecated"
+	EventTypeRegistered	= "registered"
+	EventTypeUpdated	= "updated"
+	EventTypePaused		= "paused"
+	EventTypeResumed	= "resumed"
+	EventTypeDeprecated	= "deprecated"
 
-	MaxEntitiesV1        = uint32(256)
-	MaxCapabilitiesV1    = uint32(64)
-	MaxDependenciesV1    = uint32(64)
-	MaxModuleNameBytesV1 = uint32(96)
-	MaxCapabilityBytesV1 = uint32(128)
-	MaxDependencyEdgesV1 = uint32(1_024)
-	DefaultModuleVersion = uint64(1)
-	ModuleConfig         = "config"
-	ModuleConstitution   = "constitution"
+	MaxEntitiesV1		= uint32(256)
+	MaxCapabilitiesV1	= uint32(64)
+	MaxDependenciesV1	= uint32(64)
+	MaxModuleNameBytesV1	= uint32(96)
+	MaxCapabilityBytesV1	= uint32(128)
+	MaxDependencyEdgesV1	= uint32(1_024)
+	DefaultModuleVersion	= uint64(1)
+	ModuleConfig		= "config"
+	ModuleConstitution	= "constitution"
 )
 
 type Params struct {
-	Authority          string
-	MaxEntities        uint32
-	MaxCapabilities    uint32
-	MaxDependencies    uint32
-	MaxModuleNameBytes uint32
-	MaxCapabilityBytes uint32
-	MaxDependencyEdges uint32
-	RequiredModules    []string
+	Authority		string
+	MaxEntities		uint32
+	MaxCapabilities		uint32
+	MaxDependencies		uint32
+	MaxModuleNameBytes	uint32
+	MaxCapabilityBytes	uint32
+	MaxDependencyEdges	uint32
+	RequiredModules		[]string
 }
 
 type SystemEntity struct {
-	Name                              string
-	ModuleName                        string
-	ModuleAccountAddress              string
-	RawAddress                        string
-	UserFriendlyAddress               string
-	AuthorityAddress                  string
-	Status                            string
-	Core                              bool
-	CanHoldFunds                      bool
-	CanReceiveUserFunds               bool
-	CanSendFunds                      bool
-	Capabilities                      []string
-	Version                           uint64
-	Dependencies                      []string
-	Required                          bool
-	PrivilegedCallsAllowedWhilePaused bool
+	Name					string
+	ModuleName				string
+	ModuleAccountAddress			string
+	RawAddress				string
+	UserFriendlyAddress			string
+	AuthorityAddress			string
+	Status					string
+	Core					bool
+	CanHoldFunds				bool
+	CanReceiveUserFunds			bool
+	CanSendFunds				bool
+	Capabilities				[]string
+	Version					uint64
+	Dependencies				[]string
+	Required				bool
+	PrivilegedCallsAllowedWhilePaused	bool
 }
 
 type State struct {
-	Entities               []SystemEntity
-	UserControlledAccounts []string
+	Entities		[]SystemEntity
+	UserControlledAccounts	[]string
 }
 
 type DependencyEdge struct {
-	ModuleName string
-	DependsOn  string
+	ModuleName	string
+	DependsOn	string
 }
 
 type SystemEntityEvent struct {
-	Type       string
-	ModuleName string
-	Status     string
-	Height     uint64
+	Type		string
+	ModuleName	string
+	Status		string
+	Height		uint64
 }
 
 type MsgRegisterSystemEntity struct {
-	Authority string
-	Entity    SystemEntity
+	Authority	string
+	Entity		SystemEntity
 }
 
 type MsgUpdateSystemEntity struct {
-	Authority string
-	Entity    SystemEntity
+	Authority	string
+	Entity		SystemEntity
 }
 
 type MsgPauseSystemEntity struct {
-	Authority                       string
-	ModuleName                      string
-	Height                          uint64
-	AllowPrivilegedCallsWhilePaused bool
+	Authority			string
+	ModuleName			string
+	Height				uint64
+	AllowPrivilegedCallsWhilePaused	bool
 }
 
 type MsgResumeSystemEntity struct {
-	Authority  string
-	ModuleName string
-	Height     uint64
+	Authority	string
+	ModuleName	string
+	Height		uint64
 }
 
 type MsgDeprecateSystemEntity struct {
-	Authority  string
-	ModuleName string
-	Height     uint64
+	Authority	string
+	ModuleName	string
+	Height		uint64
 }
 
 func DefaultParams() Params {
@@ -115,14 +115,14 @@ func DefaultParams() Params {
 	}
 	sort.Strings(requiredModules)
 	return Params{
-		Authority:          prototype.DefaultAuthority,
-		MaxEntities:        MaxEntitiesV1,
-		MaxCapabilities:    MaxCapabilitiesV1,
-		MaxDependencies:    MaxDependenciesV1,
-		MaxModuleNameBytes: MaxModuleNameBytesV1,
-		MaxCapabilityBytes: MaxCapabilityBytesV1,
-		MaxDependencyEdges: MaxDependencyEdgesV1,
-		RequiredModules:    requiredModules,
+		Authority:		prototype.DefaultAuthority,
+		MaxEntities:		MaxEntitiesV1,
+		MaxCapabilities:	MaxCapabilitiesV1,
+		MaxDependencies:	MaxDependenciesV1,
+		MaxModuleNameBytes:	MaxModuleNameBytesV1,
+		MaxCapabilityBytes:	MaxCapabilityBytesV1,
+		MaxDependencyEdges:	MaxDependencyEdgesV1,
+		RequiredModules:	requiredModules,
 	}
 }
 
@@ -131,19 +131,19 @@ func DefaultState() State {
 	entities := make([]SystemEntity, 0, len(addressing.AllSystemAddresses()))
 	for _, address := range addressing.AllSystemAddresses() {
 		entities = append(entities, SystemEntity{
-			Name:                 address.Name,
-			ModuleName:           address.ModuleName,
-			ModuleAccountAddress: address.Raw,
-			RawAddress:           address.Raw,
-			UserFriendlyAddress:  address.UserFriendly,
-			AuthorityAddress:     authority,
-			Status:               StatusActive,
-			Core:                 address.Core,
-			CanHoldFunds:         address.CanHoldFunds,
-			CanReceiveUserFunds:  address.CanReceiveUserFunds,
-			CanSendFunds:         address.CanSendFunds,
-			Version:              DefaultModuleVersion,
-			Required:             true,
+			Name:			address.Name,
+			ModuleName:		address.ModuleName,
+			ModuleAccountAddress:	address.Raw,
+			RawAddress:		address.Raw,
+			UserFriendlyAddress:	address.UserFriendly,
+			AuthorityAddress:	authority,
+			Status:			StatusActive,
+			Core:			address.Core,
+			CanHoldFunds:		address.CanHoldFunds,
+			CanReceiveUserFunds:	address.CanReceiveUserFunds,
+			CanSendFunds:		address.CanSendFunds,
+			Version:		DefaultModuleVersion,
+			Required:		true,
 		})
 	}
 	return State{Entities: SortEntities(entities)}
@@ -332,8 +332,8 @@ func (e SystemEntity) Normalize(params Params) SystemEntity {
 
 func (s State) Normalize(params Params) State {
 	out := State{
-		Entities:               make([]SystemEntity, 0, len(s.Entities)),
-		UserControlledAccounts: append([]string(nil), s.UserControlledAccounts...),
+		Entities:		make([]SystemEntity, 0, len(s.Entities)),
+		UserControlledAccounts:	append([]string(nil), s.UserControlledAccounts...),
 	}
 	for _, entity := range s.Entities {
 		out.Entities = append(out.Entities, entity.Normalize(params))
@@ -500,7 +500,6 @@ func IsStatus(status string) bool {
 func PrivilegedCallAllowed(entity SystemEntity) bool {
 	return entity.Status == StatusActive || (entity.Status == StatusPaused && entity.PrivilegedCallsAllowedWhilePaused)
 }
-
 
 func validateAcyclic(byName map[string]SystemEntity) error {
 	visiting := map[string]bool{}

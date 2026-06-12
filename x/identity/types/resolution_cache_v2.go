@@ -7,19 +7,19 @@ import (
 )
 
 const (
-	IdentityCacheLayerFullNodeDirectV2     IdentityCacheLayerV2               = "full_node_direct"
-	IdentityCacheLayerFullNodeRecursiveV2  IdentityCacheLayerV2               = "full_node_recursive"
-	IdentityCacheLayerWalletVerifiedV2     IdentityCacheLayerV2               = "wallet_verified_proof"
-	IdentityCacheLayerServiceEndpointV2    IdentityCacheLayerV2               = "service_endpoint_ttl"
-	IdentityCacheLayerReverseVerifiedV2    IdentityCacheLayerV2               = "reverse_verified"
-	IdentityCacheInvalidDomainTransferV2   IdentityCacheInvalidationTriggerV2 = "domain_transfer"
-	IdentityCacheInvalidResolverUpdateV2   IdentityCacheInvalidationTriggerV2 = "resolver_update"
-	IdentityCacheInvalidNFTBindingUpdateV2 IdentityCacheInvalidationTriggerV2 = "nft_binding_update"
-	IdentityCacheInvalidDomainExpiryV2     IdentityCacheInvalidationTriggerV2 = "domain_expiry"
-	IdentityCacheInvalidRenewalEpochV2     IdentityCacheInvalidationTriggerV2 = "renewal_lifecycle_epoch"
-	IdentityCacheInvalidDelegationUpdateV2 IdentityCacheInvalidationTriggerV2 = "delegation_update"
-	IdentityCacheInvalidZonePolicyUpdateV2 IdentityCacheInvalidationTriggerV2 = "zone_policy_update"
-	IdentityCacheInvalidReverseUpdateV2    IdentityCacheInvalidationTriggerV2 = "reverse_record_update"
+	IdentityCacheLayerFullNodeDirectV2	IdentityCacheLayerV2			= "full_node_direct"
+	IdentityCacheLayerFullNodeRecursiveV2	IdentityCacheLayerV2			= "full_node_recursive"
+	IdentityCacheLayerWalletVerifiedV2	IdentityCacheLayerV2			= "wallet_verified_proof"
+	IdentityCacheLayerServiceEndpointV2	IdentityCacheLayerV2			= "service_endpoint_ttl"
+	IdentityCacheLayerReverseVerifiedV2	IdentityCacheLayerV2			= "reverse_verified"
+	IdentityCacheInvalidDomainTransferV2	IdentityCacheInvalidationTriggerV2	= "domain_transfer"
+	IdentityCacheInvalidResolverUpdateV2	IdentityCacheInvalidationTriggerV2	= "resolver_update"
+	IdentityCacheInvalidNFTBindingUpdateV2	IdentityCacheInvalidationTriggerV2	= "nft_binding_update"
+	IdentityCacheInvalidDomainExpiryV2	IdentityCacheInvalidationTriggerV2	= "domain_expiry"
+	IdentityCacheInvalidRenewalEpochV2	IdentityCacheInvalidationTriggerV2	= "renewal_lifecycle_epoch"
+	IdentityCacheInvalidDelegationUpdateV2	IdentityCacheInvalidationTriggerV2	= "delegation_update"
+	IdentityCacheInvalidZonePolicyUpdateV2	IdentityCacheInvalidationTriggerV2	= "zone_policy_update"
+	IdentityCacheInvalidReverseUpdateV2	IdentityCacheInvalidationTriggerV2	= "reverse_record_update"
 )
 
 type IdentityCacheLayerV2 string
@@ -27,54 +27,54 @@ type IdentityCacheLayerV2 string
 type IdentityCacheInvalidationTriggerV2 string
 
 type IdentityResolutionCacheKeyV2 struct {
-	Layer         IdentityCacheLayerV2
-	NameHash      string
-	RecordVersion uint64
-	Height        uint64
-	PathHash      string
-	TargetKey     string
+	Layer		IdentityCacheLayerV2
+	NameHash	string
+	RecordVersion	uint64
+	Height		uint64
+	PathHash	string
+	TargetKey	string
 }
 
 type IdentityVerifiedCacheMetadataV2 struct {
-	Key                  IdentityResolutionCacheKeyV2
-	ProofHeight          uint64
-	TrustedHeaderChainID string
-	TrustedHeaderHeight  uint64
-	TrustedHeaderAppHash string
-	FreshUntilHeight     uint64
-	ResolverTTL          uint64
-	DomainExpiryHeight   uint64
-	Verified             bool
-	LightClient          bool
+	Key			IdentityResolutionCacheKeyV2
+	ProofHeight		uint64
+	TrustedHeaderChainID	string
+	TrustedHeaderHeight	uint64
+	TrustedHeaderAppHash	string
+	FreshUntilHeight	uint64
+	ResolverTTL		uint64
+	DomainExpiryHeight	uint64
+	Verified		bool
+	LightClient		bool
 }
 
 type IdentityCacheInvalidationEventV2 struct {
-	Trigger           IdentityCacheInvalidationTriggerV2
-	NameHash          string
-	RecordVersion     uint64
-	Height            uint64
-	ParentEpoch       uint64
-	ChildEpoch        uint64
-	ReverseAddressHex string
+	Trigger			IdentityCacheInvalidationTriggerV2
+	NameHash		string
+	RecordVersion		uint64
+	Height			uint64
+	ParentEpoch		uint64
+	ChildEpoch		uint64
+	ReverseAddressHex	string
 }
 
 type ResolutionCacheRecordV2 struct {
-	NameHash           string
-	ResolutionPathHash string
-	ResolvedRecordHash string
-	ValidUntilHeight   uint64
-	SourceVersion      uint64
-	ParentEpoch        uint64
-	ChildEpoch         uint64
+	NameHash		string
+	ResolutionPathHash	string
+	ResolvedRecordHash	string
+	ValidUntilHeight	uint64
+	SourceVersion		uint64
+	ParentEpoch		uint64
+	ChildEpoch		uint64
 }
 
 type ResolutionCacheUseContextV2 struct {
-	Height        uint64
-	SourceVersion uint64
-	ParentEpoch   uint64
-	ChildEpoch    uint64
-	LightClient   bool
-	ProofVerified bool
+	Height		uint64
+	SourceVersion	uint64
+	ParentEpoch	uint64
+	ChildEpoch	uint64
+	LightClient	bool
+	ProofVerified	bool
 }
 
 func NewResolutionCacheRecordV2(name string, resolutionPathHash string, resolvedRecordHash string, validUntilHeight uint64, sourceVersion uint64, parentEpoch uint64, childEpoch uint64) (ResolutionCacheRecordV2, error) {
@@ -83,13 +83,13 @@ func NewResolutionCacheRecordV2(name string, resolutionPathHash string, resolved
 		return ResolutionCacheRecordV2{}, err
 	}
 	record := ResolutionCacheRecordV2{
-		NameHash:           nameHash,
-		ResolutionPathHash: resolutionPathHash,
-		ResolvedRecordHash: resolvedRecordHash,
-		ValidUntilHeight:   validUntilHeight,
-		SourceVersion:      sourceVersion,
-		ParentEpoch:        parentEpoch,
-		ChildEpoch:         childEpoch,
+		NameHash:		nameHash,
+		ResolutionPathHash:	resolutionPathHash,
+		ResolvedRecordHash:	resolvedRecordHash,
+		ValidUntilHeight:	validUntilHeight,
+		SourceVersion:		sourceVersion,
+		ParentEpoch:		parentEpoch,
+		ChildEpoch:		childEpoch,
 	}
 	return record, ValidateResolutionCacheRecordV2(record)
 }
@@ -144,12 +144,12 @@ func NewIdentityResolutionCacheKeyV2(layer IdentityCacheLayerV2, name string, re
 		return IdentityResolutionCacheKeyV2{}, err
 	}
 	key := IdentityResolutionCacheKeyV2{
-		Layer:         layer,
-		NameHash:      nameHash,
-		RecordVersion: recordVersion,
-		Height:        height,
-		PathHash:      pathHash,
-		TargetKey:     targetKey,
+		Layer:		layer,
+		NameHash:	nameHash,
+		RecordVersion:	recordVersion,
+		Height:		height,
+		PathHash:	pathHash,
+		TargetKey:	targetKey,
 	}
 	return key, ValidateIdentityResolutionCacheKeyV2(key)
 }
@@ -207,16 +207,16 @@ func NewIdentityVerifiedCacheMetadataV2(key IdentityResolutionCacheKeyV2, proofH
 		freshUntil = domainExpiryHeight
 	}
 	metadata := IdentityVerifiedCacheMetadataV2{
-		Key:                  key,
-		ProofHeight:          proofHeight,
-		TrustedHeaderChainID: trustedHeader.ChainID,
-		TrustedHeaderHeight:  trustedHeader.Height,
-		TrustedHeaderAppHash: trustedHeader.AppHash,
-		FreshUntilHeight:     freshUntil,
-		ResolverTTL:          resolverTTL,
-		DomainExpiryHeight:   domainExpiryHeight,
-		Verified:             trustedHeader.Trusted,
-		LightClient:          lightClient,
+		Key:			key,
+		ProofHeight:		proofHeight,
+		TrustedHeaderChainID:	trustedHeader.ChainID,
+		TrustedHeaderHeight:	trustedHeader.Height,
+		TrustedHeaderAppHash:	trustedHeader.AppHash,
+		FreshUntilHeight:	freshUntil,
+		ResolverTTL:		resolverTTL,
+		DomainExpiryHeight:	domainExpiryHeight,
+		Verified:		trustedHeader.Trusted,
+		LightClient:		lightClient,
 	}
 	return metadata, ValidateIdentityVerifiedCacheMetadataV2(metadata)
 }

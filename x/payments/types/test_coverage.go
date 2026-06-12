@@ -11,30 +11,30 @@ type RequiredTestCoverageKind string
 type RequiredTestCoverageID string
 
 const (
-	RequiredTestCoverageUnit        RequiredTestCoverageKind = "UNIT"
-	RequiredTestCoverageIntegration RequiredTestCoverageKind = "INTEGRATION"
-	RequiredTestCoverageInvariant   RequiredTestCoverageKind = "INVARIANT"
-	RequiredTestCoverageFuzz        RequiredTestCoverageKind = "FUZZ"
-	RequiredTestCoveragePerformance RequiredTestCoverageKind = "PERFORMANCE"
+	RequiredTestCoverageUnit	RequiredTestCoverageKind	= "UNIT"
+	RequiredTestCoverageIntegration	RequiredTestCoverageKind	= "INTEGRATION"
+	RequiredTestCoverageInvariant	RequiredTestCoverageKind	= "INVARIANT"
+	RequiredTestCoverageFuzz	RequiredTestCoverageKind	= "FUZZ"
+	RequiredTestCoveragePerformance	RequiredTestCoverageKind	= "PERFORMANCE"
 )
 
 type RequiredTestCoverageEntry struct {
-	CoverageID   RequiredTestCoverageID
-	Kind         RequiredTestCoverageKind
-	Description  string
-	TestNames    []string
-	Evidence     []string
-	EvidenceHash string
+	CoverageID	RequiredTestCoverageID
+	Kind		RequiredTestCoverageKind
+	Description	string
+	TestNames	[]string
+	Evidence	[]string
+	EvidenceHash	string
 }
 
 type RequiredTestCoverageReport struct {
-	UnitCount        uint64
-	IntegrationCount uint64
-	InvariantCount   uint64
-	FuzzCount        uint64
-	PerformanceCount uint64
-	Entries          []RequiredTestCoverageEntry
-	ReportHash       string
+	UnitCount		uint64
+	IntegrationCount	uint64
+	InvariantCount		uint64
+	FuzzCount		uint64
+	PerformanceCount	uint64
+	Entries			[]RequiredTestCoverageEntry
+	ReportHash		string
 }
 
 func BuildRequiredTestCoverageReport() RequiredTestCoverageReport {
@@ -223,11 +223,11 @@ func requiredPerformanceCoverage(id RequiredTestCoverageID, description string, 
 
 func requiredTestCoverage(id RequiredTestCoverageID, kind RequiredTestCoverageKind, description string, tests []string, evidence ...string) RequiredTestCoverageEntry {
 	entry := RequiredTestCoverageEntry{
-		CoverageID:  id,
-		Kind:        kind,
-		Description: description,
-		TestNames:   tests,
-		Evidence:    evidence,
+		CoverageID:	id,
+		Kind:		kind,
+		Description:	description,
+		TestNames:	tests,
+		Evidence:	evidence,
 	}
 	entry.EvidenceHash = ComputeRequiredTestCoverageEntryHash(entry)
 	return entry.Normalize()

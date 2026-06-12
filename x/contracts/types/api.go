@@ -7,54 +7,54 @@ import (
 )
 
 const (
-	MaxContractMetadataBytes = 1024
-	MaxContractPayloadBytes  = 64 * 1024
-	MaxContractQueryLimit    = 100
+	MaxContractMetadataBytes	= 1024
+	MaxContractPayloadBytes		= 64 * 1024
+	MaxContractQueryLimit		= 100
 )
 
 type MsgDeployContract struct {
-	Creator        string
-	CodeID         string
-	ChainID        string
-	Namespace      string
-	Salt           string
-	StateInit      *StateInit
-	InitPayload    []byte
-	InitialBalance uint64
-	Admin          string
-	Upgradeable    bool
-	SystemOwned    bool
-	SchemaVersion  uint64
-	Metadata       []byte
-	Height         uint64
+	Creator		string
+	CodeID		string
+	ChainID		string
+	Namespace	string
+	Salt		string
+	StateInit	*StateInit
+	InitPayload	[]byte
+	InitialBalance	uint64
+	Admin		string
+	Upgradeable	bool
+	SystemOwned	bool
+	SchemaVersion	uint64
+	Metadata	[]byte
+	Height		uint64
 }
 
 type MsgExecuteExternal struct {
-	Sender          string
-	ContractAddress string
-	ChainID         string
-	Namespace       string
-	StateInit       *StateInit
-	Payload         []byte
-	Funds           uint64
-	GasLimit        uint64
-	Metadata        []byte
-	Height          uint64
+	Sender		string
+	ContractAddress	string
+	ChainID		string
+	Namespace	string
+	StateInit	*StateInit
+	Payload		[]byte
+	Funds		uint64
+	GasLimit	uint64
+	Metadata	[]byte
+	Height		uint64
 }
 
 type MsgExecuteInternal struct {
-	Message InternalMessage
-	Height  uint64
+	Message	InternalMessage
+	Height	uint64
 }
 
 type MsgSendInternalMessage struct {
-	Message InternalMessage
-	Height  uint64
+	Message	InternalMessage
+	Height	uint64
 }
 
 type MsgUpdateContractParams struct {
-	Authority string
-	Params    Params
+	Authority	string
+	Params		Params
 }
 
 type MsgUpdateContractParamsResponse struct {
@@ -76,8 +76,8 @@ type QueryCodeRequest struct {
 }
 
 type QueryCodeResponse struct {
-	Code  CodeRecord
-	Found bool
+	Code	CodeRecord
+	Found	bool
 }
 
 type QueryCodesRequest struct {
@@ -97,9 +97,9 @@ type QueryContractsResponse struct {
 }
 
 type QueryContractStorageRequest struct {
-	ContractAddress string
-	KeyPrefix       []byte
-	Pagination      PageRequest
+	ContractAddress	string
+	KeyPrefix	[]byte
+	Pagination	PageRequest
 }
 
 type QueryContractStorageResponse struct {
@@ -107,8 +107,8 @@ type QueryContractStorageResponse struct {
 }
 
 type QueryContractReceiptsRequest struct {
-	ContractAddress string
-	Pagination      PageRequest
+	ContractAddress	string
+	Pagination	PageRequest
 }
 
 type QueryContractReceiptsResponse struct {
@@ -116,8 +116,8 @@ type QueryContractReceiptsResponse struct {
 }
 
 type QueryContractQueueRequest struct {
-	ContractAddress string
-	Pagination      PageRequest
+	ContractAddress	string
+	Pagination	PageRequest
 }
 
 type QueryContractQueueResponse struct {
@@ -125,8 +125,8 @@ type QueryContractQueueResponse struct {
 }
 
 type QueryContractEventsRequest struct {
-	ContractAddress string
-	Pagination      PageRequest
+	ContractAddress	string
+	Pagination	PageRequest
 }
 
 type QueryContractEventsResponse struct{}

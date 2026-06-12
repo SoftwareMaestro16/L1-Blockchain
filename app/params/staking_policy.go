@@ -3,87 +3,87 @@ package params
 import "fmt"
 
 const (
-	StakingPolicyDenom = BaseDenom
+	StakingPolicyDenom	= BaseDenom
 
-	StakingUnbondingBlockTimeSeconds = uint64(6)
-	StakingUnbondingMinDays          = uint64(14)
-	StakingUnbondingMaxDays          = uint64(21)
-	StakingUnbondingDefaultDays      = StakingUnbondingMinDays
+	StakingUnbondingBlockTimeSeconds	= uint64(6)
+	StakingUnbondingMinDays			= uint64(14)
+	StakingUnbondingMaxDays			= uint64(21)
+	StakingUnbondingDefaultDays		= StakingUnbondingMinDays
 
-	StakingUnbondingMinBlocks     = StakingUnbondingMinDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
-	StakingUnbondingMaxBlocks     = StakingUnbondingMaxDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
-	StakingUnbondingDefaultBlocks = StakingUnbondingDefaultDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
+	StakingUnbondingMinBlocks	= StakingUnbondingMinDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
+	StakingUnbondingMaxBlocks	= StakingUnbondingMaxDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
+	StakingUnbondingDefaultBlocks	= StakingUnbondingDefaultDays * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds
 
-	StakingMinSelfBondAET        = int64(10_000)
-	StakingMinValidatorBondAET   = int64(50_000)
-	StakingMinSelfBondNaet       = StakingMinSelfBondAET * BaseUnitsPerDisplay
-	StakingMinValidatorBondNaet  = StakingMinValidatorBondAET * BaseUnitsPerDisplay
-	StakingCommissionFloorBps    = int64(300)
-	StakingCommissionCeilingBps  = MaxCommissionBps
-	StakingMaxDailyCommissionBps = MaxDailyCommissionChangeBps
+	StakingMinSelfBondAET		= int64(10_000)
+	StakingMinValidatorBondAET	= int64(50_000)
+	StakingMinSelfBondNaet		= StakingMinSelfBondAET * BaseUnitsPerDisplay
+	StakingMinValidatorBondNaet	= StakingMinValidatorBondAET * BaseUnitsPerDisplay
+	StakingCommissionFloorBps	= int64(300)
+	StakingCommissionCeilingBps	= MaxCommissionBps
+	StakingMaxDailyCommissionBps	= MaxDailyCommissionChangeBps
 )
 
 type StakingDelegationPolicy struct {
-	Denom                    string
-	MinSelfBondNaet          int64
-	MinValidatorBondNaet     int64
-	MinCommissionBps         int64
-	MaxCommissionBps         int64
-	MaxDailyCommissionBps    int64
-	UnbondingMinBlocks       uint64
-	UnbondingMaxBlocks       uint64
-	UnbondingDefaultBlocks   uint64
-	DelegationEnabled        bool
-	RedelegationEnabled      bool
-	NominationPoolsEnabled   bool
-	SlashingInherited        bool
-	RequireValidatorMetadata bool
+	Denom				string
+	MinSelfBondNaet			int64
+	MinValidatorBondNaet		int64
+	MinCommissionBps		int64
+	MaxCommissionBps		int64
+	MaxDailyCommissionBps		int64
+	UnbondingMinBlocks		uint64
+	UnbondingMaxBlocks		uint64
+	UnbondingDefaultBlocks		uint64
+	DelegationEnabled		bool
+	RedelegationEnabled		bool
+	NominationPoolsEnabled		bool
+	SlashingInherited		bool
+	RequireValidatorMetadata	bool
 }
 
 type AntiCartelPolicy struct {
-	CommissionFloorBps              int64
-	CommissionCeilingBps            int64
-	MaxDailyCommissionChangeBps     int64
-	ValidatorIdentityRegistry       bool
-	MandatoryKYC                    bool
-	ValidatorMetadataTransparency   bool
-	PublicConcentrationMetrics      bool
-	SelfBondRatioVisibility         bool
-	ObjectiveCorrelationWarnings    bool
-	EconomicSignalsInsteadOfHalting bool
+	CommissionFloorBps		int64
+	CommissionCeilingBps		int64
+	MaxDailyCommissionChangeBps	int64
+	ValidatorIdentityRegistry	bool
+	MandatoryKYC			bool
+	ValidatorMetadataTransparency	bool
+	PublicConcentrationMetrics	bool
+	SelfBondRatioVisibility		bool
+	ObjectiveCorrelationWarnings	bool
+	EconomicSignalsInsteadOfHalting	bool
 }
 
 func DefaultStakingDelegationPolicy() StakingDelegationPolicy {
 	return StakingDelegationPolicy{
-		Denom:                    StakingPolicyDenom,
-		MinSelfBondNaet:          StakingMinSelfBondNaet,
-		MinValidatorBondNaet:     StakingMinValidatorBondNaet,
-		MinCommissionBps:         StakingCommissionFloorBps,
-		MaxCommissionBps:         StakingCommissionCeilingBps,
-		MaxDailyCommissionBps:    StakingMaxDailyCommissionBps,
-		UnbondingMinBlocks:       StakingUnbondingMinBlocks,
-		UnbondingMaxBlocks:       StakingUnbondingMaxBlocks,
-		UnbondingDefaultBlocks:   StakingUnbondingDefaultBlocks,
-		DelegationEnabled:        true,
-		RedelegationEnabled:      true,
-		NominationPoolsEnabled:   true,
-		SlashingInherited:        true,
-		RequireValidatorMetadata: true,
+		Denom:				StakingPolicyDenom,
+		MinSelfBondNaet:		StakingMinSelfBondNaet,
+		MinValidatorBondNaet:		StakingMinValidatorBondNaet,
+		MinCommissionBps:		StakingCommissionFloorBps,
+		MaxCommissionBps:		StakingCommissionCeilingBps,
+		MaxDailyCommissionBps:		StakingMaxDailyCommissionBps,
+		UnbondingMinBlocks:		StakingUnbondingMinBlocks,
+		UnbondingMaxBlocks:		StakingUnbondingMaxBlocks,
+		UnbondingDefaultBlocks:		StakingUnbondingDefaultBlocks,
+		DelegationEnabled:		true,
+		RedelegationEnabled:		true,
+		NominationPoolsEnabled:		true,
+		SlashingInherited:		true,
+		RequireValidatorMetadata:	true,
 	}
 }
 
 func DefaultAntiCartelPolicy() AntiCartelPolicy {
 	return AntiCartelPolicy{
-		CommissionFloorBps:              StakingCommissionFloorBps,
-		CommissionCeilingBps:            StakingCommissionCeilingBps,
-		MaxDailyCommissionChangeBps:     StakingMaxDailyCommissionBps,
-		ValidatorIdentityRegistry:       true,
-		MandatoryKYC:                    false,
-		ValidatorMetadataTransparency:   true,
-		PublicConcentrationMetrics:      true,
-		SelfBondRatioVisibility:         true,
-		ObjectiveCorrelationWarnings:    true,
-		EconomicSignalsInsteadOfHalting: true,
+		CommissionFloorBps:			StakingCommissionFloorBps,
+		CommissionCeilingBps:			StakingCommissionCeilingBps,
+		MaxDailyCommissionChangeBps:		StakingMaxDailyCommissionBps,
+		ValidatorIdentityRegistry:		true,
+		MandatoryKYC:				false,
+		ValidatorMetadataTransparency:		true,
+		PublicConcentrationMetrics:		true,
+		SelfBondRatioVisibility:		true,
+		ObjectiveCorrelationWarnings:		true,
+		EconomicSignalsInsteadOfHalting:	true,
 	}
 }
 

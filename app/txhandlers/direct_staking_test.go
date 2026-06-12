@@ -17,27 +17,27 @@ type msgTx struct {
 	msgs []sdk.Msg
 }
 
-func (tx msgTx) GetMsgs() []sdk.Msg { return tx.msgs }
+func (tx msgTx) GetMsgs() []sdk.Msg	{ return tx.msgs }
 
-func (tx msgTx) GetMsgsV2() ([]protov2.Message, error) { return nil, nil }
+func (tx msgTx) GetMsgsV2() ([]protov2.Message, error)	{ return nil, nil }
 
 func TestRejectDirectUserStakingDecorator(t *testing.T) {
 	amount := sdk.NewInt64Coin("naet", 10)
 	tests := []struct {
-		name string
-		msg  sdk.Msg
+		name	string
+		msg	sdk.Msg
 	}{
 		{
-			name: "delegate",
-			msg:  stakingtypes.NewMsgDelegate("AE1", "AE2", amount),
+			name:	"delegate",
+			msg:	stakingtypes.NewMsgDelegate("AE1", "AE2", amount),
 		},
 		{
-			name: "redelegate",
-			msg:  stakingtypes.NewMsgBeginRedelegate("AE1", "AE2", "AE3", amount),
+			name:	"redelegate",
+			msg:	stakingtypes.NewMsgBeginRedelegate("AE1", "AE2", "AE3", amount),
 		},
 		{
-			name: "undelegate",
-			msg:  stakingtypes.NewMsgUndelegate("AE1", "AE2", amount),
+			name:	"undelegate",
+			msg:	stakingtypes.NewMsgUndelegate("AE1", "AE2", amount),
 		},
 	}
 

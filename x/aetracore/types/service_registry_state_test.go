@@ -113,13 +113,13 @@ func TestServiceRegistryStateIndexesProvidersReputationAndReceipts(t *testing.T)
 	ctx := ServiceConsensusContext{ChainID: "aetra-test", Height: 50}
 	call := servicePipelineCall(ctx, service, "resolve", ServiceCallKindOnChain, 1, "identity/state", "1")
 	receipt, err := NewServiceCallReceipt(call, ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         ServiceCallStatusExecuted,
-		ResponseHash:   testHash("identity/response"),
-		PaymentStatus:  ServicePaymentStatusSettled,
-		GasUsed:        100,
-		ExecutedHeight: 50,
-		AnchoredHeight: 50,
+		CallID:		call.CallID,
+		Status:		ServiceCallStatusExecuted,
+		ResponseHash:	testHash("identity/response"),
+		PaymentStatus:	ServicePaymentStatusSettled,
+		GasUsed:	100,
+		ExecutedHeight:	50,
+		AnchoredHeight:	50,
 	})
 	require.NoError(t, err)
 
@@ -159,12 +159,12 @@ func TestServiceRegistryStateRejectsDuplicateServiceNameAndExpiredBinding(t *tes
 	require.ErrorContains(t, err, "key collision")
 
 	binding := IdentityServiceBinding{
-		IdentityName:   "identity.aet",
-		ServiceID:      "identity-resolver",
-		Owner:          DefaultAuthority,
-		DescriptorHash: ComputeServiceDescriptorHash(first),
-		CreatedHeight:  10,
-		ExpiryHeight:   10,
+		IdentityName:	"identity.aet",
+		ServiceID:	"identity-resolver",
+		Owner:		DefaultAuthority,
+		DescriptorHash:	ComputeServiceDescriptorHash(first),
+		CreatedHeight:	10,
+		ExpiryHeight:	10,
 	}
 	binding.BindingHash = ComputeIdentityServiceBindingHash(binding)
 	require.ErrorContains(t, binding.Validate(), "expiry")

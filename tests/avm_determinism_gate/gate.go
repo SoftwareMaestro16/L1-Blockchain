@@ -21,11 +21,11 @@ var ProductionDirs = []string{
 }
 
 type Violation struct {
-	File string
-	Line int
-	Col  int
-	Rule string
-	Text string
+	File	string
+	Line	int
+	Col	int
+	Rule	string
+	Text	string
 }
 
 func (v Violation) String() string {
@@ -82,10 +82,10 @@ func (g Gate) ScanFile(path string) ([]Violation, error) {
 		return nil, err
 	}
 	scanner := fileScanner{
-		root:        g.Root,
-		path:        path,
-		fset:        fset,
-		importPaths: make(map[string]string),
+		root:		g.Root,
+		path:		path,
+		fset:		fset,
+		importPaths:	make(map[string]string),
 	}
 	scanner.scanImports(file)
 	ast.Inspect(file, scanner.inspectNode)
@@ -110,13 +110,13 @@ func AssertNoViolations(violations []Violation) error {
 }
 
 type fileScanner struct {
-	root        string
-	path        string
-	fset        *token.FileSet
-	importPaths map[string]string
-	violations  []Violation
-	fn          *ast.FuncDecl
-	mapVars     []map[string]struct{}
+	root		string
+	path		string
+	fset		*token.FileSet
+	importPaths	map[string]string
+	violations	[]Violation
+	fn		*ast.FuncDecl
+	mapVars		[]map[string]struct{}
 }
 
 func (s *fileScanner) scanImports(file *ast.File) {
@@ -278,11 +278,11 @@ func (s *fileScanner) add(pos token.Pos, rule, text string) {
 		}
 	}
 	s.violations = append(s.violations, Violation{
-		File: path,
-		Line: position.Line,
-		Col:  position.Column,
-		Rule: rule,
-		Text: text,
+		File:	path,
+		Line:	position.Line,
+		Col:	position.Column,
+		Rule:	rule,
+		Text:	text,
 	})
 }
 

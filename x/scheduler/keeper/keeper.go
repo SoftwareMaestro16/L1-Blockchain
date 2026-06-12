@@ -18,16 +18,16 @@ var genesisKey = []byte{0x01}
 type JobHandler func(job schedulertypes.ScheduledJob, currentHeight uint64) schedulertypes.JobExecutionResult
 
 type GenesisState struct {
-	Version         uint64
-	Params          prototype.Params
-	SchedulerParams schedulertypes.SchedulerParams
-	State           schedulertypes.SchedulerState
+	Version		uint64
+	Params		prototype.Params
+	SchedulerParams	schedulertypes.SchedulerParams
+	State		schedulertypes.SchedulerState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
-	handlers     map[string]JobHandler
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
+	handlers	map[string]JobHandler
 }
 
 func NewKeeper() Keeper {
@@ -40,10 +40,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version:         prototype.CurrentGenesisVersion,
-		Params:          prototype.DefaultParams(),
-		SchedulerParams: schedulertypes.DefaultSchedulerParams(),
-		State:           schedulertypes.EmptySchedulerState(),
+		Version:		prototype.CurrentGenesisVersion,
+		Params:			prototype.DefaultParams(),
+		SchedulerParams:	schedulertypes.DefaultSchedulerParams(),
+		State:			schedulertypes.EmptySchedulerState(),
 	}
 }
 
@@ -322,11 +322,11 @@ func (k *Keeper) setJobPaused(authority, ownerModule, jobID string, paused bool)
 func (k Keeper) executeJob(job schedulertypes.ScheduledJob, currentHeight uint64) (schedulertypes.JobHistoryRecord, schedulertypes.ScheduledJob) {
 	job = job.Normalize()
 	record := schedulertypes.JobHistoryRecord{
-		JobID:       job.ID,
-		OwnerModule: job.OwnerModule,
-		Height:      currentHeight,
-		Status:      schedulertypes.HistoryStatusFailure,
-		Attempt:     job.FailureCount + 1,
+		JobID:		job.ID,
+		OwnerModule:	job.OwnerModule,
+		Height:		currentHeight,
+		Status:		schedulertypes.HistoryStatusFailure,
+		Attempt:	job.FailureCount + 1,
 	}
 	handler := k.handlers[job.OwnerModule]
 	if handler == nil {
@@ -353,9 +353,9 @@ func safeExecute(handler JobHandler, job schedulertypes.ScheduledJob, currentHei
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			result = schedulertypes.JobExecutionResult{
-				Success: false,
-				GasUsed: job.MaxGas,
-				Error:   fmt.Sprintf("scheduler job panicked: %v", recovered),
+				Success:	false,
+				GasUsed:	job.MaxGas,
+				Error:		fmt.Sprintf("scheduler job panicked: %v", recovered),
 			}
 		}
 	}()

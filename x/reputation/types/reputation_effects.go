@@ -5,52 +5,52 @@ import (
 )
 
 const (
-	MaxFeePremiumBpsDefault     = uint32(15_000)
-	MaxFeeDiscountBpsDefault     = uint32(5_000)
-	MaxQueuePriorityBoostDefault = uint32(5_000)
-	MaxValidatorAllocBoostBpsDefault  = uint32(2_000)
-	MaxValidatorAllocPenaltyBpsDefault = uint32(3_000)
-	MaxServiceTrustRoutingBoostDefault = uint32(3_000)
-	DecayRatePerEpochDefaultEffect    = uint8(1)
-	ConfidenceGainRateDefault         = uint32(100)
-	ConfidenceLossRateDefault          = uint32(200)
-	PerEpochScoreCapDefault            = uint32(500)
-	PerEpochConfidenceCapDefault       = uint32(300)
+	MaxFeePremiumBpsDefault			= uint32(15_000)
+	MaxFeeDiscountBpsDefault		= uint32(5_000)
+	MaxQueuePriorityBoostDefault		= uint32(5_000)
+	MaxValidatorAllocBoostBpsDefault	= uint32(2_000)
+	MaxValidatorAllocPenaltyBpsDefault	= uint32(3_000)
+	MaxServiceTrustRoutingBoostDefault	= uint32(3_000)
+	DecayRatePerEpochDefaultEffect		= uint8(1)
+	ConfidenceGainRateDefault		= uint32(100)
+	ConfidenceLossRateDefault		= uint32(200)
+	PerEpochScoreCapDefault			= uint32(500)
+	PerEpochConfidenceCapDefault		= uint32(300)
 
-	NeutralScoreBps = uint32(5_000)
+	NeutralScoreBps	= uint32(5_000)
 
-	MinStakeAmountForPoolStakingDefault = uint64(10_000_000_000)
+	MinStakeAmountForPoolStakingDefault	= uint64(10_000_000_000)
 )
 
 type ReputationEffectParams struct {
-	MaxFeePremiumBps           uint32 `json:"max_fee_premium_bps"`
-	MaxFeeDiscountBps          uint32 `json:"max_fee_discount_bps"`
-	MaxQueuePriorityBoostBps   uint32 `json:"max_queue_priority_boost_bps"`
-	MaxValidatorAllocBoostBps  uint32 `json:"max_validator_allocation_boost_bps"`
-	MaxValidatorAllocPenaltyBps uint32 `json:"max_validator_allocation_penalty_bps"`
-	MaxServiceTrustRoutingBps  uint32 `json:"max_service_trust_routing_boost_bps"`
-	DecayRatePerEpoch          uint8  `json:"decay_rate_per_epoch"`
-	ConfidenceGainRate         uint32 `json:"confidence_gain_rate"`
-	ConfidenceLossRate         uint32 `json:"confidence_loss_rate"`
-	PerEpochScoreCap           uint32 `json:"per_epoch_score_cap"`
-	PerEpochConfidenceCap      uint32 `json:"per_epoch_confidence_cap"`
-	MinStakeAmountForPool      uint64 `json:"min_stake_amount_for_pool"`
+	MaxFeePremiumBps		uint32	`json:"max_fee_premium_bps"`
+	MaxFeeDiscountBps		uint32	`json:"max_fee_discount_bps"`
+	MaxQueuePriorityBoostBps	uint32	`json:"max_queue_priority_boost_bps"`
+	MaxValidatorAllocBoostBps	uint32	`json:"max_validator_allocation_boost_bps"`
+	MaxValidatorAllocPenaltyBps	uint32	`json:"max_validator_allocation_penalty_bps"`
+	MaxServiceTrustRoutingBps	uint32	`json:"max_service_trust_routing_boost_bps"`
+	DecayRatePerEpoch		uint8	`json:"decay_rate_per_epoch"`
+	ConfidenceGainRate		uint32	`json:"confidence_gain_rate"`
+	ConfidenceLossRate		uint32	`json:"confidence_loss_rate"`
+	PerEpochScoreCap		uint32	`json:"per_epoch_score_cap"`
+	PerEpochConfidenceCap		uint32	`json:"per_epoch_confidence_cap"`
+	MinStakeAmountForPool		uint64	`json:"min_stake_amount_for_pool"`
 }
 
 func DefaultReputationEffectParams() ReputationEffectParams {
 	return ReputationEffectParams{
-		MaxFeePremiumBps:           MaxFeePremiumBpsDefault,
-		MaxFeeDiscountBps:          MaxFeeDiscountBpsDefault,
-		MaxQueuePriorityBoostBps:  MaxQueuePriorityBoostDefault,
-		MaxValidatorAllocBoostBps:  MaxValidatorAllocBoostBpsDefault,
-		MaxValidatorAllocPenaltyBps: MaxValidatorAllocPenaltyBpsDefault,
-		MaxServiceTrustRoutingBps:  MaxServiceTrustRoutingBoostDefault,
-		DecayRatePerEpoch:         DecayRatePerEpochDefaultEffect,
-		ConfidenceGainRate:        ConfidenceGainRateDefault,
-		ConfidenceLossRate:        ConfidenceLossRateDefault,
-		PerEpochScoreCap:          PerEpochScoreCapDefault,
-		PerEpochConfidenceCap:     PerEpochConfidenceCapDefault,
-		MinStakeAmountForPool:      MinStakeAmountForPoolStakingDefault,
+		MaxFeePremiumBps:		MaxFeePremiumBpsDefault,
+		MaxFeeDiscountBps:		MaxFeeDiscountBpsDefault,
+		MaxQueuePriorityBoostBps:	MaxQueuePriorityBoostDefault,
+		MaxValidatorAllocBoostBps:	MaxValidatorAllocBoostBpsDefault,
+		MaxValidatorAllocPenaltyBps:	MaxValidatorAllocPenaltyBpsDefault,
+		MaxServiceTrustRoutingBps:	MaxServiceTrustRoutingBoostDefault,
+		DecayRatePerEpoch:		DecayRatePerEpochDefaultEffect,
+		ConfidenceGainRate:		ConfidenceGainRateDefault,
+		ConfidenceLossRate:		ConfidenceLossRateDefault,
+		PerEpochScoreCap:		PerEpochScoreCapDefault,
+		PerEpochConfidenceCap:		PerEpochConfidenceCapDefault,
+		MinStakeAmountForPool:		MinStakeAmountForPoolStakingDefault,
 	}
 }
 

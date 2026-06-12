@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	eventTypeConfigChangeSubmitted = "config_change_submitted"
-	eventTypeConfigChangeApproved  = "config_change_approved"
-	eventTypeConfigChangeRejected  = "config_change_rejected"
-	eventTypeConfigChangeExecuted  = "config_change_executed"
-	eventTypeConfigChangeCancelled = "config_change_cancelled"
+	eventTypeConfigChangeSubmitted	= "config_change_submitted"
+	eventTypeConfigChangeApproved	= "config_change_approved"
+	eventTypeConfigChangeRejected	= "config_change_rejected"
+	eventTypeConfigChangeExecuted	= "config_change_executed"
+	eventTypeConfigChangeCancelled	= "config_change_cancelled"
 )
 
 var _ types.MsgServer = grpcMsgServer{}
@@ -24,8 +24,8 @@ var _ types.QueryServer = grpcQueryServer{}
 type grpcMsgServer struct{ keeper *Keeper }
 type grpcQueryServer struct{ keeper *Keeper }
 
-func NewGRPCMsgServer(k *Keeper) types.MsgServer     { return grpcMsgServer{keeper: k} }
-func NewGRPCQueryServer(k *Keeper) types.QueryServer { return grpcQueryServer{keeper: k} }
+func NewGRPCMsgServer(k *Keeper) types.MsgServer	{ return grpcMsgServer{keeper: k} }
+func NewGRPCQueryServer(k *Keeper) types.QueryServer	{ return grpcQueryServer{keeper: k} }
 
 func (s grpcMsgServer) SubmitConfigChange(ctx context.Context, msg *types.MsgSubmitConfigChange) (*types.MsgSubmitConfigChangeResponse, error) {
 	if msg == nil {
@@ -229,5 +229,5 @@ func paginateChanges(changes []types.ConfigChange, offset, limit uint64) ([]type
 	return changes[int(offset):int(end)], next
 }
 
-func int64String(value int64) string   { return strconv.FormatInt(value, 10) }
-func uint64String(value uint64) string { return strconv.FormatUint(value, 10) }
+func int64String(value int64) string	{ return strconv.FormatInt(value, 10) }
+func uint64String(value uint64) string	{ return strconv.FormatUint(value, 10) }

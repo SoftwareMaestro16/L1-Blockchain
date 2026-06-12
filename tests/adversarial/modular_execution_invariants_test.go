@@ -95,12 +95,12 @@ func TestPhase11ModularExecutionInvariants(t *testing.T) {
 		right := shardsim.ShardID{WorkchainID: shardsim.BaseWorkchain, Prefix: "1"}
 		for i := 0; i < 16; i++ {
 			require.NoError(t, sim.EnqueueMessage(shardsim.CrossShardMessage{
-				Source:      left,
-				Destination: right,
-				Nonce:       uint64(i + 1),
-				Payload:     []byte(fmt.Sprintf("payload-%02d", i)),
-				RoutingKey:  []byte(fmt.Sprintf("route-%02d", i)),
-				Timeout:     100,
+				Source:		left,
+				Destination:	right,
+				Nonce:		uint64(i + 1),
+				Payload:	[]byte(fmt.Sprintf("payload-%02d", i)),
+				RoutingKey:	[]byte(fmt.Sprintf("route-%02d", i)),
+				Timeout:	100,
 			}))
 		}
 		before := queueMessageIDs(sim.Export(), left)
@@ -120,12 +120,12 @@ func TestPhase11ModularExecutionInvariants(t *testing.T) {
 	t.Run("load score max delta and routing determinism", func(t *testing.T) {
 		params := loadtypes.DefaultParams()
 		result, err := loadtypes.ComputeLoadScore(params, loadtypes.EMAState{}, loadtypes.Metrics{
-			CanonicalMempoolSize:        params.TargetMempoolSize,
-			UsedBlockGas:                params.TargetBlockGas,
-			AverageInclusionDelayBlocks: params.TargetLatencyBlocks,
-			FailedTxCount:               1,
-			TotalTxCount:                1,
-			ExecutionStepCount:          params.TargetExecutionSteps,
+			CanonicalMempoolSize:		params.TargetMempoolSize,
+			UsedBlockGas:			params.TargetBlockGas,
+			AverageInclusionDelayBlocks:	params.TargetLatencyBlocks,
+			FailedTxCount:			1,
+			TotalTxCount:			1,
+			ExecutionStepCount:		params.TargetExecutionSteps,
 		})
 		require.NoError(t, err)
 		require.LessOrEqual(t, result.LoadScoreBps, params.MaxDeltaBps)
@@ -144,19 +144,19 @@ func FuzzMalformedMeshMessagesFailSafely(f *testing.F) {
 	f.Add([]byte{}, []byte{}, "", uint64(0))
 	f.Fuzz(func(t *testing.T, sender []byte, recipient []byte, payload string, nonce uint64) {
 		msg := meshtypes.MeshMessage{
-			SourceZone:        "FINANCIAL_ZONE",
-			SourceShard:       "0:0",
-			DestinationZone:   "CONTRACT_ZONE",
-			DestinationShard:  "0:1",
-			Nonce:             nonce,
-			Sender:            sender,
-			Recipient:         recipient,
-			AssetCommitment:   meshtypes.HashParts("asset", payload),
-			PayloadHash:       meshtypes.HashParts("payload", payload),
-			TimeoutHeight:     10,
-			Finality:          meshtypes.FinalityReference{Height: 1, CommitmentHash: hashString("commitment")},
-			Sequence:          nonce,
-			SourceLogicalTime: 1,
+			SourceZone:		"FINANCIAL_ZONE",
+			SourceShard:		"0:0",
+			DestinationZone:	"CONTRACT_ZONE",
+			DestinationShard:	"0:1",
+			Nonce:			nonce,
+			Sender:			sender,
+			Recipient:		recipient,
+			AssetCommitment:	meshtypes.HashParts("asset", payload),
+			PayloadHash:		meshtypes.HashParts("payload", payload),
+			TimeoutHeight:		10,
+			Finality:		meshtypes.FinalityReference{Height: 1, CommitmentHash: hashString("commitment")},
+			Sequence:		nonce,
+			SourceLogicalTime:	1,
 		}
 		if valid, err := meshtypes.NewMessage(msg); err == nil {
 			require.NoError(t, valid.Validate())
@@ -250,19 +250,19 @@ func FuzzExportImportCorruptionFailSafely(f *testing.F) {
 
 func adversarialRouteInput(feeDenom string) routingtypes.RouteInput {
 	return routingtypes.RouteInput{
-		MsgType:         routingtypes.MsgTypeBankSend,
-		FeeDenom:        feeDenom,
-		FeeClass:        routingtypes.MaxFeeClass + 100,
-		ReputationClass: routingtypes.MaxReputationClass + 100,
-		AdmissionHeight: 1,
-		TxHash:          []byte("tx-hash"),
-		RoutingEpoch:    7,
+		MsgType:		routingtypes.MsgTypeBankSend,
+		FeeDenom:		feeDenom,
+		FeeClass:		routingtypes.MaxFeeClass + 100,
+		ReputationClass:	routingtypes.MaxReputationClass + 100,
+		AdmissionHeight:	1,
+		TxHash:			[]byte("tx-hash"),
+		RoutingEpoch:		7,
 		ActiveShards: map[routingtypes.ZoneID]uint32{
 			routingtypes.ZoneFinancial: 4,
 		},
 		Locality: routingtypes.Locality{
-			AccountKey: []byte("account"),
-			AssetDenom: "naet",
+			AccountKey:	[]byte("account"),
+			AssetDenom:	"naet",
 		},
 	}
 }
@@ -276,29 +276,29 @@ func adversarialMeshFixture(t *testing.T) (meshtypes.MeshState, meshtypes.MeshMe
 	state, err = meshtypes.RegisterDestination(state, meshtypes.MeshDestination{ZoneID: "FINANCIAL_ZONE", ShardID: "0:0", Active: true})
 	require.NoError(t, err)
 	commitment := meshtypes.FinalizedCommitment{
-		ZoneID:         "FINANCIAL_ZONE",
-		ShardID:        "0:0",
-		Height:         90,
-		CommitmentHash: meshtypes.HashParts("source-commitment", "financial", "90"),
-		MessageRoot:    meshtypes.HashParts("message-root", "financial", "90"),
-		ReceiptRoot:    meshtypes.HashParts("receipt-root", "financial", "90"),
+		ZoneID:		"FINANCIAL_ZONE",
+		ShardID:	"0:0",
+		Height:		90,
+		CommitmentHash:	meshtypes.HashParts("source-commitment", "financial", "90"),
+		MessageRoot:	meshtypes.HashParts("message-root", "financial", "90"),
+		ReceiptRoot:	meshtypes.HashParts("receipt-root", "financial", "90"),
 	}
 	state, err = meshtypes.AddFinalizedCommitment(state, commitment)
 	require.NoError(t, err)
 	msg, err := meshtypes.NewMessage(meshtypes.MeshMessage{
-		SourceZone:        "FINANCIAL_ZONE",
-		SourceShard:       "0:0",
-		DestinationZone:   "CONTRACT_ZONE",
-		DestinationShard:  "0:1",
-		Nonce:             7,
-		Sender:            []byte("sender"),
-		Recipient:         []byte("recipient"),
-		AssetCommitment:   meshtypes.HashParts("asset", "100naet"),
-		PayloadHash:       meshtypes.HashParts("payload", "execute"),
-		TimeoutHeight:     150,
-		Finality:          meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
-		Sequence:          3,
-		SourceLogicalTime: 88,
+		SourceZone:		"FINANCIAL_ZONE",
+		SourceShard:		"0:0",
+		DestinationZone:	"CONTRACT_ZONE",
+		DestinationShard:	"0:1",
+		Nonce:			7,
+		Sender:			[]byte("sender"),
+		Recipient:		[]byte("recipient"),
+		AssetCommitment:	meshtypes.HashParts("asset", "100naet"),
+		PayloadHash:		meshtypes.HashParts("payload", "execute"),
+		TimeoutHeight:		150,
+		Finality:		meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
+		Sequence:		3,
+		SourceLogicalTime:	88,
 	})
 	require.NoError(t, err)
 	msg.Proof = meshtypes.BuildProof(msg, commitment)
@@ -307,24 +307,24 @@ func adversarialMeshFixture(t *testing.T) (meshtypes.MeshState, meshtypes.MeshMe
 
 func adversarialMeshSuccess() meshtypes.ExecutionResult {
 	return meshtypes.ExecutionResult{
-		Success:    true,
-		Code:       0,
-		ResultHash: meshtypes.HashParts("execution", "success"),
+		Success:	true,
+		Code:		0,
+		ResultHash:	meshtypes.HashParts("execution", "success"),
 	}
 }
 
 func adversarialZone(id zonestypes.ZoneID, kind zonestypes.ZoneKind, vm zonestypes.VMPolicy) zonestypes.Zone {
 	return zonestypes.Zone{
-		ID:                     id,
-		Kind:                   kind,
-		VMPolicy:               vm,
-		FeePolicy:              zonestypes.FeePolicyNaet,
-		GenesisStateHash:       hashString(string(id) + "-genesis"),
-		StateTransitionID:      "transition-" + string(id),
-		UpgradePolicy:          zonestypes.UpgradePolicyGovernance,
-		DataAvailabilityPolicy: zonestypes.DataAvailabilityCoreCommitment,
-		AuditStatus:            zonestypes.AuditStatusExperimental,
-		ActivationHeight:       1,
+		ID:			id,
+		Kind:			kind,
+		VMPolicy:		vm,
+		FeePolicy:		zonestypes.FeePolicyNaet,
+		GenesisStateHash:	hashString(string(id) + "-genesis"),
+		StateTransitionID:	"transition-" + string(id),
+		UpgradePolicy:		zonestypes.UpgradePolicyGovernance,
+		DataAvailabilityPolicy:	zonestypes.DataAvailabilityCoreCommitment,
+		AuditStatus:		zonestypes.AuditStatusExperimental,
+		ActivationHeight:	1,
 	}
 }
 
@@ -337,12 +337,12 @@ func adversarialSimulator(t *testing.T) *shardsim.Simulator {
 	}, "phase11-adversarial")
 	require.NoError(t, err)
 	require.NoError(t, sim.AddWorkchain(shardsim.WorkchainConfig{
-		ID:               shardsim.BaseWorkchain,
-		AllowedVMs:       []string{"AVM", "COSMWASM_GATED", "NATIVE_MODULE"},
-		FeeDenom:         shardsim.FeeDenomNaet,
-		AddressFormat:    "ae",
-		GenesisStateHash: hashString("base-workchain-genesis"),
-		UpgradePolicy:    "GOVERNANCE",
+		ID:			shardsim.BaseWorkchain,
+		AllowedVMs:		[]string{"AVM", "COSMWASM_GATED", "NATIVE_MODULE"},
+		FeeDenom:		shardsim.FeeDenomNaet,
+		AddressFormat:		"ae",
+		GenesisStateHash:	hashString("base-workchain-genesis"),
+		UpgradePolicy:		"GOVERNANCE",
 	}))
 	return sim
 }

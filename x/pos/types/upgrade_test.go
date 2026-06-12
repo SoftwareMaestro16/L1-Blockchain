@@ -509,25 +509,25 @@ func TestUnbondingRiskWindowExtendsBeyondUnbonding(t *testing.T) {
 	require.Equal(t, ComputeUnbondingRiskHistoryKey(record), record.RiskHistoryKey)
 
 	exposure, err := PendingUnbondingSlashExposure(PendingUnbondingSlashExposureInput{
-		Record:        record,
-		FaultEpoch:    23,
-		EvidenceEpoch: 27,
+		Record:		record,
+		FaultEpoch:	23,
+		EvidenceEpoch:	27,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_000), exposure)
 
 	exposure, err = PendingUnbondingSlashExposure(PendingUnbondingSlashExposureInput{
-		Record:        record,
-		FaultEpoch:    24,
-		EvidenceEpoch: 25,
+		Record:		record,
+		FaultEpoch:	24,
+		EvidenceEpoch:	25,
 	})
 	require.NoError(t, err)
 	require.True(t, exposure.IsZero())
 
 	exposure, err = PendingUnbondingSlashExposure(PendingUnbondingSlashExposureInput{
-		Record:        record,
-		FaultEpoch:    23,
-		EvidenceEpoch: 28,
+		Record:		record,
+		FaultEpoch:	23,
+		EvidenceEpoch:	28,
 	})
 	require.NoError(t, err)
 	require.True(t, exposure.IsZero())
@@ -585,20 +585,20 @@ func TestRiskWindowRecordQueriesSlashExposureForDelayedEvidence(t *testing.T) {
 	require.Equal(t, RiskWindowStatusExpired, expired.Status)
 
 	result, err := QuerySlashExposure([]RiskWindowRecord{exited}, SlashExposureQuery{
-		StakeOwner:       "delegator-a",
-		ValidatorAddress: "val-a",
-		FaultEpoch:       23,
-		EvidenceEpoch:    27,
+		StakeOwner:		"delegator-a",
+		ValidatorAddress:	"val-a",
+		FaultEpoch:		23,
+		EvidenceEpoch:		27,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_000), result.ExposureNaet)
 	require.Len(t, result.MatchingWindows, 1)
 
 	result, err = QuerySlashExposure([]RiskWindowRecord{exited}, SlashExposureQuery{
-		StakeOwner:       "delegator-a",
-		ValidatorAddress: "val-a",
-		FaultEpoch:       23,
-		EvidenceEpoch:    28,
+		StakeOwner:		"delegator-a",
+		ValidatorAddress:	"val-a",
+		FaultEpoch:		23,
+		EvidenceEpoch:		28,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ExposureNaet.IsZero())
@@ -620,19 +620,19 @@ func TestRiskWindowRecordKeepsRedelegationSourceExposure(t *testing.T) {
 	require.Equal(t, RiskWindowStatusExited, window.Status)
 
 	result, err := QuerySlashExposure([]RiskWindowRecord{window}, SlashExposureQuery{
-		StakeOwner:       "delegator-a",
-		ValidatorAddress: "val-source",
-		FaultEpoch:       21,
-		EvidenceEpoch:    24,
+		StakeOwner:		"delegator-a",
+		ValidatorAddress:	"val-source",
+		FaultEpoch:		21,
+		EvidenceEpoch:		24,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(500), result.ExposureNaet)
 
 	result, err = QuerySlashExposure([]RiskWindowRecord{window}, SlashExposureQuery{
-		StakeOwner:       "delegator-a",
-		ValidatorAddress: "val-dest",
-		FaultEpoch:       21,
-		EvidenceEpoch:    24,
+		StakeOwner:		"delegator-a",
+		ValidatorAddress:	"val-dest",
+		FaultEpoch:		21,
+		EvidenceEpoch:		24,
 	})
 	require.NoError(t, err)
 	require.True(t, result.ExposureNaet.IsZero())
@@ -655,17 +655,17 @@ func TestEconomicSecurityMetricsComputeFormulaAndRequiredMetrics(t *testing.T) {
 	}
 
 	metrics, err := ComputeEconomicSecurityMetrics(EconomicSecurityInput{
-		Validators:              validators,
-		RiskWindows:             windows,
-		TopN:                    1,
-		ParticipatingValidators: 2,
-		EligibleValidators:      3,
-		AcceptedSlashEvents:     3,
-		DetectedFaultEvents:     4,
-		AcceptedEvidence:        5,
-		SubmittedEvidence:       8,
-		CompletedTasks:          9,
-		ExpectedTasks:           12,
+		Validators:			validators,
+		RiskWindows:			windows,
+		TopN:				1,
+		ParticipatingValidators:	2,
+		EligibleValidators:		3,
+		AcceptedSlashEvents:		3,
+		DetectedFaultEvents:		4,
+		AcceptedEvidence:		5,
+		SubmittedEvidence:		8,
+		CompletedTasks:			9,
+		ExpectedTasks:			12,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(3_500), metrics.TotalBondedStakeNaet)
@@ -685,16 +685,16 @@ func TestEconomicSecurityMetricsComputeFormulaAndRequiredMetrics(t *testing.T) {
 	}, metrics.DelegationRiskDistribution)
 
 	override, err := ComputeEconomicSecurityMetrics(EconomicSecurityInput{
-		Validators:              validators,
-		RiskWindows:             windows,
-		StakeAtRiskNaet:         sdkmath.NewInt(2_000),
-		TopN:                    2,
-		ParticipatingValidators: 3,
-		EligibleValidators:      3,
-		AcceptedSlashEvents:     1,
-		DetectedFaultEvents:     2,
-		CompletedTasks:          1,
-		ExpectedTasks:           1,
+		Validators:			validators,
+		RiskWindows:			windows,
+		StakeAtRiskNaet:		sdkmath.NewInt(2_000),
+		TopN:				2,
+		ParticipatingValidators:	3,
+		EligibleValidators:		3,
+		AcceptedSlashEvents:		1,
+		DetectedFaultEvents:		2,
+		CompletedTasks:			1,
+		ExpectedTasks:			1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(2_000), override.TotalStakeAtRiskNaet)
@@ -708,17 +708,17 @@ func TestEconomicSecurityMetricsRejectsManipulatedInputs(t *testing.T) {
 	validators := scoredCandidates(t, params, []Candidate{candidate("val-a", 1_000, 0)})
 	windows := []RiskWindowRecord{riskWindow("delegator-a", "val-a", 1_000, RiskWindowStatusActive)}
 	input := EconomicSecurityInput{
-		Validators:              validators,
-		RiskWindows:             windows,
-		TopN:                    1,
-		ParticipatingValidators: 1,
-		EligibleValidators:      1,
-		AcceptedSlashEvents:     1,
-		DetectedFaultEvents:     1,
-		AcceptedEvidence:        1,
-		SubmittedEvidence:       1,
-		CompletedTasks:          1,
-		ExpectedTasks:           1,
+		Validators:			validators,
+		RiskWindows:			windows,
+		TopN:				1,
+		ParticipatingValidators:	1,
+		EligibleValidators:		1,
+		AcceptedSlashEvents:		1,
+		DetectedFaultEvents:		1,
+		AcceptedEvidence:		1,
+		SubmittedEvidence:		1,
+		CompletedTasks:			1,
+		ExpectedTasks:			1,
 	}
 	_, err := ComputeEconomicSecurityMetrics(input)
 	require.NoError(t, err)
@@ -755,17 +755,17 @@ func TestCentralizationDashboardExposesControlsQueriesAndAlerts(t *testing.T) {
 		candidate("val-c", 100, 0),
 	})
 	securityInput := EconomicSecurityInput{
-		Validators:              validators,
-		RiskWindows:             []RiskWindowRecord{riskWindow("delegator-a", "val-a", 800, RiskWindowStatusActive), riskWindow("delegator-b", "val-b", 200, RiskWindowStatusActive)},
-		TopN:                    1,
-		ParticipatingValidators: 3,
-		EligibleValidators:      3,
-		AcceptedSlashEvents:     1,
-		DetectedFaultEvents:     1,
-		AcceptedEvidence:        1,
-		SubmittedEvidence:       1,
-		CompletedTasks:          5,
-		ExpectedTasks:           5,
+		Validators:			validators,
+		RiskWindows:			[]RiskWindowRecord{riskWindow("delegator-a", "val-a", 800, RiskWindowStatusActive), riskWindow("delegator-b", "val-b", 200, RiskWindowStatusActive)},
+		TopN:				1,
+		ParticipatingValidators:	3,
+		EligibleValidators:		3,
+		AcceptedSlashEvents:		1,
+		DetectedFaultEvents:		1,
+		AcceptedEvidence:		1,
+		SubmittedEvidence:		1,
+		CompletedTasks:			5,
+		ExpectedTasks:			5,
 	}
 	query, err := QuerySecurityMetrics(SecurityMetricQuery{Input: securityInput})
 	require.NoError(t, err)
@@ -779,8 +779,8 @@ func TestCentralizationDashboardExposesControlsQueriesAndAlerts(t *testing.T) {
 	controlParams.MaxTaskAssignmentShareBps = 6_000
 	controlParams.BootstrapMaxVotingPowerShareBps = 1_500
 	dashboard, err := BuildCentralizationDashboard(CentralizationDashboardInput{
-		SecurityInput: securityInput,
-		ControlParams: controlParams,
+		SecurityInput:	securityInput,
+		ControlParams:	controlParams,
 		TaskAssignments: []CentralizationTaskAssignment{
 			{TaskGroupID: "tg-a", ValidatorAddress: "val-a", AssignmentCount: 4},
 			{TaskGroupID: "tg-b", ValidatorAddress: "val-b", AssignmentCount: 1},
@@ -817,11 +817,11 @@ func TestStakeConcentrationAndSplittingSimulations(t *testing.T) {
 	params.StakeSaturationThresholdNaet = sdkmath.NewInt(10_000)
 	params.StakeSaturationCapFactorBps = BasisPoints
 	concentration, err := SimulateStakeConcentration(StakeConcentrationSimulationInput{
-		Params:                  params,
-		Candidates:              []Candidate{candidate("val-a", 1_000, 0), candidate("val-b", 1_000, 0), candidate("val-c", 1_000, 0)},
-		TargetValidatorID:       "val-a",
-		AddedDelegatedStakeNaet: sdkmath.NewInt(4_000),
-		TopN:                    1,
+		Params:				params,
+		Candidates:			[]Candidate{candidate("val-a", 1_000, 0), candidate("val-b", 1_000, 0), candidate("val-c", 1_000, 0)},
+		TargetValidatorID:		"val-a",
+		AddedDelegatedStakeNaet:	sdkmath.NewInt(4_000),
+		TopN:				1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(3_333), concentration.Before.TopNVotingPowerConcentrationBps)
@@ -832,10 +832,10 @@ func TestStakeConcentrationAndSplittingSimulations(t *testing.T) {
 
 	params.StakeSaturationThresholdNaet = sdkmath.NewInt(1_000)
 	split, err := SimulateStakeSplitting(StakeSplittingSimulationInput{
-		Params:     params,
-		Candidate:  candidate("val-heavy", 3_000, 0),
-		SplitCount: 3,
-		TopN:       1,
+		Params:		params,
+		Candidate:	candidate("val-heavy", 3_000, 0),
+		SplitCount:	3,
+		TopN:		1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_000), split.SingleEffectiveStakeNaet)
@@ -867,12 +867,12 @@ func TestBuildElectionCandidatesAppliesDelayedDelegationsToStakeWeight(t *testin
 	params.MinStakeNaet = sdkmath.NewInt(100)
 	candidates := []Candidate{candidate("val-market", 1_000, 0)}
 	intents := []DelegationIntent{{
-		NominatorID:            "nom-a",
-		ValidatorID:            "val-market",
-		StakeNaet:              sdkmath.NewInt(2_000),
-		RequestedEpoch:         10,
-		MaxCommissionBps:       500,
-		MinPerformanceScoreBps: 9_000,
+		NominatorID:		"nom-a",
+		ValidatorID:		"val-market",
+		StakeNaet:		sdkmath.NewInt(2_000),
+		RequestedEpoch:		10,
+		MaxCommissionBps:	500,
+		MinPerformanceScoreBps:	9_000,
 	}}
 
 	early, rejected, err := BuildElectionCandidates(params, 10, candidates, intents)
@@ -894,29 +894,29 @@ func TestBuildElectionCandidatesAppliesDelayedDelegationsToStakeWeight(t *testin
 
 func TestValidatorElectionFactorCalculatorsUseDeterministicBps(t *testing.T) {
 	performance, err := ComputePerformanceFactor(PerformanceFactorInput{
-		CompletedTasks:         8,
-		MissedTasks:            2,
-		CorrectVerifications:   9,
-		IncorrectVerifications: 1,
-		AvailableWindows:       4,
-		CommittedWindows:       5,
+		CompletedTasks:		8,
+		MissedTasks:		2,
+		CorrectVerifications:	9,
+		IncorrectVerifications:	1,
+		AvailableWindows:	4,
+		CommittedWindows:	5,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(8_400), performance)
 
 	uptime, err := ComputeUptimeFactor(UptimeFactorInput{
-		SignedBlocks:             90,
-		TotalBlocks:              100,
-		TaskParticipations:       8,
-		MissedTaskParticipations: 2,
+		SignedBlocks:			90,
+		TotalBlocks:			100,
+		TaskParticipations:		8,
+		MissedTaskParticipations:	2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(8_700), uptime)
 
 	latency, err := ComputeLatencyFactor(LatencyFactorInput{
-		CommittedWindow: true,
-		TargetMillis:    1_000,
-		P95Millis:       2_000,
+		CommittedWindow:	true,
+		TargetMillis:		1_000,
+		P95Millis:		2_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(5_000), latency)
@@ -926,12 +926,12 @@ func TestValidatorElectionFactorCalculatorsUseDeterministicBps(t *testing.T) {
 	require.Equal(t, uint32(BasisPoints), latency)
 
 	reliability, err := ComputeReliabilityIndex(ReliabilityIndexInput{
-		PriorIndexBps:    9_000,
-		SlashEvents:      1,
-		DowntimeEpochs:   2,
-		MissedTasks:      3,
-		RejectedEvidence: 2,
-		RecoveryEpochs:   5,
+		PriorIndexBps:		9_000,
+		SlashEvents:		1,
+		DowntimeEpochs:		2,
+		MissedTasks:		3,
+		RejectedEvidence:	2,
+		RecoveryEpochs:		5,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(5_700), reliability)
@@ -953,29 +953,29 @@ func TestValidatorElectionFactorCalculatorsRejectUnsafeInputs(t *testing.T) {
 
 func TestPerformanceBasedRewardFormulaUsesDeterministicFixedPointMath(t *testing.T) {
 	correctness, err := ComputeCorrectnessScore(CorrectnessScoreInput{
-		ValidSignatures:   8,
-		InvalidSignatures: 1,
-		ValidTaskOutputs:  2,
-		AcceptedEvidence:  1,
+		ValidSignatures:	8,
+		InvalidSignatures:	1,
+		ValidTaskOutputs:	2,
+		AcceptedEvidence:	1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(7_692), correctness)
 
 	completion, err := ComputeTaskCompletionRate(TaskCompletionRateInput{
-		CompletedAssignedTasks: 7,
-		ExpectedAssignedTasks:  10,
+		CompletedAssignedTasks:	7,
+		ExpectedAssignedTasks:	10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(7_000), completion)
 
 	record, err := ComputePerformanceBasedReward(PerformanceRewardInput{
-		EpochID:               14,
-		ValidatorID:           "val-performance",
-		BaseEmissionNaet:      sdkmath.NewInt(1_000_000),
-		UptimeScoreBps:        9_000,
-		LatencyScoreBps:       8_000,
-		CorrectnessScoreBps:   7_500,
-		TaskCompletionRateBps: 5_000,
+		EpochID:		14,
+		ValidatorID:		"val-performance",
+		BaseEmissionNaet:	sdkmath.NewInt(1_000_000),
+		UptimeScoreBps:		9_000,
+		LatencyScoreBps:	8_000,
+		CorrectnessScoreBps:	7_500,
+		TaskCompletionRateBps:	5_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(270_000), record.RewardNaet)
@@ -998,40 +998,40 @@ func TestPerformanceBasedRewardRejectsUnsafeInputs(t *testing.T) {
 	require.ErrorContains(t, err, "evidence penalty overflow")
 
 	_, err = ComputePerformanceBasedReward(PerformanceRewardInput{
-		EpochID:               14,
-		ValidatorID:           "val-performance",
-		BaseEmissionNaet:      sdkmath.NewInt(-1),
-		UptimeScoreBps:        BasisPoints,
-		LatencyScoreBps:       BasisPoints,
-		CorrectnessScoreBps:   BasisPoints,
-		TaskCompletionRateBps: BasisPoints,
+		EpochID:		14,
+		ValidatorID:		"val-performance",
+		BaseEmissionNaet:	sdkmath.NewInt(-1),
+		UptimeScoreBps:		BasisPoints,
+		LatencyScoreBps:	BasisPoints,
+		CorrectnessScoreBps:	BasisPoints,
+		TaskCompletionRateBps:	BasisPoints,
 	})
 	require.ErrorContains(t, err, "base emission")
 
 	_, err = ComputePerformanceBasedReward(PerformanceRewardInput{
-		EpochID:               14,
-		ValidatorID:           "val-performance",
-		BaseEmissionNaet:      sdkmath.NewInt(1),
-		UptimeScoreBps:        BasisPoints + 1,
-		LatencyScoreBps:       BasisPoints,
-		CorrectnessScoreBps:   BasisPoints,
-		TaskCompletionRateBps: BasisPoints,
+		EpochID:		14,
+		ValidatorID:		"val-performance",
+		BaseEmissionNaet:	sdkmath.NewInt(1),
+		UptimeScoreBps:		BasisPoints + 1,
+		LatencyScoreBps:	BasisPoints,
+		CorrectnessScoreBps:	BasisPoints,
+		TaskCompletionRateBps:	BasisPoints,
 	})
 	require.ErrorContains(t, err, "uptime score")
 }
 
 func TestPerformanceRecordComputesRewardMultiplierAndDampening(t *testing.T) {
 	record, err := BuildPerformanceRecord(PerformanceRecordInput{
-		EpochID:             14,
-		OperatorAddress:     "val-performance",
-		Role:                ValidatorRoleCollator,
-		AssignedTasks:       10,
-		CompletedTasks:      7,
-		MissedTasks:         2,
-		InvalidTasks:        1,
-		UptimeScoreBps:      9_000,
-		LatencyScoreBps:     8_000,
-		CorrectnessScoreBps: 7_500,
+		EpochID:		14,
+		OperatorAddress:	"val-performance",
+		Role:			ValidatorRoleCollator,
+		AssignedTasks:		10,
+		CompletedTasks:		7,
+		MissedTasks:		2,
+		InvalidTasks:		1,
+		UptimeScoreBps:		9_000,
+		LatencyScoreBps:	8_000,
+		CorrectnessScoreBps:	7_500,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []string{
@@ -1053,12 +1053,12 @@ func TestPerformanceRecordComputesRewardMultiplierAndDampening(t *testing.T) {
 	require.NoError(t, record.Validate())
 
 	dampened, err := ApplyPerformanceDampening(PerformanceDampeningInput{
-		Record:                           record,
-		CurrentRewardNaet:                sdkmath.NewInt(1_000_000),
-		FutureElectionScoreBps:           9_000,
-		DelegationAttractivenessBps:      8_000,
-		RoleEligibilityBps:               8_500,
-		CollatorAssignmentProbabilityBps: 7_000,
+		Record:					record,
+		CurrentRewardNaet:			sdkmath.NewInt(1_000_000),
+		FutureElectionScoreBps:			9_000,
+		DelegationAttractivenessBps:		8_000,
+		RoleEligibilityBps:			8_500,
+		CollatorAssignmentProbabilityBps:	7_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(378_000), dampened.CurrentRewardNaet)
@@ -1070,36 +1070,36 @@ func TestPerformanceRecordComputesRewardMultiplierAndDampening(t *testing.T) {
 
 func TestPerformanceRecordRejectsInvalidTaskAccountingAndPreservesNonCollatorAssignmentProbability(t *testing.T) {
 	_, err := BuildPerformanceRecord(PerformanceRecordInput{
-		EpochID:             14,
-		OperatorAddress:     "val-performance",
-		Role:                ValidatorRoleVerifier,
-		AssignedTasks:       2,
-		CompletedTasks:      2,
-		MissedTasks:         1,
-		UptimeScoreBps:      BasisPoints,
-		LatencyScoreBps:     BasisPoints,
-		CorrectnessScoreBps: BasisPoints,
+		EpochID:		14,
+		OperatorAddress:	"val-performance",
+		Role:			ValidatorRoleVerifier,
+		AssignedTasks:		2,
+		CompletedTasks:		2,
+		MissedTasks:		1,
+		UptimeScoreBps:		BasisPoints,
+		LatencyScoreBps:	BasisPoints,
+		CorrectnessScoreBps:	BasisPoints,
 	})
 	require.ErrorContains(t, err, "task counts")
 
 	record, err := BuildPerformanceRecord(PerformanceRecordInput{
-		EpochID:             14,
-		OperatorAddress:     "val-verifier",
-		Role:                ValidatorRoleVerifier,
-		AssignedTasks:       4,
-		CompletedTasks:      4,
-		UptimeScoreBps:      5_000,
-		LatencyScoreBps:     5_000,
-		CorrectnessScoreBps: 5_000,
+		EpochID:		14,
+		OperatorAddress:	"val-verifier",
+		Role:			ValidatorRoleVerifier,
+		AssignedTasks:		4,
+		CompletedTasks:		4,
+		UptimeScoreBps:		5_000,
+		LatencyScoreBps:	5_000,
+		CorrectnessScoreBps:	5_000,
 	})
 	require.NoError(t, err)
 	dampened, err := ApplyPerformanceDampening(PerformanceDampeningInput{
-		Record:                           record,
-		CurrentRewardNaet:                sdkmath.NewInt(1_000),
-		FutureElectionScoreBps:           BasisPoints,
-		DelegationAttractivenessBps:      BasisPoints,
-		RoleEligibilityBps:               BasisPoints,
-		CollatorAssignmentProbabilityBps: 7_000,
+		Record:					record,
+		CurrentRewardNaet:			sdkmath.NewInt(1_000),
+		FutureElectionScoreBps:			BasisPoints,
+		DelegationAttractivenessBps:		BasisPoints,
+		RoleEligibilityBps:			BasisPoints,
+		CollatorAssignmentProbabilityBps:	7_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(7_000), dampened.CollatorAssignmentProbabilityBps)
@@ -1146,12 +1146,12 @@ func TestTaskAssignmentsAreSeededRoleAwareAndStable(t *testing.T) {
 	require.NoError(t, err)
 
 	tasks := []WorkloadTask{{
-		TaskID:             "task-a",
-		ZoneID:             "CORE",
-		ShardID:            "shard-0",
-		WorkloadClass:      "settlement",
-		RequiredValidators: 2,
-		Roles:              []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleBlockProducer},
+		TaskID:			"task-a",
+		ZoneID:			"CORE",
+		ShardID:		"shard-0",
+		WorkloadClass:		"settlement",
+		RequiredValidators:	2,
+		Roles:			[]ValidatorRole{ValidatorRoleVerifier, ValidatorRoleBlockProducer},
 	}}
 	left, err := BuildTaskAssignments(params, epoch, validators, tasks)
 	require.NoError(t, err)
@@ -1193,24 +1193,24 @@ func TestTaskGroupsCaptureWorkloadDomainsAndStakeRoots(t *testing.T) {
 
 	tasks := []WorkloadTask{
 		{
-			TaskID:             "zone-exec-a",
-			WorkloadID:         "zone-alpha",
-			WorkloadType:       WorkloadTypeZoneExecution,
-			ZoneID:             "ZONE-A",
-			ShardID:            "shard-0",
-			WorkloadClass:      "execution",
-			RequiredValidators: 2,
-			Roles:              []ValidatorRole{ValidatorRoleVerifier, ValidatorRoleCollator},
+			TaskID:			"zone-exec-a",
+			WorkloadID:		"zone-alpha",
+			WorkloadType:		WorkloadTypeZoneExecution,
+			ZoneID:			"ZONE-A",
+			ShardID:		"shard-0",
+			WorkloadClass:		"execution",
+			RequiredValidators:	2,
+			Roles:			[]ValidatorRole{ValidatorRoleVerifier, ValidatorRoleCollator},
 		},
 		{
-			TaskID:             "evidence-a",
-			WorkloadID:         "evidence-market",
-			WorkloadType:       WorkloadTypeEvidenceVerification,
-			ZoneID:             "GLOBAL",
-			ShardID:            "evidence",
-			WorkloadClass:      "evidence",
-			RequiredValidators: 2,
-			Roles:              []ValidatorRole{ValidatorRoleEvidenceReviewer, ValidatorRoleVerifier},
+			TaskID:			"evidence-a",
+			WorkloadID:		"evidence-market",
+			WorkloadType:		WorkloadTypeEvidenceVerification,
+			ZoneID:			"GLOBAL",
+			ShardID:		"evidence",
+			WorkloadClass:		"evidence",
+			RequiredValidators:	2,
+			Roles:			[]ValidatorRole{ValidatorRoleEvidenceReviewer, ValidatorRoleVerifier},
 		},
 	}
 	left, err := BuildTaskGroups(params, epoch, validators, tasks, 41, 60)
@@ -1248,26 +1248,26 @@ func TestTaskGroupsValidateWorkloadTypesAndHeightWindow(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = BuildTaskGroups(params, epoch, validators, []WorkloadTask{{
-		TaskID:             "bad-workload",
-		WorkloadID:         "bad-workload",
-		WorkloadType:       WorkloadType("invalid"),
-		ZoneID:             "GLOBAL",
-		ShardID:            "shard",
-		WorkloadClass:      "class",
-		RequiredValidators: 2,
-		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+		TaskID:			"bad-workload",
+		WorkloadID:		"bad-workload",
+		WorkloadType:		WorkloadType("invalid"),
+		ZoneID:			"GLOBAL",
+		ShardID:		"shard",
+		WorkloadClass:		"class",
+		RequiredValidators:	2,
+		Roles:			[]ValidatorRole{ValidatorRoleVerifier},
 	}}, 51, 70)
 	require.ErrorContains(t, err, "unsupported workload type")
 
 	_, err = BuildTaskGroups(params, epoch, validators, []WorkloadTask{{
-		TaskID:             "proof-a",
-		WorkloadID:         "proof-a",
-		WorkloadType:       WorkloadTypeProofVerification,
-		ZoneID:             "GLOBAL",
-		ShardID:            "proof",
-		WorkloadClass:      "proof",
-		RequiredValidators: 2,
-		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+		TaskID:			"proof-a",
+		WorkloadID:		"proof-a",
+		WorkloadType:		WorkloadTypeProofVerification,
+		ZoneID:			"GLOBAL",
+		ShardID:		"proof",
+		WorkloadClass:		"proof",
+		RequiredValidators:	2,
+		Roles:			[]ValidatorRole{ValidatorRoleVerifier},
 	}}, 70, 70)
 	require.ErrorContains(t, err, "expiry height")
 }
@@ -1281,12 +1281,12 @@ func TestTaskAssignmentsRespectValidatorCapacityAndExclusions(t *testing.T) {
 	for i := range candidates {
 		candidates[i].Roles = []ValidatorRole{ValidatorRoleVerifier}
 		candidates[i].Capacity = ValidatorCapacity{
-			MaxTaskGroups:          1,
-			SupportedWorkloads:     []WorkloadType{WorkloadTypeProofVerification},
-			ZoneSupport:            []string{"ZONE-A"},
-			HardwareClassOptional:  "hsm-small",
-			NetworkClassOptional:   "wan-low-latency",
-			AvailabilityCommitment: 9_800,
+			MaxTaskGroups:		1,
+			SupportedWorkloads:	[]WorkloadType{WorkloadTypeProofVerification},
+			ZoneSupport:		[]string{"ZONE-A"},
+			HardwareClassOptional:	"hsm-small",
+			NetworkClassOptional:	"wan-low-latency",
+			AvailabilityCommitment:	9_800,
 		}
 	}
 	validators := scoredCandidates(t, params, candidates)
@@ -1295,26 +1295,26 @@ func TestTaskAssignmentsRespectValidatorCapacityAndExclusions(t *testing.T) {
 
 	assignments, err := BuildTaskAssignments(params, epoch, validators, []WorkloadTask{
 		{
-			TaskID:             "proof-a",
-			WorkloadID:         "proof-a",
-			WorkloadType:       WorkloadTypeProofVerification,
-			ZoneID:             "ZONE-A",
-			ShardID:            "proof",
-			WorkloadClass:      "proof",
-			RequiredValidators: 1,
-			Roles:              []ValidatorRole{ValidatorRoleVerifier},
-			ExcludedValidators: []string{"val-000"},
+			TaskID:			"proof-a",
+			WorkloadID:		"proof-a",
+			WorkloadType:		WorkloadTypeProofVerification,
+			ZoneID:			"ZONE-A",
+			ShardID:		"proof",
+			WorkloadClass:		"proof",
+			RequiredValidators:	1,
+			Roles:			[]ValidatorRole{ValidatorRoleVerifier},
+			ExcludedValidators:	[]string{"val-000"},
 		},
 		{
-			TaskID:             "proof-b",
-			WorkloadID:         "proof-b",
-			WorkloadType:       WorkloadTypeProofVerification,
-			ZoneID:             "ZONE-A",
-			ShardID:            "proof",
-			WorkloadClass:      "proof",
-			RequiredValidators: 1,
-			Roles:              []ValidatorRole{ValidatorRoleVerifier},
-			ExcludedValidators: []string{"val-000"},
+			TaskID:			"proof-b",
+			WorkloadID:		"proof-b",
+			WorkloadType:		WorkloadTypeProofVerification,
+			ZoneID:			"ZONE-A",
+			ShardID:		"proof",
+			WorkloadClass:		"proof",
+			RequiredValidators:	1,
+			Roles:			[]ValidatorRole{ValidatorRoleVerifier},
+			ExcludedValidators:	[]string{"val-000"},
 		},
 	})
 	require.NoError(t, err)
@@ -1325,26 +1325,26 @@ func TestTaskAssignmentsRespectValidatorCapacityAndExclusions(t *testing.T) {
 	require.NotEqual(t, assignments.Assignments[0].Validators[0], assignments.Assignments[1].Validators[0])
 
 	_, err = BuildTaskAssignments(params, epoch, validators, []WorkloadTask{{
-		TaskID:             "unsupported",
-		WorkloadID:         "unsupported",
-		WorkloadType:       WorkloadTypeDataAvailability,
-		ZoneID:             "ZONE-A",
-		ShardID:            "da",
-		WorkloadClass:      "da",
-		RequiredValidators: 1,
-		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+		TaskID:			"unsupported",
+		WorkloadID:		"unsupported",
+		WorkloadType:		WorkloadTypeDataAvailability,
+		ZoneID:			"ZONE-A",
+		ShardID:		"da",
+		WorkloadClass:		"da",
+		RequiredValidators:	1,
+		Roles:			[]ValidatorRole{ValidatorRoleVerifier},
 	}})
 	require.ErrorContains(t, err, "insufficient validators")
 
 	_, err = BuildTaskAssignments(params, epoch, validators, []WorkloadTask{{
-		TaskID:             "unsupported-zone",
-		WorkloadID:         "unsupported-zone",
-		WorkloadType:       WorkloadTypeProofVerification,
-		ZoneID:             "ZONE-B",
-		ShardID:            "proof",
-		WorkloadClass:      "proof",
-		RequiredValidators: 1,
-		Roles:              []ValidatorRole{ValidatorRoleVerifier},
+		TaskID:			"unsupported-zone",
+		WorkloadID:		"unsupported-zone",
+		WorkloadType:		WorkloadTypeProofVerification,
+		ZoneID:			"ZONE-B",
+		ShardID:		"proof",
+		WorkloadClass:		"proof",
+		RequiredValidators:	1,
+		Roles:			[]ValidatorRole{ValidatorRoleVerifier},
 	}})
 	require.ErrorContains(t, err, "insufficient validators")
 }
@@ -1360,25 +1360,25 @@ func TestValidatorCapacityDeclarationValidationAndSlashableFault(t *testing.T) {
 	require.ErrorContains(t, candidate.Validate(params), "availability commitment")
 
 	slashable, err := IsSlashableCapacityFault(CapacityFaultEvidence{
-		ValidatorID:       "val-capacity",
-		WorkloadID:        "proof-a",
-		WorkloadType:      WorkloadTypeProofVerification,
-		AssignmentEpoch:   7,
-		EvidenceHeight:    70,
-		UsedForAssignment: true,
-		Finalized:         true,
+		ValidatorID:		"val-capacity",
+		WorkloadID:		"proof-a",
+		WorkloadType:		WorkloadTypeProofVerification,
+		AssignmentEpoch:	7,
+		EvidenceHeight:		70,
+		UsedForAssignment:	true,
+		Finalized:		true,
 	})
 	require.NoError(t, err)
 	require.True(t, slashable)
 
 	slashable, err = IsSlashableCapacityFault(CapacityFaultEvidence{
-		ValidatorID:       "val-capacity",
-		WorkloadID:        "proof-a",
-		WorkloadType:      WorkloadTypeProofVerification,
-		AssignmentEpoch:   7,
-		EvidenceHeight:    70,
-		UsedForAssignment: false,
-		Finalized:         true,
+		ValidatorID:		"val-capacity",
+		WorkloadID:		"proof-a",
+		WorkloadType:		WorkloadTypeProofVerification,
+		AssignmentEpoch:	7,
+		EvidenceHeight:		70,
+		UsedForAssignment:	false,
+		Finalized:		true,
 	})
 	require.NoError(t, err)
 	require.False(t, slashable)
@@ -1393,12 +1393,12 @@ func TestDelegationIntentsRespectActivationDelayAndRiskProfile(t *testing.T) {
 
 	intents := []DelegationIntent{
 		{
-			NominatorID:            "nom-a",
-			ValidatorID:            "val-market",
-			StakeNaet:              sdkmath.NewInt(500),
-			RequestedEpoch:         10,
-			MaxCommissionBps:       500,
-			MinPerformanceScoreBps: 8_000,
+			NominatorID:		"nom-a",
+			ValidatorID:		"val-market",
+			StakeNaet:		sdkmath.NewInt(500),
+			RequestedEpoch:		10,
+			MaxCommissionBps:	500,
+			MinPerformanceScoreBps:	8_000,
 		},
 	}
 	activations, rejected, err := ActivateDelegationIntents(params, 11, candidates, intents)
@@ -1408,12 +1408,12 @@ func TestDelegationIntentsRespectActivationDelayAndRiskProfile(t *testing.T) {
 	require.Contains(t, rejected[0].Reason, "activation delay")
 
 	intents = append(intents, DelegationIntent{
-		NominatorID:            "nom-b",
-		ValidatorID:            "val-market",
-		StakeNaet:              sdkmath.NewInt(500),
-		RequestedEpoch:         10,
-		MaxCommissionBps:       500,
-		MinPerformanceScoreBps: 9_500,
+		NominatorID:		"nom-b",
+		ValidatorID:		"val-market",
+		StakeNaet:		sdkmath.NewInt(500),
+		RequestedEpoch:		10,
+		MaxCommissionBps:	500,
+		MinPerformanceScoreBps:	9_500,
 	})
 	activations, rejected, err = ActivateDelegationIntents(params, 12, candidates, intents)
 	require.NoError(t, err)
@@ -1428,14 +1428,14 @@ func TestEvidenceSettlementPaysReporterFromObjectiveSlash(t *testing.T) {
 	params := DefaultParams()
 	params.ReporterRewardBps = 500
 	settlement, err := SettleEvidenceCase(params, 12, EvidenceCase{
-		EvidenceID:       "evidence-1",
-		ReporterID:       "reporter-a",
-		ValidatorID:      "val-a",
-		Misbehavior:      MisbehaviorDoubleSign,
-		SlashFractionBps: 1_000,
-		EvidenceHeight:   99,
-		EvidenceEpoch:    10,
-		Finalized:        true,
+		EvidenceID:		"evidence-1",
+		ReporterID:		"reporter-a",
+		ValidatorID:		"val-a",
+		Misbehavior:		MisbehaviorDoubleSign,
+		SlashFractionBps:	1_000,
+		EvidenceHeight:		99,
+		EvidenceEpoch:		10,
+		Finalized:		true,
 	}, sdkmath.NewInt(1_000), []Nomination{{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(1_000)}})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(200), settlement.Slash.TotalSlashedNaet)
@@ -1444,14 +1444,14 @@ func TestEvidenceSettlementPaysReporterFromObjectiveSlash(t *testing.T) {
 	require.Len(t, settlement.SettlementHash, PosHashHexLength)
 
 	_, err = SettleEvidenceCase(params, 12, EvidenceCase{
-		EvidenceID:       "evidence-stale",
-		ReporterID:       "reporter-a",
-		ValidatorID:      "val-a",
-		Misbehavior:      MisbehaviorDowntime,
-		SlashFractionBps: 100,
-		EvidenceHeight:   99,
-		EvidenceEpoch:    6,
-		Finalized:        true,
+		EvidenceID:		"evidence-stale",
+		ReporterID:		"reporter-a",
+		ValidatorID:		"val-a",
+		Misbehavior:		MisbehaviorDowntime,
+		SlashFractionBps:	100,
+		EvidenceHeight:		99,
+		EvidenceEpoch:		6,
+		Finalized:		true,
 	}, sdkmath.NewInt(1_000), nil)
 	require.ErrorContains(t, err, "outside slashable window")
 }
@@ -1509,15 +1509,15 @@ func TestEvidenceRecordMatchesDesignFieldsAndStatusValues(t *testing.T) {
 	}, EvidenceRecordStatusValues())
 
 	record, err := NewEvidenceRecord(EvidenceRecord{
-		EvidenceID:          "evidence-record-1",
-		EvidenceType:        EvidenceTypeInvalidProofAcceptance,
-		AccusedValidator:    "val-000",
-		Reporter:            "val-001",
-		EpochID:             7,
-		TaskGroupIDOptional: "task-group-1",
-		ObjectHash:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		ProofPayloadHash:    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-		SubmittedHeight:     70,
+		EvidenceID:		"evidence-record-1",
+		EvidenceType:		EvidenceTypeInvalidProofAcceptance,
+		AccusedValidator:	"val-000",
+		Reporter:		"val-001",
+		EpochID:		7,
+		TaskGroupIDOptional:	"task-group-1",
+		ObjectHash:		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		ProofPayloadHash:	"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		SubmittedHeight:	70,
 	})
 	require.NoError(t, err)
 	require.Equal(t, EvidenceStatusSubmitted, record.Status)
@@ -1533,24 +1533,24 @@ func TestEvidenceVerificationGroupSelectionIsDeterministicAndExcludesParties(t *
 	epoch, err := NewEpochRecord(params, 7, 70, 90, EpochPhaseAssignment, "", validators)
 	require.NoError(t, err)
 	record, err := NewEvidenceRecord(EvidenceRecord{
-		EvidenceID:       "evidence-record-2",
-		EvidenceType:     EvidenceTypeFalseCapacityDeclaration,
-		AccusedValidator: "val-000",
-		Reporter:         "val-001",
-		EpochID:          epoch.EpochID,
-		ObjectHash:       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		ProofPayloadHash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-		SubmittedHeight:  72,
+		EvidenceID:		"evidence-record-2",
+		EvidenceType:		EvidenceTypeFalseCapacityDeclaration,
+		AccusedValidator:	"val-000",
+		Reporter:		"val-001",
+		EpochID:		epoch.EpochID,
+		ObjectHash:		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		ProofPayloadHash:	"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		SubmittedHeight:	72,
 	})
 	require.NoError(t, err)
 
 	left, err := SelectEvidenceVerificationGroup(EvidenceVerificationGroupInput{
-		Params:               params,
-		Epoch:                epoch,
-		ActiveValidators:     validators,
-		Evidence:             record,
-		MinimumGroupSize:     3,
-		DecisionThresholdBps: 7_000,
+		Params:			params,
+		Epoch:			epoch,
+		ActiveValidators:	validators,
+		Evidence:		record,
+		MinimumGroupSize:	3,
+		DecisionThresholdBps:	7_000,
 	})
 	require.NoError(t, err)
 	require.Len(t, left.Members, 3)
@@ -1567,12 +1567,12 @@ func TestEvidenceVerificationGroupSelectionIsDeterministicAndExcludesParties(t *
 		reversed[i], reversed[j] = reversed[j], reversed[i]
 	}
 	right, err := SelectEvidenceVerificationGroup(EvidenceVerificationGroupInput{
-		Params:               params,
-		Epoch:                epoch,
-		ActiveValidators:     reversed,
-		Evidence:             record,
-		MinimumGroupSize:     3,
-		DecisionThresholdBps: 7_000,
+		Params:			params,
+		Epoch:			epoch,
+		ActiveValidators:	reversed,
+		Evidence:		record,
+		MinimumGroupSize:	3,
+		DecisionThresholdBps:	7_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, left, right)
@@ -1597,33 +1597,33 @@ func TestEvidenceVerificationGroupRejectsInsufficientEligibleValidators(t *testi
 	epoch, err := NewEpochRecord(params, 8, 80, 100, EpochPhaseAssignment, "", validators)
 	require.NoError(t, err)
 	record, err := NewEvidenceRecord(EvidenceRecord{
-		EvidenceID:       "evidence-record-3",
-		EvidenceType:     EvidenceTypeDowntimeProof,
-		AccusedValidator: "val-000",
-		Reporter:         "val-001",
-		EpochID:          epoch.EpochID,
-		ObjectHash:       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		ProofPayloadHash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-		SubmittedHeight:  82,
+		EvidenceID:		"evidence-record-3",
+		EvidenceType:		EvidenceTypeDowntimeProof,
+		AccusedValidator:	"val-000",
+		Reporter:		"val-001",
+		EpochID:		epoch.EpochID,
+		ObjectHash:		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		ProofPayloadHash:	"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+		SubmittedHeight:	82,
 	})
 	require.NoError(t, err)
 
 	_, err = SelectEvidenceVerificationGroup(EvidenceVerificationGroupInput{
-		Params:           params,
-		Epoch:            epoch,
-		ActiveValidators: validators,
-		Evidence:         record,
-		MinimumGroupSize: 3,
+		Params:			params,
+		Epoch:			epoch,
+		ActiveValidators:	validators,
+		Evidence:		record,
+		MinimumGroupSize:	3,
 	})
 	require.ErrorContains(t, err, "insufficient eligible validators")
 
 	_, err = SelectEvidenceVerificationGroup(EvidenceVerificationGroupInput{
-		Params:               params,
-		Epoch:                epoch,
-		ActiveValidators:     validators,
-		Evidence:             record,
-		MinimumGroupSize:     2,
-		DecisionThresholdBps: BasisPoints + 1,
+		Params:			params,
+		Epoch:			epoch,
+		ActiveValidators:	validators,
+		Evidence:		record,
+		MinimumGroupSize:	2,
+		DecisionThresholdBps:	BasisPoints + 1,
 	})
 	require.ErrorContains(t, err, "decision threshold")
 }
@@ -1632,16 +1632,16 @@ func TestStructuredEvidenceLifecycleFinalizesAndExecutesSlash(t *testing.T) {
 	params := DefaultParams()
 	params.ReporterRewardBps = 500
 	evidence, err := SubmitStructuredEvidence(StructuredEvidenceRecord{
-		EvidenceID:          "evidence-structured-1",
-		EvidenceType:        EvidenceTypeInvalidTaskExecutionProof,
-		ReporterID:          "reporter-a",
-		AccusedValidatorID:  "val-a",
-		SubjectID:           "task/proof/1",
-		EvidenceHash:        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		EvidenceHeight:      101,
-		EvidenceEpoch:       10,
-		SubmittedHeight:     102,
-		VerificationGroupID: "evidence-group-a",
+		EvidenceID:		"evidence-structured-1",
+		EvidenceType:		EvidenceTypeInvalidTaskExecutionProof,
+		ReporterID:		"reporter-a",
+		AccusedValidatorID:	"val-a",
+		SubjectID:		"task/proof/1",
+		EvidenceHash:		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		EvidenceHeight:		101,
+		EvidenceEpoch:		10,
+		SubmittedHeight:	102,
+		VerificationGroupID:	"evidence-group-a",
 	})
 	require.NoError(t, err)
 	require.Equal(t, EvidenceStatusSubmitted, evidence.Status)
@@ -1684,16 +1684,16 @@ func TestStructuredEvidenceLifecycleFinalizesAndExecutesSlash(t *testing.T) {
 
 func TestStructuredEvidenceLifecycleRejectsUnverifiedOrRejectedEvidence(t *testing.T) {
 	evidence, err := SubmitStructuredEvidence(StructuredEvidenceRecord{
-		EvidenceID:          "evidence-structured-2",
-		EvidenceType:        EvidenceTypeDowntimeProof,
-		ReporterID:          "reporter-a",
-		AccusedValidatorID:  "val-a",
-		SubjectID:           "height/100",
-		EvidenceHash:        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-		EvidenceHeight:      100,
-		EvidenceEpoch:       10,
-		SubmittedHeight:     101,
-		VerificationGroupID: "evidence-group-a",
+		EvidenceID:		"evidence-structured-2",
+		EvidenceType:		EvidenceTypeDowntimeProof,
+		ReporterID:		"reporter-a",
+		AccusedValidatorID:	"val-a",
+		SubjectID:		"height/100",
+		EvidenceHash:		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		EvidenceHeight:		100,
+		EvidenceEpoch:		10,
+		SubmittedHeight:	101,
+		VerificationGroupID:	"evidence-group-a",
 	})
 	require.NoError(t, err)
 
@@ -1719,8 +1719,8 @@ func TestStructuredEvidenceLifecycleRejectsUnverifiedOrRejectedEvidence(t *testi
 
 func TestWorkloadRewardsSplitByRoleAndCompletedUnits(t *testing.T) {
 	settlement, err := SettleWorkloadRewards(WorkloadRewardInput{
-		EpochID:          9,
-		TotalRewardsNaet: sdkmath.NewInt(1_000),
+		EpochID:		9,
+		TotalRewardsNaet:	sdkmath.NewInt(1_000),
 		RoleWeights: []RoleRewardWeight{
 			{Role: ValidatorRoleBlockProducer, WeightBps: 5_000},
 			{Role: ValidatorRoleVerifier, WeightBps: 5_000},
@@ -1777,25 +1777,25 @@ func TestValidatorRoleExpansionAndRoleRecordFields(t *testing.T) {
 func TestRoleRecordsAllowOverlapButRejectDuplicateRoleForEpoch(t *testing.T) {
 	capacity := ValidatorCapacity{MaxTaskGroups: 3, SupportedWorkloads: []WorkloadType{WorkloadTypeProofVerification}, AvailabilityCommitment: 9_000}
 	verifier, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress:  "val-a",
-		Role:              ValidatorRoleVerifier,
-		EpochID:           12,
-		Status:            RoleStatusAssigned,
-		EligibilityScore:  9_500,
-		Capacity:          capacity,
-		AssignedTaskCount: 2,
-		PerformanceScore:  9_700,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleVerifier,
+		EpochID:		12,
+		Status:			RoleStatusAssigned,
+		EligibilityScore:	9_500,
+		Capacity:		capacity,
+		AssignedTaskCount:	2,
+		PerformanceScore:	9_700,
 	})
 	require.NoError(t, err)
 	reporter, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress:  "val-a",
-		Role:              ValidatorRoleEvidenceReporter,
-		EpochID:           12,
-		Status:            RoleStatusEligible,
-		EligibilityScore:  9_300,
-		Capacity:          capacity,
-		AssignedTaskCount: 0,
-		PerformanceScore:  9_400,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleEvidenceReporter,
+		EpochID:		12,
+		Status:			RoleStatusEligible,
+		EligibilityScore:	9_300,
+		Capacity:		capacity,
+		AssignedTaskCount:	0,
+		PerformanceScore:	9_400,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateRoleRecords([]RoleRecord{verifier, reporter}))
@@ -1807,31 +1807,31 @@ func TestRoleRecordsAllowOverlapButRejectDuplicateRoleForEpoch(t *testing.T) {
 
 func TestRoleRecordRejectsCapacityOverflowAndInvalidScores(t *testing.T) {
 	_, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress:  "val-a",
-		Role:              ValidatorRoleCollator,
-		EpochID:           12,
-		Status:            RoleStatusAssigned,
-		EligibilityScore:  9_500,
-		Capacity:          ValidatorCapacity{MaxTaskGroups: 1, SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution}},
-		AssignedTaskCount: 2,
-		PerformanceScore:  9_000,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleCollator,
+		EpochID:		12,
+		Status:			RoleStatusAssigned,
+		EligibilityScore:	9_500,
+		Capacity:		ValidatorCapacity{MaxTaskGroups: 1, SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution}},
+		AssignedTaskCount:	2,
+		PerformanceScore:	9_000,
 	})
 	require.ErrorContains(t, err, "exceeds capacity")
 
 	_, err = NewRoleRecord(RoleRecord{
-		ValidatorAddress: "val-a",
-		Role:             ValidatorRoleFisherman,
-		EpochID:          12,
-		Status:           RoleStatusEligible,
-		EligibilityScore: BasisPoints + 1,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleFisherman,
+		EpochID:		12,
+		Status:			RoleStatusEligible,
+		EligibilityScore:	BasisPoints + 1,
 	})
 	require.ErrorContains(t, err, "eligibility score")
 
 	_, err = NewRoleRecord(RoleRecord{
-		ValidatorAddress: "val-a",
-		Role:             ValidatorRoleProposer,
-		EpochID:          12,
-		Status:           RoleStatusAssigned,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleProposer,
+		EpochID:		12,
+		Status:			RoleStatusAssigned,
 	})
 	require.ErrorContains(t, err, "assigned task count")
 }
@@ -1851,9 +1851,9 @@ func TestRoleRegistryEligibilityChecksRoleSpecificRules(t *testing.T) {
 	proposer.PerformanceScoreBps = BasisPoints
 	proposer.UptimeFactorBps = BasisPoints
 	record, err := CheckRoleEligibility(registry, RoleEligibilityInput{
-		Params:    params,
-		Role:      ValidatorRoleProposer,
-		Candidate: proposer,
+		Params:		params,
+		Role:		ValidatorRoleProposer,
+		Candidate:	proposer,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "val-proposer", record.ValidatorAddress)
@@ -1866,10 +1866,10 @@ func TestRoleRegistryEligibilityChecksRoleSpecificRules(t *testing.T) {
 	require.ErrorContains(t, err, "minimum validator stake")
 
 	fisherman, err := CheckRoleEligibility(registry, RoleEligibilityInput{
-		Params:       params,
-		Role:         ValidatorRoleFisherman,
-		ActorAddress: "fish-1",
-		DepositNaet:  sdkmath.NewInt(1),
+		Params:		params,
+		Role:		ValidatorRoleFisherman,
+		ActorAddress:	"fish-1",
+		DepositNaet:	sdkmath.NewInt(1),
 	})
 	require.NoError(t, err)
 	require.Equal(t, "fish-1", fisherman.ValidatorAddress)
@@ -1883,18 +1883,18 @@ func TestRoleRegistryEligibilityChecksRoleSpecificRules(t *testing.T) {
 	operator.PerformanceScoreBps = BasisPoints
 	operator.UptimeFactorBps = BasisPoints
 	_, err = CheckRoleEligibility(registry, RoleEligibilityInput{
-		Params:    params,
-		Role:      ValidatorRoleDelegationOperator,
-		Candidate: operator,
+		Params:		params,
+		Role:		ValidatorRoleDelegationOperator,
+		Candidate:	operator,
 	})
 	require.ErrorContains(t, err, "authorization")
 	_, err = CheckRoleEligibility(registry, RoleEligibilityInput{
-		Params:                       params,
-		Role:                         ValidatorRoleDelegationOperator,
-		Candidate:                    operator,
-		DelegationOperatorAuthorized: true,
-		FeesDisclosed:                true,
-		RiskPolicyDisclosed:          true,
+		Params:				params,
+		Role:				ValidatorRoleDelegationOperator,
+		Candidate:			operator,
+		DelegationOperatorAuthorized:	true,
+		FeesDisclosed:			true,
+		RiskPolicyDisclosed:		true,
 	})
 	require.NoError(t, err)
 }
@@ -1902,25 +1902,25 @@ func TestRoleRegistryEligibilityChecksRoleSpecificRules(t *testing.T) {
 func TestRolePerformanceMetricsRewardsAndSuspensionRespectOverlap(t *testing.T) {
 	capacity := ValidatorCapacity{MaxTaskGroups: 3, SupportedWorkloads: []WorkloadType{WorkloadTypeProofVerification}, AvailabilityCommitment: 9_000}
 	verifier, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress:  "val-a",
-		Role:              ValidatorRoleVerifier,
-		EpochID:           12,
-		Status:            RoleStatusAssigned,
-		EligibilityScore:  9_500,
-		Capacity:          capacity,
-		AssignedTaskCount: 3,
-		PerformanceScore:  9_500,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleVerifier,
+		EpochID:		12,
+		Status:			RoleStatusAssigned,
+		EligibilityScore:	9_500,
+		Capacity:		capacity,
+		AssignedTaskCount:	3,
+		PerformanceScore:	9_500,
 	})
 	require.NoError(t, err)
 	collator, err := NewRoleRecord(RoleRecord{
-		ValidatorAddress:  "val-a",
-		Role:              ValidatorRoleCollator,
-		EpochID:           12,
-		Status:            RoleStatusAssigned,
-		EligibilityScore:  9_000,
-		Capacity:          capacity,
-		AssignedTaskCount: 1,
-		PerformanceScore:  8_000,
+		ValidatorAddress:	"val-a",
+		Role:			ValidatorRoleCollator,
+		EpochID:		12,
+		Status:			RoleStatusAssigned,
+		EligibilityScore:	9_000,
+		Capacity:		capacity,
+		AssignedTaskCount:	1,
+		PerformanceScore:	8_000,
 	})
 	require.NoError(t, err)
 	metrics, err := ComputeRolePerformanceMetrics(verifier, 2, 1, 0)
@@ -1928,9 +1928,9 @@ func TestRolePerformanceMetricsRewardsAndSuspensionRespectOverlap(t *testing.T) 
 	require.Equal(t, uint32(4_166), metrics.PerformanceScore)
 
 	rewards, err := SettleRoleRewards(RoleRewardInput{
-		EpochID:          12,
-		TotalRewardsNaet: sdkmath.NewInt(1_000),
-		Records:          []RoleRecord{verifier, collator},
+		EpochID:		12,
+		TotalRewardsNaet:	sdkmath.NewInt(1_000),
+		Records:		[]RoleRecord{verifier, collator},
 		Weights: []RoleRewardWeight{
 			{Role: ValidatorRoleVerifier, WeightBps: 5_000},
 			{Role: ValidatorRoleCollator, WeightBps: 5_000},
@@ -1947,12 +1947,12 @@ func TestRolePerformanceMetricsRewardsAndSuspensionRespectOverlap(t *testing.T) 
 	require.Equal(t, RoleStatusAssigned, suspended[1].Status)
 
 	penalty, err := ComputeSlashingPenalty(SlashingPenaltyInput{
-		PenaltyID:         "penalty-role-specific",
-		ValidatorID:       "val-a",
-		SeverityLevel:     SlashSeverityInvalidTaskExecution,
-		StakeExposureNaet: sdkmath.NewInt(1_000),
-		SelfStakeNaet:     sdkmath.NewInt(1_000),
-		RoleSuspensions:   []ValidatorRole{ValidatorRoleVerifier},
+		PenaltyID:		"penalty-role-specific",
+		ValidatorID:		"val-a",
+		SeverityLevel:		SlashSeverityInvalidTaskExecution,
+		StakeExposureNaet:	sdkmath.NewInt(1_000),
+		SelfStakeNaet:		sdkmath.NewInt(1_000),
+		RoleSuspensions:	[]ValidatorRole{ValidatorRoleVerifier},
 	})
 	require.NoError(t, err)
 	candidate := candidate("val-a", 1_000_000_000, 0)
@@ -1964,12 +1964,12 @@ func TestRolePerformanceMetricsRewardsAndSuspensionRespectOverlap(t *testing.T) 
 
 func TestCollatorRecordMatchesSpecAndValidatesRegistration(t *testing.T) {
 	record, err := NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-1",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution, WorkloadTypeZoneExecution},
-		BondOptional:       sdkmath.NewInt(100),
-		Reputation:         9_100,
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-1",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution, WorkloadTypeZoneExecution},
+		BondOptional:		sdkmath.NewInt(100),
+		Reputation:		9_100,
+		RegisteredEpoch:	13,
 	})
 	require.NoError(t, err)
 	require.Equal(t, CollatorStatusRegistered, record.Status)
@@ -2011,28 +2011,28 @@ func TestCollatorRecordMatchesSpecAndValidatesRegistration(t *testing.T) {
 	require.ErrorContains(t, tamperedRegistry.Validate(), "registry root")
 
 	_, err = NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-dup",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution, WorkloadTypeShardExecution},
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-dup",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution, WorkloadTypeShardExecution},
+		RegisteredEpoch:	13,
 	})
 	require.ErrorContains(t, err, "duplicate supported workload")
 
 	_, err = NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-bad-bond",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution},
-		BondOptional:       sdkmath.NewInt(-1),
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-bad-bond",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution},
+		BondOptional:		sdkmath.NewInt(-1),
+		RegisteredEpoch:	13,
 	})
 	require.ErrorContains(t, err, "bond optional")
 
 	_, err = NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-bad-reputation",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution},
-		Reputation:         BasisPoints + 1,
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-bad-reputation",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution},
+		Reputation:		BasisPoints + 1,
+		RegisteredEpoch:	13,
 	})
 	require.ErrorContains(t, err, "reputation")
 }
@@ -2040,31 +2040,31 @@ func TestCollatorRecordMatchesSpecAndValidatesRegistration(t *testing.T) {
 func TestCollatorBuildsCandidateOutputButRequiresValidatorVerification(t *testing.T) {
 	params := DefaultParams()
 	collator, err := NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-1",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution},
-		Status:             CollatorStatusActive,
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-1",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution},
+		Status:			CollatorStatusActive,
+		RegisteredEpoch:	13,
 	})
 	require.NoError(t, err)
 	task := WorkloadTask{
-		TaskID:             "task-1",
-		WorkloadID:         "workload-1",
-		WorkloadType:       WorkloadTypeShardExecution,
-		ZoneID:             "zone-a",
-		ShardID:            "shard-1",
-		WorkloadClass:      DefaultWorkloadClass,
-		RequiredValidators: params.MinTaskGroupValidators,
-		Roles:              []ValidatorRole{ValidatorRoleCollator, ValidatorRoleVerifier},
+		TaskID:			"task-1",
+		WorkloadID:		"workload-1",
+		WorkloadType:		WorkloadTypeShardExecution,
+		ZoneID:			"zone-a",
+		ShardID:		"shard-1",
+		WorkloadClass:		DefaultWorkloadClass,
+		RequiredValidators:	params.MinTaskGroupValidators,
+		Roles:			[]ValidatorRole{ValidatorRoleCollator, ValidatorRoleVerifier},
 	}
 	output, err := BuildCollatorCandidateOutput(params, CollatorCandidateOutputInput{
-		EpochID:             13,
-		Collator:            collator,
-		Task:                task,
-		TaskGroupIDOptional: "task-group-1",
-		TransactionRoot:     PosEmptyRootHash,
-		StateTransitionRoot: PosEmptyRootHash,
-		ProofBundleRoot:     PosEmptyRootHash,
+		EpochID:		13,
+		Collator:		collator,
+		Task:			task,
+		TaskGroupIDOptional:	"task-group-1",
+		TransactionRoot:	PosEmptyRootHash,
+		StateTransitionRoot:	PosEmptyRootHash,
+		ProofBundleRoot:	PosEmptyRootHash,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "collator-1", output.CollatorID)
@@ -2086,24 +2086,24 @@ func TestCollatorBuildsCandidateOutputButRequiresValidatorVerification(t *testin
 	unsupported := collator
 	unsupported.SupportedWorkloads = []WorkloadType{WorkloadTypeEvidenceVerification}
 	_, err = BuildCollatorCandidateOutput(params, CollatorCandidateOutputInput{
-		EpochID:             13,
-		Collator:            unsupported,
-		Task:                task,
-		TransactionRoot:     PosEmptyRootHash,
-		StateTransitionRoot: PosEmptyRootHash,
-		ProofBundleRoot:     PosEmptyRootHash,
+		EpochID:		13,
+		Collator:		unsupported,
+		Task:			task,
+		TransactionRoot:	PosEmptyRootHash,
+		StateTransitionRoot:	PosEmptyRootHash,
+		ProofBundleRoot:	PosEmptyRootHash,
 	})
 	require.ErrorContains(t, err, "does not support workload")
 
 	suspended := collator
 	suspended.Status = CollatorStatusSuspended
 	_, err = BuildCollatorCandidateOutput(params, CollatorCandidateOutputInput{
-		EpochID:             13,
-		Collator:            suspended,
-		Task:                task,
-		TransactionRoot:     PosEmptyRootHash,
-		StateTransitionRoot: PosEmptyRootHash,
-		ProofBundleRoot:     PosEmptyRootHash,
+		EpochID:		13,
+		Collator:		suspended,
+		Task:			task,
+		TransactionRoot:	PosEmptyRootHash,
+		StateTransitionRoot:	PosEmptyRootHash,
+		ProofBundleRoot:	PosEmptyRootHash,
 	})
 	require.ErrorContains(t, err, "not eligible")
 }
@@ -2111,31 +2111,31 @@ func TestCollatorBuildsCandidateOutputButRequiresValidatorVerification(t *testin
 func TestCollatorOutputVerificationFinalizationAndInvalidEvidence(t *testing.T) {
 	params := DefaultParams()
 	collator, err := NewCollatorRecord(CollatorRecord{
-		CollatorID:         "collator-bonded",
-		OperatorAddress:    "operator-1",
-		SupportedWorkloads: []WorkloadType{WorkloadTypeShardExecution},
-		BondOptional:       sdkmath.NewInt(10_000),
-		Status:             CollatorStatusActive,
-		RegisteredEpoch:    13,
+		CollatorID:		"collator-bonded",
+		OperatorAddress:	"operator-1",
+		SupportedWorkloads:	[]WorkloadType{WorkloadTypeShardExecution},
+		BondOptional:		sdkmath.NewInt(10_000),
+		Status:			CollatorStatusActive,
+		RegisteredEpoch:	13,
 	})
 	require.NoError(t, err)
 	task := WorkloadTask{
-		TaskID:             "task-1",
-		WorkloadID:         "workload-1",
-		WorkloadType:       WorkloadTypeShardExecution,
-		ZoneID:             "zone-a",
-		ShardID:            "shard-1",
-		WorkloadClass:      DefaultWorkloadClass,
-		RequiredValidators: params.MinTaskGroupValidators,
-		Roles:              []ValidatorRole{ValidatorRoleCollator, ValidatorRoleVerifier},
+		TaskID:			"task-1",
+		WorkloadID:		"workload-1",
+		WorkloadType:		WorkloadTypeShardExecution,
+		ZoneID:			"zone-a",
+		ShardID:		"shard-1",
+		WorkloadClass:		DefaultWorkloadClass,
+		RequiredValidators:	params.MinTaskGroupValidators,
+		Roles:			[]ValidatorRole{ValidatorRoleCollator, ValidatorRoleVerifier},
 	}
 	output, err := BuildCollatorCandidateOutput(params, CollatorCandidateOutputInput{
-		EpochID:             13,
-		Collator:            collator,
-		Task:                task,
-		TransactionRoot:     PosEmptyRootHash,
-		StateTransitionRoot: PosEmptyRootHash,
-		ProofBundleRoot:     PosEmptyRootHash,
+		EpochID:		13,
+		Collator:		collator,
+		Task:			task,
+		TransactionRoot:	PosEmptyRootHash,
+		StateTransitionRoot:	PosEmptyRootHash,
+		ProofBundleRoot:	PosEmptyRootHash,
 	})
 	require.NoError(t, err)
 
@@ -2201,13 +2201,13 @@ func scoredCandidates(t *testing.T, params Params, candidates []Candidate) []Sco
 
 func riskWindow(stakeOwner string, validatorAddress string, amount int64, status string) RiskWindowRecord {
 	window := RiskWindowRecord{
-		StakeOwner:          stakeOwner,
-		ValidatorAddress:    validatorAddress,
-		AmountNaet:          sdkmath.NewInt(amount),
-		StartEpoch:          10,
-		EndEpoch:            20,
-		SlashableUntilEpoch: 24,
-		Status:              status,
+		StakeOwner:		stakeOwner,
+		ValidatorAddress:	validatorAddress,
+		AmountNaet:		sdkmath.NewInt(amount),
+		StartEpoch:		10,
+		EndEpoch:		20,
+		SlashableUntilEpoch:	24,
+		Status:			status,
 	}
 	window.RiskHistoryRoot = ComputeRiskWindowRoot(window)
 	return window

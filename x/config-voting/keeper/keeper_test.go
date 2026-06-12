@@ -29,14 +29,14 @@ func setupKeeper(t *testing.T) Keeper {
 
 func proposal(id string, snapshot []configvotingtypes.VotingPowerSnapshotEntry) configvotingtypes.ConfigProposal {
 	return configvotingtypes.ConfigProposal{
-		ProposalID:          id,
-		Title:               "critical config",
-		ConfigKey:           configtypes.KeyConsensusMaxBlockGas,
-		ConfigValue:         "1000000",
-		Operation:           configtypes.OperationSet,
-		SnapshotHeight:      1,
-		SubmitHeight:        2,
-		VotingPowerSnapshot: snapshot,
+		ProposalID:		id,
+		Title:			"critical config",
+		ConfigKey:		configtypes.KeyConsensusMaxBlockGas,
+		ConfigValue:		"1000000",
+		Operation:		configtypes.OperationSet,
+		SnapshotHeight:		1,
+		SubmitHeight:		2,
+		VotingPowerSnapshot:	snapshot,
 	}
 }
 
@@ -56,11 +56,11 @@ func submit(t *testing.T, k *Keeper, id string, snapshot []configvotingtypes.Vot
 
 func executeMsg(id string, height uint64) configvotingtypes.MsgExecuteConfigProposal {
 	return configvotingtypes.MsgExecuteConfigProposal{
-		Authority:    authority,
-		ProposalID:   id,
-		Height:       height,
-		ConfigParams: configtypes.DefaultParams(),
-		ConfigState:  configtypes.ConfigState{},
+		Authority:	authority,
+		ProposalID:	id,
+		Height:		height,
+		ConfigParams:	configtypes.DefaultParams(),
+		ConfigState:	configtypes.ConfigState{},
 	}
 }
 
@@ -151,7 +151,6 @@ func TestVotingPowerSnapshotPreservedAcrossValidatorSetChange(t *testing.T) {
 	_, err := k.VoteConfigProposal(configvotingtypes.MsgVoteConfigProposal{Voter: "val1", ProposalID: "p1", Option: configvotingtypes.VoteOptionYes, Height: 3})
 	require.NoError(t, err)
 
-	// Later proposals may see a changed validator set, but p1 keeps its proposal-height snapshot.
 	submit(t, &k, "p2", []configvotingtypes.VotingPowerSnapshotEntry{{Voter: "val1", Power: 10}, {Voter: "val3", Power: 90}})
 	executed, err := k.ExecuteConfigProposal(executeMsg("p1", p.EarliestExecutionHeight))
 	require.NoError(t, err)

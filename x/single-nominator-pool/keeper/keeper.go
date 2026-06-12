@@ -16,17 +16,17 @@ import (
 var genesisKey = []byte{0x01}
 
 type GenesisState struct {
-	Version uint64
-	Params  types.Params
-	State   types.State
+	Version	uint64
+	Params	types.Params
+	State	types.State
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
-func NewKeeper() Keeper { return Keeper{genesis: DefaultGenesis()} }
+func NewKeeper() Keeper	{ return Keeper{genesis: DefaultGenesis()} }
 
 func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 	return Keeper{genesis: DefaultGenesis(), storeService: storeService}
@@ -67,7 +67,7 @@ func (k *Keeper) InitGenesisState(ctx context.Context, gs GenesisState) error {
 	return k.storeService.OpenKVStore(ctx).Set(genesisKey, bz)
 }
 
-func (k Keeper) ExportGenesis() GenesisState { return cloneGenesis(k.genesis) }
+func (k Keeper) ExportGenesis() GenesisState	{ return cloneGenesis(k.genesis) }
 
 func (k Keeper) ExportGenesisState(ctx context.Context) (GenesisState, error) {
 	if k.storeService == nil {
@@ -107,10 +107,10 @@ func (k *Keeper) CreateSingleNominatorPool(msg types.MsgCreateSingleNominatorPoo
 		return types.SingleNominatorPool{}, errors.New("single nominator pool already exists")
 	}
 	pool := types.SingleNominatorPool{
-		PoolAddress: msg.PoolAddress,
-		Owner:       msg.Owner,
-		Validator:   msg.Validator,
-		Status:      types.StatusActive,
+		PoolAddress:	msg.PoolAddress,
+		Owner:		msg.Owner,
+		Validator:	msg.Validator,
+		Status:		types.StatusActive,
 	}
 	if err := pool.Validate(k.genesis.Params); err != nil {
 		return types.SingleNominatorPool{}, err
@@ -177,10 +177,10 @@ func (k *Keeper) WithdrawSingleNominator(msg types.MsgWithdrawSingleNominator) (
 	}
 	pool.BondedStake -= msg.Amount
 	pool.PendingWithdrawal = types.PendingWithdrawal{
-		Amount:         msg.Amount,
-		RequestHeight:  msg.Height,
-		CompleteHeight: msg.Height + k.genesis.Params.UnbondingBlocks,
-		Status:         types.WithdrawalStatusPending,
+		Amount:		msg.Amount,
+		RequestHeight:	msg.Height,
+		CompleteHeight:	msg.Height + k.genesis.Params.UnbondingBlocks,
+		Status:		types.WithdrawalStatusPending,
 	}
 	if _, err := k.savePool(idx, pool); err != nil {
 		return types.PendingWithdrawal{}, err
@@ -283,8 +283,8 @@ func (k Keeper) SingleNominatorRewards(poolAddress string) (uint64, bool) {
 
 type Migrator struct{ keeper *Keeper }
 
-func NewMigrator(k *Keeper) Migrator  { return Migrator{keeper: k} }
-func (m Migrator) Migrate1to2() error { return m.keeper.ExportGenesis().Validate() }
+func NewMigrator(k *Keeper) Migrator	{ return Migrator{keeper: k} }
+func (m Migrator) Migrate1to2() error	{ return m.keeper.ExportGenesis().Validate() }
 func (k Keeper) Migrate1to2State(ctx context.Context) error {
 	_, err := k.ExportGenesisState(ctx)
 	return err

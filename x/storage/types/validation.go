@@ -7,73 +7,73 @@ import (
 )
 
 const (
-	DefaultStorageFeeDenom       = "uaet"
-	DefaultStorageBytePrice      = uint64(1)
-	DefaultStorageChunkBytePrice = uint64(1)
-	DefaultStorageReceiptFee     = uint64(10)
-	DefaultStorageMinimumFee     = uint64(100)
-	DefaultLazyFetchMaxBytes     = uint64(4 * 1024 * 1024)
-	LazyFetchBoundaryVersionV1   = uint64(1)
+	DefaultStorageFeeDenom		= "uaet"
+	DefaultStorageBytePrice		= uint64(1)
+	DefaultStorageChunkBytePrice	= uint64(1)
+	DefaultStorageReceiptFee	= uint64(10)
+	DefaultStorageMinimumFee	= uint64(100)
+	DefaultLazyFetchMaxBytes	= uint64(4 * 1024 * 1024)
+	LazyFetchBoundaryVersionV1	= uint64(1)
 )
 
 type StorageReplicationPolicyRule struct {
-	Policy               string
-	MinReplicas          uint32
-	MaxReplicas          uint32
-	MinAvailabilityBps   uint32
-	RequiresErasureGroup bool
+	Policy			string
+	MinReplicas		uint32
+	MaxReplicas		uint32
+	MinAvailabilityBps	uint32
+	RequiresErasureGroup	bool
 }
 
 type StorageValidationParams struct {
-	ChunkParams                 StorageChunkParams
-	AllowedAccessPolicies       []string
-	ReplicationPolicyRules      []StorageReplicationPolicyRule
-	RequireProofBackedRetrieval bool
+	ChunkParams			StorageChunkParams
+	AllowedAccessPolicies		[]string
+	ReplicationPolicyRules		[]StorageReplicationPolicyRule
+	RequireProofBackedRetrieval	bool
 }
 
 type StorageFeeParams struct {
-	Denom           string
-	ObjectBytePrice uint64
-	ChunkBytePrice  uint64
-	ReceiptFee      uint64
-	MinimumFee      uint64
+	Denom		string
+	ObjectBytePrice	uint64
+	ChunkBytePrice	uint64
+	ReceiptFee	uint64
+	MinimumFee	uint64
 }
 
 type StorageFeeQuote struct {
-	Payer        string
-	ObjectID     string
-	Denom        string
-	ObjectBytes  uint64
-	ChunkBytes   uint64
-	ReceiptCount uint32
-	FeeAmount    uint64
-	QuoteHash    string
+	Payer		string
+	ObjectID	string
+	Denom		string
+	ObjectBytes	uint64
+	ChunkBytes	uint64
+	ReceiptCount	uint32
+	FeeAmount	uint64
+	QuoteHash	string
 }
 
 type LazyFetchRequest struct {
-	ObjectID           string
-	ContentHash        string
-	ChunkIndexOptional uint32
-	ChunkProofRoot     string
-	Requester          string
-	MaxBytes           uint64
-	RequestHeight      uint64
-	Version            uint64
-	RequestHash        string
+	ObjectID		string
+	ContentHash		string
+	ChunkIndexOptional	uint32
+	ChunkProofRoot		string
+	Requester		string
+	MaxBytes		uint64
+	RequestHeight		uint64
+	Version			uint64
+	RequestHash		string
 }
 
 type LazyFetchResultBoundary struct {
-	RequestHash  string
-	Provider     string
-	PayloadHash  string
-	Proof        StorageChunkInclusionProof
-	ResultHeight uint64
-	ResultHash   string
+	RequestHash	string
+	Provider	string
+	PayloadHash	string
+	Proof		StorageChunkInclusionProof
+	ResultHeight	uint64
+	ResultHash	string
 }
 
 func DefaultStorageValidationParams() StorageValidationParams {
 	return StorageValidationParams{
-		ChunkParams: DefaultStorageChunkParams(),
+		ChunkParams:	DefaultStorageChunkParams(),
 		AllowedAccessPolicies: []string{
 			AccessPolicyPermissioned,
 			AccessPolicyPrivate,
@@ -85,17 +85,17 @@ func DefaultStorageValidationParams() StorageValidationParams {
 			{Policy: ReplicationPolicyRegional, MinReplicas: 2, MaxReplicas: 16, MinAvailabilityBps: 9500},
 			{Policy: ReplicationPolicySingle, MinReplicas: 1, MaxReplicas: 1, MinAvailabilityBps: 9000},
 		},
-		RequireProofBackedRetrieval: true,
+		RequireProofBackedRetrieval:	true,
 	}
 }
 
 func DefaultStorageFeeParams() StorageFeeParams {
 	return StorageFeeParams{
-		Denom:           DefaultStorageFeeDenom,
-		ObjectBytePrice: DefaultStorageBytePrice,
-		ChunkBytePrice:  DefaultStorageChunkBytePrice,
-		ReceiptFee:      DefaultStorageReceiptFee,
-		MinimumFee:      DefaultStorageMinimumFee,
+		Denom:			DefaultStorageFeeDenom,
+		ObjectBytePrice:	DefaultStorageBytePrice,
+		ChunkBytePrice:		DefaultStorageChunkBytePrice,
+		ReceiptFee:		DefaultStorageReceiptFee,
+		MinimumFee:		DefaultStorageMinimumFee,
 	}
 }
 
@@ -283,13 +283,13 @@ func NewStorageFeeQuote(payer string, object StorageObject, descriptors []Storag
 		total = params.MinimumFee
 	}
 	quote := StorageFeeQuote{
-		Payer:        payer,
-		ObjectID:     object.ObjectID,
-		Denom:        params.Denom,
-		ObjectBytes:  object.Size,
-		ChunkBytes:   chunkBytes,
-		ReceiptCount: receiptCount,
-		FeeAmount:    total,
+		Payer:		payer,
+		ObjectID:	object.ObjectID,
+		Denom:		params.Denom,
+		ObjectBytes:	object.Size,
+		ChunkBytes:	chunkBytes,
+		ReceiptCount:	receiptCount,
+		FeeAmount:	total,
 	}
 	quote.QuoteHash = ComputeStorageFeeQuoteHash(quote)
 	return quote, quote.Validate()

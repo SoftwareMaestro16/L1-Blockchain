@@ -84,7 +84,7 @@ func deterministicGenesisWithValidator(t testing.TB) (*L1App, GenesisState, *cmt
 	accountPrivKey := secp256k1.GenPrivKeyFromSecret([]byte("aetra-deterministic-account"))
 	account := authtypes.NewBaseAccount(accountPrivKey.PubKey().Address().Bytes(), accountPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
-		Address: account.GetAddress().String(),
+		Address:	account.GetAddress().String(),
 		Coins: sdk.NewCoins(
 			sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000)),
 		),
@@ -104,17 +104,17 @@ func runEmptyBlocksAndExportAppState(t testing.TB, genesisBytes []byte, nextVali
 	app := NewL1App(log.NewNopLogger(), dbm.NewMemDB(), true, appOptions)
 
 	_, err := app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: simtestutil.DefaultConsensusParams,
-		AppStateBytes:   genesisBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	simtestutil.DefaultConsensusParams,
+		AppStateBytes:		genesisBytes,
 	})
 	require.NoError(t, err)
 
 	for height := int64(1); height <= blocks; height++ {
 		_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
-			Height:             height,
-			Hash:               app.LastCommitID().Hash,
-			NextValidatorsHash: nextValidatorsHash,
+			Height:			height,
+			Hash:			app.LastCommitID().Hash,
+			NextValidatorsHash:	nextValidatorsHash,
 		})
 		require.NoError(t, err)
 		_, err = app.Commit()

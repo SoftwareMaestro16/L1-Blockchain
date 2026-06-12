@@ -6,17 +6,17 @@ import (
 )
 
 const (
-	MinIdentityBatchResolverUpdateGasV2 = uint64(1_000)
-	MaxIdentityBatchResolverUpdateGasV2 = uint64(1_000_000)
+	MinIdentityBatchResolverUpdateGasV2	= uint64(1_000)
+	MaxIdentityBatchResolverUpdateGasV2	= uint64(1_000_000)
 
-	IdentityBatchFailureAtomicV2  IdentityBatchFailureModeV2 = "atomic"
-	IdentityBatchFailurePartialV2 IdentityBatchFailureModeV2 = "partial"
+	IdentityBatchFailureAtomicV2	IdentityBatchFailureModeV2	= "atomic"
+	IdentityBatchFailurePartialV2	IdentityBatchFailureModeV2	= "partial"
 
-	IdentityBatchUpdateSuccessV2      IdentityBatchUpdateStatusV2 = "success"
-	IdentityBatchUpdateUnauthorizedV2 IdentityBatchUpdateStatusV2 = "unauthorized"
-	IdentityBatchUpdateVersionErrorV2 IdentityBatchUpdateStatusV2 = "version_error"
-	IdentityBatchUpdateGasErrorV2     IdentityBatchUpdateStatusV2 = "gas_error"
-	IdentityBatchUpdateInvalidV2      IdentityBatchUpdateStatusV2 = "invalid"
+	IdentityBatchUpdateSuccessV2		IdentityBatchUpdateStatusV2	= "success"
+	IdentityBatchUpdateUnauthorizedV2	IdentityBatchUpdateStatusV2	= "unauthorized"
+	IdentityBatchUpdateVersionErrorV2	IdentityBatchUpdateStatusV2	= "version_error"
+	IdentityBatchUpdateGasErrorV2		IdentityBatchUpdateStatusV2	= "gas_error"
+	IdentityBatchUpdateInvalidV2		IdentityBatchUpdateStatusV2	= "invalid"
 )
 
 type IdentityBatchFailureModeV2 string
@@ -24,33 +24,33 @@ type IdentityBatchFailureModeV2 string
 type IdentityBatchUpdateStatusV2 string
 
 type IdentityBatchResolverUpdateOptionsV2 struct {
-	Mode         IdentityBatchFailureModeV2
-	Height       uint64
-	GasPerUpdate uint64
-	GasLimit     uint64
+	Mode		IdentityBatchFailureModeV2
+	Height		uint64
+	GasPerUpdate	uint64
+	GasLimit	uint64
 }
 
 type IdentityBatchResolverUpdateResultV2 struct {
-	Index           uint32
-	Name            string
-	NameHash        string
-	Status          IdentityBatchUpdateStatusV2
-	Error           string
-	GasWanted       uint64
-	GasUsed         uint64
-	PreviousVersion uint64
-	NewVersion      uint64
+	Index		uint32
+	Name		string
+	NameHash	string
+	Status		IdentityBatchUpdateStatusV2
+	Error		string
+	GasWanted	uint64
+	GasUsed		uint64
+	PreviousVersion	uint64
+	NewVersion	uint64
 }
 
 type IdentityBatchResolverUpdateResponseV2 struct {
-	Mode        IdentityBatchFailureModeV2
-	Atomic      bool
-	Results     []IdentityBatchResolverUpdateResultV2
-	Successes   uint32
-	Failures    uint32
-	GasWanted   uint64
-	GasUsed     uint64
-	ResultOrder string
+	Mode		IdentityBatchFailureModeV2
+	Atomic		bool
+	Results		[]IdentityBatchResolverUpdateResultV2
+	Successes	uint32
+	Failures	uint32
+	GasWanted	uint64
+	GasUsed		uint64
+	ResultOrder	string
 }
 
 func ExecuteBatchResolverUpdatesV2(state IdentityState, msg MsgBatchUpdateResolversV2, options IdentityBatchResolverUpdateOptionsV2) (IdentityState, IdentityBatchResolverUpdateResponseV2, error) {
@@ -66,18 +66,18 @@ func ExecuteBatchResolverUpdatesV2(state IdentityState, msg MsgBatchUpdateResolv
 	}
 	next := state.Export()
 	response := IdentityBatchResolverUpdateResponseV2{
-		Mode:        mode,
-		Atomic:      mode == IdentityBatchFailureAtomicV2,
-		Results:     make([]IdentityBatchResolverUpdateResultV2, 0, len(msg.Updates)),
-		GasWanted:   options.GasLimit,
-		ResultOrder: "input_index",
+		Mode:		mode,
+		Atomic:		mode == IdentityBatchFailureAtomicV2,
+		Results:	make([]IdentityBatchResolverUpdateResultV2, 0, len(msg.Updates)),
+		GasWanted:	options.GasLimit,
+		ResultOrder:	"input_index",
 	}
 	for i, update := range msg.Updates {
 		result := IdentityBatchResolverUpdateResultV2{
-			Index:     uint32(i),
-			Name:      update.Name,
-			NameHash:  update.NameHash,
-			GasWanted: options.GasPerUpdate,
+			Index:		uint32(i),
+			Name:		update.Name,
+			NameHash:	update.NameHash,
+			GasWanted:	options.GasPerUpdate,
 		}
 		if response.GasUsed+options.GasPerUpdate > options.GasLimit {
 			result.Status = IdentityBatchUpdateGasErrorV2

@@ -11,52 +11,52 @@ import (
 )
 
 const (
-	OpNoop          = "noop"
-	OpStorageRead   = "storage_read"
-	OpStorageWrite  = "storage_write"
-	OpCryptoVerify  = "crypto_verify"
-	OpContractCall  = "contract_call"
-	OpHeavyCompute  = "heavy_compute"
-	DefaultBlockCap = uint64(10_000_000)
+	OpNoop		= "noop"
+	OpStorageRead	= "storage_read"
+	OpStorageWrite	= "storage_write"
+	OpCryptoVerify	= "crypto_verify"
+	OpContractCall	= "contract_call"
+	OpHeavyCompute	= "heavy_compute"
+	DefaultBlockCap	= uint64(10_000_000)
 )
 
 type Params struct {
-	DefaultOpCost           uint64
-	MaxBlockComputeUnits    uint64
-	MaxContractComputeUnits uint64
-	OpCosts                 map[string]uint64
+	DefaultOpCost		uint64
+	MaxBlockComputeUnits	uint64
+	MaxContractComputeUnits	uint64
+	OpCosts			map[string]uint64
 }
 
 type Operation struct {
-	Contract sdk.AccAddress
-	Op       string
-	Count    uint64
+	Contract	sdk.AccAddress
+	Op		string
+	Count		uint64
 }
 
 type ContractStats struct {
-	Contract sdk.AccAddress
-	Used     uint64
-	Ops      uint64
+	Contract	sdk.AccAddress
+	Used		uint64
+	Ops		uint64
 }
 
 type BlockMeter struct {
-	params Params
-	used   uint64
-	stats  map[string]ContractStats
+	params	Params
+	used	uint64
+	stats	map[string]ContractStats
 }
 
 func DefaultParams() Params {
 	return Params{
-		DefaultOpCost:           1,
-		MaxBlockComputeUnits:    DefaultBlockCap,
-		MaxContractComputeUnits: DefaultBlockCap / 10,
+		DefaultOpCost:			1,
+		MaxBlockComputeUnits:		DefaultBlockCap,
+		MaxContractComputeUnits:	DefaultBlockCap / 10,
 		OpCosts: map[string]uint64{
-			OpNoop:         1,
-			OpStorageRead:  5,
-			OpStorageWrite: 20,
-			OpCryptoVerify: 500,
-			OpContractCall: 100,
-			OpHeavyCompute: 10_000,
+			OpNoop:		1,
+			OpStorageRead:	5,
+			OpStorageWrite:	20,
+			OpCryptoVerify:	500,
+			OpContractCall:	100,
+			OpHeavyCompute:	10_000,
 		},
 	}
 }

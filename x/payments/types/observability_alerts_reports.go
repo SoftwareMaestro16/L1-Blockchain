@@ -12,108 +12,108 @@ import (
 type PaymentObservabilityAlertType string
 
 const (
-	PaymentAlertHighPendingDisputeCount                 PaymentObservabilityAlertType = "HIGH_PENDING_DISPUTE_COUNT"
-	PaymentAlertChallengeNearExpiryWithoutFinalization  PaymentObservabilityAlertType = "CHALLENGE_NEAR_EXPIRY_WITHOUT_FINALIZATION"
-	PaymentAlertFraudProofRejectionSpike                PaymentObservabilityAlertType = "FRAUD_PROOF_REJECTION_SPIKE"
-	PaymentAlertChannelOpenSpamSpike                    PaymentObservabilityAlertType = "CHANNEL_OPEN_SPAM_SPIKE"
-	PaymentAlertPromiseExpiryBacklog                    PaymentObservabilityAlertType = "PROMISE_EXPIRY_BACKLOG"
-	PaymentAlertSettlementQueueBacklog                  PaymentObservabilityAlertType = "SETTLEMENT_QUEUE_BACKLOG"
-	PaymentAlertBlockSTMConflictRateAboveThreshold      PaymentObservabilityAlertType = "BLOCKSTM_CONFLICT_RATE_ABOVE_THRESHOLD"
-	PaymentAlertPaymentModuleStoreLatencyAboveThreshold PaymentObservabilityAlertType = "PAYMENT_MODULE_STORE_LATENCY_ABOVE_THRESHOLD"
-	PaymentAlertWatchServiceEventReplayLag              PaymentObservabilityAlertType = "WATCH_SERVICE_EVENT_REPLAY_LAG"
-	PaymentAlertRoutingGossipSpamRateAboveThreshold     PaymentObservabilityAlertType = "ROUTING_GOSSIP_SPAM_RATE_ABOVE_THRESHOLD"
+	PaymentAlertHighPendingDisputeCount			PaymentObservabilityAlertType	= "HIGH_PENDING_DISPUTE_COUNT"
+	PaymentAlertChallengeNearExpiryWithoutFinalization	PaymentObservabilityAlertType	= "CHALLENGE_NEAR_EXPIRY_WITHOUT_FINALIZATION"
+	PaymentAlertFraudProofRejectionSpike			PaymentObservabilityAlertType	= "FRAUD_PROOF_REJECTION_SPIKE"
+	PaymentAlertChannelOpenSpamSpike			PaymentObservabilityAlertType	= "CHANNEL_OPEN_SPAM_SPIKE"
+	PaymentAlertPromiseExpiryBacklog			PaymentObservabilityAlertType	= "PROMISE_EXPIRY_BACKLOG"
+	PaymentAlertSettlementQueueBacklog			PaymentObservabilityAlertType	= "SETTLEMENT_QUEUE_BACKLOG"
+	PaymentAlertBlockSTMConflictRateAboveThreshold		PaymentObservabilityAlertType	= "BLOCKSTM_CONFLICT_RATE_ABOVE_THRESHOLD"
+	PaymentAlertPaymentModuleStoreLatencyAboveThreshold	PaymentObservabilityAlertType	= "PAYMENT_MODULE_STORE_LATENCY_ABOVE_THRESHOLD"
+	PaymentAlertWatchServiceEventReplayLag			PaymentObservabilityAlertType	= "WATCH_SERVICE_EVENT_REPLAY_LAG"
+	PaymentAlertRoutingGossipSpamRateAboveThreshold		PaymentObservabilityAlertType	= "ROUTING_GOSSIP_SPAM_RATE_ABOVE_THRESHOLD"
 )
 
 type PaymentObservabilityAlertSeverity string
 
 const (
-	PaymentAlertSeverityWarning  PaymentObservabilityAlertSeverity = "WARNING"
-	PaymentAlertSeverityCritical PaymentObservabilityAlertSeverity = "CRITICAL"
+	PaymentAlertSeverityWarning	PaymentObservabilityAlertSeverity	= "WARNING"
+	PaymentAlertSeverityCritical	PaymentObservabilityAlertSeverity	= "CRITICAL"
 )
 
 type PaymentObservabilityAlertThresholds struct {
-	WindowBlocks              uint64
-	HighPendingDisputeCount   uint64
-	NearExpiryWithoutFinalize uint64
-	FraudProofRejectionSpike  uint64
-	ChannelOpenSpamSpike      uint64
-	PromiseExpiryBacklog      uint64
-	SettlementQueueBacklog    uint64
-	BlockSTMConflictRateBps   uint64
-	StoreLatencyOps           uint64
-	WatchReplayLagBlocks      uint64
-	RoutingGossipSpamRateBps  uint64
+	WindowBlocks			uint64
+	HighPendingDisputeCount		uint64
+	NearExpiryWithoutFinalize	uint64
+	FraudProofRejectionSpike	uint64
+	ChannelOpenSpamSpike		uint64
+	PromiseExpiryBacklog		uint64
+	SettlementQueueBacklog		uint64
+	BlockSTMConflictRateBps		uint64
+	StoreLatencyOps			uint64
+	WatchReplayLagBlocks		uint64
+	RoutingGossipSpamRateBps	uint64
 }
 
 type PaymentObservabilityExternalSignals struct {
-	WatcherReplayHeight      uint64
-	RoutingGossipMessages    uint64
-	RoutingGossipRejected    uint64
-	RoutingGossipSpamRateBps uint64
+	WatcherReplayHeight		uint64
+	RoutingGossipMessages		uint64
+	RoutingGossipRejected		uint64
+	RoutingGossipSpamRateBps	uint64
 }
 
 type PaymentObservabilityAlert struct {
-	AlertID      string
-	AlertType    PaymentObservabilityAlertType
-	Severity     PaymentObservabilityAlertSeverity
-	Height       uint64
-	MetricName   string
-	MetricValue  uint64
-	Threshold    uint64
-	Message      string
-	EvidenceHash string
+	AlertID		string
+	AlertType	PaymentObservabilityAlertType
+	Severity	PaymentObservabilityAlertSeverity
+	Height		uint64
+	MetricName	string
+	MetricValue	uint64
+	Threshold	uint64
+	Message		string
+	EvidenceHash	string
 }
 
 type PaymentObservabilityReportType string
 
 const (
-	PaymentReportDailyLockedLiquidity         PaymentObservabilityReportType = "DAILY_LOCKED_LIQUIDITY"
-	PaymentReportDailySettlementVolume        PaymentObservabilityReportType = "DAILY_SETTLEMENT_VOLUME"
-	PaymentReportDailyRoutingFee              PaymentObservabilityReportType = "DAILY_ROUTING_FEE"
-	PaymentReportDailyDisputeAndFraud         PaymentObservabilityReportType = "DAILY_DISPUTE_AND_FRAUD"
-	PaymentReportDailyStateFootprint          PaymentObservabilityReportType = "DAILY_STATE_FOOTPRINT"
-	PaymentReportWeeklyChannelChurn           PaymentObservabilityReportType = "WEEKLY_CHANNEL_CHURN"
-	PaymentReportWeeklyLiquidityConcentration PaymentObservabilityReportType = "WEEKLY_LIQUIDITY_CONCENTRATION"
-	PaymentReportWeeklyPerformance            PaymentObservabilityReportType = "WEEKLY_PERFORMANCE"
+	PaymentReportDailyLockedLiquidity		PaymentObservabilityReportType	= "DAILY_LOCKED_LIQUIDITY"
+	PaymentReportDailySettlementVolume		PaymentObservabilityReportType	= "DAILY_SETTLEMENT_VOLUME"
+	PaymentReportDailyRoutingFee			PaymentObservabilityReportType	= "DAILY_ROUTING_FEE"
+	PaymentReportDailyDisputeAndFraud		PaymentObservabilityReportType	= "DAILY_DISPUTE_AND_FRAUD"
+	PaymentReportDailyStateFootprint		PaymentObservabilityReportType	= "DAILY_STATE_FOOTPRINT"
+	PaymentReportWeeklyChannelChurn			PaymentObservabilityReportType	= "WEEKLY_CHANNEL_CHURN"
+	PaymentReportWeeklyLiquidityConcentration	PaymentObservabilityReportType	= "WEEKLY_LIQUIDITY_CONCENTRATION"
+	PaymentReportWeeklyPerformance			PaymentObservabilityReportType	= "WEEKLY_PERFORMANCE"
 )
 
 type PaymentObservabilityReport struct {
-	ReportID                       string
-	ReportType                     PaymentObservabilityReportType
-	PeriodStartHeight              uint64
-	PeriodEndHeight                uint64
-	TotalLockedNaet                string
-	SettlementVolumeNaet           string
-	RoutingFeesNaet                string
-	DisputeCount                   uint64
-	FraudProofsSubmitted           uint64
-	FraudProofsAccepted            uint64
-	FraudProofsRejected            uint64
-	StateFootprintRecords          uint64
-	ChannelOpens                   uint64
-	ChannelSettlements             uint64
-	ChannelChurnRateBps            uint64
-	LargestLockedChannelNaet       string
-	LiquidityConcentrationBps      uint64
-	BlockSTMConflictRateBps        uint64
-	StoreV2PaymentModuleLatencyOps uint64
-	DisputeInclusionLatencyBlocks  uint64
-	ReportHash                     string
+	ReportID			string
+	ReportType			PaymentObservabilityReportType
+	PeriodStartHeight		uint64
+	PeriodEndHeight			uint64
+	TotalLockedNaet			string
+	SettlementVolumeNaet		string
+	RoutingFeesNaet			string
+	DisputeCount			uint64
+	FraudProofsSubmitted		uint64
+	FraudProofsAccepted		uint64
+	FraudProofsRejected		uint64
+	StateFootprintRecords		uint64
+	ChannelOpens			uint64
+	ChannelSettlements		uint64
+	ChannelChurnRateBps		uint64
+	LargestLockedChannelNaet	string
+	LiquidityConcentrationBps	uint64
+	BlockSTMConflictRateBps		uint64
+	StoreV2PaymentModuleLatencyOps	uint64
+	DisputeInclusionLatencyBlocks	uint64
+	ReportHash			string
 }
 
 func DefaultPaymentObservabilityAlertThresholds() PaymentObservabilityAlertThresholds {
 	return PaymentObservabilityAlertThresholds{
-		WindowBlocks:              100,
-		HighPendingDisputeCount:   100,
-		NearExpiryWithoutFinalize: 1,
-		FraudProofRejectionSpike:  10,
-		ChannelOpenSpamSpike:      1_000,
-		PromiseExpiryBacklog:      500,
-		SettlementQueueBacklog:    500,
-		BlockSTMConflictRateBps:   2_500,
-		StoreLatencyOps:           10_000,
-		WatchReplayLagBlocks:      50,
-		RoutingGossipSpamRateBps:  2_000,
+		WindowBlocks:			100,
+		HighPendingDisputeCount:	100,
+		NearExpiryWithoutFinalize:	1,
+		FraudProofRejectionSpike:	10,
+		ChannelOpenSpamSpike:		1_000,
+		PromiseExpiryBacklog:		500,
+		SettlementQueueBacklog:		500,
+		BlockSTMConflictRateBps:	2_500,
+		StoreLatencyOps:		10_000,
+		WatchReplayLagBlocks:		50,
+		RoutingGossipSpamRateBps:	2_000,
 	}
 }
 
@@ -134,13 +134,13 @@ func EvaluatePaymentObservabilityAlerts(state PaymentsState, metrics PaymentObse
 			return
 		}
 		alert := PaymentObservabilityAlert{
-			AlertType:   alertType,
-			Severity:    severity,
-			Height:      currentHeight,
-			MetricName:  metricName,
-			MetricValue: value,
-			Threshold:   threshold,
-			Message:     message,
+			AlertType:	alertType,
+			Severity:	severity,
+			Height:		currentHeight,
+			MetricName:	metricName,
+			MetricValue:	value,
+			Threshold:	threshold,
+			Message:	message,
 		}.WithHash()
 		alerts = append(alerts, alert)
 	}
@@ -361,10 +361,10 @@ func (r PaymentObservabilityReport) Validate() error {
 		return err
 	}
 	for label, value := range map[string]string{
-		"total locked naet":           report.TotalLockedNaet,
-		"settlement volume naet":      report.SettlementVolumeNaet,
-		"routing fees naet":           report.RoutingFeesNaet,
-		"largest locked channel naet": report.LargestLockedChannelNaet,
+		"total locked naet":		report.TotalLockedNaet,
+		"settlement volume naet":	report.SettlementVolumeNaet,
+		"routing fees naet":		report.RoutingFeesNaet,
+		"largest locked channel naet":	report.LargestLockedChannelNaet,
 	} {
 		if err := validateNonNegativeInt("payments observability report "+label, value); err != nil {
 			return err
@@ -488,24 +488,24 @@ func buildPaymentObservabilityReportSummary(state PaymentsState, fraud FraudProo
 	}
 	storeLatency := maxUint64(metrics.StoreV2PaymentModuleReadLatencyOps, metrics.StoreV2PaymentModuleWriteLatencyOps)
 	return PaymentObservabilityReport{
-		PeriodStartHeight:              startHeight,
-		PeriodEndHeight:                endHeight,
-		TotalLockedNaet:                totalLocked.String(),
-		SettlementVolumeNaet:           settlementVolume.String(),
-		RoutingFeesNaet:                routingFees.String(),
-		DisputeCount:                   metrics.ActiveDisputes,
-		FraudProofsSubmitted:           metrics.FraudProofsSubmitted,
-		FraudProofsAccepted:            uint64(len(fraud.EvidenceRecords)),
-		FraudProofsRejected:            metrics.FraudProofsRejected,
-		StateFootprintRecords:          paymentStateFootprintRecords(layout),
-		ChannelOpens:                   channelOpens,
-		ChannelSettlements:             channelSettlements,
-		ChannelChurnRateBps:            churnRate,
-		LargestLockedChannelNaet:       largestLocked.String(),
-		LiquidityConcentrationBps:      concentration,
-		BlockSTMConflictRateBps:        metrics.BlockSTMConflictRateBps,
-		StoreV2PaymentModuleLatencyOps: storeLatency,
-		DisputeInclusionLatencyBlocks:  metrics.DisputeInclusionLatency,
+		PeriodStartHeight:		startHeight,
+		PeriodEndHeight:		endHeight,
+		TotalLockedNaet:		totalLocked.String(),
+		SettlementVolumeNaet:		settlementVolume.String(),
+		RoutingFeesNaet:		routingFees.String(),
+		DisputeCount:			metrics.ActiveDisputes,
+		FraudProofsSubmitted:		metrics.FraudProofsSubmitted,
+		FraudProofsAccepted:		uint64(len(fraud.EvidenceRecords)),
+		FraudProofsRejected:		metrics.FraudProofsRejected,
+		StateFootprintRecords:		paymentStateFootprintRecords(layout),
+		ChannelOpens:			channelOpens,
+		ChannelSettlements:		channelSettlements,
+		ChannelChurnRateBps:		churnRate,
+		LargestLockedChannelNaet:	largestLocked.String(),
+		LiquidityConcentrationBps:	concentration,
+		BlockSTMConflictRateBps:	metrics.BlockSTMConflictRateBps,
+		StoreV2PaymentModuleLatencyOps:	storeLatency,
+		DisputeInclusionLatencyBlocks:	metrics.DisputeInclusionLatency,
 	}, nil
 }
 

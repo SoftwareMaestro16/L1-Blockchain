@@ -78,15 +78,15 @@ func TestQueueValidation(t *testing.T) {
 
 func testItem(scheduled uint64, class uint8, txHeight uint64, txIndex uint32, msgIndex uint32, sourceLT uint64) QueueItem {
 	return QueueItem{
-		ScheduledHeight:   scheduled,
-		ReputationClass:   class,
-		TxHeight:          txHeight,
-		TxIndex:           txIndex,
-		MessageIndex:      msgIndex,
-		SourceLogicalTime: sourceLT,
-		Account:           addr(1),
-		Contract:          addr(2),
-		Payload:           []byte("payload"),
+		ScheduledHeight:	scheduled,
+		ReputationClass:	class,
+		TxHeight:		txHeight,
+		TxIndex:		txIndex,
+		MessageIndex:		msgIndex,
+		SourceLogicalTime:	sourceLT,
+		Account:		addr(1),
+		Contract:		addr(2),
+		Payload:		[]byte("payload"),
 	}
 }
 

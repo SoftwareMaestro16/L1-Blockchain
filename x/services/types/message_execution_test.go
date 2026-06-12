@@ -99,11 +99,11 @@ func TestUnifiedServiceCallbackExecutionEmitsReceipt(t *testing.T) {
 	require.NoError(t, err)
 
 	outcome := coretypes.ServiceExecutionOutcome{
-		CallID:        callback.CallbackCallID,
-		Status:        coretypes.ServiceCallStatusExecuted,
-		ResponseHash:  testInterfaceHash("callback/response"),
-		PaymentStatus: coretypes.ServicePaymentStatusSettled,
-		GasUsed:       11,
+		CallID:		callback.CallbackCallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("callback/response"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	11,
 	}
 	emission, err := EmitServiceCallbackReceipt(ctx, target, callback, outcome)
 	require.NoError(t, err)

@@ -10,69 +10,69 @@ import (
 const MaxAetherMeshRouteHops = 16
 
 type AetherMeshRoutingCostParams struct {
-	BaseHopCost       uint64
-	GasCostWeight     uint64
-	CongestionWeight  uint64
-	ReliabilityWeight uint64
-	LatencyWeight     uint64
+	BaseHopCost		uint64
+	GasCostWeight		uint64
+	CongestionWeight	uint64
+	ReliabilityWeight	uint64
+	LatencyWeight		uint64
 }
 
 type AetherMeshRouteEdge struct {
-	RouteID                 string
-	SourceZone              string
-	DestinationZone         string
-	Enabled                 bool
-	ExpiresHeight           uint64
-	CommittedGasCost        uint64
-	CommittedCongestion     uint64
-	InverseReliabilityScore uint64
-	CommittedLatencyBucket  uint64
-	ReliabilityCommitment   string
-	EdgeHash                string
+	RouteID			string
+	SourceZone		string
+	DestinationZone		string
+	Enabled			bool
+	ExpiresHeight		uint64
+	CommittedGasCost	uint64
+	CommittedCongestion	uint64
+	InverseReliabilityScore	uint64
+	CommittedLatencyBucket	uint64
+	ReliabilityCommitment	string
+	EdgeHash		string
 }
 
 type AetherMeshRouteSelectionRequest struct {
-	SourceZone             string
-	DestinationZone        string
-	Sender                 string
-	Recipient              string
-	Opcode                 string
-	RoutingTableRoot       string
-	CongestionSnapshotRoot string
-	MaxHops                uint32
-	CurrentHeight          uint64
-	CostParams             AetherMeshRoutingCostParams
+	SourceZone		string
+	DestinationZone		string
+	Sender			string
+	Recipient		string
+	Opcode			string
+	RoutingTableRoot	string
+	CongestionSnapshotRoot	string
+	MaxHops			uint32
+	CurrentHeight		uint64
+	CostParams		AetherMeshRoutingCostParams
 }
 
 type AetherMeshRouteCandidate struct {
-	RouteID   string
-	Hops      []AetherMeshRouteEdge
-	Score     uint64
-	RouteHash string
+	RouteID		string
+	Hops		[]AetherMeshRouteEdge
+	Score		uint64
+	RouteHash	string
 }
 
 type AetherMeshSelectedRouteMetadata struct {
-	RouteID                string
-	SourceZone             string
-	DestinationZone        string
-	Sender                 string
-	Recipient              string
-	Opcode                 string
-	RoutingTableRoot       string
-	CongestionSnapshotRoot string
-	Score                  uint64
-	HopCount               uint32
-	RouteHash              string
-	MetadataHash           string
+	RouteID			string
+	SourceZone		string
+	DestinationZone		string
+	Sender			string
+	Recipient		string
+	Opcode			string
+	RoutingTableRoot	string
+	CongestionSnapshotRoot	string
+	Score			uint64
+	HopCount		uint32
+	RouteHash		string
+	MetadataHash		string
 }
 
 func DefaultAetherMeshRoutingCostParams() AetherMeshRoutingCostParams {
 	return AetherMeshRoutingCostParams{
-		BaseHopCost:       1,
-		GasCostWeight:     1,
-		CongestionWeight:  1,
-		ReliabilityWeight: 1,
-		LatencyWeight:     1,
+		BaseHopCost:		1,
+		GasCostWeight:		1,
+		CongestionWeight:	1,
+		ReliabilityWeight:	1,
+		LatencyWeight:		1,
 	}
 }
 
@@ -116,17 +116,17 @@ func SelectAetherMeshRoute(req AetherMeshRouteSelectionRequest, routingTable []A
 	})
 	selected := candidates[0]
 	metadata := AetherMeshSelectedRouteMetadata{
-		RouteID:                selected.RouteID,
-		SourceZone:             req.SourceZone,
-		DestinationZone:        req.DestinationZone,
-		Sender:                 req.Sender,
-		Recipient:              req.Recipient,
-		Opcode:                 req.Opcode,
-		RoutingTableRoot:       req.RoutingTableRoot,
-		CongestionSnapshotRoot: req.CongestionSnapshotRoot,
-		Score:                  selected.Score,
-		HopCount:               uint32(len(selected.Hops)),
-		RouteHash:              selected.RouteHash,
+		RouteID:		selected.RouteID,
+		SourceZone:		req.SourceZone,
+		DestinationZone:	req.DestinationZone,
+		Sender:			req.Sender,
+		Recipient:		req.Recipient,
+		Opcode:			req.Opcode,
+		RoutingTableRoot:	req.RoutingTableRoot,
+		CongestionSnapshotRoot:	req.CongestionSnapshotRoot,
+		Score:			selected.Score,
+		HopCount:		uint32(len(selected.Hops)),
+		RouteHash:		selected.RouteHash,
 	}
 	metadata.MetadataHash = ComputeAetherMeshSelectedRouteMetadataHash(metadata)
 	return metadata, metadata.Validate()
@@ -231,9 +231,9 @@ func BuildAetherMeshRouteCandidate(req AetherMeshRouteSelectionRequest, hops []A
 		routeIDs = append(routeIDs, edge.RouteID)
 	}
 	candidate := AetherMeshRouteCandidate{
-		RouteID: strings.Join(routeIDs, "/"),
-		Hops:    normalized,
-		Score:   score,
+		RouteID:	strings.Join(routeIDs, "/"),
+		Hops:		normalized,
+		Score:		score,
 	}
 	candidate.RouteHash = ComputeAetherMeshRouteCandidateHash(req, candidate)
 	return candidate, nil
@@ -342,8 +342,8 @@ func ComputeAetherMeshRouteEdgeCost(edge AetherMeshRouteEdge, params AetherMeshR
 	params = normalizeAetherMeshRoutingCostParams(params)
 	total := params.BaseHopCost
 	for _, term := range []struct {
-		weight uint64
-		value  uint64
+		weight	uint64
+		value	uint64
 	}{
 		{params.GasCostWeight, edge.CommittedGasCost},
 		{params.CongestionWeight, edge.CommittedCongestion},

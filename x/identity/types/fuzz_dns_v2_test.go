@@ -211,7 +211,7 @@ func FuzzBatchUpdateOrderingV2(f *testing.F) {
 			t.Skip()
 		}
 		msg := MsgBatchUpdateResolversV2{
-			Auth: benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 1),
+			Auth:	benchmarkIdentityTxAuth(IdentitySignerScopeBatchAdmin, 1),
 			Updates: []ResolverBatchUpdateV2{
 				{Name: left, NameHash: leftHash, Patch: ResolverPatch{Primary: addr(3)}, ExpectedRecordVersion: 1, RecordTTL: 10},
 				{Name: right, NameHash: rightHash, Patch: ResolverPatch{Primary: addr(4)}, ExpectedRecordVersion: 1, RecordTTL: 10},

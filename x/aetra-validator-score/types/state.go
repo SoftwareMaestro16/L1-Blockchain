@@ -10,120 +10,120 @@ import (
 )
 
 type Params struct {
-	Authority                      string       `json:"authority"`
-	UptimeWindowBlocks             uint64       `json:"uptime_window_blocks"`
-	JailPenaltyBps                 uint32       `json:"jail_penalty_bps"`
-	SlashEventPenaltyBps           uint32       `json:"slash_event_penalty_bps"`
-	SelfBondFullScoreBps           uint32       `json:"self_bond_full_score_bps"`
-	MinRewardMultiplierBps         uint32       `json:"min_reward_multiplier_bps"`
-	ObjectiveRewardModifierEnabled bool         `json:"objective_reward_modifier_enabled"`
-	ConsensusOverrideEnabled       bool         `json:"consensus_override_enabled"`
-	Weights                        ScoreWeights `json:"weights"`
+	Authority			string		`json:"authority"`
+	UptimeWindowBlocks		uint64		`json:"uptime_window_blocks"`
+	JailPenaltyBps			uint32		`json:"jail_penalty_bps"`
+	SlashEventPenaltyBps		uint32		`json:"slash_event_penalty_bps"`
+	SelfBondFullScoreBps		uint32		`json:"self_bond_full_score_bps"`
+	MinRewardMultiplierBps		uint32		`json:"min_reward_multiplier_bps"`
+	ObjectiveRewardModifierEnabled	bool		`json:"objective_reward_modifier_enabled"`
+	ConsensusOverrideEnabled	bool		`json:"consensus_override_enabled"`
+	Weights				ScoreWeights	`json:"weights"`
 }
 
 type ScoreWeights struct {
-	UptimeBps           uint32 `json:"uptime_bps"`
-	MissedBlocksBps     uint32 `json:"missed_blocks_bps"`
-	JailBps             uint32 `json:"jail_bps"`
-	SlashHistoryBps     uint32 `json:"slash_history_bps"`
-	SelfBondBps         uint32 `json:"self_bond_bps"`
-	CommissionBps       uint32 `json:"commission_bps"`
-	GovernanceBps       uint32 `json:"governance_bps"`
-	DecentralizationBps uint32 `json:"decentralization_bps"`
-	IdentityBps         uint32 `json:"identity_bps"`
+	UptimeBps		uint32	`json:"uptime_bps"`
+	MissedBlocksBps		uint32	`json:"missed_blocks_bps"`
+	JailBps			uint32	`json:"jail_bps"`
+	SlashHistoryBps		uint32	`json:"slash_history_bps"`
+	SelfBondBps		uint32	`json:"self_bond_bps"`
+	CommissionBps		uint32	`json:"commission_bps"`
+	GovernanceBps		uint32	`json:"governance_bps"`
+	DecentralizationBps	uint32	`json:"decentralization_bps"`
+	IdentityBps		uint32	`json:"identity_bps"`
 }
 
 type SlashEvent struct {
-	Height      uint64 `json:"height"`
-	FractionBps uint32 `json:"fraction_bps"`
-	Reason      string `json:"reason"`
+	Height		uint64	`json:"height"`
+	FractionBps	uint32	`json:"fraction_bps"`
+	Reason		string	`json:"reason"`
 }
 
 type CommissionPoint struct {
-	Epoch         uint64 `json:"epoch"`
-	CommissionBps uint32 `json:"commission_bps"`
+	Epoch		uint64	`json:"epoch"`
+	CommissionBps	uint32	`json:"commission_bps"`
 }
 
 type ValidatorMetricInput struct {
-	OperatorAddress          string            `json:"operator_address"`
-	SignedBlocks             uint64            `json:"signed_blocks"`
-	MissedBlocks             uint64            `json:"missed_blocks"`
-	UptimeWindow             uint64            `json:"uptime_window"`
-	JailEvents               uint64            `json:"jail_events"`
-	SlashEvents              []SlashEvent      `json:"slash_events"`
-	SelfBond                 uint64            `json:"self_bond"`
-	TotalBond                uint64            `json:"total_bond"`
-	CommissionHistory        []CommissionPoint `json:"commission_history"`
-	GovernanceVotes          uint64            `json:"governance_votes"`
-	GovernanceProposals      uint64            `json:"governance_proposals"`
-	ConcentrationBps         uint32            `json:"concentration_bps"`
-	ConcentrationStatus      string            `json:"concentration_status"`
-	IdentityMetadataComplete bool              `json:"identity_metadata_complete"`
+	OperatorAddress			string			`json:"operator_address"`
+	SignedBlocks			uint64			`json:"signed_blocks"`
+	MissedBlocks			uint64			`json:"missed_blocks"`
+	UptimeWindow			uint64			`json:"uptime_window"`
+	JailEvents			uint64			`json:"jail_events"`
+	SlashEvents			[]SlashEvent		`json:"slash_events"`
+	SelfBond			uint64			`json:"self_bond"`
+	TotalBond			uint64			`json:"total_bond"`
+	CommissionHistory		[]CommissionPoint	`json:"commission_history"`
+	GovernanceVotes			uint64			`json:"governance_votes"`
+	GovernanceProposals		uint64			`json:"governance_proposals"`
+	ConcentrationBps		uint32			`json:"concentration_bps"`
+	ConcentrationStatus		string			`json:"concentration_status"`
+	IdentityMetadataComplete	bool			`json:"identity_metadata_complete"`
 }
 
 type ValidatorScore struct {
-	OperatorAddress            string `json:"operator_address"`
-	Epoch                      uint64 `json:"epoch"`
-	UptimeWindow               uint64 `json:"uptime_window"`
-	SignedBlocks               uint64 `json:"signed_blocks"`
-	MissedBlocks               uint64 `json:"missed_blocks"`
-	JailEvents                 uint64 `json:"jail_events"`
-	SlashEventCount            uint64 `json:"slash_event_count"`
-	SelfBondBps                uint32 `json:"self_bond_bps"`
-	LastCommissionBps          uint32 `json:"last_commission_bps"`
-	GovernanceParticipationBps uint32 `json:"governance_participation_bps"`
-	ConcentrationBps           uint32 `json:"concentration_bps"`
-	ConcentrationStatus        string `json:"concentration_status"`
-	IdentityMetadataComplete   bool   `json:"identity_metadata_complete"`
-	UptimeScoreBps             uint32 `json:"uptime_score_bps"`
-	MissedBlockScoreBps        uint32 `json:"missed_block_score_bps"`
-	JailScoreBps               uint32 `json:"jail_score_bps"`
-	SlashHistoryScoreBps       uint32 `json:"slash_history_score_bps"`
-	SelfBondScoreBps           uint32 `json:"self_bond_score_bps"`
-	CommissionScoreBps         uint32 `json:"commission_score_bps"`
-	GovernanceScoreBps         uint32 `json:"governance_score_bps"`
-	DecentralizationScoreBps   uint32 `json:"decentralization_score_bps"`
-	IdentityScoreBps           uint32 `json:"identity_score_bps"`
-	OverallScoreBps            uint32 `json:"overall_score_bps"`
-	RewardMultiplierBps        uint32 `json:"reward_multiplier_bps"`
-	InformationalOnly          bool   `json:"informational_only"`
-	ConsensusOverrideAllowed   bool   `json:"consensus_override_allowed"`
+	OperatorAddress			string	`json:"operator_address"`
+	Epoch				uint64	`json:"epoch"`
+	UptimeWindow			uint64	`json:"uptime_window"`
+	SignedBlocks			uint64	`json:"signed_blocks"`
+	MissedBlocks			uint64	`json:"missed_blocks"`
+	JailEvents			uint64	`json:"jail_events"`
+	SlashEventCount			uint64	`json:"slash_event_count"`
+	SelfBondBps			uint32	`json:"self_bond_bps"`
+	LastCommissionBps		uint32	`json:"last_commission_bps"`
+	GovernanceParticipationBps	uint32	`json:"governance_participation_bps"`
+	ConcentrationBps		uint32	`json:"concentration_bps"`
+	ConcentrationStatus		string	`json:"concentration_status"`
+	IdentityMetadataComplete	bool	`json:"identity_metadata_complete"`
+	UptimeScoreBps			uint32	`json:"uptime_score_bps"`
+	MissedBlockScoreBps		uint32	`json:"missed_block_score_bps"`
+	JailScoreBps			uint32	`json:"jail_score_bps"`
+	SlashHistoryScoreBps		uint32	`json:"slash_history_score_bps"`
+	SelfBondScoreBps		uint32	`json:"self_bond_score_bps"`
+	CommissionScoreBps		uint32	`json:"commission_score_bps"`
+	GovernanceScoreBps		uint32	`json:"governance_score_bps"`
+	DecentralizationScoreBps	uint32	`json:"decentralization_score_bps"`
+	IdentityScoreBps		uint32	`json:"identity_score_bps"`
+	OverallScoreBps			uint32	`json:"overall_score_bps"`
+	RewardMultiplierBps		uint32	`json:"reward_multiplier_bps"`
+	InformationalOnly		bool	`json:"informational_only"`
+	ConsensusOverrideAllowed	bool	`json:"consensus_override_allowed"`
 }
 
 type PublicValidatorMetrics struct {
-	OperatorAddress            string `json:"operator_address"`
-	Epoch                      uint64 `json:"epoch"`
-	UptimeBps                  uint32 `json:"uptime_bps"`
-	MissedBlocks               uint64 `json:"missed_blocks"`
-	JailEvents                 uint64 `json:"jail_events"`
-	SlashEventCount            uint64 `json:"slash_event_count"`
-	SelfBondBps                uint32 `json:"self_bond_bps"`
-	LastCommissionBps          uint32 `json:"last_commission_bps"`
-	GovernanceParticipationBps uint32 `json:"governance_participation_bps"`
-	ConcentrationBps           uint32 `json:"concentration_bps"`
-	ConcentrationStatus        string `json:"concentration_status"`
-	IdentityMetadataComplete   bool   `json:"identity_metadata_complete"`
-	OverallScoreBps            uint32 `json:"overall_score_bps"`
-	RewardMultiplierBps        uint32 `json:"reward_multiplier_bps"`
-	InformationalOnly          bool   `json:"informational_only"`
+	OperatorAddress			string	`json:"operator_address"`
+	Epoch				uint64	`json:"epoch"`
+	UptimeBps			uint32	`json:"uptime_bps"`
+	MissedBlocks			uint64	`json:"missed_blocks"`
+	JailEvents			uint64	`json:"jail_events"`
+	SlashEventCount			uint64	`json:"slash_event_count"`
+	SelfBondBps			uint32	`json:"self_bond_bps"`
+	LastCommissionBps		uint32	`json:"last_commission_bps"`
+	GovernanceParticipationBps	uint32	`json:"governance_participation_bps"`
+	ConcentrationBps		uint32	`json:"concentration_bps"`
+	ConcentrationStatus		string	`json:"concentration_status"`
+	IdentityMetadataComplete	bool	`json:"identity_metadata_complete"`
+	OverallScoreBps			uint32	`json:"overall_score_bps"`
+	RewardMultiplierBps		uint32	`json:"reward_multiplier_bps"`
+	InformationalOnly		bool	`json:"informational_only"`
 }
 
 type GenesisState struct {
-	Params  Params                 `json:"params"`
-	Epoch   uint64                 `json:"epoch"`
-	Metrics []ValidatorMetricInput `json:"metrics"`
-	Scores  []ValidatorScore       `json:"scores"`
+	Params	Params			`json:"params"`
+	Epoch	uint64			`json:"epoch"`
+	Metrics	[]ValidatorMetricInput	`json:"metrics"`
+	Scores	[]ValidatorScore	`json:"scores"`
 }
 
 type MsgUpdateValidatorScoreParams struct {
-	Authority string `json:"authority"`
-	Params    Params `json:"params"`
+	Authority	string	`json:"authority"`
+	Params		Params	`json:"params"`
 }
 
 type MsgUpdateValidatorScores struct {
-	Authority string                 `json:"authority"`
-	Epoch     uint64                 `json:"epoch"`
-	Metrics   []ValidatorMetricInput `json:"metrics"`
+	Authority	string			`json:"authority"`
+	Epoch		uint64			`json:"epoch"`
+	Metrics		[]ValidatorMetricInput	`json:"metrics"`
 }
 
 type QueryParamsRequest struct{}
@@ -140,33 +140,33 @@ type QueryAllValidatorScoresResponse struct{ Scores []ValidatorScore }
 
 func DefaultParams(authority string) Params {
 	return Params{
-		Authority:                      authority,
-		UptimeWindowBlocks:             10_000,
-		JailPenaltyBps:                 1_000,
-		SlashEventPenaltyBps:           500,
-		SelfBondFullScoreBps:           1_000,
-		MinRewardMultiplierBps:         7_000,
-		ObjectiveRewardModifierEnabled: true,
-		ConsensusOverrideEnabled:       false,
+		Authority:			authority,
+		UptimeWindowBlocks:		10_000,
+		JailPenaltyBps:			1_000,
+		SlashEventPenaltyBps:		500,
+		SelfBondFullScoreBps:		1_000,
+		MinRewardMultiplierBps:		7_000,
+		ObjectiveRewardModifierEnabled:	true,
+		ConsensusOverrideEnabled:	false,
 		Weights: ScoreWeights{
-			UptimeBps:           2_500,
-			MissedBlocksBps:     1_000,
-			JailBps:             1_000,
-			SlashHistoryBps:     1_500,
-			SelfBondBps:         1_000,
-			CommissionBps:       1_000,
-			GovernanceBps:       1_000,
-			DecentralizationBps: 800,
-			IdentityBps:         200,
+			UptimeBps:		2_500,
+			MissedBlocksBps:	1_000,
+			JailBps:		1_000,
+			SlashHistoryBps:	1_500,
+			SelfBondBps:		1_000,
+			CommissionBps:		1_000,
+			GovernanceBps:		1_000,
+			DecentralizationBps:	800,
+			IdentityBps:		200,
 		},
 	}
 }
 
 func DefaultGenesisState(authority string) GenesisState {
 	return GenesisState{
-		Params:  DefaultParams(authority),
-		Metrics: []ValidatorMetricInput{},
-		Scores:  []ValidatorScore{},
+		Params:		DefaultParams(authority),
+		Metrics:	[]ValidatorMetricInput{},
+		Scores:		[]ValidatorScore{},
 	}
 }
 
@@ -210,21 +210,21 @@ func CanonicalMetricInputs(inputs []ValidatorMetricInput) ([]ValidatorMetricInpu
 
 func PublicMetricsFromScore(score ValidatorScore) PublicValidatorMetrics {
 	return PublicValidatorMetrics{
-		OperatorAddress:            score.OperatorAddress,
-		Epoch:                      score.Epoch,
-		UptimeBps:                  score.UptimeScoreBps,
-		MissedBlocks:               score.MissedBlocks,
-		JailEvents:                 score.JailEvents,
-		SlashEventCount:            score.SlashEventCount,
-		SelfBondBps:                score.SelfBondBps,
-		LastCommissionBps:          score.LastCommissionBps,
-		GovernanceParticipationBps: score.GovernanceParticipationBps,
-		ConcentrationBps:           score.ConcentrationBps,
-		ConcentrationStatus:        score.ConcentrationStatus,
-		IdentityMetadataComplete:   score.IdentityMetadataComplete,
-		OverallScoreBps:            score.OverallScoreBps,
-		RewardMultiplierBps:        score.RewardMultiplierBps,
-		InformationalOnly:          score.InformationalOnly,
+		OperatorAddress:		score.OperatorAddress,
+		Epoch:				score.Epoch,
+		UptimeBps:			score.UptimeScoreBps,
+		MissedBlocks:			score.MissedBlocks,
+		JailEvents:			score.JailEvents,
+		SlashEventCount:		score.SlashEventCount,
+		SelfBondBps:			score.SelfBondBps,
+		LastCommissionBps:		score.LastCommissionBps,
+		GovernanceParticipationBps:	score.GovernanceParticipationBps,
+		ConcentrationBps:		score.ConcentrationBps,
+		ConcentrationStatus:		score.ConcentrationStatus,
+		IdentityMetadataComplete:	score.IdentityMetadataComplete,
+		OverallScoreBps:		score.OverallScoreBps,
+		RewardMultiplierBps:		score.RewardMultiplierBps,
+		InformationalOnly:		score.InformationalOnly,
 	}
 }
 
@@ -255,8 +255,8 @@ func (p Params) Validate() error {
 
 func (w ScoreWeights) Validate() error {
 	weights := []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{"uptime", w.UptimeBps},
 		{"missed_blocks", w.MissedBlocksBps},
@@ -352,8 +352,8 @@ func (s ValidatorScore) Validate(params Params) error {
 		return errors.New("operator address must be non-empty")
 	}
 	bpsFields := []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{"self_bond_bps", s.SelfBondBps},
 		{"last_commission_bps", s.LastCommissionBps},
@@ -438,32 +438,32 @@ func scoreValidator(params Params, epoch uint64, input ValidatorMetricInput) Val
 	overall := weightedOverallScore(params.Weights, uptimeScore, missedBlockScore, jailScore, slashScore, selfBondScore, commissionScore, governanceScore, decentralizationScore, identityScore)
 	rewardMultiplier := objectiveRewardMultiplier(params, uptimeScore, missedBlockScore, jailScore, slashScore, decentralizationScore)
 	return ValidatorScore{
-		OperatorAddress:            input.OperatorAddress,
-		Epoch:                      epoch,
-		UptimeWindow:               input.UptimeWindow,
-		SignedBlocks:               input.SignedBlocks,
-		MissedBlocks:               input.MissedBlocks,
-		JailEvents:                 input.JailEvents,
-		SlashEventCount:            uint64(len(input.SlashEvents)),
-		SelfBondBps:                selfBondBps,
-		LastCommissionBps:          lastCommission,
-		GovernanceParticipationBps: governanceScore,
-		ConcentrationBps:           input.ConcentrationBps,
-		ConcentrationStatus:        normalizeConcentrationStatus(input.ConcentrationStatus),
-		IdentityMetadataComplete:   input.IdentityMetadataComplete,
-		UptimeScoreBps:             uptimeScore,
-		MissedBlockScoreBps:        missedBlockScore,
-		JailScoreBps:               jailScore,
-		SlashHistoryScoreBps:       slashScore,
-		SelfBondScoreBps:           selfBondScore,
-		CommissionScoreBps:         commissionScore,
-		GovernanceScoreBps:         governanceScore,
-		DecentralizationScoreBps:   decentralizationScore,
-		IdentityScoreBps:           identityScore,
-		OverallScoreBps:            overall,
-		RewardMultiplierBps:        rewardMultiplier,
-		InformationalOnly:          !params.ObjectiveRewardModifierEnabled,
-		ConsensusOverrideAllowed:   params.ConsensusOverrideEnabled,
+		OperatorAddress:		input.OperatorAddress,
+		Epoch:				epoch,
+		UptimeWindow:			input.UptimeWindow,
+		SignedBlocks:			input.SignedBlocks,
+		MissedBlocks:			input.MissedBlocks,
+		JailEvents:			input.JailEvents,
+		SlashEventCount:		uint64(len(input.SlashEvents)),
+		SelfBondBps:			selfBondBps,
+		LastCommissionBps:		lastCommission,
+		GovernanceParticipationBps:	governanceScore,
+		ConcentrationBps:		input.ConcentrationBps,
+		ConcentrationStatus:		normalizeConcentrationStatus(input.ConcentrationStatus),
+		IdentityMetadataComplete:	input.IdentityMetadataComplete,
+		UptimeScoreBps:			uptimeScore,
+		MissedBlockScoreBps:		missedBlockScore,
+		JailScoreBps:			jailScore,
+		SlashHistoryScoreBps:		slashScore,
+		SelfBondScoreBps:		selfBondScore,
+		CommissionScoreBps:		commissionScore,
+		GovernanceScoreBps:		governanceScore,
+		DecentralizationScoreBps:	decentralizationScore,
+		IdentityScoreBps:		identityScore,
+		OverallScoreBps:		overall,
+		RewardMultiplierBps:		rewardMultiplier,
+		InformationalOnly:		!params.ObjectiveRewardModifierEnabled,
+		ConsensusOverrideAllowed:	params.ConsensusOverrideEnabled,
 	}
 }
 

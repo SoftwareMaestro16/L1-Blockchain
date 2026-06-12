@@ -7,25 +7,25 @@ import (
 )
 
 const (
-	DefaultPeerRotationLimitBps = uint32(2_500)
-	DefaultStalePeerEpochs      = uint64(4)
+	DefaultPeerRotationLimitBps	= uint32(2_500)
+	DefaultStalePeerEpochs		= uint64(4)
 )
 
 type OverlayMembershipManager struct {
-	Descriptors []OverlayDescriptor
-	Records     []OverlayMembershipRecord
+	Descriptors	[]OverlayDescriptor
+	Records		[]OverlayMembershipRecord
 }
 
 type PeerRotationPolicy struct {
-	MaxRotatedPeersBps uint32
-	StaleAfterEpochs   uint64
+	MaxRotatedPeersBps	uint32
+	StaleAfterEpochs	uint64
 }
 
 type PeerSetManager struct {
-	Descriptor     OverlayDescriptor
-	Graph          AdaptiveOverlayGraph
-	DecayPolicy    PeerScoreDecayPolicy
-	RotationPolicy PeerRotationPolicy
+	Descriptor	OverlayDescriptor
+	Graph		AdaptiveOverlayGraph
+	DecayPolicy	PeerScoreDecayPolicy
+	RotationPolicy	PeerRotationPolicy
 }
 
 func NewOverlayMembershipManager(descriptors []OverlayDescriptor) (OverlayMembershipManager, error) {
@@ -108,8 +108,8 @@ func (m OverlayMembershipManager) Validate(currentHeight uint64) error {
 
 func (m OverlayMembershipManager) Clone() OverlayMembershipManager {
 	out := OverlayMembershipManager{
-		Descriptors: cloneOverlayDescriptors(m.Descriptors),
-		Records:     make([]OverlayMembershipRecord, len(m.Records)),
+		Descriptors:	cloneOverlayDescriptors(m.Descriptors),
+		Records:	make([]OverlayMembershipRecord, len(m.Records)),
 	}
 	for i, record := range m.Records {
 		out.Records[i] = NormalizeOverlayMembershipRecord(record)
@@ -170,8 +170,8 @@ func (r OverlayMembershipRecord) Validate(currentHeight uint64) error {
 
 func DefaultPeerRotationPolicy() PeerRotationPolicy {
 	return PeerRotationPolicy{
-		MaxRotatedPeersBps: DefaultPeerRotationLimitBps,
-		StaleAfterEpochs:   DefaultStalePeerEpochs,
+		MaxRotatedPeersBps:	DefaultPeerRotationLimitBps,
+		StaleAfterEpochs:	DefaultStalePeerEpochs,
 	}
 }
 
@@ -181,10 +181,10 @@ func NewPeerSetManager(desc OverlayDescriptor, localNodeID string, peers []Adapt
 		return PeerSetManager{}, err
 	}
 	return PeerSetManager{
-		Descriptor:     NormalizeOverlayDescriptor(desc),
-		Graph:          graph,
-		DecayPolicy:    DefaultPeerScoreDecayPolicy(),
-		RotationPolicy: DefaultPeerRotationPolicy(),
+		Descriptor:	NormalizeOverlayDescriptor(desc),
+		Graph:		graph,
+		DecayPolicy:	DefaultPeerScoreDecayPolicy(),
+		RotationPolicy:	DefaultPeerRotationPolicy(),
 	}, nil
 }
 
@@ -289,12 +289,12 @@ func BuildRoutingGraphFromAdaptiveGraph(desc OverlayDescriptor, adaptive Adaptiv
 	addAdaptiveEdges := func(priority uint32, peers []AdaptivePeer) {
 		for _, peer := range peers {
 			edges = append(edges, RoutingEdge{
-				FromNodeID:    adaptive.LocalNodeID,
-				ToNodeID:      peer.NodeID,
-				LatencyMillis: peer.LatencyMillis,
-				Weight:        peer.ScoreBps,
-				Priority:      priority,
-				ZoneID:        firstString(peer.ZonesSupported),
+				FromNodeID:	adaptive.LocalNodeID,
+				ToNodeID:	peer.NodeID,
+				LatencyMillis:	peer.LatencyMillis,
+				Weight:		peer.ScoreBps,
+				Priority:	priority,
+				ZoneID:		firstString(peer.ZonesSupported),
 			})
 		}
 	}
@@ -305,11 +305,11 @@ func BuildRoutingGraphFromAdaptiveGraph(desc OverlayDescriptor, adaptive Adaptiv
 	addAdaptiveEdges(4, adaptive.ServiceSet)
 	addAdaptiveEdges(5, adaptive.FallbackSet)
 	graph := NormalizeRoutingGraph(RoutingGraph{
-		OverlayID:             desc.OverlayID,
-		Version:               adaptive.RoutingEpoch,
-		Committed:             committed,
-		DeterministicHintHash: deterministicHintHash,
-		Edges:                 dedupeRoutingEdges(edges),
+		OverlayID:		desc.OverlayID,
+		Version:		adaptive.RoutingEpoch,
+		Committed:		committed,
+		DeterministicHintHash:	deterministicHintHash,
+		Edges:			dedupeRoutingEdges(edges),
 	})
 	if err := graph.Validate(desc); err != nil {
 		return RoutingGraph{}, err
@@ -353,13 +353,13 @@ func BuildOverlayRouteWithFallback(req OverlayRoutingRequest, descriptors []Over
 		targets = targets[:fanout]
 	}
 	return OverlayRoutePlan{
-		MessageID:               msg.ReplaySafeID,
-		OverlayID:               desc.OverlayID,
-		OverlayType:             desc.OverlayType,
-		Strategy:                RoutingStrategyProbabilisticGossip,
-		TargetNodeIDs:           targets,
-		UsesNodeLocalAdaptation: true,
-		FallbackUsed:            true,
+		MessageID:			msg.ReplaySafeID,
+		OverlayID:			desc.OverlayID,
+		OverlayType:			desc.OverlayType,
+		Strategy:			RoutingStrategyProbabilisticGossip,
+		TargetNodeIDs:			targets,
+		UsesNodeLocalAdaptation:	true,
+		FallbackUsed:			true,
 	}, nil
 }
 

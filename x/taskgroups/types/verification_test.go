@@ -82,14 +82,14 @@ func TestCrossDomainProofVerificationCoversConfiguredProofKinds(t *testing.T) {
 	}
 	for _, kind := range kinds {
 		proof := CrossDomainProof{
-			ProofID:        "proof-" + kind,
-			WorkloadID:     group.WorkloadID,
-			ProofKind:      kind,
-			SubjectID:      "subject-1",
-			RootHash:       "1111111111111111111111111111111111111111111111111111111111111111",
-			ParentRootHash: "2222222222222222222222222222222222222222222222222222222222222222",
-			ProofHash:      "3333333333333333333333333333333333333333333333333333333333333333",
-			CreatedHeight:  40,
+			ProofID:	"proof-" + kind,
+			WorkloadID:	group.WorkloadID,
+			ProofKind:	kind,
+			SubjectID:	"subject-1",
+			RootHash:	"1111111111111111111111111111111111111111111111111111111111111111",
+			ParentRootHash:	"2222222222222222222222222222222222222222222222222222222222222222",
+			ProofHash:	"3333333333333333333333333333333333333333333333333333333333333333",
+			CreatedHeight:	40,
 		}
 		require.NoError(t, VerifyCrossDomainProof(group, proof))
 	}
@@ -98,14 +98,14 @@ func TestCrossDomainProofVerificationCoversConfiguredProofKinds(t *testing.T) {
 func TestCrossDomainProofVerificationRejectsMismatchesAndUnconfiguredContractExecution(t *testing.T) {
 	group := proposerTestGroup()
 	proof := CrossDomainProof{
-		ProofID:        "proof-contract",
-		WorkloadID:     group.WorkloadID,
-		ProofKind:      ProofKindContractExecution,
-		SubjectID:      "contract-1",
-		RootHash:       "1111111111111111111111111111111111111111111111111111111111111111",
-		ParentRootHash: "2222222222222222222222222222222222222222222222222222222222222222",
-		ProofHash:      "3333333333333333333333333333333333333333333333333333333333333333",
-		CreatedHeight:  40,
+		ProofID:	"proof-contract",
+		WorkloadID:	group.WorkloadID,
+		ProofKind:	ProofKindContractExecution,
+		SubjectID:	"contract-1",
+		RootHash:	"1111111111111111111111111111111111111111111111111111111111111111",
+		ParentRootHash:	"2222222222222222222222222222222222222222222222222222222222222222",
+		ProofHash:	"3333333333333333333333333333333333333333333333333333333333333333",
+		CreatedHeight:	40,
 	}
 	require.ErrorContains(t, VerifyCrossDomainProof(group, proof), "not configured")
 

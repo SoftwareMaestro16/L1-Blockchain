@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	authority = prototype.DefaultAuthority
-	bridgeID  = "eth-mainnet"
+	authority	= prototype.DefaultAuthority
+	bridgeID	= "eth-mainnet"
 )
 
 func setupKeeper(t *testing.T) Keeper {
@@ -27,27 +27,27 @@ func setupKeeper(t *testing.T) Keeper {
 
 func bridge(height uint64) types.BridgeRecord {
 	return types.BridgeRecord{
-		BridgeID:         bridgeID,
-		SourceChain:      "ethereum",
-		TargetChain:      "aetra",
-		Operators:        []string{"op2", "op1"},
-		ProofPolicy:      types.ProofPolicyLightClient,
-		DailyLimit:       100,
-		FeePolicy:        types.BridgeFeePolicy{FeeBps: 10, Collector: "treasury"},
-		RegisteredHeight: height,
+		BridgeID:		bridgeID,
+		SourceChain:		"ethereum",
+		TargetChain:		"aetra",
+		Operators:		[]string{"op2", "op1"},
+		ProofPolicy:		types.ProofPolicyLightClient,
+		DailyLimit:		100,
+		FeePolicy:		types.BridgeFeePolicy{FeeBps: 10, Collector: "treasury"},
+		RegisteredHeight:	height,
 	}
 }
 
 func event(id string, amount, height uint64) types.BridgeEvent {
 	return types.BridgeEvent{
-		EventID:         id,
-		BridgeID:        bridgeID,
-		SourceChain:     "ethereum",
-		Asset:           "ETH",
-		Amount:          amount,
-		ProofPolicy:     types.ProofPolicyLightClient,
-		ProofRoot:       strings.Repeat("a", 64),
-		SubmittedHeight: height,
+		EventID:		id,
+		BridgeID:		bridgeID,
+		SourceChain:		"ethereum",
+		Asset:			"ETH",
+		Amount:			amount,
+		ProofPolicy:		types.ProofPolicyLightClient,
+		ProofRoot:		strings.Repeat("a", 64),
+		SubmittedHeight:	height,
 	}
 }
 
@@ -87,13 +87,13 @@ func TestMappingConflictRejected(t *testing.T) {
 	_, err := k.RegisterBridge(types.MsgRegisterBridge{Authority: authority, Bridge: bridge(1)})
 	require.NoError(t, err)
 	_, err = k.RegisterAssetMapping(types.MsgRegisterAssetMapping{
-		Authority: authority,
-		Mapping:   types.AssetMapping{BridgeID: bridgeID, SourceAsset: "ETH", TargetAsset: "aETH", Decimals: 18, Enabled: true},
+		Authority:	authority,
+		Mapping:	types.AssetMapping{BridgeID: bridgeID, SourceAsset: "ETH", TargetAsset: "aETH", Decimals: 18, Enabled: true},
 	})
 	require.NoError(t, err)
 	_, err = k.RegisterAssetMapping(types.MsgRegisterAssetMapping{
-		Authority: authority,
-		Mapping:   types.AssetMapping{BridgeID: bridgeID, SourceAsset: "ETH", TargetAsset: "wrappedETH", Decimals: 18, Enabled: true},
+		Authority:	authority,
+		Mapping:	types.AssetMapping{BridgeID: bridgeID, SourceAsset: "ETH", TargetAsset: "wrappedETH", Decimals: 18, Enabled: true},
 	})
 	require.ErrorContains(t, err, "conflict")
 }

@@ -3,29 +3,29 @@ package types
 import "fmt"
 
 const (
-	DefaultIdentityLightClientFreshnessThresholdV2 = uint64(20)
+	DefaultIdentityLightClientFreshnessThresholdV2	= uint64(20)
 
-	IdentityLightClientProofRequestResolutionV2          IdentityLightClientProofRequestKindV2 = "QueryResolutionProof"
-	IdentityLightClientProofRequestRecursiveResolutionV2 IdentityLightClientProofRequestKindV2 = "QueryRecursiveResolutionProof"
+	IdentityLightClientProofRequestResolutionV2		IdentityLightClientProofRequestKindV2	= "QueryResolutionProof"
+	IdentityLightClientProofRequestRecursiveResolutionV2	IdentityLightClientProofRequestKindV2	= "QueryRecursiveResolutionProof"
 
-	IdentityLightClientCheckPassedV2  IdentityLightClientCheckStatusV2 = "passed"
-	IdentityLightClientCheckFailedV2  IdentityLightClientCheckStatusV2 = "failed"
-	IdentityLightClientCheckSkippedV2 IdentityLightClientCheckStatusV2 = "skipped"
+	IdentityLightClientCheckPassedV2	IdentityLightClientCheckStatusV2	= "passed"
+	IdentityLightClientCheckFailedV2	IdentityLightClientCheckStatusV2	= "failed"
+	IdentityLightClientCheckSkippedV2	IdentityLightClientCheckStatusV2	= "skipped"
 
-	IdentityLightClientCheckHeaderTrustV2        IdentityLightClientCheckNameV2 = "header_trust"
-	IdentityLightClientCheckChainIDV2            IdentityLightClientCheckNameV2 = "chain_id_match"
-	IdentityLightClientCheckProofHeightV2        IdentityLightClientCheckNameV2 = "proof_height_match"
-	IdentityLightClientCheckNameNormalizationV2  IdentityLightClientCheckNameV2 = "name_normalization_match"
-	IdentityLightClientCheckNameHashV2           IdentityLightClientCheckNameV2 = "name_hash_match"
-	IdentityLightClientCheckDomainProofV2        IdentityLightClientCheckNameV2 = "domain_record_proof"
-	IdentityLightClientCheckDomainLifecycleV2    IdentityLightClientCheckNameV2 = "domain_lifecycle_validity"
-	IdentityLightClientCheckNFTBindingV2         IdentityLightClientCheckNameV2 = "nft_binding_proof"
-	IdentityLightClientCheckOwnershipV2          IdentityLightClientCheckNameV2 = "ownership_consistency"
-	IdentityLightClientCheckResolverProofV2      IdentityLightClientCheckNameV2 = "resolver_proof"
-	IdentityLightClientCheckTargetExistsV2       IdentityLightClientCheckNameV2 = "requested_target_field_existence"
-	IdentityLightClientCheckTTLExpiryV2          IdentityLightClientCheckNameV2 = "record_ttl_and_expiry"
-	IdentityLightClientCheckDelegationProofV2    IdentityLightClientCheckNameV2 = "delegation_proof_for_subdomains"
-	IdentityLightClientCheckReverseConsistencyV2 IdentityLightClientCheckNameV2 = "reverse_forward_consistency_proof"
+	IdentityLightClientCheckHeaderTrustV2		IdentityLightClientCheckNameV2	= "header_trust"
+	IdentityLightClientCheckChainIDV2		IdentityLightClientCheckNameV2	= "chain_id_match"
+	IdentityLightClientCheckProofHeightV2		IdentityLightClientCheckNameV2	= "proof_height_match"
+	IdentityLightClientCheckNameNormalizationV2	IdentityLightClientCheckNameV2	= "name_normalization_match"
+	IdentityLightClientCheckNameHashV2		IdentityLightClientCheckNameV2	= "name_hash_match"
+	IdentityLightClientCheckDomainProofV2		IdentityLightClientCheckNameV2	= "domain_record_proof"
+	IdentityLightClientCheckDomainLifecycleV2	IdentityLightClientCheckNameV2	= "domain_lifecycle_validity"
+	IdentityLightClientCheckNFTBindingV2		IdentityLightClientCheckNameV2	= "nft_binding_proof"
+	IdentityLightClientCheckOwnershipV2		IdentityLightClientCheckNameV2	= "ownership_consistency"
+	IdentityLightClientCheckResolverProofV2		IdentityLightClientCheckNameV2	= "resolver_proof"
+	IdentityLightClientCheckTargetExistsV2		IdentityLightClientCheckNameV2	= "requested_target_field_existence"
+	IdentityLightClientCheckTTLExpiryV2		IdentityLightClientCheckNameV2	= "record_ttl_and_expiry"
+	IdentityLightClientCheckDelegationProofV2	IdentityLightClientCheckNameV2	= "delegation_proof_for_subdomains"
+	IdentityLightClientCheckReverseConsistencyV2	IdentityLightClientCheckNameV2	= "reverse_forward_consistency_proof"
 )
 
 type IdentityLightClientProofRequestKindV2 string
@@ -35,45 +35,45 @@ type IdentityLightClientCheckStatusV2 string
 type IdentityLightClientCheckNameV2 string
 
 type IdentityLightClientResolutionCheckV2 struct {
-	Name    IdentityLightClientCheckNameV2
-	Status  IdentityLightClientCheckStatusV2
-	Code    IdentityLightClientFailureCodeV2
-	Message string
+	Name	IdentityLightClientCheckNameV2
+	Status	IdentityLightClientCheckStatusV2
+	Code	IdentityLightClientFailureCodeV2
+	Message	string
 }
 
 type IdentityLightweightResolutionRequestV2 struct {
-	ExpectedChainID          string
-	RequestedName            string
-	NormalizationVersion     uint64
-	TrustedHeader            IdentityTrustedHeaderV2
-	Proof                    IdentityResolutionProofFormatV2
-	RecursiveProof           *RecursiveResolutionProofV2
-	TargetType               IdentityResolutionTargetTypeV2
-	TargetKey                string
-	AllowRenewalWindow       bool
-	CurrentHeight            uint64
-	AuthorizedAliasKeys      []string
-	RequireReverseResolution bool
-	FreshnessThreshold       uint64
+	ExpectedChainID			string
+	RequestedName			string
+	NormalizationVersion		uint64
+	TrustedHeader			IdentityTrustedHeaderV2
+	Proof				IdentityResolutionProofFormatV2
+	RecursiveProof			*RecursiveResolutionProofV2
+	TargetType			IdentityResolutionTargetTypeV2
+	TargetKey			string
+	AllowRenewalWindow		bool
+	CurrentHeight			uint64
+	AuthorizedAliasKeys		[]string
+	RequireReverseResolution	bool
+	FreshnessThreshold		uint64
 }
 
 type IdentityLightweightResolutionResultV2 struct {
-	Verified       bool
-	ProofRequest   IdentityLightClientProofRequestKindV2
-	NormalizedName string
-	NameHash       string
-	Target         IdentityLightClientVerifiedTargetV2
-	CacheMetadata  *IdentityVerifiedCacheMetadataV2
-	Checks         []IdentityLightClientResolutionCheckV2
-	FailureCode    IdentityLightClientFailureCodeV2
-	Error          string
+	Verified	bool
+	ProofRequest	IdentityLightClientProofRequestKindV2
+	NormalizedName	string
+	NameHash	string
+	Target		IdentityLightClientVerifiedTargetV2
+	CacheMetadata	*IdentityVerifiedCacheMetadataV2
+	Checks		[]IdentityLightClientResolutionCheckV2
+	FailureCode	IdentityLightClientFailureCodeV2
+	Error		string
 }
 
 func ResolveIdentityLightweightV2(request IdentityLightweightResolutionRequestV2) (IdentityLightweightResolutionResultV2, error) {
 	checks := newLightClientResolutionChecksV2(request)
 	result := IdentityLightweightResolutionResultV2{
-		ProofRequest: lightClientProofRequestTypeV2(request),
-		Checks:       checks,
+		ProofRequest:	lightClientProofRequestTypeV2(request),
+		Checks:		checks,
 	}
 	normalized, err := lightClientPreflightResolutionRequestV2(request, &result)
 	if err != nil {
@@ -83,18 +83,18 @@ func ResolveIdentityLightweightV2(request IdentityLightweightResolutionRequestV2
 	result.NameHash = normalized.NameHash
 
 	target, err := VerifyIdentityResolutionProofLightClientV2(IdentityLightClientVerificationRequestV2{
-		ExpectedChainID:          request.ExpectedChainID,
-		RequestedName:            request.RequestedName,
-		NormalizationVersion:     normalized.Version,
-		TrustedHeader:            request.TrustedHeader,
-		Proof:                    request.Proof,
-		RecursiveProof:           request.RecursiveProof,
-		TargetType:               request.TargetType,
-		TargetKey:                request.TargetKey,
-		AllowRenewalWindow:       request.AllowRenewalWindow,
-		CurrentHeight:            request.CurrentHeight,
-		AuthorizedAliasKeys:      append([]string(nil), request.AuthorizedAliasKeys...),
-		RequireReverseResolution: request.RequireReverseResolution,
+		ExpectedChainID:		request.ExpectedChainID,
+		RequestedName:			request.RequestedName,
+		NormalizationVersion:		normalized.Version,
+		TrustedHeader:			request.TrustedHeader,
+		Proof:				request.Proof,
+		RecursiveProof:			request.RecursiveProof,
+		TargetType:			request.TargetType,
+		TargetKey:			request.TargetKey,
+		AllowRenewalWindow:		request.AllowRenewalWindow,
+		CurrentHeight:			request.CurrentHeight,
+		AuthorizedAliasKeys:		append([]string(nil), request.AuthorizedAliasKeys...),
+		RequireReverseResolution:	request.RequireReverseResolution,
 	})
 	if err != nil {
 		failLightClientResultV2(&result, checkForLightClientFailureV2(err), err)

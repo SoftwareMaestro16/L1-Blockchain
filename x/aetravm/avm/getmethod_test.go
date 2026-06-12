@@ -6,10 +6,6 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Method Selector Tests
-// ---------------
-
 func TestComputeMethodSelector(t *testing.T) {
 	sel1 := ComputeMethodSelector("get_balance(address)")
 	sel2 := ComputeMethodSelector("get_balance(address)")
@@ -37,21 +33,17 @@ func TestComputeMethodSelectorDeterministic(t *testing.T) {
 	}
 }
 
-// ---------------
-// ABI Method Resolver Tests
-// ---------------
-
 func TestABIMethodResolverRegisterAndLookup(t *testing.T) {
 	resolver := NewABIMethodResolver()
 	sel := ComputeMethodSelector("get_balance(address)")
 
 	method := GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 1000,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	1000,
+		Mutability:	MethodRead,
 	}
 
 	err := resolver.Register(method)
@@ -96,12 +88,12 @@ func TestABIMethodResolverDuplicateName(t *testing.T) {
 	sel := ComputeMethodSelector("get_balance(address)")
 
 	method := GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 1000,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	1000,
+		Mutability:	MethodRead,
 	}
 	resolver.Register(method)
 
@@ -116,12 +108,12 @@ func TestABIMethodResolverWriteMutabilityRejected(t *testing.T) {
 	sel := ComputeMethodSelector("transfer(address,uint64)")
 
 	method := GetMethodABI{
-		Name:        "transfer",
-		Selector:    sel,
-		InputCodec:  "address,uint64",
-		OutputCodec: "bool",
-		GasEstimate: 5000,
-		Mutability:  MethodWrite,
+		Name:		"transfer",
+		Selector:	sel,
+		InputCodec:	"address,uint64",
+		OutputCodec:	"bool",
+		GasEstimate:	5000,
+		Mutability:	MethodWrite,
 	}
 
 	err := resolver.Register(method)
@@ -135,12 +127,12 @@ func TestABIMethodResolverZeroGasEstimate(t *testing.T) {
 	sel := ComputeMethodSelector("get_balance(address)")
 
 	method := GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 0,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	0,
+		Mutability:	MethodRead,
 	}
 
 	err := resolver.Register(method)
@@ -148,10 +140,6 @@ func TestABIMethodResolverZeroGasEstimate(t *testing.T) {
 		t.Error("should reject zero gas estimate")
 	}
 }
-
-// ---------------
-// Query VM Tests
-// ---------------
 
 func testStateRoot() *chunk.Chunk {
 	m := chunk.NewEmptyMap()
@@ -164,17 +152,17 @@ func TestQueryVMQueryByName(t *testing.T) {
 	resolver := NewABIMethodResolver()
 	sel := ComputeMethodSelector("get_balance(address)")
 	resolver.Register(GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 1000,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	1000,
+		Mutability:	MethodRead,
 	})
 
 	snapshot := QuerySnapshot{
-		StateRootChunk: testStateRoot(),
-		Code:           []byte("code"),
+		StateRootChunk:	testStateRoot(),
+		Code:		[]byte("code"),
 	}
 
 	vm := NewQueryVM(resolver, snapshot, 100000)
@@ -197,17 +185,17 @@ func TestQueryVMQueryBySelector(t *testing.T) {
 	resolver := NewABIMethodResolver()
 	sel := ComputeMethodSelector("get_balance(address)")
 	resolver.Register(GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 1000,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	1000,
+		Mutability:	MethodRead,
 	})
 
 	snapshot := QuerySnapshot{
-		StateRootChunk: testStateRoot(),
-		Code:           []byte("code"),
+		StateRootChunk:	testStateRoot(),
+		Code:		[]byte("code"),
 	}
 
 	vm := NewQueryVM(resolver, snapshot, 100000)
@@ -223,8 +211,8 @@ func TestQueryVMQueryBySelector(t *testing.T) {
 func TestQueryVMUnknownMethodRejected(t *testing.T) {
 	resolver := NewABIMethodResolver()
 	snapshot := QuerySnapshot{
-		StateRootChunk: testStateRoot(),
-		Code:           []byte("code"),
+		StateRootChunk:	testStateRoot(),
+		Code:		[]byte("code"),
 	}
 
 	vm := NewQueryVM(resolver, snapshot, 100000)
@@ -233,10 +221,6 @@ func TestQueryVMUnknownMethodRejected(t *testing.T) {
 		t.Error("unknown method should be rejected")
 	}
 }
-
-// ---------------
-// Forbidden Operation Detection
-// ---------------
 
 func TestForbiddenOpsInQuery(t *testing.T) {
 	forbiddenOps := []ISAOpcode{
@@ -272,27 +256,23 @@ func TestForbiddenOpsInQuery(t *testing.T) {
 	}
 }
 
-// ---------------
-// ABI Schema Hash Tests
-// ---------------
-
 func TestABISchemaHashDeterministic(t *testing.T) {
 	methods := []GetMethodABI{
 		{
-			Name:        "get_balance",
-			Selector:    ComputeMethodSelector("get_balance(address)"),
-			InputCodec:  "address",
-			OutputCodec: "uint64",
-			GasEstimate: 1000,
-			Mutability:  MethodRead,
+			Name:		"get_balance",
+			Selector:	ComputeMethodSelector("get_balance(address)"),
+			InputCodec:	"address",
+			OutputCodec:	"uint64",
+			GasEstimate:	1000,
+			Mutability:	MethodRead,
 		},
 		{
-			Name:        "get_total_supply",
-			Selector:    ComputeMethodSelector("get_total_supply()"),
-			InputCodec:  "",
-			OutputCodec: "uint64",
-			GasEstimate: 500,
-			Mutability:  MethodRead,
+			Name:		"get_total_supply",
+			Selector:	ComputeMethodSelector("get_total_supply()"),
+			InputCodec:	"",
+			OutputCodec:	"uint64",
+			GasEstimate:	500,
+			Mutability:	MethodRead,
 		},
 	}
 
@@ -312,22 +292,22 @@ func TestABISchemaHashDeterministic(t *testing.T) {
 func TestABISchemaHashChangesOnMutation(t *testing.T) {
 	methods1 := []GetMethodABI{
 		{
-			Name:        "get_balance",
-			Selector:    ComputeMethodSelector("get_balance(address)"),
-			InputCodec:  "address",
-			OutputCodec: "uint64",
-			GasEstimate: 1000,
-			Mutability:  MethodRead,
+			Name:		"get_balance",
+			Selector:	ComputeMethodSelector("get_balance(address)"),
+			InputCodec:	"address",
+			OutputCodec:	"uint64",
+			GasEstimate:	1000,
+			Mutability:	MethodRead,
 		},
 	}
 	methods2 := []GetMethodABI{
 		{
-			Name:        "get_balance",
-			Selector:    ComputeMethodSelector("get_balance(address)"),
-			InputCodec:  "address",
-			OutputCodec: "uint64",
-			GasEstimate: 2000, // Different gas
-			Mutability:  MethodRead,
+			Name:		"get_balance",
+			Selector:	ComputeMethodSelector("get_balance(address)"),
+			InputCodec:	"address",
+			OutputCodec:	"uint64",
+			GasEstimate:	2000,
+			Mutability:	MethodRead,
 		},
 	}
 
@@ -338,20 +318,16 @@ func TestABISchemaHashChangesOnMutation(t *testing.T) {
 	}
 }
 
-// ---------------
-// Method Discovery Tests
-// ---------------
-
 func TestMethodDiscovery(t *testing.T) {
 	resolver := NewABIMethodResolver()
 	sel := ComputeMethodSelector("get_balance(address)")
 	resolver.Register(GetMethodABI{
-		Name:        "get_balance",
-		Selector:    sel,
-		InputCodec:  "address",
-		OutputCodec: "uint64",
-		GasEstimate: 1000,
-		Mutability:  MethodRead,
+		Name:		"get_balance",
+		Selector:	sel,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasEstimate:	1000,
+		Mutability:	MethodRead,
 	})
 
 	discovery, err := NewMethodDiscovery(resolver)
@@ -378,10 +354,6 @@ func TestMethodDiscovery(t *testing.T) {
 	}
 }
 
-// ---------------
-// Response Format Tests
-// ---------------
-
 func TestDetermineResponseFormat(t *testing.T) {
 	if DetermineResponseFormat(true) != ResponseFormatTypedJSON {
 		t.Error("ABI known should use typed JSON")
@@ -393,13 +365,13 @@ func TestDetermineResponseFormat(t *testing.T) {
 
 func TestQueryResultFormatTypedJSON(t *testing.T) {
 	result := &QueryResult{
-		ExitCode:     0,
-		GasUsed:      500,
-		MethodName:   "get_balance",
-		ABIKnown:      true,
-		InputCodec:   "address",
-		OutputCodec:  "uint64",
-		GasBreakdown: QueryGasModel{ComputeGas: 300, DecodeGas: 100, SerializationGas: 100},
+		ExitCode:	0,
+		GasUsed:	500,
+		MethodName:	"get_balance",
+		ABIKnown:	true,
+		InputCodec:	"address",
+		OutputCodec:	"uint64",
+		GasBreakdown:	QueryGasModel{ComputeGas: 300, DecodeGas: 100, SerializationGas: 100},
 	}
 
 	formatted, err := result.FormatResponse()
@@ -413,11 +385,11 @@ func TestQueryResultFormatTypedJSON(t *testing.T) {
 
 func TestQueryResultFormatRawHex(t *testing.T) {
 	result := &QueryResult{
-		ExitCode:      0,
-		GasUsed:       500,
-		MethodName:    "unknown",
-		ABIKnown:       false,
-		ResponseBytes: []byte{0xDE, 0xAD, 0xBE, 0xEF},
+		ExitCode:	0,
+		GasUsed:	500,
+		MethodName:	"unknown",
+		ABIKnown:	false,
+		ResponseBytes:	[]byte{0xDE, 0xAD, 0xBE, 0xEF},
 	}
 
 	formatted, err := result.FormatResponse()
@@ -429,15 +401,11 @@ func TestQueryResultFormatRawHex(t *testing.T) {
 	}
 }
 
-// ---------------
-// Proof Mode Test
-// ---------------
-
 func TestBuildGetMethodProof(t *testing.T) {
 	sel := ComputeMethodSelector("get_balance(address)")
 	snapshot := QuerySnapshot{
-		StateRootChunk: testStateRoot(),
-		Code:           []byte("code"),
+		StateRootChunk:	testStateRoot(),
+		Code:		[]byte("code"),
 	}
 
 	proof := BuildGetMethodProof(snapshot, "get_balance", sel, []byte{1, 2, 3})
@@ -454,10 +422,6 @@ func TestBuildGetMethodProof(t *testing.T) {
 		t.Error("response hash should not be empty")
 	}
 }
-
-// ---------------
-// ABIMethodNotFoundError Test
-// ---------------
 
 func TestABIMethodNotFoundError(t *testing.T) {
 	err := NewABIMethodNotFoundError("nonexistent")

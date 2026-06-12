@@ -12,153 +12,153 @@ import (
 )
 
 const (
-	ModuleName = "mint-authority"
-	StoreKey   = "xmintauthority"
+	ModuleName	= "mint-authority"
+	StoreKey	= "xmintauthority"
 
-	DefaultMintAuthorityParamsAuthority = "4:0000000000000000000000000000000000000000000000000000000000000001"
-	DefaultMintAuthorityModuleAccount   = "mint-authority"
-	DefaultMintAuthorityAlias           = "AETMint"
-	DefaultMintAuthorityPurpose         = "base-denom emission only"
-	DefaultBaseDenom                    = "naet"
-	DefaultEmissionCaller               = "x/emissions"
-	BasisPoints                         = uint32(10_000)
+	DefaultMintAuthorityParamsAuthority	= "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultMintAuthorityModuleAccount	= "mint-authority"
+	DefaultMintAuthorityAlias		= "AETMint"
+	DefaultMintAuthorityPurpose		= "base-denom emission only"
+	DefaultBaseDenom			= "naet"
+	DefaultEmissionCaller			= "x/emissions"
+	BasisPoints				= uint32(10_000)
 )
 
 type MintAuthorityParams struct {
-	Authority                      string
-	BaseDenom                      string
-	MinterModuleAccount            string
-	MinterAlias                    string
-	NormalEmissionCaller           string
-	EmergencyCaller                string
-	EmergencyMintingEnabled        bool
-	EmergencyConstitutionAuthority string
-	RequireSystemRegistry          bool
-	MaxMintEvents                  uint32
+	Authority			string
+	BaseDenom			string
+	MinterModuleAccount		string
+	MinterAlias			string
+	NormalEmissionCaller		string
+	EmergencyCaller			string
+	EmergencyMintingEnabled		bool
+	EmergencyConstitutionAuthority	string
+	RequireSystemRegistry		bool
+	MaxMintEvents			uint32
 }
 
 type SystemAccountRegistration struct {
-	ModuleName     string
-	Alias          string
-	Purpose        string
-	Registered     bool
-	UserControlled bool
+	ModuleName	string
+	Alias		string
+	Purpose		string
+	Registered	bool
+	UserControlled	bool
 }
 
 type AllowedCaller struct {
-	Caller    string
-	Emergency bool
-	Enabled   bool
+	Caller		string
+	Emergency	bool
+	Enabled		bool
 }
 
 type MintCap struct {
-	Denom       string
-	EpochCap    sdkmath.Int
-	LifetimeCap sdkmath.Int
-	CapHash     string
+	Denom		string
+	EpochCap	sdkmath.Int
+	LifetimeCap	sdkmath.Int
+	CapHash		string
 }
 
 type MintedByEpoch struct {
-	Epoch     uint64
-	Denom     string
-	Amount    sdkmath.Int
-	EpochHash string
+	Epoch		uint64
+	Denom		string
+	Amount		sdkmath.Int
+	EpochHash	string
 }
 
 type MintedLifetime struct {
-	Denom        string
-	Amount       sdkmath.Int
-	LifetimeHash string
+	Denom		string
+	Amount		sdkmath.Int
+	LifetimeHash	string
 }
 
 type EmissionDecision struct {
-	DecisionHash string
-	Caller       string
-	Denom        string
-	Amount       sdkmath.Int
-	Epoch        uint64
-	Height       uint64
-	Approved     bool
+	DecisionHash	string
+	Caller		string
+	Denom		string
+	Amount		sdkmath.Int
+	Epoch		uint64
+	Height		uint64
+	Approved	bool
 }
 
 type ConstitutionEmergencyAuthorization struct {
-	AuthorizationHash string
-	Caller            string
-	Denom             string
-	Amount            sdkmath.Int
-	Epoch             uint64
-	Height            uint64
-	Enabled           bool
-	Bounded           bool
+	AuthorizationHash	string
+	Caller			string
+	Denom			string
+	Amount			sdkmath.Int
+	Epoch			uint64
+	Height			uint64
+	Enabled			bool
+	Bounded			bool
 }
 
 type MintEvent struct {
-	EventID                  string
-	Caller                   string
-	Recipient                string
-	Denom                    string
-	Amount                   sdkmath.Int
-	Epoch                    uint64
-	Height                   uint64
-	EmissionsDecisionHash    string
-	Emergency                bool
-	ConstitutionDecisionHash string
-	EventHash                string
+	EventID				string
+	Caller				string
+	Recipient			string
+	Denom				string
+	Amount				sdkmath.Int
+	Epoch				uint64
+	Height				uint64
+	EmissionsDecisionHash		string
+	Emergency			bool
+	ConstitutionDecisionHash	string
+	EventHash			string
 }
 
 type MintAuthorityState struct {
-	Params         MintAuthorityParams
-	Registration   SystemAccountRegistration
-	AllowedCallers []AllowedCaller
-	Caps           []MintCap
-	MintedByEpoch  []MintedByEpoch
-	MintedLifetime []MintedLifetime
-	Events         []MintEvent
+	Params		MintAuthorityParams
+	Registration	SystemAccountRegistration
+	AllowedCallers	[]AllowedCaller
+	Caps		[]MintCap
+	MintedByEpoch	[]MintedByEpoch
+	MintedLifetime	[]MintedLifetime
+	Events		[]MintEvent
 }
 
 type MsgMintProtocolCoins struct {
-	Caller                   string
-	Recipient                string
-	Denom                    string
-	Amount                   sdkmath.Int
-	Epoch                    uint64
-	Height                   uint64
-	EmissionsDecisionHash    string
-	Emergency                bool
-	ConstitutionDecisionHash string
+	Caller				string
+	Recipient			string
+	Denom				string
+	Amount				sdkmath.Int
+	Epoch				uint64
+	Height				uint64
+	EmissionsDecisionHash		string
+	Emergency			bool
+	ConstitutionDecisionHash	string
 }
 
 type MsgUpdateMintAuthorityParams struct {
-	Authority      string
-	Params         MintAuthorityParams
-	Registration   SystemAccountRegistration
-	AllowedCallers []AllowedCaller
-	Caps           []MintCap
+	Authority	string
+	Params		MintAuthorityParams
+	Registration	SystemAccountRegistration
+	AllowedCallers	[]AllowedCaller
+	Caps		[]MintCap
 }
 
 type QueryMintedByEpochRequest struct {
-	Epoch uint64
-	Denom string
+	Epoch	uint64
+	Denom	string
 }
 
 func DefaultMintAuthorityParams() MintAuthorityParams {
 	return MintAuthorityParams{
-		Authority:             DefaultMintAuthorityParamsAuthority,
-		BaseDenom:             DefaultBaseDenom,
-		MinterModuleAccount:   DefaultMintAuthorityModuleAccount,
-		MinterAlias:           DefaultMintAuthorityAlias,
-		NormalEmissionCaller:  DefaultEmissionCaller,
-		RequireSystemRegistry: true,
-		MaxMintEvents:         4096,
+		Authority:		DefaultMintAuthorityParamsAuthority,
+		BaseDenom:		DefaultBaseDenom,
+		MinterModuleAccount:	DefaultMintAuthorityModuleAccount,
+		MinterAlias:		DefaultMintAuthorityAlias,
+		NormalEmissionCaller:	DefaultEmissionCaller,
+		RequireSystemRegistry:	true,
+		MaxMintEvents:		4096,
 	}
 }
 
 func DefaultMintAuthorityRegistration() SystemAccountRegistration {
 	return SystemAccountRegistration{
-		ModuleName: DefaultMintAuthorityModuleAccount,
-		Alias:      DefaultMintAuthorityAlias,
-		Purpose:    DefaultMintAuthorityPurpose,
-		Registered: true,
+		ModuleName:	DefaultMintAuthorityModuleAccount,
+		Alias:		DefaultMintAuthorityAlias,
+		Purpose:	DefaultMintAuthorityPurpose,
+		Registered:	true,
 	}
 }
 
@@ -184,16 +184,16 @@ func NewMintAuthorityState(params MintAuthorityParams, registration SystemAccoun
 	}
 	if len(caps) == 0 {
 		caps = []MintCap{{
-			Denom:       params.BaseDenom,
-			EpochCap:    sdkmath.NewInt(1_000_000),
-			LifetimeCap: sdkmath.NewInt(100_000_000),
+			Denom:		params.BaseDenom,
+			EpochCap:	sdkmath.NewInt(1_000_000),
+			LifetimeCap:	sdkmath.NewInt(100_000_000),
 		}}
 	}
 	state := MintAuthorityState{
-		Params:         params,
-		Registration:   registration,
-		AllowedCallers: defaultAllowedMintCallers(params),
-		Caps:           caps,
+		Params:		params,
+		Registration:	registration,
+		AllowedCallers:	defaultAllowedMintCallers(params),
+		Caps:		caps,
 	}
 	state = NormalizeMintAuthorityState(state)
 	if err := state.Validate(); err != nil {
@@ -446,27 +446,27 @@ func ApplyMintProtocolCoins(state MintAuthorityState, msg MsgMintProtocolCoins, 
 		return MintAuthorityState{}, MintEvent{}, errors.New("mint authority minted amount exceeds lifetime cap")
 	}
 	event := MintEvent{
-		Caller:                   msg.Caller,
-		Recipient:                msg.Recipient,
-		Denom:                    msg.Denom,
-		Amount:                   msg.Amount,
-		Epoch:                    msg.Epoch,
-		Height:                   msg.Height,
-		EmissionsDecisionHash:    msg.EmissionsDecisionHash,
-		Emergency:                msg.Emergency,
-		ConstitutionDecisionHash: msg.ConstitutionDecisionHash,
+		Caller:				msg.Caller,
+		Recipient:			msg.Recipient,
+		Denom:				msg.Denom,
+		Amount:				msg.Amount,
+		Epoch:				msg.Epoch,
+		Height:				msg.Height,
+		EmissionsDecisionHash:		msg.EmissionsDecisionHash,
+		Emergency:			msg.Emergency,
+		ConstitutionDecisionHash:	msg.ConstitutionDecisionHash,
 	}
 	event.EventID = ComputeMintEventID(event)
 	event.EventHash = ComputeMintEventHash(event)
 	next.Events = append(next.Events, event)
 	next.setEpochCounter(MintedByEpoch{
-		Epoch:  msg.Epoch,
-		Denom:  msg.Denom,
-		Amount: epochCounter.Amount.Add(msg.Amount),
+		Epoch:	msg.Epoch,
+		Denom:	msg.Denom,
+		Amount:	epochCounter.Amount.Add(msg.Amount),
 	})
 	next.setLifetimeCounter(MintedLifetime{
-		Denom:  msg.Denom,
-		Amount: lifetimeCounter.Amount.Add(msg.Amount),
+		Denom:	msg.Denom,
+		Amount:	lifetimeCounter.Amount.Add(msg.Amount),
 	})
 	next = NormalizeMintAuthorityState(next)
 	if err := next.Validate(); err != nil {
@@ -673,13 +673,13 @@ func (state *MintAuthorityState) setLifetimeCounter(counter MintedLifetime) {
 func cloneState(state MintAuthorityState) MintAuthorityState {
 	state = NormalizeMintAuthorityState(state)
 	return MintAuthorityState{
-		Params:         state.Params,
-		Registration:   state.Registration,
-		AllowedCallers: append([]AllowedCaller(nil), state.AllowedCallers...),
-		Caps:           append([]MintCap(nil), state.Caps...),
-		MintedByEpoch:  append([]MintedByEpoch(nil), state.MintedByEpoch...),
-		MintedLifetime: append([]MintedLifetime(nil), state.MintedLifetime...),
-		Events:         append([]MintEvent(nil), state.Events...),
+		Params:		state.Params,
+		Registration:	state.Registration,
+		AllowedCallers:	append([]AllowedCaller(nil), state.AllowedCallers...),
+		Caps:		append([]MintCap(nil), state.Caps...),
+		MintedByEpoch:	append([]MintedByEpoch(nil), state.MintedByEpoch...),
+		MintedLifetime:	append([]MintedLifetime(nil), state.MintedLifetime...),
+		Events:		append([]MintEvent(nil), state.Events...),
 	}
 }
 

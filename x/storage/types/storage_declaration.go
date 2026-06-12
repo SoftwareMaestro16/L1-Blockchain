@@ -9,50 +9,50 @@ import (
 )
 
 const (
-	StorageModelEphemeral           = "ephemeral"
-	StorageModelPersistentOnChain   = "persistent_on_chain"
-	StorageModelDistributedOffChain = "distributed_off_chain"
-	StorageModelHybrid              = "hybrid"
+	StorageModelEphemeral		= "ephemeral"
+	StorageModelPersistentOnChain	= "persistent_on_chain"
+	StorageModelDistributedOffChain	= "distributed_off_chain"
+	StorageModelHybrid		= "hybrid"
 
-	StorageRetrievalNone             = "none"
-	StorageRetrievalInline           = "inline"
-	StorageRetrievalOnChainState     = "on_chain_state"
-	StorageRetrievalContentAddressed = "content_addressed"
-	StorageRetrievalProviderRPC      = "provider_rpc"
-	StorageRetrievalHybridEndpoint   = "hybrid_endpoint"
+	StorageRetrievalNone			= "none"
+	StorageRetrievalInline			= "inline"
+	StorageRetrievalOnChainState		= "on_chain_state"
+	StorageRetrievalContentAddressed	= "content_addressed"
+	StorageRetrievalProviderRPC		= "provider_rpc"
+	StorageRetrievalHybridEndpoint		= "hybrid_endpoint"
 
-	StorageVerificationNone             = "none"
-	StorageVerificationStateRoot        = "state_root"
-	StorageVerificationContentHash      = "content_hash"
-	StorageVerificationChunkProof       = "chunk_proof"
-	StorageVerificationHybridCommitment = "hybrid_commitment"
+	StorageVerificationNone			= "none"
+	StorageVerificationStateRoot		= "state_root"
+	StorageVerificationContentHash		= "content_hash"
+	StorageVerificationChunkProof		= "chunk_proof"
+	StorageVerificationHybridCommitment	= "hybrid_commitment"
 
-	StorageRetentionNone      = "none"
-	StorageRetentionHeight    = "height"
-	StorageRetentionExpiry    = "expiry"
-	StorageRetentionPermanent = "permanent"
+	StorageRetentionNone		= "none"
+	StorageRetentionHeight		= "height"
+	StorageRetentionExpiry		= "expiry"
+	StorageRetentionPermanent	= "permanent"
 )
 
 type StorageDeclaration struct {
-	StorageModel            string
-	ContentHashOptional     string
-	StateRootOptional       string
-	ContentLocationOptional string
-	RetrievalMethod         string
-	VerificationMethod      string
-	RetentionPolicy         string
-	AccessPolicy            string
-	AccessReceiptOptional   string
-	MaxPayloadBytes         uint64
-	DeclarationHash         string
+	StorageModel		string
+	ContentHashOptional	string
+	StateRootOptional	string
+	ContentLocationOptional	string
+	RetrievalMethod		string
+	VerificationMethod	string
+	RetentionPolicy		string
+	AccessPolicy		string
+	AccessReceiptOptional	string
+	MaxPayloadBytes		uint64
+	DeclarationHash		string
 }
 
 type StorageConsensusValidationPlan struct {
-	DeclarationHash         string
-	RequiredCommitments     []string
-	RequiresOffchainPayload bool
-	MaxPayloadBytes         uint64
-	PlanHash                string
+	DeclarationHash		string
+	RequiredCommitments	[]string
+	RequiresOffchainPayload	bool
+	MaxPayloadBytes		uint64
+	PlanHash		string
 }
 
 func NewStorageDeclaration(declaration StorageDeclaration) (StorageDeclaration, error) {
@@ -75,29 +75,29 @@ func NewHybridStorageDeclaration(object StorageObject, stateRoot, contentLocatio
 		retrievalMethod = StorageRetrievalHybridEndpoint
 	}
 	return NewStorageDeclaration(StorageDeclaration{
-		StorageModel:            StorageModelHybrid,
-		ContentHashOptional:     object.ContentHash,
-		StateRootOptional:       stateRoot,
-		ContentLocationOptional: contentLocation,
-		RetrievalMethod:         retrievalMethod,
-		VerificationMethod:      StorageVerificationHybridCommitment,
-		RetentionPolicy:         StorageRetentionExpiry,
-		AccessPolicy:            object.AccessPolicy,
-		AccessReceiptOptional:   accessReceipt,
-		MaxPayloadBytes:         maxPayloadBytes,
+		StorageModel:			StorageModelHybrid,
+		ContentHashOptional:		object.ContentHash,
+		StateRootOptional:		stateRoot,
+		ContentLocationOptional:	contentLocation,
+		RetrievalMethod:		retrievalMethod,
+		VerificationMethod:		StorageVerificationHybridCommitment,
+		RetentionPolicy:		StorageRetentionExpiry,
+		AccessPolicy:			object.AccessPolicy,
+		AccessReceiptOptional:		accessReceipt,
+		MaxPayloadBytes:		maxPayloadBytes,
 	})
 }
 
 func NewStorageDeclarationFromServiceDescriptor(descriptor coretypes.ServiceStorageDescriptor) (StorageDeclaration, error) {
 	declaration := StorageDeclaration{
-		StorageModel:        storageModelFromServiceDescriptor(descriptor.Model),
-		ContentHashOptional: descriptor.ContentHash,
-		StateRootOptional:   descriptor.StateRoot,
-		RetrievalMethod:     descriptor.RetrievalMethod,
-		VerificationMethod:  descriptor.VerificationMethod,
-		RetentionPolicy:     descriptor.RetentionPolicy,
-		AccessPolicy:        descriptor.AccessPolicy,
-		MaxPayloadBytes:     descriptor.MaxPayloadBytes,
+		StorageModel:		storageModelFromServiceDescriptor(descriptor.Model),
+		ContentHashOptional:	descriptor.ContentHash,
+		StateRootOptional:	descriptor.StateRoot,
+		RetrievalMethod:	descriptor.RetrievalMethod,
+		VerificationMethod:	descriptor.VerificationMethod,
+		RetentionPolicy:	descriptor.RetentionPolicy,
+		AccessPolicy:		descriptor.AccessPolicy,
+		MaxPayloadBytes:	descriptor.MaxPayloadBytes,
 	}
 	if declaration.ContentHashOptional == "" && descriptor.Model != coretypes.ServiceStorageOnChain {
 		declaration.ContentHashOptional = descriptor.CommitmentHash
@@ -200,10 +200,10 @@ func BuildStorageConsensusValidationPlan(declaration StorageDeclaration) (Storag
 		commitments = append(commitments, declaration.StateRootOptional)
 	}
 	plan := StorageConsensusValidationPlan{
-		DeclarationHash:         declaration.DeclarationHash,
-		RequiredCommitments:     normalizeStorageHashes(commitments),
-		RequiresOffchainPayload: false,
-		MaxPayloadBytes:         declaration.MaxPayloadBytes,
+		DeclarationHash:		declaration.DeclarationHash,
+		RequiredCommitments:		normalizeStorageHashes(commitments),
+		RequiresOffchainPayload:	false,
+		MaxPayloadBytes:		declaration.MaxPayloadBytes,
 	}
 	plan.PlanHash = ComputeStorageConsensusValidationPlanHash(plan)
 	return plan, plan.Validate()

@@ -38,14 +38,14 @@ func TestIdentityLookupMessagesAcceptSectionEightTwoTargetsAndStatuses(t *testin
 		IdentityLookupTargetMetadata,
 	} {
 		req, err := NewMsgResolveIdentity(MsgResolveIdentity{
-			RequestID:     identityHash("request", string(target)),
-			Requester:     "contract:caller",
-			SourceZoneID:  "CONTRACT_ZONE",
-			TargetName:    "alice.aet",
-			TargetType:    target,
-			ProofRequired: true,
-			ReplyTo:       "contract:caller",
-			ExpiryHeight:  50,
+			RequestID:	identityHash("request", string(target)),
+			Requester:	"contract:caller",
+			SourceZoneID:	"CONTRACT_ZONE",
+			TargetName:	"alice.aet",
+			TargetType:	target,
+			ProofRequired:	true,
+			ReplyTo:	"contract:caller",
+			ExpiryHeight:	50,
 		})
 		require.NoError(t, err)
 		require.Equal(t, target, req.TargetType)
@@ -63,14 +63,14 @@ func TestIdentityLookupMessagesAcceptSectionEightTwoTargetsAndStatuses(t *testin
 			resolvedValue = hex.EncodeToString([]byte("awallet1"))
 		}
 		result, err := NewMsgIdentityResolutionResult(MsgIdentityResolutionResult{
-			RequestID:             identityHash("request-status", string(status)),
-			Name:                  "alice.aet",
-			TargetType:            IdentityLookupTargetAccount,
-			ResolvedValue:         resolvedValue,
-			ResolverRecordVersion: 7,
-			ProofHashOptional:     identityHash("proof", string(status)),
-			Status:                status,
-			ExpiryHeight:          60,
+			RequestID:		identityHash("request-status", string(status)),
+			Name:			"alice.aet",
+			TargetType:		IdentityLookupTargetAccount,
+			ResolvedValue:		resolvedValue,
+			ResolverRecordVersion:	7,
+			ProofHashOptional:	identityHash("proof", string(status)),
+			Status:			status,
+			ExpiryHeight:		60,
 		})
 		require.NoError(t, err)
 		require.Equal(t, status, result.Status)
@@ -130,30 +130,30 @@ func TestIdentityVerifiedResolverCacheRequiresProofExpiryAndInvalidation(t *test
 	require.NoError(t, err)
 	require.Len(t, entry.InvalidationTriggers, 2)
 	require.NoError(t, ValidateIdentityVerifiedResolverCacheUseV2(entry, IdentityCacheUseV2{
-		Height:                20,
-		ResolverRecordVersion: result.ResolverRecordVersion,
-		ProofVerified:         true,
+		Height:			20,
+		ResolverRecordVersion:	result.ResolverRecordVersion,
+		ProofVerified:		true,
 	}))
 
 	err = ValidateIdentityVerifiedResolverCacheUseV2(entry, IdentityCacheUseV2{
-		Height:                result.ExpiryHeight + 1,
-		ResolverRecordVersion: result.ResolverRecordVersion,
-		ProofVerified:         true,
+		Height:			result.ExpiryHeight + 1,
+		ResolverRecordVersion:	result.ResolverRecordVersion,
+		ProofVerified:		true,
 	})
 	require.ErrorContains(t, err, "expired")
 
 	err = ValidateIdentityVerifiedResolverCacheUseV2(entry, IdentityCacheUseV2{
-		Height:                20,
-		ResolverRecordVersion: result.ResolverRecordVersion + 1,
-		ProofVerified:         true,
+		Height:			20,
+		ResolverRecordVersion:	result.ResolverRecordVersion + 1,
+		ProofVerified:		true,
 	})
 	require.ErrorContains(t, err, "version changed")
 
 	err = ValidateIdentityVerifiedResolverCacheUseV2(entry, IdentityCacheUseV2{
-		Height:                20,
-		ResolverRecordVersion: result.ResolverRecordVersion,
-		ProofVerified:         true,
-		InvalidationTrigger:   IdentityCacheInvalidResolverUpdateV2,
+		Height:			20,
+		ResolverRecordVersion:	result.ResolverRecordVersion,
+		ProofVerified:		true,
+		InvalidationTrigger:	IdentityCacheInvalidResolverUpdateV2,
 	})
 	require.ErrorContains(t, err, "invalidated")
 }
@@ -176,32 +176,32 @@ func TestIdentityContractResolutionUseRequiresProofOrIdentityOriginReceipt(t *te
 	result := testIdentityResolutionResultV2(t, req, IdentityResolutionStatusResolved, true)
 
 	require.NoError(t, ValidateIdentityContractResolutionUseV2(IdentityContractResolutionUseV2{
-		Result:        result,
-		CurrentHeight: 20,
-		ProofVerified: true,
+		Result:		result,
+		CurrentHeight:	20,
+		ProofVerified:	true,
 	}))
 
 	require.NoError(t, ValidateIdentityContractResolutionUseV2(IdentityContractResolutionUseV2{
-		Result:              result,
-		CurrentHeight:       20,
-		MessageOriginZoneID: IdentityZoneID,
-		ReceiptRoot:         identityHash("receipt-root"),
-		ReceiptHash:         identityHash("receipt-hash"),
+		Result:			result,
+		CurrentHeight:		20,
+		MessageOriginZoneID:	IdentityZoneID,
+		ReceiptRoot:		identityHash("receipt-root"),
+		ReceiptHash:		identityHash("receipt-hash"),
 	}))
 
 	err := ValidateIdentityContractResolutionUseV2(IdentityContractResolutionUseV2{
-		Result:              result,
-		CurrentHeight:       20,
-		MessageOriginZoneID: "APPLICATION_ZONE",
-		ReceiptRoot:         identityHash("receipt-root"),
-		ReceiptHash:         identityHash("receipt-hash"),
+		Result:			result,
+		CurrentHeight:		20,
+		MessageOriginZoneID:	"APPLICATION_ZONE",
+		ReceiptRoot:		identityHash("receipt-root"),
+		ReceiptHash:		identityHash("receipt-hash"),
 	})
 	require.ErrorContains(t, err, "verified proof or Identity Zone origin")
 
 	err = ValidateIdentityContractResolutionUseV2(IdentityContractResolutionUseV2{
-		Result:        result,
-		CurrentHeight: result.ExpiryHeight + 1,
-		ProofVerified: true,
+		Result:		result,
+		CurrentHeight:	result.ExpiryHeight + 1,
+		ProofVerified:	true,
 	})
 	require.ErrorContains(t, err, "expired")
 }
@@ -209,14 +209,14 @@ func TestIdentityContractResolutionUseRequiresProofOrIdentityOriginReceipt(t *te
 func testIdentityResolveRequestV2(t *testing.T, proofRequired bool) MsgResolveIdentity {
 	t.Helper()
 	msg, err := NewMsgResolveIdentity(MsgResolveIdentity{
-		RequestID:     identityHash("request-id", "alice"),
-		Requester:     "contract:caller",
-		SourceZoneID:  "CONTRACT_ZONE",
-		TargetName:    "alice.aet",
-		TargetType:    IdentityLookupTargetAccount,
-		ProofRequired: proofRequired,
-		ReplyTo:       "contract:caller",
-		ExpiryHeight:  50,
+		RequestID:	identityHash("request-id", "alice"),
+		Requester:	"contract:caller",
+		SourceZoneID:	"CONTRACT_ZONE",
+		TargetName:	"alice.aet",
+		TargetType:	IdentityLookupTargetAccount,
+		ProofRequired:	proofRequired,
+		ReplyTo:	"contract:caller",
+		ExpiryHeight:	50,
 	})
 	require.NoError(t, err)
 	return msg
@@ -233,14 +233,14 @@ func testIdentityResolutionResultV2(t *testing.T, req MsgResolveIdentity, status
 		value = hex.EncodeToString([]byte("awallet1"))
 	}
 	result, err := NewMsgIdentityResolutionResult(MsgIdentityResolutionResult{
-		RequestID:             req.RequestID,
-		Name:                  "alice.aet",
-		TargetType:            req.TargetType,
-		ResolvedValue:         value,
-		ResolverRecordVersion: 7,
-		ProofHashOptional:     proofHash,
-		Status:                status,
-		ExpiryHeight:          80,
+		RequestID:		req.RequestID,
+		Name:			"alice.aet",
+		TargetType:		req.TargetType,
+		ResolvedValue:		value,
+		ResolverRecordVersion:	7,
+		ProofHashOptional:	proofHash,
+		Status:			status,
+		ExpiryHeight:		80,
 	})
 	require.NoError(t, err)
 	return result

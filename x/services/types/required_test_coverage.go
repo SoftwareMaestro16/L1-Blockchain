@@ -17,84 +17,84 @@ type ServiceFuzzTestCaseID string
 type ServicePerformanceTestCaseID string
 
 const (
-	ServiceRequiredTestUnit        ServiceRequiredTestKind = "unit"
-	ServiceRequiredTestIntegration ServiceRequiredTestKind = "integration"
-	ServiceRequiredTestInvariant   ServiceRequiredTestKind = "invariant"
-	ServiceRequiredTestFuzz        ServiceRequiredTestKind = "fuzz"
-	ServiceRequiredTestPerformance ServiceRequiredTestKind = "performance"
+	ServiceRequiredTestUnit		ServiceRequiredTestKind	= "unit"
+	ServiceRequiredTestIntegration	ServiceRequiredTestKind	= "integration"
+	ServiceRequiredTestInvariant	ServiceRequiredTestKind	= "invariant"
+	ServiceRequiredTestFuzz		ServiceRequiredTestKind	= "fuzz"
+	ServiceRequiredTestPerformance	ServiceRequiredTestKind	= "performance"
 
-	ServiceUnitCallIDDerivation    ServiceUnitTestCaseID = "call_id_derivation"
-	ServiceUnitDescriptorHash      ServiceUnitTestCaseID = "descriptor_hash_calculation"
-	ServiceUnitIdempotencyKey      ServiceUnitTestCaseID = "idempotency_key_behavior"
-	ServiceUnitInterfaceHash       ServiceUnitTestCaseID = "interface_hash_calculation"
-	ServiceUnitMethodIDValidation  ServiceUnitTestCaseID = "method_id_validation"
-	ServiceUnitNonceReplay         ServiceUnitTestCaseID = "nonce_replay_rejection"
-	ServiceUnitPaymentModel        ServiceUnitTestCaseID = "payment_model_validation"
-	ServiceUnitReceiptHash         ServiceUnitTestCaseID = "receipt_hash_calculation"
-	ServiceUnitServiceIDValidation ServiceUnitTestCaseID = "service_id_validation"
-	ServiceUnitTrustModel          ServiceUnitTestCaseID = "trust_model_validation"
+	ServiceUnitCallIDDerivation	ServiceUnitTestCaseID	= "call_id_derivation"
+	ServiceUnitDescriptorHash	ServiceUnitTestCaseID	= "descriptor_hash_calculation"
+	ServiceUnitIdempotencyKey	ServiceUnitTestCaseID	= "idempotency_key_behavior"
+	ServiceUnitInterfaceHash	ServiceUnitTestCaseID	= "interface_hash_calculation"
+	ServiceUnitMethodIDValidation	ServiceUnitTestCaseID	= "method_id_validation"
+	ServiceUnitNonceReplay		ServiceUnitTestCaseID	= "nonce_replay_rejection"
+	ServiceUnitPaymentModel		ServiceUnitTestCaseID	= "payment_model_validation"
+	ServiceUnitReceiptHash		ServiceUnitTestCaseID	= "receipt_hash_calculation"
+	ServiceUnitServiceIDValidation	ServiceUnitTestCaseID	= "service_id_validation"
+	ServiceUnitTrustModel		ServiceUnitTestCaseID	= "trust_model_validation"
 
-	ServiceIntegrationAnchorOffChainResult     ServiceIntegrationTestCaseID = "anchor_off_chain_service_result"
-	ServiceIntegrationChallengeMixedResult     ServiceIntegrationTestCaseID = "challenge_mixed_service_result"
-	ServiceIntegrationExecuteOnChainCall       ServiceIntegrationTestCaseID = "execute_on_chain_service_call"
-	ServiceIntegrationGenerateReceiptProof     ServiceIntegrationTestCaseID = "generate_and_verify_service_receipt_proof"
-	ServiceIntegrationRegisterFogProvider      ServiceIntegrationTestCaseID = "register_provider_for_fog_market_service"
-	ServiceIntegrationRegisterInterfaceBinding ServiceIntegrationTestCaseID = "register_interface_and_bind_to_service"
-	ServiceIntegrationRegisterMixedService     ServiceIntegrationTestCaseID = "register_mixed_service"
-	ServiceIntegrationRegisterOffChainAnchor   ServiceIntegrationTestCaseID = "register_off_chain_service_anchor"
-	ServiceIntegrationRegisterOnChainService   ServiceIntegrationTestCaseID = "register_on_chain_service"
-	ServiceIntegrationResolveAETBinding        ServiceIntegrationTestCaseID = "resolve_service_through_aet_binding"
-	ServiceIntegrationSettleEscrowPayment      ServiceIntegrationTestCaseID = "settle_escrow_payment"
+	ServiceIntegrationAnchorOffChainResult		ServiceIntegrationTestCaseID	= "anchor_off_chain_service_result"
+	ServiceIntegrationChallengeMixedResult		ServiceIntegrationTestCaseID	= "challenge_mixed_service_result"
+	ServiceIntegrationExecuteOnChainCall		ServiceIntegrationTestCaseID	= "execute_on_chain_service_call"
+	ServiceIntegrationGenerateReceiptProof		ServiceIntegrationTestCaseID	= "generate_and_verify_service_receipt_proof"
+	ServiceIntegrationRegisterFogProvider		ServiceIntegrationTestCaseID	= "register_provider_for_fog_market_service"
+	ServiceIntegrationRegisterInterfaceBinding	ServiceIntegrationTestCaseID	= "register_interface_and_bind_to_service"
+	ServiceIntegrationRegisterMixedService		ServiceIntegrationTestCaseID	= "register_mixed_service"
+	ServiceIntegrationRegisterOffChainAnchor	ServiceIntegrationTestCaseID	= "register_off_chain_service_anchor"
+	ServiceIntegrationRegisterOnChainService	ServiceIntegrationTestCaseID	= "register_on_chain_service"
+	ServiceIntegrationResolveAETBinding		ServiceIntegrationTestCaseID	= "resolve_service_through_aet_binding"
+	ServiceIntegrationSettleEscrowPayment		ServiceIntegrationTestCaseID	= "settle_escrow_payment"
 
-	ServiceInvariantActiveServiceInterface        ServiceInvariantTestCaseID = "active_service_does_not_reference_missing_interface"
-	ServiceInvariantCallReceiptServiceMethod      ServiceInvariantTestCaseID = "call_receipt_references_existing_service_and_method"
-	ServiceInvariantDescriptorStoredHash          ServiceInvariantTestCaseID = "service_descriptor_hash_matches_stored_descriptor"
-	ServiceInvariantExpiredServiceRejectsCalls    ServiceInvariantTestCaseID = "expired_service_cannot_accept_new_calls"
-	ServiceInvariantInterfaceRegisteredHash       ServiceInvariantTestCaseID = "service_interface_hash_matches_registered_interface"
-	ServiceInvariantPaymentSettlementEscrowLimit  ServiceInvariantTestCaseID = "payment_settlement_does_not_exceed_escrow"
-	ServiceInvariantProviderCollateralNonNegative ServiceInvariantTestCaseID = "provider_collateral_cannot_be_negative"
-	ServiceInvariantReceiptRootCommittedReceipts  ServiceInvariantTestCaseID = "receipt_root_includes_all_committed_receipts"
+	ServiceInvariantActiveServiceInterface		ServiceInvariantTestCaseID	= "active_service_does_not_reference_missing_interface"
+	ServiceInvariantCallReceiptServiceMethod	ServiceInvariantTestCaseID	= "call_receipt_references_existing_service_and_method"
+	ServiceInvariantDescriptorStoredHash		ServiceInvariantTestCaseID	= "service_descriptor_hash_matches_stored_descriptor"
+	ServiceInvariantExpiredServiceRejectsCalls	ServiceInvariantTestCaseID	= "expired_service_cannot_accept_new_calls"
+	ServiceInvariantInterfaceRegisteredHash		ServiceInvariantTestCaseID	= "service_interface_hash_matches_registered_interface"
+	ServiceInvariantPaymentSettlementEscrowLimit	ServiceInvariantTestCaseID	= "payment_settlement_does_not_exceed_escrow"
+	ServiceInvariantProviderCollateralNonNegative	ServiceInvariantTestCaseID	= "provider_collateral_cannot_be_negative"
+	ServiceInvariantReceiptRootCommittedReceipts	ServiceInvariantTestCaseID	= "receipt_root_includes_all_committed_receipts"
 
-	ServiceFuzzDuplicateIdempotencyKeys  ServiceFuzzTestCaseID = "duplicate_idempotency_keys"
-	ServiceFuzzDuplicateNonces           ServiceFuzzTestCaseID = "duplicate_nonces"
-	ServiceFuzzForgedProviderSignatures  ServiceFuzzTestCaseID = "forged_provider_signatures"
-	ServiceFuzzInvalidDisputeProofs      ServiceFuzzTestCaseID = "invalid_dispute_proofs"
-	ServiceFuzzInvalidResultAnchors      ServiceFuzzTestCaseID = "invalid_result_anchors"
-	ServiceFuzzLargePayloadCalls         ServiceFuzzTestCaseID = "large_payload_calls"
-	ServiceFuzzMalformedDescriptors      ServiceFuzzTestCaseID = "malformed_descriptors"
-	ServiceFuzzMalformedInterfaceSchemas ServiceFuzzTestCaseID = "malformed_interface_schemas"
-	ServiceFuzzPaymentEdgeCases          ServiceFuzzTestCaseID = "payment_edge_cases"
+	ServiceFuzzDuplicateIdempotencyKeys	ServiceFuzzTestCaseID	= "duplicate_idempotency_keys"
+	ServiceFuzzDuplicateNonces		ServiceFuzzTestCaseID	= "duplicate_nonces"
+	ServiceFuzzForgedProviderSignatures	ServiceFuzzTestCaseID	= "forged_provider_signatures"
+	ServiceFuzzInvalidDisputeProofs		ServiceFuzzTestCaseID	= "invalid_dispute_proofs"
+	ServiceFuzzInvalidResultAnchors		ServiceFuzzTestCaseID	= "invalid_result_anchors"
+	ServiceFuzzLargePayloadCalls		ServiceFuzzTestCaseID	= "large_payload_calls"
+	ServiceFuzzMalformedDescriptors		ServiceFuzzTestCaseID	= "malformed_descriptors"
+	ServiceFuzzMalformedInterfaceSchemas	ServiceFuzzTestCaseID	= "malformed_interface_schemas"
+	ServiceFuzzPaymentEdgeCases		ServiceFuzzTestCaseID	= "payment_edge_cases"
 
-	ServicePerformanceBlockSTMConflictRate       ServicePerformanceTestCaseID = "blockstm_conflict_rate_for_independent_services"
-	ServicePerformanceInterfaceLookupLatency     ServicePerformanceTestCaseID = "interface_lookup_latency"
-	ServicePerformanceOnChainExecutionThroughput ServicePerformanceTestCaseID = "on_chain_service_call_execution_throughput"
-	ServicePerformanceProviderLookupLatency      ServicePerformanceTestCaseID = "provider_lookup_latency"
-	ServicePerformanceReceiptAnchoringThroughput ServicePerformanceTestCaseID = "receipt_anchoring_throughput"
-	ServicePerformanceReceiptProofLatency        ServicePerformanceTestCaseID = "receipt_proof_generation_latency"
-	ServicePerformanceRegistryLookupLatency      ServicePerformanceTestCaseID = "service_registry_direct_lookup_latency"
-	ServicePerformanceServiceCallEnqueue         ServicePerformanceTestCaseID = "service_call_enqueue_throughput"
+	ServicePerformanceBlockSTMConflictRate		ServicePerformanceTestCaseID	= "blockstm_conflict_rate_for_independent_services"
+	ServicePerformanceInterfaceLookupLatency	ServicePerformanceTestCaseID	= "interface_lookup_latency"
+	ServicePerformanceOnChainExecutionThroughput	ServicePerformanceTestCaseID	= "on_chain_service_call_execution_throughput"
+	ServicePerformanceProviderLookupLatency		ServicePerformanceTestCaseID	= "provider_lookup_latency"
+	ServicePerformanceReceiptAnchoringThroughput	ServicePerformanceTestCaseID	= "receipt_anchoring_throughput"
+	ServicePerformanceReceiptProofLatency		ServicePerformanceTestCaseID	= "receipt_proof_generation_latency"
+	ServicePerformanceRegistryLookupLatency		ServicePerformanceTestCaseID	= "service_registry_direct_lookup_latency"
+	ServicePerformanceServiceCallEnqueue		ServicePerformanceTestCaseID	= "service_call_enqueue_throughput"
 )
 
 type ServiceRequiredTestCase struct {
-	Kind         ServiceRequiredTestKind
-	UnitCase     ServiceUnitTestCaseID
-	Integration  ServiceIntegrationTestCaseID
-	Invariant    ServiceInvariantTestCaseID
-	Fuzz         ServiceFuzzTestCaseID
-	Performance  ServicePerformanceTestCaseID
-	PackagePath  string
-	TestName     string
-	EvidenceHash string
-	CaseHash     string
+	Kind		ServiceRequiredTestKind
+	UnitCase	ServiceUnitTestCaseID
+	Integration	ServiceIntegrationTestCaseID
+	Invariant	ServiceInvariantTestCaseID
+	Fuzz		ServiceFuzzTestCaseID
+	Performance	ServicePerformanceTestCaseID
+	PackagePath	string
+	TestName	string
+	EvidenceHash	string
+	CaseHash	string
 }
 
 type ServiceRequiredTestCoverage struct {
-	UnitTests        []ServiceRequiredTestCase
-	IntegrationTests []ServiceRequiredTestCase
-	InvariantTests   []ServiceRequiredTestCase
-	FuzzTests        []ServiceRequiredTestCase
-	PerformanceTests []ServiceRequiredTestCase
-	CoverageHash     string
+	UnitTests		[]ServiceRequiredTestCase
+	IntegrationTests	[]ServiceRequiredTestCase
+	InvariantTests		[]ServiceRequiredTestCase
+	FuzzTests		[]ServiceRequiredTestCase
+	PerformanceTests	[]ServiceRequiredTestCase
+	CoverageHash		string
 }
 
 func DefaultServiceRequiredTestCoverage() (ServiceRequiredTestCoverage, error) {
@@ -159,11 +159,11 @@ func DefaultServiceRequiredTestCoverage() (ServiceRequiredTestCoverage, error) {
 
 func NewServiceRequiredTestCoverage(unit []ServiceRequiredTestCase, integration []ServiceRequiredTestCase, invariant []ServiceRequiredTestCase, fuzz []ServiceRequiredTestCase, performance []ServiceRequiredTestCase) (ServiceRequiredTestCoverage, error) {
 	coverage := ServiceRequiredTestCoverage{
-		UnitTests:        cloneServiceRequiredTestCases(unit),
-		IntegrationTests: cloneServiceRequiredTestCases(integration),
-		InvariantTests:   cloneServiceRequiredTestCases(invariant),
-		FuzzTests:        cloneServiceRequiredTestCases(fuzz),
-		PerformanceTests: cloneServiceRequiredTestCases(performance),
+		UnitTests:		cloneServiceRequiredTestCases(unit),
+		IntegrationTests:	cloneServiceRequiredTestCases(integration),
+		InvariantTests:		cloneServiceRequiredTestCases(invariant),
+		FuzzTests:		cloneServiceRequiredTestCases(fuzz),
+		PerformanceTests:	cloneServiceRequiredTestCases(performance),
 	}
 	sortServiceRequiredTestCases(coverage.UnitTests)
 	sortServiceRequiredTestCases(coverage.IntegrationTests)
@@ -415,11 +415,11 @@ func IsServicePerformanceTestCaseID(caseID ServicePerformanceTestCaseID) bool {
 
 func newServiceUnitTestCase(caseID ServiceUnitTestCaseID, testName, evidence string) ServiceRequiredTestCase {
 	testCase := ServiceRequiredTestCase{
-		Kind:         ServiceRequiredTestUnit,
-		UnitCase:     caseID,
-		PackagePath:  "x/services/types",
-		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
+		Kind:		ServiceRequiredTestUnit,
+		UnitCase:	caseID,
+		PackagePath:	"x/services/types",
+		TestName:	strings.TrimSpace(testName),
+		EvidenceHash:	servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -427,11 +427,11 @@ func newServiceUnitTestCase(caseID ServiceUnitTestCaseID, testName, evidence str
 
 func newServiceIntegrationTestCase(caseID ServiceIntegrationTestCaseID, testName, evidence string) ServiceRequiredTestCase {
 	testCase := ServiceRequiredTestCase{
-		Kind:         ServiceRequiredTestIntegration,
-		Integration:  caseID,
-		PackagePath:  "x/services/types",
-		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
+		Kind:		ServiceRequiredTestIntegration,
+		Integration:	caseID,
+		PackagePath:	"x/services/types",
+		TestName:	strings.TrimSpace(testName),
+		EvidenceHash:	servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -439,11 +439,11 @@ func newServiceIntegrationTestCase(caseID ServiceIntegrationTestCaseID, testName
 
 func newServiceInvariantTestCase(caseID ServiceInvariantTestCaseID, testName, evidence string) ServiceRequiredTestCase {
 	testCase := ServiceRequiredTestCase{
-		Kind:         ServiceRequiredTestInvariant,
-		Invariant:    caseID,
-		PackagePath:  "x/services/types",
-		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
+		Kind:		ServiceRequiredTestInvariant,
+		Invariant:	caseID,
+		PackagePath:	"x/services/types",
+		TestName:	strings.TrimSpace(testName),
+		EvidenceHash:	servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -451,11 +451,11 @@ func newServiceInvariantTestCase(caseID ServiceInvariantTestCaseID, testName, ev
 
 func newServiceFuzzTestCase(caseID ServiceFuzzTestCaseID, testName, evidence string) ServiceRequiredTestCase {
 	testCase := ServiceRequiredTestCase{
-		Kind:         ServiceRequiredTestFuzz,
-		Fuzz:         caseID,
-		PackagePath:  "x/services/types",
-		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
+		Kind:		ServiceRequiredTestFuzz,
+		Fuzz:		caseID,
+		PackagePath:	"x/services/types",
+		TestName:	strings.TrimSpace(testName),
+		EvidenceHash:	servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase
@@ -463,11 +463,11 @@ func newServiceFuzzTestCase(caseID ServiceFuzzTestCaseID, testName, evidence str
 
 func newServicePerformanceTestCase(caseID ServicePerformanceTestCaseID, testName, evidence string) ServiceRequiredTestCase {
 	testCase := ServiceRequiredTestCase{
-		Kind:         ServiceRequiredTestPerformance,
-		Performance:  caseID,
-		PackagePath:  "x/services/types",
-		TestName:     strings.TrimSpace(testName),
-		EvidenceHash: servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
+		Kind:		ServiceRequiredTestPerformance,
+		Performance:	caseID,
+		PackagePath:	"x/services/types",
+		TestName:	strings.TrimSpace(testName),
+		EvidenceHash:	servicesHashParts("aetra-services-required-test-evidence-v1", string(caseID), evidence),
 	}
 	testCase.CaseHash = ComputeServiceRequiredTestCaseHash(testCase)
 	return testCase

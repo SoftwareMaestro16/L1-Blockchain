@@ -7,35 +7,35 @@ import (
 )
 
 const (
-	SystemAddressStatusActive = "active"
+	SystemAddressStatusActive	= "active"
 
-	ReservedUserWorkchain   = 4
-	ReservedSystemWorkchain = -7
+	ReservedUserWorkchain	= 4
+	ReservedSystemWorkchain	= -7
 
-	SystemAddressAETElectorName         = "AETElector"
-	SystemAddressAETConfigName          = "AETConfig"
-	SystemAddressAETMintName            = "AETMint"
-	SystemAddressAETBurnName            = "AETBurn"
-	SystemAddressAETElectorUserFriendly = "AEAAAQEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELECTOR"
-	SystemAddressAETConfigUserFriendly  = "AEAAAQCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCONFIG"
-	SystemAddressAETMintUserFriendly    = "AEAAAQMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMINT"
-	SystemAddressAETBurnUserFriendly    = "AEAAAQBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBURN"
-	SystemAddressAETElectorRaw          = "-7:01041041041041041041041041041041041041041041041041041042c4093391"
-	SystemAddressAETConfigRaw           = "-7:008208208208208208208208208208208208208208208208208208208e345206"
-	SystemAddressAETMintRaw             = "4:030c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c308353"
-	SystemAddressAETBurnRaw             = "4:004104104104104104104104104104104104104104104104104104104105444d"
+	SystemAddressAETElectorName		= "AETElector"
+	SystemAddressAETConfigName		= "AETConfig"
+	SystemAddressAETMintName		= "AETMint"
+	SystemAddressAETBurnName		= "AETBurn"
+	SystemAddressAETElectorUserFriendly	= "AEAAAQEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELECTOR"
+	SystemAddressAETConfigUserFriendly	= "AEAAAQCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCONFIG"
+	SystemAddressAETMintUserFriendly	= "AEAAAQMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMINT"
+	SystemAddressAETBurnUserFriendly	= "AEAAAQBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBURN"
+	SystemAddressAETElectorRaw		= "-7:01041041041041041041041041041041041041041041041041041042c4093391"
+	SystemAddressAETConfigRaw		= "-7:008208208208208208208208208208208208208208208208208208208e345206"
+	SystemAddressAETMintRaw			= "4:030c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c30c308353"
+	SystemAddressAETBurnRaw			= "4:004104104104104104104104104104104104104104104104104104104105444d"
 )
 
 type SystemAddress struct {
-	Name                string
-	ModuleName          string
-	Raw                 string
-	UserFriendly        string
-	Core                bool
-	CanHoldFunds        bool
-	CanReceiveUserFunds bool
-	CanSendFunds        bool
-	Status              string
+	Name			string
+	ModuleName		string
+	Raw			string
+	UserFriendly		string
+	Core			bool
+	CanHoldFunds		bool
+	CanReceiveUserFunds	bool
+	CanSendFunds		bool
+	Status			string
 }
 
 var reservedSystemAddresses = []SystemAddress{
@@ -73,15 +73,15 @@ var reservedSystemAddresses = []SystemAddress{
 
 func systemAddress(name, moduleName, raw, userFriendly string, core, canHoldFunds, canReceiveUserFunds, canSendFunds bool) SystemAddress {
 	return SystemAddress{
-		Name:                name,
-		ModuleName:          moduleName,
-		Raw:                 raw,
-		UserFriendly:        userFriendly,
-		Core:                core,
-		CanHoldFunds:        canHoldFunds,
-		CanReceiveUserFunds: canReceiveUserFunds,
-		CanSendFunds:        canSendFunds,
-		Status:              SystemAddressStatusActive,
+		Name:			name,
+		ModuleName:		moduleName,
+		Raw:			raw,
+		UserFriendly:		userFriendly,
+		Core:			core,
+		CanHoldFunds:		canHoldFunds,
+		CanReceiveUserFunds:	canReceiveUserFunds,
+		CanSendFunds:		canSendFunds,
+		Status:			SystemAddressStatusActive,
 	}
 }
 

@@ -14,125 +14,125 @@ const (
 type RL2PayloadType string
 
 const (
-	RL2PayloadLargeBlock      RL2PayloadType = "large_block"
-	RL2PayloadBlockChunk      RL2PayloadType = "block_chunk"
-	RL2PayloadStateSyncStream RL2PayloadType = "state_sync_stream"
-	RL2PayloadZoneSnapshot    RL2PayloadType = "zone_snapshot"
-	RL2PayloadExecutionResult RL2PayloadType = "execution_result"
-	RL2PayloadStorageObject   RL2PayloadType = "storage_object"
-	RL2PayloadProofSet        RL2PayloadType = "proof_set"
+	RL2PayloadLargeBlock		RL2PayloadType	= "large_block"
+	RL2PayloadBlockChunk		RL2PayloadType	= "block_chunk"
+	RL2PayloadStateSyncStream	RL2PayloadType	= "state_sync_stream"
+	RL2PayloadZoneSnapshot		RL2PayloadType	= "zone_snapshot"
+	RL2PayloadExecutionResult	RL2PayloadType	= "execution_result"
+	RL2PayloadStorageObject		RL2PayloadType	= "storage_object"
+	RL2PayloadProofSet		RL2PayloadType	= "proof_set"
 )
 
 type RL2FECPolicy string
 
 const (
-	RL2FECNone        RL2FECPolicy = "none"
-	RL2FECXORParity   RL2FECPolicy = "xor_parity"
-	RL2FECReedSolomon RL2FECPolicy = "reed_solomon"
+	RL2FECNone		RL2FECPolicy	= "none"
+	RL2FECXORParity		RL2FECPolicy	= "xor_parity"
+	RL2FECReedSolomon	RL2FECPolicy	= "reed_solomon"
 )
 
 type RL2TransferState string
 
 const (
-	RL2StateOffered          RL2TransferState = "offered"
-	RL2StateAccepted         RL2TransferState = "accepted"
-	RL2StateStreaming        RL2TransferState = "streaming"
-	RL2StatePaused           RL2TransferState = "paused"
-	RL2StateResumed          RL2TransferState = "resumed"
-	RL2StateVerified         RL2TransferState = "verified"
-	RL2StateCompleted        RL2TransferState = "completed"
-	RL2StateTimeout          RL2TransferState = "timeout"
-	RL2StateCancelled        RL2TransferState = "cancelled"
-	RL2StateInvalidChunk     RL2TransferState = "invalid_chunk"
-	RL2StateRootMismatch     RL2TransferState = "root_mismatch"
-	RL2StatePeerDisconnected RL2TransferState = "peer_disconnected"
+	RL2StateOffered			RL2TransferState	= "offered"
+	RL2StateAccepted		RL2TransferState	= "accepted"
+	RL2StateStreaming		RL2TransferState	= "streaming"
+	RL2StatePaused			RL2TransferState	= "paused"
+	RL2StateResumed			RL2TransferState	= "resumed"
+	RL2StateVerified		RL2TransferState	= "verified"
+	RL2StateCompleted		RL2TransferState	= "completed"
+	RL2StateTimeout			RL2TransferState	= "timeout"
+	RL2StateCancelled		RL2TransferState	= "cancelled"
+	RL2StateInvalidChunk		RL2TransferState	= "invalid_chunk"
+	RL2StateRootMismatch		RL2TransferState	= "root_mismatch"
+	RL2StatePeerDisconnected	RL2TransferState	= "peer_disconnected"
 )
 
 type RL2Transfer struct {
-	TransferID     string
-	SourceNode     string
-	TargetNode     string
-	PayloadType    RL2PayloadType
-	PayloadRoot    string
-	ChunkCount     uint32
-	ChunkSize      uint64
-	FECPolicy      RL2FECPolicy
-	Priority       uint32
-	DeadlineHeight uint64
-	ResumeToken    string
+	TransferID	string
+	SourceNode	string
+	TargetNode	string
+	PayloadType	RL2PayloadType
+	PayloadRoot	string
+	ChunkCount	uint32
+	ChunkSize	uint64
+	FECPolicy	RL2FECPolicy
+	Priority	uint32
+	DeadlineHeight	uint64
+	ResumeToken	string
 }
 
 type RL2TransferProgress struct {
-	TransferID     string
-	ReceivedChunks []uint32
-	VerifiedBitmap []bool
-	ResumeToken    string
+	TransferID	string
+	ReceivedChunks	[]uint32
+	VerifiedBitmap	[]bool
+	ResumeToken	string
 }
 
 type RL2ChunkDescriptor struct {
-	TransferID string
-	ChunkIndex uint32
-	ChunkHash  string
-	ChunkSize  uint64
-	RangeStart uint64
-	RangeEnd   uint64
-	ProofPath  []string
+	TransferID	string
+	ChunkIndex	uint32
+	ChunkHash	string
+	ChunkSize	uint64
+	RangeStart	uint64
+	RangeEnd	uint64
+	ProofPath	[]string
 }
 
 type RL2ChunkRequest struct {
-	TransferID     string
-	MissingIndexes []uint32
-	ResumeToken    string
+	TransferID	string
+	MissingIndexes	[]uint32
+	ResumeToken	string
 }
 
 type RL2StreamingPlan struct {
-	TransferID         string
-	Channel            ChannelClass
-	PriorityLane       uint32
-	ParallelStreams    uint32
-	MaxInFlightChunks  uint32
-	ChunkBudgetBytes   uint64
-	BackpressureActive bool
-	FECEnabled         bool
+	TransferID		string
+	Channel			ChannelClass
+	PriorityLane		uint32
+	ParallelStreams		uint32
+	MaxInFlightChunks	uint32
+	ChunkBudgetBytes	uint64
+	BackpressureActive	bool
+	FECEnabled		bool
 }
 
 type RL2TransferOffer struct {
-	OfferID            string
-	Transfer           RL2Transfer
-	DescriptorRoot     string
-	OfferedHeight      uint64
-	ExpiresHeight      uint64
-	SuggestedChunkSize uint64
-	MaxParallelStreams uint32
-	ResumeToken        string
+	OfferID			string
+	Transfer		RL2Transfer
+	DescriptorRoot		string
+	OfferedHeight		uint64
+	ExpiresHeight		uint64
+	SuggestedChunkSize	uint64
+	MaxParallelStreams	uint32
+	ResumeToken		string
 }
 
 type RL2TransferAcceptance struct {
-	OfferID            string
-	TransferID         string
-	AcceptedHeight     uint64
-	AcceptedChunkSize  uint64
-	MaxParallelStreams uint32
-	ResumeToken        string
+	OfferID			string
+	TransferID		string
+	AcceptedHeight		uint64
+	AcceptedChunkSize	uint64
+	MaxParallelStreams	uint32
+	ResumeToken		string
 }
 
 type RL2BackpressureSignal struct {
-	TransferID        string
-	QueuedBytes       uint64
-	AvailableBytes    uint64
-	MaxInFlightChunks uint32
-	PauseRequested    bool
-	ResumeToken       string
+	TransferID		string
+	QueuedBytes		uint64
+	AvailableBytes		uint64
+	MaxInFlightChunks	uint32
+	PauseRequested		bool
+	ResumeToken		string
 }
 
 type RL2TransferSession struct {
-	Offer         RL2TransferOffer
-	Acceptance    RL2TransferAcceptance
-	State         RL2TransferState
-	Progress      RL2TransferProgress
-	StreamingPlan RL2StreamingPlan
-	FailureReason string
-	LastHeight    uint64
+	Offer		RL2TransferOffer
+	Acceptance	RL2TransferAcceptance
+	State		RL2TransferState
+	Progress	RL2TransferProgress
+	StreamingPlan	RL2StreamingPlan
+	FailureReason	string
+	LastHeight	uint64
 }
 
 func NewRL2Transfer(transfer RL2Transfer) (RL2Transfer, error) {
@@ -166,15 +166,15 @@ func NewRL2TransferFromChunks(sourceNode, targetNode string, payloadType RL2Payl
 		}
 	}
 	return NewRL2Transfer(RL2Transfer{
-		SourceNode:     sourceNode,
-		TargetNode:     targetNode,
-		PayloadType:    payloadType,
-		PayloadRoot:    payloadRoot,
-		ChunkCount:     first.Total,
-		ChunkSize:      maxChunkSize,
-		FECPolicy:      fecPolicy,
-		Priority:       priority,
-		DeadlineHeight: deadlineHeight,
+		SourceNode:	sourceNode,
+		TargetNode:	targetNode,
+		PayloadType:	payloadType,
+		PayloadRoot:	payloadRoot,
+		ChunkCount:	first.Total,
+		ChunkSize:	maxChunkSize,
+		FECPolicy:	fecPolicy,
+		Priority:	priority,
+		DeadlineHeight:	deadlineHeight,
 	})
 }
 
@@ -249,12 +249,12 @@ func NewRL2TransferOfferFromChunks(sourceNode, targetNode string, payloadType RL
 		return RL2TransferOffer{}, nil, err
 	}
 	offer, err := NewRL2TransferOffer(RL2TransferOffer{
-		Transfer:           transfer,
-		DescriptorRoot:     descriptorRoot,
-		OfferedHeight:      uint64(offeredHeight),
-		ExpiresHeight:      uint64(expiresHeight),
-		SuggestedChunkSize: chunkSize,
-		MaxParallelStreams: maxParallelStreams,
+		Transfer:		transfer,
+		DescriptorRoot:		descriptorRoot,
+		OfferedHeight:		uint64(offeredHeight),
+		ExpiresHeight:		uint64(expiresHeight),
+		SuggestedChunkSize:	chunkSize,
+		MaxParallelStreams:	maxParallelStreams,
 	})
 	if err != nil {
 		return RL2TransferOffer{}, nil, err
@@ -422,11 +422,11 @@ func (t RL2Transfer) TransportEnvelope(enqueuedHeight, sequence uint64) (Transpo
 		return TransportEnvelope{}, err
 	}
 	envelope := TransportEnvelope{
-		Channel:        RL2ChannelForPayloadType(transfer.PayloadType),
-		SizeBytes:      transfer.ChunkSize,
-		EnqueuedHeight: enqueuedHeight,
-		Sequence:       sequence,
-		PayloadHash:    transfer.PayloadRoot,
+		Channel:	RL2ChannelForPayloadType(transfer.PayloadType),
+		SizeBytes:	transfer.ChunkSize,
+		EnqueuedHeight:	enqueuedHeight,
+		Sequence:	sequence,
+		PayloadHash:	transfer.PayloadRoot,
 	}
 	envelope = envelope.Normalize()
 	if err := envelope.Validate(DefaultChannelPolicies()); err != nil {
@@ -552,10 +552,10 @@ func NewRL2TransferProgress(transfer RL2Transfer, receivedChunks []uint32) (RL2T
 		bitmap[index] = true
 	}
 	return RL2TransferProgress{
-		TransferID:     transfer.TransferID,
-		ReceivedChunks: normalized,
-		VerifiedBitmap: bitmap,
-		ResumeToken:    token,
+		TransferID:	transfer.TransferID,
+		ReceivedChunks:	normalized,
+		VerifiedBitmap:	bitmap,
+		ResumeToken:	token,
 	}, nil
 }
 
@@ -587,13 +587,13 @@ func NewRL2ChunkDescriptors(transfer RL2Transfer, chunks []PayloadChunk) ([]RL2C
 		}
 		size := uint64(len(chunk.Bytes))
 		descriptor := RL2ChunkDescriptor{
-			TransferID: transfer.TransferID,
-			ChunkIndex: chunk.Index,
-			ChunkHash:  chunk.ChunkHash,
-			ChunkSize:  size,
-			RangeStart: offset,
-			RangeEnd:   offset + size,
-			ProofPath:  proofPath,
+			TransferID:	transfer.TransferID,
+			ChunkIndex:	chunk.Index,
+			ChunkHash:	chunk.ChunkHash,
+			ChunkSize:	size,
+			RangeStart:	offset,
+			RangeEnd:	offset + size,
+			ProofPath:	proofPath,
 		}
 		if err := descriptor.Validate(transfer); err != nil {
 			return nil, err
@@ -806,9 +806,9 @@ func NewRL2ChunkRequest(transfer RL2Transfer, verifiedChunks []uint32) (RL2Chunk
 		return RL2ChunkRequest{}, err
 	}
 	return RL2ChunkRequest{
-		TransferID:     progress.TransferID,
-		MissingIndexes: missing,
-		ResumeToken:    progress.ResumeToken,
+		TransferID:	progress.TransferID,
+		MissingIndexes:	missing,
+		ResumeToken:	progress.ResumeToken,
 	}, nil
 }
 
@@ -832,12 +832,12 @@ func NewRL2BackpressureSignal(transfer RL2Transfer, queuedBytes, availableBytes 
 		maxInFlight = transfer.ChunkCount
 	}
 	return RL2BackpressureSignal{
-		TransferID:        transfer.TransferID,
-		QueuedBytes:       queuedBytes,
-		AvailableBytes:    availableBytes,
-		MaxInFlightChunks: maxInFlight,
-		PauseRequested:    queuedBytes >= availableBytes,
-		ResumeToken:       progress.ResumeToken,
+		TransferID:		transfer.TransferID,
+		QueuedBytes:		queuedBytes,
+		AvailableBytes:		availableBytes,
+		MaxInFlightChunks:	maxInFlight,
+		PauseRequested:		queuedBytes >= availableBytes,
+		ResumeToken:		progress.ResumeToken,
 	}, nil
 }
 
@@ -920,14 +920,14 @@ func PlanRL2Streaming(transfer RL2Transfer, score PeerScore, availableBytesPerBl
 		maxInFlight = 1
 	}
 	return RL2StreamingPlan{
-		TransferID:         transfer.TransferID,
-		Channel:            RL2ChannelForPayloadType(transfer.PayloadType),
-		PriorityLane:       transfer.Priority,
-		ParallelStreams:    parallelStreams,
-		MaxInFlightChunks:  maxInFlight,
-		ChunkBudgetBytes:   effectiveBudget,
-		BackpressureActive: backpressure,
-		FECEnabled:         transfer.FECPolicy != RL2FECNone,
+		TransferID:		transfer.TransferID,
+		Channel:		RL2ChannelForPayloadType(transfer.PayloadType),
+		PriorityLane:		transfer.Priority,
+		ParallelStreams:	parallelStreams,
+		MaxInFlightChunks:	maxInFlight,
+		ChunkBudgetBytes:	effectiveBudget,
+		BackpressureActive:	backpressure,
+		FECEnabled:		transfer.FECPolicy != RL2FECNone,
 	}, nil
 }
 
@@ -949,22 +949,22 @@ func AcceptRL2TransferOffer(offer RL2TransferOffer, verifiedChunks []uint32, acc
 		return RL2TransferSession{}, err
 	}
 	acceptance := RL2TransferAcceptance{
-		OfferID:            offer.OfferID,
-		TransferID:         offer.Transfer.TransferID,
-		AcceptedHeight:     acceptedHeight,
-		AcceptedChunkSize:  offer.SuggestedChunkSize,
-		MaxParallelStreams: offer.MaxParallelStreams,
-		ResumeToken:        progress.ResumeToken,
+		OfferID:		offer.OfferID,
+		TransferID:		offer.Transfer.TransferID,
+		AcceptedHeight:		acceptedHeight,
+		AcceptedChunkSize:	offer.SuggestedChunkSize,
+		MaxParallelStreams:	offer.MaxParallelStreams,
+		ResumeToken:		progress.ResumeToken,
 	}.Normalize()
 	if err := acceptance.Validate(offer, acceptedHeight); err != nil {
 		return RL2TransferSession{}, err
 	}
 	return RL2TransferSession{
-		Offer:      offer,
-		Acceptance: acceptance,
-		State:      RL2StateAccepted,
-		Progress:   progress,
-		LastHeight: acceptedHeight,
+		Offer:		offer,
+		Acceptance:	acceptance,
+		State:		RL2StateAccepted,
+		Progress:	progress,
+		LastHeight:	acceptedHeight,
 	}, nil
 }
 

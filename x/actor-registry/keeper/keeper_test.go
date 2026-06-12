@@ -91,11 +91,11 @@ func TestMigrationUpdatesCodeHashAndLogicalTime(t *testing.T) {
 	require.NoError(t, err)
 
 	migrated, err := k.MigrateActor(types.MsgMigrateActor{
-		Authority:   prototype.DefaultAuthority,
-		ActorID:     actor.ActorID,
-		NewCodeHash: codeHash("code-b"),
-		Height:      20,
-		LogicalTime: 9,
+		Authority:	prototype.DefaultAuthority,
+		ActorID:	actor.ActorID,
+		NewCodeHash:	codeHash("code-b"),
+		Height:		20,
+		LogicalTime:	9,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.ActorStatusMigrated, migrated.Status)
@@ -104,11 +104,11 @@ func TestMigrationUpdatesCodeHashAndLogicalTime(t *testing.T) {
 	require.Equal(t, actor.ActorID, migrated.MigratedFrom)
 
 	_, err = k.UpdateActorCode(types.MsgUpdateActorCode{
-		Authority:   prototype.DefaultAuthority,
-		ActorID:     migrated.ActorID,
-		CodeHash:    codeHash("code-a"),
-		Height:      21,
-		LogicalTime: 8,
+		Authority:	prototype.DefaultAuthority,
+		ActorID:	migrated.ActorID,
+		CodeHash:	codeHash("code-a"),
+		Height:		21,
+		LogicalTime:	8,
 	})
 	require.ErrorContains(t, err, "monotonically")
 }
@@ -174,12 +174,12 @@ func enabledKeeper(t *testing.T, codeHashes ...string) Keeper {
 
 func registerMsg(owner, codeHashValue, salt string, height uint64) types.MsgRegisterActor {
 	return types.MsgRegisterActor{
-		Authority:    prototype.DefaultAuthority,
-		Owner:        owner,
-		CodeHash:     codeHashValue,
-		Salt:         salt,
-		Height:       height,
-		Capabilities: []string{"call", "storage"},
+		Authority:	prototype.DefaultAuthority,
+		Owner:		owner,
+		CodeHash:	codeHashValue,
+		Salt:		salt,
+		Height:		height,
+		Capabilities:	[]string{"call", "storage"},
 	}
 }
 

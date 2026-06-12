@@ -6,25 +6,25 @@ import (
 )
 
 type GlobalMessageRoot struct {
-	Height      uint64
-	InboxRoot   string
-	OutboxRoot  string
-	MessageRoot string
-	ZoneCount   uint64
+	Height		uint64
+	InboxRoot	string
+	OutboxRoot	string
+	MessageRoot	string
+	ZoneCount	uint64
 }
 
 type ExecutionReceiptRoot struct {
-	Height       uint64
-	ReceiptsRoot string
-	ZoneCount    uint64
+	Height		uint64
+	ReceiptsRoot	string
+	ZoneCount	uint64
 }
 
 func NewGlobalMessageRoot(height uint64, inboxRoot string, outboxRoot string, zoneCount uint64) (GlobalMessageRoot, error) {
 	root := GlobalMessageRoot{
-		Height:     height,
-		InboxRoot:  inboxRoot,
-		OutboxRoot: outboxRoot,
-		ZoneCount:  zoneCount,
+		Height:		height,
+		InboxRoot:	inboxRoot,
+		OutboxRoot:	outboxRoot,
+		ZoneCount:	zoneCount,
 	}
 	if err := root.ValidateFormat(); err != nil {
 		return GlobalMessageRoot{}, err

@@ -10,9 +10,9 @@ import (
 
 func TestSmoothEpochRewardsBoundsShortTermVariance(t *testing.T) {
 	out, err := SmoothEpochRewards(RewardSmoothingInput{
-		EpochID:                  7,
-		GrossRewardsNaet:         sdkmath.NewInt(20_000),
-		PreviousEpochRewardsNaet: sdkmath.NewInt(10_000),
+		EpochID:			7,
+		GrossRewardsNaet:		sdkmath.NewInt(20_000),
+		PreviousEpochRewardsNaet:	sdkmath.NewInt(10_000),
 		Validators: []ValidatorRewardParticipant{
 			rewardValidator("val-b", 40, 500, rewardDelegator("del-b", 1_000)),
 			rewardValidator("val-a", 60, 1_000, rewardDelegator("del-a", 3_000), rewardDelegator("del-c", 1_000)),
@@ -32,9 +32,9 @@ func TestSmoothEpochRewardsBoundsShortTermVariance(t *testing.T) {
 
 func TestSmoothEpochRewardsCalculatesCommissionAndDelegatorRewards(t *testing.T) {
 	out, err := SmoothEpochRewards(RewardSmoothingInput{
-		EpochID:                  8,
-		GrossRewardsNaet:         sdkmath.NewInt(10_000),
-		PreviousEpochRewardsNaet: sdkmath.NewInt(10_000),
+		EpochID:			8,
+		GrossRewardsNaet:		sdkmath.NewInt(10_000),
+		PreviousEpochRewardsNaet:	sdkmath.NewInt(10_000),
 		Validators: []ValidatorRewardParticipant{
 			rewardValidator("val-a", 100, 1_000, rewardDelegator("del-a", 3_000), rewardDelegator("del-b", 1_000)),
 		},
@@ -54,9 +54,9 @@ func TestSmoothEpochRewardsCalculatesCommissionAndDelegatorRewards(t *testing.T)
 
 func TestRewardSmoothingStateExportImportSafe(t *testing.T) {
 	out, err := SmoothEpochRewards(RewardSmoothingInput{
-		EpochID:                  9,
-		GrossRewardsNaet:         sdkmath.NewInt(1_001),
-		PreviousEpochRewardsNaet: sdkmath.NewInt(1_000),
+		EpochID:			9,
+		GrossRewardsNaet:		sdkmath.NewInt(1_001),
+		PreviousEpochRewardsNaet:	sdkmath.NewInt(1_000),
 		Validators: []ValidatorRewardParticipant{
 			rewardValidator("val-b", 1, 500, rewardDelegator("del-b", 1)),
 			rewardValidator("val-a", 2, 500, rewardDelegator("del-a", 1)),
@@ -74,15 +74,15 @@ func TestRewardSmoothingStateExportImportSafe(t *testing.T) {
 
 func TestRewardSmoothingStateRejectsAccountingDrift(t *testing.T) {
 	state := RewardSmoothingState{
-		EpochID:           10,
-		EpochLengthBlocks: DefaultRewardSmoothingEpochLengthBlocks,
-		TotalRewardsNaet:  sdkmath.NewInt(100),
+		EpochID:		10,
+		EpochLengthBlocks:	DefaultRewardSmoothingEpochLengthBlocks,
+		TotalRewardsNaet:	sdkmath.NewInt(100),
 		ValidatorRewards: []ValidatorRewardAllocation{{
-			ValidatorID:             "val-a",
-			GrossRewardNaet:         sdkmath.NewInt(100),
-			CommissionNaet:          sdkmath.NewInt(10),
-			DelegatorRewardPoolNaet: sdkmath.NewInt(80),
-			DelegatorRewards:        []DelegatorRewardAllocation{{DelegatorID: "del-a", RewardNaet: sdkmath.NewInt(80)}},
+			ValidatorID:			"val-a",
+			GrossRewardNaet:		sdkmath.NewInt(100),
+			CommissionNaet:			sdkmath.NewInt(10),
+			DelegatorRewardPoolNaet:	sdkmath.NewInt(80),
+			DelegatorRewards:		[]DelegatorRewardAllocation{{DelegatorID: "del-a", RewardNaet: sdkmath.NewInt(80)}},
 		}},
 	}
 
@@ -91,10 +91,10 @@ func TestRewardSmoothingStateRejectsAccountingDrift(t *testing.T) {
 
 func rewardValidator(id string, power uint64, commissionBps int64, delegators ...DelegatorRewardParticipant) ValidatorRewardParticipant {
 	return ValidatorRewardParticipant{
-		ValidatorID:    id,
-		VotingPower:    power,
-		CommissionBps:  commissionBps,
-		DelegatorStake: delegators,
+		ValidatorID:	id,
+		VotingPower:	power,
+		CommissionBps:	commissionBps,
+		DelegatorStake:	delegators,
 	}
 }
 

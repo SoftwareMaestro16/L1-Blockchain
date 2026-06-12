@@ -12,82 +12,82 @@ import (
 )
 
 const (
-	DomainAuctionDurationSeconds     = int64(24 * 60 * 60)
-	DomainAntiSnipeWindowSeconds     = int64(10 * 60)
-	DomainAntiSnipeExtendSeconds     = int64(10 * 60)
-	DomainMaxExtensions              = uint32(6)
-	DomainRegistrationPeriodSeconds  = int64(365 * 24 * 60 * 60)
-	DomainMinBidIncrementBps         = uint32(500)
-	DomainRenewalDiscountBps         = uint32(1000)
-	DomainFeeBurnBps                 = uint32(4000)
-	DomainFeeTreasuryBps             = uint32(4000)
-	DomainFeeRewardsBps              = uint32(2000)
-	DomainDistributionDenominatorBps = uint32(10_000)
+	DomainAuctionDurationSeconds		= int64(24 * 60 * 60)
+	DomainAntiSnipeWindowSeconds		= int64(10 * 60)
+	DomainAntiSnipeExtendSeconds		= int64(10 * 60)
+	DomainMaxExtensions			= uint32(6)
+	DomainRegistrationPeriodSeconds		= int64(365 * 24 * 60 * 60)
+	DomainMinBidIncrementBps		= uint32(500)
+	DomainRenewalDiscountBps		= uint32(1000)
+	DomainFeeBurnBps			= uint32(4000)
+	DomainFeeTreasuryBps			= uint32(4000)
+	DomainFeeRewardsBps			= uint32(2000)
+	DomainDistributionDenominatorBps	= uint32(10_000)
 )
 
 var (
-	DomainPremiumStartPrice = aetToNaet(10_000)
-	DomainHighStartPrice    = aetToNaet(1_000)
-	DomainMediumStartPrice  = aetToNaet(100)
-	DomainLowStartPrice     = aetToNaet(10)
+	DomainPremiumStartPrice	= aetToNaet(10_000)
+	DomainHighStartPrice	= aetToNaet(1_000)
+	DomainMediumStartPrice	= aetToNaet(100)
+	DomainLowStartPrice	= aetToNaet(10)
 )
 
 type DomainParams struct {
-	PremiumStartPrice         sdkmath.Int
-	HighStartPrice            sdkmath.Int
-	MediumStartPrice          sdkmath.Int
-	LowStartPrice             sdkmath.Int
-	MinBidIncrementBps        uint32
-	AuctionDurationSeconds    int64
-	AntiSnipeWindowSeconds    int64
-	AntiSnipeExtendSeconds    int64
-	MaxExtensions             uint32
-	RegistrationPeriodSeconds int64
-	RenewalDiscountBps        uint32
-	FeeBurnBps                uint32
-	FeeTreasuryBps            uint32
-	FeeRewardsBps             uint32
+	PremiumStartPrice		sdkmath.Int
+	HighStartPrice			sdkmath.Int
+	MediumStartPrice		sdkmath.Int
+	LowStartPrice			sdkmath.Int
+	MinBidIncrementBps		uint32
+	AuctionDurationSeconds		int64
+	AntiSnipeWindowSeconds		int64
+	AntiSnipeExtendSeconds		int64
+	MaxExtensions			uint32
+	RegistrationPeriodSeconds	int64
+	RenewalDiscountBps		uint32
+	FeeBurnBps			uint32
+	FeeTreasuryBps			uint32
+	FeeRewardsBps			uint32
 }
 
 type AuctionState struct {
-	Name          string
-	StartUnix     int64
-	EndUnix       int64
-	Extensions    uint32
-	HighestBidder sdk.AccAddress
-	HighestBid    sdkmath.Int
-	Finalized     bool
+	Name		string
+	StartUnix	int64
+	EndUnix		int64
+	Extensions	uint32
+	HighestBidder	sdk.AccAddress
+	HighestBid	sdkmath.Int
+	Finalized	bool
 }
 
 type DomainFeeDistribution struct {
-	Burn     sdkmath.Int
-	Treasury sdkmath.Int
-	Rewards  sdkmath.Int
+	Burn		sdkmath.Int
+	Treasury	sdkmath.Int
+	Rewards		sdkmath.Int
 }
 
 func DefaultDomainParams() DomainParams {
 	return DomainParams{
-		PremiumStartPrice:         DomainPremiumStartPrice,
-		HighStartPrice:            DomainHighStartPrice,
-		MediumStartPrice:          DomainMediumStartPrice,
-		LowStartPrice:             DomainLowStartPrice,
-		MinBidIncrementBps:        DomainMinBidIncrementBps,
-		AuctionDurationSeconds:    DomainAuctionDurationSeconds,
-		AntiSnipeWindowSeconds:    DomainAntiSnipeWindowSeconds,
-		AntiSnipeExtendSeconds:    DomainAntiSnipeExtendSeconds,
-		MaxExtensions:             DomainMaxExtensions,
-		RegistrationPeriodSeconds: DomainRegistrationPeriodSeconds,
-		RenewalDiscountBps:        DomainRenewalDiscountBps,
-		FeeBurnBps:                DomainFeeBurnBps,
-		FeeTreasuryBps:            DomainFeeTreasuryBps,
-		FeeRewardsBps:             DomainFeeRewardsBps,
+		PremiumStartPrice:		DomainPremiumStartPrice,
+		HighStartPrice:			DomainHighStartPrice,
+		MediumStartPrice:		DomainMediumStartPrice,
+		LowStartPrice:			DomainLowStartPrice,
+		MinBidIncrementBps:		DomainMinBidIncrementBps,
+		AuctionDurationSeconds:		DomainAuctionDurationSeconds,
+		AntiSnipeWindowSeconds:		DomainAntiSnipeWindowSeconds,
+		AntiSnipeExtendSeconds:		DomainAntiSnipeExtendSeconds,
+		MaxExtensions:			DomainMaxExtensions,
+		RegistrationPeriodSeconds:	DomainRegistrationPeriodSeconds,
+		RenewalDiscountBps:		DomainRenewalDiscountBps,
+		FeeBurnBps:			DomainFeeBurnBps,
+		FeeTreasuryBps:			DomainFeeTreasuryBps,
+		FeeRewardsBps:			DomainFeeRewardsBps,
 	}
 }
 
 func ValidateDomainParams(params DomainParams) error {
 	for _, price := range []struct {
-		label  string
-		amount sdkmath.Int
+		label	string
+		amount	sdkmath.Int
 	}{
 		{label: "premium_start_price", amount: params.PremiumStartPrice},
 		{label: "high_start_price", amount: params.HighStartPrice},
@@ -147,10 +147,10 @@ func StartAuction(name string, nowUnix int64, params DomainParams) (AuctionState
 		return AuctionState{}, err
 	}
 	return AuctionState{
-		Name:       normalized,
-		StartUnix:  nowUnix,
-		EndUnix:    nowUnix + params.AuctionDurationSeconds,
-		HighestBid: sdkmath.ZeroInt(),
+		Name:		normalized,
+		StartUnix:	nowUnix,
+		EndUnix:	nowUnix + params.AuctionDurationSeconds,
+		HighestBid:	sdkmath.ZeroInt(),
 	}, nil
 }
 
@@ -220,14 +220,14 @@ func FinalizeAuction(auction AuctionState, nowUnix int64, params DomainParams) (
 		return DomainRecord{}, DomainFeeDistribution{}, AuctionState{}, err
 	}
 	record := DomainRecord{
-		Name:          auction.Name,
-		TLD:           DomainTLD,
-		Owner:         auction.HighestBidder,
-		ExpiryUnix:    nowUnix + params.RegistrationPeriodSeconds,
-		NFTItemID:     DomainNFTItemID(auction.Name),
-		Status:        DomainStatusActive,
-		CreatedAtUnix: nowUnix,
-		UpdatedAtUnix: nowUnix,
+		Name:		auction.Name,
+		TLD:		DomainTLD,
+		Owner:		auction.HighestBidder,
+		ExpiryUnix:	nowUnix + params.RegistrationPeriodSeconds,
+		NFTItemID:	DomainNFTItemID(auction.Name),
+		Status:		DomainStatusActive,
+		CreatedAtUnix:	nowUnix,
+		UpdatedAtUnix:	nowUnix,
 	}
 	if err := ValidateDomainRecord(record); err != nil {
 		return DomainRecord{}, DomainFeeDistribution{}, AuctionState{}, err

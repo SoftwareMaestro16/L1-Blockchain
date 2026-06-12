@@ -8,7 +8,7 @@ Generated launch scope doc: `docs/TESTNET.md`.
 
 Classification counts:
 - `disabled`: 2
-- `future_avm_standard`: 16
+- `future_avm_standard`: 15
 - `launch_core`: 14
 - `launch_support`: 28
 - `prototype_only`: 7

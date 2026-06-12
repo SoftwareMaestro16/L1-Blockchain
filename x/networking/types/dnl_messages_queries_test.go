@@ -14,11 +14,11 @@ func TestDNLMessagesRegisterUpdateReputationTableAndExpire(t *testing.T) {
 	reputation := testDNLReputation(t, node.NodeID, 10)
 
 	state, err = RegisterNodeRecordInRoutingState(state, MsgRegisterNodeRecord{
-		Authority:   node.OperatorAddress,
-		Record:      node,
-		Reputation:  reputation,
-		NetworkSalt: salt,
-		Height:      10,
+		Authority:	node.OperatorAddress,
+		Record:		node,
+		Reputation:	reputation,
+		NetworkSalt:	salt,
+		Height:		10,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.Nodes, 1)
@@ -28,11 +28,11 @@ func TestDNLMessagesRegisterUpdateReputationTableAndExpire(t *testing.T) {
 	updated := testDNLNodeRecord(t, 0x91, salt, []string{"financial", "identity"}, []string{"svc-pay", "svc-name"}, 120)
 	updatedReputation := testDNLReputation(t, updated.NodeID, 11)
 	state, err = UpdateNodeRecordInRoutingState(state, MsgUpdateNodeRecord{
-		Authority:   updated.OperatorAddress,
-		Record:      updated,
-		Reputation:  updatedReputation,
-		NetworkSalt: salt,
-		Height:      11,
+		Authority:	updated.OperatorAddress,
+		Record:		updated,
+		Reputation:	updatedReputation,
+		NetworkSalt:	salt,
+		Height:		11,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.ZoneIndex, 2)
@@ -42,27 +42,27 @@ func TestDNLMessagesRegisterUpdateReputationTableAndExpire(t *testing.T) {
 	betterReputation.Reputation.ScoreBps = 9_500
 	betterReputation.CommitmentHash = ComputeReputationCommitmentHash(betterReputation)
 	state, err = SubmitReputationCommitmentInRoutingState(state, MsgSubmitReputationCommitment{
-		Authority:  updated.OperatorAddress,
-		Commitment: betterReputation,
-		Height:     12,
+		Authority:	updated.OperatorAddress,
+		Commitment:	betterReputation,
+		Height:		12,
 	})
 	require.NoError(t, err)
 
 	route := testDNLRouteForNode(t, "financial", "svc-pay", updated.NodeID, 1, 8_500, 100)
 	table := testRoutingTableForRoutes(t, 7, route)
 	state, err = UpdateRoutingTableInRoutingState(state, MsgUpdateRoutingTable{
-		Authority: updated.OperatorAddress,
-		Table:     table,
-		Height:    13,
+		Authority:	updated.OperatorAddress,
+		Table:		table,
+		Height:		13,
 	})
 	require.NoError(t, err)
 	require.Len(t, state.Tables, 1)
 
 	state, err = ExpireNodeRecordInRoutingState(state, MsgExpireNodeRecord{
-		Authority:  updated.OperatorAddress,
-		NodeID:     updated.NodeID,
-		ReasonHash: HashParts("operator-expired"),
-		Height:     14,
+		Authority:	updated.OperatorAddress,
+		NodeID:		updated.NodeID,
+		ReasonHash:	HashParts("operator-expired"),
+		Height:		14,
 	})
 	require.NoError(t, err)
 	require.Empty(t, state.Nodes)
@@ -145,10 +145,10 @@ func TestDNLMessagesRejectUnauthorizedMutations(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = ExpireNodeRecordInRoutingState(state, MsgExpireNodeRecord{
-		Authority:  "operator/wrong",
-		NodeID:     node.NodeID,
-		ReasonHash: HashParts("wrong"),
-		Height:     21,
+		Authority:	"operator/wrong",
+		NodeID:		node.NodeID,
+		ReasonHash:	HashParts("wrong"),
+		Height:		21,
 	})
 	require.ErrorContains(t, err, "authority")
 
@@ -156,9 +156,9 @@ func TestDNLMessagesRejectUnauthorizedMutations(t *testing.T) {
 	route := testDNLRouteForNode(t, "apps", "svc-other", other.NodeID, 1, 8_000, 100)
 	table := testRoutingTableForRoutes(t, 9, route)
 	_, err = UpdateRoutingTableInRoutingState(state, MsgUpdateRoutingTable{
-		Authority: node.OperatorAddress,
-		Table:     table,
-		Height:    21,
+		Authority:	node.OperatorAddress,
+		Table:		table,
+		Height:		21,
 	})
 	require.ErrorContains(t, err, "registered node")
 }

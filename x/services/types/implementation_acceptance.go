@@ -11,49 +11,49 @@ type ServiceImplementationAcceptanceCategory string
 type ServiceImplementationAcceptanceEvidence string
 
 const (
-	ServiceAcceptanceFirstClassRegistryObjects ServiceImplementationAcceptanceID = "services_first_class_registry_objects"
-	ServiceAcceptanceAllServiceTypesDefined    ServiceImplementationAcceptanceID = "all_service_types_defined"
-	ServiceAcceptanceFormalInterfaceBinding    ServiceImplementationAcceptanceID = "formal_interface_hash_binding"
-	ServiceAcceptanceUnifiedCallEnvelope       ServiceImplementationAcceptanceID = "unified_call_envelope"
-	ServiceAcceptanceDiscoveryResolution       ServiceImplementationAcceptanceID = "discovery_resolution_sources"
-	ServiceAcceptancePaymentSettlementModes    ServiceImplementationAcceptanceID = "payment_settlement_modes"
-	ServiceAcceptanceStorageDeclarations       ServiceImplementationAcceptanceID = "storage_declaration_models"
-	ServiceAcceptanceMixedServiceDisputes      ServiceImplementationAcceptanceID = "mixed_service_challenge_or_fallback"
-	ServiceAcceptanceProviderRules             ServiceImplementationAcceptanceID = "provider_collateral_and_reputation_rules"
-	ServiceAcceptanceCosmosModuleSurface       ServiceImplementationAcceptanceID = "cosmos_module_surface"
-	ServiceAcceptanceStoreV2BlockSTMStrategy   ServiceImplementationAcceptanceID = "storev2_blockstm_strategy"
-	ServiceAcceptanceSDKExecutionFlow          ServiceImplementationAcceptanceID = "sdk_execution_flow"
+	ServiceAcceptanceFirstClassRegistryObjects	ServiceImplementationAcceptanceID	= "services_first_class_registry_objects"
+	ServiceAcceptanceAllServiceTypesDefined		ServiceImplementationAcceptanceID	= "all_service_types_defined"
+	ServiceAcceptanceFormalInterfaceBinding		ServiceImplementationAcceptanceID	= "formal_interface_hash_binding"
+	ServiceAcceptanceUnifiedCallEnvelope		ServiceImplementationAcceptanceID	= "unified_call_envelope"
+	ServiceAcceptanceDiscoveryResolution		ServiceImplementationAcceptanceID	= "discovery_resolution_sources"
+	ServiceAcceptancePaymentSettlementModes		ServiceImplementationAcceptanceID	= "payment_settlement_modes"
+	ServiceAcceptanceStorageDeclarations		ServiceImplementationAcceptanceID	= "storage_declaration_models"
+	ServiceAcceptanceMixedServiceDisputes		ServiceImplementationAcceptanceID	= "mixed_service_challenge_or_fallback"
+	ServiceAcceptanceProviderRules			ServiceImplementationAcceptanceID	= "provider_collateral_and_reputation_rules"
+	ServiceAcceptanceCosmosModuleSurface		ServiceImplementationAcceptanceID	= "cosmos_module_surface"
+	ServiceAcceptanceStoreV2BlockSTMStrategy	ServiceImplementationAcceptanceID	= "storev2_blockstm_strategy"
+	ServiceAcceptanceSDKExecutionFlow		ServiceImplementationAcceptanceID	= "sdk_execution_flow"
 
-	ServiceAcceptanceCategoryRegistry    ServiceImplementationAcceptanceCategory = "registry"
-	ServiceAcceptanceCategoryInterface   ServiceImplementationAcceptanceCategory = "interface"
-	ServiceAcceptanceCategoryCall        ServiceImplementationAcceptanceCategory = "call"
-	ServiceAcceptanceCategoryDiscovery   ServiceImplementationAcceptanceCategory = "discovery"
-	ServiceAcceptanceCategoryPayment     ServiceImplementationAcceptanceCategory = "payment"
-	ServiceAcceptanceCategoryStorage     ServiceImplementationAcceptanceCategory = "storage"
-	ServiceAcceptanceCategoryMixed       ServiceImplementationAcceptanceCategory = "mixed"
-	ServiceAcceptanceCategoryProvider    ServiceImplementationAcceptanceCategory = "provider"
-	ServiceAcceptanceCategoryCosmos      ServiceImplementationAcceptanceCategory = "cosmos"
-	ServiceAcceptanceCategoryPerformance ServiceImplementationAcceptanceCategory = "performance"
-	ServiceAcceptanceCategorySDK         ServiceImplementationAcceptanceCategory = "sdk"
+	ServiceAcceptanceCategoryRegistry	ServiceImplementationAcceptanceCategory	= "registry"
+	ServiceAcceptanceCategoryInterface	ServiceImplementationAcceptanceCategory	= "interface"
+	ServiceAcceptanceCategoryCall		ServiceImplementationAcceptanceCategory	= "call"
+	ServiceAcceptanceCategoryDiscovery	ServiceImplementationAcceptanceCategory	= "discovery"
+	ServiceAcceptanceCategoryPayment	ServiceImplementationAcceptanceCategory	= "payment"
+	ServiceAcceptanceCategoryStorage	ServiceImplementationAcceptanceCategory	= "storage"
+	ServiceAcceptanceCategoryMixed		ServiceImplementationAcceptanceCategory	= "mixed"
+	ServiceAcceptanceCategoryProvider	ServiceImplementationAcceptanceCategory	= "provider"
+	ServiceAcceptanceCategoryCosmos		ServiceImplementationAcceptanceCategory	= "cosmos"
+	ServiceAcceptanceCategoryPerformance	ServiceImplementationAcceptanceCategory	= "performance"
+	ServiceAcceptanceCategorySDK		ServiceImplementationAcceptanceCategory	= "sdk"
 
-	ServiceAcceptanceEvidenceType        ServiceImplementationAcceptanceEvidence = "type_contract"
-	ServiceAcceptanceEvidenceValidation  ServiceImplementationAcceptanceEvidence = "validation"
-	ServiceAcceptanceEvidenceHash        ServiceImplementationAcceptanceEvidence = "hash_commitment"
-	ServiceAcceptanceEvidenceTest        ServiceImplementationAcceptanceEvidence = "test_coverage"
-	ServiceAcceptanceEvidenceIntegration ServiceImplementationAcceptanceEvidence = "integration_contract"
+	ServiceAcceptanceEvidenceType		ServiceImplementationAcceptanceEvidence	= "type_contract"
+	ServiceAcceptanceEvidenceValidation	ServiceImplementationAcceptanceEvidence	= "validation"
+	ServiceAcceptanceEvidenceHash		ServiceImplementationAcceptanceEvidence	= "hash_commitment"
+	ServiceAcceptanceEvidenceTest		ServiceImplementationAcceptanceEvidence	= "test_coverage"
+	ServiceAcceptanceEvidenceIntegration	ServiceImplementationAcceptanceEvidence	= "integration_contract"
 )
 
 type ServiceImplementationAcceptanceCriterion struct {
-	CriterionID      ServiceImplementationAcceptanceID
-	Category         ServiceImplementationAcceptanceCategory
-	RequiredEvidence []ServiceImplementationAcceptanceEvidence
-	RequiredObjects  []string
-	CriterionHash    string
+	CriterionID		ServiceImplementationAcceptanceID
+	Category		ServiceImplementationAcceptanceCategory
+	RequiredEvidence	[]ServiceImplementationAcceptanceEvidence
+	RequiredObjects		[]string
+	CriterionHash		string
 }
 
 type ServiceImplementationAcceptanceManifest struct {
-	Criteria     []ServiceImplementationAcceptanceCriterion
-	ManifestHash string
+	Criteria	[]ServiceImplementationAcceptanceCriterion
+	ManifestHash	string
 }
 
 type ServiceImplementationPlanningGate struct {
@@ -303,10 +303,10 @@ func IsServiceImplementationAcceptanceEvidence(evidence ServiceImplementationAcc
 
 func newServiceImplementationAcceptanceCriterion(criterionID ServiceImplementationAcceptanceID, category ServiceImplementationAcceptanceCategory, evidence []ServiceImplementationAcceptanceEvidence, objects []string) ServiceImplementationAcceptanceCriterion {
 	return ServiceImplementationAcceptanceCriterion{
-		CriterionID:      criterionID,
-		Category:         category,
-		RequiredEvidence: evidence,
-		RequiredObjects:  objects,
+		CriterionID:		criterionID,
+		Category:		category,
+		RequiredEvidence:	evidence,
+		RequiredObjects:	objects,
 	}
 }
 

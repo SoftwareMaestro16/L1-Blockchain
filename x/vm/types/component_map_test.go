@@ -62,8 +62,8 @@ func TestDefaultAVMComponentMapMatchesCoreComponentDiagram(t *testing.T) {
 func TestAVMComponentMapCanonicalRootIsDeterministic(t *testing.T) {
 	componentMap := DefaultAVMComponentMap()
 	reordered := AVMComponentMap{
-		Components: append([]AVMComponent(nil), componentMap.Components...),
-		Edges:      append([]AVMComponentEdge(nil), componentMap.Edges...),
+		Components:	append([]AVMComponent(nil), componentMap.Components...),
+		Edges:		append([]AVMComponentEdge(nil), componentMap.Edges...),
 	}
 	reordered.Components[0], reordered.Components[len(reordered.Components)-1] = reordered.Components[len(reordered.Components)-1], reordered.Components[0]
 	reordered.Edges[0], reordered.Edges[len(reordered.Edges)-1] = reordered.Edges[len(reordered.Edges)-1], reordered.Edges[0]

@@ -13,36 +13,36 @@ import (
 )
 
 const (
-	StatusActive  = "active"
-	StatusPaused  = "paused"
-	StatusDeleted = "deleted"
+	StatusActive	= "active"
+	StatusPaused	= "paused"
+	StatusDeleted	= "deleted"
 )
 
 type Actor struct {
-	Address      sdk.AccAddress
-	CodeHash     []byte
-	StateRoot    []byte
-	LogicalTime  uint64
-	MailboxStats MailboxStats
-	Status       string
+	Address		sdk.AccAddress
+	CodeHash	[]byte
+	StateRoot	[]byte
+	LogicalTime	uint64
+	MailboxStats	MailboxStats
+	Status		string
 }
 
 type MailboxStats struct {
-	Pending   uint64
-	Processed uint64
-	Failed    uint64
+	Pending		uint64
+	Processed	uint64
+	Failed		uint64
 }
 
 type ActorState struct {
-	Actor   Actor
-	Mailbox []async.QueuedMessage
+	Actor	Actor
+	Mailbox	[]async.QueuedMessage
 }
 
 type StateTransition struct {
-	ActorAddress sdk.AccAddress
-	PreviousRoot []byte
-	NextRoot     []byte
-	Message      async.MessageEnvelope
+	ActorAddress	sdk.AccAddress
+	PreviousRoot	[]byte
+	NextRoot	[]byte
+	Message		async.MessageEnvelope
 }
 
 type ExportedActors struct {
@@ -51,10 +51,10 @@ type ExportedActors struct {
 
 func NewActor(address sdk.AccAddress, codeHash []byte, state []byte) (Actor, error) {
 	actor := Actor{
-		Address:   append(sdk.AccAddress(nil), address...),
-		CodeHash:  append([]byte(nil), codeHash...),
-		StateRoot: StateRoot(state),
-		Status:    StatusActive,
+		Address:	append(sdk.AccAddress(nil), address...),
+		CodeHash:	append([]byte(nil), codeHash...),
+		StateRoot:	StateRoot(state),
+		Status:		StatusActive,
 	}
 	if err := actor.Validate(); err != nil {
 		return Actor{}, err
@@ -93,10 +93,10 @@ func ApplyMessage(actor Actor, msg async.MessageEnvelope, nextState []byte) (Act
 	next.StateRoot = StateRoot(nextState)
 	next.MailboxStats.Processed++
 	transition := StateTransition{
-		ActorAddress: append(sdk.AccAddress(nil), actor.Address...),
-		PreviousRoot: append([]byte(nil), actor.StateRoot...),
-		NextRoot:     append([]byte(nil), next.StateRoot...),
-		Message:      cloneMessage(msg),
+		ActorAddress:	append(sdk.AccAddress(nil), actor.Address...),
+		PreviousRoot:	append([]byte(nil), actor.StateRoot...),
+		NextRoot:	append([]byte(nil), next.StateRoot...),
+		Message:	cloneMessage(msg),
 	}
 	return next, transition, nil
 }
@@ -121,8 +121,8 @@ func ExportActorState(states []ActorState) (ExportedActors, error) {
 		}
 		seen[key] = struct{}{}
 		out[i] = ActorState{
-			Actor:   cloneActor(state.Actor),
-			Mailbox: cloneQueued(state.Mailbox),
+			Actor:		cloneActor(state.Actor),
+			Mailbox:	cloneQueued(state.Mailbox),
 		}
 	}
 	sort.Slice(out, func(i, j int) bool {

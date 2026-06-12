@@ -17,31 +17,31 @@ import (
 const MessageIDBytes = 32
 
 type Message struct {
-	ID          []byte
-	Source      sdk.AccAddress
-	Destination sdk.AccAddress
-	ValueNaet   sdkmath.Int
-	Opcode      uint32
-	QueryID     uint64
-	Body        []byte
-	Bounce      bool
-	Deadline    uint64
-	GasLimit    uint64
-	CreatedLT   uint64
+	ID		[]byte
+	Source		sdk.AccAddress
+	Destination	sdk.AccAddress
+	ValueNaet	sdkmath.Int
+	Opcode		uint32
+	QueryID		uint64
+	Body		[]byte
+	Bounce		bool
+	Deadline	uint64
+	GasLimit	uint64
+	CreatedLT	uint64
 }
 
 func NewMessage(source, destination sdk.AccAddress, valueNaet sdkmath.Int, opcode uint32, queryID uint64, body []byte, bounce bool, deadline uint64, gasLimit uint64, createdLT uint64) (Message, error) {
 	msg := Message{
-		Source:      append(sdk.AccAddress(nil), source...),
-		Destination: append(sdk.AccAddress(nil), destination...),
-		ValueNaet:   valueNaet,
-		Opcode:      opcode,
-		QueryID:     queryID,
-		Body:        append([]byte(nil), body...),
-		Bounce:      bounce,
-		Deadline:    deadline,
-		GasLimit:    gasLimit,
-		CreatedLT:   createdLT,
+		Source:		append(sdk.AccAddress(nil), source...),
+		Destination:	append(sdk.AccAddress(nil), destination...),
+		ValueNaet:	valueNaet,
+		Opcode:		opcode,
+		QueryID:	queryID,
+		Body:		append([]byte(nil), body...),
+		Bounce:		bounce,
+		Deadline:	deadline,
+		GasLimit:	gasLimit,
+		CreatedLT:	createdLT,
 	}
 	msg.ID = MessageID(msg)
 	if err := msg.Validate(async.DefaultParams()); err != nil {
@@ -77,17 +77,17 @@ func (m Message) Envelope(params async.Params) (async.MessageEnvelope, error) {
 		return async.MessageEnvelope{}, err
 	}
 	return async.MessageEnvelope{
-		Source:             append(sdk.AccAddress(nil), m.Source...),
-		Destination:        append(sdk.AccAddress(nil), m.Destination...),
-		Value:              sdk.NewCoin(appparams.BaseDenom, m.ValueNaet),
-		Opcode:             m.Opcode,
-		QueryID:            m.QueryID,
-		Body:               append([]byte(nil), m.Body...),
-		Bounce:             m.Bounce,
-		DeadlineBlock:      m.Deadline,
-		GasLimit:           m.GasLimit,
-		CreatedLogicalTime: m.CreatedLT,
-		ForwardFee:         sdk.NewCoin(appparams.BaseDenom, params.ForwardingFee),
+		Source:			append(sdk.AccAddress(nil), m.Source...),
+		Destination:		append(sdk.AccAddress(nil), m.Destination...),
+		Value:			sdk.NewCoin(appparams.BaseDenom, m.ValueNaet),
+		Opcode:			m.Opcode,
+		QueryID:		m.QueryID,
+		Body:			append([]byte(nil), m.Body...),
+		Bounce:			m.Bounce,
+		DeadlineBlock:		m.Deadline,
+		GasLimit:		m.GasLimit,
+		CreatedLogicalTime:	m.CreatedLT,
+		ForwardFee:		sdk.NewCoin(appparams.BaseDenom, params.ForwardingFee),
 	}, nil
 }
 

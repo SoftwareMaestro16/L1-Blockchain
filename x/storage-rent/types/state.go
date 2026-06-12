@@ -10,129 +10,129 @@ import (
 )
 
 const (
-	ContractStatusActive   = "active"
-	ContractStatusFrozen   = "frozen"
-	ContractStatusDeleted  = "deleted"
-	ContractStatusArchived = "archived"
+	ContractStatusActive	= "active"
+	ContractStatusFrozen	= "frozen"
+	ContractStatusDeleted	= "deleted"
+	ContractStatusArchived	= "archived"
 
-	DistributionScale = uint32(10_000)
-	DefaultProofRoot  = "0000000000000000000000000000000000000000000000000000000000000000"
+	DistributionScale	= uint32(10_000)
+	DefaultProofRoot	= "0000000000000000000000000000000000000000000000000000000000000000"
 )
 
 type StorageRentParams struct {
-	RentRatePerByteBlock  uint64
-	RentRatePerByteSecond uint64
-	FreeStorageAllowance  uint64
-	RetentionBlocks       uint64
-	UnfreezeBufferBlocks  uint64
-	MaxContracts          uint32
-	MaxExemptions         uint32
-	FeeCollectorAccount   string
-	TreasuryAccount       string
-	FeeCollectorShare     uint32
-	TreasuryShare         uint32
-	BurnShare             uint32
+	RentRatePerByteBlock	uint64
+	RentRatePerByteSecond	uint64
+	FreeStorageAllowance	uint64
+	RetentionBlocks		uint64
+	UnfreezeBufferBlocks	uint64
+	MaxContracts		uint32
+	MaxExemptions		uint32
+	FeeCollectorAccount	string
+	TreasuryAccount		string
+	FeeCollectorShare	uint32
+	TreasuryShare		uint32
+	BurnShare		uint32
 }
 
 type StorageRentState struct {
-	Contracts     []ContractRentRecord
-	Distributions []RentDistributionRecord
-	Exemptions    []RentExemption
-	SystemReserve SystemRentReserve
+	Contracts	[]ContractRentRecord
+	Distributions	[]RentDistributionRecord
+	Exemptions	[]RentExemption
+	SystemReserve	SystemRentReserve
 }
 
 type SystemRentReserve struct {
-	AvailableFunds                   uint64
-	ProjectedRentPerBlock            uint64
-	WarningRunwayBlocks              uint64
-	CriticalRunwayBlocks             uint64
-	FeeCollectorBalance              uint64
-	TreasuryBalance                  uint64
-	GovernanceConfiguredPayerBalance uint64
-	RequiredTopUp                    uint64
-	ProtocolCriticalExecutable       bool
-	LastRunwayBlocks                 uint64
-	LastAlert                        string
-	LastTopUpAmount                  uint64
-	LastRemainingDebt                uint64
-	LastUpdatedHeight                uint64
+	AvailableFunds				uint64
+	ProjectedRentPerBlock			uint64
+	WarningRunwayBlocks			uint64
+	CriticalRunwayBlocks			uint64
+	FeeCollectorBalance			uint64
+	TreasuryBalance				uint64
+	GovernanceConfiguredPayerBalance	uint64
+	RequiredTopUp				uint64
+	ProtocolCriticalExecutable		bool
+	LastRunwayBlocks			uint64
+	LastAlert				string
+	LastTopUpAmount				uint64
+	LastRemainingDebt			uint64
+	LastUpdatedHeight			uint64
 }
 
 type ContractRentRecord struct {
-	ContractAddress           string
-	ActorID                   string
-	StorageBytes              uint64
-	PrepaidRentBalance        uint64
-	RentDebt                  uint64
-	LastChargedHeight         uint64
-	Status                    string
-	FreezeHeight              uint64
-	DeletionEligibilityHeight uint64
-	ArchivalProofRoot         string
-	Exempt                    bool
+	ContractAddress			string
+	ActorID				string
+	StorageBytes			uint64
+	PrepaidRentBalance		uint64
+	RentDebt			uint64
+	LastChargedHeight		uint64
+	Status				string
+	FreezeHeight			uint64
+	DeletionEligibilityHeight	uint64
+	ArchivalProofRoot		string
+	Exempt				bool
 }
 
 type RentDistributionRecord struct {
-	ContractAddress    string
-	Height             uint64
-	Amount             uint64
-	FeeCollectorAmount uint64
-	TreasuryAmount     uint64
-	BurnAmount         uint64
+	ContractAddress		string
+	Height			uint64
+	Amount			uint64
+	FeeCollectorAmount	uint64
+	TreasuryAmount		uint64
+	BurnAmount		uint64
 }
 
 type RentExemption struct {
-	Account string
-	Reason  string
+	Account	string
+	Reason	string
 }
 
 type MsgWithdrawExcessRent struct {
-	Authority       string
-	ContractAddress string
-	Amount          uint64
-	Height          uint64
+	Authority	string
+	ContractAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgFreezeExpiredContract struct {
-	Authority       string
-	ContractAddress string
-	Height          uint64
+	Authority	string
+	ContractAddress	string
+	Height		uint64
 }
 
 type MsgDeleteExpiredContract struct {
-	Authority         string
-	ContractAddress   string
-	Height            uint64
-	ArchivalProofRoot string
+	Authority		string
+	ContractAddress		string
+	Height			uint64
+	ArchivalProofRoot	string
 }
 
 type MsgUpdateStorageRentParams struct {
-	Authority string
-	Params    StorageRentParams
+	Authority	string
+	Params		StorageRentParams
 }
 
 func DefaultStorageRentParams() StorageRentParams {
 	return StorageRentParams{
-		RentRatePerByteBlock:  1,
-		RentRatePerByteSecond: 1,
-		RetentionBlocks:       10_000,
-		UnfreezeBufferBlocks:  100,
-		MaxContracts:          100_000,
-		MaxExemptions:         1_024,
-		FeeCollectorAccount:   "fee_collector",
-		TreasuryAccount:       "treasury",
-		FeeCollectorShare:     5_000,
-		TreasuryShare:         4_000,
-		BurnShare:             1_000,
+		RentRatePerByteBlock:	1,
+		RentRatePerByteSecond:	1,
+		RetentionBlocks:	10_000,
+		UnfreezeBufferBlocks:	100,
+		MaxContracts:		100_000,
+		MaxExemptions:		1_024,
+		FeeCollectorAccount:	"fee_collector",
+		TreasuryAccount:	"treasury",
+		FeeCollectorShare:	5_000,
+		TreasuryShare:		4_000,
+		BurnShare:		1_000,
 	}
 }
 
 func EmptyStorageRentState() StorageRentState {
 	return StorageRentState{
-		Contracts:     []ContractRentRecord{},
-		Distributions: []RentDistributionRecord{},
-		Exemptions:    []RentExemption{},
-		SystemReserve: DefaultSystemRentReserve(),
+		Contracts:	[]ContractRentRecord{},
+		Distributions:	[]RentDistributionRecord{},
+		Exemptions:	[]RentExemption{},
+		SystemReserve:	DefaultSystemRentReserve(),
 	}
 }
 
@@ -169,10 +169,10 @@ func (p StorageRentParams) Validate() error {
 
 func (s StorageRentState) Export() StorageRentState {
 	out := StorageRentState{
-		Contracts:     cloneContracts(s.Contracts),
-		Distributions: cloneDistributions(s.Distributions),
-		Exemptions:    cloneExemptions(s.Exemptions),
-		SystemReserve: s.SystemReserve,
+		Contracts:	cloneContracts(s.Contracts),
+		Distributions:	cloneDistributions(s.Distributions),
+		Exemptions:	cloneExemptions(s.Exemptions),
+		SystemReserve:	s.SystemReserve,
 	}
 	SortContracts(out.Contracts)
 	SortDistributions(out.Distributions)
@@ -239,15 +239,15 @@ func (r SystemRentReserve) Validate() error {
 
 func (r SystemRentReserve) Accounting() SystemRentAccounting {
 	return SystemRentAccounting{
-		AvailableFunds:                   r.AvailableFunds,
-		ProjectedRentPerBlock:            r.ProjectedRentPerBlock,
-		WarningRunwayBlocks:              r.WarningRunwayBlocks,
-		CriticalRunwayBlocks:             r.CriticalRunwayBlocks,
-		FeeCollectorBalance:              r.FeeCollectorBalance,
-		TreasuryBalance:                  r.TreasuryBalance,
-		GovernanceConfiguredPayerBalance: r.GovernanceConfiguredPayerBalance,
-		RequiredTopUp:                    r.RequiredTopUp,
-		ProtocolCriticalExecutable:       r.ProtocolCriticalExecutable,
+		AvailableFunds:				r.AvailableFunds,
+		ProjectedRentPerBlock:			r.ProjectedRentPerBlock,
+		WarningRunwayBlocks:			r.WarningRunwayBlocks,
+		CriticalRunwayBlocks:			r.CriticalRunwayBlocks,
+		FeeCollectorBalance:			r.FeeCollectorBalance,
+		TreasuryBalance:			r.TreasuryBalance,
+		GovernanceConfiguredPayerBalance:	r.GovernanceConfiguredPayerBalance,
+		RequiredTopUp:				r.RequiredTopUp,
+		ProtocolCriticalExecutable:		r.ProtocolCriticalExecutable,
 	}
 }
 
@@ -421,12 +421,12 @@ func BuildDistribution(contractAddress string, height, amount uint64, params Sto
 	treasury := amount * uint64(params.TreasuryShare) / uint64(DistributionScale)
 	burn := amount - fee - treasury
 	return RentDistributionRecord{
-		ContractAddress:    strings.TrimSpace(contractAddress),
-		Height:             height,
-		Amount:             amount,
-		FeeCollectorAmount: fee,
-		TreasuryAmount:     treasury,
-		BurnAmount:         burn,
+		ContractAddress:	strings.TrimSpace(contractAddress),
+		Height:			height,
+		Amount:			amount,
+		FeeCollectorAmount:	fee,
+		TreasuryAmount:		treasury,
+		BurnAmount:		burn,
 	}
 }
 

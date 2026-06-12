@@ -13,15 +13,15 @@ var fileDescriptorNativeAccountTx = buildNativeAccountTxFileDescriptor()
 func buildNativeAccountTxFileDescriptor() []byte {
 	const path = "l1/nativeaccount/v1/tx.proto"
 	fd := &descriptorpb.FileDescriptorProto{
-		Name:    descriptorString(path),
-		Package: descriptorString("l1.nativeaccount.v1"),
-		Syntax:  descriptorString("proto3"),
+		Name:		descriptorString(path),
+		Package:	descriptorString("l1.nativeaccount.v1"),
+		Syntax:		descriptorString("proto3"),
 		Options: &descriptorpb.FileOptions{
 			GoPackage: descriptorString("github.com/sovereign-l1/l1/x/native-account/types"),
 		},
 		MessageType: []*descriptorpb.DescriptorProto{
 			{
-				Name: descriptorString("MsgActivateAccount"),
+				Name:	descriptorString("MsgActivateAccount"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("address_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorField("address_raw", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -31,7 +31,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 				},
 			},
 			{
-				Name: descriptorString("MsgActivateAccountResponse"),
+				Name:	descriptorString("MsgActivateAccountResponse"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("address_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorField("address_raw", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -40,7 +40,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 				},
 			},
 			{
-				Name: descriptorString("MsgUpdateAuthPolicy"),
+				Name:	descriptorString("MsgUpdateAuthPolicy"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorMessageField("new_auth_policy", 2, ".l1.nativeaccount.v1.AuthPolicy", false),
@@ -50,7 +50,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 			},
 			responseDescriptor("MsgUpdateAuthPolicyResponse", false),
 			{
-				Name: descriptorString("MsgRotateKey"),
+				Name:	descriptorString("MsgRotateKey"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorField("old_key_id", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -65,7 +65,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 			messageWithSignersDescriptor("MsgFreezeAccount"),
 			responseDescriptor("MsgFreezeAccountResponse", false),
 			{
-				Name: descriptorString("MsgPayStorageDebt"),
+				Name:	descriptorString("MsgPayStorageDebt"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorField("amount", 2, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
@@ -75,7 +75,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 			},
 			responseDescriptor("MsgPayStorageDebtResponse", true),
 			{
-				Name: descriptorString("MsgUnfreezeAccount"),
+				Name:	descriptorString("MsgUnfreezeAccount"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorRepeatedField("signers", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -86,7 +86,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 			},
 			responseDescriptor("MsgUnfreezeAccountResponse", true),
 			{
-				Name: descriptorString("MsgUpdateAccountMetadata"),
+				Name:	descriptorString("MsgUpdateAccountMetadata"),
 				Field: []*descriptorpb.FieldDescriptorProto{
 					descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 					descriptorMessageField("metadata", 2, ".l1.nativeaccount.v1.AccountMetadata", false),
@@ -105,7 +105,7 @@ func buildNativeAccountTxFileDescriptor() []byte {
 		},
 		Service: []*descriptorpb.ServiceDescriptorProto{
 			{
-				Name: descriptorString("Msg"),
+				Name:	descriptorString("Msg"),
 				Method: []*descriptorpb.MethodDescriptorProto{
 					methodDescriptor("ActivateAccount", "MsgActivateAccount", "MsgActivateAccountResponse"),
 					methodDescriptor("UpdateAuthPolicy", "MsgUpdateAuthPolicy", "MsgUpdateAuthPolicyResponse"),
@@ -136,9 +136,9 @@ func buildNativeAccountTxFileDescriptor() []byte {
 
 func methodDescriptor(name, input, output string) *descriptorpb.MethodDescriptorProto {
 	return &descriptorpb.MethodDescriptorProto{
-		Name:       descriptorString(name),
-		InputType:  descriptorString(".l1.nativeaccount.v1." + input),
-		OutputType: descriptorString(".l1.nativeaccount.v1." + output),
+		Name:		descriptorString(name),
+		InputType:	descriptorString(".l1.nativeaccount.v1." + input),
+		OutputType:	descriptorString(".l1.nativeaccount.v1." + output),
 	}
 }
 
@@ -162,7 +162,7 @@ func responseDescriptor(name string, includeDebt bool) *descriptorpb.DescriptorP
 
 func messageWithSignersDescriptor(name string) *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString(name),
+		Name:	descriptorString(name),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("account_user", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorRepeatedField("signers", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -173,7 +173,7 @@ func messageWithSignersDescriptor(name string) *descriptorpb.DescriptorProto {
 
 func authKeyDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("AuthKey"),
+		Name:	descriptorString("AuthKey"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("id", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorField("public_key", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -184,7 +184,7 @@ func authKeyDescriptor() *descriptorpb.DescriptorProto {
 
 func authWeightDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("AuthWeight"),
+		Name:	descriptorString("AuthWeight"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("key_id", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorField("weight", 2, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
@@ -194,7 +194,7 @@ func authWeightDescriptor() *descriptorpb.DescriptorProto {
 
 func recoveryPolicyDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("RecoveryPolicy"),
+		Name:	descriptorString("RecoveryPolicy"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorRepeatedField("keys", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorField("threshold", 2, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
@@ -205,7 +205,7 @@ func recoveryPolicyDescriptor() *descriptorpb.DescriptorProto {
 
 func timelockPolicyDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("TimelockPolicy"),
+		Name:	descriptorString("TimelockPolicy"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("auth_policy_update_end_height", 1, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
 			descriptorField("recovery_end_height", 2, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
@@ -215,7 +215,7 @@ func timelockPolicyDescriptor() *descriptorpb.DescriptorProto {
 
 func spendingLimitDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("SpendingLimit"),
+		Name:	descriptorString("SpendingLimit"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("operation", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorField("max_amount", 2, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
@@ -225,7 +225,7 @@ func spendingLimitDescriptor() *descriptorpb.DescriptorProto {
 
 func authPolicyDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("AuthPolicy"),
+		Name:	descriptorString("AuthPolicy"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("version", 1, descriptorpb.FieldDescriptorProto_TYPE_UINT64),
 			descriptorField("mode", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -241,7 +241,7 @@ func authPolicyDescriptor() *descriptorpb.DescriptorProto {
 
 func accountMetadataDescriptor() *descriptorpb.DescriptorProto {
 	return &descriptorpb.DescriptorProto{
-		Name: descriptorString("AccountMetadata"),
+		Name:	descriptorString("AccountMetadata"),
 		Field: []*descriptorpb.FieldDescriptorProto{
 			descriptorField("metadata_hash", 1, descriptorpb.FieldDescriptorProto_TYPE_STRING),
 			descriptorField("display_name_hash", 2, descriptorpb.FieldDescriptorProto_TYPE_STRING),
@@ -254,10 +254,10 @@ func accountMetadataDescriptor() *descriptorpb.DescriptorProto {
 func descriptorField(name string, number int32, typ descriptorpb.FieldDescriptorProto_Type) *descriptorpb.FieldDescriptorProto {
 	label := descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
 	return &descriptorpb.FieldDescriptorProto{
-		Name:   descriptorString(name),
-		Number: descriptorInt32(number),
-		Label:  &label,
-		Type:   &typ,
+		Name:	descriptorString(name),
+		Number:	descriptorInt32(number),
+		Label:	&label,
+		Type:	&typ,
 	}
 }
 

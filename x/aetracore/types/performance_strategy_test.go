@@ -124,23 +124,23 @@ func TestBlockSTMZonePerformancePlanDetectsSameObjectConflicts(t *testing.T) {
 
 func blockSTMAccess(actorZone ZoneID, actorShard ShardID, stateZone ZoneID, stateShard ShardID, key string, mode BlockSTMAccessMode, viaMessage bool) BlockSTMStateAccess {
 	return BlockSTMStateAccess{
-		ActorZoneID:  actorZone,
-		ActorShardID: actorShard,
-		StateZoneID:  stateZone,
-		StateShardID: stateShard,
-		StateKey:     key,
-		Mode:         mode,
-		ViaMessage:   viaMessage,
+		ActorZoneID:	actorZone,
+		ActorShardID:	actorShard,
+		StateZoneID:	stateZone,
+		StateShardID:	stateShard,
+		StateKey:	key,
+		Mode:		mode,
+		ViaMessage:	viaMessage,
 	}
 }
 
 func blockSTMBatch(sourceZone ZoneID, sourceShard ShardID, destinationZone ZoneID, destinationShard ShardID, count uint32) BlockSTMMessageBatch {
 	batch := BlockSTMMessageBatch{
-		SourceZoneID:       sourceZone,
-		SourceShardID:      sourceShard,
-		DestinationZoneID:  destinationZone,
-		DestinationShardID: destinationShard,
-		MessageCount:       count,
+		SourceZoneID:		sourceZone,
+		SourceShardID:		sourceShard,
+		DestinationZoneID:	destinationZone,
+		DestinationShardID:	destinationShard,
+		MessageCount:		count,
 	}
 	batch.BatchHash = ComputeBlockSTMMessageBatchHash(batch)
 	return batch

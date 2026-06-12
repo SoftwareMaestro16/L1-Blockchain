@@ -9,158 +9,158 @@ import (
 )
 
 const (
-	IdentityZoneID       = "IDENTITY_ZONE"
-	IdentityZonePrefix   = "identity"
-	IdentityZoneStoreV2  = IdentityStoreV2Prefix
-	IdentityZoneShardKey = "name_hash"
+	IdentityZoneID		= "IDENTITY_ZONE"
+	IdentityZonePrefix	= "identity"
+	IdentityZoneStoreV2	= IdentityStoreV2Prefix
+	IdentityZoneShardKey	= "name_hash"
 
-	IdentityZoneDomainPrefix        = IdentityZonePrefix + "/domains"
-	IdentityZoneResolverPrefix      = IdentityZonePrefix + "/resolvers"
-	IdentityZoneReversePrefix       = IdentityZonePrefix + "/reverse"
-	IdentityZoneNFTBindingPrefix    = IdentityZonePrefix + "/nft_bindings"
-	IdentityZoneGrantPrefix         = IdentityZonePrefix + "/grants"
-	IdentityZoneAuctionPrefix       = IdentityZonePrefix + "/auctions"
-	IdentityZoneProofIndexPrefix    = IdentityZonePrefix + "/proofs/index"
-	IdentityZoneResolverHookPrefix  = IdentityZonePrefix + "/resolver_vm/hooks"
-	IdentityZoneResolutionGraphRoot = IdentityZonePrefix + "/resolution_graph"
+	IdentityZoneDomainPrefix	= IdentityZonePrefix + "/domains"
+	IdentityZoneResolverPrefix	= IdentityZonePrefix + "/resolvers"
+	IdentityZoneReversePrefix	= IdentityZonePrefix + "/reverse"
+	IdentityZoneNFTBindingPrefix	= IdentityZonePrefix + "/nft_bindings"
+	IdentityZoneGrantPrefix		= IdentityZonePrefix + "/grants"
+	IdentityZoneAuctionPrefix	= IdentityZonePrefix + "/auctions"
+	IdentityZoneProofIndexPrefix	= IdentityZonePrefix + "/proofs/index"
+	IdentityZoneResolverHookPrefix	= IdentityZonePrefix + "/resolver_vm/hooks"
+	IdentityZoneResolutionGraphRoot	= IdentityZonePrefix + "/resolution_graph"
 )
 
 type IdentityZoneMessageKind string
 type IdentityZoneProofKind string
 
 const (
-	IdentityMessageLookupRequest   IdentityZoneMessageKind = "identity.lookup_request"
-	IdentityMessageLookupResponse  IdentityZoneMessageKind = "identity.lookup_response"
-	IdentityMessageAuctionFinalize IdentityZoneMessageKind = "identity.auction_finalize"
+	IdentityMessageLookupRequest	IdentityZoneMessageKind	= "identity.lookup_request"
+	IdentityMessageLookupResponse	IdentityZoneMessageKind	= "identity.lookup_response"
+	IdentityMessageAuctionFinalize	IdentityZoneMessageKind	= "identity.auction_finalize"
 
-	IdentityMessageRegisterIdentity         IdentityZoneMessageKind = "MsgRegisterIdentity"
-	IdentityMessageRenewIdentity            IdentityZoneMessageKind = "MsgRenewIdentity"
-	IdentityMessageTransferIdentity         IdentityZoneMessageKind = "MsgTransferIdentity"
-	IdentityMessageUpdateResolver           IdentityZoneMessageKind = "MsgUpdateResolver"
-	IdentityMessageSetReverse               IdentityZoneMessageKind = "MsgSetReverse"
-	IdentityMessageGrantIdentityPermission  IdentityZoneMessageKind = "MsgGrantIdentityPermission"
-	IdentityMessageRevokeIdentityPermission IdentityZoneMessageKind = "MsgRevokeIdentityPermission"
-	IdentityMessageStartIdentityAuction     IdentityZoneMessageKind = "MsgStartIdentityAuction"
-	IdentityMessageFinalizeIdentityAuction  IdentityZoneMessageKind = "MsgFinalizeIdentityAuction"
+	IdentityMessageRegisterIdentity		IdentityZoneMessageKind	= "MsgRegisterIdentity"
+	IdentityMessageRenewIdentity		IdentityZoneMessageKind	= "MsgRenewIdentity"
+	IdentityMessageTransferIdentity		IdentityZoneMessageKind	= "MsgTransferIdentity"
+	IdentityMessageUpdateResolver		IdentityZoneMessageKind	= "MsgUpdateResolver"
+	IdentityMessageSetReverse		IdentityZoneMessageKind	= "MsgSetReverse"
+	IdentityMessageGrantIdentityPermission	IdentityZoneMessageKind	= "MsgGrantIdentityPermission"
+	IdentityMessageRevokeIdentityPermission	IdentityZoneMessageKind	= "MsgRevokeIdentityPermission"
+	IdentityMessageStartIdentityAuction	IdentityZoneMessageKind	= "MsgStartIdentityAuction"
+	IdentityMessageFinalizeIdentityAuction	IdentityZoneMessageKind	= "MsgFinalizeIdentityAuction"
 
-	IdentityProofDomain         IdentityZoneProofKind = "QueryDomain"
-	IdentityProofOwnershipProof IdentityZoneProofKind = "QueryOwnershipProof"
-	IdentityProofIdentityGraph  IdentityZoneProofKind = "QueryIdentityGraph"
-	IdentityProofIdentityRoot   IdentityZoneProofKind = "QueryIdentityRoot"
+	IdentityProofDomain		IdentityZoneProofKind	= "QueryDomain"
+	IdentityProofOwnershipProof	IdentityZoneProofKind	= "QueryOwnershipProof"
+	IdentityProofIdentityGraph	IdentityZoneProofKind	= "QueryIdentityGraph"
+	IdentityProofIdentityRoot	IdentityZoneProofKind	= "QueryIdentityRoot"
 
-	IdentityProofResolver   IdentityZoneProofKind = "resolver"
-	IdentityProofReverse    IdentityZoneProofKind = "reverse"
-	IdentityProofNFTBinding IdentityZoneProofKind = "nft_binding"
-	IdentityProofAuction    IdentityZoneProofKind = "auction"
+	IdentityProofResolver	IdentityZoneProofKind	= "resolver"
+	IdentityProofReverse	IdentityZoneProofKind	= "reverse"
+	IdentityProofNFTBinding	IdentityZoneProofKind	= "nft_binding"
+	IdentityProofAuction	IdentityZoneProofKind	= "auction"
 )
 
 type IdentityZoneStateMachineDescriptor struct {
-	ZoneID          string
-	StorePrefix     string
-	ShardStrategy   string
-	MessageHandlers []IdentityZoneMessageKind
-	ProofQueries    []IdentityZoneProofKind
+	ZoneID		string
+	StorePrefix	string
+	ShardStrategy	string
+	MessageHandlers	[]IdentityZoneMessageKind
+	ProofQueries	[]IdentityZoneProofKind
 }
 
 type IdentityLookupMessage struct {
-	RequestID   string
-	QueryDomain string
-	RecordKey   string
-	SourceZone  string
-	SourceShard string
-	ReplyTo     string
-	Height      uint64
-	PayloadHash string
-	MessageHash string
+	RequestID	string
+	QueryDomain	string
+	RecordKey	string
+	SourceZone	string
+	SourceShard	string
+	ReplyTo		string
+	Height		uint64
+	PayloadHash	string
+	MessageHash	string
 }
 
 type IdentityResponseReceipt struct {
-	RequestID      string
-	QueryDomain    string
-	ResolverDomain string
-	ResponseHash   string
-	Height         uint64
-	Success        bool
-	ReceiptHash    string
+	RequestID	string
+	QueryDomain	string
+	ResolverDomain	string
+	ResponseHash	string
+	Height		uint64
+	Success		bool
+	ReceiptHash	string
 }
 
 type IdentityAuctionFinalizationReceipt struct {
-	Domain      string
-	WinnerHash  string
-	Height      uint64
-	AuctionHash string
-	ReceiptHash string
+	Domain		string
+	WinnerHash	string
+	Height		uint64
+	AuctionHash	string
+	ReceiptHash	string
 }
 
 type IdentityResolverVMHook struct {
-	HookID     string
-	NameHash   string
-	RecordKey  string
-	InputHash  string
-	OutputHash string
-	GasLimit   uint64
-	Version    uint64
-	HookHash   string
+	HookID		string
+	NameHash	string
+	RecordKey	string
+	InputHash	string
+	OutputHash	string
+	GasLimit	uint64
+	Version		uint64
+	HookHash	string
 }
 
 type IdentityResolutionGraphNode struct {
-	NodeID     string
-	NameHash   string
-	RecordKey  string
-	TargetHash string
+	NodeID		string
+	NameHash	string
+	RecordKey	string
+	TargetHash	string
 }
 
 type IdentityResolutionGraphEdge struct {
-	FromNodeID string
-	ToNodeID   string
-	EdgeKind   string
+	FromNodeID	string
+	ToNodeID	string
+	EdgeKind	string
 }
 
 type IdentityResolutionGraph struct {
-	Height    uint64
-	Nodes     []IdentityResolutionGraphNode
-	Edges     []IdentityResolutionGraphEdge
-	GraphHash string
+	Height		uint64
+	Nodes		[]IdentityResolutionGraphNode
+	Edges		[]IdentityResolutionGraphEdge
+	GraphHash	string
 }
 
 type IdentityCrossZoneBinding struct {
-	NameHash    string
-	ZoneID      string
-	BindingKey  string
-	BindingRoot string
-	Height      uint64
-	BindingHash string
+	NameHash	string
+	ZoneID		string
+	BindingKey	string
+	BindingRoot	string
+	Height		uint64
+	BindingHash	string
 }
 
 type IdentityZoneProofIndexEntry struct {
-	Height    uint64
-	NameHash  string
-	ProofKind IdentityZoneProofKind
-	ProofRoot string
-	ProofHash string
-	IndexHash string
+	Height		uint64
+	NameHash	string
+	ProofKind	IdentityZoneProofKind
+	ProofRoot	string
+	ProofHash	string
+	IndexHash	string
 }
 
 type IdentityZoneRoots struct {
-	Height           uint64
-	DomainRoot       string
-	ResolverRoot     string
-	ReverseRoot      string
-	NFTBindingRoot   string
-	GrantRoot        string
-	AuctionRoot      string
-	ProofIndexRoot   string
-	ResolverHookRoot string
-	GraphRoot        string
-	CrossZoneRoot    string
-	StateRoot        string
+	Height			uint64
+	DomainRoot		string
+	ResolverRoot		string
+	ReverseRoot		string
+	NFTBindingRoot		string
+	GrantRoot		string
+	AuctionRoot		string
+	ProofIndexRoot		string
+	ResolverHookRoot	string
+	GraphRoot		string
+	CrossZoneRoot		string
+	StateRoot		string
 }
 
 func DefaultIdentityZoneStateMachineDescriptor() IdentityZoneStateMachineDescriptor {
 	return IdentityZoneStateMachineDescriptor{
-		ZoneID:        IdentityZoneID,
-		StorePrefix:   IdentityStoreV2Prefix,
-		ShardStrategy: IdentityZoneShardKey,
+		ZoneID:		IdentityZoneID,
+		StorePrefix:	IdentityStoreV2Prefix,
+		ShardStrategy:	IdentityZoneShardKey,
 		MessageHandlers: []IdentityZoneMessageKind{
 			IdentityMessageRegisterIdentity,
 			IdentityMessageRenewIdentity,
@@ -731,17 +731,17 @@ func BuildIdentityZoneRoots(
 		return IdentityZoneRoots{}, err
 	}
 	roots := IdentityZoneRoots{
-		Height:           height,
-		DomainRoot:       ComputeIdentityZoneDomainRoot(state.Domains),
-		ResolverRoot:     ComputeIdentityZoneResolverRoot(state.Resolvers),
-		ReverseRoot:      ComputeIdentityZoneReverseRoot(state.ReverseRecords),
-		NFTBindingRoot:   ComputeIdentityZoneNFTBindingRoot(state.DomainNFTs),
-		GrantRoot:        ComputeIdentityZoneGrantRoot(nil),
-		AuctionRoot:      ComputeIdentityZoneAuctionRoot(state.Auctions),
-		ProofIndexRoot:   ComputeIdentityZoneProofIndexRoot(proofs),
-		ResolverHookRoot: ComputeIdentityResolverVMHookRoot(hooks),
-		GraphRoot:        ComputeIdentityResolutionGraphRoot(graphs),
-		CrossZoneRoot:    ComputeIdentityCrossZoneBindingRoot(bindings),
+		Height:			height,
+		DomainRoot:		ComputeIdentityZoneDomainRoot(state.Domains),
+		ResolverRoot:		ComputeIdentityZoneResolverRoot(state.Resolvers),
+		ReverseRoot:		ComputeIdentityZoneReverseRoot(state.ReverseRecords),
+		NFTBindingRoot:		ComputeIdentityZoneNFTBindingRoot(state.DomainNFTs),
+		GrantRoot:		ComputeIdentityZoneGrantRoot(nil),
+		AuctionRoot:		ComputeIdentityZoneAuctionRoot(state.Auctions),
+		ProofIndexRoot:		ComputeIdentityZoneProofIndexRoot(proofs),
+		ResolverHookRoot:	ComputeIdentityResolverVMHookRoot(hooks),
+		GraphRoot:		ComputeIdentityResolutionGraphRoot(graphs),
+		CrossZoneRoot:		ComputeIdentityCrossZoneBindingRoot(bindings),
 	}
 	roots.StateRoot = identityHash(
 		"identity-zone-state-root-v1",
@@ -765,8 +765,8 @@ func (r IdentityZoneRoots) Validate() error {
 		return errors.New("identity zone roots height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "identity zone domain root", value: r.DomainRoot},
 		{name: "identity zone resolver root", value: r.ResolverRoot},
@@ -817,11 +817,11 @@ func QueryIdentityZoneLightClientProof(state IdentityState, kind IdentityZonePro
 		return IdentityZoneProofIndexEntry{}, fmt.Errorf("identity zone light-client proof kind %q is not name-based", kind)
 	}
 	return NewIdentityZoneProofIndexEntry(IdentityZoneProofIndexEntry{
-		Height:    height,
-		NameHash:  nameHash,
-		ProofKind: kind,
-		ProofRoot: stateRoot,
-		ProofHash: proofHash,
+		Height:		height,
+		NameHash:	nameHash,
+		ProofKind:	kind,
+		ProofRoot:	stateRoot,
+		ProofHash:	proofHash,
 	})
 }
 
@@ -839,11 +839,11 @@ func QueryIdentityZoneReverseLookupProof(state IdentityState, address sdk.AccAdd
 	}
 	nameHash := identityHash("identity-zone-reverse-name", fmt.Sprintf("%x", []byte(address)))
 	entry, err := NewIdentityZoneProofIndexEntry(IdentityZoneProofIndexEntry{
-		Height:    height,
-		NameHash:  nameHash,
-		ProofKind: IdentityProofReverse,
-		ProofRoot: stateRoot,
-		ProofHash: proof.LeafHash,
+		Height:		height,
+		NameHash:	nameHash,
+		ProofKind:	IdentityProofReverse,
+		ProofRoot:	stateRoot,
+		ProofHash:	proof.LeafHash,
 	})
 	return entry, proof, err
 }

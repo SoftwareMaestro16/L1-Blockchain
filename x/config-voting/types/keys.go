@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "configvoting"
-	StoreKey   = "cfgvoting"
+	ModuleName	= "configvoting"
+	StoreKey	= "cfgvoting"
 )

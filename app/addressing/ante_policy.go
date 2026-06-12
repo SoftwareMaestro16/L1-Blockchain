@@ -11,10 +11,10 @@ import (
 type AddressPolicyRole string
 
 const (
-	AddressPolicyRoleSigner    AddressPolicyRole = "signer"
-	AddressPolicyRoleRecipient AddressPolicyRole = "recipient"
-	AddressPolicyRoleAdmin     AddressPolicyRole = "admin"
-	AddressPolicyRoleAuthority AddressPolicyRole = "authority"
+	AddressPolicyRoleSigner		AddressPolicyRole	= "signer"
+	AddressPolicyRoleRecipient	AddressPolicyRole	= "recipient"
+	AddressPolicyRoleAdmin		AddressPolicyRole	= "admin"
+	AddressPolicyRoleAuthority	AddressPolicyRole	= "authority"
 )
 
 func ValidateAnteAddressPolicy(tx sdk.Tx) error {

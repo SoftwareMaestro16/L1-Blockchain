@@ -15,10 +15,10 @@ func TestEconomicSecurityRoutesPenaltyAndRequestsReserveFunding(t *testing.T) {
 	params.ReporterRewardCapNaet = sdkmath.NewInt(100)
 
 	report, err := EvaluateEconomicSecurityEpoch(baseEconomicSecurityInput(EconomicSecurityEpochInput{
-		SlashingPenaltyNaet:         sdkmath.NewInt(1_000),
-		EvidenceAccepted:            true,
-		RequestedReporterRewardNaet: sdkmath.NewInt(150),
-		SecurityReserveBalanceNaet:  sdkmath.NewInt(500),
+		SlashingPenaltyNaet:		sdkmath.NewInt(1_000),
+		EvidenceAccepted:		true,
+		RequestedReporterRewardNaet:	sdkmath.NewInt(150),
+		SecurityReserveBalanceNaet:	sdkmath.NewInt(500),
 	}), params)
 	require.NoError(t, err)
 	require.True(t, report.Passed, report.Failed)
@@ -35,10 +35,10 @@ func TestEconomicSecurityRoutesPenaltyAndRequestsReserveFunding(t *testing.T) {
 
 func TestEconomicSecurityRejectsDuplicateEvidenceReporterReward(t *testing.T) {
 	report, err := EvaluateEconomicSecurityEpoch(baseEconomicSecurityInput(EconomicSecurityEpochInput{
-		SlashingPenaltyNaet:         sdkmath.NewInt(1_000),
-		EvidenceAccepted:            true,
-		EvidenceDuplicate:           true,
-		RequestedReporterRewardNaet: sdkmath.NewInt(500),
+		SlashingPenaltyNaet:		sdkmath.NewInt(1_000),
+		EvidenceAccepted:		true,
+		EvidenceDuplicate:		true,
+		RequestedReporterRewardNaet:	sdkmath.NewInt(500),
 	}), DefaultEconomicSecurityParams())
 	require.NoError(t, err)
 	require.True(t, report.Passed, report.Failed)
@@ -48,8 +48,8 @@ func TestEconomicSecurityRejectsDuplicateEvidenceReporterReward(t *testing.T) {
 
 func TestEconomicSecurityDetectsReserveAccountingInvariantViolation(t *testing.T) {
 	report, err := EvaluateEconomicSecurityEpoch(baseEconomicSecurityInput(EconomicSecurityEpochInput{
-		SecurityReserveBalanceNaet: sdkmath.NewInt(100),
-		SecurityReserveOutflowNaet: sdkmath.NewInt(1_000),
+		SecurityReserveBalanceNaet:	sdkmath.NewInt(100),
+		SecurityReserveOutflowNaet:	sdkmath.NewInt(1_000),
 	}), DefaultEconomicSecurityParams())
 	require.NoError(t, err)
 	require.False(t, report.Passed)
@@ -59,11 +59,11 @@ func TestEconomicSecurityDetectsReserveAccountingInvariantViolation(t *testing.T
 
 func TestEconomicSecurityCircuitBreakerRulesAreDeterministic(t *testing.T) {
 	report, err := EvaluateEconomicSecurityEpoch(baseEconomicSecurityInput(EconomicSecurityEpochInput{
-		BlockLoadBps:       HighCongestionLoadBps,
-		FeeSpikeBps:        DefaultCircuitBreakerFeeSpikeBps + 1,
-		ControllerDriftBps: DefaultCircuitBreakerControllerDriftBps + 1,
-		FailedTxRateBps:    DefaultCircuitBreakerFailedTxRateBps + 1,
-		BurnToMintBps:      DeflationGuardBurnToMintBps + 1,
+		BlockLoadBps:		HighCongestionLoadBps,
+		FeeSpikeBps:		DefaultCircuitBreakerFeeSpikeBps + 1,
+		ControllerDriftBps:	DefaultCircuitBreakerControllerDriftBps + 1,
+		FailedTxRateBps:	DefaultCircuitBreakerFailedTxRateBps + 1,
+		BurnToMintBps:		DeflationGuardBurnToMintBps + 1,
 	}), DefaultEconomicSecurityParams())
 	require.NoError(t, err)
 	require.True(t, report.Passed, report.Failed)
@@ -81,10 +81,10 @@ func TestEconomicSecurityAlertsForStateStakeAndConcentration(t *testing.T) {
 	params.MaxStateGrowthBytes = 1_000
 	params.MaxStakeMovementBps = 500
 	report, err := EvaluateEconomicSecurityEpoch(baseEconomicSecurityInput(EconomicSecurityEpochInput{
-		ValidatorConcentrationBps: params.MaxValidatorConcentrationBps + 1,
-		TopNConcentrationBps:      params.MaxTopNConcentrationBps + 1,
-		StateGrowthBytes:          2_000,
-		StakeInflowBps:            700,
+		ValidatorConcentrationBps:	params.MaxValidatorConcentrationBps + 1,
+		TopNConcentrationBps:		params.MaxTopNConcentrationBps + 1,
+		StateGrowthBytes:		2_000,
+		StakeInflowBps:			700,
 	}), params)
 	require.NoError(t, err)
 	require.True(t, report.Passed, report.Failed)
@@ -105,14 +105,14 @@ func TestEconomicSecurityRejectsMisconfiguredRoutingRatios(t *testing.T) {
 
 func baseEconomicSecurityInput(override EconomicSecurityEpochInput) EconomicSecurityEpochInput {
 	input := EconomicSecurityEpochInput{
-		EpochID:                    7,
-		BlockHeight:                700,
-		ValidatorConcentrationBps:  MaxTopValidatorConcentrationBps,
-		TopNConcentrationBps:       DefaultTopNConcentrationThresholdBps,
-		BlockLoadBps:               DefaultTargetLoadBps,
-		BurnToMintBps:              BasisPoints,
-		SecurityReserveBalanceNaet: sdkmath.NewInt(DefaultSecurityReserveTargetNaet),
-		GovernanceThresholdVersion: DefaultSecurityGovernanceVersion,
+		EpochID:			7,
+		BlockHeight:			700,
+		ValidatorConcentrationBps:	MaxTopValidatorConcentrationBps,
+		TopNConcentrationBps:		DefaultTopNConcentrationThresholdBps,
+		BlockLoadBps:			DefaultTargetLoadBps,
+		BurnToMintBps:			BasisPoints,
+		SecurityReserveBalanceNaet:	sdkmath.NewInt(DefaultSecurityReserveTargetNaet),
+		GovernanceThresholdVersion:	DefaultSecurityGovernanceVersion,
 	}
 	if override.EpochID != 0 {
 		input.EpochID = override.EpochID

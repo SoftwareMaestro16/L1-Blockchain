@@ -41,13 +41,13 @@ func TestFogProviderSelectionIsDeterministicByPolicy(t *testing.T) {
 	require.NoError(t, err)
 
 	selection, err := SelectFogProviders(registry, FogProviderSelectionPolicy{
-		Category:          FogCategoryCompute,
-		RequiredInterface: "l1.fog.v1.Compute",
-		Strategy:          FogSelectionLowestPrice,
-		MinReputation:     70,
-		MaxPriceAmount:    "5",
-		Limit:             2,
-		SelectionNonce:    "selection-1",
+		Category:		FogCategoryCompute,
+		RequiredInterface:	"l1.fog.v1.Compute",
+		Strategy:		FogSelectionLowestPrice,
+		MinReputation:		70,
+		MaxPriceAmount:		"5",
+		Limit:			2,
+		SelectionNonce:		"selection-1",
 	}, 20)
 	require.NoError(t, err)
 	require.Equal(t, []string{"provider.compute.2", "provider.compute.1"}, selection.ProviderIDs)
@@ -62,11 +62,11 @@ func TestFogProviderReputationUpdateRules(t *testing.T) {
 	require.NoError(t, err)
 
 	registry, provider, err := UpdateFogProviderReputation(registry, FogReputationEvent{
-		ProviderID: "provider.compute.1",
-		Height:     25,
-		Successes:  3,
-		ScoreDelta: 15,
-		Reason:     "receipts-accepted",
+		ProviderID:	"provider.compute.1",
+		Height:		25,
+		Successes:	3,
+		ScoreDelta:	15,
+		Reason:		"receipts-accepted",
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(65), provider.ReputationScore)
@@ -81,12 +81,12 @@ func TestFogProviderDisputeAndSlashingForProvableFault(t *testing.T) {
 	require.NoError(t, err)
 
 	registry, dispute, err := OpenFogProviderDispute(registry, FogProviderDispute{
-		ProviderID:      "provider.compute.1",
-		Challenger:      "challenger.fog.1",
-		FaultClass:      MixedFaultHigh,
-		EvidenceHash:    testHash("fog/fault/evidence"),
-		OpenedHeight:    30,
-		ResolveByHeight: 40,
+		ProviderID:		"provider.compute.1",
+		Challenger:		"challenger.fog.1",
+		FaultClass:		MixedFaultHigh,
+		EvidenceHash:		testHash("fog/fault/evidence"),
+		OpenedHeight:		30,
+		ResolveByHeight:	40,
 	})
 	require.NoError(t, err)
 	require.Equal(t, FogDisputeOpen, dispute.Status)
@@ -131,26 +131,26 @@ func testFogRegistry(t *testing.T) FogProviderRegistry {
 
 func testFogProvider(providerID string, price string, reputation uint64, mutate ...func(*FogProviderRecord)) FogProviderRecord {
 	provider := FogProviderRecord{
-		ProviderID:       providerID,
-		IdentityKey:      providerID + ".identity",
-		Category:         FogCategoryCompute,
-		ReputationScore:  reputation,
-		CollateralDenom:  NativeFeePolicyID,
-		CollateralAmount: "150",
-		StakeAmount:      "150",
+		ProviderID:		providerID,
+		IdentityKey:		providerID + ".identity",
+		Category:		FogCategoryCompute,
+		ReputationScore:	reputation,
+		CollateralDenom:	NativeFeePolicyID,
+		CollateralAmount:	"150",
+		StakeAmount:		"150",
 		Pricing: FogProviderPricing{
-			Denom:     NativeFeePolicyID,
-			Amount:    price,
-			MaxAmount: "10",
-			Unit:      FogPricingPerComputeUnit,
-			ModelHash: testHash(providerID + "/pricing"),
+			Denom:		NativeFeePolicyID,
+			Amount:		price,
+			MaxAmount:	"10",
+			Unit:		FogPricingPerComputeUnit,
+			ModelHash:	testHash(providerID + "/pricing"),
 		},
-		AvailabilityCommitment: testFogAvailability(providerID, 1, 60, 1),
-		SupportedInterfaces:    []string{"l1.fog.v1.Compute", "l1.fog.v1.Status"},
-		Status:                 FogProviderActive,
-		RegisteredHeight:       1,
-		UpdatedHeight:          1,
-		ExpiryHeight:           80,
+		AvailabilityCommitment:	testFogAvailability(providerID, 1, 60, 1),
+		SupportedInterfaces:	[]string{"l1.fog.v1.Compute", "l1.fog.v1.Status"},
+		Status:			FogProviderActive,
+		RegisteredHeight:	1,
+		UpdatedHeight:		1,
+		ExpiryHeight:		80,
 	}
 	for _, apply := range mutate {
 		apply(&provider)
@@ -162,12 +162,12 @@ func testFogProvider(providerID string, price string, reputation uint64, mutate 
 
 func testFogAvailability(providerID string, start uint64, end uint64, nonce uint64) FogAvailabilityCommitment {
 	commitment := FogAvailabilityCommitment{
-		EndpointHash:    testHash(providerID + "/endpoint"),
-		WindowStart:     start,
-		WindowEnd:       end,
-		UptimeTargetBps: 9_900,
-		RenewalNonce:    nonce,
-		SignatureHash:   testHash(providerID + "/availability/signature"),
+		EndpointHash:		testHash(providerID + "/endpoint"),
+		WindowStart:		start,
+		WindowEnd:		end,
+		UptimeTargetBps:	9_900,
+		RenewalNonce:		nonce,
+		SignatureHash:		testHash(providerID + "/availability/signature"),
 	}
 	commitment.CommitmentHash = ComputeFogAvailabilityCommitmentHash(commitment)
 	return commitment

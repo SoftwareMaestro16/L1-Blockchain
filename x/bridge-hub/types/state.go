@@ -9,136 +9,136 @@ import (
 )
 
 const (
-	BridgeRiskNormal   = "normal"
-	BridgeRiskElevated = "elevated"
-	BridgeRiskCritical = "critical"
+	BridgeRiskNormal	= "normal"
+	BridgeRiskElevated	= "elevated"
+	BridgeRiskCritical	= "critical"
 
-	BridgeEventPending   = "pending"
-	BridgeEventFinalized = "finalized"
-	BridgeEventRejected  = "rejected"
+	BridgeEventPending	= "pending"
+	BridgeEventFinalized	= "finalized"
+	BridgeEventRejected	= "rejected"
 
-	ProofPolicyLightClient = "light_client"
-	ProofPolicyMultisig    = "multisig"
-	ProofPolicyZK          = "zk"
+	ProofPolicyLightClient	= "light_client"
+	ProofPolicyMultisig	= "multisig"
+	ProofPolicyZK		= "zk"
 
-	DefaultFeeScale = uint32(10_000)
+	DefaultFeeScale	= uint32(10_000)
 )
 
 type BridgeHubParams struct {
-	MaxBridges        uint32
-	MaxAssetMappings  uint32
-	MaxPendingEvents  uint32
-	MaxOperators      uint32
-	FeeScale          uint32
-	DefaultDailyLimit uint64
+	MaxBridges		uint32
+	MaxAssetMappings	uint32
+	MaxPendingEvents	uint32
+	MaxOperators		uint32
+	FeeScale		uint32
+	DefaultDailyLimit	uint64
 }
 
 type BridgeHubState struct {
-	Bridges       []BridgeRecord
-	AssetMappings []AssetMapping
-	Events        []BridgeEvent
+	Bridges		[]BridgeRecord
+	AssetMappings	[]AssetMapping
+	Events		[]BridgeEvent
 }
 
 type BridgeRecord struct {
-	BridgeID         string
-	SourceChain      string
-	TargetChain      string
-	Operators        []string
-	RiskStatus       string
-	Paused           bool
-	ProofPolicy      string
-	DailyLimit       uint64
-	DailyUsed        uint64
-	LimitWindowStart uint64
-	FeePolicy        BridgeFeePolicy
-	RegisteredHeight uint64
-	UpdatedHeight    uint64
+	BridgeID		string
+	SourceChain		string
+	TargetChain		string
+	Operators		[]string
+	RiskStatus		string
+	Paused			bool
+	ProofPolicy		string
+	DailyLimit		uint64
+	DailyUsed		uint64
+	LimitWindowStart	uint64
+	FeePolicy		BridgeFeePolicy
+	RegisteredHeight	uint64
+	UpdatedHeight		uint64
 }
 
 type BridgeFeePolicy struct {
-	FeeBps     uint32
-	Collector  string
-	MinimumFee uint64
+	FeeBps		uint32
+	Collector	string
+	MinimumFee	uint64
 }
 
 type AssetMapping struct {
-	BridgeID    string
-	SourceAsset string
-	TargetAsset string
-	Decimals    uint32
-	Enabled     bool
+	BridgeID	string
+	SourceAsset	string
+	TargetAsset	string
+	Decimals	uint32
+	Enabled		bool
 }
 
 type BridgeEvent struct {
-	EventID         string
-	BridgeID        string
-	SourceChain     string
-	Asset           string
-	Amount          uint64
-	ProofPolicy     string
-	ProofRoot       string
-	SubmittedBy     string
-	SubmittedHeight uint64
-	FinalizedHeight uint64
-	Status          string
+	EventID		string
+	BridgeID	string
+	SourceChain	string
+	Asset		string
+	Amount		uint64
+	ProofPolicy	string
+	ProofRoot	string
+	SubmittedBy	string
+	SubmittedHeight	uint64
+	FinalizedHeight	uint64
+	Status		string
 }
 
 type MsgRegisterBridge struct {
-	Authority string
-	Bridge    BridgeRecord
+	Authority	string
+	Bridge		BridgeRecord
 }
 
 type MsgPauseBridge struct {
-	Authority string
-	BridgeID  string
-	Height    uint64
+	Authority	string
+	BridgeID	string
+	Height		uint64
 }
 
 type MsgResumeBridge struct {
-	Authority string
-	BridgeID  string
-	Height    uint64
+	Authority	string
+	BridgeID	string
+	Height		uint64
 }
 
 type MsgRegisterAssetMapping struct {
-	Authority string
-	Mapping   AssetMapping
+	Authority	string
+	Mapping		AssetMapping
 }
 
 type MsgUpdateBridgeLimits struct {
-	Authority  string
-	BridgeID   string
-	DailyLimit uint64
-	Height     uint64
+	Authority	string
+	BridgeID	string
+	DailyLimit	uint64
+	Height		uint64
 }
 
 type MsgSubmitBridgeEvent struct {
-	Submitter string
-	Event     BridgeEvent
+	Submitter	string
+	Event		BridgeEvent
 }
 
 type MsgFinalizeBridgeEvent struct {
-	Authority string
-	EventID   string
-	Height    uint64
+	Authority	string
+	EventID		string
+	Height		uint64
 }
 
 func DefaultBridgeHubParams() BridgeHubParams {
 	return BridgeHubParams{
-		MaxBridges:        1_024,
-		MaxAssetMappings:  100_000,
-		MaxPendingEvents:  100_000,
-		MaxOperators:      128,
-		FeeScale:          DefaultFeeScale,
-		DefaultDailyLimit: 1_000_000,
+		MaxBridges:		1_024,
+		MaxAssetMappings:	100_000,
+		MaxPendingEvents:	100_000,
+		MaxOperators:		128,
+		FeeScale:		DefaultFeeScale,
+		DefaultDailyLimit:	1_000_000,
 	}
 }
 
 func EmptyBridgeHubState() BridgeHubState {
 	return BridgeHubState{
-		Bridges:       []BridgeRecord{},
-		AssetMappings: []AssetMapping{},
-		Events:        []BridgeEvent{},
+		Bridges:	[]BridgeRecord{},
+		AssetMappings:	[]AssetMapping{},
+		Events:		[]BridgeEvent{},
 	}
 }
 
@@ -154,9 +154,9 @@ func (p BridgeHubParams) Validate() error {
 
 func (s BridgeHubState) Export() BridgeHubState {
 	out := BridgeHubState{
-		Bridges:       cloneBridges(s.Bridges),
-		AssetMappings: cloneMappings(s.AssetMappings),
-		Events:        cloneEvents(s.Events),
+		Bridges:	cloneBridges(s.Bridges),
+		AssetMappings:	cloneMappings(s.AssetMappings),
+		Events:		cloneEvents(s.Events),
 	}
 	SortBridges(out.Bridges)
 	SortMappings(out.AssetMappings)

@@ -15,81 +15,81 @@ type RequiredSimulationTestCoverageID string
 type RequiredPerformanceTestCoverageID string
 
 const (
-	TestCoverageKindUnit        RequiredTestCoverageKind = "unit"
-	TestCoverageKindIntegration RequiredTestCoverageKind = "integration"
-	TestCoverageKindInvariant   RequiredTestCoverageKind = "invariant"
-	TestCoverageKindSimulation  RequiredTestCoverageKind = "simulation"
-	TestCoverageKindPerformance RequiredTestCoverageKind = "performance"
+	TestCoverageKindUnit		RequiredTestCoverageKind	= "unit"
+	TestCoverageKindIntegration	RequiredTestCoverageKind	= "integration"
+	TestCoverageKindInvariant	RequiredTestCoverageKind	= "invariant"
+	TestCoverageKindSimulation	RequiredTestCoverageKind	= "simulation"
+	TestCoverageKindPerformance	RequiredTestCoverageKind	= "performance"
 
-	UnitCoverageMessageIDDerivation              RequiredUnitTestCoverageID = "message-id-derivation"
-	UnitCoverageMessageNonceValidation           RequiredUnitTestCoverageID = "message-nonce-validation"
-	UnitCoverageFIFOOrdering                     RequiredUnitTestCoverageID = "fifo-ordering"
-	UnitCoverageBounceHandling                   RequiredUnitTestCoverageID = "bounce-handling"
-	UnitCoverageExpiryHandling                   RequiredUnitTestCoverageID = "expiry-handling"
-	UnitCoverageZoneDescriptorValidation         RequiredUnitTestCoverageID = "zone-descriptor-validation"
-	UnitCoverageServiceDescriptorValidation      RequiredUnitTestCoverageID = "service-descriptor-validation"
-	UnitCoverageStorageObjectHashValidation      RequiredUnitTestCoverageID = "storage-object-hash-validation"
-	UnitCoverageIdentityResolverOutputValidation RequiredUnitTestCoverageID = "identity-resolver-output-validation"
-	UnitCoveragePaymentConditionValidation       RequiredUnitTestCoverageID = "payment-condition-validation"
-	UnitCoverageRoutingCostCalculation           RequiredUnitTestCoverageID = "routing-cost-calculation"
-	UnitCoverageRootEncoding                     RequiredUnitTestCoverageID = "root-encoding"
+	UnitCoverageMessageIDDerivation			RequiredUnitTestCoverageID	= "message-id-derivation"
+	UnitCoverageMessageNonceValidation		RequiredUnitTestCoverageID	= "message-nonce-validation"
+	UnitCoverageFIFOOrdering			RequiredUnitTestCoverageID	= "fifo-ordering"
+	UnitCoverageBounceHandling			RequiredUnitTestCoverageID	= "bounce-handling"
+	UnitCoverageExpiryHandling			RequiredUnitTestCoverageID	= "expiry-handling"
+	UnitCoverageZoneDescriptorValidation		RequiredUnitTestCoverageID	= "zone-descriptor-validation"
+	UnitCoverageServiceDescriptorValidation		RequiredUnitTestCoverageID	= "service-descriptor-validation"
+	UnitCoverageStorageObjectHashValidation		RequiredUnitTestCoverageID	= "storage-object-hash-validation"
+	UnitCoverageIdentityResolverOutputValidation	RequiredUnitTestCoverageID	= "identity-resolver-output-validation"
+	UnitCoveragePaymentConditionValidation		RequiredUnitTestCoverageID	= "payment-condition-validation"
+	UnitCoverageRoutingCostCalculation		RequiredUnitTestCoverageID	= "routing-cost-calculation"
+	UnitCoverageRootEncoding			RequiredUnitTestCoverageID	= "root-encoding"
 
-	IntegrationCoverageDefaultZoneMigration                RequiredIntegrationTestCoverageID = "default-zone-migration"
-	IntegrationCoverageFinancialZoneTransferViaMessage     RequiredIntegrationTestCoverageID = "financial-zone-transfer-via-message"
-	IntegrationCoverageIdentityZoneResolverUpdate          RequiredIntegrationTestCoverageID = "identity-zone-resolver-update"
-	IntegrationCoverageServiceRegistrationLookupProof      RequiredIntegrationTestCoverageID = "service-registration-and-lookup-proof"
-	IntegrationCoverageStorageObjectRegistrationChunkProof RequiredIntegrationTestCoverageID = "storage-object-registration-and-chunk-proof"
-	IntegrationCoverageCrossZoneIdentityBoundPayment       RequiredIntegrationTestCoverageID = "cross-zone-identity-bound-payment"
-	IntegrationCoverageContractOutboundMessageFinancial    RequiredIntegrationTestCoverageID = "contract-outbound-message-to-financial-zone"
-	IntegrationCoverageApplicationSchedulerToContract      RequiredIntegrationTestCoverageID = "application-scheduler-emits-message-to-contract-zone"
+	IntegrationCoverageDefaultZoneMigration			RequiredIntegrationTestCoverageID	= "default-zone-migration"
+	IntegrationCoverageFinancialZoneTransferViaMessage	RequiredIntegrationTestCoverageID	= "financial-zone-transfer-via-message"
+	IntegrationCoverageIdentityZoneResolverUpdate		RequiredIntegrationTestCoverageID	= "identity-zone-resolver-update"
+	IntegrationCoverageServiceRegistrationLookupProof	RequiredIntegrationTestCoverageID	= "service-registration-and-lookup-proof"
+	IntegrationCoverageStorageObjectRegistrationChunkProof	RequiredIntegrationTestCoverageID	= "storage-object-registration-and-chunk-proof"
+	IntegrationCoverageCrossZoneIdentityBoundPayment	RequiredIntegrationTestCoverageID	= "cross-zone-identity-bound-payment"
+	IntegrationCoverageContractOutboundMessageFinancial	RequiredIntegrationTestCoverageID	= "contract-outbound-message-to-financial-zone"
+	IntegrationCoverageApplicationSchedulerToContract	RequiredIntegrationTestCoverageID	= "application-scheduler-emits-message-to-contract-zone"
 
-	InvariantCoverageGlobalRootIncludesEnabledZones   RequiredInvariantTestCoverageID = "global-root-includes-enabled-zone-roots"
-	InvariantCoverageZoneRootIncludesLocalModules     RequiredInvariantTestCoverageID = "zone-root-includes-local-module-roots"
-	InvariantCoverageConsumedMessageHasOneReceipt     RequiredInvariantTestCoverageID = "consumed-message-has-one-receipt"
-	InvariantCoverageMessageValueConserved            RequiredInvariantTestCoverageID = "message-value-conserved-across-bounce-settlement"
-	InvariantCoverageReplayTombstonesRejectDuplicates RequiredInvariantTestCoverageID = "replay-tombstones-reject-duplicates"
-	InvariantCoverageActiveIdentityBindingValidOwner  RequiredInvariantTestCoverageID = "active-identity-binding-valid-owner"
-	InvariantCoverageStorageObjectSizeEqualsChunkSum  RequiredInvariantTestCoverageID = "storage-object-size-equals-chunk-sum"
-	InvariantCoveragePaymentSettlementWithinEscrow    RequiredInvariantTestCoverageID = "payment-settlement-within-escrow"
-	InvariantCoverageServiceInterfaceHashMatchesDesc  RequiredInvariantTestCoverageID = "service-interface-hash-matches-descriptor"
+	InvariantCoverageGlobalRootIncludesEnabledZones		RequiredInvariantTestCoverageID	= "global-root-includes-enabled-zone-roots"
+	InvariantCoverageZoneRootIncludesLocalModules		RequiredInvariantTestCoverageID	= "zone-root-includes-local-module-roots"
+	InvariantCoverageConsumedMessageHasOneReceipt		RequiredInvariantTestCoverageID	= "consumed-message-has-one-receipt"
+	InvariantCoverageMessageValueConserved			RequiredInvariantTestCoverageID	= "message-value-conserved-across-bounce-settlement"
+	InvariantCoverageReplayTombstonesRejectDuplicates	RequiredInvariantTestCoverageID	= "replay-tombstones-reject-duplicates"
+	InvariantCoverageActiveIdentityBindingValidOwner	RequiredInvariantTestCoverageID	= "active-identity-binding-valid-owner"
+	InvariantCoverageStorageObjectSizeEqualsChunkSum	RequiredInvariantTestCoverageID	= "storage-object-size-equals-chunk-sum"
+	InvariantCoveragePaymentSettlementWithinEscrow		RequiredInvariantTestCoverageID	= "payment-settlement-within-escrow"
+	InvariantCoverageServiceInterfaceHashMatchesDesc	RequiredInvariantTestCoverageID	= "service-interface-hash-matches-descriptor"
 
-	SimulationCoverageHighVolumePerSenderQueues       RequiredSimulationTestCoverageID = "high-volume-per-sender-queues"
-	SimulationCoverageCrossZoneCongestion             RequiredSimulationTestCoverageID = "cross-zone-congestion"
-	SimulationCoverageRoutingTableEpochChanges        RequiredSimulationTestCoverageID = "routing-table-epoch-changes"
-	SimulationCoverageServiceLookupCacheExpiry        RequiredSimulationTestCoverageID = "service-lookup-cache-expiry"
-	SimulationCoverageStorageLazyFetchReceiptLoad     RequiredSimulationTestCoverageID = "storage-lazy-fetch-receipt-load"
-	SimulationCoveragePaymentConditionTimeout         RequiredSimulationTestCoverageID = "payment-condition-timeout"
-	SimulationCoverageIdentityResolverChurn           RequiredSimulationTestCoverageID = "identity-resolver-churn"
-	SimulationCoverageMixedZoneExecutionUnderBlockSTM RequiredSimulationTestCoverageID = "mixed-zone-execution-under-blockstm"
+	SimulationCoverageHighVolumePerSenderQueues		RequiredSimulationTestCoverageID	= "high-volume-per-sender-queues"
+	SimulationCoverageCrossZoneCongestion			RequiredSimulationTestCoverageID	= "cross-zone-congestion"
+	SimulationCoverageRoutingTableEpochChanges		RequiredSimulationTestCoverageID	= "routing-table-epoch-changes"
+	SimulationCoverageServiceLookupCacheExpiry		RequiredSimulationTestCoverageID	= "service-lookup-cache-expiry"
+	SimulationCoverageStorageLazyFetchReceiptLoad		RequiredSimulationTestCoverageID	= "storage-lazy-fetch-receipt-load"
+	SimulationCoveragePaymentConditionTimeout		RequiredSimulationTestCoverageID	= "payment-condition-timeout"
+	SimulationCoverageIdentityResolverChurn			RequiredSimulationTestCoverageID	= "identity-resolver-churn"
+	SimulationCoverageMixedZoneExecutionUnderBlockSTM	RequiredSimulationTestCoverageID	= "mixed-zone-execution-under-blockstm"
 
-	PerformanceCoverageMessageEnqueueThroughput      RequiredPerformanceTestCoverageID = "message-enqueue-throughput"
-	PerformanceCoverageMessageDequeueThroughput      RequiredPerformanceTestCoverageID = "message-dequeue-throughput"
-	PerformanceCoverageReceiptProofGenerationLatency RequiredPerformanceTestCoverageID = "receipt-proof-generation-latency"
-	PerformanceCoverageServiceLookupLatency          RequiredPerformanceTestCoverageID = "service-lookup-latency"
-	PerformanceCoverageIdentityResolutionLatency     RequiredPerformanceTestCoverageID = "identity-resolution-latency"
-	PerformanceCoverageStorageProofGenerationLatency RequiredPerformanceTestCoverageID = "storage-proof-generation-latency"
-	PerformanceCoveragePaymentSettlementThroughput   RequiredPerformanceTestCoverageID = "payment-settlement-throughput"
-	PerformanceCoverageRootAggregationCostPerZone    RequiredPerformanceTestCoverageID = "root-aggregation-cost-per-zone"
-	PerformanceCoverageExportImportTime              RequiredPerformanceTestCoverageID = "export-import-time"
+	PerformanceCoverageMessageEnqueueThroughput		RequiredPerformanceTestCoverageID	= "message-enqueue-throughput"
+	PerformanceCoverageMessageDequeueThroughput		RequiredPerformanceTestCoverageID	= "message-dequeue-throughput"
+	PerformanceCoverageReceiptProofGenerationLatency	RequiredPerformanceTestCoverageID	= "receipt-proof-generation-latency"
+	PerformanceCoverageServiceLookupLatency			RequiredPerformanceTestCoverageID	= "service-lookup-latency"
+	PerformanceCoverageIdentityResolutionLatency		RequiredPerformanceTestCoverageID	= "identity-resolution-latency"
+	PerformanceCoverageStorageProofGenerationLatency	RequiredPerformanceTestCoverageID	= "storage-proof-generation-latency"
+	PerformanceCoveragePaymentSettlementThroughput		RequiredPerformanceTestCoverageID	= "payment-settlement-throughput"
+	PerformanceCoverageRootAggregationCostPerZone		RequiredPerformanceTestCoverageID	= "root-aggregation-cost-per-zone"
+	PerformanceCoverageExportImportTime			RequiredPerformanceTestCoverageID	= "export-import-time"
 )
 
 type RequiredTestCoverageSpec struct {
-	ID             string
-	Kind           RequiredTestCoverageKind
-	ModuleName     CosmosSDKModuleName
-	PhaseID        ImplementationRoadmapPhaseID
-	CoverageTarget string
-	Assertions     []string
-	SpecHash       string
+	ID		string
+	Kind		RequiredTestCoverageKind
+	ModuleName	CosmosSDKModuleName
+	PhaseID		ImplementationRoadmapPhaseID
+	CoverageTarget	string
+	Assertions	[]string
+	SpecHash	string
 }
 
 type RequiredTestCoverageManifest struct {
-	UnitTests        []RequiredTestCoverageSpec
-	IntegrationTests []RequiredTestCoverageSpec
-	InvariantTests   []RequiredTestCoverageSpec
-	SimulationTests  []RequiredTestCoverageSpec
-	PerformanceTests []RequiredTestCoverageSpec
-	ManifestHash     string
+	UnitTests		[]RequiredTestCoverageSpec
+	IntegrationTests	[]RequiredTestCoverageSpec
+	InvariantTests		[]RequiredTestCoverageSpec
+	SimulationTests		[]RequiredTestCoverageSpec
+	PerformanceTests	[]RequiredTestCoverageSpec
+	ManifestHash		string
 }
 
 func DefaultRequiredTestCoverageManifest() (RequiredTestCoverageManifest, error) {
@@ -156,11 +156,11 @@ func DefaultRequiredTestCoverageManifest() (RequiredTestCoverageManifest, error)
 
 func NewRequiredTestCoverageManifest(unitTests, integrationTests, invariantTests, simulationTests, performanceTests []RequiredTestCoverageSpec) (RequiredTestCoverageManifest, error) {
 	manifest := RequiredTestCoverageManifest{
-		UnitTests:        normalizeTestCoverageSpecs(unitTests, TestCoverageKindUnit),
-		IntegrationTests: normalizeTestCoverageSpecs(integrationTests, TestCoverageKindIntegration),
-		InvariantTests:   normalizeTestCoverageSpecs(invariantTests, TestCoverageKindInvariant),
-		SimulationTests:  normalizeTestCoverageSpecs(simulationTests, TestCoverageKindSimulation),
-		PerformanceTests: normalizeTestCoverageSpecs(performanceTests, TestCoverageKindPerformance),
+		UnitTests:		normalizeTestCoverageSpecs(unitTests, TestCoverageKindUnit),
+		IntegrationTests:	normalizeTestCoverageSpecs(integrationTests, TestCoverageKindIntegration),
+		InvariantTests:		normalizeTestCoverageSpecs(invariantTests, TestCoverageKindInvariant),
+		SimulationTests:	normalizeTestCoverageSpecs(simulationTests, TestCoverageKindSimulation),
+		PerformanceTests:	normalizeTestCoverageSpecs(performanceTests, TestCoverageKindPerformance),
 	}
 	if err := manifest.ValidateFormat(); err != nil {
 		return RequiredTestCoverageManifest{}, err
@@ -423,12 +423,12 @@ func ComputeRequiredTestCoverageManifestHash(manifest RequiredTestCoverageManife
 
 func testCoverageSpec(id string, kind RequiredTestCoverageKind, moduleName CosmosSDKModuleName, phaseID ImplementationRoadmapPhaseID, target string, assertions ...string) RequiredTestCoverageSpec {
 	return RequiredTestCoverageSpec{
-		ID:             id,
-		Kind:           kind,
-		ModuleName:     moduleName,
-		PhaseID:        phaseID,
-		CoverageTarget: target,
-		Assertions:     assertions,
+		ID:		id,
+		Kind:		kind,
+		ModuleName:	moduleName,
+		PhaseID:	phaseID,
+		CoverageTarget:	target,
+		Assertions:	assertions,
 	}
 }
 

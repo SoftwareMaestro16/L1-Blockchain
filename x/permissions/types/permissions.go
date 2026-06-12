@@ -12,23 +12,23 @@ import (
 )
 
 const (
-	ScopeContractExtension = "contract_extension"
-	ScopeResolverDelegate  = "resolver_delegate"
-	ScopeDomainManager     = "domain_manager"
-	ScopeModuleACL         = "module_acl"
-	ScopeGovernance        = "governance"
-	ScopeEmergency         = "emergency"
+	ScopeContractExtension	= "contract_extension"
+	ScopeResolverDelegate	= "resolver_delegate"
+	ScopeDomainManager	= "domain_manager"
+	ScopeModuleACL		= "module_acl"
+	ScopeGovernance		= "governance"
+	ScopeEmergency		= "emergency"
 )
 
 type Permission struct {
-	ID              string
-	Owner           sdk.AccAddress
-	Grantee         sdk.AccAddress
-	Scope           string
-	Resource        string
-	GrantedAtHeight uint64
-	ExpiresAtHeight uint64
-	RevokedAtHeight uint64
+	ID		string
+	Owner		sdk.AccAddress
+	Grantee		sdk.AccAddress
+	Scope		string
+	Resource	string
+	GrantedAtHeight	uint64
+	ExpiresAtHeight	uint64
+	RevokedAtHeight	uint64
 }
 
 type Registry struct {

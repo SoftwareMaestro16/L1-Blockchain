@@ -107,14 +107,14 @@ func TestFinalizeAuctionAssignsOwnerNFTExpiryAndDistribution(t *testing.T) {
 func TestRenewDomainExtendsExpiry(t *testing.T) {
 	params := DefaultDomainParams()
 	record := DomainRecord{
-		Name:          "alice",
-		TLD:           DomainTLD,
-		Owner:         []byte{1},
-		ExpiryUnix:    1_000,
-		NFTItemID:     DomainNFTItemID("alice"),
-		Status:        DomainStatusActive,
-		CreatedAtUnix: 1,
-		UpdatedAtUnix: 2,
+		Name:		"alice",
+		TLD:		DomainTLD,
+		Owner:		[]byte{1},
+		ExpiryUnix:	1_000,
+		NFTItemID:	DomainNFTItemID("alice"),
+		Status:		DomainStatusActive,
+		CreatedAtUnix:	1,
+		UpdatedAtUnix:	2,
 	}
 
 	renewed, fee, err := RenewDomain(record, 500, params)

@@ -11,8 +11,8 @@ import (
 
 func NewAddressCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "address",
-		Short: "Address utilities",
+		Use:	"address",
+		Short:	"Address utilities",
 	}
 	cmd.AddCommand(NewAddressConvertCmd())
 	return cmd
@@ -20,9 +20,9 @@ func NewAddressCmd() *cobra.Command {
 
 func NewAddressConvertCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "convert [address]",
-		Short: "Convert an address to Aetra raw and userfriendly forms",
-		Args:  cobra.ExactArgs(1),
+		Use:	"convert [address]",
+		Short:	"Convert an address to Aetra raw and userfriendly forms",
+		Args:	cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bz, err := aetraaddress.Parse(args[0])
 			if err != nil {
@@ -34,11 +34,11 @@ func NewAddressConvertCmd() *cobra.Command {
 				return err
 			}
 			out := struct {
-				Raw          string `json:"raw"`
-				UserFriendly string `json:"user_friendly"`
+				Raw		string	`json:"raw"`
+				UserFriendly	string	`json:"user_friendly"`
 			}{
-				Raw:          raw,
-				UserFriendly: userFriendly,
+				Raw:		raw,
+				UserFriendly:	userFriendly,
 			}
 			bzJSON, err := json.MarshalIndent(out, "", "  ")
 			if err != nil {

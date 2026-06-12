@@ -125,10 +125,10 @@ func TestAVMReplaySubmissionRejectsScopeMismatchAndExpiredHeight(t *testing.T) {
 func testAVMReplayState(t *testing.T, sender string, lastNonce uint64) AVMReplayNonceState {
 	t.Helper()
 	state, err := NewAVMReplayNonceState(AVMReplayNonceState{
-		ChainID:    "aetra-1",
-		SourceZone: zonestypes.ZoneIDApplication,
-		Sender:     sender,
-		LastNonce:  lastNonce,
+		ChainID:	"aetra-1",
+		SourceZone:	zonestypes.ZoneIDApplication,
+		Sender:		sender,
+		LastNonce:	lastNonce,
 	})
 	require.NoError(t, err)
 	return state

@@ -16,27 +16,27 @@ import (
 )
 
 type FullGenesisState struct {
-	Version uint64
+	Version	uint64
 
-	Accounts []Account
+	Accounts	[]Account
 
-	ValidatorRegistryVersion uint64
-	ValidatorRegistryParams  validatorregistrytypes.Params
-	ValidatorRegistryState   validatorregistrytypes.State
+	ValidatorRegistryVersion	uint64
+	ValidatorRegistryParams		validatorregistrytypes.Params
+	ValidatorRegistryState		validatorregistrytypes.State
 
-	LiquidStakingVersion uint64
-	LiquidStakingParams  nominatorpooltypes.Params
-	LiquidStakingState   nominatorpooltypes.State
+	LiquidStakingVersion	uint64
+	LiquidStakingParams	nominatorpooltypes.Params
+	LiquidStakingState	nominatorpooltypes.State
 
-	ReputationVersion uint64
-	ReputationState   reputationtypes.ConsolidatedReputationState
+	ReputationVersion	uint64
+	ReputationState		reputationtypes.ConsolidatedReputationState
 
-	StorageRentVersion uint64
-	StorageRentParams  storagerenttypes.StorageRentParams
-	StorageRentState   storagerenttypes.StorageRentState
+	StorageRentVersion	uint64
+	StorageRentParams	storagerenttypes.StorageRentParams
+	StorageRentState	storagerenttypes.StorageRentState
 
-	ProofMetadataVersion uint64
-	ProofMetadataState   proofregistrytypes.ProofRegistryState
+	ProofMetadataVersion	uint64
+	ProofMetadataState	proofregistrytypes.ProofRegistryState
 }
 
 type FullGenesisReader interface {
@@ -51,21 +51,21 @@ func DefaultFullGenesis() FullGenesisState {
 	reputationState := reputationtypes.NewConsolidatedReputationState(reputationtypes.DefaultReputationParams())
 	proofState, _ := proofregistrytypes.NewProofRegistryState(proofregistrytypes.DefaultHistoryWindow)
 	return FullGenesisState{
-		Version:                  prototype.CurrentGenesisVersion,
-		Accounts:                 nil,
-		ValidatorRegistryVersion: prototype.CurrentGenesisVersion,
-		ValidatorRegistryParams:  validatorregistrytypes.DefaultParams(),
-		ValidatorRegistryState:   validatorregistrytypes.State{},
-		LiquidStakingVersion:     prototype.CurrentGenesisVersion,
-		LiquidStakingParams:      nominatorpooltypes.DefaultParams(),
-		LiquidStakingState:       nominatorpooltypes.State{},
-		ReputationVersion:        prototype.CurrentGenesisVersion,
-		ReputationState:          reputationState,
-		StorageRentVersion:       prototype.CurrentGenesisVersion,
-		StorageRentParams:        storagerenttypes.DefaultStorageRentParams(),
-		StorageRentState:         storagerenttypes.EmptyStorageRentState(),
-		ProofMetadataVersion:     prototype.CurrentGenesisVersion,
-		ProofMetadataState:       proofState,
+		Version:			prototype.CurrentGenesisVersion,
+		Accounts:			nil,
+		ValidatorRegistryVersion:	prototype.CurrentGenesisVersion,
+		ValidatorRegistryParams:	validatorregistrytypes.DefaultParams(),
+		ValidatorRegistryState:		validatorregistrytypes.State{},
+		LiquidStakingVersion:		prototype.CurrentGenesisVersion,
+		LiquidStakingParams:		nominatorpooltypes.DefaultParams(),
+		LiquidStakingState:		nominatorpooltypes.State{},
+		ReputationVersion:		prototype.CurrentGenesisVersion,
+		ReputationState:		reputationState,
+		StorageRentVersion:		prototype.CurrentGenesisVersion,
+		StorageRentParams:		storagerenttypes.DefaultStorageRentParams(),
+		StorageRentState:		storagerenttypes.EmptyStorageRentState(),
+		ProofMetadataVersion:		prototype.CurrentGenesisVersion,
+		ProofMetadataState:		proofState,
 	}
 }
 
@@ -148,12 +148,12 @@ func ValidateNoSecretsInFullGenesis(gs FullGenesisState) error {
 
 func validateFullGenesisVersions(gs FullGenesisState) error {
 	versions := map[string]uint64{
-		"native account full genesis": gs.Version,
-		"validator registry":          gs.ValidatorRegistryVersion,
-		"liquid staking":              gs.LiquidStakingVersion,
-		"reputation":                  gs.ReputationVersion,
-		"storage rent":                gs.StorageRentVersion,
-		"proof metadata":              gs.ProofMetadataVersion,
+		"native account full genesis":	gs.Version,
+		"validator registry":		gs.ValidatorRegistryVersion,
+		"liquid staking":		gs.LiquidStakingVersion,
+		"reputation":			gs.ReputationVersion,
+		"storage rent":			gs.StorageRentVersion,
+		"proof metadata":		gs.ProofMetadataVersion,
 	}
 	for name, version := range versions {
 		if version != prototype.CurrentGenesisVersion {

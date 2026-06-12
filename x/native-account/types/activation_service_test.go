@@ -15,10 +15,10 @@ func TestActivateAccountSuccessInitializesDeterministicState(t *testing.T) {
 	service := newTestActivationService(t, store, 100)
 
 	result, err := service.ActivateAccount(MsgActivateAccount{
-		AddressUser: pair.User,
-		AddressRaw:  pair.Raw,
-		PublicKey:   pubKey,
-		FeePaid:     100,
+		AddressUser:	pair.User,
+		AddressRaw:	pair.Raw,
+		PublicKey:	pubKey,
+		FeePaid:	100,
 	}, 77)
 
 	require.NoError(t, err)
@@ -74,18 +74,18 @@ func TestActivateAccountRejectsMalformedAEAndRawAddress(t *testing.T) {
 	require.Error(t, err)
 
 	_, err = service.ActivateAccount(MsgActivateAccount{
-		AddressUser: pair.User,
-		AddressRaw:  "4:abcdef",
-		PublicKey:   pubKey,
-		FeePaid:     1,
+		AddressUser:	pair.User,
+		AddressRaw:	"4:abcdef",
+		PublicKey:	pubKey,
+		FeePaid:	1,
 	}, 10)
 	require.ErrorContains(t, err, "invalid activation raw address")
 
 	_, err = service.ActivateAccount(MsgActivateAccount{
-		AddressUser: pair.User,
-		AddressRaw:  completeActiveAccount(t, 0xa2, 2, 0).AddressRaw,
-		PublicKey:   pubKey,
-		FeePaid:     1,
+		AddressUser:	pair.User,
+		AddressRaw:	completeActiveAccount(t, 0xa2, 2, 0).AddressRaw,
+		PublicKey:	pubKey,
+		FeePaid:	1,
 	}, 10)
 	require.ErrorContains(t, err, "raw address must equal derived")
 }

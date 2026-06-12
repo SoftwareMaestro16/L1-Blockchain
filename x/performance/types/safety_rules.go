@@ -12,72 +12,72 @@ const (
 )
 
 type ConsensusDeterminismPolicy struct {
-	ConsensusPathName            string
-	UsesExternalAPIs             bool
-	UsesLocalClock               bool
-	UsesRandomShardPlacement     bool
-	UsesNondeterministicMapOrder bool
-	UsesMempoolOnlyExecutionData bool
-	UsesFloatingPointMath        bool
-	UsesConsensusTime            bool
-	SortsStateTransitionMaps     bool
-	EncodesProposalMempoolInputs bool
-	DeterminismPolicyHash        string
+	ConsensusPathName		string
+	UsesExternalAPIs		bool
+	UsesLocalClock			bool
+	UsesRandomShardPlacement	bool
+	UsesNondeterministicMapOrder	bool
+	UsesMempoolOnlyExecutionData	bool
+	UsesFloatingPointMath		bool
+	UsesConsensusTime		bool
+	SortsStateTransitionMaps	bool
+	EncodesProposalMempoolInputs	bool
+	DeterminismPolicyHash		string
 }
 
 type RoutingSafetyPath struct {
-	PathID        string
-	RouteHash     string
-	Cost          string
-	HopCount      uint32
-	LiquidityBps  uint32
-	CongestionBps uint32
-	TieBreakKey   string
+	PathID		string
+	RouteHash	string
+	Cost		string
+	HopCount	uint32
+	LiquidityBps	uint32
+	CongestionBps	uint32
+	TieBreakKey	string
 }
 
 type RoutingFailureAccounting struct {
-	RouteID        string
-	OriginalValue  string
-	BouncedValue   string
-	BurnedValue    string
-	ReceiptHash    string
-	ReceiptStatus  string
-	AccountingHash string
+	RouteID		string
+	OriginalValue	string
+	BouncedValue	string
+	BurnedValue	string
+	ReceiptHash	string
+	ReceiptStatus	string
+	AccountingHash	string
 }
 
 type RoutingSafetyInput struct {
-	RoutingEpoch       uint64
-	RoutingTableHash   string
-	RoutingMetricsRoot string
-	CandidatePaths     []RoutingSafetyPath
-	SelectedPathID     string
-	FailureAccounting  []RoutingFailureAccounting
-	SafetyHash         string
+	RoutingEpoch		uint64
+	RoutingTableHash	string
+	RoutingMetricsRoot	string
+	CandidatePaths		[]RoutingSafetyPath
+	SelectedPathID		string
+	FailureAccounting	[]RoutingFailureAccounting
+	SafetyHash		string
 }
 
 type InFlightShardMessage struct {
-	MessageID          string
-	SourceShardID      string
-	DestinationShardID string
-	DeliveryEpoch      uint64
-	ExpiryHeight       uint64
-	MessageHash        string
+	MessageID		string
+	SourceShardID		string
+	DestinationShardID	string
+	DeliveryEpoch		uint64
+	ExpiryHeight		uint64
+	MessageHash		string
 }
 
 type ShardLayoutTransition struct {
-	ZoneID                 string
-	PreviousLayoutEpoch    uint64
-	NextLayoutEpoch        uint64
-	CurrentHeight          uint64
-	ActivationHeight       uint64
-	EpochBoundaryHeight    uint64
-	SplitMergeDecisionHash string
-	MigrationRoot          string
-	OldLayoutHash          string
-	NewLayoutHash          string
-	ProofHorizon           uint64
-	InFlightMessages       []InFlightShardMessage
-	TransitionHash         string
+	ZoneID			string
+	PreviousLayoutEpoch	uint64
+	NextLayoutEpoch		uint64
+	CurrentHeight		uint64
+	ActivationHeight	uint64
+	EpochBoundaryHeight	uint64
+	SplitMergeDecisionHash	string
+	MigrationRoot		string
+	OldLayoutHash		string
+	NewLayoutHash		string
+	ProofHorizon		uint64
+	InFlightMessages	[]InFlightShardMessage
+	TransitionHash		string
 }
 
 func BuildConsensusDeterminismPolicy(policy ConsensusDeterminismPolicy) (ConsensusDeterminismPolicy, error) {
@@ -316,8 +316,8 @@ func (t ShardLayoutTransition) Validate() error {
 		return errors.New("safety shard transition cannot activate in the past")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"safety shard split merge decision hash", transition.SplitMergeDecisionHash},
 		{"safety shard migration root", transition.MigrationRoot},
@@ -526,5 +526,3 @@ func compareRoutingSafetyPath(left, right RoutingSafetyPath) int {
 	}
 	return 0
 }
-
-

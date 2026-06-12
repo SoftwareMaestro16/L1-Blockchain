@@ -7,28 +7,28 @@ import (
 )
 
 const (
-	IdentityStoreV2SpecFeeAccumulatorPrefix = IdentityStoreV2Prefix + "/fee_accumulator"
+	IdentityStoreV2SpecFeeAccumulatorPrefix	= IdentityStoreV2Prefix + "/fee_accumulator"
 
-	IdentityBlockSTMConflictNoneV2                       = "none"
-	IdentityBlockSTMConflictSameNameV2                   = "same_name"
-	IdentityBlockSTMConflictParentPolicyChildCreateV2    = "parent_policy_child_create"
-	IdentityBlockSTMConflictTransferResolverUpdateV2     = "transfer_resolver_update"
-	IdentityBlockSTMConflictReversePrimaryResolverV2     = "reverse_primary_resolver_update"
-	IdentityBlockSTMConflictAuctionFinalizeLateRevealV2  = "auction_finalize_late_reveal"
-	IdentityBlockSTMConflictBatchDuplicateNameHashV2     = "batch_duplicate_name_hash"
-	IdentityBlockSTMConflictParentChildUnknownV2         = "parent_child_unknown"
-	IdentityBlockSTMFeeAccumulatorPartitionModuleV2      = "identity"
-	IdentityBlockSTMFeeAccumulatorPartitionBatchModuleV2 = "identity_batch"
+	IdentityBlockSTMConflictNoneV2				= "none"
+	IdentityBlockSTMConflictSameNameV2			= "same_name"
+	IdentityBlockSTMConflictParentPolicyChildCreateV2	= "parent_policy_child_create"
+	IdentityBlockSTMConflictTransferResolverUpdateV2	= "transfer_resolver_update"
+	IdentityBlockSTMConflictReversePrimaryResolverV2	= "reverse_primary_resolver_update"
+	IdentityBlockSTMConflictAuctionFinalizeLateRevealV2	= "auction_finalize_late_reveal"
+	IdentityBlockSTMConflictBatchDuplicateNameHashV2	= "batch_duplicate_name_hash"
+	IdentityBlockSTMConflictParentChildUnknownV2		= "parent_child_unknown"
+	IdentityBlockSTMFeeAccumulatorPartitionModuleV2		= "identity"
+	IdentityBlockSTMFeeAccumulatorPartitionBatchModuleV2	= "identity_batch"
 )
 
 type IdentityBlockSTMConflictClassV2 string
 
 type IdentityBlockSTMPlanV2 struct {
-	MessageName   string
-	AccessSet     IdentityAccessSet
-	ConflictClass IdentityBlockSTMConflictClassV2
-	FeeKey        string
-	NameHashes    []string
+	MessageName	string
+	AccessSet	IdentityAccessSet
+	ConflictClass	IdentityBlockSTMConflictClassV2
+	FeeKey		string
+	NameHashes	[]string
 }
 
 func IdentityStoreV2SpecFeeAccumulatorKey(blockHeight uint64, module string) (string, error) {
@@ -50,9 +50,9 @@ func IdentityBlockSTMAccessSetV2(msg IdentityMsgV2, blockHeight uint64) (Identit
 		return IdentityBlockSTMPlanV2{}, err
 	}
 	plan := IdentityBlockSTMPlanV2{
-		MessageName:   msg.IdentityMessageName(),
-		ConflictClass: IdentityBlockSTMConflictNoneV2,
-		FeeKey:        feeKey,
+		MessageName:	msg.IdentityMessageName(),
+		ConflictClass:	IdentityBlockSTMConflictNoneV2,
+		FeeKey:		feeKey,
 	}
 	switch m := msg.(type) {
 	case MsgCommitRegistrationV2:

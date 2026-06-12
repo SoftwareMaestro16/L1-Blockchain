@@ -12,95 +12,95 @@ import (
 )
 
 const (
-	AVMContractBackendNativeModule  AVMContractBackendKind = "native_module"
-	AVMContractBackendWASMContract  AVMContractBackendKind = "wasm_contract"
-	AVMContractBackendActorContract AVMContractBackendKind = "avm_actor_contract"
+	AVMContractBackendNativeModule	AVMContractBackendKind	= "native_module"
+	AVMContractBackendWASMContract	AVMContractBackendKind	= "wasm_contract"
+	AVMContractBackendActorContract	AVMContractBackendKind	= "avm_actor_contract"
 
-	MaxAVMBackendNameLength     = 128
-	MaxAVMBackendServiceLength  = 128
-	MaxAVMBackendMethodLength   = 96
-	MaxAVMBackendRegistrySize   = 16
-	MaxAVMNativeStateWriteZones = 4
+	MaxAVMBackendNameLength		= 128
+	MaxAVMBackendServiceLength	= 128
+	MaxAVMBackendMethodLength	= 96
+	MaxAVMBackendRegistrySize	= 16
+	MaxAVMNativeStateWriteZones	= 4
 )
 
 type AVMContractBackendKind string
 
 type AVMContractBackendDescriptor struct {
-	Kind                AVMContractBackendKind
-	RouterBackend       RouterBackend
-	Runtime             string
-	Enabled             bool
-	Optional            bool
-	Deterministic       bool
-	KeeperBacked        bool
-	MsgServerCompatible bool
-	BackendHash         string
+	Kind			AVMContractBackendKind
+	RouterBackend		RouterBackend
+	Runtime			string
+	Enabled			bool
+	Optional		bool
+	Deterministic		bool
+	KeeperBacked		bool
+	MsgServerCompatible	bool
+	BackendHash		string
 }
 
 type AVMContractBackendRegistry struct {
-	Backends     []AVMContractBackendDescriptor
-	RegistryHash string
+	Backends	[]AVMContractBackendDescriptor
+	RegistryHash	string
 }
 
 type AVMNativeModuleDescriptor struct {
-	ModuleName           string
-	ZoneID               zonestypes.ZoneID
-	KeeperService        string
-	MsgServerService     string
-	ServiceInterfaceHash string
-	AllowedMessageTypes  []string
-	AllowedMethods       []string
-	DescriptorHash       string
+	ModuleName		string
+	ZoneID			zonestypes.ZoneID
+	KeeperService		string
+	MsgServerService	string
+	ServiceInterfaceHash	string
+	AllowedMessageTypes	[]string
+	AllowedMethods		[]string
+	DescriptorHash		string
 }
 
 type AVMNativeModuleRouteCall struct {
-	Descriptor          AVMNativeModuleDescriptor
-	RouteKey            string
-	Method              string
-	ZoneID              zonestypes.ZoneID
-	Lane                RouterLane
-	Backend             RouterBackend
-	DispatchMode        RouterDispatchMode
-	ReceiptPolicy       RouterReceiptPolicy
-	GasMeter            RouterGasMeter
-	Receipt             AVMExecutionReceipt
-	CalledThroughAVM    bool
-	UsesInterfaceSystem bool
-	StateWriteZones     []zonestypes.ZoneID
-	CallHash            string
+	Descriptor		AVMNativeModuleDescriptor
+	RouteKey		string
+	Method			string
+	ZoneID			zonestypes.ZoneID
+	Lane			RouterLane
+	Backend			RouterBackend
+	DispatchMode		RouterDispatchMode
+	ReceiptPolicy		RouterReceiptPolicy
+	GasMeter		RouterGasMeter
+	Receipt			AVMExecutionReceipt
+	CalledThroughAVM	bool
+	UsesInterfaceSystem	bool
+	StateWriteZones		[]zonestypes.ZoneID
+	CallHash		string
 }
 
 func DefaultAVMContractBackendRegistry(runtime RuntimePolicy) (AVMContractBackendRegistry, error) {
 	registry := AVMContractBackendRegistry{Backends: []AVMContractBackendDescriptor{
 		{
-			Kind:                AVMContractBackendNativeModule,
-			RouterBackend:       RouterBackendNativeModule,
-			Runtime:             "native",
-			Enabled:             true,
-			Optional:            false,
-			Deterministic:       true,
-			KeeperBacked:        true,
-			MsgServerCompatible: true,
+			Kind:			AVMContractBackendNativeModule,
+			RouterBackend:		RouterBackendNativeModule,
+			Runtime:		"native",
+			Enabled:		true,
+			Optional:		false,
+			Deterministic:		true,
+			KeeperBacked:		true,
+			MsgServerCompatible:	true,
 		},
 		{
-			Kind:                AVMContractBackendActorContract,
-			RouterBackend:       RouterBackendAVMActor,
-			Runtime:             RuntimeAVM,
-			Enabled:             runtime.AVMEnabled,
-			Optional:            false,
-			Deterministic:       true,
-			KeeperBacked:        false,
-			MsgServerCompatible: false,
+			Kind:			AVMContractBackendActorContract,
+			RouterBackend:		RouterBackendAVMActor,
+			Runtime:		RuntimeAVM,
+			Enabled:		runtime.AVMEnabled,
+			Optional:		false,
+			Deterministic:		true,
+			KeeperBacked:		false,
+			MsgServerCompatible:	false,
 		},
 		{
-			Kind:                AVMContractBackendWASMContract,
-			RouterBackend:       RouterBackendWASMAdapter,
-			Runtime:             RuntimeCosmWasm,
-			Enabled:             runtime.CosmWasmEnabled,
-			Optional:            true,
-			Deterministic:       true,
-			KeeperBacked:        false,
-			MsgServerCompatible: false,
+			Kind:			AVMContractBackendWASMContract,
+			RouterBackend:		RouterBackendWASMAdapter,
+			Runtime:		RuntimeCosmWasm,
+			Enabled:		runtime.CosmWasmEnabled,
+			Optional:		true,
+			Deterministic:		true,
+			KeeperBacked:		false,
+			MsgServerCompatible:	false,
 		},
 	}}
 	for i := range registry.Backends {
@@ -186,9 +186,9 @@ func (r AVMContractBackendRegistry) Validate() error {
 	}
 	seen := make(map[AVMContractBackendKind]struct{}, len(r.Backends))
 	required := map[AVMContractBackendKind]struct{}{
-		AVMContractBackendNativeModule:  {},
-		AVMContractBackendActorContract: {},
-		AVMContractBackendWASMContract:  {},
+		AVMContractBackendNativeModule:		{},
+		AVMContractBackendActorContract:	{},
+		AVMContractBackendWASMContract:		{},
 	}
 	for i, backend := range r.Backends {
 		if err := backend.Validate(); err != nil {
@@ -231,8 +231,8 @@ func (d AVMNativeModuleDescriptor) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM native module keeper service", value: d.KeeperService},
 		{name: "AVM native module MsgServer service", value: d.MsgServerService},

@@ -11,19 +11,19 @@ import (
 )
 
 type PaymentEnvelope struct {
-	Asset             string
-	Payer             string
-	PayeeService      string
-	Denom             string
-	Amount            string
-	MaxAmountOptional string
-	PricingUnit       coretypes.ServicePricingUnit
-	SettlementMode    coretypes.ServicePaymentSettlementMode
-	EscrowIDOptional  string
-	StreamIDOptional  string
-	MeterIDOptional   string
-	ExpiryHeight      uint64
-	EnvelopeHash      string
+	Asset			string
+	Payer			string
+	PayeeService		string
+	Denom			string
+	Amount			string
+	MaxAmountOptional	string
+	PricingUnit		coretypes.ServicePricingUnit
+	SettlementMode		coretypes.ServicePaymentSettlementMode
+	EscrowIDOptional	string
+	StreamIDOptional	string
+	MeterIDOptional		string
+	ExpiryHeight		uint64
+	EnvelopeHash		string
 }
 
 func NewPaymentEnvelope(envelope PaymentEnvelope) (PaymentEnvelope, error) {
@@ -44,17 +44,17 @@ func NewPaymentEnvelopeFromDescriptor(descriptor ServiceDescriptor, payer string
 		return PaymentEnvelope{}, err
 	}
 	return NewPaymentEnvelope(PaymentEnvelope{
-		Asset:             descriptor.Payment.Denom,
-		Payer:             payer,
-		PayeeService:      descriptor.ServiceID,
-		Denom:             descriptor.Payment.Denom,
-		Amount:            descriptor.Payment.Amount,
-		MaxAmountOptional: descriptor.Payment.MaxAmount,
-		PricingUnit:       descriptor.Payment.PricingUnit,
-		SettlementMode:    descriptor.Payment.SettlementMode,
-		EscrowIDOptional:  descriptor.Payment.EscrowID,
-		MeterIDOptional:   descriptor.Payment.MeterID,
-		ExpiryHeight:      firstNonZeroHeight(descriptor.Payment.ExpiryHeight, descriptor.ExpiryHeight),
+		Asset:			descriptor.Payment.Denom,
+		Payer:			payer,
+		PayeeService:		descriptor.ServiceID,
+		Denom:			descriptor.Payment.Denom,
+		Amount:			descriptor.Payment.Amount,
+		MaxAmountOptional:	descriptor.Payment.MaxAmount,
+		PricingUnit:		descriptor.Payment.PricingUnit,
+		SettlementMode:		descriptor.Payment.SettlementMode,
+		EscrowIDOptional:	descriptor.Payment.EscrowID,
+		MeterIDOptional:	descriptor.Payment.MeterID,
+		ExpiryHeight:		firstNonZeroHeight(descriptor.Payment.ExpiryHeight, descriptor.ExpiryHeight),
 	})
 }
 
@@ -93,8 +93,8 @@ func (envelope PaymentEnvelope) ValidateFormat() error {
 		return fmt.Errorf("unknown services payment envelope settlement mode %q", envelope.SettlementMode)
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "services payment envelope escrow id", value: envelope.EscrowIDOptional},
 		{name: "services payment envelope stream id", value: envelope.StreamIDOptional},

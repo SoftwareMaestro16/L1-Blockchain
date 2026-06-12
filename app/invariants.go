@@ -27,46 +27,46 @@ import (
 )
 
 const (
-	AppInvariantBankSupply                    = "bank_supply_matches_total_balances"
-	AppInvariantModuleAccounts                = "module_accounts_exist_and_match_permissions"
-	AppInvariantValidatorSet                  = "validator_set_matches_staking_state"
-	AppInvariantSystemAddresses               = "system_addresses_are_reserved_and_blocked"
-	AppInvariantFeeAccounting                 = "fee_accounting_reconciles"
-	AppInvariantStorageAccounting             = "storage_accounting_reconciles"
-	AppInvariantGenesisExport                 = "genesis_export_is_valid_and_deterministic"
-	AppInvariantPoolSharesSum                 = "pool_shares_sum_equals_total_shares"
-	AppInvariantPoolRuntimeAccounting         = "pool_active_stake_rewards_unbondings_consistent"
-	AppInvariantValidatorInsuranceBounds      = "validator_entry_self_stake_insurance_bounds"
-	AppInvariantEconomicsFeeSplit             = "fee_split_sums_to_100_percent"
-	AppInvariantEconomicsAccounting           = "burn_treasury_rewards_accounting"
-	AppInvariantAVMQueueReceipts              = "avm_contract_queue_receipts_consistency"
-	AppInvariantReservedSystemAddressPolicy   = "reserved_system_address_ownership_blocking"
-	AppInvariantBankModuleAccounting          = nativeaccounttypes.InvariantModuleBankAccountingConsistent
-	AppInvariantDirectUserDelegationRejected  = nativeaccounttypes.InvariantDirectUserValidatorDelegationRejected
-	AppInvariantProtocolCriticalStorageRent   = nativeaccounttypes.InvariantProtocolCriticalStateNotFrozenByRent
-	AppInvariantSystemStorageReserveRunway    = nativeaccounttypes.InvariantSystemStorageReserveRunway
-	AppInvariantProtocolCriticalExecutable    = nativeaccounttypes.InvariantProtocolCriticalExecutableUnderUnderfunding
-	AppInvariantSystemRentTopUpBeforeUserWork = nativeaccounttypes.InvariantSystemRentTopUpBeforeUserFreeze
+	AppInvariantBankSupply				= "bank_supply_matches_total_balances"
+	AppInvariantModuleAccounts			= "module_accounts_exist_and_match_permissions"
+	AppInvariantValidatorSet			= "validator_set_matches_staking_state"
+	AppInvariantSystemAddresses			= "system_addresses_are_reserved_and_blocked"
+	AppInvariantFeeAccounting			= "fee_accounting_reconciles"
+	AppInvariantStorageAccounting			= "storage_accounting_reconciles"
+	AppInvariantGenesisExport			= "genesis_export_is_valid_and_deterministic"
+	AppInvariantPoolSharesSum			= "pool_shares_sum_equals_total_shares"
+	AppInvariantPoolRuntimeAccounting		= "pool_active_stake_rewards_unbondings_consistent"
+	AppInvariantValidatorInsuranceBounds		= "validator_entry_self_stake_insurance_bounds"
+	AppInvariantEconomicsFeeSplit			= "fee_split_sums_to_100_percent"
+	AppInvariantEconomicsAccounting			= "burn_treasury_rewards_accounting"
+	AppInvariantAVMQueueReceipts			= "avm_contract_queue_receipts_consistency"
+	AppInvariantReservedSystemAddressPolicy		= "reserved_system_address_ownership_blocking"
+	AppInvariantBankModuleAccounting		= nativeaccounttypes.InvariantModuleBankAccountingConsistent
+	AppInvariantDirectUserDelegationRejected	= nativeaccounttypes.InvariantDirectUserValidatorDelegationRejected
+	AppInvariantProtocolCriticalStorageRent		= nativeaccounttypes.InvariantProtocolCriticalStateNotFrozenByRent
+	AppInvariantSystemStorageReserveRunway		= nativeaccounttypes.InvariantSystemStorageReserveRunway
+	AppInvariantProtocolCriticalExecutable		= nativeaccounttypes.InvariantProtocolCriticalExecutableUnderUnderfunding
+	AppInvariantSystemRentTopUpBeforeUserWork	= nativeaccounttypes.InvariantSystemRentTopUpBeforeUserFreeze
 
-	AppInvariantEmissionCap            = "emission_cap_total_minted_below_constitutional_max"
-	AppInvariantBurnAccounting         = "burn_accounting_reconciles_denom_burned_vs_bank_supply"
-	AppInvariantTreasuryAccounting     = "treasury_accounting_reconciles_bank_balance"
-	AppInvariantFeeCollectorAccounting = "fee_collector_accounting_reconciles_bank_balance"
-	AppInvariantRentReserveBalance          = "storage_rent_reserve_balance_above_protocol_minimum"
-	AppInvariantNoNativeAppAssetModules    = "no_native_app_asset_modules_wired"
+	AppInvariantEmissionCap			= "emission_cap_total_minted_below_constitutional_max"
+	AppInvariantBurnAccounting		= "burn_accounting_reconciles_denom_burned_vs_bank_supply"
+	AppInvariantTreasuryAccounting		= "treasury_accounting_reconciles_bank_balance"
+	AppInvariantFeeCollectorAccounting	= "fee_collector_accounting_reconciles_bank_balance"
+	AppInvariantRentReserveBalance		= "storage_rent_reserve_balance_above_protocol_minimum"
+	AppInvariantNoNativeAppAssetModules	= "no_native_app_asset_modules_wired"
 )
 
 // AppInvariant binds a consensus invariant ID to live application state.
 type AppInvariant struct {
-	ID          string
-	Description string
-	Check       func(ctx sdk.Context) error
+	ID		string
+	Description	string
+	Check		func(ctx sdk.Context) error
 }
 
 // AppInvariantFailure is a deterministic runtime invariant failure report.
 type AppInvariantFailure struct {
-	ID    string
-	Error string
+	ID	string
+	Error	string
 }
 
 // AppInvariantRouteRegistry is the app-owned invariant registry used by tests,
@@ -195,8 +195,8 @@ func (app *L1App) AppInvariantRegistry() []AppInvariant {
 	for _, modelInvariant := range modelRegistry {
 		id := modelInvariant.ID
 		registry = append(registry, AppInvariant{
-			ID:          id,
-			Description: modelInvariant.Description,
+			ID:		id,
+			Description:	modelInvariant.Description,
 			Check: func(ctx sdk.Context) error {
 				return app.checkAppInvariant(ctx, id)
 			},
@@ -227,8 +227,8 @@ func (app *L1App) AppInvariantRegistry() []AppInvariant {
 		id := invariant.ID
 		description := invariant.Description
 		registry = append(registry, AppInvariant{
-			ID:          id,
-			Description: description,
+			ID:		id,
+			Description:	description,
 			Check: func(ctx sdk.Context) error {
 				return app.checkAppInvariant(ctx, id)
 			},
@@ -388,8 +388,6 @@ func (app *L1App) nativeInvariantInput(ctx sdk.Context) (nativeaccounttypes.Nati
 	supply := app.BankKeeper.GetSupply(ctx, params.BondDenom)
 	totalSupply := safeUint64(supply.Amount, 0)
 
-	// TODO: read MinValidatorStake from ValidatorRegistryKeeper.ExportGenesis().Params.MinValidatorStake
-	// after test fixtures are updated to use validator stakes >= 10^15 naet (1M AE).
 	minValidatorStake := uint64(0)
 
 	emissionParams, emissionErr := app.EmissionsKeeper.GetParams(ctx)
@@ -419,21 +417,21 @@ func (app *L1App) nativeInvariantInput(ctx sdk.Context) (nativeaccounttypes.Nati
 
 	aeRoundtripStable, rawRoundtripStable := appAddressRoundtripStable()
 	return nativeaccounttypes.NativeAccountInvariantInput{
-		AEAddressRoundtripStable:     aeRoundtripStable,
-		RawAddressRoundtripStable:    rawRoundtripStable,
-		ActivationAttempts:           map[string]uint64{},
-		TotalSupply:                  totalSupply,
-		RewardBudget:                 rewardBudget,
-		ActiveValidatorCount:         activeValidators,
-		MaxValidatorCount:            uint64(params.MaxValidators),
-		ValidatorStakes:              validatorStakes,
-		MinValidatorStake:            minValidatorStake,
-		ExportImportStable:           true,
-		SystemReserveRunwayBlocks:    systemReserveRunwayBlocks,
-		MinSystemReserveRunwayBlocks: minSystemReserveRunwayBlocks,
-		SystemTopUpOrder:             []string{"system_rent_top_up", "user_freeze_processing"},
-		ProtocolCriticalExecutable:   protocolCriticalExecutable,
-		SystemRentUnderfunded:        systemRentUnderfunded,
+		AEAddressRoundtripStable:	aeRoundtripStable,
+		RawAddressRoundtripStable:	rawRoundtripStable,
+		ActivationAttempts:		map[string]uint64{},
+		TotalSupply:			totalSupply,
+		RewardBudget:			rewardBudget,
+		ActiveValidatorCount:		activeValidators,
+		MaxValidatorCount:		uint64(params.MaxValidators),
+		ValidatorStakes:		validatorStakes,
+		MinValidatorStake:		minValidatorStake,
+		ExportImportStable:		true,
+		SystemReserveRunwayBlocks:	systemReserveRunwayBlocks,
+		MinSystemReserveRunwayBlocks:	minSystemReserveRunwayBlocks,
+		SystemTopUpOrder:		[]string{"system_rent_top_up", "user_freeze_processing"},
+		ProtocolCriticalExecutable:	protocolCriticalExecutable,
+		SystemRentUnderfunded:		systemRentUnderfunded,
 	}, nil
 }
 
@@ -913,9 +911,9 @@ func validateValidatorInsuranceBounds(registryState validatorregistrytypes.State
 			mode = validatorregistrytypes.ValidatorFundingSolo
 		}
 		if err := registryParams.ValidateValidatorFunding(validatorregistrytypes.ValidatorFunding{
-			Mode:          mode,
-			SelfStake:     normalized.SelfBond,
-			NominatorBond: normalized.NominatorBond,
+			Mode:		mode,
+			SelfStake:	normalized.SelfBond,
+			NominatorBond:	normalized.NominatorBond,
 		}); err != nil {
 			return fmt.Errorf("active validator %s funding invalid: %w", normalized.OperatorAddress, err)
 		}

@@ -13,22 +13,22 @@ func TestDefaultServiceHardConstraintsManifestCoversSection19(t *testing.T) {
 	require.Len(t, manifest.Constraints, 9)
 
 	required := map[ServiceHardConstraintID]bool{
-		ServiceConstraintNoCentralizedBackendAssumption:     false,
-		ServiceConstraintNoMessagingApplicationDependency:   false,
-		ServiceConstraintNoMonolithicExecutionEngine:        false,
-		ServiceConstraintNoManualABIForRegisteredServices:   false,
-		ServiceConstraintNoExternalAPIInConsensusExecution:  false,
-		ServiceConstraintNoNondeterministicStateTransition:  false,
-		ServiceConstraintNoUnboundedRegistryScans:           false,
-		ServiceConstraintNoUnmeteredProofVerification:       false,
-		ServiceConstraintNoUnverifiedOffChainCanonicalState: false,
+		ServiceConstraintNoCentralizedBackendAssumption:	false,
+		ServiceConstraintNoMessagingApplicationDependency:	false,
+		ServiceConstraintNoMonolithicExecutionEngine:		false,
+		ServiceConstraintNoManualABIForRegisteredServices:	false,
+		ServiceConstraintNoExternalAPIInConsensusExecution:	false,
+		ServiceConstraintNoNondeterministicStateTransition:	false,
+		ServiceConstraintNoUnboundedRegistryScans:		false,
+		ServiceConstraintNoUnmeteredProofVerification:		false,
+		ServiceConstraintNoUnverifiedOffChainCanonicalState:	false,
 	}
 	consensusCritical := map[ServiceHardConstraintID]bool{
-		ServiceConstraintNoExternalAPIInConsensusExecution:  true,
-		ServiceConstraintNoNondeterministicStateTransition:  true,
-		ServiceConstraintNoUnboundedRegistryScans:           true,
-		ServiceConstraintNoUnmeteredProofVerification:       true,
-		ServiceConstraintNoUnverifiedOffChainCanonicalState: true,
+		ServiceConstraintNoExternalAPIInConsensusExecution:	true,
+		ServiceConstraintNoNondeterministicStateTransition:	true,
+		ServiceConstraintNoUnboundedRegistryScans:		true,
+		ServiceConstraintNoUnmeteredProofVerification:		true,
+		ServiceConstraintNoUnverifiedOffChainCanonicalState:	true,
 	}
 	for _, constraint := range manifest.Constraints {
 		_, found := required[constraint.ConstraintID]
@@ -75,9 +75,9 @@ func TestServiceHardConstraintsManifestRejectsHashTampering(t *testing.T) {
 
 func TestServiceExecutionHardConstraintPolicyAcceptsSafePath(t *testing.T) {
 	policy := ServiceExecutionHardConstraintPolicy{
-		OffChainResultCanonical:             true,
-		OffChainResultHasChallengeWindow:    true,
-		OffChainResultHasExplicitTrustModel: true,
+		OffChainResultCanonical:		true,
+		OffChainResultHasChallengeWindow:	true,
+		OffChainResultHasExplicitTrustModel:	true,
 	}
 	require.NoError(t, policy.ValidateAgainstHardConstraints())
 	require.True(t, policy.HasOffChainCanonicalizationGate())
@@ -85,54 +85,54 @@ func TestServiceExecutionHardConstraintPolicyAcceptsSafePath(t *testing.T) {
 
 func TestServiceExecutionHardConstraintPolicyRejectsForbiddenPaths(t *testing.T) {
 	cases := []struct {
-		name       string
-		policy     ServiceExecutionHardConstraintPolicy
-		constraint ServiceHardConstraintID
+		name		string
+		policy		ServiceExecutionHardConstraintPolicy
+		constraint	ServiceHardConstraintID
 	}{
 		{
-			name:       "centralized backend",
-			policy:     ServiceExecutionHardConstraintPolicy{CentralizedBackendRequired: true},
-			constraint: ServiceConstraintNoCentralizedBackendAssumption,
+			name:		"centralized backend",
+			policy:		ServiceExecutionHardConstraintPolicy{CentralizedBackendRequired: true},
+			constraint:	ServiceConstraintNoCentralizedBackendAssumption,
 		},
 		{
-			name:       "messaging app dependency",
-			policy:     ServiceExecutionHardConstraintPolicy{MessagingApplicationRequired: true},
-			constraint: ServiceConstraintNoMessagingApplicationDependency,
+			name:		"messaging app dependency",
+			policy:		ServiceExecutionHardConstraintPolicy{MessagingApplicationRequired: true},
+			constraint:	ServiceConstraintNoMessagingApplicationDependency,
 		},
 		{
-			name:       "monolithic engine",
-			policy:     ServiceExecutionHardConstraintPolicy{MonolithicExecutionEngine: true},
-			constraint: ServiceConstraintNoMonolithicExecutionEngine,
+			name:		"monolithic engine",
+			policy:		ServiceExecutionHardConstraintPolicy{MonolithicExecutionEngine: true},
+			constraint:	ServiceConstraintNoMonolithicExecutionEngine,
 		},
 		{
-			name:       "manual abi",
-			policy:     ServiceExecutionHardConstraintPolicy{ManualABIRequiredForRegisteredService: true},
-			constraint: ServiceConstraintNoManualABIForRegisteredServices,
+			name:		"manual abi",
+			policy:		ServiceExecutionHardConstraintPolicy{ManualABIRequiredForRegisteredService: true},
+			constraint:	ServiceConstraintNoManualABIForRegisteredServices,
 		},
 		{
-			name:       "external api",
-			policy:     ServiceExecutionHardConstraintPolicy{ExternalAPIRequiredInConsensus: true},
-			constraint: ServiceConstraintNoExternalAPIInConsensusExecution,
+			name:		"external api",
+			policy:		ServiceExecutionHardConstraintPolicy{ExternalAPIRequiredInConsensus: true},
+			constraint:	ServiceConstraintNoExternalAPIInConsensusExecution,
 		},
 		{
-			name:       "nondeterministic transition",
-			policy:     ServiceExecutionHardConstraintPolicy{NondeterministicStateTransition: true},
-			constraint: ServiceConstraintNoNondeterministicStateTransition,
+			name:		"nondeterministic transition",
+			policy:		ServiceExecutionHardConstraintPolicy{NondeterministicStateTransition: true},
+			constraint:	ServiceConstraintNoNondeterministicStateTransition,
 		},
 		{
-			name:       "unbounded registry scan",
-			policy:     ServiceExecutionHardConstraintPolicy{UnboundedRegistryScan: true},
-			constraint: ServiceConstraintNoUnboundedRegistryScans,
+			name:		"unbounded registry scan",
+			policy:		ServiceExecutionHardConstraintPolicy{UnboundedRegistryScan: true},
+			constraint:	ServiceConstraintNoUnboundedRegistryScans,
 		},
 		{
-			name:       "unmetered proof verification",
-			policy:     ServiceExecutionHardConstraintPolicy{UnmeteredProofVerification: true},
-			constraint: ServiceConstraintNoUnmeteredProofVerification,
+			name:		"unmetered proof verification",
+			policy:		ServiceExecutionHardConstraintPolicy{UnmeteredProofVerification: true},
+			constraint:	ServiceConstraintNoUnmeteredProofVerification,
 		},
 		{
-			name:       "unverified off-chain canonical result",
-			policy:     ServiceExecutionHardConstraintPolicy{OffChainResultCanonical: true},
-			constraint: ServiceConstraintNoUnverifiedOffChainCanonicalState,
+			name:		"unverified off-chain canonical result",
+			policy:		ServiceExecutionHardConstraintPolicy{OffChainResultCanonical: true},
+			constraint:	ServiceConstraintNoUnverifiedOffChainCanonicalState,
 		},
 	}
 	for _, tc := range cases {

@@ -14,24 +14,24 @@ var launchModuleInventoryJSON []byte
 type LaunchModuleClassification string
 
 const (
-	LaunchModuleLaunchCore        LaunchModuleClassification = "launch_core"
-	LaunchModuleLaunchSupport     LaunchModuleClassification = "launch_support"
-	LaunchModuleFutureAVMStandard LaunchModuleClassification = "future_avm_standard"
-	LaunchModulePrototypeOnly     LaunchModuleClassification = "prototype_only"
-	LaunchModuleDisabled          LaunchModuleClassification = "disabled"
+	LaunchModuleLaunchCore		LaunchModuleClassification	= "launch_core"
+	LaunchModuleLaunchSupport	LaunchModuleClassification	= "launch_support"
+	LaunchModuleFutureAVMStandard	LaunchModuleClassification	= "future_avm_standard"
+	LaunchModulePrototypeOnly	LaunchModuleClassification	= "prototype_only"
+	LaunchModuleDisabled		LaunchModuleClassification	= "disabled"
 )
 
 type LaunchModuleInventoryEntry struct {
-	XDir                       string                     `json:"x_dir"`
-	ModuleName                 string                     `json:"module_name"`
-	Classification             LaunchModuleClassification `json:"classification"`
-	AppWired                   bool                       `json:"app_wired"`
-	PublicTestnetReason        string                     `json:"public_testnet_reason"`
-	OwnsConsensusState         bool                       `json:"owns_consensus_state"`
-	KVBackedRuntimeMutations   bool                       `json:"kv_backed_runtime_mutations"`
-	ExportImportStatus         string                     `json:"export_import_status"`
-	InvariantStatus            string                     `json:"invariant_status"`
-	BlockLifecycleScanningRisk string                     `json:"block_lifecycle_scanning_risk"`
+	XDir				string				`json:"x_dir"`
+	ModuleName			string				`json:"module_name"`
+	Classification			LaunchModuleClassification	`json:"classification"`
+	AppWired			bool				`json:"app_wired"`
+	PublicTestnetReason		string				`json:"public_testnet_reason"`
+	OwnsConsensusState		bool				`json:"owns_consensus_state"`
+	KVBackedRuntimeMutations	bool				`json:"kv_backed_runtime_mutations"`
+	ExportImportStatus		string				`json:"export_import_status"`
+	InvariantStatus			string				`json:"invariant_status"`
+	BlockLifecycleScanningRisk	string				`json:"block_lifecycle_scanning_risk"`
 }
 
 func DefaultLaunchModuleInventory() []LaunchModuleInventoryEntry {
@@ -50,11 +50,11 @@ func ValidateLaunchModuleInventory(entries []LaunchModuleInventoryEntry, xDirs [
 		return fmt.Errorf("launch module inventory is required")
 	}
 	classes := map[LaunchModuleClassification]struct{}{
-		LaunchModuleLaunchCore:        {},
-		LaunchModuleLaunchSupport:     {},
-		LaunchModuleFutureAVMStandard: {},
-		LaunchModulePrototypeOnly:     {},
-		LaunchModuleDisabled:          {},
+		LaunchModuleLaunchCore:		{},
+		LaunchModuleLaunchSupport:	{},
+		LaunchModuleFutureAVMStandard:	{},
+		LaunchModulePrototypeOnly:	{},
+		LaunchModuleDisabled:		{},
 	}
 	xDirSet := make(map[string]struct{}, len(xDirs))
 	for _, dir := range xDirs {
@@ -199,7 +199,6 @@ func RenderLaunchModuleInventoryBoundarySummary(entries []LaunchModuleInventoryE
 	b.WriteString("\nPublic testnet profile rejects `prototype_only` and `disabled` modules in app wiring, rejects memory-only consensus keepers, and rejects native application-asset modules.\n")
 	return b.String()
 }
-
 
 func normalizeXDir(dir string) string {
 	dir = strings.TrimSpace(strings.ReplaceAll(dir, "\\", "/"))

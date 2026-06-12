@@ -11,61 +11,61 @@ type ServiceIntegrationModuleKind string
 type ServiceKeeperBoundaryName string
 
 const (
-	ServiceIntegrationModuleRequired ServiceIntegrationModuleKind = "required"
-	ServiceIntegrationModuleOptional ServiceIntegrationModuleKind = "optional"
+	ServiceIntegrationModuleRequired	ServiceIntegrationModuleKind	= "required"
+	ServiceIntegrationModuleOptional	ServiceIntegrationModuleKind	= "optional"
 
-	ServicesKeeperBoundary  ServiceKeeperBoundaryName = "ServicesKeeper"
-	InterfaceKeeperBoundary ServiceKeeperBoundaryName = "InterfaceKeeper"
-	CallKeeperBoundary      ServiceKeeperBoundaryName = "CallKeeper"
-	PaymentKeeperBoundary   ServiceKeeperBoundaryName = "PaymentKeeper"
-	ProviderKeeperBoundary  ServiceKeeperBoundaryName = "ProviderKeeper"
-	ReceiptKeeperBoundary   ServiceKeeperBoundaryName = "ReceiptKeeper"
+	ServicesKeeperBoundary	ServiceKeeperBoundaryName	= "ServicesKeeper"
+	InterfaceKeeperBoundary	ServiceKeeperBoundaryName	= "InterfaceKeeper"
+	CallKeeperBoundary	ServiceKeeperBoundaryName	= "CallKeeper"
+	PaymentKeeperBoundary	ServiceKeeperBoundaryName	= "PaymentKeeper"
+	ProviderKeeperBoundary	ServiceKeeperBoundaryName	= "ProviderKeeper"
+	ReceiptKeeperBoundary	ServiceKeeperBoundaryName	= "ReceiptKeeper"
 
-	ServiceModuleServices        = "x/services"
-	ServiceModuleInterface       = "x/serviceinterface"
-	ServiceModuleCalls           = "x/servicecalls"
-	ServiceModulePayments        = "x/servicepayments"
-	ServiceModuleProviders       = "x/serviceproviders"
-	ServiceModuleReceipts        = "x/servicereceipts"
-	ServiceModuleIdentity        = "x/identity"
-	ServiceModuleStorage         = "x/storage"
-	ServiceModuleRouting         = "x/routing"
-	ServiceModuleExternalPayment = "x/payments"
-	ServiceModuleContracts       = "x/contracts"
-	ServiceModuleAVM             = "x/avm"
+	ServiceModuleServices		= "x/services"
+	ServiceModuleInterface		= "x/serviceinterface"
+	ServiceModuleCalls		= "x/servicecalls"
+	ServiceModulePayments		= "x/servicepayments"
+	ServiceModuleProviders		= "x/serviceproviders"
+	ServiceModuleReceipts		= "x/servicereceipts"
+	ServiceModuleIdentity		= "x/identity"
+	ServiceModuleStorage		= "x/storage"
+	ServiceModuleRouting		= "x/routing"
+	ServiceModuleExternalPayment	= "x/payments"
+	ServiceModuleContracts		= "x/contracts"
+	ServiceModuleAVM		= "x/avm"
 )
 
 type ServiceIntegrationModule struct {
-	ModulePath string
-	Kind       ServiceIntegrationModuleKind
-	Purpose    string
-	StoreKey   string
-	ModuleHash string
+	ModulePath	string
+	Kind		ServiceIntegrationModuleKind
+	Purpose		string
+	StoreKey	string
+	ModuleHash	string
 }
 
 type ServiceKeeperBoundary struct {
-	KeeperName       ServiceKeeperBoundaryName
-	ModulePath       string
-	Responsibilities []string
-	StorePrefixes    []string
-	BoundaryHash     string
+	KeeperName		ServiceKeeperBoundaryName
+	ModulePath		string
+	Responsibilities	[]string
+	StorePrefixes		[]string
+	BoundaryHash		string
 }
 
 type ServiceKeeperIntegrationRules struct {
-	StoreV2IsolatedPrefixes      bool
-	CrossZoneOperationMode       string
-	PaymentSettlementIntegration string
-	IdentityAuthorizationModule  string
-	ContractExecutionIntegration string
-	RulesHash                    string
+	StoreV2IsolatedPrefixes		bool
+	CrossZoneOperationMode		string
+	PaymentSettlementIntegration	string
+	IdentityAuthorizationModule	string
+	ContractExecutionIntegration	string
+	RulesHash			string
 }
 
 type CosmosSDKServiceIntegrationManifest struct {
-	RequiredModules  []ServiceIntegrationModule
-	OptionalModules  []ServiceIntegrationModule
-	KeeperBoundaries []ServiceKeeperBoundary
-	Rules            ServiceKeeperIntegrationRules
-	ManifestHash     string
+	RequiredModules		[]ServiceIntegrationModule
+	OptionalModules		[]ServiceIntegrationModule
+	KeeperBoundaries	[]ServiceKeeperBoundary
+	Rules			ServiceKeeperIntegrationRules
+	ManifestHash		string
 }
 
 func DefaultCosmosSDKServiceIntegrationManifest() (CosmosSDKServiceIntegrationManifest, error) {
@@ -125,21 +125,21 @@ func DefaultCosmosSDKServiceIntegrationManifest() (CosmosSDKServiceIntegrationMa
 		}),
 	}
 	rules := ServiceKeeperIntegrationRules{
-		StoreV2IsolatedPrefixes:      true,
-		CrossZoneOperationMode:       "messages",
-		PaymentSettlementIntegration: "bank_or_financial_zone",
-		IdentityAuthorizationModule:  ServiceModuleIdentity,
-		ContractExecutionIntegration: "contract_module_interface",
+		StoreV2IsolatedPrefixes:	true,
+		CrossZoneOperationMode:		"messages",
+		PaymentSettlementIntegration:	"bank_or_financial_zone",
+		IdentityAuthorizationModule:	ServiceModuleIdentity,
+		ContractExecutionIntegration:	"contract_module_interface",
 	}
 	return NewCosmosSDKServiceIntegrationManifest(required, optional, boundaries, rules)
 }
 
 func NewCosmosSDKServiceIntegrationManifest(required []ServiceIntegrationModule, optional []ServiceIntegrationModule, boundaries []ServiceKeeperBoundary, rules ServiceKeeperIntegrationRules) (CosmosSDKServiceIntegrationManifest, error) {
 	manifest := CosmosSDKServiceIntegrationManifest{
-		RequiredModules:  normalizeServiceIntegrationModules(required),
-		OptionalModules:  normalizeServiceIntegrationModules(optional),
-		KeeperBoundaries: normalizeServiceKeeperBoundaries(boundaries),
-		Rules:            canonicalServiceKeeperIntegrationRules(rules),
+		RequiredModules:	normalizeServiceIntegrationModules(required),
+		OptionalModules:	normalizeServiceIntegrationModules(optional),
+		KeeperBoundaries:	normalizeServiceKeeperBoundaries(boundaries),
+		Rules:			canonicalServiceKeeperIntegrationRules(rules),
 	}
 	if manifest.Rules.RulesHash == "" {
 		manifest.Rules.RulesHash = ComputeServiceKeeperIntegrationRulesHash(manifest.Rules)
@@ -345,10 +345,10 @@ func newServiceIntegrationModule(modulePath string, kind ServiceIntegrationModul
 
 func newServiceKeeperBoundary(name ServiceKeeperBoundaryName, modulePath string, responsibilities []string, prefixes []string) ServiceKeeperBoundary {
 	boundary := ServiceKeeperBoundary{
-		KeeperName:       name,
-		ModulePath:       modulePath,
-		Responsibilities: sortedStrings(responsibilities),
-		StorePrefixes:    sortedStrings(prefixes),
+		KeeperName:		name,
+		ModulePath:		modulePath,
+		Responsibilities:	sortedStrings(responsibilities),
+		StorePrefixes:		sortedStrings(prefixes),
 	}
 	boundary.BoundaryHash = ComputeServiceKeeperBoundaryHash(boundary)
 	return boundary

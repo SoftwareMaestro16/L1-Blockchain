@@ -17,12 +17,12 @@ func NewTxConfig(appCodec codec.Codec, bankKeeper bankkeeper.BaseKeeper) client.
 	txConfig, err := authtx.NewTxConfigWithOptions(
 		appCodec,
 		authtx.ConfigOptions{
-			EnabledSignModes: enabledSignModes,
+			EnabledSignModes:	enabledSignModes,
 			SigningOptions: &signing.Options{
-				AddressCodec:          aetraaddress.Codec{},
-				ValidatorAddressCodec: aetraaddress.Codec{},
+				AddressCodec:		aetraaddress.Codec{},
+				ValidatorAddressCodec:	aetraaddress.Codec{},
 			},
-			TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(bankKeeper),
+			TextualCoinMetadataQueryFn:	txmodule.NewBankKeeperCoinMetadataQueryFn(bankKeeper),
 		},
 	)
 	if err != nil {

@@ -12,172 +12,172 @@ import (
 )
 
 const (
-	ApplicationStatusPending   = "pending"
-	ApplicationStatusWithdrawn = "withdrawn"
-	ApplicationStatusCommitted = "committed"
+	ApplicationStatusPending	= "pending"
+	ApplicationStatusWithdrawn	= "withdrawn"
+	ApplicationStatusCommitted	= "committed"
 
-	ExitStatusPending   = "pending"
-	ExitStatusCancelled = "cancelled"
-	ExitStatusFinalized = "finalized"
+	ExitStatusPending	= "pending"
+	ExitStatusCancelled	= "cancelled"
+	ExitStatusFinalized	= "finalized"
 
-	MaxCandidatesV1        = uint32(10_000)
-	MaxValidatorSetSizeV1  = uint32(512)
-	MaxTransitionHistoryV1 = uint32(512)
-	DefaultElectionWindow  = uint64(100)
-	DefaultWithdrawCutoff  = uint64(80)
-	DefaultFrozenUnlock    = uint64(1_000)
-	DefaultMaxPower        = uint64(1_000_000)
-	DefaultMaxTotalPower   = uint64(100_000_000)
+	MaxCandidatesV1		= uint32(10_000)
+	MaxValidatorSetSizeV1	= uint32(512)
+	MaxTransitionHistoryV1	= uint32(512)
+	DefaultElectionWindow	= uint64(100)
+	DefaultWithdrawCutoff	= uint64(80)
+	DefaultFrozenUnlock	= uint64(1_000)
+	DefaultMaxPower		= uint64(1_000_000)
+	DefaultMaxTotalPower	= uint64(100_000_000)
 )
 
 type Params struct {
-	Authority               string
-	MaxCandidates           uint32
-	MaxValidatorSetSize     uint32
-	MaxValidatorPower       uint64
-	MaxTotalVotingPower     uint64
-	ElectionWindowBlocks    uint64
-	WithdrawDeadlineBlocks  uint64
-	FrozenStakeUnlockBlocks uint64
-	MaxTransitionHistory    uint32
+	Authority		string
+	MaxCandidates		uint32
+	MaxValidatorSetSize	uint32
+	MaxValidatorPower	uint64
+	MaxTotalVotingPower	uint64
+	ElectionWindowBlocks	uint64
+	WithdrawDeadlineBlocks	uint64
+	FrozenStakeUnlockBlocks	uint64
+	MaxTransitionHistory	uint32
 }
 
 type ValidatorPower struct {
-	OperatorAddress    string
-	ConsensusPublicKey string
-	VotingPower        uint64
-	ValidatorStatus    string
+	OperatorAddress		string
+	ConsensusPublicKey	string
+	VotingPower		uint64
+	ValidatorStatus		string
 }
 
 type ElectionWindow struct {
-	StartHeight            uint64
-	EndHeight              uint64
-	WithdrawDeadlineHeight uint64
+	StartHeight		uint64
+	EndHeight		uint64
+	WithdrawDeadlineHeight	uint64
 }
 
 type CandidateApplication struct {
-	OperatorAddress    string
-	ConsensusPublicKey string
-	RequestedPower     uint64
-	SelfBond           uint64
-	ValidatorStatus    string
-	Status             string
-	AppliedHeight      uint64
-	UpdatedHeight      uint64
+	OperatorAddress		string
+	ConsensusPublicKey	string
+	RequestedPower		uint64
+	SelfBond		uint64
+	ValidatorStatus		string
+	Status			string
+	AppliedHeight		uint64
+	UpdatedHeight		uint64
 }
 
 type FrozenStake struct {
-	OperatorAddress string
-	Amount          uint64
-	FrozenAtHeight  uint64
-	UnlockHeight    uint64
-	Released        bool
+	OperatorAddress	string
+	Amount		uint64
+	FrozenAtHeight	uint64
+	UnlockHeight	uint64
+	Released	bool
 }
 
 type PendingExit struct {
-	OperatorAddress string
-	RequestedHeight uint64
-	Status          string
+	OperatorAddress	string
+	RequestedHeight	uint64
+	Status		string
 }
 
 type ValidatorPowerCap struct {
-	OperatorAddress string
-	MaxVotingPower  uint64
+	OperatorAddress	string
+	MaxVotingPower	uint64
 }
 
 type ElectionResult struct {
-	Epoch     uint64
-	Height    uint64
-	NextSet   []ValidatorPower
-	Committed bool
-	Finalized bool
+	Epoch		uint64
+	Height		uint64
+	NextSet		[]ValidatorPower
+	Committed	bool
+	Finalized	bool
 }
 
 type RewardDistributionSnapshot struct {
-	Epoch            uint64
-	Height           uint64
-	ValidatorPowers  []ValidatorPower
-	TotalVotingPower uint64
+	Epoch			uint64
+	Height			uint64
+	ValidatorPowers		[]ValidatorPower
+	TotalVotingPower	uint64
 }
 
 type ValidatorSetTransition struct {
-	Epoch       uint64
-	Height      uint64
-	PreviousSet []ValidatorPower
-	CurrentSet  []ValidatorPower
-	NextSet     []ValidatorPower
+	Epoch		uint64
+	Height		uint64
+	PreviousSet	[]ValidatorPower
+	CurrentSet	[]ValidatorPower
+	NextSet		[]ValidatorPower
 }
 
 type State struct {
-	PreviousValidatorSet        []ValidatorPower
-	CurrentValidatorSet         []ValidatorPower
-	NextValidatorSet            []ValidatorPower
-	ElectionEpoch               uint64
-	ElectionWindow              ElectionWindow
-	CandidateApplications       []CandidateApplication
-	FrozenStakes                []FrozenStake
-	PendingExits                []PendingExit
-	ValidatorPowerCaps          []ValidatorPowerCap
-	ElectionResults             []ElectionResult
-	RewardDistributionSnapshots []RewardDistributionSnapshot
-	TransitionHistory           []ValidatorSetTransition
+	PreviousValidatorSet		[]ValidatorPower
+	CurrentValidatorSet		[]ValidatorPower
+	NextValidatorSet		[]ValidatorPower
+	ElectionEpoch			uint64
+	ElectionWindow			ElectionWindow
+	CandidateApplications		[]CandidateApplication
+	FrozenStakes			[]FrozenStake
+	PendingExits			[]PendingExit
+	ValidatorPowerCaps		[]ValidatorPowerCap
+	ElectionResults			[]ElectionResult
+	RewardDistributionSnapshots	[]RewardDistributionSnapshot
+	TransitionHistory		[]ValidatorSetTransition
 }
 
 type MsgApplyForValidatorSet struct {
-	Authority   string
-	Application CandidateApplication
-	Height      uint64
+	Authority	string
+	Application	CandidateApplication
+	Height		uint64
 }
 
 type MsgWithdrawApplication struct {
-	Authority       string
-	OperatorAddress string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Height		uint64
 }
 
 type MsgCommitElection struct {
-	Authority string
-	Height    uint64
+	Authority	string
+	Height		uint64
 }
 
 type MsgFinalizeElection struct {
-	Authority string
-	Height    uint64
+	Authority	string
+	Height		uint64
 }
 
 type MsgRequestValidatorExit struct {
-	Authority       string
-	OperatorAddress string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Height		uint64
 }
 
 type MsgCancelValidatorExit struct {
-	Authority       string
-	OperatorAddress string
-	Height          uint64
+	Authority	string
+	OperatorAddress	string
+	Height		uint64
 }
 
 func DefaultParams() Params {
 	return Params{
-		Authority:               prototype.DefaultAuthority,
-		MaxCandidates:           MaxCandidatesV1,
-		MaxValidatorSetSize:     MaxValidatorSetSizeV1,
-		MaxValidatorPower:       DefaultMaxPower,
-		MaxTotalVotingPower:     DefaultMaxTotalPower,
-		ElectionWindowBlocks:    DefaultElectionWindow,
-		WithdrawDeadlineBlocks:  DefaultWithdrawCutoff,
-		FrozenStakeUnlockBlocks: DefaultFrozenUnlock,
-		MaxTransitionHistory:    MaxTransitionHistoryV1,
+		Authority:			prototype.DefaultAuthority,
+		MaxCandidates:			MaxCandidatesV1,
+		MaxValidatorSetSize:		MaxValidatorSetSizeV1,
+		MaxValidatorPower:		DefaultMaxPower,
+		MaxTotalVotingPower:		DefaultMaxTotalPower,
+		ElectionWindowBlocks:		DefaultElectionWindow,
+		WithdrawDeadlineBlocks:		DefaultWithdrawCutoff,
+		FrozenStakeUnlockBlocks:	DefaultFrozenUnlock,
+		MaxTransitionHistory:		MaxTransitionHistoryV1,
 	}
 }
 
 func DefaultState(params Params) State {
 	return State{
-		ElectionEpoch: 1,
+		ElectionEpoch:	1,
 		ElectionWindow: ElectionWindow{
-			StartHeight:            1,
-			EndHeight:              1 + params.ElectionWindowBlocks,
-			WithdrawDeadlineHeight: 1 + params.WithdrawDeadlineBlocks,
+			StartHeight:		1,
+			EndHeight:		1 + params.ElectionWindowBlocks,
+			WithdrawDeadlineHeight:	1 + params.WithdrawDeadlineBlocks,
 		},
 	}
 }
@@ -234,9 +234,9 @@ func (s State) Validate(params Params) error {
 		return err
 	}
 	for label, set := range map[string][]ValidatorPower{
-		"previous": s.PreviousValidatorSet,
-		"current":  s.CurrentValidatorSet,
-		"next":     s.NextValidatorSet,
+		"previous":	s.PreviousValidatorSet,
+		"current":	s.CurrentValidatorSet,
+		"next":		s.NextValidatorSet,
 	} {
 		if err := validateValidatorSet(label, set, params, label == "next"); err != nil {
 			return err
@@ -450,10 +450,10 @@ func CandidateRank(app CandidateApplication, cap uint64, params Params) Validato
 		power = params.MaxValidatorPower
 	}
 	return ValidatorPower{
-		OperatorAddress:    app.OperatorAddress,
-		ConsensusPublicKey: app.ConsensusPublicKey,
-		VotingPower:        power,
-		ValidatorStatus:    app.ValidatorStatus,
+		OperatorAddress:	app.OperatorAddress,
+		ConsensusPublicKey:	app.ConsensusPublicKey,
+		VotingPower:		power,
+		ValidatorStatus:	app.ValidatorStatus,
 	}
 }
 

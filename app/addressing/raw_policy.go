@@ -10,22 +10,22 @@ import (
 type RawAddressPolicyVersion uint32
 
 const (
-	RawAddressPolicyVersionLegacyPadded RawAddressPolicyVersion = 1
-	RawAddressPolicyVersionV2            RawAddressPolicyVersion = 2
+	RawAddressPolicyVersionLegacyPadded	RawAddressPolicyVersion	= 1
+	RawAddressPolicyVersionV2		RawAddressPolicyVersion	= 2
 )
 
 type RawAddressClass string
 
 const (
-	RawAddressClassUnknown      RawAddressClass = "unknown"
-	RawAddressClassSystemFixed  RawAddressClass = "system_fixed"
-	RawAddressClassLegacyPadded RawAddressClass = "legacy_padded"
-	RawAddressClassV2           RawAddressClass = "v2_256_bit"
+	RawAddressClassUnknown		RawAddressClass	= "unknown"
+	RawAddressClassSystemFixed	RawAddressClass	= "system_fixed"
+	RawAddressClassLegacyPadded	RawAddressClass	= "legacy_padded"
+	RawAddressClassV2		RawAddressClass	= "v2_256_bit"
 )
 
 const (
-	rawAddressV2DomainSeparator = "aetra-raw-address-v2"
-	rawAddressV2MaxAttempts     = 256
+	rawAddressV2DomainSeparator	= "aetra-raw-address-v2"
+	rawAddressV2MaxAttempts		= 256
 )
 
 func ClassifyRawAddressText(text string) (RawAddressClass, error) {

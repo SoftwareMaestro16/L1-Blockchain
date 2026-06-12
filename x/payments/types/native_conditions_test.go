@@ -18,27 +18,27 @@ func TestNativeConditionalPaymentPreimageResolvesLinkedActiveChain(t *testing.T)
 	paymentStateRoot := HashParts("native-condition-payment-state")
 
 	first, err := BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:             firstID,
-		Payer:                   alice,
-		Payee:                   router,
-		Amount:                  "100",
-		HashLock:                hashLock,
-		TimeoutHeight:           100,
-		RouteID:                 routeID,
-		NextConditionIDOptional: secondID,
-		Status:                  NativeConditionalPaymentPending,
+		ConditionID:			firstID,
+		Payer:				alice,
+		Payee:				router,
+		Amount:				"100",
+		HashLock:			hashLock,
+		TimeoutHeight:			100,
+		RouteID:			routeID,
+		NextConditionIDOptional:	secondID,
+		Status:				NativeConditionalPaymentPending,
 	})
 	require.NoError(t, err)
 	second, err := BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:                 secondID,
-		Payer:                       router,
-		Payee:                       bob,
-		Amount:                      "95",
-		HashLock:                    hashLock,
-		TimeoutHeight:               80,
-		RouteID:                     routeID,
-		PreviousConditionIDOptional: firstID,
-		Status:                      NativeConditionalPaymentPending,
+		ConditionID:			secondID,
+		Payer:				router,
+		Payee:				bob,
+		Amount:				"95",
+		HashLock:			hashLock,
+		TimeoutHeight:			80,
+		RouteID:			routeID,
+		PreviousConditionIDOptional:	firstID,
+		Status:				NativeConditionalPaymentPending,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateNativeConditionTimeoutOrdering([]NativeConditionalPayment{second, first}, 10))
@@ -69,23 +69,23 @@ func TestNativeConditionalPaymentTimeoutOrderingProtectsIntermediaries(t *testin
 	secondID := HashParts("native-condition-timeout-second")
 
 	upstream, err := BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:             firstID,
-		Payer:                   alice,
-		Payee:                   router,
-		Amount:                  "50",
-		TimeoutHeight:           100,
-		RouteID:                 routeID,
-		NextConditionIDOptional: secondID,
+		ConditionID:			firstID,
+		Payer:				alice,
+		Payee:				router,
+		Amount:				"50",
+		TimeoutHeight:			100,
+		RouteID:			routeID,
+		NextConditionIDOptional:	secondID,
 	})
 	require.NoError(t, err)
 	downstream, err := BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:                 secondID,
-		Payer:                       router,
-		Payee:                       bob,
-		Amount:                      "45",
-		TimeoutHeight:               95,
-		RouteID:                     routeID,
-		PreviousConditionIDOptional: firstID,
+		ConditionID:			secondID,
+		Payer:				router,
+		Payee:				bob,
+		Amount:				"45",
+		TimeoutHeight:			95,
+		RouteID:			routeID,
+		PreviousConditionIDOptional:	firstID,
 	})
 	require.NoError(t, err)
 	require.ErrorContains(t, ValidateNativeConditionTimeoutOrdering([]NativeConditionalPayment{upstream, downstream}, 10), "protect")
@@ -102,12 +102,12 @@ func TestNativeConditionalPaymentExpiryRefundsReservedLiquidity(t *testing.T) {
 	bob := testAddress(0xa8)
 	stateRoot := HashParts("native-condition-expiry-state")
 	condition, err := BuildNativeConditionalPayment(NativeConditionalPayment{
-		ConditionID:   HashParts("native-condition-expiry"),
-		Payer:         alice,
-		Payee:         bob,
-		Amount:        "33",
-		TimeoutHeight: 40,
-		RouteID:       HashParts("native-condition-expiry-route"),
+		ConditionID:	HashParts("native-condition-expiry"),
+		Payer:		alice,
+		Payee:		bob,
+		Amount:		"33",
+		TimeoutHeight:	40,
+		RouteID:	HashParts("native-condition-expiry-route"),
 	})
 	require.NoError(t, err)
 
@@ -126,38 +126,38 @@ func TestNativeConditionalPaymentExpiryRefundsReservedLiquidity(t *testing.T) {
 func TestCrossZonePaymentRoutingEnforcesCommittedRouteOrReservation(t *testing.T) {
 	route := testMsgPaymentRoute()
 	commitment := PaymentRouteCommitment{
-		RouteID:        route.RouteID,
-		Committer:      route.Payer,
-		CommitmentHash: ComputePaymentRouteCommitmentHash(route),
-		Signed:         true,
-		ExpiresHeight:  90,
+		RouteID:	route.RouteID,
+		Committer:	route.Payer,
+		CommitmentHash:	ComputePaymentRouteCommitmentHash(route),
+		Signed:		true,
+		ExpiresHeight:	90,
 	}
 	input, err := BuildCrossZonePaymentRoutingInput(CrossZonePaymentRoutingInput{
-		SourceAccount:         route.Payer,
-		TargetAccount:         route.Payee,
-		Amount:                route.Amount,
-		MaxFee:                route.MaxFee,
-		ExpiryHeight:          route.ExpiryHeight,
-		RoutePolicy:           DefaultRoutePolicy(),
-		LiquidityHints:        []PaymentRouteBalance{{Participant: route.Payer, Available: "105"}},
-		RouteCommitment:       commitment,
-		UnifiedMessageRoot:    HashParts("cross-zone-unified-message-root"),
-		FinancialFallbackRoot: HashParts("cross-zone-financial-fallback-root"),
+		SourceAccount:		route.Payer,
+		TargetAccount:		route.Payee,
+		Amount:			route.Amount,
+		MaxFee:			route.MaxFee,
+		ExpiryHeight:		route.ExpiryHeight,
+		RoutePolicy:		DefaultRoutePolicy(),
+		LiquidityHints:		[]PaymentRouteBalance{{Participant: route.Payer, Available: "105"}},
+		RouteCommitment:	commitment,
+		UnifiedMessageRoot:	HashParts("cross-zone-unified-message-root"),
+		FinancialFallbackRoot:	HashParts("cross-zone-financial-fallback-root"),
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateCrossZonePaymentRouteSettlement(input, route, 50))
 
 	msg, err := BuildCrossZonePaymentMessage(CrossZonePaymentMessage{
-		SourceZoneID:        "financial",
-		DestinationZoneID:   "contract",
-		SourceShardID:       1,
-		DestinationShardID:  2,
-		PayloadType:         "MsgPaymentRoute",
-		RouteID:             route.RouteID,
-		RouteCommitmentHash: commitment.CommitmentHash,
-		PaymentStateRoot:    input.RoutingRoot,
-		UnifiedMessageRoot:  input.UnifiedMessageRoot,
-		ExpiryHeight:        route.ExpiryHeight,
+		SourceZoneID:		"financial",
+		DestinationZoneID:	"contract",
+		SourceShardID:		1,
+		DestinationShardID:	2,
+		PayloadType:		"MsgPaymentRoute",
+		RouteID:		route.RouteID,
+		RouteCommitmentHash:	commitment.CommitmentHash,
+		PaymentStateRoot:	input.RoutingRoot,
+		UnifiedMessageRoot:	input.UnifiedMessageRoot,
+		ExpiryHeight:		route.ExpiryHeight,
 	})
 	require.NoError(t, err)
 	require.NoError(t, msg.Validate())
@@ -171,21 +171,21 @@ func TestCrossZonePaymentRoutingEnforcesCommittedRouteOrReservation(t *testing.T
 func TestCrossZonePaymentReservedRouteRequiresOnChainReservationRoot(t *testing.T) {
 	route := testMsgPaymentRoute()
 	input, err := BuildCrossZonePaymentRoutingInput(CrossZonePaymentRoutingInput{
-		SourceAccount:  route.Payer,
-		TargetIdentity: "merchant.aet",
-		Amount:         route.Amount,
-		MaxFee:         route.MaxFee,
-		ExpiryHeight:   route.ExpiryHeight,
-		RoutePolicy:    DefaultRoutePolicy(),
+		SourceAccount:	route.Payer,
+		TargetIdentity:	"merchant.aet",
+		Amount:		route.Amount,
+		MaxFee:		route.MaxFee,
+		ExpiryHeight:	route.ExpiryHeight,
+		RoutePolicy:	DefaultRoutePolicy(),
 		RouteCommitment: PaymentRouteCommitment{
-			RouteID:        route.RouteID,
-			Committer:      route.Payer,
-			CommitmentHash: ComputePaymentRouteCommitmentHash(route),
-			Reserved:       true,
-			ExpiresHeight:  90,
+			RouteID:	route.RouteID,
+			Committer:	route.Payer,
+			CommitmentHash:	ComputePaymentRouteCommitmentHash(route),
+			Reserved:	true,
+			ExpiresHeight:	90,
 		},
-		UnifiedMessageRoot:    HashParts("cross-zone-reserved-message-root"),
-		FinancialFallbackRoot: HashParts("cross-zone-reserved-fallback-root"),
+		UnifiedMessageRoot:	HashParts("cross-zone-reserved-message-root"),
+		FinancialFallbackRoot:	HashParts("cross-zone-reserved-fallback-root"),
 	})
 	require.NoError(t, err)
 	require.ErrorContains(t, ValidateCrossZonePaymentRouteSettlement(input, route, 50), "reservation root")

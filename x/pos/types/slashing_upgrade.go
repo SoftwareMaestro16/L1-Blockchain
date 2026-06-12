@@ -10,154 +10,154 @@ import (
 )
 
 const (
-	SlashSeverityMinorLivenessFault         = "minor_liveness_fault"
-	SlashSeverityMajorLivenessFault         = "major_liveness_fault"
-	SlashSeverityRepeatedLivenessFault      = "repeated_liveness_fault"
-	SlashSeverityInvalidTaskExecution       = "invalid_task_execution"
-	SlashSeverityInvalidStateTransition     = "invalid_state_transition"
-	SlashSeverityRepeatedInvalidProposal    = "repeated_invalid_proposal"
-	SlashSeverityRepeatedTimestampViolation = "repeated_timestamp_violation"
-	SlashSeverityEquivocation               = "equivocation"
-	SlashSeverityDoubleSign                 = "double_sign"
-	SlashSeverityEvidenceFraud              = "evidence_fraud"
+	SlashSeverityMinorLivenessFault		= "minor_liveness_fault"
+	SlashSeverityMajorLivenessFault		= "major_liveness_fault"
+	SlashSeverityRepeatedLivenessFault	= "repeated_liveness_fault"
+	SlashSeverityInvalidTaskExecution	= "invalid_task_execution"
+	SlashSeverityInvalidStateTransition	= "invalid_state_transition"
+	SlashSeverityRepeatedInvalidProposal	= "repeated_invalid_proposal"
+	SlashSeverityRepeatedTimestampViolation	= "repeated_timestamp_violation"
+	SlashSeverityEquivocation		= "equivocation"
+	SlashSeverityDoubleSign			= "double_sign"
+	SlashSeverityEvidenceFraud		= "evidence_fraud"
 
-	SlashSeverityLow      = "low"
-	SlashSeverityMedium   = "medium"
-	SlashSeverityHigh     = "high"
-	SlashSeverityCritical = "critical"
+	SlashSeverityLow	= "low"
+	SlashSeverityMedium	= "medium"
+	SlashSeverityHigh	= "high"
+	SlashSeverityCritical	= "critical"
 
-	DefaultSlashRepeatMultiplierBps = uint32(BasisPoints)
-	DefaultSlashImpactBps           = uint32(BasisPoints)
+	DefaultSlashRepeatMultiplierBps	= uint32(BasisPoints)
+	DefaultSlashImpactBps		= uint32(BasisPoints)
 
-	DefaultPenaltyBurnBps         = uint32(4_000)
-	DefaultPenaltyReporterBps     = uint32(1_000)
-	DefaultPenaltyTreasuryBps     = uint32(4_000)
-	DefaultPenaltyCompensationBps = uint32(1_000)
+	DefaultPenaltyBurnBps		= uint32(4_000)
+	DefaultPenaltyReporterBps	= uint32(1_000)
+	DefaultPenaltyTreasuryBps	= uint32(4_000)
+	DefaultPenaltyCompensationBps	= uint32(1_000)
 )
 
 type SlashingPenaltyInput struct {
-	PenaltyID                     string
-	ValidatorID                   string
-	SeverityLevel                 string
-	SeverityBps                   uint32
-	StakeExposureNaet             sdkmath.Int
-	RoleWeightBps                 uint32
-	RepeatOffenseMultiplierBps    uint32
-	TaskImpactBps                 uint32
-	SafetyImpactBps               uint32
-	LivenessImpactBps             uint32
-	SelfStakeNaet                 sdkmath.Int
-	Nominations                   []Nomination
-	RewardConfiscationNaet        sdkmath.Int
-	TemporaryJailEpochs           uint64
-	PermanentTombstone            bool
-	IdentityInvalidation          bool
-	RoleSuspensions               []ValidatorRole
-	FutureElectionScorePenaltyBps uint32
-	EvidenceHeight                int64
+	PenaltyID			string
+	ValidatorID			string
+	SeverityLevel			string
+	SeverityBps			uint32
+	StakeExposureNaet		sdkmath.Int
+	RoleWeightBps			uint32
+	RepeatOffenseMultiplierBps	uint32
+	TaskImpactBps			uint32
+	SafetyImpactBps			uint32
+	LivenessImpactBps		uint32
+	SelfStakeNaet			sdkmath.Int
+	Nominations			[]Nomination
+	RewardConfiscationNaet		sdkmath.Int
+	TemporaryJailEpochs		uint64
+	PermanentTombstone		bool
+	IdentityInvalidation		bool
+	RoleSuspensions			[]ValidatorRole
+	FutureElectionScorePenaltyBps	uint32
+	EvidenceHeight			int64
 }
 
 type SlashingPenalty struct {
-	PenaltyID                     string
-	ValidatorID                   string
-	SeverityLevel                 string
-	SeverityBps                   uint32
-	StakeExposureNaet             sdkmath.Int
-	RoleWeightBps                 uint32
-	RepeatOffenseMultiplierBps    uint32
-	TaskImpactBps                 uint32
-	SafetyImpactBps               uint32
-	LivenessImpactBps             uint32
-	ScaledPenaltyBps              uint32
-	StakeSlashNaet                sdkmath.Int
-	ValidatorStakeSlashNaet       sdkmath.Int
-	DelegatorSlashes              []NominatorSlash
-	DelegatorProportionalSlash    sdkmath.Int
-	RewardConfiscationNaet        sdkmath.Int
-	TemporaryJailEpochs           uint64
-	PermanentTombstone            bool
-	IdentityInvalidation          bool
-	RoleSuspensions               []ValidatorRole
-	FutureElectionScorePenaltyBps uint32
-	EvidenceHeight                int64
-	PenaltyHash                   string
+	PenaltyID			string
+	ValidatorID			string
+	SeverityLevel			string
+	SeverityBps			uint32
+	StakeExposureNaet		sdkmath.Int
+	RoleWeightBps			uint32
+	RepeatOffenseMultiplierBps	uint32
+	TaskImpactBps			uint32
+	SafetyImpactBps			uint32
+	LivenessImpactBps		uint32
+	ScaledPenaltyBps		uint32
+	StakeSlashNaet			sdkmath.Int
+	ValidatorStakeSlashNaet		sdkmath.Int
+	DelegatorSlashes		[]NominatorSlash
+	DelegatorProportionalSlash	sdkmath.Int
+	RewardConfiscationNaet		sdkmath.Int
+	TemporaryJailEpochs		uint64
+	PermanentTombstone		bool
+	IdentityInvalidation		bool
+	RoleSuspensions			[]ValidatorRole
+	FutureElectionScorePenaltyBps	uint32
+	EvidenceHeight			int64
+	PenaltyHash			string
 }
 
 type SlashingPenaltyRoutingInput struct {
-	Penalty                SlashingPenalty
-	ReporterID             string
-	AffectedPoolIDOptional string
-	BurnBps                uint32
-	ReporterRewardBps      uint32
-	ProtocolTreasuryBps    uint32
-	CompensationBps        uint32
-	ReporterRewardCapBps   uint32
+	Penalty			SlashingPenalty
+	ReporterID		string
+	AffectedPoolIDOptional	string
+	BurnBps			uint32
+	ReporterRewardBps	uint32
+	ProtocolTreasuryBps	uint32
+	CompensationBps		uint32
+	ReporterRewardCapBps	uint32
 }
 
 type SlashingPenaltyRouting struct {
-	PenaltyID              string
-	ValidatorID            string
-	ReporterID             string
-	AffectedPoolIDOptional string
-	TotalPenaltyNaet       sdkmath.Int
-	BurnNaet               sdkmath.Int
-	ReporterRewardNaet     sdkmath.Int
-	ProtocolTreasuryNaet   sdkmath.Int
-	CompensationNaet       sdkmath.Int
-	ResidualNaet           sdkmath.Int
-	BurnBps                uint32
-	ReporterRewardBps      uint32
-	ProtocolTreasuryBps    uint32
-	CompensationBps        uint32
-	ReporterRewardCapBps   uint32
-	RoutingHash            string
+	PenaltyID		string
+	ValidatorID		string
+	ReporterID		string
+	AffectedPoolIDOptional	string
+	TotalPenaltyNaet	sdkmath.Int
+	BurnNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ProtocolTreasuryNaet	sdkmath.Int
+	CompensationNaet	sdkmath.Int
+	ResidualNaet		sdkmath.Int
+	BurnBps			uint32
+	ReporterRewardBps	uint32
+	ProtocolTreasuryBps	uint32
+	CompensationBps		uint32
+	ReporterRewardCapBps	uint32
+	RoutingHash		string
 }
 
 type SlashingRecord struct {
-	PenaltyID              string
-	ValidatorAddress       string
-	EvidenceID             string
-	Severity               string
-	StakeExposure          sdkmath.Int
-	RoleWeight             uint32
-	SlashAmount            sdkmath.Int
-	DelegatorSlashAmount   sdkmath.Int
-	RewardConfiscation     sdkmath.Int
-	JailUntilEpochOptional uint64
-	Tombstone              bool
-	Routing                SlashingPenaltyRouting
-	ExecutedHeight         int64
-	RecordHash             string
+	PenaltyID		string
+	ValidatorAddress	string
+	EvidenceID		string
+	Severity		string
+	StakeExposure		sdkmath.Int
+	RoleWeight		uint32
+	SlashAmount		sdkmath.Int
+	DelegatorSlashAmount	sdkmath.Int
+	RewardConfiscation	sdkmath.Int
+	JailUntilEpochOptional	uint64
+	Tombstone		bool
+	Routing			SlashingPenaltyRouting
+	ExecutedHeight		int64
+	RecordHash		string
 }
 
 type SlashingExecutionInput struct {
-	EvidenceID             string
-	ReporterID             string
-	AffectedPoolIDOptional string
-	ExecutedHeight         int64
-	CurrentEpoch           uint64
-	Candidate              Candidate
-	PenaltyInput           SlashingPenaltyInput
-	RoutingInput           SlashingPenaltyRoutingInput
+	EvidenceID		string
+	ReporterID		string
+	AffectedPoolIDOptional	string
+	ExecutedHeight		int64
+	CurrentEpoch		uint64
+	Candidate		Candidate
+	PenaltyInput		SlashingPenaltyInput
+	RoutingInput		SlashingPenaltyRoutingInput
 }
 
 type SlashingExecutionResult struct {
-	Record           SlashingRecord
-	UpdatedCandidate Candidate
-	SeverityMatrix   map[string]uint32
-	NonNegative      bool
-	ExactRouting     bool
-	DelegatorExact   bool
+	Record			SlashingRecord
+	UpdatedCandidate	Candidate
+	SeverityMatrix		map[string]uint32
+	NonNegative		bool
+	ExactRouting		bool
+	DelegatorExact		bool
 }
 
 type SlashingEvidenceTimingInput struct {
-	FaultHeight                   uint64
-	EvidenceHeight                uint64
-	CurrentHeight                 uint64
-	MaxEvidenceAgeBlocks          uint64
-	ValidatorBondedHeight         uint64
-	ValidatorUnbondingHeight      uint64
-	UnbondingEvidenceWindowBlocks uint64
+	FaultHeight			uint64
+	EvidenceHeight			uint64
+	CurrentHeight			uint64
+	MaxEvidenceAgeBlocks		uint64
+	ValidatorBondedHeight		uint64
+	ValidatorUnbondingHeight	uint64
+	UnbondingEvidenceWindowBlocks	uint64
 }
 
 func SlashSeverityClasses() []string {
@@ -276,28 +276,28 @@ func ComputeSlashingPenalty(input SlashingPenaltyInput) (SlashingPenalty, error)
 	roles := cloneValidatorRoles(input.RoleSuspensions)
 	sort.SliceStable(roles, func(i, j int) bool { return roles[i] < roles[j] })
 	penalty := SlashingPenalty{
-		PenaltyID:                     input.PenaltyID,
-		ValidatorID:                   input.ValidatorID,
-		SeverityLevel:                 input.SeverityLevel,
-		SeverityBps:                   input.SeverityBps,
-		StakeExposureNaet:             input.StakeExposureNaet,
-		RoleWeightBps:                 input.RoleWeightBps,
-		RepeatOffenseMultiplierBps:    input.RepeatOffenseMultiplierBps,
-		TaskImpactBps:                 input.TaskImpactBps,
-		SafetyImpactBps:               input.SafetyImpactBps,
-		LivenessImpactBps:             input.LivenessImpactBps,
-		ScaledPenaltyBps:              scaledBps,
-		StakeSlashNaet:                stakeSlash,
-		ValidatorStakeSlashNaet:       validatorSlash,
-		DelegatorSlashes:              delegatorSlashes,
-		DelegatorProportionalSlash:    delegatorTotal,
-		RewardConfiscationNaet:        input.RewardConfiscationNaet,
-		TemporaryJailEpochs:           input.TemporaryJailEpochs,
-		PermanentTombstone:            input.PermanentTombstone,
-		IdentityInvalidation:          input.IdentityInvalidation,
-		RoleSuspensions:               roles,
-		FutureElectionScorePenaltyBps: input.FutureElectionScorePenaltyBps,
-		EvidenceHeight:                input.EvidenceHeight,
+		PenaltyID:			input.PenaltyID,
+		ValidatorID:			input.ValidatorID,
+		SeverityLevel:			input.SeverityLevel,
+		SeverityBps:			input.SeverityBps,
+		StakeExposureNaet:		input.StakeExposureNaet,
+		RoleWeightBps:			input.RoleWeightBps,
+		RepeatOffenseMultiplierBps:	input.RepeatOffenseMultiplierBps,
+		TaskImpactBps:			input.TaskImpactBps,
+		SafetyImpactBps:		input.SafetyImpactBps,
+		LivenessImpactBps:		input.LivenessImpactBps,
+		ScaledPenaltyBps:		scaledBps,
+		StakeSlashNaet:			stakeSlash,
+		ValidatorStakeSlashNaet:	validatorSlash,
+		DelegatorSlashes:		delegatorSlashes,
+		DelegatorProportionalSlash:	delegatorTotal,
+		RewardConfiscationNaet:		input.RewardConfiscationNaet,
+		TemporaryJailEpochs:		input.TemporaryJailEpochs,
+		PermanentTombstone:		input.PermanentTombstone,
+		IdentityInvalidation:		input.IdentityInvalidation,
+		RoleSuspensions:		roles,
+		FutureElectionScorePenaltyBps:	input.FutureElectionScorePenaltyBps,
+		EvidenceHeight:			input.EvidenceHeight,
 	}
 	penalty.PenaltyHash = computeSlashingPenaltyHash(penalty)
 	return penalty, penalty.Validate()
@@ -433,21 +433,21 @@ func RouteSlashingPenalty(input SlashingPenaltyRoutingInput) (SlashingPenaltyRou
 		return SlashingPenaltyRouting{}, errors.New("slashing penalty routing exceeds total penalty")
 	}
 	routing := SlashingPenaltyRouting{
-		PenaltyID:              input.Penalty.PenaltyID,
-		ValidatorID:            input.Penalty.ValidatorID,
-		ReporterID:             input.ReporterID,
-		AffectedPoolIDOptional: input.AffectedPoolIDOptional,
-		TotalPenaltyNaet:       total,
-		BurnNaet:               burn,
-		ReporterRewardNaet:     reporterReward,
-		ProtocolTreasuryNaet:   treasury,
-		CompensationNaet:       compensation,
-		ResidualNaet:           residual,
-		BurnBps:                input.BurnBps,
-		ReporterRewardBps:      input.ReporterRewardBps,
-		ProtocolTreasuryBps:    input.ProtocolTreasuryBps,
-		CompensationBps:        input.CompensationBps,
-		ReporterRewardCapBps:   input.ReporterRewardCapBps,
+		PenaltyID:		input.Penalty.PenaltyID,
+		ValidatorID:		input.Penalty.ValidatorID,
+		ReporterID:		input.ReporterID,
+		AffectedPoolIDOptional:	input.AffectedPoolIDOptional,
+		TotalPenaltyNaet:	total,
+		BurnNaet:		burn,
+		ReporterRewardNaet:	reporterReward,
+		ProtocolTreasuryNaet:	treasury,
+		CompensationNaet:	compensation,
+		ResidualNaet:		residual,
+		BurnBps:		input.BurnBps,
+		ReporterRewardBps:	input.ReporterRewardBps,
+		ProtocolTreasuryBps:	input.ProtocolTreasuryBps,
+		CompensationBps:	input.CompensationBps,
+		ReporterRewardCapBps:	input.ReporterRewardCapBps,
 	}
 	routing.RoutingHash = computeSlashingPenaltyRoutingHash(routing)
 	return routing, routing.Validate()
@@ -490,12 +490,12 @@ func ExecuteSlashing(input SlashingExecutionInput) (SlashingExecutionResult, err
 	}
 	record := NewSlashingRecord(input.EvidenceID, penalty, routing, input.CurrentEpoch, input.ExecutedHeight)
 	result := SlashingExecutionResult{
-		Record:           record,
-		UpdatedCandidate: updated,
-		SeverityMatrix:   SeverityMatrix(),
-		NonNegative:      !updated.SelfStakeNaet.IsNegative() && !updated.DelegatedStakeNaet.IsNegative(),
-		ExactRouting:     routing.BurnNaet.Add(routing.ReporterRewardNaet).Add(routing.ProtocolTreasuryNaet).Add(routing.CompensationNaet).Add(routing.ResidualNaet).Equal(routing.TotalPenaltyNaet),
-		DelegatorExact:   record.DelegatorSlashAmount.Equal(penalty.DelegatorProportionalSlash),
+		Record:			record,
+		UpdatedCandidate:	updated,
+		SeverityMatrix:		SeverityMatrix(),
+		NonNegative:		!updated.SelfStakeNaet.IsNegative() && !updated.DelegatedStakeNaet.IsNegative(),
+		ExactRouting:		routing.BurnNaet.Add(routing.ReporterRewardNaet).Add(routing.ProtocolTreasuryNaet).Add(routing.CompensationNaet).Add(routing.ResidualNaet).Equal(routing.TotalPenaltyNaet),
+		DelegatorExact:		record.DelegatorSlashAmount.Equal(penalty.DelegatorProportionalSlash),
 	}
 	if err := result.Validate(); err != nil {
 		return SlashingExecutionResult{}, err
@@ -509,19 +509,19 @@ func NewSlashingRecord(evidenceID string, penalty SlashingPenalty, routing Slash
 		jailUntil = currentEpoch + penalty.TemporaryJailEpochs
 	}
 	record := SlashingRecord{
-		PenaltyID:              penalty.PenaltyID,
-		ValidatorAddress:       penalty.ValidatorID,
-		EvidenceID:             strings.TrimSpace(evidenceID),
-		Severity:               penalty.SeverityLevel,
-		StakeExposure:          penalty.StakeExposureNaet,
-		RoleWeight:             penalty.RoleWeightBps,
-		SlashAmount:            penalty.StakeSlashNaet,
-		DelegatorSlashAmount:   penalty.DelegatorProportionalSlash,
-		RewardConfiscation:     penalty.RewardConfiscationNaet,
-		JailUntilEpochOptional: jailUntil,
-		Tombstone:              penalty.PermanentTombstone,
-		Routing:                routing,
-		ExecutedHeight:         executedHeight,
+		PenaltyID:		penalty.PenaltyID,
+		ValidatorAddress:	penalty.ValidatorID,
+		EvidenceID:		strings.TrimSpace(evidenceID),
+		Severity:		penalty.SeverityLevel,
+		StakeExposure:		penalty.StakeExposureNaet,
+		RoleWeight:		penalty.RoleWeightBps,
+		SlashAmount:		penalty.StakeSlashNaet,
+		DelegatorSlashAmount:	penalty.DelegatorProportionalSlash,
+		RewardConfiscation:	penalty.RewardConfiscationNaet,
+		JailUntilEpochOptional:	jailUntil,
+		Tombstone:		penalty.PermanentTombstone,
+		Routing:		routing,
+		ExecutedHeight:		executedHeight,
 	}
 	record.RecordHash = computeSlashingRecordHash(record)
 	return record
@@ -634,8 +634,8 @@ func (i SlashingPenaltyRoutingInput) Validate() error {
 		return errors.New("slashing compensation requires affected pool id")
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "burn bps", value: i.BurnBps},
 		{name: "reporter reward bps", value: i.ReporterRewardBps},

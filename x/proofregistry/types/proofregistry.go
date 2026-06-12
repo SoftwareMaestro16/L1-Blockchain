@@ -12,124 +12,124 @@ import (
 )
 
 const (
-	ModuleName           = "proofregistry"
-	DefaultHistoryWindow = uint64(4096)
+	ModuleName		= "proofregistry"
+	DefaultHistoryWindow	= uint64(4096)
 )
 
 type ProofRegistryQueryKind string
 type ProofFailureCategory string
 
 const (
-	QueryKindZone              ProofRegistryQueryKind = "zone"
-	QueryKindShard             ProofRegistryQueryKind = "shard"
-	QueryKindStore             ProofRegistryQueryKind = "store"
-	QueryKindMessageInclusion  ProofRegistryQueryKind = "message_inclusion"
-	QueryKindReceipt           ProofRegistryQueryKind = "receipt"
-	QueryKindIdentity          ProofRegistryQueryKind = "identity"
-	QueryKindContractState     ProofRegistryQueryKind = "contract_state"
-	QueryKindPaymentSettlement ProofRegistryQueryKind = "payment_settlement"
+	QueryKindZone			ProofRegistryQueryKind	= "zone"
+	QueryKindShard			ProofRegistryQueryKind	= "shard"
+	QueryKindStore			ProofRegistryQueryKind	= "store"
+	QueryKindMessageInclusion	ProofRegistryQueryKind	= "message_inclusion"
+	QueryKindReceipt		ProofRegistryQueryKind	= "receipt"
+	QueryKindIdentity		ProofRegistryQueryKind	= "identity"
+	QueryKindContractState		ProofRegistryQueryKind	= "contract_state"
+	QueryKindPaymentSettlement	ProofRegistryQueryKind	= "payment_settlement"
 
-	FailureCategoryTrust        ProofFailureCategory = "trust"
-	FailureCategoryScope        ProofFailureCategory = "scope"
-	FailureCategoryRoot         ProofFailureCategory = "root"
-	FailureCategoryObject       ProofFailureCategory = "object"
-	FailureCategoryNonExistence ProofFailureCategory = "non_existence"
+	FailureCategoryTrust		ProofFailureCategory	= "trust"
+	FailureCategoryScope		ProofFailureCategory	= "scope"
+	FailureCategoryRoot		ProofFailureCategory	= "root"
+	FailureCategoryObject		ProofFailureCategory	= "object"
+	FailureCategoryNonExistence	ProofFailureCategory	= "non_existence"
 )
 
 type ProofFailureCodeDescriptor struct {
-	Code     coretypes.UniversalProofFailureCode
-	Meaning  string
-	Category ProofFailureCategory
+	Code		coretypes.UniversalProofFailureCode
+	Meaning		string
+	Category	ProofFailureCategory
 }
 
 type ProofRootMetadata struct {
-	RootType        coretypes.RootType
-	Source          string
-	Description     string
-	ExpiresAtHeight uint64
-	MetadataHash    string
+	RootType	coretypes.RootType
+	Source		string
+	Description	string
+	ExpiresAtHeight	uint64
+	MetadataHash	string
 }
 
 type ProofRegistrySnapshot struct {
-	Height            uint64
-	AppHash           string
-	AetraCoreRoot     string
-	GlobalZoneRoot    string
-	GlobalMessageRoot string
-	ReceiptRoot       string
-	Roots             []coretypes.ProofRoot
-	Metadata          []ProofRootMetadata
-	SnapshotHash      string
+	Height			uint64
+	AppHash			string
+	AetraCoreRoot		string
+	GlobalZoneRoot		string
+	GlobalMessageRoot	string
+	ReceiptRoot		string
+	Roots			[]coretypes.ProofRoot
+	Metadata		[]ProofRootMetadata
+	SnapshotHash		string
 }
 
 type ProofRegistryEntry struct {
-	Kind      ProofRegistryQueryKind
-	Height    uint64
-	ProofType coretypes.UniversalProofType
-	RootType  coretypes.RootType
-	ZoneID    coretypes.ZoneID
-	ShardID   coretypes.ShardID
-	Key       []byte
-	MessageID string
-	Envelope  coretypes.UniversalProofEnvelope
-	EntryHash string
+	Kind		ProofRegistryQueryKind
+	Height		uint64
+	ProofType	coretypes.UniversalProofType
+	RootType	coretypes.RootType
+	ZoneID		coretypes.ZoneID
+	ShardID		coretypes.ShardID
+	Key		[]byte
+	MessageID	string
+	Envelope	coretypes.UniversalProofEnvelope
+	EntryHash	string
 }
 
 type ProofRegistryState struct {
-	HistoryWindow uint64
-	Snapshots     []ProofRegistrySnapshot
-	Entries       []ProofRegistryEntry
-	TestVectors   []ProofTestVector
+	HistoryWindow	uint64
+	Snapshots	[]ProofRegistrySnapshot
+	Entries		[]ProofRegistryEntry
+	TestVectors	[]ProofTestVector
 }
 
 type ProofRegistryQuery struct {
-	Kind      ProofRegistryQueryKind
-	Height    uint64
-	ProofType coretypes.UniversalProofType
-	RootType  coretypes.RootType
-	ZoneID    coretypes.ZoneID
-	ShardID   coretypes.ShardID
-	Key       []byte
-	MessageID string
+	Kind		ProofRegistryQueryKind
+	Height		uint64
+	ProofType	coretypes.UniversalProofType
+	RootType	coretypes.RootType
+	ZoneID		coretypes.ZoneID
+	ShardID		coretypes.ShardID
+	Key		[]byte
+	MessageID	string
 }
 
 type ProofRegistryResponse struct {
-	Found        bool
-	Snapshot     ProofRegistrySnapshot
-	Root         coretypes.ProofRoot
-	Envelope     coretypes.UniversalProofEnvelope
-	FailureCode  coretypes.UniversalProofFailureCode
-	ResponseHash string
+	Found		bool
+	Snapshot	ProofRegistrySnapshot
+	Root		coretypes.ProofRoot
+	Envelope	coretypes.UniversalProofEnvelope
+	FailureCode	coretypes.UniversalProofFailureCode
+	ResponseHash	string
 }
 
 type StoreV2ProofAdapterRequest struct {
-	ProofType          coretypes.UniversalProofType
-	ChainID            string
-	Height             uint64
-	AppHash            string
-	RootType           coretypes.RootType
-	ZoneID             coretypes.ZoneID
-	ShardID            coretypes.ShardID
-	Key                []byte
-	Value              []byte
-	NonExistenceMarker []byte
-	ObjectExpiryHeight uint64
-	StoreRoot          string
-	ProofOps           []string
-	VerificationPath   []coretypes.UniversalRootStep
-	ZoneCommitment     coretypes.ZoneCommitment
-	ShardCommitment    coretypes.UniversalShardCommitment
-	MessageCommitment  coretypes.UniversalMessageCommitment
+	ProofType		coretypes.UniversalProofType
+	ChainID			string
+	Height			uint64
+	AppHash			string
+	RootType		coretypes.RootType
+	ZoneID			coretypes.ZoneID
+	ShardID			coretypes.ShardID
+	Key			[]byte
+	Value			[]byte
+	NonExistenceMarker	[]byte
+	ObjectExpiryHeight	uint64
+	StoreRoot		string
+	ProofOps		[]string
+	VerificationPath	[]coretypes.UniversalRootStep
+	ZoneCommitment		coretypes.ZoneCommitment
+	ShardCommitment		coretypes.UniversalShardCommitment
+	MessageCommitment	coretypes.UniversalMessageCommitment
 }
 
 type ProofTestVector struct {
-	VectorID            string
-	Name                string
-	Positive            bool
-	Proof               coretypes.UniversalProofEnvelope
-	TrustedHeader       coretypes.UniversalTrustedHeader
-	ExpectedFailureCode coretypes.UniversalProofFailureCode
-	VectorHash          string
+	VectorID		string
+	Name			string
+	Positive		bool
+	Proof			coretypes.UniversalProofEnvelope
+	TrustedHeader		coretypes.UniversalTrustedHeader
+	ExpectedFailureCode	coretypes.UniversalProofFailureCode
+	VectorHash		string
 }
 
 func NewProofRegistryState(historyWindow uint64) (ProofRegistryState, error) {
@@ -239,31 +239,31 @@ func AddProofRegistryEntry(state ProofRegistryState, entry ProofRegistryEntry) (
 
 func BuildStoreV2ProofEnvelope(req StoreV2ProofAdapterRequest) (coretypes.UniversalProofEnvelope, error) {
 	storeProof, err := coretypes.NewUniversalStoreProof(coretypes.UniversalStoreProof{
-		ProofVersion:       coretypes.UniversalProofVersionV1,
-		Key:                req.Key,
-		Value:              req.Value,
-		NonExistenceMarker: req.NonExistenceMarker,
-		StoreRoot:          req.StoreRoot,
-		ProofOps:           req.ProofOps,
+		ProofVersion:		coretypes.UniversalProofVersionV1,
+		Key:			req.Key,
+		Value:			req.Value,
+		NonExistenceMarker:	req.NonExistenceMarker,
+		StoreRoot:		req.StoreRoot,
+		ProofOps:		req.ProofOps,
 	})
 	if err != nil {
 		return coretypes.UniversalProofEnvelope{}, err
 	}
 	proof := coretypes.UniversalProofEnvelope{
-		ProofType:          req.ProofType,
-		ProofVersion:       coretypes.UniversalProofVersionV1,
-		ChainID:            req.ChainID,
-		Height:             req.Height,
-		AppHash:            req.AppHash,
-		RootType:           req.RootType,
-		ZoneID:             req.ZoneID,
-		ShardID:            req.ShardID,
-		Key:                req.Key,
-		Value:              req.Value,
-		AbsenceMarker:      req.NonExistenceMarker,
-		ObjectExpiryHeight: req.ObjectExpiryHeight,
-		StoreProof:         storeProof,
-		VerificationPath:   append([]coretypes.UniversalRootStep(nil), req.VerificationPath...),
+		ProofType:		req.ProofType,
+		ProofVersion:		coretypes.UniversalProofVersionV1,
+		ChainID:		req.ChainID,
+		Height:			req.Height,
+		AppHash:		req.AppHash,
+		RootType:		req.RootType,
+		ZoneID:			req.ZoneID,
+		ShardID:		req.ShardID,
+		Key:			req.Key,
+		Value:			req.Value,
+		AbsenceMarker:		req.NonExistenceMarker,
+		ObjectExpiryHeight:	req.ObjectExpiryHeight,
+		StoreProof:		storeProof,
+		VerificationPath:	append([]coretypes.UniversalRootStep(nil), req.VerificationPath...),
 	}
 	if req.ZoneCommitment.CommitmentHash != "" {
 		proof.ZoneCommitment = req.ZoneCommitment
@@ -374,8 +374,8 @@ func (s ProofRegistrySnapshot) Validate() error {
 		return errors.New("proofregistry snapshot height must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"proofregistry app hash", s.AppHash},
 		{"proofregistry aether core root", s.AetraCoreRoot},

@@ -12,77 +12,77 @@ import (
 )
 
 const (
-	AVMPerformanceParallelZoneExecution       AVMPerformanceTarget = "parallel_zone_execution"
-	AVMPerformancePipelinedAsyncQueues        AVMPerformanceTarget = "pipelined_async_queue_processing"
-	AVMPerformanceBatchedMessageExecution     AVMPerformanceTarget = "batched_message_execution"
-	AVMPerformanceMinimizedStoreV2Writes      AVMPerformanceTarget = "minimized_store_v2_writes"
-	AVMPerformanceLazyStateLoading            AVMPerformanceTarget = "lazy_state_loading"
-	AVMPerformanceBoundedReceiptGeneration    AVMPerformanceTarget = "bounded_receipt_generation"
-	AVMPerformanceActorLocalConflictIsolation AVMPerformanceTarget = "actor_local_conflict_isolation"
+	AVMPerformanceParallelZoneExecution		AVMPerformanceTarget	= "parallel_zone_execution"
+	AVMPerformancePipelinedAsyncQueues		AVMPerformanceTarget	= "pipelined_async_queue_processing"
+	AVMPerformanceBatchedMessageExecution		AVMPerformanceTarget	= "batched_message_execution"
+	AVMPerformanceMinimizedStoreV2Writes		AVMPerformanceTarget	= "minimized_store_v2_writes"
+	AVMPerformanceLazyStateLoading			AVMPerformanceTarget	= "lazy_state_loading"
+	AVMPerformanceBoundedReceiptGeneration		AVMPerformanceTarget	= "bounded_receipt_generation"
+	AVMPerformanceActorLocalConflictIsolation	AVMPerformanceTarget	= "actor_local_conflict_isolation"
 
-	AVMBlockSTMConflictDifferentZones  AVMBlockSTMConflictKeyKind = "zone"
-	AVMBlockSTMConflictActorMailbox    AVMBlockSTMConflictKeyKind = "actor_mailbox"
-	AVMBlockSTMConflictContractStorage AVMBlockSTMConflictKeyKind = "contract_storage"
-	AVMBlockSTMConflictZoneQueueHead   AVMBlockSTMConflictKeyKind = "zone_queue_head"
-	AVMBlockSTMConflictSenderNonce     AVMBlockSTMConflictKeyKind = "sender_nonce"
-	AVMBlockSTMConflictPaymentEscrow   AVMBlockSTMConflictKeyKind = "payment_escrow"
-	AVMBlockSTMConflictContinuation    AVMBlockSTMConflictKeyKind = "continuation"
-	AVMBlockSTMConflictServiceCall     AVMBlockSTMConflictKeyKind = "service_call"
+	AVMBlockSTMConflictDifferentZones	AVMBlockSTMConflictKeyKind	= "zone"
+	AVMBlockSTMConflictActorMailbox		AVMBlockSTMConflictKeyKind	= "actor_mailbox"
+	AVMBlockSTMConflictContractStorage	AVMBlockSTMConflictKeyKind	= "contract_storage"
+	AVMBlockSTMConflictZoneQueueHead	AVMBlockSTMConflictKeyKind	= "zone_queue_head"
+	AVMBlockSTMConflictSenderNonce		AVMBlockSTMConflictKeyKind	= "sender_nonce"
+	AVMBlockSTMConflictPaymentEscrow	AVMBlockSTMConflictKeyKind	= "payment_escrow"
+	AVMBlockSTMConflictContinuation		AVMBlockSTMConflictKeyKind	= "continuation"
+	AVMBlockSTMConflictServiceCall		AVMBlockSTMConflictKeyKind	= "service_call"
 
-	MaxAVMBlockSTMWorkloads = 4096
+	MaxAVMBlockSTMWorkloads	= 4096
 )
 
 type AVMPerformanceTarget string
 type AVMBlockSTMConflictKeyKind string
 
 type AVMPerformanceModel struct {
-	Targets   []AVMPerformanceTarget
-	ModelHash string
+	Targets		[]AVMPerformanceTarget
+	ModelHash	string
 }
 
 type AVMBlockSTMWorkload struct {
-	WorkloadID               string
-	ZoneID                   zonestypes.ZoneID
-	ActorIDOptional          string
-	ContractAddressOptional  string
-	QueueIDOptional          string
-	ContinuationIDOptional   string
-	ServiceCallOptional      string
-	SenderNonceScopeOptional string
-	PaymentEscrowOptional    string
-	StorageKeyOptional       string
-	ExpectedVersion          uint64
-	GasEstimate              uint64
-	WritesState              bool
-	UsesGlobalCounter        bool
-	ConflictKeyKind          AVMBlockSTMConflictKeyKind
-	ConflictKey              string
-	WorkloadHash             string
+	WorkloadID			string
+	ZoneID				zonestypes.ZoneID
+	ActorIDOptional			string
+	ContractAddressOptional		string
+	QueueIDOptional			string
+	ContinuationIDOptional		string
+	ServiceCallOptional		string
+	SenderNonceScopeOptional	string
+	PaymentEscrowOptional		string
+	StorageKeyOptional		string
+	ExpectedVersion			uint64
+	GasEstimate			uint64
+	WritesState			bool
+	UsesGlobalCounter		bool
+	ConflictKeyKind			AVMBlockSTMConflictKeyKind
+	ConflictKey			string
+	WorkloadHash			string
 }
 
 type AVMBlockSTMPartition struct {
-	PartitionID   string
-	ZoneID        zonestypes.ZoneID
-	ActorID       string
-	QueueID       string
-	WorkloadIDs   []string
-	PartitionHash string
+	PartitionID	string
+	ZoneID		zonestypes.ZoneID
+	ActorID		string
+	QueueID		string
+	WorkloadIDs	[]string
+	PartitionHash	string
 }
 
 type AVMZoneExecutionAccumulator struct {
-	ZoneID          zonestypes.ZoneID
-	MessageCount    uint32
-	StoreWriteCount uint32
-	ReceiptCount    uint32
-	GasUsed         uint64
-	AccumulatorHash string
+	ZoneID		zonestypes.ZoneID
+	MessageCount	uint32
+	StoreWriteCount	uint32
+	ReceiptCount	uint32
+	GasUsed		uint64
+	AccumulatorHash	string
 }
 
 type AVMBlockSTMExecutionPlan struct {
-	Workloads    []AVMBlockSTMWorkload
-	Partitions   []AVMBlockSTMPartition
-	Accumulators []AVMZoneExecutionAccumulator
-	PlanHash     string
+	Workloads	[]AVMBlockSTMWorkload
+	Partitions	[]AVMBlockSTMPartition
+	Accumulators	[]AVMZoneExecutionAccumulator
+	PlanHash	string
 }
 
 func DefaultAVMPerformanceModel() (AVMPerformanceModel, error) {
@@ -140,8 +140,8 @@ func (w AVMBlockSTMWorkload) Validate() error {
 		}
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM BlockSTM contract address", value: w.ContractAddressOptional},
 		{name: "AVM BlockSTM queue id", value: w.QueueIDOptional},
@@ -297,11 +297,11 @@ func PartitionAVMBlockSTMWorkloads(workloads []AVMBlockSTMWorkload) []AVMBlockST
 	for partitionID, workloadIDs := range grouped {
 		sort.Strings(workloadIDs)
 		partition := AVMBlockSTMPartition{
-			PartitionID: partitionID,
-			ZoneID:      zoneByPartition[partitionID],
-			ActorID:     actorByPartition[partitionID],
-			QueueID:     queueByPartition[partitionID],
-			WorkloadIDs: workloadIDs,
+			PartitionID:	partitionID,
+			ZoneID:		zoneByPartition[partitionID],
+			ActorID:	actorByPartition[partitionID],
+			QueueID:	queueByPartition[partitionID],
+			WorkloadIDs:	workloadIDs,
 		}
 		partition.PartitionHash = ComputeAVMBlockSTMPartitionHash(partition)
 		partitions = append(partitions, partition)

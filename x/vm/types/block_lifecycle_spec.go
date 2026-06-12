@@ -12,103 +12,103 @@ import (
 )
 
 const (
-	AVMBlockStageBeginBlock               AVMBlockStage = "begin_block"
-	AVMBlockStageExecuteSyncTx            AVMBlockStage = "execute_sync_tx"
-	AVMBlockStageProcessAsyncQueue        AVMBlockStage = "process_async_queue"
-	AVMBlockStageExecuteScheduledMessages AVMBlockStage = "execute_scheduled_messages"
-	AVMBlockStageProcessContinuations     AVMBlockStage = "process_continuations"
-	AVMBlockStageFinalizeStateRoots       AVMBlockStage = "finalize_state_roots"
-	AVMBlockStageEndBlockCleanup          AVMBlockStage = "end_block_cleanup"
+	AVMBlockStageBeginBlock			AVMBlockStage	= "begin_block"
+	AVMBlockStageExecuteSyncTx		AVMBlockStage	= "execute_sync_tx"
+	AVMBlockStageProcessAsyncQueue		AVMBlockStage	= "process_async_queue"
+	AVMBlockStageExecuteScheduledMessages	AVMBlockStage	= "execute_scheduled_messages"
+	AVMBlockStageProcessContinuations	AVMBlockStage	= "process_continuations"
+	AVMBlockStageFinalizeStateRoots		AVMBlockStage	= "finalize_state_roots"
+	AVMBlockStageEndBlockCleanup		AVMBlockStage	= "end_block_cleanup"
 
-	AVMABCIPrepareProposal AVMABCIPhase = "prepare_proposal"
-	AVMABCIProcessProposal AVMABCIPhase = "process_proposal"
-	AVMABCIFinalizeBlock   AVMABCIPhase = "finalize_block"
-	AVMABCIEndBlock        AVMABCIPhase = "end_block"
+	AVMABCIPrepareProposal	AVMABCIPhase	= "prepare_proposal"
+	AVMABCIProcessProposal	AVMABCIPhase	= "process_proposal"
+	AVMABCIFinalizeBlock	AVMABCIPhase	= "finalize_block"
+	AVMABCIEndBlock		AVMABCIPhase	= "end_block"
 )
 
 type AVMBlockStage string
 type AVMABCIPhase string
 
 type AVMBlockProposalMessage struct {
-	MessageID       string
-	ZoneID          zonestypes.ZoneID
-	TargetActor     string
-	Lane            AVMQueueLane
-	Priority        uint8
-	ScheduledHeight uint64
-	ExpiryHeight    uint64
-	SenderHash      string
-	Nonce           uint64
-	GasLimit        uint64
+	MessageID	string
+	ZoneID		zonestypes.ZoneID
+	TargetActor	string
+	Lane		AVMQueueLane
+	Priority	uint8
+	ScheduledHeight	uint64
+	ExpiryHeight	uint64
+	SenderHash	string
+	Nonce		uint64
+	GasLimit	uint64
 }
 
 type AVMBlockZoneBudget struct {
-	ZoneID zonestypes.ZoneID
-	Budget zonestypes.ZoneExecutionBudget
+	ZoneID	zonestypes.ZoneID
+	Budget	zonestypes.ZoneExecutionBudget
 }
 
 type AVMABCIProposalPlan struct {
-	Height       uint64
-	Phase        AVMABCIPhase
-	Messages     []AVMBlockProposalMessage
-	ZoneBudgets  []AVMBlockZoneBudget
-	ProposalRoot string
+	Height		uint64
+	Phase		AVMABCIPhase
+	Messages	[]AVMBlockProposalMessage
+	ZoneBudgets	[]AVMBlockZoneBudget
+	ProposalRoot	string
 }
 
 type AVMBlockLifecycleStep struct {
-	Stage    AVMBlockStage
-	Height   uint64
-	Sequence uint32
-	Root     string
+	Stage		AVMBlockStage
+	Height		uint64
+	Sequence	uint32
+	Root		string
 }
 
 type AVMFinalizeBlockPlan struct {
-	Height           uint64
-	RouterRoot       string
-	SyncRoot         string
-	AsyncRoot        string
-	ScheduledRoot    string
-	ActorRoot        string
-	ContinuationRoot string
-	ReceiptRoot      string
-	AVMRoot          AVMRoot
-	ZoneRoots        []AVMZoneStateRoot
-	Receipts         []AVMExecutionReceipt
-	Steps            []AVMBlockLifecycleStep
-	FinalizeRoot     string
+	Height			uint64
+	RouterRoot		string
+	SyncRoot		string
+	AsyncRoot		string
+	ScheduledRoot		string
+	ActorRoot		string
+	ContinuationRoot	string
+	ReceiptRoot		string
+	AVMRoot			AVMRoot
+	ZoneRoots		[]AVMZoneStateRoot
+	Receipts		[]AVMExecutionReceipt
+	Steps			[]AVMBlockLifecycleStep
+	FinalizeRoot		string
 }
 
 type AVMEndBlockCleanupPlan struct {
-	Height           uint64
-	ExpiredMessages  []AVMBlockProposalMessage
-	PrunedTombstones []AVMAsyncReplayTombstone
-	ProofHorizon     uint64
-	ZoneSummaries    []zonestypes.ZoneExecutionSummary
-	CleanupRoot      string
+	Height			uint64
+	ExpiredMessages		[]AVMBlockProposalMessage
+	PrunedTombstones	[]AVMAsyncReplayTombstone
+	ProofHorizon		uint64
+	ZoneSummaries		[]zonestypes.ZoneExecutionSummary
+	CleanupRoot		string
 }
 
 type AVMBlockLifecyclePlan struct {
-	Height          uint64
-	PrepareProposal AVMABCIProposalPlan
-	ProcessProposal AVMABCIProposalPlan
-	FinalizeBlock   AVMFinalizeBlockPlan
-	EndBlock        AVMEndBlockCleanupPlan
-	PlanRoot        string
+	Height		uint64
+	PrepareProposal	AVMABCIProposalPlan
+	ProcessProposal	AVMABCIProposalPlan
+	FinalizeBlock	AVMFinalizeBlockPlan
+	EndBlock	AVMEndBlockCleanupPlan
+	PlanRoot	string
 }
 
 func NewAVMBlockProposalMessage(msg AVMAsyncMessage, lane AVMQueueLane, targetActor string) (AVMBlockProposalMessage, error) {
 	msg = canonicalAVMAsyncMessage(msg)
 	proposed := AVMBlockProposalMessage{
-		MessageID:       msg.ID,
-		ZoneID:          msg.DestinationZone,
-		TargetActor:     strings.TrimSpace(targetActor),
-		Lane:            lane,
-		Priority:        msg.Priority,
-		ScheduledHeight: AVMMessageScheduledHeight(msg),
-		ExpiryHeight:    msg.ExpiryHeight,
-		SenderHash:      AVMQueueSenderHash(msg.SourceZone, msg.Source),
-		Nonce:           msg.SenderNonce,
-		GasLimit:        msg.GasLimit,
+		MessageID:		msg.ID,
+		ZoneID:			msg.DestinationZone,
+		TargetActor:		strings.TrimSpace(targetActor),
+		Lane:			lane,
+		Priority:		msg.Priority,
+		ScheduledHeight:	AVMMessageScheduledHeight(msg),
+		ExpiryHeight:		msg.ExpiryHeight,
+		SenderHash:		AVMQueueSenderHash(msg.SourceZone, msg.Source),
+		Nonce:			msg.SenderNonce,
+		GasLimit:		msg.GasLimit,
 	}
 	return proposed, proposed.Validate()
 }
@@ -273,8 +273,8 @@ func (p AVMFinalizeBlockPlan) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM FinalizeBlock sync root", value: p.SyncRoot},
 		{name: "AVM FinalizeBlock async root", value: p.AsyncRoot},

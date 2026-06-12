@@ -13,39 +13,39 @@ import (
 )
 
 const (
-	RouterLaneSync  RouterLane = "sync_engine"
-	RouterLaneAsync RouterLane = "async_engine"
-	RouterLaneActor RouterLane = "actor_runtime"
+	RouterLaneSync	RouterLane	= "sync_engine"
+	RouterLaneAsync	RouterLane	= "async_engine"
+	RouterLaneActor	RouterLane	= "actor_runtime"
 
-	RouterBackendNativeModule RouterBackend = "native_module"
-	RouterBackendAVMActor     RouterBackend = "avm_actor"
-	RouterBackendWASMAdapter  RouterBackend = "wasm_adapter"
+	RouterBackendNativeModule	RouterBackend	= "native_module"
+	RouterBackendAVMActor		RouterBackend	= "avm_actor"
+	RouterBackendWASMAdapter	RouterBackend	= "wasm_adapter"
 
-	RouterGasClassLow      RouterGasClass = "low"
-	RouterGasClassStandard RouterGasClass = "standard"
-	RouterGasClassHigh     RouterGasClass = "high"
+	RouterGasClassLow	RouterGasClass	= "low"
+	RouterGasClassStandard	RouterGasClass	= "standard"
+	RouterGasClassHigh	RouterGasClass	= "high"
 
-	RouterDispatchModeDirect    RouterDispatchMode = "direct"
-	RouterDispatchModeQueued    RouterDispatchMode = "queued"
-	RouterDispatchModeCrossZone RouterDispatchMode = "cross_zone_async"
+	RouterDispatchModeDirect	RouterDispatchMode	= "direct"
+	RouterDispatchModeQueued	RouterDispatchMode	= "queued"
+	RouterDispatchModeCrossZone	RouterDispatchMode	= "cross_zone_async"
 
-	RouterReceiptCommit     RouterReceiptPolicy = "commit"
-	RouterReceiptDeferred   RouterReceiptPolicy = "deferred"
-	RouterReceiptDeadLetter RouterReceiptPolicy = "dead_letter"
+	RouterReceiptCommit	RouterReceiptPolicy	= "commit"
+	RouterReceiptDeferred	RouterReceiptPolicy	= "deferred"
+	RouterReceiptDeadLetter	RouterReceiptPolicy	= "dead_letter"
 
-	RouterMessageFinancialPrefix   = "financial."
-	RouterMessageIdentityPrefix    = "identity."
-	RouterMessageApplicationPrefix = "application."
-	RouterMessageContractPrefix    = "contract."
-	RouterMessageAsyncPrefix       = "async."
-	RouterMessageActorPrefix       = "actor."
-	RouterMessageResolverPrefix    = "resolver."
-	RouterMessageSchedulerPrefix   = "scheduler."
-	RouterMessageWorkflowPrefix    = "workflow."
+	RouterMessageFinancialPrefix	= "financial."
+	RouterMessageIdentityPrefix	= "identity."
+	RouterMessageApplicationPrefix	= "application."
+	RouterMessageContractPrefix	= "contract."
+	RouterMessageAsyncPrefix	= "async."
+	RouterMessageActorPrefix	= "actor."
+	RouterMessageResolverPrefix	= "resolver."
+	RouterMessageSchedulerPrefix	= "scheduler."
+	RouterMessageWorkflowPrefix	= "workflow."
 
-	MaxRouterPriority       = 255
-	MaxRouterRouteKeyLength = 128
-	MaxRouterTargetLength   = 128
+	MaxRouterPriority	= 255
+	MaxRouterRouteKeyLength	= 128
+	MaxRouterTargetLength	= 128
 )
 
 type RouterLane string
@@ -59,80 +59,80 @@ type routerByteWriter interface {
 }
 
 type RouterSchedulingMetadata struct {
-	DeliverAtBlock    uint64
-	DeadlineBlock     uint64
-	RetryCount        uint32
-	MaxRetries        uint32
-	RetryDelayBlocks  uint64
-	ContinuationToken string
+	DeliverAtBlock		uint64
+	DeadlineBlock		uint64
+	RetryCount		uint32
+	MaxRetries		uint32
+	RetryDelayBlocks	uint64
+	ContinuationToken	string
 }
 
 type RouterGasMeter struct {
-	Class    RouterGasClass
-	Limit    uint64
-	Reserved uint64
+	Class		RouterGasClass
+	Limit		uint64
+	Reserved	uint64
 }
 
 type ExecutionRouterMessage struct {
-	Sequence       uint64
-	MsgType        string
-	SourceZoneID   zonestypes.ZoneID
-	ZoneID         zonestypes.ZoneID
-	TargetModule   string
-	TargetActor    string
-	TargetContract string
-	Source         string
-	Destination    string
-	PayloadHash    string
-	Call           VMCall
-	Actor          bool
-	Backend        RouterBackend
-	GasClass       RouterGasClass
-	Priority       uint8
-	Scheduling     RouterSchedulingMetadata
-	DomainRouteKey string
-	CrossZoneWrite bool
-	BlockSTMKey    string
-	StakingPower   uint64
+	Sequence	uint64
+	MsgType		string
+	SourceZoneID	zonestypes.ZoneID
+	ZoneID		zonestypes.ZoneID
+	TargetModule	string
+	TargetActor	string
+	TargetContract	string
+	Source		string
+	Destination	string
+	PayloadHash	string
+	Call		VMCall
+	Actor		bool
+	Backend		RouterBackend
+	GasClass	RouterGasClass
+	Priority	uint8
+	Scheduling	RouterSchedulingMetadata
+	DomainRouteKey	string
+	CrossZoneWrite	bool
+	BlockSTMKey	string
+	StakingPower	uint64
 }
 
 type ExecutionRouterDispatch struct {
-	Sequence        uint64
-	ZoneID          zonestypes.ZoneID
-	MsgType         string
-	ExecutionTarget string
-	QueueID         string
-	GasMeter        RouterGasMeter
-	Lane            RouterLane
-	Backend         RouterBackend
-	DispatchMode    RouterDispatchMode
-	ReceiptPolicy   RouterReceiptPolicy
-	Priority        uint8
-	Scheduling      RouterSchedulingMetadata
-	DomainRouteKey  string
-	Call            VMCall
-	KVPrefix        string
-	BlockSTMKey     string
-	StakingPower    uint64
-	ExecutionHeight uint64
+	Sequence	uint64
+	ZoneID		zonestypes.ZoneID
+	MsgType		string
+	ExecutionTarget	string
+	QueueID		string
+	GasMeter	RouterGasMeter
+	Lane		RouterLane
+	Backend		RouterBackend
+	DispatchMode	RouterDispatchMode
+	ReceiptPolicy	RouterReceiptPolicy
+	Priority	uint8
+	Scheduling	RouterSchedulingMetadata
+	DomainRouteKey	string
+	Call		VMCall
+	KVPrefix	string
+	BlockSTMKey	string
+	StakingPower	uint64
+	ExecutionHeight	uint64
 }
 
 type ExecutionRouterZoneOutput struct {
-	ZoneID              zonestypes.ZoneID
-	StateRoot           string
-	ReceiptRoot         string
-	MessageRoot         string
-	ExecutionResultRoot string
-	ProofRoot           string
-	Budget              zonestypes.ZoneExecutionBudget
+	ZoneID			zonestypes.ZoneID
+	StateRoot		string
+	ReceiptRoot		string
+	MessageRoot		string
+	ExecutionResultRoot	string
+	ProofRoot		string
+	Budget			zonestypes.ZoneExecutionBudget
 }
 
 type ExecutionRouterPlan struct {
-	Height      uint64
-	SDKPlan     FinalizeBlockPlan
-	Dispatches  []ExecutionRouterDispatch
-	ZoneOutputs []ExecutionRouterZoneOutput
-	PlanRoot    string
+	Height		uint64
+	SDKPlan		FinalizeBlockPlan
+	Dispatches	[]ExecutionRouterDispatch
+	ZoneOutputs	[]ExecutionRouterZoneOutput
+	PlanRoot	string
 }
 
 func BuildExecutionRouterPlan(
@@ -162,13 +162,13 @@ func BuildExecutionRouterPlan(
 		budgets[dispatch.ZoneID] = nextBudget
 		dispatches = append(dispatches, dispatch)
 		sdkDispatches = append(sdkDispatches, SDKDispatch{
-			ZoneID:          dispatch.ZoneID,
-			MsgType:         dispatch.MsgType,
-			Call:            dispatch.Call,
-			KVPrefix:        dispatch.KVPrefix,
-			BlockSTMKey:     dispatch.BlockSTMKey,
-			StakingPower:    dispatch.StakingPower,
-			ExecutionHeight: dispatch.ExecutionHeight,
+			ZoneID:			dispatch.ZoneID,
+			MsgType:		dispatch.MsgType,
+			Call:			dispatch.Call,
+			KVPrefix:		dispatch.KVPrefix,
+			BlockSTMKey:		dispatch.BlockSTMKey,
+			StakingPower:		dispatch.StakingPower,
+			ExecutionHeight:	dispatch.ExecutionHeight,
 		})
 	}
 	sdkPlan, err := BuildFinalizeBlockPlan(height, binding, sdkDispatches, policy)
@@ -374,8 +374,8 @@ func (o ExecutionRouterZoneOutput) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM execution router state root", value: o.StateRoot},
 		{name: "AVM execution router receipt root", value: o.ReceiptRoot},
@@ -642,28 +642,28 @@ func routeExecutionMessage(
 	}
 	mode := RouterDispatchModeForMessage(msg)
 	dispatch := ExecutionRouterDispatch{
-		Sequence:        msg.Sequence,
-		ZoneID:          zoneID,
-		MsgType:         msg.MsgType,
-		ExecutionTarget: RouterExecutionTarget(msg),
-		QueueID:         RouterQueueID(zoneID, mode, msg.DomainRouteKey),
+		Sequence:		msg.Sequence,
+		ZoneID:			zoneID,
+		MsgType:		msg.MsgType,
+		ExecutionTarget:	RouterExecutionTarget(msg),
+		QueueID:		RouterQueueID(zoneID, mode, msg.DomainRouteKey),
 		GasMeter: RouterGasMeter{
-			Class:    msg.effectiveGasClass(),
-			Limit:    msg.Call.GasLimit,
-			Reserved: msg.Call.GasLimit,
+			Class:		msg.effectiveGasClass(),
+			Limit:		msg.Call.GasLimit,
+			Reserved:	msg.Call.GasLimit,
 		},
-		Lane:            RouterLaneForMessage(msg),
-		Backend:         backend,
-		DispatchMode:    mode,
-		ReceiptPolicy:   RouterReceiptPolicyForMode(mode),
-		Priority:        msg.Priority,
-		Scheduling:      msg.Scheduling,
-		DomainRouteKey:  strings.TrimSpace(msg.DomainRouteKey),
-		Call:            msg.Call,
-		KVPrefix:        kvPrefix,
-		BlockSTMKey:     blockSTMKey,
-		StakingPower:    msg.StakingPower,
-		ExecutionHeight: height,
+		Lane:			RouterLaneForMessage(msg),
+		Backend:		backend,
+		DispatchMode:		mode,
+		ReceiptPolicy:		RouterReceiptPolicyForMode(mode),
+		Priority:		msg.Priority,
+		Scheduling:		msg.Scheduling,
+		DomainRouteKey:		strings.TrimSpace(msg.DomainRouteKey),
+		Call:			msg.Call,
+		KVPrefix:		kvPrefix,
+		BlockSTMKey:		blockSTMKey,
+		StakingPower:		msg.StakingPower,
+		ExecutionHeight:	height,
 	}
 	if err := dispatch.Validate(policy); err != nil {
 		return ExecutionRouterDispatch{}, zonestypes.ZoneExecutionBudget{}, err
@@ -691,13 +691,13 @@ func buildRouterZoneOutputs(zones []zonestypes.ZoneRuntimeState, budgets map[zon
 	outputs := make([]ExecutionRouterZoneOutput, 0, len(zones))
 	for _, zone := range zones {
 		outputs = append(outputs, ExecutionRouterZoneOutput{
-			ZoneID:              zone.ZoneID,
-			StateRoot:           zone.StateRoot,
-			ReceiptRoot:         zone.ReceiptRoot,
-			MessageRoot:         zone.MessageRoot,
-			ExecutionResultRoot: zone.ExecutionResultRoot,
-			ProofRoot:           zone.ProofRoot,
-			Budget:              budgets[zone.ZoneID],
+			ZoneID:			zone.ZoneID,
+			StateRoot:		zone.StateRoot,
+			ReceiptRoot:		zone.ReceiptRoot,
+			MessageRoot:		zone.MessageRoot,
+			ExecutionResultRoot:	zone.ExecutionResultRoot,
+			ProofRoot:		zone.ProofRoot,
+			Budget:			budgets[zone.ZoneID],
 		})
 	}
 	sort.SliceStable(outputs, func(i, j int) bool {

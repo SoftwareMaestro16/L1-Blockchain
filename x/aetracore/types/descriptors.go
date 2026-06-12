@@ -22,217 +22,217 @@ type ServiceFailureBehavior string
 type ServiceReceiptPolicy string
 
 const (
-	ZoneTypeCore        ZoneType = "CORE"
-	ZoneTypeAetraCore   ZoneType = "AETHER_CORE"
-	ZoneTypeFinancial   ZoneType = "FINANCIAL"
-	ZoneTypeIdentity    ZoneType = "IDENTITY"
-	ZoneTypeStorage     ZoneType = "STORAGE"
-	ZoneTypePayment     ZoneType = "PAYMENT"
-	ZoneTypeContract    ZoneType = "CONTRACT"
-	ZoneTypeApplication ZoneType = "APPLICATION"
-	ZoneTypeService     ZoneType = "SERVICE"
+	ZoneTypeCore		ZoneType	= "CORE"
+	ZoneTypeAetraCore	ZoneType	= "AETHER_CORE"
+	ZoneTypeFinancial	ZoneType	= "FINANCIAL"
+	ZoneTypeIdentity	ZoneType	= "IDENTITY"
+	ZoneTypeStorage		ZoneType	= "STORAGE"
+	ZoneTypePayment		ZoneType	= "PAYMENT"
+	ZoneTypeContract	ZoneType	= "CONTRACT"
+	ZoneTypeApplication	ZoneType	= "APPLICATION"
+	ZoneTypeService		ZoneType	= "SERVICE"
 
-	ServiceTypeOnChain   ServiceType = "ON_CHAIN"
-	ServiceTypeOffChain  ServiceType = "OFF_CHAIN"
-	ServiceTypeMixed     ServiceType = "MIXED"
-	ServiceTypeFogMarket ServiceType = "FOG_MARKET"
+	ServiceTypeOnChain	ServiceType	= "ON_CHAIN"
+	ServiceTypeOffChain	ServiceType	= "OFF_CHAIN"
+	ServiceTypeMixed	ServiceType	= "MIXED"
+	ServiceTypeFogMarket	ServiceType	= "FOG_MARKET"
 
-	ServiceStatusActive     ServiceStatus = "ACTIVE"
-	ServiceStatusDisabled   ServiceStatus = "DISABLED"
-	ServiceStatusDeprecated ServiceStatus = "DEPRECATED"
+	ServiceStatusActive	ServiceStatus	= "ACTIVE"
+	ServiceStatusDisabled	ServiceStatus	= "DISABLED"
+	ServiceStatusDeprecated	ServiceStatus	= "DEPRECATED"
 
-	ServiceLocationModule          ServiceLocation = "MODULE"
-	ServiceLocationContract        ServiceLocation = "CONTRACT"
-	ServiceLocationApplicationZone ServiceLocation = "APPLICATION_ZONE"
-	ServiceLocationExternal        ServiceLocation = "EXTERNAL_ENDPOINT"
-	ServiceLocationHybrid          ServiceLocation = "HYBRID_ENDPOINT"
-	ServiceLocationProviderPool    ServiceLocation = "PROVIDER_POOL"
+	ServiceLocationModule		ServiceLocation	= "MODULE"
+	ServiceLocationContract		ServiceLocation	= "CONTRACT"
+	ServiceLocationApplicationZone	ServiceLocation	= "APPLICATION_ZONE"
+	ServiceLocationExternal		ServiceLocation	= "EXTERNAL_ENDPOINT"
+	ServiceLocationHybrid		ServiceLocation	= "HYBRID_ENDPOINT"
+	ServiceLocationProviderPool	ServiceLocation	= "PROVIDER_POOL"
 
-	ServiceTrustConsensusExecuted           ServiceTrustModel = "CONSENSUS_EXECUTED"
-	ServiceTrustEconomicallySecured         ServiceTrustModel = "ECONOMICALLY_SECURED"
-	ServiceTrustCryptographicallyVerifiable ServiceTrustModel = "CRYPTOGRAPHICALLY_VERIFIABLE"
-	ServiceTrustHybridChallengeable         ServiceTrustModel = "HYBRID_CHALLENGEABLE"
-	ServiceTrustFullyTrusted                ServiceTrustModel = "FULLY_TRUSTED"
+	ServiceTrustConsensusExecuted		ServiceTrustModel	= "CONSENSUS_EXECUTED"
+	ServiceTrustEconomicallySecured		ServiceTrustModel	= "ECONOMICALLY_SECURED"
+	ServiceTrustCryptographicallyVerifiable	ServiceTrustModel	= "CRYPTOGRAPHICALLY_VERIFIABLE"
+	ServiceTrustHybridChallengeable		ServiceTrustModel	= "HYBRID_CHALLENGEABLE"
+	ServiceTrustFullyTrusted		ServiceTrustModel	= "FULLY_TRUSTED"
 
-	ServiceVerificationConsensusReceipt   ServiceVerificationModel = "CONSENSUS_RECEIPT"
-	ServiceVerificationSignedResult       ServiceVerificationModel = "SIGNED_RESULT"
-	ServiceVerificationProofAnchored      ServiceVerificationModel = "PROOF_ANCHORED"
-	ServiceVerificationChallengeWindow    ServiceVerificationModel = "CHALLENGE_WINDOW"
-	ServiceVerificationEconomicCollateral ServiceVerificationModel = "ECONOMIC_COLLATERAL"
-	ServiceVerificationAdvisory           ServiceVerificationModel = "ADVISORY"
+	ServiceVerificationConsensusReceipt	ServiceVerificationModel	= "CONSENSUS_RECEIPT"
+	ServiceVerificationSignedResult		ServiceVerificationModel	= "SIGNED_RESULT"
+	ServiceVerificationProofAnchored	ServiceVerificationModel	= "PROOF_ANCHORED"
+	ServiceVerificationChallengeWindow	ServiceVerificationModel	= "CHALLENGE_WINDOW"
+	ServiceVerificationEconomicCollateral	ServiceVerificationModel	= "ECONOMIC_COLLATERAL"
+	ServiceVerificationAdvisory		ServiceVerificationModel	= "ADVISORY"
 
-	ServicePaymentOnChain   ServicePaymentSettlementMode = "ON_CHAIN"
-	ServicePaymentStreaming ServicePaymentSettlementMode = "STREAMING"
-	ServicePaymentPrepaid   ServicePaymentSettlementMode = "PREPAID"
-	ServicePaymentMetered   ServicePaymentSettlementMode = "METERED"
-	ServicePaymentEscrow    ServicePaymentSettlementMode = "ESCROW"
+	ServicePaymentOnChain	ServicePaymentSettlementMode	= "ON_CHAIN"
+	ServicePaymentStreaming	ServicePaymentSettlementMode	= "STREAMING"
+	ServicePaymentPrepaid	ServicePaymentSettlementMode	= "PREPAID"
+	ServicePaymentMetered	ServicePaymentSettlementMode	= "METERED"
+	ServicePaymentEscrow	ServicePaymentSettlementMode	= "ESCROW"
 
-	ServicePricingPerCall        ServicePricingUnit = "CALL"
-	ServicePricingPerByte        ServicePricingUnit = "BYTE"
-	ServicePricingPerComputeUnit ServicePricingUnit = "COMPUTE_UNIT"
-	ServicePricingSubscription   ServicePricingUnit = "SUBSCRIPTION"
+	ServicePricingPerCall		ServicePricingUnit	= "CALL"
+	ServicePricingPerByte		ServicePricingUnit	= "BYTE"
+	ServicePricingPerComputeUnit	ServicePricingUnit	= "COMPUTE_UNIT"
+	ServicePricingSubscription	ServicePricingUnit	= "SUBSCRIPTION"
 
-	ServiceStorageNone                ServiceStorageModel = "NONE"
-	ServiceStorageEphemeral           ServiceStorageModel = "EPHEMERAL"
-	ServiceStorageOnChain             ServiceStorageModel = "ON_CHAIN"
-	ServiceStorageDistributedOffChain ServiceStorageModel = "OFF_CHAIN_DISTRIBUTED"
-	ServiceStorageHybridCommitment    ServiceStorageModel = "HYBRID_COMMITMENT"
+	ServiceStorageNone			ServiceStorageModel	= "NONE"
+	ServiceStorageEphemeral			ServiceStorageModel	= "EPHEMERAL"
+	ServiceStorageOnChain			ServiceStorageModel	= "ON_CHAIN"
+	ServiceStorageDistributedOffChain	ServiceStorageModel	= "OFF_CHAIN_DISTRIBUTED"
+	ServiceStorageHybridCommitment		ServiceStorageModel	= "HYBRID_COMMITMENT"
 
-	ServiceMethodSync    ServiceMethodExecutionType = "SYNC"
-	ServiceMethodAsync   ServiceMethodExecutionType = "ASYNC"
-	ServiceMethodEvented ServiceMethodExecutionType = "EVENTED"
+	ServiceMethodSync	ServiceMethodExecutionType	= "SYNC"
+	ServiceMethodAsync	ServiceMethodExecutionType	= "ASYNC"
+	ServiceMethodEvented	ServiceMethodExecutionType	= "EVENTED"
 
-	ServiceFailureRevert          ServiceFailureBehavior = "REVERT"
-	ServiceFailureRetry           ServiceFailureBehavior = "RETRY"
-	ServiceFailureFallbackOnChain ServiceFailureBehavior = "FALLBACK_ON_CHAIN"
-	ServiceFailureChallenge       ServiceFailureBehavior = "CHALLENGE"
-	ServiceFailureSlashProvider   ServiceFailureBehavior = "SLASH_PROVIDER"
-	ServiceFailureRefund          ServiceFailureBehavior = "REFUND"
-	ServiceFailurePartialSettle   ServiceFailureBehavior = "PARTIAL_SETTLE"
+	ServiceFailureRevert		ServiceFailureBehavior	= "REVERT"
+	ServiceFailureRetry		ServiceFailureBehavior	= "RETRY"
+	ServiceFailureFallbackOnChain	ServiceFailureBehavior	= "FALLBACK_ON_CHAIN"
+	ServiceFailureChallenge		ServiceFailureBehavior	= "CHALLENGE"
+	ServiceFailureSlashProvider	ServiceFailureBehavior	= "SLASH_PROVIDER"
+	ServiceFailureRefund		ServiceFailureBehavior	= "REFUND"
+	ServiceFailurePartialSettle	ServiceFailureBehavior	= "PARTIAL_SETTLE"
 
-	ServiceReceiptCommitted         ServiceReceiptPolicy = "COMMITTED_RECEIPT"
-	ServiceReceiptCommittedAndProof ServiceReceiptPolicy = "COMMITTED_RECEIPT_AND_PROOF"
+	ServiceReceiptCommitted		ServiceReceiptPolicy	= "COMMITTED_RECEIPT"
+	ServiceReceiptCommittedAndProof	ServiceReceiptPolicy	= "COMMITTED_RECEIPT_AND_PROOF"
 )
 
 type ZoneDescriptor struct {
-	ZoneID                ZoneID
-	ZoneName              string
-	ZoneType              ZoneType
-	ModuleName            string
-	Enabled               bool
-	StateMachineVersion   uint64
-	StateVersion          uint64
-	KeeperScope           string
-	MsgServerScope        string
-	QueryServerScope      string
-	MempoolPolicyID       string
-	FeePolicyID           string
-	GasPolicyID           string
-	MessagePolicyID       string
-	RootPrefix            string
-	ShardLayoutEpoch      uint64
-	MaxShards             uint32
-	MessageCapabilities   []string
-	ProofCapabilities     []string
-	Capabilities          []string
-	UpgradeHeightOptional uint64
+	ZoneID			ZoneID
+	ZoneName		string
+	ZoneType		ZoneType
+	ModuleName		string
+	Enabled			bool
+	StateMachineVersion	uint64
+	StateVersion		uint64
+	KeeperScope		string
+	MsgServerScope		string
+	QueryServerScope	string
+	MempoolPolicyID		string
+	FeePolicyID		string
+	GasPolicyID		string
+	MessagePolicyID		string
+	RootPrefix		string
+	ShardLayoutEpoch	uint64
+	MaxShards		uint32
+	MessageCapabilities	[]string
+	ProofCapabilities	[]string
+	Capabilities		[]string
+	UpgradeHeightOptional	uint64
 }
 
 type ServiceDescriptor struct {
-	ServiceID        string
-	Owner            string
-	ServiceType      ServiceType
-	ZoneID           ZoneID
-	InterfaceID      string
-	EndpointKey      string
-	Version          uint64
-	AvailabilityHash string
-	Enabled          bool
-	Status           ServiceStatus
-	ExpiryHeight     uint64
-	CreatedHeight    uint64
-	UpdatedHeight    uint64
-	Interface        ServiceInterfaceDescriptor
-	Execution        ServiceExecutionDescriptor
-	Discovery        ServiceDiscoveryDescriptor
-	Payment          ServicePaymentDescriptor
-	Storage          ServiceStorageDescriptor
-	Verification     ServiceVerificationDescriptor
+	ServiceID		string
+	Owner			string
+	ServiceType		ServiceType
+	ZoneID			ZoneID
+	InterfaceID		string
+	EndpointKey		string
+	Version			uint64
+	AvailabilityHash	string
+	Enabled			bool
+	Status			ServiceStatus
+	ExpiryHeight		uint64
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	Interface		ServiceInterfaceDescriptor
+	Execution		ServiceExecutionDescriptor
+	Discovery		ServiceDiscoveryDescriptor
+	Payment			ServicePaymentDescriptor
+	Storage			ServiceStorageDescriptor
+	Verification		ServiceVerificationDescriptor
 }
 
 type ServiceInterfaceDescriptor struct {
-	InterfaceID    string
-	InterfaceName  string
-	InterfaceHash  string
-	Version        uint64
-	SchemaEncoding string
-	Methods        []ServiceMethodDescriptor
-	Events         []string
-	Errors         []string
-	AuthModel      string
-	PaymentModel   string
-	MetadataHash   string
-	CreatedHeight  uint64
+	InterfaceID	string
+	InterfaceName	string
+	InterfaceHash	string
+	Version		uint64
+	SchemaEncoding	string
+	Methods		[]ServiceMethodDescriptor
+	Events		[]string
+	Errors		[]string
+	AuthModel	string
+	PaymentModel	string
+	MetadataHash	string
+	CreatedHeight	uint64
 }
 
 type ServiceMethodDescriptor struct {
-	MethodID             string
-	Name                 string
-	InputSchemaHash      string
-	OutputSchemaHash     string
-	ExecutionType        ServiceMethodExecutionType
-	RequiredPaymentModel string
-	GasModel             string
-	VerificationModel    ServiceVerificationModel
-	TimeoutHeightDelta   uint64
-	IdempotencyRequired  bool
-	CallbackSupported    bool
-	FailureBehavior      ServiceFailureBehavior
+	MethodID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	ExecutionType		ServiceMethodExecutionType
+	RequiredPaymentModel	string
+	GasModel		string
+	VerificationModel	ServiceVerificationModel
+	TimeoutHeightDelta	uint64
+	IdempotencyRequired	bool
+	CallbackSupported	bool
+	FailureBehavior		ServiceFailureBehavior
 }
 
 type ServiceExecutionDescriptor struct {
-	Location        ServiceLocation
-	Target          string
-	ModuleRoute     string
-	ContractAddress string
-	Endpoint        string
-	ProviderPoolID  string
-	Mode            ExecutionMode
-	Deterministic   bool
-	ReceiptPolicy   ServiceReceiptPolicy
-	FailureBehavior ServiceFailureBehavior
-	ResultExpiry    uint64
-	ChallengeWindow uint64
+	Location	ServiceLocation
+	Target		string
+	ModuleRoute	string
+	ContractAddress	string
+	Endpoint	string
+	ProviderPoolID	string
+	Mode		ExecutionMode
+	Deterministic	bool
+	ReceiptPolicy	ServiceReceiptPolicy
+	FailureBehavior	ServiceFailureBehavior
+	ResultExpiry	uint64
+	ChallengeWindow	uint64
 }
 
 type ServiceDiscoveryDescriptor struct {
-	ServiceName            string
-	IdentityName           string
-	ProviderRoot           string
-	MetadataHash           string
-	ExternalDescriptorHash string
-	CacheExpiryHeight      uint64
-	SignaturePolicy        string
+	ServiceName		string
+	IdentityName		string
+	ProviderRoot		string
+	MetadataHash		string
+	ExternalDescriptorHash	string
+	CacheExpiryHeight	uint64
+	SignaturePolicy		string
 }
 
 type ServicePaymentDescriptor struct {
-	SettlementMode ServicePaymentSettlementMode
-	Denom          string
-	Amount         string
-	MaxAmount      string
-	PricingUnit    ServicePricingUnit
-	EscrowRequired bool
-	EscrowID       string
-	MeterID        string
-	ExpiryHeight   uint64
+	SettlementMode	ServicePaymentSettlementMode
+	Denom		string
+	Amount		string
+	MaxAmount	string
+	PricingUnit	ServicePricingUnit
+	EscrowRequired	bool
+	EscrowID	string
+	MeterID		string
+	ExpiryHeight	uint64
 }
 
 type ServiceStorageDescriptor struct {
-	Model              ServiceStorageModel
-	StateRootType      RootType
-	CommitmentHash     string
-	ContentHash        string
-	StateRoot          string
-	RetrievalMethod    string
-	VerificationMethod string
-	RetentionHeight    uint64
-	RetentionPolicy    string
-	AccessPolicy       string
-	MaxPayloadBytes    uint64
-	ProofRequired      bool
+	Model			ServiceStorageModel
+	StateRootType		RootType
+	CommitmentHash		string
+	ContentHash		string
+	StateRoot		string
+	RetrievalMethod		string
+	VerificationMethod	string
+	RetentionHeight		uint64
+	RetentionPolicy		string
+	AccessPolicy		string
+	MaxPayloadBytes		uint64
+	ProofRequired		bool
 }
 
 type ServiceVerificationDescriptor struct {
-	TrustModel               ServiceTrustModel
-	Model                    ServiceVerificationModel
-	ProofFormat              string
-	RequestSigningRequired   bool
-	ResponseSigningRequired  bool
-	ChallengeWindow          uint64
-	FallbackServiceID        string
-	ProviderCollateralDenom  string
-	ProviderCollateralAmount string
-	FaultPolicy              ServiceFailureBehavior
+	TrustModel			ServiceTrustModel
+	Model				ServiceVerificationModel
+	ProofFormat			string
+	RequestSigningRequired		bool
+	ResponseSigningRequired		bool
+	ChallengeWindow			uint64
+	FallbackServiceID		string
+	ProviderCollateralDenom		string
+	ProviderCollateralAmount	string
+	FaultPolicy			ServiceFailureBehavior
 }
 
 func (d ZoneDescriptor) Validate(params AetraCoreParams) error {

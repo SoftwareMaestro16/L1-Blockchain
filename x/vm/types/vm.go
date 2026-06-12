@@ -9,39 +9,39 @@ import (
 )
 
 const (
-	RuntimeAVM      = "avm"
-	RuntimeCosmWasm = "cosmwasm"
+	RuntimeAVM	= "avm"
+	RuntimeCosmWasm	= "cosmwasm"
 
-	ActionDeploy       = "deploy"
-	ActionExternalCall = "external_call"
-	ActionInternalCall = "internal_call"
-	ActionBouncedCall  = "bounced_call"
-	ActionQuery        = "query"
+	ActionDeploy		= "deploy"
+	ActionExternalCall	= "external_call"
+	ActionInternalCall	= "internal_call"
+	ActionBouncedCall	= "bounced_call"
+	ActionQuery		= "query"
 )
 
 type RuntimePolicy struct {
-	AVMParams       avm.Params
-	CosmWasmPolicy  wasmconfig.Policy
-	AVMEnabled      bool
-	CosmWasmEnabled bool
+	AVMParams	avm.Params
+	CosmWasmPolicy	wasmconfig.Policy
+	AVMEnabled	bool
+	CosmWasmEnabled	bool
 }
 
 type VMCall struct {
-	Runtime    string
-	Action     string
-	CodeBytes  uint64
-	GasLimit   uint64
-	QueryBytes uint64
-	QueryDepth uint32
-	Entrypoint avm.Entrypoint
+	Runtime		string
+	Action		string
+	CodeBytes	uint64
+	GasLimit	uint64
+	QueryBytes	uint64
+	QueryDepth	uint32
+	Entrypoint	avm.Entrypoint
 }
 
 func DefaultRuntimePolicy() RuntimePolicy {
 	return RuntimePolicy{
-		AVMParams:       avm.DefaultParams(),
-		CosmWasmPolicy:  wasmconfig.DefaultPolicy(),
-		AVMEnabled:      true,
-		CosmWasmEnabled: false,
+		AVMParams:		avm.DefaultParams(),
+		CosmWasmPolicy:		wasmconfig.DefaultPolicy(),
+		AVMEnabled:		true,
+		CosmWasmEnabled:	false,
 	}
 }
 

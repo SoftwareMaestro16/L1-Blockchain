@@ -69,8 +69,8 @@ func RegisterQueryServer(s grpc.Server, srv QueryServer) {
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.nominatorpool.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.nominatorpool.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		queryMethod("NominatorPool", _Query_NominatorPool_Handler),
 		queryMethod("NominatorPools", _Query_NominatorPools_Handler),
@@ -84,8 +84,8 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 		queryMethod("StakingProof", _Query_StakingProof_Handler),
 		queryMethod("PoolUnbondingQueue", _Query_PoolUnbondingQueue_Handler),
 	},
-	Streams:  []grpcgo.StreamDesc{},
-	Metadata: "l1/nominatorpool/v1/query.proto",
+	Streams:	[]grpcgo.StreamDesc{},
+	Metadata:	"l1/nominatorpool/v1/query.proto",
 }
 
 func queryMethod(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -213,11 +213,11 @@ func buildNominatorPoolQueryFileDescriptor() []byte {
 		queryDescriptorMethod("PoolUnbondingQueue", "QueryPoolUnbondingQueueRequest", "QueryPoolUnbondingQueueResponse"),
 	}
 	fd := &descriptorpb.FileDescriptorProto{
-		Name:        descriptorString("l1/nominatorpool/v1/query.proto"),
-		Package:     descriptorString("l1.nominatorpool.v1"),
-		Syntax:      descriptorString("proto3"),
-		MessageType: messages,
-		Service:     []*descriptorpb.ServiceDescriptorProto{{Name: descriptorString("Query"), Method: methods}},
+		Name:		descriptorString("l1/nominatorpool/v1/query.proto"),
+		Package:	descriptorString("l1.nominatorpool.v1"),
+		Syntax:		descriptorString("proto3"),
+		MessageType:	messages,
+		Service:	[]*descriptorpb.ServiceDescriptorProto{{Name: descriptorString("Query"), Method: methods}},
 	}
 	raw, err := proto2.Marshal(fd)
 	if err != nil {
@@ -236,9 +236,9 @@ func buildNominatorPoolQueryFileDescriptor() []byte {
 
 func queryDescriptorMethod(name, input, output string) *descriptorpb.MethodDescriptorProto {
 	return &descriptorpb.MethodDescriptorProto{
-		Name:       descriptorString(name),
-		InputType:  descriptorString(".l1.nominatorpool.v1." + input),
-		OutputType: descriptorString(".l1.nominatorpool.v1." + output),
+		Name:		descriptorString(name),
+		InputType:	descriptorString(".l1.nominatorpool.v1." + input),
+		OutputType:	descriptorString(".l1.nominatorpool.v1." + output),
 	}
 }
 
@@ -267,58 +267,58 @@ func registerQueryTypes() {
 	gogoproto.RegisterType((*QueryPoolUnbondingQueueResponse)(nil), "l1.nominatorpool.v1.QueryPoolUnbondingQueueResponse")
 }
 
-func (m *QueryNominatorPoolRequest) Reset()          { *m = QueryNominatorPoolRequest{} }
-func (m *QueryNominatorPoolResponse) Reset()         { *m = QueryNominatorPoolResponse{} }
-func (m *QueryNominatorPoolsRequest) Reset()         { *m = QueryNominatorPoolsRequest{} }
-func (m *QueryNominatorPoolsResponse) Reset()        { *m = QueryNominatorPoolsResponse{} }
-func (m *QueryPoolDelegatorRequest) Reset()          { *m = QueryPoolDelegatorRequest{} }
-func (m *QueryPoolDelegatorResponse) Reset()         { *m = QueryPoolDelegatorResponse{} }
-func (m *QueryPoolRewardsRequest) Reset()            { *m = QueryPoolRewardsRequest{} }
-func (m *QueryPoolRewardsResponse) Reset()           { *m = QueryPoolRewardsResponse{} }
-func (m *QueryPoolShareRequest) Reset()              { *m = QueryPoolShareRequest{} }
-func (m *QueryPoolShareResponse) Reset()             { *m = QueryPoolShareResponse{} }
-func (m *QueryPoolAllocationsRequest) Reset()        { *m = QueryPoolAllocationsRequest{} }
-func (m *QueryPoolAllocationsResponse) Reset()       { *m = QueryPoolAllocationsResponse{} }
-func (m *QueryStakeReputationRequest) Reset()        { *m = QueryStakeReputationRequest{} }
-func (m *QueryStakeReputationResponse) Reset()       { *m = QueryStakeReputationResponse{} }
-func (m *QueryAccountReputationRequest) Reset()      { *m = QueryAccountReputationRequest{} }
-func (m *QueryAccountReputationResponse) Reset()     { *m = QueryAccountReputationResponse{} }
-func (m *QueryStakingRewardsRequest) Reset()         { *m = QueryStakingRewardsRequest{} }
-func (m *QueryStakingRewardsResponse) Reset()        { *m = QueryStakingRewardsResponse{} }
-func (m *QueryStakingProofRequest) Reset()           { *m = QueryStakingProofRequest{} }
-func (m *QueryStakingProofResponse) Reset()          { *m = QueryStakingProofResponse{} }
-func (m *QueryPoolUnbondingQueueRequest) Reset()     { *m = QueryPoolUnbondingQueueRequest{} }
-func (m *QueryPoolUnbondingQueueResponse) Reset()    { *m = QueryPoolUnbondingQueueResponse{} }
-func (m *QueryNominatorPoolRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryNominatorPoolResponse) String() string { return gogoproto.CompactTextString(m) }
-func (m *QueryNominatorPoolsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryNominatorPoolRequest) Reset()		{ *m = QueryNominatorPoolRequest{} }
+func (m *QueryNominatorPoolResponse) Reset()		{ *m = QueryNominatorPoolResponse{} }
+func (m *QueryNominatorPoolsRequest) Reset()		{ *m = QueryNominatorPoolsRequest{} }
+func (m *QueryNominatorPoolsResponse) Reset()		{ *m = QueryNominatorPoolsResponse{} }
+func (m *QueryPoolDelegatorRequest) Reset()		{ *m = QueryPoolDelegatorRequest{} }
+func (m *QueryPoolDelegatorResponse) Reset()		{ *m = QueryPoolDelegatorResponse{} }
+func (m *QueryPoolRewardsRequest) Reset()		{ *m = QueryPoolRewardsRequest{} }
+func (m *QueryPoolRewardsResponse) Reset()		{ *m = QueryPoolRewardsResponse{} }
+func (m *QueryPoolShareRequest) Reset()			{ *m = QueryPoolShareRequest{} }
+func (m *QueryPoolShareResponse) Reset()		{ *m = QueryPoolShareResponse{} }
+func (m *QueryPoolAllocationsRequest) Reset()		{ *m = QueryPoolAllocationsRequest{} }
+func (m *QueryPoolAllocationsResponse) Reset()		{ *m = QueryPoolAllocationsResponse{} }
+func (m *QueryStakeReputationRequest) Reset()		{ *m = QueryStakeReputationRequest{} }
+func (m *QueryStakeReputationResponse) Reset()		{ *m = QueryStakeReputationResponse{} }
+func (m *QueryAccountReputationRequest) Reset()		{ *m = QueryAccountReputationRequest{} }
+func (m *QueryAccountReputationResponse) Reset()	{ *m = QueryAccountReputationResponse{} }
+func (m *QueryStakingRewardsRequest) Reset()		{ *m = QueryStakingRewardsRequest{} }
+func (m *QueryStakingRewardsResponse) Reset()		{ *m = QueryStakingRewardsResponse{} }
+func (m *QueryStakingProofRequest) Reset()		{ *m = QueryStakingProofRequest{} }
+func (m *QueryStakingProofResponse) Reset()		{ *m = QueryStakingProofResponse{} }
+func (m *QueryPoolUnbondingQueueRequest) Reset()	{ *m = QueryPoolUnbondingQueueRequest{} }
+func (m *QueryPoolUnbondingQueueResponse) Reset()	{ *m = QueryPoolUnbondingQueueResponse{} }
+func (m *QueryNominatorPoolRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryNominatorPoolResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryNominatorPoolsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryNominatorPoolsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryPoolDelegatorRequest) String() string   { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolDelegatorResponse) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolRewardsRequest) String() string     { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolRewardsResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolShareRequest) String() string       { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolShareResponse) String() string      { return gogoproto.CompactTextString(m) }
-func (m *QueryPoolAllocationsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryPoolDelegatorRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolDelegatorResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolRewardsRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolRewardsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolShareRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolShareResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPoolAllocationsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryPoolAllocationsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryStakeReputationRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryStakeReputationResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryStakeReputationRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryStakeReputationResponse) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryAccountReputationRequest) String() string {
 	return gogoproto.CompactTextString(m)
 }
 func (m *QueryAccountReputationResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryStakingRewardsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryStakingRewardsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryStakingRewardsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryStakingProofRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryStakingProofResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryStakingProofRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryStakingProofResponse) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryPoolUnbondingQueueRequest) String() string {
 	return gogoproto.CompactTextString(m)
 }
@@ -326,28 +326,28 @@ func (m *QueryPoolUnbondingQueueResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
 
-func (*QueryNominatorPoolRequest) ProtoMessage()       {}
-func (*QueryNominatorPoolResponse) ProtoMessage()      {}
-func (*QueryNominatorPoolsRequest) ProtoMessage()      {}
-func (*QueryNominatorPoolsResponse) ProtoMessage()     {}
-func (*QueryPoolDelegatorRequest) ProtoMessage()       {}
-func (*QueryPoolDelegatorResponse) ProtoMessage()      {}
-func (*QueryPoolRewardsRequest) ProtoMessage()         {}
-func (*QueryPoolRewardsResponse) ProtoMessage()        {}
-func (*QueryPoolShareRequest) ProtoMessage()           {}
-func (*QueryPoolShareResponse) ProtoMessage()          {}
-func (*QueryPoolAllocationsRequest) ProtoMessage()     {}
-func (*QueryPoolAllocationsResponse) ProtoMessage()    {}
-func (*QueryStakeReputationRequest) ProtoMessage()     {}
-func (*QueryStakeReputationResponse) ProtoMessage()    {}
-func (*QueryAccountReputationRequest) ProtoMessage()   {}
-func (*QueryAccountReputationResponse) ProtoMessage()  {}
-func (*QueryStakingRewardsRequest) ProtoMessage()      {}
-func (*QueryStakingRewardsResponse) ProtoMessage()     {}
-func (*QueryStakingProofRequest) ProtoMessage()        {}
-func (*QueryStakingProofResponse) ProtoMessage()       {}
-func (*QueryPoolUnbondingQueueRequest) ProtoMessage()  {}
-func (*QueryPoolUnbondingQueueResponse) ProtoMessage() {}
+func (*QueryNominatorPoolRequest) ProtoMessage()	{}
+func (*QueryNominatorPoolResponse) ProtoMessage()	{}
+func (*QueryNominatorPoolsRequest) ProtoMessage()	{}
+func (*QueryNominatorPoolsResponse) ProtoMessage()	{}
+func (*QueryPoolDelegatorRequest) ProtoMessage()	{}
+func (*QueryPoolDelegatorResponse) ProtoMessage()	{}
+func (*QueryPoolRewardsRequest) ProtoMessage()		{}
+func (*QueryPoolRewardsResponse) ProtoMessage()		{}
+func (*QueryPoolShareRequest) ProtoMessage()		{}
+func (*QueryPoolShareResponse) ProtoMessage()		{}
+func (*QueryPoolAllocationsRequest) ProtoMessage()	{}
+func (*QueryPoolAllocationsResponse) ProtoMessage()	{}
+func (*QueryStakeReputationRequest) ProtoMessage()	{}
+func (*QueryStakeReputationResponse) ProtoMessage()	{}
+func (*QueryAccountReputationRequest) ProtoMessage()	{}
+func (*QueryAccountReputationResponse) ProtoMessage()	{}
+func (*QueryStakingRewardsRequest) ProtoMessage()	{}
+func (*QueryStakingRewardsResponse) ProtoMessage()	{}
+func (*QueryStakingProofRequest) ProtoMessage()		{}
+func (*QueryStakingProofResponse) ProtoMessage()	{}
+func (*QueryPoolUnbondingQueueRequest) ProtoMessage()	{}
+func (*QueryPoolUnbondingQueueResponse) ProtoMessage()	{}
 
 func (*QueryNominatorPoolRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptorNominatorPoolQuery, []int{0}

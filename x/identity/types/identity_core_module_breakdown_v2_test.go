@@ -109,8 +109,8 @@ func TestIdentityCoreLifecycleKeeperContractV2HooksAndTransitions(t *testing.T) 
 	record, err := NewDomainRecordV2FromDomain(transferred, DomainRecordV2Active, 0, 21)
 	require.NoError(t, err)
 	_, err = ValidateIdentityCoreLifecycleTransitionV2(record, DomainLifecycleTransitionContextV2{
-		Event:  DomainLifecycleEventRevealRegistration,
-		Height: 22,
+		Event:	DomainLifecycleEventRevealRegistration,
+		Height:	22,
 	})
 	require.ErrorContains(t, err, string(IdentityCoreFailureInvalidLifecycleChange))
 }

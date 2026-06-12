@@ -4,11 +4,11 @@ import "github.com/spf13/cobra"
 
 func NewTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        ModuleName,
-		Short:                      "Nominator pool transaction commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       cobra.NoArgs,
+		Use:				ModuleName,
+		Short:				"Nominator pool transaction commands",
+		DisableFlagParsing:		true,
+		SuggestionsMinimumDistance:	2,
+		RunE:				cobra.NoArgs,
 	}
 	for _, use := range []string{
 		"create-pool",
@@ -37,11 +37,11 @@ func NewTxCmd() *cobra.Command {
 
 func NewQueryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                        ModuleName,
-		Short:                      "Nominator pool query commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       cobra.NoArgs,
+		Use:				ModuleName,
+		Short:				"Nominator pool query commands",
+		DisableFlagParsing:		true,
+		SuggestionsMinimumDistance:	2,
+		RunE:				cobra.NoArgs,
 	}
 	for _, use := range []string{
 		"pool",

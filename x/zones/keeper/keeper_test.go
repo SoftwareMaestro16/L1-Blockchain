@@ -118,16 +118,16 @@ func TestMigrationNoopPathValidatesCurrentState(t *testing.T) {
 
 func keeperZone(id zonestypes.ZoneID, kind zonestypes.ZoneKind, vm zonestypes.VMPolicy, activationHeight uint64) zonestypes.Zone {
 	return zonestypes.Zone{
-		ID:                     id,
-		Kind:                   kind,
-		VMPolicy:               vm,
-		FeePolicy:              zonestypes.FeePolicyNaet,
-		GenesisStateHash:       keeperHash(string(id) + "-genesis"),
-		StateTransitionID:      "transition-" + string(id),
-		UpgradePolicy:          zonestypes.UpgradePolicyGovernance,
-		DataAvailabilityPolicy: zonestypes.DataAvailabilityCoreCommitment,
-		AuditStatus:            zonestypes.AuditStatusExperimental,
-		ActivationHeight:       activationHeight,
+		ID:			id,
+		Kind:			kind,
+		VMPolicy:		vm,
+		FeePolicy:		zonestypes.FeePolicyNaet,
+		GenesisStateHash:	keeperHash(string(id) + "-genesis"),
+		StateTransitionID:	"transition-" + string(id),
+		UpgradePolicy:		zonestypes.UpgradePolicyGovernance,
+		DataAvailabilityPolicy:	zonestypes.DataAvailabilityCoreCommitment,
+		AuditStatus:		zonestypes.AuditStatusExperimental,
+		ActivationHeight:	activationHeight,
 	}
 }
 

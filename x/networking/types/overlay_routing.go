@@ -12,99 +12,99 @@ import (
 type OverlayMembershipMode string
 
 const (
-	OverlayMembershipModeDeterministicRule OverlayMembershipMode = "DETERMINISTIC_RULE"
-	OverlayMembershipModeCryptographicAuth OverlayMembershipMode = "CRYPTOGRAPHIC_AUTHORIZATION"
-	OverlayMembershipModeStakeBased        OverlayMembershipMode = "STAKE_BASED_INCLUSION"
-	OverlayMembershipModeServiceRegistry   OverlayMembershipMode = "SERVICE_REGISTRY_MEMBERSHIP"
-	OverlayMembershipModeZoneAssignment    OverlayMembershipMode = "ZONE_ASSIGNMENT"
-	OverlayMembershipModeDynamicRouting    OverlayMembershipMode = "DYNAMIC_ROUTING_ASSIGNMENT"
+	OverlayMembershipModeDeterministicRule	OverlayMembershipMode	= "DETERMINISTIC_RULE"
+	OverlayMembershipModeCryptographicAuth	OverlayMembershipMode	= "CRYPTOGRAPHIC_AUTHORIZATION"
+	OverlayMembershipModeStakeBased		OverlayMembershipMode	= "STAKE_BASED_INCLUSION"
+	OverlayMembershipModeServiceRegistry	OverlayMembershipMode	= "SERVICE_REGISTRY_MEMBERSHIP"
+	OverlayMembershipModeZoneAssignment	OverlayMembershipMode	= "ZONE_ASSIGNMENT"
+	OverlayMembershipModeDynamicRouting	OverlayMembershipMode	= "DYNAMIC_ROUTING_ASSIGNMENT"
 )
 
 type MembershipProofType string
 
 const (
-	MembershipProofValidatorSet        MembershipProofType = "VALIDATOR_SET_PROOF"
-	MembershipProofZoneAssignment      MembershipProofType = "ZONE_ASSIGNMENT_PROOF"
-	MembershipProofServiceRegistration MembershipProofType = "SERVICE_REGISTRATION_PROOF"
-	MembershipProofProviderStake       MembershipProofType = "PROVIDER_STAKE_PROOF"
-	MembershipProofSignedAuthorization MembershipProofType = "SIGNED_AUTHORIZATION_RECORD"
+	MembershipProofValidatorSet		MembershipProofType	= "VALIDATOR_SET_PROOF"
+	MembershipProofZoneAssignment		MembershipProofType	= "ZONE_ASSIGNMENT_PROOF"
+	MembershipProofServiceRegistration	MembershipProofType	= "SERVICE_REGISTRATION_PROOF"
+	MembershipProofProviderStake		MembershipProofType	= "PROVIDER_STAKE_PROOF"
+	MembershipProofSignedAuthorization	MembershipProofType	= "SIGNED_AUTHORIZATION_RECORD"
 )
 
 type OverlayMembershipProof struct {
-	ProofID       string
-	OverlayID     string
-	NodeID        string
-	ProofType     MembershipProofType
-	Mode          OverlayMembershipMode
-	Membership    OverlayMembershipRule
-	ProofHash     string
-	AuthorityHash string
-	ZoneID        string
-	ServiceID     string
-	StakeAmount   uint64
-	Committed     bool
-	Deterministic bool
-	ExpiresHeight uint64
-	AuthPubKey    []byte
-	Signature     []byte
+	ProofID		string
+	OverlayID	string
+	NodeID		string
+	ProofType	MembershipProofType
+	Mode		OverlayMembershipMode
+	Membership	OverlayMembershipRule
+	ProofHash	string
+	AuthorityHash	string
+	ZoneID		string
+	ServiceID	string
+	StakeAmount	uint64
+	Committed	bool
+	Deterministic	bool
+	ExpiresHeight	uint64
+	AuthPubKey	[]byte
+	Signature	[]byte
 }
 
 type OverlayMembershipRecord struct {
-	OverlayID     string
-	NodeID        string
-	ProofID       string
-	Membership    OverlayMembershipRule
-	Mode          OverlayMembershipMode
-	JoinedHeight  uint64
-	ExpiresHeight uint64
+	OverlayID	string
+	NodeID		string
+	ProofID		string
+	Membership	OverlayMembershipRule
+	Mode		OverlayMembershipMode
+	JoinedHeight	uint64
+	ExpiresHeight	uint64
 }
 
 type RouteHint struct {
-	ZoneID                string
-	ShardID               string
-	ServiceID             string
-	StorageKeyHash        string
-	DeterministicHintHash string
+	ZoneID			string
+	ShardID			string
+	ServiceID		string
+	StorageKeyHash		string
+	DeterministicHintHash	string
 }
 
 type RoutingGraph struct {
-	OverlayID             string
-	GraphHash             string
-	Version               uint64
-	Committed             bool
-	DeterministicHintHash string
-	Edges                 []RoutingEdge
+	OverlayID		string
+	GraphHash		string
+	Version			uint64
+	Committed		bool
+	DeterministicHintHash	string
+	Edges			[]RoutingEdge
 }
 
 type RoutingEdge struct {
-	FromNodeID    string
-	ToNodeID      string
-	LatencyMillis uint64
-	Weight        uint32
-	Priority      uint32
-	ZoneID        string
+	FromNodeID	string
+	ToNodeID	string
+	LatencyMillis	uint64
+	Weight		uint32
+	Priority	uint32
+	ZoneID		string
 }
 
 type OverlayRoutingRequest struct {
-	Message          NetworkMessage
-	SourceNodeID     string
-	CandidatePeers   []NodeRecord
-	MembershipProofs []OverlayMembershipProof
-	Graph            RoutingGraph
-	Hint             RouteHint
-	CurrentHeight    uint64
+	Message			NetworkMessage
+	SourceNodeID		string
+	CandidatePeers		[]NodeRecord
+	MembershipProofs	[]OverlayMembershipProof
+	Graph			RoutingGraph
+	Hint			RouteHint
+	CurrentHeight		uint64
 }
 
 type OverlayRoutePlan struct {
-	MessageID                 string
-	OverlayID                 string
-	OverlayType               OverlayType
-	Strategy                  RoutingStrategy
-	TargetNodeIDs             []string
-	UsesCommittedRoutingTable bool
-	UsesDeterministicHint     bool
-	UsesNodeLocalAdaptation   bool
-	FallbackUsed              bool
+	MessageID			string
+	OverlayID			string
+	OverlayType			OverlayType
+	Strategy			RoutingStrategy
+	TargetNodeIDs			[]string
+	UsesCommittedRoutingTable	bool
+	UsesDeterministicHint		bool
+	UsesNodeLocalAdaptation		bool
+	FallbackUsed			bool
 }
 
 func NewOverlayMembershipProof(proof OverlayMembershipProof) (OverlayMembershipProof, error) {
@@ -282,13 +282,13 @@ func AuthorizeOverlayMembership(record NodeRecord, desc OverlayDescriptor, proof
 		return OverlayMembershipRecord{}, errors.New("networking overlay membership proof cannot outlive node record")
 	}
 	return OverlayMembershipRecord{
-		OverlayID:     desc.OverlayID,
-		NodeID:        record.NodeID,
-		ProofID:       proof.ProofID,
-		Membership:    desc.Membership,
-		Mode:          proof.Mode,
-		JoinedHeight:  currentHeight,
-		ExpiresHeight: proof.ExpiresHeight,
+		OverlayID:	desc.OverlayID,
+		NodeID:		record.NodeID,
+		ProofID:	proof.ProofID,
+		Membership:	desc.Membership,
+		Mode:		proof.Mode,
+		JoinedHeight:	currentHeight,
+		ExpiresHeight:	proof.ExpiresHeight,
 	}, nil
 }
 
@@ -350,15 +350,15 @@ func BuildOverlayRoute(req OverlayRoutingRequest, descriptors []OverlayDescripto
 		return OverlayRoutePlan{}, errors.New("networking overlay route has no target peers")
 	}
 	return OverlayRoutePlan{
-		MessageID:                 msg.ReplaySafeID,
-		OverlayID:                 desc.OverlayID,
-		OverlayType:               desc.OverlayType,
-		Strategy:                  desc.Routing,
-		TargetNodeIDs:             targets,
-		UsesCommittedRoutingTable: graph.Committed,
-		UsesDeterministicHint:     graph.DeterministicHintHash != "" || normalizeHashText(req.Hint.DeterministicHintHash) != "",
-		UsesNodeLocalAdaptation:   strategyUsesNodeLocalAdaptation(desc.Routing) && !graph.Committed,
-		FallbackUsed:              desc.Routing == RoutingStrategyProbabilisticGossip || len(graph.Edges) == 0,
+		MessageID:			msg.ReplaySafeID,
+		OverlayID:			desc.OverlayID,
+		OverlayType:			desc.OverlayType,
+		Strategy:			desc.Routing,
+		TargetNodeIDs:			targets,
+		UsesCommittedRoutingTable:	graph.Committed,
+		UsesDeterministicHint:		graph.DeterministicHintHash != "" || normalizeHashText(req.Hint.DeterministicHintHash) != "",
+		UsesNodeLocalAdaptation:	strategyUsesNodeLocalAdaptation(desc.Routing) && !graph.Committed,
+		FallbackUsed:			desc.Routing == RoutingStrategyProbabilisticGossip || len(graph.Edges) == 0,
 	}, nil
 }
 

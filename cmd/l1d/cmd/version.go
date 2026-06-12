@@ -13,11 +13,11 @@ import (
 const binaryName = "aetrad"
 
 var (
-	appVersion = "dev"
-	gitCommit  = ""
-	buildDate  = ""
-	buildTags  = ""
-	dirty      = ""
+	appVersion	= "dev"
+	gitCommit	= ""
+	buildDate	= ""
+	buildTags	= ""
+	dirty		= ""
 )
 
 func initVersionInfo() version.ExtraInfo {
@@ -44,11 +44,11 @@ func initVersionInfo() version.ExtraInfo {
 	dirtyValue := firstNonEmpty(dirty, settings["vcs.modified"], "unknown")
 
 	return version.ExtraInfo{
-		"build_date":         buildDateValue,
-		"dirty":              dirtyValue,
-		"cosmos_sdk_version": dependencyVersion(info, "github.com/cosmos/cosmos-sdk"),
-		"cometbft_version":   dependencyVersion(info, "github.com/cometbft/cometbft"),
-		"avm_version":        strconv.FormatUint(uint64(avm.Version), 10),
+		"build_date":		buildDateValue,
+		"dirty":		dirtyValue,
+		"cosmos_sdk_version":	dependencyVersion(info, "github.com/cosmos/cosmos-sdk"),
+		"cometbft_version":	dependencyVersion(info, "github.com/cometbft/cometbft"),
+		"avm_version":		strconv.FormatUint(uint64(avm.Version), 10),
 	}
 }
 

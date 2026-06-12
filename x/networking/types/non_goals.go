@@ -10,30 +10,30 @@ import (
 type NetworkingNonGoal string
 
 const (
-	NetworkingNonGoalApplicationLogic              NetworkingNonGoal = "implement_application_logic"
-	NetworkingNonGoalReplaceCometBFTConsensus      NetworkingNonGoal = "replace_cometbft_consensus"
-	NetworkingNonGoalCentralizedRouting            NetworkingNonGoal = "assume_centralized_routing"
-	NetworkingNonGoalExternalDiscoveryServices     NetworkingNonGoal = "rely_on_external_discovery_services"
-	NetworkingNonGoalMessagingOrSocialNetworkLayer NetworkingNonGoal = "introduce_messaging_or_social_network_layer"
-	NetworkingNonGoalLiveMetricsConsensusAuthority NetworkingNonGoal = "make_live_network_metrics_consensus_authoritative"
-	NetworkingNonGoalOffChainServiceConsensusLogic NetworkingNonGoal = "execute_offchain_service_logic_inside_consensus"
+	NetworkingNonGoalApplicationLogic		NetworkingNonGoal	= "implement_application_logic"
+	NetworkingNonGoalReplaceCometBFTConsensus	NetworkingNonGoal	= "replace_cometbft_consensus"
+	NetworkingNonGoalCentralizedRouting		NetworkingNonGoal	= "assume_centralized_routing"
+	NetworkingNonGoalExternalDiscoveryServices	NetworkingNonGoal	= "rely_on_external_discovery_services"
+	NetworkingNonGoalMessagingOrSocialNetworkLayer	NetworkingNonGoal	= "introduce_messaging_or_social_network_layer"
+	NetworkingNonGoalLiveMetricsConsensusAuthority	NetworkingNonGoal	= "make_live_network_metrics_consensus_authoritative"
+	NetworkingNonGoalOffChainServiceConsensusLogic	NetworkingNonGoal	= "execute_offchain_service_logic_inside_consensus"
 )
 
 type NetworkingNonGoalSpec struct {
-	NonGoals []NetworkingNonGoal
-	SpecRoot string
+	NonGoals	[]NetworkingNonGoal
+	SpecRoot	string
 }
 
 type NetworkingScopeBoundary struct {
-	NonGoals                          NetworkingNonGoalSpec
-	ImplementsApplicationLogic        bool
-	ReplacesCometBFTConsensus         bool
-	RequiresCentralizedRouting        bool
-	RequiresExternalDiscoveryServices bool
-	IntroducesMessagingSocialLayer    bool
-	LiveMetricsConsensusAuthoritative bool
-	OffChainServiceLogicInConsensus   bool
-	BoundaryRoot                      string
+	NonGoals				NetworkingNonGoalSpec
+	ImplementsApplicationLogic		bool
+	ReplacesCometBFTConsensus		bool
+	RequiresCentralizedRouting		bool
+	RequiresExternalDiscoveryServices	bool
+	IntroducesMessagingSocialLayer		bool
+	LiveMetricsConsensusAuthoritative	bool
+	OffChainServiceLogicInConsensus		bool
+	BoundaryRoot				string
 }
 
 func DefaultNetworkingNonGoalSpec() NetworkingNonGoalSpec {

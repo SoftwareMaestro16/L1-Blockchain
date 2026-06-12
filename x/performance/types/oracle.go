@@ -12,109 +12,109 @@ import (
 )
 
 const (
-	DefaultPerformanceOracleAuthority = "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultPerformanceOracleAuthority	= "4:0000000000000000000000000000000000000000000000000000000000000001"
 
-	ReportSourceValidator = "validator"
-	ReportSourceObserver  = "observer"
+	ReportSourceValidator	= "validator"
+	ReportSourceObserver	= "observer"
 
-	ChallengeStatusOpen     = "open"
-	ChallengeStatusAccepted = "accepted"
-	ChallengeStatusRejected = "rejected"
+	ChallengeStatusOpen	= "open"
+	ChallengeStatusAccepted	= "accepted"
+	ChallengeStatusRejected	= "rejected"
 )
 
 type PerformanceOracleParams struct {
-	Authority                string
-	MinScoreBps              uint32
-	MaxScoreBps              uint32
-	MaxLatencyMillis         uint64
-	MaxResponseTimeMillis    uint64
-	MaxReportsPerEpoch       uint32
-	MaxChallengesPerEpoch    uint32
-	MinReportsForAggregation uint32
-	OutlierTrimBps           uint32
-	SlashableSourcesRequired bool
+	Authority			string
+	MinScoreBps			uint32
+	MaxScoreBps			uint32
+	MaxLatencyMillis		uint64
+	MaxResponseTimeMillis		uint64
+	MaxReportsPerEpoch		uint32
+	MaxChallengesPerEpoch		uint32
+	MinReportsForAggregation	uint32
+	OutlierTrimBps			uint32
+	SlashableSourcesRequired	bool
 }
 
 type PerformanceReport struct {
-	ReportID           string
-	Epoch              uint64
-	ValidatorAddress   string
-	ReporterAddress    string
-	Source             string
-	UptimeSignedBlocks uint64
-	UptimeTotalBlocks  uint64
-	LatencyMillis      uint64
-	ResponseTimeMillis uint64
-	MissedBlocks       uint64
-	MissedWindowBlocks uint64
-	PeerScoreBps       uint32
-	SubmittedHeight    uint64
-	Slashable          bool
-	Challenged         bool
-	ReportHash         string
+	ReportID		string
+	Epoch			uint64
+	ValidatorAddress	string
+	ReporterAddress		string
+	Source			string
+	UptimeSignedBlocks	uint64
+	UptimeTotalBlocks	uint64
+	LatencyMillis		uint64
+	ResponseTimeMillis	uint64
+	MissedBlocks		uint64
+	MissedWindowBlocks	uint64
+	PeerScoreBps		uint32
+	SubmittedHeight		uint64
+	Slashable		bool
+	Challenged		bool
+	ReportHash		string
 }
 
 type PerformanceAggregate struct {
-	Epoch                uint64
-	ValidatorAddress     string
-	ReportCount          uint32
-	UptimeScoreBps       uint32
-	LatencyScoreBps      uint32
-	ResponseTimeScoreBps uint32
-	MissedBlockScoreBps  uint32
-	PeerScoreBps         uint32
-	PerformanceScoreBps  uint32
-	AggregationHash      string
+	Epoch			uint64
+	ValidatorAddress	string
+	ReportCount		uint32
+	UptimeScoreBps		uint32
+	LatencyScoreBps		uint32
+	ResponseTimeScoreBps	uint32
+	MissedBlockScoreBps	uint32
+	PeerScoreBps		uint32
+	PerformanceScoreBps	uint32
+	AggregationHash		string
 }
 
 type PerformanceEpoch struct {
-	Epoch      uint64
-	Finalized  bool
-	Reports    []PerformanceReport
-	Aggregates []PerformanceAggregate
-	Challenges []PerformanceChallenge
-	EpochHash  string
+	Epoch		uint64
+	Finalized	bool
+	Reports		[]PerformanceReport
+	Aggregates	[]PerformanceAggregate
+	Challenges	[]PerformanceChallenge
+	EpochHash	string
 }
 
 type PerformanceChallenge struct {
-	ChallengeID   string
-	ReportID      string
-	Challenger    string
-	Reason        string
-	Epoch         uint64
-	Accepted      bool
-	Status        string
-	ChallengeHash string
+	ChallengeID	string
+	ReportID	string
+	Challenger	string
+	Reason		string
+	Epoch		uint64
+	Accepted	bool
+	Status		string
+	ChallengeHash	string
 }
 
 type PerformanceOracleState struct {
-	Params           PerformanceOracleParams
-	AggregationEpoch uint64
-	Epochs           []PerformanceEpoch
+	Params			PerformanceOracleParams
+	AggregationEpoch	uint64
+	Epochs			[]PerformanceEpoch
 }
 
 type MsgSubmitPerformanceReport struct {
-	Authority string
-	Report    PerformanceReport
+	Authority	string
+	Report		PerformanceReport
 }
 
 type MsgFinalizePerformanceEpoch struct {
-	Authority string
-	Epoch     uint64
+	Authority	string
+	Epoch		uint64
 }
 
 type MsgChallengePerformanceReport struct {
-	Authority  string
-	Epoch      uint64
-	ReportID   string
-	Challenger string
-	Reason     string
-	Accepted   bool
+	Authority	string
+	Epoch		uint64
+	ReportID	string
+	Challenger	string
+	Reason		string
+	Accepted	bool
 }
 
 type QueryValidatorPerformanceRequest struct {
-	Epoch            uint64
-	ValidatorAddress string
+	Epoch			uint64
+	ValidatorAddress	string
 }
 
 type QueryValidatorPerformanceResponse struct {
@@ -130,8 +130,8 @@ type QueryPerformanceEpochResponse struct {
 }
 
 type QueryPerformanceReportsRequest struct {
-	Epoch            uint64
-	ValidatorAddress string
+	Epoch			uint64
+	ValidatorAddress	string
 }
 
 type QueryPerformanceReportsResponse struct {
@@ -144,16 +144,16 @@ type QueryPerformanceParamsResponse struct {
 
 func DefaultPerformanceOracleParams() PerformanceOracleParams {
 	return PerformanceOracleParams{
-		Authority:                DefaultPerformanceOracleAuthority,
-		MinScoreBps:              0,
-		MaxScoreBps:              postypes.BasisPoints,
-		MaxLatencyMillis:         5_000,
-		MaxResponseTimeMillis:    10_000,
-		MaxReportsPerEpoch:       10_000,
-		MaxChallengesPerEpoch:    10_000,
-		MinReportsForAggregation: 1,
-		OutlierTrimBps:           1_000,
-		SlashableSourcesRequired: true,
+		Authority:			DefaultPerformanceOracleAuthority,
+		MinScoreBps:			0,
+		MaxScoreBps:			postypes.BasisPoints,
+		MaxLatencyMillis:		5_000,
+		MaxResponseTimeMillis:		10_000,
+		MaxReportsPerEpoch:		10_000,
+		MaxChallengesPerEpoch:		10_000,
+		MinReportsForAggregation:	1,
+		OutlierTrimBps:			1_000,
+		SlashableSourcesRequired:	true,
 	}
 }
 
@@ -564,12 +564,12 @@ func (epoch PerformanceEpoch) Validate(params PerformanceOracleParams) error {
 
 func NewPerformanceChallenge(msg MsgChallengePerformanceReport) PerformanceChallenge {
 	challenge := PerformanceChallenge{
-		ReportID:   strings.TrimSpace(msg.ReportID),
-		Challenger: strings.TrimSpace(msg.Challenger),
-		Reason:     strings.TrimSpace(msg.Reason),
-		Epoch:      msg.Epoch,
-		Accepted:   msg.Accepted,
-		Status:     ChallengeStatusRejected,
+		ReportID:	strings.TrimSpace(msg.ReportID),
+		Challenger:	strings.TrimSpace(msg.Challenger),
+		Reason:		strings.TrimSpace(msg.Reason),
+		Epoch:		msg.Epoch,
+		Accepted:	msg.Accepted,
+		Status:		ChallengeStatusRejected,
 	}
 	if msg.Accepted {
 		challenge.Status = ChallengeStatusAccepted
@@ -671,14 +671,14 @@ func aggregateValidatorReports(validator string, reports []PerformanceReport, pa
 		peer = append(peer, report.PeerScoreBps)
 	}
 	aggregate := PerformanceAggregate{
-		Epoch:                epoch,
-		ValidatorAddress:     validator,
-		ReportCount:          uint32(len(reports)),
-		UptimeScoreBps:       trimmedAverageBps(uptime, params.OutlierTrimBps),
-		LatencyScoreBps:      trimmedAverageBps(latency, params.OutlierTrimBps),
-		ResponseTimeScoreBps: trimmedAverageBps(response, params.OutlierTrimBps),
-		MissedBlockScoreBps:  trimmedAverageBps(missed, params.OutlierTrimBps),
-		PeerScoreBps:         trimmedAverageBps(peer, params.OutlierTrimBps),
+		Epoch:			epoch,
+		ValidatorAddress:	validator,
+		ReportCount:		uint32(len(reports)),
+		UptimeScoreBps:		trimmedAverageBps(uptime, params.OutlierTrimBps),
+		LatencyScoreBps:	trimmedAverageBps(latency, params.OutlierTrimBps),
+		ResponseTimeScoreBps:	trimmedAverageBps(response, params.OutlierTrimBps),
+		MissedBlockScoreBps:	trimmedAverageBps(missed, params.OutlierTrimBps),
+		PeerScoreBps:		trimmedAverageBps(peer, params.OutlierTrimBps),
 	}
 	aggregate.PerformanceScoreBps = averageBps([]uint32{
 		aggregate.UptimeScoreBps,
@@ -884,9 +884,9 @@ func finalizeEpochHash(epoch PerformanceEpoch) PerformanceEpoch {
 func clonePerformanceOracleState(state PerformanceOracleState) PerformanceOracleState {
 	state = NormalizePerformanceOracleState(state)
 	return PerformanceOracleState{
-		Params:           state.Params,
-		AggregationEpoch: state.AggregationEpoch,
-		Epochs:           append([]PerformanceEpoch(nil), state.Epochs...),
+		Params:			state.Params,
+		AggregationEpoch:	state.AggregationEpoch,
+		Epochs:			append([]PerformanceEpoch(nil), state.Epochs...),
 	}
 }
 

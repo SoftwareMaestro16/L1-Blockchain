@@ -31,50 +31,50 @@ type MsgCancelPoolWithdrawalResponse struct {
 }
 
 type MsgDepositToStakingPoolResponse struct {
-	PoolID       string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	OwnerAddress string `protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	Amount       uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Shares       uint64 `protobuf:"varint,4,opt,name=shares,proto3" json:"shares,omitempty"`
-	Height       uint64 `protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
-	ReceiptToken string `protobuf:"bytes,6,opt,name=receipt_token,json=receiptToken,proto3" json:"receipt_token,omitempty"`
+	PoolID		string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	OwnerAddress	string	`protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	Amount		uint64	`protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	Shares		uint64	`protobuf:"varint,4,opt,name=shares,proto3" json:"shares,omitempty"`
+	Height		uint64	`protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
+	ReceiptToken	string	`protobuf:"bytes,6,opt,name=receipt_token,json=receiptToken,proto3" json:"receipt_token,omitempty"`
 }
 
 type MsgRequestPoolUnbondResponse struct {
-	PoolID         string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	OwnerAddress   string `protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	RequestID      string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	Shares         uint64 `protobuf:"varint,4,opt,name=shares,proto3" json:"shares,omitempty"`
-	Amount         uint64 `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	CompleteHeight uint64 `protobuf:"varint,6,opt,name=complete_height,json=completeHeight,proto3" json:"complete_height,omitempty"`
+	PoolID		string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	OwnerAddress	string	`protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	RequestID	string	`protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Shares		uint64	`protobuf:"varint,4,opt,name=shares,proto3" json:"shares,omitempty"`
+	Amount		uint64	`protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	CompleteHeight	uint64	`protobuf:"varint,6,opt,name=complete_height,json=completeHeight,proto3" json:"complete_height,omitempty"`
 }
 
 type MsgWithdrawPoolStakeResponse struct {
-	PoolID       string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	OwnerAddress string `protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	RequestID    string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	Amount       uint64 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	Height       uint64 `protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
+	PoolID		string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	OwnerAddress	string	`protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	RequestID	string	`protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Amount		uint64	`protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	Height		uint64	`protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
 }
 
 type MsgTopUpPoolReserveResponse struct {
-	PoolID          string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	PayerAddress    string `protobuf:"bytes,2,opt,name=payer_address,json=payerAddress,proto3" json:"payer_address,omitempty"`
-	Amount          uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	StorageDebtPaid uint64 `protobuf:"varint,4,opt,name=storage_debt_paid,json=storageDebtPaid,proto3" json:"storage_debt_paid,omitempty"`
+	PoolID		string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	PayerAddress	string	`protobuf:"bytes,2,opt,name=payer_address,json=payerAddress,proto3" json:"payer_address,omitempty"`
+	Amount		uint64	`protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	StorageDebtPaid	uint64	`protobuf:"varint,4,opt,name=storage_debt_paid,json=storageDebtPaid,proto3" json:"storage_debt_paid,omitempty"`
 }
 
 type MsgClaimPoolRewardsResponse struct {
-	PoolID       string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	OwnerAddress string `protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	Amount       uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Epoch        uint64 `protobuf:"varint,4,opt,name=epoch,proto3" json:"epoch,omitempty"`
+	PoolID		string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	OwnerAddress	string	`protobuf:"bytes,2,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+	Amount		uint64	`protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	Epoch		uint64	`protobuf:"varint,4,opt,name=epoch,proto3" json:"epoch,omitempty"`
 }
 
 type MsgSyncPoolRewardsResponse struct {
-	PoolUserRewards     uint64 `protobuf:"varint,1,opt,name=pool_user_rewards,json=poolUserRewards,proto3" json:"pool_user_rewards,omitempty"`
-	ValidatorCommission uint64 `protobuf:"varint,2,opt,name=validator_commission,json=validatorCommission,proto3" json:"validator_commission,omitempty"`
-	PoolProtocolFee     uint64 `protobuf:"varint,3,opt,name=pool_protocol_fee,json=poolProtocolFee,proto3" json:"pool_protocol_fee,omitempty"`
-	RewardIndexAfter    uint64 `protobuf:"varint,4,opt,name=reward_index_after,json=rewardIndexAfter,proto3" json:"reward_index_after,omitempty"`
+	PoolUserRewards		uint64	`protobuf:"varint,1,opt,name=pool_user_rewards,json=poolUserRewards,proto3" json:"pool_user_rewards,omitempty"`
+	ValidatorCommission	uint64	`protobuf:"varint,2,opt,name=validator_commission,json=validatorCommission,proto3" json:"validator_commission,omitempty"`
+	PoolProtocolFee		uint64	`protobuf:"varint,3,opt,name=pool_protocol_fee,json=poolProtocolFee,proto3" json:"pool_protocol_fee,omitempty"`
+	RewardIndexAfter	uint64	`protobuf:"varint,4,opt,name=reward_index_after,json=rewardIndexAfter,proto3" json:"reward_index_after,omitempty"`
 }
 
 type MsgClaimStakingRewardsResponse struct {
@@ -82,24 +82,24 @@ type MsgClaimStakingRewardsResponse struct {
 }
 
 type MsgClaimStakeReputationResponse struct {
-	Account         string `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
-	PoolID          string `protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	ReputationDelta uint64 `protobuf:"varint,3,opt,name=reputation_delta,json=reputationDelta,proto3" json:"reputation_delta,omitempty"`
-	ReputationScore uint64 `protobuf:"varint,4,opt,name=reputation_score,json=reputationScore,proto3" json:"reputation_score,omitempty"`
+	Account		string	`protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
+	PoolID		string	`protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	ReputationDelta	uint64	`protobuf:"varint,3,opt,name=reputation_delta,json=reputationDelta,proto3" json:"reputation_delta,omitempty"`
+	ReputationScore	uint64	`protobuf:"varint,4,opt,name=reputation_score,json=reputationScore,proto3" json:"reputation_score,omitempty"`
 }
 
 type MsgDelegateToValidatorResponse struct{}
 type MsgRegisterValidatorResponse struct {
-	Validator string `protobuf:"bytes,1,opt,name=validator,proto3" json:"validator,omitempty"`
-	Status    string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	SelfStake uint64 `protobuf:"varint,3,opt,name=self_stake,json=selfStake,proto3" json:"self_stake,omitempty"`
-	PoolStake uint64 `protobuf:"varint,4,opt,name=pool_stake,json=poolStake,proto3" json:"pool_stake,omitempty"`
+	Validator	string	`protobuf:"bytes,1,opt,name=validator,proto3" json:"validator,omitempty"`
+	Status		string	`protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	SelfStake	uint64	`protobuf:"varint,3,opt,name=self_stake,json=selfStake,proto3" json:"self_stake,omitempty"`
+	PoolStake	uint64	`protobuf:"varint,4,opt,name=pool_stake,json=poolStake,proto3" json:"pool_stake,omitempty"`
 }
 type MsgUpdateValidatorResponse struct {
-	Validator string `protobuf:"bytes,1,opt,name=validator,proto3" json:"validator,omitempty"`
-	Status    string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
-	SelfStake uint64 `protobuf:"varint,3,opt,name=self_stake,json=selfStake,proto3" json:"self_stake,omitempty"`
-	PoolStake uint64 `protobuf:"varint,4,opt,name=pool_stake,json=poolStake,proto3" json:"pool_stake,omitempty"`
+	Validator	string	`protobuf:"bytes,1,opt,name=validator,proto3" json:"validator,omitempty"`
+	Status		string	`protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	SelfStake	uint64	`protobuf:"varint,3,opt,name=self_stake,json=selfStake,proto3" json:"self_stake,omitempty"`
+	PoolStake	uint64	`protobuf:"varint,4,opt,name=pool_stake,json=poolStake,proto3" json:"pool_stake,omitempty"`
 }
 type MsgUpdateStakingParamsResponse struct{}
 
@@ -112,9 +112,9 @@ type MsgChangePoolValidatorResponse struct {
 }
 
 type MsgCreateOfficialLiquidStakingPoolResponse struct {
-	PoolID              string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
-	ContractAddressUser string `protobuf:"bytes,2,opt,name=contract_address_user,json=contractAddressUser,proto3" json:"contract_address_user,omitempty"`
-	ContractAddressRaw  string `protobuf:"bytes,3,opt,name=contract_address_raw,json=contractAddressRaw,proto3" json:"contract_address_raw,omitempty"`
+	PoolID			string	`protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	ContractAddressUser	string	`protobuf:"bytes,2,opt,name=contract_address_user,json=contractAddressUser,proto3" json:"contract_address_user,omitempty"`
+	ContractAddressRaw	string	`protobuf:"bytes,3,opt,name=contract_address_raw,json=contractAddressRaw,proto3" json:"contract_address_raw,omitempty"`
 }
 
 type MsgServer interface {
@@ -199,11 +199,11 @@ func (UnimplementedMsgServer) CreateOfficialLiquidStakingPool(context.Context, *
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOfficialLiquidStakingPool not implemented")
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer) { s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)	{ s.RegisterService(&Msg_serviceDesc, srv) }
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.nominatorpool.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.nominatorpool.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		msgMethod("CreateNominatorPool", _Msg_CreateNominatorPool_Handler),
 		msgMethod("DepositToPool", _Msg_DepositToPool_Handler),
@@ -225,8 +225,8 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 		msgMethod("UpdateStakingParams", _Msg_UpdateStakingParams_Handler),
 		msgMethod("CreateOfficialLiquidStakingPool", _Msg_CreateOfficialLiquidStakingPool_Handler),
 	},
-	Streams:  []grpcgo.StreamDesc{},
-	Metadata: "l1/nominatorpool/v1/tx.proto",
+	Streams:	[]grpcgo.StreamDesc{},
+	Metadata:	"l1/nominatorpool/v1/tx.proto",
 }
 
 func msgMethod(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -418,11 +418,11 @@ func buildNominatorPoolTxFileDescriptor() []byte {
 		txMethod("CreateOfficialLiquidStakingPool", "MsgCreateOfficialLiquidStakingPool", "MsgCreateOfficialLiquidStakingPoolResponse"),
 	}
 	fd := &descriptorpb.FileDescriptorProto{
-		Name:        descriptorString("l1/nominatorpool/v1/tx.proto"),
-		Package:     descriptorString("l1.nominatorpool.v1"),
-		Syntax:      descriptorString("proto3"),
-		MessageType: messages,
-		Service:     []*descriptorpb.ServiceDescriptorProto{{Name: descriptorString("Msg"), Method: methods}},
+		Name:		descriptorString("l1/nominatorpool/v1/tx.proto"),
+		Package:	descriptorString("l1.nominatorpool.v1"),
+		Syntax:		descriptorString("proto3"),
+		MessageType:	messages,
+		Service:	[]*descriptorpb.ServiceDescriptorProto{{Name: descriptorString("Msg"), Method: methods}},
 	}
 	raw, err := proto2.Marshal(fd)
 	if err != nil {
@@ -441,13 +441,13 @@ func buildNominatorPoolTxFileDescriptor() []byte {
 
 func txMethod(name, input, output string) *descriptorpb.MethodDescriptorProto {
 	return &descriptorpb.MethodDescriptorProto{
-		Name:       descriptorString(name),
-		InputType:  descriptorString(".l1.nominatorpool.v1." + input),
-		OutputType: descriptorString(".l1.nominatorpool.v1." + output),
+		Name:		descriptorString(name),
+		InputType:	descriptorString(".l1.nominatorpool.v1." + input),
+		OutputType:	descriptorString(".l1.nominatorpool.v1." + output),
 	}
 }
 
-func descriptorString(value string) *string { return &value }
+func descriptorString(value string) *string	{ return &value }
 
 func registerMsgTypes() {
 	gogoproto.RegisterType((*MsgCreateNominatorPool)(nil), "l1.nominatorpool.v1.MsgCreateNominatorPool")
@@ -490,126 +490,126 @@ func registerMsgTypes() {
 	gogoproto.RegisterType((*MsgCreateOfficialLiquidStakingPoolResponse)(nil), "l1.nominatorpool.v1.MsgCreateOfficialLiquidStakingPoolResponse")
 }
 
-func (m *MsgCreateNominatorPool) Reset()             { *m = MsgCreateNominatorPool{} }
-func (m *MsgCreateNominatorPoolResponse) Reset()     { *m = MsgCreateNominatorPoolResponse{} }
-func (m *MsgDepositToPool) Reset()                   { *m = MsgDepositToPool{} }
-func (m *MsgDepositToPoolResponse) Reset()           { *m = MsgDepositToPoolResponse{} }
-func (m *MsgRequestPoolWithdrawal) Reset()           { *m = MsgRequestPoolWithdrawal{} }
-func (m *MsgRequestPoolWithdrawalResponse) Reset()   { *m = MsgRequestPoolWithdrawalResponse{} }
-func (m *MsgCancelPoolWithdrawal) Reset()            { *m = MsgCancelPoolWithdrawal{} }
-func (m *MsgCancelPoolWithdrawalResponse) Reset()    { *m = MsgCancelPoolWithdrawalResponse{} }
-func (m *MsgSyncPoolRewards) Reset()                 { *m = MsgSyncPoolRewards{} }
-func (m *MsgSyncPoolRewardsResponse) Reset()         { *m = MsgSyncPoolRewardsResponse{} }
-func (m *MsgClaimStakingRewards) Reset()             { *m = MsgClaimStakingRewards{} }
-func (m *MsgClaimStakingRewardsResponse) Reset()     { *m = MsgClaimStakingRewardsResponse{} }
-func (m *MsgUpdatePoolCommission) Reset()            { *m = MsgUpdatePoolCommission{} }
-func (m *MsgUpdatePoolCommissionResponse) Reset()    { *m = MsgUpdatePoolCommissionResponse{} }
-func (m *MsgChangePoolValidator) Reset()             { *m = MsgChangePoolValidator{} }
-func (m *MsgChangePoolValidatorResponse) Reset()     { *m = MsgChangePoolValidatorResponse{} }
-func (m *MsgDepositToStakingPool) Reset()            { *m = MsgDepositToStakingPool{} }
-func (m *MsgDepositToStakingPoolResponse) Reset()    { *m = MsgDepositToStakingPoolResponse{} }
-func (m *MsgRequestPoolUnbond) Reset()               { *m = MsgRequestPoolUnbond{} }
-func (m *MsgRequestPoolUnbondResponse) Reset()       { *m = MsgRequestPoolUnbondResponse{} }
-func (m *MsgWithdrawPoolStake) Reset()               { *m = MsgWithdrawPoolStake{} }
-func (m *MsgWithdrawPoolStakeResponse) Reset()       { *m = MsgWithdrawPoolStakeResponse{} }
-func (m *MsgTopUpPoolReserve) Reset()                { *m = MsgTopUpPoolReserve{} }
-func (m *MsgTopUpPoolReserveResponse) Reset()        { *m = MsgTopUpPoolReserveResponse{} }
-func (m *MsgClaimPoolRewards) Reset()                { *m = MsgClaimPoolRewards{} }
-func (m *MsgClaimPoolRewardsResponse) Reset()        { *m = MsgClaimPoolRewardsResponse{} }
-func (m *MsgClaimStakeReputation) Reset()            { *m = MsgClaimStakeReputation{} }
-func (m *MsgClaimStakeReputationResponse) Reset()    { *m = MsgClaimStakeReputationResponse{} }
-func (m *MsgDelegateToValidator) Reset()             { *m = MsgDelegateToValidator{} }
-func (m *MsgDelegateToValidatorResponse) Reset()     { *m = MsgDelegateToValidatorResponse{} }
-func (m *MsgRegisterValidator) Reset()               { *m = MsgRegisterValidator{} }
-func (m *MsgRegisterValidatorResponse) Reset()       { *m = MsgRegisterValidatorResponse{} }
-func (m *MsgUpdateValidator) Reset()                 { *m = MsgUpdateValidator{} }
-func (m *MsgUpdateValidatorResponse) Reset()         { *m = MsgUpdateValidatorResponse{} }
-func (m *MsgUpdateStakingParams) Reset()             { *m = MsgUpdateStakingParams{} }
-func (m *MsgUpdateStakingParamsResponse) Reset()     { *m = MsgUpdateStakingParamsResponse{} }
-func (m *MsgCreateOfficialLiquidStakingPool) Reset() { *m = MsgCreateOfficialLiquidStakingPool{} }
+func (m *MsgCreateNominatorPool) Reset()		{ *m = MsgCreateNominatorPool{} }
+func (m *MsgCreateNominatorPoolResponse) Reset()	{ *m = MsgCreateNominatorPoolResponse{} }
+func (m *MsgDepositToPool) Reset()			{ *m = MsgDepositToPool{} }
+func (m *MsgDepositToPoolResponse) Reset()		{ *m = MsgDepositToPoolResponse{} }
+func (m *MsgRequestPoolWithdrawal) Reset()		{ *m = MsgRequestPoolWithdrawal{} }
+func (m *MsgRequestPoolWithdrawalResponse) Reset()	{ *m = MsgRequestPoolWithdrawalResponse{} }
+func (m *MsgCancelPoolWithdrawal) Reset()		{ *m = MsgCancelPoolWithdrawal{} }
+func (m *MsgCancelPoolWithdrawalResponse) Reset()	{ *m = MsgCancelPoolWithdrawalResponse{} }
+func (m *MsgSyncPoolRewards) Reset()			{ *m = MsgSyncPoolRewards{} }
+func (m *MsgSyncPoolRewardsResponse) Reset()		{ *m = MsgSyncPoolRewardsResponse{} }
+func (m *MsgClaimStakingRewards) Reset()		{ *m = MsgClaimStakingRewards{} }
+func (m *MsgClaimStakingRewardsResponse) Reset()	{ *m = MsgClaimStakingRewardsResponse{} }
+func (m *MsgUpdatePoolCommission) Reset()		{ *m = MsgUpdatePoolCommission{} }
+func (m *MsgUpdatePoolCommissionResponse) Reset()	{ *m = MsgUpdatePoolCommissionResponse{} }
+func (m *MsgChangePoolValidator) Reset()		{ *m = MsgChangePoolValidator{} }
+func (m *MsgChangePoolValidatorResponse) Reset()	{ *m = MsgChangePoolValidatorResponse{} }
+func (m *MsgDepositToStakingPool) Reset()		{ *m = MsgDepositToStakingPool{} }
+func (m *MsgDepositToStakingPoolResponse) Reset()	{ *m = MsgDepositToStakingPoolResponse{} }
+func (m *MsgRequestPoolUnbond) Reset()			{ *m = MsgRequestPoolUnbond{} }
+func (m *MsgRequestPoolUnbondResponse) Reset()		{ *m = MsgRequestPoolUnbondResponse{} }
+func (m *MsgWithdrawPoolStake) Reset()			{ *m = MsgWithdrawPoolStake{} }
+func (m *MsgWithdrawPoolStakeResponse) Reset()		{ *m = MsgWithdrawPoolStakeResponse{} }
+func (m *MsgTopUpPoolReserve) Reset()			{ *m = MsgTopUpPoolReserve{} }
+func (m *MsgTopUpPoolReserveResponse) Reset()		{ *m = MsgTopUpPoolReserveResponse{} }
+func (m *MsgClaimPoolRewards) Reset()			{ *m = MsgClaimPoolRewards{} }
+func (m *MsgClaimPoolRewardsResponse) Reset()		{ *m = MsgClaimPoolRewardsResponse{} }
+func (m *MsgClaimStakeReputation) Reset()		{ *m = MsgClaimStakeReputation{} }
+func (m *MsgClaimStakeReputationResponse) Reset()	{ *m = MsgClaimStakeReputationResponse{} }
+func (m *MsgDelegateToValidator) Reset()		{ *m = MsgDelegateToValidator{} }
+func (m *MsgDelegateToValidatorResponse) Reset()	{ *m = MsgDelegateToValidatorResponse{} }
+func (m *MsgRegisterValidator) Reset()			{ *m = MsgRegisterValidator{} }
+func (m *MsgRegisterValidatorResponse) Reset()		{ *m = MsgRegisterValidatorResponse{} }
+func (m *MsgUpdateValidator) Reset()			{ *m = MsgUpdateValidator{} }
+func (m *MsgUpdateValidatorResponse) Reset()		{ *m = MsgUpdateValidatorResponse{} }
+func (m *MsgUpdateStakingParams) Reset()		{ *m = MsgUpdateStakingParams{} }
+func (m *MsgUpdateStakingParamsResponse) Reset()	{ *m = MsgUpdateStakingParamsResponse{} }
+func (m *MsgCreateOfficialLiquidStakingPool) Reset()	{ *m = MsgCreateOfficialLiquidStakingPool{} }
 func (m *MsgCreateOfficialLiquidStakingPoolResponse) Reset() {
 	*m = MsgCreateOfficialLiquidStakingPoolResponse{}
 }
 
-func (m *MsgCreateNominatorPool) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgCreateNominatorPoolResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgDepositToPool) String() string                   { return gogoproto.CompactTextString(m) }
-func (m *MsgDepositToPoolResponse) String() string           { return gogoproto.CompactTextString(m) }
-func (m *MsgRequestPoolWithdrawal) String() string           { return gogoproto.CompactTextString(m) }
-func (m *MsgRequestPoolWithdrawalResponse) String() string   { return gogoproto.CompactTextString(m) }
-func (m *MsgCancelPoolWithdrawal) String() string            { return gogoproto.CompactTextString(m) }
-func (m *MsgCancelPoolWithdrawalResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *MsgSyncPoolRewards) String() string                 { return gogoproto.CompactTextString(m) }
-func (m *MsgSyncPoolRewardsResponse) String() string         { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimStakingRewards) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimStakingRewardsResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdatePoolCommission) String() string            { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdatePoolCommissionResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *MsgChangePoolValidator) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgChangePoolValidatorResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgDepositToStakingPool) String() string            { return gogoproto.CompactTextString(m) }
-func (m *MsgDepositToStakingPoolResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *MsgRequestPoolUnbond) String() string               { return gogoproto.CompactTextString(m) }
-func (m *MsgRequestPoolUnbondResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *MsgWithdrawPoolStake) String() string               { return gogoproto.CompactTextString(m) }
-func (m *MsgWithdrawPoolStakeResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *MsgTopUpPoolReserve) String() string                { return gogoproto.CompactTextString(m) }
-func (m *MsgTopUpPoolReserveResponse) String() string        { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimPoolRewards) String() string                { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimPoolRewardsResponse) String() string        { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimStakeReputation) String() string            { return gogoproto.CompactTextString(m) }
-func (m *MsgClaimStakeReputationResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *MsgDelegateToValidator) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgDelegateToValidatorResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgRegisterValidator) String() string               { return gogoproto.CompactTextString(m) }
-func (m *MsgRegisterValidatorResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateValidator) String() string                 { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateValidatorResponse) String() string         { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateStakingParams) String() string             { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateStakingParamsResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *MsgCreateOfficialLiquidStakingPool) String() string { return gogoproto.CompactTextString(m) }
+func (m *MsgCreateNominatorPool) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgCreateNominatorPoolResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgDepositToPool) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgDepositToPoolResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgRequestPoolWithdrawal) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgRequestPoolWithdrawalResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgCancelPoolWithdrawal) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgCancelPoolWithdrawalResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgSyncPoolRewards) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgSyncPoolRewardsResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimStakingRewards) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimStakingRewardsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdatePoolCommission) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdatePoolCommissionResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgChangePoolValidator) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgChangePoolValidatorResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgDepositToStakingPool) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgDepositToStakingPoolResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgRequestPoolUnbond) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgRequestPoolUnbondResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgWithdrawPoolStake) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgWithdrawPoolStakeResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgTopUpPoolReserve) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgTopUpPoolReserveResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimPoolRewards) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimPoolRewardsResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimStakeReputation) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgClaimStakeReputationResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgDelegateToValidator) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgDelegateToValidatorResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgRegisterValidator) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgRegisterValidatorResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateValidator) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateValidatorResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateStakingParams) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateStakingParamsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgCreateOfficialLiquidStakingPool) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *MsgCreateOfficialLiquidStakingPoolResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
 
-func (*MsgCreateNominatorPool) ProtoMessage()                     {}
-func (*MsgCreateNominatorPoolResponse) ProtoMessage()             {}
-func (*MsgDepositToPool) ProtoMessage()                           {}
-func (*MsgDepositToPoolResponse) ProtoMessage()                   {}
-func (*MsgRequestPoolWithdrawal) ProtoMessage()                   {}
-func (*MsgRequestPoolWithdrawalResponse) ProtoMessage()           {}
-func (*MsgCancelPoolWithdrawal) ProtoMessage()                    {}
-func (*MsgCancelPoolWithdrawalResponse) ProtoMessage()            {}
-func (*MsgSyncPoolRewards) ProtoMessage()                         {}
-func (*MsgSyncPoolRewardsResponse) ProtoMessage()                 {}
-func (*MsgClaimStakingRewards) ProtoMessage()                     {}
-func (*MsgClaimStakingRewardsResponse) ProtoMessage()             {}
-func (*MsgUpdatePoolCommission) ProtoMessage()                    {}
-func (*MsgUpdatePoolCommissionResponse) ProtoMessage()            {}
-func (*MsgChangePoolValidator) ProtoMessage()                     {}
-func (*MsgChangePoolValidatorResponse) ProtoMessage()             {}
-func (*MsgDepositToStakingPool) ProtoMessage()                    {}
-func (*MsgDepositToStakingPoolResponse) ProtoMessage()            {}
-func (*MsgRequestPoolUnbond) ProtoMessage()                       {}
-func (*MsgRequestPoolUnbondResponse) ProtoMessage()               {}
-func (*MsgWithdrawPoolStake) ProtoMessage()                       {}
-func (*MsgWithdrawPoolStakeResponse) ProtoMessage()               {}
-func (*MsgTopUpPoolReserve) ProtoMessage()                        {}
-func (*MsgTopUpPoolReserveResponse) ProtoMessage()                {}
-func (*MsgClaimPoolRewards) ProtoMessage()                        {}
-func (*MsgClaimPoolRewardsResponse) ProtoMessage()                {}
-func (*MsgClaimStakeReputation) ProtoMessage()                    {}
-func (*MsgClaimStakeReputationResponse) ProtoMessage()            {}
-func (*MsgDelegateToValidator) ProtoMessage()                     {}
-func (*MsgDelegateToValidatorResponse) ProtoMessage()             {}
-func (*MsgRegisterValidator) ProtoMessage()                       {}
-func (*MsgRegisterValidatorResponse) ProtoMessage()               {}
-func (*MsgUpdateValidator) ProtoMessage()                         {}
-func (*MsgUpdateValidatorResponse) ProtoMessage()                 {}
-func (*MsgUpdateStakingParams) ProtoMessage()                     {}
-func (*MsgUpdateStakingParamsResponse) ProtoMessage()             {}
-func (*MsgCreateOfficialLiquidStakingPool) ProtoMessage()         {}
-func (*MsgCreateOfficialLiquidStakingPoolResponse) ProtoMessage() {}
+func (*MsgCreateNominatorPool) ProtoMessage()				{}
+func (*MsgCreateNominatorPoolResponse) ProtoMessage()			{}
+func (*MsgDepositToPool) ProtoMessage()					{}
+func (*MsgDepositToPoolResponse) ProtoMessage()				{}
+func (*MsgRequestPoolWithdrawal) ProtoMessage()				{}
+func (*MsgRequestPoolWithdrawalResponse) ProtoMessage()			{}
+func (*MsgCancelPoolWithdrawal) ProtoMessage()				{}
+func (*MsgCancelPoolWithdrawalResponse) ProtoMessage()			{}
+func (*MsgSyncPoolRewards) ProtoMessage()				{}
+func (*MsgSyncPoolRewardsResponse) ProtoMessage()			{}
+func (*MsgClaimStakingRewards) ProtoMessage()				{}
+func (*MsgClaimStakingRewardsResponse) ProtoMessage()			{}
+func (*MsgUpdatePoolCommission) ProtoMessage()				{}
+func (*MsgUpdatePoolCommissionResponse) ProtoMessage()			{}
+func (*MsgChangePoolValidator) ProtoMessage()				{}
+func (*MsgChangePoolValidatorResponse) ProtoMessage()			{}
+func (*MsgDepositToStakingPool) ProtoMessage()				{}
+func (*MsgDepositToStakingPoolResponse) ProtoMessage()			{}
+func (*MsgRequestPoolUnbond) ProtoMessage()				{}
+func (*MsgRequestPoolUnbondResponse) ProtoMessage()			{}
+func (*MsgWithdrawPoolStake) ProtoMessage()				{}
+func (*MsgWithdrawPoolStakeResponse) ProtoMessage()			{}
+func (*MsgTopUpPoolReserve) ProtoMessage()				{}
+func (*MsgTopUpPoolReserveResponse) ProtoMessage()			{}
+func (*MsgClaimPoolRewards) ProtoMessage()				{}
+func (*MsgClaimPoolRewardsResponse) ProtoMessage()			{}
+func (*MsgClaimStakeReputation) ProtoMessage()				{}
+func (*MsgClaimStakeReputationResponse) ProtoMessage()			{}
+func (*MsgDelegateToValidator) ProtoMessage()				{}
+func (*MsgDelegateToValidatorResponse) ProtoMessage()			{}
+func (*MsgRegisterValidator) ProtoMessage()				{}
+func (*MsgRegisterValidatorResponse) ProtoMessage()			{}
+func (*MsgUpdateValidator) ProtoMessage()				{}
+func (*MsgUpdateValidatorResponse) ProtoMessage()			{}
+func (*MsgUpdateStakingParams) ProtoMessage()				{}
+func (*MsgUpdateStakingParamsResponse) ProtoMessage()			{}
+func (*MsgCreateOfficialLiquidStakingPool) ProtoMessage()		{}
+func (*MsgCreateOfficialLiquidStakingPoolResponse) ProtoMessage()	{}
 
 func (*MsgCreateNominatorPool) Descriptor() ([]byte, []int) {
 	return fileDescriptorNominatorPoolTx, []int{0}
@@ -617,7 +617,7 @@ func (*MsgCreateNominatorPool) Descriptor() ([]byte, []int) {
 func (*MsgCreateNominatorPoolResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNominatorPoolTx, []int{1}
 }
-func (*MsgDepositToPool) Descriptor() ([]byte, []int) { return fileDescriptorNominatorPoolTx, []int{2} }
+func (*MsgDepositToPool) Descriptor() ([]byte, []int)	{ return fileDescriptorNominatorPoolTx, []int{2} }
 func (*MsgDepositToPoolResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptorNominatorPoolTx, []int{3}
 }

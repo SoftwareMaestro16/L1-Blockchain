@@ -10,11 +10,11 @@ import (
 
 func DefaultIdentityParams() IdentityParams {
 	return IdentityParams{
-		RegistrationPeriodBlocks: DefaultRegistrationPeriodBlocks,
-		RenewalWindowBlocks:      DefaultRenewalWindowBlocks,
-		CommitTTLBlocks:          DefaultCommitTTLBlocks,
-		AuctionCommitBlocks:      DefaultAuctionCommitBlocks,
-		AuctionRevealBlocks:      DefaultAuctionRevealBlocks,
+		RegistrationPeriodBlocks:	DefaultRegistrationPeriodBlocks,
+		RenewalWindowBlocks:		DefaultRenewalWindowBlocks,
+		CommitTTLBlocks:		DefaultCommitTTLBlocks,
+		AuctionCommitBlocks:		DefaultAuctionCommitBlocks,
+		AuctionRevealBlocks:		DefaultAuctionRevealBlocks,
 	}
 }
 
@@ -51,11 +51,11 @@ func CommitDomainRegistration(state IdentityState, name string, owner sdk.AccAdd
 	}
 	next := state.Clone()
 	next.Commits = append(next.Commits, DomainCommit{
-		Name:           normalized,
-		Owner:          cloneSpecAddress(owner),
-		CommitmentHash: commitmentHash,
-		CommitHeight:   height,
-		ExpiresHeight:  height + state.Params.CommitTTLBlocks,
+		Name:		normalized,
+		Owner:		cloneSpecAddress(owner),
+		CommitmentHash:	commitmentHash,
+		CommitHeight:	height,
+		ExpiresHeight:	height + state.Params.CommitTTLBlocks,
 	})
 	sortDomainCommits(next.Commits)
 	return next, next.Validate()
@@ -89,18 +89,18 @@ func RevealRegisterDomain(state IdentityState, name string, owner sdk.AccAddress
 		return IdentityState{}, Domain{}, err
 	}
 	domain := Domain{
-		Name:             normalized,
-		Owner:            cloneSpecAddress(owner),
-		NFTID:            nftID,
-		RegisteredHeight: height,
-		ExpiryHeight:     height + state.Params.RegistrationPeriodBlocks,
-		UpdatedHeight:    height,
+		Name:			normalized,
+		Owner:			cloneSpecAddress(owner),
+		NFTID:			nftID,
+		RegisteredHeight:	height,
+		ExpiryHeight:		height + state.Params.RegistrationPeriodBlocks,
+		UpdatedHeight:		height,
 	}
 	nft := DomainNFT{
-		ID:         nftID,
-		Domain:     normalized,
-		Owner:      cloneSpecAddress(owner),
-		MintHeight: height,
+		ID:		nftID,
+		Domain:		normalized,
+		Owner:		cloneSpecAddress(owner),
+		MintHeight:	height,
 	}
 	next := state.Clone()
 	next.Domains = upsertDomain(next.Domains, domain)
@@ -190,14 +190,14 @@ func SetIdentityResolver(state IdentityState, domainName string, actor sdk.AccAd
 	update.Domain = domain.Name
 	update.UpdatedAtUnix = int64(height)
 	record := ResolverRecord{
-		Domain:        domain.Name,
-		Owner:         cloneSpecAddress(domain.Owner),
-		Primary:       cloneSpecAddress(update.Primary),
-		Contract:      cloneSpecAddress(update.Contract),
-		ZoneEndpoint:  strings.TrimSpace(update.ZoneEndpoint),
-		Records:       cloneResolverRecords(update.Records),
-		Metadata:      append([]byte(nil), update.Metadata...),
-		UpdatedAtUnix: int64(height),
+		Domain:		domain.Name,
+		Owner:		cloneSpecAddress(domain.Owner),
+		Primary:	cloneSpecAddress(update.Primary),
+		Contract:	cloneSpecAddress(update.Contract),
+		ZoneEndpoint:	strings.TrimSpace(update.ZoneEndpoint),
+		Records:	cloneResolverRecords(update.Records),
+		Metadata:	append([]byte(nil), update.Metadata...),
+		UpdatedAtUnix:	int64(height),
 	}
 	if err := ValidateResolverRecord(record); err != nil {
 		return IdentityState{}, ResolverRecord{}, err
@@ -332,16 +332,16 @@ func (s IdentityState) Export() IdentityState {
 
 func (s IdentityState) Clone() IdentityState {
 	out := IdentityState{
-		Params:                 normalizeIdentityParams(s.Params),
-		Domains:                cloneDomains(s.Domains),
-		DomainNFTs:             cloneDomainNFTs(s.DomainNFTs),
-		Commits:                cloneDomainCommits(s.Commits),
-		UsedCommitments:        cloneUsedDomainCommitments(s.UsedCommitments),
-		Resolvers:              cloneResolvers(s.Resolvers),
-		ReverseRecords:         cloneReverseRecords(s.ReverseRecords),
-		Subdomains:             cloneSubdomains(s.Subdomains),
-		Auctions:               cloneAuctions(s.Auctions),
-		PendingResolverUpdates: cloneResolverIntents(s.PendingResolverUpdates),
+		Params:			normalizeIdentityParams(s.Params),
+		Domains:		cloneDomains(s.Domains),
+		DomainNFTs:		cloneDomainNFTs(s.DomainNFTs),
+		Commits:		cloneDomainCommits(s.Commits),
+		UsedCommitments:	cloneUsedDomainCommitments(s.UsedCommitments),
+		Resolvers:		cloneResolvers(s.Resolvers),
+		ReverseRecords:		cloneReverseRecords(s.ReverseRecords),
+		Subdomains:		cloneSubdomains(s.Subdomains),
+		Auctions:		cloneAuctions(s.Auctions),
+		PendingResolverUpdates:	cloneResolverIntents(s.PendingResolverUpdates),
 	}
 	return out
 }

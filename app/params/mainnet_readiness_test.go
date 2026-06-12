@@ -50,19 +50,19 @@ func TestMainnetReadinessRejectsMissingOperationalAndSecurityCriteria(t *testing
 
 func completeMainnetReadinessEvidence() MainnetReadinessEvidence {
 	return MainnetReadinessEvidence{
-		ValidatorSetPolicyImplementedAndTested:         true,
-		EffectivePowerCapImplementedAndTested:          true,
-		AntiConcentrationRewardsImplementedAndTested:   true,
-		DynamicInflationImplementedAndTested:           true,
-		FeeBurnTreasuryRewardSplitImplementedAndTested: true,
-		SlashingConfiguredAndTested:                    true,
-		AVMIntegratedAndTested:                         true,
-		ExportImportStable:                             true,
-		StateSyncSnapshotsStable:                       true,
-		PublicTestnetObservedValidatorBehavior:         true,
-		LoadTestsDemonstrateFinalityTarget:             true,
-		SecurityAuditCompleted:                         true,
-		CriticalFindingsFixed:                          true,
-		DocsComplete:                                   true,
+		ValidatorSetPolicyImplementedAndTested:		true,
+		EffectivePowerCapImplementedAndTested:		true,
+		AntiConcentrationRewardsImplementedAndTested:	true,
+		DynamicInflationImplementedAndTested:		true,
+		FeeBurnTreasuryRewardSplitImplementedAndTested:	true,
+		SlashingConfiguredAndTested:			true,
+		AVMIntegratedAndTested:				true,
+		ExportImportStable:				true,
+		StateSyncSnapshotsStable:			true,
+		PublicTestnetObservedValidatorBehavior:		true,
+		LoadTestsDemonstrateFinalityTarget:		true,
+		SecurityAuditCompleted:				true,
+		CriticalFindingsFixed:				true,
+		DocsComplete:					true,
 	}
 }

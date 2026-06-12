@@ -7,14 +7,14 @@ import (
 )
 
 const (
-	LaunchEvidenceLocalnet100Validators = "localnet_100_validators"
-	LaunchEvidenceStressFinality        = "stress_finality"
-	LaunchEvidenceRestartPersistence    = "restart_persistence"
-	LaunchEvidenceSnapshotStateSync     = "snapshot_state_sync"
-	LaunchEvidenceAVMStateGrowth        = "avm_state_growth"
+	LaunchEvidenceLocalnet100Validators	= "localnet_100_validators"
+	LaunchEvidenceStressFinality		= "stress_finality"
+	LaunchEvidenceRestartPersistence	= "restart_persistence"
+	LaunchEvidenceSnapshotStateSync		= "snapshot_state_sync"
+	LaunchEvidenceAVMStateGrowth		= "avm_state_growth"
 
-	DeterministicSensitiveMatchCount = 47
-	PanicMustMatchCount              = 284
+	DeterministicSensitiveMatchCount	= 47
+	PanicMustMatchCount			= 284
 )
 
 type LaunchEvidenceReport struct {
@@ -22,41 +22,41 @@ type LaunchEvidenceReport struct {
 }
 
 type LaunchEvidenceItem struct {
-	Kind                     string `json:"kind"`
-	ArtifactPath             string `json:"artifact_path"`
-	ValidatorCount           uint32 `json:"validator_count"`
-	ObservedBlocks           uint64 `json:"observed_blocks"`
-	NormalFinalityP95Seconds uint32 `json:"normal_finality_p95_seconds"`
-	StressFinalityP95Seconds uint32 `json:"stress_finality_p95_seconds"`
-	WorstFinalitySeconds     uint32 `json:"worst_finality_seconds"`
-	RestartHeightBefore      uint64 `json:"restart_height_before"`
-	RestartHeightAfter       uint64 `json:"restart_height_after"`
-	SnapshotHeight           uint64 `json:"snapshot_height"`
-	StateSyncHeight          uint64 `json:"state_sync_height"`
-	AVMStateGrowthBytes      uint64 `json:"avm_state_growth_bytes"`
-	AVMStateGrowthLimitBytes uint64 `json:"avm_state_growth_limit_bytes"`
-	DeterministicReplayHash  string `json:"deterministic_replay_hash"`
-	OperatorSummaryIncluded  bool   `json:"operator_summary_included"`
-	PrivateMaterialRedacted  bool   `json:"private_material_redacted"`
+	Kind				string	`json:"kind"`
+	ArtifactPath			string	`json:"artifact_path"`
+	ValidatorCount			uint32	`json:"validator_count"`
+	ObservedBlocks			uint64	`json:"observed_blocks"`
+	NormalFinalityP95Seconds	uint32	`json:"normal_finality_p95_seconds"`
+	StressFinalityP95Seconds	uint32	`json:"stress_finality_p95_seconds"`
+	WorstFinalitySeconds		uint32	`json:"worst_finality_seconds"`
+	RestartHeightBefore		uint64	`json:"restart_height_before"`
+	RestartHeightAfter		uint64	`json:"restart_height_after"`
+	SnapshotHeight			uint64	`json:"snapshot_height"`
+	StateSyncHeight			uint64	`json:"state_sync_height"`
+	AVMStateGrowthBytes		uint64	`json:"avm_state_growth_bytes"`
+	AVMStateGrowthLimitBytes	uint64	`json:"avm_state_growth_limit_bytes"`
+	DeterministicReplayHash		string	`json:"deterministic_replay_hash"`
+	OperatorSummaryIncluded		bool	`json:"operator_summary_included"`
+	PrivateMaterialRedacted		bool	`json:"private_material_redacted"`
 }
 
 type PatternTriageReport struct {
-	DeterministicSensitiveMatches uint32                 `json:"deterministic_sensitive_matches"`
-	PanicMustMatches              uint32                 `json:"panic_must_matches"`
-	Findings                      []PatternTriageFinding `json:"findings"`
+	DeterministicSensitiveMatches	uint32			`json:"deterministic_sensitive_matches"`
+	PanicMustMatches		uint32			`json:"panic_must_matches"`
+	Findings			[]PatternTriageFinding	`json:"findings"`
 }
 
 type PatternTriageFinding struct {
-	ID            string `json:"id"`
-	Pattern       string `json:"pattern"`
-	PatternKind   string `json:"pattern_kind"`
-	MatchCount    uint32 `json:"match_count"`
-	File          string `json:"file"`
-	Category      string `json:"category"`
-	ConsensusPath bool   `json:"consensus_path"`
-	Generated     bool   `json:"generated"`
-	TestOnly      bool   `json:"test_only"`
-	Action        string `json:"action"`
+	ID		string	`json:"id"`
+	Pattern		string	`json:"pattern"`
+	PatternKind	string	`json:"pattern_kind"`
+	MatchCount	uint32	`json:"match_count"`
+	File		string	`json:"file"`
+	Category	string	`json:"category"`
+	ConsensusPath	bool	`json:"consensus_path"`
+	Generated	bool	`json:"generated"`
+	TestOnly	bool	`json:"test_only"`
+	Action		string	`json:"action"`
 }
 
 func ValidateLaunchEvidenceReport(report LaunchEvidenceReport) error {

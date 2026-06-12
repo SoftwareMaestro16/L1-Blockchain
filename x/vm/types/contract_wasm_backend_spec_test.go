@@ -53,17 +53,17 @@ func TestAVMWASMContractRouteAllowsCrossZoneOnlyViaAsyncMessages(t *testing.T) {
 	policy := testAVMWASMSandboxPolicy(t)
 	msg := testAVMWASMCrossZoneMessage(t)
 	call, err := NewAVMWASMContractRouteCall(AVMWASMContractRouteCall{
-		SandboxPolicy: policy,
+		SandboxPolicy:	policy,
 		Call: VMCall{
-			Runtime:  RuntimeCosmWasm,
-			Action:   ActionExternalCall,
-			GasLimit: wasmconfig.DefaultSimulationGasLimit,
+			Runtime:	RuntimeCosmWasm,
+			Action:		ActionExternalCall,
+			GasLimit:	wasmconfig.DefaultSimulationGasLimit,
 		},
-		ZoneID:          zonestypes.ZoneIDContract,
-		Backend:         RouterBackendWASMAdapter,
-		DispatchMode:    RouterDispatchModeCrossZone,
-		GasMeter:        RouterGasMeter{Class: RouterGasClassStandard, Limit: wasmconfig.DefaultSimulationGasLimit, Reserved: 1_000},
-		EmittedMessages: []AVMAsyncMessage{msg},
+		ZoneID:			zonestypes.ZoneIDContract,
+		Backend:		RouterBackendWASMAdapter,
+		DispatchMode:		RouterDispatchModeCrossZone,
+		GasMeter:		RouterGasMeter{Class: RouterGasClassStandard, Limit: wasmconfig.DefaultSimulationGasLimit, Reserved: 1_000},
+		EmittedMessages:	[]AVMAsyncMessage{msg},
 	})
 	require.NoError(t, err)
 	require.NoError(t, call.Validate())
@@ -88,16 +88,16 @@ func TestAVMWASMContractRouteAllowsCrossZoneOnlyViaAsyncMessages(t *testing.T) {
 func TestAVMWASMContractRouteRejectsWrongBackendAndInvalidStoreAdapter(t *testing.T) {
 	policy := testAVMWASMSandboxPolicy(t)
 	wrongBackend := AVMWASMContractRouteCall{
-		SandboxPolicy: policy,
+		SandboxPolicy:	policy,
 		Call: VMCall{
-			Runtime:  RuntimeCosmWasm,
-			Action:   ActionExternalCall,
-			GasLimit: 1,
+			Runtime:	RuntimeCosmWasm,
+			Action:		ActionExternalCall,
+			GasLimit:	1,
 		},
-		ZoneID:       zonestypes.ZoneIDContract,
-		Backend:      RouterBackendAVMActor,
-		DispatchMode: RouterDispatchModeQueued,
-		GasMeter:     RouterGasMeter{Class: RouterGasClassStandard, Limit: 10, Reserved: 1},
+		ZoneID:		zonestypes.ZoneIDContract,
+		Backend:	RouterBackendAVMActor,
+		DispatchMode:	RouterDispatchModeQueued,
+		GasMeter:	RouterGasMeter{Class: RouterGasClassStandard, Limit: 10, Reserved: 1},
 	}
 	wrongBackend.RouteCallHash = ComputeAVMWASMContractRouteCallHash(wrongBackend)
 	require.ErrorContains(t, wrongBackend.Validate(), "WASM adapter backend")
@@ -117,23 +117,23 @@ func testAVMWASMSandboxPolicy(t *testing.T) AVMWASMSandboxPolicy {
 	table, err := DefaultAVMWASMGasConversionTable()
 	require.NoError(t, err)
 	adapter, err := NewAVMWASMStoreV2KVAdapter(AVMWASMStoreV2KVAdapter{
-		ZoneID:        zonestypes.ZoneIDContract,
-		StoreKey:      DefaultAVMStoreKey,
-		KeyPrefix:     ContractZoneKVPrefix(zonestypes.ZoneIDContract),
-		MaxKeyBytes:   DefaultMaxStorageKeyBytes,
-		MaxValueBytes: DefaultMaxStorageValueBytes,
+		ZoneID:		zonestypes.ZoneIDContract,
+		StoreKey:	DefaultAVMStoreKey,
+		KeyPrefix:	ContractZoneKVPrefix(zonestypes.ZoneIDContract),
+		MaxKeyBytes:	DefaultMaxStorageKeyBytes,
+		MaxValueBytes:	DefaultMaxStorageValueBytes,
 	})
 	require.NoError(t, err)
 	policy, err := NewAVMWASMSandboxPolicy(AVMWASMSandboxPolicy{
-		Enabled:            true,
-		Optional:           true,
-		RuntimePolicy:      runtime,
-		MaxMemoryPages:     32,
-		HostFunctions:      DefaultAVMWASMHostFunctions(),
-		GasConversion:      table,
-		StoreAdapter:       adapter,
-		ExternalNetwork:    false,
-		CrossZoneAsyncOnly: true,
+		Enabled:		true,
+		Optional:		true,
+		RuntimePolicy:		runtime,
+		MaxMemoryPages:		32,
+		HostFunctions:		DefaultAVMWASMHostFunctions(),
+		GasConversion:		table,
+		StoreAdapter:		adapter,
+		ExternalNetwork:	false,
+		CrossZoneAsyncOnly:	true,
 	})
 	require.NoError(t, err)
 	return policy

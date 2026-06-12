@@ -11,262 +11,262 @@ import (
 )
 
 const (
-	ContractStatusActive        = "active"
-	ContractStatusFrozen        = "frozen"
-	ContractStatusFrozenLimited = "frozen_limited"
-	ContractStatusArchived      = "archived"
-	ContractStatusDeleted       = "deleted"
+	ContractStatusActive		= "active"
+	ContractStatusFrozen		= "frozen"
+	ContractStatusFrozenLimited	= "frozen_limited"
+	ContractStatusArchived		= "archived"
+	ContractStatusDeleted		= "deleted"
 
-	NativeStakingCapability = "native_staking_injection"
+	NativeStakingCapability	= "native_staking_injection"
 
-	ErrUnauthorized    = "contracts_unauthorized"
-	ErrAccountInactive = "contracts_account_inactive"
-	ErrAccountFrozen   = "contracts_account_frozen"
-	ErrStorageRent     = "contracts_storage_rent"
+	ErrUnauthorized		= "contracts_unauthorized"
+	ErrAccountInactive	= "contracts_account_inactive"
+	ErrAccountFrozen	= "contracts_account_frozen"
+	ErrStorageRent		= "contracts_storage_rent"
 )
 
 type State struct {
-	Codes                []CodeRecord
-	Contracts            []Contract
-	InternalMessages     []InternalMessage
-	Receipts             []ContractReceipt
-	AssetOwnership       []AssetOwnershipRecord
-	StakingCapabilities  []ContractCapability
-	NativeStakingInjects []NativeStakingInjectionRecord
+	Codes			[]CodeRecord
+	Contracts		[]Contract
+	InternalMessages	[]InternalMessage
+	Receipts		[]ContractReceipt
+	AssetOwnership		[]AssetOwnershipRecord
+	StakingCapabilities	[]ContractCapability
+	NativeStakingInjects	[]NativeStakingInjectionRecord
 }
 
 type CodeRecord struct {
-	CodeID    string
-	CodeHash  string
-	CodeBytes uint64
-	Bytecode  []byte
-	Owner     string
+	CodeID		string
+	CodeHash	string
+	CodeBytes	uint64
+	Bytecode	[]byte
+	Owner		string
 }
 
 type Contract struct {
-	AddressUser             string
-	AddressRaw              string
-	CodeID                  string
-	CodeHash                string
-	StateInitHash           string
-	StateInit               StateInit
-	Creator                 string
-	Owner                   string
-	Admin                   string
-	Upgradeable             bool
-	UpgradesDisabled        bool
-	SystemOwned             bool
-	StorageSchemaVersion    uint64
-	InitMsg                 []byte
-	Data                    []byte
-	Balance                 uint64
-	StateRoot               string
-	Status                  string
-	StorageBytes            uint64
-	LastStorageChargeHeight uint64
-	StorageRentDebt         uint64
-	LogicalTime             uint64
-	CreatedHeight           uint64
-	UpdatedHeight           uint64
+	AddressUser		string
+	AddressRaw		string
+	CodeID			string
+	CodeHash		string
+	StateInitHash		string
+	StateInit		StateInit
+	Creator			string
+	Owner			string
+	Admin			string
+	Upgradeable		bool
+	UpgradesDisabled	bool
+	SystemOwned		bool
+	StorageSchemaVersion	uint64
+	InitMsg			[]byte
+	Data			[]byte
+	Balance			uint64
+	StateRoot		string
+	Status			string
+	StorageBytes		uint64
+	LastStorageChargeHeight	uint64
+	StorageRentDebt		uint64
+	LogicalTime		uint64
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
 }
 
 type ContractCapability struct {
-	ContractAddressUser string
-	ContractAddressRaw  string
-	Capability          string
-	PoolID              string
-	GrantedHeight       uint64
+	ContractAddressUser	string
+	ContractAddressRaw	string
+	Capability		string
+	PoolID			string
+	GrantedHeight		uint64
 }
 
 type InternalMessage struct {
-	SourceContractUser string
-	DestinationAccount string
-	Funds              uint64
-	Opcode             uint32
-	QueryID            uint64
-	Body               []byte
-	Bounce             bool
-	Deadline           uint64
-	GasLimit           uint64
-	LogicalTime        uint64
-	MessageID          string
-	Refunded           bool
-	Height             uint64
+	SourceContractUser	string
+	DestinationAccount	string
+	Funds			uint64
+	Opcode			uint32
+	QueryID			uint64
+	Body			[]byte
+	Bounce			bool
+	Deadline		uint64
+	GasLimit		uint64
+	LogicalTime		uint64
+	MessageID		string
+	Refunded		bool
+	Height			uint64
 }
 
 type AssetOwnershipRecord struct {
-	AssetType           string
-	ContractAddressUser string
-	Owner               string
-	AssetID             string
+	AssetType		string
+	ContractAddressUser	string
+	Owner			string
+	AssetID			string
 }
 
 type NativeStakingInjectionRecord struct {
-	ContractAddressUser string
-	ContractAddressRaw  string
-	PoolID              string
-	Amount              uint64
-	Height              uint64
+	ContractAddressUser	string
+	ContractAddressRaw	string
+	PoolID			string
+	Amount			uint64
+	Height			uint64
 }
 
 type ContractStorageEntry struct {
-	ContractAddress string
-	Key             []byte
-	Value           []byte
+	ContractAddress	string
+	Key		[]byte
+	Value		[]byte
 }
 
 type ContractReceipt struct {
-	ReceiptID       string
-	ContractAddress string
-	Actor           string
-	Operation       string
-	ExitCode        uint32
-	Amount          uint64
-	GasUsed         uint64
-	LogicalTime     uint64
-	Height          uint64
+	ReceiptID	string
+	ContractAddress	string
+	Actor		string
+	Operation	string
+	ExitCode	uint32
+	Amount		uint64
+	GasUsed		uint64
+	LogicalTime	uint64
+	Height		uint64
 }
 
 type MsgInstantiateContract struct {
-	Creator       string
-	CodeID        string
-	ChainID       string
-	Namespace     string
-	StateInit     *StateInit
-	InitMsg       []byte
-	Funds         uint64
-	Admin         string
-	Salt          string
-	StorageBytes  uint64
-	Upgradeable   bool
-	SystemOwned   bool
-	SchemaVersion uint64
-	Height        uint64
+	Creator		string
+	CodeID		string
+	ChainID		string
+	Namespace	string
+	StateInit	*StateInit
+	InitMsg		[]byte
+	Funds		uint64
+	Admin		string
+	Salt		string
+	StorageBytes	uint64
+	Upgradeable	bool
+	SystemOwned	bool
+	SchemaVersion	uint64
+	Height		uint64
 }
 
 type InstantiateContractResponse struct {
-	ContractAddressUser string
-	ContractAddressRaw  string
-	Owner               string
-	Admin               string
-	Balance             uint64
-	Events              []ContractEvent
+	ContractAddressUser	string
+	ContractAddressRaw	string
+	Owner			string
+	Admin			string
+	Balance			uint64
+	Events			[]ContractEvent
 }
 
 type MsgExecuteContract struct {
-	Sender          string
-	ContractAddress string
-	Msg             []byte
-	Funds           uint64
-	Height          uint64
+	Sender		string
+	ContractAddress	string
+	Msg		[]byte
+	Funds		uint64
+	Height		uint64
 }
 
 type ExecuteContractResponse struct {
-	ContractAddressUser string
-	Owner               string
-	Balance             uint64
-	Events              []ContractEvent
+	ContractAddressUser	string
+	Owner			string
+	Balance			uint64
+	Events			[]ContractEvent
 }
 
 type MsgUpgradeContractCode struct {
-	Actor            string
-	ContractAddress  string
-	NewCodeID        string
-	MigrationHandler string
-	Height           uint64
+	Actor			string
+	ContractAddress		string
+	NewCodeID		string
+	MigrationHandler	string
+	Height			uint64
 }
 
 type MsgMigrateContractState struct {
-	Actor             string
-	ContractAddress   string
-	FromSchemaVersion uint64
-	ToSchemaVersion   uint64
-	MigrationHandler  string
-	Payload           []byte
-	Height            uint64
+	Actor			string
+	ContractAddress		string
+	FromSchemaVersion	uint64
+	ToSchemaVersion		uint64
+	MigrationHandler	string
+	Payload			[]byte
+	Height			uint64
 }
 
 type MsgSetContractAdmin struct {
-	Actor           string
-	ContractAddress string
-	NewAdmin        string
-	Height          uint64
+	Actor		string
+	ContractAddress	string
+	NewAdmin	string
+	Height		uint64
 }
 
 type MsgDisableContractUpgrades struct {
-	Actor           string
-	ContractAddress string
-	Height          uint64
+	Actor		string
+	ContractAddress	string
+	Height		uint64
 }
 
 type MsgTopUpContract struct {
-	Sender          string
-	ContractAddress string
-	Amount          uint64
-	Height          uint64
+	Sender		string
+	ContractAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgPayContractStorageDebt struct {
-	Sender          string
-	ContractAddress string
-	Amount          uint64
-	Height          uint64
+	Sender		string
+	ContractAddress	string
+	Amount		uint64
+	Height		uint64
 }
 
 type MsgUnfreezeContract struct {
-	Sender          string
-	ContractAddress string
-	Height          uint64
+	Sender		string
+	ContractAddress	string
+	Height		uint64
 }
 
 type MsgGrantNativeStakingCapability struct {
-	Authority           string
-	ContractAddressUser string
-	ContractAddressRaw  string
-	PoolID              string
-	Height              uint64
+	Authority		string
+	ContractAddressUser	string
+	ContractAddressRaw	string
+	PoolID			string
+	Height			uint64
 }
 
 type MsgInjectNativeStaking struct {
-	CallerContractUser string
-	CallerContractRaw  string
-	PoolID             string
-	Amount             uint64
-	Height             uint64
+	CallerContractUser	string
+	CallerContractRaw	string
+	PoolID			string
+	Amount			uint64
+	Height			uint64
 }
 
 type MsgReceiveInternalMessage struct {
-	SourceContractUser string
-	DestinationAccount string
-	Funds              uint64
-	Opcode             uint32
-	QueryID            uint64
-	Body               []byte
-	Bounce             bool
-	Deadline           uint64
-	GasLimit           uint64
-	LogicalTime        uint64
-	MessageID          string
-	Height             uint64
+	SourceContractUser	string
+	DestinationAccount	string
+	Funds			uint64
+	Opcode			uint32
+	QueryID			uint64
+	Body			[]byte
+	Bounce			bool
+	Deadline		uint64
+	GasLimit		uint64
+	LogicalTime		uint64
+	MessageID		string
+	Height			uint64
 }
 
 type QueryAssetOwnerRequest struct {
-	AssetType           string
-	ContractAddressUser string
-	AssetID             string
+	AssetType		string
+	ContractAddressUser	string
+	AssetID			string
 }
 
 type QueryAssetOwnerResponse struct {
-	Owner string
-	Found bool
+	Owner	string
+	Found	bool
 }
 
 type ContractEvent struct {
-	Type        string
-	Actor       string
-	Contract    string
-	Amount      uint64
-	InternalRaw string
+	Type		string
+	Actor		string
+	Contract	string
+	Amount		uint64
+	InternalRaw	string
 }
 
 func (s State) Normalize() State {
@@ -729,13 +729,13 @@ func RefreshStateRoot(gs GenesisState) GenesisState {
 
 func cloneState(s State) State {
 	return State{
-		Codes:                cloneCodes(s.Codes),
-		Contracts:            cloneContracts(s.Contracts),
-		InternalMessages:     cloneInternalMessages(s.InternalMessages),
-		Receipts:             cloneReceipts(s.Receipts),
-		AssetOwnership:       append([]AssetOwnershipRecord(nil), s.AssetOwnership...),
-		StakingCapabilities:  append([]ContractCapability(nil), s.StakingCapabilities...),
-		NativeStakingInjects: append([]NativeStakingInjectionRecord(nil), s.NativeStakingInjects...),
+		Codes:			cloneCodes(s.Codes),
+		Contracts:		cloneContracts(s.Contracts),
+		InternalMessages:	cloneInternalMessages(s.InternalMessages),
+		Receipts:		cloneReceipts(s.Receipts),
+		AssetOwnership:		append([]AssetOwnershipRecord(nil), s.AssetOwnership...),
+		StakingCapabilities:	append([]ContractCapability(nil), s.StakingCapabilities...),
+		NativeStakingInjects:	append([]NativeStakingInjectionRecord(nil), s.NativeStakingInjects...),
 	}
 }
 

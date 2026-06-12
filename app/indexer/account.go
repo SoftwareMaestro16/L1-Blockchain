@@ -10,10 +10,10 @@ import (
 )
 
 type AccountMetadata struct {
-	Address       string
-	AccountNumber uint64
-	Sequence      uint64
-	PubKeyType    string
+	Address		string
+	AccountNumber	uint64
+	Sequence	uint64
+	PubKeyType	string
 }
 
 type Account interface {
@@ -36,9 +36,9 @@ func NewAccountMetadata(account Account) (AccountMetadata, error) {
 		pubKeyType = fmt.Sprintf("%T", pubKey)
 	}
 	return AccountMetadata{
-		Address:       aetraaddress.FormatAccAddress(address),
-		AccountNumber: account.GetAccountNumber(),
-		Sequence:      account.GetSequence(),
-		PubKeyType:    pubKeyType,
+		Address:	aetraaddress.FormatAccAddress(address),
+		AccountNumber:	account.GetAccountNumber(),
+		Sequence:	account.GetSequence(),
+		PubKeyType:	pubKeyType,
 	}, nil
 }

@@ -77,27 +77,27 @@ func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
 	bob := keeperAddress(0x72)
 	outsider := keeperAddress(0x73)
 	openReq := paymentstypes.ChannelOpenRequest{
-		ChainID:         "aetra-test-1",
-		Participants:    []string{alice, bob},
-		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
-		ChannelType:     paymentstypes.ChannelTypeBidirectional,
-		Collateral:      "100",
-		CloseDelay:      8,
-		ChallengePeriod: 8,
-		FeePolicyID:     paymentstypes.NativeDenom,
-		OpeningFeeDenom: paymentstypes.NativeDenom,
-		OpeningFeePaid:  paymentstypes.DefaultOpeningFee,
-		OpenHeight:      10,
+		ChainID:		"aetra-test-1",
+		Participants:		[]string{alice, bob},
+		InitialBalances:	[]paymentstypes.Balance{{Participant: alice, Amount: "100"}, {Participant: bob, Amount: "0"}},
+		ChannelType:		paymentstypes.ChannelTypeBidirectional,
+		Collateral:		"100",
+		CloseDelay:		8,
+		ChallengePeriod:	8,
+		FeePolicyID:		paymentstypes.NativeDenom,
+		OpeningFeeDenom:	paymentstypes.NativeDenom,
+		OpeningFeePaid:		paymentstypes.DefaultOpeningFee,
+		OpenHeight:		10,
 	}
 	_, err := k.ValidatePaymentChannelAnte(paymentstypes.MsgOpenChannel{
-		Signer:  outsider,
-		Request: openReq,
+		Signer:		outsider,
+		Request:	openReq,
 	})
 	require.ErrorContains(t, err, "signer must be participant")
 
 	result, err := k.HandlePaymentChannelMessage(paymentstypes.MsgOpenChannel{
-		Signer:  alice,
-		Request: openReq,
+		Signer:		alice,
+		Request:	openReq,
 	})
 	require.NoError(t, err)
 	require.Equal(t, paymentstypes.PaymentChannelMsgOpenChannel, result.MsgType)
@@ -111,26 +111,26 @@ func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
 		{Participant: bob, Amount: "45"},
 	})
 	plan, err := k.PaymentChannelAccessPlan(paymentstypes.MsgUnilateralClose{
-		Signer: alice,
+		Signer:	alice,
 		Request: paymentstypes.ChannelCloseRequest{
-			ChannelID:     channel.ChannelID,
-			ClosingState:  closeState,
-			Submitter:     alice,
-			CurrentHeight: 20,
-			SettlementFee: "0",
+			ChannelID:	channel.ChannelID,
+			ClosingState:	closeState,
+			Submitter:	alice,
+			CurrentHeight:	20,
+			SettlementFee:	"0",
 		},
 	}, 20)
 	require.NoError(t, err)
 	require.Contains(t, plan.WriteKeys, paymentstypes.PaymentPendingCloseIndexKey(channel.ChannelID))
 
 	_, err = k.HandlePaymentChannelMessage(paymentstypes.MsgUnilateralClose{
-		Signer: alice,
+		Signer:	alice,
 		Request: paymentstypes.ChannelCloseRequest{
-			ChannelID:     channel.ChannelID,
-			ClosingState:  closeState,
-			Submitter:     alice,
-			CurrentHeight: 20,
-			SettlementFee: "0",
+			ChannelID:	channel.ChannelID,
+			ClosingState:	closeState,
+			Submitter:	alice,
+			CurrentHeight:	20,
+			SettlementFee:	"0",
 		},
 	})
 	require.NoError(t, err)
@@ -139,10 +139,10 @@ func TestKeeperPaymentChannelModuleMessagesAndReplayGuards(t *testing.T) {
 	require.Equal(t, paymentstypes.ChannelStatusPendingClose, exported.State.Channels[0].Status)
 
 	result, err = k.HandlePaymentChannelMessage(paymentstypes.MsgFinalizeClose{
-		Signer: bob,
+		Signer:	bob,
 		Request: paymentstypes.FinalSettlementRequest{
-			ChannelID:     channel.ChannelID,
-			CurrentHeight: 28,
+			ChannelID:	channel.ChannelID,
+			CurrentHeight:	28,
 		},
 	})
 	require.NoError(t, err)
@@ -172,17 +172,17 @@ func TestKeeperPaymentAPISurfaceMessagesAndQueries(t *testing.T) {
 	alice := keeperAddress(0x81)
 	bob := keeperAddress(0x82)
 	openReq := paymentstypes.ChannelOpenRequest{
-		ChainID:         "aetra-test-1",
-		Participants:    []string{alice, bob},
-		InitialBalances: []paymentstypes.Balance{{Participant: alice, Amount: "200"}, {Participant: bob, Amount: "0"}},
-		ChannelType:     paymentstypes.ChannelTypeBidirectional,
-		Collateral:      "200",
-		CloseDelay:      8,
-		ChallengePeriod: 8,
-		FeePolicyID:     paymentstypes.NativeDenom,
-		OpeningFeeDenom: paymentstypes.NativeDenom,
-		OpeningFeePaid:  paymentstypes.DefaultOpeningFee,
-		OpenHeight:      10,
+		ChainID:		"aetra-test-1",
+		Participants:		[]string{alice, bob},
+		InitialBalances:	[]paymentstypes.Balance{{Participant: alice, Amount: "200"}, {Participant: bob, Amount: "0"}},
+		ChannelType:		paymentstypes.ChannelTypeBidirectional,
+		Collateral:		"200",
+		CloseDelay:		8,
+		ChallengePeriod:	8,
+		FeePolicyID:		paymentstypes.NativeDenom,
+		OpeningFeeDenom:	paymentstypes.NativeDenom,
+		OpeningFeePaid:		paymentstypes.DefaultOpeningFee,
+		OpenHeight:		10,
 	}
 	result, err := k.HandlePaymentAPIMessage(paymentstypes.MsgOpenChannel{Signer: alice, Request: openReq})
 	require.NoError(t, err)
@@ -210,10 +210,10 @@ func TestKeeperPaymentAPISurfaceMessagesAndQueries(t *testing.T) {
 		{Participant: bob, Amount: "80"},
 	})
 	result, err = k.HandlePaymentAPIMessage(paymentstypes.MsgUnilateralClose{Signer: alice, Request: paymentstypes.ChannelCloseRequest{
-		ChannelID:     channelID,
-		ClosingState:  closeState,
-		CurrentHeight: 20,
-		SettlementFee: "0",
+		ChannelID:	channelID,
+		ClosingState:	closeState,
+		CurrentHeight:	20,
+		SettlementFee:	"0",
 	}})
 	require.NoError(t, err)
 	require.Equal(t, paymentstypes.PaymentAPIMsgUnilateralClose, result.MsgName)
@@ -273,10 +273,10 @@ func TestKeeperPaymentFeeScheduleBlocksOpenBypass(t *testing.T) {
 	schedule.ChannelOpenFee = "3"
 	require.NoError(t, k.ConfigurePaymentFeeSchedule(schedule))
 	require.NoError(t, k.SetPaymentFeeMultiplier(paymentstypes.PaymentFeeMultiplier{
-		FeeClass:      paymentstypes.PaymentFeeClassChannelOpen,
-		MultiplierBps: 20_000,
-		CongestionBps: 2_500,
-		UpdatedHeight: channel.OpenHeight,
+		FeeClass:	paymentstypes.PaymentFeeClassChannelOpen,
+		MultiplierBps:	20_000,
+		CongestionBps:	2_500,
+		UpdatedHeight:	channel.OpenHeight,
 	}))
 	err := k.OpenChannel(channel)
 	require.ErrorContains(t, err, "fee below required")
@@ -387,9 +387,9 @@ func TestKeeperRoutingEngineModuleSelectsRetriesAndProbes(t *testing.T) {
 	require.NotEmpty(t, probe.RouteHash)
 
 	engine, retry, err := k.RetryRoutingPath(engine, paymentstypes.RouteRetryRequest{
-		Selection: paymentstypes.RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 21, Policy: policy},
-		Failures:  []paymentstypes.RouteFailureReport{{ChannelID: first.ChannelID, From: alice, To: router, FailureClass: paymentstypes.RouteFailureCongestion, Retryable: true, ObservedHeight: 20}},
-		Policy:    paymentstypes.RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
+		Selection:	paymentstypes.RouteSelectionRequest{From: alice, To: bob, Amount: "100", CurrentHeight: 21, Policy: policy},
+		Failures:	[]paymentstypes.RouteFailureReport{{ChannelID: first.ChannelID, From: alice, To: router, FailureClass: paymentstypes.RouteFailureCongestion, Retryable: true, ObservedHeight: 20}},
+		Policy:		paymentstypes.RouteRetryPolicy{MaxAttempts: 3, AlternateRouteLimit: 2, ExcludeFailedEdges: true},
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(2), retry.Attempts)
@@ -423,11 +423,11 @@ func TestKeeperConditionalPaymentsModuleMessagesAndInvariants(t *testing.T) {
 	promise := keeperSignedPromiseWithHashLock(t, promiseChannel, "keeper-conditional-promise", alice, bob, "20", "1", 7, 40, paymentstypes.HashParts(preimage))
 
 	snapshot, err := k.HandleConditionalPaymentMessage(paymentstypes.MsgRegisterPromise{
-		Signer:        alice,
-		ChannelID:     channel.ChannelID,
-		BaseState:     base,
-		Promises:      []paymentstypes.ConditionalPromise{promise},
-		CurrentHeight: 20,
+		Signer:		alice,
+		ChannelID:	channel.ChannelID,
+		BaseState:	base,
+		Promises:	[]paymentstypes.ConditionalPromise{promise},
+		CurrentHeight:	20,
 	})
 	require.NoError(t, err)
 	require.Len(t, snapshot.Promises, 1)
@@ -435,11 +435,11 @@ func TestKeeperConditionalPaymentsModuleMessagesAndInvariants(t *testing.T) {
 	require.NoError(t, k.AssertConditionalReserveInvariant())
 
 	snapshot, err = k.HandleConditionalPaymentMessage(paymentstypes.MsgResolveWithPreimage{Request: paymentstypes.PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []paymentstypes.ConditionalPromise{promise},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 30,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]paymentstypes.ConditionalPromise{promise},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	30,
 	}})
 	require.NoError(t, err)
 	require.Len(t, snapshot.PreimageClaims, 1)
@@ -447,11 +447,11 @@ func TestKeeperConditionalPaymentsModuleMessagesAndInvariants(t *testing.T) {
 	require.NoError(t, k.AssertConditionalReserveInvariant())
 
 	_, err = k.HandleConditionalPaymentMessage(paymentstypes.MsgResolveWithPreimage{Request: paymentstypes.PreimageRevealRequest{
-		ChannelID:     channel.ChannelID,
-		Promises:      []paymentstypes.ConditionalPromise{promise},
-		Preimage:      preimage,
-		Revealer:      bob,
-		CurrentHeight: 31,
+		ChannelID:	channel.ChannelID,
+		Promises:	[]paymentstypes.ConditionalPromise{promise},
+		Preimage:	preimage,
+		Revealer:	bob,
+		CurrentHeight:	31,
 	}})
 	require.ErrorContains(t, err, "already been settled")
 }
@@ -468,40 +468,40 @@ func TestKeeperLiquidityOptimizationModuleReservationsForecastsAndDecay(t *testi
 	require.NoError(t, k.OpenChannel(channel))
 
 	liquidity, err := k.HandleLiquidityOptimizationMessage(paymentstypes.MsgSetLiquidityLimits{
-		Signer: alice,
+		Signer:	alice,
 		Limits: paymentstypes.LiquidityLimits{
-			ChannelID:            channel.ChannelID,
-			Participant:          alice,
-			MaxReservedCapacity:  "350",
-			MinAvailableCapacity: "50",
-			MaxBaseFee:           "5",
-			MaxReservationFee:    "3",
-			MaxVirtualSetupFee:   "8",
-			MaxRebalanceLoad:     8,
+			ChannelID:		channel.ChannelID,
+			Participant:		alice,
+			MaxReservedCapacity:	"350",
+			MinAvailableCapacity:	"50",
+			MaxBaseFee:		"5",
+			MaxReservationFee:	"3",
+			MaxVirtualSetupFee:	"8",
+			MaxRebalanceLoad:	8,
 		},
-		CurrentHeight: 12,
+		CurrentHeight:	12,
 	})
 	require.NoError(t, err)
 	require.Len(t, liquidity.Limits, 1)
 
 	liquidity, err = k.HandleLiquidityOptimizationMessage(paymentstypes.MsgAdvertiseLiquidity{
-		Signer: alice,
+		Signer:	alice,
 		Advertisement: paymentstypes.LiquidityAdvertisement{
-			ChannelID:           channel.ChannelID,
-			Advertiser:          alice,
-			Counterparty:        bob,
-			Capacity:            "300",
-			FeeDenom:            paymentstypes.NativeDenom,
-			BaseFee:             "2",
-			ReservationFee:      "3",
-			VirtualSetupFee:     "5",
-			ReliabilityBps:      9_000,
-			ValidUntilHeight:    80,
-			DepositAmount:       "9",
-			BackedByReservation: true,
+			ChannelID:		channel.ChannelID,
+			Advertiser:		alice,
+			Counterparty:		bob,
+			Capacity:		"300",
+			FeeDenom:		paymentstypes.NativeDenom,
+			BaseFee:		"2",
+			ReservationFee:		"3",
+			VirtualSetupFee:	"5",
+			ReliabilityBps:		9_000,
+			ValidUntilHeight:	80,
+			DepositAmount:		"9",
+			BackedByReservation:	true,
 		},
-		RequiredDeposit: "5",
-		CurrentHeight:   13,
+		RequiredDeposit:	"5",
+		CurrentHeight:		13,
 	})
 	require.NoError(t, err)
 	require.Len(t, liquidity.Positions, 1)
@@ -509,20 +509,20 @@ func TestKeeperLiquidityOptimizationModuleReservationsForecastsAndDecay(t *testi
 	require.Len(t, liquidity.Scores, 1)
 
 	reservation, err := paymentstypes.BuildSignedLiquidityReservation(paymentstypes.SignedLiquidityReservation{
-		AdvertisementID:  liquidity.Positions[0].FeePolicyID,
-		ChainID:          channel.ChainID,
-		ChannelID:        channel.ChannelID,
-		Reserver:         alice,
-		Counterparty:     bob,
-		Capacity:         "200",
-		FeeAmount:        "3",
-		ExpirationHeight: 30,
-		Nonce:            1,
+		AdvertisementID:	liquidity.Positions[0].FeePolicyID,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		Reserver:		alice,
+		Counterparty:		bob,
+		Capacity:		"200",
+		FeeAmount:		"3",
+		ExpirationHeight:	30,
+		Nonce:			1,
 	}, alice)
 	require.NoError(t, err)
 	liquidity, err = k.HandleLiquidityOptimizationMessage(paymentstypes.MsgReserveLiquidity{
-		Reservation:   reservation,
-		CurrentHeight: 14,
+		Reservation:	reservation,
+		CurrentHeight:	14,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "200", liquidity.Positions[0].ReservedCapacity)
@@ -571,22 +571,22 @@ func TestKeeperFraudProofVerificationModuleRecordsRewardsAndDedup(t *testing.T) 
 		{Participant: bob, Amount: "60"},
 	})
 	proof := paymentstypes.FraudProof{
-		ProofID:         paymentstypes.HashParts("keeper-fraud-proof", channel.ChannelID),
-		ProofType:       paymentstypes.FraudProofTypeDoubleSign,
-		SubmittedBy:     bob,
-		OffendingSigner: alice,
-		StateA:          closeState,
-		StateB:          conflicting,
-		EvidenceHash:    paymentstypes.HashParts("keeper-fraud-proof-evidence", closeState.StateHash, conflicting.StateHash),
-		PenaltyDenom:    paymentstypes.NativeDenom,
-		PenaltyAmount:   "20",
+		ProofID:		paymentstypes.HashParts("keeper-fraud-proof", channel.ChannelID),
+		ProofType:		paymentstypes.FraudProofTypeDoubleSign,
+		SubmittedBy:		bob,
+		OffendingSigner:	alice,
+		StateA:			closeState,
+		StateB:			conflicting,
+		EvidenceHash:		paymentstypes.HashParts("keeper-fraud-proof-evidence", closeState.StateHash, conflicting.StateHash),
+		PenaltyDenom:		paymentstypes.NativeDenom,
+		PenaltyAmount:		"20",
 	}
 	fraud, err := k.HandleFraudProofVerificationMessage(paymentstypes.MsgSubmitDoubleSignProof{Input: paymentstypes.FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         proof,
-		CurrentHeight: 21,
-		Policy:        paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
-		GasLimit:      100_000_000,
+		ChannelID:	channel.ChannelID,
+		Proof:		proof,
+		CurrentHeight:	21,
+		Policy:		paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
+		GasLimit:	100_000_000,
 	}})
 	require.NoError(t, err)
 	require.Len(t, fraud.EvidenceRecords, 1)
@@ -603,18 +603,18 @@ func TestKeeperFraudProofVerificationModuleRecordsRewardsAndDedup(t *testing.T) 
 	duplicate.StateB = closeState
 	duplicate.EvidenceHash = paymentstypes.HashParts("keeper-fraud-proof-duplicate-evidence", conflicting.StateHash, closeState.StateHash)
 	_, err = k.HandleFraudProofVerificationMessage(paymentstypes.MsgSubmitDoubleSignProof{Input: paymentstypes.FraudProofSubmission{
-		ChannelID:     channel.ChannelID,
-		Proof:         duplicate,
-		CurrentHeight: 22,
-		Policy:        paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
-		GasLimit:      100_000_000,
+		ChannelID:	channel.ChannelID,
+		Proof:		duplicate,
+		CurrentHeight:	22,
+		Policy:		paymentstypes.FraudPenaltyPolicy{ReporterRewardCap: "4", BurnShareBps: paymentstypes.MaxPenaltyRouteBps},
+		GasLimit:	100_000_000,
 	}})
 	require.ErrorContains(t, err, "duplicate fraud evidence")
 
 	fraud, err = k.HandleFraudProofVerificationMessage(paymentstypes.MsgClaimReporterReward{
-		RewardID:      fraud.ReporterRewards[0].RewardID,
-		Reporter:      bob,
-		CurrentHeight: 23,
+		RewardID:	fraud.ReporterRewards[0].RewardID,
+		Reporter:	bob,
+		CurrentHeight:	23,
 	})
 	require.NoError(t, err)
 	require.True(t, fraud.ReporterRewards[0].Claimed)
@@ -637,17 +637,17 @@ func TestKeeperValidatorAssistedWatchDispute(t *testing.T) {
 	channel := keeperSignedChannel(t, "keeper-validator-watch", "100", alice, bob)
 	require.NoError(t, k.OpenChannel(channel))
 	require.NoError(t, k.RegisterValidatorPaymentService(paymentstypes.ValidatorPaymentServiceMetadata{
-		ValidatorAddress: validator,
-		ServiceAddress:   service,
-		WatchEndpoint:    "https://validator.example/watch",
-		MinDelegation:    "10",
-		Active:           true,
-		UpdatedHeight:    10,
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		WatchEndpoint:		"https://validator.example/watch",
+		MinDelegation:		"10",
+		Active:			true,
+		UpdatedHeight:		10,
 	}))
 	require.NoError(t, k.RegisterValidatorWatchService(paymentstypes.ValidatorWatchRegistration{
-		ValidatorAddress: validator,
-		Delegator:        bob,
-		RegisteredHeight: 11,
+		ValidatorAddress:	validator,
+		Delegator:		bob,
+		RegisteredHeight:	11,
 	}))
 	stale := keeperSignedState(t, channel, 2, channel.OpeningStateHash, []paymentstypes.Balance{
 		{Participant: alice, Amount: "50"},
@@ -659,14 +659,14 @@ func TestKeeperValidatorAssistedWatchDispute(t *testing.T) {
 	})
 	require.NoError(t, k.SubmitClose(channel.ChannelID, stale, alice, 20, "0"))
 	require.NoError(t, k.SubmitValidatorAssistedDispute(paymentstypes.ValidatorAssistedDisputeSubmission{
-		ValidatorAddress:      validator,
-		ServiceAddress:        service,
-		Delegator:             bob,
-		ChannelID:             channel.ChannelID,
-		ClosingStateReference: stale.StateHash,
-		NewerState:            newer,
-		CurrentHeight:         21,
-		EvidenceHash:          paymentstypes.HashParts("keeper-validator-watch", channel.ChannelID, newer.StateHash),
+		ValidatorAddress:	validator,
+		ServiceAddress:		service,
+		Delegator:		bob,
+		ChannelID:		channel.ChannelID,
+		ClosingStateReference:	stale.StateHash,
+		NewerState:		newer,
+		CurrentHeight:		21,
+		EvidenceHash:		paymentstypes.HashParts("keeper-validator-watch", channel.ChannelID, newer.StateHash),
 	}))
 	debug, err := k.QueryStateHash(channel.ChannelID)
 	require.NoError(t, err)
@@ -677,20 +677,20 @@ func keeperSignedChannel(t *testing.T, salt, collateral, left, right string) pay
 	t.Helper()
 
 	channel := paymentstypes.ChannelRecord{
-		ChainID:             "aetra-test-1",
-		ChannelID:           paymentstypes.HashParts(salt, left, right),
-		ChannelType:         paymentstypes.ChannelTypeBidirectional,
-		Participants:        []string{left, right},
-		Denom:               paymentstypes.NativeDenom,
-		Collateral:          collateral,
-		OpenHeight:          10,
-		CloseDelay:          8,
-		DisputePeriod:       8,
-		OpeningFeePaid:      paymentstypes.DefaultOpeningFee,
-		ConditionalPayments: true,
-		CustodyDenom:        paymentstypes.NativeDenom,
-		CustodyAmount:       collateral,
-		Status:              paymentstypes.ChannelStatusOpen,
+		ChainID:		"aetra-test-1",
+		ChannelID:		paymentstypes.HashParts(salt, left, right),
+		ChannelType:		paymentstypes.ChannelTypeBidirectional,
+		Participants:		[]string{left, right},
+		Denom:			paymentstypes.NativeDenom,
+		Collateral:		collateral,
+		OpenHeight:		10,
+		CloseDelay:		8,
+		DisputePeriod:		8,
+		OpeningFeePaid:		paymentstypes.DefaultOpeningFee,
+		ConditionalPayments:	true,
+		CustodyDenom:		paymentstypes.NativeDenom,
+		CustodyAmount:		collateral,
+		Status:			paymentstypes.ChannelStatusOpen,
 	}
 	openState := keeperSignedState(t, channel, 1, "", []paymentstypes.Balance{
 		{Participant: left, Amount: collateral},
@@ -706,18 +706,18 @@ func keeperSignedState(t *testing.T, channel paymentstypes.ChannelRecord, nonce 
 	t.Helper()
 
 	state, err := paymentstypes.BuildState(paymentstypes.ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           paymentstypes.CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             nonce,
-		Balances:          balances,
-		PreviousStateHash: previous,
-		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + nonce,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       paymentstypes.NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		paymentstypes.CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			nonce,
+		Balances:		balances,
+		PreviousStateHash:	previous,
+		TimeoutHeight:		channel.OpenHeight + channel.DisputePeriod + nonce,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		paymentstypes.NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -734,20 +734,20 @@ func keeperSignedReserveState(t *testing.T, channel paymentstypes.ChannelRecord,
 	t.Helper()
 
 	state, err := paymentstypes.BuildState(paymentstypes.ChannelState{
-		ChainID:           channel.ChainID,
-		ChannelID:         channel.ChannelID,
-		ChannelType:       channel.ChannelType,
-		Denom:             channel.Denom,
-		Version:           paymentstypes.CurrentStateVersion,
-		Epoch:             1,
-		Nonce:             nonce,
-		Balances:          balances,
-		ReserveA:          reserveA,
-		ReserveB:          reserveB,
-		PreviousStateHash: previous,
-		TimeoutHeight:     channel.OpenHeight + channel.DisputePeriod + 70,
-		CloseDelay:        channel.DisputePeriod,
-		FeePolicyID:       paymentstypes.NativeDenom,
+		ChainID:		channel.ChainID,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		Denom:			channel.Denom,
+		Version:		paymentstypes.CurrentStateVersion,
+		Epoch:			1,
+		Nonce:			nonce,
+		Balances:		balances,
+		ReserveA:		reserveA,
+		ReserveB:		reserveB,
+		PreviousStateHash:	previous,
+		TimeoutHeight:		channel.OpenHeight + channel.DisputePeriod + 70,
+		CloseDelay:		channel.DisputePeriod,
+		FeePolicyID:		paymentstypes.NativeDenom,
 	})
 	require.NoError(t, err)
 	for _, signer := range channel.Normalize().Participants {
@@ -764,17 +764,17 @@ func keeperSignedPromiseWithHashLock(t *testing.T, channel paymentstypes.Channel
 	t.Helper()
 
 	promise, err := paymentstypes.BuildConditionalPromise(paymentstypes.ConditionalPromise{
-		PromiseID:        paymentstypes.HashParts("keeper-promise", channel.ChannelID, salt),
-		ChannelID:        channel.ChannelID,
-		Source:           source,
-		Destination:      destination,
-		Amount:           amount,
-		Fee:              fee,
-		HashLock:         hashLock,
-		TimeoutHeight:    timeoutHeight,
-		TimeoutTimestamp: int64(timeoutHeight * 10),
-		ConditionType:    paymentstypes.ConditionTypeHashLock,
-		Nonce:            nonce,
+		PromiseID:		paymentstypes.HashParts("keeper-promise", channel.ChannelID, salt),
+		ChannelID:		channel.ChannelID,
+		Source:			source,
+		Destination:		destination,
+		Amount:			amount,
+		Fee:			fee,
+		HashLock:		hashLock,
+		TimeoutHeight:		timeoutHeight,
+		TimeoutTimestamp:	int64(timeoutHeight * 10),
+		ConditionType:		paymentstypes.ConditionTypeHashLock,
+		Nonce:			nonce,
 	})
 	require.NoError(t, err)
 	promise.Signature, err = paymentstypes.SignatureForPromise(channel, promise, source)

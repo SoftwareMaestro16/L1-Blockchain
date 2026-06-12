@@ -10,28 +10,28 @@ import (
 func TestEconomicAttackPreventionModelsEveryAttackClass(t *testing.T) {
 	params := DefaultEconomicAttackHardeningParams()
 	report, err := EvaluateEconomicAttackPrevention(EconomicAttackPreventionInput{
-		ExpectedAttackProfitNaet: sdkmath.NewInt(1_000),
-		TotalStakeNaet:           sdkmath.NewInt(1_000_000),
-		ValidatorStakeNaet:       sdkmath.NewInt(400_000),
-		ValidatorStakeBps:        4_000,
-		CommissionChangeBps:      500,
-		RewardDeviationBps:       900,
-		SlashingPenaltyNaet:      sdkmath.NewInt(20_000),
-		FeeSpamTxCount:           500,
-		FeePerSpamTxNaet:         sdkmath.NewInt(3),
-		FailedTxRateBps:          2_500,
-		StateGrowthBytes:         25_000,
-		StateExpansionFeeNaet:    sdkmath.NewInt(5_000),
-		EvidenceSubmissions:      25,
-		EvidenceDepositNaet:      sdkmath.NewInt(100),
-		ReporterRewardCapNaet:    sdkmath.NewInt(500),
-		DelegationInflowBps:      1_500,
+		ExpectedAttackProfitNaet:	sdkmath.NewInt(1_000),
+		TotalStakeNaet:			sdkmath.NewInt(1_000_000),
+		ValidatorStakeNaet:		sdkmath.NewInt(400_000),
+		ValidatorStakeBps:		4_000,
+		CommissionChangeBps:		500,
+		RewardDeviationBps:		900,
+		SlashingPenaltyNaet:		sdkmath.NewInt(20_000),
+		FeeSpamTxCount:			500,
+		FeePerSpamTxNaet:		sdkmath.NewInt(3),
+		FailedTxRateBps:		2_500,
+		StateGrowthBytes:		25_000,
+		StateExpansionFeeNaet:		sdkmath.NewInt(5_000),
+		EvidenceSubmissions:		25,
+		EvidenceDepositNaet:		sdkmath.NewInt(100),
+		ReporterRewardCapNaet:		sdkmath.NewInt(500),
+		DelegationInflowBps:		1_500,
 		ControllerInput: EconomicCircuitBreakerInput{
-			BlockLoadBps:       BasisPoints,
-			FeeSpikeBps:        DefaultCircuitBreakerFeeSpikeBps + 1,
-			ControllerDriftBps: DefaultCircuitBreakerControllerDriftBps + 1,
-			FailedTxRateBps:    DefaultCircuitBreakerFailedTxRateBps + 1,
-			BurnToMintBps:      DeflationGuardBurnToMintBps + 1,
+			BlockLoadBps:		BasisPoints,
+			FeeSpikeBps:		DefaultCircuitBreakerFeeSpikeBps + 1,
+			ControllerDriftBps:	DefaultCircuitBreakerControllerDriftBps + 1,
+			FailedTxRateBps:	DefaultCircuitBreakerFailedTxRateBps + 1,
+			BurnToMintBps:		DeflationGuardBurnToMintBps + 1,
 		},
 	}, params)
 	require.NoError(t, err)
@@ -72,12 +72,12 @@ func TestValidatorCartelSimulationPricesCollusion(t *testing.T) {
 	params := DefaultEconomicAttackHardeningParams()
 	params.CartelPenaltyBps = 20_000
 	report, err := SimulateValidatorCartel(CartelSimulationInput{
-		ValidatorPowerBps: []int64{2_000, 1_600, 800, 600},
-		ColludingIndices:  []int{0, 1},
-		RewardPoolNaet:    sdkmath.NewInt(10_000),
-		ExpectedMEVNaet:   sdkmath.NewInt(500),
-		Epochs:            2,
-		Params:            params,
+		ValidatorPowerBps:	[]int64{2_000, 1_600, 800, 600},
+		ColludingIndices:	[]int{0, 1},
+		RewardPoolNaet:		sdkmath.NewInt(10_000),
+		ExpectedMEVNaet:	sdkmath.NewInt(500),
+		Epochs:			2,
+		Params:			params,
 	})
 	require.NoError(t, err)
 	require.True(t, report.Triggered)
@@ -102,7 +102,7 @@ func TestStakeMovementMonitorFlagsAbnormalMovements(t *testing.T) {
 			{ValidatorID: "val2", StakeBps: 600},
 			{ValidatorID: "val3", StakeBps: 900},
 		},
-		Params: params,
+		Params:	params,
 	})
 	require.NoError(t, err)
 	require.True(t, report.Abnormal)
@@ -123,19 +123,19 @@ func TestGovernedCircuitBreakerActivationIsDeterministic(t *testing.T) {
 	params.CircuitBreakerParams.MinCooldownBlocks = 9
 
 	first, err := EvaluateGovernedEconomicCircuitBreaker(EconomicCircuitBreakerInput{
-		BlockLoadBps:       BasisPoints,
-		FeeSpikeBps:        1_001,
-		ControllerDriftBps: 101,
-		FailedTxRateBps:    101,
-		BurnToMintBps:      DeflationGuardBurnToMintBps + 1,
+		BlockLoadBps:		BasisPoints,
+		FeeSpikeBps:		1_001,
+		ControllerDriftBps:	101,
+		FailedTxRateBps:	101,
+		BurnToMintBps:		DeflationGuardBurnToMintBps + 1,
 	}, params)
 	require.NoError(t, err)
 	second, err := EvaluateGovernedEconomicCircuitBreaker(EconomicCircuitBreakerInput{
-		BlockLoadBps:       BasisPoints,
-		FeeSpikeBps:        1_001,
-		ControllerDriftBps: 101,
-		FailedTxRateBps:    101,
-		BurnToMintBps:      DeflationGuardBurnToMintBps + 1,
+		BlockLoadBps:		BasisPoints,
+		FeeSpikeBps:		1_001,
+		ControllerDriftBps:	101,
+		FailedTxRateBps:	101,
+		BurnToMintBps:		DeflationGuardBurnToMintBps + 1,
 	}, params)
 	require.NoError(t, err)
 	require.Equal(t, first, second)

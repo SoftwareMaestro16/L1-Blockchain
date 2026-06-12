@@ -12,37 +12,37 @@ func TestActorRuntimePlanModelsMailboxIsolationEmissionsAndContinuations(t *test
 	msgB := actorMailboxMessage("service", "counter", 2)
 	emitted := engineAsyncMessage(9, 10, 25)
 	plan, err := NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
+		Height:	12,
 		Actors: []ActorRuntimeActor{{
-			ActorID:   "counter",
-			CodeRef:   "code/counter/v1",
-			StateRoot: engineHash("counter-state"),
-			Mailbox:   []ActorMailboxMessage{msgB, msgA},
+			ActorID:	"counter",
+			CodeRef:	"code/counter/v1",
+			StateRoot:	engineHash("counter-state"),
+			Mailbox:	[]ActorMailboxMessage{msgB, msgA},
 		}},
 		Executions: []ActorExecution{{
-			ActorID:         "counter",
-			MessageSequence: 1,
-			Handler:         "receive",
-			GasLimit:        100,
-			GasUsed:         40,
+			ActorID:		"counter",
+			MessageSequence:	1,
+			Handler:		"receive",
+			GasLimit:		100,
+			GasUsed:		40,
 			StateWrites: []ActorStateWrite{{
-				ActorID: "counter",
-				Key:     ActorStateKeyPrefix("counter") + "balance",
-				Hash:    engineHash("balance"),
+				ActorID:	"counter",
+				Key:		ActorStateKeyPrefix("counter") + "balance",
+				Hash:		engineHash("balance"),
 			}},
-			EmittedMessages: []async.MessageEnvelope{emitted},
-			ResultCode:      async.ResultOK,
+			EmittedMessages:	[]async.MessageEnvelope{emitted},
+			ResultCode:		async.ResultOK,
 		}},
 		Continuations: []ContinuationRecord{{
-			ContinuationID:    "payment-timeout",
-			ActorID:           "counter",
-			StepIndex:         1,
-			PartialStateHash:  engineHash("partial"),
-			PartialStateBytes: 32,
-			ResumeHeight:      13,
-			ExpiryHeight:      20,
-			GasReserved:       50,
-			Status:            ContinuationStatusScheduled,
+			ContinuationID:		"payment-timeout",
+			ActorID:		"counter",
+			StepIndex:		1,
+			PartialStateHash:	engineHash("partial"),
+			PartialStateBytes:	32,
+			ResumeHeight:		13,
+			ExpiryHeight:		20,
+			GasReserved:		50,
+			Status:			ContinuationStatusScheduled,
 		}},
 	})
 	require.NoError(t, err)
@@ -59,31 +59,31 @@ func TestActorRuntimePlanModelsMailboxIsolationEmissionsAndContinuations(t *test
 
 func TestActorRuntimeRejectsCrossActorStateMutationAndDuplicateExecution(t *testing.T) {
 	actor := ActorRuntimeActor{
-		ActorID:   "counter",
-		CodeRef:   "code/counter/v1",
-		StateRoot: engineHash("counter-state"),
-		Mailbox:   []ActorMailboxMessage{actorMailboxMessage("service", "counter", 1)},
+		ActorID:	"counter",
+		CodeRef:	"code/counter/v1",
+		StateRoot:	engineHash("counter-state"),
+		Mailbox:	[]ActorMailboxMessage{actorMailboxMessage("service", "counter", 1)},
 	}
 	_, err := NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
-		Actors: []ActorRuntimeActor{actor},
+		Height:	12,
+		Actors:	[]ActorRuntimeActor{actor},
 		Executions: []ActorExecution{{
-			ActorID:         "counter",
-			MessageSequence: 1,
-			Handler:         "receive",
-			GasLimit:        100,
+			ActorID:		"counter",
+			MessageSequence:	1,
+			Handler:		"receive",
+			GasLimit:		100,
 			StateWrites: []ActorStateWrite{{
-				ActorID: "other",
-				Key:     ActorStateKeyPrefix("other") + "balance",
-				Hash:    engineHash("balance"),
+				ActorID:	"other",
+				Key:		ActorStateKeyPrefix("other") + "balance",
+				Hash:		engineHash("balance"),
 			}},
 		}},
 	})
 	require.ErrorContains(t, err, "another actor")
 
 	_, err = NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
-		Actors: []ActorRuntimeActor{actor},
+		Height:	12,
+		Actors:	[]ActorRuntimeActor{actor},
 		Executions: []ActorExecution{
 			{ActorID: "counter", MessageSequence: 1, Handler: "receive", GasLimit: 100},
 			{ActorID: "counter", MessageSequence: 1, Handler: "receive", GasLimit: 100},
@@ -94,22 +94,22 @@ func TestActorRuntimeRejectsCrossActorStateMutationAndDuplicateExecution(t *test
 
 func TestActorRuntimeRejectsInvalidMailboxAndFailedStateCommit(t *testing.T) {
 	_, err := NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
+		Height:	12,
 		Actors: []ActorRuntimeActor{{
-			ActorID:   "counter",
-			CodeRef:   "code/counter/v1",
-			StateRoot: engineHash("counter-state"),
-			Mailbox:   []ActorMailboxMessage{actorMailboxMessage("service", "other", 1)},
+			ActorID:	"counter",
+			CodeRef:	"code/counter/v1",
+			StateRoot:	engineHash("counter-state"),
+			Mailbox:	[]ActorMailboxMessage{actorMailboxMessage("service", "other", 1)},
 		}},
 	})
 	require.ErrorContains(t, err, "target must match actor")
 
 	_, err = NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
+		Height:	12,
 		Actors: []ActorRuntimeActor{{
-			ActorID:   "counter",
-			CodeRef:   "code/counter/v1",
-			StateRoot: engineHash("counter-state"),
+			ActorID:	"counter",
+			CodeRef:	"code/counter/v1",
+			StateRoot:	engineHash("counter-state"),
 			Mailbox: []ActorMailboxMessage{
 				actorMailboxMessage("service", "counter", 1),
 				actorMailboxMessage("service", "counter", 1),
@@ -119,24 +119,24 @@ func TestActorRuntimeRejectsInvalidMailboxAndFailedStateCommit(t *testing.T) {
 	require.ErrorContains(t, err, "duplicate actor runtime mailbox sequence")
 
 	_, err = NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
+		Height:	12,
 		Actors: []ActorRuntimeActor{{
-			ActorID:   "counter",
-			CodeRef:   "code/counter/v1",
-			StateRoot: engineHash("counter-state"),
-			Mailbox:   []ActorMailboxMessage{actorMailboxMessage("service", "counter", 1)},
+			ActorID:	"counter",
+			CodeRef:	"code/counter/v1",
+			StateRoot:	engineHash("counter-state"),
+			Mailbox:	[]ActorMailboxMessage{actorMailboxMessage("service", "counter", 1)},
 		}},
 		Executions: []ActorExecution{{
-			ActorID:         "counter",
-			MessageSequence: 1,
-			Handler:         "receive",
-			GasLimit:        100,
+			ActorID:		"counter",
+			MessageSequence:	1,
+			Handler:		"receive",
+			GasLimit:		100,
 			StateWrites: []ActorStateWrite{{
-				ActorID: "counter",
-				Key:     ActorStateKeyPrefix("counter") + "balance",
-				Hash:    engineHash("balance"),
+				ActorID:	"counter",
+				Key:		ActorStateKeyPrefix("counter") + "balance",
+				Hash:		engineHash("balance"),
 			}},
-			Error: "deterministic handler error",
+			Error:	"deterministic handler error",
 		}},
 	})
 	require.ErrorContains(t, err, "must not commit")
@@ -144,63 +144,63 @@ func TestActorRuntimeRejectsInvalidMailboxAndFailedStateCommit(t *testing.T) {
 
 func TestContinuationStorageRequiresSchedulerResumeAndExpiryReceipt(t *testing.T) {
 	actor := ActorRuntimeActor{
-		ActorID:   "counter",
-		CodeRef:   "code/counter/v1",
-		StateRoot: engineHash("counter-state"),
+		ActorID:	"counter",
+		CodeRef:	"code/counter/v1",
+		StateRoot:	engineHash("counter-state"),
 	}
 	_, err := NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 12,
-		Actors: []ActorRuntimeActor{actor},
+		Height:	12,
+		Actors:	[]ActorRuntimeActor{actor},
 		Continuations: []ContinuationRecord{{
-			ContinuationID:    "resume-counter",
-			ActorID:           "counter",
-			StepIndex:         1,
-			PartialStateHash:  engineHash("partial"),
-			PartialStateBytes: 32,
-			ResumeHeight:      10,
-			ExpiryHeight:      20,
-			GasReserved:       50,
-			Status:            ContinuationStatusResumed,
-			ResumeBy:          "direct-call",
+			ContinuationID:		"resume-counter",
+			ActorID:		"counter",
+			StepIndex:		1,
+			PartialStateHash:	engineHash("partial"),
+			PartialStateBytes:	32,
+			ResumeHeight:		10,
+			ExpiryHeight:		20,
+			GasReserved:		50,
+			Status:			ContinuationStatusResumed,
+			ResumeBy:		"direct-call",
 		}},
 	})
 	require.ErrorContains(t, err, "only through scheduler")
 
 	_, err = NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 21,
-		Actors: []ActorRuntimeActor{actor},
+		Height:	21,
+		Actors:	[]ActorRuntimeActor{actor},
 		Continuations: []ContinuationRecord{{
-			ContinuationID:    "expired-counter",
-			ActorID:           "counter",
-			StepIndex:         1,
-			PartialStateHash:  engineHash("partial"),
-			PartialStateBytes: 32,
-			ResumeHeight:      10,
-			ExpiryHeight:      20,
-			GasReserved:       50,
-			Status:            ContinuationStatusScheduled,
+			ContinuationID:		"expired-counter",
+			ActorID:		"counter",
+			StepIndex:		1,
+			PartialStateHash:	engineHash("partial"),
+			PartialStateBytes:	32,
+			ResumeHeight:		10,
+			ExpiryHeight:		20,
+			GasReserved:		50,
+			Status:			ContinuationStatusScheduled,
 		}},
 	})
 	require.ErrorContains(t, err, "failure receipt")
 
 	expired, err := NewActorRuntimePlan(ActorRuntimePlan{
-		Height: 21,
-		Actors: []ActorRuntimeActor{actor},
+		Height:	21,
+		Actors:	[]ActorRuntimeActor{actor},
 		Continuations: []ContinuationRecord{{
-			ContinuationID:    "expired-counter",
-			ActorID:           "counter",
-			StepIndex:         1,
-			PartialStateHash:  engineHash("partial"),
-			PartialStateBytes: 32,
-			ResumeHeight:      10,
-			ExpiryHeight:      20,
-			GasReserved:       50,
-			Status:            ContinuationStatusExpired,
+			ContinuationID:		"expired-counter",
+			ActorID:		"counter",
+			StepIndex:		1,
+			PartialStateHash:	engineHash("partial"),
+			PartialStateBytes:	32,
+			ResumeHeight:		10,
+			ExpiryHeight:		20,
+			GasReserved:		50,
+			Status:			ContinuationStatusExpired,
 			FailureReceipt: async.ExecutionReceipt{
-				Sequence:   1,
-				ResultCode: async.ResultExpired,
-				GasUsed:    1,
-				Error:      "continuation expired",
+				Sequence:	1,
+				ResultCode:	async.ResultExpired,
+				GasUsed:	1,
+				Error:		"continuation expired",
 			},
 		}},
 	})
@@ -211,10 +211,10 @@ func TestContinuationStorageRequiresSchedulerResumeAndExpiryReceipt(t *testing.T
 func actorMailboxMessage(source, target string, sequence uint64) ActorMailboxMessage {
 	msg := engineAsyncMessage(byte(sequence), sequence, 20)
 	return ActorMailboxMessage{
-		Sequence:           sequence,
-		SourceActor:        source,
-		TargetActor:        target,
-		CreatedLogicalTime: sequence,
-		Envelope:           msg,
+		Sequence:		sequence,
+		SourceActor:		source,
+		TargetActor:		target,
+		CreatedLogicalTime:	sequence,
+		Envelope:		msg,
 	}
 }

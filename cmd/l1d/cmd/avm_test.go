@@ -20,9 +20,9 @@ import (
 
 func TestAVMCLICommandConstruction(t *testing.T) {
 	for _, tc := range []struct {
-		name string
-		root *cobraCommandShim
-		path []string
+		name	string
+		root	*cobraCommandShim
+		path	[]string
 	}{
 		{name: "tx store-code", root: shimCommand(NewAVMTxCmd()), path: []string{"store-code"}},
 		{name: "tx deploy", root: shimCommand(NewAVMTxCmd()), path: []string{"deploy"}},
@@ -69,19 +69,19 @@ func TestAVMCLIE2ESmokeDeployExecuteQuery(t *testing.T) {
 	)
 	require.NoError(t, err)
 	var deploy struct {
-		Service string `json:"service"`
-		Method  string `json:"method"`
-		TypeURL string `json:"type_url"`
-		Request struct {
-			Creator     string `json:"creator"`
-			CodeID      string `json:"code_id"`
-			InitPayload string `json:"init_payload_base64"`
-			Height      uint64 `json:"height"`
-		} `json:"request"`
-		Expected struct {
-			ContractAddressUser string `json:"contract_address_user"`
-			ContractAddressRaw  string `json:"contract_address_raw"`
-		} `json:"expected_response_fields"`
+		Service	string	`json:"service"`
+		Method	string	`json:"method"`
+		TypeURL	string	`json:"type_url"`
+		Request	struct {
+			Creator		string	`json:"creator"`
+			CodeID		string	`json:"code_id"`
+			InitPayload	string	`json:"init_payload_base64"`
+			Height		uint64	`json:"height"`
+		}	`json:"request"`
+		Expected	struct {
+			ContractAddressUser	string	`json:"contract_address_user"`
+			ContractAddressRaw	string	`json:"contract_address_raw"`
+		}	`json:"expected_response_fields"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(deployOut), &deploy), deployOut)
 	require.Equal(t, "l1.contracts.v1.Msg", deploy.Service)
@@ -123,13 +123,13 @@ func TestAVMCLIE2ESmokeDeployExecuteQuery(t *testing.T) {
 
 func TestAVMCLIDecodeReceiptStableJSON(t *testing.T) {
 	receipt := async.ExecutionReceipt{
-		Sequence:       7,
-		Opcode:         99,
-		QueryID:        42,
-		ResultCode:     async.ResultOK,
-		GasUsed:        1234,
-		StorageFeeNaet: sdkmath.NewInt(5),
-		ForwardFeeNaet: sdkmath.NewInt(3),
+		Sequence:	7,
+		Opcode:		99,
+		QueryID:	42,
+		ResultCode:	async.ResultOK,
+		GasUsed:	1234,
+		StorageFeeNaet:	sdkmath.NewInt(5),
+		ForwardFeeNaet:	sdkmath.NewInt(3),
 	}
 	bz, err := json.Marshal(receipt)
 	require.NoError(t, err)
@@ -141,12 +141,12 @@ func TestAVMCLIDecodeReceiptStableJSON(t *testing.T) {
 	require.Equal(t, first, second)
 
 	var decoded struct {
-		ReceiptID      string `json:"receipt_id"`
-		ExitCode       uint32 `json:"exit_code"`
-		GasUsed        uint64 `json:"gas_used"`
-		StorageFeeNaet string `json:"storage_fee_naet"`
-		ForwardFeeNaet string `json:"forward_fee_naet"`
-		RetryScheduled bool   `json:"retry_scheduled"`
+		ReceiptID	string	`json:"receipt_id"`
+		ExitCode	uint32	`json:"exit_code"`
+		GasUsed		uint64	`json:"gas_used"`
+		StorageFeeNaet	string	`json:"storage_fee_naet"`
+		ForwardFeeNaet	string	`json:"forward_fee_naet"`
+		RetryScheduled	bool	`json:"retry_scheduled"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(first), &decoded), first)
 	require.NotEmpty(t, decoded.ReceiptID)
@@ -162,9 +162,9 @@ func TestAVMCLIEncodeMessageCanonicalizesJSON(t *testing.T) {
 	require.NoError(t, err)
 
 	var decoded struct {
-		BodyBase64 string `json:"body_base64"`
-		Opcode     uint32 `json:"opcode"`
-		QueryID    uint64 `json:"query_id"`
+		BodyBase64	string	`json:"body_base64"`
+		Opcode		uint32	`json:"opcode"`
+		QueryID		uint64	`json:"query_id"`
 	}
 	require.NoError(t, json.Unmarshal([]byte(out), &decoded), out)
 	body, err := base64.StdEncoding.DecodeString(decoded.BodyBase64)

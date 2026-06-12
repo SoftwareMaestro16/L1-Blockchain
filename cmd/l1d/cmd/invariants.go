@@ -37,18 +37,18 @@ func (o invariantAppOptions) Get(key string) interface{} {
 var _ servertypes.AppOptions = invariantAppOptions{}
 
 type invariantCheckReport struct {
-	Command  string                      `json:"command"`
-	Mode     string                      `json:"mode"`
-	Passed   bool                        `json:"passed"`
-	Routes   []string                    `json:"routes"`
-	Skipped  []string                    `json:"skipped,omitempty"`
-	Failures []l1app.AppInvariantFailure `json:"failures,omitempty"`
+	Command		string				`json:"command"`
+	Mode		string				`json:"mode"`
+	Passed		bool				`json:"passed"`
+	Routes		[]string			`json:"routes"`
+	Skipped		[]string			`json:"skipped,omitempty"`
+	Failures	[]l1app.AppInvariantFailure	`json:"failures,omitempty"`
 }
 
 func NewInvariantsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "invariants",
-		Short: "Run critical Aetra app invariant checks",
+		Use:	"invariants",
+		Short:	"Run critical Aetra app invariant checks",
 	}
 	cmd.AddCommand(newInvariantListCmd(), newInvariantCheckCmd())
 	return cmd
@@ -56,16 +56,16 @@ func NewInvariantsCmd() *cobra.Command {
 
 func newInvariantListCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "list",
-		Short: "List registered critical invariant routes",
-		Args:  cobra.NoArgs,
+		Use:	"list",
+		Short:	"List registered critical invariant routes",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return writeCommandJSON(cmd, struct {
-				Command string   `json:"command"`
-				Routes  []string `json:"routes"`
+				Command	string		`json:"command"`
+				Routes	[]string	`json:"routes"`
 			}{
-				Command: "invariants list",
-				Routes:  l1app.CriticalAppInvariantRoutes(),
+				Command:	"invariants list",
+				Routes:		l1app.CriticalAppInvariantRoutes(),
 			})
 		},
 	}
@@ -73,9 +73,9 @@ func newInvariantListCmd() *cobra.Command {
 
 func newInvariantCheckCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "check",
-		Short: "Run critical invariants against deterministic default genesis",
-		Args:  cobra.NoArgs,
+		Use:	"check",
+		Short:	"Run critical invariants against deterministic default genesis",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			report, err := runDefaultGenesisInvariantCheck()
 			if err != nil {
@@ -112,12 +112,12 @@ func runDefaultGenesisInvariantCheck() (invariantCheckReport, error) {
 	failures := app.RunCriticalInvariants(ctx)
 	failures, skipped := filterDefaultGenesisInvariantFailures(failures)
 	report := invariantCheckReport{
-		Command:  "invariants check",
-		Mode:     "default-genesis",
-		Passed:   len(failures) == 0,
-		Routes:   app.CriticalInvariantRoutes(),
-		Skipped:  skipped,
-		Failures: failures,
+		Command:	"invariants check",
+		Mode:		"default-genesis",
+		Passed:		len(failures) == 0,
+		Routes:		app.CriticalInvariantRoutes(),
+		Skipped:	skipped,
+		Failures:	failures,
 	}
 	if _, err := json.Marshal(report); err != nil {
 		return invariantCheckReport{}, err
@@ -158,17 +158,17 @@ func invariantDefaultGenesisWithValidator(app *l1app.L1App) (l1app.GenesisState,
 	bondAmt := sdk.TokensFromConsensusPower(1, sdk.DefaultPowerReduction)
 	valAddr := sdk.ValAddress(addr)
 	validator := stakingtypes.Validator{
-		OperatorAddress:   valAddr.String(),
-		ConsensusPubkey:   pubAny,
-		Jailed:            false,
-		Status:            stakingtypes.Bonded,
-		Tokens:            bondAmt,
-		DelegatorShares:   sdkmath.LegacyOneDec(),
-		Description:       stakingtypes.Description{},
-		UnbondingHeight:   0,
-		UnbondingTime:     time.Unix(1, 0).UTC(),
-		Commission:        stakingtypes.NewCommission(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec()),
-		MinSelfDelegation: sdkmath.OneInt(),
+		OperatorAddress:	valAddr.String(),
+		ConsensusPubkey:	pubAny,
+		Jailed:			false,
+		Status:			stakingtypes.Bonded,
+		Tokens:			bondAmt,
+		DelegatorShares:	sdkmath.LegacyOneDec(),
+		Description:		stakingtypes.Description{},
+		UnbondingHeight:	0,
+		UnbondingTime:		time.Unix(1, 0).UTC(),
+		Commission:		stakingtypes.NewCommission(sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec(), sdkmath.LegacyZeroDec()),
+		MinSelfDelegation:	sdkmath.OneInt(),
 	}
 	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), []stakingtypes.Validator{validator}, []stakingtypes.Delegation{
 		stakingtypes.NewDelegation(addr.String(), valAddr.String(), sdkmath.LegacyOneDec()),

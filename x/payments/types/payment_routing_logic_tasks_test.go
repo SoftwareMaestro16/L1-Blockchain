@@ -56,11 +56,11 @@ func TestPaymentRoutingLogicTaskSpecRejectsDuplicateAndTamperedDescriptors(t *te
 	require.Empty(t, duplicate.Root)
 
 	_, err = BuildPaymentRoutingLogicTaskDescriptor(PaymentRoutingLogicTaskDescriptor{
-		TaskID:      PaymentRoutingLogicTaskID("unknown"),
-		Task:        "unknown",
-		Target:      "unknown",
-		Enforcement: "unknown",
-		Evidence:    "unknown",
+		TaskID:		PaymentRoutingLogicTaskID("unknown"),
+		Task:		"unknown",
+		Target:		"unknown",
+		Enforcement:	"unknown",
+		Evidence:	"unknown",
 	})
 	require.ErrorContains(t, err, "unknown payments routing task")
 

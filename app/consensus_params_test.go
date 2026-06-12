@@ -47,8 +47,8 @@ func TestConsensusParamsAreNotHardcodedConstants(t *testing.T) {
 	senderPrivKey := secp256k1.GenPrivKey()
 	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
 	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
+		Address:	acc.GetAddress().String(),
+		Coins:		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000))),
 	}
 
 	app, genesisState := setup(true, 5)
@@ -60,13 +60,13 @@ func TestConsensusParamsAreNotHardcodedConstants(t *testing.T) {
 
 	customParams := &cmtproto.ConsensusParams{
 		Block: &cmtproto.BlockParams{
-			MaxBytes: 999999,
-			MaxGas:   12345678,
+			MaxBytes:	999999,
+			MaxGas:		12345678,
 		},
 		Evidence: &cmtproto.EvidenceParams{
-			MaxAgeNumBlocks: 100,
-			MaxAgeDuration:  1000000000,
-			MaxBytes:        5000,
+			MaxAgeNumBlocks:	100,
+			MaxAgeDuration:		1000000000,
+			MaxBytes:		5000,
 		},
 		Validator: &cmtproto.ValidatorParams{
 			PubKeyTypes: []string{cmttypes.ABCIPubKeyTypeEd25519},
@@ -74,9 +74,9 @@ func TestConsensusParamsAreNotHardcodedConstants(t *testing.T) {
 	}
 
 	_, err = app.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: customParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	customParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 

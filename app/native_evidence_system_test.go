@@ -40,25 +40,25 @@ func TestNativeEvidenceStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	genesis := GenesisStateWithSingleValidator(t, source)
 	evidenceGenesis := nativeevidencekeeper.DefaultGenesis()
 	evidenceGenesis.State.Evidence = []nativeevidencetypes.EvidenceRecord{{
-		EvidenceID:       "app-evidence-1",
-		Status:           nativeevidencetypes.StatusPending,
-		EvidenceType:     nativeevidencetypes.EvidenceTypeFraud,
-		AccusedValidator: nativeEvidenceRawAddress("11"),
-		Reporter:         nativeEvidenceRawAddress("22"),
-		ProofPayloadHash: nativeEvidenceProofHash("app-evidence-1"),
-		PayloadSizeBytes: 128,
+		EvidenceID:		"app-evidence-1",
+		Status:			nativeevidencetypes.StatusPending,
+		EvidenceType:		nativeevidencetypes.EvidenceTypeFraud,
+		AccusedValidator:	nativeEvidenceRawAddress("11"),
+		Reporter:		nativeEvidenceRawAddress("22"),
+		ProofPayloadHash:	nativeEvidenceProofHash("app-evidence-1"),
+		PayloadSizeBytes:	128,
 		SlashDecision: nativeevidencetypes.SlashDecision{
-			FractionBps: evidenceGenesis.Params.CriticalFaultSlashFractionBps,
-			Tombstone:   true,
+			FractionBps:	evidenceGenesis.Params.CriticalFaultSlashFractionBps,
+			Tombstone:	true,
 		},
 		RewardDecision: nativeevidencetypes.RewardDecision{
-			Reporter:   nativeEvidenceRawAddress("22"),
-			AmountNaet: 100,
+			Reporter:	nativeEvidenceRawAddress("22"),
+			AmountNaet:	100,
 		},
-		SubmittedHeight:  1,
-		UpdatedHeight:    1,
-		ExpirationHeight: 100,
-		RequiresReview:   true,
+		SubmittedHeight:	1,
+		UpdatedHeight:		1,
+		ExpirationHeight:	100,
+		RequiresReview:		true,
 	}}
 	evidenceGenesis.State = evidenceGenesis.State.Normalize(evidenceGenesis.Params)
 	require.NoError(t, evidenceGenesis.Validate())
@@ -69,15 +69,15 @@ func TestNativeEvidenceStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

@@ -98,13 +98,13 @@ func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 	initialFunds := uint64(500)
 
 	created, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet,
-		CodeID:  codeHash,
-		InitMsg: initMsg,
-		Funds:   initialFunds,
-		Admin:   wallet,
-		Salt:    "contract-a",
-		Height:  10,
+		Creator:	wallet,
+		CodeID:		codeHash,
+		InitMsg:	initMsg,
+		Funds:		initialFunds,
+		Admin:		wallet,
+		Salt:		"contract-a",
+		Height:		10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, wallet, created.Owner)
@@ -124,11 +124,11 @@ func TestWalletInstantiatesExecutesAndPassesFunds(t *testing.T) {
 
 	execMsg := []byte(`{"transfer":1}`)
 	executed, err := k.ExecuteContract(types.MsgExecuteContract{
-		Sender:          wallet,
-		ContractAddress: created.ContractAddressUser,
-		Msg:             execMsg,
-		Funds:           25,
-		Height:          11,
+		Sender:			wallet,
+		ContractAddress:	created.ContractAddressUser,
+		Msg:			execMsg,
+		Funds:			25,
+		Height:			11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, created.ContractAddressUser, executed.ContractAddressUser)
@@ -154,24 +154,24 @@ func TestContractUpgradeMigrationAndAdminPolicy(t *testing.T) {
 	require.NoError(t, err)
 
 	immutable, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet, CodeID: codeV1, InitMsg: []byte("v1"), Admin: admin, Salt: "immutable", Height: 10,
+		Creator:	wallet, CodeID: codeV1, InitMsg: []byte("v1"), Admin: admin, Salt: "immutable", Height: 10,
 	})
 	require.NoError(t, err)
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: admin, ContractAddress: immutable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 11,
+		Actor:	admin, ContractAddress: immutable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 11,
 	})
 	require.ErrorContains(t, err, "immutable")
 
 	upgradeable, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet, CodeID: codeV1, InitMsg: []byte("v1"), Admin: admin, Salt: "upgradeable", Upgradeable: true, SchemaVersion: 1, Height: 20,
+		Creator:	wallet, CodeID: codeV1, InitMsg: []byte("v1"), Admin: admin, Salt: "upgradeable", Upgradeable: true, SchemaVersion: 1, Height: 20,
 	})
 	require.NoError(t, err)
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: other, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 21,
+		Actor:	other, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 21,
 	})
 	require.ErrorContains(t, err, types.ErrUnauthorized)
 	receipt, err := k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: admin, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 22,
+		Actor:	admin, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV2Hash, MigrationHandler: "schema_only", Height: 22,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "upgrade_code", receipt.Operation)
@@ -182,7 +182,7 @@ func TestContractUpgradeMigrationAndAdminPolicy(t *testing.T) {
 
 	beforeRoot := query.Contract.StateRoot
 	_, err = k.MigrateContractState(types.MsgMigrateContractState{
-		Actor: admin, ContractAddress: upgradeable.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "fail", Payload: []byte("bad"), Height: 23,
+		Actor:	admin, ContractAddress: upgradeable.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "fail", Payload: []byte("bad"), Height: 23,
 	})
 	require.ErrorContains(t, err, "migration handler failed")
 	rolledBack, err := k.Contract(types.QueryContractRequest{ContractAddress: upgradeable.ContractAddressUser})
@@ -191,7 +191,7 @@ func TestContractUpgradeMigrationAndAdminPolicy(t *testing.T) {
 	require.Equal(t, beforeRoot, rolledBack.Contract.StateRoot)
 
 	receipt, err = k.MigrateContractState(types.MsgMigrateContractState{
-		Actor: admin, ContractAddress: upgradeable.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "append", Payload: []byte(":v2"), Height: 24,
+		Actor:	admin, ContractAddress: upgradeable.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "append", Payload: []byte(":v2"), Height: 24,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "migrate_state", receipt.Operation)
@@ -206,7 +206,7 @@ func TestContractUpgradeMigrationAndAdminPolicy(t *testing.T) {
 	_, err = k.DisableContractUpgrades(types.MsgDisableContractUpgrades{Actor: newAdmin, ContractAddress: upgradeable.ContractAddressUser, Height: 26})
 	require.NoError(t, err)
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: newAdmin, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV1, MigrationHandler: "schema_only", Height: 27,
+		Actor:	newAdmin, ContractAddress: upgradeable.ContractAddressUser, NewCodeID: codeV1, MigrationHandler: "schema_only", Height: 27,
 	})
 	require.ErrorContains(t, err, "immutable")
 }
@@ -219,15 +219,15 @@ func TestSystemOwnedContractUpgradeRequiresGovernanceAuthority(t *testing.T) {
 	_, err := k.StoreCode(types.MsgStoreCode{Authority: wallet, CodeHash: codeV2, CodeBytes: 256})
 	require.NoError(t, err)
 	created, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet, CodeID: codeV1, InitMsg: []byte("sys"), Admin: wallet, Salt: "system-owned", Upgradeable: true, SystemOwned: true, Height: 10,
+		Creator:	wallet, CodeID: codeV1, InitMsg: []byte("sys"), Admin: wallet, Salt: "system-owned", Upgradeable: true, SystemOwned: true, Height: 10,
 	})
 	require.NoError(t, err)
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: wallet, ContractAddress: created.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 11,
+		Actor:	wallet, ContractAddress: created.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 11,
 	})
 	require.ErrorContains(t, err, "governance authority")
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: k.Params().Authority, ContractAddress: created.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 12,
+		Actor:	k.Params().Authority, ContractAddress: created.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 12,
 	})
 	require.NoError(t, err)
 }
@@ -301,22 +301,22 @@ func TestContractOwnersAdminsAndAssetQueriesUseAEAndRegistryState(t *testing.T) 
 	rawAdmin, err := types.RawAddressForUserAddress(admin)
 	require.NoError(t, err)
 	_, err = k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet, CodeID: codeHash, Admin: rawAdmin, Salt: "raw-admin", Height: 9,
+		Creator:	wallet, CodeID: codeHash, Admin: rawAdmin, Salt: "raw-admin", Height: 9,
 	})
 	require.ErrorContains(t, err, "AE user-facing")
 
 	created, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator: wallet, CodeID: codeHash, Admin: admin, Salt: "asset-contract", Height: 10,
+		Creator:	wallet, CodeID: codeHash, Admin: admin, Salt: "asset-contract", Height: 10,
 	})
 	require.NoError(t, err)
 	require.True(t, stringsHasPrefix(created.Owner, "AE"))
 	require.True(t, stringsHasPrefix(created.Admin, "AE"))
 
 	err = k.SetAssetOwner(types.AssetOwnershipRecord{
-		AssetType:           "contract_asset",
-		ContractAddressUser: created.ContractAddressUser,
-		AssetID:             "asset-1",
-		Owner:               assetOwner,
+		AssetType:		"contract_asset",
+		ContractAddressUser:	created.ContractAddressUser,
+		AssetID:		"asset-1",
+		Owner:			assetOwner,
 	})
 	require.NoError(t, err)
 	owner, err := k.AssetOwner(types.QueryAssetOwnerRequest{AssetType: "contract_asset", ContractAddressUser: created.ContractAddressUser, AssetID: "asset-1"})
@@ -336,10 +336,10 @@ func TestAssetOwnershipRecordValidate(t *testing.T) {
 	created := instantiateContract(t, &k, wallet, codeHash, "asset-record", 10, 0, 0)
 
 	err := k.SetAssetOwner(types.AssetOwnershipRecord{
-		AssetType:           "contract_asset",
-		ContractAddressUser: created.ContractAddressUser,
-		AssetID:             "asset-1",
-		Owner:               wallet,
+		AssetType:		"contract_asset",
+		ContractAddressUser:	created.ContractAddressUser,
+		AssetID:		"asset-1",
+		Owner:			wallet,
 	})
 	require.NoError(t, err)
 }
@@ -352,33 +352,33 @@ func TestOfficialLiquidStakingContractCapabilityAllowsNativeHookOnlyForAuthorize
 	unauthorized := instantiateContract(t, &k, wallet, codeHash, "other-contract", 11, 1000, 0)
 
 	capability, err := k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
-		Authority:           types.DefaultParams().Authority,
-		ContractAddressUser: official.ContractAddressUser,
-		ContractAddressRaw:  official.ContractAddressRaw,
-		PoolID:              "official-pool",
-		Height:              12,
+		Authority:		types.DefaultParams().Authority,
+		ContractAddressUser:	official.ContractAddressUser,
+		ContractAddressRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Height:			12,
 	})
 	require.NoError(t, err)
 	require.Equal(t, official.ContractAddressUser, capability.ContractAddressUser)
 	require.Equal(t, official.ContractAddressRaw, capability.ContractAddressRaw)
 
 	injection, err := k.InjectNativeStaking(types.MsgInjectNativeStaking{
-		CallerContractUser: official.ContractAddressUser,
-		CallerContractRaw:  official.ContractAddressRaw,
-		PoolID:             "official-pool",
-		Amount:             500,
-		Height:             13,
+		CallerContractUser:	official.ContractAddressUser,
+		CallerContractRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Amount:			500,
+		Height:			13,
 	})
 	require.NoError(t, err)
 	require.Equal(t, official.ContractAddressUser, injection.ContractAddressUser)
 	require.Equal(t, official.ContractAddressRaw, injection.ContractAddressRaw)
 
 	_, err = k.InjectNativeStaking(types.MsgInjectNativeStaking{
-		CallerContractUser: unauthorized.ContractAddressUser,
-		CallerContractRaw:  unauthorized.ContractAddressRaw,
-		PoolID:             "official-pool",
-		Amount:             1,
-		Height:             14,
+		CallerContractUser:	unauthorized.ContractAddressUser,
+		CallerContractRaw:	unauthorized.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Amount:			1,
+		Height:			14,
 	})
 	require.ErrorContains(t, err, types.ErrUnauthorized)
 }
@@ -390,20 +390,20 @@ func TestNativeStakingCapabilityRejectsBadAuthorityAndFrozenContract(t *testing.
 	official := instantiateContract(t, &k, wallet, codeHash, "official-frozen", 10, 100, 0)
 
 	_, err := k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
-		Authority:           wallet,
-		ContractAddressUser: official.ContractAddressUser,
-		ContractAddressRaw:  official.ContractAddressRaw,
-		PoolID:              "official-pool",
-		Height:              11,
+		Authority:		wallet,
+		ContractAddressUser:	official.ContractAddressUser,
+		ContractAddressRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Height:			11,
 	})
 	require.ErrorContains(t, err, types.ErrUnauthorized)
 
 	_, err = k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
-		Authority:           types.DefaultParams().Authority,
-		ContractAddressUser: official.ContractAddressUser,
-		ContractAddressRaw:  official.ContractAddressRaw,
-		PoolID:              "official-pool",
-		Height:              12,
+		Authority:		types.DefaultParams().Authority,
+		ContractAddressUser:	official.ContractAddressUser,
+		ContractAddressRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Height:			12,
 	})
 	require.NoError(t, err)
 
@@ -412,11 +412,11 @@ func TestNativeStakingCapabilityRejectsBadAuthorityAndFrozenContract(t *testing.
 	require.NoError(t, k.InitGenesis(gs))
 
 	_, err = k.InjectNativeStaking(types.MsgInjectNativeStaking{
-		CallerContractUser: official.ContractAddressUser,
-		CallerContractRaw:  official.ContractAddressRaw,
-		PoolID:             "official-pool",
-		Amount:             500,
-		Height:             13,
+		CallerContractUser:	official.ContractAddressUser,
+		CallerContractRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Amount:			500,
+		Height:			13,
 	})
 	require.ErrorContains(t, err, types.ErrAccountFrozen)
 
@@ -433,20 +433,20 @@ func TestNativeStakingHookChargesStorageRentBeforeInjection(t *testing.T) {
 	official := instantiateContract(t, &k, wallet, codeHash, "official-rent", 10, 1, 0)
 
 	_, err := k.GrantNativeStakingCapability(types.MsgGrantNativeStakingCapability{
-		Authority:           types.DefaultParams().Authority,
-		ContractAddressUser: official.ContractAddressUser,
-		ContractAddressRaw:  official.ContractAddressRaw,
-		PoolID:              "official-pool",
-		Height:              11,
+		Authority:		types.DefaultParams().Authority,
+		ContractAddressUser:	official.ContractAddressUser,
+		ContractAddressRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Height:			11,
 	})
 	require.NoError(t, err)
 
 	_, err = k.InjectNativeStaking(types.MsgInjectNativeStaking{
-		CallerContractUser: official.ContractAddressUser,
-		CallerContractRaw:  official.ContractAddressRaw,
-		PoolID:             "official-pool",
-		Amount:             500,
-		Height:             12,
+		CallerContractUser:	official.ContractAddressUser,
+		CallerContractRaw:	official.ContractAddressRaw,
+		PoolID:			"official-pool",
+		Amount:			500,
+		Height:			12,
 	})
 	require.ErrorContains(t, err, types.ErrStorageRent)
 
@@ -470,11 +470,11 @@ func TestInternalMessagesAndExportImportAreDeterministic(t *testing.T) {
 	contract := instantiateContract(t, &k, wallet, codeHash, "internal", 10, 1000, 0)
 
 	message, err := k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
-		SourceContractUser: contract.ContractAddressUser,
-		DestinationAccount: destination,
-		Funds:              7,
-		Body:               []byte("hello"),
-		Height:             11,
+		SourceContractUser:	contract.ContractAddressUser,
+		DestinationAccount:	destination,
+		Funds:			7,
+		Body:			[]byte("hello"),
+		Height:			11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, contract.ContractAddressUser, message.SourceContractUser)
@@ -504,21 +504,21 @@ func TestContractsTypedMsgAndQueryServiceSurface(t *testing.T) {
 	require.Len(t, codes, 1)
 
 	deployed, err := k.DeployContract(types.MsgDeployContract{
-		Creator:        wallet,
-		CodeID:         stored.CodeID,
-		Salt:           "typed",
-		InitPayload:    []byte("init"),
-		InitialBalance: 1_000,
-		Admin:          wallet,
-		Height:         20,
+		Creator:	wallet,
+		CodeID:		stored.CodeID,
+		Salt:		"typed",
+		InitPayload:	[]byte("init"),
+		InitialBalance:	1_000,
+		Admin:		wallet,
+		Height:		20,
 	})
 	require.NoError(t, err)
 	executed, err := k.ExecuteExternal(types.MsgExecuteExternal{
-		Sender:          wallet,
-		ContractAddress: deployed.ContractAddressUser,
-		Payload:         []byte("call"),
-		GasLimit:        k.Params().MaxGasPerExecution,
-		Height:          21,
+		Sender:			wallet,
+		ContractAddress:	deployed.ContractAddressUser,
+		Payload:		[]byte("call"),
+		GasLimit:		k.Params().MaxGasPerExecution,
+		Height:			21,
 	})
 	require.NoError(t, err)
 	require.Equal(t, deployed.ContractAddressUser, executed.ContractAddressUser)
@@ -532,18 +532,18 @@ func TestContractsTypedMsgAndQueryServiceSurface(t *testing.T) {
 
 	internal, err := k.SendInternalMessage(types.MsgSendInternalMessage{
 		Message: types.InternalMessage{
-			SourceContractUser: deployed.ContractAddressUser,
-			DestinationAccount: destination,
-			Funds:              5,
-			Opcode:             7,
-			QueryID:            9,
-			Body:               []byte("internal"),
-			Bounce:             true,
-			Deadline:           25,
-			GasLimit:           100,
-			LogicalTime:        3,
+			SourceContractUser:	deployed.ContractAddressUser,
+			DestinationAccount:	destination,
+			Funds:			5,
+			Opcode:			7,
+			QueryID:		9,
+			Body:			[]byte("internal"),
+			Bounce:			true,
+			Deadline:		25,
+			GasLimit:		100,
+			LogicalTime:		3,
 		},
-		Height: 22,
+		Height:	22,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, internal.MessageID)
@@ -554,9 +554,9 @@ func TestContractsTypedMsgAndQueryServiceSurface(t *testing.T) {
 	storage, err := k.ContractStorage(types.QueryContractStorageRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 1}})
 	require.NoError(t, err)
 	require.Equal(t, []types.ContractStorageEntry{{
-		ContractAddress: deployed.ContractAddressUser,
-		Key:             []byte("data"),
-		Value:           []byte("call"),
+		ContractAddress:	deployed.ContractAddressUser,
+		Key:			[]byte("data"),
+		Value:			[]byte("call"),
 	}}, storage)
 	receipts, err := k.ContractReceipts(types.QueryContractReceiptsRequest{ContractAddress: deployed.ContractAddressUser, Pagination: types.PageRequest{Limit: 10}})
 	require.NoError(t, err)
@@ -576,10 +576,10 @@ func TestStateInitCounterfactualDeployVirtualQueryAndExternalAttachment(t *testi
 	require.NoError(t, err)
 
 	virtual, err := k.Contract(types.QueryContractRequest{
-		ChainID:   "chain-a",
-		Namespace: "zone-a",
-		Deployer:  wallet,
-		StateInit: &stateInit,
+		ChainID:	"chain-a",
+		Namespace:	"zone-a",
+		Deployer:	wallet,
+		StateInit:	&stateInit,
 	})
 	require.NoError(t, err)
 	require.False(t, virtual.Found)
@@ -587,28 +587,28 @@ func TestStateInitCounterfactualDeployVirtualQueryAndExternalAttachment(t *testi
 	require.Equal(t, expectedUser, virtual.ContractAddress)
 
 	deployed, err := k.DeployContract(types.MsgDeployContract{
-		Creator:        wallet,
-		CodeID:         codeHash,
-		ChainID:        "chain-a",
-		Namespace:      "zone-a",
-		StateInit:      &stateInit,
-		InitPayload:    []byte("init"),
-		InitialBalance: 1_000,
-		Height:         20,
+		Creator:	wallet,
+		CodeID:		codeHash,
+		ChainID:	"chain-a",
+		Namespace:	"zone-a",
+		StateInit:	&stateInit,
+		InitPayload:	[]byte("init"),
+		InitialBalance:	1_000,
+		Height:		20,
 	})
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, deployed.ContractAddressUser)
 	require.Equal(t, expectedRaw, deployed.ContractAddressRaw)
 
 	_, err = k.DeployContract(types.MsgDeployContract{
-		Creator:        wallet,
-		CodeID:         codeHash,
-		ChainID:        "chain-a",
-		Namespace:      "zone-a",
-		StateInit:      &stateInit,
-		InitPayload:    []byte("init"),
-		InitialBalance: 1_000,
-		Height:         21,
+		Creator:	wallet,
+		CodeID:		codeHash,
+		ChainID:	"chain-a",
+		Namespace:	"zone-a",
+		StateInit:	&stateInit,
+		InitPayload:	[]byte("init"),
+		InitialBalance:	1_000,
+		Height:		21,
 	})
 	require.ErrorContains(t, err, "already exists")
 
@@ -616,14 +616,14 @@ func TestStateInitCounterfactualDeployVirtualQueryAndExternalAttachment(t *testi
 	lazyAddress, _, err := types.DeriveContractAddressFromStateInit("chain-a", "zone-a", wallet, lazyInit, k.Params())
 	require.NoError(t, err)
 	executed, err := k.ExecuteExternal(types.MsgExecuteExternal{
-		Sender:          wallet,
-		ContractAddress: lazyAddress,
-		ChainID:         "chain-a",
-		Namespace:       "zone-a",
-		StateInit:       &lazyInit,
-		Payload:         []byte("call"),
-		GasLimit:        k.Params().MaxGasPerExecution,
-		Height:          22,
+		Sender:			wallet,
+		ContractAddress:	lazyAddress,
+		ChainID:		"chain-a",
+		Namespace:		"zone-a",
+		StateInit:		&lazyInit,
+		Payload:		[]byte("call"),
+		GasLimit:		k.Params().MaxGasPerExecution,
+		Height:			22,
 	})
 	require.NoError(t, err)
 	require.Equal(t, lazyAddress, executed.ContractAddressUser)
@@ -653,11 +653,11 @@ func TestInternalMessageChargesStorageRentBeforeSend(t *testing.T) {
 	contract := instantiateContract(t, &k, wallet, codeHash, "internal-rent", 10, 1, 0)
 
 	_, err := k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{
-		SourceContractUser: contract.ContractAddressUser,
-		DestinationAccount: destination,
-		Funds:              7,
-		Body:               []byte("hello"),
-		Height:             12,
+		SourceContractUser:	contract.ContractAddressUser,
+		DestinationAccount:	destination,
+		Funds:			7,
+		Body:			[]byte("hello"),
+		Height:			12,
 	})
 	require.ErrorContains(t, err, types.ErrStorageRent)
 
@@ -678,10 +678,10 @@ func TestAVMContractLifecycleStateMachineEnforced(t *testing.T) {
 
 	active := instantiateContract(t, &k, wallet, codeHash, "lifecycle-active", 10, 500, 0)
 	executed, err := k.ExecuteContract(types.MsgExecuteContract{
-		Sender:          wallet,
-		ContractAddress: active.ContractAddressUser,
-		Msg:             []byte("active-call"),
-		Height:          11,
+		Sender:			wallet,
+		ContractAddress:	active.ContractAddressUser,
+		Msg:			[]byte("active-call"),
+		Height:			11,
 	})
 	require.NoError(t, err)
 	require.Equal(t, active.ContractAddressUser, executed.ContractAddressUser)
@@ -725,7 +725,7 @@ func TestAVMContractLifecycleStateMachineEnforced(t *testing.T) {
 	_, err = k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{SourceContractUser: frozenLimited.ContractAddressUser, DestinationAccount: other, Height: 32})
 	require.ErrorContains(t, err, types.ErrAccountFrozen)
 	_, err = k.UpgradeContractCode(types.MsgUpgradeContractCode{
-		Actor: wallet, ContractAddress: frozenLimited.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 33,
+		Actor:	wallet, ContractAddress: frozenLimited.ContractAddressUser, NewCodeID: codeV2, MigrationHandler: "schema_only", Height: 33,
 	})
 	require.ErrorContains(t, err, types.ErrAccountFrozen)
 	_, err = k.TopUpContract(types.MsgTopUpContract{Sender: wallet, ContractAddress: frozenLimited.ContractAddressUser, Amount: 10, Height: 34})
@@ -744,7 +744,7 @@ func TestAVMContractLifecycleStateMachineEnforced(t *testing.T) {
 	_, err = k.ReceiveInternalMessage(types.MsgReceiveInternalMessage{SourceContractUser: archived.ContractAddressUser, DestinationAccount: other, Height: 42})
 	require.ErrorContains(t, err, types.ErrContractLifecycle)
 	_, err = k.MigrateContractState(types.MsgMigrateContractState{
-		Actor: wallet, ContractAddress: archived.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "schema_only", Height: 43,
+		Actor:	wallet, ContractAddress: archived.ContractAddressUser, FromSchemaVersion: 1, ToSchemaVersion: 2, MigrationHandler: "schema_only", Height: 43,
 	})
 	require.ErrorContains(t, err, types.ErrContractLifecycle)
 	archivedRoot, err := k.ContractStateRoot(types.QueryContractStateRootRequest{ContractAddress: archived.ContractAddressUser})
@@ -784,14 +784,14 @@ func storeContractCode(t *testing.T, k *Keeper, owner string) string {
 func instantiateContract(t *testing.T, k *Keeper, owner string, codeHash string, salt string, height uint64, funds uint64, storageBytes uint64) types.InstantiateContractResponse {
 	t.Helper()
 	created, err := k.InstantiateContract(types.MsgInstantiateContract{
-		Creator:      owner,
-		CodeID:       codeHash,
-		InitMsg:      []byte("init"),
-		Funds:        funds,
-		Admin:        owner,
-		Salt:         salt,
-		StorageBytes: 0,
-		Height:       height,
+		Creator:	owner,
+		CodeID:		codeHash,
+		InitMsg:	[]byte("init"),
+		Funds:		funds,
+		Admin:		owner,
+		Salt:		salt,
+		StorageBytes:	0,
+		Height:		height,
 	})
 	require.NoError(t, err)
 	return created

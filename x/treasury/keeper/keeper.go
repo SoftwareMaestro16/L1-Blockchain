@@ -16,18 +16,18 @@ import (
 )
 
 type Keeper struct {
-	cdc           codec.BinaryCodec
-	storeService  corestore.KVStoreService
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
-	authority     string
+	cdc		codec.BinaryCodec
+	storeService	corestore.KVStoreService
+	accountKeeper	types.AccountKeeper
+	bankKeeper	types.BankKeeper
+	authority	string
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService corestore.KVStoreService, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, authority string) Keeper {
 	return Keeper{cdc: cdc, storeService: storeService, accountKeeper: accountKeeper, bankKeeper: bankKeeper, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)
@@ -162,18 +162,18 @@ func (k Keeper) SubmitSpend(ctx context.Context, proposer, recipient string, amo
 		return types.TreasurySpend{}, err
 	}
 	spend := types.TreasurySpend{
-		Id:                id,
-		Proposer:          proposer,
-		Recipient:         recipient,
-		Amount:            amount,
-		Bucket:            bucket,
-		Status:            types.StatusPending,
-		Epoch:             epoch,
-		VestingStartEpoch: vestingStart,
-		VestingEndEpoch:   vestingEnd,
-		Metadata:          metadata,
-		CreatedHeight:     sdk.UnwrapSDKContext(ctx).BlockHeight(),
-		UpdatedHeight:     sdk.UnwrapSDKContext(ctx).BlockHeight(),
+		Id:			id,
+		Proposer:		proposer,
+		Recipient:		recipient,
+		Amount:			amount,
+		Bucket:			bucket,
+		Status:			types.StatusPending,
+		Epoch:			epoch,
+		VestingStartEpoch:	vestingStart,
+		VestingEndEpoch:	vestingEnd,
+		Metadata:		metadata,
+		CreatedHeight:		sdk.UnwrapSDKContext(ctx).BlockHeight(),
+		UpdatedHeight:		sdk.UnwrapSDKContext(ctx).BlockHeight(),
 	}
 	if err := spend.Validate(params); err != nil {
 		return types.TreasurySpend{}, types.ErrInvalidSpend.Wrap(err.Error())

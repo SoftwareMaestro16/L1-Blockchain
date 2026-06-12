@@ -8,108 +8,108 @@ import (
 )
 
 const (
-	BasisPoints = uint32(10_000)
+	BasisPoints	= uint32(10_000)
 
-	DefaultWindowBlocks     = uint64(60)
-	DefaultAlphaNumerator   = uint64(2)
-	DefaultAlphaDenominator = DefaultWindowBlocks + 1
-	DefaultMaxDeltaBps      = uint32(500)
+	DefaultWindowBlocks	= uint64(60)
+	DefaultAlphaNumerator	= uint64(2)
+	DefaultAlphaDenominator	= DefaultWindowBlocks + 1
+	DefaultMaxDeltaBps	= uint32(500)
 
-	DefaultTargetMempoolSize    = uint64(10_000)
-	DefaultTargetBlockGas       = uint64(20_000_000)
-	DefaultTargetLatencyBlocks  = uint64(5)
-	DefaultTargetExecutionSteps = uint64(20_000_000)
+	DefaultTargetMempoolSize	= uint64(10_000)
+	DefaultTargetBlockGas		= uint64(20_000_000)
+	DefaultTargetLatencyBlocks	= uint64(5)
+	DefaultTargetExecutionSteps	= uint64(20_000_000)
 
-	DefaultMempoolSizeWeightBps      = uint32(2_000)
-	DefaultBlockUtilizationWeightBps = uint32(3_000)
-	DefaultTxLatencyWeightBps        = uint32(2_000)
-	DefaultFailureRateWeightBps      = uint32(1_000)
-	DefaultExecutionTimeWeightBps    = uint32(2_000)
+	DefaultMempoolSizeWeightBps		= uint32(2_000)
+	DefaultBlockUtilizationWeightBps	= uint32(3_000)
+	DefaultTxLatencyWeightBps		= uint32(2_000)
+	DefaultFailureRateWeightBps		= uint32(1_000)
+	DefaultExecutionTimeWeightBps		= uint32(2_000)
 
-	LowLoadUpperBps    = uint32(3_000)
-	MediumLoadUpperBps = uint32(7_000)
+	LowLoadUpperBps		= uint32(3_000)
+	MediumLoadUpperBps	= uint32(7_000)
 
-	maxAlphaDenominator = uint64(1_000_000)
+	maxAlphaDenominator	= uint64(1_000_000)
 )
 
 type LoadBand string
 
 const (
-	LoadBandLow    LoadBand = "LOW"
-	LoadBandMedium LoadBand = "MEDIUM"
-	LoadBandHigh   LoadBand = "HIGH"
+	LoadBandLow	LoadBand	= "LOW"
+	LoadBandMedium	LoadBand	= "MEDIUM"
+	LoadBandHigh	LoadBand	= "HIGH"
 )
 
 type Params struct {
-	WindowBlocks     uint64
-	AlphaNumerator   uint64
-	AlphaDenominator uint64
-	MaxDeltaBps      uint32
+	WindowBlocks		uint64
+	AlphaNumerator		uint64
+	AlphaDenominator	uint64
+	MaxDeltaBps		uint32
 
-	TargetMempoolSize    uint64
-	TargetBlockGas       uint64
-	TargetLatencyBlocks  uint64
-	TargetExecutionSteps uint64
+	TargetMempoolSize	uint64
+	TargetBlockGas		uint64
+	TargetLatencyBlocks	uint64
+	TargetExecutionSteps	uint64
 
-	MempoolSizeWeightBps      uint32
-	BlockUtilizationWeightBps uint32
-	TxLatencyWeightBps        uint32
-	FailureRateWeightBps      uint32
-	ExecutionTimeWeightBps    uint32
+	MempoolSizeWeightBps		uint32
+	BlockUtilizationWeightBps	uint32
+	TxLatencyWeightBps		uint32
+	FailureRateWeightBps		uint32
+	ExecutionTimeWeightBps		uint32
 }
 
 type Metrics struct {
-	CanonicalMempoolSize        uint64
-	UsedBlockGas                uint64
-	AverageInclusionDelayBlocks uint64
-	FailedTxCount               uint64
-	TotalTxCount                uint64
-	ExecutionStepCount          uint64
+	CanonicalMempoolSize		uint64
+	UsedBlockGas			uint64
+	AverageInclusionDelayBlocks	uint64
+	FailedTxCount			uint64
+	TotalTxCount			uint64
+	ExecutionStepCount		uint64
 }
 
 type Scores struct {
-	MempoolSizeBps      uint32
-	BlockUtilizationBps uint32
-	TxLatencyBps        uint32
-	FailureRateBps      uint32
-	ExecutionTimeBps    uint32
+	MempoolSizeBps		uint32
+	BlockUtilizationBps	uint32
+	TxLatencyBps		uint32
+	FailureRateBps		uint32
+	ExecutionTimeBps	uint32
 }
 
 type EMAState struct {
-	MempoolSizeBps      uint32
-	BlockUtilizationBps uint32
-	TxLatencyBps        uint32
-	FailureRateBps      uint32
-	ExecutionTimeBps    uint32
-	LoadScoreBps        uint32
-	WindowHeight        uint64
+	MempoolSizeBps		uint32
+	BlockUtilizationBps	uint32
+	TxLatencyBps		uint32
+	FailureRateBps		uint32
+	ExecutionTimeBps	uint32
+	LoadScoreBps		uint32
+	WindowHeight		uint64
 }
 
 type Result struct {
-	Scores          Scores
-	EMA             EMAState
-	RawLoadScoreBps uint32
-	LoadScoreBps    uint32
-	Band            LoadBand
+	Scores		Scores
+	EMA		EMAState
+	RawLoadScoreBps	uint32
+	LoadScoreBps	uint32
+	Band		LoadBand
 }
 
 func DefaultParams() Params {
 	return Params{
-		WindowBlocks:     DefaultWindowBlocks,
-		AlphaNumerator:   DefaultAlphaNumerator,
-		AlphaDenominator: DefaultAlphaDenominator,
-		MaxDeltaBps:      DefaultMaxDeltaBps,
+		WindowBlocks:		DefaultWindowBlocks,
+		AlphaNumerator:		DefaultAlphaNumerator,
+		AlphaDenominator:	DefaultAlphaDenominator,
+		MaxDeltaBps:		DefaultMaxDeltaBps,
 
-		TargetMempoolSize:    DefaultTargetMempoolSize,
-		TargetBlockGas:       DefaultTargetBlockGas,
-		TargetLatencyBlocks:  DefaultTargetLatencyBlocks,
-		TargetExecutionSteps: DefaultTargetExecutionSteps,
+		TargetMempoolSize:	DefaultTargetMempoolSize,
+		TargetBlockGas:		DefaultTargetBlockGas,
+		TargetLatencyBlocks:	DefaultTargetLatencyBlocks,
+		TargetExecutionSteps:	DefaultTargetExecutionSteps,
 
-		MempoolSizeWeightBps:      DefaultMempoolSizeWeightBps,
-		BlockUtilizationWeightBps: DefaultBlockUtilizationWeightBps,
-		TxLatencyWeightBps:        DefaultTxLatencyWeightBps,
-		FailureRateWeightBps:      DefaultFailureRateWeightBps,
-		ExecutionTimeWeightBps:    DefaultExecutionTimeWeightBps,
+		MempoolSizeWeightBps:		DefaultMempoolSizeWeightBps,
+		BlockUtilizationWeightBps:	DefaultBlockUtilizationWeightBps,
+		TxLatencyWeightBps:		DefaultTxLatencyWeightBps,
+		FailureRateWeightBps:		DefaultFailureRateWeightBps,
+		ExecutionTimeWeightBps:		DefaultExecutionTimeWeightBps,
 	}
 }
 
@@ -176,11 +176,11 @@ func (s Scores) Validate() error {
 
 func (s EMAState) Validate() error {
 	scores := Scores{
-		MempoolSizeBps:      s.MempoolSizeBps,
-		BlockUtilizationBps: s.BlockUtilizationBps,
-		TxLatencyBps:        s.TxLatencyBps,
-		FailureRateBps:      s.FailureRateBps,
-		ExecutionTimeBps:    s.ExecutionTimeBps,
+		MempoolSizeBps:		s.MempoolSizeBps,
+		BlockUtilizationBps:	s.BlockUtilizationBps,
+		TxLatencyBps:		s.TxLatencyBps,
+		FailureRateBps:		s.FailureRateBps,
+		ExecutionTimeBps:	s.ExecutionTimeBps,
 	}
 	if err := scores.Validate(); err != nil {
 		return err
@@ -196,11 +196,11 @@ func NormalizeMetrics(params Params, metrics Metrics) (Scores, error) {
 		return Scores{}, err
 	}
 	scores := Scores{
-		MempoolSizeBps:      normalizeRatioBps(metrics.CanonicalMempoolSize, params.TargetMempoolSize),
-		BlockUtilizationBps: normalizeRatioBps(metrics.UsedBlockGas, params.TargetBlockGas),
-		TxLatencyBps:        normalizeRatioBps(metrics.AverageInclusionDelayBlocks, params.TargetLatencyBlocks),
-		FailureRateBps:      normalizeRatioBps(metrics.FailedTxCount, maxUint64(1, metrics.TotalTxCount)),
-		ExecutionTimeBps:    normalizeRatioBps(metrics.ExecutionStepCount, params.TargetExecutionSteps),
+		MempoolSizeBps:		normalizeRatioBps(metrics.CanonicalMempoolSize, params.TargetMempoolSize),
+		BlockUtilizationBps:	normalizeRatioBps(metrics.UsedBlockGas, params.TargetBlockGas),
+		TxLatencyBps:		normalizeRatioBps(metrics.AverageInclusionDelayBlocks, params.TargetLatencyBlocks),
+		FailureRateBps:		normalizeRatioBps(metrics.FailedTxCount, maxUint64(1, metrics.TotalTxCount)),
+		ExecutionTimeBps:	normalizeRatioBps(metrics.ExecutionStepCount, params.TargetExecutionSteps),
 	}
 	return scores, nil
 }
@@ -220,27 +220,27 @@ func ComputeLoadScore(params Params, previous EMAState, metrics Metrics) (Result
 		return Result{}, err
 	}
 	ema := EMAState{
-		MempoolSizeBps:      updateEMA(params, previous.MempoolSizeBps, scores.MempoolSizeBps),
-		BlockUtilizationBps: updateEMA(params, previous.BlockUtilizationBps, scores.BlockUtilizationBps),
-		TxLatencyBps:        updateEMA(params, previous.TxLatencyBps, scores.TxLatencyBps),
-		FailureRateBps:      updateEMA(params, previous.FailureRateBps, scores.FailureRateBps),
-		ExecutionTimeBps:    updateEMA(params, previous.ExecutionTimeBps, scores.ExecutionTimeBps),
-		WindowHeight:        previous.WindowHeight + 1,
+		MempoolSizeBps:		updateEMA(params, previous.MempoolSizeBps, scores.MempoolSizeBps),
+		BlockUtilizationBps:	updateEMA(params, previous.BlockUtilizationBps, scores.BlockUtilizationBps),
+		TxLatencyBps:		updateEMA(params, previous.TxLatencyBps, scores.TxLatencyBps),
+		FailureRateBps:		updateEMA(params, previous.FailureRateBps, scores.FailureRateBps),
+		ExecutionTimeBps:	updateEMA(params, previous.ExecutionTimeBps, scores.ExecutionTimeBps),
+		WindowHeight:		previous.WindowHeight + 1,
 	}
 	rawScore := weightedScore(params, Scores{
-		MempoolSizeBps:      ema.MempoolSizeBps,
-		BlockUtilizationBps: ema.BlockUtilizationBps,
-		TxLatencyBps:        ema.TxLatencyBps,
-		FailureRateBps:      ema.FailureRateBps,
-		ExecutionTimeBps:    ema.ExecutionTimeBps,
+		MempoolSizeBps:		ema.MempoolSizeBps,
+		BlockUtilizationBps:	ema.BlockUtilizationBps,
+		TxLatencyBps:		ema.TxLatencyBps,
+		FailureRateBps:		ema.FailureRateBps,
+		ExecutionTimeBps:	ema.ExecutionTimeBps,
 	})
 	ema.LoadScoreBps = clampDelta(previous.LoadScoreBps, rawScore, params.MaxDeltaBps)
 	return Result{
-		Scores:          scores,
-		EMA:             ema,
-		RawLoadScoreBps: rawScore,
-		LoadScoreBps:    ema.LoadScoreBps,
-		Band:            BandForScore(ema.LoadScoreBps),
+		Scores:			scores,
+		EMA:			ema,
+		RawLoadScoreBps:	rawScore,
+		LoadScoreBps:		ema.LoadScoreBps,
+		Band:			BandForScore(ema.LoadScoreBps),
 	}, nil
 }
 

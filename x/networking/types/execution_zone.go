@@ -10,89 +10,89 @@ import (
 type ExecutionRoutingClass string
 
 const (
-	ExecutionRoutingTx               ExecutionRoutingClass = "tx"
-	ExecutionRoutingZone             ExecutionRoutingClass = "zone"
-	ExecutionRoutingShard            ExecutionRoutingClass = "shard"
-	ExecutionRoutingExecutionOverlay ExecutionRoutingClass = "execution_overlay"
+	ExecutionRoutingTx			ExecutionRoutingClass	= "tx"
+	ExecutionRoutingZone			ExecutionRoutingClass	= "zone"
+	ExecutionRoutingShard			ExecutionRoutingClass	= "shard"
+	ExecutionRoutingExecutionOverlay	ExecutionRoutingClass	= "execution_overlay"
 )
 
 type ReceiptPolicy string
 
 const (
-	ReceiptPolicyNone        ReceiptPolicy = "none"
-	ReceiptPolicyOnDelivery  ReceiptPolicy = "on_delivery"
-	ReceiptPolicyOnExecution ReceiptPolicy = "on_execution"
-	ReceiptPolicyOnFailure   ReceiptPolicy = "on_failure"
-	ReceiptPolicyAlways      ReceiptPolicy = "always"
+	ReceiptPolicyNone		ReceiptPolicy	= "none"
+	ReceiptPolicyOnDelivery		ReceiptPolicy	= "on_delivery"
+	ReceiptPolicyOnExecution	ReceiptPolicy	= "on_execution"
+	ReceiptPolicyOnFailure		ReceiptPolicy	= "on_failure"
+	ReceiptPolicyAlways		ReceiptPolicy	= "always"
 )
 
 type CrossZoneReceiptStatus string
 
 const (
-	CrossZoneReceiptDelivered  CrossZoneReceiptStatus = "delivered"
-	CrossZoneReceiptExecuted   CrossZoneReceiptStatus = "executed"
-	CrossZoneReceiptExpired    CrossZoneReceiptStatus = "expired"
-	CrossZoneReceiptBounced    CrossZoneReceiptStatus = "bounced"
-	CrossZoneReceiptRolledBack CrossZoneReceiptStatus = "rolled_back"
+	CrossZoneReceiptDelivered	CrossZoneReceiptStatus	= "delivered"
+	CrossZoneReceiptExecuted	CrossZoneReceiptStatus	= "executed"
+	CrossZoneReceiptExpired		CrossZoneReceiptStatus	= "expired"
+	CrossZoneReceiptBounced		CrossZoneReceiptStatus	= "bounced"
+	CrossZoneReceiptRolledBack	CrossZoneReceiptStatus	= "rolled_back"
 )
 
 type ExecutionMessageSchedule struct {
-	ScheduleID        string
-	ZoneID            string
-	ShardID           string
-	RoutingClass      ExecutionRoutingClass
-	Committed         bool
-	Ordered           bool
-	ScheduleHash      string
-	TransactionIDs    []string
-	MessageIDs        []string
-	FirstZoneSequence uint64
-	LastZoneSequence  uint64
+	ScheduleID		string
+	ZoneID			string
+	ShardID			string
+	RoutingClass		ExecutionRoutingClass
+	Committed		bool
+	Ordered			bool
+	ScheduleHash		string
+	TransactionIDs		[]string
+	MessageIDs		[]string
+	FirstZoneSequence	uint64
+	LastZoneSequence	uint64
 }
 
 type ExecutionZoneMessage struct {
-	Message                AetherMeshMessage
-	RoutingClass           ExecutionRoutingClass
-	ZoneID                 string
-	ShardID                string
-	ExecutionOverlayID     string
-	ExecutionGroupID       string
-	BlockSTMGroupID        string
-	ZoneSequence           uint64
-	NetworkDeliveryOrdinal uint64
-	ConsensusScheduleID    string
-	ConsensusScheduleHash  string
-	ConsensusScheduleOrder uint64
-	Async                  bool
-	ParallelZoneExecution  bool
-	DeterministicOrdering  bool
-	CrossZone              CrossZoneMessage
+	Message			AetherMeshMessage
+	RoutingClass		ExecutionRoutingClass
+	ZoneID			string
+	ShardID			string
+	ExecutionOverlayID	string
+	ExecutionGroupID	string
+	BlockSTMGroupID		string
+	ZoneSequence		uint64
+	NetworkDeliveryOrdinal	uint64
+	ConsensusScheduleID	string
+	ConsensusScheduleHash	string
+	ConsensusScheduleOrder	uint64
+	Async			bool
+	ParallelZoneExecution	bool
+	DeterministicOrdering	bool
+	CrossZone		CrossZoneMessage
 }
 
 type CrossZoneMessage struct {
-	SourceZone      string
-	DestinationZone string
-	SourceSequence  uint64
-	MessageHash     string
-	ExpiryHeight    uint64
-	ReceiptPolicy   ReceiptPolicy
-	ProofRequired   bool
+	SourceZone	string
+	DestinationZone	string
+	SourceSequence	uint64
+	MessageHash	string
+	ExpiryHeight	uint64
+	ReceiptPolicy	ReceiptPolicy
+	ProofRequired	bool
 }
 
 type CrossZoneReceipt struct {
-	ReceiptID       string
-	SourceZone      string
-	DestinationZone string
-	SourceSequence  uint64
-	MessageHash     string
-	Status          CrossZoneReceiptStatus
-	ReceiptPolicy   ReceiptPolicy
-	ProofHash       string
-	ReceiptHeight   uint64
-	RollbackSafe    bool
-	ProofQueryable  bool
-	Bounced         bool
-	Error           string
+	ReceiptID	string
+	SourceZone	string
+	DestinationZone	string
+	SourceSequence	uint64
+	MessageHash	string
+	Status		CrossZoneReceiptStatus
+	ReceiptPolicy	ReceiptPolicy
+	ProofHash	string
+	ReceiptHeight	uint64
+	RollbackSafe	bool
+	ProofQueryable	bool
+	Bounced		bool
+	Error		string
 }
 
 type CrossZoneReplayGuard struct {

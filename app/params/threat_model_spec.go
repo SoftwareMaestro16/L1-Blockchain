@@ -6,164 +6,164 @@ import (
 )
 
 const (
-	AetraThreatModelModuleName = "aetra-threat-model"
+	AetraThreatModelModuleName	= "aetra-threat-model"
 
-	AetraThreatValidatorCartel                   = "several_validators_coordinate_censorship_or_governance_capture"
-	AetraThreatStakeCentralizationThroughRewards = "large_validators_grow_faster_because_delegators_chase_apparent_safety_apr"
-	AetraThreatDowntimeWeakOperators             = "too_many_low_quality_validators_reduce_liveness"
-	AetraThreatGovernanceAttack                  = "malicious_proposal_changes_economics_slashing_cap_or_vm_params_dangerously"
-	AetraThreatContractAttack                    = "malicious_cosmwasm_contract_consumes_gas_storage_exploits_permissions_or_causes_state_bloat"
+	AetraThreatValidatorCartel			= "several_validators_coordinate_censorship_or_governance_capture"
+	AetraThreatStakeCentralizationThroughRewards	= "large_validators_grow_faster_because_delegators_chase_apparent_safety_apr"
+	AetraThreatDowntimeWeakOperators		= "too_many_low_quality_validators_reduce_liveness"
+	AetraThreatGovernanceAttack			= "malicious_proposal_changes_economics_slashing_cap_or_vm_params_dangerously"
+	AetraThreatContractAttack			= "malicious_cosmwasm_contract_consumes_gas_storage_exploits_permissions_or_causes_state_bloat"
 
-	AetraThreatControlValidatorSetTarget             = "100_300_validator_target"
-	AetraThreatControlValidatorPowerCap              = "validator_power_cap"
-	AetraThreatControlTopNMonitoring                 = "top_n_monitoring"
-	AetraThreatControlCommissionFloor                = "commission_floor"
-	AetraThreatControlIdentityTransparency           = "identity_transparency"
-	AetraThreatControlGovernanceParticipationMetrics = "governance_participation_metrics"
-	AetraThreatControlDelegationWarnings             = "delegation_warnings"
-	AetraThreatControlOverflowRewardsReduced         = "overflow_rewards_reduced"
-	AetraThreatControlOverCapWarnings                = "over_cap_warnings"
-	AetraThreatControlConcentrationMetrics           = "concentration_metrics"
-	AetraThreatControlRewardMultiplierBasedOnCap     = "reward_multiplier_based_on_cap"
-	AetraThreatControlMinimumSelfBond                = "minimum_self_bond"
-	AetraThreatControlValidatorScore                 = "validator_score"
-	AetraThreatControlDowntimeSlashing               = "downtime_slashing"
-	AetraThreatControlJail                           = "jail"
-	AetraThreatControlPublicMetrics                  = "public_metrics"
-	AetraThreatControlGradualValidatorSetGrowth      = "gradual_validator_set_growth"
-	AetraThreatControlParamBounds                    = "param_bounds"
-	AetraThreatControlDelayedActivation              = "delayed_activation"
-	AetraThreatControlEmergencyReviewWindow          = "emergency_review_window_for_critical_params"
-	AetraThreatControlExplicitAuthorityChecks        = "explicit_authority_checks"
-	AetraThreatControlEventMonitoring                = "event_monitoring"
-	AetraThreatControlGasLimits                      = "gas_limits"
-	AetraThreatControlStoragePricing                 = "storage_pricing"
-	AetraThreatControlUploadPolicy                   = "upload_policy"
-	AetraThreatControlMigrationControls              = "migration_controls"
-	AetraThreatControlContractSizeLimit              = "contract_size_limit"
-	AetraThreatControlMaliciousContractTestSuite     = "malicious_contract_test_suite"
+	AetraThreatControlValidatorSetTarget			= "100_300_validator_target"
+	AetraThreatControlValidatorPowerCap			= "validator_power_cap"
+	AetraThreatControlTopNMonitoring			= "top_n_monitoring"
+	AetraThreatControlCommissionFloor			= "commission_floor"
+	AetraThreatControlIdentityTransparency			= "identity_transparency"
+	AetraThreatControlGovernanceParticipationMetrics	= "governance_participation_metrics"
+	AetraThreatControlDelegationWarnings			= "delegation_warnings"
+	AetraThreatControlOverflowRewardsReduced		= "overflow_rewards_reduced"
+	AetraThreatControlOverCapWarnings			= "over_cap_warnings"
+	AetraThreatControlConcentrationMetrics			= "concentration_metrics"
+	AetraThreatControlRewardMultiplierBasedOnCap		= "reward_multiplier_based_on_cap"
+	AetraThreatControlMinimumSelfBond			= "minimum_self_bond"
+	AetraThreatControlValidatorScore			= "validator_score"
+	AetraThreatControlDowntimeSlashing			= "downtime_slashing"
+	AetraThreatControlJail					= "jail"
+	AetraThreatControlPublicMetrics				= "public_metrics"
+	AetraThreatControlGradualValidatorSetGrowth		= "gradual_validator_set_growth"
+	AetraThreatControlParamBounds				= "param_bounds"
+	AetraThreatControlDelayedActivation			= "delayed_activation"
+	AetraThreatControlEmergencyReviewWindow			= "emergency_review_window_for_critical_params"
+	AetraThreatControlExplicitAuthorityChecks		= "explicit_authority_checks"
+	AetraThreatControlEventMonitoring			= "event_monitoring"
+	AetraThreatControlGasLimits				= "gas_limits"
+	AetraThreatControlStoragePricing			= "storage_pricing"
+	AetraThreatControlUploadPolicy				= "upload_policy"
+	AetraThreatControlMigrationControls			= "migration_controls"
+	AetraThreatControlContractSizeLimit			= "contract_size_limit"
+	AetraThreatControlMaliciousContractTestSuite		= "malicious_contract_test_suite"
 
-	AetraThreatSimulationTop10Concentration         = "top_10_concentration_simulation"
-	AetraThreatSimulationSplitIdentityValidator     = "split_identity_validator_simulation"
-	AetraThreatSimulationDelegationOverflow         = "delegation_overflow_simulation"
-	AetraThreatSimulationGovernanceCaptureThreshold = "governance_capture_threshold_analysis"
+	AetraThreatSimulationTop10Concentration		= "top_10_concentration_simulation"
+	AetraThreatSimulationSplitIdentityValidator	= "split_identity_validator_simulation"
+	AetraThreatSimulationDelegationOverflow		= "delegation_overflow_simulation"
+	AetraThreatSimulationGovernanceCaptureThreshold	= "governance_capture_threshold_analysis"
 
-	AetraThreatTestOverCapRewardsLower            = "rewards_for_over_cap_validator_lower_than_normal"
-	AetraThreatTestDelegatorAPROverflowPenalty    = "delegator_apr_estimate_reflects_overflow_penalty"
-	AetraThreatTestCapChangeAccountingSafe        = "cap_changes_do_not_create_accounting_corruption"
-	AetraThreatTestLivenessUnderOneThirdOffline   = "liveness_with_less_than_one_third_voting_power_offline"
-	AetraThreatTestHaltOverOneThirdOfflineDoc     = "halt_behavior_with_more_than_one_third_offline_documented"
-	AetraThreatTestRecoveryAfterValidatorsReturn  = "recovery_after_validators_return"
-	AetraThreatTestDowntimePenaltiesApplied       = "downtime_penalties_applied"
-	AetraThreatTestMaliciousParamProposalRejected = "malicious_param_proposal_rejected"
-	AetraThreatTestOutOfRangeValuesRejected       = "out_of_range_values_rejected"
-	AetraThreatTestAuthoritySpoofingRejected      = "authority_spoofing_rejected"
-	AetraThreatTestDelayedActivationWorks         = "delayed_activation_works"
-	AetraThreatTestContractGasExhaustion          = "gas_exhaustion"
-	AetraThreatTestContractStorageAbuse           = "storage_abuse"
-	AetraThreatTestUnauthorizedMigration          = "unauthorized_migration"
-	AetraThreatTestInvalidInstantiate             = "invalid_instantiate"
-	AetraThreatTestMaliciousContainedExportImport = "export_import_with_malicious_but_contained_contract_state"
+	AetraThreatTestOverCapRewardsLower		= "rewards_for_over_cap_validator_lower_than_normal"
+	AetraThreatTestDelegatorAPROverflowPenalty	= "delegator_apr_estimate_reflects_overflow_penalty"
+	AetraThreatTestCapChangeAccountingSafe		= "cap_changes_do_not_create_accounting_corruption"
+	AetraThreatTestLivenessUnderOneThirdOffline	= "liveness_with_less_than_one_third_voting_power_offline"
+	AetraThreatTestHaltOverOneThirdOfflineDoc	= "halt_behavior_with_more_than_one_third_offline_documented"
+	AetraThreatTestRecoveryAfterValidatorsReturn	= "recovery_after_validators_return"
+	AetraThreatTestDowntimePenaltiesApplied		= "downtime_penalties_applied"
+	AetraThreatTestMaliciousParamProposalRejected	= "malicious_param_proposal_rejected"
+	AetraThreatTestOutOfRangeValuesRejected		= "out_of_range_values_rejected"
+	AetraThreatTestAuthoritySpoofingRejected	= "authority_spoofing_rejected"
+	AetraThreatTestDelayedActivationWorks		= "delayed_activation_works"
+	AetraThreatTestContractGasExhaustion		= "gas_exhaustion"
+	AetraThreatTestContractStorageAbuse		= "storage_abuse"
+	AetraThreatTestUnauthorizedMigration		= "unauthorized_migration"
+	AetraThreatTestInvalidInstantiate		= "invalid_instantiate"
+	AetraThreatTestMaliciousContainedExportImport	= "export_import_with_malicious_but_contained_contract_state"
 )
 
 type AetraValidatorCartelThreatEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Threats     []string
-	Controls    []string
-	Simulations []string
+	Threats		[]string
+	Controls	[]string
+	Simulations	[]string
 
-	UsesObjectiveChainData      bool
-	UsesEconomicSignals         bool
-	AvoidsMandatoryValidatorKYC bool
-	DoesNotHaltStakingOnWarning bool
+	UsesObjectiveChainData		bool
+	UsesEconomicSignals		bool
+	AvoidsMandatoryValidatorKYC	bool
+	DoesNotHaltStakingOnWarning	bool
 }
 
 type AetraValidatorCartelThreatReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraStakeCentralizationRewardsThreatEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Threats  []string
-	Controls []string
-	Tests    []string
+	Threats		[]string
+	Controls	[]string
+	Tests		[]string
 }
 
 type AetraStakeCentralizationRewardsThreatReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraDowntimeWeakOperatorsThreatEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Threats  []string
-	Controls []string
-	Tests    []string
+	Threats		[]string
+	Controls	[]string
+	Tests		[]string
 }
 
 type AetraDowntimeWeakOperatorsThreatReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraGovernanceAttackThreatEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Threats  []string
-	Controls []string
-	Tests    []string
+	Threats		[]string
+	Controls	[]string
+	Tests		[]string
 }
 
 type AetraGovernanceAttackThreatReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 type AetraContractAttackThreatEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	Threats  []string
-	Controls []string
-	Tests    []string
+	Threats		[]string
+	Controls	[]string
+	Tests		[]string
 }
 
 type AetraContractAttackThreatReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultAetraValidatorCartelThreatEvidence() AetraValidatorCartelThreatEvidence {
 	return AetraValidatorCartelThreatEvidence{
-		ModuleName: AetraThreatModelModuleName,
+		ModuleName:	AetraThreatModelModuleName,
 		Threats: []string{
 			AetraThreatValidatorCartel,
 		},
-		Controls:    requiredAetraValidatorCartelControls(),
-		Simulations: requiredAetraValidatorCartelSimulations(),
+		Controls:	requiredAetraValidatorCartelControls(),
+		Simulations:	requiredAetraValidatorCartelSimulations(),
 
-		UsesObjectiveChainData:      true,
-		UsesEconomicSignals:         true,
-		AvoidsMandatoryValidatorKYC: true,
-		DoesNotHaltStakingOnWarning: true,
+		UsesObjectiveChainData:		true,
+		UsesEconomicSignals:		true,
+		AvoidsMandatoryValidatorKYC:	true,
+		DoesNotHaltStakingOnWarning:	true,
 	}
 }
 
@@ -200,22 +200,22 @@ func BuildAetraValidatorCartelThreatReport(evidence AetraValidatorCartelThreatEv
 
 	sort.Strings(failed)
 	return AetraValidatorCartelThreatReport{
-		ModuleName: evidence.ModuleName,
-		Required:   16,
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	16,
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraStakeCentralizationRewardsThreatEvidence() AetraStakeCentralizationRewardsThreatEvidence {
 	return AetraStakeCentralizationRewardsThreatEvidence{
-		ModuleName: AetraThreatModelModuleName,
+		ModuleName:	AetraThreatModelModuleName,
 		Threats: []string{
 			AetraThreatStakeCentralizationThroughRewards,
 		},
-		Controls: requiredAetraStakeCentralizationRewardsControls(),
-		Tests:    requiredAetraStakeCentralizationRewardsTests(),
+		Controls:	requiredAetraStakeCentralizationRewardsControls(),
+		Tests:		requiredAetraStakeCentralizationRewardsTests(),
 	}
 }
 
@@ -238,22 +238,22 @@ func BuildAetraStakeCentralizationRewardsThreatReport(evidence AetraStakeCentral
 
 	sort.Strings(failed)
 	return AetraStakeCentralizationRewardsThreatReport{
-		ModuleName: evidence.ModuleName,
-		Required:   9,
-		Passed:     passedThreats + passedControls + passedTests,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	9,
+		Passed:		passedThreats + passedControls + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraDowntimeWeakOperatorsThreatEvidence() AetraDowntimeWeakOperatorsThreatEvidence {
 	return AetraDowntimeWeakOperatorsThreatEvidence{
-		ModuleName: AetraThreatModelModuleName,
+		ModuleName:	AetraThreatModelModuleName,
 		Threats: []string{
 			AetraThreatDowntimeWeakOperators,
 		},
-		Controls: requiredAetraDowntimeWeakOperatorsControls(),
-		Tests:    requiredAetraDowntimeWeakOperatorsTests(),
+		Controls:	requiredAetraDowntimeWeakOperatorsControls(),
+		Tests:		requiredAetraDowntimeWeakOperatorsTests(),
 	}
 }
 
@@ -276,22 +276,22 @@ func BuildAetraDowntimeWeakOperatorsThreatReport(evidence AetraDowntimeWeakOpera
 
 	sort.Strings(failed)
 	return AetraDowntimeWeakOperatorsThreatReport{
-		ModuleName: evidence.ModuleName,
-		Required:   11,
-		Passed:     passedThreats + passedControls + passedTests,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	11,
+		Passed:		passedThreats + passedControls + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraGovernanceAttackThreatEvidence() AetraGovernanceAttackThreatEvidence {
 	return AetraGovernanceAttackThreatEvidence{
-		ModuleName: AetraThreatModelModuleName,
+		ModuleName:	AetraThreatModelModuleName,
 		Threats: []string{
 			AetraThreatGovernanceAttack,
 		},
-		Controls: requiredAetraGovernanceAttackControls(),
-		Tests:    requiredAetraGovernanceAttackTests(),
+		Controls:	requiredAetraGovernanceAttackControls(),
+		Tests:		requiredAetraGovernanceAttackTests(),
 	}
 }
 
@@ -314,22 +314,22 @@ func BuildAetraGovernanceAttackThreatReport(evidence AetraGovernanceAttackThreat
 
 	sort.Strings(failed)
 	return AetraGovernanceAttackThreatReport{
-		ModuleName: evidence.ModuleName,
-		Required:   10,
-		Passed:     passedThreats + passedControls + passedTests,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	10,
+		Passed:		passedThreats + passedControls + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
 func DefaultAetraContractAttackThreatEvidence() AetraContractAttackThreatEvidence {
 	return AetraContractAttackThreatEvidence{
-		ModuleName: AetraThreatModelModuleName,
+		ModuleName:	AetraThreatModelModuleName,
 		Threats: []string{
 			AetraThreatContractAttack,
 		},
-		Controls: requiredAetraContractAttackControls(),
-		Tests:    requiredAetraContractAttackTests(),
+		Controls:	requiredAetraContractAttackControls(),
+		Tests:		requiredAetraContractAttackTests(),
 	}
 }
 
@@ -352,11 +352,11 @@ func BuildAetraContractAttackThreatReport(evidence AetraContractAttackThreatEvid
 
 	sort.Strings(failed)
 	return AetraContractAttackThreatReport{
-		ModuleName: evidence.ModuleName,
-		Required:   12,
-		Passed:     passedThreats + passedControls + passedTests,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	12,
+		Passed:		passedThreats + passedControls + passedTests,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 

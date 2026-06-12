@@ -13,100 +13,100 @@ type VMSafetyRuleID string
 type ProofSafetyRuleID string
 
 const (
-	ShardSafetyEpochBoundary        ShardSafetyRuleID = "layout-changes-at-epoch-boundaries"
-	ShardSafetyReproducibleDecision ShardSafetyRuleID = "reproducible-split-merge-decisions"
-	ShardSafetyDeliveryEpoch        ShardSafetyRuleID = "in-flight-messages-include-delivery-epoch"
-	ShardSafetyMigrationRoot        ShardSafetyRuleID = "state-migration-emits-migration-root"
-	ShardSafetyProofHorizon         ShardSafetyRuleID = "old-layout-queryable-for-proof-horizon"
+	ShardSafetyEpochBoundary	ShardSafetyRuleID	= "layout-changes-at-epoch-boundaries"
+	ShardSafetyReproducibleDecision	ShardSafetyRuleID	= "reproducible-split-merge-decisions"
+	ShardSafetyDeliveryEpoch	ShardSafetyRuleID	= "in-flight-messages-include-delivery-epoch"
+	ShardSafetyMigrationRoot	ShardSafetyRuleID	= "state-migration-emits-migration-root"
+	ShardSafetyProofHorizon		ShardSafetyRuleID	= "old-layout-queryable-for-proof-horizon"
 
-	VMSafetyGasMetering          VMSafetyRuleID = "mandatory-gas-metering"
-	VMSafetyBoundedIteration     VMSafetyRuleID = "bounded-storage-iteration"
-	VMSafetyMeteredProofs        VMSafetyRuleID = "metered-proof-verification"
-	VMSafetyForwardingFeeReserve VMSafetyRuleID = "message-forwarding-fee-reserved"
-	VMSafetyNoRemoteMutation     VMSafetyRuleID = "no-synchronous-remote-zone-mutation"
-	VMSafetyDeterministicTimeout VMSafetyRuleID = "deterministic-promise-timeouts"
+	VMSafetyGasMetering		VMSafetyRuleID	= "mandatory-gas-metering"
+	VMSafetyBoundedIteration	VMSafetyRuleID	= "bounded-storage-iteration"
+	VMSafetyMeteredProofs		VMSafetyRuleID	= "metered-proof-verification"
+	VMSafetyForwardingFeeReserve	VMSafetyRuleID	= "message-forwarding-fee-reserved"
+	VMSafetyNoRemoteMutation	VMSafetyRuleID	= "no-synchronous-remote-zone-mutation"
+	VMSafetyDeterministicTimeout	VMSafetyRuleID	= "deterministic-promise-timeouts"
 
-	ProofSafetyTrustedHeight     ProofSafetyRuleID = "trusted-header-height-binding"
-	ProofSafetyZoneShardIDs      ProofSafetyRuleID = "zone-and-shard-identifiers"
-	ProofSafetyObjectKeyRootType ProofSafetyRuleID = "object-key-and-root-type"
-	ProofSafetyExplicitAbsence   ProofSafetyRuleID = "explicit-non-existence-proofs"
-	ProofSafetySupportedVersion  ProofSafetyRuleID = "reject-unsupported-proof-versions"
+	ProofSafetyTrustedHeight	ProofSafetyRuleID	= "trusted-header-height-binding"
+	ProofSafetyZoneShardIDs		ProofSafetyRuleID	= "zone-and-shard-identifiers"
+	ProofSafetyObjectKeyRootType	ProofSafetyRuleID	= "object-key-and-root-type"
+	ProofSafetyExplicitAbsence	ProofSafetyRuleID	= "explicit-non-existence-proofs"
+	ProofSafetySupportedVersion	ProofSafetyRuleID	= "reject-unsupported-proof-versions"
 )
 
 type ShardSafetyRule struct {
-	RuleID         ShardSafetyRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		ShardSafetyRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type VMSafetyRule struct {
-	RuleID         VMSafetyRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		VMSafetyRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type ProofSafetyRule struct {
-	RuleID         ProofSafetyRuleID
-	Rule           string
-	Enforcement    string
-	Evidence       string
-	DescriptorHash string
+	RuleID		ProofSafetyRuleID
+	Rule		string
+	Enforcement	string
+	Evidence	string
+	DescriptorHash	string
 }
 
 type ExtendedSafetyRulesSpec struct {
-	Version         uint64
-	ShardSafety     []ShardSafetyRule
-	VMSafety        []VMSafetyRule
-	ProofSafety     []ProofSafetyRule
-	ShardSafetyRoot string
-	VMSafetyRoot    string
-	ProofSafetyRoot string
-	Root            string
+	Version		uint64
+	ShardSafety	[]ShardSafetyRule
+	VMSafety	[]VMSafetyRule
+	ProofSafety	[]ProofSafetyRule
+	ShardSafetyRoot	string
+	VMSafetyRoot	string
+	ProofSafetyRoot	string
+	Root		string
 }
 
 type ShardSafetyEvidence struct {
-	SourceLayoutEpoch    uint64
-	TargetLayoutEpoch    uint64
-	ActivationHeight     uint64
-	DecisionHeight       uint64
-	DecisionHash         string
-	CommittedMetricsRoot string
-	DeliveryEpoch        uint64
-	MigrationRoot        string
-	OldLayoutHash        string
-	ProofHorizonUntil    uint64
-	EvidenceHash         string
+	SourceLayoutEpoch	uint64
+	TargetLayoutEpoch	uint64
+	ActivationHeight	uint64
+	DecisionHeight		uint64
+	DecisionHash		string
+	CommittedMetricsRoot	string
+	DeliveryEpoch		uint64
+	MigrationRoot		string
+	OldLayoutHash		string
+	ProofHorizonUntil	uint64
+	EvidenceHash		string
 }
 
 type VMSafetyEvidence struct {
-	GasTableHash              string
-	GasLimit                  uint64
-	GasUsed                   uint64
-	MaxStorageIterationItems  uint32
-	ProofVerificationGas      uint64
-	ForwardingFeeReserved     uint64
-	CreatedMessageCount       uint32
-	SynchronousRemoteMutation bool
-	PromiseTimeoutHeight      uint64
-	ConsensusHeight           uint64
-	EvidenceHash              string
+	GasTableHash			string
+	GasLimit			uint64
+	GasUsed				uint64
+	MaxStorageIterationItems	uint32
+	ProofVerificationGas		uint64
+	ForwardingFeeReserved		uint64
+	CreatedMessageCount		uint32
+	SynchronousRemoteMutation	bool
+	PromiseTimeoutHeight		uint64
+	ConsensusHeight			uint64
+	EvidenceHash			string
 }
 
 type ProofSafetyEvidence struct {
-	ProofVersion        uint64
-	TrustedHeaderHeight uint64
-	ProofHeight         uint64
-	ZoneID              ZoneID
-	ShardID             ShardID
-	RootType            RootType
-	ObjectKey           []byte
-	NonExistenceProof   bool
-	AbsenceMarker       []byte
-	EvidenceHash        string
+	ProofVersion		uint64
+	TrustedHeaderHeight	uint64
+	ProofHeight		uint64
+	ZoneID			ZoneID
+	ShardID			ShardID
+	RootType		RootType
+	ObjectKey		[]byte
+	NonExistenceProof	bool
+	AbsenceMarker		[]byte
+	EvidenceHash		string
 }
 
 func DefaultExtendedSafetyRulesSpec() (ExtendedSafetyRulesSpec, error) {
@@ -146,10 +146,10 @@ func ProofSafetyRules() []ProofSafetyRule {
 
 func BuildExtendedSafetyRulesSpec(shard []ShardSafetyRule, vm []VMSafetyRule, proof []ProofSafetyRule) (ExtendedSafetyRulesSpec, error) {
 	spec := ExtendedSafetyRulesSpec{
-		Version:     ExtendedSafetyRulesSpecVersion,
-		ShardSafety: normalizeShardSafetyRules(shard),
-		VMSafety:    normalizeVMSafetyRules(vm),
-		ProofSafety: normalizeProofSafetyRules(proof),
+		Version:	ExtendedSafetyRulesSpecVersion,
+		ShardSafety:	normalizeShardSafetyRules(shard),
+		VMSafety:	normalizeVMSafetyRules(vm),
+		ProofSafety:	normalizeProofSafetyRules(proof),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return ExtendedSafetyRulesSpec{}, err
@@ -198,9 +198,9 @@ func (s ExtendedSafetyRulesSpec) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name     string
-		value    string
-		expected string
+		name		string
+		value		string
+		expected	string
 	}{
 		{"aetracore shard safety root", s.ShardSafetyRoot, ComputeShardSafetyRulesRoot(s.ShardSafety)},
 		{"aetracore VM safety root", s.VMSafetyRoot, ComputeVMSafetyRulesRoot(s.VMSafety)},
@@ -235,8 +235,8 @@ func ValidateShardSafetyEvidence(e ShardSafetyEvidence) error {
 		return errors.New("aetracore shard safety old layout proof horizon is too short")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore shard safety decision hash", e.DecisionHash},
 		{"aetracore shard safety committed metrics root", e.CommittedMetricsRoot},

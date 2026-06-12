@@ -6,26 +6,18 @@ import (
 	"github.com/sovereign-l1/l1/x/aetravm/chunk"
 )
 
-// ---------------
-// Task 4.17: AVM Security & Determinism Gate Tests
-// ---------------
-
-// ---------------
-// Capability Class Tests
-// ---------------
-
 func TestCapabilityClassString(t *testing.T) {
 	tests := map[CapabilityClass]string{
-		CapClassTime:            "TIME",
-		CapClassRandomness:      "RANDOMNESS",
-		CapClassIO:              "IO",
-		CapClassProcessControl:  "PROCESS_CONTROL",
-		CapClassParallelExec:    "PARALLEL_EXECUTION",
-		CapClassFloatArithmetic: "FLOAT_ARITHMETIC",
-		CapClassStorage:         "STORAGE",
-		CapClassMessaging:       "MESSAGING",
-		CapClassCrypto:          "CRYPTO",
-		CapClassChain:           "CHAIN",
+		CapClassTime:			"TIME",
+		CapClassRandomness:		"RANDOMNESS",
+		CapClassIO:			"IO",
+		CapClassProcessControl:		"PROCESS_CONTROL",
+		CapClassParallelExec:		"PARALLEL_EXECUTION",
+		CapClassFloatArithmetic:	"FLOAT_ARITHMETIC",
+		CapClassStorage:		"STORAGE",
+		CapClassMessaging:		"MESSAGING",
+		CapClassCrypto:			"CRYPTO",
+		CapClassChain:			"CHAIN",
 	}
 	for class, expected := range tests {
 		if class.String() != expected {
@@ -58,18 +50,18 @@ func TestForbiddenCapabilityClasses(t *testing.T) {
 
 func TestCapabilityClassForHostFunction(t *testing.T) {
 	tests := map[HostFunction]CapabilityClass{
-		HostWallClockTime:  CapClassTime,
-		HostRandomness:     CapClassRandomness,
-		HostFilesystem:     CapClassIO,
-		HostNetwork:        CapClassIO,
-		HostFloatingPoint:  CapClassFloatArithmetic,
-		HostGoroutine:      CapClassProcessControl,
-		HostProcessEnv:      CapClassProcessControl,
-		HostReadStorage:    CapClassStorage,
-		HostWriteStorage:   CapClassStorage,
-		HostHashSHA256:     CapClassCrypto,
-		HostHashBLAKE3:     CapClassCrypto,
-		HostGetBlockHeight: CapClassChain,
+		HostWallClockTime:	CapClassTime,
+		HostRandomness:		CapClassRandomness,
+		HostFilesystem:		CapClassIO,
+		HostNetwork:		CapClassIO,
+		HostFloatingPoint:	CapClassFloatArithmetic,
+		HostGoroutine:		CapClassProcessControl,
+		HostProcessEnv:		CapClassProcessControl,
+		HostReadStorage:	CapClassStorage,
+		HostWriteStorage:	CapClassStorage,
+		HostHashSHA256:		CapClassCrypto,
+		HostHashBLAKE3:		CapClassCrypto,
+		HostGetBlockHeight:	CapClassChain,
 	}
 	for fn, expected := range tests {
 		got := CapabilityClassForHostFunction(fn)
@@ -90,10 +82,6 @@ func TestForbiddenHostFunctionClasses(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Determinism Gate Tests
-// ---------------
 
 func TestDeterminismGateCreatesWithChecks(t *testing.T) {
 	gate := NewDeterminismGate()
@@ -180,10 +168,6 @@ func TestDeterminismGateActionBudgetExceeded(t *testing.T) {
 	}
 }
 
-// ---------------
-// Deterministic Repeated Execution Tests
-// ---------------
-
 func TestDeterministicRepeatedExecution(t *testing.T) {
 	state := EmptyStateRootChunk()
 	msg := Message{Type: MessageInternal, Sender: "AE:sender", Target: "4:target", Value: 100, GasLimit: 5000}
@@ -207,10 +191,6 @@ func TestDeterministicRepeatedExecution(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Shuffled Map Input Normalization Tests
-// ---------------
 
 func TestNormalizeChunkMapEntries(t *testing.T) {
 	m := chunk.NewEmptyMap()
@@ -269,10 +249,6 @@ func TestMapIterationDeterminism(t *testing.T) {
 	}
 }
 
-// ---------------
-// Export/Import/Re-execute Tests
-// ---------------
-
 func TestExportImportReExecute(t *testing.T) {
 	state := EmptyStateRootChunk()
 	msg := Message{Type: MessageInternal, Sender: "AE:sender", Target: "4:target", Value: 200, GasLimit: 10000}
@@ -294,10 +270,6 @@ func TestExportImportReExecute(t *testing.T) {
 
 	_ = stateHashBefore
 }
-
-// ---------------
-// Randomized Bytecode Verifier Fuzz Tests
-// ---------------
 
 func TestFuzzBytecodeVerifierCorpus(t *testing.T) {
 	model := DefaultFuzzResilienceModel()
@@ -384,10 +356,6 @@ func TestVerifyRawFuzzBytecode(t *testing.T) {
 	}
 }
 
-// ---------------
-// Forbidden Host Call Attempt Tests
-// ---------------
-
 func TestForbiddenHostFunctionIDs(t *testing.T) {
 	forbiddenIDs := ForbiddenHostFunctionIDs()
 	expected := []HostFunction{
@@ -430,10 +398,6 @@ func TestRuntimeIsolationEnforcer(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Gas Overflow Deterministic Error Tests
-// ---------------
 
 func TestGasOverflowDeterministicError(t *testing.T) {
 	state := EmptyStateRootChunk()
@@ -491,10 +455,6 @@ func TestGasSafetyNoPartialSideEffects(t *testing.T) {
 	_ = model
 }
 
-// ---------------
-// Storage Limit Tests
-// ---------------
-
 func TestStackDepthLimit(t *testing.T) {
 	state := EmptyStateRootChunk()
 	msg := Message{Type: MessageInternal, Sender: "AE:sender", Target: "4:target", GasLimit: 100000}
@@ -525,10 +485,6 @@ func TestActionBudgetLimit(t *testing.T) {
 	}
 }
 
-// ---------------
-// Runtime Isolation Policy Tests
-// ---------------
-
 func TestDefaultIsolationPolicyAllForbidden(t *testing.T) {
 	policy := DefaultRuntimeIsolationPolicy()
 	violations := policy.Validate()
@@ -539,9 +495,9 @@ func TestDefaultIsolationPolicyAllForbidden(t *testing.T) {
 
 func TestIsolationPolicyDetectsViolations(t *testing.T) {
 	policy := RuntimeIsolationPolicy{
-		AllowFilesystem:    true,
-		AllowWallClockTime: true,
-		AllowFloatingPoint: true,
+		AllowFilesystem:	true,
+		AllowWallClockTime:	true,
+		AllowFloatingPoint:	true,
 	}
 	violations := policy.Validate()
 	if len(violations) != 3 {
@@ -551,22 +507,18 @@ func TestIsolationPolicyDetectsViolations(t *testing.T) {
 
 func TestIsolationPolicyForbiddenAccesses(t *testing.T) {
 	policy := RuntimeIsolationPolicy{
-		AllowNetwork:           true,
-		AllowProcessInteraction: true,
-		AllowProcessEntropy:    true,
-		AllowThreadCreation:    true,
-		AllowAsyncExecution:    true,
-		AllowExternalRandomness: true,
+		AllowNetwork:			true,
+		AllowProcessInteraction:	true,
+		AllowProcessEntropy:		true,
+		AllowThreadCreation:		true,
+		AllowAsyncExecution:		true,
+		AllowExternalRandomness:	true,
 	}
 	violations := policy.Validate()
 	if len(violations) != 6 {
 		t.Errorf("expected 6 violations, got %d: %v", len(violations), violations)
 	}
 }
-
-// ---------------
-// Normalization Policy Tests
-// ---------------
 
 func TestDefaultNormalizationPolicy(t *testing.T) {
 	policy := DefaultNormalizationPolicy()
@@ -617,10 +569,6 @@ func TestNormalizeMessageOrder(t *testing.T) {
 	}
 }
 
-// ---------------
-// Static Security Scanner Tests
-// ---------------
-
 func TestStaticSecurityScannerCreation(t *testing.T) {
 	scanner := NewStaticSecurityScanner()
 	if len(scanner.ForbiddenHostFns) == 0 {
@@ -648,10 +596,6 @@ func TestStaticSecurityScannerFullScan(t *testing.T) {
 		t.Error("expected violations from full scan with forbidden host functions")
 	}
 }
-
-// ---------------
-// Fuzz Resilience Model Tests
-// ---------------
 
 func TestDefaultFuzzResilienceModel(t *testing.T) {
 	model := DefaultFuzzResilienceModel()
@@ -706,10 +650,6 @@ func TestGenerateRandomHostCall(t *testing.T) {
 	}
 }
 
-// ---------------
-// Deterministic Randomness Tests
-// ---------------
-
 func TestDeterministicRandomnessSameInputs(t *testing.T) {
 	stateRoot := []byte("state_root_1")
 	entropy := []byte("entropy_1")
@@ -746,10 +686,6 @@ func TestDeterministicRandomnessDifferentInputs(t *testing.T) {
 	}
 }
 
-// ---------------
-// Execution Replay Tests
-// ---------------
-
 func TestReplayRecordDeterminism(t *testing.T) {
 	state := EmptyStateRootChunk()
 	msg := Message{Type: MessageInternal, Sender: "AE:sender", Target: "4:target", Value: 100, GasLimit: 5000}
@@ -783,10 +719,6 @@ func TestReplayRecordGasConsistency(t *testing.T) {
 	}
 }
 
-// ---------------
-// Adversarial Vector Tests
-// ---------------
-
 func TestAdversarialVectorsDefined(t *testing.T) {
 	if len(AdversarialVectors) == 0 {
 		t.Fatal("expected adversarial vectors to be defined")
@@ -818,10 +750,6 @@ func TestAdversarialVectorExitCodes(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Failure Classification Tests
-// ---------------
 
 func TestClassifyFailureSuccess(t *testing.T) {
 	cls := ClassifyFailure(ExitSuccess)
@@ -894,16 +822,12 @@ func TestFailureSequenceIsolated(t *testing.T) {
 	}
 }
 
-// ---------------
-// Consensus Safety Guarantee Tests
-// ---------------
-
 func TestConsensusSafetyGuarantee(t *testing.T) {
 	guarantee := ConsensusSafetyGuarantee{
-		DeterminismPassed:   true,
-		IsolationPassed:     true,
-		ReplayabilityPassed: true,
-		BoundednessPassed:  true,
+		DeterminismPassed:	true,
+		IsolationPassed:	true,
+		ReplayabilityPassed:	true,
+		BoundednessPassed:	true,
 	}
 	if !guarantee.IsConsensusSafe() {
 		t.Error("expected consensus safety guarantee to pass")
@@ -912,10 +836,10 @@ func TestConsensusSafetyGuarantee(t *testing.T) {
 
 func TestConsensusSafetyGuaranteeFailed(t *testing.T) {
 	guarantee := ConsensusSafetyGuarantee{
-		DeterminismPassed:   false,
-		IsolationPassed:     true,
-		ReplayabilityPassed: true,
-		BoundednessPassed:  true,
+		DeterminismPassed:	false,
+		IsolationPassed:	true,
+		ReplayabilityPassed:	true,
+		BoundednessPassed:	true,
 	}
 	if guarantee.IsConsensusSafe() {
 		t.Error("expected consensus safety guarantee to fail with determinism fail")
@@ -962,8 +886,8 @@ func TestSecurityInvariantCheck(t *testing.T) {
 
 func TestSecurityInvariantViolation(t *testing.T) {
 	isolation := RuntimeIsolationPolicy{
-		AllowFilesystem:    true,
-		AllowWallClockTime: true,
+		AllowFilesystem:	true,
+		AllowWallClockTime:	true,
 	}
 	gasModel := DefaultGasSafetyModel()
 	gate := NewDeterminismGate()
@@ -980,15 +904,11 @@ func TestSecurityInvariantViolation(t *testing.T) {
 	}
 }
 
-// ---------------
-// Safety Layer Tests
-// ---------------
-
 func TestSafetyLayerStrings(t *testing.T) {
 	tests := map[SafetyLayer]string{
-		LayerCompile: "compile",
-		LayerVerify:  "verify",
-		LayerRuntime:  "runtime",
+		LayerCompile:	"compile",
+		LayerVerify:	"verify",
+		LayerRuntime:	"runtime",
 	}
 	for layer, expected := range tests {
 		if layer.String() != expected {
@@ -1015,10 +935,6 @@ func TestGateResultLayers(t *testing.T) {
 		}
 	}
 }
-
-// ---------------
-// Gas Safety Deterministic Error Model Tests
-// ---------------
 
 func TestGasSafetyDeterministicErrorModel(t *testing.T) {
 	_ = DefaultGasSafetyModel()
@@ -1052,14 +968,10 @@ func TestGasExhaustionNoStateMutation(t *testing.T) {
 	}
 }
 
-// ---------------
-// Bounce Explosion Prevention Tests
-// ---------------
-
 func TestBounceExplosionPrevention(t *testing.T) {
 	msg := AVMLedgerReceipt{
-		ExitCode:     ExitChunkError,
-		MessageFlags: MessageFlags{Bounced: true},
+		ExitCode:	ExitChunkError,
+		MessageFlags:	MessageFlags{Bounced: true},
 	}
 	if !msg.MessageFlags.Bounced {
 		t.Error("expected bounced flag")
@@ -1069,10 +981,6 @@ func TestBounceExplosionPrevention(t *testing.T) {
 		t.Error("bounced message must not be bounce-eligible (prevents infinite loop)")
 	}
 }
-
-// ---------------
-// SeedCryptoRand Tests
-// ---------------
 
 func TestSeedCryptoRandDeterministic(t *testing.T) {
 	beacon := []byte{1, 2, 3, 4, 5, 6, 7, 8}

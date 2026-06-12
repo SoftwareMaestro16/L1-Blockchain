@@ -1,8 +1,0 @@
-{
-  "recommendations": [
-    "bufbuild.vscode-buf"
-  ],
-  "unwantedRecommendations": [
-    "zxh404.vscode-proto3"
-  ]
-}

@@ -14,194 +14,194 @@ import (
 )
 
 const (
-	ScoreMin = uint8(0)
-	ScoreMax = uint8(100)
+	ScoreMin	= uint8(0)
+	ScoreMax	= uint8(100)
 
-	LevelRestricted = "restricted"
-	LevelNew        = "new"
-	LevelNormal     = "normal"
-	LevelTrusted    = "trusted"
-	LevelElite      = "elite"
+	LevelRestricted	= "restricted"
+	LevelNew	= "new"
+	LevelNormal	= "normal"
+	LevelTrusted	= "trusted"
+	LevelElite	= "elite"
 
-	MaxDomainScore   = uint16(10)
-	MaxContractScore = uint16(15)
+	MaxDomainScore		= uint16(10)
+	MaxContractScore	= uint16(15)
 
-	DefaultReputationAuthority = "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultReputationAuthority	= "4:0000000000000000000000000000000000000000000000000000000000000001"
 
-	SubjectValidator = "validator"
-	SubjectReporter  = "reporter"
-	SubjectAccount   = "account"
+	SubjectValidator	= "validator"
+	SubjectReporter		= "reporter"
+	SubjectAccount		= "account"
 
-	ComponentMissedBlock = "missed_block"
-	ComponentSlashing    = "slashing"
-	ComponentSpam        = "spam"
-	ComponentUptime      = "uptime"
-	ComponentRecovery    = "recovery"
-	ComponentVolume      = "volume"
-	ComponentStakeTime   = "stake_time"
+	ComponentMissedBlock	= "missed_block"
+	ComponentSlashing	= "slashing"
+	ComponentSpam		= "spam"
+	ComponentUptime		= "uptime"
+	ComponentRecovery	= "recovery"
+	ComponentVolume		= "volume"
+	ComponentStakeTime	= "stake_time"
 
-	StakeReputationMaxScore          = uint16(100)
-	DefaultStakeSecondsPerPoint      = uint64(3_600)
-	DefaultJailedPoolExposureBps     = uint32(0)
-	DefaultSlashedPoolExposureBps    = uint32(5_000)
-	DefaultValidatorStakeBonusBps    = uint32(2_000)
-	DefaultMaxStakeReputationRecords = uint32(1_000_000)
+	StakeReputationMaxScore			= uint16(100)
+	DefaultStakeSecondsPerPoint		= uint64(3_600)
+	DefaultJailedPoolExposureBps		= uint32(0)
+	DefaultSlashedPoolExposureBps		= uint32(5_000)
+	DefaultValidatorStakeBonusBps		= uint32(2_000)
+	DefaultMaxStakeReputationRecords	= uint32(1_000_000)
 )
 
 type ReputationRecord struct {
-	Account          sdk.AccAddress
-	Score            uint8
-	AgeScore         uint16
-	StakingScore     uint16
-	TxSuccessScore   uint16
-	VolumeScore      uint16
-	DomainScore      uint16
-	ContractScore    uint16
-	SpamPenalty      uint16
-	FailedTxPenalty  uint16
-	SlashPenalty     uint16
-	LastUpdatedEpoch uint64
+	Account			sdk.AccAddress
+	Score			uint8
+	AgeScore		uint16
+	StakingScore		uint16
+	TxSuccessScore		uint16
+	VolumeScore		uint16
+	DomainScore		uint16
+	ContractScore		uint16
+	SpamPenalty		uint16
+	FailedTxPenalty		uint16
+	SlashPenalty		uint16
+	LastUpdatedEpoch	uint64
 }
 
 type DecayParams struct {
-	InactiveAfterEpochs uint64
-	DecayRatePerEpoch   uint8
+	InactiveAfterEpochs	uint64
+	DecayRatePerEpoch	uint8
 }
 
 type ReputationParams struct {
-	Authority                 string
-	MinScore                  uint8
-	MaxScore                  uint8
-	MissedBlockPenalty        uint16
-	SlashingPenalty           uint16
-	UptimeReward              uint16
-	RecoveryReward            uint16
-	SlashingReducesScore      bool
-	Decay                     DecayParams
-	MaxHistorySnapshots       uint32
-	MaxEvents                 uint32
-	StakeSecondsPerPoint      uint64
-	JailedPoolExposureBps     uint32
-	SlashedPoolExposureBps    uint32
-	ValidatorStakeBonusBps    uint32
-	MaxStakeReputationRecords uint32
+	Authority			string
+	MinScore			uint8
+	MaxScore			uint8
+	MissedBlockPenalty		uint16
+	SlashingPenalty			uint16
+	UptimeReward			uint16
+	RecoveryReward			uint16
+	SlashingReducesScore		bool
+	Decay				DecayParams
+	MaxHistorySnapshots		uint32
+	MaxEvents			uint32
+	StakeSecondsPerPoint		uint64
+	JailedPoolExposureBps		uint32
+	SlashedPoolExposureBps		uint32
+	ValidatorStakeBonusBps		uint32
+	MaxStakeReputationRecords	uint32
 }
 
 type ReputationEvent struct {
-	EventID     string
-	SubjectType string
-	Subject     sdk.AccAddress
-	Component   string
-	Amount      uint16
-	Reason      string
-	Epoch       uint64
-	ScoreBefore uint8
-	ScoreAfter  uint8
-	EventHash   string
+	EventID		string
+	SubjectType	string
+	Subject		sdk.AccAddress
+	Component	string
+	Amount		uint16
+	Reason		string
+	Epoch		uint64
+	ScoreBefore	uint8
+	ScoreAfter	uint8
+	EventHash	string
 }
 
 type ReputationSnapshot struct {
-	Epoch           uint64
-	ValidatorScores []ReputationScore
-	ReporterScores  []ReputationScore
-	SnapshotHash    string
+	Epoch		uint64
+	ValidatorScores	[]ReputationScore
+	ReporterScores	[]ReputationScore
+	SnapshotHash	string
 }
 
 type ReputationScore struct {
-	Account sdk.AccAddress
-	Score   uint8
+	Account	sdk.AccAddress
+	Score	uint8
 }
 
 type ReputationState struct {
-	Params         ReputationParams
-	Accounts       []ReputationRecord
-	Validators     []ReputationRecord
-	Reporters      []ReputationRecord
-	StakeRecords   []StakeReputationRecord
-	Snapshots      []ReputationSnapshot
-	PenaltyEvents  []ReputationEvent
-	RecoveryEvents []ReputationEvent
+	Params		ReputationParams
+	Accounts	[]ReputationRecord
+	Validators	[]ReputationRecord
+	Reporters	[]ReputationRecord
+	StakeRecords	[]StakeReputationRecord
+	Snapshots	[]ReputationSnapshot
+	PenaltyEvents	[]ReputationEvent
+	RecoveryEvents	[]ReputationEvent
 }
 
 type StakePoolExposure struct {
-	PoolID                string
-	Shares                uint64
-	TotalPoolShares       uint64
-	PoolActiveStake       uint64
-	EffectiveStake        uint64
-	LastUpdatedUnix       uint64
-	ValidatorJailed       bool
-	ValidatorSlashed      bool
-	ValidatorOperator     bool
-	ValidatorBonusBps     uint32
-	ValidatorBonusBlocked bool
+	PoolID			string
+	Shares			uint64
+	TotalPoolShares		uint64
+	PoolActiveStake		uint64
+	EffectiveStake		uint64
+	LastUpdatedUnix		uint64
+	ValidatorJailed		bool
+	ValidatorSlashed	bool
+	ValidatorOperator	bool
+	ValidatorBonusBps	uint32
+	ValidatorBonusBlocked	bool
 }
 
 type StakeReputationRecord struct {
-	Account                     sdk.AccAddress
-	AccountUser                 string
-	StakeWeightedSeconds        uint64
-	ClaimedStakeWeightedSeconds uint64
-	ClaimedStakeReputation      uint16
-	LastUpdatedUnix             uint64
-	PoolExposures               []StakePoolExposure
-	NonTransferable             bool
+	Account				sdk.AccAddress
+	AccountUser			string
+	StakeWeightedSeconds		uint64
+	ClaimedStakeWeightedSeconds	uint64
+	ClaimedStakeReputation		uint16
+	LastUpdatedUnix			uint64
+	PoolExposures			[]StakePoolExposure
+	NonTransferable			bool
 }
 
 type StakeReputationClaim struct {
-	Account                       sdk.AccAddress
-	AccountUser                   string
-	StakeWeightedSeconds          uint64
-	ClaimableStakeWeightedSeconds uint64
-	ReputationDelta               uint16
-	ClaimedStakeReputation        uint16
-	AccountScoreAfter             uint8
-	ClaimHash                     string
+	Account				sdk.AccAddress
+	AccountUser			string
+	StakeWeightedSeconds		uint64
+	ClaimableStakeWeightedSeconds	uint64
+	ReputationDelta			uint16
+	ClaimedStakeReputation		uint16
+	AccountScoreAfter		uint8
+	ClaimHash			string
 }
 
 type MsgUpdateReputationParams struct {
-	Authority string
-	Params    ReputationParams
+	Authority	string
+	Params		ReputationParams
 }
 
 type MsgApplyReputationPenalty struct {
-	Authority   string
-	SubjectType string
-	Subject     sdk.AccAddress
-	Component   string
-	Amount      uint16
-	Reason      string
-	Epoch       uint64
+	Authority	string
+	SubjectType	string
+	Subject		sdk.AccAddress
+	Component	string
+	Amount		uint16
+	Reason		string
+	Epoch		uint64
 }
 
 type MsgApplyReputationReward struct {
-	Authority   string
-	SubjectType string
-	Subject     sdk.AccAddress
-	Component   string
-	Amount      uint16
-	Reason      string
-	Epoch       uint64
+	Authority	string
+	SubjectType	string
+	Subject		sdk.AccAddress
+	Component	string
+	Amount		uint16
+	Reason		string
+	Epoch		uint64
 }
 
 type MsgRecomputeReputation struct {
-	Authority   string
-	SubjectType string
-	Subject     sdk.AccAddress
-	Epoch       uint64
+	Authority	string
+	SubjectType	string
+	Subject		sdk.AccAddress
+	Epoch		uint64
 }
 
 type MsgClaimStakeReputation struct {
-	Authority         string
-	Account           string
-	PoolID            string
-	PoolShares        uint64
-	PoolTotalShares   uint64
-	PoolActiveStake   uint64
-	TimestampUnix     uint64
-	ValidatorOperator bool
-	ValidatorJailed   bool
-	ValidatorSlashed  bool
+	Authority		string
+	Account			string
+	PoolID			string
+	PoolShares		uint64
+	PoolTotalShares		uint64
+	PoolActiveStake		uint64
+	TimestampUnix		uint64
+	ValidatorOperator	bool
+	ValidatorJailed		bool
+	ValidatorSlashed	bool
 }
 
 type QueryStakeReputationRequest struct {
@@ -217,43 +217,43 @@ type QueryAccountReputationRequest struct {
 }
 
 type QueryAccountReputationResponse struct {
-	Record          ReputationRecord
-	StakeReputation StakeReputationRecord
+	Record		ReputationRecord
+	StakeReputation	StakeReputationRecord
 }
 
 type ReputationHistoryQuery struct {
-	SubjectType string
-	Subject     sdk.AccAddress
-	Limit       uint32
+	SubjectType	string
+	Subject		sdk.AccAddress
+	Limit		uint32
 }
 
 type ProgressiveLimits struct {
-	MaxTxsPerBlock uint32
-	MaxTxGas       uint64
-	MaxQueueMsgs   uint32
+	MaxTxsPerBlock	uint32
+	MaxTxGas	uint64
+	MaxQueueMsgs	uint32
 }
 
 func DefaultReputationParams() ReputationParams {
 	return ReputationParams{
-		Authority:            DefaultReputationAuthority,
-		MinScore:             ScoreMin,
-		MaxScore:             ScoreMax,
-		MissedBlockPenalty:   5,
-		SlashingPenalty:      25,
-		UptimeReward:         2,
-		RecoveryReward:       3,
-		SlashingReducesScore: true,
+		Authority:		DefaultReputationAuthority,
+		MinScore:		ScoreMin,
+		MaxScore:		ScoreMax,
+		MissedBlockPenalty:	5,
+		SlashingPenalty:	25,
+		UptimeReward:		2,
+		RecoveryReward:		3,
+		SlashingReducesScore:	true,
 		Decay: DecayParams{
-			InactiveAfterEpochs: 10,
-			DecayRatePerEpoch:   1,
+			InactiveAfterEpochs:	10,
+			DecayRatePerEpoch:	1,
 		},
-		MaxHistorySnapshots:       1024,
-		MaxEvents:                 4096,
-		StakeSecondsPerPoint:      DefaultStakeSecondsPerPoint,
-		JailedPoolExposureBps:     DefaultJailedPoolExposureBps,
-		SlashedPoolExposureBps:    DefaultSlashedPoolExposureBps,
-		ValidatorStakeBonusBps:    DefaultValidatorStakeBonusBps,
-		MaxStakeReputationRecords: DefaultMaxStakeReputationRecords,
+		MaxHistorySnapshots:		1024,
+		MaxEvents:			4096,
+		StakeSecondsPerPoint:		DefaultStakeSecondsPerPoint,
+		JailedPoolExposureBps:		DefaultJailedPoolExposureBps,
+		SlashedPoolExposureBps:		DefaultSlashedPoolExposureBps,
+		ValidatorStakeBonusBps:		DefaultValidatorStakeBonusBps,
+		MaxStakeReputationRecords:	DefaultMaxStakeReputationRecords,
 	}
 }
 
@@ -489,9 +489,9 @@ func SnapshotReputationEpoch(state ReputationState, epoch uint64) (ReputationSta
 		return ReputationState{}, ReputationSnapshot{}, errors.New("reputation snapshot epoch must be positive")
 	}
 	snapshot := ReputationSnapshot{
-		Epoch:           epoch,
-		ValidatorScores: scoresFromRecords(state.Validators),
-		ReporterScores:  scoresFromRecords(state.Reporters),
+		Epoch:			epoch,
+		ValidatorScores:	scoresFromRecords(state.Validators),
+		ReporterScores:		scoresFromRecords(state.Reporters),
 	}
 	snapshot.SnapshotHash = ComputeReputationSnapshotHash(snapshot)
 	if err := snapshot.Validate(); err != nil {
@@ -536,15 +536,15 @@ func ApplyClaimStakeReputation(state ReputationState, msg MsgClaimStakeReputatio
 		record = NewStakeReputationRecord(account)
 	}
 	nextRecord, err := AccumulateStakeExposure(state.Params, record, StakePoolExposure{
-		PoolID:            strings.TrimSpace(msg.PoolID),
-		Shares:            msg.PoolShares,
-		TotalPoolShares:   msg.PoolTotalShares,
-		PoolActiveStake:   msg.PoolActiveStake,
-		LastUpdatedUnix:   msg.TimestampUnix,
-		ValidatorJailed:   msg.ValidatorJailed,
-		ValidatorSlashed:  msg.ValidatorSlashed,
-		ValidatorOperator: msg.ValidatorOperator,
-		ValidatorBonusBps: state.Params.ValidatorStakeBonusBps,
+		PoolID:			strings.TrimSpace(msg.PoolID),
+		Shares:			msg.PoolShares,
+		TotalPoolShares:	msg.PoolTotalShares,
+		PoolActiveStake:	msg.PoolActiveStake,
+		LastUpdatedUnix:	msg.TimestampUnix,
+		ValidatorJailed:	msg.ValidatorJailed,
+		ValidatorSlashed:	msg.ValidatorSlashed,
+		ValidatorOperator:	msg.ValidatorOperator,
+		ValidatorBonusBps:	state.Params.ValidatorStakeBonusBps,
 	})
 	if err != nil {
 		return ReputationState{}, StakeReputationClaim{}, err
@@ -566,13 +566,13 @@ func ApplyClaimStakeReputation(state ReputationState, msg MsgClaimStakeReputatio
 	if reputationDelta == 0 {
 		state = state.upsertStakeRecord(nextRecord)
 		return state, StakeReputationClaim{
-			Account:                       cloneAddress(account),
-			AccountUser:                   nextRecord.AccountUser,
-			StakeWeightedSeconds:          nextRecord.StakeWeightedSeconds,
-			ClaimableStakeWeightedSeconds: claimable,
-			ClaimedStakeReputation:        nextRecord.ClaimedStakeReputation,
-			AccountScoreAfter:             accountScore(state, account),
-			ClaimHash:                     ComputeStakeReputationClaimHash(nextRecord, 0, 0),
+			Account:			cloneAddress(account),
+			AccountUser:			nextRecord.AccountUser,
+			StakeWeightedSeconds:		nextRecord.StakeWeightedSeconds,
+			ClaimableStakeWeightedSeconds:	claimable,
+			ClaimedStakeReputation:		nextRecord.ClaimedStakeReputation,
+			AccountScoreAfter:		accountScore(state, account),
+			ClaimHash:			ComputeStakeReputationClaimHash(nextRecord, 0, 0),
 		}, state.Validate()
 	}
 	nextRecord.ClaimedStakeWeightedSeconds += uint64(reputationDelta) * state.Params.StakeSecondsPerPoint
@@ -593,13 +593,13 @@ func ApplyClaimStakeReputation(state ReputationState, msg MsgClaimStakeReputatio
 	state = state.upsertStakeRecord(nextRecord)
 	state = NormalizeReputationState(state)
 	claim := StakeReputationClaim{
-		Account:                       cloneAddress(account),
-		AccountUser:                   nextRecord.AccountUser,
-		StakeWeightedSeconds:          nextRecord.StakeWeightedSeconds,
-		ClaimableStakeWeightedSeconds: claimable,
-		ReputationDelta:               reputationDelta,
-		ClaimedStakeReputation:        nextRecord.ClaimedStakeReputation,
-		AccountScoreAfter:             accountRecord.Score,
+		Account:			cloneAddress(account),
+		AccountUser:			nextRecord.AccountUser,
+		StakeWeightedSeconds:		nextRecord.StakeWeightedSeconds,
+		ClaimableStakeWeightedSeconds:	claimable,
+		ReputationDelta:		reputationDelta,
+		ClaimedStakeReputation:		nextRecord.ClaimedStakeReputation,
+		AccountScoreAfter:		accountRecord.Score,
 	}
 	claim.ClaimHash = ComputeStakeReputationClaimHash(nextRecord, reputationDelta, accountRecord.Score)
 	return state, claim, state.Validate()
@@ -667,14 +667,14 @@ func ImportReputationState(exported ReputationState) (ReputationState, error) {
 
 func NewReputationEvent(subjectType string, subject sdk.AccAddress, component string, amount uint16, reason string, epoch uint64, before uint8, after uint8) (ReputationEvent, error) {
 	event := ReputationEvent{
-		SubjectType: subjectType,
-		Subject:     cloneAddress(subject),
-		Component:   strings.TrimSpace(component),
-		Amount:      amount,
-		Reason:      strings.TrimSpace(reason),
-		Epoch:       epoch,
-		ScoreBefore: before,
-		ScoreAfter:  after,
+		SubjectType:	subjectType,
+		Subject:	cloneAddress(subject),
+		Component:	strings.TrimSpace(component),
+		Amount:		amount,
+		Reason:		strings.TrimSpace(reason),
+		Epoch:		epoch,
+		ScoreBefore:	before,
+		ScoreAfter:	after,
 	}
 	if event.Reason == "" {
 		event.Reason = event.Component
@@ -841,9 +841,9 @@ func IsStakeReputationTransferableAsTokenNFTOrDomain() bool {
 
 func NewStakeReputationRecord(account sdk.AccAddress) StakeReputationRecord {
 	return StakeReputationRecord{
-		Account:         cloneAddress(account),
-		AccountUser:     addressing.FormatAccAddress(account),
-		NonTransferable: true,
+		Account:		cloneAddress(account),
+		AccountUser:		addressing.FormatAccAddress(account),
+		NonTransferable:	true,
 	}
 }
 
@@ -1375,14 +1375,14 @@ func trimSnapshots(snapshots []ReputationSnapshot, limit uint32) []ReputationSna
 func cloneReputationState(state ReputationState) ReputationState {
 	state = NormalizeReputationState(state)
 	return ReputationState{
-		Params:         state.Params,
-		Accounts:       append([]ReputationRecord(nil), state.Accounts...),
-		Validators:     append([]ReputationRecord(nil), state.Validators...),
-		Reporters:      append([]ReputationRecord(nil), state.Reporters...),
-		StakeRecords:   cloneStakeReputationRecords(state.StakeRecords),
-		Snapshots:      append([]ReputationSnapshot(nil), state.Snapshots...),
-		PenaltyEvents:  append([]ReputationEvent(nil), state.PenaltyEvents...),
-		RecoveryEvents: append([]ReputationEvent(nil), state.RecoveryEvents...),
+		Params:		state.Params,
+		Accounts:	append([]ReputationRecord(nil), state.Accounts...),
+		Validators:	append([]ReputationRecord(nil), state.Validators...),
+		Reporters:	append([]ReputationRecord(nil), state.Reporters...),
+		StakeRecords:	cloneStakeReputationRecords(state.StakeRecords),
+		Snapshots:	append([]ReputationSnapshot(nil), state.Snapshots...),
+		PenaltyEvents:	append([]ReputationEvent(nil), state.PenaltyEvents...),
+		RecoveryEvents:	append([]ReputationEvent(nil), state.RecoveryEvents...),
 	}
 }
 

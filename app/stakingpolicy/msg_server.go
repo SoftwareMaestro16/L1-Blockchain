@@ -14,8 +14,8 @@ import (
 const DirectUserDelegationDisabledMessage = "direct user delegation to validators is disabled; use official liquid staking pool deposit"
 
 const (
-	nominatorPoolModule       = "nominator-pool"
-	singleNominatorPoolModule = "single-nominator-pool"
+	nominatorPoolModule		= "nominator-pool"
+	singleNominatorPoolModule	= "single-nominator-pool"
 )
 
 type DirectDelegationPolicy struct {

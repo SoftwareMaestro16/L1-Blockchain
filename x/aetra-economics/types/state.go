@@ -10,87 +10,87 @@ import (
 )
 
 type Params struct {
-	Authority                     string `json:"authority"`
-	InflationMinBps               uint32 `json:"inflation_min_bps"`
-	InflationMaxBps               uint32 `json:"inflation_max_bps"`
-	InflationChangeRateBps        uint32 `json:"inflation_change_rate_bps"`
-	TargetBondedRatioBps          uint32 `json:"target_bonded_ratio_bps"`
-	BurnMinBps                    uint32 `json:"burn_min_bps"`
-	BurnMaxBps                    uint32 `json:"burn_max_bps"`
-	BurnCurrentBps                uint32 `json:"burn_current_bps"`
-	ValidatorRewardMinBps         uint32 `json:"validator_reward_min_bps"`
-	ValidatorRewardMaxBps         uint32 `json:"validator_reward_max_bps"`
-	ValidatorRewardBps            uint32 `json:"validator_reward_bps"`
-	TreasuryMinBps                uint32 `json:"treasury_min_bps"`
-	TreasuryMaxBps                uint32 `json:"treasury_max_bps"`
-	TreasuryBps                   uint32 `json:"treasury_bps"`
-	EmergencyAllowZeroRewardShare bool   `json:"emergency_allow_zero_reward_share"`
-	RewardSmoothingWindow         uint64 `json:"reward_smoothing_window"`
-	APRTargetMinBps               uint32 `json:"apr_target_min_bps"`
-	APRTargetMaxBps               uint32 `json:"apr_target_max_bps"`
-	EpochsPerYear                 uint64 `json:"epochs_per_year"`
+	Authority			string	`json:"authority"`
+	InflationMinBps			uint32	`json:"inflation_min_bps"`
+	InflationMaxBps			uint32	`json:"inflation_max_bps"`
+	InflationChangeRateBps		uint32	`json:"inflation_change_rate_bps"`
+	TargetBondedRatioBps		uint32	`json:"target_bonded_ratio_bps"`
+	BurnMinBps			uint32	`json:"burn_min_bps"`
+	BurnMaxBps			uint32	`json:"burn_max_bps"`
+	BurnCurrentBps			uint32	`json:"burn_current_bps"`
+	ValidatorRewardMinBps		uint32	`json:"validator_reward_min_bps"`
+	ValidatorRewardMaxBps		uint32	`json:"validator_reward_max_bps"`
+	ValidatorRewardBps		uint32	`json:"validator_reward_bps"`
+	TreasuryMinBps			uint32	`json:"treasury_min_bps"`
+	TreasuryMaxBps			uint32	`json:"treasury_max_bps"`
+	TreasuryBps			uint32	`json:"treasury_bps"`
+	EmergencyAllowZeroRewardShare	bool	`json:"emergency_allow_zero_reward_share"`
+	RewardSmoothingWindow		uint64	`json:"reward_smoothing_window"`
+	APRTargetMinBps			uint32	`json:"apr_target_min_bps"`
+	APRTargetMaxBps			uint32	`json:"apr_target_max_bps"`
+	EpochsPerYear			uint64	`json:"epochs_per_year"`
 }
 
 type EconomicsState struct {
-	CurrentInflationBps   uint32               `json:"current_inflation_bps"`
-	CurrentBondedRatioBps uint32               `json:"current_bonded_ratio_bps"`
-	EstimatedAPRBps       uint32               `json:"estimated_apr_bps"`
-	TotalSupply           uint64               `json:"total_supply"`
-	BurnedSupply          uint64               `json:"burned_supply"`
-	TreasuryBalance       uint64               `json:"treasury_balance"`
-	RewardHistory         []EpochRewardSummary `json:"reward_history"`
+	CurrentInflationBps	uint32			`json:"current_inflation_bps"`
+	CurrentBondedRatioBps	uint32			`json:"current_bonded_ratio_bps"`
+	EstimatedAPRBps		uint32			`json:"estimated_apr_bps"`
+	TotalSupply		uint64			`json:"total_supply"`
+	BurnedSupply		uint64			`json:"burned_supply"`
+	TreasuryBalance		uint64			`json:"treasury_balance"`
+	RewardHistory		[]EpochRewardSummary	`json:"reward_history"`
 }
 
 type EpochEconomicsInput struct {
-	Epoch         uint64 `json:"epoch"`
-	TotalSupply   uint64 `json:"total_supply"`
-	BondedTokens  uint64 `json:"bonded_tokens"`
-	FeesCollected uint64 `json:"fees_collected"`
+	Epoch		uint64	`json:"epoch"`
+	TotalSupply	uint64	`json:"total_supply"`
+	BondedTokens	uint64	`json:"bonded_tokens"`
+	FeesCollected	uint64	`json:"fees_collected"`
 }
 
 type FeeSplit struct {
-	FeesCollected             uint64 `json:"fees_collected"`
-	BurnAmount                uint64 `json:"burn_amount"`
-	TreasuryAmount            uint64 `json:"treasury_amount"`
-	ValidatorDelegatorRewards uint64 `json:"validator_delegator_rewards"`
-	BurnBps                   uint32 `json:"burn_bps"`
-	TreasuryBps               uint32 `json:"treasury_bps"`
-	ValidatorRewardBps        uint32 `json:"validator_reward_bps"`
+	FeesCollected			uint64	`json:"fees_collected"`
+	BurnAmount			uint64	`json:"burn_amount"`
+	TreasuryAmount			uint64	`json:"treasury_amount"`
+	ValidatorDelegatorRewards	uint64	`json:"validator_delegator_rewards"`
+	BurnBps				uint32	`json:"burn_bps"`
+	TreasuryBps			uint32	`json:"treasury_bps"`
+	ValidatorRewardBps		uint32	`json:"validator_reward_bps"`
 }
 
 type EpochRewardSummary struct {
-	Epoch                     uint64 `json:"epoch"`
-	StartingSupply            uint64 `json:"starting_supply"`
-	EndingSupply              uint64 `json:"ending_supply"`
-	BondedTokens              uint64 `json:"bonded_tokens"`
-	BondedRatioBps            uint32 `json:"bonded_ratio_bps"`
-	InflationBps              uint32 `json:"inflation_bps"`
-	EstimatedAPRBps           uint32 `json:"estimated_apr_bps"`
-	FeesCollected             uint64 `json:"fees_collected"`
-	BurnedAmount              uint64 `json:"burned_amount"`
-	TreasuryAmount            uint64 `json:"treasury_amount"`
-	ValidatorDelegatorRewards uint64 `json:"validator_delegator_rewards"`
-	MintedRewards             uint64 `json:"minted_rewards"`
-	GrossRewards              uint64 `json:"gross_rewards"`
-	SmoothedRewards           uint64 `json:"smoothed_rewards"`
-	NetSupplyChange           int64  `json:"net_supply_change"`
-	BurnedSupply              uint64 `json:"burned_supply"`
-	TreasuryBalance           uint64 `json:"treasury_balance"`
+	Epoch				uint64	`json:"epoch"`
+	StartingSupply			uint64	`json:"starting_supply"`
+	EndingSupply			uint64	`json:"ending_supply"`
+	BondedTokens			uint64	`json:"bonded_tokens"`
+	BondedRatioBps			uint32	`json:"bonded_ratio_bps"`
+	InflationBps			uint32	`json:"inflation_bps"`
+	EstimatedAPRBps			uint32	`json:"estimated_apr_bps"`
+	FeesCollected			uint64	`json:"fees_collected"`
+	BurnedAmount			uint64	`json:"burned_amount"`
+	TreasuryAmount			uint64	`json:"treasury_amount"`
+	ValidatorDelegatorRewards	uint64	`json:"validator_delegator_rewards"`
+	MintedRewards			uint64	`json:"minted_rewards"`
+	GrossRewards			uint64	`json:"gross_rewards"`
+	SmoothedRewards			uint64	`json:"smoothed_rewards"`
+	NetSupplyChange			int64	`json:"net_supply_change"`
+	BurnedSupply			uint64	`json:"burned_supply"`
+	TreasuryBalance			uint64	`json:"treasury_balance"`
 }
 
 type GenesisState struct {
-	Params Params         `json:"params"`
-	State  EconomicsState `json:"state"`
+	Params	Params		`json:"params"`
+	State	EconomicsState	`json:"state"`
 }
 
 type MsgUpdateEconomicsParams struct {
-	Authority string `json:"authority"`
-	Params    Params `json:"params"`
+	Authority	string	`json:"authority"`
+	Params		Params	`json:"params"`
 }
 
 type MsgApplyEpochEconomics struct {
-	Authority string              `json:"authority"`
-	Input     EpochEconomicsInput `json:"input"`
+	Authority	string			`json:"authority"`
+	Input		EpochEconomicsInput	`json:"input"`
 }
 
 type QueryCurrentInflationRequest struct{}
@@ -100,33 +100,33 @@ type QueryCurrentBondedRatioRequest struct{}
 type QueryCurrentBondedRatioResponse struct{ BondedRatioBps uint32 }
 
 type QueryEstimatedAPRRequest struct {
-	ValidatorCommissionBps    uint32 `json:"validator_commission_bps"`
-	ValidatorOperatingCostBps uint32 `json:"validator_operating_cost_bps"`
+	ValidatorCommissionBps		uint32	`json:"validator_commission_bps"`
+	ValidatorOperatingCostBps	uint32	`json:"validator_operating_cost_bps"`
 }
 
 type QueryEstimatedAPRResponse struct {
-	IsEstimate                    bool   `json:"is_estimate"`
-	EstimateLabel                 string `json:"estimate_label"`
-	InflationOnlyAPRBps           uint32 `json:"inflation_only_apr_bps"`
-	FeeAdjustedAPRBps             uint32 `json:"fee_adjusted_apr_bps"`
-	ValidatorCommissionImpactBps  uint32 `json:"validator_commission_impact_bps"`
-	EstimatedDelegatorAPRBps      uint32 `json:"estimated_delegator_apr_bps"`
-	EstimatedValidatorGrossAPRBps uint32 `json:"estimated_validator_gross_apr_bps"`
-	EstimatedValidatorNetAPRBps   uint32 `json:"estimated_validator_net_apr_bps"`
+	IsEstimate			bool	`json:"is_estimate"`
+	EstimateLabel			string	`json:"estimate_label"`
+	InflationOnlyAPRBps		uint32	`json:"inflation_only_apr_bps"`
+	FeeAdjustedAPRBps		uint32	`json:"fee_adjusted_apr_bps"`
+	ValidatorCommissionImpactBps	uint32	`json:"validator_commission_impact_bps"`
+	EstimatedDelegatorAPRBps	uint32	`json:"estimated_delegator_apr_bps"`
+	EstimatedValidatorGrossAPRBps	uint32	`json:"estimated_validator_gross_apr_bps"`
+	EstimatedValidatorNetAPRBps	uint32	`json:"estimated_validator_net_apr_bps"`
 }
 
 type QueryFeeSplitParamsRequest struct{}
 type QueryFeeSplitParamsResponse struct {
-	BurnMinBps                    uint32 `json:"burn_min_bps"`
-	BurnMaxBps                    uint32 `json:"burn_max_bps"`
-	BurnCurrentBps                uint32 `json:"burn_current_bps"`
-	ValidatorRewardMinBps         uint32 `json:"validator_reward_min_bps"`
-	ValidatorRewardMaxBps         uint32 `json:"validator_reward_max_bps"`
-	ValidatorRewardBps            uint32 `json:"validator_reward_bps"`
-	TreasuryMinBps                uint32 `json:"treasury_min_bps"`
-	TreasuryMaxBps                uint32 `json:"treasury_max_bps"`
-	TreasuryBps                   uint32 `json:"treasury_bps"`
-	EmergencyAllowZeroRewardShare bool   `json:"emergency_allow_zero_reward_share"`
+	BurnMinBps			uint32	`json:"burn_min_bps"`
+	BurnMaxBps			uint32	`json:"burn_max_bps"`
+	BurnCurrentBps			uint32	`json:"burn_current_bps"`
+	ValidatorRewardMinBps		uint32	`json:"validator_reward_min_bps"`
+	ValidatorRewardMaxBps		uint32	`json:"validator_reward_max_bps"`
+	ValidatorRewardBps		uint32	`json:"validator_reward_bps"`
+	TreasuryMinBps			uint32	`json:"treasury_min_bps"`
+	TreasuryMaxBps			uint32	`json:"treasury_max_bps"`
+	TreasuryBps			uint32	`json:"treasury_bps"`
+	EmergencyAllowZeroRewardShare	bool	`json:"emergency_allow_zero_reward_share"`
 }
 
 type QueryBurnedSupplyRequest struct{}
@@ -140,36 +140,36 @@ type QueryEpochRewardSummaryResponse struct{ Summary EpochRewardSummary }
 
 func DefaultParams(authority string) Params {
 	return Params{
-		Authority:              authority,
-		InflationMinBps:        200,
-		InflationMaxBps:        500,
-		InflationChangeRateBps: 25,
-		TargetBondedRatioBps:   6_000,
-		BurnMinBps:             3_000,
-		BurnMaxBps:             6_000,
-		BurnCurrentBps:         5_000,
-		ValidatorRewardMinBps:  2_000,
-		ValidatorRewardMaxBps:  4_000,
-		ValidatorRewardBps:     3_500,
-		TreasuryMinBps:         1_000,
-		TreasuryMaxBps:         2_000,
-		TreasuryBps:            1_500,
-		RewardSmoothingWindow:  7,
-		APRTargetMinBps:        500,
-		APRTargetMaxBps:        800,
-		EpochsPerYear:          6_307_200,
+		Authority:		authority,
+		InflationMinBps:	200,
+		InflationMaxBps:	500,
+		InflationChangeRateBps:	25,
+		TargetBondedRatioBps:	6_000,
+		BurnMinBps:		3_000,
+		BurnMaxBps:		6_000,
+		BurnCurrentBps:		5_000,
+		ValidatorRewardMinBps:	2_000,
+		ValidatorRewardMaxBps:	4_000,
+		ValidatorRewardBps:	3_500,
+		TreasuryMinBps:		1_000,
+		TreasuryMaxBps:		2_000,
+		TreasuryBps:		1_500,
+		RewardSmoothingWindow:	7,
+		APRTargetMinBps:	500,
+		APRTargetMaxBps:	800,
+		EpochsPerYear:		6_307_200,
 	}
 }
 
 func DefaultGenesisState(authority string) GenesisState {
 	params := DefaultParams(authority)
 	return GenesisState{
-		Params: params,
+		Params:	params,
 		State: EconomicsState{
-			CurrentInflationBps:   midpointBps(params.InflationMinBps, params.InflationMaxBps),
-			CurrentBondedRatioBps: params.TargetBondedRatioBps,
-			EstimatedAPRBps:       EstimateAPRBps(midpointBps(params.InflationMinBps, params.InflationMaxBps), params.TargetBondedRatioBps),
-			RewardHistory:         []EpochRewardSummary{},
+			CurrentInflationBps:	midpointBps(params.InflationMinBps, params.InflationMaxBps),
+			CurrentBondedRatioBps:	params.TargetBondedRatioBps,
+			EstimatedAPRBps:	EstimateAPRBps(midpointBps(params.InflationMinBps, params.InflationMaxBps), params.TargetBondedRatioBps),
+			RewardHistory:		[]EpochRewardSummary{},
 		},
 	}
 }
@@ -250,14 +250,14 @@ func EstimateAPRBreakdown(params Params, state EconomicsState, req QueryEstimate
 	validatorNetAPR := subtractUint32Floor(validatorGrossAPR, req.ValidatorOperatingCostBps)
 
 	return QueryEstimatedAPRResponse{
-		IsEstimate:                    true,
-		EstimateLabel:                 "estimate_not_guaranteed_return",
-		InflationOnlyAPRBps:           inflationOnly,
-		FeeAdjustedAPRBps:             feeAdjusted,
-		ValidatorCommissionImpactBps:  commissionImpact,
-		EstimatedDelegatorAPRBps:      delegatorAPR,
-		EstimatedValidatorGrossAPRBps: validatorGrossAPR,
-		EstimatedValidatorNetAPRBps:   validatorNetAPR,
+		IsEstimate:			true,
+		EstimateLabel:			"estimate_not_guaranteed_return",
+		InflationOnlyAPRBps:		inflationOnly,
+		FeeAdjustedAPRBps:		feeAdjusted,
+		ValidatorCommissionImpactBps:	commissionImpact,
+		EstimatedDelegatorAPRBps:	delegatorAPR,
+		EstimatedValidatorGrossAPRBps:	validatorGrossAPR,
+		EstimatedValidatorNetAPRBps:	validatorNetAPR,
 	}, nil
 }
 
@@ -279,13 +279,13 @@ func ComputeFeeSplit(params Params, fees uint64) (FeeSplit, error) {
 	}
 	validatorRewards := fees - burn - treasury
 	return FeeSplit{
-		FeesCollected:             fees,
-		BurnAmount:                burn,
-		TreasuryAmount:            treasury,
-		ValidatorDelegatorRewards: validatorRewards,
-		BurnBps:                   params.BurnCurrentBps,
-		TreasuryBps:               params.TreasuryBps,
-		ValidatorRewardBps:        params.ValidatorRewardBps,
+		FeesCollected:			fees,
+		BurnAmount:			burn,
+		TreasuryAmount:			treasury,
+		ValidatorDelegatorRewards:	validatorRewards,
+		BurnBps:			params.BurnCurrentBps,
+		TreasuryBps:			params.TreasuryBps,
+		ValidatorRewardBps:		params.ValidatorRewardBps,
 	}, nil
 }
 
@@ -337,23 +337,23 @@ func ApplyEpoch(params Params, state EconomicsState, input EpochEconomicsInput) 
 		return EconomicsState{}, EpochRewardSummary{}, err
 	}
 	summary := EpochRewardSummary{
-		Epoch:                     input.Epoch,
-		StartingSupply:            input.TotalSupply,
-		EndingSupply:              endingSupply,
-		BondedTokens:              input.BondedTokens,
-		BondedRatioBps:            bondedRatio,
-		InflationBps:              inflation,
-		EstimatedAPRBps:           estimatedAPR,
-		FeesCollected:             input.FeesCollected,
-		BurnedAmount:              split.BurnAmount,
-		TreasuryAmount:            split.TreasuryAmount,
-		ValidatorDelegatorRewards: split.ValidatorDelegatorRewards,
-		MintedRewards:             minted,
-		GrossRewards:              grossRewards,
-		SmoothedRewards:           smoothed,
-		NetSupplyChange:           netSupplyChange,
-		BurnedSupply:              burnedSupply,
-		TreasuryBalance:           treasuryBalance,
+		Epoch:				input.Epoch,
+		StartingSupply:			input.TotalSupply,
+		EndingSupply:			endingSupply,
+		BondedTokens:			input.BondedTokens,
+		BondedRatioBps:			bondedRatio,
+		InflationBps:			inflation,
+		EstimatedAPRBps:		estimatedAPR,
+		FeesCollected:			input.FeesCollected,
+		BurnedAmount:			split.BurnAmount,
+		TreasuryAmount:			split.TreasuryAmount,
+		ValidatorDelegatorRewards:	split.ValidatorDelegatorRewards,
+		MintedRewards:			minted,
+		GrossRewards:			grossRewards,
+		SmoothedRewards:		smoothed,
+		NetSupplyChange:		netSupplyChange,
+		BurnedSupply:			burnedSupply,
+		TreasuryBalance:		treasuryBalance,
 	}
 	if err := summary.Validate(params); err != nil {
 		return EconomicsState{}, EpochRewardSummary{}, err

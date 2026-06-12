@@ -11,47 +11,47 @@ import (
 )
 
 const (
-	ResourceCompute  = "compute"
-	ResourceStorage  = "storage"
-	ResourcePriority = "priority"
+	ResourceCompute		= "compute"
+	ResourceStorage		= "storage"
+	ResourcePriority	= "priority"
 
-	BasisPoints = uint64(10_000)
+	BasisPoints	= uint64(10_000)
 )
 
 type Params struct {
-	MaxPremiumNaet      uint64
-	FairnessPriorityCap uint64
-	MinNormalSlots      uint32
-	MaxAccountShareBps  uint64
+	MaxPremiumNaet		uint64
+	FairnessPriorityCap	uint64
+	MinNormalSlots		uint32
+	MaxAccountShareBps	uint64
 }
 
 type Order struct {
-	ID          string
-	Account     sdk.AccAddress
-	Resource    string
-	Quantity    uint64
-	PremiumNaet uint64
-	BaseFeePaid bool
-	NormalUser  bool
-	Sequence    uint64
+	ID		string
+	Account		sdk.AccAddress
+	Resource	string
+	Quantity	uint64
+	PremiumNaet	uint64
+	BaseFeePaid	bool
+	NormalUser	bool
+	Sequence	uint64
 }
 
 type Selection struct {
-	Accepted []Order
-	Rejected []RejectedOrder
+	Accepted	[]Order
+	Rejected	[]RejectedOrder
 }
 
 type RejectedOrder struct {
-	Order  Order
-	Reason string
+	Order	Order
+	Reason	string
 }
 
 func DefaultParams() Params {
 	return Params{
-		MaxPremiumNaet:      1_000,
-		FairnessPriorityCap: 100,
-		MinNormalSlots:      1,
-		MaxAccountShareBps:  5_000,
+		MaxPremiumNaet:		1_000,
+		FairnessPriorityCap:	100,
+		MinNormalSlots:		1,
+		MaxAccountShareBps:	5_000,
 	}
 }
 

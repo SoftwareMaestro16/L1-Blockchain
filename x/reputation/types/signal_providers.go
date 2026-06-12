@@ -5,40 +5,40 @@ import (
 )
 
 const (
-	SignalTypeStakeTime          = "stake_time"
-	SignalTypeTxSuccess          = "tx_success"
-	SignalTypeTxFailure          = "tx_failure"
-	SignalTypeTxSpam             = "tx_spam"
-	SignalTypeContractOk         = "contract_ok"
-	SignalTypeContractFail       = "contract_fail"
-	SignalTypeRecovery           = "recovery"
-	SignalTypeFreeze             = "freeze"
-	SignalTypeUnfreeze           = "unfreeze"
-	SignalTypeValidatorUptime    = "validator_uptime"
-	SignalTypeValidatorMissed    = "validator_missed"
-	SignalTypeValidatorSlashed   = "validator_slashed"
-	SignalTypeValidatorCommission = "validator_commission"
-	SignalTypeServiceAvailable   = "service_available"
-	SignalTypeServiceUnavailable = "service_unavailable"
-	SignalTypeServiceProofQuality = "service_proof_quality"
-	SignalTypeDomainRegistration = "domain_registration"
+	SignalTypeStakeTime		= "stake_time"
+	SignalTypeTxSuccess		= "tx_success"
+	SignalTypeTxFailure		= "tx_failure"
+	SignalTypeTxSpam		= "tx_spam"
+	SignalTypeContractOk		= "contract_ok"
+	SignalTypeContractFail		= "contract_fail"
+	SignalTypeRecovery		= "recovery"
+	SignalTypeFreeze		= "freeze"
+	SignalTypeUnfreeze		= "unfreeze"
+	SignalTypeValidatorUptime	= "validator_uptime"
+	SignalTypeValidatorMissed	= "validator_missed"
+	SignalTypeValidatorSlashed	= "validator_slashed"
+	SignalTypeValidatorCommission	= "validator_commission"
+	SignalTypeServiceAvailable	= "service_available"
+	SignalTypeServiceUnavailable	= "service_unavailable"
+	SignalTypeServiceProofQuality	= "service_proof_quality"
+	SignalTypeDomainRegistration	= "domain_registration"
 )
 
 type SignalProviderType string
 
 const (
-	SignalProviderUser      SignalProviderType = "user"
-	SignalProviderValidator SignalProviderType = "validator"
-	SignalProviderService   SignalProviderType = "service"
+	SignalProviderUser	SignalProviderType	= "user"
+	SignalProviderValidator	SignalProviderType	= "validator"
+	SignalProviderService	SignalProviderType	= "service"
 )
 
 type ReputationSignal struct {
-	ProviderType SignalProviderType `json:"provider_type"`
-	ProviderID   string             `json:"provider_id"`
-	SignalType   string             `json:"signal_type"`
-	Height       uint64             `json:"height"`
-	Amount       uint64             `json:"amount"`
-	Metadata     string             `json:"metadata,omitempty"`
+	ProviderType	SignalProviderType	`json:"provider_type"`
+	ProviderID	string			`json:"provider_id"`
+	SignalType	string			`json:"signal_type"`
+	Height		uint64			`json:"height"`
+	Amount		uint64			`json:"amount"`
+	Metadata	string			`json:"metadata,omitempty"`
 }
 
 func (s ReputationSignal) Validate() error {

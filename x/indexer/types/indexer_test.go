@@ -54,10 +54,10 @@ func TestIndexerValidationAndConsensusBoundary(t *testing.T) {
 
 func record(kind string, key string, height uint64, fields ...Field) Record {
 	return Record{
-		Kind:   kind,
-		Key:    key,
-		Height: height,
-		TxHash: []byte(key),
-		Fields: CanonicalFields(fields),
+		Kind:	kind,
+		Key:	key,
+		Height:	height,
+		TxHash:	[]byte(key),
+		Fields:	CanonicalFields(fields),
 	}
 }

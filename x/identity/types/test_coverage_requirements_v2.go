@@ -10,30 +10,30 @@ import (
 type IdentityUnitTestCoverageAreaV2 string
 
 const (
-	IdentityUnitTestNameNormalizationV2          IdentityUnitTestCoverageAreaV2 = "name_normalization"
-	IdentityUnitTestNameHashGenerationV2         IdentityUnitTestCoverageAreaV2 = "name_hash_generation"
-	IdentityUnitTestCommitmentHashGenerationV2   IdentityUnitTestCoverageAreaV2 = "commitment_hash_generation"
-	IdentityUnitTestCommitmentRevealValidationV2 IdentityUnitTestCoverageAreaV2 = "commitment_reveal_validation"
-	IdentityUnitTestDomainLifecycleTransitionsV2 IdentityUnitTestCoverageAreaV2 = "domain_lifecycle_transitions"
-	IdentityUnitTestNFTBindingChecksV2           IdentityUnitTestCoverageAreaV2 = "nft_binding_checks"
-	IdentityUnitTestResolverFieldValidationV2    IdentityUnitTestCoverageAreaV2 = "resolver_field_validation"
-	IdentityUnitTestReverseForwardConsistencyV2  IdentityUnitTestCoverageAreaV2 = "reverse_forward_consistency_validation"
-	IdentityUnitTestDelegationScopeChecksV2      IdentityUnitTestCoverageAreaV2 = "delegation_scope_checks"
-	IdentityUnitTestZonePolicyValidationV2       IdentityUnitTestCoverageAreaV2 = "zone_policy_validation"
-	IdentityUnitTestPricingFunctionV2            IdentityUnitTestCoverageAreaV2 = "pricing_function"
-	IdentityUnitTestAuctionWinnerSelectionV2     IdentityUnitTestCoverageAreaV2 = "auction_winner_selection"
-	IdentityUnitTestProofEncodingV2              IdentityUnitTestCoverageAreaV2 = "proof_encoding"
+	IdentityUnitTestNameNormalizationV2		IdentityUnitTestCoverageAreaV2	= "name_normalization"
+	IdentityUnitTestNameHashGenerationV2		IdentityUnitTestCoverageAreaV2	= "name_hash_generation"
+	IdentityUnitTestCommitmentHashGenerationV2	IdentityUnitTestCoverageAreaV2	= "commitment_hash_generation"
+	IdentityUnitTestCommitmentRevealValidationV2	IdentityUnitTestCoverageAreaV2	= "commitment_reveal_validation"
+	IdentityUnitTestDomainLifecycleTransitionsV2	IdentityUnitTestCoverageAreaV2	= "domain_lifecycle_transitions"
+	IdentityUnitTestNFTBindingChecksV2		IdentityUnitTestCoverageAreaV2	= "nft_binding_checks"
+	IdentityUnitTestResolverFieldValidationV2	IdentityUnitTestCoverageAreaV2	= "resolver_field_validation"
+	IdentityUnitTestReverseForwardConsistencyV2	IdentityUnitTestCoverageAreaV2	= "reverse_forward_consistency_validation"
+	IdentityUnitTestDelegationScopeChecksV2		IdentityUnitTestCoverageAreaV2	= "delegation_scope_checks"
+	IdentityUnitTestZonePolicyValidationV2		IdentityUnitTestCoverageAreaV2	= "zone_policy_validation"
+	IdentityUnitTestPricingFunctionV2		IdentityUnitTestCoverageAreaV2	= "pricing_function"
+	IdentityUnitTestAuctionWinnerSelectionV2	IdentityUnitTestCoverageAreaV2	= "auction_winner_selection"
+	IdentityUnitTestProofEncodingV2			IdentityUnitTestCoverageAreaV2	= "proof_encoding"
 )
 
 type IdentityRequiredUnitTestCoverageV2 struct {
-	RequiredAreas []IdentityUnitTestCoverageAreaV2
-	ExistingTests map[IdentityUnitTestCoverageAreaV2][]string
-	CoverageHash  string
+	RequiredAreas	[]IdentityUnitTestCoverageAreaV2
+	ExistingTests	map[IdentityUnitTestCoverageAreaV2][]string
+	CoverageHash	string
 }
 
 func DefaultIdentityRequiredUnitTestCoverageV2() IdentityRequiredUnitTestCoverageV2 {
 	coverage := IdentityRequiredUnitTestCoverageV2{
-		RequiredAreas: IdentityRequiredUnitTestCoverageAreasV2(),
+		RequiredAreas:	IdentityRequiredUnitTestCoverageAreasV2(),
 		ExistingTests: map[IdentityUnitTestCoverageAreaV2][]string{
 			IdentityUnitTestNameNormalizationV2: {
 				"x/identity/types/validation_v2_test.go:TestNameNormalizationV2MigrationAndTxVersionRejection",
@@ -185,30 +185,30 @@ func identityCoverageAreaKnownV2(area IdentityUnitTestCoverageAreaV2, required [
 type IdentityIntegrationTestCoverageAreaV2 string
 
 const (
-	IdentityIntegrationRegisterMintNFTV2                 IdentityIntegrationTestCoverageAreaV2 = "register_domain_and_mint_nft"
-	IdentityIntegrationTransferNFTAtomicV2               IdentityIntegrationTestCoverageAreaV2 = "transfer_domain_and_update_nft_ownership_atomically"
-	IdentityIntegrationResolverOwnerUpdateV2             IdentityIntegrationTestCoverageAreaV2 = "update_resolver_as_owner"
-	IdentityIntegrationRejectUnauthorizedResolverV2      IdentityIntegrationTestCoverageAreaV2 = "reject_resolver_update_by_unauthorized_account"
-	IdentityIntegrationCreateDelegatedSubdomainV2        IdentityIntegrationTestCoverageAreaV2 = "create_delegated_subdomain"
-	IdentityIntegrationRevokeDelegationV2                IdentityIntegrationTestCoverageAreaV2 = "revoke_delegation_and_reject_further_delegate_updates"
-	IdentityIntegrationRenewBeforeExpiryV2               IdentityIntegrationTestCoverageAreaV2 = "renew_domain_before_expiry"
-	IdentityIntegrationExpireReleaseV2                   IdentityIntegrationTestCoverageAreaV2 = "expire_and_release_domain"
-	IdentityIntegrationVerifyReverseV2                   IdentityIntegrationTestCoverageAreaV2 = "verify_reverse_resolution"
-	IdentityIntegrationInvalidateReverseResolverUpdateV2 IdentityIntegrationTestCoverageAreaV2 = "invalidate_reverse_on_resolver_update"
-	IdentityIntegrationCommitRevealAuctionV2             IdentityIntegrationTestCoverageAreaV2 = "run_commit_reveal_auction"
-	IdentityIntegrationBatchDisjointResolversV2          IdentityIntegrationTestCoverageAreaV2 = "batch_update_disjoint_resolvers"
-	IdentityIntegrationRecursiveProofV2                  IdentityIntegrationTestCoverageAreaV2 = "generate_and_verify_recursive_proof"
+	IdentityIntegrationRegisterMintNFTV2			IdentityIntegrationTestCoverageAreaV2	= "register_domain_and_mint_nft"
+	IdentityIntegrationTransferNFTAtomicV2			IdentityIntegrationTestCoverageAreaV2	= "transfer_domain_and_update_nft_ownership_atomically"
+	IdentityIntegrationResolverOwnerUpdateV2		IdentityIntegrationTestCoverageAreaV2	= "update_resolver_as_owner"
+	IdentityIntegrationRejectUnauthorizedResolverV2		IdentityIntegrationTestCoverageAreaV2	= "reject_resolver_update_by_unauthorized_account"
+	IdentityIntegrationCreateDelegatedSubdomainV2		IdentityIntegrationTestCoverageAreaV2	= "create_delegated_subdomain"
+	IdentityIntegrationRevokeDelegationV2			IdentityIntegrationTestCoverageAreaV2	= "revoke_delegation_and_reject_further_delegate_updates"
+	IdentityIntegrationRenewBeforeExpiryV2			IdentityIntegrationTestCoverageAreaV2	= "renew_domain_before_expiry"
+	IdentityIntegrationExpireReleaseV2			IdentityIntegrationTestCoverageAreaV2	= "expire_and_release_domain"
+	IdentityIntegrationVerifyReverseV2			IdentityIntegrationTestCoverageAreaV2	= "verify_reverse_resolution"
+	IdentityIntegrationInvalidateReverseResolverUpdateV2	IdentityIntegrationTestCoverageAreaV2	= "invalidate_reverse_on_resolver_update"
+	IdentityIntegrationCommitRevealAuctionV2		IdentityIntegrationTestCoverageAreaV2	= "run_commit_reveal_auction"
+	IdentityIntegrationBatchDisjointResolversV2		IdentityIntegrationTestCoverageAreaV2	= "batch_update_disjoint_resolvers"
+	IdentityIntegrationRecursiveProofV2			IdentityIntegrationTestCoverageAreaV2	= "generate_and_verify_recursive_proof"
 )
 
 type IdentityRequiredIntegrationTestCoverageV2 struct {
-	RequiredAreas []IdentityIntegrationTestCoverageAreaV2
-	ExistingTests map[IdentityIntegrationTestCoverageAreaV2][]string
-	CoverageHash  string
+	RequiredAreas	[]IdentityIntegrationTestCoverageAreaV2
+	ExistingTests	map[IdentityIntegrationTestCoverageAreaV2][]string
+	CoverageHash	string
 }
 
 func DefaultIdentityRequiredIntegrationTestCoverageV2() IdentityRequiredIntegrationTestCoverageV2 {
 	coverage := IdentityRequiredIntegrationTestCoverageV2{
-		RequiredAreas: IdentityRequiredIntegrationTestCoverageAreasV2(),
+		RequiredAreas:	IdentityRequiredIntegrationTestCoverageAreasV2(),
 		ExistingTests: map[IdentityIntegrationTestCoverageAreaV2][]string{
 			IdentityIntegrationRegisterMintNFTV2: {
 				"x/identity/types/keepers_v2_test.go:TestIdentityKeeperV2LifecycleAndNFTInvariant",
@@ -317,27 +317,27 @@ func ComputeIdentityRequiredIntegrationTestCoverageHashV2(coverage IdentityRequi
 type IdentityInvariantTestCoverageAreaV2 string
 
 const (
-	IdentityInvariantRegistryNFTOwnerV2       IdentityInvariantTestCoverageAreaV2 = "active_registry_owner_equals_nft_owner"
-	IdentityInvariantResolverActiveDomainV2   IdentityInvariantTestCoverageAreaV2 = "resolver_record_requires_active_domain"
-	IdentityInvariantVerifiedReverseForwardV2 IdentityInvariantTestCoverageAreaV2 = "verified_reverse_record_has_matching_forward_resolution"
-	IdentityInvariantChildExpiryV2            IdentityInvariantTestCoverageAreaV2 = "child_domain_expiry_does_not_exceed_parent_unless_detached"
-	IdentityInvariantDelegationExpiryV2       IdentityInvariantTestCoverageAreaV2 = "delegation_expiry_does_not_exceed_authorized_domain_unless_detached"
-	IdentityInvariantAuctionActiveDomainV2    IdentityInvariantTestCoverageAreaV2 = "auction_cannot_activate_already_active_domain"
-	IdentityInvariantResolverByteLimitV2      IdentityInvariantTestCoverageAreaV2 = "resolver_record_byte_size_never_exceeds_parameter_limit"
-	IdentityInvariantExpiryIndexV2            IdentityInvariantTestCoverageAreaV2 = "expiry_index_contains_every_expiring_domain"
-	IdentityInvariantOwnerIndexV2             IdentityInvariantTestCoverageAreaV2 = "owner_index_matches_domain_ownership"
-	IdentityInvariantCacheSourceVersionV2     IdentityInvariantTestCoverageAreaV2 = "cache_record_invalidates_on_source_version_change"
+	IdentityInvariantRegistryNFTOwnerV2		IdentityInvariantTestCoverageAreaV2	= "active_registry_owner_equals_nft_owner"
+	IdentityInvariantResolverActiveDomainV2		IdentityInvariantTestCoverageAreaV2	= "resolver_record_requires_active_domain"
+	IdentityInvariantVerifiedReverseForwardV2	IdentityInvariantTestCoverageAreaV2	= "verified_reverse_record_has_matching_forward_resolution"
+	IdentityInvariantChildExpiryV2			IdentityInvariantTestCoverageAreaV2	= "child_domain_expiry_does_not_exceed_parent_unless_detached"
+	IdentityInvariantDelegationExpiryV2		IdentityInvariantTestCoverageAreaV2	= "delegation_expiry_does_not_exceed_authorized_domain_unless_detached"
+	IdentityInvariantAuctionActiveDomainV2		IdentityInvariantTestCoverageAreaV2	= "auction_cannot_activate_already_active_domain"
+	IdentityInvariantResolverByteLimitV2		IdentityInvariantTestCoverageAreaV2	= "resolver_record_byte_size_never_exceeds_parameter_limit"
+	IdentityInvariantExpiryIndexV2			IdentityInvariantTestCoverageAreaV2	= "expiry_index_contains_every_expiring_domain"
+	IdentityInvariantOwnerIndexV2			IdentityInvariantTestCoverageAreaV2	= "owner_index_matches_domain_ownership"
+	IdentityInvariantCacheSourceVersionV2		IdentityInvariantTestCoverageAreaV2	= "cache_record_invalidates_on_source_version_change"
 )
 
 type IdentityRequiredInvariantTestCoverageV2 struct {
-	RequiredAreas []IdentityInvariantTestCoverageAreaV2
-	ExistingTests map[IdentityInvariantTestCoverageAreaV2][]string
-	CoverageHash  string
+	RequiredAreas	[]IdentityInvariantTestCoverageAreaV2
+	ExistingTests	map[IdentityInvariantTestCoverageAreaV2][]string
+	CoverageHash	string
 }
 
 func DefaultIdentityRequiredInvariantTestCoverageV2() IdentityRequiredInvariantTestCoverageV2 {
 	coverage := IdentityRequiredInvariantTestCoverageV2{
-		RequiredAreas: IdentityRequiredInvariantTestCoverageAreasV2(),
+		RequiredAreas:	IdentityRequiredInvariantTestCoverageAreasV2(),
 		ExistingTests: map[IdentityInvariantTestCoverageAreaV2][]string{
 			IdentityInvariantRegistryNFTOwnerV2: {
 				"x/identity/types/domain_v2_test.go:TestDomainRecordV2EnforcesNFTOwnerAndExpiry",
@@ -513,28 +513,28 @@ func identityCoverageReferenceHasSupportedFunctionV2(ref string) bool {
 type IdentityFuzzTestCoverageAreaV2 string
 
 const (
-	IdentityFuzzMalformedNamesV2              IdentityFuzzTestCoverageAreaV2 = "malformed_names"
-	IdentityFuzzBoundaryLengthNamesV2         IdentityFuzzTestCoverageAreaV2 = "boundary_length_names"
-	IdentityFuzzSpoofingPatternCandidatesV2   IdentityFuzzTestCoverageAreaV2 = "spoofing_pattern_candidates"
-	IdentityFuzzCommitmentPreimagesV2         IdentityFuzzTestCoverageAreaV2 = "commitment_preimages"
-	IdentityFuzzAuctionBidRevealOrderingV2    IdentityFuzzTestCoverageAreaV2 = "auction_bid_reveal_ordering"
-	IdentityFuzzResolverPayloadsV2            IdentityFuzzTestCoverageAreaV2 = "resolver_payloads"
-	IdentityFuzzInterfaceDescriptorSchemasV2  IdentityFuzzTestCoverageAreaV2 = "interface_descriptor_schemas"
-	IdentityFuzzDelegationPermissionCombosV2  IdentityFuzzTestCoverageAreaV2 = "delegation_permission_combinations"
-	IdentityFuzzRecursiveProofPathsV2         IdentityFuzzTestCoverageAreaV2 = "recursive_proof_paths"
-	IdentityFuzzReverseResolutionMismatchesV2 IdentityFuzzTestCoverageAreaV2 = "reverse_resolution_mismatches"
-	IdentityFuzzBatchUpdateOrderingV2         IdentityFuzzTestCoverageAreaV2 = "batch_update_ordering"
+	IdentityFuzzMalformedNamesV2			IdentityFuzzTestCoverageAreaV2	= "malformed_names"
+	IdentityFuzzBoundaryLengthNamesV2		IdentityFuzzTestCoverageAreaV2	= "boundary_length_names"
+	IdentityFuzzSpoofingPatternCandidatesV2		IdentityFuzzTestCoverageAreaV2	= "spoofing_pattern_candidates"
+	IdentityFuzzCommitmentPreimagesV2		IdentityFuzzTestCoverageAreaV2	= "commitment_preimages"
+	IdentityFuzzAuctionBidRevealOrderingV2		IdentityFuzzTestCoverageAreaV2	= "auction_bid_reveal_ordering"
+	IdentityFuzzResolverPayloadsV2			IdentityFuzzTestCoverageAreaV2	= "resolver_payloads"
+	IdentityFuzzInterfaceDescriptorSchemasV2	IdentityFuzzTestCoverageAreaV2	= "interface_descriptor_schemas"
+	IdentityFuzzDelegationPermissionCombosV2	IdentityFuzzTestCoverageAreaV2	= "delegation_permission_combinations"
+	IdentityFuzzRecursiveProofPathsV2		IdentityFuzzTestCoverageAreaV2	= "recursive_proof_paths"
+	IdentityFuzzReverseResolutionMismatchesV2	IdentityFuzzTestCoverageAreaV2	= "reverse_resolution_mismatches"
+	IdentityFuzzBatchUpdateOrderingV2		IdentityFuzzTestCoverageAreaV2	= "batch_update_ordering"
 )
 
 type IdentityRequiredFuzzTestCoverageV2 struct {
-	RequiredAreas []IdentityFuzzTestCoverageAreaV2
-	ExistingTests map[IdentityFuzzTestCoverageAreaV2][]string
-	CoverageHash  string
+	RequiredAreas	[]IdentityFuzzTestCoverageAreaV2
+	ExistingTests	map[IdentityFuzzTestCoverageAreaV2][]string
+	CoverageHash	string
 }
 
 func DefaultIdentityRequiredFuzzTestCoverageV2() IdentityRequiredFuzzTestCoverageV2 {
 	coverage := IdentityRequiredFuzzTestCoverageV2{
-		RequiredAreas: IdentityRequiredFuzzTestCoverageAreasV2(),
+		RequiredAreas:	IdentityRequiredFuzzTestCoverageAreasV2(),
 		ExistingTests: map[IdentityFuzzTestCoverageAreaV2][]string{
 			IdentityFuzzMalformedNamesV2: {
 				"x/identity/types/fuzz_dns_v2_test.go:FuzzIdentityMalformedNamesV2",
@@ -622,27 +622,27 @@ func ComputeIdentityRequiredFuzzTestCoverageHashV2(coverage IdentityRequiredFuzz
 type IdentityPerformanceTestCoverageAreaV2 string
 
 const (
-	IdentityPerformanceDirectResolutionReadLatencyV2   IdentityPerformanceTestCoverageAreaV2 = "direct_resolution_read_latency"
-	IdentityPerformanceRecursiveReadLatencyByDepthV2   IdentityPerformanceTestCoverageAreaV2 = "recursive_resolution_read_latency_by_depth"
-	IdentityPerformanceResolverUpdateWriteLatencyV2    IdentityPerformanceTestCoverageAreaV2 = "resolver_update_write_latency"
-	IdentityPerformanceBatchResolverUpdatesPerBlockV2  IdentityPerformanceTestCoverageAreaV2 = "batch_resolver_updates_per_block"
-	IdentityPerformanceBatchRenewalsPerBlockV2         IdentityPerformanceTestCoverageAreaV2 = "batch_renewals_per_block"
-	IdentityPerformanceDomainRegistrationsPerBlockV2   IdentityPerformanceTestCoverageAreaV2 = "domain_registrations_per_block"
-	IdentityPerformanceBlockSTMMixedConflictRateV2     IdentityPerformanceTestCoverageAreaV2 = "blockstm_conflict_rate_under_mixed_identity_workload"
-	IdentityPerformanceStoreV2ProofGenerationLatencyV2 IdentityPerformanceTestCoverageAreaV2 = "store_v2_proof_generation_latency"
-	IdentityPerformanceAdaptiveSyncLargeRecoveryTimeV2 IdentityPerformanceTestCoverageAreaV2 = "adaptive_sync_recovery_time_with_large_identity_state"
-	IdentityPerformanceExportImportIdentityStateTimeV2 IdentityPerformanceTestCoverageAreaV2 = "export_import_time_for_identity_state"
+	IdentityPerformanceDirectResolutionReadLatencyV2	IdentityPerformanceTestCoverageAreaV2	= "direct_resolution_read_latency"
+	IdentityPerformanceRecursiveReadLatencyByDepthV2	IdentityPerformanceTestCoverageAreaV2	= "recursive_resolution_read_latency_by_depth"
+	IdentityPerformanceResolverUpdateWriteLatencyV2		IdentityPerformanceTestCoverageAreaV2	= "resolver_update_write_latency"
+	IdentityPerformanceBatchResolverUpdatesPerBlockV2	IdentityPerformanceTestCoverageAreaV2	= "batch_resolver_updates_per_block"
+	IdentityPerformanceBatchRenewalsPerBlockV2		IdentityPerformanceTestCoverageAreaV2	= "batch_renewals_per_block"
+	IdentityPerformanceDomainRegistrationsPerBlockV2	IdentityPerformanceTestCoverageAreaV2	= "domain_registrations_per_block"
+	IdentityPerformanceBlockSTMMixedConflictRateV2		IdentityPerformanceTestCoverageAreaV2	= "blockstm_conflict_rate_under_mixed_identity_workload"
+	IdentityPerformanceStoreV2ProofGenerationLatencyV2	IdentityPerformanceTestCoverageAreaV2	= "store_v2_proof_generation_latency"
+	IdentityPerformanceAdaptiveSyncLargeRecoveryTimeV2	IdentityPerformanceTestCoverageAreaV2	= "adaptive_sync_recovery_time_with_large_identity_state"
+	IdentityPerformanceExportImportIdentityStateTimeV2	IdentityPerformanceTestCoverageAreaV2	= "export_import_time_for_identity_state"
 )
 
 type IdentityRequiredPerformanceTestCoverageV2 struct {
-	RequiredAreas []IdentityPerformanceTestCoverageAreaV2
-	ExistingTests map[IdentityPerformanceTestCoverageAreaV2][]string
-	CoverageHash  string
+	RequiredAreas	[]IdentityPerformanceTestCoverageAreaV2
+	ExistingTests	map[IdentityPerformanceTestCoverageAreaV2][]string
+	CoverageHash	string
 }
 
 func DefaultIdentityRequiredPerformanceTestCoverageV2() IdentityRequiredPerformanceTestCoverageV2 {
 	coverage := IdentityRequiredPerformanceTestCoverageV2{
-		RequiredAreas: IdentityRequiredPerformanceTestCoverageAreasV2(),
+		RequiredAreas:	IdentityRequiredPerformanceTestCoverageAreasV2(),
 		ExistingTests: map[IdentityPerformanceTestCoverageAreaV2][]string{
 			IdentityPerformanceDirectResolutionReadLatencyV2: {
 				"x/identity/types/bench_test.go:BenchmarkIdentityStoreV2DirectResolutionReadPath",

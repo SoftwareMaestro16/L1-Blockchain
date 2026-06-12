@@ -28,11 +28,11 @@ func StartSealedAuction(state IdentityState, name string, startHeight uint64) (I
 		return IdentityState{}, Auction{}, errors.New("identity auction already exists")
 	}
 	auction := Auction{
-		Name:              normalized,
-		CommitStartHeight: startHeight,
-		RevealStartHeight: startHeight + state.Params.AuctionCommitBlocks,
-		RevealEndHeight:   startHeight + state.Params.AuctionCommitBlocks + state.Params.AuctionRevealBlocks,
-		Phase:             AuctionPhaseCommit,
+		Name:			normalized,
+		CommitStartHeight:	startHeight,
+		RevealStartHeight:	startHeight + state.Params.AuctionCommitBlocks,
+		RevealEndHeight:	startHeight + state.Params.AuctionCommitBlocks + state.Params.AuctionRevealBlocks,
+		Phase:			AuctionPhaseCommit,
 	}
 	next := state.Clone()
 	next.Auctions = append(next.Auctions, auction)
@@ -181,12 +181,12 @@ func buildAuctionRefunds(auction Auction, winner AuctionReveal) []AuctionRefundR
 			continue
 		}
 		receipt := AuctionRefundReceipt{
-			ReceiptID:      identityHash("auction-refund", auction.Name, reveal.CommitmentHash),
-			Name:           auction.Name,
-			Bidder:         cloneSpecAddress(reveal.Bidder),
-			Amount:         reveal.Bid,
-			CommitmentHash: reveal.CommitmentHash,
-			Reason:         "losing_bid",
+			ReceiptID:	identityHash("auction-refund", auction.Name, reveal.CommitmentHash),
+			Name:		auction.Name,
+			Bidder:		cloneSpecAddress(reveal.Bidder),
+			Amount:		reveal.Bid,
+			CommitmentHash:	reveal.CommitmentHash,
+			Reason:		"losing_bid",
 		}
 		refunds = append(refunds, receipt)
 	}

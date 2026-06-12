@@ -183,10 +183,10 @@ func TestAccountInvariantRejectsAddressAndSecretSecurityCases(t *testing.T) {
 }
 
 type testAccountStore struct {
-	accounts []Account
-	gets     int
-	sets     int
-	scans    int
+	accounts	[]Account
+	gets		int
+	sets		int
+	scans		int
 }
 
 func newTestAccountStore(accounts ...Account) *testAccountStore {
@@ -255,28 +255,28 @@ func v1Account(t *testing.T, fill byte, accountNumber, sequence uint64) Account 
 	t.Helper()
 	user, raw := testAddressPair(t, fill)
 	return Account{
-		Version:       AccountVersionV1,
-		AddressUser:   user,
-		AddressRaw:    raw,
-		PubKeys:       []string{fmt.Sprintf("ed25519:%064x", fill)},
-		AccountNumber: accountNumber,
-		Sequence:      sequence,
-		Status:        AccountStatusActive,
+		Version:	AccountVersionV1,
+		AddressUser:	user,
+		AddressRaw:	raw,
+		PubKeys:	[]string{fmt.Sprintf("ed25519:%064x", fill)},
+		AccountNumber:	accountNumber,
+		Sequence:	sequence,
+		Status:		AccountStatusActive,
 		AuthPolicy: AuthPolicy{
-			Version: 1,
-			Mode:    "single_key",
+			Version:	1,
+			Mode:		"single_key",
 		},
 		Metadata: AccountMetadata{
-			MetadataHash:    fmt.Sprintf("meta-%02x", fill),
-			DisplayNameHash: fmt.Sprintf("display-%02x", fill),
-			DomainAlias:     fmt.Sprintf("account-%02x.aet", fill),
-			CreatedHeight:   10,
+			MetadataHash:		fmt.Sprintf("meta-%02x", fill),
+			DisplayNameHash:	fmt.Sprintf("display-%02x", fill),
+			DomainAlias:		fmt.Sprintf("account-%02x.aet", fill),
+			CreatedHeight:		10,
 		},
-		ReputationID:            fmt.Sprintf("rep-%02x", fill),
-		CreatedHeight:           10,
-		LastActiveHeight:        11,
-		LastStorageChargeHeight: 12,
-		StorageRentDebt:         5,
+		ReputationID:			fmt.Sprintf("rep-%02x", fill),
+		CreatedHeight:			10,
+		LastActiveHeight:		11,
+		LastStorageChargeHeight:	12,
+		StorageRentDebt:		5,
 	}
 }
 

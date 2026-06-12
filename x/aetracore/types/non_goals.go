@@ -10,28 +10,28 @@ import (
 type NonGoalID string
 
 const (
-	NonGoalNoMessagingSocialApplicationLayer        NonGoalID = "no-messaging-or-social-application-layer"
-	NonGoalNoUIAssumptions                          NonGoalID = "no-ui-assumptions"
-	NonGoalNoCentralizedServiceDependency           NonGoalID = "no-centralized-service-dependency"
-	NonGoalNoExternalAPIReliance                    NonGoalID = "no-external-api-reliance"
-	NonGoalNoCanonicalOffchainResultWithoutProof    NonGoalID = "no-offchain-service-result-canonical-without-proof-or-receipt"
-	NonGoalNoDirectSynchronousCrossZoneFunctionCall NonGoalID = "no-direct-synchronous-cross-zone-function-calls"
+	NonGoalNoMessagingSocialApplicationLayer	NonGoalID	= "no-messaging-or-social-application-layer"
+	NonGoalNoUIAssumptions				NonGoalID	= "no-ui-assumptions"
+	NonGoalNoCentralizedServiceDependency		NonGoalID	= "no-centralized-service-dependency"
+	NonGoalNoExternalAPIReliance			NonGoalID	= "no-external-api-reliance"
+	NonGoalNoCanonicalOffchainResultWithoutProof	NonGoalID	= "no-offchain-service-result-canonical-without-proof-or-receipt"
+	NonGoalNoDirectSynchronousCrossZoneFunctionCall	NonGoalID	= "no-direct-synchronous-cross-zone-function-calls"
 )
 
 type NonGoal struct {
-	ID                 NonGoalID
-	Boundary           string
-	Modules            []CosmosSDKModuleName
-	Forbidden          bool
-	ConsensusBoundary  bool
-	CommitmentRequired bool
-	Rationale          []string
-	NonGoalHash        string
+	ID			NonGoalID
+	Boundary		string
+	Modules			[]CosmosSDKModuleName
+	Forbidden		bool
+	ConsensusBoundary	bool
+	CommitmentRequired	bool
+	Rationale		[]string
+	NonGoalHash		string
 }
 
 type NonGoalManifest struct {
-	NonGoals     []NonGoal
-	ManifestHash string
+	NonGoals	[]NonGoal
+	ManifestHash	string
 }
 
 func DefaultNonGoalManifest() (NonGoalManifest, error) {
@@ -219,13 +219,13 @@ func ComputeNonGoalManifestHash(manifest NonGoalManifest) string {
 
 func nonGoal(id NonGoalID, boundary string, modules []CosmosSDKModuleName, commitmentRequired bool, rationale ...string) NonGoal {
 	return NonGoal{
-		ID:                 id,
-		Boundary:           boundary,
-		Modules:            modules,
-		Forbidden:          true,
-		ConsensusBoundary:  true,
-		CommitmentRequired: commitmentRequired,
-		Rationale:          rationale,
+		ID:			id,
+		Boundary:		boundary,
+		Modules:		modules,
+		Forbidden:		true,
+		ConsensusBoundary:	true,
+		CommitmentRequired:	commitmentRequired,
+		Rationale:		rationale,
 	}
 }
 

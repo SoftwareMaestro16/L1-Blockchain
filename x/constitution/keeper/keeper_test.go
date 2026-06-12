@@ -17,12 +17,12 @@ func TestDefaultGenesisValidates(t *testing.T) {
 func TestOrdinaryConfigChangeFailsOutsideConstitutionalBounds(t *testing.T) {
 	k := NewKeeper()
 	err := k.ValidateOrdinaryConfigChange(configtypes.ConfigChange{
-		ID:          "bad-block-gas",
-		Key:         configtypes.KeyConsensusMaxBlockGas,
-		Value:       "1000000001",
-		Operation:   configtypes.OperationSet,
-		Status:      configtypes.ChangeStatusPending,
-		SubmittedBy: prototype.DefaultAuthority,
+		ID:		"bad-block-gas",
+		Key:		configtypes.KeyConsensusMaxBlockGas,
+		Value:		"1000000001",
+		Operation:	configtypes.OperationSet,
+		Status:		configtypes.ChangeStatusPending,
+		SubmittedBy:	prototype.DefaultAuthority,
 	})
 	require.ErrorContains(t, err, "constitutional max block gas")
 }
@@ -33,39 +33,39 @@ func TestConstitutionalUpdateRequiresSpecialFlowAndDelay(t *testing.T) {
 	proposed.MaxBlockGas = proposed.MaxBlockGas + 1
 
 	amendment, err := k.ProposeConstitutionAmendment(types.MsgProposeConstitutionAmendment{
-		Authority: prototype.DefaultAuthority,
+		Authority:	prototype.DefaultAuthority,
 		Amendment: types.Amendment{
-			ID:       "raise-block-gas",
-			Proposed: proposed,
-			Reason:   "capacity",
+			ID:		"raise-block-gas",
+			Proposed:	proposed,
+			Reason:		"capacity",
 		},
 	}, 10)
 	require.NoError(t, err)
 	require.Equal(t, uint64(110), amendment.ExecutableHeight)
 
 	_, _, err = k.ExecuteConstitutionAmendment(types.MsgExecuteConstitutionAmendment{
-		Authority:   prototype.DefaultAuthority,
-		AmendmentID: "raise-block-gas",
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-block-gas",
 	}, 109)
 	require.ErrorContains(t, err, "approved")
 
 	_, err = k.VoteConstitutionAmendment(types.MsgVoteConstitutionAmendment{
-		Authority:      prototype.DefaultAuthority,
-		AmendmentID:    "raise-block-gas",
-		Support:        types.VoteSupportYes,
-		VotingPowerBps: 6_700,
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-block-gas",
+		Support:	types.VoteSupportYes,
+		VotingPowerBps:	6_700,
 	}, 20)
 	require.NoError(t, err)
 
 	_, _, err = k.ExecuteConstitutionAmendment(types.MsgExecuteConstitutionAmendment{
-		Authority:   prototype.DefaultAuthority,
-		AmendmentID: "raise-block-gas",
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-block-gas",
 	}, 109)
 	require.ErrorContains(t, err, "delay")
 
 	updated, executed, err := k.ExecuteConstitutionAmendment(types.MsgExecuteConstitutionAmendment{
-		Authority:   prototype.DefaultAuthority,
-		AmendmentID: "raise-block-gas",
+		Authority:	prototype.DefaultAuthority,
+		AmendmentID:	"raise-block-gas",
 	}, 110)
 	require.NoError(t, err)
 	require.Equal(t, types.AmendmentStatusExecuted, executed.Status)
@@ -86,10 +86,10 @@ func TestExportImportPreservesAmendmentQueue(t *testing.T) {
 	source := NewKeeper()
 	for _, id := range []string{"z", "a"} {
 		_, err := source.ProposeConstitutionAmendment(types.MsgProposeConstitutionAmendment{
-			Authority: prototype.DefaultAuthority,
+			Authority:	prototype.DefaultAuthority,
 			Amendment: types.Amendment{
-				ID:       id,
-				Proposed: types.DefaultConstitution().Normalize(),
+				ID:		id,
+				Proposed:	types.DefaultConstitution().Normalize(),
 			},
 		}, 1)
 		require.NoError(t, err)
@@ -108,20 +108,20 @@ func TestExportImportPreservesAmendmentQueue(t *testing.T) {
 func TestMaliciousAuthorityCannotBypassProtectedModuleList(t *testing.T) {
 	k := NewKeeper()
 	err := k.ValidateOrdinaryConfigChange(configtypes.ConfigChange{
-		ID:          "disable-config",
-		Key:         "module/enabled/config",
-		Value:       "false",
-		Operation:   configtypes.OperationSet,
-		Status:      configtypes.ChangeStatusPending,
-		SubmittedBy: prototype.DefaultAuthority,
+		ID:		"disable-config",
+		Key:		"module/enabled/config",
+		Value:		"false",
+		Operation:	configtypes.OperationSet,
+		Status:		configtypes.ChangeStatusPending,
+		SubmittedBy:	prototype.DefaultAuthority,
 	})
 	require.ErrorContains(t, err, "protected modules")
 
 	_, err = k.ProposeConstitutionAmendment(types.MsgProposeConstitutionAmendment{
-		Authority: "4:0000000000000000000000000000000000000000000000000000000000000002",
+		Authority:	"4:0000000000000000000000000000000000000000000000000000000000000002",
 		Amendment: types.Amendment{
-			ID:       "malicious",
-			Proposed: types.DefaultConstitution().Normalize(),
+			ID:		"malicious",
+			Proposed:	types.DefaultConstitution().Normalize(),
 		},
 	}, 1)
 	require.ErrorContains(t, err, "governance authority")

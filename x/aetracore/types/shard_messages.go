@@ -9,8 +9,8 @@ import (
 type ShardQueueKind string
 
 const (
-	ShardQueueInbox  ShardQueueKind = "inbox"
-	ShardQueueOutbox ShardQueueKind = "outbox"
+	ShardQueueInbox		ShardQueueKind	= "inbox"
+	ShardQueueOutbox	ShardQueueKind	= "outbox"
 )
 
 type ShardMigrationStatus string
@@ -20,56 +20,56 @@ const (
 )
 
 type ShardMessageEnvelope struct {
-	MsgID               string
-	TraceID             string
-	Sender              string
-	Receiver            string
-	SenderZoneID        ZoneID
-	SenderShardID       ShardID
-	ReceiverZoneID      ZoneID
-	ReceiverShardID     ShardID
-	DestinationStateKey string
-	PayloadType         string
-	PayloadHash         string
-	Priority            uint32
-	AdmissionHeight     uint64
-	CreatedAtHeight     uint64
-	ExpiryHeight        uint64
-	MessageIndex        uint32
-	SourceLayoutEpoch   uint64
-	DeliveryLayoutEpoch uint64
-	MessageHash         string
+	MsgID			string
+	TraceID			string
+	Sender			string
+	Receiver		string
+	SenderZoneID		ZoneID
+	SenderShardID		ShardID
+	ReceiverZoneID		ZoneID
+	ReceiverShardID		ShardID
+	DestinationStateKey	string
+	PayloadType		string
+	PayloadHash		string
+	Priority		uint32
+	AdmissionHeight		uint64
+	CreatedAtHeight		uint64
+	ExpiryHeight		uint64
+	MessageIndex		uint32
+	SourceLayoutEpoch	uint64
+	DeliveryLayoutEpoch	uint64
+	MessageHash		string
 }
 
 type ShardMessageStore struct {
-	ZoneID    ZoneID
-	ShardID   ShardID
-	Height    uint64
-	QueueKind ShardQueueKind
-	Messages  []ShardMessageEnvelope
-	StoreRoot string
+	ZoneID		ZoneID
+	ShardID		ShardID
+	Height		uint64
+	QueueKind	ShardQueueKind
+	Messages	[]ShardMessageEnvelope
+	StoreRoot	string
 }
 
 type ShardMessageStoreEntry struct {
-	Key         string
-	MsgID       string
-	MessageHash string
+	Key		string
+	MsgID		string
+	MessageHash	string
 }
 
 type ShardMigrationReceipt struct {
-	TaskID             string
-	TaskHash           string
-	ZoneID             ZoneID
-	SourceShardID      ShardID
-	DestinationShardID ShardID
-	SourceLayoutEpoch  uint64
-	TargetLayoutEpoch  uint64
-	DeliveryEpoch      uint64
-	Height             uint64
-	Status             ShardMigrationStatus
-	StateRootBefore    string
-	StateRootAfter     string
-	ReceiptHash        string
+	TaskID			string
+	TaskHash		string
+	ZoneID			ZoneID
+	SourceShardID		ShardID
+	DestinationShardID	ShardID
+	SourceLayoutEpoch	uint64
+	TargetLayoutEpoch	uint64
+	DeliveryEpoch		uint64
+	Height			uint64
+	Status			ShardMigrationStatus
+	StateRootBefore		string
+	StateRootAfter		string
+	ReceiptHash		string
 }
 
 func NewShardMessageEnvelope(msg ShardMessageEnvelope) (ShardMessageEnvelope, error) {
@@ -231,10 +231,10 @@ func ResolveShardMessageDeliveryRoute(layouts []ShardLayout, msg ShardMessageEnv
 		return ShardRoute{}, errors.New("aetracore shard message delivery missing committed layout")
 	}
 	return RouteKeyToShard(layout, ShardRoutingInput{
-		ZoneID:            msg.ReceiverZoneID,
-		StateKey:          msg.DestinationStateKey,
-		ShardLayoutEpoch:  layout.LayoutEpoch,
-		PlacementOverride: msg.ReceiverShardID,
+		ZoneID:			msg.ReceiverZoneID,
+		StateKey:		msg.DestinationStateKey,
+		ShardLayoutEpoch:	layout.LayoutEpoch,
+		PlacementOverride:	msg.ReceiverShardID,
 	})
 }
 
@@ -271,17 +271,17 @@ func ExecuteShardMigrationTasks(tasks []ShardMigrationTask, height uint64, state
 			return nil, "", err
 		}
 		receipt := ShardMigrationReceipt{
-			TaskID:             task.TaskID,
-			TaskHash:           task.TaskHash,
-			ZoneID:             task.ZoneID,
-			SourceShardID:      task.SourceShardID,
-			DestinationShardID: task.DestinationShardID,
-			SourceLayoutEpoch:  task.SourceLayoutEpoch,
-			TargetLayoutEpoch:  task.TargetLayoutEpoch,
-			DeliveryEpoch:      task.DeliveryEpoch,
-			Height:             height,
-			Status:             ShardMigrationStatusExecuted,
-			StateRootBefore:    currentRoot,
+			TaskID:			task.TaskID,
+			TaskHash:		task.TaskHash,
+			ZoneID:			task.ZoneID,
+			SourceShardID:		task.SourceShardID,
+			DestinationShardID:	task.DestinationShardID,
+			SourceLayoutEpoch:	task.SourceLayoutEpoch,
+			TargetLayoutEpoch:	task.TargetLayoutEpoch,
+			DeliveryEpoch:		task.DeliveryEpoch,
+			Height:			height,
+			Status:			ShardMigrationStatusExecuted,
+			StateRootBefore:	currentRoot,
 		}
 		receipt.StateRootAfter = hashParts("aetra-aek-shard-migration-state-root-v1", currentRoot, task.TaskHash, fmt.Sprint(height))
 		receipt.ReceiptHash = ComputeShardMigrationReceiptHash(receipt)

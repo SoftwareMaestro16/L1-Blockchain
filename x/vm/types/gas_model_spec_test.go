@@ -285,16 +285,16 @@ func testAVMGasMessage(t *testing.T) AVMAsyncMessage {
 func testAVMFailedGasReceipt(t *testing.T, msg AVMAsyncMessage, gasUsed uint64) AVMExecutionReceipt {
 	t.Helper()
 	receipt, err := NewAVMExecutionReceipt(AVMExecutionReceipt{
-		MessageID:          msg.ID,
-		ZoneID:             msg.DestinationZone,
-		Executor:           "gas-executor",
-		Status:             AVMReceiptStatusFailed,
-		GasUsed:            gasUsed,
-		StorageWritten:     1,
-		EventsHash:         engineHash("gas-events"),
-		OutputMessagesRoot: engineHash("gas-output"),
-		ErrorCodeOptional:  "gas_failed",
-		CreatedHeight:      20,
+		MessageID:		msg.ID,
+		ZoneID:			msg.DestinationZone,
+		Executor:		"gas-executor",
+		Status:			AVMReceiptStatusFailed,
+		GasUsed:		gasUsed,
+		StorageWritten:		1,
+		EventsHash:		engineHash("gas-events"),
+		OutputMessagesRoot:	engineHash("gas-output"),
+		ErrorCodeOptional:	"gas_failed",
+		CreatedHeight:		20,
 	})
 	require.NoError(t, err)
 	return receipt

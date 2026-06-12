@@ -152,19 +152,19 @@ func TestUnifiedServiceCallRejectsRoutingRuleViolations(t *testing.T) {
 	require.ErrorContains(t, ValidateUnifiedServiceCallForDescriptor(ctx, descriptor, expired), "deadline")
 
 	badRoute := UnifiedCallRoutingPlan{
-		CallID:                        call.CallID,
-		TargetService:                 call.TargetService,
-		MethodID:                      call.MethodID,
-		ServiceType:                   coretypes.ServiceTypeMixed,
-		ExecutionLocation:             call.ExecutionLocation,
-		Kind:                          call.Kind,
-		Routes:                        []UnifiedServiceRoute{UnifiedRouteOnChainCommitment, UnifiedRouteOnChainPayment, UnifiedRouteProofVerification},
-		ReserveFundsBeforeExecution:   true,
-		VerifyResultProofBeforeAccept: true,
-		CommitResultOnChain:           true,
-		PaymentRouteRequired:          true,
-		OffChainExecutionRequired:     true,
-		ConsensusAcceptanceRoute:      UnifiedRouteOnChainCommitment,
+		CallID:				call.CallID,
+		TargetService:			call.TargetService,
+		MethodID:			call.MethodID,
+		ServiceType:			coretypes.ServiceTypeMixed,
+		ExecutionLocation:		call.ExecutionLocation,
+		Kind:				call.Kind,
+		Routes:				[]UnifiedServiceRoute{UnifiedRouteOnChainCommitment, UnifiedRouteOnChainPayment, UnifiedRouteProofVerification},
+		ReserveFundsBeforeExecution:	true,
+		VerifyResultProofBeforeAccept:	true,
+		CommitResultOnChain:		true,
+		PaymentRouteRequired:		true,
+		OffChainExecutionRequired:	true,
+		ConsensusAcceptanceRoute:	UnifiedRouteOnChainCommitment,
 	}
 	badRoute.RoutingHash = ComputeUnifiedCallRoutingPlanHash(badRoute)
 	require.ErrorContains(t, badRoute.Validate(), "mixed call")
@@ -189,13 +189,13 @@ func testUnifiedOnChainDescriptor() coretypes.ServiceDescriptor {
 	descriptor.Interface.InterfaceHash = coretypes.ComputeServiceInterfaceHash(descriptor.Interface)
 	descriptor.InterfaceID = descriptor.Interface.InterfaceID
 	descriptor.Execution = coretypes.ServiceExecutionDescriptor{
-		Location:        coretypes.ServiceLocationModule,
-		Target:          "identity.unified",
-		ModuleRoute:     "identity",
-		Mode:            coretypes.ExecutionModeSync,
-		Deterministic:   true,
-		FailureBehavior: coretypes.ServiceFailureRevert,
-		ReceiptPolicy:   coretypes.ServiceReceiptCommitted,
+		Location:		coretypes.ServiceLocationModule,
+		Target:			"identity.unified",
+		ModuleRoute:		"identity",
+		Mode:			coretypes.ExecutionModeSync,
+		Deterministic:		true,
+		FailureBehavior:	coretypes.ServiceFailureRevert,
+		ReceiptPolicy:		coretypes.ServiceReceiptCommitted,
 	}
 	descriptor.Storage = coretypes.ServiceStorageDescriptor{Model: coretypes.ServiceStorageOnChain, StateRootType: coretypes.StateProofRootType, ProofRequired: true}
 	descriptor.Verification = coretypes.ServiceVerificationDescriptor{TrustModel: coretypes.ServiceTrustConsensusExecuted, Model: coretypes.ServiceVerificationConsensusReceipt}
@@ -217,20 +217,20 @@ func testUnifiedOffChainDescriptor() coretypes.ServiceDescriptor {
 	descriptor.Interface.InterfaceHash = coretypes.ComputeServiceInterfaceHash(descriptor.Interface)
 	descriptor.InterfaceID = descriptor.Interface.InterfaceID
 	descriptor.Execution = coretypes.ServiceExecutionDescriptor{
-		Location:        coretypes.ServiceLocationExternal,
-		Target:          "indexer.unified",
-		Endpoint:        "https://indexer-unified.aetra.local/v1",
-		Mode:            coretypes.ExecutionModeAsync,
-		FailureBehavior: coretypes.ServiceFailureRetry,
-		ResultExpiry:    20,
-		ReceiptPolicy:   coretypes.ServiceReceiptCommitted,
+		Location:		coretypes.ServiceLocationExternal,
+		Target:			"indexer.unified",
+		Endpoint:		"https://indexer-unified.aetra.local/v1",
+		Mode:			coretypes.ExecutionModeAsync,
+		FailureBehavior:	coretypes.ServiceFailureRetry,
+		ResultExpiry:		20,
+		ReceiptPolicy:		coretypes.ServiceReceiptCommitted,
 	}
 	descriptor.Storage = coretypes.ServiceStorageDescriptor{Model: coretypes.ServiceStorageEphemeral}
 	descriptor.Verification = coretypes.ServiceVerificationDescriptor{
-		TrustModel:              coretypes.ServiceTrustFullyTrusted,
-		Model:                   coretypes.ServiceVerificationSignedResult,
-		RequestSigningRequired:  true,
-		ResponseSigningRequired: true,
+		TrustModel:			coretypes.ServiceTrustFullyTrusted,
+		Model:				coretypes.ServiceVerificationSignedResult,
+		RequestSigningRequired:		true,
+		ResponseSigningRequired:	true,
 	}
 	return coretypes.CanonicalServiceDescriptor(descriptor)
 }

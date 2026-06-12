@@ -162,9 +162,9 @@ func finalize(batchID string, height uint64) types.MsgFinalizeAVMExecutionBatch 
 
 func testBatch(id string, tasks ...types.AVMExecutionTask) types.AVMExecutionBatch {
 	return types.AVMExecutionBatch{
-		BatchID:         id,
-		SubmittedHeight: 1,
-		Tasks:           tasks,
+		BatchID:		id,
+		SubmittedHeight:	1,
+		Tasks:			tasks,
 	}
 }
 
@@ -174,12 +174,12 @@ func task(id, contract, mailbox string, reads []string, writes []string) types.A
 		stateWrites = append(stateWrites, types.AVMStateWrite{Key: key, Value: id + "-value"})
 	}
 	return types.AVMExecutionTask{
-		TaskID:          id,
-		ContractAddress: contract,
-		Mailbox:         mailbox,
-		ReadSet:         reads,
-		WriteSet:        writes,
-		StateWrites:     stateWrites,
-		GasLimit:        10,
+		TaskID:			id,
+		ContractAddress:	contract,
+		Mailbox:		mailbox,
+		ReadSet:		reads,
+		WriteSet:		writes,
+		StateWrites:		stateWrites,
+		GasLimit:		10,
 	}
 }

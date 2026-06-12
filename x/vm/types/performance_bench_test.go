@@ -31,21 +31,21 @@ func BenchmarkAVMQueueInsertAndPop(b *testing.B) {
 
 func BenchmarkAVMActorExecution(b *testing.B) {
 	actor := ActorRuntimeActor{
-		ActorID:   "bench-actor",
-		CodeRef:   "code/bench/v1",
-		StateRoot: engineHash("bench-actor-state"),
-		Mailbox:   []ActorMailboxMessage{benchActorMailboxMessage("service", "bench-actor", 1)},
+		ActorID:	"bench-actor",
+		CodeRef:	"code/bench/v1",
+		StateRoot:	engineHash("bench-actor-state"),
+		Mailbox:	[]ActorMailboxMessage{benchActorMailboxMessage("service", "bench-actor", 1)},
 	}
 	execution := ActorExecution{
-		ActorID:         "bench-actor",
-		MessageSequence: 1,
-		Handler:         "handle",
-		GasLimit:        1000,
-		GasUsed:         100,
+		ActorID:		"bench-actor",
+		MessageSequence:	1,
+		Handler:		"handle",
+		GasLimit:		1000,
+		GasUsed:		100,
 		StateWrites: []ActorStateWrite{{
-			ActorID: "bench-actor",
-			Key:     ActorStateKeyPrefix("bench-actor") + "counter",
-			Hash:    engineHash("counter"),
+			ActorID:	"bench-actor",
+			Key:		ActorStateKeyPrefix("bench-actor") + "counter",
+			Hash:		engineHash("counter"),
 		}},
 	}
 	b.ReportAllocs()
@@ -58,21 +58,21 @@ func BenchmarkAVMActorExecution(b *testing.B) {
 
 func BenchmarkAVMContinuationResume(b *testing.B) {
 	actor := ActorRuntimeActor{
-		ActorID:   "bench-actor",
-		CodeRef:   "code/bench/v1",
-		StateRoot: engineHash("bench-actor-state"),
+		ActorID:	"bench-actor",
+		CodeRef:	"code/bench/v1",
+		StateRoot:	engineHash("bench-actor-state"),
 	}
 	continuation := ContinuationRecord{
-		ContinuationID:    "bench-continuation",
-		ActorID:           actor.ActorID,
-		StepIndex:         1,
-		PartialStateHash:  engineHash("partial"),
-		PartialStateBytes: 64,
-		ResumeHeight:      21,
-		ExpiryHeight:      30,
-		GasReserved:       1000,
-		Status:            ContinuationStatusResumed,
-		ResumeBy:          ContinuationResumeByScheduler,
+		ContinuationID:		"bench-continuation",
+		ActorID:		actor.ActorID,
+		StepIndex:		1,
+		PartialStateHash:	engineHash("partial"),
+		PartialStateBytes:	64,
+		ResumeHeight:		21,
+		ExpiryHeight:		30,
+		GasReserved:		1000,
+		Status:			ContinuationStatusResumed,
+		ResumeBy:		ContinuationResumeByScheduler,
 	}
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
@@ -89,15 +89,15 @@ func BenchmarkAVMCrossZoneMessages(b *testing.B) {
 	}
 	queue, _ := NewAVMZoneQueue(AVMZoneQueue{ZoneID: zonestypes.ZoneIDContract})
 	policy := AVMCrossZoneRoutePolicy{
-		SourceZone:       zonestypes.ZoneIDApplication,
-		DestinationZone:  zonestypes.ZoneIDContract,
-		GasPolicy:        zonestypes.DefaultZoneGasPolicy(),
-		ExecutionBudget:  zonestypes.ZoneExecutionBudget{MaxGas: 1_000_000, MaxMessages: 128},
-		MessageFilter:    zonestypes.ZoneMessageFilter{AllowedMessageTypes: []string{"contract.call"}},
-		AllowedOpcodes:   []string{"contract.call"},
-		BounceBehavior:   AVMCrossZoneBounceAllowed,
-		ProofRequirement: AVMCrossZoneProofNone,
-		ValueAccounting:  AVMCrossZoneValueMessage,
+		SourceZone:		zonestypes.ZoneIDApplication,
+		DestinationZone:	zonestypes.ZoneIDContract,
+		GasPolicy:		zonestypes.DefaultZoneGasPolicy(),
+		ExecutionBudget:	zonestypes.ZoneExecutionBudget{MaxGas: 1_000_000, MaxMessages: 128},
+		MessageFilter:		zonestypes.ZoneMessageFilter{AllowedMessageTypes: []string{"contract.call"}},
+		AllowedOpcodes:		[]string{"contract.call"},
+		BounceBehavior:		AVMCrossZoneBounceAllowed,
+		ProofRequirement:	AVMCrossZoneProofNone,
+		ValueAccounting:	AVMCrossZoneValueMessage,
 	}
 	policy.PolicyHash = ComputeAVMCrossZoneRoutePolicyHash(policy)
 	b.ReportAllocs()
@@ -138,14 +138,14 @@ func BenchmarkAVMStoreV2ReadWriteLatency(b *testing.B) {
 
 func BenchmarkAVMRootGeneration(b *testing.B) {
 	root := AVMRoot{
-		Height:           100,
-		RouterRoot:       engineHash("router"),
-		AsyncMessageRoot: engineHash("async"),
-		ActorRoot:        engineHash("actor"),
-		ContractRoot:     engineHash("contract"),
-		ContinuationRoot: engineHash("continuation"),
-		InterfaceRoot:    engineHash("interface"),
-		ReceiptRoot:      engineHash("receipt"),
+		Height:			100,
+		RouterRoot:		engineHash("router"),
+		AsyncMessageRoot:	engineHash("async"),
+		ActorRoot:		engineHash("actor"),
+		ContractRoot:		engineHash("contract"),
+		ContinuationRoot:	engineHash("continuation"),
+		InterfaceRoot:		engineHash("interface"),
+		ReceiptRoot:		engineHash("receipt"),
 	}
 	b.ReportAllocs()
 	for n := 0; n < b.N; n++ {
@@ -158,23 +158,23 @@ func BenchmarkAVMRootGeneration(b *testing.B) {
 
 func benchAVMMessage(source string, nonce, createdHeight, delayHeight, expiryHeight, gasLimit uint64) AVMAsyncMessage {
 	msg := AVMAsyncMessage{
-		ChainID:         "aetra-1",
-		Source:          source,
-		Destination:     "contract",
-		Payload:         []byte("payload"),
-		GasLimit:        gasLimit,
-		DelayHeight:     delayHeight,
-		ExpiryHeight:    expiryHeight,
-		RetryPolicy:     DefaultAVMRetryPolicy(expiryHeight),
-		BounceFlag:      true,
-		SourceZone:      zonestypes.ZoneIDApplication,
-		DestinationZone: zonestypes.ZoneIDContract,
-		SenderNonce:     nonce,
-		PayloadType:     "contract.call",
-		ValueNAET:       1,
-		ForwardingFee:   1,
-		Priority:        1,
-		CreatedHeight:   createdHeight,
+		ChainID:		"aetra-1",
+		Source:			source,
+		Destination:		"contract",
+		Payload:		[]byte("payload"),
+		GasLimit:		gasLimit,
+		DelayHeight:		delayHeight,
+		ExpiryHeight:		expiryHeight,
+		RetryPolicy:		DefaultAVMRetryPolicy(expiryHeight),
+		BounceFlag:		true,
+		SourceZone:		zonestypes.ZoneIDApplication,
+		DestinationZone:	zonestypes.ZoneIDContract,
+		SenderNonce:		nonce,
+		PayloadType:		"contract.call",
+		ValueNAET:		1,
+		ForwardingFee:		1,
+		Priority:		1,
+		CreatedHeight:		createdHeight,
 	}
 	built, err := NewAVMAsyncMessage(msg)
 	if err != nil {
@@ -185,10 +185,10 @@ func benchAVMMessage(source string, nonce, createdHeight, delayHeight, expiryHei
 
 func benchActorMailboxMessage(source, target string, sequence uint64) ActorMailboxMessage {
 	return ActorMailboxMessage{
-		Sequence:           sequence,
-		SourceActor:        source,
-		TargetActor:        target,
-		CreatedLogicalTime: sequence,
-		Envelope:           async.MessageEnvelope{GasLimit: 100},
+		Sequence:		sequence,
+		SourceActor:		source,
+		TargetActor:		target,
+		CreatedLogicalTime:	sequence,
+		Envelope:		async.MessageEnvelope{GasLimit: 100},
 	}
 }

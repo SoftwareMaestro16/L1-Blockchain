@@ -9,34 +9,34 @@ import (
 )
 
 const (
-	DefaultAuthority         = "4:0000000000000000000000000000000000000000000000000000000000000001"
-	DefaultQueryLimit        = uint64(50)
-	MaxQueryLimit            = uint64(200)
-	DefaultRootHistory       = uint64(4096)
-	MaxRootHistory           = uint64(1_000_000)
-	DefaultMaxZones          = uint32(32)
-	MaxZones                 = uint32(1024)
-	DefaultMaxShards         = uint32(64)
-	MaxShardsPerZone         = uint32(65_536)
-	DefaultProposalItems     = uint32(10_000)
-	MaxProposalItems         = uint32(250_000)
-	NativeFeePolicyID        = "naet"
-	DefaultMempoolPolicy     = "core-default"
-	DefaultMessagePolicy     = "async-message-v1"
-	DefaultGasPolicy         = "deterministic-gas-v1"
-	DefaultProofRootType     = "global"
-	NextArchitectureRootType = "aetra_next"
-	AccountProofRootType     = "account"
-	IdentityProofRootType    = "identity"
-	ResolverProofRootType    = "resolver"
-	ZoneCommitmentsRoot      = "zone_commitments"
-	ShardLayoutRootType      = "shard_layouts"
-	RoutingTableRootType     = "routing_table"
-	MessageProofRootType     = "messages"
-	ReceiptProofRootType     = "receipts"
-	PaymentsProofRootType    = "payments"
-	VMProofRootType          = "vm"
-	StateProofRootType       = "state"
+	DefaultAuthority		= "4:0000000000000000000000000000000000000000000000000000000000000001"
+	DefaultQueryLimit		= uint64(50)
+	MaxQueryLimit			= uint64(200)
+	DefaultRootHistory		= uint64(4096)
+	MaxRootHistory			= uint64(1_000_000)
+	DefaultMaxZones			= uint32(32)
+	MaxZones			= uint32(1024)
+	DefaultMaxShards		= uint32(64)
+	MaxShardsPerZone		= uint32(65_536)
+	DefaultProposalItems		= uint32(10_000)
+	MaxProposalItems		= uint32(250_000)
+	NativeFeePolicyID		= "naet"
+	DefaultMempoolPolicy		= "core-default"
+	DefaultMessagePolicy		= "async-message-v1"
+	DefaultGasPolicy		= "deterministic-gas-v1"
+	DefaultProofRootType		= "global"
+	NextArchitectureRootType	= "aetra_next"
+	AccountProofRootType		= "account"
+	IdentityProofRootType		= "identity"
+	ResolverProofRootType		= "resolver"
+	ZoneCommitmentsRoot		= "zone_commitments"
+	ShardLayoutRootType		= "shard_layouts"
+	RoutingTableRootType		= "routing_table"
+	MessageProofRootType		= "messages"
+	ReceiptProofRootType		= "receipts"
+	PaymentsProofRootType		= "payments"
+	VMProofRootType			= "vm"
+	StateProofRootType		= "state"
 )
 
 type ZoneID string
@@ -44,39 +44,39 @@ type ShardID string
 type RootType string
 
 const (
-	ZoneIDAetraCore   = "AETHER_CORE"
-	ZoneIDFinancial   = "FINANCIAL_ZONE"
-	ZoneIDIdentity    = "IDENTITY_ZONE"
-	ZoneIDPayment     = "PAYMENT_ZONE"
-	ZoneIDApplication = "APPLICATION_ZONE"
-	ZoneIDContract    = "CONTRACT_ZONE"
+	ZoneIDAetraCore		= "AETHER_CORE"
+	ZoneIDFinancial		= "FINANCIAL_ZONE"
+	ZoneIDIdentity		= "IDENTITY_ZONE"
+	ZoneIDPayment		= "PAYMENT_ZONE"
+	ZoneIDApplication	= "APPLICATION_ZONE"
+	ZoneIDContract		= "CONTRACT_ZONE"
 )
 
 type AetraCoreParams struct {
-	Enabled                       bool
-	Authority                     string
-	DefaultQueryLimit             uint64
-	MaxQueryLimit                 uint64
-	MaxZones                      uint32
-	MaxShardsPerZone              uint32
-	MaxProposalItemsPerBlock      uint32
-	RootHistoryWindow             uint64
-	CrossZoneFinalityDelay        uint64
-	DeterministicProposalGrouping bool
-	ProductionVersionGate         string
+	Enabled				bool
+	Authority			string
+	DefaultQueryLimit		uint64
+	MaxQueryLimit			uint64
+	MaxZones			uint32
+	MaxShardsPerZone		uint32
+	MaxProposalItemsPerBlock	uint32
+	RootHistoryWindow		uint64
+	CrossZoneFinalityDelay		uint64
+	DeterministicProposalGrouping	bool
+	ProductionVersionGate		string
 }
 
 func DefaultParams() AetraCoreParams {
 	return AetraCoreParams{
-		Authority:                     DefaultAuthority,
-		DefaultQueryLimit:             DefaultQueryLimit,
-		MaxQueryLimit:                 MaxQueryLimit,
-		MaxZones:                      DefaultMaxZones,
-		MaxShardsPerZone:              DefaultMaxShards,
-		MaxProposalItemsPerBlock:      DefaultProposalItems,
-		RootHistoryWindow:             DefaultRootHistory,
-		CrossZoneFinalityDelay:        1,
-		DeterministicProposalGrouping: true,
+		Authority:			DefaultAuthority,
+		DefaultQueryLimit:		DefaultQueryLimit,
+		MaxQueryLimit:			MaxQueryLimit,
+		MaxZones:			DefaultMaxZones,
+		MaxShardsPerZone:		DefaultMaxShards,
+		MaxProposalItemsPerBlock:	DefaultProposalItems,
+		RootHistoryWindow:		DefaultRootHistory,
+		CrossZoneFinalityDelay:		1,
+		DeterministicProposalGrouping:	true,
 	}
 }
 

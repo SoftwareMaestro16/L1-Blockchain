@@ -45,25 +45,25 @@ func TestStorageChunkSetRetrievalProofAndReceipt(t *testing.T) {
 	require.Equal(t, object.ChunkRoots, chunkSet.ChunkRoots)
 
 	proof, err := NewStorageRetrievalProof(StorageRetrievalProof{
-		ObjectID:    object.ObjectID,
-		ContentHash: object.ContentHash,
-		ChunkRoot:   chunkSet.ChunkRoot,
-		ChunkIndex:  0,
-		ChunkHash:   object.ChunkRoots[0],
-		ProofPath:   []string{object.ChunkRoots[1]},
+		ObjectID:	object.ObjectID,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	chunkSet.ChunkRoot,
+		ChunkIndex:	0,
+		ChunkHash:	object.ChunkRoots[0],
+		ProofPath:	[]string{object.ChunkRoots[1]},
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeStorageRetrievalProofHash(proof), proof.ProofHash)
 
 	receipt, err := NewStorageAccessReceipt(StorageAccessReceipt{
-		ObjectID:       object.ObjectID,
-		Accessor:       "service/alice",
-		AccessType:     "read",
-		AccessHeight:   12,
-		ContentHash:    object.ContentHash,
-		ChunkRoot:      chunkSet.ChunkRoot,
-		PolicyHash:     ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
-		RetrievalProof: proof.ProofHash,
+		ObjectID:	object.ObjectID,
+		Accessor:	"service/alice",
+		AccessType:	"read",
+		AccessHeight:	12,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	chunkSet.ChunkRoot,
+		PolicyHash:	ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
+		RetrievalProof:	proof.ProofHash,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, receipt.ReceiptID)
@@ -105,17 +105,17 @@ func TestStorageObjectCommitmentStateRejectsTamperedReceipt(t *testing.T) {
 func testStorageObject(t *testing.T, owner string, chunks []string) StorageObject {
 	t.Helper()
 	object, err := NewStorageObject(StorageObject{
-		ContentHash:            storageTestHash(owner + "/content"),
-		ChunkRoots:             chunks,
-		Size:                   1024,
-		ReplicationPolicy:      ReplicationPolicyMultiZone,
-		AccessPolicy:           AccessPolicyPermissioned,
-		Owner:                  owner,
-		StorageClass:           StorageClassWarm,
-		CreatedHeight:          10,
-		ExpiresHeightOptional:  100,
-		MetadataHashOptional:   storageTestHash(owner + "/metadata"),
-		AvailabilityCommitment: storageTestHash(owner + "/availability"),
+		ContentHash:		storageTestHash(owner + "/content"),
+		ChunkRoots:		chunks,
+		Size:			1024,
+		ReplicationPolicy:	ReplicationPolicyMultiZone,
+		AccessPolicy:		AccessPolicyPermissioned,
+		Owner:			owner,
+		StorageClass:		StorageClassWarm,
+		CreatedHeight:		10,
+		ExpiresHeightOptional:	100,
+		MetadataHashOptional:	storageTestHash(owner + "/metadata"),
+		AvailabilityCommitment:	storageTestHash(owner + "/availability"),
 	})
 	require.NoError(t, err)
 	return object
@@ -124,13 +124,13 @@ func testStorageObject(t *testing.T, owner string, chunks []string) StorageObjec
 func testStorageReceipt(t *testing.T, object StorageObject, height uint64) StorageAccessReceipt {
 	t.Helper()
 	receipt, err := NewStorageAccessReceipt(StorageAccessReceipt{
-		ObjectID:     object.ObjectID,
-		Accessor:     object.Owner,
-		AccessType:   "read",
-		AccessHeight: height,
-		ContentHash:  object.ContentHash,
-		ChunkRoot:    ComputeStorageChunkRoot(object.ChunkRoots),
-		PolicyHash:   ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
+		ObjectID:	object.ObjectID,
+		Accessor:	object.Owner,
+		AccessType:	"read",
+		AccessHeight:	height,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	ComputeStorageChunkRoot(object.ChunkRoots),
+		PolicyHash:	ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
 	})
 	require.NoError(t, err)
 	return receipt

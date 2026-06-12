@@ -10,60 +10,60 @@ import (
 )
 
 type OnChainServiceRegistryState struct {
-	Descriptor              ServiceDescriptor
-	DescriptorHash          string
-	InterfaceDescriptorHash string
-	PaymentModel            string
-	VerificationModel       ServiceVerificationModel
-	OwnerAuthorizationHash  string
-	ExpiryHeight            uint64
-	StateHash               string
+	Descriptor		ServiceDescriptor
+	DescriptorHash		string
+	InterfaceDescriptorHash	string
+	PaymentModel		string
+	VerificationModel	ServiceVerificationModel
+	OwnerAuthorizationHash	string
+	ExpiryHeight		uint64
+	StateHash		string
 }
 
 type HybridServiceRegistryAnchor struct {
-	ServiceID         string
-	Owner             string
-	DescriptorHash    string
-	InterfaceHash     string
-	ProviderRoot      string
-	ExpiryHeight      uint64
-	VerificationModel ServiceVerificationModel
-	AnchorHash        string
+	ServiceID		string
+	Owner			string
+	DescriptorHash		string
+	InterfaceHash		string
+	ProviderRoot		string
+	ExpiryHeight		uint64
+	VerificationModel	ServiceVerificationModel
+	AnchorHash		string
 }
 
 type MeshServiceRegistryAdvertisement struct {
-	ServiceID         string
-	Owner             string
-	ProviderID        string
-	Endpoint          string
-	DescriptorHash    string
-	InterfaceHash     string
-	ProviderRoot      string
-	GossipTopic       string
-	IndexerNodeID     string
-	SignatureHash     string
-	AnchorProof       ServiceRegistryProof
-	AdvertisedHeight  uint64
-	ExpiryHeight      uint64
-	AdvertisementHash string
+	ServiceID		string
+	Owner			string
+	ProviderID		string
+	Endpoint		string
+	DescriptorHash		string
+	InterfaceHash		string
+	ProviderRoot		string
+	GossipTopic		string
+	IndexerNodeID		string
+	SignatureHash		string
+	AnchorProof		ServiceRegistryProof
+	AdvertisedHeight	uint64
+	ExpiryHeight		uint64
+	AdvertisementHash	string
 }
 
 type MeshServiceRegistryCacheRecord struct {
-	Advertisement   MeshServiceRegistryAdvertisement
-	AdvisoryOnly    bool
-	LocalReputation uint64
-	CachedHeight    uint64
-	ExpiryHeight    uint64
-	CacheHash       string
+	Advertisement	MeshServiceRegistryAdvertisement
+	AdvisoryOnly	bool
+	LocalReputation	uint64
+	CachedHeight	uint64
+	ExpiryHeight	uint64
+	CacheHash	string
 }
 
 type ServiceRegistryModeState struct {
-	Mode          ServiceRegistryMode
-	OnChainStates []OnChainServiceRegistryState
-	HybridAnchors []HybridServiceRegistryAnchor
-	MeshRecords   []MeshServiceRegistryCacheRecord
-	StateRoot     string
-	UpdatedHeight uint64
+	Mode		ServiceRegistryMode
+	OnChainStates	[]OnChainServiceRegistryState
+	HybridAnchors	[]HybridServiceRegistryAnchor
+	MeshRecords	[]MeshServiceRegistryCacheRecord
+	StateRoot	string
+	UpdatedHeight	uint64
 }
 
 func NewOnChainServiceRegistryState(descriptor ServiceDescriptor, ownerAuthorizationHash string) (OnChainServiceRegistryState, error) {
@@ -75,13 +75,13 @@ func NewOnChainServiceRegistryState(descriptor ServiceDescriptor, ownerAuthoriza
 		return OnChainServiceRegistryState{}, err
 	}
 	state := OnChainServiceRegistryState{
-		Descriptor:              descriptor,
-		DescriptorHash:          ComputeServiceDescriptorHash(descriptor),
-		InterfaceDescriptorHash: descriptor.Interface.InterfaceHash,
-		PaymentModel:            registryPaymentModel(descriptor),
-		VerificationModel:       descriptor.Verification.Model,
-		OwnerAuthorizationHash:  strings.ToLower(strings.TrimSpace(ownerAuthorizationHash)),
-		ExpiryHeight:            descriptor.ExpiryHeight,
+		Descriptor:			descriptor,
+		DescriptorHash:			ComputeServiceDescriptorHash(descriptor),
+		InterfaceDescriptorHash:	descriptor.Interface.InterfaceHash,
+		PaymentModel:			registryPaymentModel(descriptor),
+		VerificationModel:		descriptor.Verification.Model,
+		OwnerAuthorizationHash:		strings.ToLower(strings.TrimSpace(ownerAuthorizationHash)),
+		ExpiryHeight:			descriptor.ExpiryHeight,
 	}
 	state.StateHash = ComputeOnChainServiceRegistryStateHash(state)
 	return state, state.Validate()
@@ -97,13 +97,13 @@ func NewHybridServiceRegistryAnchor(descriptor ServiceDescriptor) (HybridService
 		return HybridServiceRegistryAnchor{}, errors.New("aetracore hybrid registry anchor requires provider root")
 	}
 	anchor := HybridServiceRegistryAnchor{
-		ServiceID:         descriptor.ServiceID,
-		Owner:             descriptor.Owner,
-		DescriptorHash:    ComputeServiceDescriptorHash(descriptor),
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		ProviderRoot:      providerRoot,
-		ExpiryHeight:      descriptor.ExpiryHeight,
-		VerificationModel: descriptor.Verification.Model,
+		ServiceID:		descriptor.ServiceID,
+		Owner:			descriptor.Owner,
+		DescriptorHash:		ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		ProviderRoot:		providerRoot,
+		ExpiryHeight:		descriptor.ExpiryHeight,
+		VerificationModel:	descriptor.Verification.Model,
 	}
 	anchor.AnchorHash = ComputeHybridServiceRegistryAnchorHash(anchor)
 	return anchor, anchor.Validate()
@@ -114,8 +114,8 @@ func BuildServiceRegistryModeState(mode ServiceRegistryMode, descriptors []Servi
 		return ServiceRegistryModeState{}, errors.New("aetracore service registry mode state height must be positive")
 	}
 	state := ServiceRegistryModeState{
-		Mode:          mode,
-		UpdatedHeight: height,
+		Mode:		mode,
+		UpdatedHeight:	height,
 	}
 	switch mode {
 	case ServiceRegistryOnChain:
@@ -165,17 +165,17 @@ func NewMeshServiceRegistryAdvertisement(descriptor ServiceDescriptor, providerI
 	}
 	providerRoot := registryProviderSet(descriptor)
 	advertisement := MeshServiceRegistryAdvertisement{
-		ServiceID:        descriptor.ServiceID,
-		Owner:            descriptor.Owner,
-		ProviderID:       strings.TrimSpace(providerID),
-		Endpoint:         strings.TrimSpace(endpoint),
-		DescriptorHash:   ComputeServiceDescriptorHash(descriptor),
-		InterfaceHash:    descriptor.Interface.InterfaceHash,
-		ProviderRoot:     providerRoot,
-		GossipTopic:      strings.TrimSpace(gossipTopic),
-		SignatureHash:    strings.ToLower(strings.TrimSpace(signatureHash)),
-		AdvertisedHeight: advertisedHeight,
-		ExpiryHeight:     descriptor.ExpiryHeight,
+		ServiceID:		descriptor.ServiceID,
+		Owner:			descriptor.Owner,
+		ProviderID:		strings.TrimSpace(providerID),
+		Endpoint:		strings.TrimSpace(endpoint),
+		DescriptorHash:		ComputeServiceDescriptorHash(descriptor),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		ProviderRoot:		providerRoot,
+		GossipTopic:		strings.TrimSpace(gossipTopic),
+		SignatureHash:		strings.ToLower(strings.TrimSpace(signatureHash)),
+		AdvertisedHeight:	advertisedHeight,
+		ExpiryHeight:		descriptor.ExpiryHeight,
 	}
 	advertisement.AdvertisementHash = ComputeMeshServiceRegistryAdvertisementHash(advertisement)
 	return advertisement, advertisement.Validate()
@@ -203,11 +203,11 @@ func NewMeshServiceRegistryCacheRecord(advertisement MeshServiceRegistryAdvertis
 		return MeshServiceRegistryCacheRecord{}, errors.New("aetracore mesh registry cached record is expired")
 	}
 	record := MeshServiceRegistryCacheRecord{
-		Advertisement:   advertisement,
-		AdvisoryOnly:    true,
-		LocalReputation: localReputation,
-		CachedHeight:    cachedHeight,
-		ExpiryHeight:    advertisement.ExpiryHeight,
+		Advertisement:		advertisement,
+		AdvisoryOnly:		true,
+		LocalReputation:	localReputation,
+		CachedHeight:		cachedHeight,
+		ExpiryHeight:		advertisement.ExpiryHeight,
 	}
 	record.CacheHash = ComputeMeshServiceRegistryCacheRecordHash(record)
 	return record, record.Validate()
@@ -218,9 +218,9 @@ func BuildDistributedRegistryMeshState(records []MeshServiceRegistryCacheRecord,
 		return ServiceRegistryModeState{}, errors.New("aetracore distributed registry mesh height must be positive")
 	}
 	state := ServiceRegistryModeState{
-		Mode:          ServiceRegistryMesh,
-		MeshRecords:   append([]MeshServiceRegistryCacheRecord(nil), records...),
-		UpdatedHeight: height,
+		Mode:		ServiceRegistryMesh,
+		MeshRecords:	append([]MeshServiceRegistryCacheRecord(nil), records...),
+		UpdatedHeight:	height,
 	}
 	sortMeshServiceRegistryCacheRecords(state.MeshRecords)
 	state.StateRoot = ComputeServiceRegistryModeStateRoot(state)
@@ -351,13 +351,13 @@ func (state ServiceRegistryModeState) OnChainDescriptorByID(serviceID string) (S
 	for _, onChainState := range state.OnChainStates {
 		if onChainState.Descriptor.ServiceID == serviceID {
 			proof := ServiceRegistryProof{
-				ServiceID:      serviceID,
-				RegistryMode:   state.Mode,
-				RegistryRoot:   state.StateRoot,
-				RecordHash:     onChainState.StateHash,
-				DescriptorHash: onChainState.DescriptorHash,
-				InterfaceHash:  onChainState.InterfaceDescriptorHash,
-				ProofHeight:    state.UpdatedHeight,
+				ServiceID:	serviceID,
+				RegistryMode:	state.Mode,
+				RegistryRoot:	state.StateRoot,
+				RecordHash:	onChainState.StateHash,
+				DescriptorHash:	onChainState.DescriptorHash,
+				InterfaceHash:	onChainState.InterfaceDescriptorHash,
+				ProofHeight:	state.UpdatedHeight,
 			}
 			proof.ProofHash = ComputeServiceRegistryProofHash(proof)
 			return onChainState.Descriptor, proof, true
@@ -373,13 +373,13 @@ func (state ServiceRegistryModeState) HybridAnchorByID(serviceID string) (Hybrid
 	for _, anchor := range state.HybridAnchors {
 		if anchor.ServiceID == serviceID {
 			proof := ServiceRegistryProof{
-				ServiceID:      serviceID,
-				RegistryMode:   state.Mode,
-				RegistryRoot:   state.StateRoot,
-				RecordHash:     anchor.AnchorHash,
-				DescriptorHash: anchor.DescriptorHash,
-				InterfaceHash:  anchor.InterfaceHash,
-				ProofHeight:    state.UpdatedHeight,
+				ServiceID:	serviceID,
+				RegistryMode:	state.Mode,
+				RegistryRoot:	state.StateRoot,
+				RecordHash:	anchor.AnchorHash,
+				DescriptorHash:	anchor.DescriptorHash,
+				InterfaceHash:	anchor.InterfaceHash,
+				ProofHeight:	state.UpdatedHeight,
 			}
 			proof.ProofHash = ComputeServiceRegistryProofHash(proof)
 			return anchor, proof, true
@@ -395,13 +395,13 @@ func (state ServiceRegistryModeState) MeshLookup(serviceID string) (MeshServiceR
 	for _, record := range state.MeshRecords {
 		if record.Advertisement.ServiceID == serviceID {
 			proof := ServiceRegistryProof{
-				ServiceID:      serviceID,
-				RegistryMode:   state.Mode,
-				RegistryRoot:   state.StateRoot,
-				RecordHash:     record.CacheHash,
-				DescriptorHash: record.Advertisement.DescriptorHash,
-				InterfaceHash:  record.Advertisement.InterfaceHash,
-				ProofHeight:    state.UpdatedHeight,
+				ServiceID:	serviceID,
+				RegistryMode:	state.Mode,
+				RegistryRoot:	state.StateRoot,
+				RecordHash:	record.CacheHash,
+				DescriptorHash:	record.Advertisement.DescriptorHash,
+				InterfaceHash:	record.Advertisement.InterfaceHash,
+				ProofHeight:	state.UpdatedHeight,
 			}
 			proof.ProofHash = ComputeServiceRegistryProofHash(proof)
 			return record, proof, true

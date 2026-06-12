@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "bridgehub"
-	StoreKey   = ModuleName
+	ModuleName	= "bridgehub"
+	StoreKey	= ModuleName
 )

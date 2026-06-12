@@ -16,115 +16,115 @@ type PaymentAPIQueryName string
 type PaymentAPIEventName string
 
 const (
-	PaymentAPIMsgOpenChannel                  PaymentAPIMessageName = "MsgOpenChannel"
-	PaymentAPIMsgCooperativeClose             PaymentAPIMessageName = "MsgCooperativeClose"
-	PaymentAPIMsgUnilateralClose              PaymentAPIMessageName = "MsgUnilateralClose"
-	PaymentAPIMsgDisputeClose                 PaymentAPIMessageName = "MsgDisputeClose"
-	PaymentAPIMsgFinalizeClose                PaymentAPIMessageName = "MsgFinalizeClose"
-	PaymentAPIMsgSubmitCheckpoint             PaymentAPIMessageName = "MsgSubmitCheckpoint"
-	PaymentAPIMsgRegisterPromise              PaymentAPIMessageName = "MsgRegisterPromise"
-	PaymentAPIMsgResolvePromise               PaymentAPIMessageName = "MsgResolvePromise"
-	PaymentAPIMsgExpirePromise                PaymentAPIMessageName = "MsgExpirePromise"
-	PaymentAPIMsgBatchResolvePromises         PaymentAPIMessageName = "MsgBatchResolvePromises"
-	PaymentAPIMsgOpenVirtualChannel           PaymentAPIMessageName = "MsgOpenVirtualChannel"
-	PaymentAPIMsgCloseVirtualChannel          PaymentAPIMessageName = "MsgCloseVirtualChannel"
-	PaymentAPIMsgDisputeVirtualChannel        PaymentAPIMessageName = "MsgDisputeVirtualChannel"
-	PaymentAPIMsgSubmitFraudProof             PaymentAPIMessageName = "MsgSubmitFraudProof"
-	PaymentAPIMsgRegisterRoutingAdvertisement PaymentAPIMessageName = "MsgRegisterRoutingAdvertisement"
+	PaymentAPIMsgOpenChannel			PaymentAPIMessageName	= "MsgOpenChannel"
+	PaymentAPIMsgCooperativeClose			PaymentAPIMessageName	= "MsgCooperativeClose"
+	PaymentAPIMsgUnilateralClose			PaymentAPIMessageName	= "MsgUnilateralClose"
+	PaymentAPIMsgDisputeClose			PaymentAPIMessageName	= "MsgDisputeClose"
+	PaymentAPIMsgFinalizeClose			PaymentAPIMessageName	= "MsgFinalizeClose"
+	PaymentAPIMsgSubmitCheckpoint			PaymentAPIMessageName	= "MsgSubmitCheckpoint"
+	PaymentAPIMsgRegisterPromise			PaymentAPIMessageName	= "MsgRegisterPromise"
+	PaymentAPIMsgResolvePromise			PaymentAPIMessageName	= "MsgResolvePromise"
+	PaymentAPIMsgExpirePromise			PaymentAPIMessageName	= "MsgExpirePromise"
+	PaymentAPIMsgBatchResolvePromises		PaymentAPIMessageName	= "MsgBatchResolvePromises"
+	PaymentAPIMsgOpenVirtualChannel			PaymentAPIMessageName	= "MsgOpenVirtualChannel"
+	PaymentAPIMsgCloseVirtualChannel		PaymentAPIMessageName	= "MsgCloseVirtualChannel"
+	PaymentAPIMsgDisputeVirtualChannel		PaymentAPIMessageName	= "MsgDisputeVirtualChannel"
+	PaymentAPIMsgSubmitFraudProof			PaymentAPIMessageName	= "MsgSubmitFraudProof"
+	PaymentAPIMsgRegisterRoutingAdvertisement	PaymentAPIMessageName	= "MsgRegisterRoutingAdvertisement"
 )
 
 const (
-	PaymentAPIQueryChannel               PaymentAPIQueryName = "QueryChannel"
-	PaymentAPIQueryChannelsByParticipant PaymentAPIQueryName = "QueryChannelsByParticipant"
-	PaymentAPIQueryPendingClose          PaymentAPIQueryName = "QueryPendingClose"
-	PaymentAPIQueryFinalizationHeight    PaymentAPIQueryName = "QueryFinalizationHeight"
-	PaymentAPIQueryCondition             PaymentAPIQueryName = "QueryCondition"
-	PaymentAPIQueryConditionsByChannel   PaymentAPIQueryName = "QueryConditionsByChannel"
-	PaymentAPIQueryVirtualChannel        PaymentAPIQueryName = "QueryVirtualChannel"
-	PaymentAPIQueryChannelCapacity       PaymentAPIQueryName = "QueryChannelCapacity"
-	PaymentAPIQueryFeeSchedule           PaymentAPIQueryName = "QueryFeeSchedule"
-	PaymentAPIQuerySettlementTombstone   PaymentAPIQueryName = "QuerySettlementTombstone"
-	PaymentAPIQueryFraudProof            PaymentAPIQueryName = "QueryFraudProof"
-	PaymentAPIQueryActiveDisputes        PaymentAPIQueryName = "QueryActiveDisputes"
-	PaymentAPIQueryPendingFinalizations  PaymentAPIQueryName = "QueryPendingFinalizations"
+	PaymentAPIQueryChannel			PaymentAPIQueryName	= "QueryChannel"
+	PaymentAPIQueryChannelsByParticipant	PaymentAPIQueryName	= "QueryChannelsByParticipant"
+	PaymentAPIQueryPendingClose		PaymentAPIQueryName	= "QueryPendingClose"
+	PaymentAPIQueryFinalizationHeight	PaymentAPIQueryName	= "QueryFinalizationHeight"
+	PaymentAPIQueryCondition		PaymentAPIQueryName	= "QueryCondition"
+	PaymentAPIQueryConditionsByChannel	PaymentAPIQueryName	= "QueryConditionsByChannel"
+	PaymentAPIQueryVirtualChannel		PaymentAPIQueryName	= "QueryVirtualChannel"
+	PaymentAPIQueryChannelCapacity		PaymentAPIQueryName	= "QueryChannelCapacity"
+	PaymentAPIQueryFeeSchedule		PaymentAPIQueryName	= "QueryFeeSchedule"
+	PaymentAPIQuerySettlementTombstone	PaymentAPIQueryName	= "QuerySettlementTombstone"
+	PaymentAPIQueryFraudProof		PaymentAPIQueryName	= "QueryFraudProof"
+	PaymentAPIQueryActiveDisputes		PaymentAPIQueryName	= "QueryActiveDisputes"
+	PaymentAPIQueryPendingFinalizations	PaymentAPIQueryName	= "QueryPendingFinalizations"
 )
 
 const (
-	PaymentAPIEventChannelOpened                  PaymentAPIEventName = "channel_opened"
-	PaymentAPIEventChannelCheckpointed            PaymentAPIEventName = "channel_checkpointed"
-	PaymentAPIEventChannelCloseStarted            PaymentAPIEventName = "channel_close_started"
-	PaymentAPIEventChannelDisputed                PaymentAPIEventName = "channel_disputed"
-	PaymentAPIEventChannelFinalized               PaymentAPIEventName = "channel_finalized"
-	PaymentAPIEventChannelSettled                 PaymentAPIEventName = "channel_settled"
-	PaymentAPIEventChannelPenalized               PaymentAPIEventName = "channel_penalized"
-	PaymentAPIEventPromiseRegistered              PaymentAPIEventName = "promise_registered"
-	PaymentAPIEventPromiseResolved                PaymentAPIEventName = "promise_resolved"
-	PaymentAPIEventPromiseExpired                 PaymentAPIEventName = "promise_expired"
-	PaymentAPIEventVirtualChannelOpened           PaymentAPIEventName = "virtual_channel_opened"
-	PaymentAPIEventVirtualChannelClosed           PaymentAPIEventName = "virtual_channel_closed"
-	PaymentAPIEventVirtualChannelDisputed         PaymentAPIEventName = "virtual_channel_disputed"
-	PaymentAPIEventFraudProofAccepted             PaymentAPIEventName = "fraud_proof_accepted"
-	PaymentAPIEventFraudProofRejected             PaymentAPIEventName = "fraud_proof_rejected"
-	PaymentAPIEventRoutingAdvertisementRegistered PaymentAPIEventName = "routing_advertisement_registered"
-	PaymentAPIEventSettlementFeeCharged           PaymentAPIEventName = "settlement_fee_charged"
+	PaymentAPIEventChannelOpened			PaymentAPIEventName	= "channel_opened"
+	PaymentAPIEventChannelCheckpointed		PaymentAPIEventName	= "channel_checkpointed"
+	PaymentAPIEventChannelCloseStarted		PaymentAPIEventName	= "channel_close_started"
+	PaymentAPIEventChannelDisputed			PaymentAPIEventName	= "channel_disputed"
+	PaymentAPIEventChannelFinalized			PaymentAPIEventName	= "channel_finalized"
+	PaymentAPIEventChannelSettled			PaymentAPIEventName	= "channel_settled"
+	PaymentAPIEventChannelPenalized			PaymentAPIEventName	= "channel_penalized"
+	PaymentAPIEventPromiseRegistered		PaymentAPIEventName	= "promise_registered"
+	PaymentAPIEventPromiseResolved			PaymentAPIEventName	= "promise_resolved"
+	PaymentAPIEventPromiseExpired			PaymentAPIEventName	= "promise_expired"
+	PaymentAPIEventVirtualChannelOpened		PaymentAPIEventName	= "virtual_channel_opened"
+	PaymentAPIEventVirtualChannelClosed		PaymentAPIEventName	= "virtual_channel_closed"
+	PaymentAPIEventVirtualChannelDisputed		PaymentAPIEventName	= "virtual_channel_disputed"
+	PaymentAPIEventFraudProofAccepted		PaymentAPIEventName	= "fraud_proof_accepted"
+	PaymentAPIEventFraudProofRejected		PaymentAPIEventName	= "fraud_proof_rejected"
+	PaymentAPIEventRoutingAdvertisementRegistered	PaymentAPIEventName	= "routing_advertisement_registered"
+	PaymentAPIEventSettlementFeeCharged		PaymentAPIEventName	= "settlement_fee_charged"
 )
 
 type MsgResolvePromise = MsgResolveWithPreimage
 type MsgRegisterRoutingAdvertisement = MsgRegisterChannelAdvertisement
 
 type MsgOpenVirtualChannel struct {
-	Signer          string
-	VirtualChannel  VirtualChannel
-	ActivationProof VirtualActivationProof
+	Signer		string
+	VirtualChannel	VirtualChannel
+	ActivationProof	VirtualActivationProof
 }
 
 type MsgCloseVirtualChannel struct {
-	Signer           string
-	VirtualChannelID string
-	CloseProof       VirtualCloseProof
-	CurrentHeight    uint64
+	Signer			string
+	VirtualChannelID	string
+	CloseProof		VirtualCloseProof
+	CurrentHeight		uint64
 }
 
 type MsgDisputeVirtualChannel struct {
-	Signer        string
-	Proof         VirtualChannelDisputeProof
-	CurrentHeight uint64
+	Signer		string
+	Proof		VirtualChannelDisputeProof
+	CurrentHeight	uint64
 }
 
 type MsgSubmitFraudProof struct {
-	Signer     string
-	Submission FraudProofSubmission
+	Signer		string
+	Submission	FraudProofSubmission
 }
 
 type PaymentAPISurfaceResult struct {
-	MsgName             PaymentAPIMessageName
-	ChannelResult       PaymentChannelMessageResult
-	ConditionalSnapshot ConditionalPaymentsModuleState
-	VirtualChannelID    string
-	ClosedVirtual       VirtualChannel
-	VirtualReleases     []VirtualReserveRelease
-	FraudSnapshot       FraudProofVerificationState
+	MsgName			PaymentAPIMessageName
+	ChannelResult		PaymentChannelMessageResult
+	ConditionalSnapshot	ConditionalPaymentsModuleState
+	VirtualChannelID	string
+	ClosedVirtual		VirtualChannel
+	VirtualReleases		[]VirtualReserveRelease
+	FraudSnapshot		FraudProofVerificationState
 }
 
 type ChannelCapacity struct {
-	ChannelID              string
-	TotalCollateral        string
-	PendingConditionAmount string
-	ReservedLiquidity      string
-	AvailableCapacity      string
-	ParticipantBalances    []Balance
-	ParticipantAvailable   []Balance
-	ConditionCount         uint64
-	CapacityHash           string
+	ChannelID		string
+	TotalCollateral		string
+	PendingConditionAmount	string
+	ReservedLiquidity	string
+	AvailableCapacity	string
+	ParticipantBalances	[]Balance
+	ParticipantAvailable	[]Balance
+	ConditionCount		uint64
+	CapacityHash		string
 }
 
 type FraudProofQueryResult struct {
-	Proof     FraudProof
-	Evidence  EvidenceRecord
-	Penalty   PenaltyRecord
-	Reward    ReporterReward
-	Pending   bool
-	Canonical string
+	Proof		FraudProof
+	Evidence	EvidenceRecord
+	Penalty		PenaltyRecord
+	Reward		ReporterReward
+	Pending		bool
+	Canonical	string
 }
 
 func RequiredPaymentOnChainMessages() []PaymentAPIMessageName {
@@ -234,8 +234,8 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
 		apiResult := PaymentAPISurfaceResult{
-			MsgName:       paymentAPINameForChannelMessage(m),
-			ChannelResult: result,
+			MsgName:	paymentAPINameForChannelMessage(m),
+			ChannelResult:	result,
 		}
 		next, err = appendPaymentAPIEvents(next, paymentAPIEventsForChannelMessage(chain, next, m, apiResult)...)
 		if err != nil {
@@ -248,8 +248,8 @@ func ApplyPaymentAPISurfaceMessage(chain PaymentsState, fraud FraudProofVerifica
 			return PaymentsState{}, FraudProofVerificationState{}, PaymentAPISurfaceResult{}, err
 		}
 		apiResult := PaymentAPISurfaceResult{
-			MsgName:             paymentAPINameForConditionalMessage(m),
-			ConditionalSnapshot: snapshot,
+			MsgName:		paymentAPINameForConditionalMessage(m),
+			ConditionalSnapshot:	snapshot,
 		}
 		next, err = appendPaymentAPIEvents(next, paymentAPIEventsForConditionalMessage(chain, next, m)...)
 		if err != nil {
@@ -481,14 +481,14 @@ func QueryChannelCapacity(state PaymentsState, liquidity LiquidityOptimizationSt
 		participantAvailable = append(participantAvailable, Balance{Participant: balance.Participant, Amount: share.String()})
 	}
 	capacity := ChannelCapacity{
-		ChannelID:              channel.ChannelID,
-		TotalCollateral:        total.String(),
-		PendingConditionAmount: pending.String(),
-		ReservedLiquidity:      reserved.String(),
-		AvailableCapacity:      available.String(),
-		ParticipantBalances:    normalizeBalances(channel.LatestState.Balances),
-		ParticipantAvailable:   normalizeBalances(participantAvailable),
-		ConditionCount:         uint64(len(channel.LatestState.Conditions)),
+		ChannelID:		channel.ChannelID,
+		TotalCollateral:	total.String(),
+		PendingConditionAmount:	pending.String(),
+		ReservedLiquidity:	reserved.String(),
+		AvailableCapacity:	available.String(),
+		ParticipantBalances:	normalizeBalances(channel.LatestState.Balances),
+		ParticipantAvailable:	normalizeBalances(participantAvailable),
+		ConditionCount:		uint64(len(channel.LatestState.Conditions)),
 	}
 	capacity.CapacityHash = HashParts("payments-query-channel-capacity", capacity.ChannelID, capacity.TotalCollateral, capacity.PendingConditionAmount, capacity.ReservedLiquidity, capacity.AvailableCapacity)
 	return capacity, nil
@@ -939,11 +939,11 @@ func newPaymentAPIEvent(name PaymentAPIEventName, channelID string, height uint6
 		parts = append(parts, attr.Key, attr.Value)
 	}
 	return PaymentEvent{
-		EventID:    HashParts(parts...),
-		EventType:  string(name),
-		ChannelID:  channelID,
-		Height:     height,
-		Attributes: normalizedAttrs,
+		EventID:	HashParts(parts...),
+		EventType:	string(name),
+		ChannelID:	channelID,
+		Height:		height,
+		Attributes:	normalizedAttrs,
 	}.Normalize()
 }
 

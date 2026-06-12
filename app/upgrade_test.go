@@ -34,8 +34,8 @@ func TestNoOpUpgradeDryRunAndExport(t *testing.T) {
 	require.True(t, app.UpgradeKeeper.HasHandler(UpgradeName))
 
 	require.NoError(t, app.UpgradeKeeper.ApplyUpgrade(ctx, upgradetypes.Plan{
-		Name:   UpgradeName,
-		Height: ctx.BlockHeight(),
+		Name:	UpgradeName,
+		Height:	ctx.BlockHeight(),
 	}))
 
 	after, err := app.UpgradeKeeper.GetModuleVersionMap(ctx)

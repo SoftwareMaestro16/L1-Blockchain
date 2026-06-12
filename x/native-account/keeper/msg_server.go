@@ -11,7 +11,7 @@ var _ nativeaccount.MsgServer = msgServer{}
 
 type msgServer struct {
 	nativeaccount.UnimplementedMsgServer
-	keeper Keeper
+	keeper	Keeper
 }
 
 func NewMsgServerImpl(k Keeper) nativeaccount.MsgServer {
@@ -27,10 +27,10 @@ func (m msgServer) ActivateAccount(ctx context.Context, msg *nativeaccount.MsgAc
 		return nil, err
 	}
 	return &nativeaccount.MsgActivateAccountResponse{
-		AddressUser:   result.Account.AddressUser,
-		AddressRaw:    result.Account.AddressRaw,
-		AccountNumber: result.Account.AccountNumber,
-		Sequence:      result.Account.Sequence,
+		AddressUser:	result.Account.AddressUser,
+		AddressRaw:	result.Account.AddressRaw,
+		AccountNumber:	result.Account.AccountNumber,
+		Sequence:	result.Account.Sequence,
 	}, nil
 }
 

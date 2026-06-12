@@ -8,131 +8,131 @@ import (
 )
 
 const (
-	ParticipantClassValidator       = "validator"
-	ParticipantClassDelegator       = "delegator"
-	ParticipantClassUser            = "user"
-	ParticipantClassProtocolReserve = "protocol_reserve"
+	ParticipantClassValidator	= "validator"
+	ParticipantClassDelegator	= "delegator"
+	ParticipantClassUser		= "user"
+	ParticipantClassProtocolReserve	= "protocol_reserve"
 
-	IncentiveResourceConsensusSecurity = "consensus_security"
-	IncentiveResourceExecution         = "execution"
-	IncentiveResourceStorage           = "storage"
-	IncentiveResourceSpamRisk          = "spam_risk"
-	IncentiveResourceSlashingRisk      = "slashing_risk"
-	IncentiveResourceProtocolReserve   = "protocol_reserve"
+	IncentiveResourceConsensusSecurity	= "consensus_security"
+	IncentiveResourceExecution		= "execution"
+	IncentiveResourceStorage		= "storage"
+	IncentiveResourceSpamRisk		= "spam_risk"
+	IncentiveResourceSlashingRisk		= "slashing_risk"
+	IncentiveResourceProtocolReserve	= "protocol_reserve"
 
-	ParameterChangeInflation     = "inflation"
-	ParameterChangeBurn          = "burn"
-	ParameterChangeFeeSplit      = "fee_split"
-	ParameterChangeStorageRent   = "storage_rent"
-	ParameterChangeConcentration = "concentration"
+	ParameterChangeInflation	= "inflation"
+	ParameterChangeBurn		= "burn"
+	ParameterChangeFeeSplit		= "fee_split"
+	ParameterChangeStorageRent	= "storage_rent"
+	ParameterChangeConcentration	= "concentration"
 )
 
 type ParticipantIncentiveEntry struct {
-	ParticipantClass        string
-	ResourceOrRisk          string
-	RewardsNaet             sdkmath.Int
-	PenaltiesNaet           sdkmath.Int
-	FeesPaidNaet            sdkmath.Int
-	ReserveContributionNaet sdkmath.Int
-	NetPositionNaet         sdkmath.Int
-	Explanation             string
+	ParticipantClass	string
+	ResourceOrRisk		string
+	RewardsNaet		sdkmath.Int
+	PenaltiesNaet		sdkmath.Int
+	FeesPaidNaet		sdkmath.Int
+	ReserveContributionNaet	sdkmath.Int
+	NetPositionNaet		sdkmath.Int
+	Explanation		string
 }
 
 type ParticipantIncentiveMapInput struct {
-	ValidatorRewardsNaet sdkmath.Int
-	DelegatorRewardsNaet sdkmath.Int
-	UserFeesPaidNaet     sdkmath.Int
-	ExecutionFeesNaet    sdkmath.Int
-	StorageFeesNaet      sdkmath.Int
-	SpamSurchargeNaet    sdkmath.Int
-	ValidatorSlashedNaet sdkmath.Int
-	DelegatorSlashedNaet sdkmath.Int
-	ReserveFundingNaet   sdkmath.Int
-	BurnedNaet           sdkmath.Int
+	ValidatorRewardsNaet	sdkmath.Int
+	DelegatorRewardsNaet	sdkmath.Int
+	UserFeesPaidNaet	sdkmath.Int
+	ExecutionFeesNaet	sdkmath.Int
+	StorageFeesNaet		sdkmath.Int
+	SpamSurchargeNaet	sdkmath.Int
+	ValidatorSlashedNaet	sdkmath.Int
+	DelegatorSlashedNaet	sdkmath.Int
+	ReserveFundingNaet	sdkmath.Int
+	BurnedNaet		sdkmath.Int
 }
 
 type ParticipantIncentiveMapReport struct {
-	Entries                      []ParticipantIncentiveEntry
-	TotalRewardsNaet             sdkmath.Int
-	TotalPenaltiesNaet           sdkmath.Int
-	TotalFeesPaidNaet            sdkmath.Int
-	TotalReserveContributionNaet sdkmath.Int
-	Passed                       bool
-	Failed                       []string
+	Entries				[]ParticipantIncentiveEntry
+	TotalRewardsNaet		sdkmath.Int
+	TotalPenaltiesNaet		sdkmath.Int
+	TotalFeesPaidNaet		sdkmath.Int
+	TotalReserveContributionNaet	sdkmath.Int
+	Passed				bool
+	Failed				[]string
 }
 
 type EpochEconomicReportInput struct {
-	EpochID                   uint64
-	StartingSupplyNaet        sdkmath.Int
-	EndingSupplyNaet          sdkmath.Int
-	GrossIssuedNaet           sdkmath.Int
-	BurnedNaet                sdkmath.Int
-	FeesCollectedNaet         sdkmath.Int
-	ValidatorRewardsNaet      sdkmath.Int
-	DelegatorRewardsNaet      sdkmath.Int
-	SlashedNaet               sdkmath.Int
-	ReserveInflowNaet         sdkmath.Int
-	ReserveOutflowNaet        sdkmath.Int
-	StateGrowthBytes          int64
-	ValidatorConcentrationBps int64
-	ParticipantInput          ParticipantIncentiveMapInput
+	EpochID				uint64
+	StartingSupplyNaet		sdkmath.Int
+	EndingSupplyNaet		sdkmath.Int
+	GrossIssuedNaet			sdkmath.Int
+	BurnedNaet			sdkmath.Int
+	FeesCollectedNaet		sdkmath.Int
+	ValidatorRewardsNaet		sdkmath.Int
+	DelegatorRewardsNaet		sdkmath.Int
+	SlashedNaet			sdkmath.Int
+	ReserveInflowNaet		sdkmath.Int
+	ReserveOutflowNaet		sdkmath.Int
+	StateGrowthBytes		int64
+	ValidatorConcentrationBps	int64
+	ParticipantInput		ParticipantIncentiveMapInput
 }
 
 type EpochEconomicReport struct {
-	EpochID                   uint64
-	StartingSupplyNaet        sdkmath.Int
-	EndingSupplyNaet          sdkmath.Int
-	ExpectedEndingSupplyNaet  sdkmath.Int
-	GrossIssuedNaet           sdkmath.Int
-	BurnedNaet                sdkmath.Int
-	NetIssuanceNaet           sdkmath.Int
-	FeesCollectedNaet         sdkmath.Int
-	RewardsDistributedNaet    sdkmath.Int
-	SlashedFundsNaet          sdkmath.Int
-	ReserveInflowNaet         sdkmath.Int
-	ReserveOutflowNaet        sdkmath.Int
-	NetReserveChangeNaet      sdkmath.Int
-	StateGrowthBytes          int64
-	ValidatorConcentrationBps int64
-	ParticipantIncentives     ParticipantIncentiveMapReport
-	GovernanceSummary         string
-	Reconciled                bool
-	Failed                    []string
+	EpochID				uint64
+	StartingSupplyNaet		sdkmath.Int
+	EndingSupplyNaet		sdkmath.Int
+	ExpectedEndingSupplyNaet	sdkmath.Int
+	GrossIssuedNaet			sdkmath.Int
+	BurnedNaet			sdkmath.Int
+	NetIssuanceNaet			sdkmath.Int
+	FeesCollectedNaet		sdkmath.Int
+	RewardsDistributedNaet		sdkmath.Int
+	SlashedFundsNaet		sdkmath.Int
+	ReserveInflowNaet		sdkmath.Int
+	ReserveOutflowNaet		sdkmath.Int
+	NetReserveChangeNaet		sdkmath.Int
+	StateGrowthBytes		int64
+	ValidatorConcentrationBps	int64
+	ParticipantIncentives		ParticipantIncentiveMapReport
+	GovernanceSummary		string
+	Reconciled			bool
+	Failed				[]string
 }
 
 type GovernanceParameterImpactInput struct {
-	ParameterName                      string
-	CurrentValueBps                    int64
-	ProposedValueBps                   int64
-	CurrentEpochReport                 EpochEconomicReportInput
-	ProjectedEpochs                    uint32
-	RequirePreUpgradeSimulation        bool
-	ConsensusRewardAccountingPreserved bool
+	ParameterName				string
+	CurrentValueBps				int64
+	ProposedValueBps			int64
+	CurrentEpochReport			EpochEconomicReportInput
+	ProjectedEpochs				uint32
+	RequirePreUpgradeSimulation		bool
+	ConsensusRewardAccountingPreserved	bool
 }
 
 type GovernanceDashboardRow struct {
-	Metric        string
-	CurrentNaet   sdkmath.Int
-	ProjectedNaet sdkmath.Int
-	DeltaNaet     sdkmath.Int
-	CurrentBps    int64
-	ProjectedBps  int64
+	Metric		string
+	CurrentNaet	sdkmath.Int
+	ProjectedNaet	sdkmath.Int
+	DeltaNaet	sdkmath.Int
+	CurrentBps	int64
+	ProjectedBps	int64
 }
 
 type GovernanceParameterImpactReport struct {
-	ParameterName                      string
-	CurrentValueBps                    int64
-	ProposedValueBps                   int64
-	DeltaBps                           int64
-	ProjectedReports                   []EpochEconomicReport
-	ProjectedSupplyDeltaNaet           sdkmath.Int
-	ProjectedReserveDeltaNaet          sdkmath.Int
-	ProjectedRewardDeltaNaet           sdkmath.Int
-	PreUpgradeSimulationIncluded       bool
-	ConsensusRewardAccountingPreserved bool
-	ActivationAllowed                  bool
-	DashboardRows                      []GovernanceDashboardRow
-	Failed                             []string
+	ParameterName				string
+	CurrentValueBps				int64
+	ProposedValueBps			int64
+	DeltaBps				int64
+	ProjectedReports			[]EpochEconomicReport
+	ProjectedSupplyDeltaNaet		sdkmath.Int
+	ProjectedReserveDeltaNaet		sdkmath.Int
+	ProjectedRewardDeltaNaet		sdkmath.Int
+	PreUpgradeSimulationIncluded		bool
+	ConsensusRewardAccountingPreserved	bool
+	ActivationAllowed			bool
+	DashboardRows				[]GovernanceDashboardRow
+	Failed					[]string
 }
 
 func BuildParticipantIncentiveMap(input ParticipantIncentiveMapInput) (ParticipantIncentiveMapReport, error) {
@@ -202,13 +202,13 @@ func BuildParticipantIncentiveMap(input ParticipantIncentiveMapInput) (Participa
 	}
 
 	return ParticipantIncentiveMapReport{
-		Entries:                      entries,
-		TotalRewardsNaet:             totalRewards,
-		TotalPenaltiesNaet:           totalPenalties,
-		TotalFeesPaidNaet:            userFees,
-		TotalReserveContributionNaet: totalReserve,
-		Passed:                       len(failed) == 0,
-		Failed:                       failed,
+		Entries:			entries,
+		TotalRewardsNaet:		totalRewards,
+		TotalPenaltiesNaet:		totalPenalties,
+		TotalFeesPaidNaet:		userFees,
+		TotalReserveContributionNaet:	totalReserve,
+		Passed:				len(failed) == 0,
+		Failed:				failed,
 	}, nil
 }
 
@@ -220,12 +220,12 @@ func GenerateEpochEconomicReport(input EpochEconomicReportInput) (EpochEconomicR
 	participantInput := input.ParticipantInput
 	if participantInput == (ParticipantIncentiveMapInput{}) {
 		participantInput = ParticipantIncentiveMapInput{
-			ValidatorRewardsNaet: input.ValidatorRewardsNaet,
-			DelegatorRewardsNaet: input.DelegatorRewardsNaet,
-			UserFeesPaidNaet:     input.FeesCollectedNaet,
-			ValidatorSlashedNaet: input.SlashedNaet,
-			ReserveFundingNaet:   normalizeInt(input.ReserveInflowNaet).Sub(normalizeInt(input.ReserveOutflowNaet)),
-			BurnedNaet:           input.BurnedNaet,
+			ValidatorRewardsNaet:	input.ValidatorRewardsNaet,
+			DelegatorRewardsNaet:	input.DelegatorRewardsNaet,
+			UserFeesPaidNaet:	input.FeesCollectedNaet,
+			ValidatorSlashedNaet:	input.SlashedNaet,
+			ReserveFundingNaet:	normalizeInt(input.ReserveInflowNaet).Sub(normalizeInt(input.ReserveOutflowNaet)),
+			BurnedNaet:		input.BurnedNaet,
 		}
 	}
 	participantReport, err := BuildParticipantIncentiveMap(participantInput)
@@ -253,24 +253,24 @@ func GenerateEpochEconomicReport(input EpochEconomicReportInput) (EpochEconomicR
 	rewards := normalizeInt(input.ValidatorRewardsNaet).Add(normalizeInt(input.DelegatorRewardsNaet))
 	netReserve := normalizeInt(input.ReserveInflowNaet).Sub(normalizeInt(input.ReserveOutflowNaet))
 	report := EpochEconomicReport{
-		EpochID:                   input.EpochID,
-		StartingSupplyNaet:        starting,
-		EndingSupplyNaet:          ending,
-		ExpectedEndingSupplyNaet:  expectedEnding,
-		GrossIssuedNaet:           grossIssued,
-		BurnedNaet:                burned,
-		NetIssuanceNaet:           grossIssued.Sub(burned),
-		FeesCollectedNaet:         normalizeInt(input.FeesCollectedNaet),
-		RewardsDistributedNaet:    rewards,
-		SlashedFundsNaet:          normalizeInt(input.SlashedNaet),
-		ReserveInflowNaet:         normalizeInt(input.ReserveInflowNaet),
-		ReserveOutflowNaet:        normalizeInt(input.ReserveOutflowNaet),
-		NetReserveChangeNaet:      netReserve,
-		StateGrowthBytes:          input.StateGrowthBytes,
-		ValidatorConcentrationBps: input.ValidatorConcentrationBps,
-		ParticipantIncentives:     participantReport,
-		Reconciled:                len(failed) == 0,
-		Failed:                    failed,
+		EpochID:			input.EpochID,
+		StartingSupplyNaet:		starting,
+		EndingSupplyNaet:		ending,
+		ExpectedEndingSupplyNaet:	expectedEnding,
+		GrossIssuedNaet:		grossIssued,
+		BurnedNaet:			burned,
+		NetIssuanceNaet:		grossIssued.Sub(burned),
+		FeesCollectedNaet:		normalizeInt(input.FeesCollectedNaet),
+		RewardsDistributedNaet:		rewards,
+		SlashedFundsNaet:		normalizeInt(input.SlashedNaet),
+		ReserveInflowNaet:		normalizeInt(input.ReserveInflowNaet),
+		ReserveOutflowNaet:		normalizeInt(input.ReserveOutflowNaet),
+		NetReserveChangeNaet:		netReserve,
+		StateGrowthBytes:		input.StateGrowthBytes,
+		ValidatorConcentrationBps:	input.ValidatorConcentrationBps,
+		ParticipantIncentives:		participantReport,
+		Reconciled:			len(failed) == 0,
+		Failed:				failed,
 	}
 	report.GovernanceSummary = fmt.Sprintf(
 		"epoch=%d issuance=%s burn=%s net=%s fees=%s rewards=%s slashed=%s reserve_delta=%s state_growth_bytes=%d validator_concentration_bps=%d",
@@ -318,12 +318,12 @@ func GenerateGovernanceParameterImpactReport(input GovernanceParameterImpactInpu
 		nextInput.EndingSupplyNaet = sdkmath.ZeroInt()
 		applyGovernanceProjection(&nextInput, input.ParameterName, input.ProposedValueBps)
 		nextInput.ParticipantInput = ParticipantIncentiveMapInput{
-			ValidatorRewardsNaet: nextInput.ValidatorRewardsNaet,
-			DelegatorRewardsNaet: nextInput.DelegatorRewardsNaet,
-			UserFeesPaidNaet:     nextInput.FeesCollectedNaet,
-			ValidatorSlashedNaet: nextInput.SlashedNaet,
-			ReserveFundingNaet:   normalizeInt(nextInput.ReserveInflowNaet).Sub(normalizeInt(nextInput.ReserveOutflowNaet)),
-			BurnedNaet:           nextInput.BurnedNaet,
+			ValidatorRewardsNaet:	nextInput.ValidatorRewardsNaet,
+			DelegatorRewardsNaet:	nextInput.DelegatorRewardsNaet,
+			UserFeesPaidNaet:	nextInput.FeesCollectedNaet,
+			ValidatorSlashedNaet:	nextInput.SlashedNaet,
+			ReserveFundingNaet:	normalizeInt(nextInput.ReserveInflowNaet).Sub(normalizeInt(nextInput.ReserveOutflowNaet)),
+			BurnedNaet:		nextInput.BurnedNaet,
 		}
 
 		report, err := GenerateEpochEconomicReport(nextInput)
@@ -346,40 +346,40 @@ func GenerateGovernanceParameterImpactReport(input GovernanceParameterImpactInpu
 	rows := governanceDashboardRows(current, projected, input.CurrentValueBps, input.ProposedValueBps)
 
 	return GovernanceParameterImpactReport{
-		ParameterName:                      input.ParameterName,
-		CurrentValueBps:                    input.CurrentValueBps,
-		ProposedValueBps:                   input.ProposedValueBps,
-		DeltaBps:                           input.ProposedValueBps - input.CurrentValueBps,
-		ProjectedReports:                   projected,
-		ProjectedSupplyDeltaNaet:           supplyDelta,
-		ProjectedReserveDeltaNaet:          reserveDelta,
-		ProjectedRewardDeltaNaet:           rewardDelta,
-		PreUpgradeSimulationIncluded:       simulationIncluded,
-		ConsensusRewardAccountingPreserved: input.ConsensusRewardAccountingPreserved,
-		ActivationAllowed:                  len(failed) == 0,
-		DashboardRows:                      rows,
-		Failed:                             failed,
+		ParameterName:				input.ParameterName,
+		CurrentValueBps:			input.CurrentValueBps,
+		ProposedValueBps:			input.ProposedValueBps,
+		DeltaBps:				input.ProposedValueBps - input.CurrentValueBps,
+		ProjectedReports:			projected,
+		ProjectedSupplyDeltaNaet:		supplyDelta,
+		ProjectedReserveDeltaNaet:		reserveDelta,
+		ProjectedRewardDeltaNaet:		rewardDelta,
+		PreUpgradeSimulationIncluded:		simulationIncluded,
+		ConsensusRewardAccountingPreserved:	input.ConsensusRewardAccountingPreserved,
+		ActivationAllowed:			len(failed) == 0,
+		DashboardRows:				rows,
+		Failed:					failed,
 	}, nil
 }
 
 func buildParticipantEntry(class, resource string, rewards, penalties, feesPaid, reserveContribution sdkmath.Int, explanation string) ParticipantIncentiveEntry {
 	net := normalizeInt(rewards).Add(normalizeInt(reserveContribution)).Sub(normalizeInt(penalties)).Sub(normalizeInt(feesPaid))
 	return ParticipantIncentiveEntry{
-		ParticipantClass:        class,
-		ResourceOrRisk:          resource,
-		RewardsNaet:             normalizeInt(rewards),
-		PenaltiesNaet:           normalizeInt(penalties),
-		FeesPaidNaet:            normalizeInt(feesPaid),
-		ReserveContributionNaet: normalizeInt(reserveContribution),
-		NetPositionNaet:         net,
-		Explanation:             explanation,
+		ParticipantClass:		class,
+		ResourceOrRisk:			resource,
+		RewardsNaet:			normalizeInt(rewards),
+		PenaltiesNaet:			normalizeInt(penalties),
+		FeesPaidNaet:			normalizeInt(feesPaid),
+		ReserveContributionNaet:	normalizeInt(reserveContribution),
+		NetPositionNaet:		net,
+		Explanation:			explanation,
 	}
 }
 
 func validateParticipantIncentiveInput(input ParticipantIncentiveMapInput) error {
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "validator_rewards_naet", value: input.ValidatorRewardsNaet},
 		{name: "delegator_rewards_naet", value: input.DelegatorRewardsNaet},
@@ -404,8 +404,8 @@ func validateEpochEconomicReportInput(input EpochEconomicReportInput) error {
 		return fmt.Errorf("epoch_id must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "starting_supply_naet", value: input.StartingSupplyNaet},
 		{name: "ending_supply_naet", value: input.EndingSupplyNaet},
@@ -492,36 +492,36 @@ func governanceDashboardRows(current EpochEconomicReport, projected []EpochEcono
 	}
 	return []GovernanceDashboardRow{
 		{
-			Metric:        "supply",
-			CurrentNaet:   current.EndingSupplyNaet,
-			ProjectedNaet: last.EndingSupplyNaet,
-			DeltaNaet:     last.EndingSupplyNaet.Sub(current.EndingSupplyNaet),
-			CurrentBps:    currentBps,
-			ProjectedBps:  proposedBps,
+			Metric:		"supply",
+			CurrentNaet:	current.EndingSupplyNaet,
+			ProjectedNaet:	last.EndingSupplyNaet,
+			DeltaNaet:	last.EndingSupplyNaet.Sub(current.EndingSupplyNaet),
+			CurrentBps:	currentBps,
+			ProjectedBps:	proposedBps,
 		},
 		{
-			Metric:        "rewards",
-			CurrentNaet:   current.RewardsDistributedNaet,
-			ProjectedNaet: last.RewardsDistributedNaet,
-			DeltaNaet:     last.RewardsDistributedNaet.Sub(current.RewardsDistributedNaet),
-			CurrentBps:    currentBps,
-			ProjectedBps:  proposedBps,
+			Metric:		"rewards",
+			CurrentNaet:	current.RewardsDistributedNaet,
+			ProjectedNaet:	last.RewardsDistributedNaet,
+			DeltaNaet:	last.RewardsDistributedNaet.Sub(current.RewardsDistributedNaet),
+			CurrentBps:	currentBps,
+			ProjectedBps:	proposedBps,
 		},
 		{
-			Metric:        "reserve_delta",
-			CurrentNaet:   current.NetReserveChangeNaet,
-			ProjectedNaet: last.NetReserveChangeNaet,
-			DeltaNaet:     last.NetReserveChangeNaet.Sub(current.NetReserveChangeNaet),
-			CurrentBps:    currentBps,
-			ProjectedBps:  proposedBps,
+			Metric:		"reserve_delta",
+			CurrentNaet:	current.NetReserveChangeNaet,
+			ProjectedNaet:	last.NetReserveChangeNaet,
+			DeltaNaet:	last.NetReserveChangeNaet.Sub(current.NetReserveChangeNaet),
+			CurrentBps:	currentBps,
+			ProjectedBps:	proposedBps,
 		},
 		{
-			Metric:        "net_issuance",
-			CurrentNaet:   current.NetIssuanceNaet,
-			ProjectedNaet: last.NetIssuanceNaet,
-			DeltaNaet:     last.NetIssuanceNaet.Sub(current.NetIssuanceNaet),
-			CurrentBps:    currentBps,
-			ProjectedBps:  proposedBps,
+			Metric:		"net_issuance",
+			CurrentNaet:	current.NetIssuanceNaet,
+			ProjectedNaet:	last.NetIssuanceNaet,
+			DeltaNaet:	last.NetIssuanceNaet.Sub(current.NetIssuanceNaet),
+			CurrentBps:	currentBps,
+			ProjectedBps:	proposedBps,
 		},
 	}
 }

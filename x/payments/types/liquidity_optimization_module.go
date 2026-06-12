@@ -14,118 +14,118 @@ import (
 type LiquidityOptimizationMessageType string
 
 const (
-	LiquidityMsgAdvertiseLiquidity    LiquidityOptimizationMessageType = "MsgAdvertiseLiquidity"
-	LiquidityMsgReserveLiquidity      LiquidityOptimizationMessageType = "MsgReserveLiquidity"
-	LiquidityMsgReleaseReservation    LiquidityOptimizationMessageType = "MsgReleaseReservation"
-	LiquidityMsgUpdateFeePolicy       LiquidityOptimizationMessageType = "MsgUpdateFeePolicy"
-	LiquidityMsgSubmitRebalanceIntent LiquidityOptimizationMessageType = "MsgSubmitRebalanceIntent"
-	LiquidityMsgSetLiquidityLimits    LiquidityOptimizationMessageType = "MsgSetLiquidityLimits"
+	LiquidityMsgAdvertiseLiquidity		LiquidityOptimizationMessageType	= "MsgAdvertiseLiquidity"
+	LiquidityMsgReserveLiquidity		LiquidityOptimizationMessageType	= "MsgReserveLiquidity"
+	LiquidityMsgReleaseReservation		LiquidityOptimizationMessageType	= "MsgReleaseReservation"
+	LiquidityMsgUpdateFeePolicy		LiquidityOptimizationMessageType	= "MsgUpdateFeePolicy"
+	LiquidityMsgSubmitRebalanceIntent	LiquidityOptimizationMessageType	= "MsgSubmitRebalanceIntent"
+	LiquidityMsgSetLiquidityLimits		LiquidityOptimizationMessageType	= "MsgSetLiquidityLimits"
 )
 
 type LiquidityPosition struct {
-	PositionID         string
-	ChannelID          string
-	Owner              string
-	Counterparty       string
-	AdvertisedCapacity string
-	ReservedCapacity   string
-	AvailableCapacity  string
-	FeePolicyID        string
-	ReliabilityBps     uint32
-	UpdatedHeight      uint64
-	AdvertisementHash  string
-	PositionHash       string
+	PositionID		string
+	ChannelID		string
+	Owner			string
+	Counterparty		string
+	AdvertisedCapacity	string
+	ReservedCapacity	string
+	AvailableCapacity	string
+	FeePolicyID		string
+	ReliabilityBps		uint32
+	UpdatedHeight		uint64
+	AdvertisementHash	string
+	PositionHash		string
 }
 
 type Reservation struct {
-	ReservationID    string
-	AdvertisementID  string
-	ChannelID        string
-	Reserver         string
-	Counterparty     string
-	Capacity         string
-	FeeAmount        string
-	ExpirationHeight uint64
-	CreatedHeight    uint64
-	Released         bool
-	ReleaseHeight    uint64
-	CommitmentHash   string
+	ReservationID		string
+	AdvertisementID		string
+	ChannelID		string
+	Reserver		string
+	Counterparty		string
+	Capacity		string
+	FeeAmount		string
+	ExpirationHeight	uint64
+	CreatedHeight		uint64
+	Released		bool
+	ReleaseHeight		uint64
+	CommitmentHash		string
 }
 
 type RebalanceIntent struct {
-	IntentID          string
-	ChannelID         string
-	Owner             string
-	TargetCapacity    string
-	MaxSettlementLoad uint32
-	Priority          uint32
-	SubmittedHeight   uint64
-	ExpiresHeight     uint64
-	IntentHash        string
+	IntentID		string
+	ChannelID		string
+	Owner			string
+	TargetCapacity		string
+	MaxSettlementLoad	uint32
+	Priority		uint32
+	SubmittedHeight		uint64
+	ExpiresHeight		uint64
+	IntentHash		string
 }
 
 type CapacityForecast struct {
-	ForecastID            string
-	ChannelID             string
-	From                  string
-	To                    string
-	AvailableCapacity     string
-	ReservedCapacity      string
-	PendingConditionCount uint32
-	ReservePressureBps    uint32
-	ForecastHeight        uint64
-	ExpiresHeight         uint64
-	ForecastHash          string
+	ForecastID		string
+	ChannelID		string
+	From			string
+	To			string
+	AvailableCapacity	string
+	ReservedCapacity	string
+	PendingConditionCount	uint32
+	ReservePressureBps	uint32
+	ForecastHeight		uint64
+	ExpiresHeight		uint64
+	ForecastHash		string
 }
 
 type LiquidityScore struct {
-	ScoreID       string
-	ChannelID     string
-	From          string
-	To            string
-	RawScore      int64
-	Score         int64
-	DecayBps      uint32
-	UpdatedHeight uint64
-	ExpiresHeight uint64
-	ScoreHash     string
+	ScoreID		string
+	ChannelID	string
+	From		string
+	To		string
+	RawScore	int64
+	Score		int64
+	DecayBps	uint32
+	UpdatedHeight	uint64
+	ExpiresHeight	uint64
+	ScoreHash	string
 }
 
 type LiquidityLimits struct {
-	LimitID              string
-	ChannelID            string
-	Participant          string
-	MaxReservedCapacity  string
-	MinAvailableCapacity string
-	MaxBaseFee           string
-	MaxReservationFee    string
-	MaxVirtualSetupFee   string
-	MaxProportionalBps   uint32
-	MaxRebalanceLoad     uint32
-	UpdatedHeight        uint64
-	LimitHash            string
+	LimitID			string
+	ChannelID		string
+	Participant		string
+	MaxReservedCapacity	string
+	MinAvailableCapacity	string
+	MaxBaseFee		string
+	MaxReservationFee	string
+	MaxVirtualSetupFee	string
+	MaxProportionalBps	uint32
+	MaxRebalanceLoad	uint32
+	UpdatedHeight		uint64
+	LimitHash		string
 }
 
 type LiquidityFeePolicyBounds struct {
-	MaxBaseFee         string
-	MaxReservationFee  string
-	MaxVirtualSetupFee string
-	MaxCongestionFee   string
-	MaxFailurePenalty  string
-	MaxHopFee          string
-	MaxProportionalBps uint32
-	MinValidityWindow  uint64
-	MaxValidityWindow  uint64
+	MaxBaseFee		string
+	MaxReservationFee	string
+	MaxVirtualSetupFee	string
+	MaxCongestionFee	string
+	MaxFailurePenalty	string
+	MaxHopFee		string
+	MaxProportionalBps	uint32
+	MinValidityWindow	uint64
+	MaxValidityWindow	uint64
 }
 
 type LiquidityOptimizationState struct {
-	Positions        []LiquidityPosition
-	Reservations     []Reservation
-	RebalanceIntents []RebalanceIntent
-	FeePolicies      []FeePolicy
-	Forecasts        []CapacityForecast
-	Scores           []LiquidityScore
-	Limits           []LiquidityLimits
+	Positions		[]LiquidityPosition
+	Reservations		[]Reservation
+	RebalanceIntents	[]RebalanceIntent
+	FeePolicies		[]FeePolicy
+	Forecasts		[]CapacityForecast
+	Scores			[]LiquidityScore
+	Limits			[]LiquidityLimits
 }
 
 type LiquidityOptimizationMessage interface {
@@ -134,42 +134,42 @@ type LiquidityOptimizationMessage interface {
 }
 
 type MsgAdvertiseLiquidity struct {
-	Signer          string
-	Advertisement   LiquidityAdvertisement
-	RequiredDeposit string
-	CurrentHeight   uint64
+	Signer		string
+	Advertisement	LiquidityAdvertisement
+	RequiredDeposit	string
+	CurrentHeight	uint64
 }
 
 type MsgReserveLiquidity struct {
-	Reservation   SignedLiquidityReservation
-	CurrentHeight uint64
+	Reservation	SignedLiquidityReservation
+	CurrentHeight	uint64
 }
 
 type MsgReleaseReservation struct {
-	ReservationID string
-	ChannelID     string
-	Releaser      string
-	CurrentHeight uint64
-	Reason        string
+	ReservationID	string
+	ChannelID	string
+	Releaser	string
+	CurrentHeight	uint64
+	Reason		string
 }
 
 type MsgUpdateFeePolicy struct {
-	Signer        string
-	Policy        RoutingFeePolicyUpdate
-	Bounds        LiquidityFeePolicyBounds
-	CurrentHeight uint64
+	Signer		string
+	Policy		RoutingFeePolicyUpdate
+	Bounds		LiquidityFeePolicyBounds
+	CurrentHeight	uint64
 }
 
 type MsgSubmitRebalanceIntent struct {
-	Signer        string
-	Intent        RebalanceIntent
-	CurrentHeight uint64
+	Signer		string
+	Intent		RebalanceIntent
+	CurrentHeight	uint64
 }
 
 type MsgSetLiquidityLimits struct {
-	Signer        string
-	Limits        LiquidityLimits
-	CurrentHeight uint64
+	Signer		string
+	Limits		LiquidityLimits
+	CurrentHeight	uint64
 }
 
 func EmptyLiquidityOptimizationState() LiquidityOptimizationState {
@@ -241,17 +241,17 @@ func AdvertiseLiquidity(chain PaymentsState, state LiquidityOptimizationState, m
 		return LiquidityOptimizationState{}, err
 	}
 	position := LiquidityPosition{
-		PositionID:         HashParts("liquidity-position", ad.AdvertisementID),
-		ChannelID:          ad.ChannelID,
-		Owner:              ad.Advertiser,
-		Counterparty:       ad.Counterparty,
-		AdvertisedCapacity: ad.Capacity,
-		ReservedCapacity:   reserved.String(),
-		AvailableCapacity:  available,
-		FeePolicyID:        ad.AdvertisementID,
-		ReliabilityBps:     ad.ReliabilityBps,
-		UpdatedHeight:      msg.CurrentHeight,
-		AdvertisementHash:  ad.AdvertisementHash,
+		PositionID:		HashParts("liquidity-position", ad.AdvertisementID),
+		ChannelID:		ad.ChannelID,
+		Owner:			ad.Advertiser,
+		Counterparty:		ad.Counterparty,
+		AdvertisedCapacity:	ad.Capacity,
+		ReservedCapacity:	reserved.String(),
+		AvailableCapacity:	available,
+		FeePolicyID:		ad.AdvertisementID,
+		ReliabilityBps:		ad.ReliabilityBps,
+		UpdatedHeight:		msg.CurrentHeight,
+		AdvertisementHash:	ad.AdvertisementHash,
 	}
 	position = position.WithHash()
 	next := state.Clone()
@@ -342,15 +342,15 @@ func UpdateLiquidityFeePolicy(chain PaymentsState, state LiquidityOptimizationSt
 		return LiquidityOptimizationState{}, err
 	}
 	policy := FeePolicy{
-		PolicyID:    msg.Policy.PolicyID,
-		ChannelID:   msg.Policy.ChannelID,
-		From:        msg.Policy.From,
-		To:          msg.Policy.To,
-		BaseFee:     msg.Policy.BaseHopFee,
-		MaxFee:      msg.Policy.MaxHopFee,
-		ValidAfter:  msg.Policy.ValidAfterHeight,
-		ValidUntil:  msg.Policy.ValidUntilHeight,
-		MessageHash: msg.Policy.PolicyHash,
+		PolicyID:	msg.Policy.PolicyID,
+		ChannelID:	msg.Policy.ChannelID,
+		From:		msg.Policy.From,
+		To:		msg.Policy.To,
+		BaseFee:	msg.Policy.BaseHopFee,
+		MaxFee:		msg.Policy.MaxHopFee,
+		ValidAfter:	msg.Policy.ValidAfterHeight,
+		ValidUntil:	msg.Policy.ValidUntilHeight,
+		MessageHash:	msg.Policy.PolicyHash,
 	}.Normalize()
 	if err := policy.Validate(); err != nil {
 		return LiquidityOptimizationState{}, err
@@ -493,16 +493,16 @@ func BuildCapacityForecast(chain PaymentsState, state LiquidityOptimizationState
 		}
 	}
 	forecast := CapacityForecast{
-		ForecastID:            HashParts("liquidity-capacity-forecast", channelID, from, to, fmt.Sprintf("%020d", currentHeight)),
-		ChannelID:             channelID,
-		From:                  from,
-		To:                    to,
-		AvailableCapacity:     available.String(),
-		ReservedCapacity:      reserved.String(),
-		PendingConditionCount: uint32(len(channel.LatestState.Conditions)),
-		ReservePressureBps:    pressure,
-		ForecastHeight:        currentHeight,
-		ExpiresHeight:         currentHeight + ttl,
+		ForecastID:		HashParts("liquidity-capacity-forecast", channelID, from, to, fmt.Sprintf("%020d", currentHeight)),
+		ChannelID:		channelID,
+		From:			from,
+		To:			to,
+		AvailableCapacity:	available.String(),
+		ReservedCapacity:	reserved.String(),
+		PendingConditionCount:	uint32(len(channel.LatestState.Conditions)),
+		ReservePressureBps:	pressure,
+		ForecastHeight:		currentHeight,
+		ExpiresHeight:		currentHeight + ttl,
 	}
 	return forecast.WithHash(), nil
 }
@@ -516,15 +516,15 @@ func BuildLiquidityScoreForAdvertisement(ad LiquidityAdvertisement, stats EdgeRo
 		return LiquidityScore{}, err
 	}
 	score := LiquidityScore{
-		ScoreID:       HashParts("liquidity-score", ad.ChannelID, ad.Advertiser, ad.Counterparty),
-		ChannelID:     ad.ChannelID,
-		From:          ad.Advertiser,
-		To:            ad.Counterparty,
-		RawScore:      raw,
-		Score:         raw,
-		DecayBps:      0,
-		UpdatedHeight: currentHeight,
-		ExpiresHeight: currentHeight + ttl,
+		ScoreID:	HashParts("liquidity-score", ad.ChannelID, ad.Advertiser, ad.Counterparty),
+		ChannelID:	ad.ChannelID,
+		From:		ad.Advertiser,
+		To:		ad.Counterparty,
+		RawScore:	raw,
+		Score:		raw,
+		DecayBps:	0,
+		UpdatedHeight:	currentHeight,
+		ExpiresHeight:	currentHeight + ttl,
 	}
 	return score.WithHash(), nil
 }
@@ -577,9 +577,9 @@ func ValidateLiquidityFeePolicyBounds(policy RoutingFeePolicyUpdate, bounds Liqu
 		return errors.New("payments liquidity fee policy proportional fee exceeds bounds")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
-		bound string
+		name	string
+		value	string
+		bound	string
 	}{
 		{"payments liquidity fee policy base fee", policy.BaseHopFee, bounds.MaxBaseFee},
 		{"payments liquidity fee policy reservation fee", policy.LiquidityReservationFee, bounds.MaxReservationFee},
@@ -598,16 +598,16 @@ func ValidateLiquidityFeePolicyBounds(policy RoutingFeePolicyUpdate, bounds Liqu
 func ReservationFromSigned(reservation SignedLiquidityReservation, createdHeight uint64) Reservation {
 	reservation = reservation.Normalize()
 	return Reservation{
-		ReservationID:    reservation.ReservationID,
-		AdvertisementID:  reservation.AdvertisementID,
-		ChannelID:        reservation.ChannelID,
-		Reserver:         reservation.Reserver,
-		Counterparty:     reservation.Counterparty,
-		Capacity:         reservation.Capacity,
-		FeeAmount:        reservation.FeeAmount,
-		ExpirationHeight: reservation.ExpirationHeight,
-		CreatedHeight:    createdHeight,
-		CommitmentHash:   reservation.CommitmentHash,
+		ReservationID:		reservation.ReservationID,
+		AdvertisementID:	reservation.AdvertisementID,
+		ChannelID:		reservation.ChannelID,
+		Reserver:		reservation.Reserver,
+		Counterparty:		reservation.Counterparty,
+		Capacity:		reservation.Capacity,
+		FeeAmount:		reservation.FeeAmount,
+		ExpirationHeight:	reservation.ExpirationHeight,
+		CreatedHeight:		createdHeight,
+		CommitmentHash:		reservation.CommitmentHash,
 	}.Normalize()
 }
 
@@ -617,13 +617,13 @@ func (s LiquidityOptimizationState) Export() LiquidityOptimizationState {
 
 func (s LiquidityOptimizationState) Clone() LiquidityOptimizationState {
 	out := LiquidityOptimizationState{
-		Positions:        make([]LiquidityPosition, len(s.Positions)),
-		Reservations:     make([]Reservation, len(s.Reservations)),
-		RebalanceIntents: make([]RebalanceIntent, len(s.RebalanceIntents)),
-		FeePolicies:      make([]FeePolicy, len(s.FeePolicies)),
-		Forecasts:        make([]CapacityForecast, len(s.Forecasts)),
-		Scores:           make([]LiquidityScore, len(s.Scores)),
-		Limits:           make([]LiquidityLimits, len(s.Limits)),
+		Positions:		make([]LiquidityPosition, len(s.Positions)),
+		Reservations:		make([]Reservation, len(s.Reservations)),
+		RebalanceIntents:	make([]RebalanceIntent, len(s.RebalanceIntents)),
+		FeePolicies:		make([]FeePolicy, len(s.FeePolicies)),
+		Forecasts:		make([]CapacityForecast, len(s.Forecasts)),
+		Scores:			make([]LiquidityScore, len(s.Scores)),
+		Limits:			make([]LiquidityLimits, len(s.Limits)),
 	}
 	copy(out.Positions, s.Positions)
 	copy(out.Reservations, s.Reservations)
@@ -1003,8 +1003,8 @@ func (l LiquidityLimits) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name   string
-		amount string
+		name	string
+		amount	string
 	}{
 		{"payments liquidity max reserved", limits.MaxReservedCapacity},
 		{"payments liquidity min available", limits.MinAvailableCapacity},

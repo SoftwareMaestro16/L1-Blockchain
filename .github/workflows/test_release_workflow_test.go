@@ -12,7 +12,7 @@ func repoRoot() string {
 		return dir
 	}
 	cwd, _ := os.Getwd()
-	// If we're in .github/workflows, go up two dirs
+
 	if strings.HasSuffix(cwd, ".github/workflows") {
 		return filepath.Dir(filepath.Dir(cwd))
 	}

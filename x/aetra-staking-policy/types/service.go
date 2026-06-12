@@ -45,14 +45,14 @@ type QueryServer interface {
 	DelegationWarningStatus(context.Context, *QueryDelegationWarningStatusRequest) (*QueryDelegationWarningStatusResponse, error)
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetrastakingpolicy.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.aetrastakingpolicy.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("UpdateStakingPolicyParams", serviceHandler("UpdateStakingPolicyParams", func() interface{} { return new(MsgUpdateStakingPolicyParams) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).UpdateStakingPolicyParams(ctx, req.(*MsgUpdateStakingPolicyParams))
@@ -64,12 +64,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).AcknowledgeConcentrationWarning(ctx, req.(*MsgAcknowledgeConcentrationWarning))
 		})),
 	},
-	Metadata: "l1/aetrastakingpolicy/v1/tx.proto",
+	Metadata:	"l1/aetrastakingpolicy/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetrastakingpolicy.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.aetrastakingpolicy.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("Params", serviceHandler("Params", func() interface{} { return new(QueryParamsRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -90,7 +90,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).DelegationWarningStatus(ctx, req.(*QueryDelegationWarningStatusRequest))
 		})),
 	},
-	Metadata: "l1/aetrastakingpolicy/v1/query.proto",
+	Metadata:	"l1/aetrastakingpolicy/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -143,7 +143,7 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgUpdateStakingPolicyParams)(nil), "l1.aetrastakingpolicy.v1.MsgUpdateStakingPolicyParams")
@@ -154,70 +154,70 @@ func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgAcknowledgeConcentrationWarningResponse)(nil), "l1.aetrastakingpolicy.v1.MsgAcknowledgeConcentrationWarningResponse")
 }
 
-func (m *MsgUpdateStakingPolicyParams) Reset()         { *m = MsgUpdateStakingPolicyParams{} }
-func (m *MsgRegisterValidatorIdentity) Reset()         { *m = MsgRegisterValidatorIdentity{} }
-func (m *MsgAcknowledgeConcentrationWarning) Reset()   { *m = MsgAcknowledgeConcentrationWarning{} }
-func (m *MsgUpdateStakingPolicyParamsResponse) Reset() { *m = MsgUpdateStakingPolicyParamsResponse{} }
-func (m *MsgRegisterValidatorIdentityResponse) Reset() { *m = MsgRegisterValidatorIdentityResponse{} }
+func (m *MsgUpdateStakingPolicyParams) Reset()		{ *m = MsgUpdateStakingPolicyParams{} }
+func (m *MsgRegisterValidatorIdentity) Reset()		{ *m = MsgRegisterValidatorIdentity{} }
+func (m *MsgAcknowledgeConcentrationWarning) Reset()	{ *m = MsgAcknowledgeConcentrationWarning{} }
+func (m *MsgUpdateStakingPolicyParamsResponse) Reset()	{ *m = MsgUpdateStakingPolicyParamsResponse{} }
+func (m *MsgRegisterValidatorIdentityResponse) Reset()	{ *m = MsgRegisterValidatorIdentityResponse{} }
 func (m *MsgAcknowledgeConcentrationWarningResponse) Reset() {
 	*m = MsgAcknowledgeConcentrationWarningResponse{}
 }
 
-func (m *MsgUpdateStakingPolicyParams) String() string         { return gogoproto.CompactTextString(m) }
-func (m *MsgRegisterValidatorIdentity) String() string         { return gogoproto.CompactTextString(m) }
-func (m *MsgAcknowledgeConcentrationWarning) String() string   { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateStakingPolicyParamsResponse) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgRegisterValidatorIdentityResponse) String() string { return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateStakingPolicyParams) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgRegisterValidatorIdentity) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgAcknowledgeConcentrationWarning) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateStakingPolicyParamsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgRegisterValidatorIdentityResponse) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *MsgAcknowledgeConcentrationWarningResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
 
-func (*MsgUpdateStakingPolicyParams) ProtoMessage()               {}
-func (*MsgRegisterValidatorIdentity) ProtoMessage()               {}
-func (*MsgAcknowledgeConcentrationWarning) ProtoMessage()         {}
-func (*MsgUpdateStakingPolicyParamsResponse) ProtoMessage()       {}
-func (*MsgRegisterValidatorIdentityResponse) ProtoMessage()       {}
-func (*MsgAcknowledgeConcentrationWarningResponse) ProtoMessage() {}
+func (*MsgUpdateStakingPolicyParams) ProtoMessage()			{}
+func (*MsgRegisterValidatorIdentity) ProtoMessage()			{}
+func (*MsgAcknowledgeConcentrationWarning) ProtoMessage()		{}
+func (*MsgUpdateStakingPolicyParamsResponse) ProtoMessage()		{}
+func (*MsgRegisterValidatorIdentityResponse) ProtoMessage()		{}
+func (*MsgAcknowledgeConcentrationWarningResponse) ProtoMessage()	{}
 
-func (m *QueryParamsRequest) Reset()                    { *m = QueryParamsRequest{} }
-func (m *QueryParamsResponse) Reset()                   { *m = QueryParamsResponse{} }
-func (m *QueryValidatorEffectivePowerRequest) Reset()   { *m = QueryValidatorEffectivePowerRequest{} }
-func (m *QueryValidatorEffectivePowerResponse) Reset()  { *m = QueryValidatorEffectivePowerResponse{} }
-func (m *QueryValidatorStakeRequest) Reset()            { *m = QueryValidatorStakeRequest{} }
-func (m *QueryValidatorStakeResponse) Reset()           { *m = QueryValidatorStakeResponse{} }
-func (m *QueryTopNConcentrationRequest) Reset()         { *m = QueryTopNConcentrationRequest{} }
-func (m *QueryTopNConcentrationResponse) Reset()        { *m = QueryTopNConcentrationResponse{} }
-func (m *QueryValidatorRewardMultiplierRequest) Reset() { *m = QueryValidatorRewardMultiplierRequest{} }
+func (m *QueryParamsRequest) Reset()			{ *m = QueryParamsRequest{} }
+func (m *QueryParamsResponse) Reset()			{ *m = QueryParamsResponse{} }
+func (m *QueryValidatorEffectivePowerRequest) Reset()	{ *m = QueryValidatorEffectivePowerRequest{} }
+func (m *QueryValidatorEffectivePowerResponse) Reset()	{ *m = QueryValidatorEffectivePowerResponse{} }
+func (m *QueryValidatorStakeRequest) Reset()		{ *m = QueryValidatorStakeRequest{} }
+func (m *QueryValidatorStakeResponse) Reset()		{ *m = QueryValidatorStakeResponse{} }
+func (m *QueryTopNConcentrationRequest) Reset()		{ *m = QueryTopNConcentrationRequest{} }
+func (m *QueryTopNConcentrationResponse) Reset()	{ *m = QueryTopNConcentrationResponse{} }
+func (m *QueryValidatorRewardMultiplierRequest) Reset()	{ *m = QueryValidatorRewardMultiplierRequest{} }
 func (m *QueryValidatorRewardMultiplierResponse) Reset() {
 	*m = QueryValidatorRewardMultiplierResponse{}
 }
-func (m *QueryDelegationWarningStatusRequest) Reset()          { *m = QueryDelegationWarningStatusRequest{} }
-func (m *QueryDelegationWarningStatusResponse) Reset()         { *m = QueryDelegationWarningStatusResponse{} }
-func (m *QueryParamsRequest) String() string                   { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsResponse) String() string                  { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorEffectivePowerRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorEffectivePowerResponse) String() string { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorStakeRequest) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryValidatorStakeResponse) String() string          { return gogoproto.CompactTextString(m) }
-func (m *QueryTopNConcentrationRequest) String() string        { return gogoproto.CompactTextString(m) }
-func (m *QueryTopNConcentrationResponse) String() string       { return gogoproto.CompactTextString(m) }
+func (m *QueryDelegationWarningStatusRequest) Reset()		{ *m = QueryDelegationWarningStatusRequest{} }
+func (m *QueryDelegationWarningStatusResponse) Reset()		{ *m = QueryDelegationWarningStatusResponse{} }
+func (m *QueryParamsRequest) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsResponse) String() string			{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorEffectivePowerRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorEffectivePowerResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorStakeRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryValidatorStakeResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryTopNConcentrationRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryTopNConcentrationResponse) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryValidatorRewardMultiplierRequest) String() string {
 	return gogoproto.CompactTextString(m)
 }
 func (m *QueryValidatorRewardMultiplierResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryDelegationWarningStatusRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryDelegationWarningStatusResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryParamsRequest) ProtoMessage()                      {}
-func (*QueryParamsResponse) ProtoMessage()                     {}
-func (*QueryValidatorEffectivePowerRequest) ProtoMessage()     {}
-func (*QueryValidatorEffectivePowerResponse) ProtoMessage()    {}
-func (*QueryValidatorStakeRequest) ProtoMessage()              {}
-func (*QueryValidatorStakeResponse) ProtoMessage()             {}
-func (*QueryTopNConcentrationRequest) ProtoMessage()           {}
-func (*QueryTopNConcentrationResponse) ProtoMessage()          {}
-func (*QueryValidatorRewardMultiplierRequest) ProtoMessage()   {}
-func (*QueryValidatorRewardMultiplierResponse) ProtoMessage()  {}
-func (*QueryDelegationWarningStatusRequest) ProtoMessage()     {}
-func (*QueryDelegationWarningStatusResponse) ProtoMessage()    {}
+func (m *QueryDelegationWarningStatusRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryDelegationWarningStatusResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()			{}
+func (*QueryParamsResponse) ProtoMessage()			{}
+func (*QueryValidatorEffectivePowerRequest) ProtoMessage()	{}
+func (*QueryValidatorEffectivePowerResponse) ProtoMessage()	{}
+func (*QueryValidatorStakeRequest) ProtoMessage()		{}
+func (*QueryValidatorStakeResponse) ProtoMessage()		{}
+func (*QueryTopNConcentrationRequest) ProtoMessage()		{}
+func (*QueryTopNConcentrationResponse) ProtoMessage()		{}
+func (*QueryValidatorRewardMultiplierRequest) ProtoMessage()	{}
+func (*QueryValidatorRewardMultiplierResponse) ProtoMessage()	{}
+func (*QueryDelegationWarningStatusRequest) ProtoMessage()	{}
+func (*QueryDelegationWarningStatusResponse) ProtoMessage()	{}

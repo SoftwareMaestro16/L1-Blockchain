@@ -34,25 +34,25 @@ func TestAVMMethodDescriptorSupportsExecutionModesAndOptionalRequirements(t *tes
 		AVMInterfaceExecutionGet,
 	} {
 		method := AVMMethodDescriptor{
-			MethodID:                   "method-" + string(mode),
-			Name:                       "method_" + string(mode),
-			InputSchemaHash:            engineHash("input-" + string(mode)),
-			OutputSchemaHash:           engineHash("output-" + string(mode)),
-			ExecutionMode:              mode,
-			GasHint:                    10,
-			PaymentRequirementOptional: "naet",
-			ProofRequirementOptional:   "state-proof",
+			MethodID:			"method-" + string(mode),
+			Name:				"method_" + string(mode),
+			InputSchemaHash:		engineHash("input-" + string(mode)),
+			OutputSchemaHash:		engineHash("output-" + string(mode)),
+			ExecutionMode:			mode,
+			GasHint:			10,
+			PaymentRequirementOptional:	"naet",
+			ProofRequirementOptional:	"state-proof",
 		}
 		require.NoError(t, method.Validate())
 	}
 
 	badMode := AVMMethodDescriptor{
-		MethodID:         "bad",
-		Name:             "bad",
-		InputSchemaHash:  engineHash("input"),
-		OutputSchemaHash: engineHash("output"),
-		ExecutionMode:    AVMInterfaceExecutionMode("streaming"),
-		GasHint:          1,
+		MethodID:		"bad",
+		Name:			"bad",
+		InputSchemaHash:	engineHash("input"),
+		OutputSchemaHash:	engineHash("output"),
+		ExecutionMode:		AVMInterfaceExecutionMode("streaming"),
+		GasHint:		1,
 	}
 	require.ErrorContains(t, badMode.Validate(), "execution mode")
 
@@ -65,19 +65,19 @@ func TestAVMMethodDescriptorSupportsExecutionModesAndOptionalRequirements(t *tes
 func TestAVMInterfaceRegistryRootAndDuplicateRejection(t *testing.T) {
 	descriptor := testAVMInterfaceDescriptor(t)
 	second, err := NewAVMInterfaceDescriptor(AVMInterfaceDescriptor{
-		InterfaceVersion: "v1.0.1",
-		Owner:            "native-bank",
-		TargetType:       AVMInterfaceTargetNativeModule,
+		InterfaceVersion:	"v1.0.1",
+		Owner:			"native-bank",
+		TargetType:		AVMInterfaceTargetNativeModule,
 		MethodDescriptors: []AVMMethodDescriptor{{
-			MethodID:         "bank.send",
-			Name:             "MsgSend",
-			InputSchemaHash:  engineHash("bank-send-input"),
-			OutputSchemaHash: engineHash("bank-send-output"),
-			ExecutionMode:    AVMInterfaceExecutionSync,
-			GasHint:          20,
+			MethodID:		"bank.send",
+			Name:			"MsgSend",
+			InputSchemaHash:	engineHash("bank-send-input"),
+			OutputSchemaHash:	engineHash("bank-send-output"),
+			ExecutionMode:		AVMInterfaceExecutionSync,
+			GasHint:		20,
 		}},
-		SchemaEncoding:       AVMInterfaceSchemaProtobuf,
-		MetadataHashOptional: engineHash("bank-metadata"),
+		SchemaEncoding:		AVMInterfaceSchemaProtobuf,
+		MetadataHashOptional:	engineHash("bank-metadata"),
 	})
 	require.NoError(t, err)
 
@@ -96,38 +96,38 @@ func TestAVMInterfaceRegistryRootAndDuplicateRejection(t *testing.T) {
 func TestAVMInterfaceSchemaBindingsQueriesAndSDKCodegen(t *testing.T) {
 	contractDescriptor := testAVMInterfaceDescriptor(t)
 	serviceDescriptor, err := NewAVMInterfaceDescriptor(AVMInterfaceDescriptor{
-		InterfaceVersion: "v2.0.0",
-		Owner:            "rpc-service",
-		TargetType:       AVMInterfaceTargetService,
+		InterfaceVersion:	"v2.0.0",
+		Owner:			"rpc-service",
+		TargetType:		AVMInterfaceTargetService,
 		MethodDescriptors: []AVMMethodDescriptor{{
-			MethodID:         "rpc.submit",
-			Name:             "submit",
-			InputSchemaHash:  engineHash("rpc-submit-input"),
-			OutputSchemaHash: engineHash("rpc-submit-output"),
-			ExecutionMode:    AVMInterfaceExecutionSync,
-			GasHint:          11,
+			MethodID:		"rpc.submit",
+			Name:			"submit",
+			InputSchemaHash:	engineHash("rpc-submit-input"),
+			OutputSchemaHash:	engineHash("rpc-submit-output"),
+			ExecutionMode:		AVMInterfaceExecutionSync,
+			GasHint:		11,
 		}},
-		SchemaEncoding: AVMInterfaceSchemaProtobuf,
+		SchemaEncoding:	AVMInterfaceSchemaProtobuf,
 	})
 	require.NoError(t, err)
 	contractSchema := testAVMInterfaceSchema(t, contractDescriptor)
 	serviceSchema := testAVMInterfaceSchema(t, serviceDescriptor)
 	contractBinding, err := NewAVMInterfaceBinding(AVMInterfaceBinding{
-		TargetID:      "contract-actor-1",
-		TargetType:    AVMInterfaceTargetContract,
-		InterfaceHash: contractDescriptor.InterfaceHash,
+		TargetID:	"contract-actor-1",
+		TargetType:	AVMInterfaceTargetContract,
+		InterfaceHash:	contractDescriptor.InterfaceHash,
 	})
 	require.NoError(t, err)
 	serviceBinding, err := NewAVMInterfaceBinding(AVMInterfaceBinding{
-		TargetID:      "rpc-service",
-		TargetType:    AVMInterfaceTargetService,
-		InterfaceHash: serviceDescriptor.InterfaceHash,
+		TargetID:	"rpc-service",
+		TargetType:	AVMInterfaceTargetService,
+		InterfaceHash:	serviceDescriptor.InterfaceHash,
 	})
 	require.NoError(t, err)
 	registry, err := NewAVMInterfaceRegistry(AVMInterfaceRegistry{
-		Interfaces: []AVMInterfaceDescriptor{serviceDescriptor, contractDescriptor},
-		Schemas:    []AVMInterfaceSchema{serviceSchema, contractSchema},
-		Bindings:   []AVMInterfaceBinding{serviceBinding, contractBinding},
+		Interfaces:	[]AVMInterfaceDescriptor{serviceDescriptor, contractDescriptor},
+		Schemas:	[]AVMInterfaceSchema{serviceSchema, contractSchema},
+		Bindings:	[]AVMInterfaceBinding{serviceBinding, contractBinding},
 	})
 	require.NoError(t, err)
 
@@ -140,11 +140,11 @@ func TestAVMInterfaceSchemaBindingsQueriesAndSDKCodegen(t *testing.T) {
 	require.Equal(t, serviceDescriptor.InterfaceHash, queriedService.InterfaceHash)
 
 	codegen, err := NewAVMSDKCodeGenerationFormat(AVMSDKCodeGenerationFormat{
-		InterfaceHash:     contractDescriptor.InterfaceHash,
-		Format:            AVMInterfaceSDKTypeScript,
-		PackageName:       "aetra_actor",
-		MethodBindings:    []string{"execute", "schedule"},
-		GetMethodBindings: []string{"balance"},
+		InterfaceHash:		contractDescriptor.InterfaceHash,
+		Format:			AVMInterfaceSDKTypeScript,
+		PackageName:		"aetra_actor",
+		MethodBindings:		[]string{"execute", "schedule"},
+		GetMethodBindings:	[]string{"balance"},
 	})
 	require.NoError(t, err)
 	require.NoError(t, codegen.Validate())
@@ -169,8 +169,8 @@ func TestAVMInterfaceHashVerificationSchemaMismatchAndVersionChanges(t *testing.
 	require.ErrorContains(t, VerifyAVMInterfaceSchema(descriptor, schema), "descriptor root mismatch")
 
 	registry, err := NewAVMInterfaceRegistry(AVMInterfaceRegistry{
-		Interfaces: []AVMInterfaceDescriptor{descriptor},
-		Schemas:    []AVMInterfaceSchema{schema},
+		Interfaces:	[]AVMInterfaceDescriptor{descriptor},
+		Schemas:	[]AVMInterfaceSchema{schema},
 	})
 	require.NoError(t, err)
 	require.Equal(t, schema.SchemaHash, registry.Schemas[0].SchemaHash)
@@ -224,54 +224,54 @@ func TestAVMInterfaceDescriptorRejectsMalformedDescriptorSets(t *testing.T) {
 func testAVMInterfaceDescriptor(t *testing.T) AVMInterfaceDescriptor {
 	t.Helper()
 	descriptor, err := NewAVMInterfaceDescriptor(AVMInterfaceDescriptor{
-		InterfaceVersion: "v1.0.0",
-		Owner:            "actor-contract-1",
-		TargetType:       AVMInterfaceTargetActor,
+		InterfaceVersion:	"v1.0.0",
+		Owner:			"actor-contract-1",
+		TargetType:		AVMInterfaceTargetActor,
 		MethodDescriptors: []AVMMethodDescriptor{
 			{
-				MethodID:                   "actor.execute",
-				Name:                       "execute",
-				InputSchemaHash:            engineHash("execute-input"),
-				OutputSchemaHash:           engineHash("execute-output"),
-				ExecutionMode:              AVMInterfaceExecutionAsync,
-				GasHint:                    100,
-				PaymentRequirementOptional: "naet",
-				ProofRequirementOptional:   "state-proof",
+				MethodID:			"actor.execute",
+				Name:				"execute",
+				InputSchemaHash:		engineHash("execute-input"),
+				OutputSchemaHash:		engineHash("execute-output"),
+				ExecutionMode:			AVMInterfaceExecutionAsync,
+				GasHint:			100,
+				PaymentRequirementOptional:	"naet",
+				ProofRequirementOptional:	"state-proof",
 			},
 			{
-				MethodID:         "actor.schedule",
-				Name:             "schedule",
-				InputSchemaHash:  engineHash("schedule-input"),
-				OutputSchemaHash: engineHash("schedule-output"),
-				ExecutionMode:    AVMInterfaceExecutionScheduled,
-				GasHint:          120,
+				MethodID:		"actor.schedule",
+				Name:			"schedule",
+				InputSchemaHash:	engineHash("schedule-input"),
+				OutputSchemaHash:	engineHash("schedule-output"),
+				ExecutionMode:		AVMInterfaceExecutionScheduled,
+				GasHint:		120,
 			},
 		},
 		EventDescriptors: []AVMEventDescriptor{{
-			EventID:    "actor.executed",
-			Name:       "ActorExecuted",
-			SchemaHash: engineHash("event-schema"),
+			EventID:	"actor.executed",
+			Name:		"ActorExecuted",
+			SchemaHash:	engineHash("event-schema"),
 		}},
 		AsyncHandlerDescriptors: []AVMAsyncHandlerDescriptor{{
-			HandlerID:           "actor.handle",
-			Name:                "handle",
-			InputSchemaHash:     engineHash("handler-input"),
-			OutputSchemaHash:    engineHash("handler-output"),
-			GasHint:             80,
-			RetryPolicyOptional: "bounded",
-			CallbackBehavior:    "emit_receipt",
-			TimeoutHeight:       10,
+			HandlerID:		"actor.handle",
+			Name:			"handle",
+			InputSchemaHash:	engineHash("handler-input"),
+			OutputSchemaHash:	engineHash("handler-output"),
+			GasHint:		80,
+			RetryPolicyOptional:	"bounded",
+			CallbackBehavior:	"emit_receipt",
+			TimeoutHeight:		10,
 		}},
 		GetMethodDescriptors: []AVMGetMethodDescriptor{{
-			MethodID:         "actor.balance",
-			Name:             "balance",
-			InputSchemaHash:  engineHash("get-input"),
-			OutputSchemaHash: engineHash("get-output"),
-			GasHint:          5,
-			ReadOnly:         true,
+			MethodID:		"actor.balance",
+			Name:			"balance",
+			InputSchemaHash:	engineHash("get-input"),
+			OutputSchemaHash:	engineHash("get-output"),
+			GasHint:		5,
+			ReadOnly:		true,
 		}},
-		SchemaEncoding:       AVMInterfaceSchemaJSONSchema,
-		MetadataHashOptional: engineHash("interface-metadata"),
+		SchemaEncoding:		AVMInterfaceSchemaJSONSchema,
+		MetadataHashOptional:	engineHash("interface-metadata"),
 	})
 	require.NoError(t, err)
 	return descriptor
@@ -280,9 +280,9 @@ func testAVMInterfaceDescriptor(t *testing.T) AVMInterfaceDescriptor {
 func testAVMInterfaceSchema(t *testing.T, descriptor AVMInterfaceDescriptor) AVMInterfaceSchema {
 	t.Helper()
 	schema, err := NewAVMInterfaceSchema(AVMInterfaceSchema{
-		InterfaceHash:  descriptor.InterfaceHash,
-		SchemaEncoding: descriptor.SchemaEncoding,
-		DescriptorRoot: ComputeAVMInterfaceDescriptorRoot(descriptor),
+		InterfaceHash:	descriptor.InterfaceHash,
+		SchemaEncoding:	descriptor.SchemaEncoding,
+		DescriptorRoot:	ComputeAVMInterfaceDescriptorRoot(descriptor),
 		UseCases: []AVMInterfaceUseCase{
 			AVMInterfaceUseUIGeneration,
 			AVMInterfaceUseWalletForms,

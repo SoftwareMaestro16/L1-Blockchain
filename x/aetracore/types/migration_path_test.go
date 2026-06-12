@@ -396,17 +396,17 @@ func TestPerformanceHardeningMigrationEvidenceRequiresScalingSyncAndCongestionDe
 
 func validBaselineHardeningEvidence() BaselineHardeningEvidence {
 	evidence := BaselineHardeningEvidence{
-		ModuleBoundaryDocsRoot:   hashParts("module boundary docs"),
-		StateExportManifestHash:  hashParts("export manifest"),
-		GenesisImportHash:        hashParts("genesis import"),
-		DynamicFeeBoundsTestHash: hashParts("dynamic fee bounds tests"),
-		LegacyInvariantRoot:      hashParts("staking slashing bank distribution invariants"),
-		StoreV2AuditHash:         hashParts("store v2 compatibility audit"),
-		UpgradeHandlerPrefixHash: hashParts("upgrade handler prefix migration"),
-		StateReproducible:        true,
-		StateExportable:          true,
-		InvariantCoverage:        true,
-		PrefixMigrationSafe:      true,
+		ModuleBoundaryDocsRoot:		hashParts("module boundary docs"),
+		StateExportManifestHash:	hashParts("export manifest"),
+		GenesisImportHash:		hashParts("genesis import"),
+		DynamicFeeBoundsTestHash:	hashParts("dynamic fee bounds tests"),
+		LegacyInvariantRoot:		hashParts("staking slashing bank distribution invariants"),
+		StoreV2AuditHash:		hashParts("store v2 compatibility audit"),
+		UpgradeHandlerPrefixHash:	hashParts("upgrade handler prefix migration"),
+		StateReproducible:		true,
+		StateExportable:		true,
+		InvariantCoverage:		true,
+		PrefixMigrationSafe:		true,
 	}
 	evidence.EvidenceHash = ComputeBaselineHardeningEvidenceHash(evidence)
 	return evidence
@@ -414,16 +414,16 @@ func validBaselineHardeningEvidence() BaselineHardeningEvidence {
 
 func validCoreCommitmentMigrationEvidence() CoreCommitmentMigrationEvidence {
 	evidence := CoreCommitmentMigrationEvidence{
-		AetraCoreModuleHash:       hashParts("x/aetracore"),
-		DefaultZoneDescriptorHash: hashParts("default zone descriptor"),
-		DefaultZoneStateRoot:      hashParts("default zone state root"),
-		EmptyMessageRoot:          EmptyRootHash,
-		ProofRegistryRoot:         hashParts("proof root registry"),
-		RootQueryAPIHash:          hashParts("root query APIs"),
-		AppHashCoreRoot:           hashParts("app hash includes core root"),
-		DefaultZoneID:             ZoneID("DEFAULT"),
-		SingleZoneMode:            true,
-		ProofRegistryMetadata:     true,
+		AetraCoreModuleHash:		hashParts("x/aetracore"),
+		DefaultZoneDescriptorHash:	hashParts("default zone descriptor"),
+		DefaultZoneStateRoot:		hashParts("default zone state root"),
+		EmptyMessageRoot:		EmptyRootHash,
+		ProofRegistryRoot:		hashParts("proof root registry"),
+		RootQueryAPIHash:		hashParts("root query APIs"),
+		AppHashCoreRoot:		hashParts("app hash includes core root"),
+		DefaultZoneID:			ZoneID("DEFAULT"),
+		SingleZoneMode:			true,
+		ProofRegistryMetadata:		true,
 	}
 	evidence.EvidenceHash = ComputeCoreCommitmentMigrationEvidenceHash(evidence)
 	return evidence
@@ -431,18 +431,18 @@ func validCoreCommitmentMigrationEvidence() CoreCommitmentMigrationEvidence {
 
 func validMessageBusMigrationEvidence() MessageBusMigrationEvidence {
 	evidence := MessageBusMigrationEvidence{
-		MsgbusModuleHash:        hashParts("x/msgbus"),
-		MessageCodecHash:        hashParts("canonical message encoding"),
-		MessageIDDerivationHash: hashParts("message id derivation"),
-		InboxStoreRoot:          hashParts("inbox store root"),
-		OutboxStoreRoot:         hashParts("outbox store root"),
-		ReceiptStoreRoot:        hashParts("receipt store root"),
-		LocalExecutionRoot:      hashParts("local zone message execution"),
-		ExpiryBounceRoot:        hashParts("expiry and bounce logic"),
-		InclusionProofRoot:      hashParts("message inclusion proof"),
-		MessagesCommitted:       true,
-		LocalAsyncDeterministic: true,
-		ReceiptProofQueryable:   true,
+		MsgbusModuleHash:		hashParts("x/msgbus"),
+		MessageCodecHash:		hashParts("canonical message encoding"),
+		MessageIDDerivationHash:	hashParts("message id derivation"),
+		InboxStoreRoot:			hashParts("inbox store root"),
+		OutboxStoreRoot:		hashParts("outbox store root"),
+		ReceiptStoreRoot:		hashParts("receipt store root"),
+		LocalExecutionRoot:		hashParts("local zone message execution"),
+		ExpiryBounceRoot:		hashParts("expiry and bounce logic"),
+		InclusionProofRoot:		hashParts("message inclusion proof"),
+		MessagesCommitted:		true,
+		LocalAsyncDeterministic:	true,
+		ReceiptProofQueryable:		true,
 	}
 	evidence.EvidenceHash = ComputeMessageBusMigrationEvidenceHash(evidence)
 	return evidence
@@ -450,16 +450,16 @@ func validMessageBusMigrationEvidence() MessageBusMigrationEvidence {
 
 func validZoneExtractionMigrationEvidence() ZoneExtractionMigrationEvidence {
 	evidence := ZoneExtractionMigrationEvidence{
-		FinancialZoneRoot:          hashParts("financial zone root"),
-		IdentityZoneRoot:           hashParts("identity zone root"),
-		ApplicationZoneRoot:        hashParts("application zone root"),
-		ZoneKeeperRoot:             hashParts("zone keeper root"),
-		ZonePrefixRoot:             hashParts("zone prefix root"),
-		ZoneFeePolicyRoot:          hashParts("zone fee policy root"),
-		ZoneExecutionSummaryRoot:   hashParts("zone execution summary root"),
-		FinancialModulesRouted:     true,
-		IdentityIsolated:           true,
-		ZoneRootsCommittedPerBlock: true,
+		FinancialZoneRoot:		hashParts("financial zone root"),
+		IdentityZoneRoot:		hashParts("identity zone root"),
+		ApplicationZoneRoot:		hashParts("application zone root"),
+		ZoneKeeperRoot:			hashParts("zone keeper root"),
+		ZonePrefixRoot:			hashParts("zone prefix root"),
+		ZoneFeePolicyRoot:		hashParts("zone fee policy root"),
+		ZoneExecutionSummaryRoot:	hashParts("zone execution summary root"),
+		FinancialModulesRouted:		true,
+		IdentityIsolated:		true,
+		ZoneRootsCommittedPerBlock:	true,
 	}
 	evidence.EvidenceHash = ComputeZoneExtractionMigrationEvidenceHash(evidence)
 	return evidence
@@ -467,17 +467,17 @@ func validZoneExtractionMigrationEvidence() ZoneExtractionMigrationEvidence {
 
 func validShardingRuntimeMigrationEvidence() ShardingRuntimeMigrationEvidence {
 	evidence := ShardingRuntimeMigrationEvidence{
-		ShardsModuleHash:        hashParts("x/shards"),
-		ShardLayoutRoot:         hashParts("shard layout descriptors"),
-		RouteKeyCalculationRoot: hashParts("route key calculation"),
-		PerShardInboxRoot:       hashParts("per shard inbox root"),
-		PerShardOutboxRoot:      hashParts("per shard outbox root"),
-		ShardRootAggregate:      hashParts("shard root aggregation"),
-		SplitMergeScheduleRoot:  hashParts("split merge scheduler"),
-		ShardMigrationRoot:      hashParts("deterministic shard migration"),
-		MultiShardZones:         true,
-		ParallelShardWorkloads:  true,
-		InflightMessagesSafe:    true,
+		ShardsModuleHash:		hashParts("x/shards"),
+		ShardLayoutRoot:		hashParts("shard layout descriptors"),
+		RouteKeyCalculationRoot:	hashParts("route key calculation"),
+		PerShardInboxRoot:		hashParts("per shard inbox root"),
+		PerShardOutboxRoot:		hashParts("per shard outbox root"),
+		ShardRootAggregate:		hashParts("shard root aggregation"),
+		SplitMergeScheduleRoot:		hashParts("split merge scheduler"),
+		ShardMigrationRoot:		hashParts("deterministic shard migration"),
+		MultiShardZones:		true,
+		ParallelShardWorkloads:		true,
+		InflightMessagesSafe:		true,
 	}
 	evidence.EvidenceHash = ComputeShardingRuntimeMigrationEvidenceHash(evidence)
 	return evidence
@@ -485,16 +485,16 @@ func validShardingRuntimeMigrationEvidence() ShardingRuntimeMigrationEvidence {
 
 func validAVM20MigrationEvidence() AVM20MigrationEvidence {
 	evidence := AVM20MigrationEvidence{
-		BytecodeFormatHash:      hashParts("AVM bytecode format"),
-		InterpreterRoot:         hashParts("AVM interpreter"),
-		GasTableRoot:            hashParts("AVM gas table"),
-		ContractStorageRoot:     hashParts("contract storage adapter"),
-		MessageSyscallRoot:      hashParts("contract message syscalls"),
-		ProofSyscallRoot:        hashParts("proof verification syscalls"),
-		ABIRegistryRoot:         hashParts("ABI registry"),
-		DeterministicContracts:  true,
-		AsyncMessages:           true,
-		ContractProofsAvailable: true,
+		BytecodeFormatHash:		hashParts("AVM bytecode format"),
+		InterpreterRoot:		hashParts("AVM interpreter"),
+		GasTableRoot:			hashParts("AVM gas table"),
+		ContractStorageRoot:		hashParts("contract storage adapter"),
+		MessageSyscallRoot:		hashParts("contract message syscalls"),
+		ProofSyscallRoot:		hashParts("proof verification syscalls"),
+		ABIRegistryRoot:		hashParts("ABI registry"),
+		DeterministicContracts:		true,
+		AsyncMessages:			true,
+		ContractProofsAvailable:	true,
 	}
 	evidence.EvidenceHash = ComputeAVM20MigrationEvidenceHash(evidence)
 	return evidence
@@ -502,15 +502,15 @@ func validAVM20MigrationEvidence() AVM20MigrationEvidence {
 
 func validIdentityPaymentIntegrationEvidence() IdentityPaymentIntegrationEvidence {
 	evidence := IdentityPaymentIntegrationEvidence{
-		IdentityProofRoot:            hashParts("identity proof activation"),
-		IdentityLookupMessageRoot:    hashParts("cross zone identity lookup messages"),
-		PaymentChannelSettlementRoot: hashParts("payment channel settlement"),
-		ConditionalPaymentRouteRoot:  hashParts("conditional payment routing"),
-		PaymentProofAPIRoot:          hashParts("payment proof APIs"),
-		WalletSDKHelperRoot:          hashParts("wallet SDK identity payment helpers"),
-		ProofBackedNames:             true,
-		TrustlessPayments:            true,
-		AsyncContractMessages:        true,
+		IdentityProofRoot:		hashParts("identity proof activation"),
+		IdentityLookupMessageRoot:	hashParts("cross zone identity lookup messages"),
+		PaymentChannelSettlementRoot:	hashParts("payment channel settlement"),
+		ConditionalPaymentRouteRoot:	hashParts("conditional payment routing"),
+		PaymentProofAPIRoot:		hashParts("payment proof APIs"),
+		WalletSDKHelperRoot:		hashParts("wallet SDK identity payment helpers"),
+		ProofBackedNames:		true,
+		TrustlessPayments:		true,
+		AsyncContractMessages:		true,
 	}
 	evidence.EvidenceHash = ComputeIdentityPaymentIntegrationEvidenceHash(evidence)
 	return evidence
@@ -518,16 +518,16 @@ func validIdentityPaymentIntegrationEvidence() IdentityPaymentIntegrationEvidenc
 
 func validPerformanceHardeningMigrationEvidence() PerformanceHardeningMigrationEvidence {
 	evidence := PerformanceHardeningMigrationEvidence{
-		BlockSTMWorkloadRoot:     hashParts("BlockSTM zone shard workloads"),
-		ConflictProfileRoot:      hashParts("conflict profiling"),
-		StoreV2BenchmarkRoot:     hashParts("Store v2 benchmarks"),
-		MempoolLaneRoot:          hashParts("mempool lanes"),
-		CongestionRoutingRoot:    hashParts("congestion aware routing"),
-		AdaptiveSyncRecoveryRoot: hashParts("AdaptiveSync recovery tests"),
-		LoadSimulationRoot:       hashParts("multi zone traffic load simulation"),
-		ParallelismScales:        true,
-		StateSyncRecoversRoots:   true,
-		CongestionDeterministic:  true,
+		BlockSTMWorkloadRoot:		hashParts("BlockSTM zone shard workloads"),
+		ConflictProfileRoot:		hashParts("conflict profiling"),
+		StoreV2BenchmarkRoot:		hashParts("Store v2 benchmarks"),
+		MempoolLaneRoot:		hashParts("mempool lanes"),
+		CongestionRoutingRoot:		hashParts("congestion aware routing"),
+		AdaptiveSyncRecoveryRoot:	hashParts("AdaptiveSync recovery tests"),
+		LoadSimulationRoot:		hashParts("multi zone traffic load simulation"),
+		ParallelismScales:		true,
+		StateSyncRecoversRoots:		true,
+		CongestionDeterministic:	true,
 	}
 	evidence.EvidenceHash = ComputePerformanceHardeningMigrationEvidenceHash(evidence)
 	return evidence

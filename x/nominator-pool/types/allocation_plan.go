@@ -7,11 +7,11 @@ import (
 )
 
 type PoolAllocationPlanInput struct {
-	PoolID                string
-	Epoch                 uint64
-	Height                uint64
-	MaxTouchedAllocations uint32
-	Weights               []AllocationWeight
+	PoolID			string
+	Epoch			uint64
+	Height			uint64
+	MaxTouchedAllocations	uint32
+	Weights			[]AllocationWeight
 }
 
 func BuildPoolAllocationPlan(input PoolAllocationPlanInput) (PoolRebalanceReceipt, error) {
@@ -28,9 +28,9 @@ func BuildPoolAllocationPlan(input PoolAllocationPlanInput) (PoolRebalanceReceip
 	sort.SliceStable(weights, func(i, j int) bool { return weights[i].ValidatorAddress < weights[j].ValidatorAddress })
 
 	receipt := PoolRebalanceReceipt{
-		PoolID: input.PoolID,
-		Epoch:  input.Epoch,
-		Height: input.Height,
+		PoolID:	input.PoolID,
+		Epoch:	input.Epoch,
+		Height:	input.Height,
 	}
 	for _, weight := range weights {
 		if weight.WeightBps == 0 {
@@ -40,10 +40,10 @@ func BuildPoolAllocationPlan(input PoolAllocationPlanInput) (PoolRebalanceReceip
 			break
 		}
 		allocation := PoolValidatorAllocation{
-			PoolID:          input.PoolID,
-			Validator:       weight.ValidatorAddress,
-			TargetWeightBps: weight.WeightBps,
-			UpdatedHeight:   input.Height,
+			PoolID:			input.PoolID,
+			Validator:		weight.ValidatorAddress,
+			TargetWeightBps:	weight.WeightBps,
+			UpdatedHeight:		input.Height,
 		}
 		receipt.Allocations = append(receipt.Allocations, allocation)
 		receipt.InternalMetadata.TouchedKeys = append(receipt.InternalMetadata.TouchedKeys, string(PoolAllocationKey(input.PoolID, weight.ValidatorAddress)))

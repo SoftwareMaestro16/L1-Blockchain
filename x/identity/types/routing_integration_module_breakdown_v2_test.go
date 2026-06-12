@@ -53,12 +53,12 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.NoError(t, err)
 
 	tx, err := BuildRoutingIntegrationTransactionMappingV2(IdentitySendByNameRequestV2{
-		Name:             "alice.aet",
-		State:            state,
-		Height:           14,
-		RecordTTL:        30,
-		CurrentHeight:    15,
-		IncludeAuditMemo: true,
+		Name:			"alice.aet",
+		State:			state,
+		Height:			14,
+		RecordTTL:		30,
+		CurrentHeight:		15,
+		IncludeAuditMemo:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "alice.aet", tx.Name)
@@ -67,16 +67,16 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.NoError(t, ValidateIdentityTransactionMappingV2(tx))
 
 	contract, err := BuildRoutingIntegrationContractInvocationMappingV2(IdentityInvokeByNameRequestV2{
-		Name:                  "alice.aet",
-		TargetID:              ResolverKeyContract,
-		InterfaceID:           "aw5",
-		ExpectedInterfaceHash: interfaceHash,
-		Method:                "swap",
-		PayloadHash:           identityHash("payload"),
-		State:                 state,
-		Height:                14,
-		RecordTTL:             30,
-		CurrentHeight:         15,
+		Name:			"alice.aet",
+		TargetID:		ResolverKeyContract,
+		InterfaceID:		"aw5",
+		ExpectedInterfaceHash:	interfaceHash,
+		Method:			"swap",
+		PayloadHash:		identityHash("payload"),
+		State:			state,
+		Height:			14,
+		RecordTTL:		30,
+		CurrentHeight:		15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ResolverKeyContract, contract.TargetID)
@@ -88,15 +88,15 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.NoError(t, ValidateContractInvocationMappingV2(contract))
 
 	service, err := BuildRoutingIntegrationServiceMappingV2(IdentityServiceDiscoveryRequestV2{
-		Name:                  "alice.aet",
-		ServiceID:             "rpc",
-		SupportedTransports:   []string{"https"},
-		AllowedAuthPolicies:   []string{"none"},
-		SupportedServiceTypes: []string{IdentityServiceTypeGenericV1},
-		State:                 state,
-		Height:                14,
-		RecordTTL:             30,
-		CurrentHeight:         15,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		SupportedServiceTypes:	[]string{IdentityServiceTypeGenericV1},
+		State:			state,
+		Height:			14,
+		RecordTTL:		30,
+		CurrentHeight:		15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "rpc", service.ServiceID)
@@ -109,14 +109,14 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	proof := routingIntegrationInlineInterfaceProof(t, state)
 	inlineHash := proof.ResolverRecord.InterfaceDescriptors[0].SchemaHash
 	iface, err := BuildRoutingIntegrationInterfaceMappingV2(IdentityInterfaceSchemaRequestV2{
-		Name:               "alice.aet",
-		InterfaceID:        "aw5",
-		ExpectedSchemaHash: inlineHash,
-		WalletPolicy:       DefaultIdentityInterfaceWalletPolicyV2(),
-		CurrentHeight:      15,
-		ExpectedChainID:    "aetra-local-1",
-		TrustedHeader:      trustedHeaderForProofV2(proof),
-		Proof:              &proof,
+		Name:			"alice.aet",
+		InterfaceID:		"aw5",
+		ExpectedSchemaHash:	inlineHash,
+		WalletPolicy:		DefaultIdentityInterfaceWalletPolicyV2(),
+		CurrentHeight:		15,
+		ExpectedChainID:	"aetra-local-1",
+		TrustedHeader:		trustedHeaderForProofV2(proof),
+		Proof:			&proof,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "aw5", iface.InterfaceID)
@@ -134,12 +134,12 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.NotEmpty(t, helper.HelperHash)
 
 	resolvedTx, err := QueryRoutingIntegrationResolvedExecutionTargetV2(RoutingIntegrationResolvedExecutionTargetRequestV2{
-		Name:          "alice.aet",
-		TargetType:    IdentityResolutionTargetPrimary,
-		State:         state,
-		Height:        14,
-		RecordTTL:     30,
-		CurrentHeight: 15,
+		Name:		"alice.aet",
+		TargetType:	IdentityResolutionTargetPrimary,
+		State:		state,
+		Height:		14,
+		RecordTTL:	30,
+		CurrentHeight:	15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, addr(2), resolvedTx.Address)
@@ -147,17 +147,17 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.NotEmpty(t, resolvedTx.ResultHash)
 
 	resolvedContract, err := QueryRoutingIntegrationResolvedExecutionTargetV2(RoutingIntegrationResolvedExecutionTargetRequestV2{
-		Name:          "alice.aet",
-		TargetType:    IdentityResolutionTargetContract,
-		TargetKey:     ResolverKeyContract,
-		InterfaceID:   "aw5",
-		ExpectedHash:  interfaceHash,
-		Method:        "swap",
-		PayloadHash:   identityHash("payload"),
-		State:         state,
-		Height:        14,
-		RecordTTL:     30,
-		CurrentHeight: 15,
+		Name:		"alice.aet",
+		TargetType:	IdentityResolutionTargetContract,
+		TargetKey:	ResolverKeyContract,
+		InterfaceID:	"aw5",
+		ExpectedHash:	interfaceHash,
+		Method:		"swap",
+		PayloadHash:	identityHash("payload"),
+		State:		state,
+		Height:		14,
+		RecordTTL:	30,
+		CurrentHeight:	15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, addr(3), resolvedContract.Address)
@@ -165,13 +165,13 @@ func TestRoutingIntegrationModuleMappingsAndResolvedTargetsV2(t *testing.T) {
 	require.Equal(t, "swap", resolvedContract.Route.Entrypoint)
 
 	resolvedService, err := QueryRoutingIntegrationResolvedExecutionTargetV2(RoutingIntegrationResolvedExecutionTargetRequestV2{
-		Name:          "alice.aet",
-		TargetType:    IdentityResolutionTargetService,
-		TargetKey:     "rpc",
-		State:         state,
-		Height:        14,
-		RecordTTL:     30,
-		CurrentHeight: 15,
+		Name:		"alice.aet",
+		TargetType:	IdentityResolutionTargetService,
+		TargetKey:	"rpc",
+		State:		state,
+		Height:		14,
+		RecordTTL:	30,
+		CurrentHeight:	15,
 	})
 	require.NoError(t, err)
 	require.Equal(t, "https://rpc.aet", resolvedService.Endpoint)
@@ -186,22 +186,22 @@ func TestRoutingIntegrationModuleFailureGuardsV2(t *testing.T) {
 	interfaceHash, err := InterfaceDescriptorHashV2("wallet-v1")
 	require.NoError(t, err)
 	require.ErrorContains(t, ValidateRoutingIntegrationInterfaceTargetV2(ResolverKeyContract, InterfaceDescriptorV2{
-		InterfaceID:              "aw5",
-		SchemaHash:               interfaceHash,
-		Version:                  "v1",
-		RenderPolicy:             IdentityRenderPolicyConfirmV2,
-		ContractTargetIDOptional: "other",
+		InterfaceID:			"aw5",
+		SchemaHash:			interfaceHash,
+		Version:			"v1",
+		RenderPolicy:			IdentityRenderPolicyConfirmV2,
+		ContractTargetIDOptional:	"other",
 	}), string(RoutingIntegrationFailureWrongInterfaceTarget))
 
 	service, err := BuildRoutingIntegrationServiceMappingV2(IdentityServiceDiscoveryRequestV2{
-		Name:                "alice.aet",
-		ServiceID:           "rpc",
-		SupportedTransports: []string{"https"},
-		AllowedAuthPolicies: []string{"none"},
-		State:               state,
-		Height:              14,
-		RecordTTL:           30,
-		CurrentHeight:       15,
+		Name:			"alice.aet",
+		ServiceID:		"rpc",
+		SupportedTransports:	[]string{"https"},
+		AllowedAuthPolicies:	[]string{"none"},
+		State:			state,
+		Height:			14,
+		RecordTTL:		30,
+		CurrentHeight:		15,
 	})
 	require.NoError(t, err)
 	require.ErrorContains(t, ValidateRoutingIntegrationServiceEndpointAvailabilityV2(service, false), string(RoutingIntegrationFailureServiceEndpointUnavailable))
@@ -209,27 +209,27 @@ func TestRoutingIntegrationModuleFailureGuardsV2(t *testing.T) {
 	record, err := BuildUnifiedResolutionRecordV2(state, "alice.aet", 14, 30)
 	require.NoError(t, err)
 	record.ExecutionHints = []ExecutionHintV2{{
-		Key:                           "hint.default_gas_limit",
-		Value:                         "1000",
-		DefaultGasLimitHint:           1_000,
-		PreferredFeeMode:              "priority",
-		AsyncAllowed:                  true,
-		RequiresInterfaceConfirmation: true,
-		SimulationRequired:            true,
+		Key:				"hint.default_gas_limit",
+		Value:				"1000",
+		DefaultGasLimitHint:		1_000,
+		PreferredFeeMode:		"priority",
+		AsyncAllowed:			true,
+		RequiresInterfaceConfirmation:	true,
+		SimulationRequired:		true,
 	}}
 	require.ErrorContains(t, ValidateRoutingIntegrationExecutionHintsV2(record, ExecutionHintPolicyV2{
-		MaxGasLimitHint:     MaxExecutionGasLimitHintV2,
-		AllowedFeeModes:     []string{"standard"},
-		AllowAsyncExecution: false,
+		MaxGasLimitHint:	MaxExecutionGasLimitHintV2,
+		AllowedFeeModes:	[]string{"standard"},
+		AllowAsyncExecution:	false,
 	}), string(RoutingIntegrationFailureExecutionHintConflict))
 
 	require.ErrorContains(t, ValidateRoutingIntegrationAdvisoryAuthorizationV2(RoutingIntegrationWalletSDKHelperV2{
-		AdvisoryOnly:     true,
-		UserConfirmation: true,
+		AdvisoryOnly:		true,
+		UserConfirmation:	true,
 	}, true), string(RoutingIntegrationFailureAdvisoryAsAuthorization))
 	require.ErrorContains(t, ValidateRoutingIntegrationAdvisoryAuthorizationV2(RoutingIntegrationWalletSDKHelperV2{
-		AdvisoryOnly:     true,
-		UserConfirmation: false,
+		AdvisoryOnly:		true,
+		UserConfirmation:	false,
 	}, false), "requires user confirmation")
 }
 
@@ -270,9 +270,9 @@ func routingIntegrationState(t *testing.T) IdentityState {
 		{Key: "hint.simulation_required", Value: "true"},
 	})
 	next, _, err := PatchIdentityResolver(state, "alice.aet", addr(1), ResolverPatch{
-		Primary:  addr(2),
-		Contract: addr(3),
-		Metadata: metadata,
+		Primary:	addr(2),
+		Contract:	addr(3),
+		Metadata:	metadata,
 	}, 12)
 	require.NoError(t, err)
 	return next
@@ -287,12 +287,12 @@ func routingIntegrationInlineInterfaceProof(t *testing.T, state IdentityState) I
 	require.NoError(t, err)
 	require.NotNil(t, proof.ResolverRecord)
 	proof.ResolverRecord.InterfaceDescriptors = []InterfaceDescriptorV2{{
-		InterfaceID:              "aw5",
-		SchemaHash:               inlineHash,
-		SchemaInlineOptional:     inlineSchema,
-		Version:                  "v1",
-		RenderPolicy:             IdentityRenderPolicyConfirmV2,
-		ContractTargetIDOptional: ResolverKeyContract,
+		InterfaceID:			"aw5",
+		SchemaHash:			inlineHash,
+		SchemaInlineOptional:		inlineSchema,
+		Version:			"v1",
+		RenderPolicy:			IdentityRenderPolicyConfirmV2,
+		ContractTargetIDOptional:	ResolverKeyContract,
 	}}
 	proof.ProofCommitmentHash = ComputeIdentityResolutionProofCommitmentHashV2(proof)
 	require.NoError(t, ValidateIdentityResolutionProofFormatV2(proof))

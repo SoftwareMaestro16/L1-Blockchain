@@ -13,77 +13,77 @@ import (
 )
 
 const (
-	ContinuationStatusPending   ContinuationStatus = "pending"
-	ContinuationStatusScheduled ContinuationStatus = "scheduled"
-	ContinuationStatusResumed   ContinuationStatus = "resumed"
-	ContinuationStatusExpired   ContinuationStatus = "expired"
-	ContinuationStatusFailed    ContinuationStatus = "failed"
+	ContinuationStatusPending	ContinuationStatus	= "pending"
+	ContinuationStatusScheduled	ContinuationStatus	= "scheduled"
+	ContinuationStatusResumed	ContinuationStatus	= "resumed"
+	ContinuationStatusExpired	ContinuationStatus	= "expired"
+	ContinuationStatusFailed	ContinuationStatus	= "failed"
 
-	ContinuationResumeByScheduler = "scheduler"
+	ContinuationResumeByScheduler	= "scheduler"
 
-	MaxActorRuntimeMailboxMessages      = 1024
-	MaxActorRuntimeEmittedMessages      = 256
-	MaxActorRuntimeStateWrites          = 256
-	MaxActorRuntimeTokenLength          = 128
-	MaxContinuationPartialStateBytes    = 64 * 1024
-	MaxContinuationRecordsPerActorBlock = 256
+	MaxActorRuntimeMailboxMessages		= 1024
+	MaxActorRuntimeEmittedMessages		= 256
+	MaxActorRuntimeStateWrites		= 256
+	MaxActorRuntimeTokenLength		= 128
+	MaxContinuationPartialStateBytes	= 64 * 1024
+	MaxContinuationRecordsPerActorBlock	= 256
 )
 
 type ContinuationStatus string
 
 type ActorRuntimeActor struct {
-	ActorID   string
-	CodeRef   string
-	StateRoot string
-	Mailbox   []ActorMailboxMessage
+	ActorID		string
+	CodeRef		string
+	StateRoot	string
+	Mailbox		[]ActorMailboxMessage
 }
 
 type ActorMailboxMessage struct {
-	Sequence           uint64
-	SourceActor        string
-	TargetActor        string
-	CreatedLogicalTime uint64
-	Envelope           async.MessageEnvelope
+	Sequence		uint64
+	SourceActor		string
+	TargetActor		string
+	CreatedLogicalTime	uint64
+	Envelope		async.MessageEnvelope
 }
 
 type ActorStateWrite struct {
-	ActorID string
-	Key     string
-	Hash    string
+	ActorID	string
+	Key	string
+	Hash	string
 }
 
 type ActorExecution struct {
-	ActorID         string
-	MessageSequence uint64
-	Handler         string
-	GasLimit        uint64
-	GasUsed         uint64
-	StateWrites     []ActorStateWrite
-	EmittedMessages []async.MessageEnvelope
-	ResultCode      uint32
-	Error           string
+	ActorID		string
+	MessageSequence	uint64
+	Handler		string
+	GasLimit	uint64
+	GasUsed		uint64
+	StateWrites	[]ActorStateWrite
+	EmittedMessages	[]async.MessageEnvelope
+	ResultCode	uint32
+	Error		string
 }
 
 type ContinuationRecord struct {
-	ContinuationID    string
-	ActorID           string
-	StepIndex         uint32
-	PartialStateHash  string
-	PartialStateBytes uint32
-	ResumeHeight      uint64
-	ExpiryHeight      uint64
-	GasReserved       uint64
-	Status            ContinuationStatus
-	ResumeBy          string
-	FailureReceipt    async.ExecutionReceipt
+	ContinuationID		string
+	ActorID			string
+	StepIndex		uint32
+	PartialStateHash	string
+	PartialStateBytes	uint32
+	ResumeHeight		uint64
+	ExpiryHeight		uint64
+	GasReserved		uint64
+	Status			ContinuationStatus
+	ResumeBy		string
+	FailureReceipt		async.ExecutionReceipt
 }
 
 type ActorRuntimePlan struct {
-	Height        uint64
-	Actors        []ActorRuntimeActor
-	Executions    []ActorExecution
-	Continuations []ContinuationRecord
-	PlanRoot      string
+	Height		uint64
+	Actors		[]ActorRuntimeActor
+	Executions	[]ActorExecution
+	Continuations	[]ContinuationRecord
+	PlanRoot	string
 }
 
 func NewActorRuntimePlan(plan ActorRuntimePlan) (ActorRuntimePlan, error) {
@@ -348,11 +348,11 @@ func ComputeActorRuntimePlanRoot(plan ActorRuntimePlan) string {
 
 func canonicalActorRuntimePlan(plan ActorRuntimePlan) ActorRuntimePlan {
 	out := ActorRuntimePlan{
-		Height:        plan.Height,
-		Actors:        cloneActorRuntimeActors(plan.Actors),
-		Executions:    cloneActorExecutions(plan.Executions),
-		Continuations: append([]ContinuationRecord(nil), plan.Continuations...),
-		PlanRoot:      strings.TrimSpace(plan.PlanRoot),
+		Height:		plan.Height,
+		Actors:		cloneActorRuntimeActors(plan.Actors),
+		Executions:	cloneActorExecutions(plan.Executions),
+		Continuations:	append([]ContinuationRecord(nil), plan.Continuations...),
+		PlanRoot:	strings.TrimSpace(plan.PlanRoot),
 	}
 	sort.SliceStable(out.Actors, func(i, j int) bool {
 		return out.Actors[i].ActorID < out.Actors[j].ActorID

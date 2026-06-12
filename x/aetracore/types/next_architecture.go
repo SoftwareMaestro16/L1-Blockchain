@@ -7,15 +7,15 @@ import (
 )
 
 type AetraNextCommitment struct {
-	Height              uint64
-	ZoneDescriptorRoot  string
-	ZoneCommitmentsRoot string
-	ShardLayoutRoot     string
-	RoutingTableRoot    string
-	UniversalProofRoot  string
-	GlobalStateRoot     string
-	ParamsHash          string
-	ArchitectureHash    string
+	Height			uint64
+	ZoneDescriptorRoot	string
+	ZoneCommitmentsRoot	string
+	ShardLayoutRoot		string
+	RoutingTableRoot	string
+	UniversalProofRoot	string
+	GlobalStateRoot		string
+	ParamsHash		string
+	ArchitectureHash	string
 }
 
 func BuildAetraNextCommitment(height uint64, state CoreState, contributions RootContributions, resolverRoot string) (AetraNextCommitment, error) {
@@ -89,14 +89,14 @@ func BuildAetraNextCommitment(height uint64, state CoreState, contributions Root
 	}
 
 	commitment := AetraNextCommitment{
-		Height:              height,
-		ZoneDescriptorRoot:  zoneDescriptorRoot,
-		ZoneCommitmentsRoot: zoneCommitmentsRoot,
-		ShardLayoutRoot:     shardLayoutRoot,
-		RoutingTableRoot:    routingTable.TableHash,
-		UniversalProofRoot:  proofRegistryRoot,
-		GlobalStateRoot:     globalRoot.GlobalRoot,
-		ParamsHash:          ComputeAetraCoreParamsHash(state.Params),
+		Height:			height,
+		ZoneDescriptorRoot:	zoneDescriptorRoot,
+		ZoneCommitmentsRoot:	zoneCommitmentsRoot,
+		ShardLayoutRoot:	shardLayoutRoot,
+		RoutingTableRoot:	routingTable.TableHash,
+		UniversalProofRoot:	proofRegistryRoot,
+		GlobalStateRoot:	globalRoot.GlobalRoot,
+		ParamsHash:		ComputeAetraCoreParamsHash(state.Params),
 	}
 	commitment.ArchitectureHash = ComputeAetraNextArchitectureHash(commitment)
 	return commitment, commitment.ValidateHash()
@@ -107,8 +107,8 @@ func (c AetraNextCommitment) ValidateFormat() error {
 		return errors.New("aetracore next architecture height must be positive")
 	}
 	for _, field := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{"aetracore next zone descriptor root", c.ZoneDescriptorRoot},
 		{"aetracore next zone commitments root", c.ZoneCommitmentsRoot},

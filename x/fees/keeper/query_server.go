@@ -60,10 +60,10 @@ func (k Keeper) NetworkLoad(ctx context.Context, req *types.QueryNetworkLoadRequ
 	}
 	utilization := types.BlockUtilizationBps(blockGasConsumed, 0, params.MaxBlockGas)
 	return &types.QueryNetworkLoadResponse{
-		BlockGasConsumed: blockGasConsumed,
-		MaxBlockGas:      params.MaxBlockGas,
-		UtilizationBps:   utilization,
-		Congested:        utilization >= params.CongestionThresholdBps,
+		BlockGasConsumed:	blockGasConsumed,
+		MaxBlockGas:		params.MaxBlockGas,
+		UtilizationBps:		utilization,
+		Congested:		utilization >= params.CongestionThresholdBps,
 	}, nil
 }
 
@@ -85,11 +85,11 @@ func (k Keeper) EstimateFee(ctx context.Context, req *types.QueryEstimateFeeRequ
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	return &types.QueryEstimateFeeResponse{
-		RequiredFee:    quote.RequiredFee.String(),
-		BaseFee:        quote.BaseFee.String(),
-		MaxFee:         quote.MaxFee.String(),
-		UtilizationBps: quote.UtilizationBps,
-		Congested:      quote.Congested,
-		AtHardCap:      quote.AtHardCap,
+		RequiredFee:	quote.RequiredFee.String(),
+		BaseFee:	quote.BaseFee.String(),
+		MaxFee:		quote.MaxFee.String(),
+		UtilizationBps:	quote.UtilizationBps,
+		Congested:	quote.Congested,
+		AtHardCap:	quote.AtHardCap,
 	}, nil
 }

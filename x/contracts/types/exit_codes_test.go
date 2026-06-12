@@ -122,22 +122,22 @@ func TestAllExitCodesUnder100(t *testing.T) {
 // TestExitCodeDomains verifies domain classification functions
 func TestExitCodeDomains(t *testing.T) {
 	tests := []struct {
-		code     uint32
-		isVM     bool
-		isAction bool
-		isState  bool
-		isSystem bool
+		code		uint32
+		isVM		bool
+		isAction	bool
+		isState		bool
+		isSystem	bool
 	}{
-		{0, true, false, false, false},   // OK
-		{14, true, false, false, false},  // InvalidJump
-		{20, true, false, false, false},  // InvalidChunkRef
-		{32, false, true, false, false},  // MessageExpired
-		{40, false, true, false, false},  // ShardUnavailable
-		{64, false, false, true, false},  // StorageLimit
-		{67, false, false, true, false},  // StateCorruption
-		{96, false, false, false, true},  // ExecutionFailed
-		{99, false, false, false, true},  // ContractAbort
-		{101, false, false, false, true}, // InsufficientBalance
+		{0, true, false, false, false},
+		{14, true, false, false, false},
+		{20, true, false, false, false},
+		{32, false, true, false, false},
+		{40, false, true, false, false},
+		{64, false, false, true, false},
+		{67, false, false, true, false},
+		{96, false, false, false, true},
+		{99, false, false, false, true},
+		{101, false, false, false, true},
 	}
 
 	for _, tt := range tests {

@@ -29,8 +29,8 @@ func TestValidateAetraChainIDAcceptsLaunchProfiles(t *testing.T) {
 
 func TestValidateAetraChainIDRejectsMalformedIDs(t *testing.T) {
 	for _, tc := range []struct {
-		chainID string
-		want    string
+		chainID	string
+		want	string
 	}{
 		{"", "required"},
 		{"cosmoshub-4", "aetra-"},

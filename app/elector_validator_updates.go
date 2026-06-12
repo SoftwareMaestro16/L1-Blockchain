@@ -102,8 +102,8 @@ func electionValidatorPowerToABCIUpdate(validator types.ValidatorPower) (abci.Va
 		return abci.ValidatorUpdate{}, errors.New("validator election voting power exceeds CometBFT int64 power")
 	}
 	return abci.ValidatorUpdate{
-		PubKey: cmtcrypto.PublicKey{Sum: &cmtcrypto.PublicKey_Ed25519{Ed25519: key}},
-		Power:  int64(validator.VotingPower),
+		PubKey:	cmtcrypto.PublicKey{Sum: &cmtcrypto.PublicKey_Ed25519{Ed25519: key}},
+		Power:	int64(validator.VotingPower),
 	}, nil
 }
 

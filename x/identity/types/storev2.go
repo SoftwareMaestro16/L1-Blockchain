@@ -11,39 +11,39 @@ import (
 )
 
 const (
-	IdentityStoreV2Prefix = "zone/identity/v2"
+	IdentityStoreV2Prefix	= "zone/identity/v2"
 
-	IdentityStoreV2DomainPrefix          = IdentityStoreV2Prefix + "/domain"
-	IdentityStoreV2ResolverPrefix        = IdentityStoreV2Prefix + "/resolver"
-	IdentityStoreV2NFTPrefix             = IdentityStoreV2Prefix + "/nft"
-	IdentityStoreV2OwnerIndexPrefix      = IdentityStoreV2Prefix + "/owner"
-	IdentityStoreV2ReversePrefix         = IdentityStoreV2Prefix + "/reverse"
-	IdentityStoreV2CommitPrefix          = IdentityStoreV2Prefix + "/commit"
-	IdentityStoreV2SubdomainIndexPrefix  = IdentityStoreV2Prefix + "/subdomain"
-	IdentityStoreV2AuctionPrefix         = IdentityStoreV2Prefix + "/auction"
-	IdentityStoreV2PendingResolverPrefix = IdentityStoreV2Prefix + "/pending-resolver"
+	IdentityStoreV2DomainPrefix		= IdentityStoreV2Prefix + "/domain"
+	IdentityStoreV2ResolverPrefix		= IdentityStoreV2Prefix + "/resolver"
+	IdentityStoreV2NFTPrefix		= IdentityStoreV2Prefix + "/nft"
+	IdentityStoreV2OwnerIndexPrefix		= IdentityStoreV2Prefix + "/owner"
+	IdentityStoreV2ReversePrefix		= IdentityStoreV2Prefix + "/reverse"
+	IdentityStoreV2CommitPrefix		= IdentityStoreV2Prefix + "/commit"
+	IdentityStoreV2SubdomainIndexPrefix	= IdentityStoreV2Prefix + "/subdomain"
+	IdentityStoreV2AuctionPrefix		= IdentityStoreV2Prefix + "/auction"
+	IdentityStoreV2PendingResolverPrefix	= IdentityStoreV2Prefix + "/pending-resolver"
 
-	IdentityStoreV2SpecDomainsPrefix           = IdentityStoreV2Prefix + "/domains"
-	IdentityStoreV2SpecDomainNamesPrefix       = IdentityStoreV2Prefix + "/domain_names"
-	IdentityStoreV2SpecCommitmentsPrefix       = IdentityStoreV2Prefix + "/commitments"
-	IdentityStoreV2SpecNFTBindingsPrefix       = IdentityStoreV2Prefix + "/nft_bindings"
-	IdentityStoreV2SpecNFTBindingsByNamePrefix = IdentityStoreV2Prefix + "/nft_bindings_by_name"
-	IdentityStoreV2SpecResolversPrefix         = IdentityStoreV2Prefix + "/resolvers"
-	IdentityStoreV2SpecReversePrefix           = IdentityStoreV2Prefix + "/reverse"
-	IdentityStoreV2SpecDelegationsPrefix       = IdentityStoreV2Prefix + "/delegations"
-	IdentityStoreV2SpecSubdomainsPrefix        = IdentityStoreV2Prefix + "/subdomains"
-	IdentityStoreV2SpecAuctionsPrefix          = IdentityStoreV2Prefix + "/auctions"
-	IdentityStoreV2SpecAuctionsByNamePrefix    = IdentityStoreV2Prefix + "/auctions_by_name"
-	IdentityStoreV2SpecResolutionCachePrefix   = IdentityStoreV2Prefix + "/resolution_cache"
-	IdentityStoreV2SpecExpiryIndexPrefix       = IdentityStoreV2Prefix + "/expiry_index"
-	IdentityStoreV2SpecOwnerIndexPrefix        = IdentityStoreV2Prefix + "/owner_index"
-	IdentityStoreV2SpecResolverIndexPrefix     = IdentityStoreV2Prefix + "/resolver_index"
-	IdentityStoreV2SpecInterfaceMetadataPrefix = IdentityStoreV2Prefix + "/interface_metadata"
+	IdentityStoreV2SpecDomainsPrefix		= IdentityStoreV2Prefix + "/domains"
+	IdentityStoreV2SpecDomainNamesPrefix		= IdentityStoreV2Prefix + "/domain_names"
+	IdentityStoreV2SpecCommitmentsPrefix		= IdentityStoreV2Prefix + "/commitments"
+	IdentityStoreV2SpecNFTBindingsPrefix		= IdentityStoreV2Prefix + "/nft_bindings"
+	IdentityStoreV2SpecNFTBindingsByNamePrefix	= IdentityStoreV2Prefix + "/nft_bindings_by_name"
+	IdentityStoreV2SpecResolversPrefix		= IdentityStoreV2Prefix + "/resolvers"
+	IdentityStoreV2SpecReversePrefix		= IdentityStoreV2Prefix + "/reverse"
+	IdentityStoreV2SpecDelegationsPrefix		= IdentityStoreV2Prefix + "/delegations"
+	IdentityStoreV2SpecSubdomainsPrefix		= IdentityStoreV2Prefix + "/subdomains"
+	IdentityStoreV2SpecAuctionsPrefix		= IdentityStoreV2Prefix + "/auctions"
+	IdentityStoreV2SpecAuctionsByNamePrefix		= IdentityStoreV2Prefix + "/auctions_by_name"
+	IdentityStoreV2SpecResolutionCachePrefix	= IdentityStoreV2Prefix + "/resolution_cache"
+	IdentityStoreV2SpecExpiryIndexPrefix		= IdentityStoreV2Prefix + "/expiry_index"
+	IdentityStoreV2SpecOwnerIndexPrefix		= IdentityStoreV2Prefix + "/owner_index"
+	IdentityStoreV2SpecResolverIndexPrefix		= IdentityStoreV2Prefix + "/resolver_index"
+	IdentityStoreV2SpecInterfaceMetadataPrefix	= IdentityStoreV2Prefix + "/interface_metadata"
 )
 
 type IdentityAccessSet struct {
-	Reads  []string
-	Writes []string
+	Reads	[]string
+	Writes	[]string
 }
 
 func IdentityDomainStoreKey(name string) (string, error) {
@@ -479,8 +479,8 @@ func (set IdentityAccessSet) Conflicts(other IdentityAccessSet) bool {
 
 func newIdentityAccessSet(reads []string, writes []string) IdentityAccessSet {
 	return IdentityAccessSet{
-		Reads:  sortedUniqueStrings(reads),
-		Writes: sortedUniqueStrings(writes),
+		Reads:	sortedUniqueStrings(reads),
+		Writes:	sortedUniqueStrings(writes),
 	}
 }
 

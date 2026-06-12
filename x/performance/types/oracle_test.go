@@ -14,8 +14,8 @@ func TestPerformanceOracleAggregatesUptime(t *testing.T) {
 	state = submitReport(t, state, oracleReport(1, "val-a", "rep-b", 100, 100, 1_000, 2_000, 0, 100, 10_000, 11))
 
 	finalized, err := ApplyFinalizePerformanceEpoch(state, MsgFinalizePerformanceEpoch{
-		Authority: state.Params.Authority,
-		Epoch:     1,
+		Authority:	state.Params.Authority,
+		Epoch:		1,
 	})
 	require.NoError(t, err)
 	res, err := QueryValidatorPerformanceOracle(finalized, QueryValidatorPerformanceRequest{Epoch: 1, ValidatorAddress: "val-a"})
@@ -33,8 +33,8 @@ func TestPerformanceOracleAggregatesLatencyAndResponseTime(t *testing.T) {
 	state = submitReport(t, state, oracleReport(2, "val-a", "rep-b", 100, 100, 2_000, 4_000, 0, 100, 10_000, 11))
 
 	finalized, err := ApplyFinalizePerformanceEpoch(state, MsgFinalizePerformanceEpoch{
-		Authority: state.Params.Authority,
-		Epoch:     2,
+		Authority:	state.Params.Authority,
+		Epoch:		2,
 	})
 	require.NoError(t, err)
 	res, err := QueryValidatorPerformanceOracle(finalized, QueryValidatorPerformanceRequest{Epoch: 2, ValidatorAddress: "val-a"})
@@ -47,14 +47,14 @@ func TestPerformanceOracleAggregatesLatencyAndResponseTime(t *testing.T) {
 func TestPerformanceOracleRejectsMalformedReport(t *testing.T) {
 	state := newPerformanceOracleState(t)
 	_, err := ApplySubmitPerformanceReport(state, MsgSubmitPerformanceReport{
-		Authority: state.Params.Authority,
-		Report:    oracleReport(1, "val-a", "rep-a", 101, 100, 1_000, 2_000, 0, 100, 9_000, 10),
+		Authority:	state.Params.Authority,
+		Report:		oracleReport(1, "val-a", "rep-a", 101, 100, 1_000, 2_000, 0, 100, 9_000, 10),
 	})
 	require.ErrorContains(t, err, "signed blocks exceed")
 
 	_, err = ApplySubmitPerformanceReport(state, MsgSubmitPerformanceReport{
-		Authority: state.Params.Authority,
-		Report:    oracleReport(1, "val-a", "rep-a", 100, 100, state.Params.MaxLatencyMillis+1, 2_000, 0, 100, 9_000, 10),
+		Authority:	state.Params.Authority,
+		Report:		oracleReport(1, "val-a", "rep-a", 100, 100, state.Params.MaxLatencyMillis+1, 2_000, 0, 100, 9_000, 10),
 	})
 	require.ErrorContains(t, err, "latency exceeds")
 
@@ -62,14 +62,14 @@ func TestPerformanceOracleRejectsMalformedReport(t *testing.T) {
 	report.Slashable = false
 	report.ReportHash = ComputePerformanceReportHash(report)
 	_, err = ApplySubmitPerformanceReport(state, MsgSubmitPerformanceReport{
-		Authority: state.Params.Authority,
-		Report:    report,
+		Authority:	state.Params.Authority,
+		Report:		report,
 	})
 	require.ErrorContains(t, err, "slashable")
 
 	_, err = ApplySubmitPerformanceReport(state, MsgSubmitPerformanceReport{
-		Authority: "wrong",
-		Report:    oracleReport(1, "val-a", "rep-a", 100, 100, 1_000, 2_000, 0, 100, 9_000, 10),
+		Authority:	"wrong",
+		Report:		oracleReport(1, "val-a", "rep-a", 100, 100, 1_000, 2_000, 0, 100, 9_000, 10),
 	})
 	require.ErrorContains(t, err, "requires authority")
 }
@@ -82,12 +82,12 @@ func TestPerformanceOracleChallengeReport(t *testing.T) {
 	state = submitReport(t, state, good)
 
 	challenged, err := ApplyChallengePerformanceReport(state, MsgChallengePerformanceReport{
-		Authority:  state.Params.Authority,
-		Epoch:      3,
-		ReportID:   bad.ReportID,
-		Challenger: "watcher-1",
-		Reason:     "invalid sample",
-		Accepted:   true,
+		Authority:	state.Params.Authority,
+		Epoch:		3,
+		ReportID:	bad.ReportID,
+		Challenger:	"watcher-1",
+		Reason:		"invalid sample",
+		Accepted:	true,
 	})
 	require.NoError(t, err)
 	reports, err := QueryPerformanceReportsOracle(challenged, QueryPerformanceReportsRequest{Epoch: 3, ValidatorAddress: "val-a"})
@@ -96,8 +96,8 @@ func TestPerformanceOracleChallengeReport(t *testing.T) {
 	require.True(t, reports.Reports[0].Challenged)
 
 	finalized, err := ApplyFinalizePerformanceEpoch(challenged, MsgFinalizePerformanceEpoch{
-		Authority: challenged.Params.Authority,
-		Epoch:     3,
+		Authority:	challenged.Params.Authority,
+		Epoch:		3,
 	})
 	require.NoError(t, err)
 	res, err := QueryValidatorPerformanceOracle(finalized, QueryValidatorPerformanceRequest{Epoch: 3, ValidatorAddress: "val-a"})
@@ -144,8 +144,8 @@ func TestPerformanceOracleExportImportDuringAggregation(t *testing.T) {
 	require.Equal(t, exported, imported)
 
 	finalized, err := ApplyFinalizePerformanceEpoch(imported, MsgFinalizePerformanceEpoch{
-		Authority: imported.Params.Authority,
-		Epoch:     5,
+		Authority:	imported.Params.Authority,
+		Epoch:		5,
 	})
 	require.NoError(t, err)
 	require.NoError(t, CheckPerformanceOracleInvariants(finalized))
@@ -164,8 +164,8 @@ func newPerformanceOracleState(t *testing.T) PerformanceOracleState {
 func submitReport(t *testing.T, state PerformanceOracleState, report PerformanceReport) PerformanceOracleState {
 	t.Helper()
 	next, err := ApplySubmitPerformanceReport(state, MsgSubmitPerformanceReport{
-		Authority: state.Params.Authority,
-		Report:    report,
+		Authority:	state.Params.Authority,
+		Report:		report,
 	})
 	require.NoError(t, err)
 	return next
@@ -173,19 +173,19 @@ func submitReport(t *testing.T, state PerformanceOracleState, report Performance
 
 func oracleReport(epoch uint64, validator string, reporter string, signed uint64, total uint64, latency uint64, response uint64, missed uint64, missedWindow uint64, peer uint32, height uint64) PerformanceReport {
 	report := PerformanceReport{
-		Epoch:              epoch,
-		ValidatorAddress:   validator,
-		ReporterAddress:    reporter,
-		Source:             ReportSourceObserver,
-		UptimeSignedBlocks: signed,
-		UptimeTotalBlocks:  total,
-		LatencyMillis:      latency,
-		ResponseTimeMillis: response,
-		MissedBlocks:       missed,
-		MissedWindowBlocks: missedWindow,
-		PeerScoreBps:       peer,
-		SubmittedHeight:    height,
-		Slashable:          true,
+		Epoch:			epoch,
+		ValidatorAddress:	validator,
+		ReporterAddress:	reporter,
+		Source:			ReportSourceObserver,
+		UptimeSignedBlocks:	signed,
+		UptimeTotalBlocks:	total,
+		LatencyMillis:		latency,
+		ResponseTimeMillis:	response,
+		MissedBlocks:		missed,
+		MissedWindowBlocks:	missedWindow,
+		PeerScoreBps:		peer,
+		SubmittedHeight:	height,
+		Slashable:		true,
 	}
 	report.ReportID = ComputePerformanceReportID(report)
 	report.ReportHash = ComputePerformanceReportHash(report)

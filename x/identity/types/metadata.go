@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	MaxResolverMetadataEntries    = 16
-	MaxResolverMetadataKeyBytes   = 48
-	MaxResolverMetadataValueBytes = 128
+	MaxResolverMetadataEntries	= 16
+	MaxResolverMetadataKeyBytes	= 48
+	MaxResolverMetadataValueBytes	= 128
 
-	ResolverMetadataRouteZone       = "route.zone"
-	ResolverMetadataRouteShard      = "route.shard"
-	ResolverMetadataRouteVM         = "route.vm"
-	ResolverMetadataRouteEntrypoint = "route.entrypoint"
+	ResolverMetadataRouteZone	= "route.zone"
+	ResolverMetadataRouteShard	= "route.shard"
+	ResolverMetadataRouteVM		= "route.vm"
+	ResolverMetadataRouteEntrypoint	= "route.entrypoint"
 
-	ResolverMetadataServicePrefix   = "service."
-	ResolverMetadataInterfacePrefix = "interface."
+	ResolverMetadataServicePrefix	= "service."
+	ResolverMetadataInterfacePrefix	= "interface."
 )
 
 type ResolverMetadataEntry struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 func ResolverMetadataServiceKey(service string) (string, error) {

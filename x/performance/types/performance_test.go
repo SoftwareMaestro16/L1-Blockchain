@@ -11,24 +11,24 @@ import (
 
 func TestCollectRolePerformanceMetricsBuildsDeterministicRecord(t *testing.T) {
 	record, err := CollectRolePerformanceMetrics(RoleMetricCollectionInput{
-		EpochID:                  14,
-		OperatorAddress:          "val-a",
-		Role:                     postypes.ValidatorRoleVerifier,
-		AssignedTasks:            10,
-		CompletedTasks:           7,
-		MissedTasks:              2,
-		InvalidTasks:             1,
-		SignedBlocks:             90,
-		TotalBlocks:              100,
-		TaskParticipations:       8,
-		MissedTaskParticipations: 2,
-		CommittedLatencyWindow:   true,
-		LatencyTargetMillis:      1_000,
-		LatencyP95Millis:         2_000,
-		ValidSignatures:          8,
-		InvalidSignatures:        1,
-		ValidTaskOutputs:         2,
-		AcceptedEvidence:         1,
+		EpochID:			14,
+		OperatorAddress:		"val-a",
+		Role:				postypes.ValidatorRoleVerifier,
+		AssignedTasks:			10,
+		CompletedTasks:			7,
+		MissedTasks:			2,
+		InvalidTasks:			1,
+		SignedBlocks:			90,
+		TotalBlocks:			100,
+		TaskParticipations:		8,
+		MissedTaskParticipations:	2,
+		CommittedLatencyWindow:		true,
+		LatencyTargetMillis:		1_000,
+		LatencyP95Millis:		2_000,
+		ValidSignatures:		8,
+		InvalidSignatures:		1,
+		ValidTaskOutputs:		2,
+		AcceptedEvidence:		1,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(8_700), record.UptimeScoreBps)
@@ -47,32 +47,32 @@ func TestPerformanceQueriesReturnCurrentAndHistoricalRecords(t *testing.T) {
 	require.NoError(t, err)
 
 	current, err := QueryPerformanceRecord(snapshot, QueryPerformanceRecordRequest{
-		EpochID:         14,
-		OperatorAddress: "val-a",
-		Role:            postypes.ValidatorRoleVerifier,
+		EpochID:		14,
+		OperatorAddress:	"val-a",
+		Role:			postypes.ValidatorRoleVerifier,
 	})
 	require.NoError(t, err)
 	require.Equal(t, verifier, current.Record)
 
 	multiplier, err := QueryRewardMultiplier(snapshot, QueryRewardMultiplierRequest{
-		EpochID:         14,
-		OperatorAddress: "val-a",
-		Role:            postypes.ValidatorRoleVerifier,
+		EpochID:		14,
+		OperatorAddress:	"val-a",
+		Role:			postypes.ValidatorRoleVerifier,
 	})
 	require.NoError(t, err)
 	require.Equal(t, verifier.RewardMultiplierBps, multiplier.RewardMultiplierBps)
 
 	history, err := QueryOperatorPerformanceHistory(snapshot, QueryOperatorPerformanceHistoryRequest{
-		OperatorAddress: "val-a",
-		Limit:           1,
+		OperatorAddress:	"val-a",
+		Limit:			1,
 	})
 	require.NoError(t, err)
 	require.Len(t, history.Records, 1)
 	require.Equal(t, uint64(14), history.Records[0].EpochID)
 
 	role, err := QueryRolePerformance(snapshot, QueryRolePerformanceRequest{
-		EpochID: 14,
-		Role:    postypes.ValidatorRoleCollator,
+		EpochID:	14,
+		Role:		postypes.ValidatorRoleCollator,
 	})
 	require.NoError(t, err)
 	require.Equal(t, []postypes.PerformanceRecord{collator}, role.Records)
@@ -81,12 +81,12 @@ func TestPerformanceQueriesReturnCurrentAndHistoricalRecords(t *testing.T) {
 func TestPerformanceDistributionDampensRewardsBeforeDistribution(t *testing.T) {
 	record := performanceRecord(t, 14, "val-a", postypes.ValidatorRoleVerifier, 5_000)
 	result, err := SettlePerformanceDistribution(PerformanceDistributionInput{
-		Performance: record,
+		Performance:	record,
 		Reward: postypes.RewardInput{
-			ValidatorID:      "val-a",
-			TotalRewardsNaet: sdkmath.NewInt(1_000),
-			CommissionBps:    1_000,
-			SelfStakeNaet:    sdkmath.NewInt(1_000),
+			ValidatorID:		"val-a",
+			TotalRewardsNaet:	sdkmath.NewInt(1_000),
+			CommissionBps:		1_000,
+			SelfStakeNaet:		sdkmath.NewInt(1_000),
 			Nominations: []postypes.Nomination{
 				{NominatorID: "nom-a", StakeNaet: sdkmath.NewInt(1_000)},
 			},
@@ -103,35 +103,35 @@ func TestPerformanceDistributionDampensRewardsBeforeDistribution(t *testing.T) {
 
 func TestPerformanceRejectsScoreManipulationAndRewardBounds(t *testing.T) {
 	_, err := CollectRolePerformanceMetrics(RoleMetricCollectionInput{
-		EpochID:         14,
-		OperatorAddress: "val-a",
-		Role:            postypes.ValidatorRoleVerifier,
-		AssignedTasks:   2,
-		CompletedTasks:  2,
-		InvalidTasks:    1,
+		EpochID:		14,
+		OperatorAddress:	"val-a",
+		Role:			postypes.ValidatorRoleVerifier,
+		AssignedTasks:		2,
+		CompletedTasks:		2,
+		InvalidTasks:		1,
 	})
 	require.ErrorContains(t, err, "task counts")
 
 	_, err = CollectRolePerformanceMetrics(RoleMetricCollectionInput{
-		EpochID:                14,
-		OperatorAddress:        "val-a",
-		Role:                   postypes.ValidatorRoleVerifier,
-		AssignedTasks:          1,
-		CompletedTasks:         1,
-		SignedBlocks:           1,
-		TotalBlocks:            1,
-		CommittedLatencyWindow: false,
-		ValidSignatures:        1,
+		EpochID:		14,
+		OperatorAddress:	"val-a",
+		Role:			postypes.ValidatorRoleVerifier,
+		AssignedTasks:		1,
+		CompletedTasks:		1,
+		SignedBlocks:		1,
+		TotalBlocks:		1,
+		CommittedLatencyWindow:	false,
+		ValidSignatures:	1,
 	})
 	require.ErrorContains(t, err, "committed measurement")
 
 	record := performanceRecord(t, 14, "val-a", postypes.ValidatorRoleVerifier, 5_000)
 	_, err = SettlePerformanceDistribution(PerformanceDistributionInput{
-		Performance: record,
+		Performance:	record,
 		Reward: postypes.RewardInput{
-			ValidatorID:      "val-b",
-			TotalRewardsNaet: sdkmath.NewInt(1_000),
-			SelfStakeNaet:    sdkmath.NewInt(1),
+			ValidatorID:		"val-b",
+			TotalRewardsNaet:	sdkmath.NewInt(1_000),
+			SelfStakeNaet:		sdkmath.NewInt(1),
 		},
 	})
 	require.ErrorContains(t, err, "validator mismatch")
@@ -145,16 +145,16 @@ func TestPerformanceRejectsScoreManipulationAndRewardBounds(t *testing.T) {
 func performanceRecord(t *testing.T, epoch uint64, operator string, role postypes.ValidatorRole, multiplier uint32) postypes.PerformanceRecord {
 	t.Helper()
 	record := postypes.PerformanceRecord{
-		EpochID:               epoch,
-		OperatorAddress:       operator,
-		Role:                  role,
-		AssignedTasks:         1,
-		CompletedTasks:        1,
-		UptimeScoreBps:        postypes.BasisPoints,
-		LatencyScoreBps:       postypes.BasisPoints,
-		CorrectnessScoreBps:   multiplier,
-		TaskCompletionRateBps: postypes.BasisPoints,
-		RewardMultiplierBps:   multiplier,
+		EpochID:		epoch,
+		OperatorAddress:	operator,
+		Role:			role,
+		AssignedTasks:		1,
+		CompletedTasks:		1,
+		UptimeScoreBps:		postypes.BasisPoints,
+		LatencyScoreBps:	postypes.BasisPoints,
+		CorrectnessScoreBps:	multiplier,
+		TaskCompletionRateBps:	postypes.BasisPoints,
+		RewardMultiplierBps:	multiplier,
 	}
 	require.NoError(t, record.Validate())
 	return record

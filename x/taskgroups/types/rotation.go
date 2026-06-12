@@ -14,83 +14,83 @@ import (
 )
 
 const (
-	ProposerStatusReady       = "ready"
-	ProposerStatusUnavailable = "unavailable"
-	ProposerStatusFallback    = "fallback"
+	ProposerStatusReady		= "ready"
+	ProposerStatusUnavailable	= "unavailable"
+	ProposerStatusFallback		= "fallback"
 )
 
 type ProposerPriority struct {
-	EpochID          uint64
-	Slot             uint64
-	TaskGroupID      string
-	ValidatorAddress string
-	PriorityScore    sdkmath.Int
-	FallbackOrder    uint32
-	ProposerStatus   string
+	EpochID			uint64
+	Slot			uint64
+	TaskGroupID		string
+	ValidatorAddress	string
+	PriorityScore		sdkmath.Int
+	FallbackOrder		uint32
+	ProposerStatus		string
 }
 
 type ProposerPriorityInput struct {
-	ValidatorScore              sdkmath.Int
-	PriorProposerPerformanceBps uint32
-	MissedProposalCount         uint64
-	TaskReliabilityBps          uint32
-	StakeSaturationDampeningBps uint32
+	ValidatorScore			sdkmath.Int
+	PriorProposerPerformanceBps	uint32
+	MissedProposalCount		uint64
+	TaskReliabilityBps		uint32
+	StakeSaturationDampeningBps	uint32
 }
 
 type ProposerSelectionInput struct {
-	Group           postypes.TaskGroup
-	ValidatorScores map[string]sdkmath.Int
-	PriorityInputs  map[string]ProposerPriorityInput
-	Unavailable     map[string]bool
+	Group		postypes.TaskGroup
+	ValidatorScores	map[string]sdkmath.Int
+	PriorityInputs	map[string]ProposerPriorityInput
+	Unavailable	map[string]bool
 }
 
 type ProposerSelection struct {
-	EpochID            uint64
-	Slot               uint64
-	TaskGroupID        string
-	CanonicalProposer  string
-	VerifierValidators []string
-	Priorities         []ProposerPriority
-	CanonicalPriority  ProposerPriority
-	FallbackUsed       bool
+	EpochID			uint64
+	Slot			uint64
+	TaskGroupID		string
+	CanonicalProposer	string
+	VerifierValidators	[]string
+	Priorities		[]ProposerPriority
+	CanonicalPriority	ProposerPriority
+	FallbackUsed		bool
 }
 
 type SlotAssignmentInput struct {
-	SelectionInput              ProposerSelectionInput
-	Slot                        uint64
-	CurrentHeight               uint64
-	MissedProposalTimeoutHeight uint64
+	SelectionInput			ProposerSelectionInput
+	Slot				uint64
+	CurrentHeight			uint64
+	MissedProposalTimeoutHeight	uint64
 }
 
 type SlotAssignmentRecord struct {
-	EpochID                     uint64
-	Slot                        uint64
-	TaskGroupID                 string
-	CanonicalProposer           string
-	VerifierValidators          []string
-	FallbackOrder               []string
-	MissedProposalTimeoutHeight uint64
-	FallbackActivated           bool
-	EligibilityProof            ProposerEligibilityProof
+	EpochID				uint64
+	Slot				uint64
+	TaskGroupID			string
+	CanonicalProposer		string
+	VerifierValidators		[]string
+	FallbackOrder			[]string
+	MissedProposalTimeoutHeight	uint64
+	FallbackActivated		bool
+	EligibilityProof		ProposerEligibilityProof
 }
 
 type ProposerEligibilityProof struct {
-	EpochID          uint64
-	Slot             uint64
-	TaskGroupID      string
-	ValidatorAddress string
-	FallbackOrder    uint32
-	PriorityScore    sdkmath.Int
-	AssignmentSeed   string
-	ProofHash        string
+	EpochID			uint64
+	Slot			uint64
+	TaskGroupID		string
+	ValidatorAddress	string
+	FallbackOrder		uint32
+	PriorityScore		sdkmath.Int
+	AssignmentSeed		string
+	ProofHash		string
 }
 
 type MissedProposalRecord struct {
-	EpochID             uint64
-	TaskGroupID         string
-	ValidatorAddress    string
-	MissedProposalCount uint64
-	LastMissedSlot      uint64
+	EpochID			uint64
+	TaskGroupID		string
+	ValidatorAddress	string
+	MissedProposalCount	uint64
+	LastMissedSlot		uint64
 }
 
 func BuildProposerPriorities(input ProposerSelectionInput, slot uint64) ([]ProposerPriority, error) {
@@ -127,13 +127,13 @@ func BuildProposerPriorities(input ProposerSelectionInput, slot uint64) ([]Propo
 			status = ProposerStatusUnavailable
 		}
 		priorities = append(priorities, ProposerPriority{
-			EpochID:          input.Group.EpochID,
-			Slot:             slot,
-			TaskGroupID:      input.Group.TaskGroupID,
-			ValidatorAddress: validatorID,
-			PriorityScore:    score,
-			FallbackOrder:    uint32(fallbackOrder),
-			ProposerStatus:   status,
+			EpochID:		input.Group.EpochID,
+			Slot:			slot,
+			TaskGroupID:		input.Group.TaskGroupID,
+			ValidatorAddress:	validatorID,
+			PriorityScore:		score,
+			FallbackOrder:		uint32(fallbackOrder),
+			ProposerStatus:		status,
 		})
 	}
 	sortProposerPriorities(priorities)
@@ -180,14 +180,14 @@ func SelectCanonicalProposer(input ProposerSelectionInput, slot uint64) (Propose
 	}
 	sort.Strings(verifiers)
 	return ProposerSelection{
-		EpochID:            input.Group.EpochID,
-		Slot:               slot,
-		TaskGroupID:        input.Group.TaskGroupID,
-		CanonicalProposer:  selected.ValidatorAddress,
-		VerifierValidators: verifiers,
-		Priorities:         priorities,
-		CanonicalPriority:  selected,
-		FallbackUsed:       fallbackUsed,
+		EpochID:		input.Group.EpochID,
+		Slot:			slot,
+		TaskGroupID:		input.Group.TaskGroupID,
+		CanonicalProposer:	selected.ValidatorAddress,
+		VerifierValidators:	verifiers,
+		Priorities:		priorities,
+		CanonicalPriority:	selected,
+		FallbackUsed:		fallbackUsed,
 	}, nil
 }
 
@@ -218,15 +218,15 @@ func BuildSlotAssignment(input SlotAssignmentInput) (SlotAssignmentRecord, error
 	}
 	proof := BuildProposerEligibilityProof(selection.CanonicalPriority, selectionInput.Group)
 	record := SlotAssignmentRecord{
-		EpochID:                     selection.EpochID,
-		Slot:                        selection.Slot,
-		TaskGroupID:                 selection.TaskGroupID,
-		CanonicalProposer:           selection.CanonicalProposer,
-		VerifierValidators:          cloneStrings(selection.VerifierValidators),
-		FallbackOrder:               fallbackOrder,
-		MissedProposalTimeoutHeight: input.MissedProposalTimeoutHeight,
-		FallbackActivated:           selection.FallbackUsed,
-		EligibilityProof:            proof,
+		EpochID:			selection.EpochID,
+		Slot:				selection.Slot,
+		TaskGroupID:			selection.TaskGroupID,
+		CanonicalProposer:		selection.CanonicalProposer,
+		VerifierValidators:		cloneStrings(selection.VerifierValidators),
+		FallbackOrder:			fallbackOrder,
+		MissedProposalTimeoutHeight:	input.MissedProposalTimeoutHeight,
+		FallbackActivated:		selection.FallbackUsed,
+		EligibilityProof:		proof,
 	}
 	return record, record.Validate(selectionInput.Group)
 }
@@ -241,13 +241,13 @@ func QueryFallbackOrder(input ProposerSelectionInput, slot uint64) ([]string, er
 
 func BuildProposerEligibilityProof(priority ProposerPriority, group postypes.TaskGroup) ProposerEligibilityProof {
 	proof := ProposerEligibilityProof{
-		EpochID:          priority.EpochID,
-		Slot:             priority.Slot,
-		TaskGroupID:      priority.TaskGroupID,
-		ValidatorAddress: priority.ValidatorAddress,
-		FallbackOrder:    priority.FallbackOrder,
-		PriorityScore:    priority.PriorityScore,
-		AssignmentSeed:   group.AssignmentSeed,
+		EpochID:		priority.EpochID,
+		Slot:			priority.Slot,
+		TaskGroupID:		priority.TaskGroupID,
+		ValidatorAddress:	priority.ValidatorAddress,
+		FallbackOrder:		priority.FallbackOrder,
+		PriorityScore:		priority.PriorityScore,
+		AssignmentSeed:		group.AssignmentSeed,
 	}
 	proof.ProofHash = computeEligibilityProofHash(proof)
 	return proof
@@ -281,11 +281,11 @@ func RecordMissedProposal(records []MissedProposalRecord, epochID uint64, slot u
 		}
 	}
 	out = append(out, MissedProposalRecord{
-		EpochID:             epochID,
-		TaskGroupID:         taskGroupID,
-		ValidatorAddress:    validatorAddress,
-		MissedProposalCount: 1,
-		LastMissedSlot:      slot,
+		EpochID:		epochID,
+		TaskGroupID:		taskGroupID,
+		ValidatorAddress:	validatorAddress,
+		MissedProposalCount:	1,
+		LastMissedSlot:		slot,
 	})
 	sortMissedProposalRecords(out)
 	return out, nil

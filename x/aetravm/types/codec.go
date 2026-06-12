@@ -34,9 +34,9 @@ func (c Uint32Codec) Decode(r *Reader) (Value, error) {
 	return Value{Type: TypeUint32, Payload: val}, nil
 }
 
-func (c Uint32Codec) GasCost() uint64          { return 10 }
-func (c Uint32Codec) MaxEncodedSize() uint32   { return 4 }
-func (c Uint32Codec) SchemaDescriptor() string { return "uint32" }
+func (c Uint32Codec) GasCost() uint64		{ return 10 }
+func (c Uint32Codec) MaxEncodedSize() uint32	{ return 4 }
+func (c Uint32Codec) SchemaDescriptor() string	{ return "uint32" }
 
 type StringCodec struct {
 	MaxLength uint32
@@ -54,7 +54,6 @@ func (c StringCodec) Encode(w *Writer, v Value) error {
 		return fmt.Errorf("invalid UTF-8 string")
 	}
 
-	// Encoded as length-prefixed bytes
 	if err := w.WriteUint32(uint32(len(s))); err != nil {
 		return err
 	}
@@ -80,14 +79,14 @@ func (c StringCodec) Decode(r *Reader) (Value, error) {
 	}
 
 	return Value{
-		Type:    &StringType{BaseType: BaseType{kind: KindString}, MaxLength: c.MaxLength},
-		Payload: s,
+		Type:		&StringType{BaseType: BaseType{kind: KindString}, MaxLength: c.MaxLength},
+		Payload:	s,
 	}, nil
 }
 
-func (c StringCodec) GasCost() uint64          { return 20 }
-func (c StringCodec) MaxEncodedSize() uint32   { return 4 + c.MaxLength }
-func (c StringCodec) SchemaDescriptor() string { return fmt.Sprintf("string(%d)", c.MaxLength) }
+func (c StringCodec) GasCost() uint64		{ return 20 }
+func (c StringCodec) MaxEncodedSize() uint32	{ return 4 + c.MaxLength }
+func (c StringCodec) SchemaDescriptor() string	{ return fmt.Sprintf("string(%d)", c.MaxLength) }
 
 // ChunkCodec handles lazy decoding of chunks.
 type ChunkCodec struct{}
@@ -108,6 +107,6 @@ func (c ChunkCodec) Decode(r *Reader) (Value, error) {
 	return Value{Type: TypeChunk, Payload: ch}, nil
 }
 
-func (c ChunkCodec) GasCost() uint64          { return 50 }
-func (c ChunkCodec) MaxEncodedSize() uint32   { return 32 } // Size of a ref hash
-func (c ChunkCodec) SchemaDescriptor() string { return "chunk" }
+func (c ChunkCodec) GasCost() uint64		{ return 50 }
+func (c ChunkCodec) MaxEncodedSize() uint32	{ return 32 }
+func (c ChunkCodec) SchemaDescriptor() string	{ return "chunk" }

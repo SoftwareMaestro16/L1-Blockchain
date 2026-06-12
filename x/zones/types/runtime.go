@@ -11,32 +11,32 @@ import (
 )
 
 const (
-	DefaultZoneStoreKey = "zones"
+	DefaultZoneStoreKey	= "zones"
 
-	ZoneStateNamespacePrefix = "zone/state/"
-	ZoneQueueNamespacePrefix = "zone/queue/"
-	ZoneProofNamespacePrefix = "zone/proof/"
-	ZoneQueryNamespacePrefix = "zone/query/"
-	ZoneKVPrefixRoot         = "zones/"
-	ZonePipelinePrefix       = "zone/pipeline/"
+	ZoneStateNamespacePrefix	= "zone/state/"
+	ZoneQueueNamespacePrefix	= "zone/queue/"
+	ZoneProofNamespacePrefix	= "zone/proof/"
+	ZoneQueryNamespacePrefix	= "zone/query/"
+	ZoneKVPrefixRoot		= "zones/"
+	ZonePipelinePrefix		= "zone/pipeline/"
 
-	MaxZoneMessageTypeLength = 96
-	MaxZoneEndpointLength    = 128
-	MaxZoneNamespaceLength   = 128
-	MaxZoneModuleNameLength  = 96
+	MaxZoneMessageTypeLength	= 96
+	MaxZoneEndpointLength		= 128
+	MaxZoneNamespaceLength		= 128
+	MaxZoneModuleNameLength		= 96
 )
 
 type ZoneExecutionBudget struct {
-	MaxGas       uint64
-	GasUsed      uint64
-	MaxMessages  uint32
-	MessagesUsed uint32
+	MaxGas		uint64
+	GasUsed		uint64
+	MaxMessages	uint32
+	MessagesUsed	uint32
 }
 
 type ZoneGasPolicy struct {
-	Denom            string
-	MaxGasPerBlock   uint64
-	MaxGasPerMessage uint64
+	Denom			string
+	MaxGasPerBlock		uint64
+	MaxGasPerMessage	uint64
 }
 
 type ZoneMessageFilter struct {
@@ -44,54 +44,54 @@ type ZoneMessageFilter struct {
 }
 
 type ZoneMessage struct {
-	ZoneID      ZoneID
-	MessageType string
-	Source      string
-	Destination string
-	GasLimit    uint64
-	PayloadHash string
-	Sequence    uint64
+	ZoneID		ZoneID
+	MessageType	string
+	Source		string
+	Destination	string
+	GasLimit	uint64
+	PayloadHash	string
+	Sequence	uint64
 }
 
 type ZoneRuntimeState struct {
-	ZoneID              ZoneID
-	StoreKey            string
-	StateNamespace      string
-	QueueNamespace      string
-	ProofNamespace      string
-	QueryNamespace      string
-	KVPrefix            string
-	ModuleSet           []string
-	ModuleSetRoot       string
-	ExecutionPipeline   string
-	StateRoot           string
-	ReceiptRoot         string
-	MessageRoot         string
-	ExecutionResultRoot string
-	ProofRoot           string
-	MessageQueue        []ZoneMessage
-	Budget              ZoneExecutionBudget
-	GasPolicy           ZoneGasPolicy
-	MessageFilter       ZoneMessageFilter
+	ZoneID			ZoneID
+	StoreKey		string
+	StateNamespace		string
+	QueueNamespace		string
+	ProofNamespace		string
+	QueryNamespace		string
+	KVPrefix		string
+	ModuleSet		[]string
+	ModuleSetRoot		string
+	ExecutionPipeline	string
+	StateRoot		string
+	ReceiptRoot		string
+	MessageRoot		string
+	ExecutionResultRoot	string
+	ProofRoot		string
+	MessageQueue		[]ZoneMessage
+	Budget			ZoneExecutionBudget
+	GasPolicy		ZoneGasPolicy
+	MessageFilter		ZoneMessageFilter
 }
 
 type ParallelExecutionPlan struct {
-	Height uint64
-	Zones  []ZoneRuntimeState
+	Height	uint64
+	Zones	[]ZoneRuntimeState
 }
 
 func DefaultZoneExecutionBudget() ZoneExecutionBudget {
 	return ZoneExecutionBudget{
-		MaxGas:      1_000_000,
-		MaxMessages: 1_000,
+		MaxGas:		1_000_000,
+		MaxMessages:	1_000,
 	}
 }
 
 func DefaultZoneGasPolicy() ZoneGasPolicy {
 	return ZoneGasPolicy{
-		Denom:            FeePolicyNaet,
-		MaxGasPerBlock:   1_000_000,
-		MaxGasPerMessage: 100_000,
+		Denom:			FeePolicyNaet,
+		MaxGasPerBlock:		1_000_000,
+		MaxGasPerMessage:	100_000,
 	}
 }
 
@@ -113,23 +113,23 @@ func NewZoneRuntimeState(zone Zone, stateRoot string, queue []ZoneMessage, budge
 		filter = DefaultZoneMessageFilter()
 	}
 	runtime := ZoneRuntimeState{
-		ZoneID:              zone.ID,
-		StoreKey:            DefaultZoneStoreKey,
-		StateNamespace:      ZoneStateNamespace(zone.ID),
-		QueueNamespace:      ZoneQueueNamespace(zone.ID),
-		ProofNamespace:      ZoneProofNamespace(zone.ID),
-		QueryNamespace:      ZoneQueryNamespace(zone.ID),
-		KVPrefix:            ZoneKVPrefix(zone.ID),
-		ModuleSet:           DefaultZoneModuleSet(zone),
-		ExecutionPipeline:   ZoneExecutionPipeline(zone.ID),
-		StateRoot:           stateRoot,
-		ReceiptRoot:         EmptyRootHash(),
-		MessageRoot:         ComputeZoneMessageRoot(queue),
-		ExecutionResultRoot: EmptyRootHash(),
-		MessageQueue:        cloneZoneMessages(queue),
-		Budget:              budget,
-		GasPolicy:           gasPolicy,
-		MessageFilter:       filter,
+		ZoneID:			zone.ID,
+		StoreKey:		DefaultZoneStoreKey,
+		StateNamespace:		ZoneStateNamespace(zone.ID),
+		QueueNamespace:		ZoneQueueNamespace(zone.ID),
+		ProofNamespace:		ZoneProofNamespace(zone.ID),
+		QueryNamespace:		ZoneQueryNamespace(zone.ID),
+		KVPrefix:		ZoneKVPrefix(zone.ID),
+		ModuleSet:		DefaultZoneModuleSet(zone),
+		ExecutionPipeline:	ZoneExecutionPipeline(zone.ID),
+		StateRoot:		stateRoot,
+		ReceiptRoot:		EmptyRootHash(),
+		MessageRoot:		ComputeZoneMessageRoot(queue),
+		ExecutionResultRoot:	EmptyRootHash(),
+		MessageQueue:		cloneZoneMessages(queue),
+		Budget:			budget,
+		GasPolicy:		gasPolicy,
+		MessageFilter:		filter,
 	}
 	runtime.ModuleSetRoot = ComputeZoneModuleSetRoot(runtime.ModuleSet)
 	runtime.ProofRoot = ComputeZoneRuntimeProofRoot(runtime)
@@ -216,8 +216,8 @@ func (z ZoneRuntimeState) Validate() error {
 		return errors.New("zone module set root mismatch")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "zone state root", value: z.StateRoot},
 		{name: "zone receipt root", value: z.ReceiptRoot},

@@ -12,33 +12,33 @@ type CanonicalServiceEndpointType string
 type CanonicalServiceStatus string
 
 const (
-	CanonicalEndpointApplication CanonicalServiceEndpointType = "application"
-	CanonicalEndpointAPI         CanonicalServiceEndpointType = "api"
-	CanonicalEndpointOffChain    CanonicalServiceEndpointType = "off_chain_compute"
-	CanonicalEndpointHybrid      CanonicalServiceEndpointType = "hybrid"
-	CanonicalEndpointZoneAware   CanonicalServiceEndpointType = "zone_aware"
+	CanonicalEndpointApplication	CanonicalServiceEndpointType	= "application"
+	CanonicalEndpointAPI		CanonicalServiceEndpointType	= "api"
+	CanonicalEndpointOffChain	CanonicalServiceEndpointType	= "off_chain_compute"
+	CanonicalEndpointHybrid		CanonicalServiceEndpointType	= "hybrid"
+	CanonicalEndpointZoneAware	CanonicalServiceEndpointType	= "zone_aware"
 
-	CanonicalServiceStatusActive   CanonicalServiceStatus = "active"
-	CanonicalServiceStatusDisabled CanonicalServiceStatus = "disabled"
-	CanonicalServiceStatusExpired  CanonicalServiceStatus = "expired"
+	CanonicalServiceStatusActive	CanonicalServiceStatus	= "active"
+	CanonicalServiceStatusDisabled	CanonicalServiceStatus	= "disabled"
+	CanonicalServiceStatusExpired	CanonicalServiceStatus	= "expired"
 )
 
 type CanonicalServiceDescriptor struct {
-	ServiceID        string
-	EndpointType     CanonicalServiceEndpointType
-	InterfaceHash    string
-	SupportedMethods []string
-	AuthModel        string
-	StateDependency  string
-	Owner            string
-	ZoneID           string
-	Version          uint64
-	EndpointURIHash  string
-	MetadataHash     string
-	TTLHeight        uint64
-	Status           CanonicalServiceStatus
-	Capabilities     []string
-	DescriptorHash   string
+	ServiceID		string
+	EndpointType		CanonicalServiceEndpointType
+	InterfaceHash		string
+	SupportedMethods	[]string
+	AuthModel		string
+	StateDependency		string
+	Owner			string
+	ZoneID			string
+	Version			uint64
+	EndpointURIHash		string
+	MetadataHash		string
+	TTLHeight		uint64
+	Status			CanonicalServiceStatus
+	Capabilities		[]string
+	DescriptorHash		string
 }
 
 func NewCanonicalServiceDescriptor(descriptor CanonicalServiceDescriptor) (CanonicalServiceDescriptor, error) {
@@ -80,20 +80,20 @@ func ProjectDistributedServiceDescriptor(record DistributedServiceRecord, endpoi
 		status = CanonicalServiceStatusDisabled
 	}
 	return NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        record.ServiceID,
-		EndpointType:     CanonicalServiceEndpointType(endpoint.Kind),
-		InterfaceHash:    record.InterfaceHash,
-		SupportedMethods: methods,
-		AuthModel:        authModel,
-		StateDependency:  stateDependency,
-		Owner:            record.Owner,
-		ZoneID:           record.ZoneID,
-		Version:          iface.Version,
-		EndpointURIHash:  endpoint.CommitmentHash,
-		MetadataHash:     record.MetadataHash,
-		TTLHeight:        record.ExpiryHeight,
-		Status:           status,
-		Capabilities:     capabilities,
+		ServiceID:		record.ServiceID,
+		EndpointType:		CanonicalServiceEndpointType(endpoint.Kind),
+		InterfaceHash:		record.InterfaceHash,
+		SupportedMethods:	methods,
+		AuthModel:		authModel,
+		StateDependency:	stateDependency,
+		Owner:			record.Owner,
+		ZoneID:			record.ZoneID,
+		Version:		iface.Version,
+		EndpointURIHash:	endpoint.CommitmentHash,
+		MetadataHash:		record.MetadataHash,
+		TTLHeight:		record.ExpiryHeight,
+		Status:			status,
+		Capabilities:		capabilities,
 	})
 }
 

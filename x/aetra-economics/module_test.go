@@ -33,8 +33,8 @@ func TestMsgServiceRejectsUnauthorizedParamsUpdate(t *testing.T) {
 	require.NotNil(t, handler)
 
 	_, err := handler(sdk.Context{}, &types.MsgUpdateEconomicsParams{
-		Authority: "bad-authority",
-		Params:    types.DefaultParams("bad-authority"),
+		Authority:	"bad-authority",
+		Params:		types.DefaultParams("bad-authority"),
 	})
 	require.ErrorContains(t, err, "invalid authority")
 }

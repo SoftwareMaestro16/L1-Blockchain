@@ -21,8 +21,8 @@ type MsgVoteConstitutionAmendmentResponse struct {
 	Amendment Amendment `protobuf:"bytes,1,opt,name=amendment,proto3" json:"amendment"`
 }
 type MsgExecuteConstitutionAmendmentResponse struct {
-	Constitution Constitution `protobuf:"bytes,1,opt,name=constitution,proto3" json:"constitution"`
-	Amendment    Amendment    `protobuf:"bytes,2,opt,name=amendment,proto3" json:"amendment"`
+	Constitution	Constitution	`protobuf:"bytes,1,opt,name=constitution,proto3" json:"constitution"`
+	Amendment	Amendment	`protobuf:"bytes,2,opt,name=amendment,proto3" json:"amendment"`
 }
 type MsgCancelConstitutionAmendmentResponse struct {
 	Amendment Amendment `protobuf:"bytes,1,opt,name=amendment,proto3" json:"amendment"`
@@ -37,20 +37,20 @@ type QueryConstitutionResponse struct {
 	Constitution Constitution `protobuf:"bytes,1,opt,name=constitution,proto3" json:"constitution"`
 }
 type QueryPendingAmendmentsRequest struct {
-	Offset uint64 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit  uint64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset	uint64	`protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit	uint64	`protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
 }
 type QueryPendingAmendmentsResponse struct {
-	Amendments []Amendment `protobuf:"bytes,1,rep,name=amendments,proto3" json:"amendments,omitempty"`
-	Next       uint64      `protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
-	Total      uint64      `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
+	Amendments	[]Amendment	`protobuf:"bytes,1,rep,name=amendments,proto3" json:"amendments,omitempty"`
+	Next		uint64		`protobuf:"varint,2,opt,name=next,proto3" json:"next,omitempty"`
+	Total		uint64		`protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"`
 }
 type QueryAmendmentRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 type QueryAmendmentResponse struct {
-	Amendment Amendment `protobuf:"bytes,1,opt,name=amendment,proto3" json:"amendment"`
-	Found     bool      `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
+	Amendment	Amendment	`protobuf:"bytes,1,opt,name=amendment,proto3" json:"amendment"`
+	Found		bool		`protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 type QueryProtectedLimitsRequest struct{}
 type QueryProtectedLimitsResponse struct {
@@ -88,14 +88,14 @@ func (UnimplementedMsgServer) CancelConstitutionAmendment(context.Context, *MsgC
 	return nil, status.Errorf(codes.Unimplemented, "method CancelConstitutionAmendment not implemented")
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.constitution.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.constitution.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("ProposeConstitutionAmendment", serviceHandler("ProposeConstitutionAmendment", func() interface{} { return new(MsgProposeConstitutionAmendment) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).ProposeConstitutionAmendment(ctx, req.(*MsgProposeConstitutionAmendment))
@@ -110,12 +110,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).CancelConstitutionAmendment(ctx, req.(*MsgCancelConstitutionAmendment))
 		})),
 	},
-	Metadata: "l1/constitution/v1/tx.proto",
+	Metadata:	"l1/constitution/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.constitution.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.constitution.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("Params", serviceHandler("Params", func() interface{} { return new(QueryParamsRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
@@ -133,7 +133,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).ProtectedLimits(ctx, req.(*QueryProtectedLimitsRequest))
 		})),
 	},
-	Metadata: "l1/constitution/v1/query.proto",
+	Metadata:	"l1/constitution/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -186,12 +186,12 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	for _, item := range []struct {
-		msg  gogoproto.Message
-		name string
+		msg	gogoproto.Message
+		name	string
 	}{
 		{(*MsgProposeConstitutionAmendment)(nil), "l1.constitution.v1.MsgProposeConstitutionAmendment"},
 		{(*MsgProposeConstitutionAmendmentResponse)(nil), "l1.constitution.v1.MsgProposeConstitutionAmendmentResponse"},
@@ -216,35 +216,35 @@ func registerServiceTypes() {
 	}
 }
 
-func (m *MsgProposeConstitutionAmendment) Reset() { *m = MsgProposeConstitutionAmendment{} }
-func (m *MsgVoteConstitutionAmendment) Reset()    { *m = MsgVoteConstitutionAmendment{} }
-func (m *MsgExecuteConstitutionAmendment) Reset() { *m = MsgExecuteConstitutionAmendment{} }
-func (m *MsgCancelConstitutionAmendment) Reset()  { *m = MsgCancelConstitutionAmendment{} }
+func (m *MsgProposeConstitutionAmendment) Reset()	{ *m = MsgProposeConstitutionAmendment{} }
+func (m *MsgVoteConstitutionAmendment) Reset()		{ *m = MsgVoteConstitutionAmendment{} }
+func (m *MsgExecuteConstitutionAmendment) Reset()	{ *m = MsgExecuteConstitutionAmendment{} }
+func (m *MsgCancelConstitutionAmendment) Reset()	{ *m = MsgCancelConstitutionAmendment{} }
 func (m *MsgProposeConstitutionAmendmentResponse) Reset() {
 	*m = MsgProposeConstitutionAmendmentResponse{}
 }
-func (m *MsgVoteConstitutionAmendmentResponse) Reset() { *m = MsgVoteConstitutionAmendmentResponse{} }
+func (m *MsgVoteConstitutionAmendmentResponse) Reset()	{ *m = MsgVoteConstitutionAmendmentResponse{} }
 func (m *MsgExecuteConstitutionAmendmentResponse) Reset() {
 	*m = MsgExecuteConstitutionAmendmentResponse{}
 }
 func (m *MsgCancelConstitutionAmendmentResponse) Reset() {
 	*m = MsgCancelConstitutionAmendmentResponse{}
 }
-func (m *QueryParamsRequest) Reset()             { *m = QueryParamsRequest{} }
-func (m *QueryParamsResponse) Reset()            { *m = QueryParamsResponse{} }
-func (m *QueryConstitutionRequest) Reset()       { *m = QueryConstitutionRequest{} }
-func (m *QueryConstitutionResponse) Reset()      { *m = QueryConstitutionResponse{} }
-func (m *QueryPendingAmendmentsRequest) Reset()  { *m = QueryPendingAmendmentsRequest{} }
-func (m *QueryPendingAmendmentsResponse) Reset() { *m = QueryPendingAmendmentsResponse{} }
-func (m *QueryAmendmentRequest) Reset()          { *m = QueryAmendmentRequest{} }
-func (m *QueryAmendmentResponse) Reset()         { *m = QueryAmendmentResponse{} }
-func (m *QueryProtectedLimitsRequest) Reset()    { *m = QueryProtectedLimitsRequest{} }
-func (m *QueryProtectedLimitsResponse) Reset()   { *m = QueryProtectedLimitsResponse{} }
+func (m *QueryParamsRequest) Reset()			{ *m = QueryParamsRequest{} }
+func (m *QueryParamsResponse) Reset()			{ *m = QueryParamsResponse{} }
+func (m *QueryConstitutionRequest) Reset()		{ *m = QueryConstitutionRequest{} }
+func (m *QueryConstitutionResponse) Reset()		{ *m = QueryConstitutionResponse{} }
+func (m *QueryPendingAmendmentsRequest) Reset()		{ *m = QueryPendingAmendmentsRequest{} }
+func (m *QueryPendingAmendmentsResponse) Reset()	{ *m = QueryPendingAmendmentsResponse{} }
+func (m *QueryAmendmentRequest) Reset()			{ *m = QueryAmendmentRequest{} }
+func (m *QueryAmendmentResponse) Reset()		{ *m = QueryAmendmentResponse{} }
+func (m *QueryProtectedLimitsRequest) Reset()		{ *m = QueryProtectedLimitsRequest{} }
+func (m *QueryProtectedLimitsResponse) Reset()		{ *m = QueryProtectedLimitsResponse{} }
 
-func (m *MsgProposeConstitutionAmendment) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgVoteConstitutionAmendment) String() string    { return gogoproto.CompactTextString(m) }
-func (m *MsgExecuteConstitutionAmendment) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgCancelConstitutionAmendment) String() string  { return gogoproto.CompactTextString(m) }
+func (m *MsgProposeConstitutionAmendment) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgVoteConstitutionAmendment) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgExecuteConstitutionAmendment) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgCancelConstitutionAmendment) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *MsgProposeConstitutionAmendmentResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
@@ -257,36 +257,36 @@ func (m *MsgExecuteConstitutionAmendmentResponse) String() string {
 func (m *MsgCancelConstitutionAmendmentResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryParamsRequest) String() string            { return gogoproto.CompactTextString(m) }
-func (m *QueryParamsResponse) String() string           { return gogoproto.CompactTextString(m) }
-func (m *QueryConstitutionRequest) String() string      { return gogoproto.CompactTextString(m) }
-func (m *QueryConstitutionResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *QueryPendingAmendmentsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryParamsRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryParamsResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryConstitutionRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryConstitutionResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryPendingAmendmentsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryPendingAmendmentsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
-func (m *QueryAmendmentRequest) String() string       { return gogoproto.CompactTextString(m) }
-func (m *QueryAmendmentResponse) String() string      { return gogoproto.CompactTextString(m) }
-func (m *QueryProtectedLimitsRequest) String() string { return gogoproto.CompactTextString(m) }
+func (m *QueryAmendmentRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryAmendmentResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryProtectedLimitsRequest) String() string	{ return gogoproto.CompactTextString(m) }
 func (m *QueryProtectedLimitsResponse) String() string {
 	return gogoproto.CompactTextString(m)
 }
 
-func (*MsgProposeConstitutionAmendment) ProtoMessage()         {}
-func (*MsgVoteConstitutionAmendment) ProtoMessage()            {}
-func (*MsgExecuteConstitutionAmendment) ProtoMessage()         {}
-func (*MsgCancelConstitutionAmendment) ProtoMessage()          {}
-func (*MsgProposeConstitutionAmendmentResponse) ProtoMessage() {}
-func (*MsgVoteConstitutionAmendmentResponse) ProtoMessage()    {}
-func (*MsgExecuteConstitutionAmendmentResponse) ProtoMessage() {}
-func (*MsgCancelConstitutionAmendmentResponse) ProtoMessage()  {}
-func (*QueryParamsRequest) ProtoMessage()                      {}
-func (*QueryParamsResponse) ProtoMessage()                     {}
-func (*QueryConstitutionRequest) ProtoMessage()                {}
-func (*QueryConstitutionResponse) ProtoMessage()               {}
-func (*QueryPendingAmendmentsRequest) ProtoMessage()           {}
-func (*QueryPendingAmendmentsResponse) ProtoMessage()          {}
-func (*QueryAmendmentRequest) ProtoMessage()                   {}
-func (*QueryAmendmentResponse) ProtoMessage()                  {}
-func (*QueryProtectedLimitsRequest) ProtoMessage()             {}
-func (*QueryProtectedLimitsResponse) ProtoMessage()            {}
+func (*MsgProposeConstitutionAmendment) ProtoMessage()		{}
+func (*MsgVoteConstitutionAmendment) ProtoMessage()		{}
+func (*MsgExecuteConstitutionAmendment) ProtoMessage()		{}
+func (*MsgCancelConstitutionAmendment) ProtoMessage()		{}
+func (*MsgProposeConstitutionAmendmentResponse) ProtoMessage()	{}
+func (*MsgVoteConstitutionAmendmentResponse) ProtoMessage()	{}
+func (*MsgExecuteConstitutionAmendmentResponse) ProtoMessage()	{}
+func (*MsgCancelConstitutionAmendmentResponse) ProtoMessage()	{}
+func (*QueryParamsRequest) ProtoMessage()			{}
+func (*QueryParamsResponse) ProtoMessage()			{}
+func (*QueryConstitutionRequest) ProtoMessage()			{}
+func (*QueryConstitutionResponse) ProtoMessage()		{}
+func (*QueryPendingAmendmentsRequest) ProtoMessage()		{}
+func (*QueryPendingAmendmentsResponse) ProtoMessage()		{}
+func (*QueryAmendmentRequest) ProtoMessage()			{}
+func (*QueryAmendmentResponse) ProtoMessage()			{}
+func (*QueryProtectedLimitsRequest) ProtoMessage()		{}
+func (*QueryProtectedLimitsResponse) ProtoMessage()		{}

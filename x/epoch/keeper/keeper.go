@@ -17,13 +17,13 @@ var genesisKey = []byte{0x01}
 const DefaultEpochHeightSpan = uint64(100)
 
 type GenesisState struct {
-	Version uint64
-	State   types.EpochState
+	Version	uint64
+	State	types.EpochState
 }
 
 type Keeper struct {
-	genesis      GenesisState
-	storeService corestore.KVStoreService
+	genesis		GenesisState
+	storeService	corestore.KVStoreService
 }
 
 func NewKeeper() Keeper {
@@ -36,10 +36,10 @@ func NewPersistentKeeper(storeService corestore.KVStoreService) Keeper {
 
 func DefaultGenesis() GenesisState {
 	return GenesisState{
-		Version: prototype.CurrentGenesisVersion,
+		Version:	prototype.CurrentGenesisVersion,
 		State: types.EpochState{
-			Params:          postypes.DefaultParams(),
-			EpochHeightSpan: DefaultEpochHeightSpan,
+			Params:			postypes.DefaultParams(),
+			EpochHeightSpan:	DefaultEpochHeightSpan,
 		},
 	}
 }
@@ -111,10 +111,10 @@ func (k *Keeper) Bootstrap(params postypes.Params, epochID uint64, startHeight u
 	}
 	next := k.genesis
 	next.State = types.EpochState{
-		Params:                  params,
-		Current:                 record,
-		CurrentStartUnixSeconds: startUnixSeconds,
-		EpochHeightSpan:         epochHeightSpan,
+		Params:				params,
+		Current:			record,
+		CurrentStartUnixSeconds:	startUnixSeconds,
+		EpochHeightSpan:		epochHeightSpan,
 	}
 	if err := next.Validate(); err != nil {
 		return postypes.EpochRecord{}, err
@@ -132,12 +132,12 @@ func (k *Keeper) BeginEpoch(height uint64, unixSeconds uint64) (types.HookRecord
 		return types.HookRecord{}, errors.New("epoch begin hook must run at epoch start height")
 	}
 	hook := types.HookRecord{
-		Event:            types.HookEventEpochBegin,
-		EpochID:          state.Current.EpochID,
-		Height:           height,
-		UnixSeconds:      unixSeconds,
-		ToPhase:          postypes.EpochPhaseDelegation,
-		ValidatorSetHash: state.Current.ValidatorSetHash,
+		Event:			types.HookEventEpochBegin,
+		EpochID:		state.Current.EpochID,
+		Height:			height,
+		UnixSeconds:		unixSeconds,
+		ToPhase:		postypes.EpochPhaseDelegation,
+		ValidatorSetHash:	state.Current.ValidatorSetHash,
 	}
 	if err := hook.Validate(); err != nil {
 		return types.HookRecord{}, err
@@ -160,13 +160,13 @@ func (k *Keeper) TransitionPhase(height uint64, unixSeconds uint64, to postypes.
 		return types.HookRecord{}, err
 	}
 	hook := types.HookRecord{
-		Event:            types.HookEventPhaseTransition,
-		EpochID:          next.EpochID,
-		Height:           height,
-		UnixSeconds:      unixSeconds,
-		FromPhase:        state.Current.Phase,
-		ToPhase:          to,
-		ValidatorSetHash: next.ValidatorSetHash,
+		Event:			types.HookEventPhaseTransition,
+		EpochID:		next.EpochID,
+		Height:			height,
+		UnixSeconds:		unixSeconds,
+		FromPhase:		state.Current.Phase,
+		ToPhase:		to,
+		ValidatorSetHash:	next.ValidatorSetHash,
 	}
 	if err := hook.Validate(); err != nil {
 		return types.HookRecord{}, err
@@ -234,21 +234,21 @@ func (k *Keeper) EndEpoch(height uint64, unixSeconds uint64, roots postypes.Epoc
 		return postypes.EpochRecord{}, err
 	}
 	endHook := types.HookRecord{
-		Event:            types.HookEventEpochEnd,
-		EpochID:          closed.EpochID,
-		Height:           height,
-		UnixSeconds:      unixSeconds,
-		FromPhase:        postypes.EpochPhaseSettlement,
-		ToPhase:          postypes.EpochPhaseClosed,
-		ValidatorSetHash: closed.ValidatorSetHash,
+		Event:			types.HookEventEpochEnd,
+		EpochID:		closed.EpochID,
+		Height:			height,
+		UnixSeconds:		unixSeconds,
+		FromPhase:		postypes.EpochPhaseSettlement,
+		ToPhase:		postypes.EpochPhaseClosed,
+		ValidatorSetHash:	closed.ValidatorSetHash,
 	}
 	beginHook := types.HookRecord{
-		Event:            types.HookEventEpochBegin,
-		EpochID:          nextRecord.EpochID,
-		Height:           nextRecord.StartHeight,
-		UnixSeconds:      unixSeconds + 1,
-		ToPhase:          postypes.EpochPhaseDelegation,
-		ValidatorSetHash: nextRecord.ValidatorSetHash,
+		Event:			types.HookEventEpochBegin,
+		EpochID:		nextRecord.EpochID,
+		Height:			nextRecord.StartHeight,
+		UnixSeconds:		unixSeconds + 1,
+		ToPhase:		postypes.EpochPhaseDelegation,
+		ValidatorSetHash:	nextRecord.ValidatorSetHash,
 	}
 	if err := endHook.Validate(); err != nil {
 		return postypes.EpochRecord{}, err

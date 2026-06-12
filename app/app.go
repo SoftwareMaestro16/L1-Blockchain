@@ -29,10 +29,10 @@ func NewL1App(
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *L1App {
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
-		ProtoFiles: proto.HybridResolver,
+		ProtoFiles:	proto.HybridResolver,
 		SigningOptions: signing.Options{
-			AddressCodec:          aetraaddress.Codec{},
-			ValidatorAddressCodec: aetraaddress.Codec{},
+			AddressCodec:		aetraaddress.Codec{},
+			ValidatorAddressCodec:	aetraaddress.Codec{},
 		},
 	})
 	appCodec := codec.NewProtoCodec(interfaceRegistry)
@@ -46,32 +46,6 @@ func NewL1App(
 	std.RegisterLegacyAminoCodec(legacyAmino)
 	std.RegisterInterfaces(interfaceRegistry)
 
-	// Below we could construct and set an application specific mempool and
-	// ABCI 1.0 PrepareProposal and ProcessProposal handlers. These defaults are
-	// already set in the SDK's BaseApp, this shows an example of how to override
-	// them.
-	//
-	// Example:
-	//
-	// bApp := baseapp.NewBaseApp(...)
-	// nonceMempool := mempool.NewSenderNonceMempool()
-	// abciPropHandler := NewDefaultProposalHandler(nonceMempool, bApp)
-	//
-	// bApp.SetMempool(nonceMempool)
-	// bApp.SetPrepareProposal(abciPropHandler.PrepareProposalHandler())
-	// bApp.SetProcessProposal(abciPropHandler.ProcessProposalHandler())
-	//
-	// Alternatively, you can construct BaseApp options, append those to
-	// baseAppOptions and pass them to NewBaseApp.
-	//
-	// Example:
-	//
-	// prepareOpt = func(app *baseapp.BaseApp) {
-	// 	abciPropHandler := baseapp.NewDefaultProposalHandler(nonceMempool, app)
-	// 	app.SetPrepareProposal(abciPropHandler.PrepareProposalHandler())
-	// }
-	// baseAppOptions = append(baseAppOptions, prepareOpt)
-
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	bApp := baseapp.NewBaseApp(appName, logger, db, txConfig.TxDecoder(), baseAppOptions...)
@@ -81,18 +55,17 @@ func NewL1App(
 
 	keys := newKVStoreKeys()
 
-	// register streaming services
 	if err := bApp.RegisterStreamingServices(appOpts, keys); err != nil {
 		panic(err)
 	}
 
 	app := &L1App{
-		BaseApp:           bApp,
-		legacyAmino:       legacyAmino,
-		appCodec:          appCodec,
-		txConfig:          txConfig,
-		interfaceRegistry: interfaceRegistry,
-		keys:              keys,
+		BaseApp:		bApp,
+		legacyAmino:		legacyAmino,
+		appCodec:		appCodec,
+		txConfig:		txConfig,
+		interfaceRegistry:	interfaceRegistry,
+		keys:			keys,
 	}
 
 	txConfig = app.initKeepers(appCodec, legacyAmino, logger, appOpts, keys)
@@ -105,29 +78,14 @@ func NewL1App(
 		panic(err)
 	}
 
-	// initialize stores
 	app.MountKVStores(keys)
 
-	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.setAnteHandler(txConfig)
 
-	// In v0.46, the SDK introduces _postHandlers_. PostHandlers are like
-	// antehandlers, but are run _after_ the `runMsgs` execution. They are also
-	// defined as a chain, and have the same signature as antehandlers.
-	//
-	// In baseapp, postHandlers are run in the same store branch as `runMsgs`,
-	// meaning that both `runMsgs` and `postHandler` state will be committed if
-	// both are successful, and both will be reverted if any of the two fails.
-	//
-	// The SDK exposes a default postHandlers chain
-	//
-	// Please note that changing any of the anteHandler or postHandler chain is
-	// likely to be a state-machine breaking change, which needs a coordinated
-	// upgrade.
 	app.setPostHandler()
 
 	if loadLatest {

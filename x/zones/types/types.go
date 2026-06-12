@@ -7,73 +7,73 @@ import (
 )
 
 const (
-	FeePolicyNaet = "naet"
+	FeePolicyNaet	= "naet"
 
-	MaxZoneIDLength      = 64
-	MaxPolicyValueLength = 64
-	HashHexLength        = 64
+	MaxZoneIDLength		= 64
+	MaxPolicyValueLength	= 64
+	HashHexLength		= 64
 )
 
 type ZoneID string
 
 const (
-	ZoneIDFinancial   ZoneID = "FINANCIAL_ZONE"
-	ZoneIDIdentity    ZoneID = "IDENTITY_ZONE"
-	ZoneIDApplication ZoneID = "APPLICATION_ZONE"
-	ZoneIDContract    ZoneID = "CONTRACT_ZONE"
+	ZoneIDFinancial		ZoneID	= "FINANCIAL_ZONE"
+	ZoneIDIdentity		ZoneID	= "IDENTITY_ZONE"
+	ZoneIDApplication	ZoneID	= "APPLICATION_ZONE"
+	ZoneIDContract		ZoneID	= "CONTRACT_ZONE"
 )
 
 type ZoneKind string
 
 const (
-	ZoneKindFinancial   ZoneKind = "FINANCIAL"
-	ZoneKindIdentity    ZoneKind = "IDENTITY"
-	ZoneKindApplication ZoneKind = "APPLICATION"
-	ZoneKindContract    ZoneKind = "CONTRACT"
+	ZoneKindFinancial	ZoneKind	= "FINANCIAL"
+	ZoneKindIdentity	ZoneKind	= "IDENTITY"
+	ZoneKindApplication	ZoneKind	= "APPLICATION"
+	ZoneKindContract	ZoneKind	= "CONTRACT"
 )
 
 type VMPolicy string
 
 const (
-	VMPolicyAVM           VMPolicy = "AVM"
-	VMPolicyCosmWasmGated VMPolicy = "COSMWASM_GATED"
-	VMPolicyNativeModule  VMPolicy = "NATIVE_MODULE"
+	VMPolicyAVM		VMPolicy	= "AVM"
+	VMPolicyCosmWasmGated	VMPolicy	= "COSMWASM_GATED"
+	VMPolicyNativeModule	VMPolicy	= "NATIVE_MODULE"
 )
 
 type UpgradePolicy string
 
 const (
-	UpgradePolicyGovernance UpgradePolicy = "GOVERNANCE"
-	UpgradePolicyScheduled  UpgradePolicy = "SCHEDULED"
-	UpgradePolicyImmutable  UpgradePolicy = "IMMUTABLE"
+	UpgradePolicyGovernance	UpgradePolicy	= "GOVERNANCE"
+	UpgradePolicyScheduled	UpgradePolicy	= "SCHEDULED"
+	UpgradePolicyImmutable	UpgradePolicy	= "IMMUTABLE"
 )
 
 type DataAvailabilityPolicy string
 
 const (
-	DataAvailabilityCoreCommitment DataAvailabilityPolicy = "CORE_COMMITMENT"
-	DataAvailabilityReplicated     DataAvailabilityPolicy = "REPLICATED"
+	DataAvailabilityCoreCommitment	DataAvailabilityPolicy	= "CORE_COMMITMENT"
+	DataAvailabilityReplicated	DataAvailabilityPolicy	= "REPLICATED"
 )
 
 type AuditStatus string
 
 const (
-	AuditStatusExperimental   AuditStatus = "EXPERIMENTAL"
-	AuditStatusInternalReview AuditStatus = "INTERNAL_REVIEW"
-	AuditStatusAudited        AuditStatus = "AUDITED"
+	AuditStatusExperimental		AuditStatus	= "EXPERIMENTAL"
+	AuditStatusInternalReview	AuditStatus	= "INTERNAL_REVIEW"
+	AuditStatusAudited		AuditStatus	= "AUDITED"
 )
 
 type Zone struct {
-	ID                     ZoneID
-	Kind                   ZoneKind
-	VMPolicy               VMPolicy
-	FeePolicy              string
-	GenesisStateHash       string
-	StateTransitionID      string
-	UpgradePolicy          UpgradePolicy
-	DataAvailabilityPolicy DataAvailabilityPolicy
-	AuditStatus            AuditStatus
-	ActivationHeight       uint64
+	ID			ZoneID
+	Kind			ZoneKind
+	VMPolicy		VMPolicy
+	FeePolicy		string
+	GenesisStateHash	string
+	StateTransitionID	string
+	UpgradePolicy		UpgradePolicy
+	DataAvailabilityPolicy	DataAvailabilityPolicy
+	AuditStatus		AuditStatus
+	ActivationHeight	uint64
 }
 
 func (z Zone) Validate() error {

@@ -10,20 +10,13 @@ import (
 	"lukechampine.com/blake3"
 )
 
-// ---------------
-// Task 4.11: AVM Value Model
-// ---------------
-// AVM runtime values are a tagged union with deterministic canonical encoding.
-// No untyped values, no implicit casts, no runtime generics or reflection.
-// All values are size-bounded and gas-metered.
-
 // ValueTag defines the runtime type tag for AVM values.
 // Every Value MUST carry a deterministic type tag.
 // No untyped values are allowed in runtime.
 type ValueTag uint8
 
 const (
-	TagNull ValueTag = iota
+	TagNull	ValueTag	= iota
 	TagBool
 	TagInt8
 	TagInt16
@@ -143,32 +136,24 @@ func IsInteger(tag ValueTag) bool {
 	return ok
 }
 
-// ---------------
-// RuntimeValue — Tagged Union Value
-// ---------------
-
 // RuntimeValue is the AVM runtime tagged union value.
 // All runtime values MUST be one of these.
 // No untyped values, no implicit casts, no runtime reflection.
 type RuntimeValue struct {
-	Tag        ValueTag
-	boolVal    bool
-	intVal     *big.Int
-	coinsVal   [16]byte
-	addrVal    string
-	hashVal    [32]byte
-	bytesVal   []byte
-	strVal     string
-	tupleVal   []RuntimeValue
-	chunkRef   *chunk.Chunk
-	readerOff  uint32
-	writerPtr  *ValueWriter
-	frameRef   *KernelExecutionFrame
+	Tag		ValueTag
+	boolVal		bool
+	intVal		*big.Int
+	coinsVal	[16]byte
+	addrVal		string
+	hashVal		[32]byte
+	bytesVal	[]byte
+	strVal		string
+	tupleVal	[]RuntimeValue
+	chunkRef	*chunk.Chunk
+	readerOff	uint32
+	writerPtr	*ValueWriter
+	frameRef	*KernelExecutionFrame
 }
-
-// ---------------
-// Value Constructors
-// ---------------
 
 func ValueNull() RuntimeValue {
 	return RuntimeValue{Tag: TagNull}
@@ -284,10 +269,6 @@ func ValueExecFrameRef(f *KernelExecutionFrame) RuntimeValue {
 	return RuntimeValue{Tag: TagExecFrameRef, frameRef: f}
 }
 
-// ---------------
-// Value Accessors (type-safe)
-// ---------------
-
 func (v RuntimeValue) AsBool() (bool, error) {
 	if v.Tag != TagBool {
 		return false, typeError(TagBool, v.Tag)
@@ -399,11 +380,11 @@ func (v RuntimeValue) AsExecFrameRef() (*KernelExecutionFrame, error) {
 	return v.frameRef, nil
 }
 
-func (v RuntimeValue) IsNull() bool  { return v.Tag == TagNull }
-func (v RuntimeValue) IsBool() bool  { return v.Tag == TagBool }
-func (v RuntimeValue) IsInt() bool   { return IsSignedInteger(v.Tag) }
-func (v RuntimeValue) IsUint() bool  { return IsUnsignedInteger(v.Tag) }
-func (v RuntimeValue) IsCoins() bool { return v.Tag == TagCoins }
+func (v RuntimeValue) IsNull() bool	{ return v.Tag == TagNull }
+func (v RuntimeValue) IsBool() bool	{ return v.Tag == TagBool }
+func (v RuntimeValue) IsInt() bool	{ return IsSignedInteger(v.Tag) }
+func (v RuntimeValue) IsUint() bool	{ return IsUnsignedInteger(v.Tag) }
+func (v RuntimeValue) IsCoins() bool	{ return v.Tag == TagCoins }
 
 func IsSignedInteger(tag ValueTag) bool {
 	return tag == TagInt8 || tag == TagInt16 || tag == TagInt32 || tag == TagInt64 || tag == TagInt128 || tag == TagInt256
@@ -413,19 +394,13 @@ func IsUnsignedInteger(tag ValueTag) bool {
 	return tag == TagUint8 || tag == TagUint16 || tag == TagUint32 || tag == TagUint64 || tag == TagUint128 || tag == TagUint256
 }
 
-// ---------------
-// Canonical Encoding
-// ---------------
-// All values MUST encode as: (ValueTag || CanonicalPayloadBytes)
-// Same semantic value MUST always produce identical byte representation.
-
 // CanonicalEncode encodes a RuntimeValue into deterministic bytes.
 func CanonicalEncode(v RuntimeValue) ([]byte, error) {
 	buf := []byte{byte(v.Tag)}
 
 	switch v.Tag {
 	case TagNull:
-		// No payload
+
 	case TagBool:
 		if v.boolVal {
 			buf = append(buf, 0x01)
@@ -489,8 +464,7 @@ func CanonicalEncode(v RuntimeValue) ([]byte, error) {
 			buf = append(buf, 0x00)
 		} else {
 			buf = append(buf, 0x01)
-			// Writer handles are execution-scoped; cannot be serialized externally
-			// Store a deterministic placeholder — actual resolution happens at runtime
+
 			buf = append(buf, make([]byte, 32)...)
 		}
 	case TagExecFrameRef:
@@ -642,7 +616,7 @@ func CanonicalDecode(data []byte) (RuntimeValue, int, error) {
 		if len(data) < offset+width {
 			return RuntimeValue{}, 0, fmt.Errorf("AVM: truncated chunk ref")
 		}
-		// For decode we create a reference by hash only — actual chunk must be resolved separately
+
 		return RuntimeValue{Tag: TagChunkRef, chunkRef: nil}, offset + width, nil
 	case TagReaderCursor:
 		width := 32 + 4
@@ -655,7 +629,7 @@ func CanonicalDecode(data []byte) (RuntimeValue, int, error) {
 		if len(data) < offset+1 {
 			return RuntimeValue{}, 0, fmt.Errorf("AVM: truncated writer handle")
 		}
-		// Writer handles cannot be truly deserialized (they're execution-scoped)
+
 		offset++
 		return RuntimeValue{Tag: TagWriterHandle, writerPtr: nil}, offset, nil
 	case TagExecFrameRef:
@@ -665,21 +639,15 @@ func CanonicalDecode(data []byte) (RuntimeValue, int, error) {
 	}
 }
 
-// ---------------
-// Type Safety: Explicit Cast Opcodes
-// ---------------
-// Invalid cast → deterministic trap with small exit code.
-// No implicit casting allowed.
-
 type CastExitCode uint8
 
 const (
-	CastOK          CastExitCode = 0
-	CastTypeMismatch CastExitCode = 1
-	CastOverflow     CastExitCode = 2
-	CastTruncation   CastExitCode = 3
-	CastInvalidUTF8  CastExitCode = 4
-	CastNullToValue  CastExitCode = 5
+	CastOK			CastExitCode	= 0
+	CastTypeMismatch	CastExitCode	= 1
+	CastOverflow		CastExitCode	= 2
+	CastTruncation		CastExitCode	= 3
+	CastInvalidUTF8		CastExitCode	= 4
+	CastNullToValue		CastExitCode	= 5
 )
 
 // ExplicitCast performs a type cast between integer widths.
@@ -717,102 +685,96 @@ func ExplicitCast(v RuntimeValue, targetTag ValueTag) (RuntimeValue, CastExitCod
 	return RuntimeValue{}, CastTypeMismatch
 }
 
-// ---------------
-// Size & Gas Boundary Model
-// ---------------
-// Every Value MUST define max encoded size and gas cost.
-// Unbounded values are forbidden.
-
 var maxEncodedSize = map[ValueTag]uint32{
-	TagNull:          1,
-	TagBool:          2,
-	TagInt8:          2,
-	TagInt16:         3,
-	TagInt32:         5,
-	TagInt64:         9,
-	TagInt128:        17,
-	TagInt256:        33,
-	TagUint8:         2,
-	TagUint16:        3,
-	TagUint32:        5,
-	TagUint64:        9,
-	TagUint128:       17,
-	TagUint256:       33,
-	TagCoins:         17,
-	TagTimestamp:      9,
-	TagAddress:       4 + MaxAddressLength,
-	TagHash:          33,
-	TagBytes:         4 + MaxBytesLength,
-	TagString:        4 + MaxStringLength,
-	TagTuple:          5 + MaxTupleElements*33,
-	TagChunkRef:      33,
-	TagReaderCursor:  37,
-	TagWriterHandle:  34,
-	TagExecFrameRef:  2,
+	TagNull:		1,
+	TagBool:		2,
+	TagInt8:		2,
+	TagInt16:		3,
+	TagInt32:		5,
+	TagInt64:		9,
+	TagInt128:		17,
+	TagInt256:		33,
+	TagUint8:		2,
+	TagUint16:		3,
+	TagUint32:		5,
+	TagUint64:		9,
+	TagUint128:		17,
+	TagUint256:		33,
+	TagCoins:		17,
+	TagTimestamp:		9,
+	TagAddress:		4 + MaxAddressLength,
+	TagHash:		33,
+	TagBytes:		4 + MaxBytesLength,
+	TagString:		4 + MaxStringLength,
+	TagTuple:		5 + MaxTupleElements*33,
+	TagChunkRef:		33,
+	TagReaderCursor:	37,
+	TagWriterHandle:	34,
+	TagExecFrameRef:	2,
 }
 
 var gasCostEncode = map[ValueTag]uint64{
-	TagNull:          1,
-	TagBool:          1,
-	TagInt8:          2,
-	TagInt16:         2,
-	TagInt32:         3,
-	TagInt64:         3,
-	TagInt128:        5,
-	TagInt256:        8,
-	TagUint8:         2,
-	TagUint16:        2,
-	TagUint32:        3,
-	TagUint64:        3,
-	TagUint128:       5,
-	TagUint256:       8,
-	TagCoins:         5,
-	TagTimestamp:      3,
-	TagAddress:       10,
-	TagHash:          10,
-	TagBytes:         5 + 1,
-	TagString:        5 + 1,
-	TagTuple:         10,
-	TagChunkRef:      15,
-	TagReaderCursor:  20,
-	TagWriterHandle:  20,
-	TagExecFrameRef:  5,
+	TagNull:		1,
+	TagBool:		1,
+	TagInt8:		2,
+	TagInt16:		2,
+	TagInt32:		3,
+	TagInt64:		3,
+	TagInt128:		5,
+	TagInt256:		8,
+	TagUint8:		2,
+	TagUint16:		2,
+	TagUint32:		3,
+	TagUint64:		3,
+	TagUint128:		5,
+	TagUint256:		8,
+	TagCoins:		5,
+	TagTimestamp:		3,
+	TagAddress:		10,
+	TagHash:		10,
+	TagBytes:		5 + 1,
+	TagString:		5 + 1,
+	TagTuple:		10,
+	TagChunkRef:		15,
+	TagReaderCursor:	20,
+	TagWriterHandle:	20,
+	TagExecFrameRef:	5,
 }
 
 var gasCostDecode = map[ValueTag]uint64{
-	TagNull:          1,
-	TagBool:          1,
-	TagInt8:          2,
-	TagInt16:         2,
-	TagInt32:         3,
-	TagInt64:         3,
-	TagInt128:        5,
-	TagInt256:        8,
-	TagUint8:         2,
-	TagUint16:        2,
-	TagUint32:        3,
-	TagUint64:        3,
-	TagUint128:       5,
-	TagUint256:       8,
-	TagCoins:         5,
-	TagTimestamp:      3,
-	TagAddress:       10,
-	TagHash:          10,
-	TagBytes:         5 + 1,
-	TagString:        5 + 1,
-	TagTuple:         10,
-	TagChunkRef:      15,
-	TagReaderCursor:  20,
-	TagWriterHandle:  20,
-	TagExecFrameRef:  5,
+	TagNull:		1,
+	TagBool:		1,
+	TagInt8:		2,
+	TagInt16:		2,
+	TagInt32:		3,
+	TagInt64:		3,
+	TagInt128:		5,
+	TagInt256:		8,
+	TagUint8:		2,
+	TagUint16:		2,
+	TagUint32:		3,
+	TagUint64:		3,
+	TagUint128:		5,
+	TagUint256:		8,
+	TagCoins:		5,
+	TagTimestamp:		3,
+	TagAddress:		10,
+	TagHash:		10,
+	TagBytes:		5 + 1,
+	TagString:		5 + 1,
+	TagTuple:		10,
+	TagChunkRef:		15,
+	TagReaderCursor:	20,
+	TagWriterHandle:	20,
+	TagExecFrameRef:	5,
 }
 
 // Size bounds for variable-length types
 const (
-	MaxAddressLength  uint32 = 128
-	MaxBytesLength    uint32 = 65536
-	MaxStringLength    uint32 = 65536
-	MaxTupleElements  uint32 = 256
+	MaxAddressLength	uint32	= 128
+	MaxBytesLength		uint32	= 65536
+	MaxStringLength		uint32	= 65536
+	MaxTupleElements	uint32	= 256
 )
 
 // MaxEncodedSize returns the maximum encoded size for a value tag.
@@ -839,11 +801,6 @@ func GasCostDecode(tag ValueTag) uint64 {
 	return 100
 }
 
-// ---------------
-// Value Hashing (Canonical)
-// ---------------
-// Same value MUST always produce same bytes → same hash.
-
 // CanonicalHash returns the BLAKE3 hash of the canonical encoding of a value.
 func CanonicalHash(v RuntimeValue) ([32]byte, error) {
 	encoded, err := CanonicalEncode(v)
@@ -852,11 +809,6 @@ func CanonicalHash(v RuntimeValue) ([32]byte, error) {
 	}
 	return blake3.Sum256(encoded), nil
 }
-
-// ---------------
-// Option<T> Encoding: Null tag OR Value<T>
-// ---------------
-// Option<T> is encoded as Null for None, or the value for Some.
 
 // OptionNone returns the null value representing Option.None.
 func OptionNone() RuntimeValue {
@@ -873,14 +825,10 @@ func IsOptionNone(v RuntimeValue) bool {
 	return v.Tag == TagNull
 }
 
-// ---------------
-// ValueWriter (Chunk Builder Abstraction)
-// ---------------
-
 type ValueWriter struct {
-	builder *chunk.Builder
-	data    []byte
-	refs    []*chunk.Chunk
+	builder	*chunk.Builder
+	data	[]byte
+	refs	[]*chunk.Chunk
 }
 
 func NewValueWriter() *ValueWriter {
@@ -915,11 +863,6 @@ func (w *ValueWriter) AddRef(c *chunk.Chunk) {
 	w.refs = append(w.refs, c)
 }
 
-// ---------------
-// Determinism Invariant Validation
-// ---------------
-// Same value MUST always produce same byte encoding, same hash, same gas cost.
-
 func ValidateDeterminism(a, b RuntimeValue) error {
 	encA, err := CanonicalEncode(a)
 	if err != nil {
@@ -943,17 +886,9 @@ func ValidateDeterminism(a, b RuntimeValue) error {
 	return nil
 }
 
-// ---------------
-// Type Error Helper
-// ---------------
-
 func typeError(expected, got ValueTag) error {
 	return fmt.Errorf("AVM type error: expected %s, got %s → EXIT_TYPE_ERROR", expected, got)
 }
-
-// ---------------
-// Internal Helpers
-// ---------------
 
 func encodeIntBytes(v *big.Int, width int) []byte {
 	if v == nil {

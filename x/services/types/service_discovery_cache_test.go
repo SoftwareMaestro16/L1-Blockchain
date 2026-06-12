@@ -17,42 +17,42 @@ func TestServiceDiscoveryCacheRejectsStaleAndOutlivingBounds(t *testing.T) {
 	require.NoError(t, err)
 
 	constraints := ServiceDiscoveryCacheConstraints{
-		RegistryExpiryHeight:     descriptor.ExpiryHeight,
-		InterfaceCompatibleUntil: descriptor.Discovery.CacheExpiryHeight,
-		CurrentHeight:            25,
+		RegistryExpiryHeight:		descriptor.ExpiryHeight,
+		InterfaceCompatibleUntil:	descriptor.Discovery.CacheExpiryHeight,
+		CurrentHeight:			25,
 	}
 	record, err := NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:           discovery.ServiceID,
-		DescriptorHash:      discovery.DescriptorHash,
-		InterfaceHash:       discovery.InterfaceHash,
-		Source:              ServiceResolutionOnChainRegistry,
-		ProofHeightOptional: proof.Proof.ProofHeight,
-		ExpiresHeight:       80,
-		FetchedAtHeight:     24,
-		Trust:               ServiceDiscoveryCacheVerified,
+		ServiceID:		discovery.ServiceID,
+		DescriptorHash:		discovery.DescriptorHash,
+		InterfaceHash:		discovery.InterfaceHash,
+		Source:			ServiceResolutionOnChainRegistry,
+		ProofHeightOptional:	proof.Proof.ProofHeight,
+		ExpiresHeight:		80,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheVerified,
 	}, constraints)
 	require.NoError(t, err)
 	require.NoError(t, record.Validate(constraints))
 
 	_, err = NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       discovery.ServiceID,
-		DescriptorHash:  discovery.DescriptorHash,
-		InterfaceHash:   discovery.InterfaceHash,
-		Source:          ServiceResolutionOnChainRegistry,
-		ExpiresHeight:   descriptor.ExpiryHeight + 1,
-		FetchedAtHeight: 24,
-		Trust:           ServiceDiscoveryCacheAdvisory,
+		ServiceID:		discovery.ServiceID,
+		DescriptorHash:		discovery.DescriptorHash,
+		InterfaceHash:		discovery.InterfaceHash,
+		Source:			ServiceResolutionOnChainRegistry,
+		ExpiresHeight:		descriptor.ExpiryHeight + 1,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheAdvisory,
 	}, constraints)
 	require.ErrorContains(t, err, "registry expiry")
 
 	_, err = NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       discovery.ServiceID,
-		DescriptorHash:  discovery.DescriptorHash,
-		InterfaceHash:   discovery.InterfaceHash,
-		Source:          ServiceResolutionOnChainRegistry,
-		ExpiresHeight:   descriptor.Discovery.CacheExpiryHeight + 1,
-		FetchedAtHeight: 24,
-		Trust:           ServiceDiscoveryCacheAdvisory,
+		ServiceID:		discovery.ServiceID,
+		DescriptorHash:		discovery.DescriptorHash,
+		InterfaceHash:		discovery.InterfaceHash,
+		Source:			ServiceResolutionOnChainRegistry,
+		ExpiresHeight:		descriptor.Discovery.CacheExpiryHeight + 1,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheAdvisory,
 	}, constraints)
 	require.ErrorContains(t, err, "interface compatibility")
 
@@ -61,13 +61,13 @@ func TestServiceDiscoveryCacheRejectsStaleAndOutlivingBounds(t *testing.T) {
 	require.ErrorContains(t, record.Validate(stale), "stale")
 
 	_, err = NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       discovery.ServiceID,
-		DescriptorHash:  discovery.DescriptorHash,
-		InterfaceHash:   discovery.InterfaceHash,
-		Source:          ServiceResolutionDistributedMesh,
-		ExpiresHeight:   70,
-		FetchedAtHeight: 24,
-		Trust:           ServiceDiscoveryCacheVerified,
+		ServiceID:		discovery.ServiceID,
+		DescriptorHash:		discovery.DescriptorHash,
+		InterfaceHash:		discovery.InterfaceHash,
+		Source:			ServiceResolutionDistributedMesh,
+		ExpiresHeight:		70,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheVerified,
 	}, constraints)
 	require.ErrorContains(t, err, "advisory")
 }
@@ -78,23 +78,23 @@ func TestDiscoveryCacheInvalidatesOnServiceUpdate(t *testing.T) {
 	require.NoError(t, err)
 	constraints := ServiceDiscoveryCacheConstraints{RegistryExpiryHeight: 100, InterfaceCompatibleUntil: 90, CurrentHeight: 25}
 	updated, err := NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       discovery.ServiceID,
-		DescriptorHash:  discovery.DescriptorHash,
-		InterfaceHash:   discovery.InterfaceHash,
-		Source:          ServiceResolutionDistributedMesh,
-		ExpiresHeight:   80,
-		FetchedAtHeight: 24,
-		Trust:           ServiceDiscoveryCacheAdvisory,
+		ServiceID:		discovery.ServiceID,
+		DescriptorHash:		discovery.DescriptorHash,
+		InterfaceHash:		discovery.InterfaceHash,
+		Source:			ServiceResolutionDistributedMesh,
+		ExpiresHeight:		80,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheAdvisory,
 	}, constraints)
 	require.NoError(t, err)
 	other, err := NewServiceDiscoveryCacheRecord(ServiceDiscoveryCacheRecord{
-		ServiceID:       "other-service",
-		DescriptorHash:  testInterfaceHash("other/descriptor"),
-		InterfaceHash:   testInterfaceHash("other/interface"),
-		Source:          ServiceResolutionDistributedMesh,
-		ExpiresHeight:   80,
-		FetchedAtHeight: 24,
-		Trust:           ServiceDiscoveryCacheAdvisory,
+		ServiceID:		"other-service",
+		DescriptorHash:		testInterfaceHash("other/descriptor"),
+		InterfaceHash:		testInterfaceHash("other/interface"),
+		Source:			ServiceResolutionDistributedMesh,
+		ExpiresHeight:		80,
+		FetchedAtHeight:	24,
+		Trust:			ServiceDiscoveryCacheAdvisory,
 	}, constraints)
 	require.NoError(t, err)
 	event, err := NewServiceDiscoveryUpdateEvent(discovery.ServiceID, testInterfaceHash("new/descriptor"), discovery.InterfaceHash, 30)
@@ -111,14 +111,14 @@ func TestSignedServiceAdvertisementRejectsForgedDiscoveryRecords(t *testing.T) {
 	discovery, err := ProjectServiceDiscoveryDescriptorFromCore(descriptor, descriptor.Discovery.ServiceName, "", "")
 	require.NoError(t, err)
 	ad, err := NewSignedServiceAdvertisement(SignedServiceAdvertisement{
-		ServiceName:    discovery.ServiceName,
-		Descriptor:     discovery,
-		Endpoint:       discovery.Endpoint,
-		InterfaceHash:  discovery.InterfaceHash,
-		Signer:         discovery.Owner,
-		ExpiresHeight:  80,
-		IssuedAtHeight: 25,
-		Nonce:          1,
+		ServiceName:	discovery.ServiceName,
+		Descriptor:	discovery,
+		Endpoint:	discovery.Endpoint,
+		InterfaceHash:	discovery.InterfaceHash,
+		Signer:		discovery.Owner,
+		ExpiresHeight:	80,
+		IssuedAtHeight:	25,
+		Nonce:		1,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ad.Validate())

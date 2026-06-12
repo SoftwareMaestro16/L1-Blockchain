@@ -87,15 +87,15 @@ func TestServiceRegistryV2MessagesMutateState(t *testing.T) {
 	require.NoError(t, err)
 
 	state, err = RegisterInterfaceInRegistryV2(state, MsgRegisterInterfaceV2{
-		Authority:  "owner-alpha",
-		Descriptor: iface,
+		Authority:	"owner-alpha",
+		Descriptor:	iface,
 	}, 2)
 	require.NoError(t, err)
 	require.Len(t, state.Interfaces, 1)
 
 	state, err = RegisterServiceInRegistryV2(state, MsgRegisterServiceV2{
-		Authority:  "owner-alpha",
-		Descriptor: service,
+		Authority:	"owner-alpha",
+		Descriptor:	service,
 	}, 3)
 	require.NoError(t, err)
 	require.Len(t, state.Descriptors, 1)
@@ -108,32 +108,32 @@ func TestServiceRegistryV2MessagesMutateState(t *testing.T) {
 	updated, err = NewCanonicalServiceDescriptor(updated)
 	require.NoError(t, err)
 	state, err = UpdateServiceInRegistryV2(state, MsgUpdateServiceV2{
-		Authority:  "owner-alpha",
-		Descriptor: updated,
+		Authority:	"owner-alpha",
+		Descriptor:	updated,
 	}, 4)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), state.Descriptors[0].Version)
 
 	state, err = BindServiceToIdentityInRegistryV2(state, MsgBindServiceToIdentityV2{
-		Authority:    "owner-alpha",
-		ServiceID:    service.ServiceID,
-		IdentityName: "svc-auto.aet",
+		Authority:	"owner-alpha",
+		ServiceID:	service.ServiceID,
+		IdentityName:	"svc-auto.aet",
 	}, 5)
 	require.NoError(t, err)
 	require.Len(t, state.IdentityBindings, 1)
 
 	state, err = DisableServiceInRegistryV2(state, MsgDisableServiceV2{
-		Authority: "owner-alpha",
-		ServiceID: service.ServiceID,
-		Height:    6,
+		Authority:	"owner-alpha",
+		ServiceID:	service.ServiceID,
+		Height:		6,
 	}, 6)
 	require.NoError(t, err)
 	require.Equal(t, CanonicalServiceStatusDisabled, state.Descriptors[0].Status)
 
 	state, err = UnbindServiceFromIdentityInRegistryV2(state, MsgUnbindServiceFromIdentityV2{
-		Authority:    "owner-alpha",
-		ServiceID:    service.ServiceID,
-		IdentityName: "svc-auto.aet",
+		Authority:	"owner-alpha",
+		ServiceID:	service.ServiceID,
+		IdentityName:	"svc-auto.aet",
 	}, 7)
 	require.NoError(t, err)
 	require.Empty(t, state.IdentityBindings)
@@ -198,20 +198,20 @@ func testRegistryInterface(t *testing.T, name string) DistributedInterfaceDescri
 func testRegistryDescriptor(t *testing.T, serviceID, interfaceHash, owner, zoneID string, methods []string) CanonicalServiceDescriptor {
 	t.Helper()
 	descriptor, err := NewCanonicalServiceDescriptor(CanonicalServiceDescriptor{
-		ServiceID:        serviceID,
-		EndpointType:     CanonicalEndpointZoneAware,
-		InterfaceHash:    interfaceHash,
-		SupportedMethods: methods,
-		AuthModel:        "account",
-		StateDependency:  "committed",
-		Owner:            owner,
-		ZoneID:           zoneID,
-		Version:          1,
-		EndpointURIHash:  testDistributedHash(serviceID + "/endpoint"),
-		MetadataHash:     testDistributedHash(serviceID + "/metadata"),
-		TTLHeight:        100,
-		Status:           CanonicalServiceStatusActive,
-		Capabilities:     []string{"proofs"},
+		ServiceID:		serviceID,
+		EndpointType:		CanonicalEndpointZoneAware,
+		InterfaceHash:		interfaceHash,
+		SupportedMethods:	methods,
+		AuthModel:		"account",
+		StateDependency:	"committed",
+		Owner:			owner,
+		ZoneID:			zoneID,
+		Version:		1,
+		EndpointURIHash:	testDistributedHash(serviceID + "/endpoint"),
+		MetadataHash:		testDistributedHash(serviceID + "/metadata"),
+		TTLHeight:		100,
+		Status:			CanonicalServiceStatusActive,
+		Capabilities:		[]string{"proofs"},
 	})
 	require.NoError(t, err)
 	return descriptor
@@ -220,12 +220,12 @@ func testRegistryDescriptor(t *testing.T, serviceID, interfaceHash, owner, zoneI
 func testRegistryReceipt(t *testing.T, serviceID, receiptID string) ServiceReceiptV2 {
 	t.Helper()
 	receipt, err := NewServiceReceiptV2(ServiceReceiptV2{
-		ServiceID:  serviceID,
-		ReceiptID:  receiptID,
-		CallID:     "call-1",
-		Status:     "committed",
-		ResultHash: testDistributedHash(serviceID + "/" + receiptID + "/result"),
-		Height:     12,
+		ServiceID:	serviceID,
+		ReceiptID:	receiptID,
+		CallID:		"call-1",
+		Status:		"committed",
+		ResultHash:	testDistributedHash(serviceID + "/" + receiptID + "/result"),
+		Height:		12,
 	})
 	require.NoError(t, err)
 	return receipt

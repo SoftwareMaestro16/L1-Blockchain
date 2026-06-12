@@ -13,65 +13,65 @@ import (
 )
 
 const (
-	MaxResolverLabels        = 8
-	MaxResolverRecords       = 16
-	MaxResolverKeyBytes      = 32
-	MaxResolverMetadataBytes = 512
+	MaxResolverLabels		= 8
+	MaxResolverRecords		= 16
+	MaxResolverKeyBytes		= 32
+	MaxResolverMetadataBytes	= 512
 
-	ResolverKeyPrimary  = "primary"
-	ResolverKeyMetadata = "metadata"
-	ResolverKeyWallet   = "wallet"
-	ResolverKeyContract = "contract"
-	ResolverKeyMultisig = "multisig"
-	ResolverKeyNFT      = "nft"
-	ResolverKeyDEX      = "dex"
+	ResolverKeyPrimary	= "primary"
+	ResolverKeyMetadata	= "metadata"
+	ResolverKeyWallet	= "wallet"
+	ResolverKeyContract	= "contract"
+	ResolverKeyMultisig	= "multisig"
+	ResolverKeyNFT		= "nft"
+	ResolverKeyDEX		= "dex"
 
-	ResolverEventSet     = "resolver_set"
-	ResolverEventChanged = "resolver_changed"
-	ResolverEventReverse = "resolver_reverse_set"
+	ResolverEventSet	= "resolver_set"
+	ResolverEventChanged	= "resolver_changed"
+	ResolverEventReverse	= "resolver_reverse_set"
 )
 
 type ResolverRecord struct {
-	Domain        string
-	Owner         sdk.AccAddress
-	Primary       sdk.AccAddress
-	Contract      sdk.AccAddress
-	ZoneEndpoint  string
-	Records       map[string]sdk.AccAddress
-	Metadata      []byte
-	UpdatedAtUnix int64
+	Domain		string
+	Owner		sdk.AccAddress
+	Primary		sdk.AccAddress
+	Contract	sdk.AccAddress
+	ZoneEndpoint	string
+	Records		map[string]sdk.AccAddress
+	Metadata	[]byte
+	UpdatedAtUnix	int64
 }
 
 type ResolverUpdate struct {
-	Domain        string
-	Primary       sdk.AccAddress
-	Contract      sdk.AccAddress
-	ZoneEndpoint  string
-	Records       map[string]sdk.AccAddress
-	Metadata      []byte
-	UpdatedAtUnix int64
+	Domain		string
+	Primary		sdk.AccAddress
+	Contract	sdk.AccAddress
+	ZoneEndpoint	string
+	Records		map[string]sdk.AccAddress
+	Metadata	[]byte
+	UpdatedAtUnix	int64
 }
 
 type ResolverGrant struct {
-	Domain        string
-	Owner         sdk.AccAddress
-	Manager       sdk.AccAddress
-	Keys          []string
-	ExpiresAtUnix int64
+	Domain		string
+	Owner		sdk.AccAddress
+	Manager		sdk.AccAddress
+	Keys		[]string
+	ExpiresAtUnix	int64
 }
 
 type ResolverEvent struct {
-	Type          string
-	Domain        string
-	Actor         sdk.AccAddress
-	Keys          []string
-	UpdatedAtUnix int64
+	Type		string
+	Domain		string
+	Actor		sdk.AccAddress
+	Keys		[]string
+	UpdatedAtUnix	int64
 }
 
 type ReverseResolverRecord struct {
-	Address       sdk.AccAddress
-	Domain        string
-	UpdatedAtUnix int64
+	Address		sdk.AccAddress
+	Domain		string
+	UpdatedAtUnix	int64
 }
 
 func ApplyResolverUpdate(existing *ResolverRecord, domainRecord DomainRecord, actor sdk.AccAddress, update ResolverUpdate, grant *ResolverGrant, nowUnix int64) (ResolverRecord, ResolverEvent, error) {
@@ -87,14 +87,14 @@ func ApplyResolverUpdate(existing *ResolverRecord, domainRecord DomainRecord, ac
 		return ResolverRecord{}, ResolverEvent{}, err
 	}
 	record := ResolverRecord{
-		Domain:        normalizedDomain,
-		Owner:         append(sdk.AccAddress(nil), domainRecord.Owner...),
-		Primary:       cloneAddress(update.Primary),
-		Contract:      cloneAddress(update.Contract),
-		ZoneEndpoint:  strings.TrimSpace(update.ZoneEndpoint),
-		Records:       cloneResolverRecords(update.Records),
-		Metadata:      append([]byte(nil), update.Metadata...),
-		UpdatedAtUnix: update.UpdatedAtUnix,
+		Domain:		normalizedDomain,
+		Owner:		append(sdk.AccAddress(nil), domainRecord.Owner...),
+		Primary:	cloneAddress(update.Primary),
+		Contract:	cloneAddress(update.Contract),
+		ZoneEndpoint:	strings.TrimSpace(update.ZoneEndpoint),
+		Records:	cloneResolverRecords(update.Records),
+		Metadata:	append([]byte(nil), update.Metadata...),
+		UpdatedAtUnix:	update.UpdatedAtUnix,
 	}
 	if existing != nil {
 		if err := ValidateResolverRecordForDomain(*existing, domainRecord, nowUnix); err != nil {
@@ -112,11 +112,11 @@ func ApplyResolverUpdate(existing *ResolverRecord, domainRecord DomainRecord, ac
 		eventType = ResolverEventChanged
 	}
 	return record, ResolverEvent{
-		Type:          eventType,
-		Domain:        record.Domain,
-		Actor:         cloneAddress(actor),
-		Keys:          changedKeys,
-		UpdatedAtUnix: update.UpdatedAtUnix,
+		Type:		eventType,
+		Domain:		record.Domain,
+		Actor:		cloneAddress(actor),
+		Keys:		changedKeys,
+		UpdatedAtUnix:	update.UpdatedAtUnix,
 	}, nil
 }
 
@@ -150,16 +150,16 @@ func SetReverseResolution(domainRecord DomainRecord, resolver ResolverRecord, ac
 		return ReverseResolverRecord{}, ResolverEvent{}, errors.New("resolver does not point to reverse address")
 	}
 	reverse := ReverseResolverRecord{
-		Address:       cloneAddress(address),
-		Domain:        resolver.Domain,
-		UpdatedAtUnix: nowUnix,
+		Address:	cloneAddress(address),
+		Domain:		resolver.Domain,
+		UpdatedAtUnix:	nowUnix,
 	}
 	event := ResolverEvent{
-		Type:          ResolverEventReverse,
-		Domain:        resolver.Domain,
-		Actor:         cloneAddress(actor),
-		Keys:          []string{ResolverKeyPrimary},
-		UpdatedAtUnix: nowUnix,
+		Type:		ResolverEventReverse,
+		Domain:		resolver.Domain,
+		Actor:		cloneAddress(actor),
+		Keys:		[]string{ResolverKeyPrimary},
+		UpdatedAtUnix:	nowUnix,
 	}
 	return reverse, event, nil
 }

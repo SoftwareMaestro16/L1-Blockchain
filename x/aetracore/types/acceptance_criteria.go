@@ -10,32 +10,32 @@ import (
 type AcceptanceCriterionID string
 
 const (
-	AcceptanceAEKCoordinatesDefaultZone             AcceptanceCriterionID = "aek-coordinates-default-zone"
-	AcceptanceFourCanonicalZonesSpecified           AcceptanceCriterionID = "four-canonical-zones-specified"
-	AcceptanceCrossZoneMessagingSemantics           AcceptanceCriterionID = "cross-zone-messaging-semantics"
-	AcceptanceServiceRegistryProofLookup            AcceptanceCriterionID = "service-registry-proof-backed-lookup"
-	AcceptanceIdentityResolverBindings              AcceptanceCriterionID = "identity-resolver-bindings"
-	AcceptanceStorageCommitmentsChunkProofs         AcceptanceCriterionID = "storage-commitments-chunk-proofs"
-	AcceptanceRoutingCommittedDeterministicTables   AcceptanceCriterionID = "routing-committed-deterministic-tables"
-	AcceptancePaymentFinancialConditionalSettlement AcceptanceCriterionID = "payment-financial-conditional-settlement"
-	AcceptanceContractMessageDrivenIsolation        AcceptanceCriterionID = "contract-message-driven-isolation"
-	AcceptanceGlobalRootExposesAllRoots             AcceptanceCriterionID = "global-root-exposes-all-roots"
-	AcceptanceModulesExportImportInvariantsTests    AcceptanceCriterionID = "modules-export-import-invariants-tests-typed-queries"
+	AcceptanceAEKCoordinatesDefaultZone		AcceptanceCriterionID	= "aek-coordinates-default-zone"
+	AcceptanceFourCanonicalZonesSpecified		AcceptanceCriterionID	= "four-canonical-zones-specified"
+	AcceptanceCrossZoneMessagingSemantics		AcceptanceCriterionID	= "cross-zone-messaging-semantics"
+	AcceptanceServiceRegistryProofLookup		AcceptanceCriterionID	= "service-registry-proof-backed-lookup"
+	AcceptanceIdentityResolverBindings		AcceptanceCriterionID	= "identity-resolver-bindings"
+	AcceptanceStorageCommitmentsChunkProofs		AcceptanceCriterionID	= "storage-commitments-chunk-proofs"
+	AcceptanceRoutingCommittedDeterministicTables	AcceptanceCriterionID	= "routing-committed-deterministic-tables"
+	AcceptancePaymentFinancialConditionalSettlement	AcceptanceCriterionID	= "payment-financial-conditional-settlement"
+	AcceptanceContractMessageDrivenIsolation	AcceptanceCriterionID	= "contract-message-driven-isolation"
+	AcceptanceGlobalRootExposesAllRoots		AcceptanceCriterionID	= "global-root-exposes-all-roots"
+	AcceptanceModulesExportImportInvariantsTests	AcceptanceCriterionID	= "modules-export-import-invariants-tests-typed-queries"
 )
 
 type AcceptanceCriterion struct {
-	ID            AcceptanceCriterionID
-	PhaseID       ImplementationRoadmapPhaseID
-	Modules       []CosmosSDKModuleName
-	RootTypes     []RootType
-	PlanningReady bool
-	Evidence      []string
-	CriterionHash string
+	ID		AcceptanceCriterionID
+	PhaseID		ImplementationRoadmapPhaseID
+	Modules		[]CosmosSDKModuleName
+	RootTypes	[]RootType
+	PlanningReady	bool
+	Evidence	[]string
+	CriterionHash	string
 }
 
 type AcceptanceCriteriaManifest struct {
-	Criteria     []AcceptanceCriterion
-	ManifestHash string
+	Criteria	[]AcceptanceCriterion
+	ManifestHash	string
 }
 
 func DefaultAcceptanceCriteriaManifest() (AcceptanceCriteriaManifest, error) {
@@ -324,12 +324,12 @@ func ComputeAcceptanceCriteriaManifestHash(manifest AcceptanceCriteriaManifest) 
 
 func acceptanceCriterion(id AcceptanceCriterionID, phaseID ImplementationRoadmapPhaseID, modules []CosmosSDKModuleName, rootTypes []RootType, evidence ...string) AcceptanceCriterion {
 	return AcceptanceCriterion{
-		ID:            id,
-		PhaseID:       phaseID,
-		Modules:       modules,
-		RootTypes:     rootTypes,
-		PlanningReady: true,
-		Evidence:      evidence,
+		ID:		id,
+		PhaseID:	phaseID,
+		Modules:	modules,
+		RootTypes:	rootTypes,
+		PlanningReady:	true,
+		Evidence:	evidence,
 	}
 }
 

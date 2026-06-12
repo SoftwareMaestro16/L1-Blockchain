@@ -11,52 +11,52 @@ type AetherFailureKind string
 type AetherRetryDecisionKind string
 
 const (
-	AetherFailureTransientQueueLimit AetherFailureKind = "transient_queue_limit"
-	AetherFailureInvalidPayload      AetherFailureKind = "invalid_payload"
-	AetherFailureExecution           AetherFailureKind = "execution_failure"
-	AetherFailureExpired             AetherFailureKind = "expired"
+	AetherFailureTransientQueueLimit	AetherFailureKind	= "transient_queue_limit"
+	AetherFailureInvalidPayload		AetherFailureKind	= "invalid_payload"
+	AetherFailureExecution			AetherFailureKind	= "execution_failure"
+	AetherFailureExpired			AetherFailureKind	= "expired"
 
-	AetherRetryNone     AetherRetryDecisionKind = "none"
-	AetherRetrySchedule AetherRetryDecisionKind = "schedule"
-	AetherRetryExpired  AetherRetryDecisionKind = "expired"
-	AetherRetryBounce   AetherRetryDecisionKind = "bounce"
+	AetherRetryNone		AetherRetryDecisionKind	= "none"
+	AetherRetrySchedule	AetherRetryDecisionKind	= "schedule"
+	AetherRetryExpired	AetherRetryDecisionKind	= "expired"
+	AetherRetryBounce	AetherRetryDecisionKind	= "bounce"
 )
 
 type AetherRetryPolicy struct {
-	MaxRetryCount       uint32
-	BaseDelayHeights    uint64
-	MaxDelayHeights     uint64
-	RetryFee            sdkmath.Int
-	BounceGasLimit      uint64
-	MaxBouncePayloadLen uint32
-	PolicyHash          string
+	MaxRetryCount		uint32
+	BaseDelayHeights	uint64
+	MaxDelayHeights		uint64
+	RetryFee		sdkmath.Int
+	BounceGasLimit		uint64
+	MaxBouncePayloadLen	uint32
+	PolicyHash		string
 }
 
 type AetherRetryState struct {
-	MsgID               string
-	RetryCount          uint32
-	ForwardingFeeEscrow sdkmath.Int
-	LastAttemptHeight   uint64
-	StateHash           string
+	MsgID			string
+	RetryCount		uint32
+	ForwardingFeeEscrow	sdkmath.Int
+	LastAttemptHeight	uint64
+	StateHash		string
 }
 
 type AetherRetryDecision struct {
-	Kind               AetherRetryDecisionKind
-	MsgID              string
-	FailureKind        AetherFailureKind
-	NextEligibleHeight uint64
-	RetryCount         uint32
-	FeeCharged         sdkmath.Int
-	RemainingFeeEscrow sdkmath.Int
-	DecisionHash       string
+	Kind			AetherRetryDecisionKind
+	MsgID			string
+	FailureKind		AetherFailureKind
+	NextEligibleHeight	uint64
+	RetryCount		uint32
+	FeeCharged		sdkmath.Int
+	RemainingFeeEscrow	sdkmath.Int
+	DecisionHash		string
 }
 
 type AetherBounceEnvelope struct {
-	OriginalMsgID      string
-	BounceMsg          AetherMessage
-	RemainingValueNAET sdkmath.Int
-	RemainingFee       sdkmath.Int
-	BounceHash         string
+	OriginalMsgID		string
+	BounceMsg		AetherMessage
+	RemainingValueNAET	sdkmath.Int
+	RemainingFee		sdkmath.Int
+	BounceHash		string
 }
 
 func DecideAetherRetry(msg AetherMessage, receipt AetherMessageReceipt, state AetherRetryState, policy AetherRetryPolicy, currentHeight uint64, failure AetherFailureKind) (AetherRetryDecision, error) {
@@ -86,12 +86,12 @@ func DecideAetherRetry(msg AetherMessage, receipt AetherMessageReceipt, state Ae
 		return AetherRetryDecision{}, errors.New("aether retry state message mismatch")
 	}
 	decision := AetherRetryDecision{
-		Kind:               AetherRetryNone,
-		MsgID:              msg.MsgID,
-		FailureKind:        failure,
-		RetryCount:         state.RetryCount,
-		FeeCharged:         sdkmath.ZeroInt(),
-		RemainingFeeEscrow: state.ForwardingFeeEscrow,
+		Kind:			AetherRetryNone,
+		MsgID:			msg.MsgID,
+		FailureKind:		failure,
+		RetryCount:		state.RetryCount,
+		FeeCharged:		sdkmath.ZeroInt(),
+		RemainingFeeEscrow:	state.ForwardingFeeEscrow,
 	}
 	if currentHeight > msg.ExpiryHeight || receipt.Status == ReceiptStatusExpired || failure == AetherFailureExpired {
 		decision.Kind = AetherRetryExpired
@@ -168,36 +168,36 @@ func BuildAetherBounce(original AetherMessage, receipt AetherMessageReceipt, rem
 		bounceExpiry = height
 	}
 	bounce, err := NewAetherMessage(AetherMessage{
-		ParentMsgID:     original.MsgID,
-		TraceID:         original.TraceID,
-		Sender:          original.Receiver,
-		SenderZoneID:    original.ReceiverZoneID,
-		SenderShardID:   original.ReceiverShardID,
-		Receiver:        original.Sender,
-		ReceiverZoneID:  original.SenderZoneID,
-		ReceiverShardID: original.SenderShardID,
-		ValueNAET:       remainingValue,
-		Payload:         payload,
-		PayloadType:     "aether.bounce",
-		GasLimit:        policy.BounceGasLimit,
-		GasPrice:        sdkmath.ZeroInt(),
-		ForwardingFee:   remainingFee,
-		ExpiryHeight:    bounceExpiry,
-		Bounce:          false,
-		ExecutionMode:   ExecutionModeAsync,
-		OrderingClass:   OrderingClassStrictTraceOrder,
-		RouteCommitment: original.RouteCommitment,
-		CreatedAtHeight: height,
-		Nonce:           nonce,
+		ParentMsgID:		original.MsgID,
+		TraceID:		original.TraceID,
+		Sender:			original.Receiver,
+		SenderZoneID:		original.ReceiverZoneID,
+		SenderShardID:		original.ReceiverShardID,
+		Receiver:		original.Sender,
+		ReceiverZoneID:		original.SenderZoneID,
+		ReceiverShardID:	original.SenderShardID,
+		ValueNAET:		remainingValue,
+		Payload:		payload,
+		PayloadType:		"aether.bounce",
+		GasLimit:		policy.BounceGasLimit,
+		GasPrice:		sdkmath.ZeroInt(),
+		ForwardingFee:		remainingFee,
+		ExpiryHeight:		bounceExpiry,
+		Bounce:			false,
+		ExecutionMode:		ExecutionModeAsync,
+		OrderingClass:		OrderingClassStrictTraceOrder,
+		RouteCommitment:	original.RouteCommitment,
+		CreatedAtHeight:	height,
+		Nonce:			nonce,
 	})
 	if err != nil {
 		return AetherBounceEnvelope{}, err
 	}
 	envelope := AetherBounceEnvelope{
-		OriginalMsgID:      original.MsgID,
-		BounceMsg:          bounce,
-		RemainingValueNAET: remainingValue,
-		RemainingFee:       remainingFee,
+		OriginalMsgID:		original.MsgID,
+		BounceMsg:		bounce,
+		RemainingValueNAET:	remainingValue,
+		RemainingFee:		remainingFee,
 	}
 	envelope.BounceHash = ComputeAetherBounceHash(envelope)
 	return envelope, envelope.Validate()

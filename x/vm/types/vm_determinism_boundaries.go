@@ -13,87 +13,87 @@ import (
 )
 
 const (
-	VMAdapterAVM      VMAdapterKind = "AVM"
-	VMAdapterCosmWasm VMAdapterKind = "COSMWASM"
+	VMAdapterAVM		VMAdapterKind	= "AVM"
+	VMAdapterCosmWasm	VMAdapterKind	= "COSMWASM"
 
-	AVMBytecodeNative         AVMBytecodeKind = "native_bytecode"
-	AVMBytecodeIntermediateIR AVMBytecodeKind = "intermediate_ir"
+	AVMBytecodeNative		AVMBytecodeKind	= "native_bytecode"
+	AVMBytecodeIntermediateIR	AVMBytecodeKind	= "intermediate_ir"
 
-	MaxVMBoundaryTokenLength = 128
-	MaxVMSyscalls            = 16
+	MaxVMBoundaryTokenLength	= 128
+	MaxVMSyscalls			= 16
 )
 
 type VMAdapterKind string
 type AVMBytecodeKind string
 
 type VMDeterminismProfile struct {
-	Runtime                     string
-	NoExternalAPICalls          bool
-	NoTimeBasedRandomness       bool
-	SortedMessageApplication    bool
-	BoundedIteration            bool
-	MaxIterationCount           uint64
-	BoundedMemory               bool
-	MaxMemoryBytes              uint64
-	ReproducibleStateTransition bool
-	MeteredStorageAccess        bool
-	MeteredProofVerification    bool
-	ProfileHash                 string
+	Runtime				string
+	NoExternalAPICalls		bool
+	NoTimeBasedRandomness		bool
+	SortedMessageApplication	bool
+	BoundedIteration		bool
+	MaxIterationCount		uint64
+	BoundedMemory			bool
+	MaxMemoryBytes			uint64
+	ReproducibleStateTransition	bool
+	MeteredStorageAccess		bool
+	MeteredProofVerification	bool
+	ProfileHash			string
 }
 
 type VMSyscallMeter struct {
-	Name     string
-	GasClass AVMGasClass
-	GasCost  uint64
-	Metered  bool
+	Name		string
+	GasClass	AVMGasClass
+	GasCost		uint64
+	Metered		bool
 }
 
 type AVMAdapterBoundary struct {
-	BytecodeKind             AVMBytecodeKind
-	Runtime                  string
-	DeterministicGasSchedule AVMGasSchedule
-	StoreKey                 string
-	StoreV2Backed            bool
-	KVPrefix                 string
-	MessageSyscall           VMSyscallMeter
-	ProofVerificationSyscall VMSyscallMeter
-	BoundaryHash             string
+	BytecodeKind			AVMBytecodeKind
+	Runtime				string
+	DeterministicGasSchedule	AVMGasSchedule
+	StoreKey			string
+	StoreV2Backed			bool
+	KVPrefix			string
+	MessageSyscall			VMSyscallMeter
+	ProofVerificationSyscall	VMSyscallMeter
+	BoundaryHash			string
 }
 
 type CosmWasmAdapterBoundary struct {
-	Runtime                   string
-	IsolatedAdapterModule     bool
-	GasConversion             AVMWASMGasConversionTable
-	StoreAdapter              AVMWASMStoreV2KVAdapter
-	ExplicitStorageKeyPrefix  bool
-	DirectNonContractState    bool
-	CrossZoneMessagesOrProofs bool
-	ExternalNetwork           bool
-	HostFunctions             []AVMWASMHostFunction
-	BoundaryHash              string
+	Runtime				string
+	IsolatedAdapterModule		bool
+	GasConversion			AVMWASMGasConversionTable
+	StoreAdapter			AVMWASMStoreV2KVAdapter
+	ExplicitStorageKeyPrefix	bool
+	DirectNonContractState		bool
+	CrossZoneMessagesOrProofs	bool
+	ExternalNetwork			bool
+	HostFunctions			[]AVMWASMHostFunction
+	BoundaryHash			string
 }
 
 type VMAdapterBoundaryManifest struct {
-	ZoneID             zonestypes.ZoneID
-	DeterminismProfile VMDeterminismProfile
-	AVM                AVMAdapterBoundary
-	CosmWasm           CosmWasmAdapterBoundary
-	ManifestHash       string
+	ZoneID			zonestypes.ZoneID
+	DeterminismProfile	VMDeterminismProfile
+	AVM			AVMAdapterBoundary
+	CosmWasm		CosmWasmAdapterBoundary
+	ManifestHash		string
 }
 
 func DefaultVMDeterminismProfile(runtime string) (VMDeterminismProfile, error) {
 	profile := VMDeterminismProfile{
-		Runtime:                     strings.TrimSpace(runtime),
-		NoExternalAPICalls:          true,
-		NoTimeBasedRandomness:       true,
-		SortedMessageApplication:    true,
-		BoundedIteration:            true,
-		MaxIterationCount:           10_000,
-		BoundedMemory:               true,
-		MaxMemoryBytes:              64 * 1024 * 1024,
-		ReproducibleStateTransition: true,
-		MeteredStorageAccess:        true,
-		MeteredProofVerification:    true,
+		Runtime:			strings.TrimSpace(runtime),
+		NoExternalAPICalls:		true,
+		NoTimeBasedRandomness:		true,
+		SortedMessageApplication:	true,
+		BoundedIteration:		true,
+		MaxIterationCount:		10_000,
+		BoundedMemory:			true,
+		MaxMemoryBytes:			64 * 1024 * 1024,
+		ReproducibleStateTransition:	true,
+		MeteredStorageAccess:		true,
+		MeteredProofVerification:	true,
 	}
 	profile.ProfileHash = ComputeVMDeterminismProfileHash(profile)
 	return profile, profile.Validate()
@@ -145,11 +145,11 @@ func NewCosmWasmAdapterBoundary(boundary CosmWasmAdapterBoundary, zoneID zonesty
 	}
 	if boundary.StoreAdapter.AdapterHash == "" {
 		adapter, err := NewAVMWASMStoreV2KVAdapter(AVMWASMStoreV2KVAdapter{
-			ZoneID:        zoneID,
-			StoreKey:      DefaultAVMStoreKey,
-			KeyPrefix:     ContractZoneKVPrefix(zoneID),
-			MaxKeyBytes:   DefaultMaxStorageKeyBytes,
-			MaxValueBytes: DefaultMaxStorageValueBytes,
+			ZoneID:		zoneID,
+			StoreKey:	DefaultAVMStoreKey,
+			KeyPrefix:	ContractZoneKVPrefix(zoneID),
+			MaxKeyBytes:	DefaultMaxStorageKeyBytes,
+			MaxValueBytes:	DefaultMaxStorageValueBytes,
 		})
 		if err != nil {
 			return CosmWasmAdapterBoundary{}, err

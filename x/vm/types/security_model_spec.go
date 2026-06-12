@@ -12,62 +12,62 @@ import (
 )
 
 const (
-	AVMSecurityAssumptionCometBFTFinality       AVMSecurityAssumption = "cometbft_finality"
-	AVMSecurityAssumptionDeterministicExecution AVMSecurityAssumption = "deterministic_execution"
-	AVMSecurityAssumptionNoExternalCalls        AVMSecurityAssumption = "no_external_calls"
-	AVMSecurityAssumptionGasBounding            AVMSecurityAssumption = "gas_bounding"
-	AVMSecurityAssumptionReplayProtection       AVMSecurityAssumption = "replay_protection"
-	AVMSecurityAssumptionZoneStateIsolation     AVMSecurityAssumption = "zone_state_isolation"
-	AVMSecurityAssumptionActorStateIsolation    AVMSecurityAssumption = "actor_state_isolation"
-	AVMSecurityAssumptionStoreRootCommitments   AVMSecurityAssumption = "store_root_commitments"
+	AVMSecurityAssumptionCometBFTFinality		AVMSecurityAssumption	= "cometbft_finality"
+	AVMSecurityAssumptionDeterministicExecution	AVMSecurityAssumption	= "deterministic_execution"
+	AVMSecurityAssumptionNoExternalCalls		AVMSecurityAssumption	= "no_external_calls"
+	AVMSecurityAssumptionGasBounding		AVMSecurityAssumption	= "gas_bounding"
+	AVMSecurityAssumptionReplayProtection		AVMSecurityAssumption	= "replay_protection"
+	AVMSecurityAssumptionZoneStateIsolation		AVMSecurityAssumption	= "zone_state_isolation"
+	AVMSecurityAssumptionActorStateIsolation	AVMSecurityAssumption	= "actor_state_isolation"
+	AVMSecurityAssumptionStoreRootCommitments	AVMSecurityAssumption	= "store_root_commitments"
 )
 
 type AVMSecurityAssumption string
 
 type AVMSecurityModel struct {
-	Assumptions         []AVMSecurityAssumption
-	StoreRootCommitment string
-	ModelHash           string
+	Assumptions		[]AVMSecurityAssumption
+	StoreRootCommitment	string
+	ModelHash		string
 }
 
 type AVMReplayProtectionRecord struct {
-	ChainID         string
-	SourceZone      zonestypes.ZoneID
-	Sender          string
-	SenderNonce     uint64
-	MessageID       string
-	CreatedHeight   uint64
-	ExpiryHeight    uint64
-	DestinationZone zonestypes.ZoneID
-	Destination     string
-	PayloadHash     string
-	RecordHash      string
+	ChainID		string
+	SourceZone	zonestypes.ZoneID
+	Sender		string
+	SenderNonce	uint64
+	MessageID	string
+	CreatedHeight	uint64
+	ExpiryHeight	uint64
+	DestinationZone	zonestypes.ZoneID
+	Destination	string
+	PayloadHash	string
+	RecordHash	string
 }
 
 type AVMExpiredNonceTombstone struct {
-	ChainID       string
-	SourceZone    zonestypes.ZoneID
-	Sender        string
-	SenderNonce   uint64
-	MessageID     string
-	ExpiryHeight  uint64
-	TombstoneHash string
+	ChainID		string
+	SourceZone	zonestypes.ZoneID
+	Sender		string
+	SenderNonce	uint64
+	MessageID	string
+	ExpiryHeight	uint64
+	TombstoneHash	string
 }
 
 type AVMReplayNonceState struct {
-	ChainID             string
-	SourceZone          zonestypes.ZoneID
-	Sender              string
-	LastNonce           uint64
-	ConsumedTombstones  []AVMAsyncReplayTombstone
-	ExpiredNonceRecords []AVMExpiredNonceTombstone
-	StateHash           string
+	ChainID			string
+	SourceZone		zonestypes.ZoneID
+	Sender			string
+	LastNonce		uint64
+	ConsumedTombstones	[]AVMAsyncReplayTombstone
+	ExpiredNonceRecords	[]AVMExpiredNonceTombstone
+	StateHash		string
 }
 
 func DefaultAVMSecurityModel(storeRootCommitment string) (AVMSecurityModel, error) {
 	model := AVMSecurityModel{
-		Assumptions:         AllAVMSecurityAssumptions(),
-		StoreRootCommitment: strings.TrimSpace(storeRootCommitment),
+		Assumptions:		AllAVMSecurityAssumptions(),
+		StoreRootCommitment:	strings.TrimSpace(storeRootCommitment),
 	}
 	model.ModelHash = ComputeAVMSecurityModelHash(model)
 	return model, model.Validate()
@@ -118,16 +118,16 @@ func NewAVMReplayProtectionRecord(msg AVMAsyncMessage) (AVMReplayProtectionRecor
 		return AVMReplayProtectionRecord{}, err
 	}
 	record := AVMReplayProtectionRecord{
-		ChainID:         msg.ChainID,
-		SourceZone:      msg.SourceZone,
-		Sender:          msg.Source,
-		SenderNonce:     msg.SenderNonce,
-		MessageID:       msg.ID,
-		CreatedHeight:   msg.CreatedHeight,
-		ExpiryHeight:    msg.ExpiryHeight,
-		DestinationZone: msg.DestinationZone,
-		Destination:     msg.Destination,
-		PayloadHash:     msg.PayloadHash,
+		ChainID:		msg.ChainID,
+		SourceZone:		msg.SourceZone,
+		Sender:			msg.Source,
+		SenderNonce:		msg.SenderNonce,
+		MessageID:		msg.ID,
+		CreatedHeight:		msg.CreatedHeight,
+		ExpiryHeight:		msg.ExpiryHeight,
+		DestinationZone:	msg.DestinationZone,
+		Destination:		msg.Destination,
+		PayloadHash:		msg.PayloadHash,
 	}
 	record = canonicalAVMReplayProtectionRecord(record)
 	record.RecordHash = ComputeAVMReplayProtectionRecordHash(record)
@@ -359,12 +359,12 @@ func ExpireAVMReplayMessage(state AVMReplayNonceState, msg AVMAsyncMessage, expi
 		return AVMReplayNonceState{}, AVMExpiredNonceTombstone{}, errors.New("AVM replay expiration height must be after message expiry")
 	}
 	tombstone := AVMExpiredNonceTombstone{
-		ChainID:      msg.ChainID,
-		SourceZone:   msg.SourceZone,
-		Sender:       msg.Source,
-		SenderNonce:  msg.SenderNonce,
-		MessageID:    msg.ID,
-		ExpiryHeight: msg.ExpiryHeight,
+		ChainID:	msg.ChainID,
+		SourceZone:	msg.SourceZone,
+		Sender:		msg.Source,
+		SenderNonce:	msg.SenderNonce,
+		MessageID:	msg.ID,
+		ExpiryHeight:	msg.ExpiryHeight,
 	}
 	tombstone = canonicalAVMExpiredNonceTombstone(tombstone)
 	tombstone.TombstoneHash = ComputeAVMExpiredNonceTombstoneHash(tombstone)

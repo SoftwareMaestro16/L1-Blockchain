@@ -8,17 +8,17 @@ import (
 
 func TestValidatorReputationSeparatesConsensusSafeAndAdvisoryComponents(t *testing.T) {
 	report, err := EvaluateValidatorReputation(ValidatorReputationInput{
-		ValidatorID:                    "val-a",
-		UptimeHistoryBps:               []int64{9_950, 9_900, 9_980},
-		MissedBlockRateHistoryBps:      []int64{20, 30, 10},
-		SlashEvents:                    1,
-		SlashSeverityBps:               200,
-		CommissionChangeHistoryBps:     []int64{50, 75},
-		SelfDelegationChangeHistoryBps: []int64{100, -50},
-		MetadataComplete:               true,
-		DelegationInflowBps:            300,
-		HistoricalRewardPerformanceBps: []int64{10_100, 9_900},
-		VotingPowerBps:                 2_500,
+		ValidatorID:			"val-a",
+		UptimeHistoryBps:		[]int64{9_950, 9_900, 9_980},
+		MissedBlockRateHistoryBps:	[]int64{20, 30, 10},
+		SlashEvents:			1,
+		SlashSeverityBps:		200,
+		CommissionChangeHistoryBps:	[]int64{50, 75},
+		SelfDelegationChangeHistoryBps:	[]int64{100, -50},
+		MetadataComplete:		true,
+		DelegationInflowBps:		300,
+		HistoricalRewardPerformanceBps:	[]int64{10_100, 9_900},
+		VotingPowerBps:			2_500,
 	}, ValidatorReputationParams{})
 	require.NoError(t, err)
 	require.Equal(t, ValidatorReputationScoringVersionV1, report.ScoringVersion)
@@ -39,15 +39,15 @@ func TestValidatorReputationSeparatesConsensusSafeAndAdvisoryComponents(t *testi
 
 func TestValidatorReputationBlocksUnsafeAdvisoryConsensusUse(t *testing.T) {
 	report, err := EvaluateValidatorReputation(ValidatorReputationInput{
-		ValidatorID:                    "val-consensus",
-		UptimeHistoryBps:               []int64{9_980},
-		MissedBlockRateHistoryBps:      []int64{0},
-		CommissionChangeHistoryBps:     []int64{100},
-		SelfDelegationChangeHistoryBps: []int64{0},
-		MetadataComplete:               true,
-		HistoricalRewardPerformanceBps: []int64{10_000},
-		UseInConsensus:                 true,
-		AdvisoryInputsDeterministic:    false,
+		ValidatorID:			"val-consensus",
+		UptimeHistoryBps:		[]int64{9_980},
+		MissedBlockRateHistoryBps:	[]int64{0},
+		CommissionChangeHistoryBps:	[]int64{100},
+		SelfDelegationChangeHistoryBps:	[]int64{0},
+		MetadataComplete:		true,
+		HistoricalRewardPerformanceBps:	[]int64{10_000},
+		UseInConsensus:			true,
+		AdvisoryInputsDeterministic:	false,
 	}, ValidatorReputationParams{})
 	require.NoError(t, err)
 	require.False(t, report.ConsensusSafeForSelection)
@@ -61,15 +61,15 @@ func TestValidatorReputationAllowsConsensusUseWhenAdvisoryInputsAreGovernedDeter
 	params.AllowAdvisoryInputsInConsensus = true
 
 	report, err := EvaluateValidatorReputation(ValidatorReputationInput{
-		ValidatorID:                    "val-safe",
-		UptimeHistoryBps:               []int64{9_980},
-		MissedBlockRateHistoryBps:      []int64{0},
-		CommissionChangeHistoryBps:     []int64{0},
-		SelfDelegationChangeHistoryBps: []int64{0},
-		MetadataComplete:               true,
-		HistoricalRewardPerformanceBps: []int64{10_000},
-		UseInConsensus:                 true,
-		AdvisoryInputsDeterministic:    true,
+		ValidatorID:			"val-safe",
+		UptimeHistoryBps:		[]int64{9_980},
+		MissedBlockRateHistoryBps:	[]int64{0},
+		CommissionChangeHistoryBps:	[]int64{0},
+		SelfDelegationChangeHistoryBps:	[]int64{0},
+		MetadataComplete:		true,
+		HistoricalRewardPerformanceBps:	[]int64{10_000},
+		UseInConsensus:			true,
+		AdvisoryInputsDeterministic:	true,
 	}, params)
 	require.NoError(t, err)
 	require.True(t, report.ConsensusSafeForSelection)
@@ -78,11 +78,11 @@ func TestValidatorReputationAllowsConsensusUseWhenAdvisoryInputsAreGovernedDeter
 
 func TestValidatorReputationStableUnderMissingAdvisoryData(t *testing.T) {
 	base := ValidatorReputationInput{
-		ValidatorID:               "val-missing",
-		UptimeHistoryBps:          []int64{9_900, 9_950},
-		MissedBlockRateHistoryBps: []int64{10, 20},
-		MetadataComplete:          true,
-		VotingPowerBps:            2_000,
+		ValidatorID:			"val-missing",
+		UptimeHistoryBps:		[]int64{9_900, 9_950},
+		MissedBlockRateHistoryBps:	[]int64{10, 20},
+		MetadataComplete:		true,
+		VotingPowerBps:			2_000,
 	}
 	withAdvisory := base
 	withAdvisory.CommissionChangeHistoryBps = []int64{20}
@@ -103,16 +103,16 @@ func TestValidatorReputationStableUnderMissingAdvisoryData(t *testing.T) {
 
 func TestValidatorReputationCaptureAndConcentrationWarnings(t *testing.T) {
 	report, err := EvaluateValidatorReputation(ValidatorReputationInput{
-		ValidatorID:                    "val-whale",
-		UptimeHistoryBps:               []int64{9_950},
-		MissedBlockRateHistoryBps:      []int64{0},
-		CommissionChangeHistoryBps:     []int64{800},
-		SelfDelegationChangeHistoryBps: []int64{-1_500},
-		MetadataChangeCount:            2,
-		MetadataComplete:               false,
-		DelegationInflowBps:            2_500,
-		HistoricalRewardPerformanceBps: []int64{9_500},
-		VotingPowerBps:                 MaxTopValidatorConcentrationBps + 1,
+		ValidatorID:			"val-whale",
+		UptimeHistoryBps:		[]int64{9_950},
+		MissedBlockRateHistoryBps:	[]int64{0},
+		CommissionChangeHistoryBps:	[]int64{800},
+		SelfDelegationChangeHistoryBps:	[]int64{-1_500},
+		MetadataChangeCount:		2,
+		MetadataComplete:		false,
+		DelegationInflowBps:		2_500,
+		HistoricalRewardPerformanceBps:	[]int64{9_500},
+		VotingPowerBps:			MaxTopValidatorConcentrationBps + 1,
 	}, ValidatorReputationParams{})
 	require.NoError(t, err)
 	require.True(t, report.ConcentrationWarning)

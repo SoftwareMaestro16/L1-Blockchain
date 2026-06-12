@@ -41,14 +41,14 @@ type QueryServer interface {
 	EpochRewardSummary(context.Context, *QueryEpochRewardSummaryRequest) (*QueryEpochRewardSummaryResponse, error)
 }
 
-func RegisterMsgServer(s grpc.Server, srv MsgServer)     { s.RegisterService(&Msg_serviceDesc, srv) }
-func RegisterQueryServer(s grpc.Server, srv QueryServer) { s.RegisterService(&Query_serviceDesc, srv) }
+func RegisterMsgServer(s grpc.Server, srv MsgServer)		{ s.RegisterService(&Msg_serviceDesc, srv) }
+func RegisterQueryServer(s grpc.Server, srv QueryServer)	{ s.RegisterService(&Query_serviceDesc, srv) }
 
 type serviceCall func(context.Context, interface{}, interface{}) (interface{}, error)
 
 var Msg_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetraeconomics.v1.Msg",
-	HandlerType: (*MsgServer)(nil),
+	ServiceName:	"l1.aetraeconomics.v1.Msg",
+	HandlerType:	(*MsgServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("UpdateEconomicsParams", serviceHandler("UpdateEconomicsParams", func() interface{} { return new(MsgUpdateEconomicsParams) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(MsgServer).UpdateEconomicsParams(ctx, req.(*MsgUpdateEconomicsParams))
@@ -57,12 +57,12 @@ var Msg_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(MsgServer).ApplyEpochEconomics(ctx, req.(*MsgApplyEpochEconomics))
 		})),
 	},
-	Metadata: "l1/aetraeconomics/v1/tx.proto",
+	Metadata:	"l1/aetraeconomics/v1/tx.proto",
 }
 
 var Query_serviceDesc = grpcgo.ServiceDesc{
-	ServiceName: "l1.aetraeconomics.v1.Query",
-	HandlerType: (*QueryServer)(nil),
+	ServiceName:	"l1.aetraeconomics.v1.Query",
+	HandlerType:	(*QueryServer)(nil),
 	Methods: []grpcgo.MethodDesc{
 		methodDesc("CurrentInflation", serviceHandler("CurrentInflation", func() interface{} { return new(QueryCurrentInflationRequest) }, func(ctx context.Context, srv interface{}, req interface{}) (interface{}, error) {
 			return srv.(QueryServer).CurrentInflation(ctx, req.(*QueryCurrentInflationRequest))
@@ -86,7 +86,7 @@ var Query_serviceDesc = grpcgo.ServiceDesc{
 			return srv.(QueryServer).EpochRewardSummary(ctx, req.(*QueryEpochRewardSummaryRequest))
 		})),
 	},
-	Metadata: "l1/aetraeconomics/v1/query.proto",
+	Metadata:	"l1/aetraeconomics/v1/query.proto",
 }
 
 func methodDesc(name string, handler grpcgo.MethodHandler) grpcgo.MethodDesc {
@@ -140,7 +140,7 @@ func buildServiceFileDescriptor(path, pkg, service string, messageNames []string
 	return buf.Bytes()
 }
 
-func stringPtr(value string) *string { return &value }
+func stringPtr(value string) *string	{ return &value }
 
 func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgUpdateEconomicsParams)(nil), "l1.aetraeconomics.v1.MsgUpdateEconomicsParams")
@@ -149,60 +149,60 @@ func registerServiceTypes() {
 	gogoproto.RegisterType((*MsgApplyEpochEconomicsResponse)(nil), "l1.aetraeconomics.v1.MsgApplyEpochEconomicsResponse")
 }
 
-func (m *MsgUpdateEconomicsParams) Reset()         { *m = MsgUpdateEconomicsParams{} }
-func (m *MsgApplyEpochEconomics) Reset()           { *m = MsgApplyEpochEconomics{} }
-func (m *MsgUpdateEconomicsParamsResponse) Reset() { *m = MsgUpdateEconomicsParamsResponse{} }
-func (m *MsgApplyEpochEconomicsResponse) Reset()   { *m = MsgApplyEpochEconomicsResponse{} }
+func (m *MsgUpdateEconomicsParams) Reset()		{ *m = MsgUpdateEconomicsParams{} }
+func (m *MsgApplyEpochEconomics) Reset()		{ *m = MsgApplyEpochEconomics{} }
+func (m *MsgUpdateEconomicsParamsResponse) Reset()	{ *m = MsgUpdateEconomicsParamsResponse{} }
+func (m *MsgApplyEpochEconomicsResponse) Reset()	{ *m = MsgApplyEpochEconomicsResponse{} }
 
-func (m *MsgUpdateEconomicsParams) String() string         { return gogoproto.CompactTextString(m) }
-func (m *MsgApplyEpochEconomics) String() string           { return gogoproto.CompactTextString(m) }
-func (m *MsgUpdateEconomicsParamsResponse) String() string { return gogoproto.CompactTextString(m) }
-func (m *MsgApplyEpochEconomicsResponse) String() string   { return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateEconomicsParams) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgApplyEpochEconomics) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *MsgUpdateEconomicsParamsResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *MsgApplyEpochEconomicsResponse) String() string	{ return gogoproto.CompactTextString(m) }
 
-func (*MsgUpdateEconomicsParams) ProtoMessage()         {}
-func (*MsgApplyEpochEconomics) ProtoMessage()           {}
-func (*MsgUpdateEconomicsParamsResponse) ProtoMessage() {}
-func (*MsgApplyEpochEconomicsResponse) ProtoMessage()   {}
+func (*MsgUpdateEconomicsParams) ProtoMessage()		{}
+func (*MsgApplyEpochEconomics) ProtoMessage()		{}
+func (*MsgUpdateEconomicsParamsResponse) ProtoMessage()	{}
+func (*MsgApplyEpochEconomicsResponse) ProtoMessage()	{}
 
-func (m *QueryCurrentInflationRequest) Reset()            { *m = QueryCurrentInflationRequest{} }
-func (m *QueryCurrentInflationResponse) Reset()           { *m = QueryCurrentInflationResponse{} }
-func (m *QueryCurrentBondedRatioRequest) Reset()          { *m = QueryCurrentBondedRatioRequest{} }
-func (m *QueryCurrentBondedRatioResponse) Reset()         { *m = QueryCurrentBondedRatioResponse{} }
-func (m *QueryEstimatedAPRRequest) Reset()                { *m = QueryEstimatedAPRRequest{} }
-func (m *QueryEstimatedAPRResponse) Reset()               { *m = QueryEstimatedAPRResponse{} }
-func (m *QueryFeeSplitParamsRequest) Reset()              { *m = QueryFeeSplitParamsRequest{} }
-func (m *QueryFeeSplitParamsResponse) Reset()             { *m = QueryFeeSplitParamsResponse{} }
-func (m *QueryBurnedSupplyRequest) Reset()                { *m = QueryBurnedSupplyRequest{} }
-func (m *QueryBurnedSupplyResponse) Reset()               { *m = QueryBurnedSupplyResponse{} }
-func (m *QueryTreasuryBalanceRequest) Reset()             { *m = QueryTreasuryBalanceRequest{} }
-func (m *QueryTreasuryBalanceResponse) Reset()            { *m = QueryTreasuryBalanceResponse{} }
-func (m *QueryEpochRewardSummaryRequest) Reset()          { *m = QueryEpochRewardSummaryRequest{} }
-func (m *QueryEpochRewardSummaryResponse) Reset()         { *m = QueryEpochRewardSummaryResponse{} }
-func (m *QueryCurrentInflationRequest) String() string    { return gogoproto.CompactTextString(m) }
-func (m *QueryCurrentInflationResponse) String() string   { return gogoproto.CompactTextString(m) }
-func (m *QueryCurrentBondedRatioRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryCurrentBondedRatioResponse) String() string { return gogoproto.CompactTextString(m) }
-func (m *QueryEstimatedAPRRequest) String() string        { return gogoproto.CompactTextString(m) }
-func (m *QueryEstimatedAPRResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *QueryFeeSplitParamsRequest) String() string      { return gogoproto.CompactTextString(m) }
-func (m *QueryFeeSplitParamsResponse) String() string     { return gogoproto.CompactTextString(m) }
-func (m *QueryBurnedSupplyRequest) String() string        { return gogoproto.CompactTextString(m) }
-func (m *QueryBurnedSupplyResponse) String() string       { return gogoproto.CompactTextString(m) }
-func (m *QueryTreasuryBalanceRequest) String() string     { return gogoproto.CompactTextString(m) }
-func (m *QueryTreasuryBalanceResponse) String() string    { return gogoproto.CompactTextString(m) }
-func (m *QueryEpochRewardSummaryRequest) String() string  { return gogoproto.CompactTextString(m) }
-func (m *QueryEpochRewardSummaryResponse) String() string { return gogoproto.CompactTextString(m) }
-func (*QueryCurrentInflationRequest) ProtoMessage()       {}
-func (*QueryCurrentInflationResponse) ProtoMessage()      {}
-func (*QueryCurrentBondedRatioRequest) ProtoMessage()     {}
-func (*QueryCurrentBondedRatioResponse) ProtoMessage()    {}
-func (*QueryEstimatedAPRRequest) ProtoMessage()           {}
-func (*QueryEstimatedAPRResponse) ProtoMessage()          {}
-func (*QueryFeeSplitParamsRequest) ProtoMessage()         {}
-func (*QueryFeeSplitParamsResponse) ProtoMessage()        {}
-func (*QueryBurnedSupplyRequest) ProtoMessage()           {}
-func (*QueryBurnedSupplyResponse) ProtoMessage()          {}
-func (*QueryTreasuryBalanceRequest) ProtoMessage()        {}
-func (*QueryTreasuryBalanceResponse) ProtoMessage()       {}
-func (*QueryEpochRewardSummaryRequest) ProtoMessage()     {}
-func (*QueryEpochRewardSummaryResponse) ProtoMessage()    {}
+func (m *QueryCurrentInflationRequest) Reset()			{ *m = QueryCurrentInflationRequest{} }
+func (m *QueryCurrentInflationResponse) Reset()			{ *m = QueryCurrentInflationResponse{} }
+func (m *QueryCurrentBondedRatioRequest) Reset()		{ *m = QueryCurrentBondedRatioRequest{} }
+func (m *QueryCurrentBondedRatioResponse) Reset()		{ *m = QueryCurrentBondedRatioResponse{} }
+func (m *QueryEstimatedAPRRequest) Reset()			{ *m = QueryEstimatedAPRRequest{} }
+func (m *QueryEstimatedAPRResponse) Reset()			{ *m = QueryEstimatedAPRResponse{} }
+func (m *QueryFeeSplitParamsRequest) Reset()			{ *m = QueryFeeSplitParamsRequest{} }
+func (m *QueryFeeSplitParamsResponse) Reset()			{ *m = QueryFeeSplitParamsResponse{} }
+func (m *QueryBurnedSupplyRequest) Reset()			{ *m = QueryBurnedSupplyRequest{} }
+func (m *QueryBurnedSupplyResponse) Reset()			{ *m = QueryBurnedSupplyResponse{} }
+func (m *QueryTreasuryBalanceRequest) Reset()			{ *m = QueryTreasuryBalanceRequest{} }
+func (m *QueryTreasuryBalanceResponse) Reset()			{ *m = QueryTreasuryBalanceResponse{} }
+func (m *QueryEpochRewardSummaryRequest) Reset()		{ *m = QueryEpochRewardSummaryRequest{} }
+func (m *QueryEpochRewardSummaryResponse) Reset()		{ *m = QueryEpochRewardSummaryResponse{} }
+func (m *QueryCurrentInflationRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryCurrentInflationResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryCurrentBondedRatioRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryCurrentBondedRatioResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryEstimatedAPRRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEstimatedAPRResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryFeeSplitParamsRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryFeeSplitParamsResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryBurnedSupplyRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryBurnedSupplyResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryTreasuryBalanceRequest) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryTreasuryBalanceResponse) String() string		{ return gogoproto.CompactTextString(m) }
+func (m *QueryEpochRewardSummaryRequest) String() string	{ return gogoproto.CompactTextString(m) }
+func (m *QueryEpochRewardSummaryResponse) String() string	{ return gogoproto.CompactTextString(m) }
+func (*QueryCurrentInflationRequest) ProtoMessage()		{}
+func (*QueryCurrentInflationResponse) ProtoMessage()		{}
+func (*QueryCurrentBondedRatioRequest) ProtoMessage()		{}
+func (*QueryCurrentBondedRatioResponse) ProtoMessage()		{}
+func (*QueryEstimatedAPRRequest) ProtoMessage()			{}
+func (*QueryEstimatedAPRResponse) ProtoMessage()		{}
+func (*QueryFeeSplitParamsRequest) ProtoMessage()		{}
+func (*QueryFeeSplitParamsResponse) ProtoMessage()		{}
+func (*QueryBurnedSupplyRequest) ProtoMessage()			{}
+func (*QueryBurnedSupplyResponse) ProtoMessage()		{}
+func (*QueryTreasuryBalanceRequest) ProtoMessage()		{}
+func (*QueryTreasuryBalanceResponse) ProtoMessage()		{}
+func (*QueryEpochRewardSummaryRequest) ProtoMessage()		{}
+func (*QueryEpochRewardSummaryResponse) ProtoMessage()		{}

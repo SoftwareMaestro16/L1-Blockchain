@@ -12,10 +12,10 @@ import (
 func TestAccountMetadataReferencesDomainAliasWithoutOwningDomainRecord(t *testing.T) {
 	owner := ownerA
 	account := accountExportFixture{
-		AddressUser: owner,
+		AddressUser:	owner,
 		Metadata: accountMetadataFixture{
-			DomainAlias:   "alice.aet",
-			CreatedHeight: 10,
+			DomainAlias:	"alice.aet",
+			CreatedHeight:	10,
 		},
 	}
 
@@ -46,11 +46,11 @@ func TestDomainOwnerQueryDoesNotReadAccountMetadata(t *testing.T) {
 }
 
 type accountExportFixture struct {
-	AddressUser string                 `json:"address_user"`
-	Metadata    accountMetadataFixture `json:"metadata,omitempty"`
+	AddressUser	string			`json:"address_user"`
+	Metadata	accountMetadataFixture	`json:"metadata,omitempty"`
 }
 
 type accountMetadataFixture struct {
-	DomainAlias   string `json:"domain_alias,omitempty"`
-	CreatedHeight uint64 `json:"created_height,omitempty"`
+	DomainAlias	string	`json:"domain_alias,omitempty"`
+	CreatedHeight	uint64	`json:"created_height,omitempty"`
 }

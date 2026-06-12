@@ -8,12 +8,12 @@ import (
 
 func TestContractLifecycleActionMatrix(t *testing.T) {
 	tests := []struct {
-		status  string
-		allowed []string
-		blocked []string
+		status	string
+		allowed	[]string
+		blocked	[]string
 	}{
 		{
-			status: ContractStatusActive,
+			status:	ContractStatusActive,
 			allowed: []string{
 				ContractLifecycleActionExecuteExternal,
 				ContractLifecycleActionReceiveInternal,
@@ -25,27 +25,10 @@ func TestContractLifecycleActionMatrix(t *testing.T) {
 				ContractLifecycleActionUpgradeMigrate,
 				ContractLifecycleActionArchiveDelete,
 			},
-			blocked: []string{ContractLifecycleActionUnfreeze},
+			blocked:	[]string{ContractLifecycleActionUnfreeze},
 		},
 		{
-			status: ContractStatusFrozen,
-			allowed: []string{
-				ContractLifecycleActionReceiveTopUp,
-				ContractLifecycleActionPayRentDebt,
-				ContractLifecycleActionUnfreeze,
-				ContractLifecycleActionQuery,
-				ContractLifecycleActionProofQuery,
-			},
-			blocked: []string{
-				ContractLifecycleActionExecuteExternal,
-				ContractLifecycleActionReceiveInternal,
-				ContractLifecycleActionEmitInternalMessage,
-				ContractLifecycleActionUpgradeMigrate,
-				ContractLifecycleActionArchiveDelete,
-			},
-		},
-		{
-			status: ContractStatusFrozenLimited,
+			status:	ContractStatusFrozen,
 			allowed: []string{
 				ContractLifecycleActionReceiveTopUp,
 				ContractLifecycleActionPayRentDebt,
@@ -62,7 +45,24 @@ func TestContractLifecycleActionMatrix(t *testing.T) {
 			},
 		},
 		{
-			status: ContractStatusArchived,
+			status:	ContractStatusFrozenLimited,
+			allowed: []string{
+				ContractLifecycleActionReceiveTopUp,
+				ContractLifecycleActionPayRentDebt,
+				ContractLifecycleActionUnfreeze,
+				ContractLifecycleActionQuery,
+				ContractLifecycleActionProofQuery,
+			},
+			blocked: []string{
+				ContractLifecycleActionExecuteExternal,
+				ContractLifecycleActionReceiveInternal,
+				ContractLifecycleActionEmitInternalMessage,
+				ContractLifecycleActionUpgradeMigrate,
+				ContractLifecycleActionArchiveDelete,
+			},
+		},
+		{
+			status:	ContractStatusArchived,
 			allowed: []string{
 				ContractLifecycleActionReceiveTopUp,
 				ContractLifecycleActionPayRentDebt,
@@ -79,8 +79,8 @@ func TestContractLifecycleActionMatrix(t *testing.T) {
 			},
 		},
 		{
-			status:  ContractStatusDeleted,
-			allowed: []string{ContractLifecycleActionQuery, ContractLifecycleActionProofQuery},
+			status:		ContractStatusDeleted,
+			allowed:	[]string{ContractLifecycleActionQuery, ContractLifecycleActionProofQuery},
 			blocked: []string{
 				ContractLifecycleActionExecuteExternal,
 				ContractLifecycleActionReceiveInternal,
@@ -127,18 +127,18 @@ func lifecycleContract(t *testing.T, status string) Contract {
 	require.NoError(t, err)
 	codeHash := stateInitHash("lifecycle-code")
 	contract := Contract{
-		AddressUser:          owner,
-		AddressRaw:           raw,
-		CodeID:               codeHash,
-		CodeHash:             codeHash,
-		Creator:              owner,
-		Owner:                owner,
-		Admin:                owner,
-		Status:               status,
-		StorageSchemaVersion: 1,
-		LogicalTime:          1,
-		CreatedHeight:        1,
-		UpdatedHeight:        1,
+		AddressUser:		owner,
+		AddressRaw:		raw,
+		CodeID:			codeHash,
+		CodeHash:		codeHash,
+		Creator:		owner,
+		Owner:			owner,
+		Admin:			owner,
+		Status:			status,
+		StorageSchemaVersion:	1,
+		LogicalTime:		1,
+		CreatedHeight:		1,
+		UpdatedHeight:		1,
 	}
 	contract.StateRoot = ComputeContractStateRoot(contract)
 	return contract

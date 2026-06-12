@@ -12,27 +12,27 @@ func TestSubdomainCreationV2DetachedLifecycleAndExpiryRules(t *testing.T) {
 	require.True(t, found)
 
 	_, _, err := IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:        "alice.aet",
-		Label:             "api",
-		Actor:             addr(1),
-		ChildOwner:        addr(2),
-		Height:            20,
-		ChildExpiryHeight: parent.ExpiryHeight + 10,
-		DelegationType:    SubdomainDelegationOwnerControlledV2,
+		ParentName:		"alice.aet",
+		Label:			"api",
+		Actor:			addr(1),
+		ChildOwner:		addr(2),
+		Height:			20,
+		ChildExpiryHeight:	parent.ExpiryHeight + 10,
+		DelegationType:		SubdomainDelegationOwnerControlledV2,
 	})
 	require.ErrorContains(t, err, "cannot exceed parent expiry")
 
 	next, record, err := IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:          "alice.aet",
-		Label:               "api",
-		Actor:               addr(1),
-		ChildOwner:          addr(2),
-		Height:              20,
-		ChildExpiryHeight:   parent.ExpiryHeight + 10,
-		DelegationType:      SubdomainDelegationDetachedPaidV2,
-		DetachedPaid:        true,
-		IndependentPayment:  true,
-		ParentAuthorization: true,
+		ParentName:		"alice.aet",
+		Label:			"api",
+		Actor:			addr(1),
+		ChildOwner:		addr(2),
+		Height:			20,
+		ChildExpiryHeight:	parent.ExpiryHeight + 10,
+		DelegationType:		SubdomainDelegationDetachedPaidV2,
+		DetachedPaid:		true,
+		IndependentPayment:	true,
+		ParentAuthorization:	true,
 	})
 	require.NoError(t, err)
 	require.True(t, record.Detached)
@@ -48,13 +48,13 @@ func TestSubdomainCreationV2DelegateZoneAndEphemeralValidation(t *testing.T) {
 	delegate, err := NewDelegationRecordV2("alice.aet", addr(7), DelegationScopeSubdomainCreate, []string{"create"}, 100, 2, "", 10)
 	require.NoError(t, err)
 	_, record, err := IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:     "alice.aet",
-		Label:          "svc",
-		Actor:          addr(7),
-		ChildOwner:     addr(8),
-		Height:         20,
-		DelegationType: SubdomainDelegationDelegateControlledV2,
-		Delegation:     &delegate,
+		ParentName:	"alice.aet",
+		Label:		"svc",
+		Actor:		addr(7),
+		ChildOwner:	addr(8),
+		Height:		20,
+		DelegationType:	SubdomainDelegationDelegateControlledV2,
+		Delegation:	&delegate,
 	})
 	require.NoError(t, err)
 	require.Equal(t, SubdomainDelegationDelegateControlledV2, record.DelegationType)
@@ -62,24 +62,24 @@ func TestSubdomainCreationV2DelegateZoneAndEphemeralValidation(t *testing.T) {
 	zone, err := NewDelegationRecordV2("alice.aet", addr(9), DelegationScopeZoneAdmin, []string{"create", "resolve"}, 100, 2, "", 10)
 	require.NoError(t, err)
 	_, record, err = IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:     "alice.aet",
-		Label:          "zone",
-		Actor:          addr(9),
-		ChildOwner:     addr(9),
-		Height:         20,
-		DelegationType: SubdomainDelegationZoneManagedV2,
-		Delegation:     &zone,
+		ParentName:	"alice.aet",
+		Label:		"zone",
+		Actor:		addr(9),
+		ChildOwner:	addr(9),
+		Height:		20,
+		DelegationType:	SubdomainDelegationZoneManagedV2,
+		Delegation:	&zone,
 	})
 	require.NoError(t, err)
 	require.Equal(t, SubdomainDelegationZoneManagedV2, record.DelegationType)
 
 	_, _, err = IssueSubdomainV2(state, SubdomainCreationPolicyV2{
-		ParentName:     "alice.aet",
-		Label:          "tmp",
-		Actor:          addr(1),
-		ChildOwner:     addr(1),
-		Height:         20,
-		DelegationType: SubdomainDelegationEphemeralServiceV2,
+		ParentName:	"alice.aet",
+		Label:		"tmp",
+		Actor:		addr(1),
+		ChildOwner:	addr(1),
+		Height:		20,
+		DelegationType:	SubdomainDelegationEphemeralServiceV2,
 	})
 	require.ErrorContains(t, err, "ephemeral")
 }
@@ -125,16 +125,16 @@ func TestIdentityPathCommitmentAndOptimizedRecursiveProofV2(t *testing.T) {
 	cache, err := NewResolutionCacheRecordV2("api.alice.aet", commitment.PathHash, recordHash, 40, 7, 2, 3)
 	require.NoError(t, err)
 	proof, optimizedCommitment, err := BuildOptimizedRecursiveResolutionProofV2(OptimizedRecursiveResolutionProofRequestV2{
-		State:         state,
-		ChainID:       "aetra-local-1",
-		RootName:      "alice.aet",
-		TargetName:    "api.alice.aet",
-		Height:        14,
-		TTL:           30,
-		Cache:         &cache,
-		SourceVersion: 7,
-		ParentEpoch:   2,
-		ChildEpoch:    3,
+		State:		state,
+		ChainID:	"aetra-local-1",
+		RootName:	"alice.aet",
+		TargetName:	"api.alice.aet",
+		Height:		14,
+		TTL:		30,
+		Cache:		&cache,
+		SourceVersion:	7,
+		ParentEpoch:	2,
+		ChildEpoch:	3,
 	})
 	require.NoError(t, err)
 	require.Equal(t, commitment.CommitmentHash, optimizedCommitment.CommitmentHash)
@@ -149,16 +149,16 @@ func TestIdentityPathCommitmentAndOptimizedRecursiveProofV2(t *testing.T) {
 	staleParent := InvalidateResolutionCacheRecordV2ForParentEpochChange(cache, 4)
 	require.ErrorContains(t, ValidateResolutionCacheRecordV2(staleParent), "valid_until_height")
 	_, _, err = BuildOptimizedRecursiveResolutionProofV2(OptimizedRecursiveResolutionProofRequestV2{
-		State:         state,
-		ChainID:       "aetra-local-1",
-		RootName:      "alice.aet",
-		TargetName:    "api.alice.aet",
-		Height:        14,
-		TTL:           30,
-		Cache:         &cache,
-		SourceVersion: 7,
-		ParentEpoch:   4,
-		ChildEpoch:    3,
+		State:		state,
+		ChainID:	"aetra-local-1",
+		RootName:	"alice.aet",
+		TargetName:	"api.alice.aet",
+		Height:		14,
+		TTL:		30,
+		Cache:		&cache,
+		SourceVersion:	7,
+		ParentEpoch:	4,
+		ChildEpoch:	3,
 	})
 	require.ErrorContains(t, err, "parent epoch")
 }

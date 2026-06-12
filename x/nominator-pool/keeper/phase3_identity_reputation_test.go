@@ -14,24 +14,24 @@ func TestPhase35PoolClaimWritesUnifiedIdentityReputationByDurationAndAmount(t *t
 	longUser := aePoolAddress(t, "c2")
 	largeUser := aePoolAddress(t, "c3")
 	k := NewKeeperWithAccountStatus(accountStatusFixture{
-		shortUser: accountStatusActive,
-		longUser:  accountStatusActive,
-		largeUser: accountStatusActive,
+		shortUser:	accountStatusActive,
+		longUser:	accountStatusActive,
+		largeUser:	accountStatusActive,
 	})
 	pool := createOfficialLiquidStakingPool(t, &k, "phase35-identity")
 	for _, deposit := range []struct {
-		user   string
-		amount uint64
+		user	string
+		amount	uint64
 	}{
 		{shortUser, types.DefaultMinPoolDeposit},
 		{longUser, types.DefaultMinPoolDeposit},
 		{largeUser, 2 * types.DefaultMinPoolDeposit},
 	} {
 		_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-			PoolID:        pool.PoolID,
-			WalletAddress: deposit.user,
-			Amount:        deposit.amount,
-			Height:        2,
+			PoolID:		pool.PoolID,
+			WalletAddress:	deposit.user,
+			Amount:		deposit.amount,
+			Height:		2,
 		})
 		require.NoError(t, err)
 	}
@@ -59,10 +59,10 @@ func TestPhase35IdentityReputationClaimIdempotentAndRecordsSlashingExposure(t *t
 	k := NewKeeperWithAccountStatus(accountStatusFixture{user: accountStatusActive})
 	pool := createOfficialLiquidStakingPool(t, &k, "phase35-slash-exposure")
 	_, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	gs := k.ExportGenesis()
@@ -84,18 +84,18 @@ func TestPhase35LowIdentityReputationDoesNotBlockPoolDepositOrClaim(t *testing.T
 	pool := createOfficialLiquidStakingPool(t, &k, "phase35-low-rep")
 
 	receipt, err := k.DepositToStakingPool(types.MsgDepositToStakingPool{
-		PoolID:        pool.PoolID,
-		WalletAddress: user,
-		Amount:        types.DefaultMinPoolDeposit,
-		Height:        2,
+		PoolID:		pool.PoolID,
+		WalletAddress:	user,
+		Amount:		types.DefaultMinPoolDeposit,
+		Height:		2,
 	})
 	require.NoError(t, err)
 	require.Equal(t, types.DefaultMinPoolDeposit, receipt.Amount)
 
 	claim, err := k.ClaimStakeReputation(types.MsgClaimStakeReputation{
-		PoolID:       pool.PoolID,
-		OwnerAddress: user,
-		Height:       12,
+		PoolID:		pool.PoolID,
+		OwnerAddress:	user,
+		Height:		12,
 	})
 	require.NoError(t, err)
 	require.Equal(t, user, claim.Account)

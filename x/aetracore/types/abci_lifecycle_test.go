@@ -10,32 +10,32 @@ func TestKernelABCIProposalLifecycleIncludesRoutedMessagesAndGasLimits(t *testin
 	state := abciLifecycleState(t)
 	ctx := KernelConsensusContext{ChainID: "aetra-testnet", Height: 21, BlockTimeUnix: 1_700_000_021}
 	local := KernelMessageEnvelope{
-		Kind:             KernelMessageLocalTx,
-		TxHash:           testHash("abci/local"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDFinancial,
-		DestinationShard: "0",
-		Sender:           "sender.local",
-		Nonce:            1,
-		GasLimit:         100,
-		PriorityClass:    2,
-		AdmissionHeight:  21,
+		Kind:			KernelMessageLocalTx,
+		TxHash:			testHash("abci/local"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDFinancial,
+		DestinationShard:	"0",
+		Sender:			"sender.local",
+		Nonce:			1,
+		GasLimit:		100,
+		PriorityClass:		2,
+		AdmissionHeight:	21,
 	}
 	routed := KernelMessageEnvelope{
-		Kind:             KernelMessageRoutedInbound,
-		TxHash:           testHash("abci/routed"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDContract,
-		DestinationShard: "0",
-		Sender:           "sender.routed",
-		Nonce:            1,
-		GasLimit:         150,
-		PriorityClass:    1,
-		AdmissionHeight:  21,
-		CommittedHeight:  20,
-		EligibleHeight:   21,
+		Kind:			KernelMessageRoutedInbound,
+		TxHash:			testHash("abci/routed"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDContract,
+		DestinationShard:	"0",
+		Sender:			"sender.routed",
+		Nonce:			1,
+		GasLimit:		150,
+		PriorityClass:		1,
+		AdmissionHeight:	21,
+		CommittedHeight:	20,
+		EligibleHeight:		21,
 	}
 	limits := KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500}
 
@@ -65,17 +65,17 @@ func TestKernelABCIProcessProposalDeterministicAcceptRejectAndTimestampBounds(t 
 	state := abciLifecycleState(t)
 	ctx := KernelConsensusContext{ChainID: "aetra-testnet", Height: 21, BlockTimeUnix: 1_700_000_021}
 	local := KernelMessageEnvelope{
-		Kind:             KernelMessageLocalTx,
-		TxHash:           testHash("abci/deterministic/local"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDFinancial,
-		DestinationShard: "0",
-		Sender:           "sender.deterministic",
-		Nonce:            1,
-		GasLimit:         100,
-		PriorityClass:    1,
-		AdmissionHeight:  21,
+		Kind:			KernelMessageLocalTx,
+		TxHash:			testHash("abci/deterministic/local"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDFinancial,
+		DestinationShard:	"0",
+		Sender:			"sender.deterministic",
+		Nonce:			1,
+		GasLimit:		100,
+		PriorityClass:		1,
+		AdmissionHeight:	21,
 	}
 	limits := KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500}
 	bounds := KernelTimestampBounds{PreviousBlockTimeUnix: 1_700_000_015, MaxForwardDriftSeconds: 120}
@@ -136,29 +136,29 @@ func TestKernelABCIFinalizeCommitAndCleanup(t *testing.T) {
 	state := abciLifecycleState(t)
 	ctx := KernelConsensusContext{ChainID: "aetra-testnet", Height: 21, BlockTimeUnix: 1_700_000_021}
 	local := KernelMessageEnvelope{
-		Kind:             KernelMessageLocalTx,
-		TxHash:           testHash("abci/finalize/local"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDFinancial,
-		DestinationShard: "0",
-		Sender:           "sender.finalize",
-		Nonce:            1,
-		GasLimit:         100,
-		PriorityClass:    1,
-		AdmissionHeight:  21,
+		Kind:			KernelMessageLocalTx,
+		TxHash:			testHash("abci/finalize/local"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDFinancial,
+		DestinationShard:	"0",
+		Sender:			"sender.finalize",
+		Nonce:			1,
+		GasLimit:		100,
+		PriorityClass:		1,
+		AdmissionHeight:	21,
 	}
 	limits := KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500}
 	proposal, err := PrepareKernelABCIProposal(ctx, state, []KernelMessageEnvelope{local}, nil, limits)
 	require.NoError(t, err)
 	classified, err := ClassifyTransaction(state, ClassificationInput{
-		Height:           ctx.Height,
-		TxHash:           local.TxHash,
-		SourceZone:       local.SourceZone,
-		SourceShard:      local.SourceShard,
-		DestinationZone:  local.DestinationZone,
-		DestinationShard: local.DestinationShard,
-		AdmissionHeight:  local.AdmissionHeight,
+		Height:			ctx.Height,
+		TxHash:			local.TxHash,
+		SourceZone:		local.SourceZone,
+		SourceShard:		local.SourceShard,
+		DestinationZone:	local.DestinationZone,
+		DestinationShard:	local.DestinationShard,
+		AdmissionHeight:	local.AdmissionHeight,
 	})
 	require.NoError(t, err)
 	receipt, err := ExecuteSync(classified, ExecutionResult{Success: true, ResultHash: testHash("abci/finalize/result")}, ctx.Height, 1)
@@ -173,8 +173,8 @@ func TestKernelABCIFinalizeCommitAndCleanup(t *testing.T) {
 			testCommitment(t, ctx.Height, ZoneIDFinancial),
 			testCommitment(t, ctx.Height, ZoneIDContract),
 		},
-		Receipts:      []ExecutionReceipt{receipt},
-		Contributions: contributions,
+		Receipts:	[]ExecutionReceipt{receipt},
+		Contributions:	contributions,
 	}, []KernelCleanupItem{
 		{QueueID: "receipts", ItemID: "future", HeightDue: 22, DeleteRoot: testHash("future")},
 		{QueueID: "receipts", ItemID: "old", HeightDue: 20, DeleteRoot: testHash("old")},
@@ -199,19 +199,19 @@ func TestKernelABCIRejectsMalformedRoutedBatch(t *testing.T) {
 	state := abciLifecycleState(t)
 	ctx := KernelConsensusContext{ChainID: "aetra-testnet", Height: 21, BlockTimeUnix: 1_700_000_021}
 	routed := KernelMessageEnvelope{
-		Kind:             KernelMessageRoutedInbound,
-		TxHash:           testHash("abci/malformed-routed"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDContract,
-		DestinationShard: "0",
-		Sender:           "sender.bad",
-		Nonce:            1,
-		GasLimit:         100,
-		PriorityClass:    1,
-		AdmissionHeight:  21,
-		CommittedHeight:  19,
-		EligibleHeight:   21,
+		Kind:			KernelMessageRoutedInbound,
+		TxHash:			testHash("abci/malformed-routed"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDContract,
+		DestinationShard:	"0",
+		Sender:			"sender.bad",
+		Nonce:			1,
+		GasLimit:		100,
+		PriorityClass:		1,
+		AdmissionHeight:	21,
+		CommittedHeight:	19,
+		EligibleHeight:		21,
 	}
 	_, err := PrepareKernelABCIProposal(ctx, state, nil, []KernelMessageEnvelope{routed}, KernelGasLimits{MaxBlockGas: 1_000, MaxZoneGas: 500})
 	require.ErrorContains(t, err, "committed root")

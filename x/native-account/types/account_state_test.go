@@ -17,35 +17,35 @@ func TestAccountValidationAcceptsCompleteActiveAccount(t *testing.T) {
 
 func TestAccountValidationRejectsSecretsInSerializedFields(t *testing.T) {
 	fixtures := []struct {
-		name   string
-		mutate func(*Account)
+		name	string
+		mutate	func(*Account)
 	}{
 		{
-			name: "pubkey private key",
+			name:	"pubkey private key",
 			mutate: func(account *Account) {
 				account.PubKeys = []string{"private_key:do-not-store"}
 			},
 		},
 		{
-			name: "auth seed phrase",
+			name:	"auth seed phrase",
 			mutate: func(account *Account) {
 				account.AuthPolicy.Mode = "seed phrase recovery"
 			},
 		},
 		{
-			name: "feature mnemonic",
+			name:	"feature mnemonic",
 			mutate: func(account *Account) {
 				account.FeatureFlags = []string{"mnemonic"}
 			},
 		},
 		{
-			name: "metadata seed",
+			name:	"metadata seed",
 			mutate: func(account *Account) {
 				account.Metadata.MetadataHash = "seed_phrase:bad"
 			},
 		},
 		{
-			name: "reputation private key",
+			name:	"reputation private key",
 			mutate: func(account *Account) {
 				account.ReputationID = "private key reference"
 			},
@@ -67,52 +67,52 @@ func TestAccountValidationRejectsSecretsInSerializedFields(t *testing.T) {
 
 func TestAccountValidationRejectsMalformedState(t *testing.T) {
 	fixtures := []struct {
-		name    string
-		mutate  func(*Account)
-		wantErr string
+		name	string
+		mutate	func(*Account)
+		wantErr	string
 	}{
 		{
-			name: "empty AE address",
+			name:	"empty AE address",
 			mutate: func(account *Account) {
 				account.AddressUser = ""
 			},
-			wantErr: "AE user-facing",
+			wantErr:	"AE user-facing",
 		},
 		{
-			name: "malformed raw address",
+			name:	"malformed raw address",
 			mutate: func(account *Account) {
 				account.AddressRaw = "4:abcdef"
 			},
-			wantErr: "invalid native account raw address",
+			wantErr:	"invalid native account raw address",
 		},
 		{
-			name: "mismatched address pair",
+			name:	"mismatched address pair",
 			mutate: func(account *Account) {
 				_, raw := testAddressPair(t, 0x83)
 				account.AddressRaw = raw
 			},
-			wantErr: "must represent the same account",
+			wantErr:	"must represent the same account",
 		},
 		{
-			name: "inactive persistent account",
+			name:	"inactive persistent account",
 			mutate: func(account *Account) {
 				account.Status = AccountStatusInactive
 			},
-			wantErr: "virtual only",
+			wantErr:	"virtual only",
 		},
 		{
-			name: "unsupported status",
+			name:	"unsupported status",
 			mutate: func(account *Account) {
 				account.Status = "deleted"
 			},
-			wantErr: "unsupported native account status",
+			wantErr:	"unsupported native account status",
 		},
 		{
-			name: "unsupported version",
+			name:	"unsupported version",
 			mutate: func(account *Account) {
 				account.Version = CurrentAccountVersion + 1
 			},
-			wantErr: "unsupported native account version",
+			wantErr:	"unsupported native account version",
 		},
 	}
 

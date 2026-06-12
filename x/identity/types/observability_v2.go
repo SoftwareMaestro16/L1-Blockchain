@@ -13,163 +13,163 @@ type IdentityObservabilityAlertTypeV2 string
 type IdentityObservabilityAlertSeverityV2 string
 
 const (
-	IdentityEventDomainCommitted    IdentityObservabilityEventTypeV2 = "identity_domain_committed"
-	IdentityEventDomainRegistered   IdentityObservabilityEventTypeV2 = "identity_domain_registered"
-	IdentityEventDomainRenewed      IdentityObservabilityEventTypeV2 = "identity_domain_renewed"
-	IdentityEventDomainTransferred  IdentityObservabilityEventTypeV2 = "identity_domain_transferred"
-	IdentityEventDomainExpired      IdentityObservabilityEventTypeV2 = "identity_domain_expired"
-	IdentityEventDomainReleased     IdentityObservabilityEventTypeV2 = "identity_domain_released"
-	IdentityEventNFTBindingUpdated  IdentityObservabilityEventTypeV2 = "identity_nft_binding_updated"
-	IdentityEventResolverUpdated    IdentityObservabilityEventTypeV2 = "identity_resolver_updated"
-	IdentityEventReverseSet         IdentityObservabilityEventTypeV2 = "identity_reverse_set"
-	IdentityEventReverseVerified    IdentityObservabilityEventTypeV2 = "identity_reverse_verified"
-	IdentityEventReverseInvalidated IdentityObservabilityEventTypeV2 = "identity_reverse_invalidated"
-	IdentityEventSubdomainCreated   IdentityObservabilityEventTypeV2 = "identity_subdomain_created"
-	IdentityEventDelegationCreated  IdentityObservabilityEventTypeV2 = "identity_delegation_created"
-	IdentityEventDelegationRevoked  IdentityObservabilityEventTypeV2 = "identity_delegation_revoked"
-	IdentityEventZonePolicyUpdated  IdentityObservabilityEventTypeV2 = "identity_zone_policy_updated"
-	IdentityEventAuctionStarted     IdentityObservabilityEventTypeV2 = "identity_auction_started"
-	IdentityEventBidCommitted       IdentityObservabilityEventTypeV2 = "identity_bid_committed"
-	IdentityEventBidRevealed        IdentityObservabilityEventTypeV2 = "identity_bid_revealed"
-	IdentityEventAuctionFinalized   IdentityObservabilityEventTypeV2 = "identity_auction_finalized"
-	IdentityEventCacheInvalidated   IdentityObservabilityEventTypeV2 = "identity_cache_invalidated"
+	IdentityEventDomainCommitted	IdentityObservabilityEventTypeV2	= "identity_domain_committed"
+	IdentityEventDomainRegistered	IdentityObservabilityEventTypeV2	= "identity_domain_registered"
+	IdentityEventDomainRenewed	IdentityObservabilityEventTypeV2	= "identity_domain_renewed"
+	IdentityEventDomainTransferred	IdentityObservabilityEventTypeV2	= "identity_domain_transferred"
+	IdentityEventDomainExpired	IdentityObservabilityEventTypeV2	= "identity_domain_expired"
+	IdentityEventDomainReleased	IdentityObservabilityEventTypeV2	= "identity_domain_released"
+	IdentityEventNFTBindingUpdated	IdentityObservabilityEventTypeV2	= "identity_nft_binding_updated"
+	IdentityEventResolverUpdated	IdentityObservabilityEventTypeV2	= "identity_resolver_updated"
+	IdentityEventReverseSet		IdentityObservabilityEventTypeV2	= "identity_reverse_set"
+	IdentityEventReverseVerified	IdentityObservabilityEventTypeV2	= "identity_reverse_verified"
+	IdentityEventReverseInvalidated	IdentityObservabilityEventTypeV2	= "identity_reverse_invalidated"
+	IdentityEventSubdomainCreated	IdentityObservabilityEventTypeV2	= "identity_subdomain_created"
+	IdentityEventDelegationCreated	IdentityObservabilityEventTypeV2	= "identity_delegation_created"
+	IdentityEventDelegationRevoked	IdentityObservabilityEventTypeV2	= "identity_delegation_revoked"
+	IdentityEventZonePolicyUpdated	IdentityObservabilityEventTypeV2	= "identity_zone_policy_updated"
+	IdentityEventAuctionStarted	IdentityObservabilityEventTypeV2	= "identity_auction_started"
+	IdentityEventBidCommitted	IdentityObservabilityEventTypeV2	= "identity_bid_committed"
+	IdentityEventBidRevealed	IdentityObservabilityEventTypeV2	= "identity_bid_revealed"
+	IdentityEventAuctionFinalized	IdentityObservabilityEventTypeV2	= "identity_auction_finalized"
+	IdentityEventCacheInvalidated	IdentityObservabilityEventTypeV2	= "identity_cache_invalidated"
 )
 
 const (
-	IdentityMetricActiveDomains                 IdentityObservabilityMetricNameV2 = "identity_active_domains"
-	IdentityMetricExpiredDomains                IdentityObservabilityMetricNameV2 = "identity_expired_domains"
-	IdentityMetricRenewalWindowDomains          IdentityObservabilityMetricNameV2 = "identity_domains_in_renewal_window"
-	IdentityMetricGracePeriodDomains            IdentityObservabilityMetricNameV2 = "identity_domains_in_grace_period"
-	IdentityMetricResolverRecordCount           IdentityObservabilityMetricNameV2 = "identity_resolver_record_count"
-	IdentityMetricAverageResolverPayloadSize    IdentityObservabilityMetricNameV2 = "identity_average_resolver_payload_size_bytes"
-	IdentityMetricReverseRecordsVerified        IdentityObservabilityMetricNameV2 = "identity_reverse_records_verified"
-	IdentityMetricReverseRecordsInvalidated     IdentityObservabilityMetricNameV2 = "identity_reverse_records_invalidated"
-	IdentityMetricSubdomainsByDepth             IdentityObservabilityMetricNameV2 = "identity_subdomains_by_depth"
-	IdentityMetricDelegationRecordsActive       IdentityObservabilityMetricNameV2 = "identity_delegation_records_active"
-	IdentityMetricAuctionsActive                IdentityObservabilityMetricNameV2 = "identity_auctions_active"
-	IdentityMetricCommitmentsActive             IdentityObservabilityMetricNameV2 = "identity_commitments_active"
-	IdentityMetricBatchResolverUpdateSize       IdentityObservabilityMetricNameV2 = "identity_batch_resolver_update_size"
-	IdentityMetricBlockSTMConflictRate          IdentityObservabilityMetricNameV2 = "identity_blockstm_conflict_rate_bps"
-	IdentityMetricStoreV2DirectReadLatency      IdentityObservabilityMetricNameV2 = "identity_store_v2_direct_resolution_read_latency_us"
-	IdentityMetricStoreV2RecursiveReadLatency   IdentityObservabilityMetricNameV2 = "identity_store_v2_recursive_resolution_read_latency_us"
-	IdentityMetricStoreV2ResolverWriteLatency   IdentityObservabilityMetricNameV2 = "identity_store_v2_resolver_update_write_latency_us"
-	IdentityMetricProofQueryLatency             IdentityObservabilityMetricNameV2 = "identity_proof_query_latency_us"
-	IdentityMetricProofVerificationFailureCount IdentityObservabilityMetricNameV2 = "identity_proof_verification_failure_count"
-	IdentityMetricExpiryProcessingBacklog       IdentityObservabilityMetricNameV2 = "identity_expiry_processing_backlog"
+	IdentityMetricActiveDomains			IdentityObservabilityMetricNameV2	= "identity_active_domains"
+	IdentityMetricExpiredDomains			IdentityObservabilityMetricNameV2	= "identity_expired_domains"
+	IdentityMetricRenewalWindowDomains		IdentityObservabilityMetricNameV2	= "identity_domains_in_renewal_window"
+	IdentityMetricGracePeriodDomains		IdentityObservabilityMetricNameV2	= "identity_domains_in_grace_period"
+	IdentityMetricResolverRecordCount		IdentityObservabilityMetricNameV2	= "identity_resolver_record_count"
+	IdentityMetricAverageResolverPayloadSize	IdentityObservabilityMetricNameV2	= "identity_average_resolver_payload_size_bytes"
+	IdentityMetricReverseRecordsVerified		IdentityObservabilityMetricNameV2	= "identity_reverse_records_verified"
+	IdentityMetricReverseRecordsInvalidated		IdentityObservabilityMetricNameV2	= "identity_reverse_records_invalidated"
+	IdentityMetricSubdomainsByDepth			IdentityObservabilityMetricNameV2	= "identity_subdomains_by_depth"
+	IdentityMetricDelegationRecordsActive		IdentityObservabilityMetricNameV2	= "identity_delegation_records_active"
+	IdentityMetricAuctionsActive			IdentityObservabilityMetricNameV2	= "identity_auctions_active"
+	IdentityMetricCommitmentsActive			IdentityObservabilityMetricNameV2	= "identity_commitments_active"
+	IdentityMetricBatchResolverUpdateSize		IdentityObservabilityMetricNameV2	= "identity_batch_resolver_update_size"
+	IdentityMetricBlockSTMConflictRate		IdentityObservabilityMetricNameV2	= "identity_blockstm_conflict_rate_bps"
+	IdentityMetricStoreV2DirectReadLatency		IdentityObservabilityMetricNameV2	= "identity_store_v2_direct_resolution_read_latency_us"
+	IdentityMetricStoreV2RecursiveReadLatency	IdentityObservabilityMetricNameV2	= "identity_store_v2_recursive_resolution_read_latency_us"
+	IdentityMetricStoreV2ResolverWriteLatency	IdentityObservabilityMetricNameV2	= "identity_store_v2_resolver_update_write_latency_us"
+	IdentityMetricProofQueryLatency			IdentityObservabilityMetricNameV2	= "identity_proof_query_latency_us"
+	IdentityMetricProofVerificationFailureCount	IdentityObservabilityMetricNameV2	= "identity_proof_verification_failure_count"
+	IdentityMetricExpiryProcessingBacklog		IdentityObservabilityMetricNameV2	= "identity_expiry_processing_backlog"
 )
 
 const (
-	IdentityMetricUnitCount        = "count"
-	IdentityMetricUnitBytes        = "bytes"
-	IdentityMetricUnitMicroseconds = "us"
-	IdentityMetricUnitBasisPoints  = "bps"
+	IdentityMetricUnitCount		= "count"
+	IdentityMetricUnitBytes		= "bytes"
+	IdentityMetricUnitMicroseconds	= "us"
+	IdentityMetricUnitBasisPoints	= "bps"
 )
 
 const (
-	IdentityAlertNFTBindingMismatch          IdentityObservabilityAlertTypeV2 = "identity_alert_nft_binding_mismatch"
-	IdentityAlertResolverPayloadNearMaximum  IdentityObservabilityAlertTypeV2 = "identity_alert_resolver_payload_near_maximum"
-	IdentityAlertExpiryBacklogAboveThreshold IdentityObservabilityAlertTypeV2 = "identity_alert_expiry_processing_backlog_above_threshold"
-	IdentityAlertProofQueryFailureSpike      IdentityObservabilityAlertTypeV2 = "identity_alert_proof_query_failure_spike"
-	IdentityAlertRegistrationSpamSpike       IdentityObservabilityAlertTypeV2 = "identity_alert_registration_spam_spike"
-	IdentityAlertResolverUpdateSpamSpike     IdentityObservabilityAlertTypeV2 = "identity_alert_resolver_update_spam_spike"
-	IdentityAlertAuctionFinalizationBacklog  IdentityObservabilityAlertTypeV2 = "identity_alert_auction_finalization_backlog"
-	IdentityAlertBlockSTMConflictRateHigh    IdentityObservabilityAlertTypeV2 = "identity_alert_blockstm_conflict_rate_above_threshold"
-	IdentityAlertStoreV2ReadLatencyHigh      IdentityObservabilityAlertTypeV2 = "identity_alert_store_v2_identity_read_latency_above_threshold"
-	IdentityAlertReverseMismatchSpike        IdentityObservabilityAlertTypeV2 = "identity_alert_reverse_verification_mismatch_spike"
+	IdentityAlertNFTBindingMismatch			IdentityObservabilityAlertTypeV2	= "identity_alert_nft_binding_mismatch"
+	IdentityAlertResolverPayloadNearMaximum		IdentityObservabilityAlertTypeV2	= "identity_alert_resolver_payload_near_maximum"
+	IdentityAlertExpiryBacklogAboveThreshold	IdentityObservabilityAlertTypeV2	= "identity_alert_expiry_processing_backlog_above_threshold"
+	IdentityAlertProofQueryFailureSpike		IdentityObservabilityAlertTypeV2	= "identity_alert_proof_query_failure_spike"
+	IdentityAlertRegistrationSpamSpike		IdentityObservabilityAlertTypeV2	= "identity_alert_registration_spam_spike"
+	IdentityAlertResolverUpdateSpamSpike		IdentityObservabilityAlertTypeV2	= "identity_alert_resolver_update_spam_spike"
+	IdentityAlertAuctionFinalizationBacklog		IdentityObservabilityAlertTypeV2	= "identity_alert_auction_finalization_backlog"
+	IdentityAlertBlockSTMConflictRateHigh		IdentityObservabilityAlertTypeV2	= "identity_alert_blockstm_conflict_rate_above_threshold"
+	IdentityAlertStoreV2ReadLatencyHigh		IdentityObservabilityAlertTypeV2	= "identity_alert_store_v2_identity_read_latency_above_threshold"
+	IdentityAlertReverseMismatchSpike		IdentityObservabilityAlertTypeV2	= "identity_alert_reverse_verification_mismatch_spike"
 )
 
 const (
-	IdentityAlertSeverityWarning  IdentityObservabilityAlertSeverityV2 = "warning"
-	IdentityAlertSeverityCritical IdentityObservabilityAlertSeverityV2 = "critical"
+	IdentityAlertSeverityWarning	IdentityObservabilityAlertSeverityV2	= "warning"
+	IdentityAlertSeverityCritical	IdentityObservabilityAlertSeverityV2	= "critical"
 )
 
 type IdentityObservabilitySpecV2 struct {
-	Events   []IdentityObservabilityEventTypeV2
-	Metrics  []IdentityObservabilityMetricNameV2
-	Alerts   []IdentityObservabilityAlertTypeV2
-	SpecHash string
+	Events		[]IdentityObservabilityEventTypeV2
+	Metrics		[]IdentityObservabilityMetricNameV2
+	Alerts		[]IdentityObservabilityAlertTypeV2
+	SpecHash	string
 }
 
 type IdentityObservabilityEventV2 struct {
-	Type       IdentityObservabilityEventTypeV2
-	Height     uint64
-	Name       string
-	NameHash   string
-	Actor      string
-	Attributes map[string]string
-	EventHash  string
+	Type		IdentityObservabilityEventTypeV2
+	Height		uint64
+	Name		string
+	NameHash	string
+	Actor		string
+	Attributes	map[string]string
+	EventHash	string
 }
 
 type IdentityMetricSampleV2 struct {
-	Name       IdentityObservabilityMetricNameV2
-	Height     uint64
-	Value      uint64
-	Unit       string
-	Labels     map[string]string
-	SampleHash string
+	Name		IdentityObservabilityMetricNameV2
+	Height		uint64
+	Value		uint64
+	Unit		string
+	Labels		map[string]string
+	SampleHash	string
 }
 
 type IdentityObservabilityMetricsInputV2 struct {
-	State                             IdentityState
-	Height                            uint64
-	Delegations                       []DelegationRecordV2
-	BatchResolverUpdateSize           uint64
-	BlockSTMIdentityMessages          uint64
-	BlockSTMConflicts                 uint64
-	StoreV2DirectReadLatencyMicros    uint64
-	StoreV2RecursiveReadLatencyMicros uint64
-	StoreV2ResolverWriteLatencyMicros uint64
-	ProofQueryLatencyMicros           uint64
-	ProofVerificationFailureCount     uint64
-	ReverseRecordsInvalidated         uint64
+	State					IdentityState
+	Height					uint64
+	Delegations				[]DelegationRecordV2
+	BatchResolverUpdateSize			uint64
+	BlockSTMIdentityMessages		uint64
+	BlockSTMConflicts			uint64
+	StoreV2DirectReadLatencyMicros		uint64
+	StoreV2RecursiveReadLatencyMicros	uint64
+	StoreV2ResolverWriteLatencyMicros	uint64
+	ProofQueryLatencyMicros			uint64
+	ProofVerificationFailureCount		uint64
+	ReverseRecordsInvalidated		uint64
 }
 
 type IdentityObservabilityMetricsSnapshotV2 struct {
-	Height       uint64
-	Metrics      []IdentityMetricSampleV2
-	SnapshotHash string
+	Height		uint64
+	Metrics		[]IdentityMetricSampleV2
+	SnapshotHash	string
 }
 
 type IdentityObservabilityAlertThresholdsV2 struct {
-	ResolverPayloadNearMaxBps           uint64
-	ExpiryBacklogThreshold              uint64
-	ProofFailureSpikeThreshold          uint64
-	RegistrationSpamSpikeThreshold      uint64
-	ResolverUpdateSpamSpikeThreshold    uint64
-	AuctionFinalizationBacklogThreshold uint64
-	BlockSTMConflictRateBpsThreshold    uint64
-	StoreV2ReadLatencyMicrosThreshold   uint64
-	ReverseMismatchSpikeThreshold       uint64
+	ResolverPayloadNearMaxBps		uint64
+	ExpiryBacklogThreshold			uint64
+	ProofFailureSpikeThreshold		uint64
+	RegistrationSpamSpikeThreshold		uint64
+	ResolverUpdateSpamSpikeThreshold	uint64
+	AuctionFinalizationBacklogThreshold	uint64
+	BlockSTMConflictRateBpsThreshold	uint64
+	StoreV2ReadLatencyMicrosThreshold	uint64
+	ReverseMismatchSpikeThreshold		uint64
 }
 
 type IdentityObservabilityAlertInputV2 struct {
-	State                        IdentityState
-	Snapshot                     IdentityObservabilityMetricsSnapshotV2
-	Height                       uint64
-	Thresholds                   IdentityObservabilityAlertThresholdsV2
-	RegistrationAttemptsInWindow uint64
-	ResolverUpdatesInWindow      uint64
-	ReverseMismatchesInWindow    uint64
+	State				IdentityState
+	Snapshot			IdentityObservabilityMetricsSnapshotV2
+	Height				uint64
+	Thresholds			IdentityObservabilityAlertThresholdsV2
+	RegistrationAttemptsInWindow	uint64
+	ResolverUpdatesInWindow		uint64
+	ReverseMismatchesInWindow	uint64
 }
 
 type IdentityObservabilityAlertV2 struct {
-	Type          IdentityObservabilityAlertTypeV2
-	Severity      IdentityObservabilityAlertSeverityV2
-	Height        uint64
-	ObservedValue uint64
-	Threshold     uint64
-	Name          string
-	NameHash      string
-	Metric        IdentityObservabilityMetricNameV2
-	Details       string
-	AlertHash     string
+	Type		IdentityObservabilityAlertTypeV2
+	Severity	IdentityObservabilityAlertSeverityV2
+	Height		uint64
+	ObservedValue	uint64
+	Threshold	uint64
+	Name		string
+	NameHash	string
+	Metric		IdentityObservabilityMetricNameV2
+	Details		string
+	AlertHash	string
 }
 
 func DefaultIdentityObservabilitySpecV2() (IdentityObservabilitySpecV2, error) {
 	spec := IdentityObservabilitySpecV2{
-		Events:  requiredIdentityObservabilityEventsV2(),
-		Metrics: requiredIdentityObservabilityMetricsV2(),
-		Alerts:  requiredIdentityObservabilityAlertsV2(),
+		Events:		requiredIdentityObservabilityEventsV2(),
+		Metrics:	requiredIdentityObservabilityMetricsV2(),
+		Alerts:		requiredIdentityObservabilityAlertsV2(),
 	}
 	spec.SpecHash = ComputeIdentityObservabilitySpecHashV2(spec)
 	return spec, ValidateIdentityObservabilitySpecV2(spec)
@@ -259,11 +259,11 @@ func BuildIdentityObservabilityABCIEventV2(event IdentityObservabilityEventV2) (
 		return IdentityABCIEventV2{}, err
 	}
 	return IdentityABCIEventV2{
-		Type:       string(event.Type),
-		Height:     event.Height,
-		Name:       event.Name,
-		NameHash:   event.NameHash,
-		Attributes: observabilityAttributesV2(event),
+		Type:		string(event.Type),
+		Height:		event.Height,
+		Name:		event.Name,
+		NameHash:	event.NameHash,
+		Attributes:	observabilityAttributesV2(event),
 	}, nil
 }
 
@@ -277,19 +277,19 @@ func BuildIdentityObservabilityMetricsSnapshotV2(input IdentityObservabilityMetr
 	}
 	params := normalizeIdentityParams(state.Params)
 	counts := map[IdentityObservabilityMetricNameV2]uint64{
-		IdentityMetricActiveDomains:                 0,
-		IdentityMetricExpiredDomains:                0,
-		IdentityMetricRenewalWindowDomains:          0,
-		IdentityMetricGracePeriodDomains:            0,
-		IdentityMetricResolverRecordCount:           uint64(len(state.Resolvers)),
-		IdentityMetricReverseRecordsVerified:        0,
-		IdentityMetricDelegationRecordsActive:       0,
-		IdentityMetricAuctionsActive:                0,
-		IdentityMetricCommitmentsActive:             0,
-		IdentityMetricExpiryProcessingBacklog:       0,
-		IdentityMetricReverseRecordsInvalidated:     input.ReverseRecordsInvalidated,
-		IdentityMetricBatchResolverUpdateSize:       input.BatchResolverUpdateSize,
-		IdentityMetricProofVerificationFailureCount: input.ProofVerificationFailureCount,
+		IdentityMetricActiveDomains:			0,
+		IdentityMetricExpiredDomains:			0,
+		IdentityMetricRenewalWindowDomains:		0,
+		IdentityMetricGracePeriodDomains:		0,
+		IdentityMetricResolverRecordCount:		uint64(len(state.Resolvers)),
+		IdentityMetricReverseRecordsVerified:		0,
+		IdentityMetricDelegationRecordsActive:		0,
+		IdentityMetricAuctionsActive:			0,
+		IdentityMetricCommitmentsActive:		0,
+		IdentityMetricExpiryProcessingBacklog:		0,
+		IdentityMetricReverseRecordsInvalidated:	input.ReverseRecordsInvalidated,
+		IdentityMetricBatchResolverUpdateSize:		input.BatchResolverUpdateSize,
+		IdentityMetricProofVerificationFailureCount:	input.ProofVerificationFailureCount,
 	}
 	var resolverPayloadBytes uint64
 	for _, domain := range state.Domains {
@@ -386,11 +386,11 @@ func BuildIdentityObservabilityMetricsSnapshotV2(input IdentityObservabilityMetr
 
 func NewIdentityMetricSampleV2(name IdentityObservabilityMetricNameV2, height uint64, value uint64, unit string, labels map[string]string) (IdentityMetricSampleV2, error) {
 	sample := IdentityMetricSampleV2{
-		Name:   name,
-		Height: height,
-		Value:  value,
-		Unit:   unit,
-		Labels: cloneStringMapV2(labels),
+		Name:	name,
+		Height:	height,
+		Value:	value,
+		Unit:	unit,
+		Labels:	cloneStringMapV2(labels),
 	}
 	sample.SampleHash = ComputeIdentityMetricSampleHashV2(sample)
 	return sample, ValidateIdentityMetricSampleV2(sample)
@@ -444,15 +444,15 @@ func ValidateIdentityObservabilityMetricsSnapshotV2(snapshot IdentityObservabili
 
 func DefaultIdentityObservabilityAlertThresholdsV2() IdentityObservabilityAlertThresholdsV2 {
 	return IdentityObservabilityAlertThresholdsV2{
-		ResolverPayloadNearMaxBps:           8_000,
-		ExpiryBacklogThreshold:              100,
-		ProofFailureSpikeThreshold:          10,
-		RegistrationSpamSpikeThreshold:      100,
-		ResolverUpdateSpamSpikeThreshold:    100,
-		AuctionFinalizationBacklogThreshold: 10,
-		BlockSTMConflictRateBpsThreshold:    2_000,
-		StoreV2ReadLatencyMicrosThreshold:   50_000,
-		ReverseMismatchSpikeThreshold:       10,
+		ResolverPayloadNearMaxBps:		8_000,
+		ExpiryBacklogThreshold:			100,
+		ProofFailureSpikeThreshold:		10,
+		RegistrationSpamSpikeThreshold:		100,
+		ResolverUpdateSpamSpikeThreshold:	100,
+		AuctionFinalizationBacklogThreshold:	10,
+		BlockSTMConflictRateBpsThreshold:	2_000,
+		StoreV2ReadLatencyMicrosThreshold:	50_000,
+		ReverseMismatchSpikeThreshold:		10,
 	}
 }
 
@@ -472,13 +472,13 @@ func EvaluateIdentityObservabilityAlertsV2(input IdentityObservabilityAlertInput
 		nft, found := findDomainNFTByID(state, domain.NFTID)
 		if !found || !addressesEqual(nft.Owner, domain.Owner) {
 			alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
-				Type:          IdentityAlertNFTBindingMismatch,
-				Severity:      IdentityAlertSeverityCritical,
-				Height:        input.Height,
-				ObservedValue: 1,
-				Threshold:     0,
-				Name:          domain.Name,
-				Details:       "registry owner and nft owner diverged",
+				Type:		IdentityAlertNFTBindingMismatch,
+				Severity:	IdentityAlertSeverityCritical,
+				Height:		input.Height,
+				ObservedValue:	1,
+				Threshold:	0,
+				Name:		domain.Name,
+				Details:	"registry owner and nft owner diverged",
 			})
 			if err != nil {
 				return nil, err
@@ -491,14 +491,14 @@ func EvaluateIdentityObservabilityAlertsV2(input IdentityObservabilityAlertInput
 		payloadBps := payloadBytes * 10_000 / MaxUnifiedPayloadBytesV2
 		if payloadBps >= thresholds.ResolverPayloadNearMaxBps {
 			alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
-				Type:          IdentityAlertResolverPayloadNearMaximum,
-				Severity:      IdentityAlertSeverityWarning,
-				Height:        input.Height,
-				ObservedValue: payloadBps,
-				Threshold:     thresholds.ResolverPayloadNearMaxBps,
-				Name:          resolver.Domain,
-				Metric:        IdentityMetricAverageResolverPayloadSize,
-				Details:       "resolver payload is near maximum",
+				Type:		IdentityAlertResolverPayloadNearMaximum,
+				Severity:	IdentityAlertSeverityWarning,
+				Height:		input.Height,
+				ObservedValue:	payloadBps,
+				Threshold:	thresholds.ResolverPayloadNearMaxBps,
+				Name:		resolver.Domain,
+				Metric:		IdentityMetricAverageResolverPayloadSize,
+				Details:	"resolver payload is near maximum",
 			})
 			if err != nil {
 				return nil, err
@@ -895,13 +895,13 @@ func appendThresholdAlertV2(alerts []IdentityObservabilityAlertV2, height uint64
 		return alerts, nil
 	}
 	alert, err := NewIdentityObservabilityAlertV2(IdentityObservabilityAlertV2{
-		Type:          alertType,
-		Severity:      severity,
-		Height:        height,
-		ObservedValue: observed,
-		Threshold:     threshold,
-		Metric:        metric,
-		Details:       details,
+		Type:		alertType,
+		Severity:	severity,
+		Height:		height,
+		ObservedValue:	observed,
+		Threshold:	threshold,
+		Metric:		metric,
+		Details:	details,
 	})
 	if err != nil {
 		return nil, err

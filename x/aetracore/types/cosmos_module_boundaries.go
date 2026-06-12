@@ -10,23 +10,23 @@ import (
 const CosmosModuleBoundarySpecVersion = uint64(1)
 
 type ExistingCosmosModuleModification struct {
-	Module               string
-	RequiredModification string
-	Boundary             string
-	DescriptorHash       string
+	Module			string
+	RequiredModification	string
+	Boundary		string
+	DescriptorHash		string
 }
 
 type CosmosModuleBoundaryRule struct {
-	Rule           string
-	Enforcement    string
-	DescriptorHash string
+	Rule		string
+	Enforcement	string
+	DescriptorHash	string
 }
 
 type CosmosModuleBoundarySpec struct {
-	Version       uint64
-	Modifications []ExistingCosmosModuleModification
-	BoundaryRules []CosmosModuleBoundaryRule
-	Root          string
+	Version		uint64
+	Modifications	[]ExistingCosmosModuleModification
+	BoundaryRules	[]CosmosModuleBoundaryRule
+	Root		string
 }
 
 func ExistingCosmosModuleModifications() []ExistingCosmosModuleModification {
@@ -55,9 +55,9 @@ func CosmosModuleBoundaryRules() []CosmosModuleBoundaryRule {
 
 func BuildCosmosModuleBoundarySpec(modifications []ExistingCosmosModuleModification, rules []CosmosModuleBoundaryRule) (CosmosModuleBoundarySpec, error) {
 	spec := CosmosModuleBoundarySpec{
-		Version:       CosmosModuleBoundarySpecVersion,
-		Modifications: normalizeExistingCosmosModuleModifications(modifications),
-		BoundaryRules: normalizeCosmosModuleBoundaryRules(rules),
+		Version:	CosmosModuleBoundarySpecVersion,
+		Modifications:	normalizeExistingCosmosModuleModifications(modifications),
+		BoundaryRules:	normalizeCosmosModuleBoundaryRules(rules),
 	}
 	if err := spec.ValidateFormat(); err != nil {
 		return CosmosModuleBoundarySpec{}, err
@@ -313,9 +313,9 @@ func ValidateCosmosModuleBoundarySpec() error {
 
 func existingCosmosModuleModification(module, requiredModification, boundary string) ExistingCosmosModuleModification {
 	modification, err := BuildExistingCosmosModuleModification(ExistingCosmosModuleModification{
-		Module:               module,
-		RequiredModification: requiredModification,
-		Boundary:             boundary,
+		Module:			module,
+		RequiredModification:	requiredModification,
+		Boundary:		boundary,
 	})
 	if err != nil {
 		panic(err)
@@ -325,8 +325,8 @@ func existingCosmosModuleModification(module, requiredModification, boundary str
 
 func cosmosModuleBoundaryRule(rule, enforcement string) CosmosModuleBoundaryRule {
 	descriptor, err := BuildCosmosModuleBoundaryRule(CosmosModuleBoundaryRule{
-		Rule:        rule,
-		Enforcement: enforcement,
+		Rule:		rule,
+		Enforcement:	enforcement,
 	})
 	if err != nil {
 		panic(err)

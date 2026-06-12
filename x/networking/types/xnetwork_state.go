@@ -8,127 +8,127 @@ import (
 )
 
 const (
-	XNetworkParamsKeyPrefix     = "network/params"
-	XNetworkNodesKeyPrefix      = "network/nodes"
-	XNetworkRolesKeyPrefix      = "network/roles"
-	XNetworkOverlaysKeyPrefix   = "network/overlays"
-	XNetworkDiscoveryKeyPrefix  = "network/discovery"
-	XNetworkReputationKeyPrefix = "network/reputation"
-	XNetworkEvidenceKeyPrefix   = "network/evidence"
+	XNetworkParamsKeyPrefix		= "network/params"
+	XNetworkNodesKeyPrefix		= "network/nodes"
+	XNetworkRolesKeyPrefix		= "network/roles"
+	XNetworkOverlaysKeyPrefix	= "network/overlays"
+	XNetworkDiscoveryKeyPrefix	= "network/discovery"
+	XNetworkReputationKeyPrefix	= "network/reputation"
+	XNetworkEvidenceKeyPrefix	= "network/evidence"
 )
 
 type XNetworkMsgType string
 
 const (
-	MsgRegisterNode          XNetworkMsgType = "MsgRegisterNode"
-	MsgUpdateNode            XNetworkMsgType = "MsgUpdateNode"
-	MsgRenewNode             XNetworkMsgType = "MsgRenewNode"
-	MsgRevokeNode            XNetworkMsgType = "MsgRevokeNode"
-	MsgSubmitNetworkEvidence XNetworkMsgType = "MsgSubmitNetworkEvidence"
+	MsgRegisterNode			XNetworkMsgType	= "MsgRegisterNode"
+	MsgUpdateNode			XNetworkMsgType	= "MsgUpdateNode"
+	MsgRenewNode			XNetworkMsgType	= "MsgRenewNode"
+	MsgRevokeNode			XNetworkMsgType	= "MsgRevokeNode"
+	MsgSubmitNetworkEvidence	XNetworkMsgType	= "MsgSubmitNetworkEvidence"
 )
 
 type XNetworkQueryType string
 
 const (
-	QueryNode            XNetworkQueryType = "QueryNode"
-	QueryNodesByRole     XNetworkQueryType = "QueryNodesByRole"
-	QueryOverlay         XNetworkQueryType = "QueryOverlay"
-	QueryDiscoveryRecord XNetworkQueryType = "QueryDiscoveryRecord"
-	QueryNetworkParams   XNetworkQueryType = "QueryNetworkParams"
-	QueryNetworkEvidence XNetworkQueryType = "QueryNetworkEvidence"
+	QueryNode		XNetworkQueryType	= "QueryNode"
+	QueryNodesByRole	XNetworkQueryType	= "QueryNodesByRole"
+	QueryOverlay		XNetworkQueryType	= "QueryOverlay"
+	QueryDiscoveryRecord	XNetworkQueryType	= "QueryDiscoveryRecord"
+	QueryNetworkParams	XNetworkQueryType	= "QueryNetworkParams"
+	QueryNetworkEvidence	XNetworkQueryType	= "QueryNetworkEvidence"
 )
 
 type NetworkEvidenceType string
 
 const (
-	NetworkEvidenceInvalidMessage       NetworkEvidenceType = "invalid_message"
-	NetworkEvidenceConflictingBroadcast NetworkEvidenceType = "conflicting_broadcast"
-	NetworkEvidenceDiscoveryForgery     NetworkEvidenceType = "discovery_forgery"
-	NetworkEvidenceChunkCorruption      NetworkEvidenceType = "chunk_corruption"
-	NetworkEvidenceRoutingManipulation  NetworkEvidenceType = "routing_manipulation"
-	NetworkEvidenceCrossZoneReplay      NetworkEvidenceType = "cross_zone_replay"
-	NetworkEvidenceBandwidthExhaustion  NetworkEvidenceType = "bandwidth_exhaustion"
+	NetworkEvidenceInvalidMessage		NetworkEvidenceType	= "invalid_message"
+	NetworkEvidenceConflictingBroadcast	NetworkEvidenceType	= "conflicting_broadcast"
+	NetworkEvidenceDiscoveryForgery		NetworkEvidenceType	= "discovery_forgery"
+	NetworkEvidenceChunkCorruption		NetworkEvidenceType	= "chunk_corruption"
+	NetworkEvidenceRoutingManipulation	NetworkEvidenceType	= "routing_manipulation"
+	NetworkEvidenceCrossZoneReplay		NetworkEvidenceType	= "cross_zone_replay"
+	NetworkEvidenceBandwidthExhaustion	NetworkEvidenceType	= "bandwidth_exhaustion"
 )
 
 type XNetworkParams struct {
-	NetworkSaltHash       string
-	MaxNodeRecordTTL      uint64
-	MaxDiscoveryRecordTTL uint64
-	EvidenceHorizon       uint64
-	ReputationDecayBps    uint32
-	MaxEvidenceBytes      uint64
+	NetworkSaltHash		string
+	MaxNodeRecordTTL	uint64
+	MaxDiscoveryRecordTTL	uint64
+	EvidenceHorizon		uint64
+	ReputationDecayBps	uint32
+	MaxEvidenceBytes	uint64
 }
 
 type XNetworkState struct {
-	Params           XNetworkParams
-	Network          NetworkingState
-	DiscoveryRecords []DiscoveryRecord
-	Reputation       []NetworkReputationRecord
-	Evidence         []NetworkEvidenceRecord
-	StateRoot        string
+	Params			XNetworkParams
+	Network			NetworkingState
+	DiscoveryRecords	[]DiscoveryRecord
+	Reputation		[]NetworkReputationRecord
+	Evidence		[]NetworkEvidenceRecord
+	StateRoot		string
 }
 
 type NetworkReputationRecord struct {
-	NodeID            string
-	Score             PeerScore
-	LastUpdatedHeight uint64
-	EvidenceHash      string
-	ConsensusEligible bool
+	NodeID			string
+	Score			PeerScore
+	LastUpdatedHeight	uint64
+	EvidenceHash		string
+	ConsensusEligible	bool
 }
 
 type NetworkEvidenceRecord struct {
-	EvidenceID     string
-	EvidenceType   NetworkEvidenceType
-	ReporterNodeID string
-	SubjectNodeID  string
-	EvidenceHash   string
-	EvidenceHeight uint64
-	PayloadBytes   uint64
-	Committed      bool
+	EvidenceID	string
+	EvidenceType	NetworkEvidenceType
+	ReporterNodeID	string
+	SubjectNodeID	string
+	EvidenceHash	string
+	EvidenceHeight	uint64
+	PayloadBytes	uint64
+	Committed	bool
 }
 
 type XNetworkStateKeys struct {
-	ParamsKey      string
-	NodeKeys       []string
-	RoleKeys       []string
-	OverlayKeys    []string
-	DiscoveryKeys  []string
-	ReputationKeys []string
-	EvidenceKeys   []string
-	StateKeysRoot  string
+	ParamsKey	string
+	NodeKeys	[]string
+	RoleKeys	[]string
+	OverlayKeys	[]string
+	DiscoveryKeys	[]string
+	ReputationKeys	[]string
+	EvidenceKeys	[]string
+	StateKeysRoot	string
 }
 
 type MsgRegisterNodeRequest struct {
-	SignerNodeID  string
-	Record        NodeRecord
-	NetworkSalt   []byte
-	CurrentHeight uint64
+	SignerNodeID	string
+	Record		NodeRecord
+	NetworkSalt	[]byte
+	CurrentHeight	uint64
 }
 
 type MsgUpdateNodeRequest struct {
-	SignerNodeID  string
-	Record        NodeRecord
-	NetworkSalt   []byte
-	CurrentHeight uint64
+	SignerNodeID	string
+	Record		NodeRecord
+	NetworkSalt	[]byte
+	CurrentHeight	uint64
 }
 
 type MsgRenewNodeRequest struct {
-	SignerNodeID  string
-	Record        NodeRecord
-	NetworkSalt   []byte
-	CurrentHeight uint64
+	SignerNodeID	string
+	Record		NodeRecord
+	NetworkSalt	[]byte
+	CurrentHeight	uint64
 }
 
 type MsgRevokeNodeRequest struct {
-	SignerNodeID  string
-	NodeID        string
-	ReasonHash    string
-	CurrentHeight uint64
+	SignerNodeID	string
+	NodeID		string
+	ReasonHash	string
+	CurrentHeight	uint64
 }
 
 type MsgSubmitNetworkEvidenceRequest struct {
-	SignerNodeID string
-	Evidence     NetworkEvidenceRecord
+	SignerNodeID	string
+	Evidence	NetworkEvidenceRecord
 }
 
 type QueryNodeRequest struct {
@@ -136,8 +136,8 @@ type QueryNodeRequest struct {
 }
 
 type QueryNodesByRoleRequest struct {
-	Role          NodeRole
-	CurrentHeight uint64
+	Role		NodeRole
+	CurrentHeight	uint64
 }
 
 type QueryOverlayRequest struct {
@@ -156,22 +156,22 @@ type QueryNetworkEvidenceRequest struct {
 
 func DefaultXNetworkParams(networkSalt []byte) XNetworkParams {
 	return XNetworkParams{
-		NetworkSaltHash:       hashBytes("aetra-x-network-salt-v1", networkSalt),
-		MaxNodeRecordTTL:      100_000,
-		MaxDiscoveryRecordTTL: 25_000,
-		EvidenceHorizon:       DefaultSecurityReplayHorizon,
-		ReputationDecayBps:    DefaultReputationDecayBps,
-		MaxEvidenceBytes:      DefaultMaxMessageBytes,
+		NetworkSaltHash:	hashBytes("aetra-x-network-salt-v1", networkSalt),
+		MaxNodeRecordTTL:	100_000,
+		MaxDiscoveryRecordTTL:	25_000,
+		EvidenceHorizon:	DefaultSecurityReplayHorizon,
+		ReputationDecayBps:	DefaultReputationDecayBps,
+		MaxEvidenceBytes:	DefaultMaxMessageBytes,
 	}
 }
 
 func NewXNetworkState(params XNetworkParams, network NetworkingState, discovery []DiscoveryRecord, reputation []NetworkReputationRecord, evidence []NetworkEvidenceRecord) (XNetworkState, error) {
 	state := XNetworkState{
-		Params:           params,
-		Network:          network.Export(),
-		DiscoveryRecords: cloneDiscoveryRecords(discovery),
-		Reputation:       cloneNetworkReputationRecords(reputation),
-		Evidence:         cloneNetworkEvidenceRecords(evidence),
+		Params:			params,
+		Network:		network.Export(),
+		DiscoveryRecords:	cloneDiscoveryRecords(discovery),
+		Reputation:		cloneNetworkReputationRecords(reputation),
+		Evidence:		cloneNetworkEvidenceRecords(evidence),
 	}
 	sortDiscoveryRecords(state.DiscoveryRecords)
 	sortNetworkReputationRecords(state.Reputation)

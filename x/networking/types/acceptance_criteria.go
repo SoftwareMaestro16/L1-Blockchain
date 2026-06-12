@@ -10,37 +10,37 @@ import (
 type NetworkingAcceptanceCriterion string
 
 const (
-	AcceptanceCriterionL0CometBFTProtected   NetworkingAcceptanceCriterion = "l0_cometbft_transport_consensus_critical_protected"
-	AcceptanceCriterionANAChannelQoS         NetworkingAcceptanceCriterion = "ana_channel_classification_peer_scoring_adaptive_fanout_qos"
-	AcceptanceCriterionL1IdentitySessions    NetworkingAcceptanceCriterion = "l1_node_identity_session_channels_defined_testable"
-	AcceptanceCriterionL2Overlays            NetworkingAcceptanceCriterion = "l2_overlays_validator_zone_execution_data_service_discovery"
-	AcceptanceCriterionL3AetherMesh          NetworkingAcceptanceCriterion = "l3_aether_mesh_execution_query_service_storage_cross_zone"
-	AcceptanceCriterionRL2Streaming          NetworkingAcceptanceCriterion = "rl2_chunked_verified_resumable_bandwidth_adaptive_streaming"
-	AcceptanceCriterionDRTDiscovery          NetworkingAcceptanceCriterion = "drt_signed_expiring_proof_attached_discovery_records"
-	AcceptanceCriterionHybridBroadcast       NetworkingAcceptanceCriterion = "hybrid_broadcast_tree_gossip_fallback_hash_dedup"
-	AcceptanceCriterionSecurityControls      NetworkingAcceptanceCriterion = "security_peer_reputation_eclipse_spam_replay_chunk_verification"
-	AcceptanceCriterionCosmosABCIIntegration NetworkingAcceptanceCriterion = "cosmos_sdk_abci_integration_rules_explicit"
-	AcceptanceCriterionRequiredTestCoverage  NetworkingAcceptanceCriterion = "tests_unit_integration_security_performance"
+	AcceptanceCriterionL0CometBFTProtected		NetworkingAcceptanceCriterion	= "l0_cometbft_transport_consensus_critical_protected"
+	AcceptanceCriterionANAChannelQoS		NetworkingAcceptanceCriterion	= "ana_channel_classification_peer_scoring_adaptive_fanout_qos"
+	AcceptanceCriterionL1IdentitySessions		NetworkingAcceptanceCriterion	= "l1_node_identity_session_channels_defined_testable"
+	AcceptanceCriterionL2Overlays			NetworkingAcceptanceCriterion	= "l2_overlays_validator_zone_execution_data_service_discovery"
+	AcceptanceCriterionL3AetherMesh			NetworkingAcceptanceCriterion	= "l3_aether_mesh_execution_query_service_storage_cross_zone"
+	AcceptanceCriterionRL2Streaming			NetworkingAcceptanceCriterion	= "rl2_chunked_verified_resumable_bandwidth_adaptive_streaming"
+	AcceptanceCriterionDRTDiscovery			NetworkingAcceptanceCriterion	= "drt_signed_expiring_proof_attached_discovery_records"
+	AcceptanceCriterionHybridBroadcast		NetworkingAcceptanceCriterion	= "hybrid_broadcast_tree_gossip_fallback_hash_dedup"
+	AcceptanceCriterionSecurityControls		NetworkingAcceptanceCriterion	= "security_peer_reputation_eclipse_spam_replay_chunk_verification"
+	AcceptanceCriterionCosmosABCIIntegration	NetworkingAcceptanceCriterion	= "cosmos_sdk_abci_integration_rules_explicit"
+	AcceptanceCriterionRequiredTestCoverage		NetworkingAcceptanceCriterion	= "tests_unit_integration_security_performance"
 )
 
 type NetworkingAcceptanceCriteriaSpec struct {
-	Criteria []NetworkingAcceptanceCriterion
-	SpecRoot string
+	Criteria	[]NetworkingAcceptanceCriterion
+	SpecRoot	string
 }
 
 type NetworkingAcceptanceEvidence struct {
-	Criterion NetworkingAcceptanceCriterion
-	Evidence  []string
-	Accepted  bool
+	Criterion	NetworkingAcceptanceCriterion
+	Evidence	[]string
+	Accepted	bool
 }
 
 type NetworkingImplementationPlanningReport struct {
-	Criteria      NetworkingAcceptanceCriteriaSpec
-	Evidence      []NetworkingAcceptanceEvidence
-	Missing       []NetworkingAcceptanceCriterion
-	Rejected      []NetworkingAcceptanceCriterion
-	Ready         bool
-	ReadinessHash string
+	Criteria	NetworkingAcceptanceCriteriaSpec
+	Evidence	[]NetworkingAcceptanceEvidence
+	Missing		[]NetworkingAcceptanceCriterion
+	Rejected	[]NetworkingAcceptanceCriterion
+	Ready		bool
+	ReadinessHash	string
 }
 
 func DefaultNetworkingAcceptanceCriteriaSpec() NetworkingAcceptanceCriteriaSpec {
@@ -101,8 +101,8 @@ func EvaluateNetworkingImplementationPlanningReadiness(spec NetworkingAcceptance
 	}
 	normalizedEvidence := NormalizeNetworkingAcceptanceEvidence(evidence)
 	report := NetworkingImplementationPlanningReport{
-		Criteria: spec,
-		Evidence: normalizedEvidence,
+		Criteria:	spec,
+		Evidence:	normalizedEvidence,
 	}
 	byCriterion := make(map[NetworkingAcceptanceCriterion]NetworkingAcceptanceEvidence, len(normalizedEvidence))
 	for _, item := range normalizedEvidence {

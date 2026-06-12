@@ -81,10 +81,10 @@ func TestMsgContractCallBuildsCanonicalMessageAetherEnvelopeAndReceipt(t *testin
 	require.Equal(t, ComputeContractCallRouteCommitment(call, admission), aether.RouteCommitment)
 
 	escrow, err := NewAetherValueEscrow(AetherValueEscrow{
-		MsgID:       aether.MsgID,
-		ValueLocked: aether.ValueNAET,
-		FeeLocked:   aether.ForwardingFee,
-		Status:      AetherEscrowLocked,
+		MsgID:		aether.MsgID,
+		ValueLocked:	aether.ValueNAET,
+		FeeLocked:	aether.ForwardingFee,
+		Status:		AetherEscrowLocked,
 	})
 	require.NoError(t, err)
 	receipt, err := AetherReceiptFromMessage(aether, ReceiptStatusAccepted, admission.CreatedHeight, 0, sdkmath.ZeroInt(), nil, "", EmptyHash(), hashParts("contract-call-writes", aether.MsgID))
@@ -154,41 +154,41 @@ func testContractCallParams() MessageParams {
 
 func testMessageLayerContractCall() MsgContractCall {
 	return MsgContractCall{
-		Caller:          addr(20),
-		ContractAddr:    addr(21),
-		Method:          "counter.increment",
-		Args:            []byte("increment"),
-		Funds:           sdkmath.NewInt(5),
-		GasLimit:        500,
-		ReplyToOptional: addr(22),
-		ExpiryHeight:    80,
+		Caller:			addr(20),
+		ContractAddr:		addr(21),
+		Method:			"counter.increment",
+		Args:			[]byte("increment"),
+		Funds:			sdkmath.NewInt(5),
+		GasLimit:		500,
+		ReplyToOptional:	addr(22),
+		ExpiryHeight:		80,
 	}
 }
 
 func testMessageLayerContractAdmission(call MsgContractCall) ContractCallAdmission {
 	return ContractCallAdmission{
-		CreatedHeight:   30,
-		Nonce:           33,
-		SourceSequence:  34,
-		ContractExists:  true,
-		ContractEnabled: true,
-		MaxArgsBytes:    128,
-		MinGasLimit:     10,
-		MaxGasLimit:     1_000,
-		ContractShardID: "contract-shard-1",
-		ReplyShardID:    "contract-shard-2",
+		CreatedHeight:		30,
+		Nonce:			33,
+		SourceSequence:		34,
+		ContractExists:		true,
+		ContractEnabled:	true,
+		MaxArgsBytes:		128,
+		MinGasLimit:		10,
+		MaxGasLimit:		1_000,
+		ContractShardID:	"contract-shard-1",
+		ReplyShardID:		"contract-shard-2",
 		EnabledMethods: []ContractCallMethod{{
-			ContractAddr: call.ContractAddr,
-			Method:       call.Method,
-			SelectorHash: ComputeContractMethodSelectorHash(call.Method),
-			Enabled:      true,
+			ContractAddr:	call.ContractAddr,
+			Method:		call.Method,
+			SelectorHash:	ComputeContractMethodSelectorHash(call.Method),
+			Enabled:	true,
 		}},
 		FundEscrows: []ContractCallFundsEscrow{{
-			Caller:       call.Caller,
-			ContractAddr: call.ContractAddr,
-			Amount:       call.Funds,
-			ExpiryHeight: call.ExpiryHeight,
-			Escrowed:     true,
+			Caller:		call.Caller,
+			ContractAddr:	call.ContractAddr,
+			Amount:		call.Funds,
+			ExpiryHeight:	call.ExpiryHeight,
+			Escrowed:	true,
 		}},
 	}
 }

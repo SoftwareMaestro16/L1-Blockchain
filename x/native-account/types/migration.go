@@ -8,23 +8,23 @@ import (
 )
 
 type BatchMigrationResult struct {
-	Processed       uint64
-	Migrated        uint64
-	NextCursor      string
-	Complete        bool
-	ProcessedUsers  []string
-	MigrationScans  uint64
-	NormalPathScans uint64
+	Processed	uint64
+	Migrated	uint64
+	NextCursor	string
+	Complete	bool
+	ProcessedUsers	[]string
+	MigrationScans	uint64
+	NormalPathScans	uint64
 }
 
 type AccountVersionUpgradePlan struct {
-	ModuleName              string
-	FromAccountVersion      uint64
-	ToAccountVersion        uint64
-	LazyMigrationEnabled    bool
-	BatchedMigrationEnabled bool
-	RequiresFullBlockScan   bool
-	RegisteredHandlers      []string
+	ModuleName		string
+	FromAccountVersion	uint64
+	ToAccountVersion	uint64
+	LazyMigrationEnabled	bool
+	BatchedMigrationEnabled	bool
+	RequiresFullBlockScan	bool
+	RegisteredHandlers	[]string
 }
 
 const nativeAccountUpgradeModuleName = "nativeaccount"
@@ -61,9 +61,9 @@ func RunBatchedMigrationJob(store AccountStore, cursor string, limit uint64) (Ba
 		return BatchMigrationResult{}, err
 	}
 	result := BatchMigrationResult{
-		Complete:       !hasMore,
-		ProcessedUsers: make([]string, 0, len(accounts)),
-		MigrationScans: 1,
+		Complete:	!hasMore,
+		ProcessedUsers:	make([]string, 0, len(accounts)),
+		MigrationScans:	1,
 	}
 	for _, account := range accounts {
 		migrated, err := MigrateAccountIfNeeded(account)
@@ -89,12 +89,12 @@ func RunBatchedMigrationJob(store AccountStore, cursor string, limit uint64) (Ba
 
 func NativeAccountVersionUpgradePlan() AccountVersionUpgradePlan {
 	return AccountVersionUpgradePlan{
-		ModuleName:              nativeAccountUpgradeModuleName,
-		FromAccountVersion:      AccountVersionV1,
-		ToAccountVersion:        AccountVersionV2,
-		LazyMigrationEnabled:    true,
-		BatchedMigrationEnabled: true,
-		RequiresFullBlockScan:   false,
+		ModuleName:			nativeAccountUpgradeModuleName,
+		FromAccountVersion:		AccountVersionV1,
+		ToAccountVersion:		AccountVersionV2,
+		LazyMigrationEnabled:		true,
+		BatchedMigrationEnabled:	true,
+		RequiresFullBlockScan:		false,
 		RegisteredHandlers: []string{
 			"MigrateAccountIfNeeded",
 			"MigrateAccountV1ToV2",
@@ -121,10 +121,10 @@ func ValidateNativeAccountVersionUpgradePlan(plan AccountVersionUpgradePlan) err
 		return errors.New("native account normal block execution must not require a full account scan")
 	}
 	required := map[string]bool{
-		"MigrateAccountIfNeeded": false,
-		"MigrateAccountV1ToV2":   false,
-		"LazyMigrateAccount":     false,
-		"RunBatchedMigrationJob": false,
+		"MigrateAccountIfNeeded":	false,
+		"MigrateAccountV1ToV2":		false,
+		"LazyMigrateAccount":		false,
+		"RunBatchedMigrationJob":	false,
 	}
 	for _, handler := range plan.RegisteredHandlers {
 		if _, found := required[handler]; found {

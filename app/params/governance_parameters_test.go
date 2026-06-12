@@ -76,13 +76,13 @@ func TestGovernanceParamSpecsCarrySection272Metadata(t *testing.T) {
 func TestGovernanceParamChangeRejectsUnsafeExecution(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
-			Key:      GovernanceParamValidatorSetSize,
-			IntValue: AetraValidatorSetMax + 1,
+			Key:		GovernanceParamValidatorSetSize,
+			IntValue:	AetraValidatorSetMax + 1,
 		},
-		VotingPeriodBlocks: GovernanceCriticalVotingPeriodBlocks,
-		QuorumBps:          GovernanceCriticalQuorumBps,
-		ProposalExecution:  true,
-		EmitsEvent:         true,
+		VotingPeriodBlocks:	GovernanceCriticalVotingPeriodBlocks,
+		QuorumBps:		GovernanceCriticalQuorumBps,
+		ProposalExecution:	true,
+		EmitsEvent:		true,
 	}
 
 	require.ErrorContains(t, ValidateGovernanceParamChange(nil, change), "validator_set_size")
@@ -99,13 +99,13 @@ func TestGovernanceParamChangeRejectsUnsafeExecution(t *testing.T) {
 func TestCriticalGovernanceParamChangesRequireLongerVotingAndHigherQuorum(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
-			Key:      GovernanceParamInflationMax,
-			IntValue: MaxInflationBps,
+			Key:		GovernanceParamInflationMax,
+			IntValue:	MaxInflationBps,
 		},
-		VotingPeriodBlocks: GovernanceDefaultVotingPeriodBlocks,
-		QuorumBps:          GovernanceCriticalQuorumBps,
-		ProposalExecution:  true,
-		EmitsEvent:         true,
+		VotingPeriodBlocks:	GovernanceDefaultVotingPeriodBlocks,
+		QuorumBps:		GovernanceCriticalQuorumBps,
+		ProposalExecution:	true,
+		EmitsEvent:		true,
 	}
 
 	require.ErrorContains(t, ValidateGovernanceParamChange(nil, change), "longer voting period")
@@ -121,13 +121,13 @@ func TestCriticalGovernanceParamChangesRequireLongerVotingAndHigherQuorum(t *tes
 func TestNonCriticalGovernanceParamChangeUsesNormalVotingBounds(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
-			Key:      GovernanceParamCommissionFloor,
-			IntValue: StakingCommissionFloorBps,
+			Key:		GovernanceParamCommissionFloor,
+			IntValue:	StakingCommissionFloorBps,
 		},
-		VotingPeriodBlocks: GovernanceDefaultVotingPeriodBlocks,
-		QuorumBps:          GovernanceDefaultQuorumBps,
-		ProposalExecution:  true,
-		EmitsEvent:         true,
+		VotingPeriodBlocks:	GovernanceDefaultVotingPeriodBlocks,
+		QuorumBps:		GovernanceDefaultQuorumBps,
+		ProposalExecution:	true,
+		EmitsEvent:		true,
 	}
 
 	require.NoError(t, ValidateGovernanceParamChange(nil, change))
@@ -148,13 +148,13 @@ func TestGovernanceGenesisValidationRejectsInvalidParams(t *testing.T) {
 func TestGovernanceEnumParamsAreBounded(t *testing.T) {
 	change := GovernanceParamChange{
 		Value: GovernanceParamValue{
-			Key:         GovernanceParamAVMContractUploadPolicy,
-			StringValue: AVMContractUploadGovernanceOnly,
+			Key:		GovernanceParamAVMContractUploadPolicy,
+			StringValue:	AVMContractUploadGovernanceOnly,
 		},
-		VotingPeriodBlocks: GovernanceCriticalVotingPeriodBlocks,
-		QuorumBps:          GovernanceCriticalQuorumBps,
-		ProposalExecution:  true,
-		EmitsEvent:         true,
+		VotingPeriodBlocks:	GovernanceCriticalVotingPeriodBlocks,
+		QuorumBps:		GovernanceCriticalQuorumBps,
+		ProposalExecution:	true,
+		EmitsEvent:		true,
 	}
 
 	require.NoError(t, ValidateGovernanceParamChange(nil, change))

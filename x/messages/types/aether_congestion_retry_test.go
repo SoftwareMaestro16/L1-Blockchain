@@ -49,10 +49,10 @@ func TestRetryScheduleExpiryAndBounceAreDeterministic(t *testing.T) {
 	require.NoError(t, err)
 	policy := testRetryPolicy()
 	state := AetherRetryState{
-		MsgID:               msg.MsgID,
-		RetryCount:          1,
-		ForwardingFeeEscrow: sdkmath.NewInt(10),
-		LastAttemptHeight:   90,
+		MsgID:			msg.MsgID,
+		RetryCount:		1,
+		ForwardingFeeEscrow:	sdkmath.NewInt(10),
+		LastAttemptHeight:	90,
 	}
 	state.StateHash = ComputeAetherRetryStateHash(state)
 	decision, err := DecideAetherRetry(msg, failed, state, policy, 90, AetherFailureTransientQueueLimit)
@@ -90,10 +90,10 @@ func TestRetryBoundsPreventUnboundedQueueGrowth(t *testing.T) {
 	require.NoError(t, err)
 	policy := testRetryPolicy()
 	state := AetherRetryState{
-		MsgID:               msg.MsgID,
-		RetryCount:          policy.MaxRetryCount,
-		ForwardingFeeEscrow: sdkmath.NewInt(100),
-		LastAttemptHeight:   91,
+		MsgID:			msg.MsgID,
+		RetryCount:		policy.MaxRetryCount,
+		ForwardingFeeEscrow:	sdkmath.NewInt(100),
+		LastAttemptHeight:	91,
 	}
 	state.StateHash = ComputeAetherRetryStateHash(state)
 	decision, err := DecideAetherRetry(msg, failed, state, policy, 91, AetherFailureTransientQueueLimit)
@@ -112,18 +112,18 @@ func TestRetryBoundsPreventUnboundedQueueGrowth(t *testing.T) {
 func congestionMetric(t *testing.T, zoneID zonestypes.ZoneID, shardID string, height uint64, outbox uint64, inbox uint64, delay uint64, failure uint64, gas uint64, expiry uint64, fairness uint64, critical bool) AetherRoutingMetric {
 	t.Helper()
 	metric := AetherRoutingMetric{
-		ZoneID:                zoneID,
-		ShardID:               shardID,
-		CommittedHeight:       height,
-		OutboxBacklog:         outbox,
-		InboxBacklog:          inbox,
-		AverageExecutionDelay: delay,
-		FailedDeliveryRate:    failure,
-		ShardGasUtilization:   gas,
-		MessageExpiryRate:     expiry,
-		Capacity:              100,
-		FairnessCredit:        fairness,
-		CriticalPriorityLane:  critical,
+		ZoneID:			zoneID,
+		ShardID:		shardID,
+		CommittedHeight:	height,
+		OutboxBacklog:		outbox,
+		InboxBacklog:		inbox,
+		AverageExecutionDelay:	delay,
+		FailedDeliveryRate:	failure,
+		ShardGasUtilization:	gas,
+		MessageExpiryRate:	expiry,
+		Capacity:		100,
+		FairnessCredit:		fairness,
+		CriticalPriorityLane:	critical,
 	}
 	metric = normalizeAetherRoutingMetric(metric)
 	metric.MetricHash = ComputeAetherRoutingMetricHash(metric)
@@ -133,12 +133,12 @@ func congestionMetric(t *testing.T, zoneID zonestypes.ZoneID, shardID string, he
 
 func testRetryPolicy() AetherRetryPolicy {
 	policy := AetherRetryPolicy{
-		MaxRetryCount:       3,
-		BaseDelayHeights:    2,
-		MaxDelayHeights:     10,
-		RetryFee:            sdkmath.NewInt(2),
-		BounceGasLimit:      20,
-		MaxBouncePayloadLen: 256,
+		MaxRetryCount:		3,
+		BaseDelayHeights:	2,
+		MaxDelayHeights:	10,
+		RetryFee:		sdkmath.NewInt(2),
+		BounceGasLimit:		20,
+		MaxBouncePayloadLen:	256,
 	}
 	policy.PolicyHash = hashParts("aether-retry-policy-test", "v1")
 	return policy

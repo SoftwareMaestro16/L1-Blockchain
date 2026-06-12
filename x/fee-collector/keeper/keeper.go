@@ -17,11 +17,11 @@ import (
 )
 
 type Keeper struct {
-	cdc           codec.BinaryCodec
-	storeService  corestore.KVStoreService
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
-	authority     string
+	cdc		codec.BinaryCodec
+	storeService	corestore.KVStoreService
+	accountKeeper	types.AccountKeeper
+	bankKeeper	types.BankKeeper
+	authority	string
 }
 
 func NewKeeper(
@@ -32,15 +32,15 @@ func NewKeeper(
 	authority string,
 ) Keeper {
 	return Keeper{
-		cdc:           cdc,
-		storeService:  storeService,
-		accountKeeper: accountKeeper,
-		bankKeeper:    bankKeeper,
-		authority:     authority,
+		cdc:		cdc,
+		storeService:	storeService,
+		accountKeeper:	accountKeeper,
+		bankKeeper:	bankKeeper,
+		authority:	authority,
 	}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) SetParams(ctx context.Context, params types.Params) error {
 	params = types.NormalizeParams(params)
@@ -359,14 +359,14 @@ func (k Keeper) distributeFees(ctx context.Context, epoch uint64) (types.FeeHist
 		return types.FeeHistoryEntry{}, err
 	}
 	history := types.FeeHistoryEntry{
-		Epoch:               epoch,
-		Collected:           collected,
-		Treasury:            pending.Treasury,
-		Protection:          pending.Protection,
-		Validators:          pending.Validators,
-		Burn:                pending.Burn,
-		RoundingRemainder:   remainder,
-		DistributedAtHeight: sdk.UnwrapSDKContext(ctx).BlockHeight(),
+		Epoch:			epoch,
+		Collected:		collected,
+		Treasury:		pending.Treasury,
+		Protection:		pending.Protection,
+		Validators:		pending.Validators,
+		Burn:			pending.Burn,
+		RoundingRemainder:	remainder,
+		DistributedAtHeight:	sdk.UnwrapSDKContext(ctx).BlockHeight(),
 	}
 	if err := k.SetFeeHistory(ctx, history); err != nil {
 		return types.FeeHistoryEntry{}, err

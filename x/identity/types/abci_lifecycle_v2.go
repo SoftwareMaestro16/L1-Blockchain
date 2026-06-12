@@ -7,82 +7,82 @@ import (
 )
 
 const (
-	IdentityObservabilityLookupVolumeV2     = "identity_lookup_volume"
-	IdentityABCIEventMalformedRejectedV2    = "identity_malformed_rejected"
-	IdentityABCIEventProposalGroupV2        = "identity_proposal_group"
-	IdentityABCIEventDomainExpiredV2        = "identity_domain_expired"
-	IdentityABCIEventCacheInvalidatedV2     = "identity_cache_invalidated"
-	IdentityABCIEventVoteTelemetryV2        = "identity_vote_telemetry"
-	IdentityProposalGroupGlobalV2           = "global"
-	IdentityProposalGroupNameHashUnknownV2  = "unknown"
-	IdentityProposalGroupingOrderNameHashV2 = "name_hash"
+	IdentityObservabilityLookupVolumeV2	= "identity_lookup_volume"
+	IdentityABCIEventMalformedRejectedV2	= "identity_malformed_rejected"
+	IdentityABCIEventProposalGroupV2	= "identity_proposal_group"
+	IdentityABCIEventDomainExpiredV2	= "identity_domain_expired"
+	IdentityABCIEventCacheInvalidatedV2	= "identity_cache_invalidated"
+	IdentityABCIEventVoteTelemetryV2	= "identity_vote_telemetry"
+	IdentityProposalGroupGlobalV2		= "global"
+	IdentityProposalGroupNameHashUnknownV2	= "unknown"
+	IdentityProposalGroupingOrderNameHashV2	= "name_hash"
 )
 
 type IdentityLookupObservabilityEventV2 struct {
-	Type          string
-	NameHash      string
-	QueryType     string
-	Height        uint64
-	Count         uint64
-	ConsensusFree bool
+	Type		string
+	NameHash	string
+	QueryType	string
+	Height		uint64
+	Count		uint64
+	ConsensusFree	bool
 }
 
 type IdentityReadOnlyQueryAuditV2 struct {
-	BeforeRoot       string
-	AfterRoot        string
-	MutationDetected bool
-	ConsensusWrites  []string
-	Observability    []IdentityLookupObservabilityEventV2
+	BeforeRoot		string
+	AfterRoot		string
+	MutationDetected	bool
+	ConsensusWrites		[]string
+	Observability		[]IdentityLookupObservabilityEventV2
 }
 
 type IdentityABCIPlusPrecheckV2 struct {
-	Accepted    bool
-	MessageName string
-	Error       string
-	Event       *IdentityABCIEventV2
+	Accepted	bool
+	MessageName	string
+	Error		string
+	Event		*IdentityABCIEventV2
 }
 
 type IdentityProposalGroupV2 struct {
-	GroupKey   string
-	Indexes    []uint32
-	Names      []string
-	NameHashes []string
+	GroupKey	string
+	Indexes		[]uint32
+	Names		[]string
+	NameHashes	[]string
 }
 
 type IdentityProposalGroupingV2 struct {
-	Order  string
-	Groups []IdentityProposalGroupV2
-	Events []IdentityABCIEventV2
+	Order	string
+	Groups	[]IdentityProposalGroupV2
+	Events	[]IdentityABCIEventV2
 }
 
 type IdentityABCIEventV2 struct {
-	Type       string
-	Height     uint64
-	Name       string
-	NameHash   string
-	Message    string
-	Attributes []string
+	Type		string
+	Height		uint64
+	Name		string
+	NameHash	string
+	Message		string
+	Attributes	[]string
 }
 
 type IdentityFinalizeRequestV2 struct {
-	State        IdentityState
-	Height       uint64
-	ExpiryLimit  uint32
-	CacheRecords []ResolutionCacheRecordV2
+	State		IdentityState
+	Height		uint64
+	ExpiryLimit	uint32
+	CacheRecords	[]ResolutionCacheRecordV2
 }
 
 type IdentityFinalizeResponseV2 struct {
-	State             IdentityState
-	ExpiredDomains    []Domain
-	InvalidatedCaches []ResolutionCacheRecordV2
-	Events            []IdentityABCIEventV2
+	State			IdentityState
+	ExpiredDomains		[]Domain
+	InvalidatedCaches	[]ResolutionCacheRecordV2
+	Events			[]IdentityABCIEventV2
 }
 
 type IdentityVoteExtensionTelemetryV2 struct {
-	Enabled     bool
-	Height      uint64
-	LookupCount uint64
-	Event       *IdentityABCIEventV2
+	Enabled		bool
+	Height		uint64
+	LookupCount	uint64
+	Event		*IdentityABCIEventV2
 }
 
 func AuditIdentityReadOnlyQueryV2(state IdentityState, height uint64, queryType string, name string, fn func(IdentityQueryServiceV2) IdentityQueryResponseV2) (IdentityQueryResponseV2, IdentityReadOnlyQueryAuditV2, error) {
@@ -102,11 +102,11 @@ func AuditIdentityReadOnlyQueryV2(state IdentityState, height uint64, queryType 
 		return IdentityQueryResponseV2{}, IdentityReadOnlyQueryAuditV2{}, err
 	}
 	audit := IdentityReadOnlyQueryAuditV2{
-		BeforeRoot:       beforeRoot,
-		AfterRoot:        afterRoot,
-		MutationDetected: beforeRoot != afterRoot,
-		ConsensusWrites:  nil,
-		Observability:    []IdentityLookupObservabilityEventV2{event},
+		BeforeRoot:		beforeRoot,
+		AfterRoot:		afterRoot,
+		MutationDetected:	beforeRoot != afterRoot,
+		ConsensusWrites:	nil,
+		Observability:		[]IdentityLookupObservabilityEventV2{event},
 	}
 	if audit.MutationDetected {
 		return response, audit, errors.New("identity read-only query mutated state")
@@ -129,12 +129,12 @@ func NewIdentityLookupObservabilityEventV2(name string, queryType string, height
 		return IdentityLookupObservabilityEventV2{}, errors.New("identity lookup observability count is required")
 	}
 	return IdentityLookupObservabilityEventV2{
-		Type:          IdentityObservabilityLookupVolumeV2,
-		NameHash:      nameHash,
-		QueryType:     queryType,
-		Height:        height,
-		Count:         count,
-		ConsensusFree: true,
+		Type:		IdentityObservabilityLookupVolumeV2,
+		NameHash:	nameHash,
+		QueryType:	queryType,
+		Height:		height,
+		Count:		count,
+		ConsensusFree:	true,
 	}, nil
 }
 
@@ -148,10 +148,10 @@ func PrecheckIdentityABCIPlusTxV2(msg IdentityMsgV2, height uint64) IdentityABCI
 	}
 	if err := ValidateIdentityMsgV2(msg); err != nil {
 		return IdentityABCIPlusPrecheckV2{
-			Accepted:    false,
-			MessageName: name,
-			Error:       err.Error(),
-			Event:       &IdentityABCIEventV2{Type: IdentityABCIEventMalformedRejectedV2, Height: height, Message: name, Attributes: []string{err.Error()}},
+			Accepted:	false,
+			MessageName:	name,
+			Error:		err.Error(),
+			Event:		&IdentityABCIEventV2{Type: IdentityABCIEventMalformedRejectedV2, Height: height, Message: name, Attributes: []string{err.Error()}},
 		}
 	}
 	return IdentityABCIPlusPrecheckV2{Accepted: true, MessageName: name}
@@ -231,12 +231,12 @@ func FinalizeIdentityABCIPlusV2(request IdentityFinalizeRequestV2) (IdentityFina
 			return IdentityFinalizeResponseV2{}, err
 		}
 		event := IdentityCacheInvalidationEventV2{
-			Trigger:       IdentityCacheInvalidDomainExpiryV2,
-			NameHash:      nameHash,
-			RecordVersion: domain.UpdatedHeight + 1,
-			Height:        request.Height,
-			ParentEpoch:   domain.UpdatedHeight + 1,
-			ChildEpoch:    domain.UpdatedHeight + 1,
+			Trigger:	IdentityCacheInvalidDomainExpiryV2,
+			NameHash:	nameHash,
+			RecordVersion:	domain.UpdatedHeight + 1,
+			Height:		request.Height,
+			ParentEpoch:	domain.UpdatedHeight + 1,
+			ChildEpoch:	domain.UpdatedHeight + 1,
 		}
 		next, err := InvalidateIdentityResolutionCachesV2(invalidated, event)
 		if err != nil {

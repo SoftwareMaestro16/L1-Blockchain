@@ -12,14 +12,14 @@ import (
 const ModuleName = "taskgroups"
 
 type WorkloadRegistration struct {
-	WorkloadID         string
-	WorkloadType       postypes.WorkloadType
-	ZoneID             string
-	ShardID            string
-	WorkloadClass      string
-	MinimumGroupSize   uint32
-	RoleRequirements   []postypes.ValidatorRole
-	ExcludedValidators []string
+	WorkloadID		string
+	WorkloadType		postypes.WorkloadType
+	ZoneID			string
+	ShardID			string
+	WorkloadClass		string
+	MinimumGroupSize	uint32
+	RoleRequirements	[]postypes.ValidatorRole
+	ExcludedValidators	[]string
 }
 
 type WorkloadRegistry struct {
@@ -27,30 +27,30 @@ type WorkloadRegistry struct {
 }
 
 type AssignmentInput struct {
-	Params           postypes.Params
-	Epoch            postypes.EpochRecord
-	ValidatorSet     []postypes.ScoredValidator
-	Registry         WorkloadRegistry
-	ActivationHeight uint64
-	ExpiryHeight     uint64
+	Params			postypes.Params
+	Epoch			postypes.EpochRecord
+	ValidatorSet		[]postypes.ScoredValidator
+	Registry		WorkloadRegistry
+	ActivationHeight	uint64
+	ExpiryHeight		uint64
 }
 
 type AssignmentState struct {
-	Registry         WorkloadRegistry
-	GroupSet         postypes.TaskGroupSet
-	ValidatorSetHash string
+	Registry		WorkloadRegistry
+	GroupSet		postypes.TaskGroupSet
+	ValidatorSetHash	string
 }
 
 type AssignmentProof struct {
-	EpochID          uint64
-	WorkloadID       string
-	TaskGroupID      string
-	TaskGroupRoot    string
-	StakeWeightRoot  string
-	AssignmentSeed   string
-	ValidatorMembers []string
-	ProposerOrder    []string
-	VerifierSet      []string
+	EpochID			uint64
+	WorkloadID		string
+	TaskGroupID		string
+	TaskGroupRoot		string
+	StakeWeightRoot		string
+	AssignmentSeed		string
+	ValidatorMembers	[]string
+	ProposerOrder		[]string
+	VerifierSet		[]string
 }
 
 func NewWorkloadRegistry(params postypes.Params, entries []WorkloadRegistration) (WorkloadRegistry, error) {
@@ -86,15 +86,15 @@ func (r WorkloadRegistration) Validate(params postypes.Params) error {
 
 func (r WorkloadRegistration) ToWorkloadTask() postypes.WorkloadTask {
 	return postypes.WorkloadTask{
-		TaskID:             r.WorkloadID,
-		WorkloadID:         r.WorkloadID,
-		WorkloadType:       r.WorkloadType,
-		ZoneID:             r.ZoneID,
-		ShardID:            r.ShardID,
-		WorkloadClass:      r.WorkloadClass,
-		RequiredValidators: r.MinimumGroupSize,
-		Roles:              cloneRoles(r.RoleRequirements),
-		ExcludedValidators: cloneStrings(r.ExcludedValidators),
+		TaskID:			r.WorkloadID,
+		WorkloadID:		r.WorkloadID,
+		WorkloadType:		r.WorkloadType,
+		ZoneID:			r.ZoneID,
+		ShardID:		r.ShardID,
+		WorkloadClass:		r.WorkloadClass,
+		RequiredValidators:	r.MinimumGroupSize,
+		Roles:			cloneRoles(r.RoleRequirements),
+		ExcludedValidators:	cloneStrings(r.ExcludedValidators),
 	}
 }
 
@@ -120,9 +120,9 @@ func DeterministicAssignment(input AssignmentInput) (AssignmentState, error) {
 		return AssignmentState{}, err
 	}
 	return AssignmentState{
-		Registry:         registry,
-		GroupSet:         groupSet,
-		ValidatorSetHash: validatorSetHash,
+		Registry:		registry,
+		GroupSet:		groupSet,
+		ValidatorSetHash:	validatorSetHash,
 	}, nil
 }
 
@@ -158,15 +158,15 @@ func (s AssignmentState) QueryAssignmentProof(workloadID string) (AssignmentProo
 			return AssignmentProof{}, false, err
 		}
 		return AssignmentProof{
-			EpochID:          group.EpochID,
-			WorkloadID:       group.WorkloadID,
-			TaskGroupID:      group.TaskGroupID,
-			TaskGroupRoot:    s.GroupSet.Root,
-			StakeWeightRoot:  group.StakeWeightRoot,
-			AssignmentSeed:   group.AssignmentSeed,
-			ValidatorMembers: cloneStrings(group.ValidatorMembers),
-			ProposerOrder:    cloneStrings(group.ProposerOrder),
-			VerifierSet:      cloneStrings(group.VerifierSet),
+			EpochID:		group.EpochID,
+			WorkloadID:		group.WorkloadID,
+			TaskGroupID:		group.TaskGroupID,
+			TaskGroupRoot:		s.GroupSet.Root,
+			StakeWeightRoot:	group.StakeWeightRoot,
+			AssignmentSeed:		group.AssignmentSeed,
+			ValidatorMembers:	cloneStrings(group.ValidatorMembers),
+			ProposerOrder:		cloneStrings(group.ProposerOrder),
+			VerifierSet:		cloneStrings(group.VerifierSet),
 		}, true, nil
 	}
 	return AssignmentProof{}, false, nil

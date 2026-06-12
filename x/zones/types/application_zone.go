@@ -10,14 +10,14 @@ import (
 )
 
 const (
-	ApplicationZonePrefix        = "apps"
-	ApplicationAppPrefix         = ApplicationZonePrefix + "/app"
-	ApplicationWorkflowPrefix    = ApplicationZonePrefix + "/workflow"
-	ApplicationSchedulerPrefix   = ApplicationZonePrefix + "/scheduler"
-	ApplicationAutomationPrefix  = ApplicationZonePrefix + "/automation"
-	ApplicationPermissionsPrefix = ApplicationZonePrefix + "/permissions"
-	ApplicationReceiptPrefix     = ApplicationZonePrefix + "/receipts"
-	ApplicationOutboxPrefix      = ApplicationZonePrefix + "/outbox"
+	ApplicationZonePrefix		= "apps"
+	ApplicationAppPrefix		= ApplicationZonePrefix + "/app"
+	ApplicationWorkflowPrefix	= ApplicationZonePrefix + "/workflow"
+	ApplicationSchedulerPrefix	= ApplicationZonePrefix + "/scheduler"
+	ApplicationAutomationPrefix	= ApplicationZonePrefix + "/automation"
+	ApplicationPermissionsPrefix	= ApplicationZonePrefix + "/permissions"
+	ApplicationReceiptPrefix	= ApplicationZonePrefix + "/receipts"
+	ApplicationOutboxPrefix		= ApplicationZonePrefix + "/outbox"
 )
 
 type ApplicationRuntime interface {
@@ -41,206 +41,206 @@ type ApplicationShardRoutingMode string
 type ApplicationProofRootType string
 
 const (
-	ApplicationWorkflowPending   ApplicationWorkflowStatus = "PENDING"
-	ApplicationWorkflowRunning   ApplicationWorkflowStatus = "RUNNING"
-	ApplicationWorkflowSucceeded ApplicationWorkflowStatus = "SUCCEEDED"
-	ApplicationWorkflowFailed    ApplicationWorkflowStatus = "FAILED"
-	ApplicationWorkflowCanceled  ApplicationWorkflowStatus = "CANCELED"
+	ApplicationWorkflowPending	ApplicationWorkflowStatus	= "PENDING"
+	ApplicationWorkflowRunning	ApplicationWorkflowStatus	= "RUNNING"
+	ApplicationWorkflowSucceeded	ApplicationWorkflowStatus	= "SUCCEEDED"
+	ApplicationWorkflowFailed	ApplicationWorkflowStatus	= "FAILED"
+	ApplicationWorkflowCanceled	ApplicationWorkflowStatus	= "CANCELED"
 
-	ApplicationTaskPending  ApplicationTaskStatus = "PENDING"
-	ApplicationTaskExecuted ApplicationTaskStatus = "EXECUTED"
-	ApplicationTaskFailed   ApplicationTaskStatus = "FAILED"
-	ApplicationTaskDeferred ApplicationTaskStatus = "DEFERRED"
-	ApplicationTaskSkipped  ApplicationTaskStatus = "SKIPPED"
-	ApplicationTaskCanceled ApplicationTaskStatus = "CANCELED"
+	ApplicationTaskPending	ApplicationTaskStatus	= "PENDING"
+	ApplicationTaskExecuted	ApplicationTaskStatus	= "EXECUTED"
+	ApplicationTaskFailed	ApplicationTaskStatus	= "FAILED"
+	ApplicationTaskDeferred	ApplicationTaskStatus	= "DEFERRED"
+	ApplicationTaskSkipped	ApplicationTaskStatus	= "SKIPPED"
+	ApplicationTaskCanceled	ApplicationTaskStatus	= "CANCELED"
 
-	ApplicationMessageCreateApp         ApplicationMessageKind = "MsgCreateApp"
-	ApplicationMessageUpdateApp         ApplicationMessageKind = "MsgUpdateApp"
-	ApplicationMessageStartWorkflow     ApplicationMessageKind = "MsgStartWorkflow"
-	ApplicationMessageAdvanceWorkflow   ApplicationMessageKind = "MsgAdvanceWorkflow"
-	ApplicationMessageScheduleTask      ApplicationMessageKind = "MsgScheduleTask"
-	ApplicationMessageCancelTask        ApplicationMessageKind = "MsgCancelTask"
-	ApplicationMessageExecuteAutomation ApplicationMessageKind = "MsgExecuteAutomation"
+	ApplicationMessageCreateApp		ApplicationMessageKind	= "MsgCreateApp"
+	ApplicationMessageUpdateApp		ApplicationMessageKind	= "MsgUpdateApp"
+	ApplicationMessageStartWorkflow		ApplicationMessageKind	= "MsgStartWorkflow"
+	ApplicationMessageAdvanceWorkflow	ApplicationMessageKind	= "MsgAdvanceWorkflow"
+	ApplicationMessageScheduleTask		ApplicationMessageKind	= "MsgScheduleTask"
+	ApplicationMessageCancelTask		ApplicationMessageKind	= "MsgCancelTask"
+	ApplicationMessageExecuteAutomation	ApplicationMessageKind	= "MsgExecuteAutomation"
 
-	ApplicationProofApp           ApplicationProofKind = "QueryApp"
-	ApplicationProofWorkflow      ApplicationProofKind = "QueryWorkflow"
-	ApplicationProofScheduledTask ApplicationProofKind = "QueryScheduledTask"
-	ApplicationProofAutomation    ApplicationProofKind = "QueryAutomation"
-	ApplicationProofAppReceipts   ApplicationProofKind = "QueryAppReceipts"
-	ApplicationProofAppQueue      ApplicationProofKind = "QueryAppQueue"
-	ApplicationProofPermissions   ApplicationProofKind = "QueryServicePermissions"
+	ApplicationProofApp		ApplicationProofKind	= "QueryApp"
+	ApplicationProofWorkflow	ApplicationProofKind	= "QueryWorkflow"
+	ApplicationProofScheduledTask	ApplicationProofKind	= "QueryScheduledTask"
+	ApplicationProofAutomation	ApplicationProofKind	= "QueryAutomation"
+	ApplicationProofAppReceipts	ApplicationProofKind	= "QueryAppReceipts"
+	ApplicationProofAppQueue	ApplicationProofKind	= "QueryAppQueue"
+	ApplicationProofPermissions	ApplicationProofKind	= "QueryServicePermissions"
 
-	ApplicationPermissionAdmin    ApplicationPermissionScope = "admin"
-	ApplicationPermissionExecute  ApplicationPermissionScope = "execute"
-	ApplicationPermissionSchedule ApplicationPermissionScope = "schedule"
+	ApplicationPermissionAdmin	ApplicationPermissionScope	= "admin"
+	ApplicationPermissionExecute	ApplicationPermissionScope	= "execute"
+	ApplicationPermissionSchedule	ApplicationPermissionScope	= "schedule"
 
-	ApplicationRouteAppID           ApplicationShardRoutingMode = "app_id"
-	ApplicationRouteWorkflowID      ApplicationShardRoutingMode = "workflow_id"
-	ApplicationRouteSchedulerBucket ApplicationShardRoutingMode = "scheduler_bucket"
+	ApplicationRouteAppID		ApplicationShardRoutingMode	= "app_id"
+	ApplicationRouteWorkflowID	ApplicationShardRoutingMode	= "workflow_id"
+	ApplicationRouteSchedulerBucket	ApplicationShardRoutingMode	= "scheduler_bucket"
 
-	ApplicationProofRootApp        ApplicationProofRootType = "app"
-	ApplicationProofRootWorkflow   ApplicationProofRootType = "workflow"
-	ApplicationProofRootScheduler  ApplicationProofRootType = "scheduler"
-	ApplicationProofRootQueue      ApplicationProofRootType = "app_queue"
-	ApplicationProofRootPermission ApplicationProofRootType = "service_permission"
+	ApplicationProofRootApp		ApplicationProofRootType	= "app"
+	ApplicationProofRootWorkflow	ApplicationProofRootType	= "workflow"
+	ApplicationProofRootScheduler	ApplicationProofRootType	= "scheduler"
+	ApplicationProofRootQueue	ApplicationProofRootType	= "app_queue"
+	ApplicationProofRootPermission	ApplicationProofRootType	= "service_permission"
 )
 
 type ApplicationZoneBoundary struct {
-	ZoneID       ZoneID
-	OwnsPrefixes []string
-	Messages     []ApplicationMessageKind
-	ProofKinds   []ApplicationProofKind
+	ZoneID		ZoneID
+	OwnsPrefixes	[]string
+	Messages	[]ApplicationMessageKind
+	ProofKinds	[]ApplicationProofKind
 }
 
 type ApplicationRecord struct {
-	AppID         string
-	Owner         string
-	RuntimeID     string
-	Version       uint64
-	Enabled       bool
-	ConfigHash    string
-	UpdatedHeight uint64
+	AppID		string
+	Owner		string
+	RuntimeID	string
+	Version		uint64
+	Enabled		bool
+	ConfigHash	string
+	UpdatedHeight	uint64
 }
 
 type ApplicationWorkflowState struct {
-	WorkflowID    string
-	AppID         string
-	Owner         string
-	Status        ApplicationWorkflowStatus
-	CurrentStep   uint32
-	TotalSteps    uint32
-	PayloadHash   string
-	UpdatedHeight uint64
+	WorkflowID	string
+	AppID		string
+	Owner		string
+	Status		ApplicationWorkflowStatus
+	CurrentStep	uint32
+	TotalSteps	uint32
+	PayloadHash	string
+	UpdatedHeight	uint64
 }
 
 type ApplicationScheduledTask struct {
-	Bucket          string
-	TaskID          string
-	WorkflowID      string
-	AppID           string
-	ScheduledHeight uint64
-	Priority        uint32
-	Sequence        uint64
-	GasLimit        uint64
-	PayloadHash     string
-	Status          ApplicationTaskStatus
+	Bucket		string
+	TaskID		string
+	WorkflowID	string
+	AppID		string
+	ScheduledHeight	uint64
+	Priority	uint32
+	Sequence	uint64
+	GasLimit	uint64
+	PayloadHash	string
+	Status		ApplicationTaskStatus
 }
 
 type ApplicationAutomation struct {
-	AutomationID  string
-	AppID         string
-	WorkflowID    string
-	Enabled       bool
-	TriggerHash   string
-	NextRunHeight uint64
-	UpdatedHeight uint64
+	AutomationID	string
+	AppID		string
+	WorkflowID	string
+	Enabled		bool
+	TriggerHash	string
+	NextRunHeight	uint64
+	UpdatedHeight	uint64
 }
 
 type ApplicationPermission struct {
-	AppID         string
-	Address       string
-	Scope         ApplicationPermissionScope
-	ExpiresHeight uint64
-	GrantHash     string
+	AppID		string
+	Address		string
+	Scope		ApplicationPermissionScope
+	ExpiresHeight	uint64
+	GrantHash	string
 }
 
 type ApplicationSchedulerQueue struct {
-	ZoneID          ZoneID
-	Height          uint64
-	MaxWorkPerBlock uint32
-	Tasks           []ApplicationScheduledTask
+	ZoneID		ZoneID
+	Height		uint64
+	MaxWorkPerBlock	uint32
+	Tasks		[]ApplicationScheduledTask
 }
 
 type ApplicationWorkLimit struct {
-	MaxTasksPerBlock    uint32
-	MaxMessagesPerBlock uint32
-	MaxGasPerBlock      uint64
+	MaxTasksPerBlock	uint32
+	MaxMessagesPerBlock	uint32
+	MaxGasPerBlock		uint64
 }
 
 type ApplicationRuntimeBoundary struct {
-	ZoneID                   ZoneID
-	RuntimeID                string
-	AllowedStatePrefixes     []string
-	CrossZoneEffectMechanism string
-	BoundaryHash             string
+	ZoneID				ZoneID
+	RuntimeID			string
+	AllowedStatePrefixes		[]string
+	CrossZoneEffectMechanism	string
+	BoundaryHash			string
 }
 
 type ApplicationShardRoute struct {
-	ZoneID      ZoneID
-	LayoutEpoch uint64
-	ShardCount  uint32
-	ShardID     uint32
-	RoutingMode ApplicationShardRoutingMode
-	RouteKey    string
-	StateKey    string
-	RouteHash   string
+	ZoneID		ZoneID
+	LayoutEpoch	uint64
+	ShardCount	uint32
+	ShardID		uint32
+	RoutingMode	ApplicationShardRoutingMode
+	RouteKey	string
+	StateKey	string
+	RouteHash	string
 }
 
 type ApplicationAsyncOutput struct {
-	OutputID        string
-	AppID           string
-	WorkflowID      string
-	DestinationZone ZoneID
-	Destination     string
-	PayloadHash     string
-	GasLimit        uint64
-	RetryNonce      uint64
-	CreatedHeight   uint64
-	MessageHash     string
+	OutputID	string
+	AppID		string
+	WorkflowID	string
+	DestinationZone	ZoneID
+	Destination	string
+	PayloadHash	string
+	GasLimit	uint64
+	RetryNonce	uint64
+	CreatedHeight	uint64
+	MessageHash	string
 }
 
 type ApplicationProofRootExport struct {
-	ZoneID   ZoneID
-	Height   uint64
-	RootType ApplicationProofRootType
-	RootHash string
-	Source   string
+	ZoneID		ZoneID
+	Height		uint64
+	RootType	ApplicationProofRootType
+	RootHash	string
+	Source		string
 }
 
 type ApplicationExecutionReceipt struct {
-	ZoneID         ZoneID
-	Height         uint64
-	ExecutionID    string
-	TaskID         string
-	WorkflowID     string
-	AppID          string
-	Status         ApplicationTaskStatus
-	GasUsed        uint64
-	OutputHash     string
-	OutboxMessages uint32
-	Sequence       uint64
-	ReceiptHash    string
+	ZoneID		ZoneID
+	Height		uint64
+	ExecutionID	string
+	TaskID		string
+	WorkflowID	string
+	AppID		string
+	Status		ApplicationTaskStatus
+	GasUsed		uint64
+	OutputHash	string
+	OutboxMessages	uint32
+	Sequence	uint64
+	ReceiptHash	string
 }
 
 type ApplicationZoneState struct {
-	Height      uint64
-	Apps        []ApplicationRecord
-	Workflows   []ApplicationWorkflowState
-	Tasks       []ApplicationScheduledTask
-	Automations []ApplicationAutomation
-	Permissions []ApplicationPermission
-	Receipts    []ApplicationExecutionReceipt
+	Height		uint64
+	Apps		[]ApplicationRecord
+	Workflows	[]ApplicationWorkflowState
+	Tasks		[]ApplicationScheduledTask
+	Automations	[]ApplicationAutomation
+	Permissions	[]ApplicationPermission
+	Receipts	[]ApplicationExecutionReceipt
 }
 
 type ApplicationZoneRoots struct {
-	Height         uint64
-	AppRoot        string
-	WorkflowRoot   string
-	SchedulerRoot  string
-	AutomationRoot string
-	PermissionRoot string
-	ReceiptRoot    string
-	QueueRoot      string
-	InboxRoot      string
-	OutboxRoot     string
-	ExecutionRoot  string
-	ProofRoot      string
-	StateRoot      string
+	Height		uint64
+	AppRoot		string
+	WorkflowRoot	string
+	SchedulerRoot	string
+	AutomationRoot	string
+	PermissionRoot	string
+	ReceiptRoot	string
+	QueueRoot	string
+	InboxRoot	string
+	OutboxRoot	string
+	ExecutionRoot	string
+	ProofRoot	string
+	StateRoot	string
 }
 
 func DefaultApplicationZoneBoundary() ApplicationZoneBoundary {
 	return ApplicationZoneBoundary{
-		ZoneID: ZoneIDApplication,
+		ZoneID:	ZoneIDApplication,
 		OwnsPrefixes: []string{
 			ApplicationAppPrefix,
 			ApplicationAutomationPrefix,
@@ -273,9 +273,9 @@ func DefaultApplicationZoneBoundary() ApplicationZoneBoundary {
 
 func DefaultApplicationWorkLimit() ApplicationWorkLimit {
 	return ApplicationWorkLimit{
-		MaxTasksPerBlock:    1024,
-		MaxMessagesPerBlock: 4096,
-		MaxGasPerBlock:      50_000_000,
+		MaxTasksPerBlock:	1024,
+		MaxMessagesPerBlock:	4096,
+		MaxGasPerBlock:		50_000_000,
 	}
 }
 
@@ -361,10 +361,10 @@ func ApplicationOutboxKey(outputID string) (string, error) {
 
 func DefaultApplicationRuntimeBoundary(runtimeID string) (ApplicationRuntimeBoundary, error) {
 	boundary := ApplicationRuntimeBoundary{
-		ZoneID:                   ZoneIDApplication,
-		RuntimeID:                runtimeID,
-		AllowedStatePrefixes:     DefaultApplicationZoneBoundary().OwnsPrefixes,
-		CrossZoneEffectMechanism: "zone-messages-only",
+		ZoneID:				ZoneIDApplication,
+		RuntimeID:			runtimeID,
+		AllowedStatePrefixes:		DefaultApplicationZoneBoundary().OwnsPrefixes,
+		CrossZoneEffectMechanism:	"zone-messages-only",
 	}
 	boundary.BoundaryHash = ComputeApplicationRuntimeBoundaryHash(boundary)
 	return boundary, boundary.ValidateHash()
@@ -395,10 +395,10 @@ func RouteApplicationSchedulerShard(bucket string, shardCount uint32, layoutEpoc
 
 func NewApplicationSchedulerQueue(height uint64, maxWorkPerBlock uint32, tasks []ApplicationScheduledTask) (ApplicationSchedulerQueue, error) {
 	queue := ApplicationSchedulerQueue{
-		ZoneID:          ZoneIDApplication,
-		Height:          height,
-		MaxWorkPerBlock: maxWorkPerBlock,
-		Tasks:           cloneApplicationScheduledTasks(tasks),
+		ZoneID:			ZoneIDApplication,
+		Height:			height,
+		MaxWorkPerBlock:	maxWorkPerBlock,
+		Tasks:			cloneApplicationScheduledTasks(tasks),
 	}
 	return queue, queue.Validate()
 }
@@ -416,30 +416,30 @@ func EmitApplicationAsyncOutput(queues ZoneMessageQueues, output ApplicationAsyn
 		return ZoneMessageQueues{}, ApplicationExecutionReceipt{}, err
 	}
 	msg := ZoneMessage{
-		ZoneID:      ZoneIDApplication,
-		MessageType: "application.async_output",
-		Source:      ApplicationOutboxPrefix,
-		Destination: string(output.DestinationZone) + ":" + output.Destination,
-		GasLimit:    output.GasLimit,
-		PayloadHash: output.MessageHash,
-		Sequence:    output.RetryNonce,
+		ZoneID:		ZoneIDApplication,
+		MessageType:	"application.async_output",
+		Source:		ApplicationOutboxPrefix,
+		Destination:	string(output.DestinationZone) + ":" + output.Destination,
+		GasLimit:	output.GasLimit,
+		PayloadHash:	output.MessageHash,
+		Sequence:	output.RetryNonce,
 	}
 	next, err := queues.EnqueueOutbox(msg)
 	if err != nil {
 		return ZoneMessageQueues{}, ApplicationExecutionReceipt{}, err
 	}
 	receipt, err := NewApplicationExecutionReceipt(ApplicationExecutionReceipt{
-		ZoneID:         ZoneIDApplication,
-		Height:         output.CreatedHeight,
-		ExecutionID:    output.OutputID,
-		TaskID:         "async-output",
-		WorkflowID:     output.WorkflowID,
-		AppID:          output.AppID,
-		Status:         ApplicationTaskExecuted,
-		GasUsed:        output.GasLimit,
-		OutputHash:     output.MessageHash,
-		OutboxMessages: 1,
-		Sequence:       output.RetryNonce,
+		ZoneID:		ZoneIDApplication,
+		Height:		output.CreatedHeight,
+		ExecutionID:	output.OutputID,
+		TaskID:		"async-output",
+		WorkflowID:	output.WorkflowID,
+		AppID:		output.AppID,
+		Status:		ApplicationTaskExecuted,
+		GasUsed:	output.GasLimit,
+		OutputHash:	output.MessageHash,
+		OutboxMessages:	1,
+		Sequence:	output.RetryNonce,
 	})
 	if err != nil {
 		return ZoneMessageQueues{}, ApplicationExecutionReceipt{}, err
@@ -531,16 +531,16 @@ func StartApplicationWorkflow(state ApplicationZoneState, workflow ApplicationWo
 	next.Height = height
 	next.Workflows = upsertApplicationWorkflow(next.Workflows, workflow)
 	receipt, err := NewApplicationExecutionReceipt(ApplicationExecutionReceipt{
-		ZoneID:      ZoneIDApplication,
-		Height:      height,
-		ExecutionID: hashRuntimeParts("application-workflow-start", workflow.WorkflowID, fmt.Sprint(height)),
-		TaskID:      "workflow-start",
-		WorkflowID:  workflow.WorkflowID,
-		AppID:       workflow.AppID,
-		Status:      ApplicationTaskExecuted,
-		GasUsed:     1,
-		OutputHash:  ComputeApplicationWorkflowRoot([]ApplicationWorkflowState{workflow}),
-		Sequence:    uint64(len(next.Receipts) + 1),
+		ZoneID:		ZoneIDApplication,
+		Height:		height,
+		ExecutionID:	hashRuntimeParts("application-workflow-start", workflow.WorkflowID, fmt.Sprint(height)),
+		TaskID:		"workflow-start",
+		WorkflowID:	workflow.WorkflowID,
+		AppID:		workflow.AppID,
+		Status:		ApplicationTaskExecuted,
+		GasUsed:	1,
+		OutputHash:	ComputeApplicationWorkflowRoot([]ApplicationWorkflowState{workflow}),
+		Sequence:	uint64(len(next.Receipts) + 1),
 	})
 	if err != nil {
 		return ApplicationZoneState{}, ApplicationExecutionReceipt{}, err
@@ -570,16 +570,16 @@ func AdvanceApplicationWorkflow(state ApplicationZoneState, workflowID string, h
 		workflow.UpdatedHeight = height
 		next.Workflows[i] = workflow
 		receipt, err := NewApplicationExecutionReceipt(ApplicationExecutionReceipt{
-			ZoneID:      ZoneIDApplication,
-			Height:      height,
-			ExecutionID: hashRuntimeParts("application-workflow-advance", workflow.WorkflowID, fmt.Sprint(height), fmt.Sprint(workflow.CurrentStep)),
-			TaskID:      "workflow-advance",
-			WorkflowID:  workflow.WorkflowID,
-			AppID:       workflow.AppID,
-			Status:      ApplicationTaskExecuted,
-			GasUsed:     1,
-			OutputHash:  ComputeApplicationWorkflowRoot([]ApplicationWorkflowState{workflow}),
-			Sequence:    uint64(len(next.Receipts) + 1),
+			ZoneID:		ZoneIDApplication,
+			Height:		height,
+			ExecutionID:	hashRuntimeParts("application-workflow-advance", workflow.WorkflowID, fmt.Sprint(height), fmt.Sprint(workflow.CurrentStep)),
+			TaskID:		"workflow-advance",
+			WorkflowID:	workflow.WorkflowID,
+			AppID:		workflow.AppID,
+			Status:		ApplicationTaskExecuted,
+			GasUsed:	1,
+			OutputHash:	ComputeApplicationWorkflowRoot([]ApplicationWorkflowState{workflow}),
+			Sequence:	uint64(len(next.Receipts) + 1),
 		})
 		if err != nil {
 			return ApplicationZoneState{}, ApplicationExecutionReceipt{}, err
@@ -617,12 +617,12 @@ func ApplicationProofRequest(kind ApplicationProofKind, key string, height uint6
 		return ZoneProofRequest{}, err
 	}
 	req := ZoneProofRequest{
-		ZoneID: ZoneIDApplication,
-		Height: height,
-		Kind:   ZoneProofKindState,
-		Key:    string(kind) + "/" + key,
-		Root:   root,
-		Limit:  limit,
+		ZoneID:	ZoneIDApplication,
+		Height:	height,
+		Kind:	ZoneProofKindState,
+		Key:	string(kind) + "/" + key,
+		Root:	root,
+		Limit:	limit,
 	}
 	return req, req.Validate()
 }
@@ -644,15 +644,15 @@ func BuildApplicationZoneRoot(roots ApplicationZoneRoots) (ZoneRoot, error) {
 		)
 	}
 	root := ZoneRoot{
-		ZoneID:              ZoneIDApplication,
-		Height:              roots.Height,
-		ZoneStateRoot:       stateRoot,
-		InboxRoot:           roots.InboxRoot,
-		OutboxRoot:          roots.OutboxRoot,
-		ReceiptRoot:         roots.ReceiptRoot,
-		EventRoot:           EmptyRootHash(),
-		ExecutionResultRoot: roots.ExecutionRoot,
-		ProofRoot:           roots.ProofRoot,
+		ZoneID:			ZoneIDApplication,
+		Height:			roots.Height,
+		ZoneStateRoot:		stateRoot,
+		InboxRoot:		roots.InboxRoot,
+		OutboxRoot:		roots.OutboxRoot,
+		ReceiptRoot:		roots.ReceiptRoot,
+		EventRoot:		EmptyRootHash(),
+		ExecutionResultRoot:	roots.ExecutionRoot,
+		ProofRoot:		roots.ProofRoot,
 	}
 	root.RootHash = ComputeZoneRootHash(root)
 	return root, root.Validate()
@@ -667,18 +667,18 @@ func BuildApplicationZoneRootFromState(height uint64, state ApplicationZoneState
 	}
 	normalized := state.Normalize()
 	roots := ApplicationZoneRoots{
-		Height:         height,
-		AppRoot:        ComputeApplicationAppRoot(normalized.Apps),
-		WorkflowRoot:   ComputeApplicationWorkflowRoot(normalized.Workflows),
-		SchedulerRoot:  ComputeApplicationTaskRoot(normalized.Tasks),
-		AutomationRoot: ComputeApplicationAutomationRoot(normalized.Automations),
-		PermissionRoot: ComputeApplicationPermissionRoot(normalized.Permissions),
-		ReceiptRoot:    ComputeApplicationReceiptRoot(normalized.Receipts),
-		InboxRoot:      queues.InboxRoot(),
-		OutboxRoot:     queues.OutboxRoot(),
-		ExecutionRoot:  ComputeApplicationExecutionRoot(normalized.Receipts),
-		ProofRoot:      proofRoot,
-		StateRoot:      ComputeApplicationZoneStateRoot(normalized),
+		Height:		height,
+		AppRoot:	ComputeApplicationAppRoot(normalized.Apps),
+		WorkflowRoot:	ComputeApplicationWorkflowRoot(normalized.Workflows),
+		SchedulerRoot:	ComputeApplicationTaskRoot(normalized.Tasks),
+		AutomationRoot:	ComputeApplicationAutomationRoot(normalized.Automations),
+		PermissionRoot:	ComputeApplicationPermissionRoot(normalized.Permissions),
+		ReceiptRoot:	ComputeApplicationReceiptRoot(normalized.Receipts),
+		InboxRoot:	queues.InboxRoot(),
+		OutboxRoot:	queues.OutboxRoot(),
+		ExecutionRoot:	ComputeApplicationExecutionRoot(normalized.Receipts),
+		ProofRoot:	proofRoot,
+		StateRoot:	ComputeApplicationZoneStateRoot(normalized),
 	}
 	roots.QueueRoot = ComputeApplicationQueueRoot(queues)
 	return BuildApplicationZoneRoot(roots)
@@ -932,13 +932,13 @@ func (r ApplicationExecutionReceipt) ZoneReceipt() (ZoneReceipt, error) {
 		status = ZoneReceiptStatusFailed
 	}
 	return NewZoneReceipt(ZoneReceipt{
-		ZoneID:     ZoneIDApplication,
-		Height:     r.Height,
-		ItemHash:   hashRuntimeParts("application-receipt-item-v1", r.ExecutionID, r.TaskID, r.WorkflowID, r.AppID),
-		Status:     status,
-		GasUsed:    r.GasUsed,
-		ResultHash: r.OutputHash,
-		Sequence:   r.Sequence,
+		ZoneID:		ZoneIDApplication,
+		Height:		r.Height,
+		ItemHash:	hashRuntimeParts("application-receipt-item-v1", r.ExecutionID, r.TaskID, r.WorkflowID, r.AppID),
+		Status:		status,
+		GasUsed:	r.GasUsed,
+		ResultHash:	r.OutputHash,
+		Sequence:	r.Sequence,
 	})
 }
 
@@ -1066,8 +1066,8 @@ func (r ApplicationZoneRoots) Validate() error {
 		return errors.New("application zone root height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "application app root", value: r.AppRoot},
 		{name: "application workflow root", value: r.WorkflowRoot},
@@ -1461,13 +1461,13 @@ func routeApplicationStateKey(mode ApplicationShardRoutingMode, routeKey string,
 		return ApplicationShardRoute{}, err
 	}
 	route := ApplicationShardRoute{
-		ZoneID:      ZoneIDApplication,
-		LayoutEpoch: layoutEpoch,
-		ShardCount:  shardCount,
-		ShardID:     uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
-		RoutingMode: mode,
-		RouteKey:    routeKey,
-		StateKey:    stateKey,
+		ZoneID:		ZoneIDApplication,
+		LayoutEpoch:	layoutEpoch,
+		ShardCount:	shardCount,
+		ShardID:	uint32(binary.BigEndian.Uint64(bytes) % uint64(shardCount)),
+		RoutingMode:	mode,
+		RouteKey:	routeKey,
+		StateKey:	stateKey,
 	}
 	route.RouteHash = ComputeApplicationShardRouteHash(route)
 	return route, route.ValidateHash()

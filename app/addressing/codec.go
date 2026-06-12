@@ -13,24 +13,24 @@ import (
 )
 
 const (
-	RawPrefix              = "4:"
-	SystemRawPrefix        = "-7:"
-	RawAddressLength       = 66
-	SystemRawAddressLength = 67
-	UserFriendlyLength     = 48
-	UserFriendlyPrefix     = "AE"
-	ZeroRawAddress         = "4:0000000000000000000000000000000000000000000000000000000000000000"
-	ZeroUserFriendly       = "AEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	rawPayloadLength       = 32
-	shortAddressLength     = 20
-	longAddressPadLength   = rawPayloadLength - shortAddressLength
-	userFriendlyVersion    = byte(1)
+	RawPrefix		= "4:"
+	SystemRawPrefix		= "-7:"
+	RawAddressLength	= 66
+	SystemRawAddressLength	= 67
+	UserFriendlyLength	= 48
+	UserFriendlyPrefix	= "AE"
+	ZeroRawAddress		= "4:0000000000000000000000000000000000000000000000000000000000000000"
+	ZeroUserFriendly	= "AEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	rawPayloadLength	= 32
+	shortAddressLength	= 20
+	longAddressPadLength	= rawPayloadLength - shortAddressLength
+	userFriendlyVersion	= byte(1)
 )
 
 var (
-	userFriendlyMagic  = [3]byte{0x00, 0x40, 0x00}
-	rawAddressRe       = regexp.MustCompile(`^4:[0-9a-f]{64}$`)
-	systemRawAddressRe = regexp.MustCompile(`^-7:[0-9a-f]{64}$`)
+	userFriendlyMagic	= [3]byte{0x00, 0x40, 0x00}
+	rawAddressRe		= regexp.MustCompile(`^4:[0-9a-f]{64}$`)
+	systemRawAddressRe	= regexp.MustCompile(`^-7:[0-9a-f]{64}$`)
 )
 
 type Codec struct{}

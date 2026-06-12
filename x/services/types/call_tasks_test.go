@@ -13,17 +13,17 @@ func TestSDKServiceCallBuilderProducesEnvelopeRoutingAndSchema(t *testing.T) {
 	descriptor := testInterfaceSystemDescriptor()
 
 	result, err := BuildSDKServiceCall(SDKServiceCallBuildRequest{
-		Context:        ctx,
-		Descriptor:     descriptor,
-		MethodID:       "submit",
-		Caller:         coretypes.DefaultAuthority,
-		Nonce:          1,
-		PayloadHash:    testInterfaceHash("sdk/payload"),
-		MaxFeeAmount:   "9",
-		SignatureHash:  testInterfaceHash("sdk/signature"),
-		TimeoutDelta:   12,
-		IdempotencyKey: "sdk-submit-idem",
-		CallbackTarget: "portable-service/callback",
+		Context:	ctx,
+		Descriptor:	descriptor,
+		MethodID:	"submit",
+		Caller:		coretypes.DefaultAuthority,
+		Nonce:		1,
+		PayloadHash:	testInterfaceHash("sdk/payload"),
+		MaxFeeAmount:	"9",
+		SignatureHash:	testInterfaceHash("sdk/signature"),
+		TimeoutDelta:	12,
+		IdempotencyKey:	"sdk-submit-idem",
+		CallbackTarget:	"portable-service/callback",
 	})
 	require.NoError(t, err)
 	require.Equal(t, result.Call.CallID, result.Envelope.CallID)
@@ -68,13 +68,13 @@ func TestReceiptAnchoringAndCallProofQuery(t *testing.T) {
 	call := testReceiptUnifiedCall(t, ctx, descriptor, 1, "anchor/payload")
 
 	anchor, err := AnchorUnifiedServiceReceipt(ctx, descriptor, index, call, coretypes.ServiceExecutionOutcome{
-		CallID:        call.CallID,
-		Status:        coretypes.ServiceCallStatusExecuted,
-		ResponseHash:  testInterfaceHash("anchor/response"),
-		ProofHash:     testInterfaceHash("anchor/proof"),
-		PaymentStatus: coretypes.ServicePaymentStatusSettled,
-		GasUsed:       88,
-		ProviderID:    "provider.storage",
+		CallID:		call.CallID,
+		Status:		coretypes.ServiceCallStatusExecuted,
+		ResponseHash:	testInterfaceHash("anchor/response"),
+		ProofHash:	testInterfaceHash("anchor/proof"),
+		PaymentStatus:	coretypes.ServicePaymentStatusSettled,
+		GasUsed:	88,
+		ProviderID:	"provider.storage",
 	}, coretypes.DefaultAuthority)
 	require.NoError(t, err)
 	require.Equal(t, call.CallID, anchor.Receipt.CallID)
@@ -83,8 +83,8 @@ func TestReceiptAnchoringAndCallProofQuery(t *testing.T) {
 	require.True(t, anchor.ReplayIndex.ContainsCallID(call.CallID))
 
 	proof, err := QueryServiceCallProofFromReplayIndex(anchor.ReplayIndex, []ServiceReceipt{anchor.Receipt}, QueryServiceCallProof{
-		ServiceID: descriptor.ServiceID,
-		CallID:    call.CallID,
+		ServiceID:	descriptor.ServiceID,
+		CallID:		call.CallID,
 	}, ctx.Height)
 	require.NoError(t, err)
 	require.True(t, proof.Found)
@@ -94,8 +94,8 @@ func TestReceiptAnchoringAndCallProofQuery(t *testing.T) {
 	require.NoError(t, proof.Proof.Validate())
 
 	missing, err := QueryServiceCallProofFromReplayIndex(anchor.ReplayIndex, nil, QueryServiceCallProof{
-		ServiceID: descriptor.ServiceID,
-		CallID:    testInterfaceHash("missing/call"),
+		ServiceID:	descriptor.ServiceID,
+		CallID:		testInterfaceHash("missing/call"),
 	}, ctx.Height)
 	require.NoError(t, err)
 	require.False(t, missing.Found)

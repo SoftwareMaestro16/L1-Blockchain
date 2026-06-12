@@ -7,113 +7,113 @@ import (
 )
 
 const (
-	BaseTransportCometBFTP2P = "COMETBFT_P2P"
-	LargePayloadBytes        = uint64(DefaultMaxMessageBytes)
+	BaseTransportCometBFTP2P	= "COMETBFT_P2P"
+	LargePayloadBytes		= uint64(DefaultMaxMessageBytes)
 )
 
 type NetworkLayer string
 
 const (
-	LayerL0Physical    NetworkLayer = "L0_PHYSICAL_TRANSPORT"
-	LayerL1Session     NetworkLayer = "L1_SECURE_IDENTITY_SESSION"
-	LayerL2Overlay     NetworkLayer = "L2_OVERLAY_ROUTING"
-	LayerL3Application NetworkLayer = "L3_APPLICATION_NETWORKING"
+	LayerL0Physical		NetworkLayer	= "L0_PHYSICAL_TRANSPORT"
+	LayerL1Session		NetworkLayer	= "L1_SECURE_IDENTITY_SESSION"
+	LayerL2Overlay		NetworkLayer	= "L2_OVERLAY_ROUTING"
+	LayerL3Application	NetworkLayer	= "L3_APPLICATION_NETWORKING"
 )
 
 type DeterminismSource string
 
 const (
-	DeterminismNone                  DeterminismSource = ""
-	DeterminismCommittedState        DeterminismSource = "COMMITTED_STATE"
-	DeterminismDeterministicProof    DeterminismSource = "DETERMINISTIC_PROOF"
-	DeterminismReplaySafeMessageID   DeterminismSource = "REPLAY_SAFE_MESSAGE_ID"
-	DeterminismSignedDiscoveryRecord DeterminismSource = "SIGNED_DISCOVERY_RECORD"
-	DeterminismAdvisoryPeerMetric    DeterminismSource = "ADVISORY_PEER_METRIC"
-	DeterminismExternalNetworkCall   DeterminismSource = "EXTERNAL_NETWORK_CALL"
+	DeterminismNone				DeterminismSource	= ""
+	DeterminismCommittedState		DeterminismSource	= "COMMITTED_STATE"
+	DeterminismDeterministicProof		DeterminismSource	= "DETERMINISTIC_PROOF"
+	DeterminismReplaySafeMessageID		DeterminismSource	= "REPLAY_SAFE_MESSAGE_ID"
+	DeterminismSignedDiscoveryRecord	DeterminismSource	= "SIGNED_DISCOVERY_RECORD"
+	DeterminismAdvisoryPeerMetric		DeterminismSource	= "ADVISORY_PEER_METRIC"
+	DeterminismExternalNetworkCall		DeterminismSource	= "EXTERNAL_NETWORK_CALL"
 )
 
 type LayerSpec struct {
-	Layer             NetworkLayer
-	Extends           NetworkLayer
-	TransportBaseline string
-	ConsensusCritical bool
-	Channels          []ChannelClass
+	Layer			NetworkLayer
+	Extends			NetworkLayer
+	TransportBaseline	string
+	ConsensusCritical	bool
+	Channels		[]ChannelClass
 }
 
 type NetworkMessage struct {
-	Layer                   NetworkLayer
-	Channel                 ChannelClass
-	ConsensusEffect         bool
-	DeterminismSource       DeterminismSource
-	ReplaySafeID            string
-	PayloadHash             string
-	PayloadSizeBytes        uint64
-	Chunked                 bool
-	CommitmentVerified      bool
-	CommittedProofHash      string
-	UsesLivePeerMetrics     bool
-	UsesExternalNetworkCall bool
+	Layer			NetworkLayer
+	Channel			ChannelClass
+	ConsensusEffect		bool
+	DeterminismSource	DeterminismSource
+	ReplaySafeID		string
+	PayloadHash		string
+	PayloadSizeBytes	uint64
+	Chunked			bool
+	CommitmentVerified	bool
+	CommittedProofHash	string
+	UsesLivePeerMetrics	bool
+	UsesExternalNetworkCall	bool
 }
 
 type DiscoveryRecord struct {
-	RecordID          string
-	RecordType        DRTObjectType
-	OwnerNodeID       string
-	TargetID          string
-	AdvertisementHash string
-	ZoneID            string
-	ServiceID         string
-	OverlayID         string
-	ExpiresHeight     uint64
-	Signature         []byte
-	ProofHash         string
-	ProofHeight       uint64
-	Record            NodeRecord
+	RecordID		string
+	RecordType		DRTObjectType
+	OwnerNodeID		string
+	TargetID		string
+	AdvertisementHash	string
+	ZoneID			string
+	ServiceID		string
+	OverlayID		string
+	ExpiresHeight		uint64
+	Signature		[]byte
+	ProofHash		string
+	ProofHeight		uint64
+	Record			NodeRecord
 }
 
 type PeerScoreUse struct {
-	Metrics          PeerMetrics
-	Score            PeerScore
-	Committed        bool
-	UsedForConsensus bool
+	Metrics			PeerMetrics
+	Score			PeerScore
+	Committed		bool
+	UsedForConsensus	bool
 }
 
 type RoutingDecisionUse struct {
-	UsedForConsensus          bool
-	DerivedFromCommittedState bool
-	DeterministicProofHash    string
+	UsedForConsensus		bool
+	DerivedFromCommittedState	bool
+	DeterministicProofHash		string
 }
 
 type StateTransitionNetworkAccess struct {
-	InStateTransition bool
-	ExternalCalls     []string
+	InStateTransition	bool
+	ExternalCalls		[]string
 }
 
 func DefaultLayerStack() []LayerSpec {
 	return []LayerSpec{
 		{
-			Layer:             LayerL0Physical,
-			TransportBaseline: BaseTransportCometBFTP2P,
-			ConsensusCritical: true,
-			Channels:          []ChannelClass{ChannelConsensus, ChannelMempool, ChannelBlock, ChannelStateSync},
+			Layer:			LayerL0Physical,
+			TransportBaseline:	BaseTransportCometBFTP2P,
+			ConsensusCritical:	true,
+			Channels:		[]ChannelClass{ChannelConsensus, ChannelMempool, ChannelBlock, ChannelStateSync},
 		},
 		{
-			Layer:             LayerL1Session,
-			Extends:           LayerL0Physical,
-			TransportBaseline: BaseTransportCometBFTP2P,
-			Channels:          []ChannelClass{ChannelDiscovery, ChannelRouting},
+			Layer:			LayerL1Session,
+			Extends:		LayerL0Physical,
+			TransportBaseline:	BaseTransportCometBFTP2P,
+			Channels:		[]ChannelClass{ChannelDiscovery, ChannelRouting},
 		},
 		{
-			Layer:             LayerL2Overlay,
-			Extends:           LayerL1Session,
-			TransportBaseline: BaseTransportCometBFTP2P,
-			Channels:          []ChannelClass{ChannelRouting, ChannelExecution, ChannelData},
+			Layer:			LayerL2Overlay,
+			Extends:		LayerL1Session,
+			TransportBaseline:	BaseTransportCometBFTP2P,
+			Channels:		[]ChannelClass{ChannelRouting, ChannelExecution, ChannelData},
 		},
 		{
-			Layer:             LayerL3Application,
-			Extends:           LayerL2Overlay,
-			TransportBaseline: BaseTransportCometBFTP2P,
-			Channels:          []ChannelClass{ChannelExecution, ChannelService, ChannelData, ChannelDiscovery},
+			Layer:			LayerL3Application,
+			Extends:		LayerL2Overlay,
+			TransportBaseline:	BaseTransportCometBFTP2P,
+			Channels:		[]ChannelClass{ChannelExecution, ChannelService, ChannelData, ChannelDiscovery},
 		},
 	}
 }
@@ -123,8 +123,8 @@ func ValidateLayerStack(stack []LayerSpec) error {
 		return errors.New("networking layer stack must define exactly L0-L3")
 	}
 	expected := []struct {
-		layer   NetworkLayer
-		extends NetworkLayer
+		layer	NetworkLayer
+		extends	NetworkLayer
 	}{
 		{LayerL0Physical, ""},
 		{LayerL1Session, LayerL0Physical},

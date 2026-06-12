@@ -10,28 +10,28 @@ import (
 type HookEvent string
 
 const (
-	HookEventEpochBegin      HookEvent = "epoch_begin"
-	HookEventPhaseTransition HookEvent = "epoch_phase_transition"
-	HookEventEpochEnd        HookEvent = "epoch_end"
+	HookEventEpochBegin		HookEvent	= "epoch_begin"
+	HookEventPhaseTransition	HookEvent	= "epoch_phase_transition"
+	HookEventEpochEnd		HookEvent	= "epoch_end"
 )
 
 type HookRecord struct {
-	Event            HookEvent
-	EpochID          uint64
-	Height           uint64
-	UnixSeconds      uint64
-	FromPhase        postypes.EpochPhase
-	ToPhase          postypes.EpochPhase
-	ValidatorSetHash string
+	Event			HookEvent
+	EpochID			uint64
+	Height			uint64
+	UnixSeconds		uint64
+	FromPhase		postypes.EpochPhase
+	ToPhase			postypes.EpochPhase
+	ValidatorSetHash	string
 }
 
 type EpochState struct {
-	Params                  postypes.Params
-	Current                 postypes.EpochRecord
-	CurrentStartUnixSeconds uint64
-	EpochHeightSpan         uint64
-	History                 []postypes.EpochRecord
-	HookLog                 []HookRecord
+	Params			postypes.Params
+	Current			postypes.EpochRecord
+	CurrentStartUnixSeconds	uint64
+	EpochHeightSpan		uint64
+	History			[]postypes.EpochRecord
+	HookLog			[]HookRecord
 }
 
 func (s EpochState) Validate() error {

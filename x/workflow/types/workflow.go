@@ -11,29 +11,29 @@ import (
 )
 
 const (
-	MaxWorkflowSteps        = 16
-	MaxWorkflowPayloadBytes = 4096
+	MaxWorkflowSteps	= 16
+	MaxWorkflowPayloadBytes	= 4096
 )
 
 type StepKind string
 
 const (
-	StepKindResolverPayment           StepKind = "resolver_payment"
-	StepKindDomainAuctionFinalization StepKind = "domain_auction_finalization"
-	StepKindContractDeployFirstMsg    StepKind = "contract_deploy_first_message"
+	StepKindResolverPayment			StepKind	= "resolver_payment"
+	StepKindDomainAuctionFinalization	StepKind	= "domain_auction_finalization"
+	StepKindContractDeployFirstMsg		StepKind	= "contract_deploy_first_message"
 )
 
 type Workflow struct {
-	ID        string
-	Authority sdk.AccAddress
-	Atomic    bool
-	Steps     []Step
+	ID		string
+	Authority	sdk.AccAddress
+	Atomic		bool
+	Steps		[]Step
 }
 
 type Step struct {
-	ID      string
-	Kind    StepKind
-	Payload []byte
+	ID	string
+	Kind	StepKind
+	Payload	[]byte
 }
 
 func ValidateWorkflow(workflow Workflow) error {

@@ -30,28 +30,28 @@ type ZoneExecutionAdapterContract interface {
 }
 
 type ZoneExecutionSummary struct {
-	ZoneID                 ZoneID
-	Height                 uint64
-	TxCount                uint64
-	InboundMessageCount    uint64
-	OutboundMessageCount   uint64
-	GasUsed                uint64
-	StateWrites            uint64
-	StateReads             uint64
-	ShardsTouched          uint32
-	FailedMessages         uint64
-	ZoneStateRoot          string
-	EventRoot              string
-	TransactionsExecuted   uint32
-	InboundMessagesApplied uint32
-	ReceiptsProduced       uint32
-	GasConsumed            uint64
-	StateRoot              string
-	InboxRoot              string
-	OutboxRoot             string
-	ReceiptRoot            string
-	ExecutionResultRoot    string
-	SummaryHash            string
+	ZoneID			ZoneID
+	Height			uint64
+	TxCount			uint64
+	InboundMessageCount	uint64
+	OutboundMessageCount	uint64
+	GasUsed			uint64
+	StateWrites		uint64
+	StateReads		uint64
+	ShardsTouched		uint32
+	FailedMessages		uint64
+	ZoneStateRoot		string
+	EventRoot		string
+	TransactionsExecuted	uint32
+	InboundMessagesApplied	uint32
+	ReceiptsProduced	uint32
+	GasConsumed		uint64
+	StateRoot		string
+	InboxRoot		string
+	OutboxRoot		string
+	ReceiptRoot		string
+	ExecutionResultRoot	string
+	SummaryHash		string
 }
 
 func BeginZoneBlock(ctx context.Context, machine ZoneExecutionMachine) error {
@@ -150,8 +150,8 @@ func (s ZoneExecutionSummary) ValidateFormat() error {
 		return errors.New("zone execution summary height must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "zone execution summary state root", value: s.ZoneStateRoot},
 		{name: "zone execution summary inbox root", value: s.InboxRoot},
@@ -245,27 +245,27 @@ func BuildZoneExecutionSummary(height uint64, runtime ZoneRuntimeState, queues Z
 		}
 	}
 	return NewZoneExecutionSummary(ZoneExecutionSummary{
-		ZoneID:                 runtime.ZoneID,
-		Height:                 height,
-		TxCount:                uint64(transactionsExecuted),
-		InboundMessageCount:    uint64(inboundMessagesApplied),
-		OutboundMessageCount:   uint64(len(queues.Outbox)),
-		GasUsed:                gasConsumed,
-		StateWrites:            uint64(len(receipts)),
-		StateReads:             uint64(len(queues.Inbox)),
-		ShardsTouched:          1,
-		FailedMessages:         countFailedZoneReceipts(receipts),
-		ZoneStateRoot:          runtime.StateRoot,
-		EventRoot:              EmptyRootHash(),
-		TransactionsExecuted:   transactionsExecuted,
-		InboundMessagesApplied: inboundMessagesApplied,
-		ReceiptsProduced:       uint32(len(receipts)),
-		GasConsumed:            gasConsumed,
-		StateRoot:              runtime.StateRoot,
-		InboxRoot:              queues.InboxRoot(),
-		OutboxRoot:             queues.OutboxRoot(),
-		ReceiptRoot:            ComputeZoneReceiptRoot(receipts),
-		ExecutionResultRoot:    ComputeZoneExecutionResultRoot(receipts),
+		ZoneID:			runtime.ZoneID,
+		Height:			height,
+		TxCount:		uint64(transactionsExecuted),
+		InboundMessageCount:	uint64(inboundMessagesApplied),
+		OutboundMessageCount:	uint64(len(queues.Outbox)),
+		GasUsed:		gasConsumed,
+		StateWrites:		uint64(len(receipts)),
+		StateReads:		uint64(len(queues.Inbox)),
+		ShardsTouched:		1,
+		FailedMessages:		countFailedZoneReceipts(receipts),
+		ZoneStateRoot:		runtime.StateRoot,
+		EventRoot:		EmptyRootHash(),
+		TransactionsExecuted:	transactionsExecuted,
+		InboundMessagesApplied:	inboundMessagesApplied,
+		ReceiptsProduced:	uint32(len(receipts)),
+		GasConsumed:		gasConsumed,
+		StateRoot:		runtime.StateRoot,
+		InboxRoot:		queues.InboxRoot(),
+		OutboxRoot:		queues.OutboxRoot(),
+		ReceiptRoot:		ComputeZoneReceiptRoot(receipts),
+		ExecutionResultRoot:	ComputeZoneExecutionResultRoot(receipts),
 	})
 }
 

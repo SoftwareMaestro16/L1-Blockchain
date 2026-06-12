@@ -14,69 +14,69 @@ import (
 type UnifiedServiceRoute string
 
 const (
-	UnifiedRouteDeliverTx         UnifiedServiceRoute = "DELIVER_TX"
-	UnifiedRouteFinalizeBlock     UnifiedServiceRoute = "FINALIZE_BLOCK"
-	UnifiedRouteServiceNetwork    UnifiedServiceRoute = "SERVICE_NETWORK"
-	UnifiedRouteOnChainCommitment UnifiedServiceRoute = "ON_CHAIN_COMMITMENT"
-	UnifiedRouteOnChainPayment    UnifiedServiceRoute = "ON_CHAIN_PAYMENT"
-	UnifiedRouteOnChainDispute    UnifiedServiceRoute = "ON_CHAIN_DISPUTE"
-	UnifiedRouteOnChainSettlement UnifiedServiceRoute = "ON_CHAIN_SETTLEMENT"
-	UnifiedRouteProofVerification UnifiedServiceRoute = "PROOF_VERIFICATION"
+	UnifiedRouteDeliverTx		UnifiedServiceRoute	= "DELIVER_TX"
+	UnifiedRouteFinalizeBlock	UnifiedServiceRoute	= "FINALIZE_BLOCK"
+	UnifiedRouteServiceNetwork	UnifiedServiceRoute	= "SERVICE_NETWORK"
+	UnifiedRouteOnChainCommitment	UnifiedServiceRoute	= "ON_CHAIN_COMMITMENT"
+	UnifiedRouteOnChainPayment	UnifiedServiceRoute	= "ON_CHAIN_PAYMENT"
+	UnifiedRouteOnChainDispute	UnifiedServiceRoute	= "ON_CHAIN_DISPUTE"
+	UnifiedRouteOnChainSettlement	UnifiedServiceRoute	= "ON_CHAIN_SETTLEMENT"
+	UnifiedRouteProofVerification	UnifiedServiceRoute	= "PROOF_VERIFICATION"
 )
 
 type UnifiedServicePayment struct {
-	Model       string
-	Denom       string
-	MaxFee      string
-	Reserve     bool
-	Escrow      bool
-	PaymentHash string
+	Model		string
+	Denom		string
+	MaxFee		string
+	Reserve		bool
+	Escrow		bool
+	PaymentHash	string
 }
 
 type UnifiedServiceCall struct {
-	CallID           string
-	TargetService    string
-	Method           string
-	PayloadHash      string
-	Payment          UnifiedServicePayment
-	ProofRequirement coretypes.ServiceVerificationModel
-	TimeoutHeight    uint64
-	SignatureHash    string
+	CallID			string
+	TargetService		string
+	Method			string
+	PayloadHash		string
+	Payment			UnifiedServicePayment
+	ProofRequirement	coretypes.ServiceVerificationModel
+	TimeoutHeight		uint64
+	SignatureHash		string
 
-	Caller            string
-	InterfaceHash     string
-	MethodID          string
-	ExecutionLocation coretypes.ServiceLocation
-	IdempotencyKey    string
-	CallbackTarget    string
-	MaxFee            string
-	CreatedHeight     uint64
-	DeadlineHeight    uint64
-	Nonce             uint64
-	Kind              coretypes.ServiceCallKind
-	RetryOf           string
-	StateReadSet      []string
-	StateWriteSet     []string
-	UnifiedCallHash   string
+	Caller			string
+	InterfaceHash		string
+	MethodID		string
+	ExecutionLocation	coretypes.ServiceLocation
+	IdempotencyKey		string
+	CallbackTarget		string
+	MaxFee			string
+	CreatedHeight		uint64
+	DeadlineHeight		uint64
+	Nonce			uint64
+	Kind			coretypes.ServiceCallKind
+	RetryOf			string
+	StateReadSet		[]string
+	StateWriteSet		[]string
+	UnifiedCallHash		string
 }
 
 type UnifiedCallRoutingPlan struct {
-	CallID                        string
-	TargetService                 string
-	MethodID                      string
-	ServiceType                   coretypes.ServiceType
-	ExecutionLocation             coretypes.ServiceLocation
-	Kind                          coretypes.ServiceCallKind
-	Routes                        []UnifiedServiceRoute
-	ReserveFundsBeforeExecution   bool
-	VerifyResultProofBeforeAccept bool
-	CommitResultOnChain           bool
-	DisputeEligible               bool
-	PaymentRouteRequired          bool
-	OffChainExecutionRequired     bool
-	OnChainExecutionRequired      bool
-	ConsensusAcceptanceRoute      UnifiedServiceRoute
-	RoutingHash                   string
+	CallID				string
+	TargetService			string
+	MethodID			string
+	ServiceType			coretypes.ServiceType
+	ExecutionLocation		coretypes.ServiceLocation
+	Kind				coretypes.ServiceCallKind
+	Routes				[]UnifiedServiceRoute
+	ReserveFundsBeforeExecution	bool
+	VerifyResultProofBeforeAccept	bool
+	CommitResultOnChain		bool
+	DisputeEligible			bool
+	PaymentRouteRequired		bool
+	OffChainExecutionRequired	bool
+	OnChainExecutionRequired	bool
+	ConsensusAcceptanceRoute	UnifiedServiceRoute
+	RoutingHash			string
 }
 
 func NewUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor ServiceDescriptor, methodID, caller string, nonce uint64, payloadHash, maxFeeAmount, signatureHash string, timeoutDelta uint64, idempotencyKey, callbackTarget string) (UnifiedServiceCall, error) {
@@ -100,35 +100,35 @@ func NewUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor Ser
 	}
 	deadline := ctx.Height + timeoutDelta
 	payment := UnifiedServicePayment{
-		Model:   registryPaymentModelFromDescriptor(descriptor),
-		Denom:   descriptor.Payment.Denom,
-		MaxFee:  strings.TrimSpace(maxFeeAmount),
-		Reserve: servicePaymentRequiresReserve(descriptor.Payment.SettlementMode),
-		Escrow:  descriptor.Payment.EscrowRequired || descriptor.Payment.SettlementMode == coretypes.ServicePaymentEscrow,
+		Model:		registryPaymentModelFromDescriptor(descriptor),
+		Denom:		descriptor.Payment.Denom,
+		MaxFee:		strings.TrimSpace(maxFeeAmount),
+		Reserve:	servicePaymentRequiresReserve(descriptor.Payment.SettlementMode),
+		Escrow:		descriptor.Payment.EscrowRequired || descriptor.Payment.SettlementMode == coretypes.ServicePaymentEscrow,
 	}
 	payment.PaymentHash = ComputeUnifiedServicePaymentHash(payment)
 	call := UnifiedServiceCall{
-		TargetService:     descriptor.ServiceID,
-		Method:            method.Name,
-		PayloadHash:       strings.ToLower(strings.TrimSpace(payloadHash)),
-		Payment:           payment,
-		ProofRequirement:  method.VerificationModel,
-		TimeoutHeight:     timeoutDelta,
-		SignatureHash:     strings.ToLower(strings.TrimSpace(signatureHash)),
-		Caller:            strings.TrimSpace(caller),
-		InterfaceHash:     descriptor.Interface.InterfaceHash,
-		MethodID:          method.MethodID,
-		ExecutionLocation: descriptor.Execution.Location,
-		IdempotencyKey:    strings.TrimSpace(idempotencyKey),
-		CallbackTarget:    strings.TrimSpace(callbackTarget),
-		MaxFee:            strings.TrimSpace(maxFeeAmount),
-		CreatedHeight:     ctx.Height,
-		DeadlineHeight:    deadline,
-		Nonce:             nonce,
-		Kind:              kind,
-		RetryOf:           "",
-		StateReadSet:      []string{descriptor.ServiceID + "/" + method.MethodID + "/read"},
-		StateWriteSet:     []string{descriptor.ServiceID + "/" + method.MethodID + "/write"},
+		TargetService:		descriptor.ServiceID,
+		Method:			method.Name,
+		PayloadHash:		strings.ToLower(strings.TrimSpace(payloadHash)),
+		Payment:		payment,
+		ProofRequirement:	method.VerificationModel,
+		TimeoutHeight:		timeoutDelta,
+		SignatureHash:		strings.ToLower(strings.TrimSpace(signatureHash)),
+		Caller:			strings.TrimSpace(caller),
+		InterfaceHash:		descriptor.Interface.InterfaceHash,
+		MethodID:		method.MethodID,
+		ExecutionLocation:	descriptor.Execution.Location,
+		IdempotencyKey:		strings.TrimSpace(idempotencyKey),
+		CallbackTarget:		strings.TrimSpace(callbackTarget),
+		MaxFee:			strings.TrimSpace(maxFeeAmount),
+		CreatedHeight:		ctx.Height,
+		DeadlineHeight:		deadline,
+		Nonce:			nonce,
+		Kind:			kind,
+		RetryOf:		"",
+		StateReadSet:		[]string{descriptor.ServiceID + "/" + method.MethodID + "/read"},
+		StateWriteSet:		[]string{descriptor.ServiceID + "/" + method.MethodID + "/write"},
 	}
 	envelope := coretypes.NormalizeServiceCall(ctx, call.ToServiceCallEnvelope())
 	call.CallID = envelope.CallID
@@ -138,24 +138,24 @@ func NewUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor Ser
 
 func (call UnifiedServiceCall) ToServiceCallEnvelope() coretypes.ServiceCallEnvelope {
 	return coretypes.ServiceCallEnvelope{
-		CallID:           strings.ToLower(strings.TrimSpace(call.CallID)),
-		ServiceID:        strings.TrimSpace(call.TargetService),
-		Caller:           strings.TrimSpace(call.Caller),
-		Nonce:            call.Nonce,
-		IdempotencyKey:   strings.TrimSpace(call.IdempotencyKey),
-		MethodID:         strings.TrimSpace(call.MethodID),
-		InterfaceHash:    strings.ToLower(strings.TrimSpace(call.InterfaceHash)),
-		PayloadHash:      strings.ToLower(strings.TrimSpace(call.PayloadHash)),
-		PaymentDenom:     strings.TrimSpace(call.Payment.Denom),
-		MaxFeeAmount:     strings.TrimSpace(call.MaxFee),
-		ProofRequirement: call.ProofRequirement,
-		Kind:             call.Kind,
-		CreatedHeight:    call.CreatedHeight,
-		DeadlineHeight:   call.DeadlineHeight,
-		Callback:         call.CallbackTarget != "",
-		RetryOf:          strings.ToLower(strings.TrimSpace(call.RetryOf)),
-		StateReadSet:     append([]string(nil), call.StateReadSet...),
-		StateWriteSet:    append([]string(nil), call.StateWriteSet...),
+		CallID:			strings.ToLower(strings.TrimSpace(call.CallID)),
+		ServiceID:		strings.TrimSpace(call.TargetService),
+		Caller:			strings.TrimSpace(call.Caller),
+		Nonce:			call.Nonce,
+		IdempotencyKey:		strings.TrimSpace(call.IdempotencyKey),
+		MethodID:		strings.TrimSpace(call.MethodID),
+		InterfaceHash:		strings.ToLower(strings.TrimSpace(call.InterfaceHash)),
+		PayloadHash:		strings.ToLower(strings.TrimSpace(call.PayloadHash)),
+		PaymentDenom:		strings.TrimSpace(call.Payment.Denom),
+		MaxFeeAmount:		strings.TrimSpace(call.MaxFee),
+		ProofRequirement:	call.ProofRequirement,
+		Kind:			call.Kind,
+		CreatedHeight:		call.CreatedHeight,
+		DeadlineHeight:		call.DeadlineHeight,
+		Callback:		call.CallbackTarget != "",
+		RetryOf:		strings.ToLower(strings.TrimSpace(call.RetryOf)),
+		StateReadSet:		append([]string(nil), call.StateReadSet...),
+		StateWriteSet:		append([]string(nil), call.StateWriteSet...),
 	}
 }
 
@@ -346,21 +346,21 @@ func RouteUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor S
 	}
 	sortUnifiedRoutes(routes)
 	plan := UnifiedCallRoutingPlan{
-		CallID:                        call.CallID,
-		TargetService:                 call.TargetService,
-		MethodID:                      call.MethodID,
-		ServiceType:                   descriptor.ServiceType,
-		ExecutionLocation:             call.ExecutionLocation,
-		Kind:                          call.Kind,
-		Routes:                        routes,
-		ReserveFundsBeforeExecution:   call.Payment.Reserve,
-		VerifyResultProofBeforeAccept: serviceProofRequiresResultVerification(call.ProofRequirement),
-		CommitResultOnChain:           serviceResultRequiresOnChainCommitment(descriptor, call),
-		DisputeEligible:               descriptor.ServiceType == coretypes.ServiceTypeMixed && descriptor.Verification.ChallengeWindow != 0,
-		PaymentRouteRequired:          call.Payment.Reserve || call.Payment.Escrow,
-		OffChainExecutionRequired:     descriptor.ServiceType == coretypes.ServiceTypeOffChain || descriptor.ServiceType == coretypes.ServiceTypeMixed,
-		OnChainExecutionRequired:      descriptor.ServiceType == coretypes.ServiceTypeOnChain,
-		ConsensusAcceptanceRoute:      consensusAcceptanceRouteForDescriptor(descriptor),
+		CallID:				call.CallID,
+		TargetService:			call.TargetService,
+		MethodID:			call.MethodID,
+		ServiceType:			descriptor.ServiceType,
+		ExecutionLocation:		call.ExecutionLocation,
+		Kind:				call.Kind,
+		Routes:				routes,
+		ReserveFundsBeforeExecution:	call.Payment.Reserve,
+		VerifyResultProofBeforeAccept:	serviceProofRequiresResultVerification(call.ProofRequirement),
+		CommitResultOnChain:		serviceResultRequiresOnChainCommitment(descriptor, call),
+		DisputeEligible:		descriptor.ServiceType == coretypes.ServiceTypeMixed && descriptor.Verification.ChallengeWindow != 0,
+		PaymentRouteRequired:		call.Payment.Reserve || call.Payment.Escrow,
+		OffChainExecutionRequired:	descriptor.ServiceType == coretypes.ServiceTypeOffChain || descriptor.ServiceType == coretypes.ServiceTypeMixed,
+		OnChainExecutionRequired:	descriptor.ServiceType == coretypes.ServiceTypeOnChain,
+		ConsensusAcceptanceRoute:	consensusAcceptanceRouteForDescriptor(descriptor),
 	}
 	plan.RoutingHash = ComputeUnifiedCallRoutingPlanHash(plan)
 	return plan, plan.Validate()

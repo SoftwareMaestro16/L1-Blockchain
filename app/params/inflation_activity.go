@@ -7,129 +7,129 @@ import (
 )
 
 const (
-	DefaultInflationPerWindowChangeLimitBps = int64(25)
-	DefaultInflationSmoothingWindow         = uint32(4)
-	DefaultOperatingCostCoverageTargetBps   = BasisPoints
-	DefaultTreasuryReserveHealthTargetBps   = BasisPoints
-	DefaultFeeRevenueTargetNaet             = int64(1_000_000_000)
-	DefaultActiveValidatorTarget            = uint64(75)
+	DefaultInflationPerWindowChangeLimitBps	= int64(25)
+	DefaultInflationSmoothingWindow		= uint32(4)
+	DefaultOperatingCostCoverageTargetBps	= BasisPoints
+	DefaultTreasuryReserveHealthTargetBps	= BasisPoints
+	DefaultFeeRevenueTargetNaet		= int64(1_000_000_000)
+	DefaultActiveValidatorTarget		= uint64(75)
 
-	InflationScenarioLowActivity         = "low_activity"
-	InflationScenarioNormalActivity      = "normal_activity"
-	InflationScenarioHighActivity        = "high_activity"
-	InflationScenarioAdversarialActivity = "adversarial_activity"
+	InflationScenarioLowActivity		= "low_activity"
+	InflationScenarioNormalActivity		= "normal_activity"
+	InflationScenarioHighActivity		= "high_activity"
+	InflationScenarioAdversarialActivity	= "adversarial_activity"
 )
 
 type ActivityInflationControllerParams struct {
-	MinInflationBps                int64
-	MaxInflationBps                int64
-	TargetStakeBps                 int64
-	TargetOperatingCostCoverageBps int64
-	TargetFeeRevenueNaet           sdkmath.Int
-	TargetActiveValidators         uint64
-	TargetTreasuryReserveHealthBps int64
-	StakeWeightBps                 int64
-	OperatingCostWeightBps         int64
-	FeeRevenueWeightBps            int64
-	ValidatorCountWeightBps        int64
-	SlashingRiskWeightBps          int64
-	NetworkActivityWeightBps       int64
-	TreasuryReserveWeightBps       int64
-	PerWindowChangeLimitBps        int64
-	SmoothingWindow                uint32
-	EmergencyFreeze                bool
+	MinInflationBps			int64
+	MaxInflationBps			int64
+	TargetStakeBps			int64
+	TargetOperatingCostCoverageBps	int64
+	TargetFeeRevenueNaet		sdkmath.Int
+	TargetActiveValidators		uint64
+	TargetTreasuryReserveHealthBps	int64
+	StakeWeightBps			int64
+	OperatingCostWeightBps		int64
+	FeeRevenueWeightBps		int64
+	ValidatorCountWeightBps		int64
+	SlashingRiskWeightBps		int64
+	NetworkActivityWeightBps	int64
+	TreasuryReserveWeightBps	int64
+	PerWindowChangeLimitBps		int64
+	SmoothingWindow			uint32
+	EmergencyFreeze			bool
 }
 
 type ActivityInflationControllerInput struct {
-	CurrentInflationBps            int64
-	BondedStakeRatioBps            int64
-	ValidatorOperatingCostIndexBps int64
-	FeeRevenueNaet                 sdkmath.Int
-	ActiveValidatorCount           uint64
-	SlashingRiskEvents             uint32
-	NetworkActivityScoreBps        int64
-	TreasuryReserveHealthBps       int64
-	RecentInflationBps             []int64
+	CurrentInflationBps		int64
+	BondedStakeRatioBps		int64
+	ValidatorOperatingCostIndexBps	int64
+	FeeRevenueNaet			sdkmath.Int
+	ActiveValidatorCount		uint64
+	SlashingRiskEvents		uint32
+	NetworkActivityScoreBps		int64
+	TreasuryReserveHealthBps	int64
+	RecentInflationBps		[]int64
 }
 
 type InflationAdjustmentComponent struct {
-	Name            string
-	ValueBps        int64
-	WeightBps       int64
-	ContributionBps int64
+	Name		string
+	ValueBps	int64
+	WeightBps	int64
+	ContributionBps	int64
 }
 
 type ActivityInflationControllerOutput struct {
-	InflationBps          int64
-	PreviousInflationBps  int64
-	RawTargetInflationBps int64
-	SmoothedInflationBps  int64
-	AppliedDeltaBps       int64
-	BoundedByMin          bool
-	BoundedByMax          bool
-	ChangeLimited         bool
-	EmergencyFrozen       bool
-	Components            []InflationAdjustmentComponent
-	QueryableInputs       ActivityInflationControllerInput
+	InflationBps		int64
+	PreviousInflationBps	int64
+	RawTargetInflationBps	int64
+	SmoothedInflationBps	int64
+	AppliedDeltaBps		int64
+	BoundedByMin		bool
+	BoundedByMax		bool
+	ChangeLimited		bool
+	EmergencyFrozen		bool
+	Components		[]InflationAdjustmentComponent
+	QueryableInputs		ActivityInflationControllerInput
 }
 
 type NetIssuanceInput struct {
-	EpochID                    uint64
-	AccountingPeriod           string
-	Blocks                     uint64
-	GrossMintedNaet            sdkmath.Int
-	BurnedNaet                 sdkmath.Int
-	FeeRevenueNaet             sdkmath.Int
-	ValidatorSecuritySpendNaet sdkmath.Int
+	EpochID				uint64
+	AccountingPeriod		string
+	Blocks				uint64
+	GrossMintedNaet			sdkmath.Int
+	BurnedNaet			sdkmath.Int
+	FeeRevenueNaet			sdkmath.Int
+	ValidatorSecuritySpendNaet	sdkmath.Int
 }
 
 type NetIssuanceReport struct {
-	EpochID                    uint64
-	AccountingPeriod           string
-	Blocks                     uint64
-	GrossMintedNaet            sdkmath.Int
-	BurnedNaet                 sdkmath.Int
-	NetSupplyChangeNaet        sdkmath.Int
-	FeeRevenueNaet             sdkmath.Int
-	ValidatorSecuritySpendNaet sdkmath.Int
-	SecuritySpendPerBlockNaet  sdkmath.Int
+	EpochID				uint64
+	AccountingPeriod		string
+	Blocks				uint64
+	GrossMintedNaet			sdkmath.Int
+	BurnedNaet			sdkmath.Int
+	NetSupplyChangeNaet		sdkmath.Int
+	FeeRevenueNaet			sdkmath.Int
+	ValidatorSecuritySpendNaet	sdkmath.Int
+	SecuritySpendPerBlockNaet	sdkmath.Int
 }
 
 type InflationSimulationStep struct {
-	Scenario    string
-	Controller  ActivityInflationControllerInput
-	NetIssuance NetIssuanceInput
+	Scenario	string
+	Controller	ActivityInflationControllerInput
+	NetIssuance	NetIssuanceInput
 }
 
 type InflationSimulationReport struct {
-	ScenarioCount           int
-	FinalInflationBps       int64
-	MinObservedInflationBps int64
-	MaxObservedInflationBps int64
-	ControllerOutputs       []ActivityInflationControllerOutput
-	NetIssuanceReports      []NetIssuanceReport
-	Passed                  bool
-	Risks                   []string
+	ScenarioCount		int
+	FinalInflationBps	int64
+	MinObservedInflationBps	int64
+	MaxObservedInflationBps	int64
+	ControllerOutputs	[]ActivityInflationControllerOutput
+	NetIssuanceReports	[]NetIssuanceReport
+	Passed			bool
+	Risks			[]string
 }
 
 func DefaultActivityInflationControllerParams() ActivityInflationControllerParams {
 	return ActivityInflationControllerParams{
-		MinInflationBps:                MinInflationBps,
-		MaxInflationBps:                MaxInflationBps,
-		TargetStakeBps:                 DefaultTargetStakeBps,
-		TargetOperatingCostCoverageBps: DefaultOperatingCostCoverageTargetBps,
-		TargetFeeRevenueNaet:           sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
-		TargetActiveValidators:         DefaultActiveValidatorTarget,
-		TargetTreasuryReserveHealthBps: DefaultTreasuryReserveHealthTargetBps,
-		StakeWeightBps:                 2_500,
-		OperatingCostWeightBps:         2_000,
-		FeeRevenueWeightBps:            1_500,
-		ValidatorCountWeightBps:        1_000,
-		SlashingRiskWeightBps:          1_000,
-		NetworkActivityWeightBps:       1_000,
-		TreasuryReserveWeightBps:       1_000,
-		PerWindowChangeLimitBps:        DefaultInflationPerWindowChangeLimitBps,
-		SmoothingWindow:                DefaultInflationSmoothingWindow,
+		MinInflationBps:		MinInflationBps,
+		MaxInflationBps:		MaxInflationBps,
+		TargetStakeBps:			DefaultTargetStakeBps,
+		TargetOperatingCostCoverageBps:	DefaultOperatingCostCoverageTargetBps,
+		TargetFeeRevenueNaet:		sdkmath.NewInt(DefaultFeeRevenueTargetNaet),
+		TargetActiveValidators:		DefaultActiveValidatorTarget,
+		TargetTreasuryReserveHealthBps:	DefaultTreasuryReserveHealthTargetBps,
+		StakeWeightBps:			2_500,
+		OperatingCostWeightBps:		2_000,
+		FeeRevenueWeightBps:		1_500,
+		ValidatorCountWeightBps:	1_000,
+		SlashingRiskWeightBps:		1_000,
+		NetworkActivityWeightBps:	1_000,
+		TreasuryReserveWeightBps:	1_000,
+		PerWindowChangeLimitBps:	DefaultInflationPerWindowChangeLimitBps,
+		SmoothingWindow:		DefaultInflationSmoothingWindow,
 	}
 }
 
@@ -158,16 +158,16 @@ func ActivityInflationControllerWithParams(input ActivityInflationControllerInpu
 	inflation := clampInt64(input.CurrentInflationBps+limitedDelta, params.MinInflationBps, params.MaxInflationBps)
 
 	output := ActivityInflationControllerOutput{
-		InflationBps:          inflation,
-		PreviousInflationBps:  input.CurrentInflationBps,
-		RawTargetInflationBps: rawTarget,
-		SmoothedInflationBps:  smoothed,
-		AppliedDeltaBps:       inflation - input.CurrentInflationBps,
-		BoundedByMin:          inflation == params.MinInflationBps && input.CurrentInflationBps+limitedDelta < params.MinInflationBps,
-		BoundedByMax:          inflation == params.MaxInflationBps && input.CurrentInflationBps+limitedDelta > params.MaxInflationBps,
-		ChangeLimited:         delta != limitedDelta,
-		Components:            components,
-		QueryableInputs:       input,
+		InflationBps:		inflation,
+		PreviousInflationBps:	input.CurrentInflationBps,
+		RawTargetInflationBps:	rawTarget,
+		SmoothedInflationBps:	smoothed,
+		AppliedDeltaBps:	inflation - input.CurrentInflationBps,
+		BoundedByMin:		inflation == params.MinInflationBps && input.CurrentInflationBps+limitedDelta < params.MinInflationBps,
+		BoundedByMax:		inflation == params.MaxInflationBps && input.CurrentInflationBps+limitedDelta > params.MaxInflationBps,
+		ChangeLimited:		delta != limitedDelta,
+		Components:		components,
+		QueryableInputs:	input,
 	}
 	if params.EmergencyFreeze {
 		output.InflationBps = input.CurrentInflationBps
@@ -196,8 +196,8 @@ func ReportNetIssuance(input NetIssuanceInput) (NetIssuanceReport, error) {
 	feeRevenue := normalizeInt(input.FeeRevenueNaet)
 	securitySpend := normalizeInt(input.ValidatorSecuritySpendNaet)
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "gross_minted_naet", value: grossMinted},
 		{name: "burned_naet", value: burned},
@@ -209,15 +209,15 @@ func ReportNetIssuance(input NetIssuanceInput) (NetIssuanceReport, error) {
 		}
 	}
 	return NetIssuanceReport{
-		EpochID:                    input.EpochID,
-		AccountingPeriod:           input.AccountingPeriod,
-		Blocks:                     input.Blocks,
-		GrossMintedNaet:            grossMinted,
-		BurnedNaet:                 burned,
-		NetSupplyChangeNaet:        grossMinted.Sub(burned),
-		FeeRevenueNaet:             feeRevenue,
-		ValidatorSecuritySpendNaet: securitySpend,
-		SecuritySpendPerBlockNaet:  securitySpend.QuoRaw(int64(input.Blocks)),
+		EpochID:			input.EpochID,
+		AccountingPeriod:		input.AccountingPeriod,
+		Blocks:				input.Blocks,
+		GrossMintedNaet:		grossMinted,
+		BurnedNaet:			burned,
+		NetSupplyChangeNaet:		grossMinted.Sub(burned),
+		FeeRevenueNaet:			feeRevenue,
+		ValidatorSecuritySpendNaet:	securitySpend,
+		SecuritySpendPerBlockNaet:	securitySpend.QuoRaw(int64(input.Blocks)),
 	}, nil
 }
 
@@ -279,14 +279,14 @@ func SimulateActivityInflation(params ActivityInflationControllerParams, steps [
 		}
 	}
 	return InflationSimulationReport{
-		ScenarioCount:           len(seenScenarios),
-		FinalInflationBps:       current,
-		MinObservedInflationBps: minObserved,
-		MaxObservedInflationBps: maxObserved,
-		ControllerOutputs:       outputs,
-		NetIssuanceReports:      reports,
-		Passed:                  len(risks) == 0,
-		Risks:                   risks,
+		ScenarioCount:			len(seenScenarios),
+		FinalInflationBps:		current,
+		MinObservedInflationBps:	minObserved,
+		MaxObservedInflationBps:	maxObserved,
+		ControllerOutputs:		outputs,
+		NetIssuanceReports:		reports,
+		Passed:				len(risks) == 0,
+		Risks:				risks,
 	}, nil
 }
 
@@ -328,13 +328,13 @@ func (p ActivityInflationControllerParams) Validate() error {
 		return fmt.Errorf("inflation controller weights must sum to %d", BasisPoints)
 	}
 	for name, value := range map[string]int64{
-		"stake_weight_bps":            p.StakeWeightBps,
-		"operating_cost_weight_bps":   p.OperatingCostWeightBps,
-		"fee_revenue_weight_bps":      p.FeeRevenueWeightBps,
-		"validator_count_weight_bps":  p.ValidatorCountWeightBps,
-		"slashing_risk_weight_bps":    p.SlashingRiskWeightBps,
-		"network_activity_weight_bps": p.NetworkActivityWeightBps,
-		"treasury_reserve_weight_bps": p.TreasuryReserveWeightBps,
+		"stake_weight_bps":		p.StakeWeightBps,
+		"operating_cost_weight_bps":	p.OperatingCostWeightBps,
+		"fee_revenue_weight_bps":	p.FeeRevenueWeightBps,
+		"validator_count_weight_bps":	p.ValidatorCountWeightBps,
+		"slashing_risk_weight_bps":	p.SlashingRiskWeightBps,
+		"network_activity_weight_bps":	p.NetworkActivityWeightBps,
+		"treasury_reserve_weight_bps":	p.TreasuryReserveWeightBps,
 	} {
 		if err := validateBps(name, value, 0, BasisPoints); err != nil {
 			return err

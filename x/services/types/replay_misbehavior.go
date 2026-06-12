@@ -14,126 +14,126 @@ type ProviderMisbehaviorFaultClass string
 type ProviderPenaltySource string
 
 const (
-	ProviderFaultInvalidResult         ProviderMisbehaviorFaultClass = "invalid_result"
-	ProviderFaultMissingResult         ProviderMisbehaviorFaultClass = "missing_result"
-	ProviderFaultLateResult            ProviderMisbehaviorFaultClass = "late_result"
-	ProviderFaultDoubleResponse        ProviderMisbehaviorFaultClass = "double_response"
-	ProviderFaultWrongInterfaceVersion ProviderMisbehaviorFaultClass = "wrong_interface_version"
-	ProviderFaultInvalidProof          ProviderMisbehaviorFaultClass = "invalid_proof"
-	ProviderFaultAvailabilityViolation ProviderMisbehaviorFaultClass = "availability_violation"
+	ProviderFaultInvalidResult		ProviderMisbehaviorFaultClass	= "invalid_result"
+	ProviderFaultMissingResult		ProviderMisbehaviorFaultClass	= "missing_result"
+	ProviderFaultLateResult			ProviderMisbehaviorFaultClass	= "late_result"
+	ProviderFaultDoubleResponse		ProviderMisbehaviorFaultClass	= "double_response"
+	ProviderFaultWrongInterfaceVersion	ProviderMisbehaviorFaultClass	= "wrong_interface_version"
+	ProviderFaultInvalidProof		ProviderMisbehaviorFaultClass	= "invalid_proof"
+	ProviderFaultAvailabilityViolation	ProviderMisbehaviorFaultClass	= "availability_violation"
 
-	ProviderPenaltyCollateral      ProviderPenaltySource = "provider_collateral"
-	ProviderPenaltyServiceStake    ProviderPenaltySource = "service_stake"
-	ProviderPenaltyEscrowedPayment ProviderPenaltySource = "escrowed_payment"
-	ProviderPenaltyReputationScore ProviderPenaltySource = "reputation_score"
+	ProviderPenaltyCollateral	ProviderPenaltySource	= "provider_collateral"
+	ProviderPenaltyServiceStake	ProviderPenaltySource	= "service_stake"
+	ProviderPenaltyEscrowedPayment	ProviderPenaltySource	= "escrowed_payment"
+	ProviderPenaltyReputationScore	ProviderPenaltySource	= "reputation_score"
 )
 
 type ServiceReplayProtectionProof struct {
-	CallID           string
-	ServiceID        string
-	MethodID         string
-	Caller           string
-	Nonce            uint64
-	IdempotencyKey   string
-	PayloadHash      string
-	DeadlineHeight   uint64
-	ReplayEntryHash  string
-	ReceiptTombstone bool
-	TombstoneHash    string
-	ReplayIndexHash  string
-	ControlHash      string
+	CallID			string
+	ServiceID		string
+	MethodID		string
+	Caller			string
+	Nonce			uint64
+	IdempotencyKey		string
+	PayloadHash		string
+	DeadlineHeight		uint64
+	ReplayEntryHash		string
+	ReceiptTombstone	bool
+	TombstoneHash		string
+	ReplayIndexHash		string
+	ControlHash		string
 }
 
 type ProviderMisbehaviorReport struct {
-	ServiceID               string
-	ProviderID              string
-	CallID                  string
-	FaultClass              ProviderMisbehaviorFaultClass
-	EvidenceHash            string
-	ExpectedInterfaceHash   string
-	ObservedInterfaceHash   string
-	ProofHash               string
-	ObservedHeight          uint64
-	DeadlineHeight          uint64
-	PenaltySources          []ProviderPenaltySource
-	CollateralSlashAmount   string
-	ServiceStakeSlashAmount string
-	EscrowForfeitAmount     string
-	ReputationDelta         int64
-	ReportHash              string
+	ServiceID		string
+	ProviderID		string
+	CallID			string
+	FaultClass		ProviderMisbehaviorFaultClass
+	EvidenceHash		string
+	ExpectedInterfaceHash	string
+	ObservedInterfaceHash	string
+	ProofHash		string
+	ObservedHeight		uint64
+	DeadlineHeight		uint64
+	PenaltySources		[]ProviderPenaltySource
+	CollateralSlashAmount	string
+	ServiceStakeSlashAmount	string
+	EscrowForfeitAmount	string
+	ReputationDelta		int64
+	ReportHash		string
 }
 
 type ServiceFaultProof struct {
-	ServiceID             string
-	ProviderID            string
-	CallID                string
-	FaultClass            ProviderMisbehaviorFaultClass
-	ReportHash            string
-	EvidenceHash          string
-	ProofHash             string
-	ExpectedInterfaceHash string
-	ObservedInterfaceHash string
-	ReceiptHash           string
-	TombstoneHash         string
-	SubmittedHeight       uint64
-	FaultProofHash        string
+	ServiceID		string
+	ProviderID		string
+	CallID			string
+	FaultClass		ProviderMisbehaviorFaultClass
+	ReportHash		string
+	EvidenceHash		string
+	ProofHash		string
+	ExpectedInterfaceHash	string
+	ObservedInterfaceHash	string
+	ReceiptHash		string
+	TombstoneHash		string
+	SubmittedHeight		uint64
+	FaultProofHash		string
 }
 
 type ProviderPenaltyRouteEntry struct {
-	Source          ProviderPenaltySource
-	Denom           string
-	Amount          string
-	ReputationDelta int64
-	Recipient       string
-	RouteEntryHash  string
+	Source		ProviderPenaltySource
+	Denom		string
+	Amount		string
+	ReputationDelta	int64
+	Recipient	string
+	RouteEntryHash	string
 }
 
 type ProviderPenaltyRoute struct {
-	ServiceID  string
-	ProviderID string
-	CallID     string
-	FaultClass ProviderMisbehaviorFaultClass
-	ReportHash string
-	Entries    []ProviderPenaltyRouteEntry
-	RouteHash  string
+	ServiceID	string
+	ProviderID	string
+	CallID		string
+	FaultClass	ProviderMisbehaviorFaultClass
+	ReportHash	string
+	Entries		[]ProviderPenaltyRouteEntry
+	RouteHash	string
 }
 
 type ServiceChallengeFlow struct {
-	ChallengeID        string
-	ServiceID          string
-	ProviderID         string
-	CallID             string
-	FaultClass         ProviderMisbehaviorFaultClass
-	DisputeMessageHash string
-	FaultProofHash     string
-	PenaltyRouteHash   string
-	OpenedHeight       uint64
-	ChallengeEndHeight uint64
-	FlowHash           string
+	ChallengeID		string
+	ServiceID		string
+	ProviderID		string
+	CallID			string
+	FaultClass		ProviderMisbehaviorFaultClass
+	DisputeMessageHash	string
+	FaultProofHash		string
+	PenaltyRouteHash	string
+	OpenedHeight		uint64
+	ChallengeEndHeight	uint64
+	FlowHash		string
 }
 
 type ServiceReceiptFreshnessProof struct {
-	CallID            string
-	ReceiptHash       string
-	TombstoneHash     string
-	ReceiptHeight     uint64
-	RetainUntilHeight uint64
-	CurrentHeight     uint64
-	Stale             bool
-	FreshnessHash     string
+	CallID			string
+	ReceiptHash		string
+	TombstoneHash		string
+	ReceiptHeight		uint64
+	RetainUntilHeight	uint64
+	CurrentHeight		uint64
+	Stale			bool
+	FreshnessHash		string
 }
 
 type ServiceSecurityImplementationBundle struct {
-	ServiceID                     string
-	TrustModelLabel               ServiceTrustModelLabel
-	ExecutionFailureBehaviorLabel ServiceFailureBehaviorLabel
-	CollateralMessageHash         string
-	ChallengeFlowHash             string
-	FaultProofHash                string
-	PenaltyRouteHash              string
-	ReplayControlHash             string
-	ReceiptFreshnessHash          string
-	ImplementationHash            string
+	ServiceID			string
+	TrustModelLabel			ServiceTrustModelLabel
+	ExecutionFailureBehaviorLabel	ServiceFailureBehaviorLabel
+	CollateralMessageHash		string
+	ChallengeFlowHash		string
+	FaultProofHash			string
+	PenaltyRouteHash		string
+	ReplayControlHash		string
+	ReceiptFreshnessHash		string
+	ImplementationHash		string
 }
 
 func NewServiceReplayProtectionProof(ctx coretypes.ServiceConsensusContext, descriptor ServiceDescriptor, index ServiceCallReplayIndex, call UnifiedServiceCall, requireTombstone bool) (ServiceReplayProtectionProof, error) {
@@ -159,17 +159,17 @@ func NewServiceReplayProtectionProof(ctx coretypes.ServiceConsensusContext, desc
 		return ServiceReplayProtectionProof{}, errors.New("services replay protection requires receipt tombstone")
 	}
 	proof := ServiceReplayProtectionProof{
-		CallID:           call.CallID,
-		ServiceID:        call.TargetService,
-		MethodID:         call.MethodID,
-		Caller:           call.Caller,
-		Nonce:            call.Nonce,
-		IdempotencyKey:   call.IdempotencyKey,
-		PayloadHash:      call.PayloadHash,
-		DeadlineHeight:   call.DeadlineHeight,
-		ReplayEntryHash:  entry.EntryHash,
-		ReceiptTombstone: tombstoneFound,
-		ReplayIndexHash:  index.IndexHash,
+		CallID:			call.CallID,
+		ServiceID:		call.TargetService,
+		MethodID:		call.MethodID,
+		Caller:			call.Caller,
+		Nonce:			call.Nonce,
+		IdempotencyKey:		call.IdempotencyKey,
+		PayloadHash:		call.PayloadHash,
+		DeadlineHeight:		call.DeadlineHeight,
+		ReplayEntryHash:	entry.EntryHash,
+		ReceiptTombstone:	tombstoneFound,
+		ReplayIndexHash:	index.IndexHash,
 	}
 	if tombstoneFound {
 		proof.TombstoneHash = tombstone.TombstoneHash
@@ -211,18 +211,18 @@ func NewServiceFaultProof(report ProviderMisbehaviorReport, receipt ServiceRecei
 		return ServiceFaultProof{}, errors.New("services fault proof submitted height is invalid")
 	}
 	proof := ServiceFaultProof{
-		ServiceID:             report.ServiceID,
-		ProviderID:            report.ProviderID,
-		CallID:                receipt.CallID,
-		FaultClass:            report.FaultClass,
-		ReportHash:            report.ReportHash,
-		EvidenceHash:          report.EvidenceHash,
-		ProofHash:             report.ProofHash,
-		ExpectedInterfaceHash: report.ExpectedInterfaceHash,
-		ObservedInterfaceHash: report.ObservedInterfaceHash,
-		ReceiptHash:           receipt.ReceiptHash,
-		TombstoneHash:         tombstone.TombstoneHash,
-		SubmittedHeight:       submittedHeight,
+		ServiceID:		report.ServiceID,
+		ProviderID:		report.ProviderID,
+		CallID:			receipt.CallID,
+		FaultClass:		report.FaultClass,
+		ReportHash:		report.ReportHash,
+		EvidenceHash:		report.EvidenceHash,
+		ProofHash:		report.ProofHash,
+		ExpectedInterfaceHash:	report.ExpectedInterfaceHash,
+		ObservedInterfaceHash:	report.ObservedInterfaceHash,
+		ReceiptHash:		receipt.ReceiptHash,
+		TombstoneHash:		tombstone.TombstoneHash,
+		SubmittedHeight:	submittedHeight,
 	}
 	proof.FaultProofHash = ComputeServiceFaultProofHash(proof)
 	return proof, proof.Validate()
@@ -240,11 +240,11 @@ func NewProviderPenaltyRoute(report ProviderMisbehaviorReport, denom, recipient 
 		return ProviderPenaltyRoute{}, err
 	}
 	route := ProviderPenaltyRoute{
-		ServiceID:  report.ServiceID,
-		ProviderID: report.ProviderID,
-		CallID:     report.CallID,
-		FaultClass: report.FaultClass,
-		ReportHash: report.ReportHash,
+		ServiceID:	report.ServiceID,
+		ProviderID:	report.ProviderID,
+		CallID:		report.CallID,
+		FaultClass:	report.FaultClass,
+		ReportHash:	report.ReportHash,
 	}
 	for _, source := range report.PenaltySources {
 		entry := ProviderPenaltyRouteEntry{Source: source, Denom: denom, Recipient: recipient}
@@ -294,15 +294,15 @@ func NewServiceChallengeFlow(descriptor ServiceDescriptor, msg coretypes.MsgSubm
 		return ServiceChallengeFlow{}, errors.New("services challenge flow requires challenge window")
 	}
 	flow := ServiceChallengeFlow{
-		ServiceID:          descriptor.ServiceID,
-		ProviderID:         proof.ProviderID,
-		CallID:             proof.CallID,
-		FaultClass:         proof.FaultClass,
-		DisputeMessageHash: msg.MessageHash,
-		FaultProofHash:     proof.FaultProofHash,
-		PenaltyRouteHash:   route.RouteHash,
-		OpenedHeight:       msg.OpenedHeight,
-		ChallengeEndHeight: msg.OpenedHeight + challengeWindow,
+		ServiceID:		descriptor.ServiceID,
+		ProviderID:		proof.ProviderID,
+		CallID:			proof.CallID,
+		FaultClass:		proof.FaultClass,
+		DisputeMessageHash:	msg.MessageHash,
+		FaultProofHash:		proof.FaultProofHash,
+		PenaltyRouteHash:	route.RouteHash,
+		OpenedHeight:		msg.OpenedHeight,
+		ChallengeEndHeight:	msg.OpenedHeight + challengeWindow,
 	}
 	flow.ChallengeID = ComputeServiceChallengeID(flow)
 	flow.FlowHash = ComputeServiceChallengeFlowHash(flow)
@@ -321,13 +321,13 @@ func NewServiceReceiptFreshnessProof(tombstone ServiceReceiptTombstone, currentH
 		return ServiceReceiptFreshnessProof{}, errors.New("services receipt freshness proof is stale")
 	}
 	proof := ServiceReceiptFreshnessProof{
-		CallID:            tombstone.CallID,
-		ReceiptHash:       tombstone.ReceiptHash,
-		TombstoneHash:     tombstone.TombstoneHash,
-		ReceiptHeight:     tombstone.ReceiptHeight,
-		RetainUntilHeight: tombstone.RetainUntilHeight,
-		CurrentHeight:     currentHeight,
-		Stale:             stale,
+		CallID:			tombstone.CallID,
+		ReceiptHash:		tombstone.ReceiptHash,
+		TombstoneHash:		tombstone.TombstoneHash,
+		ReceiptHeight:		tombstone.ReceiptHeight,
+		RetainUntilHeight:	tombstone.RetainUntilHeight,
+		CurrentHeight:		currentHeight,
+		Stale:			stale,
 	}
 	proof.FreshnessHash = ComputeServiceReceiptFreshnessProofHash(proof)
 	return proof, proof.Validate()
@@ -374,15 +374,15 @@ func NewServiceSecurityImplementationBundle(descriptor ServiceDescriptor, collat
 		return ServiceSecurityImplementationBundle{}, err
 	}
 	bundle := ServiceSecurityImplementationBundle{
-		ServiceID:                     descriptor.ServiceID,
-		TrustModelLabel:               trustLabel,
-		ExecutionFailureBehaviorLabel: failureLabel,
-		CollateralMessageHash:         collateralMsg.MessageHash,
-		ChallengeFlowHash:             flow.FlowHash,
-		FaultProofHash:                faultProof.FaultProofHash,
-		PenaltyRouteHash:              route.RouteHash,
-		ReplayControlHash:             replayProof.ControlHash,
-		ReceiptFreshnessHash:          freshness.FreshnessHash,
+		ServiceID:			descriptor.ServiceID,
+		TrustModelLabel:		trustLabel,
+		ExecutionFailureBehaviorLabel:	failureLabel,
+		CollateralMessageHash:		collateralMsg.MessageHash,
+		ChallengeFlowHash:		flow.FlowHash,
+		FaultProofHash:			faultProof.FaultProofHash,
+		PenaltyRouteHash:		route.RouteHash,
+		ReplayControlHash:		replayProof.ControlHash,
+		ReceiptFreshnessHash:		freshness.FreshnessHash,
 	}
 	bundle.ImplementationHash = ComputeServiceSecurityImplementationBundleHash(bundle)
 	return bundle, bundle.Validate()
@@ -625,13 +625,13 @@ func (bundle ServiceSecurityImplementationBundle) Validate() error {
 		return errors.New("services security implementation failure label is required")
 	}
 	for label, value := range map[string]string{
-		"collateral message": bundle.CollateralMessageHash,
-		"challenge flow":     bundle.ChallengeFlowHash,
-		"fault proof":        bundle.FaultProofHash,
-		"penalty route":      bundle.PenaltyRouteHash,
-		"replay control":     bundle.ReplayControlHash,
-		"receipt freshness":  bundle.ReceiptFreshnessHash,
-		"implementation":     bundle.ImplementationHash,
+		"collateral message":	bundle.CollateralMessageHash,
+		"challenge flow":	bundle.ChallengeFlowHash,
+		"fault proof":		bundle.FaultProofHash,
+		"penalty route":	bundle.PenaltyRouteHash,
+		"replay control":	bundle.ReplayControlHash,
+		"receipt freshness":	bundle.ReceiptFreshnessHash,
+		"implementation":	bundle.ImplementationHash,
 	} {
 		if err := coretypes.ValidateHash("services security implementation "+label+" hash", value); err != nil {
 			return err

@@ -8,98 +8,98 @@ import (
 )
 
 const (
-	MaxDNLEntries        = 4096
-	MaxDNLRoutes         = 8192
-	MaxDNLCache          = 4096
-	DefaultDNLQueryLimit = uint32(32)
-	MaxDNLQueryLimit     = uint32(256)
+	MaxDNLEntries		= 4096
+	MaxDNLRoutes		= 8192
+	MaxDNLCache		= 4096
+	DefaultDNLQueryLimit	= uint32(32)
+	MaxDNLQueryLimit	= uint32(256)
 )
 
 type DNLServiceDiscoveryEntry struct {
-	EntryID       string
-	ServiceID     string
-	ZoneID        string
-	InterfaceHash string
-	EndpointHash  string
-	RouteID       string
-	ExpiryHeight  uint64
-	ProofHash     string
-	EntryHash     string
+	EntryID		string
+	ServiceID	string
+	ZoneID		string
+	InterfaceHash	string
+	EndpointHash	string
+	RouteID		string
+	ExpiryHeight	uint64
+	ProofHash	string
+	EntryHash	string
 }
 
 type DNLRoutingTableEntry struct {
-	RouteID       string
-	ZoneID        string
-	ServiceID     string
-	NextHopNodeID string
-	OverlayID     string
-	Priority      uint32
-	WeightBps     uint32
-	ExpiryHeight  uint64
-	EntryHash     string
+	RouteID		string
+	ZoneID		string
+	ServiceID	string
+	NextHopNodeID	string
+	OverlayID	string
+	Priority	uint32
+	WeightBps	uint32
+	ExpiryHeight	uint64
+	EntryHash	string
 }
 
 type DNLCacheEntry struct {
-	CacheKey     string
-	QueryHash    string
-	ResponseHash string
-	ExpiryHeight uint64
-	ProofHash    string
-	EntryHash    string
+	CacheKey	string
+	QueryHash	string
+	ResponseHash	string
+	ExpiryHeight	uint64
+	ProofHash	string
+	EntryHash	string
 }
 
 type DNLState struct {
-	ServiceEntries []DNLServiceDiscoveryEntry
-	RoutingTable   []DNLRoutingTableEntry
-	CacheEntries   []DNLCacheEntry
-	Height         uint64
-	ServicesRoot   string
-	RoutingRoot    string
-	LookupRoot     string
-	CacheRoot      string
-	StateRoot      string
+	ServiceEntries	[]DNLServiceDiscoveryEntry
+	RoutingTable	[]DNLRoutingTableEntry
+	CacheEntries	[]DNLCacheEntry
+	Height		uint64
+	ServicesRoot	string
+	RoutingRoot	string
+	LookupRoot	string
+	CacheRoot	string
+	StateRoot	string
 }
 
 type DNLQuery struct {
-	ServiceID     string
-	ZoneID        string
-	InterfaceHash string
-	CurrentHeight uint64
-	Limit         uint32
-	RequireProof  bool
+	ServiceID	string
+	ZoneID		string
+	InterfaceHash	string
+	CurrentHeight	uint64
+	Limit		uint32
+	RequireProof	bool
 }
 
 type DNLProof struct {
-	Key       string
-	ValueHash string
-	StateRoot string
-	Height    uint64
-	Path      []string
-	ProofHash string
+	Key		string
+	ValueHash	string
+	StateRoot	string
+	Height		uint64
+	Path		[]string
+	ProofHash	string
 }
 
 type DNLDiscoveryResponse struct {
-	QueryHash    string
-	Entries      []DNLServiceDiscoveryEntry
-	Routes       []DNLRoutingTableEntry
-	Proof        DNLProof
-	ExpiryHeight uint64
-	ResponseHash string
+	QueryHash	string
+	Entries		[]DNLServiceDiscoveryEntry
+	Routes		[]DNLRoutingTableEntry
+	Proof		DNLProof
+	ExpiryHeight	uint64
+	ResponseHash	string
 }
 
 type DNLAdvisoryObservation struct {
-	ObservedNodeID  string
-	ServiceID       string
-	ZoneID          string
-	EndpointHash    string
-	ObservedHeight  uint64
-	ObservationHash string
+	ObservedNodeID	string
+	ServiceID	string
+	ZoneID		string
+	EndpointHash	string
+	ObservedHeight	uint64
+	ObservationHash	string
 }
 
 type DNLStateEntry struct {
-	Key       string
-	ValueHash string
-	EntryHash string
+	Key		string
+	ValueHash	string
+	EntryHash	string
 }
 
 func NewDNLServiceDiscoveryEntry(entry DNLServiceDiscoveryEntry) (DNLServiceDiscoveryEntry, error) {
@@ -137,10 +137,10 @@ func NewDNLCacheEntry(entry DNLCacheEntry) (DNLCacheEntry, error) {
 
 func BuildDNLState(entries []DNLServiceDiscoveryEntry, routes []DNLRoutingTableEntry, cache []DNLCacheEntry, height uint64) (DNLState, error) {
 	state := DNLState{
-		ServiceEntries: normalizeDNLServiceEntries(entries),
-		RoutingTable:   normalizeDNLRoutes(routes),
-		CacheEntries:   normalizeDNLCacheEntries(cache),
-		Height:         height,
+		ServiceEntries:	normalizeDNLServiceEntries(entries),
+		RoutingTable:	normalizeDNLRoutes(routes),
+		CacheEntries:	normalizeDNLCacheEntries(cache),
+		Height:		height,
 	}
 	if err := state.ValidateFormat(); err != nil {
 		return DNLState{}, err
@@ -198,10 +198,10 @@ func QueryDNL(state DNLState, query DNLQuery) (DNLDiscoveryResponse, error) {
 	}
 	routes = uniqueSortedDNLRoutes(routes)
 	response := DNLDiscoveryResponse{
-		QueryHash:    ComputeDNLQueryHash(query),
-		Entries:      entries,
-		Routes:       routes,
-		ExpiryHeight: minDNLExpiry(entries, routes),
+		QueryHash:	ComputeDNLQueryHash(query),
+		Entries:	entries,
+		Routes:		routes,
+		ExpiryHeight:	minDNLExpiry(entries, routes),
 	}
 	if query.RequireProof {
 		proofKey := DNLQueryProofKey(query)
@@ -246,10 +246,10 @@ func BuildDNLCacheEntryFromResponse(response DNLDiscoveryResponse) (DNLCacheEntr
 		return DNLCacheEntry{}, err
 	}
 	return NewDNLCacheEntry(DNLCacheEntry{
-		QueryHash:    response.QueryHash,
-		ResponseHash: response.ResponseHash,
-		ExpiryHeight: response.ExpiryHeight,
-		ProofHash:    response.Proof.ProofHash,
+		QueryHash:	response.QueryHash,
+		ResponseHash:	response.ResponseHash,
+		ExpiryHeight:	response.ExpiryHeight,
+		ProofHash:	response.Proof.ProofHash,
 	})
 }
 
@@ -302,12 +302,12 @@ func DNLCacheKey(cacheKey string) (string, error) {
 func DNLQueryProofKey(query DNLQuery) string {
 	query = NormalizeDNLQuery(query)
 	return "dnl/lookup/" + ComputeDNLQueryHash(DNLQuery{
-		ServiceID:     query.ServiceID,
-		ZoneID:        query.ZoneID,
-		InterfaceHash: query.InterfaceHash,
-		CurrentHeight: 0,
-		Limit:         0,
-		RequireProof:  false,
+		ServiceID:	query.ServiceID,
+		ZoneID:		query.ZoneID,
+		InterfaceHash:	query.InterfaceHash,
+		CurrentHeight:	0,
+		Limit:		0,
+		RequireProof:	false,
 	})
 }
 
@@ -512,14 +512,14 @@ func (state DNLState) Validate() error {
 		return errors.New("networking DNL state root is required")
 	}
 	expected := DNLState{
-		ServiceEntries: state.ServiceEntries,
-		RoutingTable:   state.RoutingTable,
-		CacheEntries:   state.CacheEntries,
-		Height:         state.Height,
-		ServicesRoot:   ComputeDNLServiceRoot(state.ServiceEntries),
-		RoutingRoot:    ComputeDNLRoutingRoot(state.RoutingTable),
-		LookupRoot:     ComputeDNLLookupRoot(state.ServiceEntries, state.RoutingTable),
-		CacheRoot:      ComputeDNLCacheRoot(state.CacheEntries),
+		ServiceEntries:	state.ServiceEntries,
+		RoutingTable:	state.RoutingTable,
+		CacheEntries:	state.CacheEntries,
+		Height:		state.Height,
+		ServicesRoot:	ComputeDNLServiceRoot(state.ServiceEntries),
+		RoutingRoot:	ComputeDNLRoutingRoot(state.RoutingTable),
+		LookupRoot:	ComputeDNLLookupRoot(state.ServiceEntries, state.RoutingTable),
+		CacheRoot:	ComputeDNLCacheRoot(state.CacheEntries),
 	}
 	expected.StateRoot = ComputeDNLStateRoot(expected)
 	if state.ServicesRoot != expected.ServicesRoot || state.RoutingRoot != expected.RoutingRoot || state.LookupRoot != expected.LookupRoot || state.CacheRoot != expected.CacheRoot || state.StateRoot != expected.StateRoot {

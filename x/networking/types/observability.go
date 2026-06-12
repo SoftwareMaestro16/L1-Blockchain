@@ -10,138 +10,138 @@ import (
 type NetworkingObservableMetric string
 
 const (
-	ObservableMetricActivePeers                     NetworkingObservableMetric = "active_peers"
-	ObservableMetricPeersByRole                     NetworkingObservableMetric = "peers_by_role"
-	ObservableMetricActiveSessions                  NetworkingObservableMetric = "active_sessions"
-	ObservableMetricStreamsByChannelType            NetworkingObservableMetric = "streams_by_channel_type"
-	ObservableMetricPerChannelBandwidth             NetworkingObservableMetric = "per_channel_bandwidth"
-	ObservableMetricPeerScore                       NetworkingObservableMetric = "peer_score"
-	ObservableMetricOverlaySize                     NetworkingObservableMetric = "overlay_size"
-	ObservableMetricOverlayChurn                    NetworkingObservableMetric = "overlay_churn"
-	ObservableMetricDiscoveryQueryLatency           NetworkingObservableMetric = "discovery_query_latency"
-	ObservableMetricBroadcastDedupHitRate           NetworkingObservableMetric = "broadcast_dedup_hit_rate"
-	ObservableMetricRL2TransferThroughput           NetworkingObservableMetric = "rl2_transfer_throughput"
-	ObservableMetricRL2ChunkRetryRate               NetworkingObservableMetric = "rl2_chunk_retry_rate"
-	ObservableMetricBlockPropagationLatency         NetworkingObservableMetric = "block_propagation_latency"
-	ObservableMetricCrossZoneMessageDeliveryLatency NetworkingObservableMetric = "cross_zone_message_delivery_latency"
-	ObservableMetricServiceTrafficVolume            NetworkingObservableMetric = "service_traffic_volume"
-	ObservableMetricRoutingFailureCount             NetworkingObservableMetric = "routing_failure_count"
+	ObservableMetricActivePeers			NetworkingObservableMetric	= "active_peers"
+	ObservableMetricPeersByRole			NetworkingObservableMetric	= "peers_by_role"
+	ObservableMetricActiveSessions			NetworkingObservableMetric	= "active_sessions"
+	ObservableMetricStreamsByChannelType		NetworkingObservableMetric	= "streams_by_channel_type"
+	ObservableMetricPerChannelBandwidth		NetworkingObservableMetric	= "per_channel_bandwidth"
+	ObservableMetricPeerScore			NetworkingObservableMetric	= "peer_score"
+	ObservableMetricOverlaySize			NetworkingObservableMetric	= "overlay_size"
+	ObservableMetricOverlayChurn			NetworkingObservableMetric	= "overlay_churn"
+	ObservableMetricDiscoveryQueryLatency		NetworkingObservableMetric	= "discovery_query_latency"
+	ObservableMetricBroadcastDedupHitRate		NetworkingObservableMetric	= "broadcast_dedup_hit_rate"
+	ObservableMetricRL2TransferThroughput		NetworkingObservableMetric	= "rl2_transfer_throughput"
+	ObservableMetricRL2ChunkRetryRate		NetworkingObservableMetric	= "rl2_chunk_retry_rate"
+	ObservableMetricBlockPropagationLatency		NetworkingObservableMetric	= "block_propagation_latency"
+	ObservableMetricCrossZoneMessageDeliveryLatency	NetworkingObservableMetric	= "cross_zone_message_delivery_latency"
+	ObservableMetricServiceTrafficVolume		NetworkingObservableMetric	= "service_traffic_volume"
+	ObservableMetricRoutingFailureCount		NetworkingObservableMetric	= "routing_failure_count"
 )
 
 type NetworkingObservableEvent string
 
 const (
-	ObservableEventNetworkNodeRegistered         NetworkingObservableEvent = "network_node_registered"
-	ObservableEventNetworkSessionOpened          NetworkingObservableEvent = "network_session_opened"
-	ObservableEventNetworkSessionClosed          NetworkingObservableEvent = "network_session_closed"
-	ObservableEventNetworkPeerScoreUpdated       NetworkingObservableEvent = "network_peer_score_updated"
-	ObservableEventNetworkOverlayJoined          NetworkingObservableEvent = "network_overlay_joined"
-	ObservableEventNetworkOverlayLeft            NetworkingObservableEvent = "network_overlay_left"
-	ObservableEventNetworkDiscoveryRecordStored  NetworkingObservableEvent = "network_discovery_record_stored"
-	ObservableEventNetworkDiscoveryRecordExpired NetworkingObservableEvent = "network_discovery_record_expired"
-	ObservableEventNetworkRL2TransferStarted     NetworkingObservableEvent = "network_rl2_transfer_started"
-	ObservableEventNetworkRL2TransferCompleted   NetworkingObservableEvent = "network_rl2_transfer_completed"
-	ObservableEventNetworkInvalidChunk           NetworkingObservableEvent = "network_invalid_chunk"
-	ObservableEventNetworkBroadcastConflict      NetworkingObservableEvent = "network_broadcast_conflict"
-	ObservableEventNetworkRouteFailed            NetworkingObservableEvent = "network_route_failed"
+	ObservableEventNetworkNodeRegistered		NetworkingObservableEvent	= "network_node_registered"
+	ObservableEventNetworkSessionOpened		NetworkingObservableEvent	= "network_session_opened"
+	ObservableEventNetworkSessionClosed		NetworkingObservableEvent	= "network_session_closed"
+	ObservableEventNetworkPeerScoreUpdated		NetworkingObservableEvent	= "network_peer_score_updated"
+	ObservableEventNetworkOverlayJoined		NetworkingObservableEvent	= "network_overlay_joined"
+	ObservableEventNetworkOverlayLeft		NetworkingObservableEvent	= "network_overlay_left"
+	ObservableEventNetworkDiscoveryRecordStored	NetworkingObservableEvent	= "network_discovery_record_stored"
+	ObservableEventNetworkDiscoveryRecordExpired	NetworkingObservableEvent	= "network_discovery_record_expired"
+	ObservableEventNetworkRL2TransferStarted	NetworkingObservableEvent	= "network_rl2_transfer_started"
+	ObservableEventNetworkRL2TransferCompleted	NetworkingObservableEvent	= "network_rl2_transfer_completed"
+	ObservableEventNetworkInvalidChunk		NetworkingObservableEvent	= "network_invalid_chunk"
+	ObservableEventNetworkBroadcastConflict		NetworkingObservableEvent	= "network_broadcast_conflict"
+	ObservableEventNetworkRouteFailed		NetworkingObservableEvent	= "network_route_failed"
 )
 
 type NetworkingObservableAlert string
 
 const (
-	ObservableAlertConsensusChannelLatencyAboveThreshold NetworkingObservableAlert = "consensus_channel_latency_above_threshold"
-	ObservableAlertBlockPropagationLatencySpike          NetworkingObservableAlert = "block_propagation_latency_spike"
-	ObservableAlertPeerScoreCollapse                     NetworkingObservableAlert = "peer_score_collapse"
-	ObservableAlertOverlayPartitionSuspected             NetworkingObservableAlert = "overlay_partition_suspected"
-	ObservableAlertDiscoveryPoisoningAttempt             NetworkingObservableAlert = "discovery_poisoning_attempt"
-	ObservableAlertRL2InvalidChunkSpike                  NetworkingObservableAlert = "rl2_invalid_chunk_spike"
-	ObservableAlertServiceTrafficExceedingQuota          NetworkingObservableAlert = "service_traffic_exceeding_quota"
-	ObservableAlertCrossZoneMessageDeliveryBacklog       NetworkingObservableAlert = "cross_zone_message_delivery_backlog"
-	ObservableAlertEclipseRiskPeerDiversityLow           NetworkingObservableAlert = "eclipse_risk_peer_diversity_low"
+	ObservableAlertConsensusChannelLatencyAboveThreshold	NetworkingObservableAlert	= "consensus_channel_latency_above_threshold"
+	ObservableAlertBlockPropagationLatencySpike		NetworkingObservableAlert	= "block_propagation_latency_spike"
+	ObservableAlertPeerScoreCollapse			NetworkingObservableAlert	= "peer_score_collapse"
+	ObservableAlertOverlayPartitionSuspected		NetworkingObservableAlert	= "overlay_partition_suspected"
+	ObservableAlertDiscoveryPoisoningAttempt		NetworkingObservableAlert	= "discovery_poisoning_attempt"
+	ObservableAlertRL2InvalidChunkSpike			NetworkingObservableAlert	= "rl2_invalid_chunk_spike"
+	ObservableAlertServiceTrafficExceedingQuota		NetworkingObservableAlert	= "service_traffic_exceeding_quota"
+	ObservableAlertCrossZoneMessageDeliveryBacklog		NetworkingObservableAlert	= "cross_zone_message_delivery_backlog"
+	ObservableAlertEclipseRiskPeerDiversityLow		NetworkingObservableAlert	= "eclipse_risk_peer_diversity_low"
 )
 
 type NetworkingAlertSeverity string
 
 const (
-	NetworkingAlertSeverityWarning  NetworkingAlertSeverity = "warning"
-	NetworkingAlertSeverityCritical NetworkingAlertSeverity = "critical"
+	NetworkingAlertSeverityWarning	NetworkingAlertSeverity	= "warning"
+	NetworkingAlertSeverityCritical	NetworkingAlertSeverity	= "critical"
 )
 
 type NetworkingAlertCondition string
 
 const (
-	NetworkingAlertConditionAboveThreshold NetworkingAlertCondition = "above_threshold"
-	NetworkingAlertConditionBelowThreshold NetworkingAlertCondition = "below_threshold"
+	NetworkingAlertConditionAboveThreshold	NetworkingAlertCondition	= "above_threshold"
+	NetworkingAlertConditionBelowThreshold	NetworkingAlertCondition	= "below_threshold"
 )
 
 type NetworkingMetricSample struct {
-	Metric NetworkingObservableMetric
-	Labels []string
-	Value  uint64
-	Height uint64
+	Metric	NetworkingObservableMetric
+	Labels	[]string
+	Value	uint64
+	Height	uint64
 }
 
 type NetworkingEventRecord struct {
-	Event        NetworkingObservableEvent
-	NodeID       string
-	OverlayID    string
-	Channel      ChannelClass
-	TransferID   string
-	MessageID    string
-	EvidenceHash string
-	Height       uint64
-	EventID      string
+	Event		NetworkingObservableEvent
+	NodeID		string
+	OverlayID	string
+	Channel		ChannelClass
+	TransferID	string
+	MessageID	string
+	EvidenceHash	string
+	Height		uint64
+	EventID		string
 }
 
 type NetworkingObservabilitySpec struct {
-	Metrics  []NetworkingObservableMetric
-	Events   []NetworkingObservableEvent
-	Alerts   []NetworkingObservableAlert
-	SpecRoot string
+	Metrics		[]NetworkingObservableMetric
+	Events		[]NetworkingObservableEvent
+	Alerts		[]NetworkingObservableAlert
+	SpecRoot	string
 }
 
 type NetworkingObservabilityReport struct {
-	Spec           NetworkingObservabilitySpec
-	Metrics        []NetworkingMetricSample
-	Events         []NetworkingEventRecord
-	MissingMetrics []NetworkingObservableMetric
-	MissingEvents  []NetworkingObservableEvent
-	Ready          bool
-	ReportHash     string
+	Spec		NetworkingObservabilitySpec
+	Metrics		[]NetworkingMetricSample
+	Events		[]NetworkingEventRecord
+	MissingMetrics	[]NetworkingObservableMetric
+	MissingEvents	[]NetworkingObservableEvent
+	Ready		bool
+	ReportHash	string
 }
 
 type NetworkingAlertRule struct {
-	Alert         NetworkingObservableAlert
-	Severity      NetworkingAlertSeverity
-	Condition     NetworkingAlertCondition
-	SourceMetrics []NetworkingObservableMetric
-	SourceEvents  []NetworkingObservableEvent
-	Threshold     uint64
-	WindowBlocks  uint64
-	Description   string
+	Alert		NetworkingObservableAlert
+	Severity	NetworkingAlertSeverity
+	Condition	NetworkingAlertCondition
+	SourceMetrics	[]NetworkingObservableMetric
+	SourceEvents	[]NetworkingObservableEvent
+	Threshold	uint64
+	WindowBlocks	uint64
+	Description	string
 }
 
 type NetworkingAlertSignal struct {
-	Alert        NetworkingObservableAlert
-	Severity     NetworkingAlertSeverity
-	Condition    NetworkingAlertCondition
-	SourceMetric NetworkingObservableMetric
-	SourceEvent  NetworkingObservableEvent
-	NodeID       string
-	OverlayID    string
-	Observed     uint64
-	Threshold    uint64
-	WindowBlocks uint64
-	Height       uint64
-	TriggerID    string
+	Alert		NetworkingObservableAlert
+	Severity	NetworkingAlertSeverity
+	Condition	NetworkingAlertCondition
+	SourceMetric	NetworkingObservableMetric
+	SourceEvent	NetworkingObservableEvent
+	NodeID		string
+	OverlayID	string
+	Observed	uint64
+	Threshold	uint64
+	WindowBlocks	uint64
+	Height		uint64
+	TriggerID	string
 }
 
 type NetworkingAlertReport struct {
-	Rules         []NetworkingAlertRule
-	Signals       []NetworkingAlertSignal
-	MissingAlerts []NetworkingObservableAlert
-	Ready         bool
-	ReportHash    string
+	Rules		[]NetworkingAlertRule
+	Signals		[]NetworkingAlertSignal
+	MissingAlerts	[]NetworkingObservableAlert
+	Ready		bool
+	ReportHash	string
 }
 
 func DefaultNetworkingObservabilitySpec() NetworkingObservabilitySpec {
@@ -270,9 +270,9 @@ func BuildNetworkingObservabilityReport(spec NetworkingObservabilitySpec, metric
 	normalizedMetrics := NormalizeNetworkingMetricSamples(metrics)
 	normalizedEvents := NormalizeNetworkingEventRecords(events)
 	report := NetworkingObservabilityReport{
-		Spec:    spec,
-		Metrics: normalizedMetrics,
-		Events:  normalizedEvents,
+		Spec:		spec,
+		Metrics:	normalizedMetrics,
+		Events:		normalizedEvents,
 	}
 	coveredMetrics := make(map[NetworkingObservableMetric]struct{}, len(normalizedMetrics))
 	for _, sample := range normalizedMetrics {
@@ -308,88 +308,88 @@ func BuildNetworkingObservabilityReport(spec NetworkingObservabilitySpec, metric
 func DefaultNetworkingAlertRules() []NetworkingAlertRule {
 	return []NetworkingAlertRule{
 		{
-			Alert:         ObservableAlertConsensusChannelLatencyAboveThreshold,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricBlockPropagationLatency},
-			Threshold:     250,
-			WindowBlocks:  3,
-			Description:   "Consensus channel latency above threshold",
+			Alert:		ObservableAlertConsensusChannelLatencyAboveThreshold,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricBlockPropagationLatency},
+			Threshold:	250,
+			WindowBlocks:	3,
+			Description:	"Consensus channel latency above threshold",
 		},
 		{
-			Alert:         ObservableAlertBlockPropagationLatencySpike,
-			Severity:      NetworkingAlertSeverityWarning,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricBlockPropagationLatency},
-			Threshold:     500,
-			WindowBlocks:  5,
-			Description:   "Block propagation latency spike",
+			Alert:		ObservableAlertBlockPropagationLatencySpike,
+			Severity:	NetworkingAlertSeverityWarning,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricBlockPropagationLatency},
+			Threshold:	500,
+			WindowBlocks:	5,
+			Description:	"Block propagation latency spike",
 		},
 		{
-			Alert:         ObservableAlertPeerScoreCollapse,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionBelowThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricPeerScore},
-			Threshold:     2_500,
-			WindowBlocks:  10,
-			Description:   "Peer score collapse",
+			Alert:		ObservableAlertPeerScoreCollapse,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionBelowThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricPeerScore},
+			Threshold:	2_500,
+			WindowBlocks:	10,
+			Description:	"Peer score collapse",
 		},
 		{
-			Alert:         ObservableAlertOverlayPartitionSuspected,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricRoutingFailureCount, ObservableMetricOverlayChurn},
-			SourceEvents:  []NetworkingObservableEvent{ObservableEventNetworkRouteFailed},
-			Threshold:     3,
-			WindowBlocks:  6,
-			Description:   "Overlay partition suspected",
+			Alert:		ObservableAlertOverlayPartitionSuspected,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricRoutingFailureCount, ObservableMetricOverlayChurn},
+			SourceEvents:	[]NetworkingObservableEvent{ObservableEventNetworkRouteFailed},
+			Threshold:	3,
+			WindowBlocks:	6,
+			Description:	"Overlay partition suspected",
 		},
 		{
-			Alert:         ObservableAlertDiscoveryPoisoningAttempt,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricDiscoveryQueryLatency},
-			SourceEvents:  []NetworkingObservableEvent{ObservableEventNetworkDiscoveryRecordStored, ObservableEventNetworkDiscoveryRecordExpired},
-			Threshold:     1,
-			WindowBlocks:  10,
-			Description:   "Discovery poisoning attempt",
+			Alert:		ObservableAlertDiscoveryPoisoningAttempt,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricDiscoveryQueryLatency},
+			SourceEvents:	[]NetworkingObservableEvent{ObservableEventNetworkDiscoveryRecordStored, ObservableEventNetworkDiscoveryRecordExpired},
+			Threshold:	1,
+			WindowBlocks:	10,
+			Description:	"Discovery poisoning attempt",
 		},
 		{
-			Alert:         ObservableAlertRL2InvalidChunkSpike,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricRL2ChunkRetryRate},
-			SourceEvents:  []NetworkingObservableEvent{ObservableEventNetworkInvalidChunk},
-			Threshold:     2,
-			WindowBlocks:  4,
-			Description:   "RL2 invalid chunk spike",
+			Alert:		ObservableAlertRL2InvalidChunkSpike,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricRL2ChunkRetryRate},
+			SourceEvents:	[]NetworkingObservableEvent{ObservableEventNetworkInvalidChunk},
+			Threshold:	2,
+			WindowBlocks:	4,
+			Description:	"RL2 invalid chunk spike",
 		},
 		{
-			Alert:         ObservableAlertServiceTrafficExceedingQuota,
-			Severity:      NetworkingAlertSeverityWarning,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricServiceTrafficVolume, ObservableMetricPerChannelBandwidth},
-			Threshold:     10 << 20,
-			WindowBlocks:  5,
-			Description:   "Service traffic exceeding quota",
+			Alert:		ObservableAlertServiceTrafficExceedingQuota,
+			Severity:	NetworkingAlertSeverityWarning,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricServiceTrafficVolume, ObservableMetricPerChannelBandwidth},
+			Threshold:	10 << 20,
+			WindowBlocks:	5,
+			Description:	"Service traffic exceeding quota",
 		},
 		{
-			Alert:         ObservableAlertCrossZoneMessageDeliveryBacklog,
-			Severity:      NetworkingAlertSeverityWarning,
-			Condition:     NetworkingAlertConditionAboveThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricCrossZoneMessageDeliveryLatency},
-			Threshold:     1_000,
-			WindowBlocks:  8,
-			Description:   "Cross-zone message delivery backlog",
+			Alert:		ObservableAlertCrossZoneMessageDeliveryBacklog,
+			Severity:	NetworkingAlertSeverityWarning,
+			Condition:	NetworkingAlertConditionAboveThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricCrossZoneMessageDeliveryLatency},
+			Threshold:	1_000,
+			WindowBlocks:	8,
+			Description:	"Cross-zone message delivery backlog",
 		},
 		{
-			Alert:         ObservableAlertEclipseRiskPeerDiversityLow,
-			Severity:      NetworkingAlertSeverityCritical,
-			Condition:     NetworkingAlertConditionBelowThreshold,
-			SourceMetrics: []NetworkingObservableMetric{ObservableMetricActivePeers, ObservableMetricPeersByRole, ObservableMetricOverlaySize},
-			Threshold:     4,
-			WindowBlocks:  20,
-			Description:   "Eclipse risk peer diversity low",
+			Alert:		ObservableAlertEclipseRiskPeerDiversityLow,
+			Severity:	NetworkingAlertSeverityCritical,
+			Condition:	NetworkingAlertConditionBelowThreshold,
+			SourceMetrics:	[]NetworkingObservableMetric{ObservableMetricActivePeers, ObservableMetricPeersByRole, ObservableMetricOverlaySize},
+			Threshold:	4,
+			WindowBlocks:	20,
+			Description:	"Eclipse risk peer diversity low",
 		},
 	}
 }
@@ -425,8 +425,8 @@ func BuildNetworkingAlertReport(rules []NetworkingAlertRule, signals []Networkin
 	}
 	normalizedSignals := NormalizeNetworkingAlertSignals(signals)
 	report := NetworkingAlertReport{
-		Rules:   normalizedRules,
-		Signals: normalizedSignals,
+		Rules:		normalizedRules,
+		Signals:	normalizedSignals,
 	}
 	signaled := make(map[NetworkingObservableAlert]struct{}, len(normalizedSignals))
 	for _, signal := range normalizedSignals {
@@ -448,14 +448,14 @@ func BuildNetworkingAlertReport(rules []NetworkingAlertRule, signals []Networkin
 
 func NewNetworkingEventRecord(event NetworkingObservableEvent, nodeID, overlayID string, channel ChannelClass, transferID, messageID, evidenceHash string, height uint64) NetworkingEventRecord {
 	record := NetworkingEventRecord{
-		Event:        event,
-		NodeID:       nodeID,
-		OverlayID:    overlayID,
-		Channel:      channel,
-		TransferID:   transferID,
-		MessageID:    messageID,
-		EvidenceHash: evidenceHash,
-		Height:       height,
+		Event:		event,
+		NodeID:		nodeID,
+		OverlayID:	overlayID,
+		Channel:	channel,
+		TransferID:	transferID,
+		MessageID:	messageID,
+		EvidenceHash:	evidenceHash,
+		Height:		height,
 	}
 	record = NormalizeNetworkingEventRecord(record)
 	record.EventID = ComputeNetworkingEventID(record)
@@ -465,17 +465,17 @@ func NewNetworkingEventRecord(event NetworkingObservableEvent, nodeID, overlayID
 func NewNetworkingAlertSignal(rule NetworkingAlertRule, sourceMetric NetworkingObservableMetric, sourceEvent NetworkingObservableEvent, nodeID, overlayID string, observed uint64, height uint64) NetworkingAlertSignal {
 	rule = NormalizeNetworkingAlertRule(rule)
 	signal := NetworkingAlertSignal{
-		Alert:        rule.Alert,
-		Severity:     rule.Severity,
-		Condition:    rule.Condition,
-		SourceMetric: sourceMetric,
-		SourceEvent:  sourceEvent,
-		NodeID:       nodeID,
-		OverlayID:    overlayID,
-		Observed:     observed,
-		Threshold:    rule.Threshold,
-		WindowBlocks: rule.WindowBlocks,
-		Height:       height,
+		Alert:		rule.Alert,
+		Severity:	rule.Severity,
+		Condition:	rule.Condition,
+		SourceMetric:	sourceMetric,
+		SourceEvent:	sourceEvent,
+		NodeID:		nodeID,
+		OverlayID:	overlayID,
+		Observed:	observed,
+		Threshold:	rule.Threshold,
+		WindowBlocks:	rule.WindowBlocks,
+		Height:		height,
 	}
 	signal = NormalizeNetworkingAlertSignal(signal)
 	signal.TriggerID = ComputeNetworkingAlertTriggerID(signal)

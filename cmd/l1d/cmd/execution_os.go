@@ -25,11 +25,11 @@ import (
 )
 
 const (
-	executionOSProfileBase              = "base"
-	executionOSProfileSim               = "execution-os-sim"
-	executionOSProfileZonesPrototype    = "zones-prototype"
-	executionOSProfileMeshPrototype     = "mesh-prototype"
-	executionOSProfileIdentityPrototype = "identity-prototype"
+	executionOSProfileBase			= "base"
+	executionOSProfileSim			= "execution-os-sim"
+	executionOSProfileZonesPrototype	= "zones-prototype"
+	executionOSProfileMeshPrototype		= "mesh-prototype"
+	executionOSProfileIdentityPrototype	= "identity-prototype"
 )
 
 var executionOSProfiles = []string{
@@ -41,90 +41,90 @@ var executionOSProfiles = []string{
 }
 
 type executionOSReport struct {
-	Profile        string                 `json:"profile"`
-	Load           executionOSLoadReport  `json:"load"`
-	Routing        executionOSRouteReport `json:"routing"`
-	Sharding       executionOSShardReport `json:"sharding"`
-	Zones          executionOSZonesReport `json:"zones"`
-	Mesh           executionOSMeshReport  `json:"mesh"`
-	Identity       executionOSIDReport    `json:"identity"`
-	RestartSafe    bool                   `json:"restart_safe"`
-	FeatureGated   bool                   `json:"feature_gated"`
-	ProductionLive bool                   `json:"production_live"`
+	Profile		string			`json:"profile"`
+	Load		executionOSLoadReport	`json:"load"`
+	Routing		executionOSRouteReport	`json:"routing"`
+	Sharding	executionOSShardReport	`json:"sharding"`
+	Zones		executionOSZonesReport	`json:"zones"`
+	Mesh		executionOSMeshReport	`json:"mesh"`
+	Identity	executionOSIDReport	`json:"identity"`
+	RestartSafe	bool			`json:"restart_safe"`
+	FeatureGated	bool			`json:"feature_gated"`
+	ProductionLive	bool			`json:"production_live"`
 }
 
 type executionOSLoadReport struct {
-	ScoreBps     uint32 `json:"score_bps"`
-	Band         string `json:"band"`
-	WindowHeight uint64 `json:"window_height"`
+	ScoreBps	uint32	`json:"score_bps"`
+	Band		string	`json:"band"`
+	WindowHeight	uint64	`json:"window_height"`
 }
 
 type executionOSRouteReport struct {
-	MsgType      string `json:"msg_type"`
-	TxClass      string `json:"tx_class"`
-	ZoneID       string `json:"zone_id"`
-	ShardID      uint32 `json:"shard_id"`
-	ActiveShards uint32 `json:"active_shards"`
+	MsgType		string	`json:"msg_type"`
+	TxClass		string	`json:"tx_class"`
+	ZoneID		string	`json:"zone_id"`
+	ShardID		uint32	`json:"shard_id"`
+	ActiveShards	uint32	`json:"active_shards"`
 }
 
 type executionOSShardReport struct {
-	WorkchainID      int32    `json:"workchain_id"`
-	ActiveShardCount uint32   `json:"active_shard_count"`
-	ShardIDs         []string `json:"shard_ids"`
-	RoutingEpoch     uint64   `json:"routing_epoch"`
-	DataAvailable    bool     `json:"data_available"`
+	WorkchainID		int32		`json:"workchain_id"`
+	ActiveShardCount	uint32		`json:"active_shard_count"`
+	ShardIDs		[]string	`json:"shard_ids"`
+	RoutingEpoch		uint64		`json:"routing_epoch"`
+	DataAvailable		bool		`json:"data_available"`
 }
 
 type executionOSZonesReport struct {
-	ActiveZones     []string `json:"active_zones"`
-	CommitmentRoots []string `json:"commitment_roots"`
+	ActiveZones	[]string	`json:"active_zones"`
+	CommitmentRoots	[]string	`json:"commitment_roots"`
 }
 
 type executionOSMeshReport struct {
-	MessageID         string `json:"message_id"`
-	ReceiptStatus     string `json:"receipt_status"`
-	ReceiptHash       string `json:"receipt_hash"`
-	ReplayMarkerCount int    `json:"replay_marker_count"`
-	PendingMessages   int    `json:"pending_messages"`
+	MessageID		string	`json:"message_id"`
+	ReceiptStatus		string	`json:"receipt_status"`
+	ReceiptHash		string	`json:"receipt_hash"`
+	ReplayMarkerCount	int	`json:"replay_marker_count"`
+	PendingMessages		int	`json:"pending_messages"`
 }
 
 type executionOSIDReport struct {
-	Domain          string `json:"domain"`
-	NFTID           string `json:"nft_id"`
-	ResolvedAddress string `json:"resolved_address"`
-	Lifecycle       string `json:"lifecycle"`
+	Domain		string	`json:"domain"`
+	NFTID		string	`json:"nft_id"`
+	ResolvedAddress	string	`json:"resolved_address"`
+	Lifecycle	string	`json:"lifecycle"`
 }
 
 type executionOSDiagnostics struct {
-	Profile             string                 `json:"profile"`
-	Source              string                 `json:"source"`
-	FeatureGates        map[string]featureGate `json:"feature_gates"`
-	CurrentLoadScoreBps uint32                 `json:"current_load_score_bps"`
-	LoadWindowHeight    uint64                 `json:"load_window_height"`
-	ActiveZones         []string               `json:"active_zones"`
-	ActiveShards        []zoneShardSummary     `json:"active_shards"`
-	PendingMeshMessages int                    `json:"pending_mesh_messages"`
-	ReplayMarkerCount   int                    `json:"replay_marker_count"`
-	MeshReceiptCount    int                    `json:"mesh_receipt_count"`
-	ZoneCommitmentRoots []string               `json:"zone_commitment_roots"`
-	IdentityPrototype   bool                   `json:"identity_prototype"`
-	ProductionLive      bool                   `json:"production_live"`
+	Profile			string			`json:"profile"`
+	Source			string			`json:"source"`
+	FeatureGates		map[string]featureGate	`json:"feature_gates"`
+	CurrentLoadScoreBps	uint32			`json:"current_load_score_bps"`
+	LoadWindowHeight	uint64			`json:"load_window_height"`
+	ActiveZones		[]string		`json:"active_zones"`
+	ActiveShards		[]zoneShardSummary	`json:"active_shards"`
+	PendingMeshMessages	int			`json:"pending_mesh_messages"`
+	ReplayMarkerCount	int			`json:"replay_marker_count"`
+	MeshReceiptCount	int			`json:"mesh_receipt_count"`
+	ZoneCommitmentRoots	[]string		`json:"zone_commitment_roots"`
+	IdentityPrototype	bool			`json:"identity_prototype"`
+	ProductionLive		bool			`json:"production_live"`
 }
 
 type featureGate struct {
-	Enabled        bool `json:"enabled"`
-	TestnetProfile bool `json:"testnet_profile"`
+	Enabled		bool	`json:"enabled"`
+	TestnetProfile	bool	`json:"testnet_profile"`
 }
 
 type zoneShardSummary struct {
-	ZoneID       string `json:"zone_id"`
-	ActiveShards uint32 `json:"active_shards"`
+	ZoneID		string	`json:"zone_id"`
+	ActiveShards	uint32	`json:"active_shards"`
 }
 
 func NewExecutionOSCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "execution-os",
-		Short: "Aetra modular execution OS operator tools",
+		Use:	"execution-os",
+		Short:	"Aetra modular execution OS operator tools",
 	}
 	cmd.AddCommand(
 		newExecutionOSProfilesCmd(),
@@ -136,9 +136,9 @@ func NewExecutionOSCmd() *cobra.Command {
 
 func newExecutionOSProfilesCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "profiles",
-		Short: "List supported local execution OS profiles",
-		Args:  cobra.NoArgs,
+		Use:	"profiles",
+		Short:	"List supported local execution OS profiles",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return writeJSON(cmd, struct {
 				Profiles []string `json:"profiles"`
@@ -150,9 +150,9 @@ func newExecutionOSProfilesCmd() *cobra.Command {
 func newExecutionOSSmokeCmd() *cobra.Command {
 	var profile string
 	cmd := &cobra.Command{
-		Use:   "smoke",
-		Short: "Run a deterministic execution OS simulator smoke scenario",
-		Args:  cobra.NoArgs,
+		Use:	"smoke",
+		Short:	"Run a deterministic execution OS simulator smoke scenario",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if err := validateExecutionOSProfile(profile); err != nil {
 				return err
@@ -172,9 +172,9 @@ func newExecutionOSDiagnosticsCmd() *cobra.Command {
 	var profile string
 	var genesisPath string
 	cmd := &cobra.Command{
-		Use:   "diagnostics",
-		Short: "Inspect execution OS prototype state from genesis or simulator defaults",
-		Args:  cobra.NoArgs,
+		Use:	"diagnostics",
+		Short:	"Inspect execution OS prototype state from genesis or simulator defaults",
+		Args:	cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			if err := validateExecutionOSProfile(profile); err != nil {
 				return err
@@ -197,19 +197,19 @@ func buildExecutionOSSmokeReport(profile string) (executionOSReport, error) {
 		return executionOSReport{}, err
 	}
 	route, err := routingtypes.Route(routingtypes.RouteInput{
-		MsgType:         routingtypes.MsgTypeBankSend,
-		FeeDenom:        routingtypes.NativeFeeDenom,
-		FeeClass:        99,
-		ReputationClass: 99,
-		AdmissionHeight: 12,
-		TxHash:          hashBytes("operator-smoke-tx"),
-		RoutingEpoch:    simState.LoadStates[shardsim.BaseWorkchain].RoutingEpoch,
+		MsgType:		routingtypes.MsgTypeBankSend,
+		FeeDenom:		routingtypes.NativeFeeDenom,
+		FeeClass:		99,
+		ReputationClass:	99,
+		AdmissionHeight:	12,
+		TxHash:			hashBytes("operator-smoke-tx"),
+		RoutingEpoch:		simState.LoadStates[shardsim.BaseWorkchain].RoutingEpoch,
 		ActiveShards: map[routingtypes.ZoneID]uint32{
 			routingtypes.ZoneFinancial: uint32(len(simState.Shards)),
 		},
 		Locality: routingtypes.Locality{
-			AccountKey: []byte("operator-account"),
-			AssetDenom: "naet",
+			AccountKey:	[]byte("operator-account"),
+			AssetDenom:	"naet",
 		},
 	})
 	if err != nil {
@@ -233,61 +233,61 @@ func buildExecutionOSSmokeReport(profile string) (executionOSReport, error) {
 	}
 	loadState := simState.LoadStates[shardsim.BaseWorkchain]
 	return executionOSReport{
-		Profile: profile,
+		Profile:	profile,
 		Load: executionOSLoadReport{
-			ScoreBps:     loadResult.LoadScoreBps,
-			Band:         string(loadResult.Band),
-			WindowHeight: loadResult.EMA.WindowHeight,
+			ScoreBps:	loadResult.LoadScoreBps,
+			Band:		string(loadResult.Band),
+			WindowHeight:	loadResult.EMA.WindowHeight,
 		},
 		Routing: executionOSRouteReport{
-			MsgType:      routingtypes.MsgTypeBankSend,
-			TxClass:      string(route.TxClass),
-			ZoneID:       string(route.ZoneID),
-			ShardID:      uint32(route.ShardID),
-			ActiveShards: route.ActiveShards,
+			MsgType:	routingtypes.MsgTypeBankSend,
+			TxClass:	string(route.TxClass),
+			ZoneID:		string(route.ZoneID),
+			ShardID:	uint32(route.ShardID),
+			ActiveShards:	route.ActiveShards,
 		},
 		Sharding: executionOSShardReport{
-			WorkchainID:      shardsim.BaseWorkchain,
-			ActiveShardCount: loadState.ActiveShardCount,
-			ShardIDs:         shardKeys(simState),
-			RoutingEpoch:     loadState.RoutingEpoch,
-			DataAvailable:    allShardsAvailable(simState),
+			WorkchainID:		shardsim.BaseWorkchain,
+			ActiveShardCount:	loadState.ActiveShardCount,
+			ShardIDs:		shardKeys(simState),
+			RoutingEpoch:		loadState.RoutingEpoch,
+			DataAvailable:		allShardsAvailable(simState),
 		},
 		Zones: executionOSZonesReport{
-			ActiveZones:     zoneIDs(zoneState.ActiveZones),
-			CommitmentRoots: zoneCommitmentRoots(zoneState.Commitments),
+			ActiveZones:		zoneIDs(zoneState.ActiveZones),
+			CommitmentRoots:	zoneCommitmentRoots(zoneState.Commitments),
 		},
 		Mesh: executionOSMeshReport{
-			MessageID:         meshMsg.MessageID,
-			ReceiptStatus:     string(meshReceipt.Status),
-			ReceiptHash:       meshReceipt.ReceiptHash,
-			ReplayMarkerCount: len(meshState.ReplayMarkers),
-			PendingMessages:   0,
+			MessageID:		meshMsg.MessageID,
+			ReceiptStatus:		string(meshReceipt.Status),
+			ReceiptHash:		meshReceipt.ReceiptHash,
+			ReplayMarkerCount:	len(meshState.ReplayMarkers),
+			PendingMessages:	0,
 		},
 		Identity: executionOSIDReport{
-			Domain:          domain.Name,
-			NFTID:           domain.NFTID,
-			ResolvedAddress: hex.EncodeToString(resolved),
-			Lifecycle:       string(lifecycle),
+			Domain:			domain.Name,
+			NFTID:			domain.NFTID,
+			ResolvedAddress:	hex.EncodeToString(resolved),
+			Lifecycle:		string(lifecycle),
 		},
-		RestartSafe:    true,
-		FeatureGated:   profile != executionOSProfileBase,
-		ProductionLive: false,
+		RestartSafe:	true,
+		FeatureGated:	profile != executionOSProfileBase,
+		ProductionLive:	false,
 	}, nil
 }
 
 func buildExecutionOSDiagnostics(profile, genesisPath string) (executionOSDiagnostics, error) {
 	diag := executionOSDiagnostics{
-		Profile: profile,
-		Source:  "simulator-defaults",
+		Profile:	profile,
+		Source:		"simulator-defaults",
 		FeatureGates: map[string]featureGate{
-			"load":    {},
-			"routing": {},
-			"zones":   {},
-			"mesh":    {},
+			"load":		{},
+			"routing":	{},
+			"zones":	{},
+			"mesh":		{},
 		},
-		IdentityPrototype: profile == executionOSProfileIdentityPrototype,
-		ProductionLive:    false,
+		IdentityPrototype:	profile == executionOSProfileIdentityPrototype,
+		ProductionLive:		false,
 	}
 	if genesisPath == "" {
 		return diag, nil
@@ -369,12 +369,12 @@ func runShardingSmoke() (loadtypes.Result, shardsim.MasterchainState, error) {
 		return loadtypes.Result{}, shardsim.MasterchainState{}, err
 	}
 	if err := sim.AddWorkchain(shardsim.WorkchainConfig{
-		ID:               shardsim.BaseWorkchain,
-		AllowedVMs:       []string{"AVM", "COSMWASM_GATED", "NATIVE_MODULE"},
-		FeeDenom:         shardsim.FeeDenomNaet,
-		AddressFormat:    "ae",
-		GenesisStateHash: hashString("operator-workchain-genesis"),
-		UpgradePolicy:    "GOVERNANCE",
+		ID:			shardsim.BaseWorkchain,
+		AllowedVMs:		[]string{"AVM", "COSMWASM_GATED", "NATIVE_MODULE"},
+		FeeDenom:		shardsim.FeeDenomNaet,
+		AddressFormat:		"ae",
+		GenesisStateHash:	hashString("operator-workchain-genesis"),
+		UpgradePolicy:		"GOVERNANCE",
 	}); err != nil {
 		return loadtypes.Result{}, shardsim.MasterchainState{}, err
 	}
@@ -383,20 +383,20 @@ func runShardingSmoke() (loadtypes.Result, shardsim.MasterchainState, error) {
 	params.AlphaDenominator = 1
 	params.MaxDeltaBps = loadtypes.BasisPoints
 	policy := shardsim.ShardActivationPolicy{
-		WorkchainID:       shardsim.BaseWorkchain,
-		LoadParams:        params,
-		PartialShardCount: 2,
-		MaxShardCount:     4,
-		CooldownBlocks:    2,
-		RoutingEpoch:      1,
+		WorkchainID:		shardsim.BaseWorkchain,
+		LoadParams:		params,
+		PartialShardCount:	2,
+		MaxShardCount:		4,
+		CooldownBlocks:		2,
+		RoutingEpoch:		1,
 	}
 	transition, err := sim.UpdateLoadAndShards(policy, loadtypes.Metrics{
-		CanonicalMempoolSize:        params.TargetMempoolSize,
-		UsedBlockGas:                params.TargetBlockGas,
-		AverageInclusionDelayBlocks: params.TargetLatencyBlocks,
-		FailedTxCount:               1,
-		TotalTxCount:                1,
-		ExecutionStepCount:          params.TargetExecutionSteps,
+		CanonicalMempoolSize:		params.TargetMempoolSize,
+		UsedBlockGas:			params.TargetBlockGas,
+		AverageInclusionDelayBlocks:	params.TargetLatencyBlocks,
+		FailedTxCount:			1,
+		TotalTxCount:			1,
+		ExecutionStepCount:		params.TargetExecutionSteps,
 	}, 10)
 	if err != nil {
 		return loadtypes.Result{}, shardsim.MasterchainState{}, err
@@ -457,40 +457,40 @@ func runMeshSmoke() (meshtypes.MeshState, meshtypes.MeshMessage, meshtypes.MeshR
 		return meshtypes.MeshState{}, meshtypes.MeshMessage{}, meshtypes.MeshReceipt{}, err
 	}
 	commitment := meshtypes.FinalizedCommitment{
-		ZoneID:         "FINANCIAL_ZONE",
-		ShardID:        "0:0",
-		Height:         90,
-		CommitmentHash: meshtypes.HashParts("source-commitment", "financial", "0:0", "90"),
-		MessageRoot:    meshtypes.HashParts("message-root", "financial", "90"),
-		ReceiptRoot:    meshtypes.HashParts("receipt-root", "financial", "90"),
+		ZoneID:		"FINANCIAL_ZONE",
+		ShardID:	"0:0",
+		Height:		90,
+		CommitmentHash:	meshtypes.HashParts("source-commitment", "financial", "0:0", "90"),
+		MessageRoot:	meshtypes.HashParts("message-root", "financial", "90"),
+		ReceiptRoot:	meshtypes.HashParts("receipt-root", "financial", "90"),
 	}
 	state, err = meshtypes.AddFinalizedCommitment(state, commitment)
 	if err != nil {
 		return meshtypes.MeshState{}, meshtypes.MeshMessage{}, meshtypes.MeshReceipt{}, err
 	}
 	msg, err := meshtypes.NewMessage(meshtypes.MeshMessage{
-		SourceZone:        "FINANCIAL_ZONE",
-		SourceShard:       "0:0",
-		DestinationZone:   "CONTRACT_ZONE",
-		DestinationShard:  "0:1",
-		Nonce:             7,
-		Sender:            []byte("operator-sender"),
-		Recipient:         []byte("operator-contract"),
-		AssetCommitment:   meshtypes.HashParts("asset", "100naet"),
-		PayloadHash:       meshtypes.HashParts("payload", "execute"),
-		TimeoutHeight:     150,
-		Finality:          meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
-		Sequence:          3,
-		SourceLogicalTime: 88,
+		SourceZone:		"FINANCIAL_ZONE",
+		SourceShard:		"0:0",
+		DestinationZone:	"CONTRACT_ZONE",
+		DestinationShard:	"0:1",
+		Nonce:			7,
+		Sender:			[]byte("operator-sender"),
+		Recipient:		[]byte("operator-contract"),
+		AssetCommitment:	meshtypes.HashParts("asset", "100naet"),
+		PayloadHash:		meshtypes.HashParts("payload", "execute"),
+		TimeoutHeight:		150,
+		Finality:		meshtypes.FinalityReference{Height: commitment.Height, CommitmentHash: commitment.CommitmentHash},
+		Sequence:		3,
+		SourceLogicalTime:	88,
 	})
 	if err != nil {
 		return meshtypes.MeshState{}, meshtypes.MeshMessage{}, meshtypes.MeshReceipt{}, err
 	}
 	msg.Proof = meshtypes.BuildProof(msg, commitment)
 	next, receipt, err := meshtypes.ApplyMessage(state, msg, meshtypes.ExecutionResult{
-		Success:    true,
-		Code:       0,
-		ResultHash: meshtypes.HashParts("execution", "success"),
+		Success:	true,
+		Code:		0,
+		ResultHash:	meshtypes.HashParts("execution", "success"),
 	}, 100)
 	if err != nil {
 		return meshtypes.MeshState{}, meshtypes.MeshMessage{}, meshtypes.MeshReceipt{}, err
@@ -527,16 +527,16 @@ func runIdentitySmoke() (identitytypes.IdentityState, identitytypes.Domain, sdk.
 
 func operatorZone(id zonestypes.ZoneID, kind zonestypes.ZoneKind, vm zonestypes.VMPolicy) zonestypes.Zone {
 	return zonestypes.Zone{
-		ID:                     id,
-		Kind:                   kind,
-		VMPolicy:               vm,
-		FeePolicy:              zonestypes.FeePolicyNaet,
-		GenesisStateHash:       hashString(string(id) + "-genesis"),
-		StateTransitionID:      "transition-" + string(id),
-		UpgradePolicy:          zonestypes.UpgradePolicyGovernance,
-		DataAvailabilityPolicy: zonestypes.DataAvailabilityCoreCommitment,
-		AuditStatus:            zonestypes.AuditStatusExperimental,
-		ActivationHeight:       1,
+		ID:			id,
+		Kind:			kind,
+		VMPolicy:		vm,
+		FeePolicy:		zonestypes.FeePolicyNaet,
+		GenesisStateHash:	hashString(string(id) + "-genesis"),
+		StateTransitionID:	"transition-" + string(id),
+		UpgradePolicy:		zonestypes.UpgradePolicyGovernance,
+		DataAvailabilityPolicy:	zonestypes.DataAvailabilityCoreCommitment,
+		AuditStatus:		zonestypes.AuditStatusExperimental,
+		ActivationHeight:	1,
 	}
 }
 

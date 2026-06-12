@@ -83,13 +83,13 @@ func TestXServicePaymentsModelEscrowMessagesAndUnderfundedGuard(t *testing.T) {
 func TestXServicePaymentsUsageReceiptInvalidGuard(t *testing.T) {
 	envelope := testPaymentStateEnvelope(t, coretypes.ServicePricingPerComputeUnit, coretypes.ServicePaymentMetered, "3")
 	receipt, err := NewPaymentUsageReceipt(PaymentUsageReceipt{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("servicepayments/metered/call"),
-		ProviderID:    "provider-1",
-		ComputeUnits:  5,
-		ReceiptHeight: 30,
-		SignedBy:      "provider-1",
-		SignatureHash: testInterfaceHash("servicepayments/metered/signature"),
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("servicepayments/metered/call"),
+		ProviderID:	"provider-1",
+		ComputeUnits:	5,
+		ReceiptHeight:	30,
+		SignedBy:	"provider-1",
+		SignatureHash:	testInterfaceHash("servicepayments/metered/signature"),
 	})
 	require.NoError(t, err)
 	quote, err := QuotePerComputeUnitPayment(envelope, receipt)
@@ -151,26 +151,26 @@ func TestXServicePaymentsModelSnapshotRejectsChangedAfterSigning(t *testing.T) {
 func TestXServicePaymentsQueriesAndFinancialIntegration(t *testing.T) {
 	envelope := testPaymentStateEnvelope(t, coretypes.ServicePricingPerComputeUnit, coretypes.ServicePaymentMetered, "3")
 	model, err := NewServicePaymentModel(ServicePaymentModel{
-		ServiceID:          envelope.PayeeService,
-		SupportedDenoms:    []string{envelope.Denom},
-		DefaultDenom:       envelope.Denom,
-		PricingUnit:        envelope.PricingUnit,
-		SettlementMode:     envelope.SettlementMode,
-		UnitAmount:         envelope.Amount,
-		MaxAmountOptional:  envelope.MaxAmountOptional,
-		FailurePolicy:      coretypes.ServiceFailureRefund,
-		KnownBeforeSigning: true,
-		UpdatedHeight:      10,
+		ServiceID:		envelope.PayeeService,
+		SupportedDenoms:	[]string{envelope.Denom},
+		DefaultDenom:		envelope.Denom,
+		PricingUnit:		envelope.PricingUnit,
+		SettlementMode:		envelope.SettlementMode,
+		UnitAmount:		envelope.Amount,
+		MaxAmountOptional:	envelope.MaxAmountOptional,
+		FailurePolicy:		coretypes.ServiceFailureRefund,
+		KnownBeforeSigning:	true,
+		UpdatedHeight:		10,
 	})
 	require.NoError(t, err)
 	receipt, err := NewPaymentUsageReceipt(PaymentUsageReceipt{
-		ServiceID:     envelope.PayeeService,
-		CallID:        testInterfaceHash("servicepayments/query/call"),
-		ProviderID:    "provider-1",
-		ComputeUnits:  2,
-		ReceiptHeight: 30,
-		SignedBy:      "provider-1",
-		SignatureHash: testInterfaceHash("servicepayments/query/signature"),
+		ServiceID:	envelope.PayeeService,
+		CallID:		testInterfaceHash("servicepayments/query/call"),
+		ProviderID:	"provider-1",
+		ComputeUnits:	2,
+		ReceiptHeight:	30,
+		SignedBy:	"provider-1",
+		SignatureHash:	testInterfaceHash("servicepayments/query/signature"),
 	})
 	require.NoError(t, err)
 	quote, err := QuotePerComputeUnitPayment(envelope, receipt)

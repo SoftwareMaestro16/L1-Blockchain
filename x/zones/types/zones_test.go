@@ -210,16 +210,16 @@ func TestDuplicateCommitmentRejected(t *testing.T) {
 
 func testZone(id ZoneID, kind ZoneKind, vm VMPolicy, activationHeight uint64) Zone {
 	return Zone{
-		ID:                     id,
-		Kind:                   kind,
-		VMPolicy:               vm,
-		FeePolicy:              FeePolicyNaet,
-		GenesisStateHash:       hash(string(id) + "-genesis"),
-		StateTransitionID:      "transition-" + string(id),
-		UpgradePolicy:          UpgradePolicyGovernance,
-		DataAvailabilityPolicy: DataAvailabilityCoreCommitment,
-		AuditStatus:            AuditStatusExperimental,
-		ActivationHeight:       activationHeight,
+		ID:			id,
+		Kind:			kind,
+		VMPolicy:		vm,
+		FeePolicy:		FeePolicyNaet,
+		GenesisStateHash:	hash(string(id) + "-genesis"),
+		StateTransitionID:	"transition-" + string(id),
+		UpgradePolicy:		UpgradePolicyGovernance,
+		DataAvailabilityPolicy:	DataAvailabilityCoreCommitment,
+		AuditStatus:		AuditStatusExperimental,
+		ActivationHeight:	activationHeight,
 	}
 }
 

@@ -55,12 +55,12 @@ func TestStorageValidationRejectsInvalidReplicationParameters(t *testing.T) {
 	object.ReplicationPolicy = ReplicationPolicySingle
 	object.ObjectHash = ComputeStorageObjectHash(object)
 	replication, err := NewReplicationStatusCommitment(ReplicationStatusCommitment{
-		ObjectID:           object.ObjectID,
-		ReplicationPolicy:  ReplicationPolicySingle,
-		StorageClass:       object.StorageClass,
-		ReplicaCount:       2,
-		AvailabilityBps:    9000,
-		LastVerifiedHeight: 20,
+		ObjectID:		object.ObjectID,
+		ReplicationPolicy:	ReplicationPolicySingle,
+		StorageClass:		object.StorageClass,
+		ReplicaCount:		2,
+		AvailabilityBps:	9000,
+		LastVerifiedHeight:	20,
 	})
 	require.NoError(t, err)
 	state, err := BuildStorageStateV2(
@@ -102,21 +102,21 @@ func TestLazyFetchBoundaryStaysOutsideConsensus(t *testing.T) {
 	object, chunks := testStorageStateObjectWithChunks(t, "alice", "lazy")
 	proof := testStorageChunkProof(t, object, chunks, 1)
 	request, err := NewLazyFetchRequest(LazyFetchRequest{
-		ObjectID:           object.ObjectID,
-		ContentHash:        object.ContentHash,
-		ChunkIndexOptional: proof.ChunkIndex,
-		ChunkProofRoot:     proof.ChunkProofRoot,
-		Requester:          "service/alice",
-		MaxBytes:           1024,
-		RequestHeight:      50,
+		ObjectID:		object.ObjectID,
+		ContentHash:		object.ContentHash,
+		ChunkIndexOptional:	proof.ChunkIndex,
+		ChunkProofRoot:		proof.ChunkProofRoot,
+		Requester:		"service/alice",
+		MaxBytes:		1024,
+		RequestHeight:		50,
 	})
 	require.NoError(t, err)
 	result, err := NewLazyFetchResultBoundary(LazyFetchResultBoundary{
-		RequestHash:  request.RequestHash,
-		Provider:     "provider/one",
-		PayloadHash:  proof.ChunkHash,
-		Proof:        proof,
-		ResultHeight: 51,
+		RequestHash:	request.RequestHash,
+		Provider:	"provider/one",
+		PayloadHash:	proof.ChunkHash,
+		Proof:		proof,
+		ResultHeight:	51,
 	})
 	require.NoError(t, err)
 	require.NoError(t, ValidateLazyFetchBoundaryOutsideConsensus(request, result, object))
@@ -136,13 +136,13 @@ func testStorageChunkProof(t *testing.T, object StorageObject, chunks []StorageC
 	}
 	chunk := chunks[index]
 	proof, err := NewStorageChunkInclusionProof(StorageChunkInclusionProof{
-		ObjectID:       object.ObjectID,
-		ContentHash:    object.ContentHash,
-		ObjectRoot:     object.ObjectHash,
-		ChunkIndex:     chunk.ChunkIndex,
-		ChunkHash:      chunk.ChunkHash,
-		ChunkProofRoot: chunk.ChunkProofRoot,
-		ProofPath:      proofPath,
+		ObjectID:	object.ObjectID,
+		ContentHash:	object.ContentHash,
+		ObjectRoot:	object.ObjectHash,
+		ChunkIndex:	chunk.ChunkIndex,
+		ChunkHash:	chunk.ChunkHash,
+		ChunkProofRoot:	chunk.ChunkProofRoot,
+		ProofPath:	proofPath,
 	})
 	require.NoError(t, err)
 	return proof
@@ -151,14 +151,14 @@ func testStorageChunkProof(t *testing.T, object StorageObject, chunks []StorageC
 func testStorageReceiptWithProof(t *testing.T, object StorageObject, proof StorageChunkInclusionProof, height uint64) StorageAccessReceipt {
 	t.Helper()
 	receipt, err := NewStorageAccessReceipt(StorageAccessReceipt{
-		ObjectID:       object.ObjectID,
-		Accessor:       object.Owner,
-		AccessType:     "read",
-		AccessHeight:   height,
-		ContentHash:    object.ContentHash,
-		ChunkRoot:      ComputeStorageChunkRoot(object.ChunkRoots),
-		PolicyHash:     ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
-		RetrievalProof: proof.ProofHash,
+		ObjectID:	object.ObjectID,
+		Accessor:	object.Owner,
+		AccessType:	"read",
+		AccessHeight:	height,
+		ContentHash:	object.ContentHash,
+		ChunkRoot:	ComputeStorageChunkRoot(object.ChunkRoots),
+		PolicyHash:	ComputeStoragePolicyHash(object.ReplicationPolicy, object.AccessPolicy, object.StorageClass),
+		RetrievalProof:	proof.ProofHash,
 	})
 	require.NoError(t, err)
 	return receipt

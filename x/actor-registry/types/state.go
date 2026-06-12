@@ -10,124 +10,124 @@ import (
 )
 
 const (
-	ActorStatusActive   = "active"
-	ActorStatusFrozen   = "frozen"
-	ActorStatusDeleted  = "deleted"
-	ActorStatusMigrated = "migrated"
+	ActorStatusActive	= "active"
+	ActorStatusFrozen	= "frozen"
+	ActorStatusDeleted	= "deleted"
+	ActorStatusMigrated	= "migrated"
 
-	RentStatusCurrent    = "current"
-	RentStatusDue        = "due"
-	RentStatusDelinquent = "delinquent"
+	RentStatusCurrent	= "current"
+	RentStatusDue		= "due"
+	RentStatusDelinquent	= "delinquent"
 
-	DeletedValuePolicyReject   = "reject"
-	DeletedValuePolicyRedirect = "redirect"
-	DeletedValuePolicyRefund   = "refund"
+	DeletedValuePolicyReject	= "reject"
+	DeletedValuePolicyRedirect	= "redirect"
+	DeletedValuePolicyRefund	= "refund"
 
-	MaxCapabilityBytes = 128
+	MaxCapabilityBytes	= 128
 )
 
 type ActorRegistryParams struct {
-	MaxActors             uint32
-	MaxCapabilities       uint32
-	DeletedValuePolicy    string
-	DeletedValueRedirect  string
-	AllowDeletedValueSend bool
+	MaxActors		uint32
+	MaxCapabilities		uint32
+	DeletedValuePolicy	string
+	DeletedValueRedirect	string
+	AllowDeletedValueSend	bool
 }
 
 type ActorRegistryState struct {
-	Actors     []ActorRecord
-	CodeStore  []CodeRecord
-	Migrations []ActorMigrationRecord
+	Actors		[]ActorRecord
+	CodeStore	[]CodeRecord
+	Migrations	[]ActorMigrationRecord
 }
 
 type CodeRecord struct {
-	CodeHash     string
-	RegisteredBy string
-	RegisteredAt uint64
+	CodeHash	string
+	RegisteredBy	string
+	RegisteredAt	uint64
 }
 
 type ActorRecord struct {
-	ActorID          string
-	ContractAddress  string
-	Owner            string
-	CodeHash         string
-	StorageRoot      string
-	MailboxRoot      string
-	Balance          uint64
-	LogicalTime      uint64
-	Status           string
-	RentStatus       string
-	LastActiveHeight uint64
-	Capabilities     []string
-	MigratedFrom     string
-	MigratedTo       string
+	ActorID			string
+	ContractAddress		string
+	Owner			string
+	CodeHash		string
+	StorageRoot		string
+	MailboxRoot		string
+	Balance			uint64
+	LogicalTime		uint64
+	Status			string
+	RentStatus		string
+	LastActiveHeight	uint64
+	Capabilities		[]string
+	MigratedFrom		string
+	MigratedTo		string
 }
 
 type ActorMigrationRecord struct {
-	ActorID      string
-	FromCodeHash string
-	ToCodeHash   string
-	Height       uint64
-	LogicalTime  uint64
+	ActorID		string
+	FromCodeHash	string
+	ToCodeHash	string
+	Height		uint64
+	LogicalTime	uint64
 }
 
 type MsgRegisterActor struct {
-	Authority       string
-	Owner           string
-	CodeHash        string
-	Salt            string
-	ActorID         string
-	ContractAddress string
-	StorageRoot     string
-	MailboxRoot     string
-	Balance         uint64
-	Height          uint64
-	Capabilities    []string
+	Authority	string
+	Owner		string
+	CodeHash	string
+	Salt		string
+	ActorID		string
+	ContractAddress	string
+	StorageRoot	string
+	MailboxRoot	string
+	Balance		uint64
+	Height		uint64
+	Capabilities	[]string
 }
 
 type MsgUpdateActorCode struct {
-	Authority   string
-	ActorID     string
-	CodeHash    string
-	Height      uint64
-	LogicalTime uint64
+	Authority	string
+	ActorID		string
+	CodeHash	string
+	Height		uint64
+	LogicalTime	uint64
 }
 
 type MsgFreezeActor struct {
-	Authority string
-	ActorID   string
-	Height    uint64
+	Authority	string
+	ActorID		string
+	Height		uint64
 }
 
 type MsgUnfreezeActor struct {
-	Authority string
-	ActorID   string
-	Height    uint64
+	Authority	string
+	ActorID		string
+	Height		uint64
 }
 
 type MsgDeleteActor struct {
-	Authority string
-	ActorID   string
-	Height    uint64
+	Authority	string
+	ActorID		string
+	Height		uint64
 }
 
 type MsgMigrateActor struct {
-	Authority      string
-	ActorID        string
-	NewCodeHash    string
-	NewStorageRoot string
-	NewMailboxRoot string
-	NewActorID     string
-	NewAddress     string
-	Height         uint64
-	LogicalTime    uint64
+	Authority	string
+	ActorID		string
+	NewCodeHash	string
+	NewStorageRoot	string
+	NewMailboxRoot	string
+	NewActorID	string
+	NewAddress	string
+	Height		uint64
+	LogicalTime	uint64
 }
 
 func DefaultActorRegistryParams() ActorRegistryParams {
 	return ActorRegistryParams{
-		MaxActors:          100_000,
-		MaxCapabilities:    64,
-		DeletedValuePolicy: DeletedValuePolicyReject,
+		MaxActors:		100_000,
+		MaxCapabilities:	64,
+		DeletedValuePolicy:	DeletedValuePolicyReject,
 	}
 }
 
@@ -153,9 +153,9 @@ func (p ActorRegistryParams) Validate() error {
 
 func (s ActorRegistryState) Export() ActorRegistryState {
 	out := ActorRegistryState{
-		Actors:     cloneActors(s.Actors),
-		CodeStore:  cloneCodeStore(s.CodeStore),
-		Migrations: cloneMigrations(s.Migrations),
+		Actors:		cloneActors(s.Actors),
+		CodeStore:	cloneCodeStore(s.CodeStore),
+		Migrations:	cloneMigrations(s.Migrations),
 	}
 	SortActors(out.Actors)
 	SortCodeStore(out.CodeStore)

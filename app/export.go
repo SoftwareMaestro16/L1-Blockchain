@@ -17,19 +17,19 @@ func (app *L1App) ExportAppStateAndValidators(forZeroHeight bool, jailAllowedAdd
 
 func (app *L1App) exportDependencies() exporting.Dependencies {
 	return exporting.Dependencies{
-		AppCodec:        app.appCodec,
-		ModuleManager:   app.ModuleManager,
-		AccountKeeper:   app.AccountKeeper,
-		StakingKeeper:   app.StakingKeeper,
-		DistrKeeper:     app.DistrKeeper,
-		SlashingKeeper:  app.SlashingKeeper,
-		StakingStoreKey: app.GetKey(stakingtypes.StoreKey),
-		Logger:          app.Logger(),
+		AppCodec:		app.appCodec,
+		ModuleManager:		app.ModuleManager,
+		AccountKeeper:		app.AccountKeeper,
+		StakingKeeper:		app.StakingKeeper,
+		DistrKeeper:		app.DistrKeeper,
+		SlashingKeeper:		app.SlashingKeeper,
+		StakingStoreKey:	app.GetKey(stakingtypes.StoreKey),
+		Logger:			app.Logger(),
 		NewContext: func(header cmtproto.Header) sdk.Context {
 			return app.NewUncachedContext(false, header)
 		},
-		LastBlockHeight:   app.LastBlockHeight,
-		ConsensusParams:   app.GetConsensusParams,
-		EnsureCollections: app.ensureCoreGenesisCollections,
+		LastBlockHeight:	app.LastBlockHeight,
+		ConsensusParams:	app.GetConsensusParams,
+		EnsureCollections:	app.ensureCoreGenesisCollections,
 	}
 }

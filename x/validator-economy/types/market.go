@@ -12,501 +12,501 @@ import (
 )
 
 type ValidatorMarketState struct {
-	Params            postypes.Params
-	Candidates        []postypes.Candidate
-	Delegations       []DelegationRecord
-	ScoreRecords      []ValidatorScoreRecord
-	SlashHistory      []ValidatorSlashHistoryRecord
-	CommissionHistory []ValidatorCommissionRecord
+	Params			postypes.Params
+	Candidates		[]postypes.Candidate
+	Delegations		[]DelegationRecord
+	ScoreRecords		[]ValidatorScoreRecord
+	SlashHistory		[]ValidatorSlashHistoryRecord
+	CommissionHistory	[]ValidatorCommissionRecord
 }
 
 type ValidatorSlashHistoryRecord struct {
-	EpochID              uint64
-	Height               int64
-	Validator            string
-	Misbehavior          string
-	SlashFractionBps     uint32
-	SelfBondSlashedNaet  sdkmath.Int
-	DelegatorSlashedNaet sdkmath.Int
-	TotalSlashedNaet     sdkmath.Int
+	EpochID			uint64
+	Height			int64
+	Validator		string
+	Misbehavior		string
+	SlashFractionBps	uint32
+	SelfBondSlashedNaet	sdkmath.Int
+	DelegatorSlashedNaet	sdkmath.Int
+	TotalSlashedNaet	sdkmath.Int
 }
 
 type ValidatorCommissionRecord struct {
-	EpochID       uint64
-	Height        int64
-	Validator     string
-	CommissionBps uint32
+	EpochID		uint64
+	Height		int64
+	Validator	string
+	CommissionBps	uint32
 }
 
 type ValidatorRisk struct {
-	Validator              string
-	SlashEventCount        uint32
-	TotalSlashedNaet       sdkmath.Int
-	LatestReliabilityBps   uint32
-	RiskScoreBps           uint32
-	DelegatorRiskInherited bool
+	Validator		string
+	SlashEventCount		uint32
+	TotalSlashedNaet	sdkmath.Int
+	LatestReliabilityBps	uint32
+	RiskScoreBps		uint32
+	DelegatorRiskInherited	bool
 }
 
 type ValidatorEffectiveYield struct {
-	Validator              string
-	RawStakeNaet           sdkmath.Int
-	RewardWeightNaet       sdkmath.Int
-	GrossYieldBps          uint32
-	NetYieldBps            uint32
-	CommissionBps          uint32
-	SaturationDampeningBps uint32
+	Validator		string
+	RawStakeNaet		sdkmath.Int
+	RewardWeightNaet	sdkmath.Int
+	GrossYieldBps		uint32
+	NetYieldBps		uint32
+	CommissionBps		uint32
+	SaturationDampeningBps	uint32
 }
 
 type DelegationRiskExposure struct {
-	Delegator              string
-	Validator              string
-	Amount                 sdkmath.Int
-	RiskAppetite           string
-	AdvisoryRiskProfile    bool
-	SlashEventsInherited   []ValidatorSlashHistoryRecord
-	ProjectedSlashNaet     sdkmath.Int
-	FirstLossProtectedNaet sdkmath.Int
-	HistoricalSlashNaet    sdkmath.Int
+	Delegator		string
+	Validator		string
+	Amount			sdkmath.Int
+	RiskAppetite		string
+	AdvisoryRiskProfile	bool
+	SlashEventsInherited	[]ValidatorSlashHistoryRecord
+	ProjectedSlashNaet	sdkmath.Int
+	FirstLossProtectedNaet	sdkmath.Int
+	HistoricalSlashNaet	sdkmath.Int
 }
 
 type DelegationCommissionStatus struct {
-	Delegator              string
-	Validator              string
-	Status                 string
-	CommissionToleranceBps uint32
-	CurrentCommissionBps   uint32
-	CommissionExceeded     bool
-	Alert                  *DelegationCommissionAlert
+	Delegator		string
+	Validator		string
+	Status			string
+	CommissionToleranceBps	uint32
+	CurrentCommissionBps	uint32
+	CommissionExceeded	bool
+	Alert			*DelegationCommissionAlert
 }
 
 const (
-	DelegationPolicyLowRisk                    = "low_risk"
-	DelegationPolicyHighAvailability           = "high_availability"
-	DelegationPolicyDecentralizationSupporting = "decentralization_supporting"
-	DelegationPolicyMaxYieldWithinRiskBounds   = "max_yield_within_risk_bounds"
+	DelegationPolicyLowRisk				= "low_risk"
+	DelegationPolicyHighAvailability		= "high_availability"
+	DelegationPolicyDecentralizationSupporting	= "decentralization_supporting"
+	DelegationPolicyMaxYieldWithinRiskBounds	= "max_yield_within_risk_bounds"
 
-	ConcentrationStatusNormal  = "normal"
-	ConcentrationStatusWarning = "warning"
+	ConcentrationStatusNormal	= "normal"
+	ConcentrationStatusWarning	= "warning"
 
-	ValidatorEventMetadataChange   = "validator_metadata_change"
-	ValidatorEventCommissionChange = "validator_commission_change"
-	DelegatorAlertCaptureRisk      = "delegator_alert_capture_risk"
+	ValidatorEventMetadataChange	= "validator_metadata_change"
+	ValidatorEventCommissionChange	= "validator_commission_change"
+	DelegatorAlertCaptureRisk	= "delegator_alert_capture_risk"
 
-	CaptureRiskSuddenDelegationInflow        = "sudden_delegation_inflow"
-	CaptureRiskRapidCommissionChange         = "rapid_commission_change"
-	CaptureRiskRecentSlash                   = "recent_slash"
-	CaptureRiskSelfDelegationWithdrawal      = "self_delegation_withdrawal"
-	CaptureRiskOperatorMetadataInconsistency = "operator_metadata_inconsistency"
+	CaptureRiskSuddenDelegationInflow		= "sudden_delegation_inflow"
+	CaptureRiskRapidCommissionChange		= "rapid_commission_change"
+	CaptureRiskRecentSlash				= "recent_slash"
+	CaptureRiskSelfDelegationWithdrawal		= "self_delegation_withdrawal"
+	CaptureRiskOperatorMetadataInconsistency	= "operator_metadata_inconsistency"
 )
 
 type ValidatorRiskScoreComponents struct {
-	Validator            string
-	SlashHistoryRiskBps  uint32
-	ReliabilityRiskBps   uint32
-	ConcentrationRiskBps uint32
-	CommissionRiskBps    uint32
-	TotalRiskScoreBps    uint32
+	Validator		string
+	SlashHistoryRiskBps	uint32
+	ReliabilityRiskBps	uint32
+	ConcentrationRiskBps	uint32
+	CommissionRiskBps	uint32
+	TotalRiskScoreBps	uint32
 }
 
 type DelegationYieldEstimate struct {
-	Validator                  string
-	Delegator                  string
-	DelegationAmountNaet       sdkmath.Int
-	RewardInputNaet            sdkmath.Int
-	AdjustedRewardInputNaet    sdkmath.Int
-	EstimatedRewardNaet        sdkmath.Int
-	GrossYieldBps              uint32
-	NetYieldBps                uint32
-	CommissionBps              uint32
-	PerformanceAdjustmentBps   uint32
-	ConcentrationAdjustmentBps uint32
-	ValidatorCommissionNaet    sdkmath.Int
-	UsesDistributionInputs     bool
+	Validator			string
+	Delegator			string
+	DelegationAmountNaet		sdkmath.Int
+	RewardInputNaet			sdkmath.Int
+	AdjustedRewardInputNaet		sdkmath.Int
+	EstimatedRewardNaet		sdkmath.Int
+	GrossYieldBps			uint32
+	NetYieldBps			uint32
+	CommissionBps			uint32
+	PerformanceAdjustmentBps	uint32
+	ConcentrationAdjustmentBps	uint32
+	ValidatorCommissionNaet		sdkmath.Int
+	UsesDistributionInputs		bool
 }
 
 type ValidatorDisclosure struct {
-	Validator              string
-	CommissionBps          uint32
-	MaxCommissionChangeBps uint32
-	UptimeBps              uint32
-	SlashHistoryCount      uint32
-	TotalSlashedNaet       sdkmath.Int
-	SelfDelegationNaet     sdkmath.Int
-	ConcentrationStatus    string
-	ConcentrationWarnings  []string
+	Validator		string
+	CommissionBps		uint32
+	MaxCommissionChangeBps	uint32
+	UptimeBps		uint32
+	SlashHistoryCount	uint32
+	TotalSlashedNaet	sdkmath.Int
+	SelfDelegationNaet	sdkmath.Int
+	ConcentrationStatus	string
+	ConcentrationWarnings	[]string
 }
 
 type DelegationPolicyTemplate struct {
-	Name                      string
-	RiskAppetite              string
-	MaxRiskScoreBps           uint32
-	MinUptimeBps              uint32
-	MaxCommissionBps          uint32
-	MaxValidatorShareBps      uint32
-	RequireNoSlashHistory     bool
-	PreferConcentrationRelief bool
-	AdvisoryOnly              bool
+	Name				string
+	RiskAppetite			string
+	MaxRiskScoreBps			uint32
+	MinUptimeBps			uint32
+	MaxCommissionBps		uint32
+	MaxValidatorShareBps		uint32
+	RequireNoSlashHistory		bool
+	PreferConcentrationRelief	bool
+	AdvisoryOnly			bool
 }
 
 type DelegationPolicyEvaluation struct {
-	PolicyName   string
-	Matches      bool
-	Reasons      []string
-	AdvisoryOnly bool
+	PolicyName	string
+	Matches		bool
+	Reasons		[]string
+	AdvisoryOnly	bool
 }
 
 type DelegatorValidatorProfile struct {
-	Validator             string
-	Risk                  ValidatorRisk
-	RiskComponents        ValidatorRiskScoreComponents
-	YieldEstimate         DelegationYieldEstimate
-	ConcentrationWarnings []string
-	Disclosure            ValidatorDisclosure
-	PolicyEvaluations     []DelegationPolicyEvaluation
-	AdvisoryOnly          bool
+	Validator		string
+	Risk			ValidatorRisk
+	RiskComponents		ValidatorRiskScoreComponents
+	YieldEstimate		DelegationYieldEstimate
+	ConcentrationWarnings	[]string
+	Disclosure		ValidatorDisclosure
+	PolicyEvaluations	[]DelegationPolicyEvaluation
+	AdvisoryOnly		bool
 }
 
 type RedelegationRewardPreview struct {
-	Delegator             string
-	FromValidator         string
-	ToValidator           string
-	AmountNaet            sdkmath.Int
-	CurrentEstimate       DelegationYieldEstimate
-	TargetEstimate        DelegationYieldEstimate
-	RewardDeltaNaet       sdkmath.Int
-	NetYieldDeltaBps      int32
-	TargetRisk            ValidatorRisk
-	TargetRiskComponents  ValidatorRiskScoreComponents
-	TargetDisclosure      ValidatorDisclosure
-	PolicyEvaluations     []DelegationPolicyEvaluation
-	AdvisoryOnly          bool
-	StakeMovementExecuted bool
+	Delegator		string
+	FromValidator		string
+	ToValidator		string
+	AmountNaet		sdkmath.Int
+	CurrentEstimate		DelegationYieldEstimate
+	TargetEstimate		DelegationYieldEstimate
+	RewardDeltaNaet		sdkmath.Int
+	NetYieldDeltaBps	int32
+	TargetRisk		ValidatorRisk
+	TargetRiskComponents	ValidatorRiskScoreComponents
+	TargetDisclosure	ValidatorDisclosure
+	PolicyEvaluations	[]DelegationPolicyEvaluation
+	AdvisoryOnly		bool
+	StakeMovementExecuted	bool
 }
 
 type EventAttribute struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 type ValidatorMachineEvent struct {
-	Type       string
-	Validator  string
-	EpochID    uint64
-	Height     int64
-	Attributes []EventAttribute
+	Type		string
+	Validator	string
+	EpochID		uint64
+	Height		int64
+	Attributes	[]EventAttribute
 }
 
 type ValidatorMetadataSnapshot struct {
-	OperatorID      string
-	ConsensusKeyID  string
-	Moniker         string
-	Website         string
-	SecurityContact string
-	PayoutAddress   string
+	OperatorID	string
+	ConsensusKeyID	string
+	Moniker		string
+	Website		string
+	SecurityContact	string
+	PayoutAddress	string
 }
 
 type ValidatorMetadataChangeInput struct {
-	EpochID        uint64
-	Height         int64
-	Validator      string
-	Previous       ValidatorMetadataSnapshot
-	Current        ValidatorMetadataSnapshot
-	CooldownEpochs uint64
+	EpochID		uint64
+	Height		int64
+	Validator	string
+	Previous	ValidatorMetadataSnapshot
+	Current		ValidatorMetadataSnapshot
+	CooldownEpochs	uint64
 }
 
 type ValidatorMetadataChangeRecord struct {
-	EpochID            uint64
-	Height             int64
-	Validator          string
-	Previous           ValidatorMetadataSnapshot
-	Current            ValidatorMetadataSnapshot
-	ChangedFields      []string
-	Material           bool
-	CooldownUntilEpoch uint64
-	Event              ValidatorMachineEvent
+	EpochID			uint64
+	Height			int64
+	Validator		string
+	Previous		ValidatorMetadataSnapshot
+	Current			ValidatorMetadataSnapshot
+	ChangedFields		[]string
+	Material		bool
+	CooldownUntilEpoch	uint64
+	Event			ValidatorMachineEvent
 }
 
 type CommissionChangeInput struct {
-	EpochID                   uint64
-	Height                    int64
-	Validator                 string
-	PreviousCommissionBps     uint32
-	NewCommissionBps          uint32
-	MaxIncreaseBpsPerInterval uint32
-	WarningPeriodEpochs       uint64
+	EpochID				uint64
+	Height				int64
+	Validator			string
+	PreviousCommissionBps		uint32
+	NewCommissionBps		uint32
+	MaxIncreaseBpsPerInterval	uint32
+	WarningPeriodEpochs		uint64
 }
 
 type CommissionChangeRecord struct {
-	EpochID               uint64
-	Height                int64
-	Validator             string
-	PreviousCommissionBps uint32
-	NewCommissionBps      uint32
-	IncreaseBps           uint32
-	RiskFlag              bool
-	EffectiveEpoch        uint64
-	Event                 ValidatorMachineEvent
+	EpochID			uint64
+	Height			int64
+	Validator		string
+	PreviousCommissionBps	uint32
+	NewCommissionBps	uint32
+	IncreaseBps		uint32
+	RiskFlag		bool
+	EffectiveEpoch		uint64
+	Event			ValidatorMachineEvent
 }
 
 type CaptureRiskParams struct {
-	MaterialChangeCooldownEpochs        uint64
-	CommissionChangeIntervalEpochs      uint64
-	MaxCommissionIncreaseBpsPerInterval uint32
-	SuddenDelegationInflowBps           uint32
-	SelfDelegationWithdrawalBps         uint32
-	RecentSlashWindowEpochs             uint64
-	HighRiskIndicatorThreshold          uint32
+	MaterialChangeCooldownEpochs		uint64
+	CommissionChangeIntervalEpochs		uint64
+	MaxCommissionIncreaseBpsPerInterval	uint32
+	SuddenDelegationInflowBps		uint32
+	SelfDelegationWithdrawalBps		uint32
+	RecentSlashWindowEpochs			uint64
+	HighRiskIndicatorThreshold		uint32
 }
 
 type CaptureRiskInput struct {
-	Validator         string
-	CurrentEpoch      uint64
-	Height            int64
-	PreviousCandidate postypes.Candidate
-	CurrentCandidate  postypes.Candidate
-	MetadataChanges   []ValidatorMetadataChangeRecord
-	CommissionHistory []ValidatorCommissionRecord
-	SlashHistory      []ValidatorSlashHistoryRecord
-	Params            CaptureRiskParams
+	Validator		string
+	CurrentEpoch		uint64
+	Height			int64
+	PreviousCandidate	postypes.Candidate
+	CurrentCandidate	postypes.Candidate
+	MetadataChanges		[]ValidatorMetadataChangeRecord
+	CommissionHistory	[]ValidatorCommissionRecord
+	SlashHistory		[]ValidatorSlashHistoryRecord
+	Params			CaptureRiskParams
 }
 
 type CaptureRiskIndicator struct {
-	Name        string
-	SeverityBps uint32
-	Detail      string
+	Name		string
+	SeverityBps	uint32
+	Detail		string
 }
 
 type DelegatorAlertEvent struct {
-	Type         string
-	Validator    string
-	EpochID      uint64
-	Height       int64
-	Reason       string
-	AdvisoryOnly bool
+	Type		string
+	Validator	string
+	EpochID		uint64
+	Height		int64
+	Reason		string
+	AdvisoryOnly	bool
 }
 
 type CaptureRiskReport struct {
-	Validator         string
-	RiskScoreBps      uint32
-	Indicators        []CaptureRiskIndicator
-	AlertEvents       []DelegatorAlertEvent
-	HighRisk          bool
-	AdvisoryOnly      bool
-	SlashableBehavior bool
+	Validator		string
+	RiskScoreBps		uint32
+	Indicators		[]CaptureRiskIndicator
+	AlertEvents		[]DelegatorAlertEvent
+	HighRisk		bool
+	AdvisoryOnly		bool
+	SlashableBehavior	bool
 }
 
 type RiskAdjustedYieldInput struct {
-	Delegator                 string
-	Validator                 string
-	AmountNaet                sdkmath.Int
-	AnnualRewardsNaet         sdkmath.Int
-	UnbondingLiquidityCostBps uint32
-	Decentralization          DecentralizationParams
-	ActiveValidatorIDs        []string
+	Delegator			string
+	Validator			string
+	AmountNaet			sdkmath.Int
+	AnnualRewardsNaet		sdkmath.Int
+	UnbondingLiquidityCostBps	uint32
+	Decentralization		DecentralizationParams
+	ActiveValidatorIDs		[]string
 }
 
 type RiskAdjustedYieldProjection struct {
-	Validator                  string
-	Delegator                  string
-	GrossRewardRateBps         uint32
-	CommissionBps              uint32
-	HistoricalUptimeBps        uint32
-	SlashProbabilityProxyBps   uint32
-	ConcentrationAdjustmentBps uint32
-	UnbondingLiquidityCostBps  uint32
-	RiskAdjustedYieldBps       uint32
-	ExpectedRewardNaet         sdkmath.Int
-	LowRewardNaet              sdkmath.Int
-	HighRewardNaet             sdkmath.Int
-	UncertaintyBps             uint32
-	ReproducibleFromQueries    bool
+	Validator			string
+	Delegator			string
+	GrossRewardRateBps		uint32
+	CommissionBps			uint32
+	HistoricalUptimeBps		uint32
+	SlashProbabilityProxyBps	uint32
+	ConcentrationAdjustmentBps	uint32
+	UnbondingLiquidityCostBps	uint32
+	RiskAdjustedYieldBps		uint32
+	ExpectedRewardNaet		sdkmath.Int
+	LowRewardNaet			sdkmath.Int
+	HighRewardNaet			sdkmath.Int
+	UncertaintyBps			uint32
+	ReproducibleFromQueries		bool
 }
 
 type ValidatorRewardObservation struct {
-	EpochID           uint64
-	Validator         string
-	RewardPerStakeBps uint32
+	EpochID			uint64
+	Validator		string
+	RewardPerStakeBps	uint32
 }
 
 type ValidatorRewardVariance struct {
-	Validator        string
-	ObservationCount uint32
-	MeanRewardBps    uint32
-	MinRewardBps     uint32
-	MaxRewardBps     uint32
-	VarianceBps      uint32
+	Validator		string
+	ObservationCount	uint32
+	MeanRewardBps		uint32
+	MinRewardBps		uint32
+	MaxRewardBps		uint32
+	VarianceBps		uint32
 }
 
 type RedelegationCostEstimate struct {
-	AmountNaet         sdkmath.Int
-	UnbondingSeconds   uint64
-	LiquidityCostBps   uint32
-	CommissionDeltaBps int32
-	RiskDeltaBps       int32
-	EstimatedCostNaet  sdkmath.Int
+	AmountNaet		sdkmath.Int
+	UnbondingSeconds	uint64
+	LiquidityCostBps	uint32
+	CommissionDeltaBps	int32
+	RiskDeltaBps		int32
+	EstimatedCostNaet	sdkmath.Int
 }
 
 type DelegationSimulationInput struct {
-	Delegator                 string
-	FromValidator             string
-	ToValidator               string
-	AmountNaet                sdkmath.Int
-	AnnualRewardsNaet         sdkmath.Int
-	CurrentEpoch              uint64
-	Height                    int64
-	CommissionOverrides       []ValidatorCommissionRecord
-	SlashEvents               []ValidatorSlashHistoryRecord
-	Decentralization          DecentralizationParams
-	ActiveValidatorIDs        []string
-	UnbondingLiquidityCostBps uint32
+	Delegator			string
+	FromValidator			string
+	ToValidator			string
+	AmountNaet			sdkmath.Int
+	AnnualRewardsNaet		sdkmath.Int
+	CurrentEpoch			uint64
+	Height				int64
+	CommissionOverrides		[]ValidatorCommissionRecord
+	SlashEvents			[]ValidatorSlashHistoryRecord
+	Decentralization		DecentralizationParams
+	ActiveValidatorIDs		[]string
+	UnbondingLiquidityCostBps	uint32
 }
 
 type DelegationSimulationResult struct {
-	CurrentProjection        RiskAdjustedYieldProjection
-	TargetProjection         RiskAdjustedYieldProjection
-	RedelegationPreview      RedelegationRewardPreview
-	RedelegationCost         RedelegationCostEstimate
-	ProjectedRewardDeltaNaet sdkmath.Int
-	AdvisoryOnly             bool
+	CurrentProjection		RiskAdjustedYieldProjection
+	TargetProjection		RiskAdjustedYieldProjection
+	RedelegationPreview		RedelegationRewardPreview
+	RedelegationCost		RedelegationCostEstimate
+	ProjectedRewardDeltaNaet	sdkmath.Int
+	AdvisoryOnly			bool
 }
 
 type FirstLossSelfBondAccounting struct {
-	Validator                  string
-	TargetSlashNaet            sdkmath.Int
-	SelfBondAvailableNaet      sdkmath.Int
-	SelfBondAbsorbedNaet       sdkmath.Int
-	DelegatorResidualSlashNaet sdkmath.Int
-	FirstLossApplied           bool
+	Validator			string
+	TargetSlashNaet			sdkmath.Int
+	SelfBondAvailableNaet		sdkmath.Int
+	SelfBondAbsorbedNaet		sdkmath.Int
+	DelegatorResidualSlashNaet	sdkmath.Int
+	FirstLossApplied		bool
 }
 
 type SlashPropagationInput struct {
-	Validator         string
-	SelfBondNaet      sdkmath.Int
-	Delegations       []DelegationRecord
-	SlashFractionBps  uint32
-	SelfBondFirstLoss bool
-	EvidenceHeight    int64
-	Misbehavior       string
-	EpochID           uint64
+	Validator		string
+	SelfBondNaet		sdkmath.Int
+	Delegations		[]DelegationRecord
+	SlashFractionBps	uint32
+	SelfBondFirstLoss	bool
+	EvidenceHeight		int64
+	Misbehavior		string
+	EpochID			uint64
 }
 
 type SlashPropagationResult struct {
-	Validator             string
-	SelfBondSlashedNaet   sdkmath.Int
-	DelegatorSlashes      []DelegatorSlashExposure
-	TotalDelegatorSlashed sdkmath.Int
-	TotalSlashedNaet      sdkmath.Int
+	Validator		string
+	SelfBondSlashedNaet	sdkmath.Int
+	DelegatorSlashes	[]DelegatorSlashExposure
+	TotalDelegatorSlashed	sdkmath.Int
+	TotalSlashedNaet	sdkmath.Int
 }
 
 type DelegatorSlashExposure struct {
-	Delegator   string
-	Validator   string
-	Amount      sdkmath.Int
-	SlashedNaet sdkmath.Int
-	RiskTranche string
+	Delegator	string
+	Validator	string
+	Amount		sdkmath.Int
+	SlashedNaet	sdkmath.Int
+	RiskTranche	string
 }
 
 const (
-	SlashSeverityMinorDowntime                SlashSeverityClass = "minor_downtime"
-	SlashSeverityMajorDowntime                SlashSeverityClass = "major_downtime"
-	SlashSeverityRepeatedDowntime             SlashSeverityClass = "repeated_downtime"
-	SlashSeverityEquivocation                 SlashSeverityClass = "equivocation"
-	SlashSeverityEvidenceManipulation         SlashSeverityClass = "evidence_manipulation"
-	SlashSeverityKeyCompromiseResponseFailure SlashSeverityClass = "key_compromise_response_failure"
-	DefaultRepeatOffenseDecayEpochs                              = uint64(4)
-	DefaultRepeatOffenseStepBps                                  = uint32(2_500)
-	DefaultMaxRepeatOffenseMultiplierBps                         = uint32(30_000)
+	SlashSeverityMinorDowntime			SlashSeverityClass	= "minor_downtime"
+	SlashSeverityMajorDowntime			SlashSeverityClass	= "major_downtime"
+	SlashSeverityRepeatedDowntime			SlashSeverityClass	= "repeated_downtime"
+	SlashSeverityEquivocation			SlashSeverityClass	= "equivocation"
+	SlashSeverityEvidenceManipulation		SlashSeverityClass	= "evidence_manipulation"
+	SlashSeverityKeyCompromiseResponseFailure	SlashSeverityClass	= "key_compromise_response_failure"
+	DefaultRepeatOffenseDecayEpochs						= uint64(4)
+	DefaultRepeatOffenseStepBps						= uint32(2_500)
+	DefaultMaxRepeatOffenseMultiplierBps					= uint32(30_000)
 
-	ConcentrationWarningValidatorShare        = "validator_voting_power_concentration"
-	ConcentrationWarningTopNShare             = "top_n_voting_power_concentration"
-	ConcentrationWarningDelegatorShare        = "delegator_concentration"
-	ConcentrationWarningSelfDelegation        = "self_delegation_below_requirement"
-	ConcentrationWarningCommissionByPower     = "commission_concentration_by_power"
-	ConcentrationWarningRewardDampeningActive = "reward_dampening_active"
+	ConcentrationWarningValidatorShare		= "validator_voting_power_concentration"
+	ConcentrationWarningTopNShare			= "top_n_voting_power_concentration"
+	ConcentrationWarningDelegatorShare		= "delegator_concentration"
+	ConcentrationWarningSelfDelegation		= "self_delegation_below_requirement"
+	ConcentrationWarningCommissionByPower		= "commission_concentration_by_power"
+	ConcentrationWarningRewardDampeningActive	= "reward_dampening_active"
 )
 
 type SlashSeverityClass string
 
 type SlashingSeverityParam struct {
-	Severity             SlashSeverityClass
-	BasePenaltyBps       uint32
-	BurnBps              uint32
-	TreasuryBps          uint32
-	ReporterRewardBps    uint32
-	ReporterRewardCapBps uint32
+	Severity		SlashSeverityClass
+	BasePenaltyBps		uint32
+	BurnBps			uint32
+	TreasuryBps		uint32
+	ReporterRewardBps	uint32
+	ReporterRewardCapBps	uint32
 }
 
 type SlashingEvidence struct {
-	EvidenceID string
-	ReporterID string
-	Accepted   bool
-	Duplicate  bool
+	EvidenceID	string
+	ReporterID	string
+	Accepted	bool
+	Duplicate	bool
 }
 
 type SlashingRoutingInput struct {
-	Validator          string
-	Severity           SlashSeverityClass
-	TotalStakeNaet     sdkmath.Int
-	Evidence           SlashingEvidence
-	PriorOffenseEpochs []uint64
-	CurrentEpoch       uint64
-	Params             []SlashingSeverityParam
+	Validator		string
+	Severity		SlashSeverityClass
+	TotalStakeNaet		sdkmath.Int
+	Evidence		SlashingEvidence
+	PriorOffenseEpochs	[]uint64
+	CurrentEpoch		uint64
+	Params			[]SlashingSeverityParam
 }
 
 type SlashingRoutingResult struct {
-	Validator             string
-	Severity              SlashSeverityClass
-	PenaltyBps            uint32
-	RepeatMultiplierBps   uint32
-	PenaltyNaet           sdkmath.Int
-	BurnNaet              sdkmath.Int
-	TreasuryNaet          sdkmath.Int
-	ReporterRewardNaet    sdkmath.Int
-	ValidatorResidualNaet sdkmath.Int
-	ReporterPaid          bool
-	Event                 SlashingEvent
+	Validator		string
+	Severity		SlashSeverityClass
+	PenaltyBps		uint32
+	RepeatMultiplierBps	uint32
+	PenaltyNaet		sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ValidatorResidualNaet	sdkmath.Int
+	ReporterPaid		bool
+	Event			SlashingEvent
 }
 
 type SlashingEvent struct {
-	Validator          string
-	Severity           SlashSeverityClass
-	Reason             string
-	PenaltyNaet        sdkmath.Int
-	BurnNaet           sdkmath.Int
-	TreasuryNaet       sdkmath.Int
-	ReporterRewardNaet sdkmath.Int
-	ReporterID         string
-	ReporterPaid       bool
+	Validator		string
+	Severity		SlashSeverityClass
+	Reason			string
+	PenaltyNaet		sdkmath.Int
+	BurnNaet		sdkmath.Int
+	TreasuryNaet		sdkmath.Int
+	ReporterRewardNaet	sdkmath.Int
+	ReporterID		string
+	ReporterPaid		bool
 }
 
 type DecentralizationParams struct {
-	TopN                          int
-	MaxValidatorShareBps          uint32
-	MaxTopNShareBps               uint32
-	MaxDelegatorConcentrationBps  uint32
-	MinSelfDelegationRatioBps     uint32
-	MinSelfDelegationNaet         sdkmath.Int
-	MaxCommissionWeightedBps      uint32
-	RewardDampeningSafetyFloorBps uint32
-	StakeMovementIncentiveBps     uint32
+	TopN				int
+	MaxValidatorShareBps		uint32
+	MaxTopNShareBps			uint32
+	MaxDelegatorConcentrationBps	uint32
+	MinSelfDelegationRatioBps	uint32
+	MinSelfDelegationNaet		sdkmath.Int
+	MaxCommissionWeightedBps	uint32
+	RewardDampeningSafetyFloorBps	uint32
+	StakeMovementIncentiveBps	uint32
 }
 
 type ValidatorConcentrationMetric struct {
-	Validator                 string
-	VotingPowerShareBps       uint32
-	DelegatorConcentrationBps uint32
-	SelfDelegationRatioBps    uint32
-	CommissionBps             uint32
-	RewardDampeningBps        uint32
-	StakeMovementIncentiveBps uint32
-	Warnings                  []string
+	Validator			string
+	VotingPowerShareBps		uint32
+	DelegatorConcentrationBps	uint32
+	SelfDelegationRatioBps		uint32
+	CommissionBps			uint32
+	RewardDampeningBps		uint32
+	StakeMovementIncentiveBps	uint32
+	Warnings			[]string
 }
 
 type ActiveSetConcentrationReport struct {
-	Metrics               []ValidatorConcentrationMetric
-	TopNShareBps          uint32
-	CommissionWeightedBps uint32
-	ActiveSetWarnings     []string
+	Metrics			[]ValidatorConcentrationMetric
+	TopNShareBps		uint32
+	CommissionWeightedBps	uint32
+	ActiveSetWarnings	[]string
 }
 
 func NewValidatorMarketState(params postypes.Params, candidates []postypes.Candidate, delegations []DelegationRecord, scoreRecords []ValidatorScoreRecord, slashHistory []ValidatorSlashHistoryRecord, commissionHistory []ValidatorCommissionRecord) (ValidatorMarketState, error) {
@@ -547,12 +547,12 @@ func NewValidatorMarketState(params postypes.Params, candidates []postypes.Candi
 	}
 	sortCommissionHistory(commissionCopies)
 	return ValidatorMarketState{
-		Params:            params,
-		Candidates:        candidateCopies,
-		Delegations:       delegationState.Records,
-		ScoreRecords:      scoreState.Records,
-		SlashHistory:      slashCopies,
-		CommissionHistory: commissionCopies,
+		Params:			params,
+		Candidates:		candidateCopies,
+		Delegations:		delegationState.Records,
+		ScoreRecords:		scoreState.Records,
+		SlashHistory:		slashCopies,
+		CommissionHistory:	commissionCopies,
 	}, nil
 }
 
@@ -623,8 +623,8 @@ func (p SlashingSeverityParam) Validate() error {
 		return err
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "base_penalty_bps", value: p.BasePenaltyBps},
 		{name: "burn_bps", value: p.BurnBps},
@@ -726,28 +726,28 @@ func RouteSlashing(input SlashingRoutingInput) (SlashingRoutingResult, error) {
 	}
 	residual := penalty.Sub(routed)
 	event := SlashingEvent{
-		Validator:          validator,
-		Severity:           input.Severity,
-		Reason:             string(input.Severity),
-		PenaltyNaet:        penalty,
-		BurnNaet:           burn,
-		TreasuryNaet:       treasury,
-		ReporterRewardNaet: reporter,
-		ReporterID:         reporterID,
-		ReporterPaid:       reporterPaid,
+		Validator:		validator,
+		Severity:		input.Severity,
+		Reason:			string(input.Severity),
+		PenaltyNaet:		penalty,
+		BurnNaet:		burn,
+		TreasuryNaet:		treasury,
+		ReporterRewardNaet:	reporter,
+		ReporterID:		reporterID,
+		ReporterPaid:		reporterPaid,
 	}
 	result := SlashingRoutingResult{
-		Validator:             validator,
-		Severity:              input.Severity,
-		PenaltyBps:            penaltyBps,
-		RepeatMultiplierBps:   multiplier,
-		PenaltyNaet:           penalty,
-		BurnNaet:              burn,
-		TreasuryNaet:          treasury,
-		ReporterRewardNaet:    reporter,
-		ValidatorResidualNaet: residual,
-		ReporterPaid:          reporterPaid,
-		Event:                 event,
+		Validator:		validator,
+		Severity:		input.Severity,
+		PenaltyBps:		penaltyBps,
+		RepeatMultiplierBps:	multiplier,
+		PenaltyNaet:		penalty,
+		BurnNaet:		burn,
+		TreasuryNaet:		treasury,
+		ReporterRewardNaet:	reporter,
+		ValidatorResidualNaet:	residual,
+		ReporterPaid:		reporterPaid,
+		Event:			event,
 	}
 	if !result.BurnNaet.Add(result.TreasuryNaet).Add(result.ReporterRewardNaet).Add(result.ValidatorResidualNaet).Equal(result.PenaltyNaet) {
 		return SlashingRoutingResult{}, errors.New("slashing routing invariant failed")
@@ -774,15 +774,15 @@ func findSlashingSeverityParam(params []SlashingSeverityParam, severity SlashSev
 
 func DefaultDecentralizationParams(params postypes.Params) DecentralizationParams {
 	return DecentralizationParams{
-		TopN:                          3,
-		MaxValidatorShareBps:          params.MaxVotingPowerBps,
-		MaxTopNShareBps:               6_700,
-		MaxDelegatorConcentrationBps:  5_000,
-		MinSelfDelegationRatioBps:     500,
-		MinSelfDelegationNaet:         params.MinStakeNaet,
-		MaxCommissionWeightedBps:      params.MaxCommissionBps,
-		RewardDampeningSafetyFloorBps: 7_500,
-		StakeMovementIncentiveBps:     250,
+		TopN:				3,
+		MaxValidatorShareBps:		params.MaxVotingPowerBps,
+		MaxTopNShareBps:		6_700,
+		MaxDelegatorConcentrationBps:	5_000,
+		MinSelfDelegationRatioBps:	500,
+		MinSelfDelegationNaet:		params.MinStakeNaet,
+		MaxCommissionWeightedBps:	params.MaxCommissionBps,
+		RewardDampeningSafetyFloorBps:	7_500,
+		StakeMovementIncentiveBps:	250,
 	}
 }
 
@@ -794,8 +794,8 @@ func (p DecentralizationParams) Validate(posParams postypes.Params) error {
 		return errors.New("top n must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "max_validator_share_bps", value: p.MaxValidatorShareBps},
 		{name: "max_top_n_share_bps", value: p.MaxTopNShareBps},
@@ -820,13 +820,13 @@ func (p DecentralizationParams) Validate(posParams postypes.Params) error {
 
 func DefaultCaptureRiskParams(params postypes.Params) CaptureRiskParams {
 	return CaptureRiskParams{
-		MaterialChangeCooldownEpochs:        2,
-		CommissionChangeIntervalEpochs:      4,
-		MaxCommissionIncreaseBpsPerInterval: 500,
-		SuddenDelegationInflowBps:           3_000,
-		SelfDelegationWithdrawalBps:         2_500,
-		RecentSlashWindowEpochs:             params.EvidenceWindowEpochs,
-		HighRiskIndicatorThreshold:          2,
+		MaterialChangeCooldownEpochs:		2,
+		CommissionChangeIntervalEpochs:		4,
+		MaxCommissionIncreaseBpsPerInterval:	500,
+		SuddenDelegationInflowBps:		3_000,
+		SelfDelegationWithdrawalBps:		2_500,
+		RecentSlashWindowEpochs:		params.EvidenceWindowEpochs,
+		HighRiskIndicatorThreshold:		2,
 	}
 }
 
@@ -847,8 +847,8 @@ func (p CaptureRiskParams) Validate(params postypes.Params) error {
 		return fmt.Errorf("max commission increase must be <= %d bps", params.MaxCommissionBps)
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "sudden_delegation_inflow_bps", value: p.SuddenDelegationInflowBps},
 		{name: "self_delegation_withdrawal_bps", value: p.SelfDelegationWithdrawalBps},
@@ -893,20 +893,20 @@ func TrackValidatorMetadataChange(input ValidatorMetadataChangeInput) (Validator
 		{Key: "cooldown_until_epoch", Value: fmt.Sprintf("%d", cooldownUntil)},
 	}
 	record := ValidatorMetadataChangeRecord{
-		EpochID:            input.EpochID,
-		Height:             input.Height,
-		Validator:          validator,
-		Previous:           normalizeMetadataSnapshot(input.Previous),
-		Current:            normalizeMetadataSnapshot(input.Current),
-		ChangedFields:      changed,
-		Material:           material,
-		CooldownUntilEpoch: cooldownUntil,
+		EpochID:		input.EpochID,
+		Height:			input.Height,
+		Validator:		validator,
+		Previous:		normalizeMetadataSnapshot(input.Previous),
+		Current:		normalizeMetadataSnapshot(input.Current),
+		ChangedFields:		changed,
+		Material:		material,
+		CooldownUntilEpoch:	cooldownUntil,
 		Event: ValidatorMachineEvent{
-			Type:       ValidatorEventMetadataChange,
-			Validator:  validator,
-			EpochID:    input.EpochID,
-			Height:     input.Height,
-			Attributes: attrs,
+			Type:		ValidatorEventMetadataChange,
+			Validator:	validator,
+			EpochID:	input.EpochID,
+			Height:		input.Height,
+			Attributes:	attrs,
 		},
 	}
 	return record, true, nil
@@ -938,19 +938,19 @@ func TrackValidatorCommissionChange(input CommissionChangeInput) (CommissionChan
 	}
 	riskFlag := input.MaxIncreaseBpsPerInterval > 0 && increase > input.MaxIncreaseBpsPerInterval
 	record := CommissionChangeRecord{
-		EpochID:               input.EpochID,
-		Height:                input.Height,
-		Validator:             validator,
-		PreviousCommissionBps: input.PreviousCommissionBps,
-		NewCommissionBps:      input.NewCommissionBps,
-		IncreaseBps:           increase,
-		RiskFlag:              riskFlag,
-		EffectiveEpoch:        input.EpochID + input.WarningPeriodEpochs,
+		EpochID:		input.EpochID,
+		Height:			input.Height,
+		Validator:		validator,
+		PreviousCommissionBps:	input.PreviousCommissionBps,
+		NewCommissionBps:	input.NewCommissionBps,
+		IncreaseBps:		increase,
+		RiskFlag:		riskFlag,
+		EffectiveEpoch:		input.EpochID + input.WarningPeriodEpochs,
 		Event: ValidatorMachineEvent{
-			Type:      ValidatorEventCommissionChange,
-			Validator: validator,
-			EpochID:   input.EpochID,
-			Height:    input.Height,
+			Type:		ValidatorEventCommissionChange,
+			Validator:	validator,
+			EpochID:	input.EpochID,
+			Height:		input.Height,
 			Attributes: []EventAttribute{
 				{Key: "previous_commission_bps", Value: fmt.Sprintf("%d", input.PreviousCommissionBps)},
 				{Key: "new_commission_bps", Value: fmt.Sprintf("%d", input.NewCommissionBps)},
@@ -1017,22 +1017,22 @@ func EvaluateValidatorCaptureRisk(input CaptureRiskInput) (CaptureRiskReport, er
 		score += uint64(indicator.SeverityBps)
 	}
 	report := CaptureRiskReport{
-		Validator:         validator,
-		RiskScoreBps:      minBps(score),
-		Indicators:        indicators,
-		HighRisk:          uint32(len(indicators)) >= params.HighRiskIndicatorThreshold,
-		AdvisoryOnly:      true,
-		SlashableBehavior: false,
+		Validator:		validator,
+		RiskScoreBps:		minBps(score),
+		Indicators:		indicators,
+		HighRisk:		uint32(len(indicators)) >= params.HighRiskIndicatorThreshold,
+		AdvisoryOnly:		true,
+		SlashableBehavior:	false,
 	}
 	if report.HighRisk {
 		for _, indicator := range indicators {
 			report.AlertEvents = append(report.AlertEvents, DelegatorAlertEvent{
-				Type:         DelegatorAlertCaptureRisk,
-				Validator:    validator,
-				EpochID:      input.CurrentEpoch,
-				Height:       input.Height,
-				Reason:       indicator.Name,
-				AdvisoryOnly: true,
+				Type:		DelegatorAlertCaptureRisk,
+				Validator:	validator,
+				EpochID:	input.CurrentEpoch,
+				Height:		input.Height,
+				Reason:		indicator.Name,
+				AdvisoryOnly:	true,
 			})
 		}
 	}
@@ -1057,11 +1057,11 @@ func PropagateSlash(input SlashPropagationInput) (SlashPropagationResult, error)
 	totalStake := input.SelfBondNaet.Add(totalDelegated)
 	targetSlash := mulIntBps(totalStake, input.SlashFractionBps)
 	result := SlashPropagationResult{
-		Validator:             strings.TrimSpace(input.Validator),
-		SelfBondSlashedNaet:   mulIntBps(input.SelfBondNaet, input.SlashFractionBps),
-		DelegatorSlashes:      make([]DelegatorSlashExposure, 0, len(validatorDelegations)),
-		TotalDelegatorSlashed: sdkmath.ZeroInt(),
-		TotalSlashedNaet:      sdkmath.ZeroInt(),
+		Validator:		strings.TrimSpace(input.Validator),
+		SelfBondSlashedNaet:	mulIntBps(input.SelfBondNaet, input.SlashFractionBps),
+		DelegatorSlashes:	make([]DelegatorSlashExposure, 0, len(validatorDelegations)),
+		TotalDelegatorSlashed:	sdkmath.ZeroInt(),
+		TotalSlashedNaet:	sdkmath.ZeroInt(),
 	}
 	if input.SelfBondFirstLoss && targetSlash.GT(result.SelfBondSlashedNaet) {
 		if input.SelfBondNaet.GTE(targetSlash) {
@@ -1077,11 +1077,11 @@ func PropagateSlash(input SlashPropagationInput) (SlashPropagationResult, error)
 			slashed = shareByStake(remaining, record.Amount, totalDelegated)
 		}
 		result.DelegatorSlashes = append(result.DelegatorSlashes, DelegatorSlashExposure{
-			Delegator:   record.Delegator,
-			Validator:   record.Validator,
-			Amount:      record.Amount,
-			SlashedNaet: slashed,
-			RiskTranche: record.RiskTrancheOptional,
+			Delegator:	record.Delegator,
+			Validator:	record.Validator,
+			Amount:		record.Amount,
+			SlashedNaet:	slashed,
+			RiskTranche:	record.RiskTrancheOptional,
 		})
 		result.TotalDelegatorSlashed = result.TotalDelegatorSlashed.Add(slashed)
 	}
@@ -1101,12 +1101,12 @@ func BuildFirstLossSelfBondAccounting(input SlashPropagationInput) (FirstLossSel
 	}
 	targetSlash := mulIntBps(input.SelfBondNaet.Add(totalDelegated), input.SlashFractionBps)
 	return FirstLossSelfBondAccounting{
-		Validator:                  strings.TrimSpace(input.Validator),
-		TargetSlashNaet:            targetSlash,
-		SelfBondAvailableNaet:      input.SelfBondNaet,
-		SelfBondAbsorbedNaet:       propagation.SelfBondSlashedNaet,
-		DelegatorResidualSlashNaet: propagation.TotalDelegatorSlashed,
-		FirstLossApplied:           input.SelfBondFirstLoss,
+		Validator:			strings.TrimSpace(input.Validator),
+		TargetSlashNaet:		targetSlash,
+		SelfBondAvailableNaet:		input.SelfBondNaet,
+		SelfBondAbsorbedNaet:		propagation.SelfBondSlashedNaet,
+		DelegatorResidualSlashNaet:	propagation.TotalDelegatorSlashed,
+		FirstLossApplied:		input.SelfBondFirstLoss,
 	}, nil
 }
 
@@ -1126,11 +1126,11 @@ func (s ValidatorMarketState) QueryValidatorRisk(validator string) (ValidatorRis
 		reliability = postypes.BasisPoints
 	}
 	risk := ValidatorRisk{
-		Validator:              validator,
-		SlashEventCount:        uint32(len(history)),
-		TotalSlashedNaet:       totalSlashed,
-		LatestReliabilityBps:   reliability,
-		DelegatorRiskInherited: len(history) > 0,
+		Validator:		validator,
+		SlashEventCount:	uint32(len(history)),
+		TotalSlashedNaet:	totalSlashed,
+		LatestReliabilityBps:	reliability,
+		DelegatorRiskInherited:	len(history) > 0,
 	}
 	risk.RiskScoreBps = minBps(uint64(len(history))*1_000 + uint64(postypes.BasisPoints-reliability))
 	return risk, true
@@ -1158,11 +1158,11 @@ func (s ValidatorMarketState) QueryValidatorRiskComponents(validator string, dec
 		}
 	}
 	components := ValidatorRiskScoreComponents{
-		Validator:            validator,
-		SlashHistoryRiskBps:  minBps(uint64(risk.SlashEventCount) * 1_000),
-		ReliabilityRiskBps:   postypes.BasisPoints - risk.LatestReliabilityBps,
-		ConcentrationRiskBps: concentrationRisk,
-		CommissionRiskBps:    commission,
+		Validator:		validator,
+		SlashHistoryRiskBps:	minBps(uint64(risk.SlashEventCount) * 1_000),
+		ReliabilityRiskBps:	postypes.BasisPoints - risk.LatestReliabilityBps,
+		ConcentrationRiskBps:	concentrationRisk,
+		CommissionRiskBps:	commission,
 	}
 	components.TotalRiskScoreBps = minBps(uint64(components.SlashHistoryRiskBps) + uint64(components.ReliabilityRiskBps) + uint64(components.ConcentrationRiskBps) + uint64(components.CommissionRiskBps))
 	return components, true, nil
@@ -1184,13 +1184,13 @@ func (s ValidatorMarketState) QueryValidatorEffectiveYield(validator string, ann
 	gross := shareBps(annualRewardsNaet, preview.BondedStakeNaet)
 	net := uint32((uint64(gross) * uint64(postypes.BasisPoints-commission)) / uint64(postypes.BasisPoints))
 	return ValidatorEffectiveYield{
-		Validator:              strings.TrimSpace(validator),
-		RawStakeNaet:           preview.BondedStakeNaet,
-		RewardWeightNaet:       preview.RewardWeightNaet,
-		GrossYieldBps:          gross,
-		NetYieldBps:            net,
-		CommissionBps:          commission,
-		SaturationDampeningBps: shareBps(preview.RewardWeightNaet, preview.BondedStakeNaet),
+		Validator:		strings.TrimSpace(validator),
+		RawStakeNaet:		preview.BondedStakeNaet,
+		RewardWeightNaet:	preview.RewardWeightNaet,
+		GrossYieldBps:		gross,
+		NetYieldBps:		net,
+		CommissionBps:		commission,
+		SaturationDampeningBps:	shareBps(preview.RewardWeightNaet, preview.BondedStakeNaet),
 	}, true, nil
 }
 
@@ -1233,11 +1233,11 @@ func (s ValidatorMarketState) QueryDelegationYieldEstimate(delegator string, val
 	adjustedRewards = adjustedRewards.MulRaw(int64(postypes.BasisPoints - concentration)).QuoRaw(int64(postypes.BasisPoints))
 	nominations := s.rewardNominationsForValidator(validator, delegator, amount)
 	distribution, err := postypes.DistributeRewards(postypes.RewardInput{
-		ValidatorID:      validator,
-		TotalRewardsNaet: adjustedRewards,
-		CommissionBps:    commission,
-		SelfStakeNaet:    candidate.SelfStakeNaet,
-		Nominations:      nominations,
+		ValidatorID:		validator,
+		TotalRewardsNaet:	adjustedRewards,
+		CommissionBps:		commission,
+		SelfStakeNaet:		candidate.SelfStakeNaet,
+		Nominations:		nominations,
 	})
 	if err != nil {
 		return DelegationYieldEstimate{}, false, err
@@ -1251,19 +1251,19 @@ func (s ValidatorMarketState) QueryDelegationYieldEstimate(delegator string, val
 	}
 	totalStake := candidate.SelfStakeNaet.Add(sumNominationStake(nominations))
 	return DelegationYieldEstimate{
-		Validator:                  validator,
-		Delegator:                  delegator,
-		DelegationAmountNaet:       amount,
-		RewardInputNaet:            annualRewardsNaet,
-		AdjustedRewardInputNaet:    adjustedRewards,
-		EstimatedRewardNaet:        estimatedReward,
-		GrossYieldBps:              shareBps(annualRewardsNaet, totalStake),
-		NetYieldBps:                shareBps(estimatedReward, amount),
-		CommissionBps:              commission,
-		PerformanceAdjustmentBps:   performance,
-		ConcentrationAdjustmentBps: concentration,
-		ValidatorCommissionNaet:    distribution.ValidatorCommissionNaet,
-		UsesDistributionInputs:     true,
+		Validator:			validator,
+		Delegator:			delegator,
+		DelegationAmountNaet:		amount,
+		RewardInputNaet:		annualRewardsNaet,
+		AdjustedRewardInputNaet:	adjustedRewards,
+		EstimatedRewardNaet:		estimatedReward,
+		GrossYieldBps:			shareBps(annualRewardsNaet, totalStake),
+		NetYieldBps:			shareBps(estimatedReward, amount),
+		CommissionBps:			commission,
+		PerformanceAdjustmentBps:	performance,
+		ConcentrationAdjustmentBps:	concentration,
+		ValidatorCommissionNaet:	distribution.ValidatorCommissionNaet,
+		UsesDistributionInputs:		true,
 	}, true, nil
 }
 
@@ -1291,11 +1291,11 @@ func (s ValidatorMarketState) QueryDelegationRiskExposure(delegator string, vali
 		return DelegationRiskExposure{}, false, fmt.Errorf("validator %q is not in market candidates", validator)
 	}
 	propagation, err := PropagateSlash(SlashPropagationInput{
-		Validator:         validator,
-		SelfBondNaet:      candidate.SelfStakeNaet,
-		Delegations:       s.Delegations,
-		SlashFractionBps:  slashFractionBps,
-		SelfBondFirstLoss: selfBondFirstLoss,
+		Validator:		validator,
+		SelfBondNaet:		candidate.SelfStakeNaet,
+		Delegations:		s.Delegations,
+		SlashFractionBps:	slashFractionBps,
+		SelfBondFirstLoss:	selfBondFirstLoss,
 	})
 	if err != nil {
 		return DelegationRiskExposure{}, false, err
@@ -1318,15 +1318,15 @@ func (s ValidatorMarketState) QueryDelegationRiskExposure(delegator string, vali
 		historical = historical.Add(shareByStake(event.DelegatorSlashedNaet, record.Amount, s.totalDelegatedAtValidator(validator)))
 	}
 	return DelegationRiskExposure{
-		Delegator:              delegator,
-		Validator:              validator,
-		Amount:                 record.Amount,
-		RiskAppetite:           record.RiskAppetite,
-		AdvisoryRiskProfile:    true,
-		SlashEventsInherited:   history,
-		ProjectedSlashNaet:     projected,
-		FirstLossProtectedNaet: firstLossProtected,
-		HistoricalSlashNaet:    historical,
+		Delegator:		delegator,
+		Validator:		validator,
+		Amount:			record.Amount,
+		RiskAppetite:		record.RiskAppetite,
+		AdvisoryRiskProfile:	true,
+		SlashEventsInherited:	history,
+		ProjectedSlashNaet:	projected,
+		FirstLossProtectedNaet:	firstLossProtected,
+		HistoricalSlashNaet:	historical,
 	}, true, nil
 }
 
@@ -1356,13 +1356,13 @@ func (s ValidatorMarketState) QueryDelegationCommissionStatus(delegator string, 
 		return DelegationCommissionStatus{}, false, err
 	}
 	return DelegationCommissionStatus{
-		Delegator:              delegator,
-		Validator:              validator,
-		Status:                 updated.Status,
-		CommissionToleranceBps: record.CommissionTolerance,
-		CurrentCommissionBps:   currentCommission,
-		CommissionExceeded:     updated.Status == DelegationStatusCommissionExceeded,
-		Alert:                  alert,
+		Delegator:		delegator,
+		Validator:		validator,
+		Status:			updated.Status,
+		CommissionToleranceBps:	record.CommissionTolerance,
+		CurrentCommissionBps:	currentCommission,
+		CommissionExceeded:	updated.Status == DelegationStatusCommissionExceeded,
+		Alert:			alert,
 	}, true, nil
 }
 
@@ -1397,14 +1397,14 @@ func (s ValidatorMarketState) QueryDelegatorValidatorProfile(delegator string, v
 	}
 	evaluations := EvaluateDelegationPolicyTemplates(DefaultDelegationPolicyTemplates(s.Params), components, yield, disclosure)
 	return DelegatorValidatorProfile{
-		Validator:             strings.TrimSpace(validator),
-		Risk:                  risk,
-		RiskComponents:        components,
-		YieldEstimate:         yield,
-		ConcentrationWarnings: disclosure.ConcentrationWarnings,
-		Disclosure:            disclosure,
-		PolicyEvaluations:     evaluations,
-		AdvisoryOnly:          true,
+		Validator:		strings.TrimSpace(validator),
+		Risk:			risk,
+		RiskComponents:		components,
+		YieldEstimate:		yield,
+		ConcentrationWarnings:	disclosure.ConcentrationWarnings,
+		Disclosure:		disclosure,
+		PolicyEvaluations:	evaluations,
+		AdvisoryOnly:		true,
 	}, true, nil
 }
 
@@ -1436,15 +1436,15 @@ func (s ValidatorMarketState) QueryValidatorDisclosure(validator string, decPara
 		uptime = latest.UptimeFactor
 	}
 	return ValidatorDisclosure{
-		Validator:              validator,
-		CommissionBps:          commission,
-		MaxCommissionChangeBps: s.Params.MaxCommissionBps - commission,
-		UptimeBps:              normalizeOptionalBps(uptime),
-		SlashHistoryCount:      risk.SlashEventCount,
-		TotalSlashedNaet:       risk.TotalSlashedNaet,
-		SelfDelegationNaet:     candidate.SelfStakeNaet,
-		ConcentrationStatus:    status,
-		ConcentrationWarnings:  warnings,
+		Validator:		validator,
+		CommissionBps:		commission,
+		MaxCommissionChangeBps:	s.Params.MaxCommissionBps - commission,
+		UptimeBps:		normalizeOptionalBps(uptime),
+		SlashHistoryCount:	risk.SlashEventCount,
+		TotalSlashedNaet:	risk.TotalSlashedNaet,
+		SelfDelegationNaet:	candidate.SelfStakeNaet,
+		ConcentrationStatus:	status,
+		ConcentrationWarnings:	warnings,
 	}, true, nil
 }
 
@@ -1488,20 +1488,20 @@ func (s ValidatorMarketState) QueryRedelegationRewardPreview(delegator string, f
 		return RedelegationRewardPreview{}, found, err
 	}
 	return RedelegationRewardPreview{
-		Delegator:             delegator,
-		FromValidator:         fromValidator,
-		ToValidator:           toValidator,
-		AmountNaet:            amount,
-		CurrentEstimate:       current,
-		TargetEstimate:        target,
-		RewardDeltaNaet:       target.EstimatedRewardNaet.Sub(current.EstimatedRewardNaet),
-		NetYieldDeltaBps:      int32(target.NetYieldBps) - int32(current.NetYieldBps),
-		TargetRisk:            targetRisk,
-		TargetRiskComponents:  targetComponents,
-		TargetDisclosure:      targetDisclosure,
-		PolicyEvaluations:     EvaluateDelegationPolicyTemplates(DefaultDelegationPolicyTemplates(s.Params), targetComponents, target, targetDisclosure),
-		AdvisoryOnly:          true,
-		StakeMovementExecuted: false,
+		Delegator:		delegator,
+		FromValidator:		fromValidator,
+		ToValidator:		toValidator,
+		AmountNaet:		amount,
+		CurrentEstimate:	current,
+		TargetEstimate:		target,
+		RewardDeltaNaet:	target.EstimatedRewardNaet.Sub(current.EstimatedRewardNaet),
+		NetYieldDeltaBps:	int32(target.NetYieldBps) - int32(current.NetYieldBps),
+		TargetRisk:		targetRisk,
+		TargetRiskComponents:	targetComponents,
+		TargetDisclosure:	targetDisclosure,
+		PolicyEvaluations:	EvaluateDelegationPolicyTemplates(DefaultDelegationPolicyTemplates(s.Params), targetComponents, target, targetDisclosure),
+		AdvisoryOnly:		true,
+		StakeMovementExecuted:	false,
 	}, true, nil
 }
 
@@ -1541,20 +1541,20 @@ func (s ValidatorMarketState) QueryRiskAdjustedYieldProjection(input RiskAdjuste
 	}
 	high := expected.MulRaw(int64(postypes.BasisPoints + highBand)).QuoRaw(int64(postypes.BasisPoints))
 	return RiskAdjustedYieldProjection{
-		Validator:                  yield.Validator,
-		Delegator:                  yield.Delegator,
-		GrossRewardRateBps:         yield.GrossYieldBps,
-		CommissionBps:              yield.CommissionBps,
-		HistoricalUptimeBps:        disclosure.UptimeBps,
-		SlashProbabilityProxyBps:   slashProxy,
-		ConcentrationAdjustmentBps: yield.ConcentrationAdjustmentBps,
-		UnbondingLiquidityCostBps:  input.UnbondingLiquidityCostBps,
-		RiskAdjustedYieldBps:       riskAdjusted,
-		ExpectedRewardNaet:         expected,
-		LowRewardNaet:              low,
-		HighRewardNaet:             high,
-		UncertaintyBps:             uncertainty,
-		ReproducibleFromQueries:    true,
+		Validator:			yield.Validator,
+		Delegator:			yield.Delegator,
+		GrossRewardRateBps:		yield.GrossYieldBps,
+		CommissionBps:			yield.CommissionBps,
+		HistoricalUptimeBps:		disclosure.UptimeBps,
+		SlashProbabilityProxyBps:	slashProxy,
+		ConcentrationAdjustmentBps:	yield.ConcentrationAdjustmentBps,
+		UnbondingLiquidityCostBps:	input.UnbondingLiquidityCostBps,
+		RiskAdjustedYieldBps:		riskAdjusted,
+		ExpectedRewardNaet:		expected,
+		LowRewardNaet:			low,
+		HighRewardNaet:			high,
+		UncertaintyBps:			uncertainty,
+		ReproducibleFromQueries:	true,
 	}, true, nil
 }
 
@@ -1593,12 +1593,12 @@ func ComputeValidatorRewardVariance(validator string, observations []ValidatorRe
 		}
 	}
 	return ValidatorRewardVariance{
-		Validator:        validator,
-		ObservationCount: uint32(len(values)),
-		MeanRewardBps:    mean,
-		MinRewardBps:     values[0],
-		MaxRewardBps:     values[len(values)-1],
-		VarianceBps:      uint32(deviation / uint64(len(values))),
+		Validator:		validator,
+		ObservationCount:	uint32(len(values)),
+		MeanRewardBps:		mean,
+		MinRewardBps:		values[0],
+		MaxRewardBps:		values[len(values)-1],
+		VarianceBps:		uint32(deviation / uint64(len(values))),
 	}, true, nil
 }
 
@@ -1619,25 +1619,25 @@ func (s ValidatorMarketState) SimulateDelegation(input DelegationSimulationInput
 		sortSlashHistory(simulated.SlashHistory)
 	}
 	current, found, err := simulated.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
-		Delegator:                 input.Delegator,
-		Validator:                 input.FromValidator,
-		AmountNaet:                amount,
-		AnnualRewardsNaet:         input.AnnualRewardsNaet,
-		UnbondingLiquidityCostBps: input.UnbondingLiquidityCostBps,
-		Decentralization:          input.Decentralization,
-		ActiveValidatorIDs:        input.ActiveValidatorIDs,
+		Delegator:			input.Delegator,
+		Validator:			input.FromValidator,
+		AmountNaet:			amount,
+		AnnualRewardsNaet:		input.AnnualRewardsNaet,
+		UnbondingLiquidityCostBps:	input.UnbondingLiquidityCostBps,
+		Decentralization:		input.Decentralization,
+		ActiveValidatorIDs:		input.ActiveValidatorIDs,
 	})
 	if err != nil || !found {
 		return DelegationSimulationResult{}, found, err
 	}
 	target, found, err := simulated.QueryRiskAdjustedYieldProjection(RiskAdjustedYieldInput{
-		Delegator:                 input.Delegator,
-		Validator:                 input.ToValidator,
-		AmountNaet:                amount,
-		AnnualRewardsNaet:         input.AnnualRewardsNaet,
-		UnbondingLiquidityCostBps: input.UnbondingLiquidityCostBps,
-		Decentralization:          input.Decentralization,
-		ActiveValidatorIDs:        input.ActiveValidatorIDs,
+		Delegator:			input.Delegator,
+		Validator:			input.ToValidator,
+		AmountNaet:			amount,
+		AnnualRewardsNaet:		input.AnnualRewardsNaet,
+		UnbondingLiquidityCostBps:	input.UnbondingLiquidityCostBps,
+		Decentralization:		input.Decentralization,
+		ActiveValidatorIDs:		input.ActiveValidatorIDs,
 	})
 	if err != nil || !found {
 		return DelegationSimulationResult{}, found, err
@@ -1648,12 +1648,12 @@ func (s ValidatorMarketState) SimulateDelegation(input DelegationSimulationInput
 	}
 	cost := simulated.estimateRedelegationCost(amount, current, target, input.UnbondingLiquidityCostBps)
 	return DelegationSimulationResult{
-		CurrentProjection:        current,
-		TargetProjection:         target,
-		RedelegationPreview:      preview,
-		RedelegationCost:         cost,
-		ProjectedRewardDeltaNaet: target.ExpectedRewardNaet.Sub(current.ExpectedRewardNaet),
-		AdvisoryOnly:             true,
+		CurrentProjection:		current,
+		TargetProjection:		target,
+		RedelegationPreview:		preview,
+		RedelegationCost:		cost,
+		ProjectedRewardDeltaNaet:	target.ExpectedRewardNaet.Sub(current.ExpectedRewardNaet),
+		AdvisoryOnly:			true,
 	}, true, nil
 }
 
@@ -1707,11 +1707,11 @@ func (s ValidatorMarketState) QueryConcentrationReport(params DecentralizationPa
 		commission := latestCommissionBps(s.CommissionHistory, validatorID, candidate.CommissionBps)
 		commissionWeighted += uint64(share) * uint64(commission)
 		metric := ValidatorConcentrationMetric{
-			Validator:                 validatorID,
-			VotingPowerShareBps:       share,
-			DelegatorConcentrationBps: s.delegatorConcentrationBps(validatorID),
-			SelfDelegationRatioBps:    shareBps(candidate.SelfStakeNaet, totalForValidator),
-			CommissionBps:             commission,
+			Validator:			validatorID,
+			VotingPowerShareBps:		share,
+			DelegatorConcentrationBps:	s.delegatorConcentrationBps(validatorID),
+			SelfDelegationRatioBps:		shareBps(candidate.SelfStakeNaet, totalForValidator),
+			CommissionBps:			commission,
 		}
 		metric.RewardDampeningBps = concentrationRewardDampeningBps(share, params.MaxValidatorShareBps, params.RewardDampeningSafetyFloorBps)
 		metric.Warnings = concentrationWarnings(params, candidate, metric)
@@ -1831,12 +1831,12 @@ func (s ValidatorMarketState) estimateRedelegationCost(amount sdkmath.Int, curre
 	}
 	totalCostBps = minBps(uint64(totalCostBps) + uint64(liquidityCostBps))
 	return RedelegationCostEstimate{
-		AmountNaet:         amount,
-		UnbondingSeconds:   s.Params.UnbondingSeconds,
-		LiquidityCostBps:   liquidityCostBps,
-		CommissionDeltaBps: commissionDelta,
-		RiskDeltaBps:       riskDelta,
-		EstimatedCostNaet:  mulIntBps(amount, totalCostBps),
+		AmountNaet:		amount,
+		UnbondingSeconds:	s.Params.UnbondingSeconds,
+		LiquidityCostBps:	liquidityCostBps,
+		CommissionDeltaBps:	commissionDelta,
+		RiskDeltaBps:		riskDelta,
+		EstimatedCostNaet:	mulIntBps(amount, totalCostBps),
 	}
 }
 
@@ -1847,42 +1847,42 @@ func DefaultDelegationPolicyTemplates(params postypes.Params) []DelegationPolicy
 	}
 	return []DelegationPolicyTemplate{
 		{
-			Name:                  DelegationPolicyLowRisk,
-			RiskAppetite:          RiskAppetiteConservative,
-			MaxRiskScoreBps:       2_000,
-			MinUptimeBps:          9_800,
-			MaxCommissionBps:      minUint32(params.MaxCommissionBps, 1_000),
-			MaxValidatorShareBps:  maxConcentration,
-			RequireNoSlashHistory: false,
-			AdvisoryOnly:          true,
+			Name:			DelegationPolicyLowRisk,
+			RiskAppetite:		RiskAppetiteConservative,
+			MaxRiskScoreBps:	2_000,
+			MinUptimeBps:		9_800,
+			MaxCommissionBps:	minUint32(params.MaxCommissionBps, 1_000),
+			MaxValidatorShareBps:	maxConcentration,
+			RequireNoSlashHistory:	false,
+			AdvisoryOnly:		true,
 		},
 		{
-			Name:                 DelegationPolicyHighAvailability,
-			RiskAppetite:         RiskAppetiteBalanced,
-			MaxRiskScoreBps:      3_000,
-			MinUptimeBps:         9_900,
-			MaxCommissionBps:     params.MaxCommissionBps,
-			MaxValidatorShareBps: postypes.BasisPoints,
-			AdvisoryOnly:         true,
+			Name:			DelegationPolicyHighAvailability,
+			RiskAppetite:		RiskAppetiteBalanced,
+			MaxRiskScoreBps:	3_000,
+			MinUptimeBps:		9_900,
+			MaxCommissionBps:	params.MaxCommissionBps,
+			MaxValidatorShareBps:	postypes.BasisPoints,
+			AdvisoryOnly:		true,
 		},
 		{
-			Name:                      DelegationPolicyDecentralizationSupporting,
-			RiskAppetite:              RiskAppetiteBalanced,
-			MaxRiskScoreBps:           5_000,
-			MinUptimeBps:              params.MinUptimeBps,
-			MaxCommissionBps:          params.MaxCommissionBps,
-			MaxValidatorShareBps:      maxConcentration,
-			PreferConcentrationRelief: true,
-			AdvisoryOnly:              true,
+			Name:				DelegationPolicyDecentralizationSupporting,
+			RiskAppetite:			RiskAppetiteBalanced,
+			MaxRiskScoreBps:		5_000,
+			MinUptimeBps:			params.MinUptimeBps,
+			MaxCommissionBps:		params.MaxCommissionBps,
+			MaxValidatorShareBps:		maxConcentration,
+			PreferConcentrationRelief:	true,
+			AdvisoryOnly:			true,
 		},
 		{
-			Name:                 DelegationPolicyMaxYieldWithinRiskBounds,
-			RiskAppetite:         RiskAppetiteAggressive,
-			MaxRiskScoreBps:      5_000,
-			MinUptimeBps:         params.MinUptimeBps,
-			MaxCommissionBps:     params.MaxCommissionBps,
-			MaxValidatorShareBps: postypes.BasisPoints,
-			AdvisoryOnly:         true,
+			Name:			DelegationPolicyMaxYieldWithinRiskBounds,
+			RiskAppetite:		RiskAppetiteAggressive,
+			MaxRiskScoreBps:	5_000,
+			MinUptimeBps:		params.MinUptimeBps,
+			MaxCommissionBps:	params.MaxCommissionBps,
+			MaxValidatorShareBps:	postypes.BasisPoints,
+			AdvisoryOnly:		true,
 		},
 	}
 }
@@ -1913,10 +1913,10 @@ func EvaluateDelegationPolicyTemplates(templates []DelegationPolicyTemplate, ris
 			reasons = append(reasons, "net_yield_unavailable")
 		}
 		out = append(out, DelegationPolicyEvaluation{
-			PolicyName:   template.Name,
-			Matches:      len(reasons) == 0,
-			Reasons:      reasons,
-			AdvisoryOnly: true,
+			PolicyName:	template.Name,
+			Matches:	len(reasons) == 0,
+			Reasons:	reasons,
+			AdvisoryOnly:	true,
 		})
 	}
 	sort.SliceStable(out, func(i, j int) bool {
@@ -2012,12 +2012,12 @@ func metadataChangedFields(previous ValidatorMetadataSnapshot, current Validator
 
 func normalizeMetadataSnapshot(snapshot ValidatorMetadataSnapshot) ValidatorMetadataSnapshot {
 	return ValidatorMetadataSnapshot{
-		OperatorID:      strings.TrimSpace(snapshot.OperatorID),
-		ConsensusKeyID:  strings.TrimSpace(snapshot.ConsensusKeyID),
-		Moniker:         strings.TrimSpace(snapshot.Moniker),
-		Website:         strings.TrimSpace(snapshot.Website),
-		SecurityContact: strings.TrimSpace(snapshot.SecurityContact),
-		PayoutAddress:   strings.TrimSpace(snapshot.PayoutAddress),
+		OperatorID:		strings.TrimSpace(snapshot.OperatorID),
+		ConsensusKeyID:		strings.TrimSpace(snapshot.ConsensusKeyID),
+		Moniker:		strings.TrimSpace(snapshot.Moniker),
+		Website:		strings.TrimSpace(snapshot.Website),
+		SecurityContact:	strings.TrimSpace(snapshot.SecurityContact),
+		PayoutAddress:		strings.TrimSpace(snapshot.PayoutAddress),
 	}
 }
 

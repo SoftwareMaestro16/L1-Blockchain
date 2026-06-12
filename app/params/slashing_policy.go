@@ -8,203 +8,203 @@ import (
 )
 
 const (
-	SlashingEvidenceStandardCosmos = "cosmos_sdk_x_slashing_x_evidence"
+	SlashingEvidenceStandardCosmos	= "cosmos_sdk_x_slashing_x_evidence"
 
-	DoubleSignSlashMinBps     = int64(500)
-	DoubleSignSlashMaxBps     = int64(1_000)
-	DoubleSignSlashDefaultBps = DoubleSignSlashMinBps
+	DoubleSignSlashMinBps		= int64(500)
+	DoubleSignSlashMaxBps		= int64(1_000)
+	DoubleSignSlashDefaultBps	= DoubleSignSlashMinBps
 
-	DowntimeFirstSlashMinBps     = int64(5)
-	DowntimeFirstSlashMaxBps     = int64(10)
-	DowntimeFirstSlashDefaultBps = DowntimeFirstSlashMinBps
+	DowntimeFirstSlashMinBps	= int64(5)
+	DowntimeFirstSlashMaxBps	= int64(10)
+	DowntimeFirstSlashDefaultBps	= DowntimeFirstSlashMinBps
 
-	DowntimeRepeatSlashMinBps     = int64(25)
-	DowntimeRepeatSlashMaxBps     = int64(50)
-	DowntimeRepeatSlashDefaultBps = DowntimeRepeatSlashMinBps
+	DowntimeRepeatSlashMinBps	= int64(25)
+	DowntimeRepeatSlashMaxBps	= int64(50)
+	DowntimeRepeatSlashDefaultBps	= DowntimeRepeatSlashMinBps
 
-	DowntimeChronicSlashMaxBps     = int64(100)
-	DowntimeChronicSlashDefaultBps = DowntimeChronicSlashMaxBps
+	DowntimeChronicSlashMaxBps	= int64(100)
+	DowntimeChronicSlashDefaultBps	= DowntimeChronicSlashMaxBps
 
-	DowntimeFirstJailMinMinutes     = int64(60)
-	DowntimeFirstJailMaxMinutes     = int64(360)
-	DowntimeFirstJailDefaultMinutes = DowntimeFirstJailMinMinutes
-	DowntimeRepeatJailMinutes       = int64(24 * 60)
-	DowntimeChronicJailMinutes      = int64(72 * 60)
+	DowntimeFirstJailMinMinutes	= int64(60)
+	DowntimeFirstJailMaxMinutes	= int64(360)
+	DowntimeFirstJailDefaultMinutes	= DowntimeFirstJailMinMinutes
+	DowntimeRepeatJailMinutes	= int64(24 * 60)
+	DowntimeChronicJailMinutes	= int64(72 * 60)
 
-	RepeatedInvalidProposalSlashBps       = int64(25)
-	RepeatedInvalidProposalJailMinutes    = int64(24 * 60)
-	RepeatedTimestampViolationSlashBps    = int64(25)
-	RepeatedTimestampViolationJailMinutes = int64(24 * 60)
-	TimestampMaxForwardDriftSeconds       = int64(120)
+	RepeatedInvalidProposalSlashBps		= int64(25)
+	RepeatedInvalidProposalJailMinutes	= int64(24 * 60)
+	RepeatedTimestampViolationSlashBps	= int64(25)
+	RepeatedTimestampViolationJailMinutes	= int64(24 * 60)
+	TimestampMaxForwardDriftSeconds		= int64(120)
 
-	HeightEvidenceMaxAgeBlocks          = uint64(100_000)
-	HeightUnbondingEvidenceWindowBlocks = uint64(30_000)
+	HeightEvidenceMaxAgeBlocks		= uint64(100_000)
+	HeightUnbondingEvidenceWindowBlocks	= uint64(30_000)
 
-	DowntimeOffenseCleanDecayDays    = int64(30)
-	DowntimeOffenseMaxPenaltyBps     = DowntimeChronicSlashMaxBps
-	DowntimeOffenseMaxJailMinutes    = DowntimeChronicJailMinutes
-	DowntimeOffenseQueryStatusMethod = "QueryDowntimeOffenseStatus"
+	DowntimeOffenseCleanDecayDays		= int64(30)
+	DowntimeOffenseMaxPenaltyBps		= DowntimeChronicSlashMaxBps
+	DowntimeOffenseMaxJailMinutes		= DowntimeChronicJailMinutes
+	DowntimeOffenseQueryStatusMethod	= "QueryDowntimeOffenseStatus"
 
-	InvalidProposalMaxBytesDefault = uint64(2 * 1024 * 1024)
+	InvalidProposalMaxBytesDefault	= uint64(2 * 1024 * 1024)
 )
 
 type SlashingAccountabilityPolicy struct {
-	EvidenceStandard                       string
-	ObjectiveCryptographicEvidenceOnly     bool
-	SubjectiveSlashingAllowed              bool
-	DoubleSignSlashBps                     int64
-	DoubleSignJailImmediate                bool
-	DoubleSignPermanentTombstone           bool
-	ConsensusKeyReuseForbidden             bool
-	UsesCosmosSlashingAndEvidence          bool
-	BaseFaultsUseCometBFTEvidence          bool
-	StandardDoubleSignIntegrated           bool
-	StandardLivenessDowntimeIntegrated     bool
-	StandardTombstoneIntegrated            bool
-	StandardJailUnjailIntegrated           bool
-	CustomLogicWrapsStandardOnly           bool
-	CoreSlashingForkForbidden              bool
-	ProgressiveDowntimeEnabled             bool
-	StandardDowntimeStatePreserved         bool
-	CustomDowntimeOverlayRequired          bool
-	DowntimeOffenseTracksValidatorConsAddr bool
-	DowntimeOffenseTracksOffenseCount      bool
-	DowntimeOffenseTracksFirstOffenseTime  bool
-	DowntimeOffenseTracksLastOffenseTime   bool
-	DowntimeOffenseTracksLastSlashFraction bool
-	DowntimeOffenseTracksCurrentJail       bool
-	DowntimeOffenseCleanDecayDays          int64
-	DowntimeOffenseMaxPenaltyBps           int64
-	DowntimeOffenseMaxJailMinutes          int64
-	DowntimeOffenseDelegatorRiskInherited  bool
-	DowntimeOffenseQueryStatusEnabled      bool
-	DowntimeOffenseUnjailKeepsHistory      bool
-	DowntimeFirstSlashBps                  int64
-	DowntimeFirstJailMinutes               int64
-	DowntimeRepeatSlashBps                 int64
-	DowntimeRepeatJailMinutes              int64
-	DowntimeChronicSlashBps                int64
-	DowntimeChronicJailMinutes             int64
-	DowntimeGovernanceReputationFlag       bool
-	InvalidProposalDeterministicReject     bool
-	InvalidProposalAutoSlash               bool
-	InvalidProposalRepeatEvidenceOnly      bool
-	ProcessProposalExternalInputs          bool
-	ProcessProposalTestsRequired           bool
-	RepeatedInvalidProposalSlashBps        int64
-	RepeatedInvalidProposalJailMinutes     int64
-	TimestampRejectOutsideBounds           bool
-	TimestampCometBFTCompatible            bool
-	TimestampCustomWallClockLogic          bool
-	TimestampSlashObjectiveEvidenceOnly    bool
-	TimestampRepeatedViolationsSlashBps    int64
-	TimestampRepeatedViolationsJailMinutes int64
-	TimestampMaxForwardDriftSeconds        int64
-	HeightConsensusControlled              bool
-	SingleValidatorHeightControlForbidden  bool
-	SameHeightDoubleSignCovered            bool
-	EquivocationCovered                    bool
-	InvalidProposalHeightChecked           bool
-	NonDeterministicAppValidationForbidden bool
-	EvidenceExpirationChecked              bool
-	UnbondingEvidenceTimingChecked         bool
-	HeightEvidenceMaxAgeBlocks             uint64
-	HeightUnbondingEvidenceWindowBlocks    uint64
-	EvidenceWhileValidatorBondedTest       bool
-	EvidenceWhileValidatorUnbondingTest    bool
-	EvidenceAfterUnbondingBeforeExpiryTest bool
-	EvidenceAfterExpirationRejectedTest    bool
-	DelegatorInfractionHeightSlashTest     bool
-	TombstoneCapBehaviorTest               bool
-	InvalidTxProposalRejectedTest          bool
-	OversizedProposalRejectedTest          bool
-	MalformedSpecialTxRejectedTest         bool
-	ValidProposalAcceptedTest              bool
-	AllValidatorsProposalDeterminismTest   bool
-	InvalidProposalWallClockForbidden      bool
-	InvalidProposalExternalAPIsForbidden   bool
-	ProcessProposalFragilityForbidden      bool
-	InvalidProposalMaxBytes                uint64
+	EvidenceStandard			string
+	ObjectiveCryptographicEvidenceOnly	bool
+	SubjectiveSlashingAllowed		bool
+	DoubleSignSlashBps			int64
+	DoubleSignJailImmediate			bool
+	DoubleSignPermanentTombstone		bool
+	ConsensusKeyReuseForbidden		bool
+	UsesCosmosSlashingAndEvidence		bool
+	BaseFaultsUseCometBFTEvidence		bool
+	StandardDoubleSignIntegrated		bool
+	StandardLivenessDowntimeIntegrated	bool
+	StandardTombstoneIntegrated		bool
+	StandardJailUnjailIntegrated		bool
+	CustomLogicWrapsStandardOnly		bool
+	CoreSlashingForkForbidden		bool
+	ProgressiveDowntimeEnabled		bool
+	StandardDowntimeStatePreserved		bool
+	CustomDowntimeOverlayRequired		bool
+	DowntimeOffenseTracksValidatorConsAddr	bool
+	DowntimeOffenseTracksOffenseCount	bool
+	DowntimeOffenseTracksFirstOffenseTime	bool
+	DowntimeOffenseTracksLastOffenseTime	bool
+	DowntimeOffenseTracksLastSlashFraction	bool
+	DowntimeOffenseTracksCurrentJail	bool
+	DowntimeOffenseCleanDecayDays		int64
+	DowntimeOffenseMaxPenaltyBps		int64
+	DowntimeOffenseMaxJailMinutes		int64
+	DowntimeOffenseDelegatorRiskInherited	bool
+	DowntimeOffenseQueryStatusEnabled	bool
+	DowntimeOffenseUnjailKeepsHistory	bool
+	DowntimeFirstSlashBps			int64
+	DowntimeFirstJailMinutes		int64
+	DowntimeRepeatSlashBps			int64
+	DowntimeRepeatJailMinutes		int64
+	DowntimeChronicSlashBps			int64
+	DowntimeChronicJailMinutes		int64
+	DowntimeGovernanceReputationFlag	bool
+	InvalidProposalDeterministicReject	bool
+	InvalidProposalAutoSlash		bool
+	InvalidProposalRepeatEvidenceOnly	bool
+	ProcessProposalExternalInputs		bool
+	ProcessProposalTestsRequired		bool
+	RepeatedInvalidProposalSlashBps		int64
+	RepeatedInvalidProposalJailMinutes	int64
+	TimestampRejectOutsideBounds		bool
+	TimestampCometBFTCompatible		bool
+	TimestampCustomWallClockLogic		bool
+	TimestampSlashObjectiveEvidenceOnly	bool
+	TimestampRepeatedViolationsSlashBps	int64
+	TimestampRepeatedViolationsJailMinutes	int64
+	TimestampMaxForwardDriftSeconds		int64
+	HeightConsensusControlled		bool
+	SingleValidatorHeightControlForbidden	bool
+	SameHeightDoubleSignCovered		bool
+	EquivocationCovered			bool
+	InvalidProposalHeightChecked		bool
+	NonDeterministicAppValidationForbidden	bool
+	EvidenceExpirationChecked		bool
+	UnbondingEvidenceTimingChecked		bool
+	HeightEvidenceMaxAgeBlocks		uint64
+	HeightUnbondingEvidenceWindowBlocks	uint64
+	EvidenceWhileValidatorBondedTest	bool
+	EvidenceWhileValidatorUnbondingTest	bool
+	EvidenceAfterUnbondingBeforeExpiryTest	bool
+	EvidenceAfterExpirationRejectedTest	bool
+	DelegatorInfractionHeightSlashTest	bool
+	TombstoneCapBehaviorTest		bool
+	InvalidTxProposalRejectedTest		bool
+	OversizedProposalRejectedTest		bool
+	MalformedSpecialTxRejectedTest		bool
+	ValidProposalAcceptedTest		bool
+	AllValidatorsProposalDeterminismTest	bool
+	InvalidProposalWallClockForbidden	bool
+	InvalidProposalExternalAPIsForbidden	bool
+	ProcessProposalFragilityForbidden	bool
+	InvalidProposalMaxBytes			uint64
 }
 
 func DefaultSlashingAccountabilityPolicy() SlashingAccountabilityPolicy {
 	return SlashingAccountabilityPolicy{
-		EvidenceStandard:                       SlashingEvidenceStandardCosmos,
-		ObjectiveCryptographicEvidenceOnly:     true,
-		SubjectiveSlashingAllowed:              false,
-		DoubleSignSlashBps:                     DoubleSignSlashDefaultBps,
-		DoubleSignJailImmediate:                true,
-		DoubleSignPermanentTombstone:           true,
-		ConsensusKeyReuseForbidden:             true,
-		UsesCosmosSlashingAndEvidence:          true,
-		BaseFaultsUseCometBFTEvidence:          true,
-		StandardDoubleSignIntegrated:           true,
-		StandardLivenessDowntimeIntegrated:     true,
-		StandardTombstoneIntegrated:            true,
-		StandardJailUnjailIntegrated:           true,
-		CustomLogicWrapsStandardOnly:           true,
-		CoreSlashingForkForbidden:              true,
-		ProgressiveDowntimeEnabled:             true,
-		StandardDowntimeStatePreserved:         true,
-		CustomDowntimeOverlayRequired:          true,
-		DowntimeOffenseTracksValidatorConsAddr: true,
-		DowntimeOffenseTracksOffenseCount:      true,
-		DowntimeOffenseTracksFirstOffenseTime:  true,
-		DowntimeOffenseTracksLastOffenseTime:   true,
-		DowntimeOffenseTracksLastSlashFraction: true,
-		DowntimeOffenseTracksCurrentJail:       true,
-		DowntimeOffenseCleanDecayDays:          DowntimeOffenseCleanDecayDays,
-		DowntimeOffenseMaxPenaltyBps:           DowntimeOffenseMaxPenaltyBps,
-		DowntimeOffenseMaxJailMinutes:          DowntimeOffenseMaxJailMinutes,
-		DowntimeOffenseDelegatorRiskInherited:  true,
-		DowntimeOffenseQueryStatusEnabled:      true,
-		DowntimeOffenseUnjailKeepsHistory:      true,
-		DowntimeFirstSlashBps:                  DowntimeFirstSlashDefaultBps,
-		DowntimeFirstJailMinutes:               DowntimeFirstJailDefaultMinutes,
-		DowntimeRepeatSlashBps:                 DowntimeRepeatSlashDefaultBps,
-		DowntimeRepeatJailMinutes:              DowntimeRepeatJailMinutes,
-		DowntimeChronicSlashBps:                DowntimeChronicSlashDefaultBps,
-		DowntimeChronicJailMinutes:             DowntimeChronicJailMinutes,
-		DowntimeGovernanceReputationFlag:       true,
-		InvalidProposalDeterministicReject:     true,
-		InvalidProposalAutoSlash:               false,
-		InvalidProposalRepeatEvidenceOnly:      true,
-		ProcessProposalExternalInputs:          false,
-		ProcessProposalTestsRequired:           true,
-		RepeatedInvalidProposalSlashBps:        RepeatedInvalidProposalSlashBps,
-		RepeatedInvalidProposalJailMinutes:     RepeatedInvalidProposalJailMinutes,
-		TimestampRejectOutsideBounds:           true,
-		TimestampCometBFTCompatible:            true,
-		TimestampCustomWallClockLogic:          false,
-		TimestampSlashObjectiveEvidenceOnly:    true,
-		TimestampRepeatedViolationsSlashBps:    RepeatedTimestampViolationSlashBps,
-		TimestampRepeatedViolationsJailMinutes: RepeatedTimestampViolationJailMinutes,
-		TimestampMaxForwardDriftSeconds:        TimestampMaxForwardDriftSeconds,
-		HeightConsensusControlled:              true,
-		SingleValidatorHeightControlForbidden:  true,
-		SameHeightDoubleSignCovered:            true,
-		EquivocationCovered:                    true,
-		InvalidProposalHeightChecked:           true,
-		NonDeterministicAppValidationForbidden: true,
-		EvidenceExpirationChecked:              true,
-		UnbondingEvidenceTimingChecked:         true,
-		HeightEvidenceMaxAgeBlocks:             HeightEvidenceMaxAgeBlocks,
-		HeightUnbondingEvidenceWindowBlocks:    HeightUnbondingEvidenceWindowBlocks,
-		EvidenceWhileValidatorBondedTest:       true,
-		EvidenceWhileValidatorUnbondingTest:    true,
-		EvidenceAfterUnbondingBeforeExpiryTest: true,
-		EvidenceAfterExpirationRejectedTest:    true,
-		DelegatorInfractionHeightSlashTest:     true,
-		TombstoneCapBehaviorTest:               true,
-		InvalidTxProposalRejectedTest:          true,
-		OversizedProposalRejectedTest:          true,
-		MalformedSpecialTxRejectedTest:         true,
-		ValidProposalAcceptedTest:              true,
-		AllValidatorsProposalDeterminismTest:   true,
-		InvalidProposalWallClockForbidden:      true,
-		InvalidProposalExternalAPIsForbidden:   true,
-		ProcessProposalFragilityForbidden:      true,
-		InvalidProposalMaxBytes:                InvalidProposalMaxBytesDefault,
+		EvidenceStandard:			SlashingEvidenceStandardCosmos,
+		ObjectiveCryptographicEvidenceOnly:	true,
+		SubjectiveSlashingAllowed:		false,
+		DoubleSignSlashBps:			DoubleSignSlashDefaultBps,
+		DoubleSignJailImmediate:		true,
+		DoubleSignPermanentTombstone:		true,
+		ConsensusKeyReuseForbidden:		true,
+		UsesCosmosSlashingAndEvidence:		true,
+		BaseFaultsUseCometBFTEvidence:		true,
+		StandardDoubleSignIntegrated:		true,
+		StandardLivenessDowntimeIntegrated:	true,
+		StandardTombstoneIntegrated:		true,
+		StandardJailUnjailIntegrated:		true,
+		CustomLogicWrapsStandardOnly:		true,
+		CoreSlashingForkForbidden:		true,
+		ProgressiveDowntimeEnabled:		true,
+		StandardDowntimeStatePreserved:		true,
+		CustomDowntimeOverlayRequired:		true,
+		DowntimeOffenseTracksValidatorConsAddr:	true,
+		DowntimeOffenseTracksOffenseCount:	true,
+		DowntimeOffenseTracksFirstOffenseTime:	true,
+		DowntimeOffenseTracksLastOffenseTime:	true,
+		DowntimeOffenseTracksLastSlashFraction:	true,
+		DowntimeOffenseTracksCurrentJail:	true,
+		DowntimeOffenseCleanDecayDays:		DowntimeOffenseCleanDecayDays,
+		DowntimeOffenseMaxPenaltyBps:		DowntimeOffenseMaxPenaltyBps,
+		DowntimeOffenseMaxJailMinutes:		DowntimeOffenseMaxJailMinutes,
+		DowntimeOffenseDelegatorRiskInherited:	true,
+		DowntimeOffenseQueryStatusEnabled:	true,
+		DowntimeOffenseUnjailKeepsHistory:	true,
+		DowntimeFirstSlashBps:			DowntimeFirstSlashDefaultBps,
+		DowntimeFirstJailMinutes:		DowntimeFirstJailDefaultMinutes,
+		DowntimeRepeatSlashBps:			DowntimeRepeatSlashDefaultBps,
+		DowntimeRepeatJailMinutes:		DowntimeRepeatJailMinutes,
+		DowntimeChronicSlashBps:		DowntimeChronicSlashDefaultBps,
+		DowntimeChronicJailMinutes:		DowntimeChronicJailMinutes,
+		DowntimeGovernanceReputationFlag:	true,
+		InvalidProposalDeterministicReject:	true,
+		InvalidProposalAutoSlash:		false,
+		InvalidProposalRepeatEvidenceOnly:	true,
+		ProcessProposalExternalInputs:		false,
+		ProcessProposalTestsRequired:		true,
+		RepeatedInvalidProposalSlashBps:	RepeatedInvalidProposalSlashBps,
+		RepeatedInvalidProposalJailMinutes:	RepeatedInvalidProposalJailMinutes,
+		TimestampRejectOutsideBounds:		true,
+		TimestampCometBFTCompatible:		true,
+		TimestampCustomWallClockLogic:		false,
+		TimestampSlashObjectiveEvidenceOnly:	true,
+		TimestampRepeatedViolationsSlashBps:	RepeatedTimestampViolationSlashBps,
+		TimestampRepeatedViolationsJailMinutes:	RepeatedTimestampViolationJailMinutes,
+		TimestampMaxForwardDriftSeconds:	TimestampMaxForwardDriftSeconds,
+		HeightConsensusControlled:		true,
+		SingleValidatorHeightControlForbidden:	true,
+		SameHeightDoubleSignCovered:		true,
+		EquivocationCovered:			true,
+		InvalidProposalHeightChecked:		true,
+		NonDeterministicAppValidationForbidden:	true,
+		EvidenceExpirationChecked:		true,
+		UnbondingEvidenceTimingChecked:		true,
+		HeightEvidenceMaxAgeBlocks:		HeightEvidenceMaxAgeBlocks,
+		HeightUnbondingEvidenceWindowBlocks:	HeightUnbondingEvidenceWindowBlocks,
+		EvidenceWhileValidatorBondedTest:	true,
+		EvidenceWhileValidatorUnbondingTest:	true,
+		EvidenceAfterUnbondingBeforeExpiryTest:	true,
+		EvidenceAfterExpirationRejectedTest:	true,
+		DelegatorInfractionHeightSlashTest:	true,
+		TombstoneCapBehaviorTest:		true,
+		InvalidTxProposalRejectedTest:		true,
+		OversizedProposalRejectedTest:		true,
+		MalformedSpecialTxRejectedTest:		true,
+		ValidProposalAcceptedTest:		true,
+		AllValidatorsProposalDeterminismTest:	true,
+		InvalidProposalWallClockForbidden:	true,
+		InvalidProposalExternalAPIsForbidden:	true,
+		ProcessProposalFragilityForbidden:	true,
+		InvalidProposalMaxBytes:		InvalidProposalMaxBytesDefault,
 	}
 }
 

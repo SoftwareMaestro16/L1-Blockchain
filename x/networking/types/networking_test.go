@@ -35,17 +35,17 @@ func TestNodeIdentityDerivesFromKeysAndBindsRoles(t *testing.T) {
 	require.NoError(t, err)
 
 	left, err := SignNodeRecord(NodeRecord{
-		Roles:                []NodeRole{NodeRoleFull},
-		NetworkAddressesHash: leftAddressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		Roles:			[]NodeRole{NodeRoleFull},
+		NetworkAddressesHash:	leftAddressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	right, err := SignNodeRecord(NodeRecord{
-		Roles:                []NodeRole{NodeRoleFull},
-		NetworkAddressesHash: rightAddressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		Roles:			[]NodeRole{NodeRoleFull},
+		NetworkAddressesHash:	rightAddressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, privateKey, salt)
 	require.NoError(t, err)
 
@@ -59,11 +59,11 @@ func TestNodeIdentityDerivesFromKeysAndBindsRoles(t *testing.T) {
 
 	validatorKey := ed25519.NewKeyFromSeed(bytes.Repeat([]byte{0x13}, ed25519.SeedSize)).Public().(ed25519.PublicKey)
 	validator, err := SignNodeRecord(NodeRecord{
-		ValidatorPubKey:      validatorKey,
-		Roles:                []NodeRole{NodeRoleValidator, NodeRoleFull},
-		NetworkAddressesHash: leftAddressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		ValidatorPubKey:	validatorKey,
+		Roles:			[]NodeRole{NodeRoleValidator, NodeRoleFull},
+		NetworkAddressesHash:	leftAddressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	require.Equal(t, ComputeNodeID(validatorKey, salt), validator.NodeID)
@@ -106,11 +106,11 @@ func TestSignedIdentityTransitionRotatesNodeIdentity(t *testing.T) {
 	state, err = OpenSession(state, session, 12)
 	require.NoError(t, err)
 	state, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         oldRecord.NodeID,
-		Role:           NodeRoleService,
-		Bonded:         true,
-		CommitmentHash: HashParts("old-service-commitment"),
-		ExpiresHeight:  70,
+		NodeID:		oldRecord.NodeID,
+		Role:		NodeRoleService,
+		Bonded:		true,
+		CommitmentHash:	HashParts("old-service-commitment"),
+		ExpiresHeight:	70,
 	}, 13)
 	require.NoError(t, err)
 
@@ -213,13 +213,13 @@ func TestSessionKeyRotationUpdatesKeysWithoutChangingSessionID(t *testing.T) {
 	require.NoError(t, err)
 
 	rotated, err := RotateSessionKeys(handshake.Session, SessionKeyRotationRequest{
-		SessionID:                handshake.Session.SessionID,
-		NewLocalEphemeralPubKey:  bytes.Repeat([]byte{0xc3}, SessionEphemeralKeyBytes),
-		NewRemoteEphemeralPubKey: bytes.Repeat([]byte{0xd4}, SessionEphemeralKeyBytes),
-		NewSecretCommitmentHash:  HashParts("rotated-session-secret", handshake.Session.SessionID),
-		RotatedAtHeight:          40,
-		ExpiresHeight:            80,
-		Nonce:                    []byte("rotation-nonce"),
+		SessionID:			handshake.Session.SessionID,
+		NewLocalEphemeralPubKey:	bytes.Repeat([]byte{0xc3}, SessionEphemeralKeyBytes),
+		NewRemoteEphemeralPubKey:	bytes.Repeat([]byte{0xd4}, SessionEphemeralKeyBytes),
+		NewSecretCommitmentHash:	HashParts("rotated-session-secret", handshake.Session.SessionID),
+		RotatedAtHeight:		40,
+		ExpiresHeight:			80,
+		Nonce:				[]byte("rotation-nonce"),
 	})
 	require.NoError(t, err)
 	require.Equal(t, handshake.Session.SessionID, rotated.SessionID)
@@ -230,13 +230,13 @@ func TestSessionKeyRotationUpdatesKeysWithoutChangingSessionID(t *testing.T) {
 	}
 
 	_, err = RotateSessionKeys(handshake.Session, SessionKeyRotationRequest{
-		SessionID:                handshake.Session.SessionID,
-		NewLocalEphemeralPubKey:  bytes.Repeat([]byte{0xc3}, SessionEphemeralKeyBytes),
-		NewRemoteEphemeralPubKey: bytes.Repeat([]byte{0xd4}, SessionEphemeralKeyBytes),
-		NewSecretCommitmentHash:  HashParts("rotated-session-secret", handshake.Session.SessionID),
-		RotatedAtHeight:          81,
-		ExpiresHeight:            90,
-		Nonce:                    []byte("late-rotation"),
+		SessionID:			handshake.Session.SessionID,
+		NewLocalEphemeralPubKey:	bytes.Repeat([]byte{0xc3}, SessionEphemeralKeyBytes),
+		NewRemoteEphemeralPubKey:	bytes.Repeat([]byte{0xd4}, SessionEphemeralKeyBytes),
+		NewSecretCommitmentHash:	HashParts("rotated-session-secret", handshake.Session.SessionID),
+		RotatedAtHeight:		81,
+		ExpiresHeight:			90,
+		Nonce:				[]byte("late-rotation"),
 	})
 	require.ErrorContains(t, err, "outside session range")
 }
@@ -313,25 +313,25 @@ func TestQoSClassPoliciesForbidConsensusInversionAndDowngradeServiceOnly(t *test
 func TestConsensusEnvelopeOutranksServiceAndBulkData(t *testing.T) {
 	policies := DefaultChannelPolicies()
 	service := TransportEnvelope{
-		Channel:        ChannelService,
-		SizeBytes:      512,
-		EnqueuedHeight: 1,
-		Sequence:       1,
-		PayloadHash:    HashParts("service"),
+		Channel:	ChannelService,
+		SizeBytes:	512,
+		EnqueuedHeight:	1,
+		Sequence:	1,
+		PayloadHash:	HashParts("service"),
 	}
 	data := TransportEnvelope{
-		Channel:        ChannelData,
-		SizeBytes:      2 << 20,
-		EnqueuedHeight: 1,
-		Sequence:       2,
-		PayloadHash:    HashParts("data"),
+		Channel:	ChannelData,
+		SizeBytes:	2 << 20,
+		EnqueuedHeight:	1,
+		Sequence:	2,
+		PayloadHash:	HashParts("data"),
 	}
 	consensus := TransportEnvelope{
-		Channel:        ChannelConsensus,
-		SizeBytes:      128,
-		EnqueuedHeight: 100,
-		Sequence:       99,
-		PayloadHash:    HashParts("consensus"),
+		Channel:	ChannelConsensus,
+		SizeBytes:	128,
+		EnqueuedHeight:	100,
+		Sequence:	99,
+		PayloadHash:	HashParts("consensus"),
 	}
 
 	next, found, err := SelectNextEnvelope([]TransportEnvelope{service, data, consensus}, policies)
@@ -342,15 +342,15 @@ func TestConsensusEnvelopeOutranksServiceAndBulkData(t *testing.T) {
 
 func TestL0ChannelIDsAreStableAndRoundTrip(t *testing.T) {
 	expected := map[ChannelClass]ChannelID{
-		ChannelConsensus: ChannelIDConsensus,
-		ChannelMempool:   ChannelIDMempool,
-		ChannelBlock:     ChannelIDBlock,
-		ChannelStateSync: ChannelIDStateSync,
-		ChannelData:      ChannelIDData,
-		ChannelExecution: ChannelIDExecution,
-		ChannelService:   ChannelIDService,
-		ChannelRouting:   ChannelIDRouting,
-		ChannelDiscovery: ChannelIDDiscovery,
+		ChannelConsensus:	ChannelIDConsensus,
+		ChannelMempool:		ChannelIDMempool,
+		ChannelBlock:		ChannelIDBlock,
+		ChannelStateSync:	ChannelIDStateSync,
+		ChannelData:		ChannelIDData,
+		ChannelExecution:	ChannelIDExecution,
+		ChannelService:		ChannelIDService,
+		ChannelRouting:		ChannelIDRouting,
+		ChannelDiscovery:	ChannelIDDiscovery,
 	}
 
 	for channel, id := range expected {
@@ -462,8 +462,8 @@ func TestRL2TransferIDValidationAndChannelMapping(t *testing.T) {
 	target := HashParts("rl2-node", "target")
 	payloadRoot := HashParts("rl2-payload", "root")
 	cases := []struct {
-		payloadType RL2PayloadType
-		channel     ChannelClass
+		payloadType	RL2PayloadType
+		channel		ChannelClass
 	}{
 		{RL2PayloadLargeBlock, ChannelBlock},
 		{RL2PayloadBlockChunk, ChannelBlock},
@@ -477,14 +477,14 @@ func TestRL2TransferIDValidationAndChannelMapping(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(string(tc.payloadType), func(t *testing.T) {
 			transfer, err := NewRL2Transfer(RL2Transfer{
-				SourceNode:     source,
-				TargetNode:     target,
-				PayloadType:    tc.payloadType,
-				PayloadRoot:    payloadRoot,
-				ChunkCount:     4,
-				ChunkSize:      1024,
-				Priority:       DefaultRL2Priority(tc.payloadType),
-				DeadlineHeight: 100,
+				SourceNode:	source,
+				TargetNode:	target,
+				PayloadType:	tc.payloadType,
+				PayloadRoot:	payloadRoot,
+				ChunkCount:	4,
+				ChunkSize:	1024,
+				Priority:	DefaultRL2Priority(tc.payloadType),
+				DeadlineHeight:	100,
 			})
 			require.NoError(t, err)
 			require.Equal(t, ComputeRL2TransferID(transfer), transfer.TransferID)
@@ -505,48 +505,48 @@ func TestRL2TransferRejectsExpiredInvalidRootAndChunkBounds(t *testing.T) {
 	target := HashParts("rl2-node", "target")
 	payloadRoot := HashParts("rl2-payload", "root")
 	valid, err := NewRL2Transfer(RL2Transfer{
-		SourceNode:     source,
-		TargetNode:     target,
-		PayloadType:    RL2PayloadStateSyncStream,
-		PayloadRoot:    payloadRoot,
-		ChunkCount:     2,
-		ChunkSize:      512,
-		Priority:       DefaultRL2Priority(RL2PayloadStateSyncStream),
-		DeadlineHeight: 50,
+		SourceNode:	source,
+		TargetNode:	target,
+		PayloadType:	RL2PayloadStateSyncStream,
+		PayloadRoot:	payloadRoot,
+		ChunkCount:	2,
+		ChunkSize:	512,
+		Priority:	DefaultRL2Priority(RL2PayloadStateSyncStream),
+		DeadlineHeight:	50,
 	})
 	require.NoError(t, err)
 
 	require.ErrorContains(t, valid.Validate(51), "expired")
 
 	_, err = NewRL2Transfer(RL2Transfer{
-		SourceNode:  source,
-		TargetNode:  target,
-		PayloadType: RL2PayloadStateSyncStream,
-		PayloadRoot: "bad-root",
-		ChunkCount:  2,
-		ChunkSize:   512,
-		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+		SourceNode:	source,
+		TargetNode:	target,
+		PayloadType:	RL2PayloadStateSyncStream,
+		PayloadRoot:	"bad-root",
+		ChunkCount:	2,
+		ChunkSize:	512,
+		Priority:	DefaultRL2Priority(RL2PayloadStateSyncStream),
 	})
 	require.ErrorContains(t, err, "payload root")
 
 	_, err = NewRL2Transfer(RL2Transfer{
-		SourceNode:  source,
-		TargetNode:  target,
-		PayloadType: RL2PayloadStateSyncStream,
-		PayloadRoot: payloadRoot,
-		ChunkSize:   512,
-		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+		SourceNode:	source,
+		TargetNode:	target,
+		PayloadType:	RL2PayloadStateSyncStream,
+		PayloadRoot:	payloadRoot,
+		ChunkSize:	512,
+		Priority:	DefaultRL2Priority(RL2PayloadStateSyncStream),
 	})
 	require.ErrorContains(t, err, "chunk count")
 
 	_, err = NewRL2Transfer(RL2Transfer{
-		SourceNode:  source,
-		TargetNode:  target,
-		PayloadType: RL2PayloadStateSyncStream,
-		PayloadRoot: payloadRoot,
-		ChunkCount:  2,
-		ChunkSize:   MaxChunkBytes + 1,
-		Priority:    DefaultRL2Priority(RL2PayloadStateSyncStream),
+		SourceNode:	source,
+		TargetNode:	target,
+		PayloadType:	RL2PayloadStateSyncStream,
+		PayloadRoot:	payloadRoot,
+		ChunkCount:	2,
+		ChunkSize:	MaxChunkBytes + 1,
+		Priority:	DefaultRL2Priority(RL2PayloadStateSyncStream),
 	})
 	require.ErrorContains(t, err, "chunk size")
 
@@ -922,54 +922,54 @@ func TestDefaultOverlayDescriptorsCoverL2OverlayTypes(t *testing.T) {
 
 func TestOverlayDescriptorRejectsInvalidMembershipQoSAndFanout(t *testing.T) {
 	_, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeService,
-		PolicyHash:  HashParts("bad-service-overlay-qos"),
-		Membership:  OverlayMembershipServiceAdvertisement,
-		Routing:     RoutingStrategyLowLatencyAdvisory,
-		MinPeers:    2,
-		MaxPeers:    8,
-		Fanout:      2,
-		QoSClass:    QoSClassBulkData,
-		Version:     1,
+		OverlayType:	OverlayTypeService,
+		PolicyHash:	HashParts("bad-service-overlay-qos"),
+		Membership:	OverlayMembershipServiceAdvertisement,
+		Routing:	RoutingStrategyLowLatencyAdvisory,
+		MinPeers:	2,
+		MaxPeers:	8,
+		Fanout:		2,
+		QoSClass:	QoSClassBulkData,
+		Version:	1,
 	})
 	require.ErrorContains(t, err, "qos")
 
 	_, err = NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeService,
-		PolicyHash:  HashParts("bad-service-overlay-membership"),
-		Membership:  OverlayMembershipRoutingRole,
-		Routing:     RoutingStrategyLowLatencyAdvisory,
-		MinPeers:    2,
-		MaxPeers:    8,
-		Fanout:      2,
-		QoSClass:    QoSClassServiceCall,
-		Version:     1,
+		OverlayType:	OverlayTypeService,
+		PolicyHash:	HashParts("bad-service-overlay-membership"),
+		Membership:	OverlayMembershipRoutingRole,
+		Routing:	RoutingStrategyLowLatencyAdvisory,
+		MinPeers:	2,
+		MaxPeers:	8,
+		Fanout:		2,
+		QoSClass:	QoSClassServiceCall,
+		Version:	1,
 	})
 	require.ErrorContains(t, err, "membership")
 
 	_, err = NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeData,
-		PolicyHash:  HashParts("bad-data-overlay-fanout"),
-		Membership:  OverlayMembershipDataProvider,
-		Routing:     RoutingStrategyKBucket,
-		MinPeers:    2,
-		MaxPeers:    4,
-		Fanout:      5,
-		QoSClass:    QoSClassBulkData,
-		Version:     1,
+		OverlayType:	OverlayTypeData,
+		PolicyHash:	HashParts("bad-data-overlay-fanout"),
+		Membership:	OverlayMembershipDataProvider,
+		Routing:	RoutingStrategyKBucket,
+		MinPeers:	2,
+		MaxPeers:	4,
+		Fanout:		5,
+		QoSClass:	QoSClassBulkData,
+		Version:	1,
 	})
 	require.ErrorContains(t, err, "fanout")
 
 	_, err = NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeValidator,
-		PolicyHash:  HashParts("bad-validator-overlay-routing"),
-		Membership:  OverlayMembershipValidatorSet,
-		Routing:     RoutingStrategyLowLatencyAdvisory,
-		MinPeers:    4,
-		MaxPeers:    32,
-		Fanout:      4,
-		QoSClass:    QoSClassCriticalConsensus,
-		Version:     1,
+		OverlayType:	OverlayTypeValidator,
+		PolicyHash:	HashParts("bad-validator-overlay-routing"),
+		Membership:	OverlayMembershipValidatorSet,
+		Routing:	RoutingStrategyLowLatencyAdvisory,
+		MinPeers:	4,
+		MaxPeers:	32,
+		Fanout:		4,
+		QoSClass:	QoSClassCriticalConsensus,
+		Version:	1,
 	})
 	require.ErrorContains(t, err, "advisory")
 }
@@ -1001,12 +1001,12 @@ func TestOverlayMembershipMatchesNodeRolesAndCapabilities(t *testing.T) {
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.1:26656"})
 	require.NoError(t, err)
 	validator, err := SignNodeRecord(NodeRecord{
-		ValidatorPubKey:      validatorKey,
-		Roles:                []NodeRole{NodeRoleValidator, NodeRoleFull},
-		NetworkAddressesHash: addressHash,
-		ZonesSupported:       []string{"APPLICATION_ZONE"},
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		ValidatorPubKey:	validatorKey,
+		Roles:			[]NodeRole{NodeRoleValidator, NodeRoleFull},
+		NetworkAddressesHash:	addressHash,
+		ZonesSupported:		[]string{"APPLICATION_ZONE"},
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, validatorPrivateKey, salt)
 	require.NoError(t, err)
 
@@ -1018,16 +1018,16 @@ func TestOverlayMembershipMatchesNodeRolesAndCapabilities(t *testing.T) {
 func TestNetworkingStateRegistersAndPrunesOverlayDescriptors(t *testing.T) {
 	state := EmptyState()
 	desc, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType:   OverlayTypeService,
-		PolicyHash:    HashParts("temporary-service-overlay"),
-		Membership:    OverlayMembershipServiceAdvertisement,
-		Routing:       RoutingStrategyLowLatencyAdvisory,
-		MinPeers:      2,
-		MaxPeers:      16,
-		Fanout:        4,
-		QoSClass:      QoSClassServiceCall,
-		ExpiresHeight: 30,
-		Version:       2,
+		OverlayType:	OverlayTypeService,
+		PolicyHash:	HashParts("temporary-service-overlay"),
+		Membership:	OverlayMembershipServiceAdvertisement,
+		Routing:	RoutingStrategyLowLatencyAdvisory,
+		MinPeers:	2,
+		MaxPeers:	16,
+		Fanout:		4,
+		QoSClass:	QoSClassServiceCall,
+		ExpiresHeight:	30,
+		Version:	2,
 	})
 	require.NoError(t, err)
 
@@ -1093,15 +1093,15 @@ func TestOverlayRoutingPipelineClassifiesAndSelectsServiceProviders(t *testing.T
 	left.ServicesSupported = []string{"state-sync"}
 	right.ServicesSupported = []string{"execution-stream"}
 	desc, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeService,
-		PolicyHash:  HashParts("service-provider-routing"),
-		Membership:  OverlayMembershipServiceAdvertisement,
-		Routing:     RoutingStrategyServiceProvider,
-		MinPeers:    2,
-		MaxPeers:    8,
-		Fanout:      2,
-		QoSClass:    QoSClassServiceCall,
-		Version:     1,
+		OverlayType:	OverlayTypeService,
+		PolicyHash:	HashParts("service-provider-routing"),
+		Membership:	OverlayMembershipServiceAdvertisement,
+		Routing:	RoutingStrategyServiceProvider,
+		MinPeers:	2,
+		MaxPeers:	8,
+		Fanout:		2,
+		QoSClass:	QoSClassServiceCall,
+		Version:	1,
 	})
 	require.NoError(t, err)
 	proofs := []OverlayMembershipProof{
@@ -1109,21 +1109,21 @@ func TestOverlayRoutingPipelineClassifiesAndSelectsServiceProviders(t *testing.T
 		testOverlayMembershipProof(t, right, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80),
 	}
 	msg, err := NewNetworkMessage(NetworkMessage{
-		Layer:            LayerL3Application,
-		Channel:          ChannelService,
-		PayloadHash:      HashParts("service-route-payload"),
-		PayloadSizeBytes: 512,
+		Layer:			LayerL3Application,
+		Channel:		ChannelService,
+		PayloadHash:		HashParts("service-route-payload"),
+		PayloadSizeBytes:	512,
 	})
 	require.NoError(t, err)
 
 	plan, err := BuildOverlayRoute(OverlayRoutingRequest{
-		Message:          msg,
-		SourceNodeID:     source.NodeID,
-		CandidatePeers:   []NodeRecord{left, right},
-		MembershipProofs: proofs,
-		Graph:            RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
-		Hint:             RouteHint{ServiceID: "execution-stream"},
-		CurrentHeight:    20,
+		Message:		msg,
+		SourceNodeID:		source.NodeID,
+		CandidatePeers:		[]NodeRecord{left, right},
+		MembershipProofs:	proofs,
+		Graph:			RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
+		Hint:			RouteHint{ServiceID: "execution-stream"},
+		CurrentHeight:		20,
 	}, []OverlayDescriptor{desc})
 	require.NoError(t, err)
 	require.Equal(t, OverlayTypeService, plan.OverlayType)
@@ -1137,15 +1137,15 @@ func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T
 	slow := signedNodeRecord(t, 0x3f, salt, 100, NodeRoleZoneExecution)
 	fast := signedNodeRecord(t, 0x40, salt, 100, NodeRoleZoneExecution)
 	desc, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeExecution,
-		PolicyHash:  HashParts("committed-latency-routing"),
-		Membership:  OverlayMembershipExecutionRole,
-		Routing:     RoutingStrategyShortestLatencyPath,
-		MinPeers:    2,
-		MaxPeers:    8,
-		Fanout:      2,
-		QoSClass:    QoSClassExecutionMessage,
-		Version:     1,
+		OverlayType:	OverlayTypeExecution,
+		PolicyHash:	HashParts("committed-latency-routing"),
+		Membership:	OverlayMembershipExecutionRole,
+		Routing:	RoutingStrategyShortestLatencyPath,
+		MinPeers:	2,
+		MaxPeers:	8,
+		Fanout:		2,
+		QoSClass:	QoSClassExecutionMessage,
+		Version:	1,
 	})
 	require.NoError(t, err)
 	proofs := []OverlayMembershipProof{
@@ -1153,17 +1153,17 @@ func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T
 		testOverlayMembershipProof(t, fast, desc, MembershipProofZoneAssignment, OverlayMembershipModeZoneAssignment, 80),
 	}
 	msg, err := NewNetworkMessage(NetworkMessage{
-		Layer:             LayerL2Overlay,
-		Channel:           ChannelExecution,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismCommittedState,
-		PayloadHash:       HashParts("execution-route-payload"),
-		PayloadSizeBytes:  512,
+		Layer:			LayerL2Overlay,
+		Channel:		ChannelExecution,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismCommittedState,
+		PayloadHash:		HashParts("execution-route-payload"),
+		PayloadSizeBytes:	512,
 	})
 	require.NoError(t, err)
 	graph := RoutingGraph{
-		OverlayID: desc.OverlayID,
-		Version:   1,
+		OverlayID:	desc.OverlayID,
+		Version:	1,
 		Edges: []RoutingEdge{
 			{FromNodeID: source.NodeID, ToNodeID: slow.NodeID, LatencyMillis: 90, Priority: 2},
 			{FromNodeID: source.NodeID, ToNodeID: fast.NodeID, LatencyMillis: 10, Priority: 1},
@@ -1171,23 +1171,23 @@ func TestOverlayRoutingConsensusSafetyRequiresCommittedRoutingTable(t *testing.T
 	}
 
 	_, err = BuildOverlayRoute(OverlayRoutingRequest{
-		Message:          msg,
-		SourceNodeID:     source.NodeID,
-		CandidatePeers:   []NodeRecord{slow, fast},
-		MembershipProofs: proofs,
-		Graph:            graph,
-		CurrentHeight:    20,
+		Message:		msg,
+		SourceNodeID:		source.NodeID,
+		CandidatePeers:		[]NodeRecord{slow, fast},
+		MembershipProofs:	proofs,
+		Graph:			graph,
+		CurrentHeight:		20,
 	}, []OverlayDescriptor{desc})
 	require.ErrorContains(t, err, "committed routing")
 
 	graph.Committed = true
 	plan, err := BuildOverlayRoute(OverlayRoutingRequest{
-		Message:          msg,
-		SourceNodeID:     source.NodeID,
-		CandidatePeers:   []NodeRecord{slow, fast},
-		MembershipProofs: proofs,
-		Graph:            graph,
-		CurrentHeight:    20,
+		Message:		msg,
+		SourceNodeID:		source.NodeID,
+		CandidatePeers:		[]NodeRecord{slow, fast},
+		MembershipProofs:	proofs,
+		Graph:			graph,
+		CurrentHeight:		20,
 	}, []OverlayDescriptor{desc})
 	require.NoError(t, err)
 	require.True(t, plan.UsesCommittedRoutingTable)
@@ -1232,16 +1232,16 @@ func TestAdaptiveOverlayGraphRejectsEclipseAndZoneReplacement(t *testing.T) {
 	peerA := AdaptivePeer{NodeID: HashParts("aa-peer-a"), ScoreBps: 8_000, ReliabilityBps: 8_000, ZonesSupported: []string{"APPLICATION_ZONE"}}
 	peerB := AdaptivePeer{NodeID: HashParts("aa-peer-b"), ScoreBps: 7_000, ReliabilityBps: 7_000, ZonesSupported: []string{"APPLICATION_ZONE"}}
 	graph := AdaptiveOverlayGraph{
-		OverlayID:    desc.OverlayID,
-		LocalNodeID:  HashParts("local-adaptive-node"),
-		RoutingEpoch: 1,
-		RandomSet:    []AdaptivePeer{peerA, peerB},
-		FallbackSet:  []AdaptivePeer{peerA},
-		FastSet:      []AdaptivePeer{peerA},
-		StableSet:    []AdaptivePeer{peerB},
-		ZoneSet:      []AdaptivePeer{peerA, peerB},
-		ServiceSet:   []AdaptivePeer{},
-		PolicyHash:   HashParts("bad-adaptive-policy"),
+		OverlayID:	desc.OverlayID,
+		LocalNodeID:	HashParts("local-adaptive-node"),
+		RoutingEpoch:	1,
+		RandomSet:	[]AdaptivePeer{peerA, peerB},
+		FallbackSet:	[]AdaptivePeer{peerA},
+		FastSet:	[]AdaptivePeer{peerA},
+		StableSet:	[]AdaptivePeer{peerB},
+		ZoneSet:	[]AdaptivePeer{peerA, peerB},
+		ServiceSet:	[]AdaptivePeer{},
+		PolicyHash:	HashParts("bad-adaptive-policy"),
 	}
 	require.ErrorContains(t, graph.Validate(desc), "zone peers")
 
@@ -1252,15 +1252,15 @@ func TestAdaptiveOverlayGraphRejectsEclipseAndZoneReplacement(t *testing.T) {
 
 func TestPeerScoreDecayIsBoundedByPolicy(t *testing.T) {
 	decayed, err := DecayPeerScore(PeerScore{ScoreBps: 9_000}, 3, PeerScoreDecayPolicy{
-		MaxDecayBpsPerEpoch: 1_000,
-		MinScoreBps:         4_000,
+		MaxDecayBpsPerEpoch:	1_000,
+		MinScoreBps:		4_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(6_000), decayed.ScoreBps)
 
 	decayed, err = DecayPeerScore(PeerScore{ScoreBps: 4_500}, 5, PeerScoreDecayPolicy{
-		MaxDecayBpsPerEpoch: 1_000,
-		MinScoreBps:         4_000,
+		MaxDecayBpsPerEpoch:	1_000,
+		MinScoreBps:		4_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(4_000), decayed.ScoreBps)
@@ -1274,32 +1274,32 @@ func TestPeerScoreDecayIsBoundedByPolicy(t *testing.T) {
 func TestRoutingTableCommitmentGuardsExecutionScheduling(t *testing.T) {
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	commitment, err := NewRoutingTableCommitment(RoutingTableCommitment{
-		RoutingEpoch: 3,
+		RoutingEpoch:	3,
 		OverlayRoots: []OverlayRouteRoot{
 			{OverlayID: desc.OverlayID, RootHash: HashParts("service-overlay-root")},
 		},
-		ZoneRouteRoot:          HashParts("zone-route-root"),
-		ServiceRouteRoot:       HashParts("service-route-root"),
-		PeerClassRoot:          HashParts("peer-class-root"),
-		CongestionSnapshotRoot: HashParts("congestion-snapshot-root"),
-		PolicyHash:             desc.PolicyHash,
+		ZoneRouteRoot:		HashParts("zone-route-root"),
+		ServiceRouteRoot:	HashParts("service-route-root"),
+		PeerClassRoot:		HashParts("peer-class-root"),
+		CongestionSnapshotRoot:	HashParts("congestion-snapshot-root"),
+		PolicyHash:		desc.PolicyHash,
 	})
 	require.NoError(t, err)
 	require.NoError(t, commitment.Validate())
 	require.NotEmpty(t, ComputeRoutingTableCommitmentHash(commitment))
 
 	require.NoError(t, ValidateRoutingTableUse(RoutingTableUse{
-		Commitment:                commitment,
-		UsedForPhysicalForwarding: true,
+		Commitment:			commitment,
+		UsedForPhysicalForwarding:	true,
 	}))
 	require.ErrorContains(t, ValidateRoutingTableUse(RoutingTableUse{
-		Commitment:                 commitment,
-		UsedForExecutionScheduling: true,
+		Commitment:			commitment,
+		UsedForExecutionScheduling:	true,
 	}), "execution scheduling")
 	require.NoError(t, ValidateRoutingTableUse(RoutingTableUse{
-		Commitment:                 commitment,
-		Committed:                  true,
-		UsedForExecutionScheduling: true,
+		Commitment:			commitment,
+		Committed:			true,
+		UsedForExecutionScheduling:	true,
 	}))
 
 	tampered := commitment
@@ -1356,22 +1356,22 @@ func TestOverlayPartitionUsesFallbackRouteForPhysicalDelivery(t *testing.T) {
 	fallbackB := signedNodeRecord(t, 0x53, salt, 100, NodeRoleFull)
 	fallbackC := signedNodeRecord(t, 0x54, salt, 100, NodeRoleFull)
 	desc, err := NewOverlayDescriptor(OverlayDescriptor{
-		OverlayType: OverlayTypeService,
-		PolicyHash:  HashParts("partitioned-service-overlay"),
-		Membership:  OverlayMembershipServiceAdvertisement,
-		Routing:     RoutingStrategyServiceProvider,
-		MinPeers:    3,
-		MaxPeers:    8,
-		Fanout:      3,
-		QoSClass:    QoSClassServiceCall,
-		Version:     1,
+		OverlayType:	OverlayTypeService,
+		PolicyHash:	HashParts("partitioned-service-overlay"),
+		Membership:	OverlayMembershipServiceAdvertisement,
+		Routing:	RoutingStrategyServiceProvider,
+		MinPeers:	3,
+		MaxPeers:	8,
+		Fanout:		3,
+		QoSClass:	QoSClassServiceCall,
+		Version:	1,
 	})
 	require.NoError(t, err)
 	msg, err := NewNetworkMessage(NetworkMessage{
-		Layer:            LayerL3Application,
-		Channel:          ChannelService,
-		PayloadHash:      HashParts("partitioned-service-payload"),
-		PayloadSizeBytes: 512,
+		Layer:			LayerL3Application,
+		Channel:		ChannelService,
+		PayloadHash:		HashParts("partitioned-service-payload"),
+		PayloadSizeBytes:	512,
 	})
 	require.NoError(t, err)
 	fallbackGraph, err := BuildAdaptiveOverlayGraph(desc, source.NodeID, []AdaptivePeer{
@@ -1382,13 +1382,13 @@ func TestOverlayPartitionUsesFallbackRouteForPhysicalDelivery(t *testing.T) {
 	require.NoError(t, err)
 
 	plan, err := BuildOverlayRouteWithFallback(OverlayRoutingRequest{
-		Message:          msg,
-		SourceNodeID:     source.NodeID,
-		CandidatePeers:   []NodeRecord{service},
-		MembershipProofs: []OverlayMembershipProof{testOverlayMembershipProof(t, service, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80)},
-		Graph:            RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
-		Hint:             RouteHint{ServiceID: "execution-stream"},
-		CurrentHeight:    20,
+		Message:		msg,
+		SourceNodeID:		source.NodeID,
+		CandidatePeers:		[]NodeRecord{service},
+		MembershipProofs:	[]OverlayMembershipProof{testOverlayMembershipProof(t, service, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80)},
+		Graph:			RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
+		Hint:			RouteHint{ServiceID: "execution-stream"},
+		CurrentHeight:		20,
 	}, []OverlayDescriptor{desc}, fallbackGraph)
 	require.NoError(t, err)
 	require.True(t, plan.FallbackUsed)
@@ -1400,11 +1400,11 @@ func TestOverlayPartitionUsesFallbackRouteForPhysicalDelivery(t *testing.T) {
 	consensusMsg.DeterminismSource = DeterminismCommittedState
 	consensusMsg.ReplaySafeID = ComputeNetworkMessageID(consensusMsg)
 	_, err = BuildOverlayRouteWithFallback(OverlayRoutingRequest{
-		Message:        consensusMsg,
-		SourceNodeID:   source.NodeID,
-		CandidatePeers: []NodeRecord{service},
-		Graph:          RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
-		CurrentHeight:  20,
+		Message:	consensusMsg,
+		SourceNodeID:	source.NodeID,
+		CandidatePeers:	[]NodeRecord{service},
+		Graph:		RoutingGraph{OverlayID: desc.OverlayID, Version: 1},
+		CurrentHeight:	20,
 	}, []OverlayDescriptor{desc}, fallbackGraph)
 	require.Error(t, err)
 }
@@ -1439,15 +1439,15 @@ func TestAdaptivePeerRotationBoundsChurnAndKeepsStablePeers(t *testing.T) {
 
 func TestAetherMeshMessageTypesMapToChannels(t *testing.T) {
 	expected := map[AetherMeshMessageType]ChannelClass{
-		MeshMessageConsensus: ChannelConsensus,
-		MeshMessageTx:        ChannelMempool,
-		MeshMessageExecution: ChannelExecution,
-		MeshMessageQuery:     ChannelService,
-		MeshMessageService:   ChannelService,
-		MeshMessageCrossZone: ChannelExecution,
-		MeshMessageStateSync: ChannelStateSync,
-		MeshMessageStorage:   ChannelData,
-		MeshMessageRouting:   ChannelRouting,
+		MeshMessageConsensus:	ChannelConsensus,
+		MeshMessageTx:		ChannelMempool,
+		MeshMessageExecution:	ChannelExecution,
+		MeshMessageQuery:	ChannelService,
+		MeshMessageService:	ChannelService,
+		MeshMessageCrossZone:	ChannelExecution,
+		MeshMessageStateSync:	ChannelStateSync,
+		MeshMessageStorage:	ChannelData,
+		MeshMessageRouting:	ChannelRouting,
 	}
 
 	require.Len(t, AetherMeshMessageTypes(), len(expected))
@@ -1465,33 +1465,33 @@ func TestAetherMeshMessageSignsAndRejectsTampering(t *testing.T) {
 	desc := defaultOverlayByType(t, OverlayTypeService)
 
 	msg, err := SignAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageService,
-		Payload:         []byte("service-call-payload"),
-		Origin:          origin.NodeID,
-		Destination:     destination.NodeID,
-		Priority:        PriorityForChannel(ChannelService),
-		TTL:             50,
-		OverlayID:       desc.OverlayID,
-		Sequence:        1,
-		RouteHint:       RouteHint{ServiceID: "execution-stream"},
-		DeadlineHeight:  70,
-		ConsensusEffect: false,
+		Type:			MeshMessageService,
+		Payload:		[]byte("service-call-payload"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelService),
+		TTL:			50,
+		OverlayID:		desc.OverlayID,
+		Sequence:		1,
+		RouteHint:		RouteHint{ServiceID: "execution-stream"},
+		DeadlineHeight:		70,
+		ConsensusEffect:	false,
 	}, originKey)
 	require.NoError(t, err)
 	require.NoError(t, VerifyAetherMeshMessageSignature(msg, originKey.Public().(ed25519.PublicKey), 20))
 
 	again, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageService,
-		Payload:         []byte("service-call-payload"),
-		Origin:          origin.NodeID,
-		Destination:     destination.NodeID,
-		Priority:        PriorityForChannel(ChannelService),
-		TTL:             50,
-		OverlayID:       desc.OverlayID,
-		Sequence:        1,
-		RouteHint:       RouteHint{ServiceID: "execution-stream"},
-		DeadlineHeight:  70,
-		ConsensusEffect: false,
+		Type:			MeshMessageService,
+		Payload:		[]byte("service-call-payload"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelService),
+		TTL:			50,
+		OverlayID:		desc.OverlayID,
+		Sequence:		1,
+		RouteHint:		RouteHint{ServiceID: "execution-stream"},
+		DeadlineHeight:		70,
+		ConsensusEffect:	false,
 	})
 	require.NoError(t, err)
 	require.Equal(t, msg.MessageID, again.MessageID)
@@ -1508,50 +1508,50 @@ func TestAetherMeshCrossZoneAndConsensusProofRules(t *testing.T) {
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
 
 	_, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageCrossZone,
-		Payload:         []byte("cross-zone"),
-		Origin:          origin.NodeID,
-		Destination:     destination.NodeID,
-		Priority:        PriorityForChannel(ChannelExecution),
-		TTL:             25,
-		OverlayID:       desc.OverlayID,
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "APPLICATION_ZONE",
-		Sequence:        1,
+		Type:			MeshMessageCrossZone,
+		Payload:		[]byte("cross-zone"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			25,
+		OverlayID:		desc.OverlayID,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"APPLICATION_ZONE",
+		Sequence:		1,
 	})
 	require.ErrorContains(t, err, "different zones")
 
 	_, err = NewAetherMeshMessage(AetherMeshMessage{
-		Type:              MeshMessageService,
-		Payload:           []byte("consensus-service"),
-		Origin:            origin.NodeID,
-		Destination:       destination.NodeID,
-		Priority:          PriorityForChannel(ChannelService),
-		TTL:               25,
-		OverlayID:         defaultOverlayByType(t, OverlayTypeService).OverlayID,
-		Sequence:          1,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismCommittedState,
+		Type:			MeshMessageService,
+		Payload:		[]byte("consensus-service"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelService),
+		TTL:			25,
+		OverlayID:		defaultOverlayByType(t, OverlayTypeService).OverlayID,
+		Sequence:		1,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismCommittedState,
 	})
 	require.ErrorContains(t, err, "proof")
 
 	msg, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:              MeshMessageCrossZone,
-		Payload:           []byte("cross-zone"),
-		Origin:            origin.NodeID,
-		Destination:       destination.NodeID,
-		Priority:          PriorityForChannel(ChannelExecution),
-		TTL:               25,
-		OverlayID:         desc.OverlayID,
-		SourceZone:        "APPLICATION_ZONE",
-		DestinationZone:   "FINANCIAL_ZONE",
-		Sequence:          2,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismDeterministicProof,
+		Type:			MeshMessageCrossZone,
+		Payload:		[]byte("cross-zone"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			25,
+		OverlayID:		desc.OverlayID,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		Sequence:		2,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismDeterministicProof,
 		Proof: AetherMeshProof{
-			ProofType:   "zone-commitment",
-			ProofHash:   HashParts("cross-zone-proof"),
-			ProofHeight: 20,
+			ProofType:	"zone-commitment",
+			ProofHash:	HashParts("cross-zone-proof"),
+			ProofHeight:	20,
 		},
 	})
 	require.NoError(t, err)
@@ -1569,36 +1569,36 @@ func TestAetherMeshRouteUsesOverlayAndServicePeers(t *testing.T) {
 	right := signedNodeRecord(t, 0x62, salt, 100, NodeRoleService)
 	desc := defaultOverlayByType(t, OverlayTypeService)
 	msg, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:           MeshMessageService,
-		Payload:        []byte("mesh-service-route"),
-		Origin:         source.NodeID,
-		Destination:    right.NodeID,
-		Priority:       PriorityForChannel(ChannelService),
-		TTL:            30,
-		OverlayID:      desc.OverlayID,
-		Sequence:       1,
-		RouteHint:      RouteHint{ServiceID: "execution-stream"},
-		DeadlineHeight: 90,
+		Type:		MeshMessageService,
+		Payload:	[]byte("mesh-service-route"),
+		Origin:		source.NodeID,
+		Destination:	right.NodeID,
+		Priority:	PriorityForChannel(ChannelService),
+		TTL:		30,
+		OverlayID:	desc.OverlayID,
+		Sequence:	1,
+		RouteHint:	RouteHint{ServiceID: "execution-stream"},
+		DeadlineHeight:	90,
 	})
 	require.NoError(t, err)
 
 	delivery, err := RouteAetherMeshMessage(AetherMeshRouteRequest{
-		Message:        msg,
-		SourceNodeID:   source.NodeID,
-		CandidatePeers: []NodeRecord{left, right},
+		Message:	msg,
+		SourceNodeID:	source.NodeID,
+		CandidatePeers:	[]NodeRecord{left, right},
 		MembershipProofs: []OverlayMembershipProof{
 			testOverlayMembershipProof(t, left, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80),
 			testOverlayMembershipProof(t, right, desc, MembershipProofServiceRegistration, OverlayMembershipModeServiceRegistry, 80),
 		},
 		Graph: RoutingGraph{
-			OverlayID: desc.OverlayID,
-			Version:   1,
+			OverlayID:	desc.OverlayID,
+			Version:	1,
 			Edges: []RoutingEdge{
 				{FromNodeID: source.NodeID, ToNodeID: left.NodeID, LatencyMillis: 25, Priority: 1},
 				{FromNodeID: source.NodeID, ToNodeID: right.NodeID, LatencyMillis: 15, Priority: 0},
 			},
 		},
-		CurrentHeight: 20,
+		CurrentHeight:	20,
 	}, []OverlayDescriptor{desc})
 	require.NoError(t, err)
 	require.Equal(t, ChannelService, delivery.Channel)
@@ -1613,67 +1613,67 @@ func TestExecutionZoneMessageRequiresCommittedScheduleForConsensusOrder(t *testi
 	destination := signedNodeRecord(t, 0x64, salt, 100, NodeRoleZoneExecution)
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
 	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:              MeshMessageExecution,
-		Payload:           []byte("execution-zone-payload"),
-		Origin:            origin.NodeID,
-		Destination:       destination.NodeID,
-		Priority:          PriorityForChannel(ChannelExecution),
-		TTL:               40,
-		OverlayID:         desc.OverlayID,
-		DestinationZone:   "APPLICATION_ZONE",
-		Sequence:          7,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismCommittedState,
+		Type:			MeshMessageExecution,
+		Payload:		[]byte("execution-zone-payload"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			40,
+		OverlayID:		desc.OverlayID,
+		DestinationZone:	"APPLICATION_ZONE",
+		Sequence:		7,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismCommittedState,
 		Proof: AetherMeshProof{
-			ProofType:   "committed-schedule",
-			ProofHash:   HashParts("execution-proof"),
-			ProofHeight: 30,
+			ProofType:	"committed-schedule",
+			ProofHash:	HashParts("execution-proof"),
+			ProofHeight:	30,
 		},
 	})
 	require.NoError(t, err)
 	uncommitted, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
-		ZoneID:            "APPLICATION_ZONE",
-		ShardID:           "shard-1",
-		RoutingClass:      ExecutionRoutingExecutionOverlay,
-		Ordered:           true,
-		MessageIDs:        []string{mesh.MessageID},
-		FirstZoneSequence: 7,
-		LastZoneSequence:  7,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-1",
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		Ordered:		true,
+		MessageIDs:		[]string{mesh.MessageID},
+		FirstZoneSequence:	7,
+		LastZoneSequence:	7,
 	})
 	require.NoError(t, err)
 
 	_, err = NewExecutionZoneMessage(ExecutionZoneMessage{
-		Message:                mesh,
-		RoutingClass:           ExecutionRoutingExecutionOverlay,
-		ZoneID:                 "APPLICATION_ZONE",
-		ShardID:                "shard-1",
-		ExecutionOverlayID:     desc.OverlayID,
-		ZoneSequence:           7,
-		NetworkDeliveryOrdinal: 99,
-		ConsensusScheduleOrder: 1,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-1",
+		ExecutionOverlayID:	desc.OverlayID,
+		ZoneSequence:		7,
+		NetworkDeliveryOrdinal:	99,
+		ConsensusScheduleOrder:	1,
 	}, uncommitted)
 	require.ErrorContains(t, err, "committed schedule")
 
 	committed, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
-		ZoneID:            "APPLICATION_ZONE",
-		ShardID:           "shard-1",
-		RoutingClass:      ExecutionRoutingExecutionOverlay,
-		Committed:         true,
-		Ordered:           true,
-		MessageIDs:        []string{mesh.MessageID},
-		FirstZoneSequence: 7,
-		LastZoneSequence:  7,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-1",
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		Committed:		true,
+		Ordered:		true,
+		MessageIDs:		[]string{mesh.MessageID},
+		FirstZoneSequence:	7,
+		LastZoneSequence:	7,
 	})
 	require.NoError(t, err)
 	executionMsg, err := NewExecutionZoneMessage(ExecutionZoneMessage{
-		Message:                mesh,
-		RoutingClass:           ExecutionRoutingExecutionOverlay,
-		ZoneID:                 "APPLICATION_ZONE",
-		ShardID:                "shard-1",
-		ExecutionOverlayID:     desc.OverlayID,
-		ZoneSequence:           7,
-		NetworkDeliveryOrdinal: 99,
-		ConsensusScheduleOrder: 1,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-1",
+		ExecutionOverlayID:	desc.OverlayID,
+		ZoneSequence:		7,
+		NetworkDeliveryOrdinal:	99,
+		ConsensusScheduleOrder:	1,
 	}, committed)
 	require.NoError(t, err)
 	require.NotEqual(t, executionMsg.NetworkDeliveryOrdinal, executionMsg.ConsensusScheduleOrder)
@@ -1686,42 +1686,42 @@ func TestExecutionZoneMessageSupportsAsyncParallelBlockSTMGroups(t *testing.T) {
 	destination := signedNodeRecord(t, 0x66, salt, 100, NodeRoleZoneExecution)
 	desc := defaultOverlayByType(t, OverlayTypeExecution)
 	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageExecution,
-		Payload:         []byte("async-execution"),
-		Origin:          origin.NodeID,
-		Destination:     destination.NodeID,
-		Priority:        PriorityForChannel(ChannelExecution),
-		TTL:             40,
-		OverlayID:       desc.OverlayID,
-		DestinationZone: "APPLICATION_ZONE",
-		Sequence:        8,
+		Type:			MeshMessageExecution,
+		Payload:		[]byte("async-execution"),
+		Origin:			origin.NodeID,
+		Destination:		destination.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			40,
+		OverlayID:		desc.OverlayID,
+		DestinationZone:	"APPLICATION_ZONE",
+		Sequence:		8,
 	})
 	require.NoError(t, err)
 
 	_, err = NewExecutionZoneMessage(ExecutionZoneMessage{
-		Message:               mesh,
-		RoutingClass:          ExecutionRoutingShard,
-		ZoneID:                "APPLICATION_ZONE",
-		ShardID:               "shard-2",
-		ExecutionOverlayID:    desc.OverlayID,
-		ExecutionGroupID:      HashParts("async-group"),
-		ZoneSequence:          8,
-		Async:                 true,
-		ParallelZoneExecution: true,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingShard,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-2",
+		ExecutionOverlayID:	desc.OverlayID,
+		ExecutionGroupID:	HashParts("async-group"),
+		ZoneSequence:		8,
+		Async:			true,
+		ParallelZoneExecution:	true,
 	}, ExecutionMessageSchedule{})
 	require.ErrorContains(t, err, "BlockSTM")
 
 	executionMsg, err := NewExecutionZoneMessage(ExecutionZoneMessage{
-		Message:               mesh,
-		RoutingClass:          ExecutionRoutingShard,
-		ZoneID:                "APPLICATION_ZONE",
-		ShardID:               "shard-2",
-		ExecutionOverlayID:    desc.OverlayID,
-		ExecutionGroupID:      HashParts("async-group"),
-		BlockSTMGroupID:       HashParts("blockstm-group"),
-		ZoneSequence:          8,
-		Async:                 true,
-		ParallelZoneExecution: true,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingShard,
+		ZoneID:			"APPLICATION_ZONE",
+		ShardID:		"shard-2",
+		ExecutionOverlayID:	desc.OverlayID,
+		ExecutionGroupID:	HashParts("async-group"),
+		BlockSTMGroupID:	HashParts("blockstm-group"),
+		ZoneSequence:		8,
+		Async:			true,
+		ParallelZoneExecution:	true,
 	}, ExecutionMessageSchedule{})
 	require.NoError(t, err)
 	require.True(t, executionMsg.Async)
@@ -1730,12 +1730,12 @@ func TestExecutionZoneMessageSupportsAsyncParallelBlockSTMGroups(t *testing.T) {
 
 func TestCrossZoneMessageRequiresSequenceExpiryAndReplayProtection(t *testing.T) {
 	msg := CrossZoneMessage{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		MessageHash:     HashParts("cross-zone-message"),
-		ExpiryHeight:    90,
-		ReceiptPolicy:   ReceiptPolicyOnExecution,
-		ProofRequired:   true,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		MessageHash:		HashParts("cross-zone-message"),
+		ExpiryHeight:		90,
+		ReceiptPolicy:		ReceiptPolicyOnExecution,
+		ProofRequired:		true,
 	}
 	_, err := NewCrossZoneMessage(msg)
 	require.ErrorContains(t, err, "source sequence")
@@ -1758,16 +1758,16 @@ func TestCrossZoneMessageRequiresSequenceExpiryAndReplayProtection(t *testing.T)
 
 func TestCrossZoneReceiptIsRollbackSafeAndProofQueryable(t *testing.T) {
 	receipt := CrossZoneReceipt{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		SourceSequence:  11,
-		MessageHash:     HashParts("cross-zone-message"),
-		Status:          CrossZoneReceiptExecuted,
-		ReceiptPolicy:   ReceiptPolicyAlways,
-		ProofHash:       HashParts("cross-zone-receipt-proof"),
-		ReceiptHeight:   35,
-		RollbackSafe:    true,
-		ProofQueryable:  true,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		SourceSequence:		11,
+		MessageHash:		HashParts("cross-zone-message"),
+		Status:			CrossZoneReceiptExecuted,
+		ReceiptPolicy:		ReceiptPolicyAlways,
+		ProofHash:		HashParts("cross-zone-receipt-proof"),
+		ReceiptHeight:		35,
+		RollbackSafe:		true,
+		ProofQueryable:		true,
 	}
 	created, err := NewCrossZoneReceipt(receipt)
 	require.NoError(t, err)
@@ -1825,12 +1825,12 @@ func TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps(t *testing.T) {
 	require.Equal(t, uint64(2), seq)
 
 	first, err := NewCrossZoneMessage(CrossZoneMessage{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		SourceSequence:  1,
-		MessageHash:     HashParts("cz-sequence-1"),
-		ExpiryHeight:    100,
-		ReceiptPolicy:   ReceiptPolicyAlways,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		SourceSequence:		1,
+		MessageHash:		HashParts("cz-sequence-1"),
+		ExpiryHeight:		100,
+		ReceiptPolicy:		ReceiptPolicyAlways,
 	})
 	require.NoError(t, err)
 	tracker, err = AcceptCrossZoneSequence(tracker, first, true, 20)
@@ -1839,12 +1839,12 @@ func TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps(t *testing.T) {
 	require.ErrorContains(t, err, "replay")
 
 	gap, err := NewCrossZoneMessage(CrossZoneMessage{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		SourceSequence:  3,
-		MessageHash:     HashParts("cz-sequence-3"),
-		ExpiryHeight:    100,
-		ReceiptPolicy:   ReceiptPolicyAlways,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		SourceSequence:		3,
+		MessageHash:		HashParts("cz-sequence-3"),
+		ExpiryHeight:		100,
+		ReceiptPolicy:		ReceiptPolicyAlways,
 	})
 	require.NoError(t, err)
 	_, err = AcceptCrossZoneSequence(tracker, gap, true, 22)
@@ -1855,16 +1855,16 @@ func TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps(t *testing.T) {
 
 func TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics(t *testing.T) {
 	receipt, err := NewCrossZoneReceipt(CrossZoneReceipt{
-		SourceZone:      "APPLICATION_ZONE",
-		DestinationZone: "FINANCIAL_ZONE",
-		SourceSequence:  12,
-		MessageHash:     HashParts("receipt-delivery-message"),
-		Status:          CrossZoneReceiptDelivered,
-		ReceiptPolicy:   ReceiptPolicyOnDelivery,
-		ProofHash:       HashParts("receipt-delivery-proof"),
-		ReceiptHeight:   44,
-		RollbackSafe:    true,
-		ProofQueryable:  true,
+		SourceZone:		"APPLICATION_ZONE",
+		DestinationZone:	"FINANCIAL_ZONE",
+		SourceSequence:		12,
+		MessageHash:		HashParts("receipt-delivery-message"),
+		Status:			CrossZoneReceiptDelivered,
+		ReceiptPolicy:		ReceiptPolicyOnDelivery,
+		ProofHash:		HashParts("receipt-delivery-proof"),
+		ReceiptHeight:		44,
+		RollbackSafe:		true,
+		ProofQueryable:		true,
 	})
 	require.NoError(t, err)
 	delivery, err := NewReceiptDelivery(receipt, HashParts("receipt-destination-node"), 45)
@@ -1883,23 +1883,23 @@ func TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics(t *testing.T) {
 
 func TestQueryResponseProofAttachmentIsRequiredAndMetriced(t *testing.T) {
 	_, err := NewQueryResponseProof(QueryResponseProof{
-		RequestID:      HashParts("query-request"),
-		Responder:      HashParts("query-responder"),
-		PayloadHash:    HashParts("query-payload"),
-		ResponseHeight: 50,
+		RequestID:	HashParts("query-request"),
+		Responder:	HashParts("query-responder"),
+		PayloadHash:	HashParts("query-payload"),
+		ResponseHeight:	50,
 	})
 	require.ErrorContains(t, err, "proof")
 
 	response, err := NewQueryResponseProof(QueryResponseProof{
-		RequestID:   HashParts("query-request"),
-		Responder:   HashParts("query-responder"),
-		PayloadHash: HashParts("query-payload"),
+		RequestID:	HashParts("query-request"),
+		Responder:	HashParts("query-responder"),
+		PayloadHash:	HashParts("query-payload"),
 		Proof: AetherMeshProof{
-			ProofType:   "iavl-query-proof",
-			ProofHash:   HashParts("query-proof"),
-			ProofHeight: 49,
+			ProofType:	"iavl-query-proof",
+			ProofHash:	HashParts("query-proof"),
+			ProofHeight:	49,
 		},
-		ResponseHeight: 50,
+		ResponseHeight:	50,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ComputeQueryResponseID(response), response.ResponseID)
@@ -1994,11 +1994,11 @@ func TestANAGuardrailsRejectConsensusReplacementAndCommittedPeerMetrics(t *testi
 func TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService(t *testing.T) {
 	adapter := DefaultAetherNetworkingAdapter()
 	consensus := TransportEnvelope{
-		Channel:        ChannelConsensus,
-		SizeBytes:      128,
-		EnqueuedHeight: 100,
-		Sequence:       1,
-		PayloadHash:    HashParts("consensus-vote"),
+		Channel:	ChannelConsensus,
+		SizeBytes:	128,
+		EnqueuedHeight:	100,
+		Sequence:	1,
+		PayloadHash:	HashParts("consensus-vote"),
 	}
 	plan, err := PlanPropagation(adapter, consensus, 20, PeerScore{ScoreBps: BasisPoints})
 	require.NoError(t, err)
@@ -2007,11 +2007,11 @@ func TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService(t *testing.T)
 	require.False(t, plan.UsesAdvisoryPeerMetric)
 
 	service := TransportEnvelope{
-		Channel:        ChannelService,
-		SizeBytes:      512,
-		EnqueuedHeight: 100,
-		Sequence:       2,
-		PayloadHash:    HashParts("service-message"),
+		Channel:	ChannelService,
+		SizeBytes:	512,
+		EnqueuedHeight:	100,
+		Sequence:	2,
+		PayloadHash:	HashParts("service-message"),
 	}
 	plan, err = PlanPropagation(adapter, service, 20, PeerScore{ScoreBps: 9_000})
 	require.NoError(t, err)
@@ -2036,13 +2036,13 @@ func TestANAMultiplexingDoesNotLetServiceOutrankConsensus(t *testing.T) {
 func TestNetworkMessageHardRules(t *testing.T) {
 	proofHash := HashParts("committed-service-proof")
 	msg, err := NewNetworkMessage(NetworkMessage{
-		Layer:              LayerL3Application,
-		Channel:            ChannelService,
-		ConsensusEffect:    true,
-		DeterminismSource:  DeterminismDeterministicProof,
-		PayloadHash:        HashParts("payload"),
-		PayloadSizeBytes:   128,
-		CommittedProofHash: proofHash,
+		Layer:			LayerL3Application,
+		Channel:		ChannelService,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismDeterministicProof,
+		PayloadHash:		HashParts("payload"),
+		PayloadSizeBytes:	128,
+		CommittedProofHash:	proofHash,
 	})
 	require.NoError(t, err)
 	require.NoError(t, msg.ValidateHardRules())
@@ -2065,10 +2065,10 @@ func TestNetworkMessageHardRules(t *testing.T) {
 
 func TestLargeNetworkPayloadRequiresChunkedVerifiedCommitment(t *testing.T) {
 	msg := NetworkMessage{
-		Layer:            LayerL3Application,
-		Channel:          ChannelData,
-		PayloadHash:      HashParts("large-payload"),
-		PayloadSizeBytes: LargePayloadBytes + 1,
+		Layer:			LayerL3Application,
+		Channel:		ChannelData,
+		PayloadHash:		HashParts("large-payload"),
+		PayloadSizeBytes:	LargePayloadBytes + 1,
 	}
 
 	require.ErrorContains(t, msg.ValidateHardRules(), "large payloads")
@@ -2082,9 +2082,9 @@ func TestDiscoveryRecordMustBeSignedExpiringAndProofChecked(t *testing.T) {
 	salt := []byte("aetra-test-network")
 	record := signedNodeRecord(t, 0x51, salt, 100, NodeRoleStateSync)
 	discovery := DiscoveryRecord{
-		Record:      record,
-		ProofHash:   HashParts("optional-discovery-proof"),
-		ProofHeight: 90,
+		Record:		record,
+		ProofHash:	HashParts("optional-discovery-proof"),
+		ProofHeight:	90,
 	}
 
 	require.NoError(t, discovery.Validate(salt, 95))
@@ -2129,10 +2129,10 @@ func TestDistributedRoutingTableIndexesLeaseBasedDiscoveryObjects(t *testing.T) 
 	require.NoError(t, table.Validate(salt, 20))
 
 	serviceResults := table.Query(DRTQuery{
-		ObjectType:    DRTObjectServiceEndpoint,
-		OverlayID:     overlay.OverlayID,
-		ServiceID:     "svc.payments",
-		CurrentHeight: 20,
+		ObjectType:	DRTObjectServiceEndpoint,
+		OverlayID:	overlay.OverlayID,
+		ServiceID:	"svc.payments",
+		CurrentHeight:	20,
 	})
 	require.Len(t, serviceResults, 2)
 	require.Equal(t, serviceHigh.NodeID, serviceResults[0].Discovery.Record.NodeID)
@@ -2274,12 +2274,12 @@ func TestDiscoveryQueryOperationsCoverNodeZoneStorageAndEndpoint(t *testing.T) {
 	require.Len(t, table.FindEndpoint(HashParts("endpoint", "storage"), 20), 1)
 
 	_, err = NewSignedDiscoveryRecord(DiscoveryRecord{
-		RecordType:        DRTObjectStorageProvider,
-		OwnerNodeID:       node.NodeID,
-		TargetID:          node.NodeID,
-		AdvertisementHash: HashParts("endpoint", "bad-storage"),
-		ExpiresHeight:     80,
-		Record:            node,
+		RecordType:		DRTObjectStorageProvider,
+		OwnerNodeID:		node.NodeID,
+		TargetID:		node.NodeID,
+		AdvertisementHash:	HashParts("endpoint", "bad-storage"),
+		ExpiresHeight:		80,
+		Record:			node,
 	}, deterministicPrivateKey(0x5e), salt)
 	require.ErrorContains(t, err, "storage provider role")
 }
@@ -2306,9 +2306,9 @@ func TestDiscoveryResponseSignsResultsAndProofAttachment(t *testing.T) {
 	require.NoError(t, err)
 	stateRoot := HashParts("state-root", "services")
 	proof := DiscoveryOnChainProof{
-		ProofHeight: 20,
-		StateRoot:   stateRoot,
-		ProofHash:   ComputeDiscoveryOnChainProofHash(resultHash, stateRoot, 20),
+		ProofHeight:	20,
+		StateRoot:	stateRoot,
+		ProofHash:	ComputeDiscoveryOnChainProofHash(resultHash, stateRoot, 20),
 	}
 	proven, err := BuildDiscoveryResponse(table, query, source, deterministicPrivateKey(0x62), salt, proof, 20)
 	require.NoError(t, err)
@@ -2373,16 +2373,16 @@ func TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired(t *testing.T
 	desc := defaultOverlayByType(t, OverlayTypeRouting)
 
 	msg, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   desc.OverlayID,
-		PayloadHash: HashParts("broadcast", "payload"),
-		PayloadType: BroadcastPayloadRouting,
-		Height:      10,
-		TTL:         8,
-		Priority:    PriorityForChannel(ChannelRouting),
+		OverlayID:	desc.OverlayID,
+		PayloadHash:	HashParts("broadcast", "payload"),
+		PayloadType:	BroadcastPayloadRouting,
+		Height:		10,
+		TTL:		8,
+		Priority:	PriorityForChannel(ChannelRouting),
 		FanoutPolicy: BroadcastFanoutPolicy{
-			TreeFanout:   2,
-			GossipFanout: 3,
-			OverlayBound: true,
+			TreeFanout:	2,
+			GossipFanout:	3,
+			OverlayBound:	true,
 		},
 	}, originKey, salt)
 	require.NoError(t, err)
@@ -2417,23 +2417,23 @@ func TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout(t *testin
 	desc := defaultOverlayByType(t, OverlayTypeRouting)
 
 	msg, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   desc.OverlayID,
-		PayloadHash: HashParts("broadcast", "tree"),
-		PayloadType: BroadcastPayloadRouting,
-		Height:      20,
-		TTL:         5,
-		Priority:    1,
+		OverlayID:	desc.OverlayID,
+		PayloadHash:	HashParts("broadcast", "tree"),
+		PayloadType:	BroadcastPayloadRouting,
+		Height:		20,
+		TTL:		5,
+		Priority:	1,
 		FanoutPolicy: BroadcastFanoutPolicy{
-			TreeFanout:   desc.Fanout + 10,
-			GossipFanout: desc.Fanout + 10,
-			OverlayBound: true,
+			TreeFanout:	desc.Fanout + 10,
+			GossipFanout:	desc.Fanout + 10,
+			OverlayBound:	true,
 		},
 	}, originKey, salt)
 	require.NoError(t, err)
 
 	graph := RoutingGraph{
-		OverlayID: desc.OverlayID,
-		Version:   1,
+		OverlayID:	desc.OverlayID,
+		Version:	1,
 		Edges: []RoutingEdge{
 			{FromNodeID: local.NodeID, ToNodeID: peerB.NodeID, LatencyMillis: 50, Weight: 7_000, Priority: 2},
 			{FromNodeID: local.NodeID, ToNodeID: peerA.NodeID, LatencyMillis: 10, Weight: 9_000, Priority: 1},
@@ -2462,21 +2462,21 @@ func TestBroadcastPriorityOrderingAndOverlayMismatch(t *testing.T) {
 	serviceDesc := defaultOverlayByType(t, OverlayTypeService)
 	routingDesc := defaultOverlayByType(t, OverlayTypeRouting)
 	low, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   serviceDesc.OverlayID,
-		PayloadHash: HashParts("broadcast", "low"),
-		PayloadType: BroadcastPayloadService,
-		Height:      30,
-		TTL:         5,
-		Priority:    5,
+		OverlayID:	serviceDesc.OverlayID,
+		PayloadHash:	HashParts("broadcast", "low"),
+		PayloadType:	BroadcastPayloadService,
+		Height:		30,
+		TTL:		5,
+		Priority:	5,
 	}, key, salt)
 	require.NoError(t, err)
 	high, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   serviceDesc.OverlayID,
-		PayloadHash: HashParts("broadcast", "high"),
-		PayloadType: BroadcastPayloadService,
-		Height:      31,
-		TTL:         5,
-		Priority:    1,
+		OverlayID:	serviceDesc.OverlayID,
+		PayloadHash:	HashParts("broadcast", "high"),
+		PayloadType:	BroadcastPayloadService,
+		Height:		31,
+		TTL:		5,
+		Priority:	1,
 	}, key, salt)
 	require.NoError(t, err)
 
@@ -2492,12 +2492,12 @@ func TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes(t *testing.
 	peer := signedNodeRecord(t, 0x6f, salt, 100, NodeRoleRouting)
 	desc := defaultOverlayByType(t, OverlayTypeRouting)
 	msg, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   desc.OverlayID,
-		PayloadHash: HashParts("broadcast", "dedupe"),
-		PayloadType: BroadcastPayloadRouting,
-		Height:      40,
-		TTL:         10,
-		Priority:    2,
+		OverlayID:	desc.OverlayID,
+		PayloadHash:	HashParts("broadcast", "dedupe"),
+		PayloadType:	BroadcastPayloadRouting,
+		Height:		40,
+		TTL:		10,
+		Priority:	2,
 	}, key, salt)
 	require.NoError(t, err)
 
@@ -2536,11 +2536,11 @@ func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testi
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.70:26656"})
 	require.NoError(t, err)
 	proposer, err := SignNodeRecord(NodeRecord{
-		ValidatorPubKey:      validatorKey,
-		Roles:                []NodeRole{NodeRoleValidator},
-		NetworkAddressesHash: addressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		ValidatorPubKey:	validatorKey,
+		Roles:			[]NodeRole{NodeRoleValidator},
+		NetworkAddressesHash:	addressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, proposerKey, salt)
 	require.NoError(t, err)
 
@@ -2554,14 +2554,14 @@ func TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs(t *testi
 	headerHash := HashParts("block-header", "height-42")
 	blockRoot := ComputeBlockRoot(headerHash, chunkRoot, proofRoot)
 	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
-		Height:                   42,
-		ProposerNodeID:           proposer.NodeID,
-		HeaderHash:               headerHash,
-		ChunkSetRoot:             chunkRoot,
-		ProofSetRoot:             proofRoot,
-		BlockRoot:                blockRoot,
-		ChunkCount:               uint32(len(chunks)),
-		AvailabilityMetadataHash: HashParts("availability", "metadata"),
+		Height:				42,
+		ProposerNodeID:			proposer.NodeID,
+		HeaderHash:			headerHash,
+		ChunkSetRoot:			chunkRoot,
+		ProofSetRoot:			proofRoot,
+		BlockRoot:			blockRoot,
+		ChunkCount:			uint32(len(chunks)),
+		AvailabilityMetadataHash:	HashParts("availability", "metadata"),
 	})
 	require.NoError(t, err)
 	proofSet := BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: proofHashes}
@@ -2644,12 +2644,12 @@ func TestStreamSessionFromSpecOpensAndAccountsFlowControl(t *testing.T) {
 
 func TestStreamSessionPauseResumeDrainCloseAndFail(t *testing.T) {
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("parent-session"),
-		PayloadType:       StreamingPayloadStorageObject,
-		Priority:          PriorityForChannel(ChannelData),
-		FlowControlWindow: 2048,
-		ChunkSize:         512,
-		Parallelism:       2,
+		SessionID:		HashParts("parent-session"),
+		PayloadType:		StreamingPayloadStorageObject,
+		Priority:		PriorityForChannel(ChannelData),
+		FlowControlWindow:	2048,
+		ChunkSize:		512,
+		Parallelism:		2,
 	})
 	require.NoError(t, err)
 
@@ -2680,11 +2680,11 @@ func TestStreamSessionPauseResumeDrainCloseAndFail(t *testing.T) {
 	require.Equal(t, StreamStateClosed, stream.State)
 
 	failing, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("parent-session-fail"),
-		PayloadType:       StreamingPayloadProofBundle,
-		Priority:          PriorityForChannel(ChannelData),
-		FlowControlWindow: 1024,
-		ChunkSize:         256,
+		SessionID:		HashParts("parent-session-fail"),
+		PayloadType:		StreamingPayloadProofBundle,
+		Priority:		PriorityForChannel(ChannelData),
+		FlowControlWindow:	1024,
+		ChunkSize:		256,
 	})
 	require.NoError(t, err)
 	failing, err = OpenStreamSession(failing)
@@ -2696,16 +2696,16 @@ func TestStreamSessionPauseResumeDrainCloseAndFail(t *testing.T) {
 
 func TestStreamPayloadTypeMapsToRL2AndRejectsInvalidBounds(t *testing.T) {
 	cases := map[StreamingPayloadType]struct {
-		rl2     RL2PayloadType
-		channel ChannelClass
+		rl2	RL2PayloadType
+		channel	ChannelClass
 	}{
-		StreamingPayloadStateSync:            {rl2: RL2PayloadStateSyncStream, channel: ChannelStateSync},
-		StreamingPayloadZoneSnapshot:         {rl2: RL2PayloadZoneSnapshot, channel: ChannelData},
-		StreamingPayloadBlockPropagation:     {rl2: RL2PayloadLargeBlock, channel: ChannelBlock},
-		StreamingPayloadExecutionReceipts:    {rl2: RL2PayloadExecutionResult, channel: ChannelExecution},
-		StreamingPayloadStorageObject:        {rl2: RL2PayloadStorageObject, channel: ChannelData},
-		StreamingPayloadProofBundle:          {rl2: RL2PayloadProofSet, channel: ChannelData},
-		StreamingPayloadHistoricalQueryRange: {rl2: RL2PayloadStorageObject, channel: ChannelData},
+		StreamingPayloadStateSync:		{rl2: RL2PayloadStateSyncStream, channel: ChannelStateSync},
+		StreamingPayloadZoneSnapshot:		{rl2: RL2PayloadZoneSnapshot, channel: ChannelData},
+		StreamingPayloadBlockPropagation:	{rl2: RL2PayloadLargeBlock, channel: ChannelBlock},
+		StreamingPayloadExecutionReceipts:	{rl2: RL2PayloadExecutionResult, channel: ChannelExecution},
+		StreamingPayloadStorageObject:		{rl2: RL2PayloadStorageObject, channel: ChannelData},
+		StreamingPayloadProofBundle:		{rl2: RL2PayloadProofSet, channel: ChannelData},
+		StreamingPayloadHistoricalQueryRange:	{rl2: RL2PayloadStorageObject, channel: ChannelData},
 	}
 
 	for payloadType, expected := range cases {
@@ -2719,45 +2719,45 @@ func TestStreamPayloadTypeMapsToRL2AndRejectsInvalidBounds(t *testing.T) {
 	}
 
 	_, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("invalid-stream-window"),
-		PayloadType:       StreamingPayloadBlockPropagation,
-		Priority:          PriorityForChannel(ChannelBlock),
-		FlowControlWindow: 128,
-		ChunkSize:         256,
+		SessionID:		HashParts("invalid-stream-window"),
+		PayloadType:		StreamingPayloadBlockPropagation,
+		Priority:		PriorityForChannel(ChannelBlock),
+		FlowControlWindow:	128,
+		ChunkSize:		256,
 	})
 	require.ErrorContains(t, err, "chunk size exceeds")
 
 	_, err = NewStreamSession(StreamSession{
-		SessionID:         HashParts("invalid-stream-ack"),
-		PayloadType:       StreamingPayloadExecutionReceipts,
-		Priority:          PriorityForChannel(ChannelExecution),
-		FlowControlWindow: 1024,
-		ChunkSize:         256,
-		BytesSent:         1,
-		BytesAcknowledged: 2,
-		State:             StreamStateActive,
+		SessionID:		HashParts("invalid-stream-ack"),
+		PayloadType:		StreamingPayloadExecutionReceipts,
+		Priority:		PriorityForChannel(ChannelExecution),
+		FlowControlWindow:	1024,
+		ChunkSize:		256,
+		BytesSent:		1,
+		BytesAcknowledged:	2,
+		State:			StreamStateActive,
 	})
 	require.ErrorContains(t, err, "acknowledged bytes exceed")
 
 	_, err = NewStreamSession(StreamSession{
-		SessionID:         HashParts("invalid-stream-opening"),
-		PayloadType:       StreamingPayloadProofBundle,
-		Priority:          PriorityForChannel(ChannelData),
-		FlowControlWindow: 1024,
-		ChunkSize:         256,
-		BytesSent:         1,
+		SessionID:		HashParts("invalid-stream-opening"),
+		PayloadType:		StreamingPayloadProofBundle,
+		Priority:		PriorityForChannel(ChannelData),
+		FlowControlWindow:	1024,
+		ChunkSize:		256,
+		BytesSent:		1,
 	})
 	require.ErrorContains(t, err, "opening")
 }
 
 func TestStreamBackpressureSignalsControlWindowAndState(t *testing.T) {
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("backpressure-parent"),
-		PayloadType:       StreamingPayloadExecutionReceipts,
-		Priority:          PriorityForChannel(ChannelExecution),
-		FlowControlWindow: 2048,
-		ChunkSize:         512,
-		Parallelism:       2,
+		SessionID:		HashParts("backpressure-parent"),
+		PayloadType:		StreamingPayloadExecutionReceipts,
+		Priority:		PriorityForChannel(ChannelExecution),
+		FlowControlWindow:	2048,
+		ChunkSize:		512,
+		Parallelism:		2,
 	})
 	require.NoError(t, err)
 	stream, err = OpenStreamSession(stream)
@@ -2766,25 +2766,25 @@ func TestStreamBackpressureSignalsControlWindowAndState(t *testing.T) {
 	require.NoError(t, err)
 
 	_, _, err = ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID:          stream.StreamID,
-		Signal:            StreamSignalWindowUpdate,
-		FlowControlWindow: 512,
+		StreamID:		stream.StreamID,
+		Signal:			StreamSignalWindowUpdate,
+		FlowControlWindow:	512,
 	})
 	require.ErrorContains(t, err, "below in-flight")
 
 	stream, window, err := ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID:              stream.StreamID,
-		Signal:                StreamSignalWindowUpdate,
-		FlowControlWindow:     1536,
-		CumulativeAcknowledge: 512,
+		StreamID:		stream.StreamID,
+		Signal:			StreamSignalWindowUpdate,
+		FlowControlWindow:	1536,
+		CumulativeAcknowledge:	512,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1024), window.AvailableWindow)
 	require.Equal(t, uint64(512), stream.BytesAcknowledged)
 
 	stream, window, err = ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID: stream.StreamID,
-		Signal:   StreamSignalPause,
+		StreamID:	stream.StreamID,
+		Signal:		StreamSignalPause,
 	})
 	require.NoError(t, err)
 	require.Equal(t, StreamStatePaused, stream.State)
@@ -2801,8 +2801,8 @@ func TestStreamBackpressureSignalsControlWindowAndState(t *testing.T) {
 	require.Equal(t, StreamingPayloadStorageObject, ordered[2].PayloadType)
 
 	stream, _, err = ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID: stream.StreamID,
-		Signal:   StreamSignalResume,
+		StreamID:	stream.StreamID,
+		Signal:		StreamSignalResume,
 	})
 	require.NoError(t, err)
 	require.Equal(t, StreamStateActive, stream.State)
@@ -2810,17 +2810,17 @@ func TestStreamBackpressureSignalsControlWindowAndState(t *testing.T) {
 	stream, _, err = AcknowledgeStreamBytes(stream, stream.BytesSent)
 	require.NoError(t, err)
 	stream, window, err = ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID:           stream.StreamID,
-		Signal:             StreamSignalSlowDown,
-		SuggestedChunkSize: 256,
+		StreamID:		stream.StreamID,
+		Signal:			StreamSignalSlowDown,
+		SuggestedChunkSize:	256,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(256), stream.ChunkSize)
 	require.False(t, window.Backpressure)
 
 	stream, _, err = ApplyStreamBackpressure(stream, StreamBackpressureFrame{
-		StreamID: stream.StreamID,
-		Signal:   StreamSignalCancel,
+		StreamID:	stream.StreamID,
+		Signal:		StreamSignalCancel,
 	})
 	require.NoError(t, err)
 	require.Equal(t, StreamStateFailed, stream.State)
@@ -2828,23 +2828,23 @@ func TestStreamBackpressureSignalsControlWindowAndState(t *testing.T) {
 
 func TestStreamAdaptiveChunkingAndMetricsRespectBoundaries(t *testing.T) {
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("adaptive-stream-parent"),
-		PayloadType:       StreamingPayloadStateSync,
-		Priority:          PriorityForChannel(ChannelStateSync),
-		FlowControlWindow: 4096,
-		ChunkSize:         512,
-		Parallelism:       4,
+		SessionID:		HashParts("adaptive-stream-parent"),
+		PayloadType:		StreamingPayloadStateSync,
+		Priority:		PriorityForChannel(ChannelStateSync),
+		FlowControlWindow:	4096,
+		ChunkSize:		512,
+		Parallelism:		4,
 	})
 	require.NoError(t, err)
 	stream, err = OpenStreamSession(stream)
 	require.NoError(t, err)
 
 	next, err := RecommendStreamChunkSize(stream, StreamAdaptiveChunkInputs{
-		ObservedThroughputBps: 32 << 20,
-		LossRateBps:           50,
-		PeerScoreBps:          9_000,
-		PayloadPriority:       stream.Priority,
-		StreamClass:           QoSClassStateSync,
+		ObservedThroughputBps:	32 << 20,
+		LossRateBps:		50,
+		PeerScoreBps:		9_000,
+		PayloadPriority:	stream.Priority,
+		StreamClass:		QoSClassStateSync,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1024), next)
@@ -2869,11 +2869,11 @@ func TestStreamAdaptiveChunkingAndMetricsRespectBoundaries(t *testing.T) {
 	stream, _, err = AcknowledgeStreamBytes(stream, stream.BytesSent)
 	require.NoError(t, err)
 	next, err = RecommendStreamChunkSize(stream, StreamAdaptiveChunkInputs{
-		ObservedThroughputBps: 1 << 20,
-		LossRateBps:           800,
-		PeerScoreBps:          4_500,
-		PayloadPriority:       stream.Priority,
-		StreamClass:           QoSClassStateSync,
+		ObservedThroughputBps:	1 << 20,
+		LossRateBps:		800,
+		PeerScoreBps:		4_500,
+		PayloadPriority:	stream.Priority,
+		StreamClass:		QoSClassStateSync,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(512), next)
@@ -2899,12 +2899,12 @@ func TestStreamPartialRecoveryFetchAndStableReassemblyRoot(t *testing.T) {
 	require.ErrorContains(t, VerifyStreamChunkHash(corrupt), "chunk hash")
 
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("partial-recovery-parent"),
-		PayloadType:       StreamingPayloadStorageObject,
-		Priority:          PriorityForChannel(ChannelData),
-		FlowControlWindow: 2048,
-		ChunkSize:         256,
-		Parallelism:       3,
+		SessionID:		HashParts("partial-recovery-parent"),
+		PayloadType:		StreamingPayloadStorageObject,
+		Priority:		PriorityForChannel(ChannelData),
+		FlowControlWindow:	2048,
+		ChunkSize:		256,
+		Parallelism:		3,
 	})
 	require.NoError(t, err)
 	stream, err = OpenStreamSession(stream)
@@ -2930,15 +2930,15 @@ func TestNetworkSecurityPolicyDetectsThreatsAndProtectsConsensus(t *testing.T) {
 
 	score := PeerScore{ScoreBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 8_000}
 	decision, err := EvaluateNetworkSecurity(score, PeerSecurityObservation{
-		PeerNodeID:            HashParts("security-peer"),
-		InvalidMessages:       policy.MaxInvalidMessages + 1,
-		DuplicateMessages:     policy.MaxInvalidMessages + 2,
-		CorruptChunks:         1,
-		ForgedAdvertisements:  1,
-		BytesThisEpoch:        policy.MaxBytesPerEpoch + 1,
-		SybilClusterPeers:     3,
-		CrossZoneReplayCount:  1,
-		ConflictingBroadcasts: 1,
+		PeerNodeID:		HashParts("security-peer"),
+		InvalidMessages:	policy.MaxInvalidMessages + 1,
+		DuplicateMessages:	policy.MaxInvalidMessages + 2,
+		CorruptChunks:		1,
+		ForgedAdvertisements:	1,
+		BytesThisEpoch:		policy.MaxBytesPerEpoch + 1,
+		SybilClusterPeers:	3,
+		CrossZoneReplayCount:	1,
+		ConflictingBroadcasts:	1,
 	}, policy)
 	require.NoError(t, err)
 	require.False(t, decision.Accepted)
@@ -2955,10 +2955,10 @@ func TestNetworkSecurityPolicyDetectsThreatsAndProtectsConsensus(t *testing.T) {
 	require.Contains(t, decision.Controls, ControlQoSIsolation)
 
 	ok, err := CheckChannelRateLimit(ChannelRateLimit{Channel: ChannelDiscovery, MaxBytes: 1024, WindowHeight: 1, DropOnExceeded: true}, ChannelRateUsage{
-		Channel:     ChannelDiscovery,
-		Bytes:       2048,
-		WindowStart: 10,
-		WindowEnd:   10,
+		Channel:	ChannelDiscovery,
+		Bytes:		2048,
+		WindowStart:	10,
+		WindowEnd:	10,
 	})
 	require.NoError(t, err)
 	require.False(t, ok)
@@ -3058,11 +3058,11 @@ func TestNetworkSecurityPeerDiversityAndWithheldBlockChunks(t *testing.T) {
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.79:26656"})
 	require.NoError(t, err)
 	proposer, err := SignNodeRecord(NodeRecord{
-		ValidatorPubKey:      validatorKey,
-		Roles:                []NodeRole{NodeRoleValidator},
-		NetworkAddressesHash: addressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		ValidatorPubKey:	validatorKey,
+		Roles:			[]NodeRole{NodeRoleValidator},
+		NetworkAddressesHash:	addressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, proposerKey, salt)
 	require.NoError(t, err)
 	blockBytes := bytes.Repeat([]byte("security-block"), 32)
@@ -3074,14 +3074,14 @@ func TestNetworkSecurityPeerDiversityAndWithheldBlockChunks(t *testing.T) {
 	proofRoot := HashParts(append([]string{"block-proof-set"}, proofHashes...)...)
 	headerHash := HashParts("security-header", "42")
 	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
-		Height:                   42,
-		ProposerNodeID:           proposer.NodeID,
-		HeaderHash:               headerHash,
-		ChunkSetRoot:             chunkRoot,
-		ProofSetRoot:             proofRoot,
-		BlockRoot:                ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
-		ChunkCount:               uint32(len(chunks)),
-		AvailabilityMetadataHash: HashParts("security-availability"),
+		Height:				42,
+		ProposerNodeID:			proposer.NodeID,
+		HeaderHash:			headerHash,
+		ChunkSetRoot:			chunkRoot,
+		ProofSetRoot:			proofRoot,
+		BlockRoot:			ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
+		ChunkCount:			uint32(len(chunks)),
+		AvailabilityMetadataHash:	HashParts("security-availability"),
 	})
 	require.NoError(t, err)
 	session, err := StartBlockPropagation(header, BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: proofHashes}, proposer, 42)
@@ -3093,24 +3093,24 @@ func TestNetworkSecurityPeerDiversityAndWithheldBlockChunks(t *testing.T) {
 
 func TestPeerReputationIsAdvisoryUntilEvidenceCommittedAndDecayBounded(t *testing.T) {
 	input := PeerReputationInput{
-		PeerNodeID:                HashParts("reputation-peer"),
-		ValidMessages:             95,
-		InvalidMessages:           5,
-		LatencyMillis:             50,
-		ThroughputBytesPerSec:     32 << 20,
-		CorrectChunks:             20,
-		CorruptChunks:             1,
-		ValidDiscoveryResponses:   9,
-		InvalidDiscoveryResponses: 1,
-		ValidServiceResponses:     8,
-		InvalidServiceResponses:   2,
-		Timeouts:                  1,
-		DuplicateBroadcasts:       2,
-		ConflictingBroadcasts:     0,
-		ElapsedEpochs:             2,
+		PeerNodeID:			HashParts("reputation-peer"),
+		ValidMessages:			95,
+		InvalidMessages:		5,
+		LatencyMillis:			50,
+		ThroughputBytesPerSec:		32 << 20,
+		CorrectChunks:			20,
+		CorruptChunks:			1,
+		ValidDiscoveryResponses:	9,
+		InvalidDiscoveryResponses:	1,
+		ValidServiceResponses:		8,
+		InvalidServiceResponses:	2,
+		Timeouts:			1,
+		DuplicateBroadcasts:		2,
+		ConflictingBroadcasts:		0,
+		ElapsedEpochs:			2,
 		DecayPolicy: PeerScoreDecayPolicy{
-			MaxDecayBpsPerEpoch: 300,
-			MinScoreBps:         4_000,
+			MaxDecayBpsPerEpoch:	300,
+			MinScoreBps:		4_000,
 		},
 	}
 	decision, err := ComputePeerReputation(input)
@@ -3143,10 +3143,10 @@ func TestPeerReputationIsAdvisoryUntilEvidenceCommittedAndDecayBounded(t *testin
 
 func TestEclipseResistancePlanMaintainsDiversityAndProofBackedRouting(t *testing.T) {
 	graph := AdaptiveOverlayGraph{
-		OverlayID:    HashParts("eclipse-overlay"),
-		LocalNodeID:  HashParts("eclipse-local"),
-		RoutingEpoch: 7,
-		PolicyHash:   HashParts("eclipse-policy"),
+		OverlayID:	HashParts("eclipse-overlay"),
+		LocalNodeID:	HashParts("eclipse-local"),
+		RoutingEpoch:	7,
+		PolicyHash:	HashParts("eclipse-policy"),
 		RandomSet: []AdaptivePeer{
 			testSecurityAdaptivePeer("random-a", []NodeRole{NodeRoleFull}, []string{"zone-a"}),
 			testSecurityAdaptivePeer("random-b", []NodeRole{NodeRoleFull}, []string{"zone-b"}),
@@ -3165,14 +3165,14 @@ func TestEclipseResistancePlanMaintainsDiversityAndProofBackedRouting(t *testing
 	}
 	records := []DiscoveryRecord{
 		{
-			RecordType:  DRTObjectRoutingEntryPoint,
-			OwnerNodeID: graph.StableSet[0].NodeID,
-			ProofHash:   HashParts("proof-backed-routing", "a"),
-			ProofHeight: 7,
+			RecordType:	DRTObjectRoutingEntryPoint,
+			OwnerNodeID:	graph.StableSet[0].NodeID,
+			ProofHash:	HashParts("proof-backed-routing", "a"),
+			ProofHeight:	7,
 		},
 		{
-			RecordType:  DRTObjectRoutingEntryPoint,
-			OwnerNodeID: graph.StableSet[1].NodeID,
+			RecordType:	DRTObjectRoutingEntryPoint,
+			OwnerNodeID:	graph.StableSet[1].NodeID,
 		},
 	}
 	plan, err := BuildEclipseResistancePlan(graph, records, DefaultEclipseResistancePolicy(), 7)
@@ -3203,11 +3203,11 @@ func TestSpamResistanceSignedEnvelopeRateLimitsAndResourceBackedAds(t *testing.T
 	salt := []byte("aetra-test-network")
 	privateKey := deterministicPrivateKey(0x7b)
 	signer, err := SignNodeRecord(NodeRecord{
-		Roles:                []NodeRole{NodeRoleService},
-		NetworkAddressesHash: HashParts("network-addresses", "signed-envelope"),
-		ServicesSupported:    []string{"svc.secure"},
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		Roles:			[]NodeRole{NodeRoleService},
+		NetworkAddressesHash:	HashParts("network-addresses", "signed-envelope"),
+		ServicesSupported:	[]string{"svc.secure"},
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, privateKey, salt)
 	require.NoError(t, err)
 
@@ -3221,12 +3221,12 @@ func TestSpamResistanceSignedEnvelopeRateLimitsAndResourceBackedAds(t *testing.T
 
 	policy := DefaultNetworkSecurityPolicy()
 	decision, err := EvaluatePeerRateLimit(policy, PeerRateUsage{
-		PeerNodeID:  signer.NodeID,
-		Channel:     ChannelService,
-		Messages:    policy.MaxPeerMessagesPerWindow + 1,
-		Bytes:       9 << 20,
-		WindowStart: 20,
-		WindowEnd:   20,
+		PeerNodeID:	signer.NodeID,
+		Channel:	ChannelService,
+		Messages:	policy.MaxPeerMessagesPerWindow + 1,
+		Bytes:		9 << 20,
+		WindowStart:	20,
+		WindowEnd:	20,
 	})
 	require.NoError(t, err)
 	require.False(t, decision.Allowed)
@@ -3283,18 +3283,18 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 
 	origin := signedNodeRecord(t, 0x7d, []byte("aetra-test-network"), 100, NodeRoleFull)
 	msg, err := SignBroadcastMessage(BroadcastMessage{
-		OriginNode:  origin.NodeID,
-		OverlayID:   HashParts("spam-overlay"),
-		PayloadHash: HashParts("spam-payload"),
-		PayloadType: BroadcastPayloadService,
-		TTL:         5,
-		Priority:    PriorityForChannel(ChannelService),
+		OriginNode:	origin.NodeID,
+		OverlayID:	HashParts("spam-overlay"),
+		PayloadHash:	HashParts("spam-payload"),
+		PayloadType:	BroadcastPayloadService,
+		TTL:		5,
+		Priority:	PriorityForChannel(ChannelService),
 		FanoutPolicy: BroadcastFanoutPolicy{
-			TreeFanout:   1,
-			GossipFanout: 2,
-			OverlayBound: true,
+			TreeFanout:	1,
+			GossipFanout:	2,
+			OverlayBound:	true,
 		},
-		Height: 20,
+		Height:	20,
 	}, deterministicPrivateKey(0x7d), []byte("aetra-test-network"))
 	require.NoError(t, err)
 	cache := NewBroadcastDedupCache(4)
@@ -3306,12 +3306,12 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 	require.False(t, accepted)
 
 	spamResult, err := SimulateSpamResistance(policy, PeerRateUsage{
-		PeerNodeID:  origin.NodeID,
-		Channel:     ChannelService,
-		Messages:    policy.MaxPeerMessagesPerWindow + 10,
-		Bytes:       10 << 20,
-		WindowStart: 20,
-		WindowEnd:   20,
+		PeerNodeID:	origin.NodeID,
+		Channel:	ChannelService,
+		Messages:	policy.MaxPeerMessagesPerWindow + 10,
+		Bytes:		10 << 20,
+		WindowStart:	20,
+		WindowEnd:	20,
 	}, []BroadcastMessage{msg, msg}, origin.NodeID, 20)
 	require.NoError(t, err)
 	require.True(t, spamResult.Throttled)
@@ -3329,10 +3329,10 @@ func TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations(t *testing.
 	require.Contains(t, manipulation.Threats, ThreatRoutingManipulation)
 
 	graph := AdaptiveOverlayGraph{
-		OverlayID:    HashParts("spam-eclipse-overlay"),
-		LocalNodeID:  HashParts("spam-eclipse-local"),
-		RoutingEpoch: 1,
-		PolicyHash:   HashParts("spam-eclipse-policy"),
+		OverlayID:	HashParts("spam-eclipse-overlay"),
+		LocalNodeID:	HashParts("spam-eclipse-local"),
+		RoutingEpoch:	1,
+		PolicyHash:	HashParts("spam-eclipse-policy"),
 		RandomSet: []AdaptivePeer{
 			testSecurityAdaptivePeer("only-random", []NodeRole{NodeRoleFull}, []string{"zone-a"}),
 		},
@@ -3349,8 +3349,8 @@ func TestPerformanceModelValidatesOptimizationTargets(t *testing.T) {
 	blockSession := testPerformanceBlockSession(t)
 	streamPlan := testPerformanceStreamPlan()
 	zoneGraph := RoutingGraph{
-		OverlayID: HashParts("performance-zone-overlay"),
-		Version:   1,
+		OverlayID:	HashParts("performance-zone-overlay"),
+		Version:	1,
 		Edges: []RoutingEdge{
 			{FromNodeID: HashParts("performance-source"), ToNodeID: HashParts("performance-zone-peer-a"), LatencyMillis: 25, Weight: 9_000, Priority: 1, ZoneID: "zone-a"},
 			{FromNodeID: HashParts("performance-source"), ToNodeID: HashParts("performance-zone-peer-b"), LatencyMillis: 35, Weight: 8_500, Priority: 2, ZoneID: "zone-a"},
@@ -3359,15 +3359,15 @@ func TestPerformanceModelValidatesOptimizationTargets(t *testing.T) {
 	zoneGraph.GraphHash = ComputeRoutingGraphHash(zoneGraph)
 
 	plan, err := BuildPerformanceModelPlan(PerformanceModelInput{
-		PeerCount:                4096,
-		DiscoveryBranchingFactor: 16,
-		OverlayDescriptors:       DefaultOverlayDescriptors(),
-		RoutingGraphs:            []RoutingGraph{zoneGraph},
-		BlockSession:             blockSession,
-		StreamPlan:               streamPlan,
-		QoSPolicies:              DefaultQoSClassPolicies(),
-		ZoneID:                   "zone-a",
-		MaxZoneLatencyMillis:     50,
+		PeerCount:			4096,
+		DiscoveryBranchingFactor:	16,
+		OverlayDescriptors:		DefaultOverlayDescriptors(),
+		RoutingGraphs:			[]RoutingGraph{zoneGraph},
+		BlockSession:			blockSession,
+		StreamPlan:			streamPlan,
+		QoSPolicies:			DefaultQoSClassPolicies(),
+		ZoneID:				"zone-a",
+		MaxZoneLatencyMillis:		50,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint32(3), plan.DiscoveryHops)
@@ -3395,23 +3395,23 @@ func TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS(t *testing.T) {
 	require.LessOrEqual(t, fanout, desc.Fanout)
 
 	msg := BroadcastMessage{
-		BroadcastID:  HashParts("performance-broadcast"),
-		OriginNode:   HashParts("performance-origin"),
-		OverlayID:    desc.OverlayID,
-		PayloadHash:  HashParts("performance-payload"),
-		PayloadType:  BroadcastPayloadService,
-		Height:       10,
-		TTL:          10,
-		Priority:     PriorityForChannel(ChannelService),
-		FanoutPolicy: BroadcastFanoutPolicy{TreeFanout: desc.Fanout + 10, GossipFanout: desc.Fanout + 20, OverlayBound: true},
+		BroadcastID:	HashParts("performance-broadcast"),
+		OriginNode:	HashParts("performance-origin"),
+		OverlayID:	desc.OverlayID,
+		PayloadHash:	HashParts("performance-payload"),
+		PayloadType:	BroadcastPayloadService,
+		Height:		10,
+		TTL:		10,
+		Priority:	PriorityForChannel(ChannelService),
+		FanoutPolicy:	BroadcastFanoutPolicy{TreeFanout: desc.Fanout + 10, GossipFanout: desc.Fanout + 20, OverlayBound: true},
 	}
 	require.NoError(t, ValidateBoundedBroadcastFanout(msg, desc))
 	require.NoError(t, ValidateHeaderFirstPerformance(testPerformanceBlockSession(t)))
 	require.NoError(t, ValidateParallelChunkPerformance(testPerformanceStreamPlan()))
 
 	graph := RoutingGraph{
-		OverlayID: HashParts("performance-latency-overlay"),
-		Version:   1,
+		OverlayID:	HashParts("performance-latency-overlay"),
+		Version:	1,
 		Edges: []RoutingEdge{
 			{FromNodeID: HashParts("latency-source"), ToNodeID: HashParts("latency-fast"), LatencyMillis: 20, ZoneID: "zone-fast"},
 			{FromNodeID: HashParts("latency-source"), ToNodeID: HashParts("latency-slow"), LatencyMillis: 300, ZoneID: "zone-fast"},
@@ -3443,19 +3443,19 @@ func TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores(t *testin
 	overlayID := HashParts("performance-metrics-overlay")
 	streamPlan := testPerformanceStreamPlan()
 	streamMetric := StreamMetrics{
-		StreamID:           streamPlan.StreamID,
-		PayloadType:        StreamingPayloadStorageObject,
-		State:              StreamStateActive,
-		BytesSent:          1024,
-		BytesAcknowledged:  768,
-		InFlightBytes:      256,
-		AvailableWindow:    1024,
-		ThroughputBytesBps: 4096,
-		StallCount:         2,
-		CompletionBps:      7_500,
+		StreamID:		streamPlan.StreamID,
+		PayloadType:		StreamingPayloadStorageObject,
+		State:			StreamStateActive,
+		BytesSent:		1024,
+		BytesAcknowledged:	768,
+		InFlightBytes:		256,
+		AvailableWindow:	1024,
+		ThroughputBytesBps:	4096,
+		StallCount:		2,
+		CompletionBps:		7_500,
 	}
 	snapshot, err := BuildPerformanceMetricsSnapshot(PerformanceMetricsInput{
-		NodeRecords: []NodeRecord{storage, service, full},
+		NodeRecords:	[]NodeRecord{storage, service, full},
 		OverlayMemberships: []OverlayMembershipRecord{
 			{OverlayID: overlayID, NodeID: storage.NodeID},
 			{OverlayID: overlayID, NodeID: service.NodeID},
@@ -3467,15 +3467,15 @@ func TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores(t *testin
 		RouteFailures: []RouteFailureSample{
 			{OverlayID: overlayID, Attempts: 10, Failures: 1},
 		},
-		BlockSession:              testPerformanceBlockSession(t),
-		BlockHeaderLatencyMillis:  15,
-		BlockReconstructionMillis: 25,
-		BlockBytes:                2048,
-		ChunkAttempts:             10,
-		ChunkRetries:              1,
-		StreamMetrics:             []StreamMetrics{streamMetric},
-		StreamPlans:               []StreamParallelFetchPlan{streamPlan},
-		DiscoveryLatencies:        []uint64{10, 20, 30},
+		BlockSession:			testPerformanceBlockSession(t),
+		BlockHeaderLatencyMillis:	15,
+		BlockReconstructionMillis:	25,
+		BlockBytes:			2048,
+		ChunkAttempts:			10,
+		ChunkRetries:			1,
+		StreamMetrics:			[]StreamMetrics{streamMetric},
+		StreamPlans:			[]StreamParallelFetchPlan{streamPlan},
+		DiscoveryLatencies:		[]uint64{10, 20, 30},
 		CrossZoneDeliveries: []CrossZoneDeliverySample{
 			{SourceZone: "zone-a", DestinationZone: "zone-b", Sequence: 1, LatencyMillis: 50},
 			{SourceZone: "zone-a", DestinationZone: "zone-b", Sequence: 2, LatencyMillis: 70},
@@ -3484,7 +3484,7 @@ func TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores(t *testin
 			{Channel: ChannelConsensus, EnqueuedCount: 1, SentCount: 1, BytesEnqueued: 1000, BytesSent: 1000},
 			{Channel: ChannelService, EnqueuedCount: 2, SentCount: 2, BytesEnqueued: 2000, BytesSent: 1500},
 		},
-		PeerScores: []PeerScore{{ScoreBps: 9_000}, {ScoreBps: 6_000}, {ScoreBps: 3_000}},
+		PeerScores:	[]PeerScore{{ScoreBps: 9_000}, {ScoreBps: 6_000}, {ScoreBps: 3_000}},
 	})
 	require.NoError(t, err)
 	require.Len(t, snapshot.PeerCountByRole, 3)
@@ -3550,46 +3550,46 @@ func TestABCICompatibilityPipelineUsesCommittedSchedulesAndRoots(t *testing.T) {
 	origin := HashParts("abci-compat-origin")
 	destination := HashParts("abci-compat-destination")
 	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageExecution,
-		Payload:         []byte("abci-compat-execution-message"),
-		Origin:          origin,
-		Destination:     destination,
-		Priority:        2,
-		TTL:             50,
-		OverlayID:       overlayID,
-		DestinationZone: "zone-a",
-		Sequence:        10,
+		Type:			MeshMessageExecution,
+		Payload:		[]byte("abci-compat-execution-message"),
+		Origin:			origin,
+		Destination:		destination,
+		Priority:		2,
+		TTL:			50,
+		OverlayID:		overlayID,
+		DestinationZone:	"zone-a",
+		Sequence:		10,
 	})
 	require.NoError(t, err)
 	schedule, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
-		ZoneID:            "zone-a",
-		ShardID:           "shard-1",
-		RoutingClass:      ExecutionRoutingExecutionOverlay,
-		Committed:         true,
-		Ordered:           true,
-		MessageIDs:        []string{mesh.MessageID},
-		FirstZoneSequence: 10,
-		LastZoneSequence:  10,
+		ZoneID:			"zone-a",
+		ShardID:		"shard-1",
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		Committed:		true,
+		Ordered:		true,
+		MessageIDs:		[]string{mesh.MessageID},
+		FirstZoneSequence:	10,
+		LastZoneSequence:	10,
 	})
 	require.NoError(t, err)
 	hint := ANAProposalHint{
-		HintID:                HashParts("abci-compat-hint"),
-		ScheduleID:            schedule.ScheduleID,
-		ScheduleHash:          schedule.ScheduleHash,
-		ZoneID:                schedule.ZoneID,
-		ShardID:               schedule.ShardID,
-		DeterminismSource:     DeterminismCommittedState,
-		CommittedStateDerived: true,
-		UsedForOrdering:       true,
-		Priority:              1,
-		BlockSTMGroupID:       HashParts("abci-compat-blockstm"),
+		HintID:			HashParts("abci-compat-hint"),
+		ScheduleID:		schedule.ScheduleID,
+		ScheduleHash:		schedule.ScheduleHash,
+		ZoneID:			schedule.ZoneID,
+		ShardID:		schedule.ShardID,
+		DeterminismSource:	DeterminismCommittedState,
+		CommittedStateDerived:	true,
+		UsedForOrdering:	true,
+		Priority:		1,
+		BlockSTMGroupID:	HashParts("abci-compat-blockstm"),
 	}
 
 	prepared, err := BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
-		Height:    50,
-		Adapter:   DefaultAetherNetworkingAdapter(),
-		Schedules: []ExecutionMessageSchedule{schedule},
-		Hints:     []ANAProposalHint{hint},
+		Height:		50,
+		Adapter:	DefaultAetherNetworkingAdapter(),
+		Schedules:	[]ExecutionMessageSchedule{schedule},
+		Hints:		[]ANAProposalHint{hint},
 	})
 	require.NoError(t, err)
 	require.Equal(t, ABCIPrepareProposal, prepared.Phase)
@@ -3599,32 +3599,32 @@ func TestABCICompatibilityPipelineUsesCommittedSchedulesAndRoots(t *testing.T) {
 	require.Equal(t, ComputeABCIOrderingCommitment(prepared.Groups), prepared.OrderingCommitment)
 
 	processed, err := ProcessProposalCompatibility(ABCIProcessProposalInput{
-		Height:                     50,
-		Proposal:                   prepared,
-		ExpectedScheduleRoot:       prepared.ScheduleRoot,
-		ExpectedOrderingCommitment: prepared.OrderingCommitment,
-		VerifiesOrderingCommitment: true,
+		Height:				50,
+		Proposal:			prepared,
+		ExpectedScheduleRoot:		prepared.ScheduleRoot,
+		ExpectedOrderingCommitment:	prepared.OrderingCommitment,
+		VerifiesOrderingCommitment:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, ABCIProcessProposal, processed.Phase)
 
 	execMsg := ExecutionZoneMessage{
-		Message:                mesh,
-		RoutingClass:           ExecutionRoutingExecutionOverlay,
-		ZoneID:                 schedule.ZoneID,
-		ShardID:                schedule.ShardID,
-		ExecutionOverlayID:     overlayID,
-		ZoneSequence:           10,
-		ConsensusScheduleID:    schedule.ScheduleID,
-		ConsensusScheduleHash:  schedule.ScheduleHash,
-		ConsensusScheduleOrder: 1,
-		DeterministicOrdering:  true,
-		BlockSTMGroupID:        hint.BlockSTMGroupID,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		ZoneID:			schedule.ZoneID,
+		ShardID:		schedule.ShardID,
+		ExecutionOverlayID:	overlayID,
+		ZoneSequence:		10,
+		ConsensusScheduleID:	schedule.ScheduleID,
+		ConsensusScheduleHash:	schedule.ScheduleHash,
+		ConsensusScheduleOrder:	1,
+		DeterministicOrdering:	true,
+		BlockSTMGroupID:	hint.BlockSTMGroupID,
 	}
 	result, err := FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
-		Height:            50,
-		Proposal:          processed,
-		ExecutionMessages: []ExecutionZoneMessage{execMsg},
+		Height:			50,
+		Proposal:		processed,
+		ExecutionMessages:	[]ExecutionZoneMessage{execMsg},
 	})
 	require.NoError(t, err)
 	require.Equal(t, []string{mesh.MessageID}, result.ExecutedMessageIDs)
@@ -3638,43 +3638,43 @@ func TestABCICompatibilityRejectsPeerLocalOrderingUncommittedAndLiveState(t *tes
 	origin := HashParts("abci-reject-origin")
 	destination := HashParts("abci-reject-destination")
 	mesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageExecution,
-		Payload:         []byte("abci-reject-execution-message"),
-		Origin:          origin,
-		Destination:     destination,
-		Priority:        2,
-		TTL:             50,
-		OverlayID:       overlayID,
-		DestinationZone: "zone-b",
-		Sequence:        11,
+		Type:			MeshMessageExecution,
+		Payload:		[]byte("abci-reject-execution-message"),
+		Origin:			origin,
+		Destination:		destination,
+		Priority:		2,
+		TTL:			50,
+		OverlayID:		overlayID,
+		DestinationZone:	"zone-b",
+		Sequence:		11,
 	})
 	require.NoError(t, err)
 	schedule, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
-		ZoneID:            "zone-b",
-		ShardID:           "shard-1",
-		RoutingClass:      ExecutionRoutingExecutionOverlay,
-		Committed:         true,
-		Ordered:           true,
-		MessageIDs:        []string{mesh.MessageID},
-		FirstZoneSequence: 11,
-		LastZoneSequence:  11,
+		ZoneID:			"zone-b",
+		ShardID:		"shard-1",
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		Committed:		true,
+		Ordered:		true,
+		MessageIDs:		[]string{mesh.MessageID},
+		FirstZoneSequence:	11,
+		LastZoneSequence:	11,
 	})
 	require.NoError(t, err)
 
 	_, err = BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
-		Height:    60,
-		Adapter:   DefaultAetherNetworkingAdapter(),
-		Schedules: []ExecutionMessageSchedule{schedule},
+		Height:		60,
+		Adapter:	DefaultAetherNetworkingAdapter(),
+		Schedules:	[]ExecutionMessageSchedule{schedule},
 		Hints: []ANAProposalHint{{
-			HintID:                HashParts("abci-peer-local-hint"),
-			ScheduleID:            schedule.ScheduleID,
-			ScheduleHash:          schedule.ScheduleHash,
-			ZoneID:                schedule.ZoneID,
-			ShardID:               schedule.ShardID,
-			DeterminismSource:     DeterminismAdvisoryPeerMetric,
-			CommittedStateDerived: false,
-			PeerLocal:             true,
-			UsedForOrdering:       true,
+			HintID:			HashParts("abci-peer-local-hint"),
+			ScheduleID:		schedule.ScheduleID,
+			ScheduleHash:		schedule.ScheduleHash,
+			ZoneID:			schedule.ZoneID,
+			ShardID:		schedule.ShardID,
+			DeterminismSource:	DeterminismAdvisoryPeerMetric,
+			CommittedStateDerived:	false,
+			PeerLocal:		true,
+			UsedForOrdering:	true,
 		}},
 	})
 	require.ErrorContains(t, err, "peer-local")
@@ -3684,56 +3684,56 @@ func TestABCICompatibilityRejectsPeerLocalOrderingUncommittedAndLiveState(t *tes
 	uncommitted.ScheduleHash = ComputeExecutionMessageScheduleHash(uncommitted)
 	uncommitted.ScheduleID = ComputeExecutionMessageScheduleID(uncommitted)
 	_, err = BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
-		Height:    60,
-		Adapter:   DefaultAetherNetworkingAdapter(),
-		Schedules: []ExecutionMessageSchedule{uncommitted},
+		Height:		60,
+		Adapter:	DefaultAetherNetworkingAdapter(),
+		Schedules:	[]ExecutionMessageSchedule{uncommitted},
 	})
 	require.ErrorContains(t, err, "committed deterministic")
 
 	prepared, err := BuildPrepareProposalCompatibility(ABCIPrepareProposalInput{
-		Height:    60,
-		Adapter:   DefaultAetherNetworkingAdapter(),
-		Schedules: []ExecutionMessageSchedule{schedule},
+		Height:		60,
+		Adapter:	DefaultAetherNetworkingAdapter(),
+		Schedules:	[]ExecutionMessageSchedule{schedule},
 	})
 	require.NoError(t, err)
 	_, err = ProcessProposalCompatibility(ABCIProcessProposalInput{
-		Height:                     60,
-		Proposal:                   prepared,
-		ExpectedScheduleRoot:       prepared.ScheduleRoot,
-		ExpectedOrderingCommitment: prepared.OrderingCommitment,
-		DependsOnPeerLocalData:     true,
-		VerifiesOrderingCommitment: true,
+		Height:				60,
+		Proposal:			prepared,
+		ExpectedScheduleRoot:		prepared.ScheduleRoot,
+		ExpectedOrderingCommitment:	prepared.OrderingCommitment,
+		DependsOnPeerLocalData:		true,
+		VerifiesOrderingCommitment:	true,
 	})
 	require.ErrorContains(t, err, "peer-local")
 
 	_, err = ProcessProposalCompatibility(ABCIProcessProposalInput{
-		Height:                     60,
-		Proposal:                   prepared,
-		ExpectedScheduleRoot:       prepared.ScheduleRoot,
-		ExpectedOrderingCommitment: prepared.OrderingCommitment,
-		VerifiesOrderingCommitment: false,
+		Height:				60,
+		Proposal:			prepared,
+		ExpectedScheduleRoot:		prepared.ScheduleRoot,
+		ExpectedOrderingCommitment:	prepared.OrderingCommitment,
+		VerifiesOrderingCommitment:	false,
 	})
 	require.ErrorContains(t, err, "ordering commitments")
 
 	_, err = FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
-		Height:               60,
-		Proposal:             prepared,
-		LiveNetworkStateRead: true,
+		Height:			60,
+		Proposal:		prepared,
+		LiveNetworkStateRead:	true,
 	})
 	require.ErrorContains(t, err, "live network state")
 
 	uncommittedExec := ExecutionZoneMessage{
-		Message:            mesh,
-		RoutingClass:       ExecutionRoutingExecutionOverlay,
-		ZoneID:             schedule.ZoneID,
-		ShardID:            schedule.ShardID,
-		ExecutionOverlayID: overlayID,
-		ZoneSequence:       11,
+		Message:		mesh,
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		ZoneID:			schedule.ZoneID,
+		ShardID:		schedule.ShardID,
+		ExecutionOverlayID:	overlayID,
+		ZoneSequence:		11,
 	}
 	_, err = FinalizeBlockCompatibility(ABCIFinalizeBlockInput{
-		Height:            60,
-		Proposal:          prepared,
-		ExecutionMessages: []ExecutionZoneMessage{uncommittedExec},
+		Height:			60,
+		Proposal:		prepared,
+		ExecutionMessages:	[]ExecutionZoneMessage{uncommittedExec},
 	})
 	require.ErrorContains(t, err, "committed messages only")
 }
@@ -3744,65 +3744,65 @@ func TestBlockSTMNetworkAssistGroupsZoneShardAndQueuesCrossZone(t *testing.T) {
 	destination := HashParts("blockstm-api-destination")
 	txID := HashParts("blockstm-api-tx")
 	crossMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:            MeshMessageCrossZone,
-		Payload:         []byte("blockstm-cross-zone-message"),
-		Origin:          origin,
-		Destination:     destination,
-		Priority:        PriorityForChannel(ChannelExecution),
-		TTL:             50,
-		OverlayID:       overlayID,
-		SourceZone:      "zone-a",
-		DestinationZone: "zone-b",
-		Sequence:        12,
+		Type:			MeshMessageCrossZone,
+		Payload:		[]byte("blockstm-cross-zone-message"),
+		Origin:			origin,
+		Destination:		destination,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			50,
+		OverlayID:		overlayID,
+		SourceZone:		"zone-a",
+		DestinationZone:	"zone-b",
+		Sequence:		12,
 	})
 	require.NoError(t, err)
 	schedule, err := NewExecutionMessageSchedule(ExecutionMessageSchedule{
-		ZoneID:            "zone-b",
-		ShardID:           "shard-7",
-		RoutingClass:      ExecutionRoutingExecutionOverlay,
-		Committed:         true,
-		Ordered:           true,
-		TransactionIDs:    []string{txID},
-		MessageIDs:        []string{crossMesh.MessageID},
-		FirstZoneSequence: 12,
-		LastZoneSequence:  12,
+		ZoneID:			"zone-b",
+		ShardID:		"shard-7",
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		Committed:		true,
+		Ordered:		true,
+		TransactionIDs:		[]string{txID},
+		MessageIDs:		[]string{crossMesh.MessageID},
+		FirstZoneSequence:	12,
+		LastZoneSequence:	12,
 	})
 	require.NoError(t, err)
 	hint := ANAProposalHint{
-		HintID:                 HashParts("blockstm-api-hint"),
-		ScheduleID:             schedule.ScheduleID,
-		ScheduleHash:           schedule.ScheduleHash,
-		ZoneID:                 schedule.ZoneID,
-		ShardID:                schedule.ShardID,
-		DeterminismSource:      DeterminismDeterministicProof,
-		CommittedStateDerived:  true,
-		UsedForOrdering:        true,
-		Priority:               PriorityForChannel(ChannelExecution),
-		BlockSTMGroupID:        HashParts("blockstm-api-group"),
-		DeterministicHintProof: HashParts("blockstm-api-route-proof"),
+		HintID:			HashParts("blockstm-api-hint"),
+		ScheduleID:		schedule.ScheduleID,
+		ScheduleHash:		schedule.ScheduleHash,
+		ZoneID:			schedule.ZoneID,
+		ShardID:		schedule.ShardID,
+		DeterminismSource:	DeterminismDeterministicProof,
+		CommittedStateDerived:	true,
+		UsedForOrdering:	true,
+		Priority:		PriorityForChannel(ChannelExecution),
+		BlockSTMGroupID:	HashParts("blockstm-api-group"),
+		DeterministicHintProof:	HashParts("blockstm-api-route-proof"),
 	}
 	cross := ExecutionZoneMessage{
-		Message:            crossMesh,
-		RoutingClass:       ExecutionRoutingExecutionOverlay,
-		ZoneID:             "zone-b",
-		ShardID:            "shard-7",
-		ExecutionOverlayID: overlayID,
-		ZoneSequence:       12,
+		Message:		crossMesh,
+		RoutingClass:		ExecutionRoutingExecutionOverlay,
+		ZoneID:			"zone-b",
+		ShardID:		"shard-7",
+		ExecutionOverlayID:	overlayID,
+		ZoneSequence:		12,
 		CrossZone: CrossZoneMessage{
-			SourceZone:      "zone-a",
-			DestinationZone: "zone-b",
-			SourceSequence:  12,
-			MessageHash:     crossMesh.PayloadHash,
-			ExpiryHeight:    90,
-			ReceiptPolicy:   ReceiptPolicyOnExecution,
+			SourceZone:		"zone-a",
+			DestinationZone:	"zone-b",
+			SourceSequence:		12,
+			MessageHash:		crossMesh.PayloadHash,
+			ExpiryHeight:		90,
+			ReceiptPolicy:		ReceiptPolicyOnExecution,
 		},
 	}
 
 	plan, err := BuildBlockSTMNetworkAssistPlan(BlockSTMNetworkAssistInput{
-		Height:            60,
-		Schedules:         []ExecutionMessageSchedule{schedule},
-		Hints:             []ANAProposalHint{hint},
-		CrossZoneMessages: []ExecutionZoneMessage{cross},
+		Height:			60,
+		Schedules:		[]ExecutionMessageSchedule{schedule},
+		Hints:			[]ANAProposalHint{hint},
+		CrossZoneMessages:	[]ExecutionZoneMessage{cross},
 	})
 	require.NoError(t, err)
 	require.True(t, plan.PrioritizesExecutionOverlayTraffic)
@@ -3819,9 +3819,9 @@ func TestBlockSTMNetworkAssistGroupsZoneShardAndQueuesCrossZone(t *testing.T) {
 	require.Equal(t, "zone-b", plan.CrossZoneDeliveries[0].DestinationZone)
 
 	_, err = BuildBlockSTMNetworkAssistPlan(BlockSTMNetworkAssistInput{
-		Height:                    60,
-		Schedules:                 []ExecutionMessageSchedule{schedule},
-		DecidesCommittedConflicts: true,
+		Height:				60,
+		Schedules:			[]ExecutionMessageSchedule{schedule},
+		DecidesCommittedConflicts:	true,
 	})
 	require.ErrorContains(t, err, "conflicts")
 }
@@ -3836,11 +3836,11 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 	service := signedNodeRecordWithCapabilities(t, 0x83, salt, 100, []NodeRole{NodeRoleService, NodeRoleFull}, []string{"zone-api"}, []string{"svc.api"})
 	stateSync := signedNodeRecordWithCapabilities(t, 0x84, salt, 100, []NodeRole{NodeRoleStateSync}, []string{"zone-api"}, []string{"state-sync"})
 	nodeResponse, err := BuildNodeNetworkingQueryResponse(NodeNetworkingQueryRequest{
-		CurrentHeight: 80,
-		NetworkSalt:   salt,
-		Role:          NodeRoleService,
-		ZoneID:        "zone-api",
-		ServiceID:     "svc.api",
+		CurrentHeight:	80,
+		NetworkSalt:	salt,
+		Role:		NodeRoleService,
+		ZoneID:		"zone-api",
+		ServiceID:	"svc.api",
 	}, []NodeRecord{service, stateSync})
 	require.NoError(t, err)
 	require.Len(t, nodeResponse.Nodes, 1)
@@ -3849,28 +3849,28 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 
 	desc := testDefaultOverlayDescriptor(t, OverlayTypeExecution)
 	graph := NormalizeRoutingGraph(RoutingGraph{
-		OverlayID: desc.OverlayID,
-		Version:   1,
-		Committed: true,
+		OverlayID:	desc.OverlayID,
+		Version:	1,
+		Committed:	true,
 		Edges: []RoutingEdge{{
-			FromNodeID: service.NodeID,
-			ToNodeID:   stateSync.NodeID,
-			Weight:     1,
-			Priority:   PriorityForChannel(ChannelExecution),
-			ZoneID:     "zone-api",
+			FromNodeID:	service.NodeID,
+			ToNodeID:	stateSync.NodeID,
+			Weight:		1,
+			Priority:	PriorityForChannel(ChannelExecution),
+			ZoneID:		"zone-api",
 		}},
 	})
 	overlayResponse, err := BuildOverlayDiagnosticsResponse(OverlayDiagnosticsRequest{
-		OverlayID:     desc.OverlayID,
-		CurrentHeight: 80,
+		OverlayID:	desc.OverlayID,
+		CurrentHeight:	80,
 	}, []OverlayDescriptor{desc}, []OverlayMembershipRecord{{
-		OverlayID:     desc.OverlayID,
-		NodeID:        service.NodeID,
-		ProofID:       HashParts("api-membership-proof"),
-		Membership:    desc.Membership,
-		Mode:          OverlayMembershipModeZoneAssignment,
-		JoinedHeight:  70,
-		ExpiresHeight: 100,
+		OverlayID:	desc.OverlayID,
+		NodeID:		service.NodeID,
+		ProofID:	HashParts("api-membership-proof"),
+		Membership:	desc.Membership,
+		Mode:		OverlayMembershipModeZoneAssignment,
+		JoinedHeight:	70,
+		ExpiresHeight:	100,
 	}}, graph, []L3OverlayMetrics{{OverlayID: desc.OverlayID, QueuedCount: 3}}, []RouteFailureSample{{OverlayID: desc.OverlayID, Attempts: 10, Failures: 1}})
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), overlayResponse.MembershipSize)
@@ -3878,22 +3878,22 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 	require.Equal(t, uint32(1_000), overlayResponse.RouteFailureRateBps)
 
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("api-session"),
-		PayloadType:       StreamingPayloadStateSync,
-		Priority:          PriorityForChannel(ChannelStateSync),
-		FlowControlWindow: 4096,
-		ChunkSize:         1024,
-		Parallelism:       2,
-		BytesSent:         2048,
-		BytesAcknowledged: 1024,
-		State:             StreamStateActive,
+		SessionID:		HashParts("api-session"),
+		PayloadType:		StreamingPayloadStateSync,
+		Priority:		PriorityForChannel(ChannelStateSync),
+		FlowControlWindow:	4096,
+		ChunkSize:		1024,
+		Parallelism:		2,
+		BytesSent:		2048,
+		BytesAcknowledged:	1024,
+		State:			StreamStateActive,
 	})
 	require.NoError(t, err)
 	streamMetrics, err := ComputeStreamMetrics(stream, 1000, 2, 1)
 	require.NoError(t, err)
 	streamResponse, err := BuildStreamDiagnosticsResponse(StreamDiagnosticsRequest{
-		StreamID:    stream.StreamID,
-		PayloadType: StreamingPayloadStateSync,
+		StreamID:	stream.StreamID,
+		PayloadType:	StreamingPayloadStateSync,
 	}, []StreamSession{stream}, []StreamMetrics{streamMetrics})
 	require.NoError(t, err)
 	require.Equal(t, stream.StreamID, streamResponse.StreamID)
@@ -3908,12 +3908,12 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 	require.NoError(t, err)
 	stateRoot := HashParts("api-state-root")
 	proofResponse, err := BuildDiscoveryProofAPIResponse(DiscoveryProofAPIRequest{
-		Query:         DRTQuery{ObjectType: DRTObjectServiceEndpoint, ServiceID: "svc.api", Limit: 4},
-		CurrentHeight: 80,
+		Query:		DRTQuery{ObjectType: DRTObjectServiceEndpoint, ServiceID: "svc.api", Limit: 4},
+		CurrentHeight:	80,
 		OnChainProof: DiscoveryOnChainProof{
-			ProofHash:   ComputeDiscoveryOnChainProofHash(discoveryResultHash, stateRoot, 80),
-			ProofHeight: 80,
-			StateRoot:   stateRoot,
+			ProofHash:	ComputeDiscoveryOnChainProofHash(discoveryResultHash, stateRoot, 80),
+			ProofHeight:	80,
+			StateRoot:	stateRoot,
 		},
 	}, table, service, deterministicPrivateKey(0x83), salt)
 	require.NoError(t, err)
@@ -3921,20 +3921,20 @@ func TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints(t *testing
 	require.Equal(t, proofResponse.Response.ResultHash, proofResponse.ResultHash)
 
 	networkMsg, err := NewNetworkMessage(NetworkMessage{
-		Layer:             LayerL3Application,
-		Channel:           ChannelExecution,
-		ConsensusEffect:   false,
-		DeterminismSource: DeterminismNone,
-		PayloadHash:       HashParts("api-route-payload"),
-		PayloadSizeBytes:  512,
+		Layer:			LayerL3Application,
+		Channel:		ChannelExecution,
+		ConsensusEffect:	false,
+		DeterminismSource:	DeterminismNone,
+		PayloadHash:		HashParts("api-route-payload"),
+		PayloadSizeBytes:	512,
 	})
 	require.NoError(t, err)
 	routeResponse, err := BuildRouteHintAPIResponse(RouteHintAPIRequest{
-		Message:       networkMsg,
-		Descriptor:    desc,
-		Graph:         graph,
-		ClientZoneID:  "zone-api",
-		ClientShardID: "shard-api",
+		Message:	networkMsg,
+		Descriptor:	desc,
+		Graph:		graph,
+		ClientZoneID:	"zone-api",
+		ClientShardID:	"shard-api",
 	})
 	require.NoError(t, err)
 	require.True(t, routeResponse.AdvisoryOnly)
@@ -4022,30 +4022,30 @@ func TestXNetworkStateKeysMessagesAndQueries(t *testing.T) {
 	state, err = RegisterNodeRecord(state, service, salt, 10)
 	require.NoError(t, err)
 	state, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         service.NodeID,
-		Role:           NodeRoleService,
-		Bonded:         true,
-		CommitmentHash: HashParts("x-network-role-commitment"),
-		ExpiresHeight:  90,
+		NodeID:		service.NodeID,
+		Role:		NodeRoleService,
+		Bonded:		true,
+		CommitmentHash:	HashParts("x-network-role-commitment"),
+		ExpiresHeight:	90,
 	}, 11)
 	require.NoError(t, err)
 	discovery := testSignedDiscoveryObjectRecord(t, service, 0x86, salt, DRTObjectServiceEndpoint, HashParts("x-network-discovery-target"), HashParts("x-network-discovery-ad"), "", "svc.net", "", 90)
 	evidence, err := NewNetworkEvidenceRecord(NetworkEvidenceRecord{
-		EvidenceType:   NetworkEvidenceConflictingBroadcast,
-		ReporterNodeID: node.NodeID,
-		SubjectNodeID:  service.NodeID,
-		EvidenceHash:   HashParts("x-network-evidence-hash"),
-		EvidenceHeight: 20,
-		PayloadBytes:   512,
-		Committed:      true,
+		EvidenceType:	NetworkEvidenceConflictingBroadcast,
+		ReporterNodeID:	node.NodeID,
+		SubjectNodeID:	service.NodeID,
+		EvidenceHash:	HashParts("x-network-evidence-hash"),
+		EvidenceHeight:	20,
+		PayloadBytes:	512,
+		Committed:	true,
 	})
 	require.NoError(t, err)
 	reputation := NetworkReputationRecord{
-		NodeID:            service.NodeID,
-		Score:             PeerScore{ScoreBps: 8_000, LatencyBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 7_500, PenaltyBps: 250},
-		LastUpdatedHeight: 20,
-		EvidenceHash:      evidence.EvidenceHash,
-		ConsensusEligible: true,
+		NodeID:			service.NodeID,
+		Score:			PeerScore{ScoreBps: 8_000, LatencyBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 7_500, PenaltyBps: 250},
+		LastUpdatedHeight:	20,
+		EvidenceHash:		evidence.EvidenceHash,
+		ConsensusEligible:	true,
 	}
 	params := DefaultXNetworkParams(salt)
 	xstate, err := NewXNetworkState(params, state, []DiscoveryRecord{discovery}, []NetworkReputationRecord{reputation}, []NetworkEvidenceRecord{evidence})
@@ -4107,29 +4107,29 @@ func TestXNetworkStateRejectsInvalidKeysMessagesAndConsensusReputation(t *testin
 	require.ErrorContains(t, MsgRevokeNodeRequest{SignerNodeID: node.NodeID, NodeID: HashParts("other-node"), ReasonHash: HashParts("reason"), CurrentHeight: 20}.ValidateBasic(), "signer")
 
 	evidence, err := NewNetworkEvidenceRecord(NetworkEvidenceRecord{
-		EvidenceType:   NetworkEvidenceChunkCorruption,
-		ReporterNodeID: node.NodeID,
-		SubjectNodeID:  HashParts("subject"),
-		EvidenceHash:   HashParts("evidence"),
-		EvidenceHeight: 20,
-		PayloadBytes:   params.MaxEvidenceBytes + 1,
+		EvidenceType:	NetworkEvidenceChunkCorruption,
+		ReporterNodeID:	node.NodeID,
+		SubjectNodeID:	HashParts("subject"),
+		EvidenceHash:	HashParts("evidence"),
+		EvidenceHeight:	20,
+		PayloadBytes:	params.MaxEvidenceBytes + 1,
 	})
 	require.ErrorContains(t, err, "payload bytes")
 	require.Empty(t, evidence.EvidenceID)
 
 	badReputation := NetworkReputationRecord{
-		NodeID:            node.NodeID,
-		Score:             PeerScore{ScoreBps: BasisPoints + 1},
-		LastUpdatedHeight: 20,
+		NodeID:			node.NodeID,
+		Score:			PeerScore{ScoreBps: BasisPoints + 1},
+		LastUpdatedHeight:	20,
 	}
 	_, err = NewXNetworkState(params, EmptyState(), nil, []NetworkReputationRecord{badReputation}, nil)
 	require.ErrorContains(t, err, "peer score")
 
 	consensusReputation := NetworkReputationRecord{
-		NodeID:            node.NodeID,
-		Score:             PeerScore{ScoreBps: 5_000},
-		LastUpdatedHeight: 20,
-		ConsensusEligible: true,
+		NodeID:			node.NodeID,
+		Score:			PeerScore{ScoreBps: 5_000},
+		LastUpdatedHeight:	20,
+		ConsensusEligible:	true,
 	}
 	_, err = NewXNetworkState(params, EmptyState(), nil, []NetworkReputationRecord{consensusReputation}, nil)
 	require.ErrorContains(t, err, "evidence hash")
@@ -4554,35 +4554,35 @@ func TestAdvisorySignalsCannotDriveConsensusUntilCommitted(t *testing.T) {
 
 	require.NoError(t, ValidatePeerScoreUse(PeerScoreUse{Metrics: metrics, Score: score}))
 	require.ErrorContains(t, ValidatePeerScoreUse(PeerScoreUse{
-		Metrics:          metrics,
-		Score:            score,
-		UsedForConsensus: true,
+		Metrics:		metrics,
+		Score:			score,
+		UsedForConsensus:	true,
 	}), "advisory")
 	require.NoError(t, ValidatePeerScoreUse(PeerScoreUse{
-		Metrics:          metrics,
-		Score:            score,
-		Committed:        true,
-		UsedForConsensus: true,
+		Metrics:		metrics,
+		Score:			score,
+		Committed:		true,
+		UsedForConsensus:	true,
 	}))
 }
 
 func TestRoutingAndStateTransitionHardRules(t *testing.T) {
 	require.ErrorContains(t, ValidateRoutingDecisionUse(RoutingDecisionUse{UsedForConsensus: true}), "lowercase hex")
 	require.NoError(t, ValidateRoutingDecisionUse(RoutingDecisionUse{
-		UsedForConsensus:          true,
-		DerivedFromCommittedState: true,
+		UsedForConsensus:		true,
+		DerivedFromCommittedState:	true,
 	}))
 	require.NoError(t, ValidateRoutingDecisionUse(RoutingDecisionUse{
-		UsedForConsensus:       true,
-		DeterministicProofHash: HashParts("routing-proof"),
+		UsedForConsensus:	true,
+		DeterministicProofHash:	HashParts("routing-proof"),
 	}))
 
 	require.NoError(t, ValidateStateTransitionNetworkAccess(StateTransitionNetworkAccess{
 		InStateTransition: true,
 	}))
 	require.ErrorContains(t, ValidateStateTransitionNetworkAccess(StateTransitionNetworkAccess{
-		InStateTransition: true,
-		ExternalCalls:     []string{"https://example.invalid"},
+		InStateTransition:	true,
+		ExternalCalls:		[]string{"https://example.invalid"},
 	}), "forbidden")
 }
 
@@ -4615,72 +4615,72 @@ func TestNetworkingScopeBoundaryRejectsNonGoalViolations(t *testing.T) {
 	require.NotEmpty(t, boundary.BoundaryRoot)
 
 	cases := []struct {
-		name    string
-		mutate  func(NetworkingScopeBoundary) NetworkingScopeBoundary
-		wantErr string
+		name	string
+		mutate	func(NetworkingScopeBoundary) NetworkingScopeBoundary
+		wantErr	string
 	}{
 		{
-			name: "application logic",
+			name:	"application logic",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.ImplementsApplicationLogic = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "application logic",
+			wantErr:	"application logic",
 		},
 		{
-			name: "replace cometbft",
+			name:	"replace cometbft",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.ReplacesCometBFTConsensus = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "replace CometBFT consensus",
+			wantErr:	"replace CometBFT consensus",
 		},
 		{
-			name: "centralized routing",
+			name:	"centralized routing",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.RequiresCentralizedRouting = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "centralized routing",
+			wantErr:	"centralized routing",
 		},
 		{
-			name: "external discovery",
+			name:	"external discovery",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.RequiresExternalDiscoveryServices = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "external discovery services",
+			wantErr:	"external discovery services",
 		},
 		{
-			name: "messaging social",
+			name:	"messaging social",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.IntroducesMessagingSocialLayer = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "messaging or social network",
+			wantErr:	"messaging or social network",
 		},
 		{
-			name: "live metrics authoritative",
+			name:	"live metrics authoritative",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.LiveMetricsConsensusAuthoritative = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "live network metrics consensus-authoritative",
+			wantErr:	"live network metrics consensus-authoritative",
 		},
 		{
-			name: "offchain service logic",
+			name:	"offchain service logic",
 			mutate: func(boundary NetworkingScopeBoundary) NetworkingScopeBoundary {
 				boundary.OffChainServiceLogicInConsensus = true
 				boundary.BoundaryRoot = ComputeNetworkingScopeBoundaryRoot(boundary)
 				return boundary
 			},
-			wantErr: "off-chain service logic inside consensus",
+			wantErr:	"off-chain service logic inside consensus",
 		},
 	}
 	for _, tc := range cases {
@@ -4711,11 +4711,11 @@ func TestNetworkRoleConsensusScopeRequiresBondedCommitment(t *testing.T) {
 	state, err = RegisterNodeRecord(state, record, salt, 10)
 	require.NoError(t, err)
 	state, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         record.NodeID,
-		Role:           NodeRoleService,
-		Bonded:         true,
-		CommitmentHash: HashParts("service-role-commitment"),
-		ExpiresHeight:  80,
+		NodeID:		record.NodeID,
+		Role:		NodeRoleService,
+		Bonded:		true,
+		CommitmentHash:	HashParts("service-role-commitment"),
+		ExpiresHeight:	80,
 	}, 20)
 	require.NoError(t, err)
 
@@ -4764,11 +4764,11 @@ func TestValidatorRoleIsConsensusCriticalWithoutRoleCommitment(t *testing.T) {
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.1:26656"})
 	require.NoError(t, err)
 	record, err := SignNodeRecord(NodeRecord{
-		ValidatorPubKey:      validatorKey,
-		Roles:                []NodeRole{NodeRoleValidator, NodeRoleFull},
-		NetworkAddressesHash: addressHash,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        100,
+		ValidatorPubKey:	validatorKey,
+		Roles:			[]NodeRole{NodeRoleValidator, NodeRoleFull},
+		NetworkAddressesHash:	addressHash,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		100,
 	}, privateKey, salt)
 	require.NoError(t, err)
 
@@ -4784,11 +4784,11 @@ func TestValidatorRoleIsConsensusCriticalWithoutRoleCommitment(t *testing.T) {
 	require.True(t, validatorScope.ConsensusCritical)
 
 	_, err = RegisterRoleCommitment(EmptyState(), RoleCommitment{
-		NodeID:         record.NodeID,
-		Role:           NodeRoleValidator,
-		Bonded:         true,
-		CommitmentHash: HashParts("validator-role-commitment"),
-		ExpiresHeight:  80,
+		NodeID:		record.NodeID,
+		Role:		NodeRoleValidator,
+		Bonded:		true,
+		CommitmentHash:	HashParts("validator-role-commitment"),
+		ExpiresHeight:	80,
 	}, 10)
 	require.ErrorContains(t, err, "validator role")
 }
@@ -4802,39 +4802,39 @@ func TestRoleCommitmentRejectsUnbondedUnadvertisedAndOutlivingRecords(t *testing
 	require.NoError(t, err)
 
 	_, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         record.NodeID,
-		Role:           NodeRoleService,
-		CommitmentHash: HashParts("unbonded"),
-		ExpiresHeight:  80,
+		NodeID:		record.NodeID,
+		Role:		NodeRoleService,
+		CommitmentHash:	HashParts("unbonded"),
+		ExpiresHeight:	80,
 	}, 10)
 	require.ErrorContains(t, err, "bonded")
 
 	_, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         record.NodeID,
-		Role:           NodeRoleRouting,
-		Bonded:         true,
-		CommitmentHash: HashParts("not-advertised"),
-		ExpiresHeight:  80,
+		NodeID:		record.NodeID,
+		Role:		NodeRoleRouting,
+		Bonded:		true,
+		CommitmentHash:	HashParts("not-advertised"),
+		ExpiresHeight:	80,
 	}, 10)
 	require.ErrorContains(t, err, "advertised")
 
 	_, err = RegisterRoleCommitment(state, RoleCommitment{
-		NodeID:         record.NodeID,
-		Role:           NodeRoleService,
-		Bonded:         true,
-		CommitmentHash: HashParts("outlive"),
-		ExpiresHeight:  101,
+		NodeID:		record.NodeID,
+		Role:		NodeRoleService,
+		Bonded:		true,
+		CommitmentHash:	HashParts("outlive"),
+		ExpiresHeight:	101,
 	}, 10)
 	require.ErrorContains(t, err, "outlive")
 }
 
 func testEnvelope(channel ChannelClass, sizeBytes uint64, enqueuedHeight uint64, sequence uint64, label string) TransportEnvelope {
 	return TransportEnvelope{
-		Channel:        channel,
-		SizeBytes:      sizeBytes,
-		EnqueuedHeight: enqueuedHeight,
-		Sequence:       sequence,
-		PayloadHash:    HashParts(label),
+		Channel:	channel,
+		SizeBytes:	sizeBytes,
+		EnqueuedHeight:	enqueuedHeight,
+		Sequence:	sequence,
+		PayloadHash:	HashParts(label),
 	}
 }
 
@@ -4896,14 +4896,14 @@ func testOverlayMembershipProof(t *testing.T, record NodeRecord, desc OverlayDes
 	record = NormalizeNodeRecord(record)
 	desc = NormalizeOverlayDescriptor(desc)
 	proof := OverlayMembershipProof{
-		OverlayID:     desc.OverlayID,
-		NodeID:        record.NodeID,
-		ProofType:     proofType,
-		Mode:          mode,
-		Membership:    desc.Membership,
-		ProofHash:     HashParts("overlay-membership-proof", record.NodeID, desc.OverlayID, string(proofType)),
-		AuthorityHash: HashParts("overlay-membership-authority", desc.OverlayID),
-		ExpiresHeight: expiresHeight,
+		OverlayID:	desc.OverlayID,
+		NodeID:		record.NodeID,
+		ProofType:	proofType,
+		Mode:		mode,
+		Membership:	desc.Membership,
+		ProofHash:	HashParts("overlay-membership-proof", record.NodeID, desc.OverlayID, string(proofType)),
+		AuthorityHash:	HashParts("overlay-membership-authority", desc.OverlayID),
+		ExpiresHeight:	expiresHeight,
 	}
 	if len(record.ZonesSupported) > 0 {
 		proof.ZoneID = record.ZonesSupported[0]
@@ -4934,8 +4934,8 @@ func testAdaptivePeer(t *testing.T, record NodeRecord, scoreBps uint32, latencyM
 
 	score := PeerScore{ScoreBps: scoreBps}
 	metrics := PeerMetrics{
-		LatencyMillis:  latencyMillis,
-		ReliabilityBps: reliabilityBps,
+		LatencyMillis:	latencyMillis,
+		ReliabilityBps:	reliabilityBps,
 	}
 	return AdaptivePeerFromNodeRecord(record, score, metrics, committed, 20)
 }
@@ -4944,14 +4944,14 @@ func testMeshMessage(t *testing.T, messageType AetherMeshMessageType, overlayID,
 	t.Helper()
 
 	msg, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:        messageType,
-		Payload:     []byte(fmt.Sprintf("mesh-%s-%d", messageType, sequence)),
-		Origin:      origin,
-		Destination: destination,
-		Priority:    priority,
-		TTL:         50,
-		OverlayID:   overlayID,
-		Sequence:    sequence,
+		Type:		messageType,
+		Payload:	[]byte(fmt.Sprintf("mesh-%s-%d", messageType, sequence)),
+		Origin:		origin,
+		Destination:	destination,
+		Priority:	priority,
+		TTL:		50,
+		OverlayID:	overlayID,
+		Sequence:	sequence,
 	})
 	require.NoError(t, err)
 	return msg
@@ -4968,14 +4968,14 @@ func testGlobalAdaptivePeer(t *testing.T, record NodeRecord, scoreBps uint32, la
 
 func testSecurityAdaptivePeer(label string, roles []NodeRole, zones []string) AdaptivePeer {
 	return AdaptivePeer{
-		NodeID:          HashParts("security-adaptive-peer", label),
-		ScoreBps:        8_000,
-		LatencyMillis:   25,
-		ReliabilityBps:  8_500,
-		Roles:           roles,
-		ZonesSupported:  zones,
-		LastSeenHeight:  7,
-		LastScoreHeight: 7,
+		NodeID:			HashParts("security-adaptive-peer", label),
+		ScoreBps:		8_000,
+		LatencyMillis:		25,
+		ReliabilityBps:		8_500,
+		Roles:			roles,
+		ZonesSupported:		zones,
+		LastSeenHeight:		7,
+		LastScoreHeight:	7,
 	}
 }
 
@@ -4989,30 +4989,30 @@ func testPerformanceBlockSession(t *testing.T) BlockPropagationSession {
 	proofRoot := HashParts("performance-proof-root")
 	headerHash := HashParts("performance-header")
 	header, err := NewBlockBroadcastHeader(BlockBroadcastHeader{
-		Height:                   12,
-		ProposerNodeID:           HashParts("performance-proposer"),
-		HeaderHash:               headerHash,
-		ChunkSetRoot:             chunkRoot,
-		ProofSetRoot:             proofRoot,
-		BlockRoot:                ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
-		ChunkCount:               uint32(len(chunks)),
-		AvailabilityMetadataHash: HashParts("performance-availability"),
+		Height:				12,
+		ProposerNodeID:			HashParts("performance-proposer"),
+		HeaderHash:			headerHash,
+		ChunkSetRoot:			chunkRoot,
+		ProofSetRoot:			proofRoot,
+		BlockRoot:			ComputeBlockRoot(headerHash, chunkRoot, proofRoot),
+		ChunkCount:			uint32(len(chunks)),
+		AvailabilityMetadataHash:	HashParts("performance-availability"),
 	})
 	require.NoError(t, err)
 	return BlockPropagationSession{
-		Header:         header,
-		ProofSet:       BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: []string{HashParts("performance-proof")}},
-		VerifiedBitmap: make([]bool, header.ChunkCount),
+		Header:		header,
+		ProofSet:	BlockProofSet{BlockID: header.BlockID, ProofRoot: proofRoot, ProofHashes: []string{HashParts("performance-proof")}},
+		VerifiedBitmap:	make([]bool, header.ChunkCount),
 	}
 }
 
 func testPerformanceStreamPlan() StreamParallelFetchPlan {
 	streamID := HashParts("performance-stream")
 	return StreamParallelFetchPlan{
-		StreamID:     streamID,
-		ChunkSize:    256,
-		PayloadBytes: 1024,
-		TotalChunks:  4,
+		StreamID:	streamID,
+		ChunkSize:	256,
+		PayloadBytes:	1024,
+		TotalChunks:	4,
 		Requests: []StreamFetchRequest{
 			{StreamID: streamID, ChunkIndex: 0, RangeStart: 0, RangeEnd: 256, ChunkSize: 256, AssignedPeer: "peer-a"},
 			{StreamID: streamID, ChunkIndex: 1, RangeStart: 256, RangeEnd: 512, ChunkSize: 256, AssignedPeer: "peer-b"},
@@ -5045,58 +5045,58 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	for _, overlayType := range []OverlayType{OverlayTypeValidator, OverlayTypeZone, OverlayTypeService, OverlayTypeData, OverlayTypeDiscovery} {
 		desc := testDefaultOverlayDescriptor(t, overlayType)
 		memberships = append(memberships, OverlayMembershipRecord{
-			OverlayID:     desc.OverlayID,
-			NodeID:        remote.NodeID,
-			ProofID:       HashParts("roadmap-membership-proof", string(overlayType)),
-			Membership:    desc.Membership,
-			Mode:          OverlayMembershipModeCryptographicAuth,
-			JoinedHeight:  10,
-			ExpiresHeight: 90,
+			OverlayID:	desc.OverlayID,
+			NodeID:		remote.NodeID,
+			ProofID:	HashParts("roadmap-membership-proof", string(overlayType)),
+			Membership:	desc.Membership,
+			Mode:		OverlayMembershipModeCryptographicAuth,
+			JoinedHeight:	10,
+			ExpiresHeight:	90,
 		})
 	}
 	serviceDesc := testDefaultOverlayDescriptor(t, OverlayTypeService)
 	peerA := testAdaptivePeer(t, local, 8_000, 20, 9_000, true)
 	peerB := testAdaptivePeer(t, remote, 8_500, 15, 9_250, true)
 	peerC := AdaptivePeer{
-		NodeID:          HashParts("roadmap-peer-c"),
-		ScoreBps:        7_500,
-		LatencyMillis:   30,
-		ReliabilityBps:  8_500,
-		Roles:           []NodeRole{NodeRoleFull},
-		LastSeenHeight:  10,
-		LastScoreHeight: 10,
+		NodeID:			HashParts("roadmap-peer-c"),
+		ScoreBps:		7_500,
+		LatencyMillis:		30,
+		ReliabilityBps:		8_500,
+		Roles:			[]NodeRole{NodeRoleFull},
+		LastSeenHeight:		10,
+		LastScoreHeight:	10,
 	}
 	adaptiveGraph := NormalizeAdaptiveOverlayGraph(AdaptiveOverlayGraph{
-		OverlayID:    serviceDesc.OverlayID,
-		LocalNodeID:  local.NodeID,
-		RoutingEpoch: 10,
-		RandomSet:    []AdaptivePeer{peerA, peerC},
-		ServiceSet:   []AdaptivePeer{peerB},
-		FallbackSet:  []AdaptivePeer{peerA},
-		PolicyHash:   HashParts("roadmap-adaptive-policy"),
+		OverlayID:	serviceDesc.OverlayID,
+		LocalNodeID:	local.NodeID,
+		RoutingEpoch:	10,
+		RandomSet:	[]AdaptivePeer{peerA, peerC},
+		ServiceSet:	[]AdaptivePeer{peerB},
+		FallbackSet:	[]AdaptivePeer{peerA},
+		PolicyHash:	HashParts("roadmap-adaptive-policy"),
 	})
 	routingGraph := NormalizeRoutingGraph(RoutingGraph{
-		OverlayID:             serviceDesc.OverlayID,
-		Version:               10,
-		Committed:             true,
-		DeterministicHintHash: HashParts("roadmap-routing-hint"),
+		OverlayID:		serviceDesc.OverlayID,
+		Version:		10,
+		Committed:		true,
+		DeterministicHintHash:	HashParts("roadmap-routing-hint"),
 		Edges: []RoutingEdge{{
-			FromNodeID:    local.NodeID,
-			ToNodeID:      remote.NodeID,
-			LatencyMillis: 20,
-			Weight:        1,
-			Priority:      PriorityForChannel(ChannelService),
-			ZoneID:        "zone-roadmap",
+			FromNodeID:	local.NodeID,
+			ToNodeID:	remote.NodeID,
+			LatencyMillis:	20,
+			Weight:		1,
+			Priority:	PriorityForChannel(ChannelService),
+			ZoneID:		"zone-roadmap",
 		}},
 	})
 	commitment, err := NewRoutingTableCommitment(RoutingTableCommitment{
-		RoutingEpoch:           10,
-		OverlayRoots:           []OverlayRouteRoot{{OverlayID: serviceDesc.OverlayID, RootHash: routingGraph.GraphHash}},
-		ZoneRouteRoot:          HashParts("roadmap-zone-route-root"),
-		ServiceRouteRoot:       HashParts("roadmap-service-route-root"),
-		PeerClassRoot:          HashParts("roadmap-peer-class-root"),
-		CongestionSnapshotRoot: HashParts("roadmap-congestion-root"),
-		PolicyHash:             HashParts("roadmap-routing-policy"),
+		RoutingEpoch:		10,
+		OverlayRoots:		[]OverlayRouteRoot{{OverlayID: serviceDesc.OverlayID, RootHash: routingGraph.GraphHash}},
+		ZoneRouteRoot:		HashParts("roadmap-zone-route-root"),
+		ServiceRouteRoot:	HashParts("roadmap-service-route-root"),
+		PeerClassRoot:		HashParts("roadmap-peer-class-root"),
+		CongestionSnapshotRoot:	HashParts("roadmap-congestion-root"),
+		PolicyHash:		HashParts("roadmap-routing-policy"),
 	})
 	require.NoError(t, err)
 	chunks, err := ChunkPayload(bytes.Repeat([]byte("roadmap-rl2"), 128), 64)
@@ -5136,9 +5136,9 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	require.NoError(t, err)
 	stateRoot := HashParts("roadmap-discovery-state-root")
 	discoveryProof := DiscoveryOnChainProof{
-		ProofHeight: 30,
-		StateRoot:   stateRoot,
-		ProofHash:   ComputeDiscoveryOnChainProofHash(resultHash, stateRoot, 30),
+		ProofHeight:	30,
+		StateRoot:	stateRoot,
+		ProofHash:	ComputeDiscoveryOnChainProofHash(resultHash, stateRoot, 30),
 	}
 	discoveryResponse, err := BuildDiscoveryResponse(discoveryTable, DRTQuery{ObjectType: DRTObjectServiceEndpoint, ServiceID: "svc.roadmap", CurrentHeight: 30}, local, deterministicPrivateKey(0x88), salt, discoveryProof, 30)
 	require.NoError(t, err)
@@ -5150,22 +5150,22 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	expiredDiscoveryErr := ValidateSignedDiscoveryRecord(discovery, salt, 91)
 	broadcastOrigin := signedNodeRecord(t, 0x8d, salt, 100, NodeRoleRouting)
 	broadcastMsg, err := SignBroadcastMessage(BroadcastMessage{
-		OverlayID:   serviceDesc.OverlayID,
-		PayloadHash: HashParts("roadmap-broadcast-payload"),
-		PayloadType: BroadcastPayloadService,
-		Height:      20,
-		TTL:         64,
-		Priority:    PriorityForChannel(ChannelService),
+		OverlayID:	serviceDesc.OverlayID,
+		PayloadHash:	HashParts("roadmap-broadcast-payload"),
+		PayloadType:	BroadcastPayloadService,
+		Height:		20,
+		TTL:		64,
+		Priority:	PriorityForChannel(ChannelService),
 		FanoutPolicy: BroadcastFanoutPolicy{
-			TreeFanout:   serviceDesc.Fanout + 10,
-			GossipFanout: serviceDesc.Fanout + 10,
-			OverlayBound: true,
+			TreeFanout:	serviceDesc.Fanout + 10,
+			GossipFanout:	serviceDesc.Fanout + 10,
+			OverlayBound:	true,
 		},
 	}, deterministicPrivateKey(0x8d), salt)
 	require.NoError(t, err)
 	broadcastGraph := RoutingGraph{
-		OverlayID: serviceDesc.OverlayID,
-		Version:   11,
+		OverlayID:	serviceDesc.OverlayID,
+		Version:	11,
 		Edges: []RoutingEdge{
 			{FromNodeID: local.NodeID, ToNodeID: remote.NodeID, LatencyMillis: 10, Weight: 9_000, Priority: 1},
 			{FromNodeID: local.NodeID, ToNodeID: peerC.NodeID, LatencyMillis: 20, Weight: 8_000, Priority: 2},
@@ -5187,101 +5187,101 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	executionDesc := testDefaultOverlayDescriptor(t, OverlayTypeExecution)
 	dataDesc := testDefaultOverlayDescriptor(t, OverlayTypeData)
 	executionMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:              MeshMessageExecution,
-		Payload:           []byte("roadmap-execution-message"),
-		Origin:            local.NodeID,
-		Destination:       remote.NodeID,
-		Priority:          PriorityForChannel(ChannelExecution),
-		TTL:               40,
-		OverlayID:         executionDesc.OverlayID,
-		DestinationZone:   "zone-roadmap",
-		Sequence:          1,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismCommittedState,
+		Type:			MeshMessageExecution,
+		Payload:		[]byte("roadmap-execution-message"),
+		Origin:			local.NodeID,
+		Destination:		remote.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			40,
+		OverlayID:		executionDesc.OverlayID,
+		DestinationZone:	"zone-roadmap",
+		Sequence:		1,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismCommittedState,
 		Proof: AetherMeshProof{
-			ProofType:   "roadmap-execution-schedule",
-			ProofHash:   HashParts("roadmap-execution-proof"),
-			ProofHeight: 30,
+			ProofType:	"roadmap-execution-schedule",
+			ProofHash:	HashParts("roadmap-execution-proof"),
+			ProofHeight:	30,
 		},
 	})
 	require.NoError(t, err)
 	serviceMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:           MeshMessageService,
-		Payload:        []byte("roadmap-service-message"),
-		Origin:         local.NodeID,
-		Destination:    remote.NodeID,
-		Priority:       PriorityForChannel(ChannelService),
-		TTL:            40,
-		OverlayID:      serviceDesc.OverlayID,
-		Sequence:       2,
-		RouteHint:      RouteHint{ServiceID: "svc.roadmap"},
-		DeadlineHeight: 90,
+		Type:		MeshMessageService,
+		Payload:	[]byte("roadmap-service-message"),
+		Origin:		local.NodeID,
+		Destination:	remote.NodeID,
+		Priority:	PriorityForChannel(ChannelService),
+		TTL:		40,
+		OverlayID:	serviceDesc.OverlayID,
+		Sequence:	2,
+		RouteHint:	RouteHint{ServiceID: "svc.roadmap"},
+		DeadlineHeight:	90,
 	})
 	require.NoError(t, err)
 	queryMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:        MeshMessageQuery,
-		Payload:     []byte("roadmap-query-message"),
-		Origin:      local.NodeID,
-		Destination: remote.NodeID,
-		Priority:    PriorityForChannel(ChannelService),
-		TTL:         40,
-		OverlayID:   serviceDesc.OverlayID,
-		Sequence:    3,
+		Type:		MeshMessageQuery,
+		Payload:	[]byte("roadmap-query-message"),
+		Origin:		local.NodeID,
+		Destination:	remote.NodeID,
+		Priority:	PriorityForChannel(ChannelService),
+		TTL:		40,
+		OverlayID:	serviceDesc.OverlayID,
+		Sequence:	3,
 	})
 	require.NoError(t, err)
 	storageMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:        MeshMessageStorage,
-		Payload:     []byte("roadmap-storage-message"),
-		Origin:      local.NodeID,
-		Destination: storageOwner.NodeID,
-		Priority:    PriorityForChannel(ChannelData),
-		TTL:         40,
-		OverlayID:   dataDesc.OverlayID,
-		Sequence:    4,
-		RouteHint:   RouteHint{StorageKeyHash: HashParts("roadmap-storage-key")},
+		Type:		MeshMessageStorage,
+		Payload:	[]byte("roadmap-storage-message"),
+		Origin:		local.NodeID,
+		Destination:	storageOwner.NodeID,
+		Priority:	PriorityForChannel(ChannelData),
+		TTL:		40,
+		OverlayID:	dataDesc.OverlayID,
+		Sequence:	4,
+		RouteHint:	RouteHint{StorageKeyHash: HashParts("roadmap-storage-key")},
 	})
 	require.NoError(t, err)
 	crossZoneMesh, err := NewAetherMeshMessage(AetherMeshMessage{
-		Type:              MeshMessageCrossZone,
-		Payload:           []byte("roadmap-cross-zone-message"),
-		Origin:            local.NodeID,
-		Destination:       remote.NodeID,
-		Priority:          PriorityForChannel(ChannelExecution),
-		TTL:               40,
-		OverlayID:         executionDesc.OverlayID,
-		SourceZone:        "zone-roadmap",
-		DestinationZone:   "zone-remote",
-		Sequence:          5,
-		ConsensusEffect:   true,
-		DeterminismSource: DeterminismDeterministicProof,
+		Type:			MeshMessageCrossZone,
+		Payload:		[]byte("roadmap-cross-zone-message"),
+		Origin:			local.NodeID,
+		Destination:		remote.NodeID,
+		Priority:		PriorityForChannel(ChannelExecution),
+		TTL:			40,
+		OverlayID:		executionDesc.OverlayID,
+		SourceZone:		"zone-roadmap",
+		DestinationZone:	"zone-remote",
+		Sequence:		5,
+		ConsensusEffect:	true,
+		DeterminismSource:	DeterminismDeterministicProof,
 		Proof: AetherMeshProof{
-			ProofType:   "roadmap-cross-zone-proof",
-			ProofHash:   HashParts("roadmap-cross-zone-proof"),
-			ProofHeight: 30,
+			ProofType:	"roadmap-cross-zone-proof",
+			ProofHash:	HashParts("roadmap-cross-zone-proof"),
+			ProofHeight:	30,
 		},
 	})
 	require.NoError(t, err)
 	meshRoute := func(msg AetherMeshMessage, desc OverlayDescriptor, channel ChannelClass, target string) AetherMeshDelivery {
 		return AetherMeshDelivery{
-			Message: msg,
-			Channel: channel,
+			Message:	msg,
+			Channel:	channel,
 			Route: OverlayRoutePlan{
-				MessageID:     msg.MessageID,
-				OverlayID:     desc.OverlayID,
-				OverlayType:   desc.OverlayType,
-				Strategy:      desc.Routing,
-				TargetNodeIDs: []string{target},
+				MessageID:	msg.MessageID,
+				OverlayID:	desc.OverlayID,
+				OverlayType:	desc.OverlayType,
+				Strategy:	desc.Routing,
+				TargetNodeIDs:	[]string{target},
 			},
 		}
 	}
 	crossZoneMsg, err := NewCrossZoneMessage(CrossZoneMessage{
-		SourceZone:      "zone-roadmap",
-		DestinationZone: "zone-remote",
-		SourceSequence:  1,
-		MessageHash:     crossZoneMesh.PayloadHash,
-		ExpiryHeight:    100,
-		ReceiptPolicy:   ReceiptPolicyAlways,
-		ProofRequired:   true,
+		SourceZone:		"zone-roadmap",
+		DestinationZone:	"zone-remote",
+		SourceSequence:		1,
+		MessageHash:		crossZoneMesh.PayloadHash,
+		ExpiryHeight:		100,
+		ReceiptPolicy:		ReceiptPolicyAlways,
+		ProofRequired:		true,
 	})
 	require.NoError(t, err)
 	crossZoneTracker := CrossZoneSequenceTracker{}
@@ -5289,16 +5289,16 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	require.NoError(t, err)
 	_, replayErr := AcceptCrossZoneSequence(crossZoneTracker, crossZoneMsg, true, 31)
 	crossZoneReceipt, err := NewCrossZoneReceipt(CrossZoneReceipt{
-		SourceZone:      crossZoneMsg.SourceZone,
-		DestinationZone: crossZoneMsg.DestinationZone,
-		SourceSequence:  crossZoneMsg.SourceSequence,
-		MessageHash:     crossZoneMsg.MessageHash,
-		Status:          CrossZoneReceiptExecuted,
-		ReceiptPolicy:   ReceiptPolicyAlways,
-		ProofHash:       HashParts("roadmap-cross-zone-receipt-proof"),
-		ReceiptHeight:   35,
-		RollbackSafe:    true,
-		ProofQueryable:  true,
+		SourceZone:		crossZoneMsg.SourceZone,
+		DestinationZone:	crossZoneMsg.DestinationZone,
+		SourceSequence:		crossZoneMsg.SourceSequence,
+		MessageHash:		crossZoneMsg.MessageHash,
+		Status:			CrossZoneReceiptExecuted,
+		ReceiptPolicy:		ReceiptPolicyAlways,
+		ProofHash:		HashParts("roadmap-cross-zone-receipt-proof"),
+		ReceiptHeight:		35,
+		RollbackSafe:		true,
+		ProofQueryable:		true,
 	})
 	require.NoError(t, err)
 	receiptDelivery, err := NewReceiptDelivery(crossZoneReceipt, remote.NodeID, 36)
@@ -5306,54 +5306,54 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	receiptDelivery, err = AckReceiptDelivery(receiptDelivery, HashParts("roadmap-receipt-ack"))
 	require.NoError(t, err)
 	queryResponseProof, err := NewQueryResponseProof(QueryResponseProof{
-		RequestID:   queryMesh.MessageID,
-		Responder:   remote.NodeID,
-		PayloadHash: HashParts("roadmap-query-response"),
+		RequestID:	queryMesh.MessageID,
+		Responder:	remote.NodeID,
+		PayloadHash:	HashParts("roadmap-query-response"),
 		Proof: AetherMeshProof{
-			ProofType:   "roadmap-query-proof",
-			ProofHash:   HashParts("roadmap-query-proof"),
-			ProofHeight: 36,
+			ProofType:	"roadmap-query-proof",
+			ProofHash:	HashParts("roadmap-query-proof"),
+			ProofHeight:	36,
 		},
-		ResponseHeight: 37,
+		ResponseHeight:	37,
 	})
 	require.NoError(t, err)
 	l3Metrics, err := EvaluateL3Metrics(nil, []ReceiptDelivery{receiptDelivery}, []QueryResponseProof{queryResponseProof}, nil, nil)
 	require.NoError(t, err)
 	securityPolicy := DefaultNetworkSecurityPolicy()
 	securityDecision, err := EvaluateNetworkSecurity(PeerScore{ScoreBps: 8_500, ReliabilityBps: 9_000, ThroughputBps: 8_000}, PeerSecurityObservation{
-		PeerNodeID:            remote.NodeID,
-		InvalidMessages:       securityPolicy.MaxInvalidMessages + 1,
-		DuplicateMessages:     securityPolicy.MaxInvalidMessages + 2,
-		ConflictingBroadcasts: 1,
-		CorruptChunks:         1,
-		ForgedAdvertisements:  1,
-		BytesThisEpoch:        securityPolicy.MaxBytesPerEpoch + 1,
-		SybilClusterPeers:     1,
-		CrossZoneReplayCount:  1,
+		PeerNodeID:		remote.NodeID,
+		InvalidMessages:	securityPolicy.MaxInvalidMessages + 1,
+		DuplicateMessages:	securityPolicy.MaxInvalidMessages + 2,
+		ConflictingBroadcasts:	1,
+		CorruptChunks:		1,
+		ForgedAdvertisements:	1,
+		BytesThisEpoch:		securityPolicy.MaxBytesPerEpoch + 1,
+		SybilClusterPeers:	1,
+		CrossZoneReplayCount:	1,
 	}, securityPolicy)
 	require.NoError(t, err)
 	reputationDecision, err := ComputePeerReputation(PeerReputationInput{
-		PeerNodeID:                remote.NodeID,
-		ValidMessages:             90,
-		InvalidMessages:           10,
-		LatencyMillis:             50,
-		ThroughputBytesPerSec:     32 << 20,
-		CorrectChunks:             10,
-		CorruptChunks:             1,
-		ValidDiscoveryResponses:   9,
-		InvalidDiscoveryResponses: 1,
-		ValidServiceResponses:     9,
-		InvalidServiceResponses:   1,
-		Timeouts:                  1,
-		DuplicateBroadcasts:       1,
-		ConflictingBroadcasts:     1,
+		PeerNodeID:			remote.NodeID,
+		ValidMessages:			90,
+		InvalidMessages:		10,
+		LatencyMillis:			50,
+		ThroughputBytesPerSec:		32 << 20,
+		CorrectChunks:			10,
+		CorruptChunks:			1,
+		ValidDiscoveryResponses:	9,
+		InvalidDiscoveryResponses:	1,
+		ValidServiceResponses:		9,
+		InvalidServiceResponses:	1,
+		Timeouts:			1,
+		DuplicateBroadcasts:		1,
+		ConflictingBroadcasts:		1,
 	})
 	require.NoError(t, err)
 	eclipsePlan, err := BuildEclipseResistancePlan(AdaptiveOverlayGraph{
-		OverlayID:    serviceDesc.OverlayID,
-		LocalNodeID:  local.NodeID,
-		RoutingEpoch: 30,
-		PolicyHash:   HashParts("roadmap-security-eclipse-policy"),
+		OverlayID:	serviceDesc.OverlayID,
+		LocalNodeID:	local.NodeID,
+		RoutingEpoch:	30,
+		PolicyHash:	HashParts("roadmap-security-eclipse-policy"),
 		RandomSet: []AdaptivePeer{
 			testSecurityAdaptivePeer("roadmap-random-a", []NodeRole{NodeRoleFull}, []string{"zone-a"}),
 			testSecurityAdaptivePeer("roadmap-random-b", []NodeRole{NodeRoleFull}, []string{"zone-b"}),
@@ -5372,110 +5372,110 @@ func testRoadmapEvidence(t *testing.T) NetworkingRoadmapEvidence {
 	}, []DiscoveryRecord{{RecordType: DRTObjectRoutingEntryPoint, OwnerNodeID: HashParts("security-adaptive-peer", "roadmap-validator-a"), ProofHash: HashParts("roadmap-proof-backed-route"), ProofHeight: 30}}, DefaultEclipseResistancePolicy(), 30)
 	require.NoError(t, err)
 	_, eclipseThreats, err := SimulateEclipseResistance(AdaptiveOverlayGraph{
-		OverlayID:    HashParts("roadmap-bad-eclipse-overlay"),
-		LocalNodeID:  HashParts("roadmap-bad-eclipse-local"),
-		RoutingEpoch: 31,
-		PolicyHash:   HashParts("roadmap-bad-eclipse-policy"),
-		RandomSet:    []AdaptivePeer{testSecurityAdaptivePeer("roadmap-only-random", []NodeRole{NodeRoleFull}, []string{"zone-a"})},
-		FallbackSet:  []AdaptivePeer{testSecurityAdaptivePeer("roadmap-only-fallback", []NodeRole{NodeRoleFull}, []string{"zone-a"})},
+		OverlayID:	HashParts("roadmap-bad-eclipse-overlay"),
+		LocalNodeID:	HashParts("roadmap-bad-eclipse-local"),
+		RoutingEpoch:	31,
+		PolicyHash:	HashParts("roadmap-bad-eclipse-policy"),
+		RandomSet:	[]AdaptivePeer{testSecurityAdaptivePeer("roadmap-only-random", []NodeRole{NodeRoleFull}, []string{"zone-a"})},
+		FallbackSet:	[]AdaptivePeer{testSecurityAdaptivePeer("roadmap-only-fallback", []NodeRole{NodeRoleFull}, []string{"zone-a"})},
 	}, nil, DefaultEclipseResistancePolicy(), 31)
 	require.NoError(t, err)
 	spamSimulation, err := SimulateSpamResistance(securityPolicy, PeerRateUsage{
-		PeerNodeID:  remote.NodeID,
-		Channel:     ChannelService,
-		Messages:    securityPolicy.MaxPeerMessagesPerWindow + 10,
-		Bytes:       10 << 20,
-		WindowStart: 30,
-		WindowEnd:   30,
+		PeerNodeID:	remote.NodeID,
+		Channel:	ChannelService,
+		Messages:	securityPolicy.MaxPeerMessagesPerWindow + 10,
+		Bytes:		10 << 20,
+		WindowStart:	30,
+		WindowEnd:	30,
 	}, []BroadcastMessage{broadcastMsg, broadcastMsg}, remote.NodeID, 30)
 	require.NoError(t, err)
 	routingManipulation, err := SimulateRoutingManipulation([]BroadcastMessage{broadcastMsg, conflictMsg}, remote.NodeID, 30)
 	require.NoError(t, err)
 	return NetworkingRoadmapEvidence{
-		CometBFTInventory: adapter,
+		CometBFTInventory:	adapter,
 		PerformanceSnapshot: PerformanceMetricsSnapshot{
-			ChannelBandwidth: channelBandwidth,
+			ChannelBandwidth:	channelBandwidth,
 			BlockBenchmark: BlockPropagationBenchmark{
-				HeaderLatencyMillis:  10,
-				ReconstructionMillis: 20,
-				ChunkCount:           2,
-				HeaderFirst:          true,
+				HeaderLatencyMillis:	10,
+				ReconstructionMillis:	20,
+				ChunkCount:		2,
+				HeaderFirst:		true,
 			},
 			PeerScoreDistribution: PeerScoreDistributionMetric{
-				Count:      2,
-				AverageBps: 8_000,
+				Count:		2,
+				AverageBps:	8_000,
 			},
 			MessagePropagationLatency: PerformanceLatencySummary{
-				Count:         2,
-				MinMillis:     5,
-				MaxMillis:     15,
-				AverageMillis: 10,
+				Count:		2,
+				MinMillis:	5,
+				MaxMillis:	15,
+				AverageMillis:	10,
 			},
-			ServiceTrafficIsolated: true,
+			ServiceTrafficIsolated:	true,
 		},
-		L0Schedule:              schedule,
-		XNetworkParams:          DefaultXNetworkParams(salt),
-		Session:                 session,
-		NodeRecords:             []NodeRecord{local, remote},
-		SignedDiscoveryRecords:  []DiscoveryRecord{discovery, nodeDiscovery, zoneDiscovery, rpcDiscovery, storageDiscovery},
-		HandshakeReplayRejected: true,
-		KeyRotationAvailable:    true,
-		OverlayDescriptors:      descriptors,
-		OverlayMemberships:      memberships,
-		AdaptiveGraph:           adaptiveGraph,
-		RoutingGraph:            routingGraph,
+		L0Schedule:			schedule,
+		XNetworkParams:			DefaultXNetworkParams(salt),
+		Session:			session,
+		NodeRecords:			[]NodeRecord{local, remote},
+		SignedDiscoveryRecords:		[]DiscoveryRecord{discovery, nodeDiscovery, zoneDiscovery, rpcDiscovery, storageDiscovery},
+		HandshakeReplayRejected:	true,
+		KeyRotationAvailable:		true,
+		OverlayDescriptors:		descriptors,
+		OverlayMemberships:		memberships,
+		AdaptiveGraph:			adaptiveGraph,
+		RoutingGraph:			routingGraph,
 		RoutingTableUse: RoutingTableUse{
-			Commitment:                 commitment,
-			Committed:                  true,
-			UsedForExecutionScheduling: true,
+			Commitment:			commitment,
+			Committed:			true,
+			UsedForExecutionScheduling:	true,
 		},
-		PeerRotationPreserved:     true,
-		RL2Offer:                  offer,
-		RL2ChunkDescriptors:       rl2Descriptors,
-		RL2Session:                resumed,
-		RL2StreamingPlan:          resumed.StreamingPlan,
-		RL2PayloadTypes:           []RL2PayloadType{RL2PayloadLargeBlock, RL2PayloadStateSyncStream, RL2PayloadProofSet},
-		RL2BackpressureSignal:     signal,
-		RL2InvalidChunkRejected:   invalidChunkErr != nil,
-		RL2InterruptedResumed:     true,
-		DiscoveryTable:            discoveryTable,
-		DiscoveryResponse:         discoveryResponse,
-		DiscoveryObjectTypes:      []DRTObjectType{DRTObjectNode, DRTObjectExecutionZone, DRTObjectServiceEndpoint, DRTObjectRPCEndpoint, DRTObjectStorageProvider},
-		DiscoveryLeaseRenewed:     renewedDiscovery.ExpiresHeight == 95,
-		DiscoveryForgedRejected:   forgedDiscoveryErr != nil,
-		DiscoveryExpiredRejected:  expiredDiscoveryErr != nil,
-		BroadcastMessage:          broadcastMsg,
-		BroadcastPlan:             broadcastPlan,
-		BroadcastDedupCache:       broadcastCache,
-		BroadcastDuplicateHandled: duplicateDecision.DroppedDuplicate,
-		BroadcastConflictHandled:  conflictDecision.FaultEvidence.EvidenceHash != "",
-		BlockSession:              testPerformanceBlockSession(t),
-		ParallelChunkPlan:         testPerformanceStreamPlan(),
-		GossipFallbackUsed:        broadcastPlan.FallbackUsed,
-		MeshMessages:              []AetherMeshMessage{executionMesh, serviceMesh, queryMesh, storageMesh, crossZoneMesh},
+		PeerRotationPreserved:		true,
+		RL2Offer:			offer,
+		RL2ChunkDescriptors:		rl2Descriptors,
+		RL2Session:			resumed,
+		RL2StreamingPlan:		resumed.StreamingPlan,
+		RL2PayloadTypes:		[]RL2PayloadType{RL2PayloadLargeBlock, RL2PayloadStateSyncStream, RL2PayloadProofSet},
+		RL2BackpressureSignal:		signal,
+		RL2InvalidChunkRejected:	invalidChunkErr != nil,
+		RL2InterruptedResumed:		true,
+		DiscoveryTable:			discoveryTable,
+		DiscoveryResponse:		discoveryResponse,
+		DiscoveryObjectTypes:		[]DRTObjectType{DRTObjectNode, DRTObjectExecutionZone, DRTObjectServiceEndpoint, DRTObjectRPCEndpoint, DRTObjectStorageProvider},
+		DiscoveryLeaseRenewed:		renewedDiscovery.ExpiresHeight == 95,
+		DiscoveryForgedRejected:	forgedDiscoveryErr != nil,
+		DiscoveryExpiredRejected:	expiredDiscoveryErr != nil,
+		BroadcastMessage:		broadcastMsg,
+		BroadcastPlan:			broadcastPlan,
+		BroadcastDedupCache:		broadcastCache,
+		BroadcastDuplicateHandled:	duplicateDecision.DroppedDuplicate,
+		BroadcastConflictHandled:	conflictDecision.FaultEvidence.EvidenceHash != "",
+		BlockSession:			testPerformanceBlockSession(t),
+		ParallelChunkPlan:		testPerformanceStreamPlan(),
+		GossipFallbackUsed:		broadcastPlan.FallbackUsed,
+		MeshMessages:			[]AetherMeshMessage{executionMesh, serviceMesh, queryMesh, storageMesh, crossZoneMesh},
 		MeshDeliveries: []AetherMeshDelivery{
 			meshRoute(executionMesh, executionDesc, ChannelExecution, remote.NodeID),
 			meshRoute(serviceMesh, serviceDesc, ChannelService, remote.NodeID),
 			meshRoute(crossZoneMesh, executionDesc, ChannelExecution, remote.NodeID),
 		},
-		CrossZoneTracker:            crossZoneTracker,
-		CrossZoneReceipt:            crossZoneReceipt,
-		ReceiptDelivery:             receiptDelivery,
-		QueryResponseProof:          queryResponseProof,
-		L3Metrics:                   l3Metrics,
-		CrossZoneAtLeastOnce:        true,
-		CrossZoneExactlyOnce:        replayErr != nil,
-		SecurityPolicy:              securityPolicy,
-		SecurityDecision:            securityDecision,
-		ReputationDecision:          reputationDecision,
-		EclipsePlan:                 eclipsePlan,
-		EclipseThreats:              eclipseThreats,
-		SpamSimulation:              spamSimulation,
-		RoutingManipulation:         routingManipulation,
-		BandwidthExhaustionDetected: containsNetworkThreat(spamSimulation.Threats, ThreatBandwidthExhaustion),
-		ChunkCorruptionDetected:     containsNetworkThreat(securityDecision.Threats, ThreatChunkCorruption),
-		DiscoveryPoisoningDetected:  forgedDiscoveryErr != nil && discoveryResponse.OnChainProof.ProofHash != "",
-		CriticalChannelsAvailable:   true,
+		CrossZoneTracker:		crossZoneTracker,
+		CrossZoneReceipt:		crossZoneReceipt,
+		ReceiptDelivery:		receiptDelivery,
+		QueryResponseProof:		queryResponseProof,
+		L3Metrics:			l3Metrics,
+		CrossZoneAtLeastOnce:		true,
+		CrossZoneExactlyOnce:		replayErr != nil,
+		SecurityPolicy:			securityPolicy,
+		SecurityDecision:		securityDecision,
+		ReputationDecision:		reputationDecision,
+		EclipsePlan:			eclipsePlan,
+		EclipseThreats:			eclipseThreats,
+		SpamSimulation:			spamSimulation,
+		RoutingManipulation:		routingManipulation,
+		BandwidthExhaustionDetected:	containsNetworkThreat(spamSimulation.Threats, ThreatBandwidthExhaustion),
+		ChunkCorruptionDetected:	containsNetworkThreat(securityDecision.Threats, ThreatChunkCorruption),
+		DiscoveryPoisoningDetected:	forgedDiscoveryErr != nil && discoveryResponse.OnChainProof.ProofHash != "",
+		CriticalChannelsAvailable:	true,
 	}
 }
 
@@ -5506,59 +5506,59 @@ func networkingAcceptanceCriterionIDs(criteria []NetworkingAcceptanceCriterion) 
 func testNetworkingAcceptanceEvidence() []NetworkingAcceptanceEvidence {
 	return []NetworkingAcceptanceEvidence{
 		{
-			Criterion: AcceptanceCriterionL0CometBFTProtected,
-			Evidence:  []string{"TestLayerStackPreservesCometBFTBaselineAndExtensionOrder", "TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionL0CometBFTProtected,
+			Evidence:	[]string{"TestLayerStackPreservesCometBFTBaselineAndExtensionOrder", "TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionANAChannelQoS,
-			Evidence:  []string{"TestDefaultANAValidatesCometBFTBaselineAndResponsibilities", "TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionANAChannelQoS,
+			Evidence:	[]string{"TestDefaultANAValidatesCometBFTBaselineAndResponsibilities", "TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionL1IdentitySessions,
-			Evidence:  []string{"TestNodeRecordSignatureIdentityAndExpiry", "TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionL1IdentitySessions,
+			Evidence:	[]string{"TestNodeRecordSignatureIdentityAndExpiry", "TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionL2Overlays,
-			Evidence:  []string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestRoutingGraphBuildsDeterministicCommittedRoutesAndFallback"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionL2Overlays,
+			Evidence:	[]string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestRoutingGraphBuildsDeterministicCommittedRoutesAndFallback"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionL3AetherMesh,
-			Evidence:  []string{"TestAetherMeshMessageTypesMapToChannels", "TestAetherMeshCrossZoneAndConsensusProofRules"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionL3AetherMesh,
+			Evidence:	[]string{"TestAetherMeshMessageTypesMapToChannels", "TestAetherMeshCrossZoneAndConsensusProofRules"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionRL2Streaming,
-			Evidence:  []string{"TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes", "TestRL2InterruptedTransferResumesAndRejectsInvalidChunks"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionRL2Streaming,
+			Evidence:	[]string{"TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes", "TestRL2InterruptedTransferResumesAndRejectsInvalidChunks"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionDRTDiscovery,
-			Evidence:  []string{"TestDiscoveryRecordMustBeSignedExpiringAndProofChecked", "TestSignedDiscoveryRecordStoreFindRenewAndRevoke"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionDRTDiscovery,
+			Evidence:	[]string{"TestDiscoveryRecordMustBeSignedExpiringAndProofChecked", "TestSignedDiscoveryRecordStoreFindRenewAndRevoke"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionHybridBroadcast,
-			Evidence:  []string{"TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired", "TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionHybridBroadcast,
+			Evidence:	[]string{"TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired", "TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionSecurityControls,
-			Evidence:  []string{"TestNetworkSecurityReplayChannelBindingAndQoSIsolation", "TestNetworkSecuritySimulationsCoverEclipseSpamAndRoutingManipulation"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionSecurityControls,
+			Evidence:	[]string{"TestNetworkSecurityReplayChannelBindingAndQoSIsolation", "TestNetworkSecuritySimulationsCoverEclipseSpamAndRoutingManipulation"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionCosmosABCIIntegration,
-			Evidence:  []string{"TestCosmosCometBFTCompatibilityPlanPreservesRequiredSurfaces", "TestABCIIntegrationPlanKeepsLiveNetworkStateOutOfFinalizeBlock"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionCosmosABCIIntegration,
+			Evidence:	[]string{"TestCosmosCometBFTCompatibilityPlanPreservesRequiredSurfaces", "TestABCIIntegrationPlanKeepsLiveNetworkStateOutOfFinalizeBlock"},
+			Accepted:	true,
 		},
 		{
-			Criterion: AcceptanceCriterionRequiredTestCoverage,
-			Evidence:  []string{"TestRequiredNetworkingTestCoverageValidatesUnitAndIntegrationMatrix", "TestNetworkingTestCoverageReportRequiresAllRequiredEvidence"},
-			Accepted:  true,
+			Criterion:	AcceptanceCriterionRequiredTestCoverage,
+			Evidence:	[]string{"TestRequiredNetworkingTestCoverageValidatesUnitAndIntegrationMatrix", "TestNetworkingTestCoverageReportRequiresAllRequiredEvidence"},
+			Accepted:	true,
 		},
 	}
 }
@@ -5648,242 +5648,242 @@ func testNetworkingAlertSignals(rules []NetworkingAlertRule) []NetworkingAlertSi
 func testRequiredNetworkingCoverageEvidence() []NetworkingTestCoverageEvidence {
 	return []NetworkingTestCoverageEvidence{
 		{
-			Test:      RequiredTestNodeIDDerivation,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestNodeRecordSignatureIdentityAndExpiry"},
-			Passed:    true,
+			Test:		RequiredTestNodeIDDerivation,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestNodeRecordSignatureIdentityAndExpiry"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestNodeRecordSignature,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestNodeRecordSignatureIdentityAndExpiry", "TestANAValidatesSignedPeerRoleAdvertisements"},
-			Passed:    true,
+			Test:		RequiredTestNodeRecordSignature,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestNodeRecordSignatureIdentityAndExpiry", "TestANAValidatesSignedPeerRoleAdvertisements"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestSessionHandshake,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches", "TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams"},
-			Passed:    true,
+			Test:		RequiredTestSessionHandshake,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches", "TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestStreamPriority,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestAetherMeshMessageTypesMapToChannels", "TestStreamPayloadTypeMapsToRL2AndRejectsInvalidBounds"},
-			Passed:    true,
+			Test:		RequiredTestStreamPriority,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestAetherMeshMessageTypesMapToChannels", "TestStreamPayloadTypeMapsToRL2AndRejectsInvalidBounds"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestOverlayMembership,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords", "TestOverlayManagerFormsZoneAndServiceOverlays"},
-			Passed:    true,
+			Test:		RequiredTestOverlayMembership,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestOverlayMembershipProofAuthorizesServiceStakeAndSignedRecords", "TestOverlayManagerFormsZoneAndServiceOverlays"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestRouteCost,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestRoutingGraphBuildsDeterministicCommittedRoutesAndFallback", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
-			Passed:    true,
+			Test:		RequiredTestRouteCost,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestRoutingGraphBuildsDeterministicCommittedRoutesAndFallback", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestNetworkMessageID,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestNetworkMessageHardRulesRequireReplaySafeCommitments", "TestAetherMeshCrossZoneAndConsensusProofRules"},
-			Passed:    true,
+			Test:		RequiredTestNetworkMessageID,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestNetworkMessageHardRulesRequireReplaySafeCommitments", "TestAetherMeshCrossZoneAndConsensusProofRules"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestDiscoveryRecordExpiry,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestDiscoveryRecordMustBeSignedExpiringAndProofChecked", "TestSignedDiscoveryRecordStoreFindRenewAndRevoke"},
-			Passed:    true,
+			Test:		RequiredTestDiscoveryRecordExpiry,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestDiscoveryRecordMustBeSignedExpiringAndProofChecked", "TestSignedDiscoveryRecordStoreFindRenewAndRevoke"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestChunkHashVerification,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestChunkPayloadRoundTripAndCorruptionDetection", "TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes"},
-			Passed:    true,
+			Test:		RequiredTestChunkHashVerification,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestChunkPayloadRoundTripAndCorruptionDetection", "TestRL2ChunkDescriptorsVerifyOrderedMerkleRootAndChunkBytes"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestBroadcastDeduplication,
-			Category:  NetworkingTestCoverageUnit,
-			TestNames: []string{"TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired", "TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes"},
-			Passed:    true,
+			Test:		RequiredTestBroadcastDeduplication,
+			Category:	NetworkingTestCoverageUnit,
+			TestNames:	[]string{"TestBroadcastMessageSignsDeduplicatesAndRejectsForgedOrExpired", "TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestCometBFTANAConsensus,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService", "TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic"},
-			Passed:    true,
+			Test:		RequiredTestCometBFTANAConsensus,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestANAPropagationKeepsConsensusOnCometBFTAndFanoutForService", "TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestMultiplexedSessionStreams,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams", "TestNetworkSecurityReplayChannelBindingAndQoSIsolation"},
-			Passed:    true,
+			Test:		RequiredTestMultiplexedSessionStreams,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestSessionHandshakeNegotiatesEncryptedMultiplexedStreams", "TestNetworkSecurityReplayChannelBindingAndQoSIsolation"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestZoneOverlayFormation,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestOverlayRouteBuildsZoneLocalAndFallbackPlans"},
-			Passed:    true,
+			Test:		RequiredTestZoneOverlayFormation,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestOverlayRouteBuildsZoneLocalAndFallbackPlans"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestServiceOverlayFormation,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
-			Passed:    true,
+			Test:		RequiredTestServiceOverlayFormation,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestOverlayManagerFormsZoneAndServiceOverlays", "TestAetherMeshRouteUsesOverlayAndServicePeers"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestCrossZoneDelivery,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps", "TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics"},
-			Passed:    true,
+			Test:		RequiredTestCrossZoneDelivery,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps", "TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestRL2BlockChunkTransfer,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes", "TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs"},
-			Passed:    true,
+			Test:		RequiredTestRL2BlockChunkTransfer,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes", "TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestResumableStateSnapshot,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestRL2MissingChunksRequestUsesVerifiedBitmapResumeToken", "TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes"},
-			Passed:    true,
+			Test:		RequiredTestResumableStateSnapshot,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestRL2MissingChunksRequestUsesVerifiedBitmapResumeToken", "TestRL2OfferStateMachineResumesInterruptedTransferAndCompletes"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestDiscoveryProofLookup,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestDiscoveryResponseSignsResultsAndProofAttachment", "TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints"},
-			Passed:    true,
+			Test:		RequiredTestDiscoveryProofLookup,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestDiscoveryResponseSignsResultsAndProofAttachment", "TestNetworkingAPIIntegrationBuildsDiagnosticsProofsAndRouteHints"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestHeaderFirstPropagation,
-			Category:  NetworkingTestCoverageIntegration,
-			TestNames: []string{"TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs", "TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout"},
-			Passed:    true,
+			Test:		RequiredTestHeaderFirstPropagation,
+			Category:	NetworkingTestCoverageIntegration,
+			TestNames:	[]string{"TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs", "TestBroadcastForwardingUsesTreeThenGossipFallbackAndOverlayFanout"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestReplayedHandshake,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches", "TestNetworkSecurityReplayChannelBindingAndQoSIsolation"},
-			Passed:    true,
+			Test:		RequiredTestReplayedHandshake,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestSessionHandshakeRejectsReplayExpiredRecordsAndMismatches", "TestNetworkSecurityReplayChannelBindingAndQoSIsolation"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestForgedNodeAdvertisement,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestANAValidatesSignedPeerRoleAdvertisements", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
-			Passed:    true,
+			Test:		RequiredTestForgedNodeAdvertisement,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestANAValidatesSignedPeerRoleAdvertisements", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestExpiredDiscoverySecurity,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
-			Passed:    true,
+			Test:		RequiredTestExpiredDiscoverySecurity,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestDiscoveryResponseRejectsExpiredForgedAndReplayedRecords", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestConflictingBroadcast,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
-			Passed:    true,
+			Test:		RequiredTestConflictingBroadcast,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestBroadcastDedupCacheDropsDuplicatesDetectsConflictsAndPrunes", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestInvalidChunkSecurity,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestRL2StateMachineClassifiesInvalidChunksAndRootMismatch", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
-			Passed:    true,
+			Test:		RequiredTestInvalidChunkSecurity,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestRL2StateMachineClassifiesInvalidChunksAndRootMismatch", "TestNetworkSecurityAuthenticatesDiscoveryOverlayAndChunks"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestEclipsePeerSetSimulation,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestEclipseResistancePlanMaintainsDiversityAndProofBackedRouting", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
-			Passed:    true,
+			Test:		RequiredTestEclipsePeerSetSimulation,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestEclipseResistancePlanMaintainsDiversityAndProofBackedRouting", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestServiceSpamFlood,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestSpamResistanceSignedEnvelopeRateLimitsAndResourceBackedAds", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
-			Passed:    true,
+			Test:		RequiredTestServiceSpamFlood,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestSpamResistanceSignedEnvelopeRateLimitsAndResourceBackedAds", "TestSpamResistanceChunkLimitsDuplicateSuppressionAndSimulations"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestConsensusUnderBulkLoad,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
-			Passed:    true,
+			Test:		RequiredTestConsensusUnderBulkLoad,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestCrossZoneReplaySecurity,
-			Category:  NetworkingTestCoverageSecurity,
-			TestNames: []string{"TestCrossZoneMessageRequiresSequenceExpiryAndReplayProtection", "TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps"},
-			Passed:    true,
+			Test:		RequiredTestCrossZoneReplaySecurity,
+			Category:	NetworkingTestCoverageSecurity,
+			TestNames:	[]string{"TestCrossZoneMessageRequiresSequenceExpiryAndReplayProtection", "TestCrossZoneSequenceTrackerAssignsAndRejectsReplayAndGaps"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestBlockHeaderLatency,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS"},
-			Passed:    true,
+			Test:		RequiredTestBlockHeaderLatency,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestBlockReconstructionTime,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs"},
-			Passed:    true,
+			Test:		RequiredTestBlockReconstructionTime,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestBlockHeaderFirstPropagationVerifiesChunksProofsAndReconstructs"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestChunkStreamingThroughput,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS"},
-			Passed:    true,
+			Test:		RequiredTestChunkStreamingThroughput,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceModelBoundsFanoutLatencyStreamingAndQoS"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestDiscoveryQueryLatency,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestDiscoveryResponseSignsResultsAndProofAttachment"},
-			Passed:    true,
+			Test:		RequiredTestDiscoveryQueryLatency,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestDiscoveryResponseSignsResultsAndProofAttachment"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestOverlayJoinLatency,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestOverlayManagerFormsZoneAndServiceOverlays"},
-			Passed:    true,
+			Test:		RequiredTestOverlayJoinLatency,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestOverlayManagerFormsZoneAndServiceOverlays"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestCrossZonePropagation,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics"},
-			Passed:    true,
+			Test:		RequiredTestCrossZonePropagation,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestReceiptDeliveryProtocolAcknowledgesAndFeedsMetrics"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestServiceTrafficThroughput,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
-			Passed:    true,
+			Test:		RequiredTestServiceTrafficThroughput,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestPerformanceMetricsSnapshotAggregatesOverlayBandwidthAndScores", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestConsensusMixedLoadLatency,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
-			Passed:    true,
+			Test:		RequiredTestConsensusMixedLoadLatency,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestL0ScheduleKeepsConsensusAheadOfServiceAndBulkTraffic", "TestPerformanceMetricsRejectInvalidBenchmarksAndServiceIsolationFailures"},
+			Passed:		true,
 		},
 		{
-			Test:      RequiredTestPeerRotationStability,
-			Category:  NetworkingTestCoveragePerformance,
-			TestNames: []string{"TestAdaptiveOverlayGraphRejectsEclipseAndZoneReplacement", "TestAdaptivePeerRotationBoundsChurnAndKeepsStablePeers"},
-			Passed:    true,
+			Test:		RequiredTestPeerRotationStability,
+			Category:	NetworkingTestCoveragePerformance,
+			TestNames:	[]string{"TestAdaptiveOverlayGraphRejectsEclipseAndZoneReplacement", "TestAdaptivePeerRotationBoundsChurnAndKeepsStablePeers"},
+			Passed:		true,
 		},
 	}
 }
 
 func testSessionRequest(local, remote NodeRecord, openedHeight, expiresHeight uint64, nonce string, channels []ChannelClass) SessionRequest {
 	return SessionRequest{
-		LocalNodeID:                 local.NodeID,
-		RemoteNodeID:                remote.NodeID,
-		ProtocolVersions:            []string{DefaultProtocolVersion},
-		ChannelClasses:              channels,
-		LocalEphemeralPubKey:        bytes.Repeat([]byte{0xa1}, SessionEphemeralKeyBytes),
-		RemoteEphemeralPubKey:       bytes.Repeat([]byte{0xb2}, SessionEphemeralKeyBytes),
-		SessionSecretCommitmentHash: HashParts("session-secret", local.NodeID, remote.NodeID, nonce),
-		OpenedHeight:                openedHeight,
-		ExpiresHeight:               expiresHeight,
-		Nonce:                       []byte(nonce),
+		LocalNodeID:			local.NodeID,
+		RemoteNodeID:			remote.NodeID,
+		ProtocolVersions:		[]string{DefaultProtocolVersion},
+		ChannelClasses:			channels,
+		LocalEphemeralPubKey:		bytes.Repeat([]byte{0xa1}, SessionEphemeralKeyBytes),
+		RemoteEphemeralPubKey:		bytes.Repeat([]byte{0xb2}, SessionEphemeralKeyBytes),
+		SessionSecretCommitmentHash:	HashParts("session-secret", local.NodeID, remote.NodeID, nonce),
+		OpenedHeight:			openedHeight,
+		ExpiresHeight:			expiresHeight,
+		Nonce:				[]byte(nonce),
 	}
 }
 
@@ -5891,12 +5891,12 @@ func mustTestStreamSession(t *testing.T, payloadType StreamingPayloadType, prior
 	t.Helper()
 
 	stream, err := NewStreamSession(StreamSession{
-		SessionID:         HashParts("priority-stream", string(payloadType)),
-		PayloadType:       payloadType,
-		Priority:          priority,
-		FlowControlWindow: 2048,
-		ChunkSize:         512,
-		Parallelism:       1,
+		SessionID:		HashParts("priority-stream", string(payloadType)),
+		PayloadType:		payloadType,
+		Priority:		priority,
+		FlowControlWindow:	2048,
+		ChunkSize:		512,
+		Parallelism:		1,
 	})
 	require.NoError(t, err)
 	stream, err = OpenStreamSession(stream)
@@ -5923,12 +5923,12 @@ func signedNodeRecord(t *testing.T, seed byte, salt []byte, expiresHeight uint64
 	addressHash, err := HashNetworkAddresses([]string{"tcp://127.0.0.1:26656"})
 	require.NoError(t, err)
 	record, err := SignNodeRecord(NodeRecord{
-		Roles:                roles,
-		NetworkAddressesHash: addressHash,
-		ZonesSupported:       []string{"APPLICATION_ZONE", "FINANCIAL_ZONE"},
-		ServicesSupported:    []string{"state-sync", "execution-stream"},
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        expiresHeight,
+		Roles:			roles,
+		NetworkAddressesHash:	addressHash,
+		ZonesSupported:		[]string{"APPLICATION_ZONE", "FINANCIAL_ZONE"},
+		ServicesSupported:	[]string{"state-sync", "execution-stream"},
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		expiresHeight,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
@@ -5941,12 +5941,12 @@ func signedNodeRecordWithCapabilities(t *testing.T, seed byte, salt []byte, expi
 	addressHash, err := HashNetworkAddresses([]string{fmt.Sprintf("tcp://127.0.0.%d:26656", seed)})
 	require.NoError(t, err)
 	record, err := SignNodeRecord(NodeRecord{
-		Roles:                roles,
-		NetworkAddressesHash: addressHash,
-		ZonesSupported:       zones,
-		ServicesSupported:    services,
-		ProtocolVersions:     []string{DefaultProtocolVersion},
-		ExpiresHeight:        expiresHeight,
+		Roles:			roles,
+		NetworkAddressesHash:	addressHash,
+		ZonesSupported:		zones,
+		ServicesSupported:	services,
+		ProtocolVersions:	[]string{DefaultProtocolVersion},
+		ExpiresHeight:		expiresHeight,
 	}, privateKey, salt)
 	require.NoError(t, err)
 	return record
@@ -5954,18 +5954,18 @@ func signedNodeRecordWithCapabilities(t *testing.T, seed byte, salt []byte, expi
 
 func testDRTAdvertisement(objectType DRTObjectType, record NodeRecord, overlayID, zoneID, serviceID, endpointHash string, stakeWeight uint64, peerScoreBps uint32, leaseStart, leaseExpires uint64) DRTAdvertisement {
 	return DRTAdvertisement{
-		ObjectType: objectType,
+		ObjectType:	objectType,
 		Discovery: DiscoveryRecord{
 			Record: record,
 		},
-		OverlayID:         overlayID,
-		ZoneID:            zoneID,
-		ServiceID:         serviceID,
-		EndpointHash:      endpointHash,
-		StakeWeight:       stakeWeight,
-		PeerScoreBps:      peerScoreBps,
-		LeaseStartHeight:  leaseStart,
-		LeaseExpireHeight: leaseExpires,
+		OverlayID:		overlayID,
+		ZoneID:			zoneID,
+		ServiceID:		serviceID,
+		EndpointHash:		endpointHash,
+		StakeWeight:		stakeWeight,
+		PeerScoreBps:		peerScoreBps,
+		LeaseStartHeight:	leaseStart,
+		LeaseExpireHeight:	leaseExpires,
 	}
 }
 
@@ -5973,15 +5973,15 @@ func testSignedDiscoveryObjectRecord(t *testing.T, owner NodeRecord, seed byte, 
 	t.Helper()
 
 	record, err := NewSignedDiscoveryRecord(DiscoveryRecord{
-		RecordType:        recordType,
-		OwnerNodeID:       owner.NodeID,
-		TargetID:          targetID,
-		AdvertisementHash: advertisementHash,
-		ZoneID:            zoneID,
-		ServiceID:         serviceID,
-		OverlayID:         overlayID,
-		ExpiresHeight:     expiresHeight,
-		Record:            owner,
+		RecordType:		recordType,
+		OwnerNodeID:		owner.NodeID,
+		TargetID:		targetID,
+		AdvertisementHash:	advertisementHash,
+		ZoneID:			zoneID,
+		ServiceID:		serviceID,
+		OverlayID:		overlayID,
+		ExpiresHeight:		expiresHeight,
+		Record:			owner,
 	}, deterministicPrivateKey(seed), salt)
 	require.NoError(t, err)
 	return record

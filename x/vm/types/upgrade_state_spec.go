@@ -12,20 +12,20 @@ import (
 )
 
 const (
-	AVMUpgradeCompatibilityNone            AVMUpgradeCompatibilityMode = "none"
-	AVMUpgradeCompatibilityVersionedPolicy AVMUpgradeCompatibilityMode = "versioned_policy"
-	AVMUpgradeCompatibilityLegacyRuntime   AVMUpgradeCompatibilityMode = "legacy_runtime"
+	AVMUpgradeCompatibilityNone		AVMUpgradeCompatibilityMode	= "none"
+	AVMUpgradeCompatibilityVersionedPolicy	AVMUpgradeCompatibilityMode	= "versioned_policy"
+	AVMUpgradeCompatibilityLegacyRuntime	AVMUpgradeCompatibilityMode	= "legacy_runtime"
 
-	AVMUpgradeStatusScheduled AVMUpgradeStatus = "scheduled"
-	AVMUpgradeStatusActive    AVMUpgradeStatus = "active"
-	AVMUpgradeStatusCompleted AVMUpgradeStatus = "completed"
-	AVMUpgradeStatusFailed    AVMUpgradeStatus = "failed"
+	AVMUpgradeStatusScheduled	AVMUpgradeStatus	= "scheduled"
+	AVMUpgradeStatusActive		AVMUpgradeStatus	= "active"
+	AVMUpgradeStatusCompleted	AVMUpgradeStatus	= "completed"
+	AVMUpgradeStatusFailed		AVMUpgradeStatus	= "failed"
 
-	AVMUpgradeMigrationQueue        AVMUpgradeMigrationKind = "queue"
-	AVMUpgradeMigrationContinuation AVMUpgradeMigrationKind = "continuation"
+	AVMUpgradeMigrationQueue	AVMUpgradeMigrationKind	= "queue"
+	AVMUpgradeMigrationContinuation	AVMUpgradeMigrationKind	= "continuation"
 
-	MaxAVMUpgradeStates            = 4096
-	MaxAVMUpgradeMigrationHandlers = 256
+	MaxAVMUpgradeStates		= 4096
+	MaxAVMUpgradeMigrationHandlers	= 256
 )
 
 type AVMUpgradeCompatibilityMode string
@@ -33,53 +33,53 @@ type AVMUpgradeStatus string
 type AVMUpgradeMigrationKind string
 
 type AVMRuntimeVersionSet struct {
-	VMInterpreterVersion   string
-	SchedulerVersion       string
-	GasPolicyVersion       string
-	ZoneConfigVersion      string
-	BackendAdapterVersion  string
-	InterfaceSchemaVersion string
-	RetryPolicyVersion     string
-	QueueLimitVersion      string
-	RuntimeVersionSetHash  string
+	VMInterpreterVersion	string
+	SchedulerVersion	string
+	GasPolicyVersion	string
+	ZoneConfigVersion	string
+	BackendAdapterVersion	string
+	InterfaceSchemaVersion	string
+	RetryPolicyVersion	string
+	QueueLimitVersion	string
+	RuntimeVersionSetHash	string
 }
 
 type AVMScheduledUpgradeState struct {
-	UpgradeID         string
-	Component         AVMUpgradeComponentKind
-	FromVersion       string
-	ToVersion         string
-	ActivationHeight  uint64
-	MigrationRequired bool
-	CompatibilityMode AVMUpgradeCompatibilityMode
-	Status            AVMUpgradeStatus
-	StateHash         string
+	UpgradeID		string
+	Component		AVMUpgradeComponentKind
+	FromVersion		string
+	ToVersion		string
+	ActivationHeight	uint64
+	MigrationRequired	bool
+	CompatibilityMode	AVMUpgradeCompatibilityMode
+	Status			AVMUpgradeStatus
+	StateHash		string
 }
 
 type AVMUpgradeMigrationHandler struct {
-	UpgradeID     string
-	Kind          AVMUpgradeMigrationKind
-	FromVersion   string
-	ToVersion     string
-	HandlerID     string
-	SourceRoot    string
-	TargetRoot    string
-	MigratedCount uint32
-	Bounded       bool
-	HandlerHash   string
+	UpgradeID	string
+	Kind		AVMUpgradeMigrationKind
+	FromVersion	string
+	ToVersion	string
+	HandlerID	string
+	SourceRoot	string
+	TargetRoot	string
+	MigratedCount	uint32
+	Bounded		bool
+	HandlerHash	string
 }
 
 type AVMVersionedGasTable struct {
-	Tables    []AVMGasTableActivation
-	TableRoot string
+	Tables		[]AVMGasTableActivation
+	TableRoot	string
 }
 
 type AVMUpgradeStateRegistry struct {
-	RuntimeVersions   AVMRuntimeVersionSet
-	States            []AVMScheduledUpgradeState
-	MigrationHandlers []AVMUpgradeMigrationHandler
-	GasTable          AVMVersionedGasTable
-	RegistryHash      string
+	RuntimeVersions		AVMRuntimeVersionSet
+	States			[]AVMScheduledUpgradeState
+	MigrationHandlers	[]AVMUpgradeMigrationHandler
+	GasTable		AVMVersionedGasTable
+	RegistryHash		string
 }
 
 func NewAVMRuntimeVersionSet(versions AVMRuntimeVersionSet) (AVMRuntimeVersionSet, error) {
@@ -91,8 +91,8 @@ func NewAVMRuntimeVersionSet(versions AVMRuntimeVersionSet) (AVMRuntimeVersionSe
 func (v AVMRuntimeVersionSet) Validate() error {
 	v = canonicalAVMRuntimeVersionSet(v)
 	for _, item := range []struct {
-		name  string
-		value string
+		name	string
+		value	string
 	}{
 		{name: "AVM runtime VM interpreter version", value: v.VMInterpreterVersion},
 		{name: "AVM runtime scheduler version", value: v.SchedulerVersion},
@@ -309,15 +309,15 @@ func BuildAVMQueueUpgradeMigration(upgradeID, fromVersion, toVersion string, que
 	}
 	count := len(queue.PriorityQueue) + len(queue.DelayedQueue) + len(queue.RetryQueue) + len(queue.FailedQueue)
 	return NewAVMUpgradeMigrationHandler(AVMUpgradeMigrationHandler{
-		UpgradeID:     upgradeID,
-		Kind:          AVMUpgradeMigrationQueue,
-		FromVersion:   fromVersion,
-		ToVersion:     toVersion,
-		HandlerID:     "queue-migration",
-		SourceRoot:    queue.QueueRoot,
-		TargetRoot:    ComputeAVMUpgradeMigratedRoot(queue.QueueRoot, toVersion, uint32(count)),
-		MigratedCount: uint32(count),
-		Bounded:       true,
+		UpgradeID:	upgradeID,
+		Kind:		AVMUpgradeMigrationQueue,
+		FromVersion:	fromVersion,
+		ToVersion:	toVersion,
+		HandlerID:	"queue-migration",
+		SourceRoot:	queue.QueueRoot,
+		TargetRoot:	ComputeAVMUpgradeMigratedRoot(queue.QueueRoot, toVersion, uint32(count)),
+		MigratedCount:	uint32(count),
+		Bounded:	true,
 	})
 }
 
@@ -327,15 +327,15 @@ func BuildAVMContinuationUpgradeMigration(upgradeID, fromVersion, toVersion stri
 	}
 	sourceRoot := ComputeAVMUpgradeContinuationSetRoot(continuations)
 	return NewAVMUpgradeMigrationHandler(AVMUpgradeMigrationHandler{
-		UpgradeID:     upgradeID,
-		Kind:          AVMUpgradeMigrationContinuation,
-		FromVersion:   fromVersion,
-		ToVersion:     toVersion,
-		HandlerID:     "continuation-migration",
-		SourceRoot:    sourceRoot,
-		TargetRoot:    ComputeAVMUpgradeMigratedRoot(sourceRoot, toVersion, uint32(len(continuations))),
-		MigratedCount: uint32(len(continuations)),
-		Bounded:       true,
+		UpgradeID:	upgradeID,
+		Kind:		AVMUpgradeMigrationContinuation,
+		FromVersion:	fromVersion,
+		ToVersion:	toVersion,
+		HandlerID:	"continuation-migration",
+		SourceRoot:	sourceRoot,
+		TargetRoot:	ComputeAVMUpgradeMigratedRoot(sourceRoot, toVersion, uint32(len(continuations))),
+		MigratedCount:	uint32(len(continuations)),
+		Bounded:	true,
 	})
 }
 

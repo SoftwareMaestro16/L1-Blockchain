@@ -103,28 +103,28 @@ func TestGovernanceAuthorityRequiredForMessages(t *testing.T) {
 	params.TreasuryBps = 1_500
 
 	err := msgServer.UpdateEconomicsParams(types.MsgUpdateEconomicsParams{
-		Authority: "ae1notgov",
-		Params:    params,
+		Authority:	"ae1notgov",
+		Params:		params,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 
 	require.NoError(t, msgServer.UpdateEconomicsParams(types.MsgUpdateEconomicsParams{
-		Authority: authority,
-		Params:    params,
+		Authority:	authority,
+		Params:		params,
 	}))
 	feeSplit, err := k.QueryFeeSplitParams(types.QueryFeeSplitParamsRequest{})
 	require.NoError(t, err)
 	require.Equal(t, uint32(5_000), feeSplit.BurnCurrentBps)
 
 	err = msgServer.ApplyEpochEconomics(types.MsgApplyEpochEconomics{
-		Authority: "ae1notgov",
-		Input:     epochInput(1, 1_000_000_000, 600_000_000, 100_000),
+		Authority:	"ae1notgov",
+		Input:		epochInput(1, 1_000_000_000, 600_000_000, 100_000),
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorized)
 
 	require.NoError(t, msgServer.ApplyEpochEconomics(types.MsgApplyEpochEconomics{
-		Authority: authority,
-		Input:     epochInput(1, 1_000_000_000, 600_000_000, 100_000),
+		Authority:	authority,
+		Input:		epochInput(1, 1_000_000_000, 600_000_000, 100_000),
 	}))
 }
 
@@ -136,8 +136,8 @@ func TestGovernanceInvalidParamsRejected(t *testing.T) {
 	params.ValidatorRewardBps = 2_499
 
 	err := msgServer.UpdateEconomicsParams(types.MsgUpdateEconomicsParams{
-		Authority: authority,
-		Params:    params,
+		Authority:	authority,
+		Params:		params,
 	})
 	require.Error(t, err)
 	require.ErrorIs(t, err, types.ErrInvalidParams)
@@ -151,9 +151,9 @@ func fastEpochParams() types.Params {
 
 func epochInput(epoch, supply, bonded, fees uint64) types.EpochEconomicsInput {
 	return types.EpochEconomicsInput{
-		Epoch:         epoch,
-		TotalSupply:   supply,
-		BondedTokens:  bonded,
-		FeesCollected: fees,
+		Epoch:		epoch,
+		TotalSupply:	supply,
+		BondedTokens:	bonded,
+		FeesCollected:	fees,
 	}
 }

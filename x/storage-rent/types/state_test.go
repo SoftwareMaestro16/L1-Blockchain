@@ -10,12 +10,12 @@ func TestRentAccrualAndDebtNeverNegative(t *testing.T) {
 	params := DefaultStorageRentParams()
 	params.FreeStorageAllowance = 10
 	contract := ContractRentRecord{
-		ContractAddress:    "contract-1",
-		ActorID:            "actor-1",
-		StorageBytes:       20,
-		PrepaidRentBalance: 200,
-		LastChargedHeight:  1,
-		Status:             ContractStatusActive,
+		ContractAddress:	"contract-1",
+		ActorID:		"actor-1",
+		StorageBytes:		20,
+		PrepaidRentBalance:	200,
+		LastChargedHeight:	1,
+		Status:			ContractStatusActive,
 	}
 
 	next, due, err := AccrueRent(contract, params, 11)

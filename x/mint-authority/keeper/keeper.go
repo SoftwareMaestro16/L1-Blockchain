@@ -19,16 +19,16 @@ type BankKeeper interface {
 }
 
 type Keeper struct {
-	storeService corestore.KVStoreService
-	bankKeeper   BankKeeper
-	authority    string
+	storeService	corestore.KVStoreService
+	bankKeeper	BankKeeper
+	authority	string
 }
 
 func NewKeeper(storeService corestore.KVStoreService, bankKeeper BankKeeper, authority string) Keeper {
 	return Keeper{storeService: storeService, bankKeeper: bankKeeper, authority: authority}
 }
 
-func (k Keeper) Authority() string { return k.authority }
+func (k Keeper) Authority() string	{ return k.authority }
 
 func (k Keeper) DefaultGenesis() types.MintAuthorityState {
 	params := types.DefaultMintAuthorityParams()

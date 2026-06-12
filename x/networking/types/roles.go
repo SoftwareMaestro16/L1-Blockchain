@@ -7,19 +7,19 @@ import (
 )
 
 type RoleCommitment struct {
-	NodeID         string
-	Role           NodeRole
-	Bonded         bool
-	CommitmentHash string
-	ExpiresHeight  uint64
+	NodeID		string
+	Role		NodeRole
+	Bonded		bool
+	CommitmentHash	string
+	ExpiresHeight	uint64
 }
 
 type RoleScope struct {
-	NodeID            string
-	Role              NodeRole
-	Advertised        bool
-	Committed         bool
-	ConsensusCritical bool
+	NodeID			string
+	Role			NodeRole
+	Advertised		bool
+	Committed		bool
+	ConsensusCritical	bool
 }
 
 func IsConsensusCriticalRole(role NodeRole, bondedCommitted bool) bool {
@@ -67,11 +67,11 @@ func RoleScopes(record NodeRecord, commitments []RoleCommitment, currentHeight u
 	for _, role := range record.Roles {
 		committed := hasActiveRoleCommitment(record.NodeID, role, commitments, currentHeight)
 		out = append(out, RoleScope{
-			NodeID:            record.NodeID,
-			Role:              role,
-			Advertised:        true,
-			Committed:         committed,
-			ConsensusCritical: IsConsensusCriticalRole(role, committed),
+			NodeID:			record.NodeID,
+			Role:			role,
+			Advertised:		true,
+			Committed:		committed,
+			ConsensusCritical:	IsConsensusCriticalRole(role, committed),
 		})
 	}
 	return out, nil

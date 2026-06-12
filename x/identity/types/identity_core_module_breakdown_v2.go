@@ -18,97 +18,97 @@ type IdentityCoreFailureModeV2 string
 type IdentityCoreIntegrationPointV2 string
 
 const (
-	IdentityCoreModulePathV2 = "identity-core-module"
+	IdentityCoreModulePathV2	= "identity-core-module"
 
-	IdentityCoreStateDomainRecord          IdentityCoreStateObjectV2 = "DomainRecord"
-	IdentityCoreStateDomainCommitment      IdentityCoreStateObjectV2 = "DomainCommitment"
-	IdentityCoreStateDomainNFTBinding      IdentityCoreStateObjectV2 = "DomainNFTBinding"
-	IdentityCoreStateDomainLifecycleParams IdentityCoreStateObjectV2 = "DomainLifecycleParams"
-	IdentityCoreStateExpiryIndex           IdentityCoreStateObjectV2 = "ExpiryIndex"
-	IdentityCoreStateOwnerIndex            IdentityCoreStateObjectV2 = "OwnerIndex"
+	IdentityCoreStateDomainRecord		IdentityCoreStateObjectV2	= "DomainRecord"
+	IdentityCoreStateDomainCommitment	IdentityCoreStateObjectV2	= "DomainCommitment"
+	IdentityCoreStateDomainNFTBinding	IdentityCoreStateObjectV2	= "DomainNFTBinding"
+	IdentityCoreStateDomainLifecycleParams	IdentityCoreStateObjectV2	= "DomainLifecycleParams"
+	IdentityCoreStateExpiryIndex		IdentityCoreStateObjectV2	= "ExpiryIndex"
+	IdentityCoreStateOwnerIndex		IdentityCoreStateObjectV2	= "OwnerIndex"
 
-	IdentityCoreMsgCommitRegistration IdentityCoreMessageNameV2 = "MsgCommitRegistration"
-	IdentityCoreMsgRevealRegistration IdentityCoreMessageNameV2 = "MsgRevealRegistration"
-	IdentityCoreMsgRegisterDirect     IdentityCoreMessageNameV2 = "MsgRegisterDirect"
-	IdentityCoreMsgRenewDomain        IdentityCoreMessageNameV2 = "MsgRenewDomain"
-	IdentityCoreMsgTransferDomain     IdentityCoreMessageNameV2 = "MsgTransferDomain"
-	IdentityCoreMsgExpireDomain       IdentityCoreMessageNameV2 = "MsgExpireDomain"
-	IdentityCoreMsgRepairNFTBinding   IdentityCoreMessageNameV2 = "MsgRepairNFTBinding"
+	IdentityCoreMsgCommitRegistration	IdentityCoreMessageNameV2	= "MsgCommitRegistration"
+	IdentityCoreMsgRevealRegistration	IdentityCoreMessageNameV2	= "MsgRevealRegistration"
+	IdentityCoreMsgRegisterDirect		IdentityCoreMessageNameV2	= "MsgRegisterDirect"
+	IdentityCoreMsgRenewDomain		IdentityCoreMessageNameV2	= "MsgRenewDomain"
+	IdentityCoreMsgTransferDomain		IdentityCoreMessageNameV2	= "MsgTransferDomain"
+	IdentityCoreMsgExpireDomain		IdentityCoreMessageNameV2	= "MsgExpireDomain"
+	IdentityCoreMsgRepairNFTBinding		IdentityCoreMessageNameV2	= "MsgRepairNFTBinding"
 
-	IdentityCoreQueryDomain            IdentityCoreQueryNameV2 = "QueryDomain"
-	IdentityCoreQueryDomainByName      IdentityCoreQueryNameV2 = "QueryDomainByName"
-	IdentityCoreQueryDomainsByOwner    IdentityCoreQueryNameV2 = "QueryDomainsByOwner"
-	IdentityCoreQueryDomainNFTBinding  IdentityCoreQueryNameV2 = "QueryDomainNFTBinding"
-	IdentityCoreQueryDomainLifecycle   IdentityCoreQueryNameV2 = "QueryDomainLifecycle"
-	IdentityCoreQueryRegistrationPrice IdentityCoreQueryNameV2 = "QueryRegistrationPrice"
-	IdentityCoreQueryRenewalPrice      IdentityCoreQueryNameV2 = "QueryRenewalPrice"
+	IdentityCoreQueryDomain			IdentityCoreQueryNameV2	= "QueryDomain"
+	IdentityCoreQueryDomainByName		IdentityCoreQueryNameV2	= "QueryDomainByName"
+	IdentityCoreQueryDomainsByOwner		IdentityCoreQueryNameV2	= "QueryDomainsByOwner"
+	IdentityCoreQueryDomainNFTBinding	IdentityCoreQueryNameV2	= "QueryDomainNFTBinding"
+	IdentityCoreQueryDomainLifecycle	IdentityCoreQueryNameV2	= "QueryDomainLifecycle"
+	IdentityCoreQueryRegistrationPrice	IdentityCoreQueryNameV2	= "QueryRegistrationPrice"
+	IdentityCoreQueryRenewalPrice		IdentityCoreQueryNameV2	= "QueryRenewalPrice"
 
-	IdentityCoreFailureNFTOwnerMismatch       IdentityCoreFailureModeV2 = "registry_nft_owner_mismatch"
-	IdentityCoreFailureMissingExpiryIndex     IdentityCoreFailureModeV2 = "expiry_index_missing_domain"
-	IdentityCoreFailureCommitmentReplay       IdentityCoreFailureModeV2 = "commitment_replay"
-	IdentityCoreFailureTransferResolverRace   IdentityCoreFailureModeV2 = "transfer_race_with_resolver_update"
-	IdentityCoreFailureInvalidLifecycleChange IdentityCoreFailureModeV2 = "incorrect_lifecycle_transition"
+	IdentityCoreFailureNFTOwnerMismatch		IdentityCoreFailureModeV2	= "registry_nft_owner_mismatch"
+	IdentityCoreFailureMissingExpiryIndex		IdentityCoreFailureModeV2	= "expiry_index_missing_domain"
+	IdentityCoreFailureCommitmentReplay		IdentityCoreFailureModeV2	= "commitment_replay"
+	IdentityCoreFailureTransferResolverRace		IdentityCoreFailureModeV2	= "transfer_race_with_resolver_update"
+	IdentityCoreFailureInvalidLifecycleChange	IdentityCoreFailureModeV2	= "incorrect_lifecycle_transition"
 
-	IdentityCoreIntegrationNFTModule      IdentityCoreIntegrationPointV2 = "nft_module"
-	IdentityCoreIntegrationBankModule     IdentityCoreIntegrationPointV2 = "bank_module"
-	IdentityCoreIntegrationFeeModule      IdentityCoreIntegrationPointV2 = "fee_module"
-	IdentityCoreIntegrationResolverModule IdentityCoreIntegrationPointV2 = "resolver_module"
-	IdentityCoreIntegrationStoreV2        IdentityCoreIntegrationPointV2 = "store_v2"
-	IdentityCoreIntegrationBlockSTM       IdentityCoreIntegrationPointV2 = "blockstm"
+	IdentityCoreIntegrationNFTModule	IdentityCoreIntegrationPointV2	= "nft_module"
+	IdentityCoreIntegrationBankModule	IdentityCoreIntegrationPointV2	= "bank_module"
+	IdentityCoreIntegrationFeeModule	IdentityCoreIntegrationPointV2	= "fee_module"
+	IdentityCoreIntegrationResolverModule	IdentityCoreIntegrationPointV2	= "resolver_module"
+	IdentityCoreIntegrationStoreV2		IdentityCoreIntegrationPointV2	= "store_v2"
+	IdentityCoreIntegrationBlockSTM		IdentityCoreIntegrationPointV2	= "blockstm"
 )
 
 type IdentityCoreFailureCoverageV2 struct {
-	Mode       IdentityCoreFailureModeV2
-	Guard      string
-	StoreScope string
+	Mode		IdentityCoreFailureModeV2
+	Guard		string
+	StoreScope	string
 }
 
 type IdentityCoreLifecycleKeeperContractV2 struct {
-	Responsibilities []string
-	MessagesHandled  []IdentityCoreMessageNameV2
-	QueriesServed    []IdentityCoreQueryNameV2
-	NFTHooks         []string
-	Invariants       []IdentityCoreFailureModeV2
-	BlockSTMClasses  []string
+	Responsibilities	[]string
+	MessagesHandled		[]IdentityCoreMessageNameV2
+	QueriesServed		[]IdentityCoreQueryNameV2
+	NFTHooks		[]string
+	Invariants		[]IdentityCoreFailureModeV2
+	BlockSTMClasses		[]string
 }
 
 type IdentityCoreModuleBreakdownV2 struct {
-	ModulePath        string
-	Purpose           []string
-	StateObjects      []IdentityCoreStateObjectV2
-	Messages          []IdentityCoreMessageNameV2
-	Queries           []IdentityCoreQueryNameV2
-	FailureModes      []IdentityCoreFailureCoverageV2
-	IntegrationPoints []IdentityCoreIntegrationPointV2
-	Keeper            IdentityCoreLifecycleKeeperContractV2
-	StoreKeys         []string
-	BreakdownHash     string
+	ModulePath		string
+	Purpose			[]string
+	StateObjects		[]IdentityCoreStateObjectV2
+	Messages		[]IdentityCoreMessageNameV2
+	Queries			[]IdentityCoreQueryNameV2
+	FailureModes		[]IdentityCoreFailureCoverageV2
+	IntegrationPoints	[]IdentityCoreIntegrationPointV2
+	Keeper			IdentityCoreLifecycleKeeperContractV2
+	StoreKeys		[]string
+	BreakdownHash		string
 }
 
 type IdentityCoreIndexEntryV2 struct {
-	Kind         string
-	StoreKey     string
-	Name         string
-	NameHash     string
-	Owner        string
-	ExpiryHeight uint64
+	Kind		string
+	StoreKey	string
+	Name		string
+	NameHash	string
+	Owner		string
+	ExpiryHeight	uint64
 }
 
 type IdentityCoreDerivedIndexesV2 struct {
-	ExpiryIndex []IdentityCoreIndexEntryV2
-	OwnerIndex  []IdentityCoreIndexEntryV2
+	ExpiryIndex	[]IdentityCoreIndexEntryV2
+	OwnerIndex	[]IdentityCoreIndexEntryV2
 }
 
 type IdentityCoreInvariantReportV2 struct {
-	Valid          bool
-	Issues         []string
-	DerivedIndexes IdentityCoreDerivedIndexesV2
-	ReportHash     string
+	Valid		bool
+	Issues		[]string
+	DerivedIndexes	IdentityCoreDerivedIndexesV2
+	ReportHash	string
 }
 
 func DefaultIdentityCoreModuleBreakdownV2() (IdentityCoreModuleBreakdownV2, error) {
 	breakdown := IdentityCoreModuleBreakdownV2{
-		ModulePath: IdentityCoreModulePathV2,
+		ModulePath:	IdentityCoreModulePathV2,
 		Purpose: []string{
 			"canonical_domain_lifecycle",
 			"expiry_processing",
@@ -117,9 +117,9 @@ func DefaultIdentityCoreModuleBreakdownV2() (IdentityCoreModuleBreakdownV2, erro
 			"renewal_and_transfer",
 			"store_v2_indexes",
 		},
-		StateObjects: requiredIdentityCoreStateObjectsV2(),
-		Messages:     requiredIdentityCoreMessagesV2(),
-		Queries:      requiredIdentityCoreQueriesV2(),
+		StateObjects:	requiredIdentityCoreStateObjectsV2(),
+		Messages:	requiredIdentityCoreMessagesV2(),
+		Queries:	requiredIdentityCoreQueriesV2(),
 		FailureModes: []IdentityCoreFailureCoverageV2{
 			newIdentityCoreFailureCoverageV2(IdentityCoreFailureNFTOwnerMismatch, "IdentityState.Validate", IdentityStoreV2SpecNFTBindingsByNamePrefix),
 			newIdentityCoreFailureCoverageV2(IdentityCoreFailureMissingExpiryIndex, "ValidateIdentityCoreStoreV2IndexesV2", IdentityStoreV2SpecExpiryIndexPrefix),
@@ -127,7 +127,7 @@ func DefaultIdentityCoreModuleBreakdownV2() (IdentityCoreModuleBreakdownV2, erro
 			newIdentityCoreFailureCoverageV2(IdentityCoreFailureTransferResolverRace, "TransferDomainNFT", IdentityStoreV2PendingResolverPrefix),
 			newIdentityCoreFailureCoverageV2(IdentityCoreFailureInvalidLifecycleChange, "ApplyDomainLifecycleTransitionV2", IdentityStoreV2SpecDomainsPrefix),
 		},
-		IntegrationPoints: requiredIdentityCoreIntegrationPointsV2(),
+		IntegrationPoints:	requiredIdentityCoreIntegrationPointsV2(),
 		Keeper: IdentityCoreLifecycleKeeperContractV2{
 			Responsibilities: []string{
 				"domain_activation",
@@ -137,8 +137,8 @@ func DefaultIdentityCoreModuleBreakdownV2() (IdentityCoreModuleBreakdownV2, erro
 				"domain_transfer",
 				"nft_binding_repair",
 			},
-			MessagesHandled: requiredIdentityCoreMessagesV2(),
-			QueriesServed:   requiredIdentityCoreQueriesV2(),
+			MessagesHandled:	requiredIdentityCoreMessagesV2(),
+			QueriesServed:		requiredIdentityCoreQueriesV2(),
 			NFTHooks: []string{
 				"ApplyIdentityNFTTransferHookStateV2",
 				"ApplyIdentityRegistryTransferHookStateV2",
@@ -317,8 +317,8 @@ func ValidateIdentityCoreModuleInvariantsV2(state IdentityState, height uint64) 
 func BuildIdentityCoreDerivedIndexesV2(state IdentityState) (IdentityCoreDerivedIndexesV2, error) {
 	state = normalizeIdentityStateParams(state)
 	indexes := IdentityCoreDerivedIndexesV2{
-		ExpiryIndex: make([]IdentityCoreIndexEntryV2, 0, len(state.Domains)),
-		OwnerIndex:  make([]IdentityCoreIndexEntryV2, 0, len(state.Domains)),
+		ExpiryIndex:	make([]IdentityCoreIndexEntryV2, 0, len(state.Domains)),
+		OwnerIndex:	make([]IdentityCoreIndexEntryV2, 0, len(state.Domains)),
 	}
 	for _, domain := range state.Domains {
 		nameHash, err := DomainRecordV2NameHash(domain.Name)
@@ -335,20 +335,20 @@ func BuildIdentityCoreDerivedIndexesV2(state IdentityState) (IdentityCoreDerived
 		}
 		owner := hex.EncodeToString(domain.Owner)
 		indexes.ExpiryIndex = append(indexes.ExpiryIndex, IdentityCoreIndexEntryV2{
-			Kind:         "expiry_index",
-			StoreKey:     expiryKey,
-			Name:         domain.Name,
-			NameHash:     nameHash,
-			Owner:        owner,
-			ExpiryHeight: domain.ExpiryHeight,
+			Kind:		"expiry_index",
+			StoreKey:	expiryKey,
+			Name:		domain.Name,
+			NameHash:	nameHash,
+			Owner:		owner,
+			ExpiryHeight:	domain.ExpiryHeight,
 		})
 		indexes.OwnerIndex = append(indexes.OwnerIndex, IdentityCoreIndexEntryV2{
-			Kind:         "owner_index",
-			StoreKey:     ownerKey,
-			Name:         domain.Name,
-			NameHash:     nameHash,
-			Owner:        owner,
-			ExpiryHeight: domain.ExpiryHeight,
+			Kind:		"owner_index",
+			StoreKey:	ownerKey,
+			Name:		domain.Name,
+			NameHash:	nameHash,
+			Owner:		owner,
+			ExpiryHeight:	domain.ExpiryHeight,
 		})
 	}
 	sortIdentityCoreIndexEntriesV2(indexes.ExpiryIndex)
@@ -640,7 +640,6 @@ func (report *IdentityCoreInvariantReportV2) merge(other IdentityCoreInvariantRe
 		report.addIssue(issue)
 	}
 }
-
 
 func (report *IdentityCoreInvariantReportV2) addIssue(issue string) {
 	report.Valid = false

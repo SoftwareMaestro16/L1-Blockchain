@@ -13,19 +13,19 @@ import (
 type VoteExtensionHandler struct{}
 
 type VoteExtension struct {
-	Kind   string
-	Hash   []byte
-	Height int64
-	Data   []byte
+	Kind	string
+	Hash	[]byte
+	Height	int64
+	Data	[]byte
 }
 
 const (
-	VoteExtensionKindValidatorTelemetrySummary = "validator_telemetry_summary"
-	VoteExtensionKindOracleFutureExtension     = "oracle_future_extension"
-	VoteExtensionKindEncryptedMempoolShare     = "encrypted_mempool_share"
+	VoteExtensionKindValidatorTelemetrySummary	= "validator_telemetry_summary"
+	VoteExtensionKindOracleFutureExtension		= "oracle_future_extension"
+	VoteExtensionKindEncryptedMempoolShare		= "encrypted_mempool_share"
 
-	MaxVoteExtensionBytes     = 512
-	MaxVoteExtensionDataBytes = 128
+	MaxVoteExtensionBytes		= 512
+	MaxVoteExtensionDataBytes	= 128
 )
 
 func NewVoteExtensionHandler() *VoteExtensionHandler {
@@ -40,10 +40,10 @@ func (h *VoteExtensionHandler) SetHandlers(bApp *baseapp.BaseApp) {
 func (h *VoteExtensionHandler) ExtendVote() sdk.ExtendVoteHandler {
 	return func(_ sdk.Context, req *abci.RequestExtendVote) (*abci.ResponseExtendVote, error) {
 		ve := VoteExtension{
-			Kind:   VoteExtensionKindValidatorTelemetrySummary,
-			Hash:   req.Hash,
-			Height: req.Height,
-			Data:   DeterministicVoteExtensionData(req.Height, req.Hash),
+			Kind:	VoteExtensionKindValidatorTelemetrySummary,
+			Hash:	req.Hash,
+			Height:	req.Height,
+			Data:	DeterministicVoteExtensionData(req.Height, req.Hash),
 		}
 
 		bz, err := json.Marshal(ve)

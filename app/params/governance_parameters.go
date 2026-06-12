@@ -6,151 +6,151 @@ import (
 )
 
 const (
-	GovernanceParamValidatorSetSize        = "validator_set_size"
-	GovernanceParamValidatorEntryStake     = "validator_entry_stake_naet"
-	GovernanceParamPoolBackedSelfStake     = "pool_backed_validator_self_stake_naet"
-	GovernanceParamPoolBackedPoolStake     = "pool_backed_validator_pool_stake_naet"
-	GovernanceParamPoolMinDeposit          = "liquid_staking_pool_min_deposit_naet"
-	GovernanceParamValidatorPowerCap       = "validator_power_cap_bps"
-	GovernanceParamCommissionFloor         = "commission_floor_bps"
-	GovernanceParamCommissionMax           = "commission_max_bps"
-	GovernanceParamCommissionMaxChange     = "commission_max_change_bps"
-	GovernanceParamDirectUserDelegation    = "direct_user_validator_delegation"
-	GovernanceParamUnbondingBlocks         = "staking_unbonding_blocks"
-	GovernanceParamMinTxFee                = "min_tx_fee_naet"
-	GovernanceParamInflationMin            = "inflation_min_bps"
-	GovernanceParamInflationMax            = "inflation_max_bps"
-	GovernanceParamTargetBondedRatio       = "target_bonded_ratio_bps"
-	GovernanceParamFeeBurnShare            = "fee_burn_share_bps"
-	GovernanceParamFeeRewardShare          = "fee_reward_share_bps"
-	GovernanceParamFeeTreasuryShare        = "fee_treasury_share_bps"
-	GovernanceParamStorageRentRate         = "storage_rent_rate_per_byte_second_naet"
-	GovernanceParamSystemReserveMin        = "system_storage_reserve_min_runway_days"
-	GovernanceParamSystemReserveWarning    = "system_storage_reserve_warning_runway_days"
-	GovernanceParamSystemReserveCritical   = "system_storage_reserve_critical_runway_days"
-	GovernanceParamDoubleSignSlash         = "double_sign_slash_bps"
-	GovernanceParamDowntimeSlash           = "downtime_slash_bps"
-	GovernanceParamDowntimeWindow          = "downtime_window_blocks"
-	GovernanceParamAVMContractUploadPolicy = "avm_contract_upload_policy"
-	GovernanceParamTreasurySpendPolicy     = "treasury_spend_policy"
-	GovernanceParamValidatorScorePolicy    = "validator_score_policy"
-	GovernanceParamValidatorSetGrowth      = "validator_set_growth_schedule"
-	GovernanceParamBlockGasLimit           = "block_gas_limit"
-	GovernanceParamBlockMaxBytes           = "block_max_bytes"
+	GovernanceParamValidatorSetSize		= "validator_set_size"
+	GovernanceParamValidatorEntryStake	= "validator_entry_stake_naet"
+	GovernanceParamPoolBackedSelfStake	= "pool_backed_validator_self_stake_naet"
+	GovernanceParamPoolBackedPoolStake	= "pool_backed_validator_pool_stake_naet"
+	GovernanceParamPoolMinDeposit		= "liquid_staking_pool_min_deposit_naet"
+	GovernanceParamValidatorPowerCap	= "validator_power_cap_bps"
+	GovernanceParamCommissionFloor		= "commission_floor_bps"
+	GovernanceParamCommissionMax		= "commission_max_bps"
+	GovernanceParamCommissionMaxChange	= "commission_max_change_bps"
+	GovernanceParamDirectUserDelegation	= "direct_user_validator_delegation"
+	GovernanceParamUnbondingBlocks		= "staking_unbonding_blocks"
+	GovernanceParamMinTxFee			= "min_tx_fee_naet"
+	GovernanceParamInflationMin		= "inflation_min_bps"
+	GovernanceParamInflationMax		= "inflation_max_bps"
+	GovernanceParamTargetBondedRatio	= "target_bonded_ratio_bps"
+	GovernanceParamFeeBurnShare		= "fee_burn_share_bps"
+	GovernanceParamFeeRewardShare		= "fee_reward_share_bps"
+	GovernanceParamFeeTreasuryShare		= "fee_treasury_share_bps"
+	GovernanceParamStorageRentRate		= "storage_rent_rate_per_byte_second_naet"
+	GovernanceParamSystemReserveMin		= "system_storage_reserve_min_runway_days"
+	GovernanceParamSystemReserveWarning	= "system_storage_reserve_warning_runway_days"
+	GovernanceParamSystemReserveCritical	= "system_storage_reserve_critical_runway_days"
+	GovernanceParamDoubleSignSlash		= "double_sign_slash_bps"
+	GovernanceParamDowntimeSlash		= "downtime_slash_bps"
+	GovernanceParamDowntimeWindow		= "downtime_window_blocks"
+	GovernanceParamAVMContractUploadPolicy	= "avm_contract_upload_policy"
+	GovernanceParamTreasurySpendPolicy	= "treasury_spend_policy"
+	GovernanceParamValidatorScorePolicy	= "validator_score_policy"
+	GovernanceParamValidatorSetGrowth	= "validator_set_growth_schedule"
+	GovernanceParamBlockGasLimit		= "block_gas_limit"
+	GovernanceParamBlockMaxBytes		= "block_max_bytes"
 
-	GovernanceValueTypeInteger = "integer"
-	GovernanceValueTypeEnum    = "enum"
+	GovernanceValueTypeInteger	= "integer"
+	GovernanceValueTypeEnum		= "enum"
 
-	DirectUserDelegationDisabled = "disabled"
+	DirectUserDelegationDisabled	= "disabled"
 
-	AVMContractUploadDisabled       = "disabled"
-	AVMContractUploadGovernanceOnly = "governance_only"
-	AVMContractUploadPermissioned   = "permissioned"
+	AVMContractUploadDisabled	= "disabled"
+	AVMContractUploadGovernanceOnly	= "governance_only"
+	AVMContractUploadPermissioned	= "permissioned"
 
-	TreasurySpendDisabled       = "disabled"
-	TreasurySpendGovernanceOnly = "governance_only"
-	TreasurySpendBudgetCapped   = "budget_capped"
+	TreasurySpendDisabled		= "disabled"
+	TreasurySpendGovernanceOnly	= "governance_only"
+	TreasurySpendBudgetCapped	= "budget_capped"
 
-	ValidatorScorePolicyInformationalOnly = "informational_only"
-	ValidatorScorePolicyObjectiveRewards  = "objective_reward_modifier"
+	ValidatorScorePolicyInformationalOnly	= "informational_only"
+	ValidatorScorePolicyObjectiveRewards	= "objective_reward_modifier"
 
-	ValidatorSetGrowthPaused  = "paused"
-	ValidatorSetGrowthGradual = "gradual"
-	ValidatorSetGrowthMature  = "mature_cap"
+	ValidatorSetGrowthPaused	= "paused"
+	ValidatorSetGrowthGradual	= "gradual"
+	ValidatorSetGrowthMature	= "mature_cap"
 
-	GovernanceDefaultVotingPeriodBlocks    = uint64(10_000)
-	GovernanceCriticalVotingPeriodBlocks   = uint64(20_000)
-	GovernanceDefaultQuorumBps             = int64(4_000)
-	GovernanceCriticalQuorumBps            = int64(5_000)
-	GovernanceValidatorPowerCapMinBps      = int64(200)
-	GovernanceValidatorPowerCapMaxBps      = int64(300)
-	GovernanceAuthorityGovModule           = "gov"
-	GovernanceDefaultBlockGasLimit         = int64(20_000_000)
-	GovernanceMaxBlockGasLimit             = int64(80_000_000)
-	GovernanceDefaultBlockMaxBytes         = int64(1_048_576)
-	GovernanceMaxBlockMaxBytes             = int64(4_194_304)
-	GovernanceDefaultValidatorEntryStake   = int64(1_000_000) * BaseUnitsPerDisplay
-	GovernanceDefaultPoolBackedSelfStake   = int64(400_000) * BaseUnitsPerDisplay
-	GovernanceDefaultPoolBackedPoolStake   = int64(600_000) * BaseUnitsPerDisplay
-	GovernanceDefaultPoolMinDeposit        = int64(10) * BaseUnitsPerDisplay
-	GovernanceDefaultUnbondingBlocks       = int64(18 * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds)
-	GovernanceDefaultMinTxFeeNaet          = int64(3_000_000)
-	GovernanceDefaultStorageRentRate       = int64(1)
-	GovernanceDefaultReserveMinRunway      = int64(365)
-	GovernanceDefaultReserveWarningRunway  = int64(180)
-	GovernanceDefaultReserveCriticalRunway = int64(90)
+	GovernanceDefaultVotingPeriodBlocks	= uint64(10_000)
+	GovernanceCriticalVotingPeriodBlocks	= uint64(20_000)
+	GovernanceDefaultQuorumBps		= int64(4_000)
+	GovernanceCriticalQuorumBps		= int64(5_000)
+	GovernanceValidatorPowerCapMinBps	= int64(200)
+	GovernanceValidatorPowerCapMaxBps	= int64(300)
+	GovernanceAuthorityGovModule		= "gov"
+	GovernanceDefaultBlockGasLimit		= int64(20_000_000)
+	GovernanceMaxBlockGasLimit		= int64(80_000_000)
+	GovernanceDefaultBlockMaxBytes		= int64(1_048_576)
+	GovernanceMaxBlockMaxBytes		= int64(4_194_304)
+	GovernanceDefaultValidatorEntryStake	= int64(1_000_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolBackedSelfStake	= int64(400_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolBackedPoolStake	= int64(600_000) * BaseUnitsPerDisplay
+	GovernanceDefaultPoolMinDeposit		= int64(10) * BaseUnitsPerDisplay
+	GovernanceDefaultUnbondingBlocks	= int64(18 * 24 * 60 * 60 / StakingUnbondingBlockTimeSeconds)
+	GovernanceDefaultMinTxFeeNaet		= int64(3_000_000)
+	GovernanceDefaultStorageRentRate	= int64(1)
+	GovernanceDefaultReserveMinRunway	= int64(365)
+	GovernanceDefaultReserveWarningRunway	= int64(180)
+	GovernanceDefaultReserveCriticalRunway	= int64(90)
 
-	GovernanceTestValidParamProposalExecutes = "valid_param_proposal_executes"
-	GovernanceTestInvalidParamRejected       = "invalid_param_proposal_rejected"
-	GovernanceTestUnauthorizedAuthority      = "unauthorized_authority_rejected"
-	GovernanceTestEmergencyUnsafeRejected    = "emergency_unsafe_value_rejected"
-	GovernanceTestEpochDelayedActivation     = "epoch_delayed_param_activation"
-	GovernanceTestEventEmitted               = "event_emitted"
-	GovernanceTestQueryReflectsNewParams     = "query_reflects_new_params"
-	GovernanceTestExportImportAfterChange    = "export_import_after_param_change"
+	GovernanceTestValidParamProposalExecutes	= "valid_param_proposal_executes"
+	GovernanceTestInvalidParamRejected		= "invalid_param_proposal_rejected"
+	GovernanceTestUnauthorizedAuthority		= "unauthorized_authority_rejected"
+	GovernanceTestEmergencyUnsafeRejected		= "emergency_unsafe_value_rejected"
+	GovernanceTestEpochDelayedActivation		= "epoch_delayed_param_activation"
+	GovernanceTestEventEmitted			= "event_emitted"
+	GovernanceTestQueryReflectsNewParams		= "query_reflects_new_params"
+	GovernanceTestExportImportAfterChange		= "export_import_after_param_change"
 )
 
 type GovernanceParameterSpec struct {
-	Key               string
-	Category          string
-	ValueType         string
-	DefaultInt        int64
-	DefaultString     string
-	MinInt            int64
-	MaxInt            int64
-	AllowedValues     []string
-	Authority         string
-	ApplyEpochDelay   bool
-	EventType         string
-	InvalidUpdateTest bool
-	Critical          bool
-	GenesisRequired   bool
-	ExecutionBounded  bool
-	EmitsEvents       bool
+	Key			string
+	Category		string
+	ValueType		string
+	DefaultInt		int64
+	DefaultString		string
+	MinInt			int64
+	MaxInt			int64
+	AllowedValues		[]string
+	Authority		string
+	ApplyEpochDelay		bool
+	EventType		string
+	InvalidUpdateTest	bool
+	Critical		bool
+	GenesisRequired		bool
+	ExecutionBounded	bool
+	EmitsEvents		bool
 }
 
 type GovernanceParamValue struct {
-	Key         string
-	IntValue    int64
-	StringValue string
+	Key		string
+	IntValue	int64
+	StringValue	string
 }
 
 type GovernanceParamChange struct {
-	Value              GovernanceParamValue
-	VotingPeriodBlocks uint64
-	QuorumBps          int64
-	ProposalExecution  bool
-	EmitsEvent         bool
+	Value			GovernanceParamValue
+	VotingPeriodBlocks	uint64
+	QuorumBps		int64
+	ProposalExecution	bool
+	EmitsEvent		bool
 }
 
 type GovernanceParameterSafetyReport struct {
-	Specs             []GovernanceParameterSpec
-	AllBounded        bool
-	AllGenesisChecked bool
-	AllEmitEvents     bool
-	CriticalProtected bool
-	Failed            []string
+	Specs			[]GovernanceParameterSpec
+	AllBounded		bool
+	AllGenesisChecked	bool
+	AllEmitEvents		bool
+	CriticalProtected	bool
+	Failed			[]string
 }
 
 type GovernanceTestingEvidence struct {
-	ModuleName string
+	ModuleName	string
 
-	ValidParamProposalExecutes bool
-	InvalidParamRejected       bool
-	UnauthorizedAuthority      bool
-	EmergencyUnsafeRejected    bool
-	EpochDelayedActivation     bool
-	EventEmitted               bool
-	QueryReflectsNewParams     bool
-	ExportImportAfterChange    bool
+	ValidParamProposalExecutes	bool
+	InvalidParamRejected		bool
+	UnauthorizedAuthority		bool
+	EmergencyUnsafeRejected		bool
+	EpochDelayedActivation		bool
+	EventEmitted			bool
+	QueryReflectsNewParams		bool
+	ExportImportAfterChange		bool
 }
 
 type GovernanceTestingReport struct {
-	ModuleName string
-	Required   int
-	Passed     int
-	Failed     []string
-	Ready      bool
+	ModuleName	string
+	Required	int
+	Passed		int
+	Failed		[]string
+	Ready		bool
 }
 
 func DefaultGovernanceParameterSpecs() []GovernanceParameterSpec {
@@ -299,12 +299,12 @@ func BuildGovernanceParameterSafetyReport(specs []GovernanceParameterSpec) Gover
 	}
 	sort.Strings(failed)
 	return GovernanceParameterSafetyReport{
-		Specs:             specs,
-		AllBounded:        allBounded,
-		AllGenesisChecked: allGenesisChecked,
-		AllEmitEvents:     allEmitEvents,
-		CriticalProtected: criticalProtected,
-		Failed:            failed,
+		Specs:			specs,
+		AllBounded:		allBounded,
+		AllGenesisChecked:	allGenesisChecked,
+		AllEmitEvents:		allEmitEvents,
+		CriticalProtected:	criticalProtected,
+		Failed:			failed,
 	}
 }
 
@@ -335,16 +335,16 @@ func ValidateGovernanceParamChange(specs []GovernanceParameterSpec, change Gover
 
 func DefaultGovernanceTestingEvidence() GovernanceTestingEvidence {
 	return GovernanceTestingEvidence{
-		ModuleName: "x/gov",
+		ModuleName:	"x/gov",
 
-		ValidParamProposalExecutes: true,
-		InvalidParamRejected:       true,
-		UnauthorizedAuthority:      true,
-		EmergencyUnsafeRejected:    true,
-		EpochDelayedActivation:     true,
-		EventEmitted:               true,
-		QueryReflectsNewParams:     true,
-		ExportImportAfterChange:    true,
+		ValidParamProposalExecutes:	true,
+		InvalidParamRejected:		true,
+		UnauthorizedAuthority:		true,
+		EmergencyUnsafeRejected:	true,
+		EpochDelayedActivation:		true,
+		EventEmitted:			true,
+		QueryReflectsNewParams:		true,
+		ExportImportAfterChange:	true,
 	}
 }
 
@@ -385,11 +385,11 @@ func BuildGovernanceTestingReport(evidence GovernanceTestingEvidence) Governance
 
 	sort.Strings(failed)
 	return GovernanceTestingReport{
-		ModuleName: evidence.ModuleName,
-		Required:   len(checks),
-		Passed:     passed,
-		Failed:     failed,
-		Ready:      len(failed) == 0,
+		ModuleName:	evidence.ModuleName,
+		Required:	len(checks),
+		Passed:		passed,
+		Failed:		failed,
+		Ready:		len(failed) == 0,
 	}
 }
 
@@ -513,20 +513,20 @@ func (s GovernanceParameterSpec) ValidateValue(value GovernanceParamValue) error
 
 func governanceIntegerSpec(key, category string, defaultValue, minValue, maxValue int64, critical bool) GovernanceParameterSpec {
 	return GovernanceParameterSpec{
-		Key:               key,
-		Category:          category,
-		ValueType:         GovernanceValueTypeInteger,
-		DefaultInt:        defaultValue,
-		MinInt:            minValue,
-		MaxInt:            maxValue,
-		Authority:         GovernanceAuthorityGovModule,
-		ApplyEpochDelay:   critical,
-		EventType:         "governance.param_changed",
-		InvalidUpdateTest: true,
-		Critical:          critical,
-		GenesisRequired:   true,
-		ExecutionBounded:  true,
-		EmitsEvents:       true,
+		Key:			key,
+		Category:		category,
+		ValueType:		GovernanceValueTypeInteger,
+		DefaultInt:		defaultValue,
+		MinInt:			minValue,
+		MaxInt:			maxValue,
+		Authority:		GovernanceAuthorityGovModule,
+		ApplyEpochDelay:	critical,
+		EventType:		"governance.param_changed",
+		InvalidUpdateTest:	true,
+		Critical:		critical,
+		GenesisRequired:	true,
+		ExecutionBounded:	true,
+		EmitsEvents:		true,
 	}
 }
 
@@ -534,19 +534,19 @@ func governanceEnumSpec(key, category string, defaultValue string, critical bool
 	values := append([]string{}, allowedValues...)
 	sort.Strings(values)
 	return GovernanceParameterSpec{
-		Key:               key,
-		Category:          category,
-		ValueType:         GovernanceValueTypeEnum,
-		DefaultString:     defaultValue,
-		AllowedValues:     values,
-		Authority:         GovernanceAuthorityGovModule,
-		ApplyEpochDelay:   critical,
-		EventType:         "governance.param_changed",
-		InvalidUpdateTest: true,
-		Critical:          critical,
-		GenesisRequired:   true,
-		ExecutionBounded:  true,
-		EmitsEvents:       true,
+		Key:			key,
+		Category:		category,
+		ValueType:		GovernanceValueTypeEnum,
+		DefaultString:		defaultValue,
+		AllowedValues:		values,
+		Authority:		GovernanceAuthorityGovModule,
+		ApplyEpochDelay:	critical,
+		EventType:		"governance.param_changed",
+		InvalidUpdateTest:	true,
+		Critical:		critical,
+		GenesisRequired:	true,
+		ExecutionBounded:	true,
+		EmitsEvents:		true,
 	}
 }
 
@@ -574,36 +574,36 @@ func normalizeGovernanceSpecs(specs []GovernanceParameterSpec) []GovernanceParam
 
 func requiredGovernanceParameterKeys() map[string]bool {
 	return map[string]bool{
-		GovernanceParamValidatorSetSize:        true,
-		GovernanceParamValidatorEntryStake:     true,
-		GovernanceParamPoolBackedSelfStake:     true,
-		GovernanceParamPoolBackedPoolStake:     true,
-		GovernanceParamPoolMinDeposit:          true,
-		GovernanceParamValidatorPowerCap:       true,
-		GovernanceParamCommissionFloor:         true,
-		GovernanceParamCommissionMax:           true,
-		GovernanceParamCommissionMaxChange:     true,
-		GovernanceParamDirectUserDelegation:    true,
-		GovernanceParamUnbondingBlocks:         true,
-		GovernanceParamMinTxFee:                true,
-		GovernanceParamInflationMin:            true,
-		GovernanceParamInflationMax:            true,
-		GovernanceParamTargetBondedRatio:       true,
-		GovernanceParamFeeBurnShare:            true,
-		GovernanceParamFeeRewardShare:          true,
-		GovernanceParamFeeTreasuryShare:        true,
-		GovernanceParamStorageRentRate:         true,
-		GovernanceParamSystemReserveMin:        true,
-		GovernanceParamSystemReserveWarning:    true,
-		GovernanceParamSystemReserveCritical:   true,
-		GovernanceParamValidatorScorePolicy:    true,
-		GovernanceParamDoubleSignSlash:         true,
-		GovernanceParamDowntimeSlash:           true,
-		GovernanceParamDowntimeWindow:          true,
-		GovernanceParamAVMContractUploadPolicy: true,
-		GovernanceParamTreasurySpendPolicy:     true,
-		GovernanceParamValidatorSetGrowth:      true,
-		GovernanceParamBlockGasLimit:           true,
-		GovernanceParamBlockMaxBytes:           true,
+		GovernanceParamValidatorSetSize:	true,
+		GovernanceParamValidatorEntryStake:	true,
+		GovernanceParamPoolBackedSelfStake:	true,
+		GovernanceParamPoolBackedPoolStake:	true,
+		GovernanceParamPoolMinDeposit:		true,
+		GovernanceParamValidatorPowerCap:	true,
+		GovernanceParamCommissionFloor:		true,
+		GovernanceParamCommissionMax:		true,
+		GovernanceParamCommissionMaxChange:	true,
+		GovernanceParamDirectUserDelegation:	true,
+		GovernanceParamUnbondingBlocks:		true,
+		GovernanceParamMinTxFee:		true,
+		GovernanceParamInflationMin:		true,
+		GovernanceParamInflationMax:		true,
+		GovernanceParamTargetBondedRatio:	true,
+		GovernanceParamFeeBurnShare:		true,
+		GovernanceParamFeeRewardShare:		true,
+		GovernanceParamFeeTreasuryShare:	true,
+		GovernanceParamStorageRentRate:		true,
+		GovernanceParamSystemReserveMin:	true,
+		GovernanceParamSystemReserveWarning:	true,
+		GovernanceParamSystemReserveCritical:	true,
+		GovernanceParamValidatorScorePolicy:	true,
+		GovernanceParamDoubleSignSlash:		true,
+		GovernanceParamDowntimeSlash:		true,
+		GovernanceParamDowntimeWindow:		true,
+		GovernanceParamAVMContractUploadPolicy:	true,
+		GovernanceParamTreasurySpendPolicy:	true,
+		GovernanceParamValidatorSetGrowth:	true,
+		GovernanceParamBlockGasLimit:		true,
+		GovernanceParamBlockMaxBytes:		true,
 	}
 }

@@ -7,100 +7,100 @@ import (
 )
 
 const (
-	SupplyPolicyLowerNetIssuance  = "lower_net_issuance"
-	SupplyPolicyHigherNetIssuance = "higher_net_issuance"
-	SupplyPolicyHoldNetIssuance   = "hold_net_issuance"
+	SupplyPolicyLowerNetIssuance	= "lower_net_issuance"
+	SupplyPolicyHigherNetIssuance	= "higher_net_issuance"
+	SupplyPolicyHoldNetIssuance	= "hold_net_issuance"
 
-	DefaultTargetNetIssuanceMinBps         = int64(50)
-	DefaultTargetNetIssuanceMaxBps         = int64(300)
-	DefaultLowerNetIssuanceStepBps         = int64(50)
-	DefaultHigherNetIssuanceStepBps        = int64(75)
-	DefaultFeeRevenueToMintThresholdBps    = int64(5_000)
-	DefaultAdequateReserveCoverageBps      = int64(10_000)
-	DefaultMaxLowSlashingRateBps           = int64(50)
-	DefaultMaxHealthyValidatorAttritionBps = int64(100)
-	DefaultMinSupplyProjectionYears        = uint32(1)
-	DefaultMaxSupplyProjectionYears        = uint32(5)
+	DefaultTargetNetIssuanceMinBps		= int64(50)
+	DefaultTargetNetIssuanceMaxBps		= int64(300)
+	DefaultLowerNetIssuanceStepBps		= int64(50)
+	DefaultHigherNetIssuanceStepBps		= int64(75)
+	DefaultFeeRevenueToMintThresholdBps	= int64(5_000)
+	DefaultAdequateReserveCoverageBps	= int64(10_000)
+	DefaultMaxLowSlashingRateBps		= int64(50)
+	DefaultMaxHealthyValidatorAttritionBps	= int64(100)
+	DefaultMinSupplyProjectionYears		= uint32(1)
+	DefaultMaxSupplyProjectionYears		= uint32(5)
 )
 
 type SupplyStabilizationParams struct {
-	TargetNetIssuanceMinBps      int64
-	TargetNetIssuanceMaxBps      int64
-	LowerNetIssuanceStepBps      int64
-	HigherNetIssuanceStepBps     int64
-	FeeRevenueToMintThresholdBps int64
-	StableBondedStakeMinBps      int64
-	HealthyValidatorMinCount     uint64
-	LowSlashingRateMaxBps        int64
-	AdequateReserveCoverageBps   int64
-	ValidatorAttritionMaxBps     int64
-	MinProjectionYears           uint32
-	MaxProjectionYears           uint32
+	TargetNetIssuanceMinBps		int64
+	TargetNetIssuanceMaxBps		int64
+	LowerNetIssuanceStepBps		int64
+	HigherNetIssuanceStepBps	int64
+	FeeRevenueToMintThresholdBps	int64
+	StableBondedStakeMinBps		int64
+	HealthyValidatorMinCount	uint64
+	LowSlashingRateMaxBps		int64
+	AdequateReserveCoverageBps	int64
+	ValidatorAttritionMaxBps	int64
+	MinProjectionYears		uint32
+	MaxProjectionYears		uint32
 }
 
 type SupplyStabilizationInput struct {
-	CurrentSupplyNaet                  sdkmath.Int
-	RecentAnnualGrossMintedNaet        sdkmath.Int
-	RecentAnnualBurnedNaet             sdkmath.Int
-	RecentAnnualFeeRevenueNaet         sdkmath.Int
-	RecentAnnualValidatorRewardsNaet   sdkmath.Int
-	BondedStakeRatioBps                int64
-	ActiveValidatorCount               uint64
-	SlashingRateBps                    int64
-	ReserveCoverageBps                 int64
-	ValidatorAttritionBps              int64
-	SecurityRiskBps                    int64
-	ProjectionYears                    uint32
-	ConsensusRewardAccountingPreserved bool
+	CurrentSupplyNaet			sdkmath.Int
+	RecentAnnualGrossMintedNaet		sdkmath.Int
+	RecentAnnualBurnedNaet			sdkmath.Int
+	RecentAnnualFeeRevenueNaet		sdkmath.Int
+	RecentAnnualValidatorRewardsNaet	sdkmath.Int
+	BondedStakeRatioBps			int64
+	ActiveValidatorCount			uint64
+	SlashingRateBps				int64
+	ReserveCoverageBps			int64
+	ValidatorAttritionBps			int64
+	SecurityRiskBps				int64
+	ProjectionYears				uint32
+	ConsensusRewardAccountingPreserved	bool
 }
 
 type SupplyStabilizationCondition struct {
-	Name   string
-	Met    bool
-	Value  int64
-	Target int64
+	Name	string
+	Met	bool
+	Value	int64
+	Target	int64
 }
 
 type SupplyProjectionYear struct {
-	Year                       uint32
-	StartingSupplyNaet         sdkmath.Int
-	ProjectedGrossMintedNaet   sdkmath.Int
-	ProjectedBurnedNaet        sdkmath.Int
-	ProjectedNetIssuanceNaet   sdkmath.Int
-	ProjectedEndingSupplyNaet  sdkmath.Int
-	ProjectedNetIssuanceBps    int64
-	ValidatorSecuritySpendNaet sdkmath.Int
+	Year				uint32
+	StartingSupplyNaet		sdkmath.Int
+	ProjectedGrossMintedNaet	sdkmath.Int
+	ProjectedBurnedNaet		sdkmath.Int
+	ProjectedNetIssuanceNaet	sdkmath.Int
+	ProjectedEndingSupplyNaet	sdkmath.Int
+	ProjectedNetIssuanceBps		int64
+	ValidatorSecuritySpendNaet	sdkmath.Int
 }
 
 type SupplyStabilizationReport struct {
-	PolicyDirection                    string
-	CurrentNetIssuanceBps              int64
-	TargetNetIssuanceBps               int64
-	TargetNetIssuanceMinBps            int64
-	TargetNetIssuanceMaxBps            int64
-	LowerIssuanceConditions            []SupplyStabilizationCondition
-	HigherIssuanceConditions           []SupplyStabilizationCondition
-	ProjectionYears                    []SupplyProjectionYear
-	GovernanceSummary                  string
-	ConsensusRewardAccountingPreserved bool
-	Passed                             bool
-	Failed                             []string
+	PolicyDirection				string
+	CurrentNetIssuanceBps			int64
+	TargetNetIssuanceBps			int64
+	TargetNetIssuanceMinBps			int64
+	TargetNetIssuanceMaxBps			int64
+	LowerIssuanceConditions			[]SupplyStabilizationCondition
+	HigherIssuanceConditions		[]SupplyStabilizationCondition
+	ProjectionYears				[]SupplyProjectionYear
+	GovernanceSummary			string
+	ConsensusRewardAccountingPreserved	bool
+	Passed					bool
+	Failed					[]string
 }
 
 func DefaultSupplyStabilizationParams() SupplyStabilizationParams {
 	return SupplyStabilizationParams{
-		TargetNetIssuanceMinBps:      DefaultTargetNetIssuanceMinBps,
-		TargetNetIssuanceMaxBps:      DefaultTargetNetIssuanceMaxBps,
-		LowerNetIssuanceStepBps:      DefaultLowerNetIssuanceStepBps,
-		HigherNetIssuanceStepBps:     DefaultHigherNetIssuanceStepBps,
-		FeeRevenueToMintThresholdBps: DefaultFeeRevenueToMintThresholdBps,
-		StableBondedStakeMinBps:      DefaultTargetStakeBps - DefaultStakeTargetToleranceBps,
-		HealthyValidatorMinCount:     DefaultActiveValidatorTarget,
-		LowSlashingRateMaxBps:        DefaultMaxLowSlashingRateBps,
-		AdequateReserveCoverageBps:   DefaultAdequateReserveCoverageBps,
-		ValidatorAttritionMaxBps:     DefaultMaxHealthyValidatorAttritionBps,
-		MinProjectionYears:           DefaultMinSupplyProjectionYears,
-		MaxProjectionYears:           DefaultMaxSupplyProjectionYears,
+		TargetNetIssuanceMinBps:	DefaultTargetNetIssuanceMinBps,
+		TargetNetIssuanceMaxBps:	DefaultTargetNetIssuanceMaxBps,
+		LowerNetIssuanceStepBps:	DefaultLowerNetIssuanceStepBps,
+		HigherNetIssuanceStepBps:	DefaultHigherNetIssuanceStepBps,
+		FeeRevenueToMintThresholdBps:	DefaultFeeRevenueToMintThresholdBps,
+		StableBondedStakeMinBps:	DefaultTargetStakeBps - DefaultStakeTargetToleranceBps,
+		HealthyValidatorMinCount:	DefaultActiveValidatorTarget,
+		LowSlashingRateMaxBps:		DefaultMaxLowSlashingRateBps,
+		AdequateReserveCoverageBps:	DefaultAdequateReserveCoverageBps,
+		ValidatorAttritionMaxBps:	DefaultMaxHealthyValidatorAttritionBps,
+		MinProjectionYears:		DefaultMinSupplyProjectionYears,
+		MaxProjectionYears:		DefaultMaxSupplyProjectionYears,
 	}
 }
 
@@ -146,18 +146,18 @@ func GenerateSupplyStabilizationReport(input SupplyStabilizationInput, params Su
 		failed = append(failed, "supply_projection_missing")
 	}
 	return SupplyStabilizationReport{
-		PolicyDirection:                    direction,
-		CurrentNetIssuanceBps:              currentNetBps,
-		TargetNetIssuanceBps:               targetBps,
-		TargetNetIssuanceMinBps:            params.TargetNetIssuanceMinBps,
-		TargetNetIssuanceMaxBps:            params.TargetNetIssuanceMaxBps,
-		LowerIssuanceConditions:            lowerConditions,
-		HigherIssuanceConditions:           higherConditions,
-		ProjectionYears:                    projections,
-		GovernanceSummary:                  governanceSupplySummary(direction, currentNetBps, targetBps, input.ProjectionYears),
-		ConsensusRewardAccountingPreserved: input.ConsensusRewardAccountingPreserved,
-		Passed:                             len(failed) == 0,
-		Failed:                             failed,
+		PolicyDirection:			direction,
+		CurrentNetIssuanceBps:			currentNetBps,
+		TargetNetIssuanceBps:			targetBps,
+		TargetNetIssuanceMinBps:		params.TargetNetIssuanceMinBps,
+		TargetNetIssuanceMaxBps:		params.TargetNetIssuanceMaxBps,
+		LowerIssuanceConditions:		lowerConditions,
+		HigherIssuanceConditions:		higherConditions,
+		ProjectionYears:			projections,
+		GovernanceSummary:			governanceSupplySummary(direction, currentNetBps, targetBps, input.ProjectionYears),
+		ConsensusRewardAccountingPreserved:	input.ConsensusRewardAccountingPreserved,
+		Passed:					len(failed) == 0,
+		Failed:					failed,
 	}, nil
 }
 
@@ -247,8 +247,8 @@ func (p SupplyStabilizationParams) withDefaults() SupplyStabilizationParams {
 
 func (input SupplyStabilizationInput) Validate(params SupplyStabilizationParams) error {
 	for _, item := range []struct {
-		name  string
-		value sdkmath.Int
+		name	string
+		value	sdkmath.Int
 	}{
 		{name: "current_supply_naet", value: input.CurrentSupplyNaet},
 		{name: "recent_annual_gross_minted_naet", value: input.RecentAnnualGrossMintedNaet},
@@ -334,14 +334,14 @@ func projectSupply(input SupplyStabilizationInput, targetNetIssuanceBps int64) [
 		projectedMint := targetNet.Add(recentBurned)
 		endingSupply := startingSupply.Add(targetNet)
 		years = append(years, SupplyProjectionYear{
-			Year:                       year,
-			StartingSupplyNaet:         startingSupply,
-			ProjectedGrossMintedNaet:   projectedMint,
-			ProjectedBurnedNaet:        recentBurned,
-			ProjectedNetIssuanceNaet:   targetNet,
-			ProjectedEndingSupplyNaet:  endingSupply,
-			ProjectedNetIssuanceBps:    targetNetIssuanceBps,
-			ValidatorSecuritySpendNaet: securitySpend,
+			Year:				year,
+			StartingSupplyNaet:		startingSupply,
+			ProjectedGrossMintedNaet:	projectedMint,
+			ProjectedBurnedNaet:		recentBurned,
+			ProjectedNetIssuanceNaet:	targetNet,
+			ProjectedEndingSupplyNaet:	endingSupply,
+			ProjectedNetIssuanceBps:	targetNetIssuanceBps,
+			ValidatorSecuritySpendNaet:	securitySpend,
 		})
 		startingSupply = endingSupply
 	}

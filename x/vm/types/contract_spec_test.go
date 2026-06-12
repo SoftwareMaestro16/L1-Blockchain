@@ -22,10 +22,10 @@ func TestContractZoneAVMDeployExecuteQueryExecutableSpec(t *testing.T) {
 	require.Equal(t, uint64(1), avm.DecodeU64(StorageToAVM(contract.Storage)["counter"]))
 
 	state, receipt, err := ExecuteAVMContract(state, ContractCall{
-		Actor:      govAddr(),
-		Contract:   contract.Address,
-		Entrypoint: avm.EntryReceiveExternal,
-		GasLimit:   state.Policy.GasModel.ExecuteGas,
+		Actor:		govAddr(),
+		Contract:	contract.Address,
+		Entrypoint:	avm.EntryReceiveExternal,
+		GasLimit:	state.Policy.GasModel.ExecuteGas,
 	}, 12)
 	require.NoError(t, err)
 	require.Equal(t, async.ResultOK, receipt.ResultCode)
@@ -34,11 +34,11 @@ func TestContractZoneAVMDeployExecuteQueryExecutableSpec(t *testing.T) {
 	require.Equal(t, uint64(2), avm.DecodeU64(StorageToAVM(contract.Storage)["counter"]))
 
 	query, err := QueryAVMContract(state, ContractCall{
-		Actor:              govAddr(),
-		Contract:           contract.Address,
-		GasLimit:           state.Policy.GasModel.QueryGas,
-		QueryDepth:         1,
-		QueryResponseBytes: 16,
+		Actor:			govAddr(),
+		Contract:		contract.Address,
+		GasLimit:		state.Policy.GasModel.QueryGas,
+		QueryDepth:		1,
+		QueryResponseBytes:	16,
 	}, 13)
 	require.NoError(t, err)
 	require.Equal(t, async.ResultOK, query.ResultCode)
@@ -203,14 +203,14 @@ func uploadTestCode(t *testing.T, module avm.Module, actor sdkAddr, height uint6
 
 func counterSpecModule() avm.Module {
 	return avm.Module{
-		Version: avm.Version,
+		Version:	avm.Version,
 		Imports: []avm.HostFunction{
 			avm.HostReadStorage,
 			avm.HostWriteStorage,
 			avm.HostChargeGas,
 			avm.HostReturn,
 		},
-		Exports: allSpecExports(),
+		Exports:	allSpecExports(),
 		Code: []avm.Instruction{
 			{Op: avm.OpReadStorage, Data: []byte("counter")},
 			{Op: avm.OpPushU64, Arg: 1},
@@ -223,12 +223,12 @@ func counterSpecModule() avm.Module {
 
 func emitterSpecModule() avm.Module {
 	return avm.Module{
-		Version: avm.Version,
+		Version:	avm.Version,
 		Imports: []avm.HostFunction{
 			avm.HostEmitInternal,
 			avm.HostReturn,
 		},
-		Exports: emitSpecExports(),
+		Exports:	emitSpecExports(),
 		Code: []avm.Instruction{
 			{Op: avm.OpReturn, Arg: uint64(async.ResultOK)},
 			{Op: avm.OpEmitInternal, Arg: 7, Data: []byte("out")},
@@ -250,23 +250,23 @@ func doubleEmitterSpecModule() avm.Module {
 
 func allSpecExports() map[avm.Entrypoint]uint32 {
 	return map[avm.Entrypoint]uint32{
-		avm.EntryDeploy:          0,
-		avm.EntryReceiveExternal: 0,
-		avm.EntryReceiveInternal: 0,
-		avm.EntryReceiveBounced:  0,
-		avm.EntryQuery:           0,
-		avm.EntryMigrate:         0,
+		avm.EntryDeploy:		0,
+		avm.EntryReceiveExternal:	0,
+		avm.EntryReceiveInternal:	0,
+		avm.EntryReceiveBounced:	0,
+		avm.EntryQuery:			0,
+		avm.EntryMigrate:		0,
 	}
 }
 
 func emitSpecExports() map[avm.Entrypoint]uint32 {
 	return map[avm.Entrypoint]uint32{
-		avm.EntryDeploy:          0,
-		avm.EntryReceiveExternal: 1,
-		avm.EntryReceiveInternal: 1,
-		avm.EntryReceiveBounced:  1,
-		avm.EntryQuery:           0,
-		avm.EntryMigrate:         0,
+		avm.EntryDeploy:		0,
+		avm.EntryReceiveExternal:	1,
+		avm.EntryReceiveInternal:	1,
+		avm.EntryReceiveBounced:	1,
+		avm.EntryQuery:			0,
+		avm.EntryMigrate:		0,
 	}
 }
 

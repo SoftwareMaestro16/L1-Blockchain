@@ -12,86 +12,86 @@ import (
 )
 
 const (
-	AVMUpgradeComponentVMInterpreter          AVMUpgradeComponentKind = "vm_interpreter_version"
-	AVMUpgradeComponentSchedulerRules         AVMUpgradeComponentKind = "scheduler_rules"
-	AVMUpgradeComponentGasModel               AVMUpgradeComponentKind = "gas_model"
-	AVMUpgradeComponentZoneConfiguration      AVMUpgradeComponentKind = "zone_configuration"
-	AVMUpgradeComponentBackendAdapters        AVMUpgradeComponentKind = "backend_adapters"
-	AVMUpgradeComponentInterfaceSchemaVersion AVMUpgradeComponentKind = "interface_schema_version"
-	AVMUpgradeComponentRetryPolicies          AVMUpgradeComponentKind = "retry_policies"
-	AVMUpgradeComponentQueueLimits            AVMUpgradeComponentKind = "queue_limits"
+	AVMUpgradeComponentVMInterpreter		AVMUpgradeComponentKind	= "vm_interpreter_version"
+	AVMUpgradeComponentSchedulerRules		AVMUpgradeComponentKind	= "scheduler_rules"
+	AVMUpgradeComponentGasModel			AVMUpgradeComponentKind	= "gas_model"
+	AVMUpgradeComponentZoneConfiguration		AVMUpgradeComponentKind	= "zone_configuration"
+	AVMUpgradeComponentBackendAdapters		AVMUpgradeComponentKind	= "backend_adapters"
+	AVMUpgradeComponentInterfaceSchemaVersion	AVMUpgradeComponentKind	= "interface_schema_version"
+	AVMUpgradeComponentRetryPolicies		AVMUpgradeComponentKind	= "retry_policies"
+	AVMUpgradeComponentQueueLimits			AVMUpgradeComponentKind	= "queue_limits"
 
-	MaxAVMUpgradeComponents      = 32
-	MaxAVMUpgradeSchedulerRules  = 32
-	MaxAVMUpgradeVersionedItems  = 4096
-	MaxAVMUpgradeTokenLength     = 128
-	MaxAVMUpgradeVersionLength   = 64
-	MaxAVMUpgradeProposalIDBytes = 128
+	MaxAVMUpgradeComponents		= 32
+	MaxAVMUpgradeSchedulerRules	= 32
+	MaxAVMUpgradeVersionedItems	= 4096
+	MaxAVMUpgradeTokenLength	= 128
+	MaxAVMUpgradeVersionLength	= 64
+	MaxAVMUpgradeProposalIDBytes	= 128
 )
 
 type AVMUpgradeComponentKind string
 
 type AVMUpgradeComponent struct {
-	Kind             AVMUpgradeComponentKind
-	PreviousVersion  string
-	NextVersion      string
-	ActivationHeight uint64
-	ComponentHash    string
+	Kind			AVMUpgradeComponentKind
+	PreviousVersion		string
+	NextVersion		string
+	ActivationHeight	uint64
+	ComponentHash		string
 }
 
 type AVMSchedulerRuleVersion struct {
-	RuleSetID            string
-	Version              string
-	EffectiveFromHeight  uint64
-	EffectiveUntilHeight uint64
-	RuleHash             string
+	RuleSetID		string
+	Version			string
+	EffectiveFromHeight	uint64
+	EffectiveUntilHeight	uint64
+	RuleHash		string
 }
 
 type AVMGasTableActivation struct {
-	ActivationHeight uint64
-	PolicyVersion    string
-	Policy           AVMGasPolicy
-	Schedule         AVMGasSchedule
-	TableHash        string
+	ActivationHeight	uint64
+	PolicyVersion		string
+	Policy			AVMGasPolicy
+	Schedule		AVMGasSchedule
+	TableHash		string
 }
 
 type AVMContinuationRuntimeVersion struct {
-	ContinuationID string
-	ActorID        string
-	RuntimeVersion string
-	StoredHeight   uint64
-	VersionHash    string
+	ContinuationID	string
+	ActorID		string
+	RuntimeVersion	string
+	StoredHeight	uint64
+	VersionHash	string
 }
 
 type AVMContractCodeVMVersion struct {
-	CodeID      uint64
-	BackendKind AVMContractBackendKind
-	CodeHash    string
-	VMVersion   string
-	VersionHash string
+	CodeID		uint64
+	BackendKind	AVMContractBackendKind
+	CodeHash	string
+	VMVersion	string
+	VersionHash	string
 }
 
 type AVMVersionedMessageExecutionPolicy struct {
-	MessageID        string
-	CreatedHeight    uint64
-	ExecutionHeight  uint64
-	ActivationHeight uint64
-	RuntimeVersion   string
-	SchedulerVersion string
-	GasPolicyVersion string
-	PolicyHash       string
+	MessageID		string
+	CreatedHeight		uint64
+	ExecutionHeight		uint64
+	ActivationHeight	uint64
+	RuntimeVersion		string
+	SchedulerVersion	string
+	GasPolicyVersion	string
+	PolicyHash		string
 }
 
 type AVMUpgradeManifest struct {
-	UpgradeID            string
-	GovernanceProposalID string
-	StagedHeight         uint64
-	Components           []AVMUpgradeComponent
-	SchedulerRules       []AVMSchedulerRuleVersion
-	GasTables            []AVMGasTableActivation
-	Continuations        []AVMContinuationRuntimeVersion
-	ContractCodes        []AVMContractCodeVMVersion
-	ManifestHash         string
+	UpgradeID		string
+	GovernanceProposalID	string
+	StagedHeight		uint64
+	Components		[]AVMUpgradeComponent
+	SchedulerRules		[]AVMSchedulerRuleVersion
+	GasTables		[]AVMGasTableActivation
+	Continuations		[]AVMContinuationRuntimeVersion
+	ContractCodes		[]AVMContractCodeVMVersion
+	ManifestHash		string
 }
 
 func NewAVMUpgradeComponent(component AVMUpgradeComponent) (AVMUpgradeComponent, error) {
@@ -272,13 +272,13 @@ func NewAVMVersionedMessageExecutionPolicy(msg AVMAsyncMessage, activationHeight
 		return AVMVersionedMessageExecutionPolicy{}, errors.New("AVM versioned message policy requires activation and execution height")
 	}
 	policy := AVMVersionedMessageExecutionPolicy{
-		MessageID:        msg.ID,
-		CreatedHeight:    msg.CreatedHeight,
-		ExecutionHeight:  executionHeight,
-		ActivationHeight: activationHeight,
-		RuntimeVersion:   strings.TrimSpace(postRuntime),
-		SchedulerVersion: strings.TrimSpace(postScheduler),
-		GasPolicyVersion: strings.TrimSpace(postGas),
+		MessageID:		msg.ID,
+		CreatedHeight:		msg.CreatedHeight,
+		ExecutionHeight:	executionHeight,
+		ActivationHeight:	activationHeight,
+		RuntimeVersion:		strings.TrimSpace(postRuntime),
+		SchedulerVersion:	strings.TrimSpace(postScheduler),
+		GasPolicyVersion:	strings.TrimSpace(postGas),
 	}
 	if msg.CreatedHeight < activationHeight {
 		policy.RuntimeVersion = strings.TrimSpace(preRuntime)

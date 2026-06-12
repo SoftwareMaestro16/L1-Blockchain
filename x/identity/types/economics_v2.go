@@ -12,29 +12,29 @@ import (
 )
 
 const (
-	IdentityDemandClassStandardV2  = IdentityDemandClassV2("standard")
-	IdentityDemandClassPremiumV2   = IdentityDemandClassV2("premium")
-	IdentityDemandClassContestedV2 = IdentityDemandClassV2("contested")
+	IdentityDemandClassStandardV2	= IdentityDemandClassV2("standard")
+	IdentityDemandClassPremiumV2	= IdentityDemandClassV2("premium")
+	IdentityDemandClassContestedV2	= IdentityDemandClassV2("contested")
 
-	IdentitySubdomainModeRootV2            = IdentitySubdomainModeV2("root")
-	IdentitySubdomainModeOwnerControlledV2 = IdentitySubdomainModeV2("owner_controlled")
-	IdentitySubdomainModeDetachedPaidV2    = IdentitySubdomainModeV2("detached_paid")
-	IdentitySubdomainModeEphemeralV2       = IdentitySubdomainModeV2("ephemeral_service")
+	IdentitySubdomainModeRootV2		= IdentitySubdomainModeV2("root")
+	IdentitySubdomainModeOwnerControlledV2	= IdentitySubdomainModeV2("owner_controlled")
+	IdentitySubdomainModeDetachedPaidV2	= IdentitySubdomainModeV2("detached_paid")
+	IdentitySubdomainModeEphemeralV2	= IdentitySubdomainModeV2("ephemeral_service")
 
-	DefaultIdentityPricingBaseDurationBlocks        = DefaultRegistrationPeriodBlocks
-	DefaultIdentityPricingMaxRegistrationDuration   = DefaultRegistrationPeriodBlocks * 5
-	DefaultIdentityPricingMaxRenewalPeriods         = uint32(5)
-	DefaultIdentityPricingScarcityShortNameBps      = uint32(15_000)
-	DefaultIdentityPricingScarcityMediumNameBps     = uint32(12_500)
-	DefaultIdentityPricingScarcityStandardBps       = uint32(10_000)
-	DefaultIdentityPricingDemandPremiumBps          = uint32(2_500)
-	DefaultIdentityPricingDemandContestedBps        = uint32(5_000)
-	DefaultIdentityPricingAuctionSettlementBps      = uint32(500)
-	DefaultIdentityPricingMultiPeriodDiscountBps    = uint32(500)
-	DefaultIdentityPricingGraceRecoveryMultiplier   = uint32(2_000)
-	DefaultIdentityPricingLabelDepthFeeNaet         = int64(1_000_000_000)
-	DefaultIdentityPricingDetachedSubdomainFeeNaet  = int64(10_000_000_000)
-	DefaultIdentityPricingEphemeralSubdomainFeeNaet = int64(500_000_000)
+	DefaultIdentityPricingBaseDurationBlocks	= DefaultRegistrationPeriodBlocks
+	DefaultIdentityPricingMaxRegistrationDuration	= DefaultRegistrationPeriodBlocks * 5
+	DefaultIdentityPricingMaxRenewalPeriods		= uint32(5)
+	DefaultIdentityPricingScarcityShortNameBps	= uint32(15_000)
+	DefaultIdentityPricingScarcityMediumNameBps	= uint32(12_500)
+	DefaultIdentityPricingScarcityStandardBps	= uint32(10_000)
+	DefaultIdentityPricingDemandPremiumBps		= uint32(2_500)
+	DefaultIdentityPricingDemandContestedBps	= uint32(5_000)
+	DefaultIdentityPricingAuctionSettlementBps	= uint32(500)
+	DefaultIdentityPricingMultiPeriodDiscountBps	= uint32(500)
+	DefaultIdentityPricingGraceRecoveryMultiplier	= uint32(2_000)
+	DefaultIdentityPricingLabelDepthFeeNaet		= int64(1_000_000_000)
+	DefaultIdentityPricingDetachedSubdomainFeeNaet	= int64(10_000_000_000)
+	DefaultIdentityPricingEphemeralSubdomainFeeNaet	= int64(500_000_000)
 )
 
 type IdentityDemandClassV2 string
@@ -42,85 +42,85 @@ type IdentityDemandClassV2 string
 type IdentitySubdomainModeV2 string
 
 type IdentityPricingParamsV2 struct {
-	AntiSquattingParams          IdentityAntiSquattingParamsV2
-	BaseDurationBlocks           uint64
-	MaxRegistrationDuration      uint64
-	MaxRenewalPeriods            uint32
-	LabelDepthFee                sdkmath.Int
-	ShortNameScarcityBps         uint32
-	MediumNameScarcityBps        uint32
-	StandardScarcityBps          uint32
-	DemandPremiumBps             uint32
-	DemandContestedBps           uint32
-	DetachedSubdomainFee         sdkmath.Int
-	EphemeralSubdomainFee        sdkmath.Int
-	AuctionSettlementBps         uint32
-	MultiPeriodDiscountEnabled   bool
-	MultiPeriodDiscountBps       uint32
-	GraceRecoveryMultiplierBps   uint32
-	RenewalRequiresWindow        bool
-	GraceRecoveryRepairsBindings bool
+	AntiSquattingParams		IdentityAntiSquattingParamsV2
+	BaseDurationBlocks		uint64
+	MaxRegistrationDuration		uint64
+	MaxRenewalPeriods		uint32
+	LabelDepthFee			sdkmath.Int
+	ShortNameScarcityBps		uint32
+	MediumNameScarcityBps		uint32
+	StandardScarcityBps		uint32
+	DemandPremiumBps		uint32
+	DemandContestedBps		uint32
+	DetachedSubdomainFee		sdkmath.Int
+	EphemeralSubdomainFee		sdkmath.Int
+	AuctionSettlementBps		uint32
+	MultiPeriodDiscountEnabled	bool
+	MultiPeriodDiscountBps		uint32
+	GraceRecoveryMultiplierBps	uint32
+	RenewalRequiresWindow		bool
+	GraceRecoveryRepairsBindings	bool
 }
 
 type IdentityDomainPriceRequestV2 struct {
-	Name                 string
-	DurationBlocks       uint64
-	DemandClass          IdentityDemandClassV2
-	Renewal              bool
-	Auction              bool
-	ResolverPayloadBytes uint64
-	SubdomainMode        IdentitySubdomainModeV2
-	RenewalPeriods       uint32
-	GraceRecovery        bool
+	Name			string
+	DurationBlocks		uint64
+	DemandClass		IdentityDemandClassV2
+	Renewal			bool
+	Auction			bool
+	ResolverPayloadBytes	uint64
+	SubdomainMode		IdentitySubdomainModeV2
+	RenewalPeriods		uint32
+	GraceRecovery		bool
 }
 
 type IdentityDomainPriceQuoteV2 struct {
-	Denom                   string
-	Name                    string
-	PricingLabel            string
-	NameLength              uint64
-	LabelCount              uint64
-	DurationBlocks          uint64
-	RenewalPeriods          uint32
-	DemandClass             IdentityDemandClassV2
-	SubdomainMode           IdentitySubdomainModeV2
-	BaseRegistrationFee     sdkmath.Int
-	ScarcityFee             sdkmath.Int
-	DemandFee               sdkmath.Int
-	LabelDepthFee           sdkmath.Int
-	StorageFootprintFee     sdkmath.Int
-	CommitmentDeposit       sdkmath.Int
-	RenewalFee              sdkmath.Int
-	AuctionSettlementFee    sdkmath.Int
-	SubdomainModeFee        sdkmath.Int
-	GraceRecoveryFee        sdkmath.Int
-	MultiPeriodDiscount     sdkmath.Int
-	Total                   sdkmath.Int
-	ResolverPayloadBytes    uint64
-	DeterministicFormula    string
-	RenewalCheaperThanFresh bool
+	Denom			string
+	Name			string
+	PricingLabel		string
+	NameLength		uint64
+	LabelCount		uint64
+	DurationBlocks		uint64
+	RenewalPeriods		uint32
+	DemandClass		IdentityDemandClassV2
+	SubdomainMode		IdentitySubdomainModeV2
+	BaseRegistrationFee	sdkmath.Int
+	ScarcityFee		sdkmath.Int
+	DemandFee		sdkmath.Int
+	LabelDepthFee		sdkmath.Int
+	StorageFootprintFee	sdkmath.Int
+	CommitmentDeposit	sdkmath.Int
+	RenewalFee		sdkmath.Int
+	AuctionSettlementFee	sdkmath.Int
+	SubdomainModeFee	sdkmath.Int
+	GraceRecoveryFee	sdkmath.Int
+	MultiPeriodDiscount	sdkmath.Int
+	Total			sdkmath.Int
+	ResolverPayloadBytes	uint64
+	DeterministicFormula	string
+	RenewalCheaperThanFresh	bool
 }
 
 func DefaultIdentityPricingParamsV2() IdentityPricingParamsV2 {
 	return IdentityPricingParamsV2{
-		AntiSquattingParams:          DefaultIdentityAntiSquattingParamsV2(),
-		BaseDurationBlocks:           DefaultIdentityPricingBaseDurationBlocks,
-		MaxRegistrationDuration:      DefaultIdentityPricingMaxRegistrationDuration,
-		MaxRenewalPeriods:            DefaultIdentityPricingMaxRenewalPeriods,
-		LabelDepthFee:                sdkmath.NewInt(DefaultIdentityPricingLabelDepthFeeNaet),
-		ShortNameScarcityBps:         DefaultIdentityPricingScarcityShortNameBps,
-		MediumNameScarcityBps:        DefaultIdentityPricingScarcityMediumNameBps,
-		StandardScarcityBps:          DefaultIdentityPricingScarcityStandardBps,
-		DemandPremiumBps:             DefaultIdentityPricingDemandPremiumBps,
-		DemandContestedBps:           DefaultIdentityPricingDemandContestedBps,
-		DetachedSubdomainFee:         sdkmath.NewInt(DefaultIdentityPricingDetachedSubdomainFeeNaet),
-		EphemeralSubdomainFee:        sdkmath.NewInt(DefaultIdentityPricingEphemeralSubdomainFeeNaet),
-		AuctionSettlementBps:         DefaultIdentityPricingAuctionSettlementBps,
-		MultiPeriodDiscountEnabled:   true,
-		MultiPeriodDiscountBps:       DefaultIdentityPricingMultiPeriodDiscountBps,
-		GraceRecoveryMultiplierBps:   DefaultIdentityPricingGraceRecoveryMultiplier,
-		RenewalRequiresWindow:        true,
-		GraceRecoveryRepairsBindings: true,
+		AntiSquattingParams:		DefaultIdentityAntiSquattingParamsV2(),
+		BaseDurationBlocks:		DefaultIdentityPricingBaseDurationBlocks,
+		MaxRegistrationDuration:	DefaultIdentityPricingMaxRegistrationDuration,
+		MaxRenewalPeriods:		DefaultIdentityPricingMaxRenewalPeriods,
+		LabelDepthFee:			sdkmath.NewInt(DefaultIdentityPricingLabelDepthFeeNaet),
+		ShortNameScarcityBps:		DefaultIdentityPricingScarcityShortNameBps,
+		MediumNameScarcityBps:		DefaultIdentityPricingScarcityMediumNameBps,
+		StandardScarcityBps:		DefaultIdentityPricingScarcityStandardBps,
+		DemandPremiumBps:		DefaultIdentityPricingDemandPremiumBps,
+		DemandContestedBps:		DefaultIdentityPricingDemandContestedBps,
+		DetachedSubdomainFee:		sdkmath.NewInt(DefaultIdentityPricingDetachedSubdomainFeeNaet),
+		EphemeralSubdomainFee:		sdkmath.NewInt(DefaultIdentityPricingEphemeralSubdomainFeeNaet),
+		AuctionSettlementBps:		DefaultIdentityPricingAuctionSettlementBps,
+		MultiPeriodDiscountEnabled:	true,
+		MultiPeriodDiscountBps:		DefaultIdentityPricingMultiPeriodDiscountBps,
+		GraceRecoveryMultiplierBps:	DefaultIdentityPricingGraceRecoveryMultiplier,
+		RenewalRequiresWindow:		true,
+		GraceRecoveryRepairsBindings:	true,
 	}
 }
 
@@ -138,8 +138,8 @@ func ValidateIdentityPricingParamsV2(params IdentityPricingParamsV2) error {
 		return errors.New("identity pricing max renewal periods is required")
 	}
 	for _, amount := range []struct {
-		label string
-		value sdkmath.Int
+		label	string
+		value	sdkmath.Int
 	}{
 		{label: "label depth fee", value: params.LabelDepthFee},
 		{label: "detached subdomain fee", value: params.DetachedSubdomainFee},
@@ -150,8 +150,8 @@ func ValidateIdentityPricingParamsV2(params IdentityPricingParamsV2) error {
 		}
 	}
 	for _, bps := range []struct {
-		label string
-		value uint32
+		label	string
+		value	uint32
 	}{
 		{label: "demand premium bps", value: params.DemandPremiumBps},
 		{label: "demand contested bps", value: params.DemandContestedBps},
@@ -169,8 +169,8 @@ func ValidateIdentityPricingParamsV2(params IdentityPricingParamsV2) error {
 		return errors.New("identity pricing scarcity bps must be at least 10000")
 	}
 	for _, bps := range []struct {
-		label string
-		value uint32
+		label	string
+		value	uint32
 	}{
 		{label: "short name scarcity bps", value: params.ShortNameScarcityBps},
 		{label: "medium name scarcity bps", value: params.MediumNameScarcityBps},
@@ -226,19 +226,19 @@ func QuoteIdentityDomainPriceV2(req IdentityDomainPriceRequestV2, params Identit
 		labelDepthFee = params.LabelDepthFee.Mul(sdkmath.NewInt(int64(len(normalization.Labels) - 1)))
 	}
 	quote := IdentityDomainPriceQuoteV2{
-		Denom:                appparams.BaseDenom,
-		Name:                 normalization.NormalizedName,
-		PricingLabel:         pricingLabel,
-		NameLength:           uint64(len(normalization.NormalizedName)),
-		LabelCount:           uint64(len(normalization.Labels)),
-		DurationBlocks:       duration,
-		RenewalPeriods:       periods,
-		DemandClass:          normalizeIdentityDemandClassV2(req.DemandClass),
-		SubdomainMode:        normalizeIdentitySubdomainModeV2(req.SubdomainMode),
-		StorageFootprintFee:  storageFee,
-		LabelDepthFee:        labelDepthFee,
-		ResolverPayloadBytes: req.ResolverPayloadBytes,
-		DeterministicFormula: "duration_scaled_length_price + scarcity_fee + demand_fee + label_depth_fee + resolver_payload_bytes*storage_fee_per_byte + optional_commitment_or_renewal_or_auction_or_grace_components",
+		Denom:			appparams.BaseDenom,
+		Name:			normalization.NormalizedName,
+		PricingLabel:		pricingLabel,
+		NameLength:		uint64(len(normalization.NormalizedName)),
+		LabelCount:		uint64(len(normalization.Labels)),
+		DurationBlocks:		duration,
+		RenewalPeriods:		periods,
+		DemandClass:		normalizeIdentityDemandClassV2(req.DemandClass),
+		SubdomainMode:		normalizeIdentitySubdomainModeV2(req.SubdomainMode),
+		StorageFootprintFee:	storageFee,
+		LabelDepthFee:		labelDepthFee,
+		ResolverPayloadBytes:	req.ResolverPayloadBytes,
+		DeterministicFormula:	"duration_scaled_length_price + scarcity_fee + demand_fee + label_depth_fee + resolver_payload_bytes*storage_fee_per_byte + optional_commitment_or_renewal_or_auction_or_grace_components",
 	}
 	if req.Renewal {
 		renewalBase, err := RenewalFee(pricingLabel, params.AntiSquattingParams.DomainParams)
@@ -274,12 +274,12 @@ func QuoteIdentityDomainPriceV2(req IdentityDomainPriceRequestV2, params Identit
 	}
 	if req.Renewal {
 		fresh, err := QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-			Name:                 normalization.NormalizedName,
-			DurationBlocks:       params.BaseDurationBlocks,
-			DemandClass:          quote.DemandClass,
-			Auction:              req.Auction,
-			ResolverPayloadBytes: req.ResolverPayloadBytes,
-			SubdomainMode:        quote.SubdomainMode,
+			Name:			normalization.NormalizedName,
+			DurationBlocks:		params.BaseDurationBlocks,
+			DemandClass:		quote.DemandClass,
+			Auction:		req.Auction,
+			ResolverPayloadBytes:	req.ResolverPayloadBytes,
+			SubdomainMode:		quote.SubdomainMode,
 		}, params.withoutRecursiveGraceDiscountV2())
 		if err == nil {
 			quote.RenewalCheaperThanFresh = quote.Total.LT(fresh.Total)
@@ -290,10 +290,10 @@ func QuoteIdentityDomainPriceV2(req IdentityDomainPriceRequestV2, params Identit
 
 func QuoteIdentityRenewalPriceV2(name string, periods uint32, resolverPayloadBytes uint64, params IdentityPricingParamsV2) (IdentityDomainPriceQuoteV2, error) {
 	return QuoteIdentityDomainPriceV2(IdentityDomainPriceRequestV2{
-		Name:                 name,
-		Renewal:              true,
-		RenewalPeriods:       periods,
-		ResolverPayloadBytes: resolverPayloadBytes,
+		Name:			name,
+		Renewal:		true,
+		RenewalPeriods:		periods,
+		ResolverPayloadBytes:	resolverPayloadBytes,
 	}, params)
 }
 

@@ -8,148 +8,148 @@ import (
 )
 
 const (
-	StateValidatorStatusActive  = "active"
-	StateValidatorStatusJailed  = "jailed"
-	StateValidatorStatusSlashed = "slashed"
-	StateValidatorStatusRetired = "retired"
+	StateValidatorStatusActive	= "active"
+	StateValidatorStatusJailed	= "jailed"
+	StateValidatorStatusSlashed	= "slashed"
+	StateValidatorStatusRetired	= "retired"
 
-	RentPayerPolicyPoolReserve = "pool_reserve"
+	RentPayerPolicyPoolReserve	= "pool_reserve"
 
-	SlashingFaultDowntime   = "downtime"
-	SlashingFaultDoubleSign = "double_sign"
+	SlashingFaultDowntime	= "downtime"
+	SlashingFaultDoubleSign	= "double_sign"
 )
 
 type Validator struct {
-	Address            string
-	SelfStake          uint64
-	NominatorStake     uint64
-	Status             string
-	PerformanceScore   uint32
-	CommissionBps      uint32
-	SlashingRiskBps    uint32
-	AllocationLimitBps uint32
-	UpdatedHeight      uint64
-	Jailed             bool
-	Tombstoned         bool
+	Address			string
+	SelfStake		uint64
+	NominatorStake		uint64
+	Status			string
+	PerformanceScore	uint32
+	CommissionBps		uint32
+	SlashingRiskBps		uint32
+	AllocationLimitBps	uint32
+	UpdatedHeight		uint64
+	Jailed			bool
+	Tombstoned		bool
 }
 
 type ValidatorPerformanceScore struct {
-	Validator string
-	Epoch     uint64
-	ScoreBps  uint32
+	Validator	string
+	Epoch		uint64
+	ScoreBps	uint32
 }
 
 type ValidatorCommission struct {
-	Validator string
-	RateBps   uint32
-	Epoch     uint64
+	Validator	string
+	RateBps		uint32
+	Epoch		uint64
 }
 
 type ValidatorSlashingRisk struct {
-	Validator string
-	RiskBps   uint32
-	Epoch     uint64
+	Validator	string
+	RiskBps		uint32
+	Epoch		uint64
 }
 
 type ValidatorAllocationLimit struct {
-	Validator string
-	LimitBps  uint32
-	Epoch     uint64
+	Validator	string
+	LimitBps	uint32
+	Epoch		uint64
 }
 
 type LiquidStakingPool struct {
-	PoolID                  string
-	ContractAddressUser     string
-	ContractAddressRaw      string
-	ReceiptToken            string
-	TotalDeposited          uint64
-	TotalActiveStake        uint64
-	TotalUnbonding          uint64
-	TotalShares             uint64
-	RewardIndex             uint64
-	AllocationEpoch         uint64
-	LastStorageChargeHeight uint64
-	StorageRentDebt         uint64
-	StorageRentReserve      uint64
-	RentPayerPolicy         string
-	Status                  string
+	PoolID			string
+	ContractAddressUser	string
+	ContractAddressRaw	string
+	ReceiptToken		string
+	TotalDeposited		uint64
+	TotalActiveStake	uint64
+	TotalUnbonding		uint64
+	TotalShares		uint64
+	RewardIndex		uint64
+	AllocationEpoch		uint64
+	LastStorageChargeHeight	uint64
+	StorageRentDebt		uint64
+	StorageRentReserve	uint64
+	RentPayerPolicy		string
+	Status			string
 }
 
 type PoolShare struct {
-	Owner                string
-	PoolID               string
-	Shares               uint64
-	PrincipalAmount      uint64
-	CreatedHeight        uint64
-	UpdatedHeight        uint64
-	LastRewardIndex      uint64
-	PendingRewards       uint64
-	StakeWeightedSeconds uint64
-	LastReputationUpdate uint64
+	Owner			string
+	PoolID			string
+	Shares			uint64
+	PrincipalAmount		uint64
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	LastRewardIndex		uint64
+	PendingRewards		uint64
+	StakeWeightedSeconds	uint64
+	LastReputationUpdate	uint64
 }
 
 type PoolValidatorAllocation struct {
-	PoolID           string
-	Validator        string
-	TargetWeightBps  uint32
-	ActiveStake      uint64
-	PendingStake     uint64
-	UnbondingStake   uint64
-	PerformanceScore uint32
-	CommissionBps    uint32
-	SlashingRiskBps  uint32
-	UpdatedHeight    uint64
+	PoolID			string
+	Validator		string
+	TargetWeightBps		uint32
+	ActiveStake		uint64
+	PendingStake		uint64
+	UnbondingStake		uint64
+	PerformanceScore	uint32
+	CommissionBps		uint32
+	SlashingRiskBps		uint32
+	UpdatedHeight		uint64
 }
 
 type PoolUnbondingRequest struct {
-	PoolID         string
-	Owner          string
-	RequestID      string
-	Shares         uint64
-	Amount         uint64
-	RequestHeight  uint64
-	CompleteHeight uint64
-	Status         string
+	PoolID		string
+	Owner		string
+	RequestID	string
+	Shares		uint64
+	Amount		uint64
+	RequestHeight	uint64
+	CompleteHeight	uint64
+	Status		string
 }
 
 type PoolRewardIndex struct {
-	PoolID      string
-	RewardIndex uint64
-	Epoch       uint64
+	PoolID		string
+	RewardIndex	uint64
+	Epoch		uint64
 }
 
 type RewardClaim struct {
-	PoolID string
-	Owner  string
-	Epoch  uint64
-	Amount uint64
+	PoolID	string
+	Owner	string
+	Epoch	uint64
+	Amount	uint64
 }
 
 type EpochStakingSnapshot struct {
-	Epoch            uint64
-	TotalActiveStake uint64
-	TotalPools       uint64
-	ValidatorCount   uint32
-	SnapshotHash     string
+	Epoch			uint64
+	TotalActiveStake	uint64
+	TotalPools		uint64
+	ValidatorCount		uint32
+	SnapshotHash		string
 }
 
 type ValidatorSetSnapshot struct {
-	HeightOrEpoch uint64
-	Validators    []string
-	TotalPower    uint64
-	SnapshotHash  string
+	HeightOrEpoch	uint64
+	Validators	[]string
+	TotalPower	uint64
+	SnapshotHash	string
 }
 
 type ValidatorSlashEvent struct {
-	Height              uint64
-	Validator           string
-	PoolID              string
-	Fault               string
-	Epoch               uint64
-	SlashingLoss        uint64
-	ValidatorStatus     string
-	Tombstoned          bool
-	PoolSlashIndexAfter uint64
+	Height			uint64
+	Validator		string
+	PoolID			string
+	Fault			string
+	Epoch			uint64
+	SlashingLoss		uint64
+	ValidatorStatus		string
+	Tombstoned		bool
+	PoolSlashIndexAfter	uint64
 }
 
 func (v Validator) Validate(params Params) error {
@@ -168,9 +168,9 @@ func (v Validator) Validate(params Params) error {
 			mode = ValidatorFundingSolo
 		}
 		return params.ValidateValidatorFunding(ValidatorFunding{
-			Mode:           mode,
-			SelfStake:      v.SelfStake,
-			NominatorStake: v.NominatorStake,
+			Mode:		mode,
+			SelfStake:	v.SelfStake,
+			NominatorStake:	v.NominatorStake,
 		})
 	}
 	return nil
@@ -279,8 +279,14 @@ func (a PoolValidatorAllocation) Validate(params Params, validator Validator) er
 	if err := ValidateUserFacingAEAddress("pool allocation validator", a.Validator); err != nil {
 		return err
 	}
-	if validator.Address != a.Validator || validator.Status != StateValidatorStatusActive {
-		return errors.New("pool allocation requires active eligible validator")
+	if validator.Address != a.Validator {
+		return errors.New("pool allocation validator address mismatch")
+	}
+	if validator.Status != StateValidatorStatusActive {
+		if a.TargetWeightBps != 0 {
+			return errors.New("pool allocation for non-active validator must have zero target weight")
+		}
+		return nil
 	}
 	if validator.SlashingRiskBps >= MaxBasisPoints {
 		return errors.New("pool allocation validator slashing risk is not eligible")

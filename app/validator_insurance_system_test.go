@@ -39,18 +39,18 @@ func TestValidatorInsurancePendingClaimSurvivesFinalizeBlockRestart(t *testing.T
 	genesis := GenesisStateWithSingleValidator(t, source)
 	insuranceGenesis := validatorinsurancekeeper.DefaultGenesis()
 	insuranceGenesis.State.Insurances = []validatorinsurancetypes.ValidatorInsurance{{
-		ValidatorAddress: validatorInsuranceRawAddress("11"),
-		Balance:          1_500,
-		ValidatorStatus:  "candidate",
+		ValidatorAddress:	validatorInsuranceRawAddress("11"),
+		Balance:		1_500,
+		ValidatorStatus:	"candidate",
 	}}
 	insuranceGenesis.State.Claims = []validatorinsurancetypes.InsuranceClaim{{
-		ClaimID:          "claim-1",
-		ValidatorAddress: validatorInsuranceRawAddress("11"),
-		Claimant:         validatorInsuranceRawAddress("22"),
-		Amount:           700,
-		Status:           validatorinsurancetypes.ClaimStatusPending,
-		Reason:           "pending review",
-		SubmittedHeight:  1,
+		ClaimID:		"claim-1",
+		ValidatorAddress:	validatorInsuranceRawAddress("11"),
+		Claimant:		validatorInsuranceRawAddress("22"),
+		Amount:			700,
+		Status:			validatorinsurancetypes.ClaimStatusPending,
+		Reason:			"pending review",
+		SubmittedHeight:	1,
 	}}
 	insuranceGenesis.State = insuranceGenesis.State.Normalize(insuranceGenesis.Params)
 	require.NoError(t, insuranceGenesis.Validate())
@@ -61,15 +61,15 @@ func TestValidatorInsurancePendingClaimSurvivesFinalizeBlockRestart(t *testing.T
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

@@ -29,13 +29,13 @@ func TestKernelLifecycleFinalizesCommittedRootsAndReceipts(t *testing.T) {
 	require.NoError(t, ProcessKernelProposal(ctx, state, planA))
 
 	classified, err := ClassifyTransaction(state, ClassificationInput{
-		Height:           ctx.Height,
-		TxHash:           testHash("kernel-sync-tx"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDFinancial,
-		DestinationShard: "0",
-		AdmissionHeight:  11,
+		Height:			ctx.Height,
+		TxHash:			testHash("kernel-sync-tx"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDFinancial,
+		DestinationShard:	"0",
+		AdmissionHeight:	11,
 	})
 	require.NoError(t, err)
 	receipt, err := ExecuteSync(classified, ExecutionResult{Success: true, ResultHash: testHash("kernel-sync-result")}, ctx.Height, 0)
@@ -50,8 +50,8 @@ func TestKernelLifecycleFinalizesCommittedRootsAndReceipts(t *testing.T) {
 			testCommitment(t, ctx.Height, ZoneIDContract),
 			testCommitment(t, ctx.Height, ZoneIDFinancial),
 		},
-		Receipts:      []ExecutionReceipt{receipt},
-		Contributions: contributions,
+		Receipts:	[]ExecutionReceipt{receipt},
+		Contributions:	contributions,
 	})
 	require.NoError(t, err)
 	require.NoError(t, finalization.Validate())
@@ -86,13 +86,13 @@ func TestKernelLifecycleRejectsReceiptRootMismatchAndDuplicateReceipts(t *testin
 	})
 	require.NoError(t, err)
 	classified, err := ClassifyTransaction(state, ClassificationInput{
-		Height:           ctx.Height,
-		TxHash:           testHash("duplicate-receipt-tx"),
-		SourceZone:       ZoneIDFinancial,
-		SourceShard:      "0",
-		DestinationZone:  ZoneIDFinancial,
-		DestinationShard: "0",
-		AdmissionHeight:  12,
+		Height:			ctx.Height,
+		TxHash:			testHash("duplicate-receipt-tx"),
+		SourceZone:		ZoneIDFinancial,
+		SourceShard:		"0",
+		DestinationZone:	ZoneIDFinancial,
+		DestinationShard:	"0",
+		AdmissionHeight:	12,
 	})
 	require.NoError(t, err)
 	receipt, err := ExecuteSync(classified, ExecutionResult{Success: true, ResultHash: testHash("duplicate-receipt-result")}, ctx.Height, 0)
@@ -103,9 +103,9 @@ func TestKernelLifecycleRejectsReceiptRootMismatchAndDuplicateReceipts(t *testin
 	contributions := testContributions(ctx.Height)
 	contributions.ReceiptsRoot = testHash("wrong-receipts-root")
 	_, _, err = FinalizeKernelBlock(ctx, state, plan, KernelFinalizationInput{
-		ZoneCommitments: []ZoneCommitment{testCommitment(t, ctx.Height, ZoneIDFinancial)},
-		Receipts:        []ExecutionReceipt{receipt},
-		Contributions:   contributions,
+		ZoneCommitments:	[]ZoneCommitment{testCommitment(t, ctx.Height, ZoneIDFinancial)},
+		Receipts:		[]ExecutionReceipt{receipt},
+		Contributions:		contributions,
 	})
 	require.ErrorContains(t, err, "receipts root contribution mismatch")
 }
@@ -129,9 +129,9 @@ func TestAetherKernelStateKeysMatchSpecification(t *testing.T) {
 	require.Equal(t, "core/zone_roots/00000000000000000007/FINANCIAL_ZONE", coreZoneRootKey)
 
 	for _, tc := range []struct {
-		name string
-		fn   func(uint64) (string, error)
-		want string
+		name	string
+		fn	func(uint64) (string, error)
+		want	string
 	}{
 		{name: "messages", fn: AetherKernelMessageRootKey, want: "aek/messages/root/00000000000000000007"},
 		{name: "receipts", fn: AetherKernelReceiptsRootKey, want: "aek/receipts/root/00000000000000000007"},

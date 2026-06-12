@@ -13,11 +13,11 @@ func ApplyMsgUpdateAuthPolicy(account Account, msg MsgUpdateAuthPolicy) (Account
 		return Account{}, errors.New("auth policy update timelock has not expired")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationAuthPolicyUpdate,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationAuthPolicyUpdate,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -35,11 +35,11 @@ func ApplyMsgRotateKey(account Account, msg MsgRotateKey) (Account, error) {
 		return Account{}, errors.New("key rotation account address mismatch")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationAuthPolicyUpdate,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationAuthPolicyUpdate,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -90,11 +90,11 @@ func ApplyMsgFreezeAccount(account Account, msg MsgFreezeAccount) (Account, erro
 		return Account{}, errors.New("freeze account address mismatch")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationFreezeAccount,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationFreezeAccount,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -114,11 +114,11 @@ func ApplyMsgUnfreezeAccount(account Account, msg MsgUnfreezeAccount) (Account, 
 		return Account{}, errors.New("account cannot unfreeze until storage debt is paid and freeze reasons are cleared")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationUnfreezeAccount,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationUnfreezeAccount,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -138,11 +138,11 @@ func ApplyMsgPayStorageDebt(account Account, msg MsgPayStorageDebt) (Account, er
 		return Account{}, errors.New("storage debt payment amount must be positive")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationPayStorageDebt,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationPayStorageDebt,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -163,11 +163,11 @@ func ApplyMsgUpdateAccountMetadata(account Account, msg MsgUpdateAccountMetadata
 		return Account{}, errors.New("metadata update account address mismatch")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationMetadataUpdate,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationMetadataUpdate,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}
@@ -184,11 +184,11 @@ func ApplyMsgUpdateAccountParams(account Account, msg MsgUpdateAccountParams) (A
 		return Account{}, errors.New("account params update address mismatch")
 	}
 	if _, err := AuthorizeAuthPolicy(account, ExternalMessage{
-		AccountUser:   account.AddressUser,
-		Sequence:      account.Sequence,
-		Signers:       msg.Signers,
-		Operation:     AuthOperationParamsUpdate,
-		CurrentHeight: msg.CurrentHeight,
+		AccountUser:	account.AddressUser,
+		Sequence:	account.Sequence,
+		Signers:	msg.Signers,
+		Operation:	AuthOperationParamsUpdate,
+		CurrentHeight:	msg.CurrentHeight,
 	}); err != nil {
 		return Account{}, err
 	}

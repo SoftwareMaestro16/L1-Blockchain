@@ -13,7 +13,7 @@ var _ types.MsgServer = msgServer{}
 
 type msgServer struct{ keeper *Keeper }
 
-func NewMsgServerImpl(k *Keeper) types.MsgServer { return msgServer{keeper: k} }
+func NewMsgServerImpl(k *Keeper) types.MsgServer	{ return msgServer{keeper: k} }
 
 func (m msgServer) CreateNominatorPool(ctx context.Context, msg *types.MsgCreateNominatorPool) (*types.MsgCreateNominatorPoolResponse, error) {
 	if msg == nil {
@@ -74,12 +74,12 @@ func (m msgServer) DepositToStakingPool(ctx context.Context, msg *types.MsgDepos
 		return nil, err
 	}
 	return &types.MsgDepositToStakingPoolResponse{
-		PoolID:       receipt.PoolID,
-		OwnerAddress: receipt.OwnerAddress,
-		Amount:       receipt.Amount,
-		Shares:       receipt.Shares,
-		Height:       receipt.Height,
-		ReceiptToken: receipt.ReceiptToken,
+		PoolID:		receipt.PoolID,
+		OwnerAddress:	receipt.OwnerAddress,
+		Amount:		receipt.Amount,
+		Shares:		receipt.Shares,
+		Height:		receipt.Height,
+		ReceiptToken:	receipt.ReceiptToken,
 	}, nil
 }
 
@@ -93,12 +93,12 @@ func (m msgServer) RequestPoolUnbond(ctx context.Context, msg *types.MsgRequestP
 		return nil, err
 	}
 	return &types.MsgRequestPoolUnbondResponse{
-		PoolID:         receipt.PoolID,
-		OwnerAddress:   receipt.OwnerAddress,
-		RequestID:      receipt.RequestID,
-		Shares:         receipt.Shares,
-		Amount:         receipt.Amount,
-		CompleteHeight: receipt.CompleteHeight,
+		PoolID:		receipt.PoolID,
+		OwnerAddress:	receipt.OwnerAddress,
+		RequestID:	receipt.RequestID,
+		Shares:		receipt.Shares,
+		Amount:		receipt.Amount,
+		CompleteHeight:	receipt.CompleteHeight,
 	}, nil
 }
 
@@ -112,11 +112,11 @@ func (m msgServer) WithdrawPoolStake(ctx context.Context, msg *types.MsgWithdraw
 		return nil, err
 	}
 	return &types.MsgWithdrawPoolStakeResponse{
-		PoolID:       receipt.PoolID,
-		OwnerAddress: receipt.OwnerAddress,
-		RequestID:    receipt.RequestID,
-		Amount:       receipt.Amount,
-		Height:       receipt.Height,
+		PoolID:		receipt.PoolID,
+		OwnerAddress:	receipt.OwnerAddress,
+		RequestID:	receipt.RequestID,
+		Amount:		receipt.Amount,
+		Height:		receipt.Height,
 	}, nil
 }
 
@@ -130,10 +130,10 @@ func (m msgServer) TopUpPoolReserve(ctx context.Context, msg *types.MsgTopUpPool
 		return nil, err
 	}
 	return &types.MsgTopUpPoolReserveResponse{
-		PoolID:          receipt.PoolID,
-		PayerAddress:    receipt.PayerAddress,
-		Amount:          receipt.Amount,
-		StorageDebtPaid: receipt.StorageDebtPaid,
+		PoolID:			receipt.PoolID,
+		PayerAddress:		receipt.PayerAddress,
+		Amount:			receipt.Amount,
+		StorageDebtPaid:	receipt.StorageDebtPaid,
 	}, nil
 }
 
@@ -147,10 +147,10 @@ func (m msgServer) ClaimPoolRewards(ctx context.Context, msg *types.MsgClaimPool
 		return nil, err
 	}
 	return &types.MsgClaimPoolRewardsResponse{
-		PoolID:       receipt.PoolID,
-		OwnerAddress: receipt.OwnerAddress,
-		Amount:       receipt.Amount,
-		Epoch:        receipt.Epoch,
+		PoolID:		receipt.PoolID,
+		OwnerAddress:	receipt.OwnerAddress,
+		Amount:		receipt.Amount,
+		Epoch:		receipt.Epoch,
 	}, nil
 }
 
@@ -164,10 +164,10 @@ func (m msgServer) SyncPoolRewards(ctx context.Context, msg *types.MsgSyncPoolRe
 		return nil, err
 	}
 	return &types.MsgSyncPoolRewardsResponse{
-		PoolUserRewards:     summary.PoolUserRewards,
-		ValidatorCommission: summary.ValidatorCommission,
-		PoolProtocolFee:     summary.PoolProtocolFee,
-		RewardIndexAfter:    summary.RewardIndexAfter,
+		PoolUserRewards:	summary.PoolUserRewards,
+		ValidatorCommission:	summary.ValidatorCommission,
+		PoolProtocolFee:	summary.PoolProtocolFee,
+		RewardIndexAfter:	summary.RewardIndexAfter,
 	}, nil
 }
 
@@ -193,10 +193,10 @@ func (m msgServer) ClaimStakeReputation(ctx context.Context, msg *types.MsgClaim
 		return nil, err
 	}
 	return &types.MsgClaimStakeReputationResponse{
-		Account:         receipt.Account,
-		PoolID:          receipt.PoolID,
-		ReputationDelta: receipt.ReputationDelta,
-		ReputationScore: receipt.ReputationScore,
+		Account:		receipt.Account,
+		PoolID:			receipt.PoolID,
+		ReputationDelta:	receipt.ReputationDelta,
+		ReputationScore:	receipt.ReputationScore,
 	}, nil
 }
 
@@ -260,9 +260,9 @@ func (m msgServer) CreateOfficialLiquidStakingPool(ctx context.Context, msg *typ
 		return nil, err
 	}
 	return &types.MsgCreateOfficialLiquidStakingPoolResponse{
-		PoolID:              pool.PoolID,
-		ContractAddressUser: pool.ContractAddressUser,
-		ContractAddressRaw:  pool.ContractAddressRaw,
+		PoolID:			pool.PoolID,
+		ContractAddressUser:	pool.ContractAddressUser,
+		ContractAddressRaw:	pool.ContractAddressRaw,
 	}, nil
 }
 

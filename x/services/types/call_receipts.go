@@ -13,74 +13,74 @@ import (
 type ServiceReceiptStatusText string
 
 const (
-	ServiceReceiptStatusAccepted   ServiceReceiptStatusText = "accepted"
-	ServiceReceiptStatusExecuted   ServiceReceiptStatusText = "executed"
-	ServiceReceiptStatusFailed     ServiceReceiptStatusText = "failed"
-	ServiceReceiptStatusExpired    ServiceReceiptStatusText = "expired"
-	ServiceReceiptStatusChallenged ServiceReceiptStatusText = "challenged"
-	ServiceReceiptStatusSettled    ServiceReceiptStatusText = "settled"
-	ServiceReceiptStatusReverted   ServiceReceiptStatusText = "reverted"
+	ServiceReceiptStatusAccepted	ServiceReceiptStatusText	= "accepted"
+	ServiceReceiptStatusExecuted	ServiceReceiptStatusText	= "executed"
+	ServiceReceiptStatusFailed	ServiceReceiptStatusText	= "failed"
+	ServiceReceiptStatusExpired	ServiceReceiptStatusText	= "expired"
+	ServiceReceiptStatusChallenged	ServiceReceiptStatusText	= "challenged"
+	ServiceReceiptStatusSettled	ServiceReceiptStatusText	= "settled"
+	ServiceReceiptStatusReverted	ServiceReceiptStatusText	= "reverted"
 )
 
 type ServiceReceiptCanonicalView struct {
-	CallID         string
-	ServiceID      string
-	MethodID       string
-	Caller         string
-	Status         ServiceReceiptStatusText
-	RequestHash    string
-	ResponseHash   string
-	ProofHash      string
-	PaymentStatus  string
-	GasUsed        uint64
-	ProviderID     string
-	ExecutedHeight uint64
-	AnchoredHeight uint64
-	ErrorCode      string
-	ReceiptHash    string
-	ViewHash       string
+	CallID		string
+	ServiceID	string
+	MethodID	string
+	Caller		string
+	Status		ServiceReceiptStatusText
+	RequestHash	string
+	ResponseHash	string
+	ProofHash	string
+	PaymentStatus	string
+	GasUsed		uint64
+	ProviderID	string
+	ExecutedHeight	uint64
+	AnchoredHeight	uint64
+	ErrorCode	string
+	ReceiptHash	string
+	ViewHash	string
 }
 
 type ServiceCallReplayEntry struct {
-	ServiceID      string
-	Caller         string
-	Nonce          uint64
-	CallID         string
-	IdempotencyKey string
-	PayloadHash    string
-	CreatedHeight  uint64
-	DeadlineHeight uint64
-	RetryOf        string
-	EntryHash      string
+	ServiceID	string
+	Caller		string
+	Nonce		uint64
+	CallID		string
+	IdempotencyKey	string
+	PayloadHash	string
+	CreatedHeight	uint64
+	DeadlineHeight	uint64
+	RetryOf		string
+	EntryHash	string
 }
 
 type ServiceReceiptTombstone struct {
-	CallID            string
-	ServiceID         string
-	Caller            string
-	Nonce             uint64
-	IdempotencyKey    string
-	ReceiptHash       string
-	CreatedHeight     uint64
-	ReceiptHeight     uint64
-	RetainUntilHeight uint64
-	TombstoneHash     string
+	CallID			string
+	ServiceID		string
+	Caller			string
+	Nonce			uint64
+	IdempotencyKey		string
+	ReceiptHash		string
+	CreatedHeight		uint64
+	ReceiptHeight		uint64
+	RetainUntilHeight	uint64
+	TombstoneHash		string
 }
 
 type ServiceCallReplayIndex struct {
-	ProofHorizon uint64
-	Entries      []ServiceCallReplayEntry
-	Tombstones   []ServiceReceiptTombstone
-	IndexHash    string
+	ProofHorizon	uint64
+	Entries		[]ServiceCallReplayEntry
+	Tombstones	[]ServiceReceiptTombstone
+	IndexHash	string
 }
 
 func ComputeUnifiedServiceCallID(ctx coretypes.ServiceConsensusContext, serviceID, caller string, nonce uint64, idempotencyKey, payloadHash string) string {
 	return coretypes.ComputeServiceCallID(ctx, coretypes.ServiceCallEnvelope{
-		ServiceID:      strings.TrimSpace(serviceID),
-		Caller:         strings.TrimSpace(caller),
-		Nonce:          nonce,
-		IdempotencyKey: strings.TrimSpace(idempotencyKey),
-		PayloadHash:    strings.ToLower(strings.TrimSpace(payloadHash)),
+		ServiceID:	strings.TrimSpace(serviceID),
+		Caller:		strings.TrimSpace(caller),
+		Nonce:		nonce,
+		IdempotencyKey:	strings.TrimSpace(idempotencyKey),
+		PayloadHash:	strings.ToLower(strings.TrimSpace(payloadHash)),
 	})
 }
 
@@ -93,21 +93,21 @@ func NewServiceReceiptCanonicalView(receipt ServiceReceipt) (ServiceReceiptCanon
 		return ServiceReceiptCanonicalView{}, err
 	}
 	view := ServiceReceiptCanonicalView{
-		CallID:         receipt.CallID,
-		ServiceID:      receipt.ServiceID,
-		MethodID:       receipt.MethodID,
-		Caller:         receipt.Caller,
-		Status:         status,
-		RequestHash:    receipt.RequestHash,
-		ResponseHash:   receipt.ResponseHash,
-		ProofHash:      receipt.ProofHash,
-		PaymentStatus:  strings.ToLower(string(receipt.PaymentStatus)),
-		GasUsed:        receipt.GasUsed,
-		ProviderID:     receipt.ProviderID,
-		ExecutedHeight: receipt.ExecutedHeight,
-		AnchoredHeight: receipt.AnchoredHeight,
-		ErrorCode:      receipt.ErrorCode,
-		ReceiptHash:    receipt.ReceiptHash,
+		CallID:		receipt.CallID,
+		ServiceID:	receipt.ServiceID,
+		MethodID:	receipt.MethodID,
+		Caller:		receipt.Caller,
+		Status:		status,
+		RequestHash:	receipt.RequestHash,
+		ResponseHash:	receipt.ResponseHash,
+		ProofHash:	receipt.ProofHash,
+		PaymentStatus:	strings.ToLower(string(receipt.PaymentStatus)),
+		GasUsed:	receipt.GasUsed,
+		ProviderID:	receipt.ProviderID,
+		ExecutedHeight:	receipt.ExecutedHeight,
+		AnchoredHeight:	receipt.AnchoredHeight,
+		ErrorCode:	receipt.ErrorCode,
+		ReceiptHash:	receipt.ReceiptHash,
 	}
 	view.ViewHash = ComputeServiceReceiptCanonicalViewHash(view)
 	return view, view.Validate()
@@ -233,15 +233,15 @@ func AcceptUnifiedServiceCall(ctx coretypes.ServiceConsensusContext, descriptor 
 		}
 	}
 	entry := ServiceCallReplayEntry{
-		ServiceID:      call.TargetService,
-		Caller:         call.Caller,
-		Nonce:          call.Nonce,
-		CallID:         call.CallID,
-		IdempotencyKey: call.IdempotencyKey,
-		PayloadHash:    call.PayloadHash,
-		CreatedHeight:  call.CreatedHeight,
-		DeadlineHeight: call.DeadlineHeight,
-		RetryOf:        call.RetryOf,
+		ServiceID:	call.TargetService,
+		Caller:		call.Caller,
+		Nonce:		call.Nonce,
+		CallID:		call.CallID,
+		IdempotencyKey:	call.IdempotencyKey,
+		PayloadHash:	call.PayloadHash,
+		CreatedHeight:	call.CreatedHeight,
+		DeadlineHeight:	call.DeadlineHeight,
+		RetryOf:	call.RetryOf,
 	}
 	entry.EntryHash = ComputeServiceCallReplayEntryHash(entry)
 	next := cloneServiceCallReplayIndex(index)
@@ -275,15 +275,15 @@ func TombstoneServiceReceipt(ctx coretypes.ServiceConsensusContext, index Servic
 		receiptHeight = call.CreatedHeight
 	}
 	tombstone := ServiceReceiptTombstone{
-		CallID:            call.CallID,
-		ServiceID:         call.TargetService,
-		Caller:            call.Caller,
-		Nonce:             call.Nonce,
-		IdempotencyKey:    call.IdempotencyKey,
-		ReceiptHash:       receipt.ReceiptHash,
-		CreatedHeight:     call.CreatedHeight,
-		ReceiptHeight:     receiptHeight,
-		RetainUntilHeight: receiptHeight + index.ProofHorizon,
+		CallID:			call.CallID,
+		ServiceID:		call.TargetService,
+		Caller:			call.Caller,
+		Nonce:			call.Nonce,
+		IdempotencyKey:		call.IdempotencyKey,
+		ReceiptHash:		receipt.ReceiptHash,
+		CreatedHeight:		call.CreatedHeight,
+		ReceiptHeight:		receiptHeight,
+		RetainUntilHeight:	receiptHeight + index.ProofHorizon,
 	}
 	tombstone.TombstoneHash = ComputeServiceReceiptTombstoneHash(tombstone)
 	next := cloneServiceCallReplayIndex(index)

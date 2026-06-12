@@ -7,58 +7,58 @@ import (
 )
 
 const (
-	AuthModeMultisig  = "multisig"
-	AuthModeThreshold = "threshold"
-	AuthModeWeighted  = "weighted"
-	AuthModeTwoDevice = "two_device"
+	AuthModeMultisig	= "multisig"
+	AuthModeThreshold	= "threshold"
+	AuthModeWeighted	= "weighted"
+	AuthModeTwoDevice	= "two_device"
 
-	AuthKeyRolePrimary  = "primary"
-	AuthKeyRoleDevice   = "device"
-	AuthKeyRoleRecovery = "recovery"
+	AuthKeyRolePrimary	= "primary"
+	AuthKeyRoleDevice	= "device"
+	AuthKeyRoleRecovery	= "recovery"
 
-	AuthOperationTransfer         = "transfer"
-	AuthOperationStakingChange    = "staking_change"
-	AuthOperationAuthPolicyUpdate = "auth_policy_update"
-	AuthOperationRecoverAccount   = "recover_account"
-	AuthOperationFreezeAccount    = "freeze_account"
-	AuthOperationPayStorageDebt   = "pay_storage_debt"
-	AuthOperationUnfreezeAccount  = "unfreeze_account"
-	AuthOperationMetadataUpdate   = "metadata_update"
-	AuthOperationParamsUpdate     = "params_update"
+	AuthOperationTransfer		= "transfer"
+	AuthOperationStakingChange	= "staking_change"
+	AuthOperationAuthPolicyUpdate	= "auth_policy_update"
+	AuthOperationRecoverAccount	= "recover_account"
+	AuthOperationFreezeAccount	= "freeze_account"
+	AuthOperationPayStorageDebt	= "pay_storage_debt"
+	AuthOperationUnfreezeAccount	= "unfreeze_account"
+	AuthOperationMetadataUpdate	= "metadata_update"
+	AuthOperationParamsUpdate	= "params_update"
 )
 
 type AuthKey struct {
-	ID        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
-	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key"`
-	Role      string `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	ID		string	`protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
+	PublicKey	string	`protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key"`
+	Role		string	`protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
 }
 
 type AuthWeight struct {
-	KeyID  string `protobuf:"bytes,1,opt,name=key_id,json=keyID,proto3" json:"key_id"`
-	Weight uint64 `protobuf:"varint,2,opt,name=weight,proto3" json:"weight"`
+	KeyID	string	`protobuf:"bytes,1,opt,name=key_id,json=keyID,proto3" json:"key_id"`
+	Weight	uint64	`protobuf:"varint,2,opt,name=weight,proto3" json:"weight"`
 }
 
 type RecoveryPolicy struct {
-	Keys              []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
-	Threshold         uint64   `protobuf:"varint,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	TimelockEndHeight uint64   `protobuf:"varint,3,opt,name=timelock_end_height,json=timelockEndHeight,proto3" json:"timelock_end_height,omitempty"`
+	Keys			[]string	`protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
+	Threshold		uint64		`protobuf:"varint,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	TimelockEndHeight	uint64		`protobuf:"varint,3,opt,name=timelock_end_height,json=timelockEndHeight,proto3" json:"timelock_end_height,omitempty"`
 }
 
 type TimelockPolicy struct {
-	AuthPolicyUpdateEndHeight uint64 `protobuf:"varint,1,opt,name=auth_policy_update_end_height,json=authPolicyUpdateEndHeight,proto3" json:"auth_policy_update_end_height,omitempty"`
-	RecoveryEndHeight         uint64 `protobuf:"varint,2,opt,name=recovery_end_height,json=recoveryEndHeight,proto3" json:"recovery_end_height,omitempty"`
+	AuthPolicyUpdateEndHeight	uint64	`protobuf:"varint,1,opt,name=auth_policy_update_end_height,json=authPolicyUpdateEndHeight,proto3" json:"auth_policy_update_end_height,omitempty"`
+	RecoveryEndHeight		uint64	`protobuf:"varint,2,opt,name=recovery_end_height,json=recoveryEndHeight,proto3" json:"recovery_end_height,omitempty"`
 }
 
 type SpendingLimit struct {
-	Operation string `protobuf:"bytes,1,opt,name=operation,proto3" json:"operation"`
-	MaxAmount uint64 `protobuf:"varint,2,opt,name=max_amount,json=maxAmount,proto3" json:"max_amount"`
+	Operation	string	`protobuf:"bytes,1,opt,name=operation,proto3" json:"operation"`
+	MaxAmount	uint64	`protobuf:"varint,2,opt,name=max_amount,json=maxAmount,proto3" json:"max_amount"`
 }
 
 type AuthzResult struct {
-	Authorized bool
-	Mode       string
-	Signers    []string
-	Weight     uint64
+	Authorized	bool
+	Mode		string
+	Signers		[]string
+	Weight		uint64
 }
 
 func (p AuthPolicy) Normalize() AuthPolicy {

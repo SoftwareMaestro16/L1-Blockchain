@@ -11,15 +11,15 @@ import (
 type AddressRole string
 
 const (
-	AddressRoleAccount   AddressRole = "account"
-	AddressRoleValidator AddressRole = "validator"
-	AddressRoleConsensus AddressRole = "consensus"
+	AddressRoleAccount	AddressRole	= "account"
+	AddressRoleValidator	AddressRole	= "validator"
+	AddressRoleConsensus	AddressRole	= "consensus"
 )
 
 type AddressPair struct {
-	Role AddressRole
-	User string
-	Raw  string
+	Role	AddressRole
+	User	string
+	Raw	string
 }
 
 func DeriveAccountAddress(pubKey cryptotypes.PubKey) (AddressPair, error) {
@@ -92,9 +92,9 @@ func addressPairFromBytes(role AddressRole, bz []byte) (AddressPair, error) {
 		return AddressPair{}, err
 	}
 	return AddressPair{
-		Role: role,
-		User: user,
-		Raw:  Format(bz),
+		Role:	role,
+		User:	user,
+		Raw:	Format(bz),
 	}, nil
 }
 

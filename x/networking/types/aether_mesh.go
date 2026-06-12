@@ -10,64 +10,64 @@ import (
 )
 
 const (
-	MaxAetherMeshPayloadBytes = MaxStreamMessageBytes
-	MaxAetherMeshTTL          = uint64(10_000)
+	MaxAetherMeshPayloadBytes	= MaxStreamMessageBytes
+	MaxAetherMeshTTL		= uint64(10_000)
 )
 
 type AetherMeshMessageType string
 
 const (
-	MeshMessageConsensus AetherMeshMessageType = "consensus"
-	MeshMessageTx        AetherMeshMessageType = "tx"
-	MeshMessageExecution AetherMeshMessageType = "execution"
-	MeshMessageQuery     AetherMeshMessageType = "query"
-	MeshMessageService   AetherMeshMessageType = "service"
-	MeshMessageCrossZone AetherMeshMessageType = "cross_zone"
-	MeshMessageStateSync AetherMeshMessageType = "state_sync"
-	MeshMessageStorage   AetherMeshMessageType = "storage"
-	MeshMessageRouting   AetherMeshMessageType = "routing"
+	MeshMessageConsensus	AetherMeshMessageType	= "consensus"
+	MeshMessageTx		AetherMeshMessageType	= "tx"
+	MeshMessageExecution	AetherMeshMessageType	= "execution"
+	MeshMessageQuery	AetherMeshMessageType	= "query"
+	MeshMessageService	AetherMeshMessageType	= "service"
+	MeshMessageCrossZone	AetherMeshMessageType	= "cross_zone"
+	MeshMessageStateSync	AetherMeshMessageType	= "state_sync"
+	MeshMessageStorage	AetherMeshMessageType	= "storage"
+	MeshMessageRouting	AetherMeshMessageType	= "routing"
 )
 
 type AetherMeshProof struct {
-	ProofType   string
-	ProofHash   string
-	ProofHeight uint64
+	ProofType	string
+	ProofHash	string
+	ProofHeight	uint64
 }
 
 type AetherMeshMessage struct {
-	Type              AetherMeshMessageType
-	Payload           []byte
-	Origin            string
-	Destination       string
-	Priority          uint32
-	TTL               uint64
-	MessageID         string
-	OverlayID         string
-	SourceZone        string
-	DestinationZone   string
-	Sequence          uint64
-	PayloadHash       string
-	RouteHint         RouteHint
-	DeadlineHeight    uint64
-	Signature         []byte
-	Proof             AetherMeshProof
-	ConsensusEffect   bool
-	DeterminismSource DeterminismSource
+	Type			AetherMeshMessageType
+	Payload			[]byte
+	Origin			string
+	Destination		string
+	Priority		uint32
+	TTL			uint64
+	MessageID		string
+	OverlayID		string
+	SourceZone		string
+	DestinationZone		string
+	Sequence		uint64
+	PayloadHash		string
+	RouteHint		RouteHint
+	DeadlineHeight		uint64
+	Signature		[]byte
+	Proof			AetherMeshProof
+	ConsensusEffect		bool
+	DeterminismSource	DeterminismSource
 }
 
 type AetherMeshRouteRequest struct {
-	Message          AetherMeshMessage
-	SourceNodeID     string
-	CandidatePeers   []NodeRecord
-	MembershipProofs []OverlayMembershipProof
-	Graph            RoutingGraph
-	CurrentHeight    uint64
+	Message			AetherMeshMessage
+	SourceNodeID		string
+	CandidatePeers		[]NodeRecord
+	MembershipProofs	[]OverlayMembershipProof
+	Graph			RoutingGraph
+	CurrentHeight		uint64
 }
 
 type AetherMeshDelivery struct {
-	Message AetherMeshMessage
-	Route   OverlayRoutePlan
-	Channel ChannelClass
+	Message	AetherMeshMessage
+	Route	OverlayRoutePlan
+	Channel	ChannelClass
 }
 
 func NewAetherMeshMessage(msg AetherMeshMessage) (AetherMeshMessage, error) {
@@ -271,16 +271,16 @@ func (m AetherMeshMessage) ToNetworkMessage() (NetworkMessage, error) {
 		return NetworkMessage{}, err
 	}
 	return NewNetworkMessage(NetworkMessage{
-		Layer:              LayerL3Application,
-		Channel:            channelForMeshMessageType(msg.Type),
-		ConsensusEffect:    msg.ConsensusEffect,
-		DeterminismSource:  msg.DeterminismSource,
-		ReplaySafeID:       msg.MessageID,
-		PayloadHash:        msg.PayloadHash,
-		PayloadSizeBytes:   uint64(len(msg.Payload)),
-		Chunked:            uint64(len(msg.Payload)) > LargePayloadBytes,
-		CommitmentVerified: msg.Proof.ProofHash != "",
-		CommittedProofHash: msg.Proof.ProofHash,
+		Layer:			LayerL3Application,
+		Channel:		channelForMeshMessageType(msg.Type),
+		ConsensusEffect:	msg.ConsensusEffect,
+		DeterminismSource:	msg.DeterminismSource,
+		ReplaySafeID:		msg.MessageID,
+		PayloadHash:		msg.PayloadHash,
+		PayloadSizeBytes:	uint64(len(msg.Payload)),
+		Chunked:		uint64(len(msg.Payload)) > LargePayloadBytes,
+		CommitmentVerified:	msg.Proof.ProofHash != "",
+		CommittedProofHash:	msg.Proof.ProofHash,
 	})
 }
 
@@ -294,13 +294,13 @@ func RouteAetherMeshMessage(req AetherMeshRouteRequest, descriptors []OverlayDes
 		return AetherMeshDelivery{}, err
 	}
 	plan, err := BuildOverlayRoute(OverlayRoutingRequest{
-		Message:          base,
-		SourceNodeID:     req.SourceNodeID,
-		CandidatePeers:   req.CandidatePeers,
-		MembershipProofs: req.MembershipProofs,
-		Graph:            req.Graph,
-		Hint:             msg.RouteHint,
-		CurrentHeight:    req.CurrentHeight,
+		Message:		base,
+		SourceNodeID:		req.SourceNodeID,
+		CandidatePeers:		req.CandidatePeers,
+		MembershipProofs:	req.MembershipProofs,
+		Graph:			req.Graph,
+		Hint:			msg.RouteHint,
+		CurrentHeight:		req.CurrentHeight,
 	}, descriptors)
 	if err != nil {
 		return AetherMeshDelivery{}, err
@@ -309,9 +309,9 @@ func RouteAetherMeshMessage(req AetherMeshRouteRequest, descriptors []OverlayDes
 		return AetherMeshDelivery{}, errors.New("networking mesh route overlay mismatch")
 	}
 	return AetherMeshDelivery{
-		Message: msg,
-		Route:   plan,
-		Channel: channelForMeshMessageType(msg.Type),
+		Message:	msg,
+		Route:		plan,
+		Channel:	channelForMeshMessageType(msg.Type),
 	}, nil
 }
 

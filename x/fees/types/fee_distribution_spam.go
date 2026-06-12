@@ -10,133 +10,133 @@ import (
 )
 
 const (
-	FeeBucketValidatorDelegator = "validator_delegator_rewards"
-	FeeBucketCommunityPool      = "community_pool"
-	FeeBucketBurn               = "burn"
-	FeeBucketStateMaintenance   = "state_maintenance_reserve"
-	FeeBucketSecurityReserve    = "security_reserve"
+	FeeBucketValidatorDelegator	= "validator_delegator_rewards"
+	FeeBucketCommunityPool		= "community_pool"
+	FeeBucketBurn			= "burn"
+	FeeBucketStateMaintenance	= "state_maintenance_reserve"
+	FeeBucketSecurityReserve	= "security_reserve"
 
-	AdmissionModeMempool        = "mempool"
-	AdmissionModeBlockExecution = "block_execution"
+	AdmissionModeMempool		= "mempool"
+	AdmissionModeBlockExecution	= "block_execution"
 )
 
 type FeeDistributionParams struct {
-	ValidatorBaseBps            uint32
-	CommunityBaseBps            uint32
-	BurnBaseBps                 uint32
-	StateMaintenanceBaseBps     uint32
-	SecurityReserveBaseBps      uint32
-	ValidatorRewardFloorBps     uint32
-	ActivityBurnMaxBps          uint32
-	StateMaintenanceMaxBps      uint32
-	SecurityReserveMaxBps       uint32
-	HighActivityThresholdBps    uint32
-	HighStateGrowthThresholdBps uint32
+	ValidatorBaseBps		uint32
+	CommunityBaseBps		uint32
+	BurnBaseBps			uint32
+	StateMaintenanceBaseBps		uint32
+	SecurityReserveBaseBps		uint32
+	ValidatorRewardFloorBps		uint32
+	ActivityBurnMaxBps		uint32
+	StateMaintenanceMaxBps		uint32
+	SecurityReserveMaxBps		uint32
+	HighActivityThresholdBps	uint32
+	HighStateGrowthThresholdBps	uint32
 }
 
 type FeeAllocationBucket struct {
-	Bucket string
-	Amount sdk.Coin
-	Bps    uint32
+	Bucket	string
+	Amount	sdk.Coin
+	Bps	uint32
 }
 
 type FeeAllocationEvent struct {
-	Type       string
-	Bucket     string
-	Denom      string
-	Amount     sdkmath.Int
-	Bps        uint32
-	Attributes []EventAttribute
+	Type		string
+	Bucket		string
+	Denom		string
+	Amount		sdkmath.Int
+	Bps		uint32
+	Attributes	[]EventAttribute
 }
 
 type EventAttribute struct {
-	Key   string
-	Value string
+	Key	string
+	Value	string
 }
 
 type FeeDistributionResult struct {
-	Collected                    sdk.Coin
-	ValidatorDelegatorRewards    sdk.Coin
-	CommunityPool                sdk.Coin
-	Burn                         sdk.Coin
-	StateMaintenanceReserve      sdk.Coin
-	SecurityReserve              sdk.Coin
-	Buckets                      []FeeAllocationBucket
-	Events                       []FeeAllocationEvent
-	ValidatorRewardFloorEnforced bool
-	BurnAllocationBps            uint32
-	StateMaintenanceBps          uint32
-	SecurityReserveBps           uint32
+	Collected			sdk.Coin
+	ValidatorDelegatorRewards	sdk.Coin
+	CommunityPool			sdk.Coin
+	Burn				sdk.Coin
+	StateMaintenanceReserve		sdk.Coin
+	SecurityReserve			sdk.Coin
+	Buckets				[]FeeAllocationBucket
+	Events				[]FeeAllocationEvent
+	ValidatorRewardFloorEnforced	bool
+	BurnAllocationBps		uint32
+	StateMaintenanceBps		uint32
+	SecurityReserveBps		uint32
 }
 
 type AccountActivityWindow struct {
-	Sender             string
-	WindowID           uint64
-	TxCount            uint32
-	FailedTxCount      uint32
-	StateWriteCount    uint32
-	DeploymentCount    uint32
-	ExecutableMessages uint32
+	Sender			string
+	WindowID		uint64
+	TxCount			uint32
+	FailedTxCount		uint32
+	StateWriteCount		uint32
+	DeploymentCount		uint32
+	ExecutableMessages	uint32
 }
 
 type AntiSpamParams struct {
-	WindowTxSoftLimit          uint32
-	FailedTxSoftLimit          uint32
-	StateWriteSoftLimit        uint32
-	DeploymentSoftLimit        uint32
-	AccountActivityScoreMaxBps uint32
-	FailedTxSurchargeStepBps   uint32
-	StateWriteSurchargeStepBps uint32
-	DeploymentSurchargeStepBps uint32
-	MaxTotalSurchargeBps       uint32
-	MinExecutableFeeNaet       sdkmath.Int
+	WindowTxSoftLimit		uint32
+	FailedTxSoftLimit		uint32
+	StateWriteSoftLimit		uint32
+	DeploymentSoftLimit		uint32
+	AccountActivityScoreMaxBps	uint32
+	FailedTxSurchargeStepBps	uint32
+	StateWriteSurchargeStepBps	uint32
+	DeploymentSurchargeStepBps	uint32
+	MaxTotalSurchargeBps		uint32
+	MinExecutableFeeNaet		sdkmath.Int
 }
 
 type AccountActivityScore struct {
-	Sender             string
-	WindowID           uint64
-	ScoreBps           uint32
-	FailedTxScoreBps   uint32
-	StateWriteScoreBps uint32
-	DeploymentScoreBps uint32
-	Bounded            bool
+	Sender			string
+	WindowID		uint64
+	ScoreBps		uint32
+	FailedTxScoreBps	uint32
+	StateWriteScoreBps	uint32
+	DeploymentScoreBps	uint32
+	Bounded			bool
 }
 
 type AntiSpamFeeInput struct {
-	Mode            string
-	BaseRequiredFee sdk.Coin
-	PaidFee         sdk.Coin
-	Activity        AccountActivityWindow
-	Params          AntiSpamParams
-	Executable      bool
+	Mode		string
+	BaseRequiredFee	sdk.Coin
+	PaidFee		sdk.Coin
+	Activity	AccountActivityWindow
+	Params		AntiSpamParams
+	Executable	bool
 }
 
 type AntiSpamAdmissionDecision struct {
-	Mode             string
-	Sender           string
-	RequiredFee      sdk.Coin
-	PaidFee          sdk.Coin
-	ActivityScoreBps uint32
-	SurchargeBps     uint32
-	Accepted         bool
-	Reason           string
-	Deterministic    bool
-	Bounded          bool
+	Mode			string
+	Sender			string
+	RequiredFee		sdk.Coin
+	PaidFee			sdk.Coin
+	ActivityScoreBps	uint32
+	SurchargeBps		uint32
+	Accepted		bool
+	Reason			string
+	Deterministic		bool
+	Bounded			bool
 }
 
 func DefaultFeeDistributionParams() FeeDistributionParams {
 	return FeeDistributionParams{
-		ValidatorBaseBps:            8_000,
-		CommunityBaseBps:            1_000,
-		BurnBaseBps:                 500,
-		StateMaintenanceBaseBps:     300,
-		SecurityReserveBaseBps:      200,
-		ValidatorRewardFloorBps:     6_000,
-		ActivityBurnMaxBps:          1_500,
-		StateMaintenanceMaxBps:      1_500,
-		SecurityReserveMaxBps:       500,
-		HighActivityThresholdBps:    7_000,
-		HighStateGrowthThresholdBps: 6_000,
+		ValidatorBaseBps:		8_000,
+		CommunityBaseBps:		1_000,
+		BurnBaseBps:			500,
+		StateMaintenanceBaseBps:	300,
+		SecurityReserveBaseBps:		200,
+		ValidatorRewardFloorBps:	6_000,
+		ActivityBurnMaxBps:		1_500,
+		StateMaintenanceMaxBps:		1_500,
+		SecurityReserveMaxBps:		500,
+		HighActivityThresholdBps:	7_000,
+		HighStateGrowthThresholdBps:	6_000,
 	}
 }
 
@@ -147,8 +147,8 @@ func (p FeeDistributionParams) Validate() error {
 		return fmt.Errorf("fee distribution base buckets must sum to 10000 bps")
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "validator reward floor", value: p.ValidatorRewardFloorBps},
 		{name: "activity burn max", value: p.ActivityBurnMaxBps},
@@ -195,8 +195,8 @@ func DistributeFeeBuckets(collected sdk.Coin, params FeeDistributionParams, sign
 	floorEnforced := false
 
 	for _, request := range []struct {
-		target *uint32
-		add    uint32
+		target	*uint32
+		add	uint32
 	}{
 		{target: &burnBps, add: activityDependentBps(signals.BlockGasUtilizationBps, params.HighActivityThresholdBps, params.ActivityBurnMaxBps)},
 		{target: &stateBps, add: activityDependentBps(stateGrowthBps, params.HighStateGrowthThresholdBps, params.StateMaintenanceMaxBps)},
@@ -231,9 +231,9 @@ func DistributeFeeBuckets(collected sdk.Coin, params FeeDistributionParams, sign
 	}
 	validatorAmount := collected.Amount.Sub(allocated)
 	validator := FeeAllocationBucket{
-		Bucket: FeeBucketValidatorDelegator,
-		Amount: sdk.NewCoin(collected.Denom, validatorAmount),
-		Bps:    validatorBps,
+		Bucket:	FeeBucketValidatorDelegator,
+		Amount:	sdk.NewCoin(collected.Denom, validatorAmount),
+		Bps:	validatorBps,
 	}
 	allocations = append([]FeeAllocationBucket{validator}, allocations...)
 	sort.SliceStable(allocations, func(i, j int) bool {
@@ -241,12 +241,12 @@ func DistributeFeeBuckets(collected sdk.Coin, params FeeDistributionParams, sign
 	})
 
 	result := FeeDistributionResult{
-		Collected:                    collected,
-		Buckets:                      allocations,
-		ValidatorRewardFloorEnforced: floorEnforced || validatorBps == params.ValidatorRewardFloorBps,
-		BurnAllocationBps:            burnBps,
-		StateMaintenanceBps:          stateBps,
-		SecurityReserveBps:           securityBps,
+		Collected:			collected,
+		Buckets:			allocations,
+		ValidatorRewardFloorEnforced:	floorEnforced || validatorBps == params.ValidatorRewardFloorBps,
+		BurnAllocationBps:		burnBps,
+		StateMaintenanceBps:		stateBps,
+		SecurityReserveBps:		securityBps,
 	}
 	for _, bucket := range allocations {
 		switch bucket.Bucket {
@@ -262,11 +262,11 @@ func DistributeFeeBuckets(collected sdk.Coin, params FeeDistributionParams, sign
 			result.SecurityReserve = bucket.Amount
 		}
 		result.Events = append(result.Events, FeeAllocationEvent{
-			Type:   "fee_allocation",
-			Bucket: bucket.Bucket,
-			Denom:  bucket.Amount.Denom,
-			Amount: bucket.Amount.Amount,
-			Bps:    bucket.Bps,
+			Type:	"fee_allocation",
+			Bucket:	bucket.Bucket,
+			Denom:	bucket.Amount.Denom,
+			Amount:	bucket.Amount.Amount,
+			Bps:	bucket.Bps,
 			Attributes: []EventAttribute{
 				{Key: "activity_bps", Value: fmt.Sprintf("%d", signals.BlockGasUtilizationBps)},
 				{Key: "state_growth_bps", Value: fmt.Sprintf("%d", stateGrowthBps)},
@@ -286,16 +286,16 @@ func DefaultAntiSpamParams(params Params) AntiSpamParams {
 		minFee = sdkmath.NewInt(1)
 	}
 	return AntiSpamParams{
-		WindowTxSoftLimit:          uint32(params.MaxSenderTxsPerBlock),
-		FailedTxSoftLimit:          3,
-		StateWriteSoftLimit:        10,
-		DeploymentSoftLimit:        2,
-		AccountActivityScoreMaxBps: uint32(BasisPoints),
-		FailedTxSurchargeStepBps:   DefaultSpamSurchargeStepBps,
-		StateWriteSurchargeStepBps: 250,
-		DeploymentSurchargeStepBps: 750,
-		MaxTotalSurchargeBps:       DefaultMaxSpamSurchargeBps,
-		MinExecutableFeeNaet:       minFee,
+		WindowTxSoftLimit:		uint32(params.MaxSenderTxsPerBlock),
+		FailedTxSoftLimit:		3,
+		StateWriteSoftLimit:		10,
+		DeploymentSoftLimit:		2,
+		AccountActivityScoreMaxBps:	uint32(BasisPoints),
+		FailedTxSurchargeStepBps:	DefaultSpamSurchargeStepBps,
+		StateWriteSurchargeStepBps:	250,
+		DeploymentSurchargeStepBps:	750,
+		MaxTotalSurchargeBps:		DefaultMaxSpamSurchargeBps,
+		MinExecutableFeeNaet:		minFee,
 	}
 }
 
@@ -304,8 +304,8 @@ func (p AntiSpamParams) Validate() error {
 		return errors.New("anti-spam soft limits must be positive")
 	}
 	for _, item := range []struct {
-		name  string
-		value uint32
+		name	string
+		value	uint32
 	}{
 		{name: "activity score max", value: p.AccountActivityScoreMaxBps},
 		{name: "failed tx surcharge step", value: p.FailedTxSurchargeStepBps},
@@ -342,13 +342,13 @@ func ScoreAccountActivity(window AccountActivityWindow, params AntiSpamParams) (
 		bounded = true
 	}
 	return AccountActivityScore{
-		Sender:             window.Sender,
-		WindowID:           window.WindowID,
-		ScoreBps:           score,
-		FailedTxScoreBps:   failed,
-		StateWriteScoreBps: stateWrites,
-		DeploymentScoreBps: deployments,
-		Bounded:            bounded,
+		Sender:			window.Sender,
+		WindowID:		window.WindowID,
+		ScoreBps:		score,
+		FailedTxScoreBps:	failed,
+		StateWriteScoreBps:	stateWrites,
+		DeploymentScoreBps:	deployments,
+		Bounded:		bounded,
 	}, nil
 }
 
@@ -403,15 +403,15 @@ func ValidateAntiSpamFee(input AntiSpamFeeInput) (AntiSpamAdmissionDecision, err
 		required = base
 	}
 	decision := AntiSpamAdmissionDecision{
-		Mode:             mode,
-		Sender:           input.Activity.Sender,
-		RequiredFee:      sdk.NewCoin(BondDenom, required),
-		PaidFee:          input.PaidFee,
-		ActivityScoreBps: score.ScoreBps,
-		SurchargeBps:     surchargeBps,
-		Accepted:         input.PaidFee.Amount.GTE(required),
-		Deterministic:    true,
-		Bounded:          surchargeBps <= params.MaxTotalSurchargeBps,
+		Mode:			mode,
+		Sender:			input.Activity.Sender,
+		RequiredFee:		sdk.NewCoin(BondDenom, required),
+		PaidFee:		input.PaidFee,
+		ActivityScoreBps:	score.ScoreBps,
+		SurchargeBps:		surchargeBps,
+		Accepted:		input.PaidFee.Amount.GTE(required),
+		Deterministic:		true,
+		Bounded:		surchargeBps <= params.MaxTotalSurchargeBps,
 	}
 	if !decision.Accepted {
 		decision.Reason = "fee_below_anti_spam_requirement"

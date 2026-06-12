@@ -11,20 +11,20 @@ import (
 )
 
 const (
-	MaxAVMDeadLetterReasonLength    = 256
-	MaxAVMDeadLetterErrorCodeLength = MaxAVMReceiptErrorCode
+	MaxAVMDeadLetterReasonLength	= 256
+	MaxAVMDeadLetterErrorCodeLength	= MaxAVMReceiptErrorCode
 )
 
 type AVMDeadLetterRecord struct {
-	MessageID            string
-	ZoneID               zonestypes.ZoneID
-	Reason               string
-	FailedAttempts       uint32
-	LastErrorCode        string
-	FinalHeight          uint64
-	RefundAmountOptional uint64
-	ReceiptID            string
-	RecordHash           string
+	MessageID		string
+	ZoneID			zonestypes.ZoneID
+	Reason			string
+	FailedAttempts		uint32
+	LastErrorCode		string
+	FinalHeight		uint64
+	RefundAmountOptional	uint64
+	ReceiptID		string
+	RecordHash		string
 }
 
 func NewAVMDeadLetterRecord(record AVMDeadLetterRecord) (AVMDeadLetterRecord, error) {

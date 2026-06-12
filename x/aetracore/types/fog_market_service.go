@@ -15,133 +15,133 @@ type FogSelectionStrategy string
 type FogDisputeStatus string
 
 const (
-	FogCategoryCompute      FogServiceCategory = "COMPUTE_PROVIDER"
-	FogCategoryStorage      FogServiceCategory = "STORAGE_PROVIDER"
-	FogCategoryRouting      FogServiceCategory = "ROUTING_PROVIDER"
-	FogCategoryExecution    FogServiceCategory = "EXECUTION_PROVIDER"
-	FogCategoryIndexing     FogServiceCategory = "INDEXING_PROVIDER"
-	FogCategoryAvailability FogServiceCategory = "AVAILABILITY_PROVIDER"
+	FogCategoryCompute	FogServiceCategory	= "COMPUTE_PROVIDER"
+	FogCategoryStorage	FogServiceCategory	= "STORAGE_PROVIDER"
+	FogCategoryRouting	FogServiceCategory	= "ROUTING_PROVIDER"
+	FogCategoryExecution	FogServiceCategory	= "EXECUTION_PROVIDER"
+	FogCategoryIndexing	FogServiceCategory	= "INDEXING_PROVIDER"
+	FogCategoryAvailability	FogServiceCategory	= "AVAILABILITY_PROVIDER"
 
-	FogProviderActive    FogProviderStatus = "ACTIVE"
-	FogProviderSuspended FogProviderStatus = "SUSPENDED"
-	FogProviderSlashed   FogProviderStatus = "SLASHED"
-	FogProviderExpired   FogProviderStatus = "EXPIRED"
+	FogProviderActive	FogProviderStatus	= "ACTIVE"
+	FogProviderSuspended	FogProviderStatus	= "SUSPENDED"
+	FogProviderSlashed	FogProviderStatus	= "SLASHED"
+	FogProviderExpired	FogProviderStatus	= "EXPIRED"
 
-	FogPricingPerRequest     FogPricingUnit = "REQUEST"
-	FogPricingPerByte        FogPricingUnit = "BYTE"
-	FogPricingPerComputeUnit FogPricingUnit = "COMPUTE_UNIT"
-	FogPricingPerStorageGiB  FogPricingUnit = "STORAGE_GIB"
-	FogPricingPerRoute       FogPricingUnit = "ROUTE"
+	FogPricingPerRequest		FogPricingUnit	= "REQUEST"
+	FogPricingPerByte		FogPricingUnit	= "BYTE"
+	FogPricingPerComputeUnit	FogPricingUnit	= "COMPUTE_UNIT"
+	FogPricingPerStorageGiB		FogPricingUnit	= "STORAGE_GIB"
+	FogPricingPerRoute		FogPricingUnit	= "ROUTE"
 
-	FogSelectionDeterministicScore FogSelectionStrategy = "DETERMINISTIC_SCORE"
-	FogSelectionLowestPrice        FogSelectionStrategy = "LOWEST_PRICE"
-	FogSelectionReputationWeighted FogSelectionStrategy = "REPUTATION_WEIGHTED"
+	FogSelectionDeterministicScore	FogSelectionStrategy	= "DETERMINISTIC_SCORE"
+	FogSelectionLowestPrice		FogSelectionStrategy	= "LOWEST_PRICE"
+	FogSelectionReputationWeighted	FogSelectionStrategy	= "REPUTATION_WEIGHTED"
 
-	FogDisputeOpen     FogDisputeStatus = "OPEN"
-	FogDisputeRejected FogDisputeStatus = "REJECTED"
-	FogDisputeProven   FogDisputeStatus = "PROVEN"
+	FogDisputeOpen		FogDisputeStatus	= "OPEN"
+	FogDisputeRejected	FogDisputeStatus	= "REJECTED"
+	FogDisputeProven	FogDisputeStatus	= "PROVEN"
 )
 
 type FogProviderRegistry struct {
-	ServiceID           string
-	ProviderPoolID      string
-	CollateralDenom     string
-	MinCollateralAmount string
-	Providers           []FogProviderRecord
-	ReputationEvents    []FogReputationEvent
-	Disputes            []FogProviderDispute
-	Slashes             []FogProviderSlash
-	RegistryHash        string
+	ServiceID		string
+	ProviderPoolID		string
+	CollateralDenom		string
+	MinCollateralAmount	string
+	Providers		[]FogProviderRecord
+	ReputationEvents	[]FogReputationEvent
+	Disputes		[]FogProviderDispute
+	Slashes			[]FogProviderSlash
+	RegistryHash		string
 }
 
 type FogProviderRecord struct {
-	ProviderID             string
-	IdentityKey            string
-	Category               FogServiceCategory
-	Pricing                FogProviderPricing
-	ReputationScore        uint64
-	CollateralDenom        string
-	CollateralAmount       string
-	StakeAmount            string
-	AvailabilityCommitment FogAvailabilityCommitment
-	SupportedInterfaces    []string
-	Status                 FogProviderStatus
-	RegisteredHeight       uint64
-	UpdatedHeight          uint64
-	ExpiryHeight           uint64
-	ProviderHash           string
+	ProviderID		string
+	IdentityKey		string
+	Category		FogServiceCategory
+	Pricing			FogProviderPricing
+	ReputationScore		uint64
+	CollateralDenom		string
+	CollateralAmount	string
+	StakeAmount		string
+	AvailabilityCommitment	FogAvailabilityCommitment
+	SupportedInterfaces	[]string
+	Status			FogProviderStatus
+	RegisteredHeight	uint64
+	UpdatedHeight		uint64
+	ExpiryHeight		uint64
+	ProviderHash		string
 }
 
 type FogProviderPricing struct {
-	Denom     string
-	Amount    string
-	MaxAmount string
-	Unit      FogPricingUnit
-	ModelHash string
+	Denom		string
+	Amount		string
+	MaxAmount	string
+	Unit		FogPricingUnit
+	ModelHash	string
 }
 
 type FogAvailabilityCommitment struct {
-	CommitmentHash  string
-	EndpointHash    string
-	WindowStart     uint64
-	WindowEnd       uint64
-	UptimeTargetBps uint32
-	RenewalNonce    uint64
-	SignatureHash   string
+	CommitmentHash	string
+	EndpointHash	string
+	WindowStart	uint64
+	WindowEnd	uint64
+	UptimeTargetBps	uint32
+	RenewalNonce	uint64
+	SignatureHash	string
 }
 
 type FogReputationEvent struct {
-	EventID    string
-	ProviderID string
-	Height     uint64
-	Successes  uint64
-	Failures   uint64
-	ScoreDelta int64
-	Reason     string
-	EventHash  string
+	EventID		string
+	ProviderID	string
+	Height		uint64
+	Successes	uint64
+	Failures	uint64
+	ScoreDelta	int64
+	Reason		string
+	EventHash	string
 }
 
 type FogProviderSelectionPolicy struct {
-	Category          FogServiceCategory
-	RequiredInterface string
-	Strategy          FogSelectionStrategy
-	MinReputation     uint64
-	MaxPriceAmount    string
-	Limit             uint32
-	SelectionNonce    string
+	Category		FogServiceCategory
+	RequiredInterface	string
+	Strategy		FogSelectionStrategy
+	MinReputation		uint64
+	MaxPriceAmount		string
+	Limit			uint32
+	SelectionNonce		string
 }
 
 type FogProviderSelection struct {
-	Policy        FogProviderSelectionPolicy
-	ProviderIDs   []string
-	SelectionHash string
+	Policy		FogProviderSelectionPolicy
+	ProviderIDs	[]string
+	SelectionHash	string
 }
 
 type FogProviderDispute struct {
-	DisputeID       string
-	ProviderID      string
-	ServiceID       string
-	Challenger      string
-	FaultClass      MixedServiceFaultClass
-	EvidenceHash    string
-	OpenedHeight    uint64
-	ResolveByHeight uint64
-	Status          FogDisputeStatus
-	DisputeHash     string
+	DisputeID	string
+	ProviderID	string
+	ServiceID	string
+	Challenger	string
+	FaultClass	MixedServiceFaultClass
+	EvidenceHash	string
+	OpenedHeight	uint64
+	ResolveByHeight	uint64
+	Status		FogDisputeStatus
+	DisputeHash	string
 }
 
 type FogProviderSlash struct {
-	SlashID         string
-	DisputeID       string
-	ProviderID      string
-	ServiceID       string
-	FaultClass      MixedServiceFaultClass
-	PenaltyDenom    string
-	PenaltyAmount   string
-	Recipient       string
-	SlashedHeight   uint64
-	ReputationDelta int64
-	SlashHash       string
+	SlashID		string
+	DisputeID	string
+	ProviderID	string
+	ServiceID	string
+	FaultClass	MixedServiceFaultClass
+	PenaltyDenom	string
+	PenaltyAmount	string
+	Recipient	string
+	SlashedHeight	uint64
+	ReputationDelta	int64
+	SlashHash	string
 }
 
 func NewFogProviderRegistry(descriptor ServiceDescriptor) (FogProviderRegistry, error) {
@@ -153,14 +153,14 @@ func NewFogProviderRegistry(descriptor ServiceDescriptor) (FogProviderRegistry, 
 		return FogProviderRegistry{}, errors.New("aetracore fog registry requires fog market service descriptor")
 	}
 	registry := FogProviderRegistry{
-		ServiceID:           descriptor.ServiceID,
-		ProviderPoolID:      descriptor.Execution.ProviderPoolID,
-		CollateralDenom:     descriptor.Verification.ProviderCollateralDenom,
-		MinCollateralAmount: descriptor.Verification.ProviderCollateralAmount,
-		Providers:           []FogProviderRecord{},
-		ReputationEvents:    []FogReputationEvent{},
-		Disputes:            []FogProviderDispute{},
-		Slashes:             []FogProviderSlash{},
+		ServiceID:		descriptor.ServiceID,
+		ProviderPoolID:		descriptor.Execution.ProviderPoolID,
+		CollateralDenom:	descriptor.Verification.ProviderCollateralDenom,
+		MinCollateralAmount:	descriptor.Verification.ProviderCollateralAmount,
+		Providers:		[]FogProviderRecord{},
+		ReputationEvents:	[]FogReputationEvent{},
+		Disputes:		[]FogProviderDispute{},
+		Slashes:		[]FogProviderSlash{},
 	}
 	registry.RegistryHash = ComputeFogProviderRegistryHash(registry)
 	return registry, registry.Validate()
@@ -334,15 +334,15 @@ func SlashFogProvider(registry FogProviderRegistry, disputeID string, proofAccep
 	}
 	penalty := fogPenaltyAmount(registry.MinCollateralAmount, dispute.FaultClass)
 	slash := FogProviderSlash{
-		DisputeID:       dispute.DisputeID,
-		ProviderID:      provider.ProviderID,
-		ServiceID:       registry.ServiceID,
-		FaultClass:      dispute.FaultClass,
-		PenaltyDenom:    registry.CollateralDenom,
-		PenaltyAmount:   penalty,
-		Recipient:       dispute.Challenger,
-		SlashedHeight:   slashedHeight,
-		ReputationDelta: fogSlashReputationDelta(dispute.FaultClass),
+		DisputeID:		dispute.DisputeID,
+		ProviderID:		provider.ProviderID,
+		ServiceID:		registry.ServiceID,
+		FaultClass:		dispute.FaultClass,
+		PenaltyDenom:		registry.CollateralDenom,
+		PenaltyAmount:		penalty,
+		Recipient:		dispute.Challenger,
+		SlashedHeight:		slashedHeight,
+		ReputationDelta:	fogSlashReputationDelta(dispute.FaultClass),
 	}
 	slash.SlashID = ComputeFogProviderSlashID(slash)
 	slash.SlashHash = ComputeFogProviderSlashHash(slash)

@@ -9,53 +9,53 @@ import (
 )
 
 const (
-	DefaultOnChainSchemaEncoding = "json-schema-v1"
-	DefaultOnChainAuthModel      = "aetra-account"
-	DefaultOnChainPaymentModel   = "naet-on-chain"
+	DefaultOnChainSchemaEncoding	= "json-schema-v1"
+	DefaultOnChainAuthModel		= "aetra-account"
+	DefaultOnChainPaymentModel	= "naet-on-chain"
 )
 
 type OnChainServiceWrapper struct {
-	ServiceID        string
-	Owner            string
-	ZoneID           ZoneID
-	ModuleName       string
-	ContractAddress  string
-	InterfaceID      string
-	InterfaceName    string
-	EndpointKey      string
-	Version          uint64
-	AvailabilityHash string
-	StateRootType    RootType
-	ReceiptPolicy    ServiceReceiptPolicy
-	PaymentDenom     string
-	PaymentAmount    string
-	Methods          []OnChainServiceMethod
-	MetadataHash     string
-	CreatedHeight    uint64
-	UpdatedHeight    uint64
-	ExpiryHeight     uint64
+	ServiceID		string
+	Owner			string
+	ZoneID			ZoneID
+	ModuleName		string
+	ContractAddress		string
+	InterfaceID		string
+	InterfaceName		string
+	EndpointKey		string
+	Version			uint64
+	AvailabilityHash	string
+	StateRootType		RootType
+	ReceiptPolicy		ServiceReceiptPolicy
+	PaymentDenom		string
+	PaymentAmount		string
+	Methods			[]OnChainServiceMethod
+	MetadataHash		string
+	CreatedHeight		uint64
+	UpdatedHeight		uint64
+	ExpiryHeight		uint64
 }
 
 type OnChainServiceMethod struct {
-	MethodID             string
-	Name                 string
-	InputSchemaHash      string
-	OutputSchemaHash     string
-	GasModel             string
-	RequiredPaymentModel string
-	FailurePolicy        ServiceFailureBehavior
-	TimeoutHeightDelta   uint64
-	IdempotencyRequired  bool
-	CallbackSupported    bool
+	MethodID		string
+	Name			string
+	InputSchemaHash		string
+	OutputSchemaHash	string
+	GasModel		string
+	RequiredPaymentModel	string
+	FailurePolicy		ServiceFailureBehavior
+	TimeoutHeightDelta	uint64
+	IdempotencyRequired	bool
+	CallbackSupported	bool
 }
 
 type ServiceStateProofQuery struct {
-	ServiceID     string
-	Height        uint64
-	StateRootType RootType
-	KeyHash       string
-	ProofRoot     string
-	QueryHash     string
+	ServiceID	string
+	Height		uint64
+	StateRootType	RootType
+	KeyHash		string
+	ProofRoot	string
+	QueryHash	string
 }
 
 func BuildOnChainServiceDescriptor(wrapper OnChainServiceWrapper) (ServiceDescriptor, error) {
@@ -68,17 +68,17 @@ func BuildOnChainServiceDescriptor(wrapper OnChainServiceWrapper) (ServiceDescri
 		methods[i] = method.ServiceMethodDescriptor()
 	}
 	interfaceDescriptor := ServiceInterfaceDescriptor{
-		InterfaceID:    wrapper.InterfaceID,
-		InterfaceName:  wrapper.InterfaceName,
-		Version:        wrapper.Version,
-		SchemaEncoding: DefaultOnChainSchemaEncoding,
-		Methods:        methods,
-		Events:         []string{"service.receipt"},
-		Errors:         []string{"service.error"},
-		AuthModel:      DefaultOnChainAuthModel,
-		PaymentModel:   DefaultOnChainPaymentModel,
-		MetadataHash:   wrapper.MetadataHash,
-		CreatedHeight:  wrapper.CreatedHeight,
+		InterfaceID:	wrapper.InterfaceID,
+		InterfaceName:	wrapper.InterfaceName,
+		Version:	wrapper.Version,
+		SchemaEncoding:	DefaultOnChainSchemaEncoding,
+		Methods:	methods,
+		Events:		[]string{"service.receipt"},
+		Errors:		[]string{"service.error"},
+		AuthModel:	DefaultOnChainAuthModel,
+		PaymentModel:	DefaultOnChainPaymentModel,
+		MetadataHash:	wrapper.MetadataHash,
+		CreatedHeight:	wrapper.CreatedHeight,
 	}
 	interfaceDescriptor = CanonicalServiceInterfaceDescriptor(interfaceDescriptor)
 	interfaceDescriptor.InterfaceHash = ComputeServiceInterfaceHash(interfaceDescriptor)
@@ -90,48 +90,48 @@ func BuildOnChainServiceDescriptor(wrapper OnChainServiceWrapper) (ServiceDescri
 		target = wrapper.ContractAddress
 	}
 	descriptor := ServiceDescriptor{
-		ServiceID:        wrapper.ServiceID,
-		Owner:            wrapper.Owner,
-		ServiceType:      ServiceTypeOnChain,
-		ZoneID:           wrapper.ZoneID,
-		InterfaceID:      wrapper.InterfaceID,
-		EndpointKey:      wrapper.EndpointKey,
-		Version:          wrapper.Version,
-		AvailabilityHash: wrapper.AvailabilityHash,
-		Enabled:          true,
-		Status:           ServiceStatusActive,
-		ExpiryHeight:     wrapper.ExpiryHeight,
-		CreatedHeight:    wrapper.CreatedHeight,
-		UpdatedHeight:    wrapper.UpdatedHeight,
-		Interface:        interfaceDescriptor,
+		ServiceID:		wrapper.ServiceID,
+		Owner:			wrapper.Owner,
+		ServiceType:		ServiceTypeOnChain,
+		ZoneID:			wrapper.ZoneID,
+		InterfaceID:		wrapper.InterfaceID,
+		EndpointKey:		wrapper.EndpointKey,
+		Version:		wrapper.Version,
+		AvailabilityHash:	wrapper.AvailabilityHash,
+		Enabled:		true,
+		Status:			ServiceStatusActive,
+		ExpiryHeight:		wrapper.ExpiryHeight,
+		CreatedHeight:		wrapper.CreatedHeight,
+		UpdatedHeight:		wrapper.UpdatedHeight,
+		Interface:		interfaceDescriptor,
 		Execution: ServiceExecutionDescriptor{
-			Location:        location,
-			Target:          target,
-			ModuleRoute:     wrapper.ModuleName,
-			ContractAddress: wrapper.ContractAddress,
-			Mode:            ExecutionModeSync,
-			Deterministic:   true,
-			ReceiptPolicy:   wrapper.ReceiptPolicy,
-			FailureBehavior: aggregateOnChainFailurePolicy(wrapper.Methods),
+			Location:		location,
+			Target:			target,
+			ModuleRoute:		wrapper.ModuleName,
+			ContractAddress:	wrapper.ContractAddress,
+			Mode:			ExecutionModeSync,
+			Deterministic:		true,
+			ReceiptPolicy:		wrapper.ReceiptPolicy,
+			FailureBehavior:	aggregateOnChainFailurePolicy(wrapper.Methods),
 		},
 		Discovery: ServiceDiscoveryDescriptor{
-			ServiceName:  wrapper.ServiceID,
-			MetadataHash: wrapper.MetadataHash,
+			ServiceName:	wrapper.ServiceID,
+			MetadataHash:	wrapper.MetadataHash,
 		},
 		Payment: ServicePaymentDescriptor{
-			SettlementMode: ServicePaymentOnChain,
-			Denom:          wrapper.PaymentDenom,
-			Amount:         wrapper.PaymentAmount,
-			PricingUnit:    ServicePricingPerCall,
+			SettlementMode:	ServicePaymentOnChain,
+			Denom:		wrapper.PaymentDenom,
+			Amount:		wrapper.PaymentAmount,
+			PricingUnit:	ServicePricingPerCall,
 		},
 		Storage: ServiceStorageDescriptor{
-			Model:         ServiceStorageOnChain,
-			StateRootType: wrapper.StateRootType,
-			ProofRequired: wrapper.ReceiptPolicy == ServiceReceiptCommittedAndProof,
+			Model:		ServiceStorageOnChain,
+			StateRootType:	wrapper.StateRootType,
+			ProofRequired:	wrapper.ReceiptPolicy == ServiceReceiptCommittedAndProof,
 		},
 		Verification: ServiceVerificationDescriptor{
-			TrustModel: ServiceTrustConsensusExecuted,
-			Model:      ServiceVerificationConsensusReceipt,
+			TrustModel:	ServiceTrustConsensusExecuted,
+			Model:		ServiceVerificationConsensusReceipt,
 		},
 	}
 	descriptor = CanonicalServiceDescriptor(descriptor)
@@ -188,14 +188,14 @@ func NewOnChainServiceReceipt(ctx ServiceConsensusContext, state CoreState, call
 		errorCode = string(FailureReasonExecutionFailed)
 	}
 	return NewServiceCallReceipt(call, ServiceExecutionOutcome{
-		CallID:         call.CallID,
-		Status:         status,
-		ResponseHash:   result.ResultHash,
-		PaymentStatus:  paymentStatus,
-		GasUsed:        gasUsed,
-		ExecutedHeight: ctx.Height,
-		AnchoredHeight: ctx.Height,
-		ErrorCode:      errorCode,
+		CallID:		call.CallID,
+		Status:		status,
+		ResponseHash:	result.ResultHash,
+		PaymentStatus:	paymentStatus,
+		GasUsed:	gasUsed,
+		ExecutedHeight:	ctx.Height,
+		AnchoredHeight:	ctx.Height,
+		ErrorCode:	errorCode,
 	})
 }
 
@@ -208,11 +208,11 @@ func NewServiceStateProofQuery(descriptor ServiceDescriptor, height uint64, keyH
 		return ServiceStateProofQuery{}, errors.New("aetracore service state proof query requires on-chain service")
 	}
 	query := ServiceStateProofQuery{
-		ServiceID:     descriptor.ServiceID,
-		Height:        height,
-		StateRootType: descriptor.Storage.StateRootType,
-		KeyHash:       keyHash,
-		ProofRoot:     proofRoot,
+		ServiceID:	descriptor.ServiceID,
+		Height:		height,
+		StateRootType:	descriptor.Storage.StateRootType,
+		KeyHash:	keyHash,
+		ProofRoot:	proofRoot,
 	}
 	if err := query.Validate(); err != nil {
 		return ServiceStateProofQuery{}, err
@@ -339,18 +339,18 @@ func (method OnChainServiceMethod) Validate() error {
 
 func (method OnChainServiceMethod) ServiceMethodDescriptor() ServiceMethodDescriptor {
 	return ServiceMethodDescriptor{
-		MethodID:             method.MethodID,
-		Name:                 method.Name,
-		InputSchemaHash:      method.InputSchemaHash,
-		OutputSchemaHash:     method.OutputSchemaHash,
-		ExecutionType:        ServiceMethodSync,
-		RequiredPaymentModel: method.RequiredPaymentModel,
-		GasModel:             method.GasModel,
-		VerificationModel:    ServiceVerificationConsensusReceipt,
-		TimeoutHeightDelta:   method.TimeoutHeightDelta,
-		IdempotencyRequired:  method.IdempotencyRequired,
-		CallbackSupported:    method.CallbackSupported,
-		FailureBehavior:      method.FailurePolicy,
+		MethodID:		method.MethodID,
+		Name:			method.Name,
+		InputSchemaHash:	method.InputSchemaHash,
+		OutputSchemaHash:	method.OutputSchemaHash,
+		ExecutionType:		ServiceMethodSync,
+		RequiredPaymentModel:	method.RequiredPaymentModel,
+		GasModel:		method.GasModel,
+		VerificationModel:	ServiceVerificationConsensusReceipt,
+		TimeoutHeightDelta:	method.TimeoutHeightDelta,
+		IdempotencyRequired:	method.IdempotencyRequired,
+		CallbackSupported:	method.CallbackSupported,
+		FailureBehavior:	method.FailurePolicy,
 	}
 }
 

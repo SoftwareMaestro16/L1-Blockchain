@@ -9,92 +9,92 @@ import (
 )
 
 type Params struct {
-	Authority                   string          `json:"authority"`
-	PowerCapSchedule            []PowerCapPhase `json:"power_cap_schedule"`
-	CommissionFloorBps          uint32          `json:"commission_floor_bps"`
-	CommissionMaxBps            uint32          `json:"commission_max_bps"`
-	MaxCommissionChangeBps      uint32          `json:"max_commission_change_bps"`
-	WarningThresholdBps         uint32          `json:"warning_threshold_bps"`
-	OverflowRewardMultiplierBps uint32          `json:"overflow_reward_multiplier_bps"`
-	MaxRewardReductionBps       uint32          `json:"max_reward_reduction_bps"`
+	Authority			string		`json:"authority"`
+	PowerCapSchedule		[]PowerCapPhase	`json:"power_cap_schedule"`
+	CommissionFloorBps		uint32		`json:"commission_floor_bps"`
+	CommissionMaxBps		uint32		`json:"commission_max_bps"`
+	MaxCommissionChangeBps		uint32		`json:"max_commission_change_bps"`
+	WarningThresholdBps		uint32		`json:"warning_threshold_bps"`
+	OverflowRewardMultiplierBps	uint32		`json:"overflow_reward_multiplier_bps"`
+	MaxRewardReductionBps		uint32		`json:"max_reward_reduction_bps"`
 }
 
 type PowerCapPhase struct {
-	MinActiveValidators uint32 `json:"min_active_validators"`
-	MaxActiveValidators uint32 `json:"max_active_validators"`
-	PowerCapBps         uint32 `json:"power_cap_bps"`
+	MinActiveValidators	uint32	`json:"min_active_validators"`
+	MaxActiveValidators	uint32	`json:"max_active_validators"`
+	PowerCapBps		uint32	`json:"power_cap_bps"`
 }
 
 type ValidatorStake struct {
-	OperatorAddress       string `json:"operator_address"`
-	RawStake              uint64 `json:"raw_stake"`
-	CommissionBps         uint32 `json:"commission_bps"`
-	PreviousCommissionBps uint32 `json:"previous_commission_bps"`
+	OperatorAddress		string	`json:"operator_address"`
+	RawStake		uint64	`json:"raw_stake"`
+	CommissionBps		uint32	`json:"commission_bps"`
+	PreviousCommissionBps	uint32	`json:"previous_commission_bps"`
 }
 
 type ValidatorPolicy struct {
-	OperatorAddress     string `json:"operator_address"`
-	RawStake            uint64 `json:"raw_stake"`
-	EffectiveStake      uint64 `json:"effective_stake"`
-	OverflowStake       uint64 `json:"overflow_stake"`
-	RawPowerBps         uint32 `json:"raw_power_bps"`
-	EffectivePowerBps   uint32 `json:"effective_power_bps"`
-	PowerCapBps         uint32 `json:"power_cap_bps"`
-	RewardMultiplierBps uint32 `json:"reward_multiplier_bps"`
-	DelegationWarning   string `json:"delegation_warning"`
-	CommissionAllowed   bool   `json:"commission_allowed"`
-	CommissionViolation string `json:"commission_violation,omitempty"`
-	WarningAcknowledged bool   `json:"warning_acknowledged"`
+	OperatorAddress		string	`json:"operator_address"`
+	RawStake		uint64	`json:"raw_stake"`
+	EffectiveStake		uint64	`json:"effective_stake"`
+	OverflowStake		uint64	`json:"overflow_stake"`
+	RawPowerBps		uint32	`json:"raw_power_bps"`
+	EffectivePowerBps	uint32	`json:"effective_power_bps"`
+	PowerCapBps		uint32	`json:"power_cap_bps"`
+	RewardMultiplierBps	uint32	`json:"reward_multiplier_bps"`
+	DelegationWarning	string	`json:"delegation_warning"`
+	CommissionAllowed	bool	`json:"commission_allowed"`
+	CommissionViolation	string	`json:"commission_violation,omitempty"`
+	WarningAcknowledged	bool	`json:"warning_acknowledged"`
 }
 
 type NetworkPolicy struct {
-	Epoch             uint64            `json:"epoch"`
-	ActiveValidators  uint32            `json:"active_validators"`
-	TotalRawStake     uint64            `json:"total_raw_stake"`
-	PowerCapBps       uint32            `json:"power_cap_bps"`
-	Validators        []ValidatorPolicy `json:"validators"`
-	Top10PowerBps     uint32            `json:"top_10_power_bps"`
-	Top20PowerBps     uint32            `json:"top_20_power_bps"`
-	Top33PowerBps     uint32            `json:"top_33_power_bps"`
-	ConcentrationWarn bool              `json:"concentration_warn"`
+	Epoch			uint64			`json:"epoch"`
+	ActiveValidators	uint32			`json:"active_validators"`
+	TotalRawStake		uint64			`json:"total_raw_stake"`
+	PowerCapBps		uint32			`json:"power_cap_bps"`
+	Validators		[]ValidatorPolicy	`json:"validators"`
+	Top10PowerBps		uint32			`json:"top_10_power_bps"`
+	Top20PowerBps		uint32			`json:"top_20_power_bps"`
+	Top33PowerBps		uint32			`json:"top_33_power_bps"`
+	ConcentrationWarn	bool			`json:"concentration_warn"`
 }
 
 type ValidatorIdentityMetadata struct {
-	OperatorAddress string `json:"operator_address"`
-	Moniker         string `json:"moniker"`
-	Website         string `json:"website,omitempty"`
-	SecurityContact string `json:"security_contact,omitempty"`
-	Details         string `json:"details,omitempty"`
+	OperatorAddress	string	`json:"operator_address"`
+	Moniker		string	`json:"moniker"`
+	Website		string	`json:"website,omitempty"`
+	SecurityContact	string	`json:"security_contact,omitempty"`
+	Details		string	`json:"details,omitempty"`
 }
 
 type WarningAcknowledgement struct {
-	OperatorAddress string `json:"operator_address"`
-	AcknowledgedAt  int64  `json:"acknowledged_at"`
-	Warning         string `json:"warning"`
+	OperatorAddress	string	`json:"operator_address"`
+	AcknowledgedAt	int64	`json:"acknowledged_at"`
+	Warning		string	`json:"warning"`
 }
 
 type GenesisState struct {
-	Params                  Params                      `json:"params"`
-	Network                 NetworkPolicy               `json:"network"`
-	Identities              []ValidatorIdentityMetadata `json:"identities"`
-	WarningAcknowledgements []WarningAcknowledgement    `json:"warning_acknowledgements"`
+	Params			Params				`json:"params"`
+	Network			NetworkPolicy			`json:"network"`
+	Identities		[]ValidatorIdentityMetadata	`json:"identities"`
+	WarningAcknowledgements	[]WarningAcknowledgement	`json:"warning_acknowledgements"`
 }
 
 type MsgUpdateStakingPolicyParams struct {
-	Authority string `json:"authority"`
-	Params    Params `json:"params"`
+	Authority	string	`json:"authority"`
+	Params		Params	`json:"params"`
 }
 
 type MsgRegisterValidatorIdentity struct {
-	Authority string                    `json:"authority"`
-	Identity  ValidatorIdentityMetadata `json:"identity"`
+	Authority	string				`json:"authority"`
+	Identity	ValidatorIdentityMetadata	`json:"identity"`
 }
 
 type MsgAcknowledgeConcentrationWarning struct {
-	Authority       string `json:"authority"`
-	OperatorAddress string `json:"operator_address"`
-	Warning         string `json:"warning"`
-	Height          int64  `json:"height"`
+	Authority	string	`json:"authority"`
+	OperatorAddress	string	`json:"operator_address"`
+	Warning		string	`json:"warning"`
+	Height		int64	`json:"height"`
 }
 
 type QueryParamsRequest struct{}
@@ -102,66 +102,66 @@ type QueryParamsResponse struct{ Params Params }
 
 type QueryValidatorEffectivePowerRequest struct{ OperatorAddress string }
 type QueryValidatorEffectivePowerResponse struct {
-	OperatorAddress   string
-	EffectiveStake    uint64
-	EffectivePowerBps uint32
-	PowerCapBps       uint32
+	OperatorAddress		string
+	EffectiveStake		uint64
+	EffectivePowerBps	uint32
+	PowerCapBps		uint32
 }
 
 type QueryValidatorStakeRequest struct{ OperatorAddress string }
 type QueryValidatorStakeResponse struct {
-	OperatorAddress   string
-	RawStake          uint64
-	EffectiveStake    uint64
-	OverflowStake     uint64
-	RawPowerBps       uint32
-	EffectivePowerBps uint32
+	OperatorAddress		string
+	RawStake		uint64
+	EffectiveStake		uint64
+	OverflowStake		uint64
+	RawPowerBps		uint32
+	EffectivePowerBps	uint32
 }
 
 type QueryTopNConcentrationRequest struct{ N uint32 }
 type QueryTopNConcentrationResponse struct {
-	N         uint32
-	PowerBps  uint32
-	TargetBps uint32
-	Exceeded  bool
+	N		uint32
+	PowerBps	uint32
+	TargetBps	uint32
+	Exceeded	bool
 }
 
 type QueryValidatorRewardMultiplierRequest struct{ OperatorAddress string }
 type QueryValidatorRewardMultiplierResponse struct {
-	OperatorAddress     string
-	RewardMultiplierBps uint32
+	OperatorAddress		string
+	RewardMultiplierBps	uint32
 }
 
 type QueryDelegationWarningStatusRequest struct{ OperatorAddress string }
 type QueryDelegationWarningStatusResponse struct {
-	OperatorAddress     string
-	Warning             string
-	WarningAcknowledged bool
+	OperatorAddress		string
+	Warning			string
+	WarningAcknowledged	bool
 }
 
 func DefaultParams(authority string) Params {
 	return Params{
-		Authority: authority,
+		Authority:	authority,
 		PowerCapSchedule: []PowerCapPhase{
 			{MinActiveValidators: 1, MaxActiveValidators: PhaseOneValidatorSetMax, PowerCapBps: PhaseOnePowerCapBps},
 			{MinActiveValidators: PhaseOneValidatorSetMax + 1, MaxActiveValidators: PhaseTwoValidatorSetMax, PowerCapBps: PhaseTwoPowerCapBps},
 			{MinActiveValidators: PhaseTwoValidatorSetMax + 1, MaxActiveValidators: 0, PowerCapBps: MatureSetPowerCapBps},
 		},
-		CommissionFloorBps:          300,
-		CommissionMaxBps:            2_000,
-		MaxCommissionChangeBps:      100,
-		WarningThresholdBps:         PhaseTwoPowerCapBps,
-		OverflowRewardMultiplierBps: 0,
-		MaxRewardReductionBps:       3_000,
+		CommissionFloorBps:		300,
+		CommissionMaxBps:		2_000,
+		MaxCommissionChangeBps:		100,
+		WarningThresholdBps:		PhaseTwoPowerCapBps,
+		OverflowRewardMultiplierBps:	0,
+		MaxRewardReductionBps:		3_000,
 	}
 }
 
 func DefaultGenesisState(authority string) GenesisState {
 	return GenesisState{
-		Params:                  DefaultParams(authority),
-		Network:                 NetworkPolicy{Validators: []ValidatorPolicy{}},
-		Identities:              []ValidatorIdentityMetadata{},
-		WarningAcknowledgements: []WarningAcknowledgement{},
+		Params:				DefaultParams(authority),
+		Network:			NetworkPolicy{Validators: []ValidatorPolicy{}},
+		Identities:			[]ValidatorIdentityMetadata{},
+		WarningAcknowledgements:	[]WarningAcknowledgement{},
 	}
 }
 
@@ -361,11 +361,11 @@ func ComputeNetworkPolicy(params Params, epoch uint64, validators []ValidatorSta
 	capBps := EffectivePowerCapBps(params, uint32(len(canonical)))
 	acknowledged := acknowledgementSet(acknowledgements)
 	out := NetworkPolicy{
-		Epoch:            epoch,
-		ActiveValidators: uint32(len(canonical)),
-		TotalRawStake:    total,
-		PowerCapBps:      capBps,
-		Validators:       make([]ValidatorPolicy, 0, len(canonical)),
+		Epoch:			epoch,
+		ActiveValidators:	uint32(len(canonical)),
+		TotalRawStake:		total,
+		PowerCapBps:		capBps,
+		Validators:		make([]ValidatorPolicy, 0, len(canonical)),
 	}
 	rawShares := make([]uint32, 0, len(canonical))
 	for _, validator := range canonical {
@@ -387,17 +387,17 @@ func ComputeNetworkPolicy(params Params, epoch uint64, validators []ValidatorSta
 			warning = DelegationWarningNearCap
 		}
 		policy := ValidatorPolicy{
-			OperatorAddress:     validator.OperatorAddress,
-			RawStake:            validator.RawStake,
-			EffectiveStake:      effectiveStake,
-			OverflowStake:       overflowStake,
-			RawPowerBps:         rawBps,
-			EffectivePowerBps:   effectiveBps,
-			PowerCapBps:         capBps,
-			RewardMultiplierBps: rewardMultiplierBps(params, rawBps, capBps),
-			DelegationWarning:   warning,
-			CommissionAllowed:   true,
-			WarningAcknowledged: acknowledged[validator.OperatorAddress+":"+warning],
+			OperatorAddress:	validator.OperatorAddress,
+			RawStake:		validator.RawStake,
+			EffectiveStake:		effectiveStake,
+			OverflowStake:		overflowStake,
+			RawPowerBps:		rawBps,
+			EffectivePowerBps:	effectiveBps,
+			PowerCapBps:		capBps,
+			RewardMultiplierBps:	rewardMultiplierBps(params, rawBps, capBps),
+			DelegationWarning:	warning,
+			CommissionAllowed:	true,
+			WarningAcknowledged:	acknowledged[validator.OperatorAddress+":"+warning],
 		}
 		out.Validators = append(out.Validators, policy)
 		rawShares = append(rawShares, rawBps)

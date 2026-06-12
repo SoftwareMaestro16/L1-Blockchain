@@ -12,72 +12,72 @@ import (
 type PaymentChannelMessageType string
 
 const (
-	PaymentChannelMsgOpenChannel                  PaymentChannelMessageType = "MsgOpenChannel"
-	PaymentChannelMsgCooperativeClose             PaymentChannelMessageType = "MsgCooperativeClose"
-	PaymentChannelMsgUnilateralClose              PaymentChannelMessageType = "MsgUnilateralClose"
-	PaymentChannelMsgDisputeClose                 PaymentChannelMessageType = "MsgDisputeClose"
-	PaymentChannelMsgFinalizeClose                PaymentChannelMessageType = "MsgFinalizeClose"
-	PaymentChannelMsgSubmitCheckpoint             PaymentChannelMessageType = "MsgSubmitCheckpoint"
-	PaymentChannelMsgCancelExpiredChannel         PaymentChannelMessageType = "MsgCancelExpiredChannel"
-	PaymentChannelMsgRegisterChannelAdvertisement PaymentChannelMessageType = "MsgRegisterChannelAdvertisement"
+	PaymentChannelMsgOpenChannel			PaymentChannelMessageType	= "MsgOpenChannel"
+	PaymentChannelMsgCooperativeClose		PaymentChannelMessageType	= "MsgCooperativeClose"
+	PaymentChannelMsgUnilateralClose		PaymentChannelMessageType	= "MsgUnilateralClose"
+	PaymentChannelMsgDisputeClose			PaymentChannelMessageType	= "MsgDisputeClose"
+	PaymentChannelMsgFinalizeClose			PaymentChannelMessageType	= "MsgFinalizeClose"
+	PaymentChannelMsgSubmitCheckpoint		PaymentChannelMessageType	= "MsgSubmitCheckpoint"
+	PaymentChannelMsgCancelExpiredChannel		PaymentChannelMessageType	= "MsgCancelExpiredChannel"
+	PaymentChannelMsgRegisterChannelAdvertisement	PaymentChannelMessageType	= "MsgRegisterChannelAdvertisement"
 )
 
 type ChannelParticipant struct {
-	ChannelID string
-	Address   string
-	Signer    bool
-	Balance   string
-	Reserve   string
+	ChannelID	string
+	Address		string
+	Signer		bool
+	Balance		string
+	Reserve		string
 }
 
 type ChannelConfig struct {
-	ChannelID           string
-	ChannelType         ChannelType
-	CloseDelay          uint64
-	ChallengePeriod     uint64
-	FeePolicyID         string
-	RoutingAdvertised   bool
-	ConditionalPayments bool
+	ChannelID		string
+	ChannelType		ChannelType
+	CloseDelay		uint64
+	ChallengePeriod		uint64
+	FeePolicyID		string
+	RoutingAdvertised	bool
+	ConditionalPayments	bool
 }
 
 type ChannelFeeAccumulator struct {
-	BlockHeight    uint64
-	Bucket         string
-	Denom          string
-	FeeAmount      string
-	PenaltyAmount  string
-	OperationCount uint64
-	AccumulatorKey string
+	BlockHeight	uint64
+	Bucket		string
+	Denom		string
+	FeeAmount	string
+	PenaltyAmount	string
+	OperationCount	uint64
+	AccumulatorKey	string
 }
 
 type PaymentChannelModuleState struct {
-	Channels             []ChannelRecord
-	Participants         []ChannelParticipant
-	Configs              []ChannelConfig
-	PendingCloses        []PendingClose
-	Settlements          []SettlementRecord
-	SettlementTombstones []ClosedChannelTombstone
-	FeeAccumulators      []ChannelFeeAccumulator
+	Channels		[]ChannelRecord
+	Participants		[]ChannelParticipant
+	Configs			[]ChannelConfig
+	PendingCloses		[]PendingClose
+	Settlements		[]SettlementRecord
+	SettlementTombstones	[]ClosedChannelTombstone
+	FeeAccumulators		[]ChannelFeeAccumulator
 }
 
 type PaymentChannelAnteFee struct {
-	MsgType       PaymentChannelMessageType
-	FeeClass      PaymentFeeClass
-	ChannelID     string
-	Payer         string
-	Paid          string
-	Required      string
-	StorageBytes  uint64
-	MultiplierBps uint32
+	MsgType		PaymentChannelMessageType
+	FeeClass	PaymentFeeClass
+	ChannelID	string
+	Payer		string
+	Paid		string
+	Required	string
+	StorageBytes	uint64
+	MultiplierBps	uint32
 }
 
 type PaymentChannelMessageResult struct {
-	MsgType       PaymentChannelMessageType
-	ChannelID     string
-	Settlement    SettlementRecord
-	Checkpoint    ChannelUpdateResult
-	Advertisement LiquidityAdvertisement
-	AnteFee       PaymentChannelAnteFee
+	MsgType		PaymentChannelMessageType
+	ChannelID	string
+	Settlement	SettlementRecord
+	Checkpoint	ChannelUpdateResult
+	Advertisement	LiquidityAdvertisement
+	AnteFee		PaymentChannelAnteFee
 }
 
 type PaymentChannelModuleMessage interface {
@@ -87,48 +87,48 @@ type PaymentChannelModuleMessage interface {
 }
 
 type MsgOpenChannel struct {
-	Signer  string
-	Request ChannelOpenRequest
+	Signer	string
+	Request	ChannelOpenRequest
 }
 
 type MsgCooperativeClose struct {
-	Signer  string
-	Request ChannelCloseRequest
+	Signer	string
+	Request	ChannelCloseRequest
 }
 
 type MsgUnilateralClose struct {
-	Signer  string
-	Request ChannelCloseRequest
+	Signer	string
+	Request	ChannelCloseRequest
 }
 
 type MsgDisputeClose struct {
-	Signer  string
-	Request ChannelDisputeRequest
+	Signer	string
+	Request	ChannelDisputeRequest
 }
 
 type MsgFinalizeClose struct {
-	Signer  string
-	Request FinalSettlementRequest
+	Signer	string
+	Request	FinalSettlementRequest
 }
 
 type MsgSubmitCheckpoint struct {
-	Signer  string
-	Request ChannelUpdateRequest
+	Signer	string
+	Request	ChannelUpdateRequest
 }
 
 type MsgCancelExpiredChannel struct {
-	Signer        string
-	ChannelID     string
-	CurrentHeight uint64
-	SettlementFee string
+	Signer		string
+	ChannelID	string
+	CurrentHeight	uint64
+	SettlementFee	string
 }
 
 type MsgRegisterChannelAdvertisement struct {
-	Signer          string
-	Advertisement   LiquidityAdvertisement
-	RequiredDeposit string
-	CurrentHeight   uint64
-	FeePaid         string
+	Signer		string
+	Advertisement	LiquidityAdvertisement
+	RequiredDeposit	string
+	CurrentHeight	uint64
+	FeePaid		string
 }
 
 func SnapshotPaymentChannelModuleState(state PaymentsState, blockHeight uint64) (PaymentChannelModuleState, error) {
@@ -137,9 +137,9 @@ func SnapshotPaymentChannelModuleState(state PaymentsState, blockHeight uint64) 
 		return PaymentChannelModuleState{}, err
 	}
 	out := PaymentChannelModuleState{
-		Channels:             append([]ChannelRecord(nil), state.Channels...),
-		Settlements:          append([]SettlementRecord(nil), state.Settlements...),
-		SettlementTombstones: append([]ClosedChannelTombstone(nil), state.ClosedChannels...),
+		Channels:		append([]ChannelRecord(nil), state.Channels...),
+		Settlements:		append([]SettlementRecord(nil), state.Settlements...),
+		SettlementTombstones:	append([]ClosedChannelTombstone(nil), state.ClosedChannels...),
 	}
 	for _, channel := range state.Channels {
 		channel = channel.Normalize()
@@ -147,11 +147,11 @@ func SnapshotPaymentChannelModuleState(state PaymentsState, blockHeight uint64) 
 		for _, participant := range channel.Participants {
 			balance, reserve := channelParticipantAmounts(channel.LatestState, participant)
 			out.Participants = append(out.Participants, ChannelParticipant{
-				ChannelID: channel.ChannelID,
-				Address:   participant,
-				Signer:    containsString(channel.RequiredSigners, participant),
-				Balance:   balance,
-				Reserve:   reserve,
+				ChannelID:	channel.ChannelID,
+				Address:	participant,
+				Signer:		containsString(channel.RequiredSigners, participant),
+				Balance:	balance,
+				Reserve:	reserve,
 			}.Normalize())
 		}
 		if channel.Status == ChannelStatusPendingClose {
@@ -168,13 +168,13 @@ func SnapshotPaymentChannelModuleState(state PaymentsState, blockHeight uint64) 
 func ChannelConfigForChannel(channel ChannelRecord) ChannelConfig {
 	channel = channel.Normalize()
 	return ChannelConfig{
-		ChannelID:           channel.ChannelID,
-		ChannelType:         channel.ChannelType,
-		CloseDelay:          channel.CloseDelay,
-		ChallengePeriod:     channel.DisputePeriod,
-		FeePolicyID:         channel.LatestState.FeePolicyID,
-		RoutingAdvertised:   channel.RoutingAdvertised,
-		ConditionalPayments: channel.ConditionalPayments,
+		ChannelID:		channel.ChannelID,
+		ChannelType:		channel.ChannelType,
+		CloseDelay:		channel.CloseDelay,
+		ChallengePeriod:	channel.DisputePeriod,
+		FeePolicyID:		channel.LatestState.FeePolicyID,
+		RoutingAdvertised:	channel.RoutingAdvertised,
+		ConditionalPayments:	channel.ConditionalPayments,
 	}.Normalize()
 }
 
@@ -185,13 +185,13 @@ func ChannelFeeAccumulatorFromBlock(acc PaymentBlockAccumulator, bucket string) 
 		bucket = "settlement"
 	}
 	return ChannelFeeAccumulator{
-		BlockHeight:    acc.BlockHeight,
-		Bucket:         bucket,
-		Denom:          NativeDenom,
-		FeeAmount:      acc.FeeAmount,
-		PenaltyAmount:  acc.PenaltyAmount,
-		OperationCount: acc.OperationCount,
-		AccumulatorKey: StoreV2FeeAccumulatorKey(fmt.Sprintf("%020d", acc.BlockHeight), bucket),
+		BlockHeight:	acc.BlockHeight,
+		Bucket:		bucket,
+		Denom:		NativeDenom,
+		FeeAmount:	acc.FeeAmount,
+		PenaltyAmount:	acc.PenaltyAmount,
+		OperationCount:	acc.OperationCount,
+		AccumulatorKey:	StoreV2FeeAccumulatorKey(fmt.Sprintf("%020d", acc.BlockHeight), bucket),
 	}.Normalize()
 }
 
@@ -308,14 +308,14 @@ func ValidatePaymentChannelMessageFee(state PaymentsState, msg PaymentChannelMod
 	_ = objectID
 	_ = height
 	ante := PaymentChannelAnteFee{
-		MsgType:       msg.PaymentChannelType(),
-		FeeClass:      feeClass,
-		ChannelID:     channel.ChannelID,
-		Payer:         payer,
-		Paid:          paid,
-		Required:      required,
-		StorageBytes:  storageBytes,
-		MultiplierBps: multiplier,
+		MsgType:	msg.PaymentChannelType(),
+		FeeClass:	feeClass,
+		ChannelID:	channel.ChannelID,
+		Payer:		payer,
+		Paid:		paid,
+		Required:	required,
+		StorageBytes:	storageBytes,
+		MultiplierBps:	multiplier,
 	}.Normalize()
 	if err := ante.Validate(); err != nil {
 		return PaymentChannelAnteFee{}, err
@@ -355,14 +355,14 @@ func RegisterChannelAdvertisement(state PaymentsState, msg MsgRegisterChannelAdv
 		return PaymentsState{}, LiquidityAdvertisement{}, err
 	}
 	next, err := RegisterRoutingEdge(charged, ChannelEdge{
-		ChannelID:     ad.ChannelID,
-		From:          ad.Advertiser,
-		To:            ad.Counterparty,
-		Capacity:      ad.Capacity,
-		FeeDenom:      ad.FeeDenom,
-		FeeAmount:     ad.BaseFee,
-		ExpiresHeight: ad.ValidUntilHeight,
-		Active:        true,
+		ChannelID:	ad.ChannelID,
+		From:		ad.Advertiser,
+		To:		ad.Counterparty,
+		Capacity:	ad.Capacity,
+		FeeDenom:	ad.FeeDenom,
+		FeeAmount:	ad.BaseFee,
+		ExpiresHeight:	ad.ValidUntilHeight,
+		Active:		true,
 	})
 	if err != nil {
 		return PaymentsState{}, LiquidityAdvertisement{}, err
@@ -399,7 +399,7 @@ func PaymentChannelMessagesConflictProfile(messages []PaymentChannelModuleMessag
 func (m MsgOpenChannel) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgOpenChannel
 }
-func (m MsgOpenChannel) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgOpenChannel) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgOpenChannel) Normalize() MsgOpenChannel {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -419,7 +419,7 @@ func (m MsgOpenChannel) ValidateBasic() error {
 func (m MsgCooperativeClose) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgCooperativeClose
 }
-func (m MsgCooperativeClose) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgCooperativeClose) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgCooperativeClose) Normalize() MsgCooperativeClose {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -444,7 +444,7 @@ func (m MsgCooperativeClose) ValidateBasic() error {
 func (m MsgUnilateralClose) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgUnilateralClose
 }
-func (m MsgUnilateralClose) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgUnilateralClose) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgUnilateralClose) Normalize() MsgUnilateralClose {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -469,7 +469,7 @@ func (m MsgUnilateralClose) ValidateBasic() error {
 func (m MsgDisputeClose) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgDisputeClose
 }
-func (m MsgDisputeClose) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgDisputeClose) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgDisputeClose) Normalize() MsgDisputeClose {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -499,7 +499,7 @@ func (m MsgDisputeClose) ValidateBasic() error {
 func (m MsgFinalizeClose) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgFinalizeClose
 }
-func (m MsgFinalizeClose) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgFinalizeClose) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgFinalizeClose) Normalize() MsgFinalizeClose {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -522,7 +522,7 @@ func (m MsgFinalizeClose) ValidateBasic() error {
 func (m MsgSubmitCheckpoint) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgSubmitCheckpoint
 }
-func (m MsgSubmitCheckpoint) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgSubmitCheckpoint) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgSubmitCheckpoint) Normalize() MsgSubmitCheckpoint {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Request = m.Request.Normalize()
@@ -550,7 +550,7 @@ func (m MsgSubmitCheckpoint) ValidateBasic() error {
 func (m MsgCancelExpiredChannel) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgCancelExpiredChannel
 }
-func (m MsgCancelExpiredChannel) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgCancelExpiredChannel) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgCancelExpiredChannel) Normalize() MsgCancelExpiredChannel {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.ChannelID = normalizeHash(m.ChannelID)
@@ -577,7 +577,7 @@ func (m MsgCancelExpiredChannel) ValidateBasic() error {
 func (m MsgRegisterChannelAdvertisement) PaymentChannelType() PaymentChannelMessageType {
 	return PaymentChannelMsgRegisterChannelAdvertisement
 }
-func (m MsgRegisterChannelAdvertisement) Signers() []string { return []string{m.Normalize().Signer} }
+func (m MsgRegisterChannelAdvertisement) Signers() []string	{ return []string{m.Normalize().Signer} }
 func (m MsgRegisterChannelAdvertisement) Normalize() MsgRegisterChannelAdvertisement {
 	m.Signer = strings.TrimSpace(m.Signer)
 	m.Advertisement = m.Advertisement.Normalize()
@@ -939,11 +939,11 @@ func settlementOperationForMessage(msg PaymentChannelModuleMessage) (SettlementO
 		stateHash = HashParts("msg-operation", channelID, string(msg.PaymentChannelType()))
 	}
 	return SettlementOperation{
-		OperationID:   HashParts("payment-channel-msg", string(msg.PaymentChannelType()), channelID, stateHash),
-		OperationType: opType,
-		ChannelID:     channelID,
-		Nonce:         nonce,
-		StateHash:     stateHash,
+		OperationID:	HashParts("payment-channel-msg", string(msg.PaymentChannelType()), channelID, stateHash),
+		OperationType:	opType,
+		ChannelID:	channelID,
+		Nonce:		nonce,
+		StateHash:	stateHash,
 	}.Normalize(), nil
 }
 
@@ -1116,5 +1116,3 @@ func ApplyChannelFeeAccumulator(acc ChannelFeeAccumulator, settlement Settlement
 	}
 	return next, nil
 }
-
-

@@ -1,6 +1,6 @@
 package types
 
 const (
-	ModuleName = "epoch"
-	StoreKey   = ModuleName
+	ModuleName	= "epoch"
+	StoreKey	= ModuleName
 )

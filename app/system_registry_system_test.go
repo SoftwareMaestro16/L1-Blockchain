@@ -40,12 +40,12 @@ func TestSystemRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	genesis := GenesisStateWithSingleValidator(t, source)
 	registryGenesis := systemregistrykeeper.DefaultGenesis()
 	registryGenesis.State.Entities = append(registryGenesis.State.Entities, systemregistrytypes.SystemEntity{
-		ModuleName:           "state-metering",
-		ModuleAccountAddress: "4:0000000000000000000000005555555555555555555555555555555555555555",
-		AuthorityAddress:     registryGenesis.Params.Authority,
-		Status:               systemregistrytypes.StatusActive,
-		Version:              1,
-		Dependencies:         []string{systemregistrytypes.ModuleConstitution},
+		ModuleName:		"state-metering",
+		ModuleAccountAddress:	"4:0000000000000000000000005555555555555555555555555555555555555555",
+		AuthorityAddress:	registryGenesis.Params.Authority,
+		Status:			systemregistrytypes.StatusActive,
+		Version:		1,
+		Dependencies:		[]string{systemregistrytypes.ModuleConstitution},
 	})
 	registryGenesis.State = registryGenesis.State.Normalize(registryGenesis.Params)
 	require.NoError(t, registryGenesis.Validate())
@@ -56,15 +56,15 @@ func TestSystemRegistrySystemStateSurvivesFinalizeBlockRestart(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = source.InitChain(&abci.RequestInitChain{
-		Validators:      []abci.ValidatorUpdate{},
-		ConsensusParams: sims.DefaultConsensusParams,
-		AppStateBytes:   stateBytes,
+		Validators:		[]abci.ValidatorUpdate{},
+		ConsensusParams:	sims.DefaultConsensusParams,
+		AppStateBytes:		stateBytes,
 	})
 	require.NoError(t, err)
 
 	_, err = source.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: 1,
-		Hash:   source.LastCommitID().Hash,
+		Height:	1,
+		Hash:	source.LastCommitID().Hash,
 	})
 	require.NoError(t, err)
 	_, err = source.Commit()

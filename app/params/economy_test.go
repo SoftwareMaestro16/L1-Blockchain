@@ -9,11 +9,11 @@ import (
 
 func TestValidatorIncomeModelIsDeterministicAndBounded(t *testing.T) {
 	income, err := ComputeValidatorIncome(ValidatorIncomeInput{
-		TotalMintRewards: sdkmath.NewInt(1_000_000),
-		TotalFeeRewards:  sdkmath.NewInt(100_000),
-		ValidatorPower:   sdkmath.NewInt(20),
-		TotalPower:       sdkmath.NewInt(100),
-		CommissionBps:    1_000,
+		TotalMintRewards:	sdkmath.NewInt(1_000_000),
+		TotalFeeRewards:	sdkmath.NewInt(100_000),
+		ValidatorPower:		sdkmath.NewInt(20),
+		TotalPower:		sdkmath.NewInt(100),
+		CommissionBps:		1_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, int64(2_000), income.RewardWeightBps)
@@ -26,11 +26,11 @@ func TestValidatorIncomeModelIsDeterministicAndBounded(t *testing.T) {
 
 func TestValidatorIncomeRejectsUnsafeCommissionAndPower(t *testing.T) {
 	_, err := ComputeValidatorIncome(ValidatorIncomeInput{
-		TotalMintRewards: sdkmath.NewInt(1),
-		TotalFeeRewards:  sdkmath.NewInt(1),
-		ValidatorPower:   sdkmath.NewInt(101),
-		TotalPower:       sdkmath.NewInt(100),
-		CommissionBps:    1_000,
+		TotalMintRewards:	sdkmath.NewInt(1),
+		TotalFeeRewards:	sdkmath.NewInt(1),
+		ValidatorPower:		sdkmath.NewInt(101),
+		TotalPower:		sdkmath.NewInt(100),
+		CommissionBps:		1_000,
 	})
 	require.ErrorContains(t, err, "validator power must be <= total power")
 
@@ -42,17 +42,17 @@ func TestValidatorIncomeRejectsUnsafeCommissionAndPower(t *testing.T) {
 
 func TestBalanceControllerRaisesAndLowersInflationWithStaking(t *testing.T) {
 	lowStake, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       4_000,
-		BlockLoadBps:        DefaultTargetLoadBps,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		4_000,
+		BlockLoadBps:		DefaultTargetLoadBps,
 	})
 	require.NoError(t, err)
 	require.Greater(t, lowStake.InflationBps, DefaultTargetInflationBps)
 
 	highStake, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       9_000,
-		BlockLoadBps:        DefaultTargetLoadBps,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		9_000,
+		BlockLoadBps:		DefaultTargetLoadBps,
 	})
 	require.NoError(t, err)
 	require.Less(t, highStake.InflationBps, DefaultTargetInflationBps)
@@ -60,18 +60,18 @@ func TestBalanceControllerRaisesAndLowersInflationWithStaking(t *testing.T) {
 
 func TestBalanceControllerCouplesInflationToNetworkActivity(t *testing.T) {
 	atTarget, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        DefaultTargetLoadBps,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		DefaultTargetLoadBps,
 	})
 	require.NoError(t, err)
 	require.Equal(t, DefaultTargetInflationBps, atTarget.InflationBps)
 	require.Zero(t, atTarget.ActivityInflationDeltaBps)
 
 	active, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        BasisPoints,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		BasisPoints,
 	})
 	require.NoError(t, err)
 	require.Equal(t, -DefaultActivityCouplingBps, active.ActivityInflationDeltaBps)
@@ -82,21 +82,21 @@ func TestBalanceControllerCouplesInflationToNetworkActivity(t *testing.T) {
 
 func TestBalanceControllerClampsInflationAndBurn(t *testing.T) {
 	minOut, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: MinInflationBps,
-		StakeRatioBps:       BasisPoints,
-		BlockLoadBps:        0,
+		CurrentInflationBps:	MinInflationBps,
+		StakeRatioBps:		BasisPoints,
+		BlockLoadBps:		0,
 	})
 	require.NoError(t, err)
 	require.Equal(t, MinInflationBps, minOut.InflationBps)
 
 	maxOut, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: MaxInflationBps,
-		StakeRatioBps:       0,
-		BlockLoadBps:        BasisPoints,
-		AnnualMint:          sdkmath.NewInt(100),
-		AnnualBurn:          sdkmath.NewInt(200),
-		AsyncQueueDepth:     10,
-		FailedTxRateBps:     1_500,
+		CurrentInflationBps:	MaxInflationBps,
+		StakeRatioBps:		0,
+		BlockLoadBps:		BasisPoints,
+		AnnualMint:		sdkmath.NewInt(100),
+		AnnualBurn:		sdkmath.NewInt(200),
+		AsyncQueueDepth:	10,
+		FailedTxRateBps:	1_500,
 	})
 	require.NoError(t, err)
 	require.Equal(t, MaxInflationBps, maxOut.InflationBps)
@@ -114,11 +114,11 @@ func TestBalanceControllerDeflationGuardIsParameterized(t *testing.T) {
 	params.DeflationGuardStepBps = 1_000
 
 	out, err := BalanceControllerWithParams(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        DefaultTargetLoadBps,
-		AnnualMint:          sdkmath.NewInt(100),
-		AnnualBurn:          sdkmath.NewInt(111),
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		DefaultTargetLoadBps,
+		AnnualMint:		sdkmath.NewInt(100),
+		AnnualBurn:		sdkmath.NewInt(111),
 	}, params)
 	require.NoError(t, err)
 	require.True(t, out.DeflationGuardActive)
@@ -127,16 +127,16 @@ func TestBalanceControllerDeflationGuardIsParameterized(t *testing.T) {
 
 func TestBalanceControllerIncludesProtocolActivityInDeflationGuard(t *testing.T) {
 	out, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        DefaultTargetLoadBps,
-		AnnualMint:          sdkmath.NewInt(100),
-		AnnualBurn:          sdkmath.NewInt(100),
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		DefaultTargetLoadBps,
+		AnnualMint:		sdkmath.NewInt(100),
+		AnnualBurn:		sdkmath.NewInt(100),
 		Activity: ProtocolEconomicActivity{
-			TxFeeNaet:             sdkmath.NewInt(10),
-			AVMStorageFeeNaet:     sdkmath.NewInt(10),
-			AVMForwardingFeeNaet:  sdkmath.NewInt(3),
-			AVMDeploymentCostNaet: sdkmath.NewInt(3),
+			TxFeeNaet:		sdkmath.NewInt(10),
+			AVMStorageFeeNaet:	sdkmath.NewInt(10),
+			AVMForwardingFeeNaet:	sdkmath.NewInt(3),
+			AVMDeploymentCostNaet:	sdkmath.NewInt(3),
 		},
 	})
 	require.NoError(t, err)
@@ -147,13 +147,13 @@ func TestBalanceControllerIncludesProtocolActivityInDeflationGuard(t *testing.T)
 func TestProtocolEconomicFlowPreservesCharges(t *testing.T) {
 	flow, err := ComputeProtocolEconomicFlow(ProtocolEconomicFlowInput{
 		Activity: ProtocolEconomicActivity{
-			TxFeeNaet:             sdkmath.NewInt(100),
-			AVMStorageFeeNaet:     sdkmath.NewInt(7),
-			AVMForwardingFeeNaet:  sdkmath.NewInt(3),
-			AVMDeploymentCostNaet: sdkmath.NewInt(1_000),
+			TxFeeNaet:		sdkmath.NewInt(100),
+			AVMStorageFeeNaet:	sdkmath.NewInt(7),
+			AVMForwardingFeeNaet:	sdkmath.NewInt(3),
+			AVMDeploymentCostNaet:	sdkmath.NewInt(1_000),
 		},
-		BurnRatioBps:     2_500,
-		TreasuryRatioBps: 1_000,
+		BurnRatioBps:		2_500,
+		TreasuryRatioBps:	1_000,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(1_110), flow.TotalChargesNaet)
@@ -165,43 +165,43 @@ func TestProtocolEconomicFlowPreservesCharges(t *testing.T) {
 
 func TestEvaluateEconomicInvariantsAcceptsBoundedAETEconomy(t *testing.T) {
 	control, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        DefaultTargetLoadBps,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		DefaultTargetLoadBps,
 	})
 	require.NoError(t, err)
 	flow, err := ComputeProtocolEconomicFlow(ProtocolEconomicFlowInput{
-		Activity:         ProtocolEconomicActivity{TxFeeNaet: sdkmath.NewInt(100)},
-		BurnRatioBps:     control.BurnRatioBps,
-		TreasuryRatioBps: TreasuryFeeRatioBps,
+		Activity:		ProtocolEconomicActivity{TxFeeNaet: sdkmath.NewInt(100)},
+		BurnRatioBps:		control.BurnRatioBps,
+		TreasuryRatioBps:	TreasuryFeeRatioBps,
 	})
 	require.NoError(t, err)
 
 	report, err := EvaluateEconomicInvariants(EconomicInvariantInput{
-		StakingDenom:                  BaseDenom,
-		FeeDenom:                      BaseDenom,
-		RewardDenom:                   BaseDenom,
-		SlashingDenom:                 BaseDenom,
-		ExecutionChargeDenom:          BaseDenom,
-		CirculatingSupply:             sdkmath.NewInt(1_000_000),
-		AnnualMint:                    sdkmath.NewInt(30_000),
-		AnnualBurn:                    sdkmath.NewInt(10_000),
-		ControllerOutput:              control,
-		FeeFlow:                       flow,
-		MaxBlockFeeNaet:               sdkmath.NewInt(1_000),
-		BlockFeeNaet:                  sdkmath.NewInt(100),
-		ValidatorRewardsDeterministic: true,
-		FeeComputationDeterministic:   true,
-		SlashingDeterministic:         true,
-		SlashingAuditable:             true,
-		SlashingRewardSafe:            true,
-		ControllerParamsExposed:       true,
-		ControllerStateExposed:        true,
-		ControllerEventsExposed:       true,
-		StorageFeePerByteNaet:         sdkmath.NewInt(2),
-		LongLivedStorageBytes:         10,
-		StorageRetentionPeriods:       2,
-		TransientExecutionChargeNaet:  sdkmath.NewInt(10),
+		StakingDenom:			BaseDenom,
+		FeeDenom:			BaseDenom,
+		RewardDenom:			BaseDenom,
+		SlashingDenom:			BaseDenom,
+		ExecutionChargeDenom:		BaseDenom,
+		CirculatingSupply:		sdkmath.NewInt(1_000_000),
+		AnnualMint:			sdkmath.NewInt(30_000),
+		AnnualBurn:			sdkmath.NewInt(10_000),
+		ControllerOutput:		control,
+		FeeFlow:			flow,
+		MaxBlockFeeNaet:		sdkmath.NewInt(1_000),
+		BlockFeeNaet:			sdkmath.NewInt(100),
+		ValidatorRewardsDeterministic:	true,
+		FeeComputationDeterministic:	true,
+		SlashingDeterministic:		true,
+		SlashingAuditable:		true,
+		SlashingRewardSafe:		true,
+		ControllerParamsExposed:	true,
+		ControllerStateExposed:		true,
+		ControllerEventsExposed:	true,
+		StorageFeePerByteNaet:		sdkmath.NewInt(2),
+		LongLivedStorageBytes:		10,
+		StorageRetentionPeriods:	2,
+		TransientExecutionChargeNaet:	sdkmath.NewInt(10),
 	})
 	require.NoError(t, err)
 	require.True(t, report.Passed)
@@ -210,36 +210,36 @@ func TestEvaluateEconomicInvariantsAcceptsBoundedAETEconomy(t *testing.T) {
 
 func TestEvaluateEconomicInvariantsReportsSpecViolations(t *testing.T) {
 	control, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       DefaultTargetStakeBps,
-		BlockLoadBps:        DefaultTargetLoadBps,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		DefaultTargetStakeBps,
+		BlockLoadBps:		DefaultTargetLoadBps,
 	})
 	require.NoError(t, err)
 
 	report, err := EvaluateEconomicInvariants(EconomicInvariantInput{
-		StakingDenom:         "uatom",
-		FeeDenom:             "uusdc",
-		RewardDenom:          "ureward",
-		SlashingDenom:        "uslash",
-		ExecutionChargeDenom: "uexec",
-		CirculatingSupply:    sdkmath.NewInt(1_000),
-		AnnualMint:           sdkmath.NewInt(200),
-		AnnualBurn:           sdkmath.NewInt(500),
-		MaxNetIssuanceBps:    100,
-		MaxNetBurnBps:        1_000,
-		ControllerOutput:     control,
+		StakingDenom:		"uatom",
+		FeeDenom:		"uusdc",
+		RewardDenom:		"ureward",
+		SlashingDenom:		"uslash",
+		ExecutionChargeDenom:	"uexec",
+		CirculatingSupply:	sdkmath.NewInt(1_000),
+		AnnualMint:		sdkmath.NewInt(200),
+		AnnualBurn:		sdkmath.NewInt(500),
+		MaxNetIssuanceBps:	100,
+		MaxNetBurnBps:		1_000,
+		ControllerOutput:	control,
 		FeeFlow: ProtocolEconomicFlowOutput{
-			TotalChargesNaet:     sdkmath.NewInt(10),
-			BurnNaet:             sdkmath.NewInt(3),
-			TreasuryNaet:         sdkmath.NewInt(1),
-			ValidatorRewardsNaet: sdkmath.NewInt(5),
+			TotalChargesNaet:	sdkmath.NewInt(10),
+			BurnNaet:		sdkmath.NewInt(3),
+			TreasuryNaet:		sdkmath.NewInt(1),
+			ValidatorRewardsNaet:	sdkmath.NewInt(5),
 		},
-		MaxBlockFeeNaet:              sdkmath.NewInt(10),
-		BlockFeeNaet:                 sdkmath.NewInt(11),
-		StorageFeePerByteNaet:        sdkmath.NewInt(1),
-		LongLivedStorageBytes:        1,
-		StorageRetentionPeriods:      1,
-		TransientExecutionChargeNaet: sdkmath.NewInt(1),
+		MaxBlockFeeNaet:		sdkmath.NewInt(10),
+		BlockFeeNaet:			sdkmath.NewInt(11),
+		StorageFeePerByteNaet:		sdkmath.NewInt(1),
+		LongLivedStorageBytes:		1,
+		StorageRetentionPeriods:	1,
+		TransientExecutionChargeNaet:	sdkmath.NewInt(1),
 	})
 	require.NoError(t, err)
 	require.False(t, report.Passed)
@@ -264,34 +264,34 @@ func TestEvaluateEconomicInvariantsRejectsInvalidControllerBounds(t *testing.T) 
 	params := DefaultBalanceControllerParams()
 	params.MaxBurnRatioBps = BasisPoints
 	control := BalanceControllerOutput{
-		InflationBps:         DefaultTargetInflationBps,
-		BurnRatioBps:         NormalBurnRatioBps,
-		ValidatorFeeRatioBps: BasisPoints - NormalBurnRatioBps - TreasuryFeeRatioBps,
+		InflationBps:		DefaultTargetInflationBps,
+		BurnRatioBps:		NormalBurnRatioBps,
+		ValidatorFeeRatioBps:	BasisPoints - NormalBurnRatioBps - TreasuryFeeRatioBps,
 	}
 	_, err := EvaluateEconomicInvariants(EconomicInvariantInput{
-		StakingDenom:         BaseDenom,
-		FeeDenom:             BaseDenom,
-		RewardDenom:          BaseDenom,
-		SlashingDenom:        BaseDenom,
-		ExecutionChargeDenom: BaseDenom,
-		ControllerParams:     params,
-		ControllerOutput:     control,
+		StakingDenom:		BaseDenom,
+		FeeDenom:		BaseDenom,
+		RewardDenom:		BaseDenom,
+		SlashingDenom:		BaseDenom,
+		ExecutionChargeDenom:	BaseDenom,
+		ControllerParams:	params,
+		ControllerOutput:	control,
 	})
 	require.ErrorContains(t, err, "max burn and treasury ratios exceed")
 }
 
 func TestEvaluateEconomicWeaknessControlsReportsProductionReadiness(t *testing.T) {
 	ready := EvaluateEconomicWeaknessControls(EconomicWeaknessControlInput{
-		BurnControllerWired:               true,
-		InflationUsesNetworkActivity:      true,
-		DeflationGuardEnforced:            true,
-		SlashingFlowIntegrated:            true,
-		EpochValidatorSelectionProduction: true,
-		AVMFeesInGlobalFeeMarket:          true,
-		StateRentOrCleanupIncentive:       true,
-		ValidatorReputationInDelegation:   true,
-		StakeConcentrationDampening:       true,
-		EconomicCircuitBreakerEnabled:     true,
+		BurnControllerWired:			true,
+		InflationUsesNetworkActivity:		true,
+		DeflationGuardEnforced:			true,
+		SlashingFlowIntegrated:			true,
+		EpochValidatorSelectionProduction:	true,
+		AVMFeesInGlobalFeeMarket:		true,
+		StateRentOrCleanupIncentive:		true,
+		ValidatorReputationInDelegation:	true,
+		StakeConcentrationDampening:		true,
+		EconomicCircuitBreakerEnabled:		true,
 	})
 	require.True(t, ready.ProductionReady)
 	require.Empty(t, ready.MissingControls)
@@ -314,18 +314,18 @@ func TestEvaluateEconomicWeaknessControlsReportsProductionReadiness(t *testing.T
 
 func TestEvaluateInflationRisksFlagsSectionRisks(t *testing.T) {
 	report, err := EvaluateInflationRisks(InflationRiskInput{
-		CirculatingSupply:              sdkmath.NewInt(1_000_000),
-		AnnualMint:                     sdkmath.NewInt(80_000),
-		AnnualBurn:                     sdkmath.NewInt(10_000),
-		ValidatorRewardPoolNaet:        sdkmath.NewInt(90),
-		ValidatorOperatingCostNaet:     sdkmath.NewInt(100),
-		CurrentInflationBps:            DefaultTargetInflationBps,
-		StakeRatioBps:                  DefaultTargetStakeBps,
-		TopValidatorStakeBps:           MaxTopValidatorConcentrationBps + 1,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps - 1,
-		ActivitySamplesBps:             []int64{500, 2_000},
-		MaxNetIssuanceBps:              500,
-		ActivityNoiseToleranceBps:      1_000,
+		CirculatingSupply:		sdkmath.NewInt(1_000_000),
+		AnnualMint:			sdkmath.NewInt(80_000),
+		AnnualBurn:			sdkmath.NewInt(10_000),
+		ValidatorRewardPoolNaet:	sdkmath.NewInt(90),
+		ValidatorOperatingCostNaet:	sdkmath.NewInt(100),
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		StakeRatioBps:			DefaultTargetStakeBps,
+		TopValidatorStakeBps:		MaxTopValidatorConcentrationBps + 1,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps - 1,
+		ActivitySamplesBps:		[]int64{500, 2_000},
+		MaxNetIssuanceBps:		500,
+		ActivityNoiseToleranceBps:	1_000,
 	})
 	require.NoError(t, err)
 	require.False(t, report.Stable)
@@ -344,19 +344,19 @@ func TestEvaluateInflationRisksFlagsSectionRisks(t *testing.T) {
 
 func TestEvaluateInflationRisksAcceptsBoundedIntegratedModel(t *testing.T) {
 	report, err := EvaluateInflationRisks(InflationRiskInput{
-		CirculatingSupply:              sdkmath.NewInt(1_000_000),
-		AnnualMint:                     sdkmath.NewInt(30_000),
-		AnnualBurn:                     sdkmath.NewInt(10_000),
-		ValidatorRewardPoolNaet:        sdkmath.NewInt(100),
-		ValidatorOperatingCostNaet:     sdkmath.NewInt(100),
-		CurrentInflationBps:            DefaultTargetInflationBps,
-		StakeRatioBps:                  DefaultTargetStakeBps,
-		TopValidatorStakeBps:           MaxTopValidatorConcentrationBps,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
-		ActivitySamplesBps:             []int64{DefaultTargetLoadBps - 100, DefaultTargetLoadBps + 100},
-		BurnIntegratedWithIssuance:     true,
-		NetIssuanceTargetConfigured:    true,
-		MaxNetIssuanceBps:              MaxInflationBps,
+		CirculatingSupply:		sdkmath.NewInt(1_000_000),
+		AnnualMint:			sdkmath.NewInt(30_000),
+		AnnualBurn:			sdkmath.NewInt(10_000),
+		ValidatorRewardPoolNaet:	sdkmath.NewInt(100),
+		ValidatorOperatingCostNaet:	sdkmath.NewInt(100),
+		CurrentInflationBps:		DefaultTargetInflationBps,
+		StakeRatioBps:			DefaultTargetStakeBps,
+		TopValidatorStakeBps:		MaxTopValidatorConcentrationBps,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps,
+		ActivitySamplesBps:		[]int64{DefaultTargetLoadBps - 100, DefaultTargetLoadBps + 100},
+		BurnIntegratedWithIssuance:	true,
+		NetIssuanceTargetConfigured:	true,
+		MaxNetIssuanceBps:		MaxInflationBps,
 	})
 	require.NoError(t, err)
 	require.True(t, report.Stable)
@@ -366,11 +366,11 @@ func TestEvaluateInflationRisksAcceptsBoundedIntegratedModel(t *testing.T) {
 
 func TestEconomicCircuitBreakerFlagsAbnormalActivity(t *testing.T) {
 	out, err := EvaluateEconomicCircuitBreaker(EconomicCircuitBreakerInput{
-		BlockLoadBps:       HighCongestionLoadBps,
-		FeeSpikeBps:        DefaultCircuitBreakerFeeSpikeBps + 1,
-		ControllerDriftBps: DefaultCircuitBreakerControllerDriftBps + 1,
-		FailedTxRateBps:    DefaultCircuitBreakerFailedTxRateBps + 1,
-		BurnToMintBps:      DeflationGuardBurnToMintBps + 1,
+		BlockLoadBps:		HighCongestionLoadBps,
+		FeeSpikeBps:		DefaultCircuitBreakerFeeSpikeBps + 1,
+		ControllerDriftBps:	DefaultCircuitBreakerControllerDriftBps + 1,
+		FailedTxRateBps:	DefaultCircuitBreakerFailedTxRateBps + 1,
+		BurnToMintBps:		DeflationGuardBurnToMintBps + 1,
 	}, EconomicCircuitBreakerParams{})
 	require.NoError(t, err)
 	require.True(t, out.Active)
@@ -386,10 +386,10 @@ func TestEconomicCircuitBreakerFlagsAbnormalActivity(t *testing.T) {
 
 func TestSlashingEconomyFlowRoutesPenaltyDeterministically(t *testing.T) {
 	flow, err := ComputeSlashingEconomyFlow(SlashingEconomyFlowInput{
-		PenaltyNaet:       sdkmath.NewInt(1_000),
-		BurnRatioBps:      2_500,
-		TreasuryRatioBps:  1_000,
-		ReporterRewardBps: 500,
+		PenaltyNaet:		sdkmath.NewInt(1_000),
+		BurnRatioBps:		2_500,
+		TreasuryRatioBps:	1_000,
+		ReporterRewardBps:	500,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(250), flow.BurnNaet)
@@ -401,10 +401,10 @@ func TestSlashingEconomyFlowRoutesPenaltyDeterministically(t *testing.T) {
 
 func TestStateRentChargesLongLivedStateAndFundsCleanup(t *testing.T) {
 	rent, err := ComputeStateRent(StateRentInput{
-		StorageBytes:     100,
-		RetentionPeriods: 3,
-		FeePerByteNaet:   sdkmath.NewInt(2),
-		CleanupEligible:  true,
+		StorageBytes:		100,
+		RetentionPeriods:	3,
+		FeePerByteNaet:		sdkmath.NewInt(2),
+		CleanupEligible:	true,
 	})
 	require.NoError(t, err)
 	require.Equal(t, sdkmath.NewInt(600), rent.RentNaet)
@@ -414,16 +414,16 @@ func TestStateRentChargesLongLivedStateAndFundsCleanup(t *testing.T) {
 
 func TestEvaluateValidatorIncentivesPricesConcentrationAndReliability(t *testing.T) {
 	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
-		ValidatorStakeBps:           4_000,
-		CommissionBps:               500,
-		UptimeBps:                   9_700,
-		MissedBlockRateBps:          100,
-		RepeatedFaultCount:          2,
-		ReporterRewardBps:           500,
-		ReporterRewardsWired:        true,
-		SelectionEconomyLinked:      true,
-		PerformanceRiskSignals:      true,
-		StakeConcentrationDampening: true,
+		ValidatorStakeBps:		4_000,
+		CommissionBps:			500,
+		UptimeBps:			9_700,
+		MissedBlockRateBps:		100,
+		RepeatedFaultCount:		2,
+		ReporterRewardBps:		500,
+		ReporterRewardsWired:		true,
+		SelectionEconomyLinked:		true,
+		PerformanceRiskSignals:		true,
+		StakeConcentrationDampening:	true,
 	})
 	require.NoError(t, err)
 	require.False(t, report.Healthy)
@@ -438,16 +438,16 @@ func TestEvaluateValidatorIncentivesPricesConcentrationAndReliability(t *testing
 
 func TestEvaluateValidatorIncentivesSupportsNewValidatorBootstrap(t *testing.T) {
 	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
-		ValidatorStakeBps:           50,
-		CommissionBps:               500,
-		UptimeBps:                   BasisPoints,
-		ReporterRewardBps:           500,
-		ReporterRewardsWired:        true,
-		SelectionEconomyLinked:      true,
-		PerformanceRiskSignals:      true,
-		StakeConcentrationDampening: true,
-		BootstrapSupportEnabled:     true,
-		NewValidator:                true,
+		ValidatorStakeBps:		50,
+		CommissionBps:			500,
+		UptimeBps:			BasisPoints,
+		ReporterRewardBps:		500,
+		ReporterRewardsWired:		true,
+		SelectionEconomyLinked:		true,
+		PerformanceRiskSignals:		true,
+		StakeConcentrationDampening:	true,
+		BootstrapSupportEnabled:	true,
+		NewValidator:			true,
 	})
 	require.NoError(t, err)
 	require.True(t, report.Healthy)
@@ -458,10 +458,10 @@ func TestEvaluateValidatorIncentivesSupportsNewValidatorBootstrap(t *testing.T) 
 
 func TestEvaluateValidatorIncentivesReportsMissingEconomicWiring(t *testing.T) {
 	report, err := EvaluateValidatorIncentives(ValidatorIncentiveInput{
-		ValidatorStakeBps: 4_000,
-		CommissionBps:     MinCommissionBps,
-		UptimeBps:         BasisPoints,
-		NewValidator:      true,
+		ValidatorStakeBps:	4_000,
+		CommissionBps:		MinCommissionBps,
+		UptimeBps:		BasisPoints,
+		NewValidator:		true,
 	})
 	require.NoError(t, err)
 	require.False(t, report.Healthy)
@@ -477,12 +477,12 @@ func TestEvaluateValidatorIncentivesReportsMissingEconomicWiring(t *testing.T) {
 
 func TestEvaluateStakingCentralizationAcceptsDiverseDelegation(t *testing.T) {
 	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
-		ValidatorStakeBps:              []int64{1_600, 1_400, 1_200, 1_000, 900, 800},
-		CommissionBps:                  []int64{500, 700},
-		SelfDelegationRequirementBps:   500,
-		RedelegationLagBlocks:          100,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
-		GovernanceVotingPowerBps:       2_000,
+		ValidatorStakeBps:		[]int64{1_600, 1_400, 1_200, 1_000, 900, 800},
+		CommissionBps:			[]int64{500, 700},
+		SelfDelegationRequirementBps:	500,
+		RedelegationLagBlocks:		100,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps,
+		GovernanceVotingPowerBps:	2_000,
 	})
 	require.NoError(t, err)
 	require.True(t, report.Healthy)
@@ -494,12 +494,12 @@ func TestEvaluateStakingCentralizationAcceptsDiverseDelegation(t *testing.T) {
 
 func TestEvaluateStakingCentralizationReportsDelegationAndGovernanceRisks(t *testing.T) {
 	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
-		ValidatorStakeBps:              []int64{4_000, 2_000, 1_000, 900, 800},
-		CommissionBps:                  []int64{MinCommissionBps, 400},
-		SelfDelegationRequirementBps:   DefaultMaxSelfDelegationBps + 1,
-		RedelegationLagBlocks:          DefaultMaxRedelegationLagBlocks + 1,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps - 1,
-		GovernanceVotingPowerBps:       DefaultGovernanceCaptureThresholdBps + 1,
+		ValidatorStakeBps:		[]int64{4_000, 2_000, 1_000, 900, 800},
+		CommissionBps:			[]int64{MinCommissionBps, 400},
+		SelfDelegationRequirementBps:	DefaultMaxSelfDelegationBps + 1,
+		RedelegationLagBlocks:		DefaultMaxRedelegationLagBlocks + 1,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps - 1,
+		GovernanceVotingPowerBps:	DefaultGovernanceCaptureThresholdBps + 1,
 	})
 	require.NoError(t, err)
 	require.False(t, report.Healthy)
@@ -519,12 +519,12 @@ func TestEvaluateStakingCentralizationReportsDelegationAndGovernanceRisks(t *tes
 
 func TestEvaluateStakingCentralizationReportsWeakSelfDelegation(t *testing.T) {
 	report, err := EvaluateStakingCentralization(StakingCentralizationInput{
-		TopValidatorStakeBps:           1_000,
-		TopValidatorsStakeBps:          3_000,
-		CommissionBps:                  []int64{500},
-		SelfDelegationRequirementBps:   DefaultMinSelfDelegationBps - 1,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
-		GovernanceVotingPowerBps:       1_000,
+		TopValidatorStakeBps:		1_000,
+		TopValidatorsStakeBps:		3_000,
+		CommissionBps:			[]int64{500},
+		SelfDelegationRequirementBps:	DefaultMinSelfDelegationBps - 1,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps,
+		GovernanceVotingPowerBps:	1_000,
 	})
 	require.NoError(t, err)
 	require.False(t, report.Healthy)
@@ -533,20 +533,20 @@ func TestEvaluateStakingCentralizationReportsWeakSelfDelegation(t *testing.T) {
 
 func TestEvaluateOptimalEconomicStateAcceptsHealthyControlLoop(t *testing.T) {
 	state, err := EvaluateOptimalEconomicState(OptimalEconomicStateInput{
-		StakeRatioBps:                  DefaultTargetStakeBps,
-		InflationBps:                   DefaultTargetInflationBps,
-		ValidatorRewardCoverageBps:     MinValidatorRewardCoverageBps,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps,
-		ActiveValidatorCount:           128,
-		MinActiveValidatorCount:        64,
-		TopValidatorStakeBps:           MaxTopValidatorConcentrationBps,
-		BlockLoadBps:                   DefaultTargetLoadBps,
-		FeeResponseBps:                 MinFeeResponseBps,
-		SpamCostMultiplierBps:          MinSpamCostMultiplierBps,
-		StorageCostCoverageBps:         MinStorageCostCoverageBps,
-		BurnToMintBps:                  DeflationGuardBurnToMintBps,
-		SlashingPenaltyCoverageBps:     MinSlashingPenaltyCoverageBps,
-		TreasuryFundingCoverageBps:     MinTreasuryFundingCoverageBps,
+		StakeRatioBps:			DefaultTargetStakeBps,
+		InflationBps:			DefaultTargetInflationBps,
+		ValidatorRewardCoverageBps:	MinValidatorRewardCoverageBps,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps,
+		ActiveValidatorCount:		128,
+		MinActiveValidatorCount:	64,
+		TopValidatorStakeBps:		MaxTopValidatorConcentrationBps,
+		BlockLoadBps:			DefaultTargetLoadBps,
+		FeeResponseBps:			MinFeeResponseBps,
+		SpamCostMultiplierBps:		MinSpamCostMultiplierBps,
+		StorageCostCoverageBps:		MinStorageCostCoverageBps,
+		BurnToMintBps:			DeflationGuardBurnToMintBps,
+		SlashingPenaltyCoverageBps:	MinSlashingPenaltyCoverageBps,
+		TreasuryFundingCoverageBps:	MinTreasuryFundingCoverageBps,
 	})
 	require.NoError(t, err)
 	require.True(t, state.Optimal)
@@ -555,20 +555,20 @@ func TestEvaluateOptimalEconomicStateAcceptsHealthyControlLoop(t *testing.T) {
 
 func TestEvaluateOptimalEconomicStateReportsUnhealthyConditions(t *testing.T) {
 	state, err := EvaluateOptimalEconomicState(OptimalEconomicStateInput{
-		StakeRatioBps:                  DefaultTargetStakeBps - DefaultStakeTargetToleranceBps - 1,
-		InflationBps:                   DefaultTargetInflationBps,
-		ValidatorRewardCoverageBps:     MinValidatorRewardCoverageBps - 1,
-		DelegatorRiskSignalCoverageBps: MinDelegatorRiskSignalCoverageBps - 1,
-		ActiveValidatorCount:           10,
-		MinActiveValidatorCount:        64,
-		TopValidatorStakeBps:           MaxTopValidatorConcentrationBps + 1,
-		BlockLoadBps:                   HighCongestionLoadBps,
-		FeeResponseBps:                 MinFeeResponseBps - 1,
-		SpamCostMultiplierBps:          MinSpamCostMultiplierBps - 1,
-		StorageCostCoverageBps:         MinStorageCostCoverageBps - 1,
-		BurnToMintBps:                  DeflationGuardBurnToMintBps + 1,
-		SlashingPenaltyCoverageBps:     MinSlashingPenaltyCoverageBps - 1,
-		TreasuryFundingCoverageBps:     MinTreasuryFundingCoverageBps - 1,
+		StakeRatioBps:			DefaultTargetStakeBps - DefaultStakeTargetToleranceBps - 1,
+		InflationBps:			DefaultTargetInflationBps,
+		ValidatorRewardCoverageBps:	MinValidatorRewardCoverageBps - 1,
+		DelegatorRiskSignalCoverageBps:	MinDelegatorRiskSignalCoverageBps - 1,
+		ActiveValidatorCount:		10,
+		MinActiveValidatorCount:	64,
+		TopValidatorStakeBps:		MaxTopValidatorConcentrationBps + 1,
+		BlockLoadBps:			HighCongestionLoadBps,
+		FeeResponseBps:			MinFeeResponseBps - 1,
+		SpamCostMultiplierBps:		MinSpamCostMultiplierBps - 1,
+		StorageCostCoverageBps:		MinStorageCostCoverageBps - 1,
+		BurnToMintBps:			DeflationGuardBurnToMintBps + 1,
+		SlashingPenaltyCoverageBps:	MinSlashingPenaltyCoverageBps - 1,
+		TreasuryFundingCoverageBps:	MinTreasuryFundingCoverageBps - 1,
 	})
 	require.NoError(t, err)
 	require.False(t, state.Optimal)
@@ -589,48 +589,48 @@ func TestEvaluateOptimalEconomicStateReportsUnhealthyConditions(t *testing.T) {
 
 func TestEvaluateOptimalEconomicStateRejectsInvalidBounds(t *testing.T) {
 	_, err := EvaluateOptimalEconomicState(OptimalEconomicStateInput{
-		StakeRatioBps:              DefaultTargetStakeBps,
-		StakeTargetToleranceBps:    -1,
-		InflationBps:               DefaultTargetInflationBps,
-		ValidatorRewardCoverageBps: MinValidatorRewardCoverageBps,
-		ActiveValidatorCount:       1,
-		TopValidatorStakeBps:       0,
-		FeeResponseBps:             MinFeeResponseBps,
-		SpamCostMultiplierBps:      MinSpamCostMultiplierBps,
-		StorageCostCoverageBps:     MinStorageCostCoverageBps,
-		SlashingPenaltyCoverageBps: MinSlashingPenaltyCoverageBps,
-		TreasuryFundingCoverageBps: MinTreasuryFundingCoverageBps,
+		StakeRatioBps:			DefaultTargetStakeBps,
+		StakeTargetToleranceBps:	-1,
+		InflationBps:			DefaultTargetInflationBps,
+		ValidatorRewardCoverageBps:	MinValidatorRewardCoverageBps,
+		ActiveValidatorCount:		1,
+		TopValidatorStakeBps:		0,
+		FeeResponseBps:			MinFeeResponseBps,
+		SpamCostMultiplierBps:		MinSpamCostMultiplierBps,
+		StorageCostCoverageBps:		MinStorageCostCoverageBps,
+		SlashingPenaltyCoverageBps:	MinSlashingPenaltyCoverageBps,
+		TreasuryFundingCoverageBps:	MinTreasuryFundingCoverageBps,
 	})
 	require.ErrorContains(t, err, "stake_target_tolerance_bps")
 }
 
 func TestBalanceControllerRejectsInvalidInputs(t *testing.T) {
 	_, err := BalanceController(BalanceControllerInput{
-		CurrentInflationBps: MaxInflationBps + 1,
-		StakeRatioBps:       0,
-		BlockLoadBps:        0,
+		CurrentInflationBps:	MaxInflationBps + 1,
+		StakeRatioBps:		0,
+		BlockLoadBps:		0,
 	})
 	require.ErrorContains(t, err, "current_inflation_bps")
 
 	_, err = BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       -1,
-		BlockLoadBps:        0,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		-1,
+		BlockLoadBps:		0,
 	})
 	require.ErrorContains(t, err, "stake_ratio_bps")
 
 	_, err = BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       0,
-		BlockLoadBps:        0,
-		AnnualMint:          sdkmath.NewInt(-1),
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		0,
+		BlockLoadBps:		0,
+		AnnualMint:		sdkmath.NewInt(-1),
 	})
 	require.ErrorContains(t, err, "annual mint and burn")
 
 	_, err = BalanceController(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       0,
-		BlockLoadBps:        0,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		0,
+		BlockLoadBps:		0,
 		Activity: ProtocolEconomicActivity{
 			AVMStorageFeeNaet: sdkmath.NewInt(-1),
 		},
@@ -640,9 +640,9 @@ func TestBalanceControllerRejectsInvalidInputs(t *testing.T) {
 	params := DefaultBalanceControllerParams()
 	params.DeflationGuardBurnToMintBps = BasisPoints - 1
 	_, err = BalanceControllerWithParams(BalanceControllerInput{
-		CurrentInflationBps: DefaultTargetInflationBps,
-		StakeRatioBps:       0,
-		BlockLoadBps:        0,
+		CurrentInflationBps:	DefaultTargetInflationBps,
+		StakeRatioBps:		0,
+		BlockLoadBps:		0,
 	}, params)
 	require.ErrorContains(t, err, "deflation_guard_burn_to_mint_bps")
 }
