@@ -100,8 +100,7 @@ func EncodeSignedTxWithChainID(
 	acc := app.AccountKeeper.GetAccount(ctx, addr)
 	require.NotNil(t, acc)
 	tx, err := sims.GenSignedMockTx(
-		//nolint:gosec // G404: deterministic PRNG is intentional for reproducible test data
-	rand.New(rand.NewSource(1)),
+		rand.New(rand.NewSource(1)), // #nosec G404 -- deterministic PRNG for reproducible test data
 		app.TxConfig(),
 		msgs,
 		fee,
